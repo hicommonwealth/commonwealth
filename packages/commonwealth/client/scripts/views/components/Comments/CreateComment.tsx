@@ -70,7 +70,8 @@ export const CreateComment = ({
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
 
   useEffect(() => {
-    setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
+    activeTopic?.id &&
+      setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
   }, [activeTopic]);
 
   useEffect(() => {
@@ -87,7 +88,8 @@ export const CreateComment = ({
   }, [tokenPostingThreshold]);
 
   useEffect(() => {
-    setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
+    activeTopic?.id &&
+      setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
   }, [activeTopic]);
 
   useEffect(() => {

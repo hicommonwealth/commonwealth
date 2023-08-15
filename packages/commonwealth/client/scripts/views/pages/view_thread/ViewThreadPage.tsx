@@ -5,7 +5,9 @@ import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import $ from 'jquery';
@@ -18,6 +20,8 @@ import app from 'state';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
@@ -32,7 +36,6 @@ import {
 } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
-import { Select } from '../../components/Select';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
 import {
@@ -47,21 +50,20 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { Select } from '../../components/Select';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { useProposalPageData } from '../view_snapshot_proposal/index';
+import { SnapshotInformationCard } from '../view_snapshot_proposal/snapshot_information_card';
+import { SnapshotPollCardContainer } from '../view_snapshot_proposal/snapshot_poll_card_container';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
+import { SnapshotCreationCard } from './snapshot_creation_card';
 import { TemplateActionCard } from './template_action_card';
 import { ViewTemplateFormCard } from './view_template_form_card';
-import ViewTemplateForm from '../view_template/view_template_form';
-import { SnapshotCreationCard } from './snapshot_creation_card';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -104,6 +106,23 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
   const [hideTemplate, setHideTemplate] = useState(false);
+  const [proposalId, setProposalId] = useState(null);
+  const [snapshotId, setSnapshotId] = useState(null);
+
+  const {
+    proposal,
+    proposalAuthor,
+    votes,
+    symbol,
+    threads,
+    activeUserAddress,
+    power,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    loadVotes,
+  } = useProposalPageData(proposalId, snapshotId);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -202,10 +221,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (!thread) {
       return;
     }
-
-    console.log('thread', thread);
-    console.log('linkedTemplates', linkedTemplates);
-    console.log('linkedTemplates[0]', linkedTemplates[0]);
 
     // load proposal
     if (!prefetch[threadId]['threadReactionsStarted']) {
@@ -481,6 +496,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  if (!snapshotId) {
+    setSnapshotId(linkedSnapshots[0].identifier.split('/')[0]);
+    setProposalId(linkedSnapshots[0].identifier.split('/')[1]);
+  }
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
   const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
@@ -834,6 +853,41 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           />
                         )}
                       </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(proposal
+              ? [
+                  {
+                    label: 'Info',
+                    item: (
+                      <SnapshotInformationCard
+                        proposal={proposal}
+                        threads={threads}
+                        header={'Snapshot Info'}
+                      />
+                    ),
+                  },
+                  {
+                    label: 'Poll',
+                    item: (
+                      <SnapshotPollCardContainer
+                        activeUserAddress={activeUserAddress}
+                        fetchedPower={!!power}
+                        identifier={identifier}
+                        proposal={proposal}
+                        scores={[]} // unused?
+                        space={space}
+                        symbol={symbol}
+                        totals={totals}
+                        totalScore={totalScore}
+                        validatedAgainstStrategies={validatedAgainstStrategies}
+                        votes={votes}
+                        loadVotes={async () =>
+                          loadVotes(snapshotId, identifier)
+                        }
+                      />
                     ),
                   },
                 ]

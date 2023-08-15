@@ -6,6 +6,7 @@ import { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
 import axios from 'axios';
+import $ from 'jquery';
 
 import moment from 'moment';
 import app from 'state';
@@ -394,8 +395,6 @@ function getProfileMetadata({ provider, userInfo }): {
     return { username: userInfo.name, avatarUrl: userInfo.profile };
   } else if (provider === 'google') {
     return { username: userInfo.name, avatarUrl: userInfo.picture };
-  } else if (provider === 'apple') {
-    return {};
   }
   return {};
 }
@@ -410,39 +409,31 @@ export async function handleSocialLoginCallback(bearer?: string) {
     console.log('Magic redirect result:', result);
   }
 
-  try {
-    const response = await axios.request({
-      method: 'post',
-      url: `${app.serverUrl()}/auth/magic`,
-      headers: {
-        Authorization: `Bearer ${bearer}`,
-      },
+  const response = await $.post({
+    url: `${app.serverUrl()}/auth/magic`,
+    headers: {
+      Authorization: `Bearer ${bearer}`,
+    },
+    xhrFields: {
       withCredentials: true,
-      data: {
-        chain: app.activeChainId(),
-        jwt: app.user.jwt,
-        username: profileMetadata?.username,
-        avatarUrl: profileMetadata?.avatarUrl,
-      },
-    });
+    },
+    data: {
+      chain: app.activeChainId(),
+      jwt: app.user.jwt,
+      username: profileMetadata?.username,
+      avatarUrl: profileMetadata?.avatarUrl,
+    },
+  });
 
-    console.log(response, 'response in finish social login');
-    console.log(response.headers, 'headers in finish social login');
-
-    if (response.data.status === 'Success') {
-      await initAppState(false);
-
-      if (app.chain) {
-        const c = app.user.selectedChain
-          ? app.user.selectedChain
-          : app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses({ chain: c });
-      }
-    } else {
-      throw new Error(`Social auth unsuccessful: ${response.status}`);
+  if (response.status === 'Success') {
+    await initAppState(false);
+    if (app.chain) {
+      const c = app.user.selectedChain
+        ? app.user.selectedChain
+        : app.config.chains.getById(app.activeChainId());
+      await updateActiveAddresses({ chain: c });
     }
-  } catch (error) {
-    console.error('Error handling social login:', error);
-    // Handle errors here
+  } else {
+    throw new Error(`Social auth unsuccessful: ${response.status}`);
   }
 }

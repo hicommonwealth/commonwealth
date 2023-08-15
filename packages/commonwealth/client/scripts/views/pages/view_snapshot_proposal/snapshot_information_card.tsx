@@ -55,11 +55,13 @@ const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
 type SnapshotInformationCardProps = {
   proposal: SnapshotProposal;
   threads: Array<{ id: string; title: string }> | null;
+  header?: string;
 };
 
 export const SnapshotInformationCard = ({
   proposal,
   threads,
+  header,
 }: SnapshotInformationCardProps) => {
   const votingSystem = capitalize(
     proposal.type.split('-').join(' ').concat(' voting')
@@ -67,7 +69,7 @@ export const SnapshotInformationCard = ({
 
   return (
     <CWContentPageCard
-      header="Information"
+      header={header || 'Information'}
       content={
         <div className="SnapshotInformationCard">
           <div className="info-rows-container">

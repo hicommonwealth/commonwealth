@@ -6,6 +6,7 @@ import type {
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
 import moment from 'moment';
+import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
@@ -113,48 +114,53 @@ export const SnapshotPollCardContainer = (
   }, [choice]);
 
   return (
-    <>
-      <SnapshotPollCard
-        pollEnded={!isActive}
-        hasVoted={hasVoted}
-        votedFor={hasVoted ? userVote : ''}
-        disableVoteButton={!fetchedPower || voteErrorText !== null}
-        proposalTitle={proposal.title}
-        timeRemaining={timeRemaining}
-        tokenSymbol={space.symbol}
-        totalVoteCount={totals.sumOfResultsBalance}
-        voteInformation={voteInformation}
-        onSnapshotVoteCast={async (_choice) => {
-          setChoice(_choice);
-        }}
-        onVoteCast={async () => {
-          setIsModalOpen(false);
-        }}
-        incrementalVoteCast={totalScore}
-        tooltipErrorMessage={voteErrorText}
-        isPreview={false}
-      />
-      <Modal
-        content={
-          <ConfirmSnapshotVoteModal
-            space={space}
-            proposal={proposal}
-            id={identifier}
-            selectedChoice={proposal?.choices.indexOf(choice).toString()}
-            totalScore={totalScore}
-            scores={scores}
-            snapshot={proposal.snapshot}
-            successCallback={async () => {
-              await loadVotes();
-              setHasVoted(true);
-              setUserVote(choice);
+    <CWContentPageCard
+      header={'Snapshot Vote'}
+      content={
+        <>
+          <SnapshotPollCard
+            pollEnded={!isActive}
+            hasVoted={hasVoted}
+            votedFor={hasVoted ? userVote : ''}
+            disableVoteButton={!fetchedPower || voteErrorText !== null}
+            proposalTitle={proposal.title}
+            timeRemaining={timeRemaining}
+            tokenSymbol={space.symbol}
+            totalVoteCount={totals.sumOfResultsBalance}
+            voteInformation={voteInformation}
+            onSnapshotVoteCast={async (_choice) => {
+              setChoice(_choice);
             }}
-            onModalClose={() => setIsModalOpen(false)}
+            onVoteCast={async () => {
+              setIsModalOpen(false);
+            }}
+            incrementalVoteCast={totalScore}
+            tooltipErrorMessage={voteErrorText}
+            isPreview={false}
           />
-        }
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
-    </>
+          <Modal
+            content={
+              <ConfirmSnapshotVoteModal
+                space={space}
+                proposal={proposal}
+                id={identifier}
+                selectedChoice={proposal?.choices.indexOf(choice).toString()}
+                totalScore={totalScore}
+                scores={scores}
+                snapshot={proposal.snapshot}
+                successCallback={async () => {
+                  await loadVotes();
+                  setHasVoted(true);
+                  setUserVote(choice);
+                }}
+                onModalClose={() => setIsModalOpen(false)}
+              />
+            }
+            onClose={() => setIsModalOpen(false)}
+            open={isModalOpen}
+          />
+        </>
+      }
+    ></CWContentPageCard>
   );
 };

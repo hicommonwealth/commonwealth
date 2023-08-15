@@ -24,16 +24,7 @@ import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
 
-type ViewProposalPageProps = {
-  identifier: string;
-  scope: string;
-  snapshotId: string;
-};
-
-export const ViewProposalPage = ({
-  identifier,
-  snapshotId,
-}: ViewProposalPageProps) => {
+export function useProposalPageData(identifier, snapshotId) {
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
@@ -64,10 +55,13 @@ export const ViewProposalPage = ({
       return null;
     }
     return new AddressInfo(null, proposal.author, activeChainId, null);
-  }, [proposal, activeChainId]);
+  }, [activeChainId, proposal]);
 
   const loadVotes = useCallback(
     async (snapId: string, proposalId: string) => {
+      if (!snapId) {
+        return;
+      }
       await app.snapshot.init(snapId);
       if (!app.snapshot.initialized) {
         return;
@@ -105,12 +99,53 @@ export const ViewProposalPage = ({
         console.error(`Failed to fetch threads: ${e}`);
       }
     },
-    [activeUserAddress]
+    [activeUserAddress, snapshotId]
   );
 
   useNecessaryEffect(() => {
     loadVotes(snapshotId, identifier).catch(console.error);
-  }, [identifier, loadVotes, snapshotId]);
+  }, [snapshotId, identifier]);
+
+  return {
+    proposal,
+    proposalAuthor,
+    votes,
+    symbol,
+    threads,
+    activeUserAddress,
+    power,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    loadVotes,
+  };
+}
+
+type ViewProposalPageProps = {
+  identifier: string;
+  scope: string;
+  snapshotId: string;
+};
+
+export const ViewProposalPage = ({
+  identifier,
+  snapshotId,
+}: ViewProposalPageProps) => {
+  const {
+    proposal,
+    proposalAuthor,
+    votes,
+    symbol,
+    threads,
+    activeUserAddress,
+    power,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    loadVotes,
+  } = useProposalPageData(identifier, snapshotId);
 
   if (!proposal) {
     return <PageLoading />;
