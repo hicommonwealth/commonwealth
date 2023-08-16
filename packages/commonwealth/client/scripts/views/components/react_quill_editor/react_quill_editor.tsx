@@ -140,7 +140,8 @@ const ReactQuillEditor = ({
           buttons: [
             {
               label: 'Yes',
-              buttonType: 'mini-red',
+              buttonType: 'destructive',
+              buttonHeight: 'sm',
               onClick: () => {
                 editor.removeFormat(0, editor.getLength());
                 setIsMarkdownEnabled(newMarkdownEnabled);
@@ -152,7 +153,8 @@ const ReactQuillEditor = ({
             },
             {
               label: 'No',
-              buttonType: 'mini-white',
+              buttonType: 'secondary',
+              buttonHeight: 'sm',
             },
           ],
         });

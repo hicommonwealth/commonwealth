@@ -77,7 +77,8 @@ export const ContractTemplateCard = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             await app.contracts.deleteCommunityContractTemplate({
               contract_id: contractId,
@@ -89,7 +90,8 @@ export const ContractTemplateCard = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });

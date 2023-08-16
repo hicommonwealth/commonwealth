@@ -104,7 +104,8 @@ export const CastVoteSection = ({
               onMouseEnter={handleInteraction}
               onMouseLeave={handleInteraction}
               label="Vote"
-              buttonType="mini-black"
+              buttonType="primary"
+              buttonHeight="sm"
               disabled={disableVoteButton}
               onClick={() => onVoteCast()}
             />
@@ -113,7 +114,8 @@ export const CastVoteSection = ({
       ) : (
         <CWButton
           label="Vote"
-          buttonType="mini-black"
+          buttonType="primary"
+          buttonHeight="sm"
           disabled={disableVoteButton}
           onClick={() => onVoteCast()}
         />

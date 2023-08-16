@@ -20,7 +20,8 @@ const ErrorPage = ({ message }: ErrorPageProps) => {
         buttons: [
           {
             label: 'Refresh',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: () => window.location.reload(),
           },
         ],

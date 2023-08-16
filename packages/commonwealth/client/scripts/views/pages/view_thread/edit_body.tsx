@@ -58,7 +58,8 @@ export const EditBody = (props: EditBodyProps) => {
         buttons: [
           {
             label: 'Yes',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: () => {
               clearEditingLocalStorage(thread.id, ContentType.Thread);
               cancelEditing();
@@ -66,7 +67,8 @@ export const EditBody = (props: EditBodyProps) => {
           },
           {
             label: 'No',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
           },
         ],
       });

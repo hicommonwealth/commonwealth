@@ -330,7 +330,7 @@ const ViewTemplatePage = () => {
       description: constructTxPreview(), // TODO: Replace with some preview we like
       buttons: [
         {
-          buttonType: 'primary-black',
+          buttonType: 'primary',
           label: 'confirm',
           onClick: async () => {
             try {
@@ -359,7 +359,7 @@ const ViewTemplatePage = () => {
           },
         },
         {
-          buttonType: 'secondary-black',
+          buttonType: 'secondary',
           label: 'cancel',
           onClick: () => {
             console.log('transaction cancelled');
