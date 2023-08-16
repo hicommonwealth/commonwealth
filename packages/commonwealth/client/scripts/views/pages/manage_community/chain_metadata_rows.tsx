@@ -17,7 +17,6 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -656,8 +655,14 @@ export const ChainMetadataRows = ({
                             channel.id
                           );
                           await refetchTopics();
+                          notifySuccess(
+                            `#${channel.name} connected to ${
+                              topics.find((topic) => topic.id === topicId)?.name
+                            }!`
+                          );
                         } catch (e) {
                           console.log(e);
+                          notifyError('Error connecting channel to topic.');
                         }
                       },
                     };
