@@ -16,7 +16,7 @@ export const getProposalsHandler = async (
 ) => {
   const { chainId } = req.query;
 
-  const proposals = await controllers.proposals.getCompletedProposals({
+  const proposals = await controllers.proposals.getProposals({
     chainId,
   });
 

@@ -1,9 +1,9 @@
 import { DB } from '../models';
 import {
-  __getCompletedProposals,
+  __getProposals,
   GetCompletedProposalsOptions,
   GetCompletedProposalsResult,
-} from './server_proposal_methods/get_completed_proposals';
+} from './server_proposal_methods/get_proposals';
 import { RedisCache } from 'common-common/src/redisCache';
 import { providers } from 'ethers';
 import { ServerError } from 'common-common/src/errors';
@@ -12,7 +12,7 @@ import {
   __getProposalVotes,
   GetProposalVotesOptions,
   GetProposalVotesResult,
-} from './server_proposal_methods/get_completed_proposal_votes';
+} from './server_proposal_methods/get_proposal_votes';
 
 export type SupportedProposalNetworks =
   | ChainNetwork.Aave
@@ -26,12 +26,12 @@ export type ContractInfo = {
 export class ServerProposalsController {
   constructor(public models: DB, public redisCache: RedisCache) {}
 
-  public async getCompletedProposals(
+  public async getProposals(
     options: GetCompletedProposalsOptions
   ): Promise<GetCompletedProposalsResult> {
     const contractInfo = await this.getContractInfo(options.chainId);
     const provider = await this.createEvmProvider(options.chainId);
-    return __getCompletedProposals.call(this, options, provider, contractInfo);
+    return __getProposals.call(this, options, provider, contractInfo);
   }
 
   public async getProposalVotes(

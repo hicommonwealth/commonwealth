@@ -15,7 +15,7 @@ export type GetCompletedProposalsResult = {
   completedProposals: any[];
 };
 
-export async function __getCompletedProposals(
+export async function __getProposals(
   this: ServerProposalsController,
   { chainId }: GetCompletedProposalsOptions,
   provider: providers.Web3Provider,
