@@ -50,7 +50,8 @@ export const ReactionButton = ({
     (r) => r.address === activeAddress
   );
   const hasReacted = thisUserReaction?.length !== 0;
-  const reactedId = thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
+  const reactedId =
+    thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
 
   const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
     useCreateThreadReactionMutation({
@@ -60,10 +61,11 @@ export const ReactionButton = ({
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       chainId: app.activeChainId(),
+      address: app.user.activeAccount.address,
       threadId: thread.id,
     });
 
-  if (showSkeleton) return <ReactionButtonSkeleton />
+  if (showSkeleton) return <ReactionButtonSkeleton />;
   const isLoading = isAddingReaction || isDeletingReaction;
 
   // token balance check if needed
@@ -82,6 +84,7 @@ export const ReactionButton = ({
     if (hasReacted) {
       deleteThreadReaction({
         chainId: app.activeChainId(),
+        address: app.user.activeAccount.address,
         threadId: thread.id,
         reactionId: reactedId as number,
       }).catch((e) => {
@@ -116,8 +119,9 @@ export const ReactionButton = ({
       ) : (
         <button
           onClick={handleVoteClick}
-          className={`ThreadReactionButton ${isLoading || isUserForbidden || !!thread.archivedAt ? ' disabled' : ''
-            }${hasReacted ? ' has-reacted' : ''}`}
+          className={`ThreadReactionButton ${
+            isLoading || isUserForbidden || !!thread.archivedAt ? ' disabled' : ''
+          }${hasReacted ? ' has-reacted' : ''}`}
         >
           {reactors.length > 0 ? (
             <CWTooltip

@@ -56,6 +56,8 @@ export const CommentReactionButton = ({
         return r.author === activeAddress;
       });
       deleteCommentReaction({
+        chainId: app.activeChainId(),
+        address: app.user.activeAccount.address,
         canvasHash: foundReaction.canvasHash,
         reactionId: foundReaction.id,
       }).catch(() => {
