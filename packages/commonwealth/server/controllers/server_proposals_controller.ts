@@ -13,7 +13,8 @@ import {
   GetProposalVotesOptions,
   GetProposalVotesResult,
 } from './server_proposal_methods/get_completed_proposal_votes';
-import { GovVersion } from './server_proposal_methods/compound/proposals';
+
+import { GovVersion } from './server_proposal_methods/compound/types';
 
 export type SupportedProposalNetworks =
   | ChainNetwork.Aave

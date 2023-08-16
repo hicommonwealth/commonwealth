@@ -6,10 +6,10 @@ import { formatAaveProposal, getEthereumAaveProposals } from './aave/proposals';
 import {
   formatCompoundBravoProposal,
   getCompoundProposals,
-  GovVersion,
 } from './compound/proposals';
 import { DB } from '../../models';
 import { ContractInfo } from '../server_proposals_controller';
+import { GovVersion } from './compound/types';
 
 export type GetCompletedProposalsOptions = {
   chainId: string;

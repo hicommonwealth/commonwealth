@@ -1,12 +1,8 @@
-import { BigNumber, ethers, providers } from 'ethers';
+import { ethers, providers } from 'ethers';
 import {
-  Governor__factory,
-  GovernorAlpha__factory,
-  GovernorBravoDelegate__factory,
-  GovernorCompatibilityBravo__factory,
+  Governor,
   GovernorAlpha,
   GovernorBravoDelegate,
-  Governor,
   GovernorCompatibilityBravo,
 } from 'common-common/src/eth/types';
 import { TypedEvent } from 'common-common/src/eth/types/commons';
@@ -14,64 +10,18 @@ import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { ProposalState } from 'chain-events/src/chains/compound/types';
 import { DB } from '../../../models';
 import { cloneDeep } from 'lodash';
-
-export enum GovVersion {
-  Alpha = 'alpha',
-  Bravo = 'bravo',
-  Oz = 'oz',
-  OzBravo = 'oz-bravo',
-}
-
-type CompoundProposalType = {
-  id: BigNumber;
-  proposer: string;
-  eta: BigNumber;
-  startBlock: BigNumber;
-  endBlock: BigNumber;
-  forVotes: BigNumber;
-  againstVotes: BigNumber;
-  abstainVotes?: BigNumber;
-  canceled: boolean;
-  executed: boolean;
-};
-
-type ProposalCreatedEventArgsArray = [
-  BigNumber,
-  string,
-  string[],
-  BigNumber[],
-  string[],
-  string[],
-  BigNumber,
-  BigNumber,
-  string
-];
-
-type ProposalCreatedEventArgsObject = {
-  id: BigNumber;
-  proposer: string;
-  targets: string[];
-  values: BigNumber[];
-  signatures: string[];
-  calldatas: string[];
-  startBlock: BigNumber;
-  endBlock: BigNumber;
-  description: string;
-};
-
-type ResolvedProposalPromises = [
-  TypedEvent<ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject>[],
-  CompoundProposalType[],
-  number[]
-];
-
-type ProposalDataType = {
-  rawProposal: CompoundProposalType;
-  proposalState: number;
-  proposalCreatedEvent: TypedEvent<
-    ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject
-  >;
-};
+import {
+  getCompoundGovContract,
+  getCompoundGovContractAndVersion,
+} from './util';
+import {
+  CompoundProposalType,
+  GovVersion,
+  ProposalCreatedEventArgsArray,
+  ProposalCreatedEventArgsObject,
+  ProposalDataType,
+  ResolvedProposalPromises,
+} from './types';
 
 export function formatCompoundBravoProposal(
   proposalData: ProposalDataType
@@ -275,7 +225,9 @@ async function getProposalCreatedEvents(
     | GovernorAlpha
     | GovernorBravoDelegate
     | GovernorCompatibilityBravo
-    | Governor
+    | Governor,
+  fromBlock = 0,
+  toBlock: number | 'latest' = 'latest'
 ): Promise<
   TypedEvent<ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject>[]
 > {
@@ -291,99 +243,9 @@ async function getProposalCreatedEvents(
       null,
       null
     ),
-    0,
-    'latest'
+    fromBlock,
+    toBlock
   );
 
   return events.map((e) => mapProposalCreatedEvent(e));
-}
-
-/**
- * This function determines which compound contract version is being used at the given address. Note that the returned
- * contract and gov version is not guaranteed to be an exact match. For example, impactmarket uses a mix of Alpha, Bravo
- * and Oz-Compatible Bravo contracts, but the returned contract will be a Bravo contract since that's what it most
- * closely matches. This function in now way affects what contract interface is chosen on the client. The purpose of
- * this function is to decide the best contract interface for fetching proposals. Ideally, proposal data is fetched at
- * the same time as proposal created events, but this is not possible for oz and oz-compatible bravo contracts since
- * they don't have sequential proposal ids.
- * @param compoundGovAddress
- * @param provider
- */
-async function getCompoundGovContractAndVersion(
-  compoundGovAddress: string,
-  provider: providers.Web3Provider
-): Promise<{
-  version: GovVersion;
-  contract:
-    | GovernorAlpha
-    | GovernorBravoDelegate
-    | GovernorCompatibilityBravo
-    | Governor;
-}> {
-  try {
-    const contract = GovernorAlpha__factory.connect(
-      compoundGovAddress,
-      provider
-    );
-    await contract.guardian();
-    return { version: GovVersion.Alpha, contract };
-  } catch (e) {
-    try {
-      const contract = GovernorBravoDelegate__factory.connect(
-        compoundGovAddress,
-        provider
-      );
-      // OZ never uses proposalCount so default to bravo if proposalCount is defined so that we
-      // can fetch proposal created events and proposal data simultaneously rather than sequentially
-      await contract.proposalCount();
-      return { version: GovVersion.Bravo, contract };
-    } catch (e) {
-      try {
-        const contract = GovernorCompatibilityBravo__factory.connect(
-          compoundGovAddress,
-          provider
-        );
-        await contract.COUNTING_MODE();
-        return { version: GovVersion.OzBravo, contract };
-      } catch (e) {
-        try {
-          const contract = Governor__factory.connect(
-            compoundGovAddress,
-            provider
-          );
-          await contract.quorum(0);
-          return { version: GovVersion.Oz, contract };
-        } catch (e) {
-          throw new Error(
-            `Failed to find Compound contract version at ${compoundGovAddress}`
-          );
-        }
-      }
-    }
-  }
-}
-
-function getCompoundGovContract(
-  govVersion: GovVersion,
-  compoundGovAddress: string,
-  provider: providers.Web3Provider
-) {
-  switch (govVersion) {
-    case GovVersion.Alpha:
-      return GovernorAlpha__factory.connect(compoundGovAddress, provider);
-    case GovVersion.Bravo:
-      return GovernorBravoDelegate__factory.connect(
-        compoundGovAddress,
-        provider
-      );
-    case GovVersion.OzBravo:
-      return GovernorCompatibilityBravo__factory.connect(
-        compoundGovAddress,
-        provider
-      );
-    case GovVersion.Oz:
-      return Governor__factory.connect(compoundGovAddress, provider);
-    default:
-      throw new Error(`Invalid Compound contract version: ${govVersion}`);
-  }
 }
