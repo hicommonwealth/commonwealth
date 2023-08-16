@@ -13,6 +13,7 @@ import { TypedEvent } from 'common-common/src/eth/types/commons';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { ProposalState } from 'chain-events/src/chains/compound/types';
 import { DB } from '../../../models';
+import { cloneDeep } from 'lodash';
 
 export enum GovVersion {
   Alpha = 'alpha',
@@ -214,7 +215,6 @@ async function getProposalDataSequentially(
   const proposalDataPromises: Promise<CompoundProposalType>[] = [];
   const proposalStatePromises: Promise<number>[] = [];
   for (const propCreatedEvent of proposalCreatedEvents) {
-    console.log('proposalCreatedEvent', +propCreatedEvent.args.id);
     proposalDataPromises.push(contract.proposals(propCreatedEvent.args.id));
     proposalStatePromises.push(contract.state(propCreatedEvent.args.id));
   }
@@ -248,21 +248,23 @@ async function getBravoProposals(
   }
 
   return getProposalAsync(contract, initialProposalId);
-  // return getProposalDataSequentially(contract);
 }
 
 /**
- * This function is used to map an OZ ProposalCreated event to an Alpha/Bravo ProposalCreated event.
- * This is necessary because OZ ProposalCreated event defines args[0] as proposalId while Alpha/Bravo
- * defines args[0] as id. This function converts proposalId to id in the given event object.
- * @param event
+ * This function is used to map a Compound compatible event arg array to a fully functional event arg object.
+ * Uses:
+ * 1. Convert proposalId to id in OZ and OZ Bravo Compatibility event args
+ * 2. Properly set calldatas in OZ Bravo Compatibility event args
+ * @param event A Compound compatible proposal created event
  */
 export function mapProposalCreatedEvent(
   event: TypedEvent<ProposalCreatedEventArgsArray & any>
 ): TypedEvent<ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject> {
   if (event.args.proposalId) {
-    const result: any = event;
+    // original event is frozen/sealed so must clone it to modify it
+    const result: any = cloneDeep(event);
     result.args.id = event.args.proposalId;
+    result.args.calldatas = event.args[5];
     delete result.args.proposalId;
     return result;
   } else return event;
