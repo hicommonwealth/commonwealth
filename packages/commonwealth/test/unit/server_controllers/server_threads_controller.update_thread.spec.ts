@@ -6,6 +6,7 @@ import {
   validatePermissions,
 } from 'server/controllers/server_threads_methods/update_thread';
 import { ChainInstance } from 'server/models/chain';
+import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
   describe('#validatePermissions', () => {
@@ -121,9 +122,7 @@ describe('ServerThreadsController', () => {
         },
       };
       const tokenBalanceCache: any = {};
-      const banCache: any = {
-        checkBan: async () => [true, null],
-      };
+      const banCache: any = BAN_CACHE_MOCK_FN('ethereum');
 
       const serverThreadsController = new ServerThreadsController(
         db,
@@ -132,6 +131,16 @@ describe('ServerThreadsController', () => {
       );
       const [updatedThread, notificationOptions, analyticsOptions] =
         await serverThreadsController.updateThread(attributes);
+
+      expect(
+        serverThreadsController.updateThread({
+          ...(attributes as any),
+          address: {
+            ...attributes.address,
+            address: '0xbanned',
+          },
+        })
+      ).to.be.rejectedWith('Ban error: banned');
 
       expect(updatedThread).to.be.ok;
       expect(notificationOptions).to.have.length(1);
