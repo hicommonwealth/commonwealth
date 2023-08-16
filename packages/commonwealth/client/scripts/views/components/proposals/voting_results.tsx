@@ -37,13 +37,11 @@ export const VotingResults = (props: VotingResultsProps) => {
   );
 
   useEffect(() => {
-    app.chainAdapterReady.on('ready', () => setLoading(false));
+    const listener = () => setLoading(false);
+    app.chainAdapterReady.on('ready', listener);
 
     return () => {
-      app.chainAdapterReady.off('ready', () => {
-        setLoading(false);
-        app.chainAdapterReady.removeAllListeners();
-      });
+      app.chainAdapterReady.off('ready', listener);
     };
   }, [setLoading]);
 
