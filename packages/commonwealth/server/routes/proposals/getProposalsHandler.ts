@@ -1,5 +1,5 @@
 import { ServerControllers } from '../../routing/router';
-import { TypedRequestQuery, TypedResponse } from '../../types';
+import { success, TypedRequestQuery, TypedResponse } from '../../types';
 
 type GetProposalsRequestParams = {
   chainId: string;
@@ -20,10 +20,7 @@ export const getProposalsHandler = async (
     chainId,
   });
 
-  return res.json({
-    status: 'Success',
-    result: {
-      proposals,
-    },
+  return success(res, {
+    proposals,
   });
 };
