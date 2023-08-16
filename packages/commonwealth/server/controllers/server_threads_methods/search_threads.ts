@@ -74,6 +74,12 @@ export async function __searchThreads(
 
   const chainWhere = bind.chain ? '"Threads".chain = $chain AND' : '';
 
+  let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
+  if (!threadTitleOnly) {
+    // for full search, use search column too
+    searchWhere += ` OR query @@ "Threads"._search`;
+  }
+
   const sqlBaseQuery = `
     SELECT
       "Threads".id,
@@ -92,7 +98,7 @@ export async function __searchThreads(
     WHERE
       ${chainWhere}
       "Threads".deleted_at IS NULL AND
-      query @@ "Threads"._search
+      ${searchWhere}
     ${paginationSort}
   `;
 
@@ -105,7 +111,7 @@ export async function __searchThreads(
     WHERE
       ${chainWhere}
       "Threads".deleted_at IS NULL AND
-      query @@ "Threads"._search
+      ${searchWhere}
   `;
 
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([

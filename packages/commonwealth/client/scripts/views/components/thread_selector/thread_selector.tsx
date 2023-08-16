@@ -35,11 +35,11 @@ export const ThreadSelector = ({
     orderDirection: APIOrderDirection.Desc,
     threadTitleOnly: true,
   };
-  const isValidSearchTerm = debouncedSearchTerm?.trim().length > 0;
+  const queryEnabled = debouncedSearchTerm?.trim().length > 0;
 
   const { data: threadsData, isLoading } = useSearchThreadsQuery({
     ...sharedQueryOptions,
-    enabled: isValidSearchTerm,
+    enabled: queryEnabled,
   });
 
   const searchResults = useMemo(() => {
@@ -56,7 +56,7 @@ export const ThreadSelector = ({
   }, [threadsData]);
 
   const getEmptyContentMessage = () => {
-    if (!isValidSearchTerm) {
+    if (!queryEnabled) {
       return 'Type a thread title to search';
     } else if (searchResults.length === 0) {
       return 'No threads found';
@@ -65,7 +65,7 @@ export const ThreadSelector = ({
     }
   };
 
-  const options = !isValidSearchTerm ? linkedThreadsToSet : searchResults;
+  const options = !queryEnabled ? linkedThreadsToSet : searchResults;
 
   const handleInputChange = (e: any) => {
     setSearchTerm(e.target.value);
@@ -112,7 +112,7 @@ export const ThreadSelector = ({
       />
 
       <QueryList
-        loading={isValidSearchTerm ? isLoading : false}
+        loading={queryEnabled ? isLoading : false}
         options={options}
         components={{ EmptyPlaceholder: EmptyComponent }}
         renderItem={renderItem}
