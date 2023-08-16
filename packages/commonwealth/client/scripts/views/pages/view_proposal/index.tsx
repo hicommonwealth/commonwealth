@@ -80,11 +80,9 @@ const ViewProposalPage = ({
       );
 
       if (!foundProposal?.ipfsData) {
-        const listener = () => setProposal(foundProposal);
-        foundProposal.ipfsDataReady.on('ready', listener);
-        return () => {
-          foundProposal.ipfsDataReady.off('ready', listener);
-        };
+        foundProposal.ipfsDataReady.once('ready', () =>
+          setProposal(foundProposal)
+        );
       } else {
         setProposal(foundProposal);
       }
