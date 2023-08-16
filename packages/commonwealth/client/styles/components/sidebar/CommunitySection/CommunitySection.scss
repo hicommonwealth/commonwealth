@@ -1,4 +1,4 @@
-@import '../../shared';
+@import '../../../shared';
 
 .community-menu {
   background-color: $neutral-25;
@@ -40,16 +40,5 @@
       justify-content: center;
       margin-bottom: 16px;
     }
-  }
-}
-
-.community-menu-skeleton {
-  padding: 16px;
-
-  .community-menu-skeleton-section-items {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-top: 8px;
   }
 }

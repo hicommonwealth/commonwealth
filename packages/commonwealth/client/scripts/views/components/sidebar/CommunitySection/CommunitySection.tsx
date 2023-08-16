@@ -1,4 +1,4 @@
-import 'components/sidebar/CommunitySection.scss';
+import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
