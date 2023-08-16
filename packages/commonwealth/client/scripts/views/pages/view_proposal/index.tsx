@@ -73,19 +73,23 @@ const ViewProposalPage = ({
       chainId: app.chain?.id,
     });
 
-  if (!aaveProposalsLoading && fetchAaveData && !proposal) {
-    const foundProposal = cachedAaveProposals?.find(
-      (p) => p.identifier === proposalId
-    );
+  useEffect(() => {
+    if (!aaveProposalsLoading && fetchAaveData && !proposal) {
+      const foundProposal = cachedAaveProposals?.find(
+        (p) => p.identifier === proposalId
+      );
 
-    if (!foundProposal?.ipfsData) {
-      foundProposal.ipfsDataReady.on('ready', () => {
+      if (!foundProposal?.ipfsData) {
+        const listener = () => setProposal(foundProposal);
+        foundProposal.ipfsDataReady.on('ready', listener);
+        return () => {
+          foundProposal.ipfsDataReady.off('ready', listener);
+        };
+      } else {
         setProposal(foundProposal);
-      });
-    } else {
-      setProposal(foundProposal);
+      }
     }
-  }
+  }, [cachedAaveProposals]);
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
