@@ -1,9 +1,6 @@
 import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import BN from 'bn.js';
-import { CompoundEvents } from 'chain-events/src';
-import { CompoundTypes } from 'chain-events/src/types';
 import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
-import { chainToEventNetwork } from 'controllers/server/chain_entities';
 import type { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
 import type { ITXModalData } from '../../../../models/interfaces';
 import ProposalModule from '../../../../models/ProposalModule';
@@ -14,6 +11,9 @@ import type CompoundAPI from './api';
 import { GovernorType } from './api';
 import type CompoundChain from './chain';
 import CompoundProposal from './proposal';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import axios from 'axios';
+import { ApiEndpoints } from 'state/api/config';
 
 export interface CompoundProposalArgs {
   targets: string[];
@@ -31,7 +31,6 @@ export default class CompoundGovernance extends ProposalModule<
   // CONSTANTS
   private _quorumVotes: BN;
   private _proposalThreshold: BN;
-  private _votingDelay: BN;
   private _votingPeriod: BN;
 
   private _api: CompoundAPI;
@@ -45,10 +44,6 @@ export default class CompoundGovernance extends ProposalModule<
 
   public get proposalThreshold() {
     return this._proposalThreshold;
-  }
-
-  public get votingDelay() {
-    return this._votingDelay;
   }
 
   public get votingPeriod() {
@@ -71,16 +66,16 @@ export default class CompoundGovernance extends ProposalModule<
   }
 
   // INIT / DEINIT
-  constructor(app: IApp, private _usingServerChainEntities = false) {
-    super(
-      app,
-      (e) => new CompoundProposal(this._Accounts, this._Chain, this, e)
-    );
+  constructor(app: IApp) {
+    super(app);
   }
 
   public async propose(args: CompoundProposalArgs): Promise<string> {
     const address = this.app.user.activeAccount.address;
-    const contract = await attachSigner(this.app.user.activeAccount, this._api.Contract);
+    const contract = await attachSigner(
+      this.app.user.activeAccount,
+      this._api.Contract
+    );
 
     const { targets, values, signatures, calldatas, description } = args;
     if (!targets || !values || !calldatas || !description)
@@ -131,9 +126,6 @@ export default class CompoundGovernance extends ProposalModule<
     this._Chain = chain;
     this._Accounts = Accounts;
 
-    this._votingDelay = new BN(
-      (await this._api.Contract.votingDelay()).toString()
-    );
     this._votingPeriod = new BN(
       (await this._api.Contract.votingPeriod()).toString()
     );
@@ -175,42 +167,27 @@ export default class CompoundGovernance extends ProposalModule<
       );
     }
 
-    // load server proposals
-    console.log('Fetching compound proposals from backend.');
-    await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.getByType(
-      CompoundTypes.EntityKind.Proposal
-    );
-    console.log(`Found ${entities.length} proposals!`);
-    entities.forEach((e) => this._entityConstructor(e));
-    await Promise.all(this.store.getAll().map((p) => p.init()));
+    this._initialized = true;
+  }
 
-    // register new chain-event handlers
-    this.app.chainEntities.registerEntityHandler(
-      CompoundTypes.EntityKind.Proposal,
-      (entity, event) => {
-        this.updateProposal(entity, event);
-        const proposal = this.store.getByIdentifier(entity.typeId);
-        if (!proposal.initialized) {
-          proposal.init();
-        }
+  static async getProposals(compoundChain: Compound) {
+    const { chain, accounts, governance, meta } = compoundChain;
+    const res = await axios.get(
+      `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSALS}`,
+      {
+        params: {
+          chainId: meta.id,
+        },
       }
     );
+    const proposals: ICompoundProposalResponse[] = res.data.result.proposals;
+    proposals.forEach((p) => {
+      new CompoundProposal(accounts, chain, governance, p);
+    });
 
-    // kick off listener
-    const subscriber = new CompoundEvents.Subscriber(
-      this._api.Contract as any,
-      this.app.chain.id
-    );
-    const processor = new CompoundEvents.Processor(this._api.Contract as any);
-    await this.app.chainEntities.subscribeEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      subscriber,
-      processor
-    );
+    await Promise.all(governance.store.getAll().map((p) => p.init()));
 
-    this._initialized = true;
+    return governance.store.getAll();
   }
 
   public deinit() {

@@ -16,6 +16,7 @@ export type ContractAttributes = {
   token_name?: string;
   symbol?: string;
   type?: string;
+  gov_version?: string;
   is_factory?: boolean;
   nickname?: string;
   created_at?: Date;
@@ -47,6 +48,7 @@ export default (
       token_name: { type: dataTypes.STRING, allowNull: true },
       symbol: { type: dataTypes.STRING, allowNull: true },
       type: { type: dataTypes.STRING, allowNull: true }, // for governance erc20, etc. formerly network
+      gov_version: { type: dataTypes.STRING, allowNull: true },
       abi_id: { type: dataTypes.INTEGER, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },

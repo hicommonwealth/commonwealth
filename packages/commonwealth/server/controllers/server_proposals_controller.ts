@@ -13,6 +13,7 @@ import {
   GetProposalVotesOptions,
   GetProposalVotesResult,
 } from './server_proposal_methods/get_completed_proposal_votes';
+import { GovVersion } from './server_proposal_methods/compound/proposals';
 
 export type SupportedProposalNetworks =
   | ChainNetwork.Aave
@@ -21,6 +22,7 @@ export type SupportedProposalNetworks =
 export type ContractInfo = {
   address: string;
   type: SupportedProposalNetworks;
+  govVersion: GovVersion;
 };
 
 export class ServerProposalsController {
@@ -31,7 +33,13 @@ export class ServerProposalsController {
   ): Promise<GetCompletedProposalsResult> {
     const contractInfo = await this.getContractInfo(options.chainId);
     const provider = await this.createEvmProvider(options.chainId);
-    return __getCompletedProposals.call(this, options, provider, contractInfo);
+    return __getCompletedProposals.call(
+      this,
+      options,
+      provider,
+      contractInfo,
+      this.models
+    );
   }
 
   public async getProposalVotes(
@@ -52,7 +60,7 @@ export class ServerProposalsController {
         {
           model: this.models.Contract,
           required: true,
-          attributes: ['address', 'type'],
+          attributes: ['address', 'type', 'gov_version'],
         },
       ],
     });
@@ -71,7 +79,11 @@ export class ServerProposalsController {
       );
     }
 
-    return { address: contract.Contract.address, type: contract.Contract.type };
+    return {
+      address: contract.Contract.address,
+      type: contract.Contract.type,
+      govVersion: <GovVersion>contract.Contract.gov_version,
+    };
   }
 
   private async createEvmProvider(
@@ -105,12 +117,12 @@ export class ServerProposalsController {
         {
           model: this.models.ChainNode,
           required: true,
-          attributes: ['private_url'],
+          attributes: ['private_url', 'url'],
         },
       ],
     });
 
-    if (!chain.ChainNode.private_url) {
+    if (!chain.ChainNode.private_url && !chain.ChainNode.url) {
       throw new ServerError(`No RPC URL found for chain ${chainId}`);
     }
 
@@ -124,6 +136,6 @@ export class ServerProposalsController {
       );
     }
 
-    return chain.ChainNode.private_url;
+    return chain.ChainNode.private_url || chain.ChainNode.url;
   }
 }

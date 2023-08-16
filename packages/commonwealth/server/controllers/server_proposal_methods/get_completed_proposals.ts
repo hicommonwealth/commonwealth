@@ -1,15 +1,15 @@
-import {
-  ServerProposalsController,
-  SupportedProposalNetworks,
-} from '../server_proposals_controller';
+import { ServerProposalsController } from '../server_proposals_controller';
 import { providers } from 'ethers';
 import { ChainNetwork } from 'common-common/src/types';
 import { ServerError } from 'common-common/src/errors';
 import { formatAaveProposal, getEthereumAaveProposals } from './aave/proposals';
 import {
   formatCompoundBravoProposal,
-  getCompoundBravoProposals,
+  getCompoundProposals,
+  GovVersion,
 } from './compound/proposals';
+import { DB } from '../../models';
+import { ContractInfo } from '../server_proposals_controller';
 
 export type GetCompletedProposalsOptions = {
   chainId: string;
@@ -23,7 +23,8 @@ export async function __getCompletedProposals(
   this: ServerProposalsController,
   { chainId }: GetCompletedProposalsOptions,
   provider: providers.Web3Provider,
-  contractInfo: { address: string; type: SupportedProposalNetworks }
+  contractInfo: ContractInfo,
+  models: DB
 ) {
   let completedProposals: any[] = [];
   if (contractInfo.type === ChainNetwork.Aave) {
@@ -33,9 +34,11 @@ export async function __getCompletedProposals(
     );
     completedProposals = proposals.map((p) => formatAaveProposal(p));
   } else if (contractInfo.type === ChainNetwork.Compound) {
-    const proposals = await getCompoundBravoProposals(
+    const proposals = await getCompoundProposals(
+      contractInfo.govVersion,
       contractInfo.address,
-      provider
+      provider,
+      models
     );
     completedProposals = proposals.map((p) => formatCompoundBravoProposal(p));
   } else {

@@ -12,12 +12,15 @@ import { utils } from 'ethers';
 import { blocknumToTime } from 'helpers';
 import { capitalize } from 'lodash';
 
-import type ChainEntity from '../../../../models/ChainEntity';
 import type ChainEvent from '../../../../models/ChainEvent';
 import type { ITXModalData, IVote } from '../../../../models/interfaces';
 import Proposal from '../../../../models/Proposal';
-import type { ProposalEndTime} from '../../../../models/types';
-import { ProposalStatus, VotingType, VotingUnit } from '../../../../models/types';
+import type { ProposalEndTime } from '../../../../models/types';
+import {
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from '../../../../models/types';
 import moment from 'moment';
 import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
@@ -45,25 +48,6 @@ export class CompoundProposalVote implements IVote<EthereumCoin> {
     this.power = power || new BN(0);
   }
 }
-
-const backportEntityToAdapter = (
-  Gov: CompoundGovernance,
-  entity: ChainEntity
-): ICompoundProposalResponse => {
-  const startEvent = entity.chainEvents.find(
-    (e) => e.data.kind === CompoundTypes.EventKind.ProposalCreated
-  );
-  const startData = startEvent.data as CompoundTypes.IProposalCreated;
-  return {
-    identifier: `${startData.id}`,
-    queued: false,
-    executed: false,
-    cancelled: false,
-    completed: false,
-    expired: false,
-    ...startData,
-  };
-};
 
 const ONE_HUNDRED_WITH_PRECISION = 10000;
 
@@ -265,18 +249,14 @@ export default class CompoundProposal extends Proposal<
     Accounts: EthereumAccounts,
     Chain: CompoundChain,
     Gov: CompoundGovernance,
-    entity: ChainEntity
+    data: ICompoundProposalResponse
   ) {
     // must set identifier before super() because of how response object is named
-    super(ProposalType.CompoundProposal, backportEntityToAdapter(Gov, entity));
+    super(ProposalType.CompoundProposal, data);
 
     this._Accounts = Accounts;
     this._Chain = Chain;
     this._Gov = Gov;
-
-    entity.chainEvents
-      .sort((e1, e2) => e1.blockNumber - e2.blockNumber)
-      .forEach((e) => this.update(e));
 
     this._Gov.store.add(this);
   }
@@ -334,23 +314,6 @@ export default class CompoundProposal extends Proposal<
         this.addOrUpdateVote(vote);
         break;
       }
-      case CompoundTypes.EventKind.ProposalCanceled: {
-        this._data.cancelled = true;
-        this._data.completed = true;
-        this.complete(this._Gov.store);
-        break;
-      }
-      case CompoundTypes.EventKind.ProposalQueued: {
-        this._data.queued = true;
-        this._data.eta = e.data.eta;
-        break;
-      }
-      case CompoundTypes.EventKind.ProposalExecuted: {
-        this._data.queued = false;
-        this._data.executed = true;
-        this.complete(this._Gov.store);
-        break;
-      }
       default: {
         break;
       }
@@ -371,7 +334,10 @@ export default class CompoundProposal extends Proposal<
     }
 
     let tx: ContractTransaction;
-    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Contract);
+    const contract = await attachSigner(
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Contract
+    );
     try {
       const gasLimit = await contract.estimateGas['cancel(uint256)'](
         this.data.identifier
@@ -386,7 +352,10 @@ export default class CompoundProposal extends Proposal<
         this._Gov.api.contractAddress,
         this._Gov.api.Provider
       );
-      const ozContract = await attachSigner(this._Gov.app.user.activeAccount, contractNoSigner);
+      const ozContract = await attachSigner(
+        this._Gov.app.user.activeAccount,
+        contractNoSigner
+      );
       const descriptionHash = utils.keccak256(
         utils.toUtf8Bytes(this.data.description)
       );
@@ -422,7 +391,10 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already queued');
     }
 
-    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Contract);
+    const contract = await attachSigner(
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Contract
+    );
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
@@ -464,7 +436,10 @@ export default class CompoundProposal extends Proposal<
       throw new Error('proposal already executed');
     }
 
-    const contract = await attachSigner(this._Gov.app.user.activeAccount, this._Gov.api.Contract);
+    const contract = await attachSigner(
+      this._Gov.app.user.activeAccount,
+      this._Gov.api.Contract
+    );
 
     let tx: ContractTransaction;
     if (this._Gov.api.govType === GovernorType.Oz) {
