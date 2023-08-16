@@ -34,7 +34,6 @@ export const AaveProposalForm = () => {
   const author = app.user.activeAccount;
   const aave = app.chain as Aave;
 
-  // TODO: @Timothee @Malik loading animation?
   useEffect(() => {
     const getExecutors = async () => {
       const executors = await aave.governance.api.getAaveExecutors();
