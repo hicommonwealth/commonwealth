@@ -6,6 +6,10 @@ import { providers } from 'ethers';
 import { ChainNetwork } from 'common-common/src/types';
 import { ServerError } from 'common-common/src/errors';
 import { formatAaveProposal, getEthereumAaveProposals } from './aave/proposals';
+import {
+  formatCompoundBravoProposal,
+  getCompoundBravoProposals,
+} from './compound/proposals';
 
 export type GetCompletedProposalsOptions = {
   chainId: string;
@@ -29,7 +33,11 @@ export async function __getCompletedProposals(
     );
     completedProposals = proposals.map((p) => formatAaveProposal(p));
   } else if (contractInfo.type === ChainNetwork.Compound) {
-    // const proposals = await getCompoundBravoProposals();
+    const proposals = await getCompoundBravoProposals(
+      contractInfo.address,
+      provider
+    );
+    completedProposals = proposals.map((p) => formatCompoundBravoProposal(p));
   } else {
     throw new ServerError(
       `Proposal fetching not supported for chain ${chainId} on network ${contractInfo.type}`

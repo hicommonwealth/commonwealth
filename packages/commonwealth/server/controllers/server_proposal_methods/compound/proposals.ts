@@ -5,6 +5,7 @@ import {
 } from 'common-common/src/eth/types';
 import { TypedEvent } from 'common-common/src/eth/types/commons';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import { ProposalState } from 'chain-events/src/chains/compound/types';
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
@@ -52,9 +53,7 @@ export function formatCompoundBravoProposal(
     id: proposalData.rawProposal.id.toString(),
     proposer: proposalData.rawProposal.proposer,
     targets: proposalData.proposalCreatedEvent.args.targets,
-    values: proposalData.proposalCreatedEvent.args.values.map((v) =>
-      v.toString()
-    ),
+    values: proposalData.proposalCreatedEvent.args[4].map((v) => v.toString()),
     signatures: proposalData.proposalCreatedEvent.args.signatures,
     calldatas: proposalData.proposalCreatedEvent.args.calldatas.map((c) =>
       ethers.utils.hexlify(c)
@@ -62,12 +61,16 @@ export function formatCompoundBravoProposal(
     startBlock: +proposalData.rawProposal.startBlock,
     endBlock: +proposalData.rawProposal.endBlock,
     description: proposalData.proposalCreatedEvent.args.description,
-    completed: true,
     eta: +proposalData.rawProposal.eta,
-    queued: true,
+    queued: proposalData.proposalState === ProposalState.Queued,
     executed: proposalData.rawProposal.executed,
     cancelled: proposalData.rawProposal.canceled,
-    expired: true,
+    expired: proposalData.proposalState === ProposalState.Expired,
+    completed:
+      proposalData.proposalState === ProposalState.Executed ||
+      proposalData.proposalState === ProposalState.Canceled ||
+      proposalData.proposalState === ProposalState.Expired ||
+      proposalData.proposalState === ProposalState.Defeated,
   };
 }
 
@@ -81,18 +84,9 @@ export async function getCompoundBravoProposals(
   );
   await contract.deployed();
 
-  const initialProposalId = await contract.initialProposalId();
-  const proposalCount = await contract.proposalCount();
-
-  const proposalPromises: Promise<CompoundBravoProposalType>[] = [];
-  const proposalStatePromises: Promise<number>[] = [];
-  for (let i = initialProposalId; i <= proposalCount; i++) {
-    const proposal = contract.proposals(i);
-    proposalPromises.push(proposal);
-    proposalStatePromises.push(contract.state(i));
-  }
-
-  const proposalCreatedEventPromise = contract.queryFilter<
+  // OpenZeppelin's Governor doesn't have initialProposalId or proposalCount method so need to fetch
+  // all proposal created events and then fetch each proposal individually
+  const proposalCreatedEvents = await contract.queryFilter<
     ProposalCreatedEventArgsArray,
     ProposalCreatedEventArgsObject
   >(
@@ -111,10 +105,20 @@ export async function getCompoundBravoProposals(
     'latest'
   );
 
-  const [proposals, proposalStates, proposalCreatedEvents] = await Promise.all([
+  // console.log("Proposal created event (tribe):", JSON.stringify(proposalCreatedEvents[0], null, 2));
+
+  const proposalPromises: Promise<CompoundBravoProposalType>[] = [];
+  const proposalStatePromises: Promise<number>[] = [];
+  for (const propCreatedEvent of proposalCreatedEvents) {
+    proposalPromises.push(contract.proposals(propCreatedEvent.args.proposalId));
+    proposalStatePromises.push(
+      contract.state(propCreatedEvent.args.proposalId)
+    );
+  }
+
+  const [proposals, proposalStates] = await Promise.all([
     Promise.all(proposalPromises),
     Promise.all(proposalStatePromises),
-    proposalCreatedEventPromise,
   ]);
 
   const allProposalData: ProposalDataType[] = [];
@@ -123,7 +127,7 @@ export async function getCompoundBravoProposals(
       rawProposal: proposals[i],
       proposalState: proposalStates[i],
       proposalCreatedEvent: proposalCreatedEvents.find((p) =>
-        p.args.proposalId.eq(i)
+        p.args.proposalId.eq(proposals[i].id)
       ),
     });
   }
