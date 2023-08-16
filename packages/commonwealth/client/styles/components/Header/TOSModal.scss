@@ -6,38 +6,6 @@
   width: auto;
   height: auto;
 
-  .compact-modal-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: $white;
-    border-radius: 6px 6px 0px 0px;
-
-    .Frame {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      .warning-icon {
-        color: $yellow-500;
-      }
-
-      .title-text {
-        font-weight: 500;
-        letter-spacing: -0.01em;
-      }
-    }
-
-    .close-icon {
-      color: $neutral-500;
-
-      &:hover {
-        cursor: pointer;
-        color: $neutral-800;
-      }
-    }
-  }
-
   .content-wrapper {
     align-items: center;
     display: flex;

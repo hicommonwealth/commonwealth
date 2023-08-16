@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X } from '@phosphor-icons/react';
 
 import type Webhook from '../../models/Webhook';
 import { NotificationCategories } from 'common-common/src/types';
@@ -13,6 +12,7 @@ import {
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/webhook_settings_modal.scss';
 
@@ -81,12 +81,7 @@ export const WebhookSettingsModal = ({
 
   return (
     <div className="WebhookSettingsModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Webhook Settings
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label="Webhook Settings" onModalClose={onModalClose} />
       <div className="compact-modal-body">
         <CWText>Which events should trigger this webhook?</CWText>
         <div className="checkbox-section">

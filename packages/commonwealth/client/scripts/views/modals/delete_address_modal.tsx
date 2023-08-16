@@ -2,8 +2,6 @@ import React from 'react';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
 
-import 'modals/delete_address_modal.scss';
-
 import app from 'state';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import AddressInfo from '../../models/AddressInfo';
@@ -11,7 +9,9 @@ import NewProfile from '../../models/NewProfile';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
-import { WarningOctagon, X } from '@phosphor-icons/react';
+import { CWModalHeader } from './CWModalHeader';
+
+import 'modals/delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
   profile: NewProfile;
@@ -68,15 +68,11 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
 
   return (
     <div className="DeleteAddressModal">
-      <div className="compact-modal-title">
-        <div className="Frame">
-          <WarningOctagon className="warning-icon" weight="fill" size={24} />
-          <CWText className="title-text" type="h4">
-            Delete Address
-          </CWText>
-        </div>
-        <X className="close-icon" onClick={closeModal} size={24} />
-      </div>
+      <CWModalHeader
+        label="Delete Address"
+        icon="danger"
+        onModalClose={closeModal}
+      />
       <div className="body">
         <CWText>
           Address will be removed from the following linked profile.

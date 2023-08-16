@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X } from '@phosphor-icons/react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import {
@@ -24,8 +23,9 @@ import {
 } from 'state/api/threads';
 import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/update_proposal_status_modal.scss';
 
@@ -309,12 +309,10 @@ export const UpdateProposalStatusModal = ({
 
   return (
     <div className="UpdateProposalStatusModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Update proposal status
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader
+        label="Update proposal status"
+        onModalClose={onModalClose}
+      />
       <div className="compact-modal-body">
         <SelectList
           defaultValue={

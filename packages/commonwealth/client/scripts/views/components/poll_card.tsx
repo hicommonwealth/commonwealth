@@ -1,5 +1,4 @@
 import React, { FC, useState } from 'react';
-import { WarningOctagon, X } from '@phosphor-icons/react';
 
 import { CWButton } from './component_kit/new_designs/cw_button';
 import { CWCard } from './component_kit/cw_card';
@@ -11,6 +10,7 @@ import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
 import { Modal } from './component_kit/cw_modal';
+import { CWModalHeader } from '../modals/CWModalHeader';
 
 import 'components/poll_card.scss';
 
@@ -299,25 +299,29 @@ export const DeletePollModal: FC<DeletePollModalProps> = ({
 
   return (
     <div className="DeleteThreadModal">
-      <div className="compact-modal-title">
-        <div className="Frame">
-          <WarningOctagon className="warning-icon" weight="fill" />
-          <CWText className="title-text" type="h4">
-            Delete this poll?
-          </CWText>
-        </div>
-        <X className="close-icon" onClick={handleCloseModal} />
-      </div>
+      <CWModalHeader
+        label="Delete this poll?"
+        icon="danger"
+        onModalClose={handleCloseModal}
+      />
       <div className="compact-modal-body">
         <div className="modal-body">
           <CWText>This action cannot be reversed.</CWText>
-          <CWButton
-            buttonType="destructive"
-            buttonHeight="sm"
-            label="Confirm"
-            onClick={handleDeleteClick}
-          />
         </div>
+      </div>
+      <div className="compact-modal-footer">
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={handleCloseModal}
+        />
+        <CWButton
+          buttonType="destructive"
+          buttonHeight="sm"
+          label="Confirm"
+          onClick={handleDeleteClick}
+        />
       </div>
     </div>
   );

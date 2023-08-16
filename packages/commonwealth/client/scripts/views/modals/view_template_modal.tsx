@@ -1,5 +1,4 @@
 import React from 'react';
-import { X } from '@phosphor-icons/react';
 
 import Template from 'models/Template';
 import { CWText } from '../components/component_kit/cw_text';
@@ -9,6 +8,7 @@ import { CWCommunityAvatar } from '../components/component_kit/cw_community_avat
 import { User } from '../components/user/user';
 import { CWDivider } from '../components/component_kit/cw_divider';
 import { renderDisabledTemplate } from 'helpers/action_template_helpers';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/view_template_modal.scss';
 
@@ -23,12 +23,7 @@ const ViewTemplateModal = ({
 
   return (
     <div className="ViewTemplateModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          View template
-        </CWText>
-        <X className="close-icon" onClick={onClose} size={24} />
-      </div>
+      <CWModalHeader label="View template AAA" onModalClose={onClose} />
       <div className="compact-modal-body">
         <div className="CreationRow">
           <CWText type="b2">By</CWText>

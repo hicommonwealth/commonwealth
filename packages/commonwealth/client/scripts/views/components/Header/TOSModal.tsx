@@ -1,9 +1,9 @@
 import React from 'react';
-import { Warning, X } from '@phosphor-icons/react';
 
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import app from 'state';
+import { CWModalHeader } from '../../modals/CWModalHeader';
 
 import 'components/Header/TOSModal.scss';
 
@@ -18,13 +18,11 @@ export const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
 
   return (
     <div className="TOSModal">
-      <div className="compact-modal-title">
-        <div className="Frame">
-          <Warning className="warning-icon" weight="fill" size={24} />
-          <CWText type="h4">Terms of Service</CWText>
-        </div>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader
+        label="Terms of Service"
+        icon="warning"
+        onModalClose={onModalClose}
+      />
       <div className="content-wrapper">
         <CWText>
           By clicking accept you agree to the community's

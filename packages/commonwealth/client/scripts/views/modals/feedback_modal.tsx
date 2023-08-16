@@ -1,15 +1,14 @@
 import React from 'react';
 import $ from 'jquery';
-import { X } from '@phosphor-icons/react';
 
 import app from 'state';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/feedback_modal.scss';
-import { CWText } from '../components/component_kit/cw_text';
 
 type FeedbackModalProps = {
   onModalClose: () => void;
@@ -25,12 +24,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
 
   return (
     <div className="FeedbackModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Send feedback
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label="Send feedback" onModalClose={onModalClose} />
       <div className="compact-modal-body">
         <CWTextArea
           placeholder="Report a bug, or suggest an improvement"

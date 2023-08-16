@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import _ from 'underscore';
 import moment from 'moment';
-import { X } from '@phosphor-icons/react';
 
 import type Thread from '../../models/Thread';
 import app from 'state';
@@ -13,6 +12,7 @@ import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/poll_editor_modal.scss';
 
@@ -113,12 +113,7 @@ export const PollEditorModal = ({
 
   return (
     <div className="PollEditorModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Create Poll
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label="Create Poll" onModalClose={onModalClose} />
       <div className="compact-modal-body">
         <CWTextInput
           label="Question"

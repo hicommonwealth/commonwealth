@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
-import { Warning, X } from '@phosphor-icons/react';
 
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { uuidv4 } from 'lib/util';
 import type { ButtonProps } from 'views/components/component_kit/new_designs/cw_button';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/confirmation_modal.scss';
 
@@ -46,17 +46,7 @@ const ConfirmationModal = ({
     <Modal
       content={
         <div className="ConfirmationModal">
-          <div className="compact-modal-title">
-            <div className="Frame">
-              <Warning className="warning-icon" weight="fill" size={24} />
-              {title && (
-                <CWText className="title-text" type="h4">
-                  {title}
-                </CWText>
-              )}
-            </div>
-            <X className="close-icon" onClick={() => onClose()} size={24} />
-          </div>
+          <CWModalHeader label={title} icon="warning" onModalClose={onClose} />
           {description && (
             <CWText type="b1" className="description">
               {description}

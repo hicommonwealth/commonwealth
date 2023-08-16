@@ -1,5 +1,4 @@
 import React from 'react';
-import { X } from '@phosphor-icons/react';
 
 import type { ChainNetwork } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
@@ -15,6 +14,7 @@ import { CWText } from './cw_text';
 import { CWNoAuthMethodsAvailable, CWAuthButton } from './cw_auth_button';
 import { CWDivider } from './cw_divider';
 import { getClasses } from './helpers';
+import { CWModalHeader } from '../../modals/CWModalHeader';
 
 import 'components/component_kit/cw_wallets_list.scss';
 
@@ -93,10 +93,7 @@ export const AccountSelector = (props: AccountSelectorProps) => {
 
   return (
     <div className="AccountSelector">
-      <div className="compact-modal-title">
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
-
+      <CWModalHeader onModalClose={onModalClose} />
       {accounts.map((account, idx) => {
         return (
           <LinkAccountItem

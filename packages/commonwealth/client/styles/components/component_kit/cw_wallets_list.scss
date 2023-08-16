@@ -117,22 +117,6 @@
   display: flex;
   flex-direction: column;
 
-  .compact-modal-title {
-    display: flex;
-    justify-content: flex-end;
-    background: $white;
-    border-radius: 6px 6px 0px 0px;
-    padding: 16px;
-
-    .close-icon {
-      color: $neutral-500;
-
-      &:hover {
-        color: $neutral-800;
-      }
-    }
-  }
-
   .account-item {
     cursor: pointer;
     padding: 16px 18px 9px;

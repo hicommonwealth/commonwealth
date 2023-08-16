@@ -3,27 +3,6 @@
 .NewTopicModal {
   width: 420px;
 
-  .compact-modal-title {
-    display: flex;
-    align-items: center;
-    background: $white;
-    border-radius: 6px 6px 0px 0px;
-
-    .title-text {
-      font-weight: 500;
-      letter-spacing: -0.01em;
-    }
-
-    .close-icon {
-      color: $neutral-500;
-
-      &:hover {
-        cursor: pointer;
-        color: $neutral-800;
-      }
-    }
-  }
-
   .compact-modal-body {
     display: flex;
     flex-direction: column;
@@ -33,6 +12,19 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
+  }
+
+  .compact-modal-footer {
+    display: flex;
+    align-items: end;
+    flex-direction: column;
+    padding: 16px;
+
+    .validation-text {
+      display: flex;
+      align-items: center;
+      padding-right: 4px;
     }
   }
 }

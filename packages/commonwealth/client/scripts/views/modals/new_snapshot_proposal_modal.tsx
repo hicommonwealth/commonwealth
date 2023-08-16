@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X } from '@phosphor-icons/react';
 
 import { NewSnapshotProposalForm } from '../pages/new_snapshot_proposal';
 import app from 'state';
 import type Thread from '../../models/Thread';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
-import { CWText } from '../components/component_kit/cw_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/new_snapshot_proposal_modal.scss';
 
@@ -41,12 +40,7 @@ export const NewSnapshotProposalModal = ({
 
   return (
     <div className="NewSnapshotProposalModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Create New Snapshot
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label="Create New Snapshot" onModalClose={onModalClose} />
       <div className="compact-modal-body">
         {snapshotOptions.length > 0 ? (
           <>

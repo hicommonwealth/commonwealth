@@ -8,30 +8,6 @@
   position: relative;
   flex-direction: column;
 
-  .compact-modal-title {
-    display: flex;
-    height: 72px;
-    padding: 24px;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    background: $white;
-    border-radius: 6px 6px 0px 0px;
-
-    .title-text {
-      font-weight: 500;
-      letter-spacing: -0.01em;
-    }
-
-    .close-icon {
-      color: $neutral-500;
-
-      &:hover {
-        color: $neutral-800;
-      }
-    }
-  }
-
   .compact-modal-body {
     flex: 1;
     display: flex;

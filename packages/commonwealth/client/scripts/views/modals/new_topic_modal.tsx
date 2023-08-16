@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import type { DeltaStatic } from 'quill';
-import { X } from '@phosphor-icons/react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import app from 'state';
@@ -9,7 +8,7 @@ import { useCreateTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
@@ -19,7 +18,7 @@ import {
   ReactQuillEditor,
 } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
-import { CWText } from '../components/component_kit/cw_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/new_topic_modal.scss';
 
@@ -72,12 +71,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
 
   return (
     <div className="NewTopicModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          New topic
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label="New topic" onModalClose={onModalClose} />
       <div className="compact-modal-body">
         <CWTextInput
           label="Name"
@@ -163,12 +157,15 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setContentDelta={setContentDelta}
           />
         )}
+      </div>
+      <div className="compact-modal-footer">
         <CWButton
           label="Create topic"
+          buttonType="primary"
+          buttonHeight="sm"
           disabled={isSaving || !!errorMsg}
           onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
             e.preventDefault();
-
             try {
               await createTopic({
                 name,
@@ -178,9 +175,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
                 tokenThreshold,
                 defaultOffchainTemplate: serializeDelta(contentDelta),
               });
-
               navigate(`/discussions/${encodeURI(name.toString().trim())}`);
-
               onModalClose();
             } catch (err) {
               setErrorMsg('Error creating topic');
@@ -188,7 +183,13 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             }
           }}
         />
-        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}{' '}
+        {errorMsg && (
+          <CWValidationText
+            className="validation-text"
+            message={errorMsg}
+            status="failure"
+          />
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X } from '@phosphor-icons/react';
 
 import { notifyError } from 'controllers/app/notifications';
 import { getAddedAndDeleted } from 'helpers/threads';
@@ -12,7 +11,7 @@ import {
 import { ThreadSelector } from 'views/components/thread_selector';
 import type Thread from '../../models/Thread';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/linked_thread_modal.scss';
 
@@ -104,12 +103,10 @@ export const LinkedThreadModal = ({
 
   return (
     <div className="LinkedThreadModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Link to Existing Threads
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader
+        label="Link to Existing Threads"
+        onModalClose={onModalClose}
+      />
       <div className="compact-modal-body">
         <ThreadSelector
           linkedThreadsToSet={tempLinkedThreads}

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X } from '@phosphor-icons/react';
 
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
@@ -8,7 +7,7 @@ import { useEditThreadTopicMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { TopicSelector } from '../components/topic_selector';
-import { CWText } from '../components/component_kit/cw_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/change_thread_topic_modal.scss';
 
@@ -52,12 +51,7 @@ export const ChangeThreadTopicModal = ({
 
   return (
     <div className="ChangeThreadTopicModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Change topic
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label="Change topic" onModalClose={onModalClose} />
       <div className="compact-modal-body">
         <TopicSelector
           topics={topics}

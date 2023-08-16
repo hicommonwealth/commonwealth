@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-import { X } from '@phosphor-icons/react';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-
 import Topic from '../../models/Topic';
-
 import app from 'state';
-
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -23,7 +19,7 @@ import {
 } from '../components/react_quill_editor/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { useDeleteTopicMutation, useEditTopicMutation } from 'state/api/topics';
-import { CWText } from '../components/component_kit/cw_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/edit_topic_modal.scss';
 
@@ -68,12 +64,10 @@ export const EditTopicModal = ({
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
-
     if (featuredInNewPost && editorText.length === 0) {
       setErrorMsg('Must provide template.');
       return;
     }
-
     const topicInfo = {
       id,
       description: description,
@@ -87,7 +81,6 @@ export const EditTopicModal = ({
         : null,
       total_threads: topic.totalThreads || 0,
     };
-
     try {
       await editTopic({ topic: new Topic(topicInfo) });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
@@ -127,12 +120,7 @@ export const EditTopicModal = ({
 
   return (
     <div className="EditTopicModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Edit topic
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label="Edit topic" onModalClose={onModalClose} />
       <div className="compact-modal-body">
         <CWTextInput
           label="Name"

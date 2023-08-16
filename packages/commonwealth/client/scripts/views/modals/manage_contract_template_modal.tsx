@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X } from '@phosphor-icons/react';
 
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
@@ -12,6 +11,7 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/manage_contract_template_modal.scss';
 
@@ -173,12 +173,7 @@ const ManageContractTemplateModal = ({
 
   return (
     <div className="ManageContractTemplateModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          {modalTitle}
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label={modalTitle} onModalClose={onModalClose} />
       {!isEditMode && (
         <CWText type="h5" className="subtitle" fontWeight="medium">
           {modalSubtitle}

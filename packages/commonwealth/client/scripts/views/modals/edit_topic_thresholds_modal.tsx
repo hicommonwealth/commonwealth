@@ -1,5 +1,4 @@
 import React from 'react';
-import { X } from '@phosphor-icons/react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { getDecimals } from 'helpers';
@@ -13,6 +12,7 @@ import Permissions from '../../utils/Permissions';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/edit_topic_thresholds_modal.scss';
 
@@ -90,12 +90,10 @@ export const EditTopicThresholdsModal = ({
 
   return (
     <div className="EditTopicThresholdsModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Edit topic thresholds
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader
+        label="Edit topic thresholds"
+        onModalClose={onModalClose}
+      />
       <div className="compact-modal-body">
         {topics.length > 0 ? (
           topics

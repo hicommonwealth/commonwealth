@@ -19,9 +19,9 @@ import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { User } from '../components/user/user';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/edit_collaborators_modal.scss';
-import { CWModalHeader } from './CWModalHeader';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;

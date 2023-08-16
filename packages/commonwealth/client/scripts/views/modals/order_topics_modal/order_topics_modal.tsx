@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X } from '@phosphor-icons/react';
 
 import { notifyError } from 'controllers/app/notifications';
 import type Topic from '../../../models/Topic';
@@ -11,6 +10,7 @@ import {
 } from 'state/api/topics';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWModalHeader } from '../CWModalHeader';
 
 import 'modals/order_topics_modal.scss';
 
@@ -59,12 +59,7 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
 
   return (
     <div className="OrderTopicsModal">
-      <div className="compact-modal-title">
-        <CWText className="title-text" type="h4">
-          Reorder Topics
-        </CWText>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader label="Reorder Topics" onModalClose={onModalClose} />
       <div className="compact-modal-body">
         <div className="featured-topic-list">
           {topics.length ? (

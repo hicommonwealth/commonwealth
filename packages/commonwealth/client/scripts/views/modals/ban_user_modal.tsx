@@ -1,12 +1,11 @@
 import React from 'react';
 import $ from 'jquery';
-import { WarningOctagon, X } from '@phosphor-icons/react';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type MinimumProfile from '../../models/MinimumProfile';
 import app from 'state';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
+import { CWModalHeader } from './CWModalHeader';
 
 import 'modals/ban_user_modal.scss';
 
@@ -20,15 +19,11 @@ export const BanUserModal = (props: BanUserModalAttrs) => {
 
   return (
     <div className="BanUserModal">
-      <div className="compact-modal-title">
-        <div className="Frame">
-          <WarningOctagon className="warning-icon" weight="fill" size={24} />
-          <CWText className="title-text" type="h4">
-            Are You Sure?
-          </CWText>
-        </div>
-        <X className="close-icon" onClick={() => onModalClose()} size={24} />
-      </div>
+      <CWModalHeader
+        label="Are You Sure?"
+        icon="danger"
+        onModalClose={onModalClose}
+      />
       <div className="compact-modal-body">
         <div>
           Banning an address prevents it from interacting with the forum.

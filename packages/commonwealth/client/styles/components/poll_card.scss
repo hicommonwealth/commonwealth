@@ -140,40 +140,16 @@
     width: 100%;
   }
 
-  .compact-modal-title {
-    background: $white;
-    border-radius: 6px 6px 0px 0px;
-
-    font-family: $font-family-silka;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 28px;
-    letter-spacing: -0.01em;
-
-    .Frame {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      .warning-icon {
-        color: $rorange-600;
-      }
-
-      .close-icon {
-        color: $neutral-500;
-
-        &:hover {
-          cursor: pointer;
-          color: $neutral-800;
-        }
-      }
-    }
-  }
-
   .modal-body {
     display: flex;
     flex-direction: column;
     gap: 16px;
+  }
+
+  .compact-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px;
   }
 }
