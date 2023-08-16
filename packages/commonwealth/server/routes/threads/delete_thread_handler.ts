@@ -14,7 +14,7 @@ export const deleteThreadHandler = async (
   req: TypedRequestParams<DeleteThreadRequestParams>,
   res: TypedResponse<DeleteThreadResponse>
 ) => {
-  const { user } = req;
+  const { user, address } = req;
   const { id } = req.params;
 
   const threadId = parseInt(id, 10) || 0;
@@ -22,7 +22,7 @@ export const deleteThreadHandler = async (
     throw new AppError(Errors.InvalidThreadID);
   }
 
-  await controllers.threads.deleteThread({ user, threadId });
+  await controllers.threads.deleteThread({ user, address, threadId });
 
   return success(res, undefined);
 };
