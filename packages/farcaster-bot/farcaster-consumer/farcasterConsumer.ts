@@ -117,6 +117,12 @@ async function buildThreadCommentTree(rootCasts: Array<any>) {
           bot_name: 'farcaster',
           topic_name: 'General',
           readOnly: false,
+          bot_meta: {
+            message_id: null,
+            channel_id: null,
+            user: { id: cast.body.username, username: cast.meta.displayName },
+            bot_type: 'farcaster',
+          },
         };
 
         let threadId;
@@ -162,6 +168,12 @@ async function buildThreadCommentTree(rootCasts: Array<any>) {
           auth: CW_BOT_KEY,
           bot_name: 'farcaster',
           parentCommentId: parentCommentId ?? null,
+          bot_meta: {
+            message_id: null,
+            channel_id: null,
+            user: { id: cast.body.username, username: cast.meta.displayName },
+            bot_type: 'farcaster',
+          },
         };
 
         let commentId;

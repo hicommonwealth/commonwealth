@@ -26,7 +26,7 @@ export async function __deleteThread(
     // Special handling for discobot threads
     const existingThread = await this.models.Thread.findOne({
       where: {
-        discord_meta: { [Op.contains]: { message_id: messageId } },
+        bot_meta: { [Op.contains]: { message_id: messageId } },
       },
     });
     if (existingThread) {

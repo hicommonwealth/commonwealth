@@ -35,7 +35,7 @@ export type UpdateThreadOptions = {
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
-  discordMeta?: any;
+  botMeta?: any;
 };
 
 export type UpdateThreadResult = [ThreadAttributes, EmitOptions[]];
@@ -54,13 +54,13 @@ export async function __updateThread(
     canvasAction,
     canvasSession,
     canvasHash,
-    discordMeta,
+    botMeta,
   }: UpdateThreadOptions
 ): Promise<UpdateThreadResult> {
   if (!threadId) {
     // Discobot handling
     const existingThread = await this.models.Thread.findOne({
-      where: { discord_meta: discordMeta },
+      where: { bot_meta: botMeta },
     });
     if (existingThread) {
       threadId = existingThread.id;

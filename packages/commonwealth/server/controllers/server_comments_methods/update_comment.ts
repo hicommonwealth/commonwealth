@@ -28,7 +28,7 @@ export type UpdateCommentOptions = {
   chain: ChainInstance;
   commentId?: number;
   commentBody: string;
-  discordMeta?: any;
+  botMeta?: any;
 };
 
 export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
@@ -41,16 +41,16 @@ export async function __updateComment(
     chain,
     commentId,
     commentBody,
-    discordMeta,
+    botMeta,
   }: UpdateCommentOptions
 ): Promise<UpdateCommentResult> {
-  if (!commentId && !discordMeta) {
+  if (!commentId && !botMeta) {
     throw new AppError(Errors.NoId);
   }
 
-  if (discordMeta !== undefined && discordMeta !== null) {
+  if (botMeta !== undefined && botMeta !== null) {
     const existingComment = await this.models.Comment.findOne({
-      where: { discord_meta: discordMeta },
+      where: { bot_meta: botMeta },
     });
     if (existingComment) {
       commentId = existingComment.id;

@@ -24,7 +24,7 @@ type CreateThreadCommentRequestBody = {
   canvas_action;
   canvas_session;
   canvas_hash;
-  discord_meta;
+  bot_meta;
 };
 type CreateThreadCommentResponse = CommentInstance;
 
@@ -41,7 +41,7 @@ export const createThreadCommentHandler = async (
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
-    discord_meta,
+    bot_meta,
   } = req.body;
 
   if (!threadId) {
@@ -62,7 +62,7 @@ export const createThreadCommentHandler = async (
       canvasAction,
       canvasSession,
       canvasHash,
-      discordMeta: discord_meta,
+      botMeta: bot_meta,
     });
 
   for (const n of notificationOptions) {

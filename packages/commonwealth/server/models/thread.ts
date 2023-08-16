@@ -51,7 +51,7 @@ export type ThreadAttributes = {
   marked_as_spam_at?: Date;
   archived_at?: Date;
   locked_at?: Date;
-  discord_meta?: any;
+  bot_meta?: any;
 
   // associations
   Chain?: ChainAttributes;
@@ -110,7 +110,7 @@ export default (
         allowNull: false,
       },
       links: { type: dataTypes.JSONB, allowNull: true },
-      discord_meta: { type: dataTypes.JSONB, allowNull: true },
+      bot_meta: { type: dataTypes.JSONB, allowNull: true },
       has_poll: { type: dataTypes.BOOLEAN, allowNull: true },
 
       // signed data

@@ -166,7 +166,7 @@ class ThreadsController {
       canvasSession,
       canvasHash,
       links,
-      discord_meta,
+      bot_meta,
     } = thread;
 
     let { reactionIds, reactionType, addressesReacted } = thread;
@@ -280,7 +280,7 @@ class ThreadsController {
       canvasSession,
       canvasHash,
       links,
-      discord_meta,
+      bot_meta,
     });
 
     return t;

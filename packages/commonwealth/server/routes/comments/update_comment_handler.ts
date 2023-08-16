@@ -4,7 +4,7 @@ import { CommentAttributes } from 'server/models/comment';
 
 type UpdateCommentRequestBody = {
   body: string;
-  discord_meta?: any;
+  bot_meta?: any;
 };
 type UpdateCommentRequestParams = {
   id: number;
@@ -19,7 +19,7 @@ export const updateCommentHandler = async (
 ) => {
   const { user, chain, address } = req;
   const { id: commentId } = req.params;
-  const { body: commentBody, discord_meta: discordMeta } = req.body;
+  const { body: commentBody, bot_meta: botMeta } = req.body;
 
   const [updatedComment, notificationOptions] =
     await controllers.comments.updateComment({
@@ -28,7 +28,7 @@ export const updateCommentHandler = async (
       chain,
       commentId,
       commentBody,
-      discordMeta,
+      botMeta,
     });
 
   // emit notifications

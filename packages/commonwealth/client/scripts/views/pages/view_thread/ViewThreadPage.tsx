@@ -513,7 +513,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
   const fromDiscordBot =
-    thread.discord_meta !== null && thread.discord_meta !== undefined;
+    thread.bot_meta !== null && thread.bot_meta !== undefined;
 
   const showLocked =
     (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
@@ -553,7 +553,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }
         isEditing={isEditingBody}
         author={app.chain.accounts.get(thread.author)}
-        discord_meta={thread.discord_meta}
+        bot_meta={thread.bot_meta}
         collaborators={thread.collaborators}
         createdAt={thread.createdAt}
         updatedAt={thread.updatedAt}

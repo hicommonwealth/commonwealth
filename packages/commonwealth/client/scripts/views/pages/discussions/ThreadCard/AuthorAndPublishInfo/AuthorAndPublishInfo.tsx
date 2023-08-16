@@ -21,10 +21,11 @@ export type AuthorAndPublishInfoProps = {
   isNew?: boolean;
   isHot?: boolean;
   authorInfo: Account | AddressInfo | MinimumProfile | undefined;
-  discord_meta?: {
-    user: { id: string; username: string };
-    channel_id: string;
-    message_id: string;
+  bot_meta?: {
+    user: { id?: string; username: string };
+    channel_id?: string;
+    message_id?: string;
+    bot_type: string;
   };
   collaboratorsInfo?: IThreadCollaborator[];
   isLocked?: boolean;
@@ -50,7 +51,7 @@ export const AuthorAndPublishInfo = ({
   lastUpdated,
   viewsCount,
   publishDate,
-  discord_meta,
+  bot_meta,
   showSplitDotIndicator = true,
   showPublishLabelWithDate,
   showEditedLabelWithDate,
@@ -66,7 +67,7 @@ export const AuthorAndPublishInfo = ({
     <CWText className="dot-indicator">•</CWText>
   );
 
-  const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
+  const fromDiscordBot = bot_meta !== null && bot_meta !== undefined;
 
   return (
     <div className="AuthorAndPublishInfo">
@@ -84,7 +85,7 @@ export const AuthorAndPublishInfo = ({
         <>
           {dotIndicator}
           <CWText type="caption" className="discord-author">
-            <b>{discord_meta?.user?.username}</b>
+            <b>{bot_meta?.user?.username}</b>
           </CWText>
           {dotIndicator}
           <CWTag label={'Discord'} type={'discord'} iconName="discord" />
@@ -166,17 +167,11 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      {isNew && (
-        <CWTag label={'New'} type={'new'} iconName={'newStar'} />
-      )}
+      {isNew && <CWTag label={'New'} type={'new'} iconName={'newStar'} />}
 
-      {isHot && (
-        <CWTag iconName="trendUp" label="Trending" type="trending"/>
-      )}
+      {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
 
-      {isSpamThread && (
-        <CWTag label={'SPAM'} type={'disabled'} />
-      )}
+      {isSpamThread && <CWTag label={'SPAM'} type={'disabled'} />}
 
       {isLocked && lockedAt && lastUpdated && (
         <LockWithTooltip

@@ -14,7 +14,7 @@ type CreateThreadRequestBody = {
   canvas_action?: any;
   canvas_session?: any;
   canvas_hash?: any;
-  discord_meta?: any;
+  bot_meta?: any;
 };
 type CreateThreadResponse = ThreadAttributes;
 
@@ -36,7 +36,7 @@ export const createThreadHandler = async (
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
-    discord_meta,
+    bot_meta,
   } = req.body;
 
   const [thread, notificationOptions, analyticsOptions] =
@@ -55,7 +55,7 @@ export const createThreadHandler = async (
       canvasAction,
       canvasSession,
       canvasHash,
-      discordMeta: discord_meta,
+      botMeta: bot_meta,
     });
 
   for (const n of notificationOptions) {

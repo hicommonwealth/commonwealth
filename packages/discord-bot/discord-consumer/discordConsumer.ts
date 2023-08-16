@@ -86,10 +86,11 @@ async function consumeMessages() {
           canvas_action: null,
           canvas_hash: null,
           canvas_session: null,
-          discord_meta: {
+          bot_meta: {
             message_id: parsedMessage.message_id,
             channel_id: parsedMessage.parent_channel_id,
             user: parsedMessage.user,
+            bot_type: 'discord',
           },
           auth: CW_BOT_KEY,
           bot_name: 'discord',
@@ -107,7 +108,7 @@ async function consumeMessages() {
       } else {
         const thread_id = (
           await sequelize.query(
-            `SELECT id FROM "Threads" WHERE discord_meta->>'message_id' = '${parsedMessage.channel_id}'`
+            `SELECT id FROM "Threads" WHERE bot_meta->>'message_id' = '${parsedMessage.channel_id}'`
           )
         )[0][0]['id'];
 
@@ -122,10 +123,11 @@ async function consumeMessages() {
           canvas_session: null,
           auth: CW_BOT_KEY,
           bot_name: 'discord',
-          discord_meta: {
+          bot_meta: {
             message_id: parsedMessage.message_id,
             channel_id: parsedMessage.parent_channel_id,
             user: parsedMessage.user,
+            bot_type: 'discord',
           },
         };
 
@@ -139,7 +141,7 @@ async function consumeMessages() {
             `${SERVER_URL}/api/bot/threads/${thread_id}/comments`,
             {
               body: comment.text,
-              discord_meta: comment.discord_meta,
+              bot_meta: comment.bot_meta,
               auth: CW_BOT_KEY,
               address: '0xdiscordbot',
               chain: comment.chain,

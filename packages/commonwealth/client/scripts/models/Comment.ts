@@ -31,7 +31,7 @@ export class Comment<T extends IUniqueId> {
   public readonly canvasAction: string;
   public readonly canvasSession: string;
   public readonly canvasHash: string;
-  public readonly discord_meta: any;
+  public readonly bot_meta: any;
 
   constructor({
     id,
@@ -52,7 +52,7 @@ export class Comment<T extends IUniqueId> {
     canvas_action,
     canvas_session,
     marked_as_spam_at,
-    discord_meta,
+    bot_meta,
   }) {
     const versionHistory = version_history
       ? version_history.map((v) => {
@@ -96,7 +96,7 @@ export class Comment<T extends IUniqueId> {
     this.canvasHash = canvas_hash;
     this.reactions = (reactions || []).map((r) => new Reaction(r));
     this.rootThread = thread_id;
-    this.discord_meta = discord_meta;
+    this.bot_meta = bot_meta;
   }
 }
 
