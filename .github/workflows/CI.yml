@@ -78,6 +78,7 @@ jobs:
           PORT: 8080
           USES_DOCKER_PGSQL: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
+          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
 
       - name: Upload e2e recordings on failure
         uses: actions/upload-artifact@v3
@@ -159,6 +160,7 @@ jobs:
           PORT: 8080
           USES_DOCKER_PGSQL: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
+          ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2

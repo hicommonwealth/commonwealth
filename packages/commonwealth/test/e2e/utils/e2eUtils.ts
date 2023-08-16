@@ -148,7 +148,7 @@ export async function createAddress(chain, profileId, userId) {
       '{"number":17693949,"hash":"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}',
       false,
       'member'
-    )
+    ) ON CONFLICT DO NOTHING
   `);
 }
 
