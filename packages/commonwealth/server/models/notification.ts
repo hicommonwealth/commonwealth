@@ -41,6 +41,22 @@ export default (
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
     },
     {
+      hooks: {
+        afterCreate: async (notification) => {
+          const { Thread } = sequelize.models;
+          const { id, category_id, thread_id } = notification;
+          if (
+            ['new-thread-creation', 'new-comment-creation'].includes(
+              category_id
+            )
+          ) {
+            await Thread.update(
+              { max_notif_id: id },
+              { where: { id: thread_id } }
+            );
+          }
+        },
+      },
       tableName: 'Notifications',
       underscored: true,
       createdAt: 'created_at',

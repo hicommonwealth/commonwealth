@@ -48,6 +48,50 @@ export default (
       canvas_hash: { type: dataTypes.STRING, allowNull: true },
     },
     {
+      hooks: {
+        afterCreate: async (reaction: ReactionInstance) => {
+          const { thread_id, comment_id } = reaction;
+          const { Thread, Comment } = sequelize.models;
+          if (thread_id) {
+            const thread = await Thread.findOne({
+              where: { id: thread_id },
+            });
+            if (thread) {
+              thread.increment('reaction_count');
+            }
+          }
+
+          if (comment_id) {
+            const comment = await Comment.findOne({
+              where: { id: comment_id },
+            });
+            if (comment) {
+              comment.increment('reaction_count');
+            }
+          }
+        },
+        afterDestroy: async (reaction: ReactionInstance) => {
+          const { thread_id, comment_id } = reaction;
+          const { Thread, Comment } = sequelize.models;
+          if (thread_id) {
+            const thread = await Thread.findOne({
+              where: { id: thread_id },
+            });
+            if (thread) {
+              thread.decrement('reaction_count');
+            }
+          }
+
+          if (comment_id) {
+            const comment = await Comment.findOne({
+              where: { id: comment_id },
+            });
+            if (comment) {
+              comment.decrement('reaction_count');
+            }
+          }
+        },
+      },
       tableName: 'Reactions',
       underscored: true,
       createdAt: 'created_at',
