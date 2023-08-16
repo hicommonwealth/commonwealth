@@ -73,6 +73,26 @@ export default (
       discord_meta: { type: dataTypes.JSONB, allowNull: true },
     },
     {
+      hooks: {
+        afterCreate: async (comment: CommentInstance) => {
+          const { Thread } = sequelize.models;
+          const thread = await Thread.findOne({
+            where: { id: comment.thread_id },
+          });
+          if (thread) {
+            thread.increment('comment_count');
+          }
+        },
+        afterDestroy: async (comment: CommentInstance) => {
+          const { Thread, Address } = sequelize.models;
+          const thread = await Thread.findOne({
+            where: { id: comment.thread_id },
+          });
+          if (thread) {
+            thread.decrement('comment_count');
+          }
+        },
+      },
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
