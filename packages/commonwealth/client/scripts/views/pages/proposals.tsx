@@ -25,8 +25,8 @@ import {
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
+  useAaveProposalsQuery,
 } from 'state/api/proposals';
-import useAaveProposalsQuery from 'state/api/proposals/aave/fetchAaveProposals';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -30,7 +30,7 @@ import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
-import useAaveProposalsQuery from 'state/api/proposals/aave/fetchAaveProposals';
+import { useAaveProposalsQuery } from 'state/api/proposals';
 
 type ViewProposalPageAttrs = {
   identifier: string;

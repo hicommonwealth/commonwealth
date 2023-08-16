@@ -21,7 +21,7 @@ import {
   YesNoRejectVotingResult,
 } from './voting_result_components';
 import useForceRerender from 'hooks/useForceRerender';
-import useAaveProposalVotesQuery from 'state/api/proposals/aave/fetchAaveProposalVotes';
+import { useAaveProposalVotesQuery } from 'state/api/proposals';
 import { ChainNetwork } from 'common-common/src/types';
 
 type VotingResultsProps = { proposal: AnyProposal };
