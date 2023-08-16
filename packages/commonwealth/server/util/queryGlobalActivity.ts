@@ -1,6 +1,6 @@
 import type MinimumProfile from '../../client/scripts/models/MinimumProfile';
 import type { DB } from '../models';
-import { getActivityFeed } from './activityUtils';
+import { getActivityFeed } from './activityQuery';
 
 export type GlobalActivity = Array<{
   category_id: string;
