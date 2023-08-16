@@ -1,8 +1,8 @@
 import { DB } from '../models';
 import {
   __getProposals,
-  GetCompletedProposalsOptions,
-  GetCompletedProposalsResult,
+  GetProposalsOptions,
+  GetProposalsResult,
 } from './server_proposal_methods/get_proposals';
 import { RedisCache } from 'common-common/src/redisCache';
 import { providers } from 'ethers';
@@ -27,8 +27,8 @@ export class ServerProposalsController {
   constructor(public models: DB, public redisCache: RedisCache) {}
 
   public async getProposals(
-    options: GetCompletedProposalsOptions
-  ): Promise<GetCompletedProposalsResult> {
+    options: GetProposalsOptions
+  ): Promise<GetProposalsResult> {
     const contractInfo = await this.getContractInfo(options.chainId);
     const provider = await this.createEvmProvider(options.chainId);
     return __getProposals.call(this, options, provider, contractInfo);
