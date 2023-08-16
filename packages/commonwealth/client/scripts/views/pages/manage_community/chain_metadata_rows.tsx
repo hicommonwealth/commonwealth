@@ -235,11 +235,12 @@ export const ChainMetadataRows = ({
 
   const handleSaveChanges = async () => {
     for (const space of snapshot) {
-      if (space !== '') {
-        if (space.slice(space.length - 4) !== '.eth') {
-          notifyError('Snapshot name must be in the form of *.eth');
-          return;
-        }
+      if (
+        space.slice(space.length - 4) !== '.eth' &&
+        space.slice(space.length - 4) !== '.xyz'
+      ) {
+        notifyError('Snapshot name must be in the form of *.eth or *.xyz');
+        return;
       }
     }
 
@@ -512,7 +513,7 @@ export const ChainMetadataRows = ({
         <InputRow
           title="Snapshot(s) -- use commas to add multiple spaces"
           value={snapshotString}
-          placeholder={chain.network}
+          placeholder="space-name.eth, space-2-name.xyz"
           onChangeHandler={(v) => {
             const snapshots = v
               .split(',')
