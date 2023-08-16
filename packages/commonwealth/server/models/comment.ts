@@ -28,6 +28,9 @@ export type CommentAttributes = {
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
+
+  //counts
+  reaction_count: number;
 };
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
@@ -71,6 +74,13 @@ export default (
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
       discord_meta: { type: dataTypes.JSONB, allowNull: true },
+
+      //counts
+      reaction_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
       hooks: {
