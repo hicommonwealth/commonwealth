@@ -21,11 +21,8 @@ import {
   YesNoRejectVotingResult,
 } from './voting_result_components';
 import useForceRerender from 'hooks/useForceRerender';
-import { IVote } from 'models/interfaces';
-import Proposal from 'models/Proposal';
 import useAaveProposalVotesQuery from 'state/api/proposals/aave/fetchAaveProposalVotes';
 import { ChainNetwork } from 'common-common/src/types';
-import useAaveProposalsQuery from 'state/api/proposals/aave/fetchAaveProposals';
 
 type VotingResultsProps = { proposal: AnyProposal };
 
