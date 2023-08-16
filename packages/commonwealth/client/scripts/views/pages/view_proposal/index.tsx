@@ -73,7 +73,7 @@ const ViewProposalPage = ({
       chainId: app.chain?.id,
     });
 
-  if (aaveProposalsLoading === false && fetchAaveData && !proposal) {
+  if (!aaveProposalsLoading && fetchAaveData && !proposal) {
     const foundProposal = cachedAaveProposals?.find(
       (p) => p.identifier === proposalId
     );
