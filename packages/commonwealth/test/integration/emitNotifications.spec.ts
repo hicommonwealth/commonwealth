@@ -158,6 +158,14 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notifRead).to.not.be.null;
+
+      //verify max_notif_id in thread is updated
+      const updatedThread = await models.Thread.findOne({
+        where: {
+          id: thread.id,
+        },
+      });
+      expect(updatedThread.max_notif_id).to.equal(notif.id);
     });
 
     it('should generate a notification and notification reads for a thread comment', async () => {
@@ -209,9 +217,23 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notifRead).to.not.be.null;
+
+      //verify max_notif_id in thread model is updated
+      const updatedThread = await models.Thread.findOne({
+        where: {
+          id: thread.id,
+        },
+      });
+      expect(updatedThread.max_notif_id).to.equal(notif.id);
     });
 
     it('should generate a notification and notification reads for a new thread reaction', async () => {
+      let updatedThread = await models.Thread.findOne({
+        where: {
+          id: thread.id,
+        },
+      });
+      const before_thread_max_notif_id = updatedThread.max_notif_id;
       const subscription = await models.Subscription.create({
         subscriber_id: userId,
         category_id: NotificationCategories.NewReaction,
@@ -258,6 +280,15 @@ describe('emitNotifications tests', () => {
         },
       });
       expect(notifRead).to.not.be.null;
+
+      // verify max_notif_id in thread is not updated on new reaction
+      // currently updating only on new thread and new comment
+      updatedThread = await models.Thread.findOne({
+        where: {
+          id: thread.id,
+        },
+      });
+      expect(updatedThread.max_notif_id).to.equal(before_thread_max_notif_id);
     });
   });
 

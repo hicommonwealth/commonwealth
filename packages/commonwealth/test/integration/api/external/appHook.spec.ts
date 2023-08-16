@@ -117,11 +117,12 @@ export async function post(
 export async function del(
   path: string,
   val: Record<string, unknown>,
-  expectError = false
+  expectError = false,
+  expectedApp = app
 ) {
   const res = <any>(
     await chai
-      .request(app)
+      .request(expectedApp)
       .delete(path)
       .set('Accept', 'application/json')
       .send(val)
