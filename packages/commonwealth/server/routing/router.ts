@@ -171,7 +171,6 @@ import { ServerChainsController } from '../controllers/server_chains_controller'
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
-import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
@@ -811,12 +810,6 @@ function setupRouter(
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
     deleteReactionHandler.bind(this, serverControllers)
-  );
-  registerRoute(
-    router,
-    'get',
-    '/comments/:id/reactions',
-    getCommentReactionsHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
