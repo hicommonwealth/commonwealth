@@ -496,7 +496,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
-  if (!snapshotId) {
+  if (linkedSnapshots && !snapshotId) {
     setSnapshotId(linkedSnapshots[0].identifier.split('/')[0]);
     setProposalId(linkedSnapshots[0].identifier.split('/')[1]);
   }
