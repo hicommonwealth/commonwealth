@@ -35,21 +35,15 @@ type ViewProposalPageAttrs = {
   type?: string;
 };
 
-const ViewProposalPage = ({
-  identifier,
-  type: typeProp,
-}: ViewProposalPageAttrs) => {
-  const proposalId = identifier.split('-')[0];
-  const navigate = useCommonNavigate();
+export function useProposalData(proposalId, typeProp) {
+  console.log(proposalId, typeProp);
+  const [error, setError] = useState(null);
+  const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
+  const hasFetchedProposalRef = useRef(false);
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
-
-  const hasFetchedProposalRef = useRef(false);
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const [votingModalOpen, setVotingModalOpen] = useState(false);
-  const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
-  const [error, setError] = useState(null);
-  const { metadata } = useProposalMetadata({ app, proposal });
+  const { metadata } = useProposalMetadata({ app, snapshotProposal: proposal });
 
   useEffect(() => {
     if (metadata?.title) forceRerender();
@@ -71,6 +65,7 @@ const ViewProposalPage = ({
       let resolvedType = typeProp;
       if (!typeProp) {
         resolvedType = chainToProposalSlug(app.chain.meta);
+        console.log(resolvedType);
       }
 
       try {
@@ -104,6 +99,26 @@ const ViewProposalPage = ({
       afterAdapterLoaded();
     }
   }, [isAdapterLoaded, proposalId]);
+
+  return {
+    error,
+    metadata,
+    isAdapterLoaded,
+    snapshotProposal: proposal,
+  };
+}
+
+const ViewProposalPage = ({
+  identifier,
+  type: typeProp,
+}: ViewProposalPageAttrs) => {
+  const proposalId = identifier.split('-')[0];
+  const navigate = useCommonNavigate();
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const { error, metadata, isAdapterLoaded, proposal } = useProposalData(
+    proposalId,
+    typeProp
+  );
 
   if (!isAdapterLoaded || !proposal) {
     return <PageLoading message="Loading..." />;

@@ -35,7 +35,7 @@ export const ProposalCard = ({
 }: ProposalCardProps) => {
   const navigate = useCommonNavigate();
   const [title, setTitle] = useState(proposal.title);
-  const { metadata } = useProposalMetadata({ app, proposal });
+  const { metadata } = useProposalMetadata({ app, snapshotProposal: proposal });
   const forceRerender = useForceRerender();
 
   const secondaryTagText = getSecondaryTagText(proposal);

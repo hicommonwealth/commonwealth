@@ -24,7 +24,7 @@ import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
 
-export function useProposalPageData(identifier, snapshotId) {
+export function useSnapshotProposalData(snapshotProposalId, snapshotId) {
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
@@ -70,6 +70,7 @@ export function useProposalPageData(identifier, snapshotId) {
       const currentProposal = app.snapshot.proposals.find(
         (p) => p.id === proposalId
       );
+      console.log(app.snapshot.proposals);
       setProposal(currentProposal);
 
       const currentSpace = app.snapshot.space;
@@ -99,15 +100,15 @@ export function useProposalPageData(identifier, snapshotId) {
         console.error(`Failed to fetch threads: ${e}`);
       }
     },
-    [activeUserAddress, snapshotId]
+    [activeUserAddress]
   );
 
   useNecessaryEffect(() => {
-    loadVotes(snapshotId, identifier).catch(console.error);
-  }, [snapshotId, identifier]);
+    loadVotes(snapshotId, snapshotProposalId).catch(console.error);
+  }, [snapshotId, snapshotProposalId]);
 
   return {
-    proposal,
+    snapshotProposal: proposal,
     proposalAuthor,
     votes,
     symbol,
@@ -133,7 +134,7 @@ export const ViewProposalPage = ({
   snapshotId,
 }: ViewProposalPageProps) => {
   const {
-    proposal,
+    snapshotProposal,
     proposalAuthor,
     votes,
     symbol,
@@ -145,32 +146,32 @@ export const ViewProposalPage = ({
     totalScore,
     validatedAgainstStrategies,
     loadVotes,
-  } = useProposalPageData(identifier, snapshotId);
+  } = useSnapshotProposalData(identifier, snapshotId);
 
-  if (!proposal) {
+  if (!snapshotProposal) {
     return <PageLoading />;
   }
 
   return (
     <CWContentPage
       showSidebar
-      title={proposal.title}
+      title={snapshotProposal.title}
       author={proposalAuthor}
-      createdAt={proposal.created}
+      createdAt={snapshotProposal.created}
       updatedAt={null}
       contentBodyLabel="Snapshot"
       subHeader={
-        proposal.state === 'active' ? (
-          <ActiveProposalPill proposalEnd={proposal.end} />
+        snapshotProposal.state === 'active' ? (
+          <ActiveProposalPill proposalEnd={snapshotProposal.end} />
         ) : (
-          <ClosedProposalPill proposalState={proposal.state} />
+          <ClosedProposalPill proposalState={snapshotProposal.state} />
         )
       }
-      body={() => <QuillRenderer doc={proposal.body} />}
+      body={() => <QuillRenderer doc={snapshotProposal.body} />}
       subBody={
         votes.length > 0 && (
           <SnapshotVotesTable
-            choices={proposal.choices}
+            choices={snapshotProposal.choices}
             symbol={symbol}
             voters={votes}
           />
@@ -180,7 +181,10 @@ export const ViewProposalPage = ({
         {
           label: 'Info',
           item: (
-            <SnapshotInformationCard proposal={proposal} threads={threads} />
+            <SnapshotInformationCard
+              proposal={snapshotProposal}
+              threads={threads}
+            />
           ),
         },
         {
@@ -190,7 +194,7 @@ export const ViewProposalPage = ({
               activeUserAddress={activeUserAddress}
               fetchedPower={!!power}
               identifier={identifier}
-              proposal={proposal}
+              proposal={snapshotProposal}
               scores={[]} // unused?
               space={space}
               symbol={symbol}

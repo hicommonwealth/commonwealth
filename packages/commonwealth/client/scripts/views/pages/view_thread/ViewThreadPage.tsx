@@ -53,7 +53,9 @@ import { QuillRenderer } from '../../components/react_quill_editor/quill_rendere
 import { Select } from '../../components/Select';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import { useProposalPageData } from '../view_snapshot_proposal/index';
+import { useProposalData } from '../view_proposal/index';
+import { ProposalInformationCard } from '../view_proposal/ViewProposalCard';
+import { useSnapshotProposalData } from '../view_snapshot_proposal/index';
 import { SnapshotInformationCard } from '../view_snapshot_proposal/snapshot_information_card';
 import { SnapshotPollCardContainer } from '../view_snapshot_proposal/snapshot_poll_card_container';
 import { EditBody } from './edit_body';
@@ -106,11 +108,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
   const [hideTemplate, setHideTemplate] = useState(false);
-  const [proposalId, setProposalId] = useState(null);
+  const [snapshotProposalId, setSnapshotProposalId] = useState(null);
   const [snapshotId, setSnapshotId] = useState(null);
+  const [proposalId, setProposalId] = useState(null);
 
   const {
-    proposal,
+    snapshotProposal,
     proposalAuthor,
     votes,
     symbol,
@@ -122,8 +125,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     totalScore,
     validatedAgainstStrategies,
     loadVotes,
-  } = useProposalPageData(proposalId, snapshotId);
+  } = useSnapshotProposalData(snapshotProposalId, snapshotId);
 
+  const { error, metadata, isAdapterLoaded, proposal } = useProposalData(
+    proposalId,
+    null
+  );
+
+  console.log(proposal, '====');
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
@@ -496,11 +505,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
-  if (linkedSnapshots && !snapshotId) {
+  if (linkedSnapshots?.length > 0 && !snapshotId) {
     setSnapshotId(linkedSnapshots[0].identifier.split('/')[0]);
-    setProposalId(linkedSnapshots[0].identifier.split('/')[1]);
+    setSnapshotProposalId(linkedSnapshots[0].identifier.split('/')[1]);
   }
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+  if (linkedProposals?.length > 0 && !proposalId) {
+    setProposalId(linkedProposals[0].identifier);
+  }
+
+  console.log(thread.links);
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
   const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
@@ -857,13 +871,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   },
                 ]
               : []),
-            ...(proposal
+            ...(snapshotProposal
               ? [
                   {
                     label: 'Info',
                     item: (
                       <SnapshotInformationCard
-                        proposal={proposal}
+                        proposal={snapshotProposal}
                         threads={threads}
                         header={'Snapshot Info'}
                       />
@@ -876,7 +890,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         activeUserAddress={activeUserAddress}
                         fetchedPower={!!power}
                         identifier={identifier}
-                        proposal={proposal}
+                        proposal={snapshotProposal}
                         scores={[]} // unused?
                         space={space}
                         symbol={symbol}
@@ -887,6 +901,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         loadVotes={async () =>
                           loadVotes(snapshotId, identifier)
                         }
+                      />
+                    ),
+                  },
+                ]
+              : []),
+            ...(proposal
+              ? [
+                  {
+                    label: 'ProposalInformationCard',
+                    item: (
+                      <ProposalInformationCard
+                        proposal={proposal}
+                        threads={threads}
                       />
                     ),
                   },
