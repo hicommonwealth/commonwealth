@@ -40,7 +40,7 @@ export const VotingResults = (props: VotingResultsProps) => {
     return () => {
       app.chainAdapterReady.off('ready', listener);
     };
-  }, [setLoading]);
+  }, []);
 
   useEffect(() => {
     app.proposalEmitter.on('redraw', forceRerender);
