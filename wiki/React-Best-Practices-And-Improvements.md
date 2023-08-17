@@ -106,17 +106,17 @@ This interface should take the naming structure `ComponentProps`, e.g. `AvatarUp
 
 Props should be immediately destructured within the Component's definition.
 
-### Hooks
+### Hooks and utils
 
-In general, hooks and utils should be kept close to the component. If a hook or util function begins to be used by multiple pages or components, it should be moved to our `/utils` and `/helpers` directories.
+Ideally, we should extract business logic to custom hooks and utils that are responsible for fetching, storing and manipulating data. This way, we follow the [single responsibility principle](https://en.wikipedia.org/wiki/Single-responsibility_principle).
 
-Ideally, we should extract business logic to custom hooks that are responsible for fetching, storing and manipulating data. This way, we follow the [single responsibility principle](https://en.wikipedia.org/wiki/Single-responsibility_principle).
+Hooks and utils should be defined in separate files, close to the component (i.e. in the same subdirectory). If a hook or util function begins to be used by multiple pages or components, it should be moved to our `/utils` and `/helpers` directories.
 
-React hooks should be housed either top of the component and should follow the [React hooks rules](https://legacy.reactjs.org/docs/hooks-rules.html).
-
-We currently overuse `// eslint-disable-next-line react-hooks/exhaustive-deps`. Passing exact dependencies as eslint suggests makes sense in the vast majority of situations; if your dependency array causes an infinite loop, it means that either the logic is poorly designed, or the dependency needs to be wrapped in `useMemo`/`useCallback`.
+React hooks (e.g. `useEffect`) should be invoked as early as possible in the component definition, at the component's top level of context, i.e. not nested inside conditionals, loops, or other logic. See the [React hooks rules](https://legacy.reactjs.org/docs/hooks-rules.html).
 
 We should favour using `useState` or `useEffect` instead of `React.useState` or `React.useEffect`. The same goes for other methods imported from the React packages.
+
+We currently overuse `// eslint-disable-next-line react-hooks/exhaustive-deps`. Passing exact dependencies as eslint suggests makes sense in the vast majority of situations; if your dependency array causes an infinite loop, it means that either the logic is poorly designed, or the dependency needs to be wrapped in `useMemo`/`useCallback`.
 
 ### Markup readability
 
