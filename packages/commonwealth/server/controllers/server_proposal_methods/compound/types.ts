@@ -44,7 +44,7 @@ export type ProposalCreatedEventArgsObject = {
 };
 
 export type ResolvedProposalPromises = [
-  TypedEvent<ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject>[],
+  ProposalCreatedEventArgsObject[],
   CompoundProposalType[],
   number[]
 ];
@@ -52,8 +52,6 @@ export type ResolvedProposalPromises = [
 export type ProposalDataType = {
   rawProposal: CompoundProposalType;
   proposalState: number;
-  proposalCreatedEvent: TypedEvent<
-    ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject
-  >;
+  proposalCreatedEvent: ProposalCreatedEventArgsObject;
   identifier?: string;
 };

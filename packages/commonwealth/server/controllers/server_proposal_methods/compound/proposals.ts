@@ -1,4 +1,4 @@
-import { ethers, providers, utils } from 'ethers';
+import { BigNumber, ethers, providers, utils } from 'ethers';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
@@ -20,7 +20,6 @@ import {
   ProposalDataType,
   ResolvedProposalPromises,
 } from './types';
-import { cloneDeep } from 'lodash';
 
 export function formatCompoundBravoProposal(
   proposalData: ProposalDataType
@@ -30,15 +29,15 @@ export function formatCompoundBravoProposal(
       proposalData.identifier || proposalData.rawProposal.id.toString(),
     id: proposalData.rawProposal.id.toHexString(),
     proposer: proposalData.rawProposal.proposer,
-    targets: proposalData.proposalCreatedEvent.args.targets,
-    values: proposalData.proposalCreatedEvent.args[4].map((v) => v.toString()),
-    signatures: proposalData.proposalCreatedEvent.args.signatures,
-    calldatas: proposalData.proposalCreatedEvent.args.calldatas.map((c) =>
+    targets: proposalData.proposalCreatedEvent.targets,
+    values: proposalData.proposalCreatedEvent.values.map((v) => v.toString()),
+    signatures: proposalData.proposalCreatedEvent.signatures,
+    calldatas: proposalData.proposalCreatedEvent.calldatas.map((c) =>
       ethers.utils.hexlify(c)
     ),
     startBlock: +proposalData.rawProposal.startBlock,
     endBlock: +proposalData.rawProposal.endBlock,
-    description: getUtf8Description(proposalData.proposalCreatedEvent),
+    description: proposalData.proposalCreatedEvent.description,
     eta: +proposalData.rawProposal.eta,
     state: proposalData.proposalState,
     completed:
@@ -84,12 +83,17 @@ export async function getCompoundProposals(
 
   await contract.deployed();
   let proposalArrays: ResolvedProposalPromises;
+  let initialProposalId: number;
   switch (govVersionFinal) {
     case GovVersion.Alpha:
-      proposalArrays = await getProposalAsync(<GovernorAlpha>contract);
+      initialProposalId = 1;
+      proposalArrays = await getProposalAsync(
+        <GovernorAlpha>contract,
+        initialProposalId
+      );
       break;
     case GovVersion.Bravo:
-      const initialProposalId = +(await contract.initialProposalId());
+      initialProposalId = +(await contract.initialProposalId());
       proposalArrays = await getProposalAsync(
         <GovernorBravoDelegate>contract,
         initialProposalId
@@ -112,7 +116,7 @@ export async function getCompoundProposals(
       rawProposal: proposals[i],
       proposalState: proposalStates[i],
       proposalCreatedEvent: proposalCreatedEvents.find((p) =>
-        p.args.id.eq(proposals[i].id)
+        p.id.eq(proposals[i].id)
       ),
     });
   }
@@ -135,7 +139,7 @@ export async function getCompoundProposals(
  */
 async function getProposalAsync(
   contract: GovernorAlpha | GovernorBravoDelegate,
-  initialProposalId = 0
+  initialProposalId: number
 ): Promise<ResolvedProposalPromises> {
   console.log('Fetching proposal data asynchronously');
   const proposalCreatedEventsPromise = getProposalCreatedEvents(contract);
@@ -171,8 +175,8 @@ async function getProposalDataSequentially(
   const proposalDataPromises: Promise<CompoundProposalType>[] = [];
   const proposalStatePromises: Promise<number>[] = [];
   for (const propCreatedEvent of proposalCreatedEvents) {
-    proposalDataPromises.push(contract.proposals(propCreatedEvent.args.id));
-    proposalStatePromises.push(contract.state(propCreatedEvent.args.id));
+    proposalDataPromises.push(contract.proposals(propCreatedEvent.id));
+    proposalStatePromises.push(contract.state(propCreatedEvent.id));
   }
 
   const [proposals, proposalStates] = await Promise.all([
@@ -184,29 +188,6 @@ async function getProposalDataSequentially(
 }
 
 /**
- * This function determines the initial proposal id and then calls getProposalAsync. This function is necessary to
- * support contract versions that don't exactly match Bravo. Such contracts (like impactmarket) generally follow the
- * Bravo contract interface, but don't have initialProposalId because they use sequential proposal ids starting from 0.
- * Therefore, for these contracts we attempt to fetch initialProposalId and if it doesn't exist, we start from 0.
- * @param contract
- */
-async function getBravoProposals(
-  contract: GovernorBravoDelegate
-): Promise<ResolvedProposalPromises> {
-  let initialProposalId = 0;
-  try {
-    // Some contracts like for impact market don't have initialProposalId and use proposal id's starting from 0
-    initialProposalId = +(await contract.initialProposalId());
-  } catch (e) {
-    console.log(
-      `initialProposalId does not exist on contract ${contract.address}. Using proposal id 0 as initialProposalId`
-    );
-  }
-
-  return getProposalAsync(contract, initialProposalId);
-}
-
-/**
  * This function is used to map a Compound compatible event arg array to a fully functional event arg object.
  * Uses:
  * 1. Convert proposalId to id in OZ and OZ Bravo Compatibility event args
@@ -215,26 +196,55 @@ async function getBravoProposals(
  */
 export function mapProposalCreatedEvent(
   event: TypedEvent<ProposalCreatedEventArgsArray & any>
-): TypedEvent<ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject> {
-  const result: any = cloneDeep(event);
-  result.args.calldatas = event.args[5];
+): ProposalCreatedEventArgsObject {
+  const result = utils.defaultAbiCoder.decode(
+    [
+      'uint',
+      'address',
+      'address[]',
+      'uint[]',
+      'string[]',
+      'bytes[]',
+      'uint',
+      'uint',
+      'bytes',
+    ],
+    event.data
+  );
+  const [
+    id,
+    proposer,
+    targets,
+    values,
+    signatures,
+    calldatas,
+    startBlock,
+    endBlock,
+    descriptionBytes,
+  ] = result;
+  const description = utils.toUtf8String(
+    descriptionBytes,
+    utils.Utf8ErrorFuncs.ignore
+  );
 
-  if (event.args.proposalId) {
-    // original event is frozen/sealed so must clone it to modify it
-    result.args.id = event.args.proposalId;
-    delete result.args.proposalId;
-  }
-
-  return result;
+  return {
+    id,
+    proposer,
+    targets,
+    values,
+    signatures,
+    calldatas,
+    startBlock,
+    endBlock,
+    description,
+  };
 }
 
 async function getProposalCreatedEvents(
   contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo,
   fromBlock = 0,
   toBlock: number | 'latest' = 'latest'
-): Promise<
-  TypedEvent<ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject>[]
-> {
+): Promise<ProposalCreatedEventArgsObject[]> {
   const events = await contract.queryFilter<ProposalCreatedEventArgsArray, any>(
     contract.filters.ProposalCreated(
       null,
@@ -252,26 +262,4 @@ async function getProposalCreatedEvents(
   );
 
   return events.map((e) => mapProposalCreatedEvent(e));
-}
-
-function getUtf8Description(
-  event: TypedEvent<
-    ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject
-  >
-) {
-  const result = utils.defaultAbiCoder.decode(
-    [
-      'uint',
-      'address',
-      'address[]',
-      'uint[]',
-      'string[]',
-      'bytes[]',
-      'uint',
-      'uint',
-      'bytes',
-    ],
-    event.data
-  );
-  return utils.toUtf8String(result[8], utils.Utf8ErrorFuncs.ignore);
 }
