@@ -127,7 +127,7 @@ export class ServerProposalsController {
       throw new ServerError(`No RPC URL found for chain ${chainId}`);
     }
 
-    // only Aave and Compound contracts on Ethereum are supported
+    // only Aave and Compound contracts on Ethereum are supported: ChainNode.id = 37 is the Ethereum RPC
     if (
       chain.ChainNode.id != 37 ||
       (chain.network !== ChainNetwork.Aave &&

@@ -14,12 +14,7 @@ import { TypedEvent } from 'common-common/src/eth/types/commons';
 
 /**
  * This function determines which compound contract version is being used at the given address. Note that the returned
- * contract and gov version is not guaranteed to be an exact match. For example, impactmarket uses a mix of Alpha, Bravo
- * and Oz-Compatible Bravo contracts, but the returned contract will be a Bravo contract since that's what it most
- * closely matches. This function in now way affects what contract interface is chosen on the client. The purpose of
- * this function is to decide the best contract interface for fetching proposals. Ideally, proposal data is fetched at
- * the same time as proposal created events, but this is not possible for oz and oz-compatible bravo contracts since
- * they don't have sequential proposal ids.
+ * contract and gov version is not guaranteed to exactly match the deployed contract.
  * @param compoundGovAddress
  * @param provider
  */
@@ -28,11 +23,7 @@ export async function getCompoundGovContractAndVersion(
   provider: providers.Web3Provider
 ): Promise<{
   version: GovVersion;
-  contract:
-    | GovernorAlpha
-    | GovernorBravoDelegate
-    | GovernorCompatibilityBravo
-    | Governor;
+  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo;
 }> {
   try {
     const contract = GovernorAlpha__factory.connect(
@@ -47,9 +38,8 @@ export async function getCompoundGovContractAndVersion(
         compoundGovAddress,
         provider
       );
-      // OZ never uses proposalCount so default to bravo if proposalCount is defined so that we
-      // can fetch proposal created events and proposal data simultaneously rather than sequentially
       await contract.proposalCount();
+      await contract.initialProposalId();
       return { version: GovVersion.Bravo, contract };
     } catch (e) {
       try {
@@ -60,18 +50,9 @@ export async function getCompoundGovContractAndVersion(
         await contract.COUNTING_MODE();
         return { version: GovVersion.OzBravo, contract };
       } catch (e) {
-        try {
-          const contract = Governor__factory.connect(
-            compoundGovAddress,
-            provider
-          );
-          await contract.quorum(0);
-          return { version: GovVersion.Oz, contract };
-        } catch (e) {
-          throw new Error(
-            `Failed to find Compound contract version at ${compoundGovAddress}`
-          );
-        }
+        throw new Error(
+          `Failed to find Compound contract version at ${compoundGovAddress}`
+        );
       }
     }
   }
@@ -95,15 +76,13 @@ export function getCompoundGovContract(
         compoundGovAddress,
         provider
       );
-    case GovVersion.Oz:
-      return Governor__factory.connect(compoundGovAddress, provider);
     default:
       throw new Error(`Invalid Compound contract version: ${govVersion}`);
   }
 }
 
 /**
- *
+ * Used to fetch events in a batched manner (e.g. 500 blocks at a time) if the given RPC provider has a block limit.
  * @param contract
  * @param queryFilterEvents
  */

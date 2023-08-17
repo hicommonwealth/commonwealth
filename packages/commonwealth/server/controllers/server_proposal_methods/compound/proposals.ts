@@ -1,6 +1,5 @@
 import { ethers, providers, utils } from 'ethers';
 import {
-  Governor,
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
@@ -9,7 +8,6 @@ import { TypedEvent } from 'common-common/src/eth/types/commons';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { ProposalState } from 'chain-events/src/chains/compound/types';
 import { DB } from '../../../models';
-import { cloneDeep } from 'lodash';
 import {
   getCompoundGovContract,
   getCompoundGovContractAndVersion,
@@ -22,12 +20,14 @@ import {
   ProposalDataType,
   ResolvedProposalPromises,
 } from './types';
+import { cloneDeep } from 'lodash';
 
 export function formatCompoundBravoProposal(
   proposalData: ProposalDataType
 ): ICompoundProposalResponse {
   return {
-    identifier: proposalData.rawProposal.id.toHexString(),
+    identifier:
+      proposalData.identifier || proposalData.rawProposal.id.toString(),
     id: proposalData.rawProposal.id.toHexString(),
     proposer: proposalData.rawProposal.proposer,
     targets: proposalData.proposalCreatedEvent.args.targets,
@@ -40,15 +40,15 @@ export function formatCompoundBravoProposal(
     endBlock: +proposalData.rawProposal.endBlock,
     description: getUtf8Description(proposalData.proposalCreatedEvent),
     eta: +proposalData.rawProposal.eta,
-    queued: proposalData.proposalState === ProposalState.Queued,
-    executed: proposalData.rawProposal.executed,
-    cancelled: proposalData.rawProposal.canceled,
-    expired: proposalData.proposalState === ProposalState.Expired,
+    state: proposalData.proposalState,
     completed:
       proposalData.proposalState === ProposalState.Executed ||
       proposalData.proposalState === ProposalState.Canceled ||
       proposalData.proposalState === ProposalState.Expired ||
       proposalData.proposalState === ProposalState.Defeated,
+    forVotes: proposalData.rawProposal.forVotes,
+    againstVotes: proposalData.rawProposal.againstVotes,
+    abstainVotes: proposalData.rawProposal.abstainVotes,
   };
 }
 
@@ -64,8 +64,7 @@ export async function getCompoundProposals(
   let contract:
     | GovernorAlpha
     | GovernorBravoDelegate
-    | GovernorCompatibilityBravo
-    | Governor;
+    | GovernorCompatibilityBravo;
   let govVersionFinal = govVersion;
   if (!govVersion) {
     const result = await getCompoundGovContractAndVersion(
@@ -90,15 +89,16 @@ export async function getCompoundProposals(
       proposalArrays = await getProposalAsync(<GovernorAlpha>contract);
       break;
     case GovVersion.Bravo:
-      proposalArrays = await getBravoProposals(<GovernorBravoDelegate>contract);
+      const initialProposalId = +(await contract.initialProposalId());
+      proposalArrays = await getProposalAsync(
+        <GovernorBravoDelegate>contract,
+        initialProposalId
+      );
       break;
     case GovVersion.OzBravo:
       proposalArrays = await getProposalDataSequentially(
         <GovernorCompatibilityBravo>contract
       );
-      break;
-    case GovVersion.Oz:
-      proposalArrays = await getProposalDataSequentially(<Governor>contract);
       break;
     default:
       throw new Error(`Invalid Compound contract version: ${govVersionFinal}`);
@@ -115,6 +115,12 @@ export async function getCompoundProposals(
         p.args.id.eq(proposals[i].id)
       ),
     });
+  }
+
+  if (govVersionFinal === GovVersion.OzBravo) {
+    allProposalData
+      .sort((p) => +p.rawProposal.startBlock)
+      .forEach((p, i) => (p.identifier = String(i)));
   }
 
   return allProposalData;
@@ -157,7 +163,7 @@ async function getProposalAsync(
  * @param contract
  */
 async function getProposalDataSequentially(
-  contract: GovernorCompatibilityBravo | Governor | GovernorBravoDelegate
+  contract: GovernorCompatibilityBravo | GovernorBravoDelegate
 ): Promise<ResolvedProposalPromises> {
   console.log('Fetching proposal data sequentially');
   const proposalCreatedEvents = await getProposalCreatedEvents(contract);
@@ -223,11 +229,7 @@ export function mapProposalCreatedEvent(
 }
 
 async function getProposalCreatedEvents(
-  contract:
-    | GovernorAlpha
-    | GovernorBravoDelegate
-    | GovernorCompatibilityBravo
-    | Governor,
+  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo,
   fromBlock = 0,
   toBlock: number | 'latest' = 'latest'
 ): Promise<

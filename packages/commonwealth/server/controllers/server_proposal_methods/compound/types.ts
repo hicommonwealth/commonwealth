@@ -4,7 +4,6 @@ import { TypedEvent } from 'common-common/src/eth/types/commons';
 export enum GovVersion {
   Alpha = 'alpha',
   Bravo = 'bravo',
-  Oz = 'oz',
   OzBravo = 'oz-bravo',
 }
 
@@ -56,4 +55,5 @@ export type ProposalDataType = {
   proposalCreatedEvent: TypedEvent<
     ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject
   >;
+  identifier?: string;
 };
