@@ -64,6 +64,10 @@ const ViewProposalPage = ({
     };
   }, [proposal, forceRerender]);
 
+  useEffect(() => {
+    document.title = `${app.chain.meta.name} – ${proposal.title}`;
+  }, []);
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
       if (hasFetchedProposalRef.current) return;
