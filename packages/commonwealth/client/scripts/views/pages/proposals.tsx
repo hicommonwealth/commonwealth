@@ -53,7 +53,7 @@ const ProposalsPage = () => {
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
   const { data: cachedAaveProposals, isError } = useAaveProposalsQuery({
-    moduleReady: app.chain?.network === ChainNetwork.Aave || !isLoading,
+    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
     chainId: app.chain?.id,
   });
 
