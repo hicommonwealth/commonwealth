@@ -383,8 +383,9 @@ export const CommentTree = ({
             try {
               await toggleCommentSpamStatus({
                 commentId: comment.id,
-                isSpam: !!comment.markedAsSpamAt,
+                isSpam: !comment.markedAsSpamAt,
                 chainId: app.activeChainId(),
+                address: app.user.activeAccount.address,
               });
             } catch (err) {
               console.log(err);
