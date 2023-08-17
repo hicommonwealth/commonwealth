@@ -8,7 +8,7 @@ import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
 
-type TagType =
+export type TagType =
   | 'passed'
   | 'failed'
   | 'active'
@@ -19,7 +19,8 @@ type TagType =
   | 'new'
   | 'trending'
   | 'disabled'
-  | 'discord';
+  | 'discord'
+  | 'farcaster';
 
 export type TagProps = {
   iconName?: IconName;

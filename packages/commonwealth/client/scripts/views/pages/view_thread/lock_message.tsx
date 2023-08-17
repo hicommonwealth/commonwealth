@@ -6,11 +6,18 @@ import moment from 'moment';
 const buildLockMessage = (
   fromDiscordBot: boolean,
   lockedAt?: moment.Moment,
+  botType?: string,
   updatedAt?: moment.Moment
 ) => {
   if (fromDiscordBot) {
-    return `This thread was started on Discord and cannot be edited or commented on in Common. 
-    New comments on the original Discord thread will appear here.`;
+    return `This thread was started on ${
+      botType === 'discord' ? 'Discord' : 'Farcaster'
+    } and cannot be edited or commented on in Common. 
+   ${
+     botType === 'discord'
+       ? 'New comments on the original Discord thread will appear here.'
+       : ''
+   }`;
   }
   if (lockedAt) {
     return `This thread was locked on ${lockedAt.format(
@@ -25,15 +32,17 @@ const buildLockMessage = (
 type LockMessageProps = {
   lockedAt?: moment.Moment;
   updatedAt?: moment.Moment;
-  fromDiscordBot?: boolean;
+  fromBot?: boolean;
+  botType?: string;
 };
 
 export const LockMessage = ({
   lockedAt,
   updatedAt,
-  fromDiscordBot,
+  fromBot,
+  botType,
 }: LockMessageProps) => {
-  const message = buildLockMessage(fromDiscordBot, lockedAt, updatedAt);
+  const message = buildLockMessage(fromBot, lockedAt, botType, updatedAt);
   return (
     <div className="callout-text">
       <CWIcon className="lock-icon" iconName="lock" iconSize="small" />

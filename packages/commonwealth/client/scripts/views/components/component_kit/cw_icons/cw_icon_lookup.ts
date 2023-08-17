@@ -86,6 +86,7 @@ export const iconLookup = {
   expand: Icons.CWExpand,
   exploreCommunity: Icons.CWExploreCommunities,
   externalLink: Icons.CWExternalLink,
+  farcaster: Icons.CWFarcaster,
   feedback: Icons.CWFeedback,
   filter: Icons.CWFilter,
   // flag: Icons.CWFlag,

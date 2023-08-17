@@ -512,11 +512,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
-  const fromDiscordBot =
-    thread.bot_meta !== null && thread.bot_meta !== undefined;
+  const fromBot = thread.bot_meta !== null && thread.bot_meta !== undefined;
 
-  const showLocked =
-    (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
+  const showLocked = (thread.readOnly && !thread.markedAsSpamAt) || fromBot;
 
   const canUpdateThread =
     isLoggedIn &&
@@ -525,7 +523,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isCommunityModerator() ||
       Permissions.isThreadAuthor(thread) ||
       Permissions.isThreadCollaborator(thread) ||
-      (fromDiscordBot && isAdmin));
+      (fromBot && isAdmin));
 
   return (
     <>
@@ -651,7 +649,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ) : (
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
-                {thread.readOnly || fromDiscordBot ? (
+                {thread.readOnly || fromBot ? (
                   <>
                     {threadOptionsComp}
                     {!thread.readOnly && thread.markedAsSpamAt && (
@@ -672,7 +670,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <LockMessage
                         lockedAt={thread.lockedAt}
                         updatedAt={thread.updatedAt}
-                        fromDiscordBot={fromDiscordBot}
+                        fromBot={fromBot}
+                        botType={thread.bot_meta?.bot_type}
                       />
                     )}
                   </>
@@ -738,7 +737,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               parentCommentId={parentCommentId}
               setParentCommentId={setParentCommentId}
               canComment={canComment}
-              fromDiscordBot={fromDiscordBot}
+              fromDiscordBot={fromBot}
             />
           </>
         }

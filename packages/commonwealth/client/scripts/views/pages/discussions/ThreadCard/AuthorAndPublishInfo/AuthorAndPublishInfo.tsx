@@ -9,13 +9,14 @@ import {
   Popover,
   usePopover,
 } from 'views/components/component_kit/cw_popover/cw_popover';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWTag, TagType } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { User } from 'views/components/user/user';
 import './AuthorAndPublishInfo.scss';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';
 import moment from 'moment';
+import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
 export type AuthorAndPublishInfoProps = {
   isNew?: boolean;
@@ -67,7 +68,8 @@ export const AuthorAndPublishInfo = ({
     <CWText className="dot-indicator">•</CWText>
   );
 
-  const fromDiscordBot = bot_meta !== null && bot_meta !== undefined;
+  const fromBot = bot_meta !== null && bot_meta !== undefined;
+  const botType = bot_meta?.bot_type;
 
   return (
     <div className="AuthorAndPublishInfo">
@@ -76,23 +78,29 @@ export const AuthorAndPublishInfo = ({
         user={authorInfo}
         popover
         linkify
-        showAddressWithDisplayName={
-          fromDiscordBot ? false : showUserAddressWithInfo
-        }
+        showAddressWithDisplayName={fromBot ? false : showUserAddressWithInfo}
       />
 
-      {fromDiscordBot && (
+      {fromBot && (
         <>
           {dotIndicator}
           <CWText type="caption" className="discord-author">
             <b>{bot_meta?.user?.username}</b>
           </CWText>
           {dotIndicator}
-          <CWTag label={'Discord'} type={'discord'} iconName="discord" />
-          {dotIndicator}
-          <CWText type="caption" className="discord-author">
-            Bridged from Discord
-          </CWText>
+          <CWTag
+            label={botType === 'discord' ? 'Discord' : 'Farcaster'}
+            type={botType as TagType}
+            iconName={botType as IconName}
+          />
+          {botType === 'discord' && (
+            <>
+              {dotIndicator}
+              <CWText type="caption" className="discord-author">
+                Bridged from Discord
+              </CWText>
+            </>
+          )}
         </>
       )}
 

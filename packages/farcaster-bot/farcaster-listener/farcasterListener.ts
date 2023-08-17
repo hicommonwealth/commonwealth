@@ -14,7 +14,7 @@ const s3 = new AWS.S3();
 
 const S3_BUCKET_NAME = 'assets.commonwealth.im';
 const S3_OBJECT_KEY = `${process.env.NODE_ENV}-last-processed-farcaster-cast-uri.txt`;
-const BOT_KEYWORD = 'cw123xyz';
+const BOT_KEYWORD = '@commonessaybot';
 
 const app = express();
 const PORT = 3000;
