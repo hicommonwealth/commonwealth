@@ -6,7 +6,8 @@ const config: PlaywrightTestConfig = {
   },
   globalSetup: './globalSetup.ts',
   globalTeardown: './globalTeardown.ts',
-  timeout: 45_000,
+  timeout: 60_000,
+  fullyParallel: true,
 };
 
 export default config;

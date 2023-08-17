@@ -6,7 +6,6 @@ import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { Thread } from '../../../models/Thread';
-import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
 import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
@@ -53,7 +52,6 @@ type ContentPageProps = {
   subBody?: ReactNode;
   subHeader?: ReactNode;
   viewCount?: number;
-  displayNewTag?: boolean;
   isSpamThread?: boolean;
   onLockToggle?: (isLocked: boolean) => any;
   onDelete?: () => any;
@@ -162,7 +160,6 @@ export const CWContentPage = ({
   subHeader,
   title,
   viewCount,
-  displayNewTag,
   isSpamThread,
   collaborators,
   onLockToggle,
@@ -193,7 +190,6 @@ export const CWContentPage = ({
     <div className="header-info-row">
       <AuthorAndPublishInfo
         showSplitDotIndicator={true}
-        isNew={!!displayNewTag}
         discord_meta={discord_meta}
         isLocked={thread?.readOnly}
         {...(thread?.lockedAt && {
