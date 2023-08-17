@@ -15,7 +15,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useGetThreadsByLinkQuery } from 'state/api/threads';
 import AddressInfo from '../../../models/AddressInfo';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import {
   ActiveProposalPill,
   ClosedProposalPill,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
 import { NewSnapshotProposalModal } from '../../modals/new_snapshot_proposal_modal';
 import { Modal } from '../../components/component_kit/cw_modal';
 
