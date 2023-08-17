@@ -35,7 +35,7 @@ import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import { CWRadioButton } from './cw_radio_button';
 import type { RadioButtonType } from './cw_radio_button';
-import { CWContentPageCard } from './cw_content_page';
+import { CWContentPageCard } from './CWContentPage';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
