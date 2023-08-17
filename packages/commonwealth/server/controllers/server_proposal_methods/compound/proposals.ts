@@ -57,7 +57,7 @@ export async function getCompoundProposals(
   compoundGovAddress: string,
   provider: providers.Web3Provider,
   models: DB
-) {
+): Promise<ProposalDataType[]> {
   console.log(
     `Fetching Compound proposals for ${compoundGovAddress}, with gov version ${govVersion}`
   );

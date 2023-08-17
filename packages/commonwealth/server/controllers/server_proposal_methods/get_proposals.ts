@@ -1,4 +1,7 @@
-import {ContractInfo, ServerProposalsController } from '../server_proposals_controller';
+import {
+  ContractInfo,
+  ServerProposalsController,
+} from '../server_proposals_controller';
 import { providers } from 'ethers';
 import { ChainNetwork } from 'common-common/src/types';
 import { ServerError } from 'common-common/src/errors';
@@ -8,15 +11,16 @@ import {
   getCompoundProposals,
 } from './compound/proposals';
 import { DB } from '../../models';
-import { ContractInfo } from '../server_proposals_controller';
-import { GovVersion } from './compound/types';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 
 export type GetProposalsOptions = {
   chainId: string;
 };
 
-export type GetProposalsResult = IAaveProposalResponse[];
+export type GetProposalsResult =
+  | IAaveProposalResponse[]
+  | ICompoundProposalResponse[];
 
 export async function __getProposals(
   this: ServerProposalsController,
@@ -25,7 +29,7 @@ export async function __getProposals(
   contractInfo: ContractInfo,
   models: DB
 ): Promise<GetProposalsResult> {
-  let formattedProposals: any[] = [];
+  let formattedProposals: GetProposalsResult = [];
   if (contractInfo.type === ChainNetwork.Aave) {
     const proposals = await getEthereumAaveProposals(
       contractInfo.address,

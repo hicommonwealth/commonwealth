@@ -118,7 +118,7 @@ export class ServerProposalsController {
         {
           model: this.models.ChainNode,
           required: true,
-          attributes: ['private_url', 'url'],
+          attributes: ['id', 'private_url', 'url'],
         },
       ],
     });
@@ -127,10 +127,12 @@ export class ServerProposalsController {
       throw new ServerError(`No RPC URL found for chain ${chainId}`);
     }
 
+    // only Aave and Compound contracts on Ethereum are supported
     if (
-      chain.network !== ChainNetwork.Aave &&
-      chain.network !== ChainNetwork.Compound &&
-      chain.base !== 'ethereum'
+      chain.ChainNode.id != 37 ||
+      (chain.network !== ChainNetwork.Aave &&
+        chain.network !== ChainNetwork.Compound &&
+        chain.base !== 'ethereum')
     ) {
       throw new ServerError(
         `Proposal fetching not supported for chain ${chainId}`
