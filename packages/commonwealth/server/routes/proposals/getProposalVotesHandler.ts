@@ -1,5 +1,5 @@
 import { ServerControllers } from '../../routing/router';
-import { TypedRequestQuery, TypedResponse } from '../../types';
+import { success, TypedRequestQuery, TypedResponse } from '../../types';
 
 type GetProposalVotesRequestParams = {
   chainId: string;
@@ -22,10 +22,7 @@ export const getProposalVotesHandler = async (
     proposalId: +proposalId,
   });
 
-  return res.json({
-    status: 'Success',
-    result: {
-      votes,
-    },
+  return success(res, {
+    votes,
   });
 };

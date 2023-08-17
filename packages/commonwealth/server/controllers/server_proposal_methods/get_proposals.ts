@@ -1,4 +1,4 @@
-import { ServerProposalsController } from '../server_proposals_controller';
+import {ContractInfo, ServerProposalsController } from '../server_proposals_controller';
 import { providers } from 'ethers';
 import { ChainNetwork } from 'common-common/src/types';
 import { ServerError } from 'common-common/src/errors';
@@ -10,29 +10,28 @@ import {
 import { DB } from '../../models';
 import { ContractInfo } from '../server_proposals_controller';
 import { GovVersion } from './compound/types';
+import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 
-export type GetCompletedProposalsOptions = {
+export type GetProposalsOptions = {
   chainId: string;
 };
 
-export type GetCompletedProposalsResult = {
-  completedProposals: any[];
-};
+export type GetProposalsResult = IAaveProposalResponse[];
 
-export async function __getCompletedProposals(
+export async function __getProposals(
   this: ServerProposalsController,
-  { chainId }: GetCompletedProposalsOptions,
+  { chainId }: GetProposalsOptions,
   provider: providers.Web3Provider,
   contractInfo: ContractInfo,
   models: DB
-) {
-  let completedProposals: any[] = [];
+): Promise<GetProposalsResult> {
+  let formattedProposals: any[] = [];
   if (contractInfo.type === ChainNetwork.Aave) {
     const proposals = await getEthereumAaveProposals(
       contractInfo.address,
       provider
     );
-    completedProposals = proposals.map((p) => formatAaveProposal(p));
+    formattedProposals = proposals.map((p) => formatAaveProposal(p));
   } else if (contractInfo.type === ChainNetwork.Compound) {
     const proposals = await getCompoundProposals(
       contractInfo.govVersion,
@@ -40,12 +39,12 @@ export async function __getCompletedProposals(
       provider,
       models
     );
-    completedProposals = proposals.map((p) => formatCompoundBravoProposal(p));
+    formattedProposals = proposals.map((p) => formatCompoundBravoProposal(p));
   } else {
     throw new ServerError(
       `Proposal fetching not supported for chain ${chainId} on network ${contractInfo.type}`
     );
   }
 
-  return completedProposals;
+  return formattedProposals;
 }
