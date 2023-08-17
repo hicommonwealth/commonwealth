@@ -1,24 +1,34 @@
 // Note, this login will not work for the homepage
+import { expect } from '@playwright/test';
 import * as process from 'process';
 import { Sequelize } from 'sequelize';
 import { DATABASE_URI } from '../../../server/config';
 
+// Logs in user for specific chain
 export async function login(page) {
-  await page.waitForSelector('.LoginSelector button');
-  let button = await page.locator('.LoginSelector button');
-  await button.click();
+  let button;
 
-  await page.waitForSelector('.LoginDesktop');
+  // wait for login button and login modal to appear
+  await expect(async () => {
+    await expect(page.locator('.LoginSelector button')).toBeVisible();
+    button = await page.locator('.LoginSelector button');
+    await button.click();
+    await expect(page.locator('.LoginDesktop')).toBeVisible();
+  }).toPass();
 
-  let metaMaskIcon = await page.$$("text='Metamask'");
-  do {
+  // Basic idea is that we lazily load the metamask mock (otherwise it will include ethereum to our initial bundle)
+  // As a result, the metamask button will not appear right away, because the lazy loading is initialized on login screen
+  // Therefore we need to re-open the login screen a few times waiting for it to finish lazy loading.
+  await expect(async () => {
     await page.mouse.click(0, 0);
     button = await page.locator('.LoginSelector button');
     await button.click();
-    metaMaskIcon = await page.$$("text='Metamask'");
-  } while (metaMaskIcon.length === 0);
-
-  await page.getByText('Metamask').click();
+    await expect(page.locator("text='Metamask'")).toBeVisible({ timeout: 100 });
+    await page.locator("text='Metamask'").click();
+    await expect(page.locator('.LoginDesktop')).toHaveCount(0, {
+      timeout: 10000,
+    });
+  }).toPass();
 }
 
 // This connection is used to speed up tests, so we don't need to load in all the models with the associated
@@ -102,10 +112,49 @@ export async function removeUser() {
   await testDb.query(removeQuery);
 }
 
-// adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
-export async function addUserIfNone() {
+export async function createAddress(chain, profileId, userId) {
+  await testDb.query(`
+    INSERT INTO "Addresses" (
+      address,
+      chain,
+      created_at,
+      updated_at,
+      user_id,
+      verification_token,
+      verified,
+      last_active,
+      is_councillor,
+      is_validator,
+      ghost_address,
+      profile_id,
+      wallet_id,
+      block_info,
+      is_user_default,
+      role
+    ) VALUES (
+      '${testAddress}',
+      '${chain}',
+      '2023-07-14 13:03:55.754-07',
+      '2023-07-14 13:03:56.212-07',
+      ${userId},
+      'a4934d7895bd5cd31ba5c7f5f8383689aed3',
+      '2023-07-14 13:03:56.212-07',
+      '2023-07-14 13:03:56.212-07',
+      false,
+      false,
+      false,
+      ${profileId},
+      'metamask',
+      '{"number":17693949,"hash":"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}',
+      false,
+      'member'
+    ) ON CONFLICT DO NOTHING
+  `);
+}
+
+export async function createInitialUser() {
   const userExists = await testDb.query(
-    `select 1 from "Addresses" where address = '${testAddress}'`
+    `select 1 from "Addresses" where address = '${testAddress}' and chain = 'ethereum'`
   );
 
   if (userExists[0].length > 0) return;
@@ -133,59 +182,41 @@ export async function addUserIfNone() {
         'never'
       ) RETURNING id`);
 
-  const profileId = await testDb.query(`
-  INSERT INTO "Profiles" (
-      user_id,
-      created_at,
-      updated_at,
-      profile_name,
-      is_default,
-      socials
-    ) VALUES (
-      ${userId[0][0]['id']},
-      '2023-07-14 13:03:56.203-07',
-      '2023-07-14 13:03:56.415-07',
-      'TestAddress',
-      false,
-      '{}'
-    ) RETURNING id
-  `);
+  const profileId = (
+    await testDb.query(`
+    INSERT INTO "Profiles" (
+        user_id,
+        created_at,
+        updated_at,
+        profile_name,
+        is_default,
+        socials
+      ) VALUES (
+        ${userId[0][0]['id']},
+        '2023-07-14 13:03:56.203-07',
+        '2023-07-14 13:03:56.415-07',
+        'TestAddress',
+        false,
+        '{}'
+      ) RETURNING id
+    `)
+  )[0][0]['id'];
 
-  testDb.query(`
-    INSERT INTO "Addresses" (
-      address,
-      chain,
-      created_at,
-      updated_at,
-      user_id,
-      verification_token,
-      verified,
-      last_active,
-      is_councillor,
-      is_validator,
-      ghost_address,
-      profile_id,
-      wallet_id,
-      block_info,
-      is_user_default,
-      role
-    ) VALUES (
-      '${testAddress}',
-      'ethereum',
-      '2023-07-14 13:03:55.754-07',
-      '2023-07-14 13:03:56.212-07',
-      ${userId[0][0]['id']},
-      'a4934d7895bd5cd31ba5c7f5f8383689aed3',
-      '2023-07-14 13:03:56.212-07',
-      '2023-07-14 13:03:56.212-07',
-      false,
-      false,
-      false,
-      ${profileId[0][0]['id']},
-      'metamask',
-      '{"number":17693949,"hash":"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}',
-      false,
-      'member'
-    )
-  `);
+  await createAddress('ethereum', profileId, userId[0][0]['id']);
+}
+
+// adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
+export async function addAddressIfNone(chain) {
+  const addresses = await testDb.query(
+    `select * from "Addresses" where address = '${testAddress}'`
+  );
+
+  // address already exists
+  if (addresses[0].some((u) => u['chain'] === chain)) return;
+
+  await createAddress(
+    chain,
+    addresses[0][0]['profile_id'],
+    addresses[0][0]['user_id']
+  );
 }

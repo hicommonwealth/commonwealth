@@ -1,12 +1,11 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import 'components/component_kit/cw_content_page.scss';
 import moment from 'moment';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { Thread } from '../../../models/Thread';
-import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
 import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
@@ -15,6 +14,8 @@ import { CWCard } from './cw_card';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { ComponentType } from './types';
+import { useNavigate } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 
 export type ContentPageSidebarItem = {
   label: string;
@@ -53,13 +54,11 @@ type ContentPageProps = {
   subBody?: ReactNode;
   subHeader?: ReactNode;
   viewCount?: number;
-  displayNewTag?: boolean;
   isSpamThread?: boolean;
   onLockToggle?: (isLocked: boolean) => any;
   onDelete?: () => any;
   onSpamToggle?: (thread: Thread) => any;
   onPinToggle?: (isPinned: boolean) => any;
-  onTopicChange?: (newTopic: Topic) => any;
   onProposalStageChange?: (newStage: ThreadStage) => any;
   onSnapshotProposalFromThread?: () => any;
   onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
@@ -153,13 +152,11 @@ export const CWContentPage = ({
   subHeader,
   title,
   viewCount,
-  displayNewTag,
   isSpamThread,
   collaborators,
   onLockToggle,
   onPinToggle,
   onDelete,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -174,7 +171,25 @@ export const CWContentPage = ({
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
 }: ContentPageProps) => {
-  const [tabSelected, setTabSelected] = useState<number>(0);
+  const navigate = useNavigate();
+  const [urlQueryParams] = useSearchParams();
+
+  const tabSelected = useMemo(() => {
+    const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
+    if (!tab) {
+      return 0;
+    }
+    return parseInt(tab, 10);
+  }, [urlQueryParams]);
+
+  const setTabSelected = (newTab: number) => {
+    const newQueryParams = new URLSearchParams(urlQueryParams.toString());
+    newQueryParams.set('tab', `${newTab}`);
+    navigate({
+      pathname: location.pathname,
+      search: `?${newQueryParams.toString()}`,
+    });
+  };
 
   if (showSkeleton) {
     return (
@@ -190,7 +205,6 @@ export const CWContentPage = ({
     <div className="header-info-row">
       <AuthorAndPublishInfo
         showSplitDotIndicator={true}
-        isNew={!!displayNewTag}
         discord_meta={discord_meta}
         isLocked={thread?.readOnly}
         {...(thread?.lockedAt && {
@@ -239,27 +253,24 @@ export const CWContentPage = ({
 
       {body &&
         body(
-          <>
-            <ThreadOptions
-              upvoteBtnVisible={!thread?.readOnly}
-              commentBtnVisible={!thread?.readOnly}
-              thread={thread}
-              totalComments={thread?.numberOfComments}
-              onLockToggle={onLockToggle}
-              onSpamToggle={onSpamToggle}
-              onDelete={onDelete}
-              onPinToggle={onPinToggle}
-              onTopicChange={onTopicChange}
-              onCollaboratorsEdit={onCollaboratorsEdit}
-              onEditCancel={onEditCancel}
-              onEditConfirm={onEditConfirm}
-              onEditStart={onEditStart}
-              canUpdateThread={canUpdateThread}
-              hasPendingEdits={hasPendingEdits}
-              onProposalStageChange={onProposalStageChange}
-              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-            />
-          </>
+          <ThreadOptions
+            upvoteBtnVisible={!thread?.readOnly}
+            commentBtnVisible={!thread?.readOnly}
+            thread={thread}
+            totalComments={thread?.numberOfComments}
+            onLockToggle={onLockToggle}
+            onSpamToggle={onSpamToggle}
+            onDelete={onDelete}
+            onPinToggle={onPinToggle}
+            onCollaboratorsEdit={onCollaboratorsEdit}
+            onEditCancel={onEditCancel}
+            onEditConfirm={onEditConfirm}
+            onEditStart={onEditStart}
+            canUpdateThread={canUpdateThread}
+            hasPendingEdits={hasPendingEdits}
+            onProposalStageChange={onProposalStageChange}
+            onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+          />
         )}
 
       {subBody}

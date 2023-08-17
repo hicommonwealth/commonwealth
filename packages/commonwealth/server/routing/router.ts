@@ -77,8 +77,6 @@ import updateThreadPrivacy from '../routes/updateThreadPrivacy';
 import updateThreadPinned from '../routes/updateThreadPinned';
 import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
-import fetchEntityTitle from '../routes/fetchEntityTitle';
-import updateChainEntityTitle from '../routes/updateChainEntityTitle';
 import addEditors, { addEditorValidation } from '../routes/addEditors';
 import deleteEditors from '../routes/deleteEditors';
 import deleteChain from '../routes/deleteChain';
@@ -108,7 +106,6 @@ import updateChainPriority from '../routes/updateChainPriority';
 
 import startSsoLogin from '../routes/startSsoLogin';
 import finishSsoLogin from '../routes/finishSsoLogin';
-import getEntityMeta from '../routes/getEntityMeta';
 import getTokenForum from '../routes/getTokenForum';
 import tokenBalance from '../routes/tokenBalance';
 import bulkBalances from '../routes/bulkBalances';
@@ -174,7 +171,6 @@ import { ServerChainsController } from '../controllers/server_chains_controller'
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
-import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
@@ -518,12 +514,7 @@ function setupRouter(
     databaseValidationService.validateChain,
     viewVotes.bind(this, models)
   );
-  registerRoute(
-    router,
-    'get',
-    '/fetchEntityTitle',
-    fetchEntityTitle.bind(this, models)
-  );
+
   registerRoute(
     router,
     'post',
@@ -609,14 +600,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateChainEntityTitle',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    updateChainEntityTitle.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
     '/addEditors',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -638,6 +621,7 @@ function setupRouter(
     'delete',
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     deleteThreadHandler.bind(this, serverControllers)
   );
@@ -826,13 +810,8 @@ function setupRouter(
     'delete',
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     deleteReactionHandler.bind(this, serverControllers)
-  );
-  registerRoute(
-    router,
-    'get',
-    '/comments/:id/reactions',
-    getCommentReactionsHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
@@ -1334,13 +1313,6 @@ function setupRouter(
 
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
-
-  registerRoute(
-    router,
-    'get',
-    '/getEntityMeta',
-    getEntityMeta.bind(this, models)
-  );
 
   // snapshotAPI
   registerRoute(

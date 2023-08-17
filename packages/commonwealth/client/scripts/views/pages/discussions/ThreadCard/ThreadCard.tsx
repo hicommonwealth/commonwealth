@@ -72,7 +72,6 @@ export const ThreadCard = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -140,7 +139,6 @@ export const ThreadCard = ({
                 new AddressInfo(null, thread.author, thread.authorChain, null)
               }
               publishDate={moment(thread.createdAt).format('l')}
-              isNew={isNewThread(thread.createdAt)}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {
@@ -234,7 +232,6 @@ export const ThreadCard = ({
               onSpamToggle={onSpamToggle}
               onLockToggle={onLockToggle}
               onPinToggle={onPinToggle}
-              onTopicChange={onTopicChange}
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onCollaboratorsEdit={onCollaboratorsEdit}

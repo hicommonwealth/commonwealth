@@ -1,5 +1,3 @@
-import fetchReactionCounts from "./fetchReactionCounts"
+import fetchReactionCounts from './fetchReactionCounts';
 
-export {
-    fetchReactionCounts
-}
+export { fetchReactionCounts };

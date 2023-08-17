@@ -38,7 +38,6 @@ abstract class Proposal<
 
   public createdAt: moment.Moment;
   public threadId: number;
-  public threadTitle: string;
 
   public abstract title: string;
 
