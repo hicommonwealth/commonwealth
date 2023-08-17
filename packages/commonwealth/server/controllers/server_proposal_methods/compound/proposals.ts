@@ -1,4 +1,4 @@
-import { ethers, providers } from 'ethers';
+import { ethers, providers, utils } from 'ethers';
 import {
   Governor,
   GovernorAlpha,
@@ -27,8 +27,8 @@ export function formatCompoundBravoProposal(
   proposalData: ProposalDataType
 ): ICompoundProposalResponse {
   return {
-    identifier: proposalData.rawProposal.id.toString(),
-    id: proposalData.rawProposal.id.toString(),
+    identifier: proposalData.rawProposal.id.toHexString(),
+    id: proposalData.rawProposal.id.toHexString(),
     proposer: proposalData.rawProposal.proposer,
     targets: proposalData.proposalCreatedEvent.args.targets,
     values: proposalData.proposalCreatedEvent.args[4].map((v) => v.toString()),
@@ -38,7 +38,7 @@ export function formatCompoundBravoProposal(
     ),
     startBlock: +proposalData.rawProposal.startBlock,
     endBlock: +proposalData.rawProposal.endBlock,
-    description: proposalData.proposalCreatedEvent.args.description,
+    description: getUtf8Description(proposalData.proposalCreatedEvent),
     eta: +proposalData.rawProposal.eta,
     queued: proposalData.proposalState === ProposalState.Queued,
     executed: proposalData.rawProposal.executed,
@@ -210,14 +210,16 @@ async function getBravoProposals(
 export function mapProposalCreatedEvent(
   event: TypedEvent<ProposalCreatedEventArgsArray & any>
 ): TypedEvent<ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject> {
+  const result: any = cloneDeep(event);
+  result.args.calldatas = event.args[5];
+
   if (event.args.proposalId) {
     // original event is frozen/sealed so must clone it to modify it
-    const result: any = cloneDeep(event);
     result.args.id = event.args.proposalId;
-    result.args.calldatas = event.args[5];
     delete result.args.proposalId;
-    return result;
-  } else return event;
+  }
+
+  return result;
 }
 
 async function getProposalCreatedEvents(
@@ -248,4 +250,26 @@ async function getProposalCreatedEvents(
   );
 
   return events.map((e) => mapProposalCreatedEvent(e));
+}
+
+function getUtf8Description(
+  event: TypedEvent<
+    ProposalCreatedEventArgsArray & ProposalCreatedEventArgsObject
+  >
+) {
+  const result = utils.defaultAbiCoder.decode(
+    [
+      'uint',
+      'address',
+      'address[]',
+      'uint[]',
+      'string[]',
+      'bytes[]',
+      'uint',
+      'uint',
+      'bytes',
+    ],
+    event.data
+  );
+  return utils.toUtf8String(result[8], utils.Utf8ErrorFuncs.ignore);
 }
