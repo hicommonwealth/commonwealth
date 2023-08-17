@@ -61,7 +61,7 @@ export const LinkedThreadsCard = ({
                     );
 
                     return (
-                      <Link key={t.id} to={discussionLink}>
+                      <Link key={t.id} to={`${discussionLink}?tab=0`}>
                         {t.title}
                       </Link>
                     );

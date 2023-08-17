@@ -47,7 +47,7 @@ export const ReactionButton = ({
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       chainId: app.activeChainId(),
-      address: app.user.activeAccount.address,
+      address: app.user.activeAccount?.address,
       threadId: thread.id,
     });
 

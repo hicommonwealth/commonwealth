@@ -1,7 +1,9 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import 'components/component_kit/CWContentPage.scss';
 import moment from 'moment';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useMemo } from 'react';
+import { useNavigate } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
 import type Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
@@ -106,7 +108,25 @@ export const CWContentPage = ({
   isWindowMedium,
   isEditing = false,
 }: ContentPageProps) => {
-  const [tabSelected, setTabSelected] = useState<number>(0);
+  const navigate = useNavigate();
+  const [urlQueryParams] = useSearchParams();
+
+  const tabSelected = useMemo(() => {
+    const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
+    if (!tab) {
+      return 0;
+    }
+    return parseInt(tab, 10);
+  }, [urlQueryParams]);
+
+  const setTabSelected = (newTab: number) => {
+    const newQueryParams = new URLSearchParams(urlQueryParams.toString());
+    newQueryParams.set('tab', `${newTab}`);
+    navigate({
+      pathname: location.pathname,
+      search: `?${newQueryParams.toString()}`,
+    });
+  };
 
   if (showSkeleton)
     return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />;
