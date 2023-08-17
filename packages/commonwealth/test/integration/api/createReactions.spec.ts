@@ -26,7 +26,7 @@ const createValidComment = async (threadId, text, jwtToken) => {
   const response = await post(
     `/api/threads/${threadId}/comments`,
     validRequest,
-    true,
+    false,
     app
   );
 
@@ -50,7 +50,7 @@ const createThreadReaction = async (threadId, jwtToken) => {
   const response = await post(
     `/api/threads/${threadId}/reactions`,
     validRequest,
-    true,
+    false,
     app
   );
 
@@ -84,6 +84,9 @@ const createCommentReaction = async (commentId, jwtToken) => {
 const deleteReaction = async (reactionId, jwtToken) => {
   const validRequest = {
     jwt: jwtToken,
+    address: testAddresses[0].address,
+    author_chain: testAddresses[0].chain,
+    chain: testAddresses[0].chain,
   };
 
   const response = await del(

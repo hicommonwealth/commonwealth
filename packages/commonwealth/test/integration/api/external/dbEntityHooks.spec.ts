@@ -28,7 +28,12 @@ export let testProfiles: ProfileAttributes[];
 
 export async function clearTestEntities() {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Reaction.destroy({
+    where: {
+      [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+    },
+    force: true,
+  });
   await models.Collaboration.destroy({
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,

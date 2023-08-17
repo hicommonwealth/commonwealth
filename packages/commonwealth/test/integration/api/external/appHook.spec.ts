@@ -129,6 +129,7 @@ export async function del(
   );
 
   if (!expectError) {
+    console.log(res.text);
     assert.equal(res.statusCode, 200);
   } else if (res.text === 'Unauthorized') {
     return res;
