@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -378,7 +377,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         canUpdateThread={canUpdateThread}
-        displayNewTag={true}
         stageLabel={!isStageDefault && thread.stage}
         subHeader={
           !!thread.url && (

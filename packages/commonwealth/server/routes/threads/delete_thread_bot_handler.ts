@@ -14,14 +14,18 @@ export const deleteBotThreadHandler = async (
   req: TypedRequestParams<DeleteBotThreadRequestParams>,
   res: TypedResponse<DeleteThreadResponse>
 ) => {
-  const { user } = req;
+  const { user, address } = req;
   const { message_id } = req.params;
 
   if (!message_id) {
     throw new AppError(Errors.InvalidThreadID);
   }
 
-  await controllers.threads.deleteThread({ user, messageId: message_id });
+  await controllers.threads.deleteThread({
+    user,
+    messageId: message_id,
+    address,
+  });
 
   return success(res, undefined);
 };
