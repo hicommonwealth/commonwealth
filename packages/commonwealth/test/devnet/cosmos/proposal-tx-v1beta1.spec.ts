@@ -59,9 +59,10 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
 
     const resp = await sendTx(rpcUrlBeta, msg, isAmino);
 
-    expect(isDeliverTxSuccess(resp)).to.be.true;
+    expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
+    console.log('resp.rawLog', resp.rawLog);
 
     await waitOneBlock(rpcUrlBeta);
     const activeProposals = await getActiveVotingProposals();

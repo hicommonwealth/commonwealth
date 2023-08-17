@@ -53,16 +53,17 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
 
     const resp = await sendTx(rpcUrl, msg, isAmino);
 
-    expect(isDeliverTxSuccess(resp)).to.be.true;
+    expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
+    console.log('resp.rawLog', resp.rawLog);
 
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
-    const onchainProposal = activeProposals[activeProposals.length - 1];
-    expect((onchainProposal.messages[0] as any)?.content?.['@type']).to.be.eql(
-      expectedProposalType
-    );
+    const onchainProposal = activeProposals[activeProposals?.length - 1];
+    expect(
+      (onchainProposal?.messages?.[0] as any)?.content?.['@type']
+    ).to.be.eql(expectedProposalType);
   };
 
   const voteTest = async (

@@ -19,8 +19,7 @@ Sandbox community:
 CI community (ephemeral spin-up for automated tests):
 
 * http://localhost:8080/csdk-v1
-* CI tests reference Docker image at https://hub.docker.com/repository/docker/irowan/heroku-csdk
-    * Note: the name `heroku-csdk` was leftover from creating the sandbox community. This image has no association with heroku.
+* CI tests reference Docker image at https://hub.docker.com/repository/docker/mhagel1/csdk-v1
 
 ### Version 0.45.0 (`gov` module v1beta1)
 
@@ -39,15 +38,11 @@ CI community (ephemeral spin-up for automated tests):
 * http://localhost:8080/csdk-beta-ci
 * CI tests reference Docker image at https://hub.docker.com/repository/docker/mhagel1/csdk-beta
 
-# How to [deploy updates](https://dashboard.heroku.com/apps/cosmos-devnet/deploy/heroku-git):
+# How to [deploy updates](https://dashboard.heroku.com/apps/cosmos-devnet/deploy/heroku-container):
 1. In terminal go to packages/chain-events/cosmos-chain-testing/v1 directory
-2. `heroku git:remote -a cosmos-devnet` (or `heroku git:remote -a cosmos-devnet-beta` for v1beta1)
-    - this creates a heroku git instance for this directory, separate from the regular commonwealth git repo
-    - be careful not to confuse these
-    - the default branch is `main`. You should be on this branch.
-3. Commit any changes you want to make to the dockerfile, bootstrap.sh, etc.
-4. To apply your changes to the heroku app, `git push heroku main`
-5. A new build and deployment will be triggered.
+2. `heroku login`
+2. `heroku container:push web` to apply your changes to the heroku app
+3. `heroku container:release web` - A new build and deployment will be triggered.
 
 Local Dev CSDK:   
 If you ever need to run devnets locally on your machine, there are three helper scripts
@@ -78,6 +73,3 @@ a shared address for this purpose.
     - Give the wallet a name you can recognize, like "CW devnet"
 
 - Go to http://localhost:8080/csdk-beta or http://localhost:8080/csdk and join community. You should be able to create proposals and vote.
-
-- Note: Select "0 STAKE" gas fee to run a transaction.
-    - The account should have unstaked tokens too, but Keplr is not registering them for some reason.
