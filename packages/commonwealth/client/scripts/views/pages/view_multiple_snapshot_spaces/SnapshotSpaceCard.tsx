@@ -1,6 +1,6 @@
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/snapshot/snapshot_space_card.scss';
+import 'pages/snapshot/SnapshotSpaceCard.scss';
 import React from 'react';
 import app from 'state';
 import { REDIRECT_ACTIONS } from '.';
@@ -43,7 +43,7 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
       app.snapshot.init(space.id).then(() => {
         navigate(
           `/new/snapshot/${app.chain.meta.snapshot}` +
-          `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
+            `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
         );
       });
     }
@@ -66,8 +66,9 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
           <div className="space-card-subheader">{space.id}</div>
         </div>
         <div className="space-card-status">
-          {`${numActiveProposals} Active Proposal${numActiveProposals === 1 ? '' : 's'
-            }`}
+          {`${numActiveProposals} Active Proposal${
+            numActiveProposals === 1 ? '' : 's'
+          }`}
         </div>
       </div>
     </CWCard>
