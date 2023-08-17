@@ -69,8 +69,8 @@ type ContentPageProps = {
   canUpdateThread?: boolean;
   showTabs?: boolean;
   showSkeleton?: boolean;
-  isWindowMedium?: boolean;
   isEditing?: boolean;
+  sidebarComponentsSkeletonCount?: number;
 };
 
 export const CWContentPage = ({
@@ -105,8 +105,8 @@ export const CWContentPage = ({
   canUpdateThread,
   showTabs = false,
   showSkeleton,
-  isWindowMedium,
   isEditing = false,
+  sidebarComponentsSkeletonCount = 2,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -128,8 +128,13 @@ export const CWContentPage = ({
     });
   };
 
-  if (showSkeleton)
-    return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />;
+  if (showSkeleton) {
+    return (
+      <CWContentPageSkeleton
+        sidebarComponentsSkeletonCount={sidebarComponentsSkeletonCount}
+      />
+    );
+  }
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
 

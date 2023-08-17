@@ -122,7 +122,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (fetchCommentsError) notifyError('Failed to load comments');
   }, [fetchCommentsError]);
 
-  const { isWindowMedium } = useBrowserWindow({
+  const { isWindowLarge } = useBrowserWindow({
+  // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -232,7 +233,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     NewProfilesController.Instance.isFetched.on('redraw', () => {
       setAreProfilesLoaded(true);
     });
-
     setAreProfilesLoaded(true);
   }, [comments, thread, areProfilesLoaded]);
 
@@ -241,7 +241,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }
 
   if (!app.chain?.meta || isLoading) {
-    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
+    return (
+      <CWContentPage
+        showSkeleton
+        sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
+      />
+    );
   }
 
   if ((!isLoading && !thread) || fetchThreadError) {

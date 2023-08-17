@@ -3,7 +3,7 @@ import React from 'react';
 import { Skeleton } from '../../Skeleton';
 import { ComponentType } from '../types';
 
-export const CWContentPageSkeleton = ({ isWindowMedium }) => {
+export const CWContentPageSkeleton = ({ sidebarComponentsSkeletonCount }) => {
   const mainBody = (
     <div className="main-body-container">
       {/* thread header */}
@@ -49,26 +49,16 @@ export const CWContentPageSkeleton = ({ isWindowMedium }) => {
     <div className={ComponentType.ContentPage}>
       <div className="sidebar-view">
         {mainBody}
-        {isWindowMedium && (
+        {sidebarComponentsSkeletonCount > 0 && (
           <div className="sidebar">
-            <div className="cards-column">
-              <Skeleton width={'80%'} />
-              <Skeleton width={'100%'} />
-              <Skeleton width={'50%'} />
-              <Skeleton width={'75%'} />
-            </div>
-            <div className="cards-column">
-              <Skeleton width={'80%'} />
-              <Skeleton width={'100%'} />
-              <Skeleton width={'50%'} />
-              <Skeleton width={'75%'} />
-            </div>
-            <div className="cards-column">
-              <Skeleton width={'80%'} />
-              <Skeleton width={'100%'} />
-              <Skeleton width={'50%'} />
-              <Skeleton width={'75%'} />
-            </div>
+            {Array.from({ length: sidebarComponentsSkeletonCount }).map(() => (
+              <div className="cards-column">
+                <Skeleton width={'80%'} />
+                <Skeleton width={'100%'} />
+                <Skeleton width={'50%'} />
+                <Skeleton width={'75%'} />
+              </div>
+            ))}
           </div>
         )}
       </div>
