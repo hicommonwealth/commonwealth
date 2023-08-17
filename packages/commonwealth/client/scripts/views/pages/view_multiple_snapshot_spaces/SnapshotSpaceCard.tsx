@@ -1,14 +1,12 @@
-import React from 'react';
-
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import type Thread from '../../../models/Thread';
-
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/snapshot/snapshot_space_card.scss';
+import React from 'react';
 import app from 'state';
 import { REDIRECT_ACTIONS } from '.';
+import type Thread from '../../../models/Thread';
 import { CWCard } from '../../components/component_kit/cw_card';
-import { useCommonNavigate } from 'navigation/helpers';
-import { Skeleton } from '../../components/Skeleton';
+import { SnapshotSpaceCardSkeleton } from './SnapshotSpaceCardSkeleton';
 
 function countActiveProposals(proposals: SnapshotProposal[]): number {
   return proposals.filter((proposal) => proposal.state === 'active').length;
@@ -26,32 +24,7 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
   const { space, proposals, redirectAction, proposal, showSkeleton } = props;
   const navigate = useCommonNavigate();
 
-  if (showSkeleton) {
-    return (
-      <CWCard
-        elevation="elevation-2"
-        className="SnapshotSpaceCard"
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-      >
-        <div className="space-card-container">
-          <div className="space-card-metadata">
-            <div className="space-card-title">
-              <Skeleton />
-            </div>
-            <div className="space-card-subheader">
-              <Skeleton />
-            </div>
-          </div>
-          <div className="space-card-status">
-            <Skeleton />
-          </div>
-        </div>
-      </CWCard>
-    );
-  }
+  if (showSkeleton) return <SnapshotSpaceCardSkeleton />;
 
   if (!space || !proposals) return;
 
@@ -70,7 +43,7 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
       app.snapshot.init(space.id).then(() => {
         navigate(
           `/new/snapshot/${app.chain.meta.snapshot}` +
-            `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
+          `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
         );
       });
     }
@@ -93,9 +66,8 @@ export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
           <div className="space-card-subheader">{space.id}</div>
         </div>
         <div className="space-card-status">
-          {`${numActiveProposals} Active Proposal${
-            numActiveProposals === 1 ? '' : 's'
-          }`}
+          {`${numActiveProposals} Active Proposal${numActiveProposals === 1 ? '' : 's'
+            }`}
         </div>
       </div>
     </CWCard>

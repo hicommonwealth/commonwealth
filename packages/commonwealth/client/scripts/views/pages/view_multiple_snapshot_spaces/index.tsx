@@ -6,7 +6,7 @@ import app from 'state';
 import type Thread from '../../../models/Thread';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWText } from '../../components/component_kit/cw_text';
-import { SnapshotSpaceCard } from './snapshot_space_card';
+import { SnapshotSpaceCard } from './SnapshotSpaceCard';
 import { Skeleton } from '../../components/Skeleton';
 
 enum SPACES_HEADER_MESSAGES {
