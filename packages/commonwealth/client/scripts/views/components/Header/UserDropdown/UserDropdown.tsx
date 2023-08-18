@@ -71,7 +71,7 @@ const UserDropdown = () => {
   const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
     (account) => {
       const signed = authenticatedAddresses[account.address];
-      const isActive = app.user.activeAccount.address === account.address;
+      const isActive = app.user.activeAccount?.address === account.address;
 
       return {
         type: 'default',

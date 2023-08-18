@@ -18,6 +18,7 @@ import { GovernanceSection } from './governance_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import Permissions from '../../../utils/Permissions';
 import AccountConnectionIndicator from './AccountConnectionIndicator';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 export type SidebarMenuName =
   | 'default'
@@ -29,12 +30,13 @@ export const Sidebar = ({ isInsideCommunity }) => {
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
   const { menuName } = useSidebarStore();
-
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
+
+  const { activeAccount } = useUserActiveAccount();
 
   return (
     <div className="Sidebar">
@@ -43,7 +45,10 @@ export const Sidebar = ({ isInsideCommunity }) => {
         {app.activeChainId() && isInsideCommunity && (
           <div className="community-menu">
             {featureFlags.sessionKeys && (
-              <AccountConnectionIndicator connected={true} />
+              <AccountConnectionIndicator
+                connected={!!activeAccount}
+                address={activeAccount?.address}
+              />
             )}
             {showAdmin && <AdminSection />}
             {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
