@@ -123,7 +123,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [fetchCommentsError]);
 
   const { isWindowLarge } = useBrowserWindow({
-  // const { isWindowMedium } = useBrowserWindow({
+    // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
