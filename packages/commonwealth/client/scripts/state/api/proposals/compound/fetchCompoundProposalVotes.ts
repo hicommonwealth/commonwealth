@@ -29,7 +29,12 @@ const useCompoundProposalVotesQuery = ({
   proposalIdentifier: string;
 }) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_PROPOSAL_VOTES, chainId, proposalId],
+    queryKey: [
+      ApiEndpoints.FETCH_PROPOSAL_VOTES,
+      chainId,
+      proposalId,
+      proposalIdentifier,
+    ],
     queryFn: () => fetchCompoundProposalVotes(proposalId, proposalIdentifier),
     enabled: moduleReady,
     staleTime: VOTE_STALE_TIME,

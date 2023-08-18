@@ -41,7 +41,7 @@ export async function getCompoundGovContractAndVersion(
       await contract.proposalCount();
       await contract.initialProposalId();
       return { version: GovVersion.Bravo, contract };
-    } catch (e) {
+    } catch (e1) {
       try {
         const contract = GovernorCompatibilityBravo__factory.connect(
           compoundGovAddress,
@@ -49,7 +49,7 @@ export async function getCompoundGovContractAndVersion(
         );
         await contract.COUNTING_MODE();
         return { version: GovVersion.OzBravo, contract };
-      } catch (e) {
+      } catch (e2) {
         throw new Error(
           `Failed to find Compound contract version at ${compoundGovAddress}`
         );
