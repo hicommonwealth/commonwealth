@@ -1,6 +1,5 @@
 'use strict';
 
-// TODO: update all null count columns by zero as default
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
@@ -36,7 +35,6 @@ module.exports = {
       );
       console.timeEnd('Add comment reaction count');
 
-      // TODO: add comments reaction
       console.log('Add thread reaction count');
       console.time('Add thread reaction count');
       await queryInterface.sequelize.query(
