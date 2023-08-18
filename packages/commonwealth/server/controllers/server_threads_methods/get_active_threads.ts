@@ -56,9 +56,10 @@ export async function __getActiveThreads(
 
   allRecentTopicThreadsRaw = allRecentTopicThreadsRaw.flat();
 
-  const allRecentTopicThreads = allRecentTopicThreadsRaw.map((t) => {
+  const allRecentTopicThreads = allRecentTopicThreadsRaw.map((thread) => {
+    const t = thread.toJSON();
     t.numberOfComments = t.comment_count || 0;
-    return t.toJSON();
+    return t;
   });
 
   communityTopics.forEach((topic) => {
