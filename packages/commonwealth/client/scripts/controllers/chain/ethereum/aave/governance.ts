@@ -159,10 +159,18 @@ export default class AaveGovernance extends ProposalModule<
 
     const proposals: IAaveProposalResponse[] = res.data.result.proposals;
     proposals.forEach((p) => {
-      new AaveProposal(accounts, governance, deserializeBigNumbers(p));
+      // this check is necessary because the store serializes the proposal instance if it already exists
+      // thus replacing the proposal instance with a regular object
+      if (!governance.store.getByIdentifier(p.identifier)) {
+        new AaveProposal(accounts, governance, deserializeBigNumbers(p));
+      }
     });
 
-    await Promise.all(governance.store.getAll().map((p) => p.init()));
+    await Promise.all(
+      governance.store.getAll().map((p) => {
+        p.init();
+      })
+    );
 
     return governance.store.getAll();
   }
