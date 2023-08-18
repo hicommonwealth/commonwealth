@@ -21,7 +21,7 @@
 1. We use Fibonacci points, i.e. 1, 2, 3, 5, 8, 13. (See [dedicated section](#fibonacci-points).)
 2. Stories of any point value *may* be broken out into subtasks.
 3. Stories of more than 3 points *must* be broken out into subtasks.
-4. Please add point estimations to your stories before moving them to In Progress. (Even better if you can have stories estimated while Teed Up.)
+4. You *must* add point estimations to your stories before moving them to In Progress. (Even better if you can have stories estimated while Teed Up.)
 6. When you complete the work, if original estimation was off, do not mutate it in place. Instead, add the correct estimation as a comment to the issue with a short explanation. 
 
 ## Blockers
@@ -41,6 +41,8 @@ NB. Points != Time! Points are an estimate of complexity, not time. Having said 
 * 5 points ~= multiple day task (large t-shirt) 
 * 8 points ~= 1 sprint / 1 week task (XL t-shirt) 
 * 13 points ~= more than a single sprint (XXL t-shirt) 
+
+Points _may_ always be increased mid-implementation, but a justification _must_ be provided.
 
 ## Friday Deployments
 ### We do not deploy late on Fridays. 
