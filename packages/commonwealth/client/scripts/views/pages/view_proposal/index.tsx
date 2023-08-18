@@ -36,14 +36,13 @@ type ViewProposalPageAttrs = {
 };
 
 export function useProposalData(proposalId, typeProp) {
-  console.log(proposalId, typeProp);
   const [error, setError] = useState(null);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const hasFetchedProposalRef = useRef(false);
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const { metadata } = useProposalMetadata({ app, snapshotProposal: proposal });
+  const { metadata } = useProposalMetadata({ app, proposal });
 
   useEffect(() => {
     if (metadata?.title) forceRerender();
@@ -75,6 +74,7 @@ export function useProposalData(proposalId, typeProp) {
       } catch (e) {
         // special case handling for completed cosmos proposals
         if (app.chain.base === ChainBase.CosmosSDK) {
+          console.log('loading cosmos proposal');
           try {
             const cosmosProposal = await (
               app.chain as Cosmos
@@ -90,21 +90,24 @@ export function useProposalData(proposalId, typeProp) {
       }
     };
 
-    if (!isAdapterLoaded) {
-      app.chainAdapterReady.on('ready', () => {
-        setIsAdapterLoaded(true);
+    if (proposalId) {
+      if (!isAdapterLoaded) {
+        app.chainAdapterReady.on('ready', () => {
+          setIsAdapterLoaded(true);
+          afterAdapterLoaded();
+        });
+      } else {
         afterAdapterLoaded();
-      });
-    } else {
-      afterAdapterLoaded();
+      }
     }
   }, [isAdapterLoaded, proposalId]);
 
+  console.log(metadata);
   return {
     error,
     metadata,
     isAdapterLoaded,
-    snapshotProposal: proposal,
+    proposal,
   };
 }
 

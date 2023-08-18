@@ -19,7 +19,7 @@ type SnapshotInfoRowProps = {
   value: string | React.ReactNode;
 };
 
-const SnapshotInfoRow = (props: SnapshotInfoRowProps) => {
+export const SnapshotInfoRow = (props: SnapshotInfoRowProps) => {
   const { label, value } = props;
 
   return (
@@ -34,7 +34,7 @@ const SnapshotInfoRow = (props: SnapshotInfoRowProps) => {
 
 type SnapshotInfoLinkRowProps = SnapshotInfoRowProps & { url: string };
 
-const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
+export const SnapshotInfoLinkRow = (props: SnapshotInfoLinkRowProps) => {
   const { label, url, value } = props;
 
   return (

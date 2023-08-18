@@ -54,7 +54,10 @@ import { Select } from '../../components/Select';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { useProposalData } from '../view_proposal/index';
-import { ProposalInformationCard } from '../view_proposal/ViewProposalCard';
+import {
+  ProposalInformationCard,
+  ProposalPollCardContainer,
+} from '../view_proposal/ProposalPollCard';
 import { useSnapshotProposalData } from '../view_snapshot_proposal/index';
 import { SnapshotInformationCard } from '../view_snapshot_proposal/snapshot_information_card';
 import { SnapshotPollCardContainer } from '../view_snapshot_proposal/snapshot_poll_card_container';
@@ -129,10 +132,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { error, metadata, isAdapterLoaded, proposal } = useProposalData(
     proposalId,
-    null
+    undefined
   );
+  console.log(metadata);
 
-  console.log(proposal, '====');
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
     +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
@@ -514,7 +517,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setProposalId(linkedProposals[0].identifier);
   }
 
-  console.log(thread.links);
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
   const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
@@ -909,11 +911,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ...(proposal
               ? [
                   {
-                    label: 'ProposalInformationCard',
+                    label: 'ProposalPoll',
                     item: (
-                      <ProposalInformationCard
+                      <ProposalPollCardContainer
+                        activeUserAddress={activeUserAddress}
+                        identifier={identifier}
                         proposal={proposal}
-                        threads={threads}
+                        scores={[]} // unused?
+                        space={space}
+                        symbol={symbol}
+                        totals={totals}
+                        totalScore={totalScore}
+                        validatedAgainstStrategies={validatedAgainstStrategies}
+                        votes={votes}
+                        loadVotes={async () =>
+                          loadVotes(snapshotId, identifier)
+                        }
                       />
                     ),
                   },

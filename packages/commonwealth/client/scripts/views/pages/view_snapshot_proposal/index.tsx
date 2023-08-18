@@ -70,7 +70,7 @@ export function useSnapshotProposalData(snapshotProposalId, snapshotId) {
       const currentProposal = app.snapshot.proposals.find(
         (p) => p.id === proposalId
       );
-      console.log(app.snapshot.proposals);
+
       setProposal(currentProposal);
 
       const currentSpace = app.snapshot.space;
