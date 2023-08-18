@@ -51,7 +51,7 @@ export const VotingResults = (props: VotingResultsProps) => {
   }, [forceRerender]);
 
   const { data } = useAaveProposalVotesQuery({
-    moduleReady: app.chain?.network === ChainNetwork.Aave || !isLoading,
+    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
     chainId: app.chain?.id,
     proposalId: proposal.identifier,
   });
