@@ -8,7 +8,10 @@ import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/comm
 import type { NotificationCategoryInstance } from 'server/models/notification_category';
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
-import type { EmailNotificationInterval } from 'server/models/user';
+import type {
+  EmailNotificationInterval,
+  UserInstance,
+} from 'server/models/user';
 import { JWT_SECRET } from '../config';
 import { sequelize } from '../database';
 import type { DB } from '../models';
@@ -121,7 +124,7 @@ const getChainStatus = async (models: DB) => {
   };
 };
 
-export const getUserStatus = async (models: DB, user) => {
+export const getUserStatus = async (models: DB, user: UserInstance) => {
   const chains = await models.Chain.findAll({
     where: { active: true },
     attributes: ['id'],
@@ -153,7 +156,7 @@ export const getUserStatus = async (models: DB, user) => {
     addresses.map((address) => address.id)
   );
 
-  const rolesPromise = findAllRoles(models, {
+  const roles = await findAllRoles(models, {
     where: { address_id: { [Op.in]: myAddressIds } },
     include: [models.Address],
   });
@@ -168,6 +171,9 @@ export const getUserStatus = async (models: DB, user) => {
    * Purpose of this section is to count the number of threads that have new updates grouped by community
    */
   const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
+  const commsAndChains2 = await getChainActivity(addresses);
+  console.log('commsAndChains: ', commsAndChains);
+  console.log('commsAndChains2: ', commsAndChains2);
   const unseenPosts = {};
   let query = ``;
   let replacements = [];
@@ -207,8 +213,7 @@ export const getUserStatus = async (models: DB, user) => {
   );
 
   // wait for all the promises to resolve
-  const [roles, starredCommunities, threadNum] = await Promise.all([
-    rolesPromise,
+  const [starredCommunities, threadNum] = await Promise.all([
     starredCommunitiesPromise,
     threadNumPromise,
   ]);
@@ -389,3 +394,16 @@ export const status = async (
     throw new ServerError('something broke', error);
   }
 };
+
+type ChainActivity = [chain: string, timestamp: string][];
+
+function getChainActivity(
+  addresses: AddressInstance[]
+): Promise<ChainActivity> {
+  return Promise.all(
+    addresses.map(async (address) => {
+      const { chain, last_active } = address;
+      return [chain, last_active.toISOString()];
+    })
+  );
+}
