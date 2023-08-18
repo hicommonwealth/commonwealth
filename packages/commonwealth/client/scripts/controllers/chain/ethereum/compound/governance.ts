@@ -183,12 +183,14 @@ export default class CompoundGovernance extends ProposalModule<
     );
     const proposals: ICompoundProposalResponse[] = res.data.result.proposals;
     proposals.forEach((p) => {
-      new CompoundProposal(
-        accounts,
-        chain,
-        governance,
-        deserializeBigNumbers(p)
-      );
+      if (!governance.store.getByIdentifier(p.identifier)) {
+        new CompoundProposal(
+          accounts,
+          chain,
+          governance,
+          deserializeBigNumbers(p)
+        );
+      }
     });
 
     return governance.store.getAll();
