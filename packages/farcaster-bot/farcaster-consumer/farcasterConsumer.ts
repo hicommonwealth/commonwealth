@@ -62,6 +62,12 @@ type ThreadCommentTree = {
   comments: Array<BotComment>;
 };
 
+function replaceCommonbotMention(text: string) {
+  const regex = /@commonessaybot/g; // 'g' flag ensures all instances are replaced
+  const markdownLink = '[@commonessaybot](https://warpcast.com/commonessaybot)';
+  return text.replace(regex, markdownLink);
+}
+
 async function buildThreadCommentTree(rootCasts: Array<any>) {
   for (const rootCast of rootCasts) {
     const queue = [
@@ -92,7 +98,9 @@ async function buildThreadCommentTree(rootCasts: Array<any>) {
           author_chain: 'logline',
           chain: 'logline',
           body: encodeURIComponent(
-            `[Go to Cast](${linkToWarpcast})` + '\n\n' + cast.body.data.text
+            `[Go to Cast](${linkToWarpcast})` +
+              '\n\n' +
+              replaceCommonbotMention(cast.body.data.text)
           ), // Add link here
           stage: 'discussion',
           kind: 'discussion',
@@ -145,7 +153,9 @@ async function buildThreadCommentTree(rootCasts: Array<any>) {
           address: '0xfarcasterbot',
           author_chain: 'logline',
           chain: 'logline',
-          text: encodeURIComponent(cast.body.data.text), // Add link here
+          text: encodeURIComponent(
+            replaceCommonbotMention(cast.body.data.text)
+          ), // Add link here
           stage: 'discussion',
           kind: 'discussion',
           auth: CW_BOT_KEY,
