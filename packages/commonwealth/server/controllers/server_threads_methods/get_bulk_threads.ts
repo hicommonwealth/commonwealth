@@ -170,25 +170,11 @@ export async function __getBulkThreads(
     throw new ServerError('Could not fetch threads');
   }
 
-  const processLinks = async (thread) => {
-    let chain_entity_meta = [];
-    if (thread.links) {
-      const ces = thread.links.filter((item) => item.source === 'proposal');
-      if (ces.length > 0) {
-        chain_entity_meta = ces.map((ce: Link) => {
-          return { ce_id: parseInt(ce.identifier), title: ce.title };
-        });
-      }
-    }
-    return { chain_entity_meta };
-  };
-
   // transform thread response
   let threads = responseThreads.map(async (t) => {
     const collaborators = JSON.parse(t.collaborators[0]).address?.length
       ? t.collaborators.map((c) => JSON.parse(c))
       : [];
-    const { chain_entity_meta } = await processLinks(t);
 
     const last_edited = getLastEdited(t);
 
@@ -209,7 +195,6 @@ export async function __getBulkThreads(
       locked_at: t.thread_locked,
       links: t.links,
       collaborators,
-      chain_entity_meta,
       has_poll: t.has_poll,
       last_commented_on: t.last_commented_on,
       plaintext: t.plaintext,

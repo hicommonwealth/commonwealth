@@ -23,10 +23,9 @@ export default function ChainEntityLinkRedirect({
         const entity = await app.chainEntities.getOneEntity(scope, identifier);
 
         // 2. query data to construct new link
-        const { title, type, typeId } = entity;
+        const { type, typeId } = entity;
         const newLink = {
           source: 'proposal',
-          title,
           identifier:
             type === 'proposal'
               ? `${typeId}`
