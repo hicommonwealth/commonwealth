@@ -21,7 +21,10 @@ import {
   YesNoRejectVotingResult,
 } from './voting_result_components';
 import useForceRerender from 'hooks/useForceRerender';
-import { useAaveProposalVotesQuery } from 'state/api/proposals';
+import {
+  useAaveProposalVotesQuery,
+  useCompoundProposalVotesQuery,
+} from 'state/api/proposals';
 import { ChainNetwork } from 'common-common/src/types';
 
 type VotingResultsProps = { proposal: AnyProposal };
@@ -56,10 +59,11 @@ export const VotingResults = (props: VotingResultsProps) => {
     proposalId: proposal.identifier,
   });
 
-  const { data: compoundVotes } = useAaveProposalVotesQuery({
+  const { data: compoundVotes } = useCompoundProposalVotesQuery({
     moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
     chainId: app.chain?.id,
     proposalId: proposal.data.id,
+    proposalIdentifier: proposal.identifier,
   });
 
   const votes = aaveVotes || compoundVotes || proposal.getVotes();

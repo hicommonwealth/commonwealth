@@ -30,7 +30,10 @@ import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
-import { useAaveProposalsQuery } from 'state/api/proposals';
+import {
+  useAaveProposalsQuery,
+  useCompoundProposalsQuery,
+} from 'state/api/proposals';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -73,6 +76,14 @@ const ViewProposalPage = ({
       chainId: app.chain?.id,
     });
 
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const fetchCompoundData = onCompound && isAdapterLoaded;
+  const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
+    useCompoundProposalsQuery({
+      moduleReady: fetchCompoundData,
+      chainId: app.chain?.id,
+    });
+
   useEffect(() => {
     if (!aaveProposalsLoading && fetchAaveData && !proposal) {
       const foundProposal = cachedAaveProposals?.find(
@@ -89,9 +100,18 @@ const ViewProposalPage = ({
     }
   }, [cachedAaveProposals]);
 
+  useEffect(() => {
+    if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
+      const foundProposal = cachedCompoundProposals?.find(
+        (p) => p.identifier === proposalId
+      );
+      setProposal(foundProposal);
+    }
+  }, [cachedCompoundProposals]);
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
-      if (onAave) return;
+      if (onAave || onCompound) return;
 
       if (hasFetchedProposalRef.current) return;
       hasFetchedProposalRef.current = true;

@@ -1,4 +1,4 @@
-import { providers } from 'ethers';
+import { BigNumber, providers } from 'ethers';
 import { getCompoundGovContract } from './util';
 import { CompoundVoteEvents, GovVersion } from './types';
 import {
@@ -67,7 +67,7 @@ export async function getCompoundProposalVotes(
     });
   } else {
     const typedContract = <GovernorCompatibilityBravo>contract;
-    const proposal = await typedContract.proposals(proposalId);
+    const proposal = await typedContract.proposals(BigNumber.from(proposalId));
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null, null),
       +proposal.startBlock,

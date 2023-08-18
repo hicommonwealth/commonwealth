@@ -41,7 +41,7 @@ export async function __getProposalVotes(
       contractInfo.govVersion,
       contractInfo.address,
       provider,
-      proposalId.toString()
+      proposalId
     );
     votes = votesArgs.map((vote) => formatCompoundProposalVote(vote));
   } else {

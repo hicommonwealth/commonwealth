@@ -253,8 +253,19 @@ export default class CompoundProposal extends Proposal<
     this._Gov.store.add(this);
   }
 
-  static async fetchVotes(proposalId: string, compoundChain: Compound) {
+  static async fetchVotes(
+    proposalId: string,
+    proposalIdentifier: string,
+    compoundChain: Compound
+  ) {
     const { chain, accounts, governance, meta } = compoundChain;
+
+    const proposalInstance =
+      governance.store.getByIdentifier(proposalIdentifier);
+    if (!proposalInstance) {
+      throw new Error(`Proposal ${proposalIdentifier} not found`);
+    }
+
     const res = await axios.get(
       `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSAL_VOTES}`,
       {
@@ -266,10 +277,6 @@ export default class CompoundProposal extends Proposal<
     );
 
     const votes: ICompoundVoteResponse[] = res.data.result.votes;
-    const proposalInstance = governance.store.getByIdentifier(proposalId);
-    if (!proposalInstance) {
-      throw new Error(`Proposal ${proposalId} not found`);
-    }
 
     for (const vote of votes) {
       const power = new BN(vote.votes);
