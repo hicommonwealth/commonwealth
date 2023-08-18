@@ -11,7 +11,6 @@ import { RABBITMQ_URI, SERVER_URL, CW_BOT_KEY } from '../utils/config';
 import axios from 'axios';
 import v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { StatsDController } from 'common-common/src/statsd';
 import {
   ServiceKey,
   startHealthCheckLoop,
@@ -64,23 +63,7 @@ type ThreadCommentTree = {
 };
 
 async function buildThreadCommentTree(rootCasts: Array<any>) {
-  const trees = [];
-
   for (const rootCast of rootCasts) {
-    const threadCommentTree: ThreadCommentTree = {
-      thread: {
-        title: rootCast.body.data.title,
-        address: '0xFarcasterBot',
-        author_chain: 'logline',
-        chain: 'logline',
-        body: rootCast.body.data.text, // Add link here
-        stage: 'discussion',
-        kind: 'thread',
-        auth: CW_BOT_KEY,
-      },
-      comments: [],
-    };
-
     const queue = [
       {
         cast: rootCast,

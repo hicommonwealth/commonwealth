@@ -140,7 +140,7 @@ const fetchData = async () => {
         RascalPublications.FarcasterListener
       );
 
-      // await saveIDToS3(castsToProcess[0]?.uri); TODO: Comment back in when we're done testing
+      await saveIDToS3(castsToProcess[0]?.uri); // TODO: Comment out when testing
       log.info(`Message published to RabbitMQ`);
     } catch (error) {
       log.info(`Error publishing to rabbitMQ`, error);
