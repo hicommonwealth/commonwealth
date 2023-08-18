@@ -13,3 +13,5 @@ export type ICompoundProposalResponse = Omit<
     abstainVotes?: BigNumber;
     state: number;
   };
+
+export type ICompoundVoteResponse = Omit<CompoundTypes.IVoteCast, 'kind'>;

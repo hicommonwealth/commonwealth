@@ -1,4 +1,4 @@
-import { BigNumber, ethers, providers, utils } from 'ethers';
+import { ethers, providers, utils } from 'ethers';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,

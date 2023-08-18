@@ -55,3 +55,11 @@ export type ProposalDataType = {
   proposalCreatedEvent: ProposalCreatedEventArgsObject;
   identifier?: string;
 };
+
+export type CompoundVoteEvents = {
+  voter: string;
+  proposalId: BigNumber;
+  support: boolean;
+  votes: BigNumber;
+  reason?: string;
+};
