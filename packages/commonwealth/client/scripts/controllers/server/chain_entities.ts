@@ -83,24 +83,10 @@ class ChainEntityController {
       .filter((e) => e.type === type);
   }
 
-  private static _formatEntitiesWithMeta(
-    entities: any[],
-    entityMetas: any[]
-  ): ChainEntity[] {
+  private static _formatEntities(entities: any[]): ChainEntity[] {
     const data: ChainEntity[] = [];
-    // save chain-entity metadata to the appropriate chain-entity
-    const metaMap: Map<string, { title: string }> = new Map(
-      entityMetas.map((e) => [e.ce_id, { title: e.title }])
-    );
-
     if (Array.isArray(entities)) {
-      // save the chain-entity objects in the store
       for (const entityJSON of entities) {
-        const metaData = metaMap.get(entityJSON.id);
-        if (metaData) {
-          entityJSON.title = metaData.title;
-        }
-
         const entity = ChainEntity.fromJSON(entityJSON);
         data.push(entity);
       }
@@ -114,17 +100,11 @@ class ChainEntityController {
    * @param id the chain entity id
    */
   public async getOneEntity(chain: string, id: string): Promise<ChainEntity> {
-    const [entities, entityMetas] = await Promise.all([
-      getFetch(`${app.serverUrl()}/ce/entities`, { chain, id }),
-      getFetch(`${app.serverUrl()}/getEntityMeta`, { chain, ce_id: id }),
-    ]);
-    const data = ChainEntityController._formatEntitiesWithMeta(
-      entities,
-      entityMetas
-    );
-    if (data?.length > 1) {
-      throw new Error('Found multiple entities with same id!');
-    }
+    const entities = await getFetch(`${app.serverUrl()}/ce/entities`, {
+      chain,
+      id,
+    });
+    const data = ChainEntityController._formatEntities(entities);
     return data ? data[0] : null;
   }
 
@@ -141,14 +121,8 @@ class ChainEntityController {
     const options: any = { chain };
 
     // load the chain-entity objects
-    const [entities, entityMetas] = await Promise.all([
-      getFetch(`${app.serverUrl()}/ce/entities`, options),
-      getFetch(`${app.serverUrl()}/getEntityMeta`, options),
-    ]);
-    const data = ChainEntityController._formatEntitiesWithMeta(
-      entities,
-      entityMetas
-    );
+    const entities = await getFetch(`${app.serverUrl()}/ce/entities`, options);
+    const data = ChainEntityController._formatEntities(entities);
     this._store.set(chain, data);
     return data;
   }

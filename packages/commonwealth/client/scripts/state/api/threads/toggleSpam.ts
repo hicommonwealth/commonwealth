@@ -7,19 +7,21 @@ interface ToggleThreadSpamProps {
   chainId: string;
   threadId: number;
   isSpam: boolean;
+  address: string;
 }
 
 const toggleThreadSpam = async ({
   chainId,
   threadId,
   isSpam,
+  address,
 }: ToggleThreadSpamProps) => {
-  const method = isSpam ? 'put' : 'delete';
-  return await axios[method](`${app.serverUrl()}/threads/${threadId}/spam`, {
-    data: {
-      jwt: app.user.jwt,
-      chain_id: chainId,
-    } as any,
+  return await axios.patch(`${app.serverUrl()}/threads/${threadId}`, {
+    author_chain: chainId,
+    chain: chainId,
+    address: address,
+    jwt: app.user.jwt,
+    spam: isSpam,
   });
 };
 
@@ -36,7 +38,7 @@ const useToggleThreadSpamMutation = ({
     mutationFn: toggleThreadSpam,
     onSuccess: async (response) => {
       updateThreadInAllCaches(chainId, threadId, {
-        markedAsSpamAt: response.data.result.markedAsSpamAt,
+        markedAsSpamAt: response.data.result.marked_as_spam_at,
       });
       return response.data.result;
     },

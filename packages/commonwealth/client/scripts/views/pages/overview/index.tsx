@@ -14,7 +14,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
-import { TopicSummaryRow } from './topic_summary_row';
+import { TopicSummaryRow } from './TopicSummaryRow';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
@@ -22,7 +22,7 @@ const OverviewPage = () => {
   const { isWindowExtraSmall } = useBrowserWindow({});
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const { data: recentlyActiveThreads } = useFetchThreadsQuery({
+  const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
     chainId: app.activeChainId(),
     topicsPerThread: 3,
@@ -127,7 +127,7 @@ const OverviewPage = () => {
       </div>
       <CWDivider />
       {topicSummaryRows.map((row, i) => (
-        <TopicSummaryRow {...row} key={i} />
+        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
       ))}
     </div>
   );

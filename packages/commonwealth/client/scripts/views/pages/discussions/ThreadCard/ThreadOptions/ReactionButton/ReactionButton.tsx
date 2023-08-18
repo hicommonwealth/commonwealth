@@ -7,7 +7,6 @@ import {
 } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
-import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
@@ -15,26 +14,13 @@ import { isWindowMediumSmallInclusive } from 'views/components/component_kit/hel
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { LoginModal } from '../../../../../modals/login_modal';
 import './ReactionButton.scss';
+import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
   showSkeleton?: boolean;
   disabled: boolean;
-};
-
-const ReactionButtonSkeleton = () => {
-  return (
-    <button
-      onClick={async (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-      className={`ThreadReactionButton showSkeleton`}
-    >
-      <Skeleton height={52} width={40} />
-    </button>
-  );
 };
 
 export const ReactionButton = ({
@@ -50,7 +36,8 @@ export const ReactionButton = ({
     (r) => r.address === activeAddress
   );
   const hasReacted = thisUserReaction?.length !== 0;
-  const reactedId = thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
+  const reactedId =
+    thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
 
   const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
     useCreateThreadReactionMutation({
@@ -60,10 +47,11 @@ export const ReactionButton = ({
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       chainId: app.activeChainId(),
+      address: app.user.activeAccount?.address,
       threadId: thread.id,
     });
 
-  if (showSkeleton) return <ReactionButtonSkeleton />
+  if (showSkeleton) return <ReactionButtonSkeleton />;
   const isLoading = isAddingReaction || isDeletingReaction;
 
   // token balance check if needed
@@ -82,6 +70,7 @@ export const ReactionButton = ({
     if (hasReacted) {
       deleteThreadReaction({
         chainId: app.activeChainId(),
+        address: app.user.activeAccount.address,
         threadId: thread.id,
         reactionId: reactedId as number,
       }).catch((e) => {
@@ -115,8 +104,9 @@ export const ReactionButton = ({
       ) : (
         <button
           onClick={handleVoteClick}
-          className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
-            }${hasReacted ? ' has-reacted' : ''}`}
+          className={`ThreadReactionButton ${
+            isLoading || isUserForbidden ? ' disabled' : ''
+          }${hasReacted ? ' has-reacted' : ''}`}
         >
           {reactors.length > 0 ? (
             <CWTooltip

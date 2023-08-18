@@ -120,12 +120,6 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
-    [RascalQueues.ChainEntityCUDMain]: {
-      ...queueConfig,
-      options: {
-        arguments: queueOptions,
-      },
-    },
     [RascalQueues.ChainEventNotificationsCUDMain]: {
       ...queueConfig,
       options: {
@@ -162,12 +156,6 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.ChainEvents,
     },
-    [RascalBindings.ChainEntityCUDMain]: {
-      source: RascalExchanges.CUD,
-      destination: RascalQueues.ChainEntityCUDMain,
-      destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ChainEntityCUD,
-    },
     [RascalBindings.ChainEventNotificationsCUD]: {
       source: RascalExchanges.CUD,
       destination: RascalQueues.ChainEventNotificationsCUDMain,
@@ -200,11 +188,6 @@ export function getAllRascalConfigs(
       routingKey: RascalRoutingKeys.ChainEvents,
       ...publicationConfig,
     },
-    [RascalPublications.ChainEntityCUDMain]: {
-      exchange: RascalExchanges.CUD,
-      routingKey: RascalRoutingKeys.ChainEntityCUD,
-      ...publicationConfig,
-    },
     [RascalPublications.ChainEventNotificationsCUDMain]: {
       exchange: RascalExchanges.CUD,
       routingKey: RascalRoutingKeys.ChainEventNotificationsCUD,
@@ -230,10 +213,6 @@ export function getAllRascalConfigs(
   const allSubscriptions: Record<RascalSubscriptions, SubscriptionConfig> = {
     [RascalSubscriptions.ChainEvents]: {
       queue: RascalQueues.ChainEvents,
-      ...subscriptionConfig,
-    },
-    [RascalSubscriptions.ChainEntityCUDMain]: {
-      queue: RascalQueues.ChainEntityCUDMain,
       ...subscriptionConfig,
     },
     [RascalSubscriptions.ChainEventNotificationsCUDMain]: {

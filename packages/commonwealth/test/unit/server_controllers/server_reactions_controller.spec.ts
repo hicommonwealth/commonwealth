@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { ServerReactionsController } from 'server/controllers/server_reactions_controller';
 import Sinon from 'sinon';
+import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerReactionsController', () => {
   describe('#deleteReaction', () => {
@@ -18,12 +19,13 @@ describe('ServerReactionsController', () => {
           }),
         },
       };
-      const banCache = {
-        checkBan: sandbox.stub().resolves([true, null]),
-      };
+      const banCache = BAN_CACHE_MOCK_FN('ethereum');
 
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
+      };
+      const address = {
+        address: '0x123',
       };
       const serverReactionsController = new ServerReactionsController(
         db as any,
@@ -32,7 +34,19 @@ describe('ServerReactionsController', () => {
       await serverReactionsController.deleteReaction({
         user: user as any,
         reactionId: 777,
+        address: address as any,
       });
+
+      expect(
+        serverReactionsController.deleteReaction({
+          user: user as any,
+          reactionId: 777,
+          address: {
+            ...(address as any),
+            address: '0xbanned',
+          },
+        })
+      ).to.be.rejectedWith('Ban error: banned');
     });
 
     it('should throw error (reaction not found)', async () => {
@@ -49,6 +63,9 @@ describe('ServerReactionsController', () => {
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
+      const address = {
+        address: '0x123',
+      };
       const serverReactionsController = new ServerReactionsController(
         db as any,
         banCache as any
@@ -57,6 +74,7 @@ describe('ServerReactionsController', () => {
         serverReactionsController.deleteReaction({
           user: user as any,
           reactionId: 888,
+          address: address as any,
         })
       ).to.be.rejectedWith(`Reaction not found: 888`);
     });
@@ -82,6 +100,9 @@ describe('ServerReactionsController', () => {
       const user = {
         getAddresses: sandbox.stub().resolves([{ id: 1, verified: true }]),
       };
+      const address = {
+        address: '0x123',
+      };
       const serverReactionsController = new ServerReactionsController(
         db as any,
         banCache as any
@@ -90,6 +111,7 @@ describe('ServerReactionsController', () => {
         serverReactionsController.deleteReaction({
           user: user as any,
           reactionId: 999,
+          address: address as any,
         })
       ).to.be.rejectedWith('Ban error: big ban err');
     });

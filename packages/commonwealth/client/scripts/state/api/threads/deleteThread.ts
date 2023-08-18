@@ -8,13 +8,20 @@ import { removeThreadFromAllCaches } from './helpers/cache';
 interface DeleteThreadProps {
   chainId: string;
   threadId: number;
+  address: string;
 }
 
-const deleteThread = async ({ chainId, threadId }: DeleteThreadProps) => {
+const deleteThread = async ({
+  chainId,
+  threadId,
+  address,
+}: DeleteThreadProps) => {
   return await axios.delete(`${app.serverUrl()}/threads/${threadId}`, {
     data: {
+      author_chain: chainId,
+      chain: chainId,
+      address: address,
       jwt: app.user.jwt,
-      chain_id: chainId,
     },
   });
 };

@@ -29,16 +29,4 @@ const fetchReactionCounts = async ({
   return [...response.data.result];
 };
 
-// TODO: when we migrate the threads controller to react query, then we should also implement cache logic below
-// for this query. The reason why it was not implemented is because "reactive" code from react query wont work in
-// the non-reactive scope of threads controller.
-// const useFetchReactionCountsQuery = ({ chainId, commentId }: FetchReactionCountsProps) => {
-//   return useQuery({
-//     queryKey: [ApiEndpoints.getCommentReactions(commentId), chainId],
-//     queryFn: () => fetchReactionCounts({ commentId, chainId }),
-//     staleTime: THREAD_REACTION_COUNTS_STALE_TIME,
-//   });
-// };
-
-// export default useFetchReactionCountsQuery;
 export default fetchReactionCounts;

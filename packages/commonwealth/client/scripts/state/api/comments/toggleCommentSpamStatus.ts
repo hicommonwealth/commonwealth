@@ -9,20 +9,26 @@ interface ToggleCommentSpamStatusProps {
   chainId: string;
   commentId: number;
   isSpam: boolean;
+  address: string;
 }
 
 const toggleCommentSpamStatus = async ({
   chainId,
   commentId,
   isSpam,
+  address,
 }: ToggleCommentSpamStatusProps) => {
   const method = isSpam ? 'put' : 'delete';
-  return await axios[method](`${app.serverUrl()}/comments/${commentId}/spam`, {
-    data: {
-      jwt: app.user.jwt,
-      chain_id: chainId,
-    } as any,
-  });
+  const body = {
+    jwt: app.user.jwt,
+    chain_id: chainId,
+    address: address,
+    author_chain: chainId,
+  };
+  return await axios[method](
+    `${app.serverUrl()}/comments/${commentId}/spam`,
+    isSpam ? body : ({ data: { ...body } } as any)
+  );
 };
 
 interface UseToggleCommentSpamStatusMutationProps {
