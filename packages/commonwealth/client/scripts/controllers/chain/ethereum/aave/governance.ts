@@ -118,7 +118,6 @@ export default class AaveGovernance extends ProposalModule<
     this._Accounts = accounts;
     this._api = chain.aaveApi;
 
-    // await AaveGovernance.getProposals(chain.app.chain as Aave)
     // set init to true without fetching proposals so chainAdapterReady emits true
     this._initialized = true;
   }

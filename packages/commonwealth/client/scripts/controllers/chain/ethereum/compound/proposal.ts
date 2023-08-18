@@ -1,4 +1,7 @@
-import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import type {
+  ICompoundProposalResponse,
+  ICompoundVoteResponse,
+} from 'adapters/chain/compound/types';
 
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
@@ -31,6 +34,9 @@ import {
   EventKind,
   ProposalState,
 } from 'chain-events/src/chains/compound/types';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import axios from 'axios';
+import { ApiEndpoints } from 'state/api/config';
 
 export enum BravoVote {
   NO = 0,
@@ -210,14 +216,6 @@ export default class CompoundProposal extends Proposal<
       .mul(ONE_HUNDRED_WITH_PRECISION)
       .div(this.data.forVotes.add(this.data.againstVotes));
 
-    // const votes = this.getVotes();
-    // const yesPower = sumVotes(votes.filter((v) => v.choice === BravoVote.YES));
-    // const noPower = sumVotes(votes.filter((v) => v.choice === BravoVote.NO));
-    // if (yesPower.isZero() && noPower.isZero()) return 0;
-    // const supportBn = yesPower
-    //   .muln(ONE_HUNDRED_WITH_PRECISION)
-    //   .div(yesPower.add(noPower));
-
     return +supportBn / ONE_HUNDRED_WITH_PRECISION;
   }
 
@@ -253,6 +251,37 @@ export default class CompoundProposal extends Proposal<
     this._completed = this.data.completed;
     this._initialized = true;
     this._Gov.store.add(this);
+  }
+
+  static async fetchVotes(proposalId: string, compoundChain: Compound) {
+    const { chain, accounts, governance, meta } = compoundChain;
+    const res = await axios.get(
+      `${chain.app.serverUrl()}${ApiEndpoints.FETCH_PROPOSAL_VOTES}`,
+      {
+        params: {
+          chainId: meta.id,
+          proposalId,
+        },
+      }
+    );
+
+    const votes: ICompoundVoteResponse[] = res.data.result.votes;
+    const proposalInstance = governance.store.getByIdentifier(proposalId);
+    if (!proposalInstance) {
+      throw new Error(`Proposal ${proposalId} not found`);
+    }
+
+    for (const vote of votes) {
+      const power = new BN(vote.votes);
+      const compoundVote = new CompoundProposalVote(
+        accounts.get(vote.voter),
+        vote.support,
+        power
+      );
+      proposalInstance.addOrUpdateVote(compoundVote);
+    }
+
+    return proposalInstance.getVotes();
   }
 
   public update(e: ChainEvent) {

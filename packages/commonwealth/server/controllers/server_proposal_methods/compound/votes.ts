@@ -26,7 +26,7 @@ export async function getCompoundProposalVotes(
   provider: providers.Web3Provider,
   proposalId: string
 ): Promise<CompoundVoteEvents[]> {
-  const contract = await getCompoundGovContract(
+  const contract = getCompoundGovContract(
     govVersion,
     compoundGovAddress,
     provider

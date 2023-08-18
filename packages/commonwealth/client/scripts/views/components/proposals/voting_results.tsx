@@ -50,13 +50,19 @@ export const VotingResults = (props: VotingResultsProps) => {
     };
   }, [forceRerender]);
 
-  const { data } = useAaveProposalVotesQuery({
-    moduleReady: app.chain?.network === ChainNetwork.Aave || !isLoading,
+  const { data: aaveVotes } = useAaveProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
     chainId: app.chain?.id,
     proposalId: proposal.identifier,
   });
 
-  const votes = data || proposal.getVotes();
+  const { data: compoundVotes } = useAaveProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+    chainId: app.chain?.id,
+    proposalId: proposal.data.id,
+  });
+
+  const votes = aaveVotes || compoundVotes || proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
   if (
