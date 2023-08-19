@@ -19,6 +19,7 @@ import { useFetchTopicsQuery } from '../../../state/api/topics';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -60,9 +61,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
-  useEffect(() => {
-    document.title = `${app.chain.meta.name} – Discussions`;
-  }, []);
+  useManageDocumentTitle(`${app.chain.meta.name} – Discussions`);
 
   return (
     <div className="DiscussionsPage">

@@ -26,6 +26,7 @@ import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type ViewProposalPageProps = {
   identifier: string;
@@ -117,9 +118,7 @@ export const ViewProposalPage = ({
     return <PageLoading />;
   }
 
-  useEffect(() => {
-    document.title = `${app.chain.meta.name} – ${proposal.title}`;
-  }, []);
+  useManageDocumentTitle(`${app.chain.meta.name} – ${proposal.title}`);
 
   return (
     <CWContentPage

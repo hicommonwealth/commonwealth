@@ -30,6 +30,7 @@ import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -64,9 +65,7 @@ const ViewProposalPage = ({
     };
   }, [proposal, forceRerender]);
 
-  useEffect(() => {
-    document.title = `${app.chain.meta.name} – ${proposal.title}`;
-  }, []);
+  useManageDocumentTitle(`${app.chain.meta.name} – ${proposal.title}`);
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {

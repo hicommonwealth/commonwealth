@@ -26,6 +26,7 @@ import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
 } from 'state/api/proposals';
+import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -72,9 +73,7 @@ const ProposalsPage = () => {
     };
   }, [setSubstrateLoading]);
 
-  useEffect(() => {
-    document.title = `${app.chain.meta.name} – Proposals`;
-  }, []);
+  useManageDocumentTitle(`${app.chain.meta.name} – Proposals`);
 
   const {
     data: activeCosmosProposals,

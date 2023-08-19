@@ -52,6 +52,7 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -155,12 +156,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   }, [initializedPolls, thread?.id]);
 
-  useEffect(() => {
-    if (thread && thread.title) {
-      document.title = `${app.chain.meta.name} – ${thread.title}`;
-    }
-  }, [thread]);
-
   // TODO: unnecessary code - must be in a redirect hook
   useNecessaryEffect(() => {
     if (!thread) {
@@ -241,6 +236,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
     setAreProfilesLoaded(true);
   }, [comments, thread, areProfilesLoaded]);
+
+  useEffect(() => {
+    if (thread && thread.title) {
+      document.title = `${app.chain.meta.name} – ${thread.title}`;
+    } else {
+      document.title = `${app.chain.meta.name} – View thread`;
+    }
+  }, [thread]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;

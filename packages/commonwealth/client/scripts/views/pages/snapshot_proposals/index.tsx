@@ -11,6 +11,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type SnapshotProposalsPageProps = {
   topic?: string;
@@ -42,9 +43,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
     spaceSubscription !== undefined
   );
 
-  useEffect(() => {
-    document.title = `${app.chain.meta.name} – Snapshots`;
-  }, []);
+  useManageDocumentTitle(`${app.chain.meta.name} – Snapshots`);
 
   useNecessaryEffect(() => {
     const fetch = async () => {
