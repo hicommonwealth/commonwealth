@@ -82,6 +82,8 @@ export const ViewSnapshotProposalPage = ({
     return new AddressInfo(null, proposal.author, activeChainId, null);
   }, [proposal, activeChainId]);
 
+  useManageDocumentTitle(`${app.chain.meta.name} – ${proposal.title}`);
+
   const { isWindowLarge } = useBrowserWindow({});
 
   const loadVotes = useCallback(
@@ -124,8 +126,6 @@ export const ViewSnapshotProposalPage = ({
       />
     );
   }
-
-  useManageDocumentTitle(`${app.chain.meta.name} – ${proposal.title}`);
 
   return (
     <CWContentPage
