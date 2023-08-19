@@ -27,11 +27,15 @@ const DiscordCallbackPage = () => {
           }
         );
 
-        navigate(
-          `/${stateJSON.cw_chain_id}/manage?returningFromDiscordCallback=true`,
-          {},
-          null
-        );
+        if (stateJSON.redirect_domain) {
+          window.location.href = `${stateJSON.redirect_domain}/manage?returningFromDiscordCallback=true`;
+        } else {
+          navigate(
+            `/${stateJSON.cw_chain_id}/manage?returningFromDiscordCallback=true`,
+            {},
+            null
+          );
+        }
       } catch (e) {
         throw new Error(e.response.data.error);
       }
