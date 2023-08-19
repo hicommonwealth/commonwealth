@@ -1,10 +1,6 @@
 import React, { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
-import {
-  getTextFromDelta,
-  renderToolbarIcon,
-  SerializableDeltaStatic,
-} from './utils';
+import { renderToolbarIcon, SerializableDeltaStatic } from './utils';
 import { DeltaStatic } from 'quill';
 import clsx from 'clsx';
 import {
