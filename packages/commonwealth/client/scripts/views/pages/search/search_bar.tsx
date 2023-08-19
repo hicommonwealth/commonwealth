@@ -75,7 +75,7 @@ export const SearchBar = () => {
     chainId,
     searchTerm: debouncedSearchTerm,
     limit: NUM_RESULTS_PER_SECTION,
-    orderBy: APIOrderBy.Rank,
+    orderBy: APIOrderBy.CreatedAt,
     orderDirection: APIOrderDirection.Desc,
   };
   const queryEnabled = debouncedSearchTerm.length > 0;
