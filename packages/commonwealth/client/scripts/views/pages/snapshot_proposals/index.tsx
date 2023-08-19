@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';

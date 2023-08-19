@@ -52,7 +52,6 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
