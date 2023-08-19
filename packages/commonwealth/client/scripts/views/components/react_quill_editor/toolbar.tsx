@@ -70,7 +70,7 @@ export const CustomQuillToolbar = ({
   isDisabled = false,
   content,
 }: CustomQuillToolbarProps) => {
-  const isModalDisabled = content.length > 0 ? false : true;
+  const isPreviewDisabled = content.length > 0 ? false : true;
 
   return (
     <div id={toolbarId} className="CustomQuillToolbar">
@@ -108,7 +108,7 @@ export const CustomQuillToolbar = ({
             iconName="eye"
             iconSize="small"
             onClick={() => setIsPreviewVisible(true)}
-            disabled={isModalDisabled}
+            disabled={isPreviewDisabled}
           />
         </div>
       </div>
