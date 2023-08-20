@@ -29,6 +29,14 @@
     }
   }
 
+  .button-row-card {
+    overflow: auto;
+
+    .Button {
+      display: inline-block;
+    }
+  }
+
   .voting-actions-header.Text {
     margin-bottom: 8px;
   }

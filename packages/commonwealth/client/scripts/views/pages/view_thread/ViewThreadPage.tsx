@@ -37,6 +37,7 @@ import {
 } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
 import {
@@ -50,6 +51,8 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
+import { VotingActions } from '../../components/proposals/voting_actions';
+import { VotingResults } from '../../components/proposals/VotingResults';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { Select } from '../../components/Select';
 import { CommentTree } from '../discussions/CommentTree';
@@ -115,6 +118,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [snapshotProposalId, setSnapshotProposalId] = useState(null);
   const [snapshotId, setSnapshotId] = useState(null);
   const [proposalId, setProposalId] = useState(null);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const toggleVotingModal = (newModalState: boolean) => {
+    setVotingModalOpen(newModalState);
+  };
+
+  const onModalClose = () => {
+    setVotingModalOpen(false);
+  };
 
   const {
     snapshotProposal,
@@ -925,21 +936,29 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   {
                     label: 'ProposalPoll',
                     item: (
-                      <ProposalPollCardContainer
-                        activeUserAddress={activeUserAddress}
-                        identifier={identifier}
-                        proposal={proposal}
-                        scores={[]} // unused?
-                        space={space}
-                        symbol={symbol}
-                        totals={totals}
-                        totalScore={totalScore}
-                        validatedAgainstStrategies={validatedAgainstStrategies}
-                        votes={proposalVotes}
-                        loadVotes={async () =>
-                          loadVotes(snapshotId, identifier)
+                      <CWContentPageCard
+                        header={'Proposal Vote'}
+                        content={
+                          <CWCard className="PollCard">
+                            <div className="poll-title-section">
+                              <CWText type="b2" className="poll-title-text">
+                                {proposal.title}
+                              </CWText>
+                            </div>
+                            <VotingResults
+                              proposal={proposal}
+                              inCardDisplay={true}
+                            />
+                            <VotingActions
+                              onModalClose={onModalClose}
+                              proposal={proposal}
+                              toggleVotingModal={toggleVotingModal}
+                              votingModalOpen={votingModalOpen}
+                              isCardDisplay={true}
+                            />
+                          </CWCard>
                         }
-                      />
+                      ></CWContentPageCard>
                     ),
                   },
                 ]

@@ -14,13 +14,10 @@ import { DefaultVotingResult } from './votingResults/DefaultVotingResult';
 import { YesNoAbstainVetoResult } from './YesNoAbstainVetoResult';
 import { YesNoRejectResult } from './YesNoRejectResult';
 
-type VotingResultsProps = { proposal: AnyProposal };
+type VotingResultsProps = { proposal: AnyProposal; inCardDisplay: boolean };
 
-export const VotingResults = (
-  props: VotingResultsProps,
-  inCardDisplay = false
-) => {
-  const { proposal } = props;
+export const VotingResults = (props: VotingResultsProps) => {
+  const { proposal, inCardDisplay } = props;
   const forceRerender = useForceRerender();
 
   const votes = proposal.getVotes();
