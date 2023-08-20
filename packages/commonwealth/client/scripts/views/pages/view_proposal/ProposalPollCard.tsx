@@ -16,6 +16,7 @@ import {
   VoteDisplay,
   VoteInformation,
 } from '../../components/poll_card';
+import { VotingResults } from '../../components/proposals/VotingResults';
 import { User } from '../../components/user/user';
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import {
@@ -28,9 +29,7 @@ import {
 } from '../view_snapshot_proposal/snapshot_poll_card';
 import { SnapshotThreadLink } from './proposal_header_links';
 
-export const ProposalPollCardContainer = (
-  props: SnapshotProposalCardsProps
-) => {
+export const ProposalPollCardContainer = (props) => {
   const {
     activeUserAddress,
     identifier,
@@ -42,104 +41,86 @@ export const ProposalPollCardContainer = (
     totalScore,
     loadVotes,
   } = props;
-
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-  const [choice, setChoice] = React.useState<string>();
-
-  const isActive =
-    proposal &&
-    moment(+proposal.start * 1000) <= moment() &&
-    moment(+proposal.end * 1000) > moment();
-
-  const [userVote, setUserVote] = useState(
-    proposal.choices[
-      votes.find((vote) => {
-        return vote.voter === activeUserAddress;
-      })?.choice - 1
-    ]
-  );
-  const [hasVoted, setHasVoted] = useState(userVote !== undefined);
-
-  const voteErrorText = !validatedAgainstStrategies
-    ? VotingError.NOT_VALIDATED
-    : hasVoted
-    ? VotingError.ALREADY_VOTED
-    : null;
-
-  const timeRemaining = useMemo(() => {
-    return calculateTimeRemaining(proposal);
-  }, [proposal]);
-
-  const voteInformation = useMemo(() => {
-    if (!proposal) {
-      return [];
-    }
-    const { choices } = proposal;
-    const voteInfo = [];
-    for (let i = 0; i < choices.length; i++) {
-      const totalVotes = votes
-        .filter((vote) => vote.choice === i + 1)
-        .reduce((sum, vote) => sum + vote.balance, 0);
-      voteInfo.push({
-        label: choices[i],
-        value: choices[i],
-        voteCount: totalVotes,
-      });
-    }
-    return voteInfo;
-  }, [proposal, votes]);
-
-  useEffect(() => {
-    if (choice) {
-      setIsModalOpen(true);
-    }
-  }, [choice]);
+  //
+  // const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  // const [choice, setChoice] = React.useState<string>();
+  //
+  // const isActive =
+  //   proposal &&
+  //   moment(+proposal.start * 1000) <= moment() &&
+  //   moment(+proposal.end * 1000) > moment();
+  //
+  // const [userVote, setUserVote] = useState(
+  //   proposal.choices[
+  //     votes.find((vote) => {
+  //       return vote.voter === activeUserAddress;
+  //     })?.choice - 1
+  //   ]
+  // );
+  // const [hasVoted, setHasVoted] = useState(userVote !== undefined);
+  //
+  // const voteErrorText = !validatedAgainstStrategies
+  //   ? VotingError.NOT_VALIDATED
+  //   : hasVoted
+  //   ? VotingError.ALREADY_VOTED
+  //   : null;
+  //
+  // const timeRemaining = useMemo(() => {
+  //   return calculateTimeRemaining(proposal);
+  // }, [proposal]);
+  //
+  // const voteInformation = useMemo(() => {
+  //   if (!proposal) {
+  //     return [];
+  //   }
+  //   const { choices } = proposal;
+  //   const voteInfo = [];
+  //   for (let i = 0; i < choices.length; i++) {
+  //     const totalVotes = votes
+  //       .filter((vote) => vote.choice === i + 1)
+  //       .reduce((sum, vote) => sum + vote.balance, 0);
+  //     voteInfo.push({
+  //       label: choices[i],
+  //       value: choices[i],
+  //       voteCount: totalVotes,
+  //     });
+  //   }
+  //   return voteInfo;
+  // }, [proposal, votes]);
+  //
+  // useEffect(() => {
+  //   if (choice) {
+  //     setIsModalOpen(true);
+  //   }
+  // }, [choice]);
 
   return (
     <CWContentPageCard
-      header={'Snapshot Vote'}
+      header={'Proposal Vote'}
       content={
         <>
-          <ProposalPollCard
-            pollEnded={!isActive}
-            hasVoted={hasVoted}
-            votedFor={hasVoted ? userVote : ''}
-            disableVoteButton={voteErrorText !== null}
-            proposalTitle={proposal.title}
-            timeRemaining={timeRemaining}
-            totalVoteCount={totals.sumOfResultsBalance}
-            voteInformation={voteInformation}
-            onSnapshotVoteCast={async (_choice) => {
-              setChoice(_choice);
-            }}
-            onVoteCast={async () => {
-              setIsModalOpen(false);
-            }}
-            incrementalVoteCast={totalScore}
-            tooltipErrorMessage={voteErrorText}
-            isPreview={false}
-          />
-          <Modal
-            content={
-              <ConfirmSnapshotVoteModal
-                space={space}
-                proposal={proposal}
-                id={identifier}
-                selectedChoice={proposal?.choices.indexOf(choice).toString()}
-                totalScore={totalScore}
-                scores={scores}
-                snapshot={proposal.snapshot}
-                successCallback={async () => {
-                  await loadVotes();
-                  setHasVoted(true);
-                  setUserVote(choice);
-                }}
-                onModalClose={() => setIsModalOpen(false)}
-              />
-            }
-            onClose={() => setIsModalOpen(false)}
-            open={isModalOpen}
-          />
+          <VotingResults proposal={proposal} />
+          {/*<Modal*/}
+          {/*  content={*/}
+          {/*    <ConfirmSnapshotVoteModal*/}
+          {/*      space={space}*/}
+          {/*      proposal={proposal}*/}
+          {/*      id={identifier}*/}
+          {/*      selectedChoice={proposal?.choices.indexOf(choice).toString()}*/}
+          {/*      totalScore={totalScore}*/}
+          {/*      scores={scores}*/}
+          {/*      snapshot={proposal.snapshot}*/}
+          {/*      successCallback={async () => {*/}
+          {/*        await loadVotes();*/}
+          {/*        setHasVoted(true);*/}
+          {/*        setUserVote(choice);*/}
+          {/*      }}*/}
+          {/*      onModalClose={() => setIsModalOpen(false)}*/}
+          {/*    />*/}
+          {/*  }*/}
+          {/*  onClose={() => setIsModalOpen(false)}*/}
+          {/*  open={isModalOpen}*/}
+          {/*/>*/}
         </>
       }
     ></CWContentPageCard>
@@ -251,18 +232,4 @@ const ProposalPollCard = (props: SnapshotPollCardProps) => {
       />
     </CWCard>
   );
-};
-
-const ProposalVotes = (proposal) => {
-  const forceRerender = useForceRerender();
-
-  const votes = proposal.getVotes();
-
-  useEffect(() => {
-    app.proposalEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.proposalEmitter.removeAllListeners();
-    };
-  }, [forceRerender]);
 };

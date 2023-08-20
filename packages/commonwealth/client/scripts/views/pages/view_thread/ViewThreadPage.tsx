@@ -26,6 +26,7 @@ import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import NewProfilesController from '../../../controllers/server/newProfiles';
+import useForceRerender from '../../../hooks/useForceRerender';
 import Comment from '../../../models/Comment';
 import Poll from '../../../models/Poll';
 import { Link, LinkDisplay, LinkSource, Thread } from '../../../models/Thread';
@@ -134,7 +135,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     proposalId,
     undefined
   );
-  console.log(metadata);
+
+  const forceRerender = useForceRerender();
+
+  const proposalVotes = proposal?.getVotes();
+
+  useEffect(() => {
+    app.proposalEmitter.on('redraw', forceRerender);
+
+    return () => {
+      app.proposalEmitter.removeAllListeners();
+    };
+  }, [forceRerender]);
 
   const threadId = identifier.split('-')[0];
   const threadDoesNotMatch =
@@ -908,7 +920,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   },
                 ]
               : []),
-            ...(proposal
+            ...(proposal && proposalVotes?.length >= 0
               ? [
                   {
                     label: 'ProposalPoll',
@@ -923,7 +935,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         totals={totals}
                         totalScore={totalScore}
                         validatedAgainstStrategies={validatedAgainstStrategies}
-                        votes={votes}
+                        votes={proposalVotes}
                         loadVotes={async () =>
                           loadVotes(snapshotId, identifier)
                         }
