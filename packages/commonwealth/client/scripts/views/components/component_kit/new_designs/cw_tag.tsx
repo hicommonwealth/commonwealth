@@ -78,14 +78,6 @@ export const CWTag = ({
         <CWIcon iconName={loginIcon} iconSize="small" className="tag-icon" />
       )}
       {type === 'input' && (
-        // profile &&
-        // <Avatar
-        //   url={profile?.avatarUrl}
-        //   size={16}
-        //   address={profile?.id}
-        // />
-        // icon inserted for styling purposes.
-        // replace CWIcon below with avatar above
         <CWCommunityAvatar size="small" community={community} />
       )}
       {!!iconName && (
