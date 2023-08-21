@@ -37,6 +37,7 @@ type ReactQuillEditorProps = {
   setContentDelta: (d: SerializableDeltaStatic) => void;
   isDisabled?: boolean;
   tooltipLabel?: string;
+  shouldFocus?: boolean;
 };
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
@@ -48,6 +49,7 @@ const ReactQuillEditor = ({
   setContentDelta,
   isDisabled = false,
   tooltipLabel = 'Join community',
+  shouldFocus = false,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -193,6 +195,12 @@ const ReactQuillEditor = ({
     }, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
+
+  useEffect(() => {
+    if (shouldFocus && editorRef && editorRef.current) {
+      editorRef.current.focus();
+    }
+  }, [shouldFocus]);
 
   const showTooltip = isDisabled && isHovering;
 
