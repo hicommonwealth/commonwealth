@@ -62,6 +62,7 @@
     "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh",
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "compress-images": "npx ts-node -T ./scripts/compressImages.ts",
+    "resize-large-images": "npx ts-node -T ./scripts/resizeImages.ts",
     "gen-e2e": "npx playwright codegen",
     "e2e-start-server": "ETH_RPC=e2e-test yarn start",
     "test-e2e-serial": "TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*",
