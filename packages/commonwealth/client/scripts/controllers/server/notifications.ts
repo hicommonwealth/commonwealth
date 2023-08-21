@@ -2,7 +2,9 @@
 import { EventEmitter } from 'events';
 import $ from 'jquery';
 
-import NotificationSubscription, { modelFromServer } from 'models/NotificationSubscription';
+import NotificationSubscription, {
+  modelFromServer,
+} from 'models/NotificationSubscription';
 
 import app from 'state';
 
@@ -46,9 +48,6 @@ class NotificationsController {
   // these are the chains that chain-events has active listeners for (used to detemine what chains are shown on the
   // notification settings page
   private _chainEventSubscribedChainIds: string[] = [];
-
-  private _maxChainEventNotificationId: number = Number.POSITIVE_INFINITY;
-  private _maxDiscussionNotificationId: number = Number.POSITIVE_INFINITY;
 
   private _numPages = 0;
   private _numUnread = 0;
@@ -309,9 +308,6 @@ class NotificationsController {
       ? { chain_filter: app.activeChainId(), maxId: undefined }
       : { chain_filter: undefined, maxId: undefined };
 
-    if (this._maxChainEventNotificationId !== Number.POSITIVE_INFINITY)
-      options.maxId = this._maxChainEventNotificationId;
-
     return post('/viewChainEventNotifications', options, (result) => {
       this._numPages = result.numPages;
       this._numUnread = result.numUnread;
@@ -327,9 +323,6 @@ class NotificationsController {
     const options: NotifOptions = app.isCustomDomain()
       ? { chain_filter: app.activeChainId(), maxId: undefined }
       : { chain_filter: undefined, maxId: undefined };
-
-    if (this._maxDiscussionNotificationId !== Number.POSITIVE_INFINITY)
-      options.maxId = this._maxDiscussionNotificationId;
 
     return post('/viewDiscussionNotifications', options, (result) => {
       this._numPages = result.numPages;
@@ -356,20 +349,9 @@ class NotificationsController {
         if (subscription.category === 'chain-event') {
           if (!this._chainEventStore.getById(notification.id))
             this._chainEventStore.add(notification);
-          // the minimum id is the new max id for next page
-          if (notificationsReadJSON.id < this._maxChainEventNotificationId) {
-            this._maxChainEventNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1)
-              this._maxChainEventNotificationId = 0;
-          }
         } else {
           if (!this._discussionStore.getById(notification.id))
             this._discussionStore.add(notification);
-          if (notificationsReadJSON.id < this._maxDiscussionNotificationId) {
-            this._maxDiscussionNotificationId = notificationsReadJSON.id;
-            if (notificationsReadJSON.id === 1)
-              this._maxDiscussionNotificationId = 0;
-          }
         }
       }
       if (subscription.category === 'chain-event') ceSubs.push(subscription);

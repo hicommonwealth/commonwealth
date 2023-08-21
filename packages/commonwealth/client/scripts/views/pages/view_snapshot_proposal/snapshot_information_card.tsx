@@ -8,7 +8,7 @@ import 'pages/snapshot/snapshot_information_card.scss';
 
 import app from 'state';
 import AddressInfo from '../../../models/AddressInfo';
-import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';

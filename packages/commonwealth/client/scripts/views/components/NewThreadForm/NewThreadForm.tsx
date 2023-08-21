@@ -97,6 +97,7 @@ export const NewThreadForm = () => {
         topic: threadTopic,
       });
 
+    try {
       const thread = await createThread({
         address: app.user.activeAccount.address,
         kind: threadKind,

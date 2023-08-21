@@ -16,9 +16,9 @@ import { User } from 'views/components/user/user';
 import './AuthorAndPublishInfo.scss';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';
 import moment from 'moment';
+import { NewThreadTag } from '../../NewThreadTag';
 
 export type AuthorAndPublishInfoProps = {
-  isNew?: boolean;
   isHot?: boolean;
   authorInfo: Account | AddressInfo | MinimumProfile | undefined;
   discord_meta?: {
@@ -42,7 +42,6 @@ export type AuthorAndPublishInfoProps = {
 };
 
 export const AuthorAndPublishInfo = ({
-  isNew,
   isHot,
   authorInfo,
   isLocked,
@@ -168,7 +167,7 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      {isNew && <CWTag label={'New'} type={'new'} iconName={'newStar'} />}
+      <NewThreadTag threadCreatedAt={moment(publishDate)} />
 
       {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
 

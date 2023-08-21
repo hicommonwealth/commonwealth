@@ -14,8 +14,6 @@ export const ApiEndpoints = {
   BULK_TOPICS: '/bulkTopics',
   FETCH_COMMENTS: '/viewComments',
   FETCH_THREADS: '/threads',
-  getCommentReactions: (commentId: number) =>
-    `/comments/${commentId}/reactions`,
   DISCORD_CHANNELS: '/getDiscordChannels',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
