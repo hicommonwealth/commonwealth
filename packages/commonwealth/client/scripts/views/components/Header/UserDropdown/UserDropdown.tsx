@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
 
@@ -18,57 +18,87 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { UserDropdownItem } from './UserDropdownItem';
-
-// TODO temp items, for sake of UI, should be replaced with dynamic addresses
-const addressesMenuItems: PopoverMenuItem[] = [
-  {
-    type: 'default',
-    label: (
-      <UserDropdownItem
-        isSignedIn={true}
-        hasJoinedCommunity={true}
-        address="0x067a7910789f214A13E195a025F881E9B59C4D76"
-      />
-    ),
-    onClick: () =>
-      console.log('0x067a7910789f214A13E195a025F881E9B59C4D76 clicked'),
-  },
-  {
-    type: 'default',
-    label: (
-      <UserDropdownItem
-        isSignedIn={true}
-        hasJoinedCommunity={false}
-        address="0x32102345067a7910789f214A13E195a025F881E9B512119"
-      />
-    ),
-    onClick: () =>
-      console.log('0x067a7910789f214A13E195a025F881E9B59C4D76 clicked'),
-  },
-  {
-    type: 'default',
-    label: (
-      <UserDropdownItem
-        isSignedIn={false}
-        username="commoner001"
-        hasJoinedCommunity={false}
-      />
-    ),
-    onClick: () => console.log('commoner001 clicked'),
-  },
-];
+import { ChainBase, WalletSsoSource } from 'common-common/src/types';
+import { chainBaseToCanvasChainId } from 'canvas';
+import { setActiveAccount } from 'controllers/app/login';
+import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
 
 const UserDropdown = () => {
   const navigate = useCommonNavigate();
+  const [authenticatedAddresses, setAuthenticatedAddresses] = useState<{
+    [address: string]: boolean;
+  }>({});
 
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [revalidationModalData, setRevalidationModalData] = useState<{
+    walletSsoSource: WalletSsoSource;
+    walletAddress: string;
+  }>(null);
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
+
+  const chainBase = app.chain?.base;
+  const idOrPrefix =
+    chainBase === ChainBase.CosmosSDK
+      ? app.chain?.meta.bech32Prefix
+      : app.chain?.meta.node?.ethChainId;
+  const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
+
+  useEffect(() => {
+    const promises = app.user.activeAccounts.map(async (activeAccount) => {
+      const isAuth = await app.sessions
+        .getSessionController(chainBase)
+        .hasAuthenticatedSession(canvasChainId, activeAccount.address);
+
+      return {
+        [activeAccount.address]: isAuth,
+      };
+    });
+
+    Promise.all(promises).then((response) => {
+      const reduced = response.reduce((acc, curr) => {
+        return { ...acc, ...curr };
+      }, {});
+      setAuthenticatedAddresses(reduced);
+    });
+  }, [canvasChainId, chainBase]);
+
+  const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
+    (account) => {
+      const signed = authenticatedAddresses[account.address];
+      const isActive = app.user.activeAccount?.address === account.address;
+
+      return {
+        type: 'default',
+        label: (
+          <UserDropdownItem
+            isSignedIn={signed}
+            hasJoinedCommunity={isActive}
+            address={account.address}
+          />
+        ),
+        onClick: async () => {
+          if (isActive) {
+            return;
+          }
+
+          if (signed) {
+            return await setActiveAccount(account);
+          }
+
+          setRevalidationModalData({
+            walletSsoSource: account.walletSsoSource,
+            walletAddress: account.address,
+          });
+        },
+      };
+    }
+  );
 
   return (
     <>
@@ -81,7 +111,7 @@ const UserDropdown = () => {
             type: 'header',
             label: 'Addresses',
           },
-          ...addressesMenuItems,
+          ...addresses,
           {
             type: 'default',
             label: 'Connect a new address',
@@ -140,6 +170,18 @@ const UserDropdown = () => {
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
+      />
+      <Modal
+        isFullScreen={false}
+        content={
+          <SessionRevalidationModal
+            onModalClose={() => setRevalidationModalData(null)}
+            walletSsoSource={revalidationModalData?.walletSsoSource}
+            walletAddress={revalidationModalData?.walletAddress}
+          />
+        }
+        onClose={() => setRevalidationModalData(null)}
+        open={!!revalidationModalData}
       />
     </>
   );
