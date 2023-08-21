@@ -23,7 +23,14 @@ async function resizeImage(data: Buffer, contentType: string) {
   ) {
     return null; // we don't support so just early exit
   }
-  const metadata = await sharp(data).metadata();
+
+  let metadata;
+  try {
+    metadata = await sharp(data).metadata();
+  } catch (e) {
+    console.log(`input buffer empty, skipping image`);
+    return;
+  }
   if (metadata.width < 1000 && metadata.height < 1000) {
     return; // auto compression/scaling can be performed by cloudflare polish, so do nothing
   }
@@ -56,7 +63,72 @@ async function resizeImage(data: Buffer, contentType: string) {
   return b.data;
 }
 
+// This function is not turned into a Promise.all because if every call was executed async, it will flood cloudflare
+// and cause this to be flagged it as a bot. It will then need to solve a captcha in order to retrieve the image.
+async function uploadToS3AndReplace(
+  data,
+  field,
+  updateFunction,
+  transaction,
+  name
+) {
+  for (const datum of data.slice(0, 20)) {
+    let resp;
+
+    try {
+      resp = await fetch(datum[field]);
+    } catch (e) {
+      console.log(`Failed to get image for ${datum[field]}`);
+      continue;
+    }
+
+    let contentType = resp.headers.get('content-type');
+    const buffer = await resp.buffer();
+
+    const resizedImage = await resizeImage(buffer, contentType);
+    if (!resizedImage) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    // we convert gif to jpeg
+    if (contentType.includes('gif')) {
+      contentType = 'image/jpeg';
+    }
+
+    const params: S3.Types.PutObjectRequest = {
+      Bucket: 'assets.commonwealth.im',
+      Key: `${datum.id}_resized.${contentType.split('/')[1]}`,
+      Body: resizedImage,
+      ContentType: contentType,
+    };
+
+    const newImage = await s3.upload(params).promise();
+
+    console.log(
+      `Success for ${name} ${datum.id} with new url ${newImage.Location}`
+    );
+    await updateFunction(datum.id, newImage.Location);
+    await models.Chain.update(
+      { icon_url: newImage.Location },
+      { where: { id: datum.id }, transaction }
+    );
+  }
+}
+
 async function main() {
+  const updateChain = async (id, location) => {
+    await models.Chain.update(
+      { icon_url: location },
+      { where: { id: id }, transaction }
+    );
+  };
+  const updateProfile = async (id, location) => {
+    await models.Profile.update(
+      { avatar_url: location },
+      { where: { id: id }, transaction }
+    );
+  };
   const chains = await models.Chain.findAll({
     where: {
       icon_url: {
@@ -65,51 +137,33 @@ async function main() {
       },
     },
   });
+  const profiles = await models.Profile.findAll({
+    where: {
+      avatar_url: {
+        [Op.ne]: null,
+        [Op.ne]: '',
+      },
+    },
+  });
   const transaction = await sequelize.transaction();
 
   try {
-    for (const chain of chains) {
-      let resp;
-
-      try {
-        resp = await fetch(chain.icon_url);
-      } catch (e) {
-        console.log(`Failed to get image for ${chain.icon_url}`);
-        continue;
-      }
-
-      let contentType = resp.headers.get('content-type');
-      const buffer = await resp.buffer();
-
-      const resizedImage = await resizeImage(buffer, contentType);
-      if (!resizedImage) {
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-
-      // we convert gif to jpeg
-      if (contentType.includes('gif')) {
-        contentType = 'image/jpeg';
-      }
-
-      const params: S3.Types.PutObjectRequest = {
-        Bucket: 'assets.commonwealth.im',
-        Key: `${chain.id}_resized.${contentType.split('/')[1]}`,
-        Body: resizedImage,
-        ContentType: contentType,
-      };
-
-      const data = await s3.upload(params).promise();
-
-      console.log(
-        `Success for community ${chain.id} with new url ${data.Location}`
-      );
-      await models.Chain.update(
-        { icon_url: data.Location },
-        { where: { id: chain.id }, transaction }
-      );
-    }
-
+    await Promise.all([
+      uploadToS3AndReplace(
+        chains,
+        'icon_url',
+        updateChain,
+        transaction,
+        'community'
+      ),
+      uploadToS3AndReplace(
+        profiles,
+        'avatar_url',
+        updateProfile,
+        transaction,
+        'profile'
+      ),
+    ]);
     // commit changes to db if all passes
     await transaction.commit();
   } catch (e) {
