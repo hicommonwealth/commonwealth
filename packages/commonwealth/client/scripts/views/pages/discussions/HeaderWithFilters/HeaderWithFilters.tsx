@@ -23,8 +23,6 @@ import {
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
-import SwitchAddressBanner from 'views/components/SwitchAddressBanner';
-import { featureFlags } from 'helpers/feature-flags';
 
 type HeaderWithFiltersProps = {
   stage: string;
@@ -139,25 +137,8 @@ export const HeaderWithFilters = ({
     );
   };
 
-  const handleSwitchAddress = () => {
-    console.log('click switch address');
-  };
-
-  const handleJoinCommunity = () => {
-    console.log('click handle join');
-  };
-
   return (
     <div className="HeaderWithFilters">
-      {featureFlags.sessionKeys && (
-        // TODO adjust communityName and onClose to be dynamic once the logic is ready
-        <SwitchAddressBanner
-          communityName="dydx"
-          onCommunityJoin={handleJoinCommunity}
-          onAddressSwitch={handleSwitchAddress}
-          onClose={() => console.log('close')}
-        />
-      )}
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
           {isUndefined(topic) ? 'All Discussions' : topic}
