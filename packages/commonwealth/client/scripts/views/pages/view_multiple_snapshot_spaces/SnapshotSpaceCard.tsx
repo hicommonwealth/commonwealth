@@ -1,13 +1,12 @@
-import React from 'react';
-
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import type Thread from '../../../models/Thread';
-
-import 'pages/snapshot/snapshot_space_card.scss';
+import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/snapshot/SnapshotSpaceCard.scss';
+import React from 'react';
 import app from 'state';
 import { REDIRECT_ACTIONS } from '.';
+import type Thread from '../../../models/Thread';
 import { CWCard } from '../../components/component_kit/cw_card';
-import { useCommonNavigate } from 'navigation/helpers';
+import { SnapshotSpaceCardSkeleton } from './SnapshotSpaceCardSkeleton';
 
 function countActiveProposals(proposals: SnapshotProposal[]): number {
   return proposals.filter((proposal) => proposal.state === 'active').length;
@@ -18,11 +17,14 @@ type SnapshotSpaceCardProps = {
   proposals: SnapshotProposal[];
   redirectAction: string;
   space: SnapshotSpace;
+  showSkeleton?: boolean;
 };
 
 export const SnapshotSpaceCard = (props: SnapshotSpaceCardProps) => {
-  const { space, proposals, redirectAction, proposal } = props;
+  const { space, proposals, redirectAction, proposal, showSkeleton } = props;
   const navigate = useCommonNavigate();
+
+  if (showSkeleton) return <SnapshotSpaceCardSkeleton />;
 
   if (!space || !proposals) return;
 

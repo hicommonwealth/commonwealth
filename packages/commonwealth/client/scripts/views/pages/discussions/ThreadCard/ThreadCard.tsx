@@ -11,7 +11,6 @@ import moment from 'moment';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
-import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -23,6 +22,7 @@ import Permissions from '../../../../utils/Permissions';
 import { isHot, isNewThread } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
 import './ThreadCard.scss';
+import { CardSkeleton } from './ThreadCardSkeleton';
 import { ThreadOptions } from './ThreadOptions';
 import { AdminActionsProps } from './ThreadOptions/AdminActions';
 import { ReactionButton } from './ThreadOptions/ReactionButton';
@@ -33,36 +33,6 @@ type CardProps = AdminActionsProps & {
   threadHref?: string;
   showSkeleton?: boolean;
   canReact?: boolean;
-};
-
-const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
-  return (
-    <div className={'ThreadCard showSkeleton'}>
-      {!isWindowSmallInclusive && (
-        <ReactionButton
-          thread={thread}
-          size="big"
-          showSkeleton
-          disabled={disabled}
-        />
-      )}
-      <div className="content-wrapper">
-        <div>
-          <Skeleton count={1} className="content-header-skeleton" />
-          <div>
-            {' '}
-            <Skeleton className="content-header-icons-skeleton" />{' '}
-          </div>
-        </div>
-        <div className="content-body-wrapper">
-          <Skeleton count={3} />
-        </div>
-      </div>
-      <div className="content-footer">
-        <Skeleton />
-      </div>
-    </div>
-  );
 };
 
 export const ThreadCard = ({

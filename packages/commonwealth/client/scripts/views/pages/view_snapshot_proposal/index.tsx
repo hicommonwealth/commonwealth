@@ -15,27 +15,27 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useGetThreadsByLinkQuery } from 'state/api/threads';
 import AddressInfo from '../../../models/AddressInfo';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { PageLoading } from '../loading';
 import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
+import useBrowserWindow from 'hooks/useBrowserWindow';
 
-type ViewProposalPageProps = {
+type ViewSnapshotProposalPageProps = {
   identifier: string;
   scope: string;
   snapshotId: string;
 };
 
-export const ViewProposalPage = ({
+export const ViewSnapshotProposalPage = ({
   identifier,
   snapshotId,
-}: ViewProposalPageProps) => {
+}: ViewSnapshotProposalPageProps) => {
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
@@ -80,6 +80,8 @@ export const ViewProposalPage = ({
     return new AddressInfo(null, proposal.author, activeChainId, null);
   }, [proposal, activeChainId]);
 
+  const { isWindowLarge } = useBrowserWindow({});
+
   const loadVotes = useCallback(
     async (snapId: string, proposalId: string) => {
       await app.snapshot.init(snapId);
@@ -113,7 +115,12 @@ export const ViewProposalPage = ({
   }, [identifier, loadVotes, snapshotId]);
 
   if (!proposal) {
-    return <PageLoading />;
+    return (
+      <CWContentPage
+        showSkeleton
+        sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
+      />
+    );
   }
 
   return (
@@ -172,4 +179,4 @@ export const ViewProposalPage = ({
   );
 };
 
-export default ViewProposalPage;
+export default ViewSnapshotProposalPage;

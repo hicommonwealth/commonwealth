@@ -1,19 +1,21 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
-import 'components/component_kit/cw_content_page.scss';
+import 'components/component_kit/CWContentPage.scss';
 import moment from 'moment';
-import React, { ReactNode, useState } from 'react';
-import type Account from '../../../models/Account';
-import AddressInfo from '../../../models/AddressInfo';
-import MinimumProfile from '../../../models/MinimumProfile';
-import { Thread } from '../../../models/Thread';
-import { ThreadStage } from '../../../models/types';
-import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
-import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
-import { Skeleton } from '../Skeleton';
-import { CWCard } from './cw_card';
-import { CWTab, CWTabBar } from './cw_tabs';
-import { CWText } from './cw_text';
-import { ComponentType } from './types';
+import React, { ReactNode, useMemo } from 'react';
+import { useNavigate } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
+import type Account from '../../../../models/Account';
+import AddressInfo from '../../../../models/AddressInfo';
+import MinimumProfile from '../../../../models/MinimumProfile';
+import { Thread } from '../../../../models/Thread';
+import { ThreadStage } from '../../../../models/types';
+import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
+import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
+import { CWCard } from '../cw_card';
+import { CWTab, CWTabBar } from '../cw_tabs';
+import { CWText } from '../cw_text';
+import { ComponentType } from '../types';
+import { CWContentPageSkeleton } from './CWContentPageSkeleton';
 
 export type ContentPageSidebarItem = {
   label: string;
@@ -67,81 +69,8 @@ type ContentPageProps = {
   canUpdateThread?: boolean;
   showTabs?: boolean;
   showSkeleton?: boolean;
-  isWindowMedium?: boolean;
   isEditing?: boolean;
-};
-
-const CWContentPageSkeleton = ({ isWindowMedium }) => {
-  const mainBody = (
-    <div className="main-body-container">
-      {/* thread header */}
-      <div className="header">
-        <Skeleton width={'90%'} />
-        <Skeleton />
-      </div>
-
-      {/* thread title */}
-      <Skeleton />
-
-      {/* thread description */}
-      <div>
-        <Skeleton width={'80%'} />
-        <Skeleton />
-        <Skeleton width={'90%'} />
-        <Skeleton />
-        <Skeleton width={'95%'} />
-      </div>
-
-      {/* comment input */}
-      <div>
-        <Skeleton height={200} />
-      </div>
-
-      {/* comment filter row */}
-      <Skeleton />
-
-      {/* mimics comments */}
-      <div>
-        <Skeleton width={'80%'} />
-        <Skeleton width={'100%'} />
-        <Skeleton width={'90%'} />
-      </div>
-      <div>
-        <Skeleton width={'90%'} />
-        <Skeleton width={'25%'} />
-      </div>
-    </div>
-  );
-
-  return (
-    <div className={ComponentType.ContentPage}>
-      <div className="sidebar-view">
-        {mainBody}
-        {isWindowMedium && (
-          <div className="sidebar">
-            <div className="cards-column">
-              <Skeleton width={'80%'} />
-              <Skeleton width={'100%'} />
-              <Skeleton width={'50%'} />
-              <Skeleton width={'75%'} />
-            </div>
-            <div className="cards-column">
-              <Skeleton width={'80%'} />
-              <Skeleton width={'100%'} />
-              <Skeleton width={'50%'} />
-              <Skeleton width={'75%'} />
-            </div>
-            <div className="cards-column">
-              <Skeleton width={'80%'} />
-              <Skeleton width={'100%'} />
-              <Skeleton width={'50%'} />
-              <Skeleton width={'75%'} />
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  sidebarComponentsSkeletonCount?: number;
 };
 
 export const CWContentPage = ({
@@ -176,13 +105,36 @@ export const CWContentPage = ({
   canUpdateThread,
   showTabs = false,
   showSkeleton,
-  isWindowMedium,
   isEditing = false,
+  sidebarComponentsSkeletonCount = 2,
 }: ContentPageProps) => {
-  const [tabSelected, setTabSelected] = useState<number>(0);
+  const navigate = useNavigate();
+  const [urlQueryParams] = useSearchParams();
 
-  if (showSkeleton)
-    return <CWContentPageSkeleton isWindowMedium={isWindowMedium} />;
+  const tabSelected = useMemo(() => {
+    const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
+    if (!tab) {
+      return 0;
+    }
+    return parseInt(tab, 10);
+  }, [urlQueryParams]);
+
+  const setTabSelected = (newTab: number) => {
+    const newQueryParams = new URLSearchParams(urlQueryParams.toString());
+    newQueryParams.set('tab', `${newTab}`);
+    navigate({
+      pathname: location.pathname,
+      search: `?${newQueryParams.toString()}`,
+    });
+  };
+
+  if (showSkeleton) {
+    return (
+      <CWContentPageSkeleton
+        sidebarComponentsSkeletonCount={sidebarComponentsSkeletonCount}
+      />
+    );
+  }
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
 
