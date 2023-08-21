@@ -1,16 +1,25 @@
-import React, { FC, ChangeEvent, useState, useEffect } from 'react';
+import React, { FC, ChangeEvent, useState } from 'react';
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import useAutocomplete from '@mui/base/useAutocomplete';
+import type { NavigateOptions, To } from 'react-router';
 
 import { ComponentType } from '../types';
 import { CWTag } from './cw_tag';
-
 import { IconName } from '../cw_icons/cw_icon_lookup';
 import { ValidationStatus } from '../cw_validation_text';
 import { CWText } from '../cw_text';
-import { CWCommunityAvatar } from '../cw_community_avatar';
 import { getClasses } from '../helpers';
-import ChainInfo from '../../../../models/ChainInfo';
+import SearchQuery, { SearchScope } from '../../../../models/SearchQuery';
+import { CWDivider } from '../cw_divider';
+import {
+  SearchBarCommentPreviewRow,
+  SearchBarCommunityPreviewRow,
+  SearchBarMemberPreviewRow,
+  SearchBarThreadPreviewRow,
+} from '../../../../../scripts/views/pages/search/search_bar_components';
+import app from '../../../../../scripts/state';
+import { notifyError } from '../../../../controllers/app/notifications';
+import { useCommonNavigate } from '../../../../../scripts/navigation/helpers';
+import useSearchResults from '../../../../../scripts/hooks/useSearchResults';
 
 import 'components/component_kit/new_designs/CWSearchBar.scss';
 
@@ -33,8 +42,6 @@ type BaseSearchBarProps = {
   tabIndex?: number;
   manualStatusMessage?: string;
   manualValidationStatus?: ValidationStatus;
-  options?: ChainInfo[];
-  setSelectedChain: (chain: ChainInfo) => void;
 };
 
 type InputStyleProps = {
@@ -51,68 +58,97 @@ type SearchBarProps = BaseSearchBarProps &
   InputInternalStyleProps &
   React.HTMLAttributes<HTMLDivElement>;
 
-export const CWSearchBar: FC<SearchBarProps> = ({
-  disabled,
-  placeholder,
-  options,
-  setSelectedChain,
-}) => {
-  const [value, setValue] = useState<string>('');
-  const [communities, setCommunities] = useState([]);
-  const [id, setId] = useState(null);
-  const [isFocused, setIsFocused] = useState<boolean>(false);
+let resetTimer = null;
 
-  const {
-    getRootProps,
-    getInputProps,
-    getListboxProps,
-    getOptionProps,
-    groupedOptions,
-  } = useAutocomplete({
-    options: communities,
-    onChange: (event: any, chain) => {
-      setValue('');
-      setId(chain.id);
-      setSelectedChain(chain.id);
-    },
-    getOptionLabel: (option) => option.name,
-  });
+const goToSearchPage = (
+  query: SearchQuery,
+  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+) => {
+  if (!query.searchTerm || !query.searchTerm.toString().trim()) {
+    notifyError('Enter a valid search term');
+    return;
+  }
+
+  app.search.addToHistory(query);
+
+  setRoute(`/search?${query.toUrlParams()}`);
+};
+
+type SectionHeaderProps = {
+  header: string;
+};
+
+const SectionHeader: FC<SectionHeaderProps> = ({ header }) => {
+  return (
+    <div className="section-header">
+      <CWText type="caption" className="section-header-text">
+        {header}
+      </CWText>
+      <CWDivider />
+    </div>
+  );
+};
+
+export const CWSearchBar: FC<SearchBarProps> = ({ disabled, placeholder }) => {
+  const navigate = useCommonNavigate();
+  const [showTag, setShowTag] = useState(true);
+  const chainId = app.activeChainId() || 'all_chains';
+  const chain = app.config.chains.getById(chainId);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { searchResults } = useSearchResults(searchTerm, [
+    'threads',
+    'replies',
+    chainId === 'all_chains' ? 'communities' : null,
+    'members',
+  ]);
+
+  const showDropdown =
+    searchTerm.length > 0 && Object.keys(searchResults || {}).length > 0;
+
+  const resetSearchBar = () => setSearchTerm('');
 
   const handleOnInput = (e: ChangeEvent<HTMLInputElement>) =>
-    setValue(e.target.value);
+    setSearchTerm(e.target.value);
 
-  const handleOnFocus = () => setIsFocused(true);
+  const handleOnKeyUp = (e) => {
+    if (e.key === 'Enter') {
+      handleGoToSearchPage();
+    } else if (e.key === 'Escape') {
+      resetSearchBar();
+    }
+  };
 
-  const handleOnBlur = () => setIsFocused(false);
+  const handleOnBlur = () => {
+    // Give time for child click events to
+    // fire before resetting the search bar
+    if (!resetTimer) {
+      resetTimer = setTimeout(() => {
+        resetSearchBar();
+        resetTimer = null;
+      }, 300);
+    }
+  };
 
   const handleOnKeyDown = (e: any) => {
-    if (e.key === 'Backspace' && value.length === 0) {
-      setId(null);
-      setSelectedChain(null);
+    if (e.key === 'Backspace' && searchTerm.length === 0) {
+      setShowTag(false);
     }
   };
 
-  const getChain = (chainId: string): ChainInfo =>
-    options.find((c) => c.id === chainId);
-
-  const sortByName = (a: any, b: any) => {
-    const nameA = a.name.toUpperCase();
-    const nameB = b.name.toUpperCase();
-
-    return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+  const handleGoToSearchPage = () => {
+    const searchQuery = new SearchQuery(searchTerm, {
+      isSearchPreview: false,
+      chainScope: showTag ? chainId : 'all_chains',
+    });
+    goToSearchPage(searchQuery, navigate);
+    resetSearchBar();
   };
-
-  useEffect(() => {
-    const list = [];
-    for (let i = 0; i < options.length; i++) {
-      list.push(options[i]);
-    }
-    list.sort(sortByName);
-    setCommunities([...list]);
-  }, [options]);
 
   return (
-    <div className={getClasses({ container: true }, ComponentType.Searchbar)}>
+    <div
+      className={getClasses({ container: true }, ComponentType.Searchbar)}
+      onBlur={handleOnBlur}
+    >
       <div
         className={getClasses<InputStyleProps & InputInternalStyleProps>(
           {
@@ -120,8 +156,6 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           },
           ComponentType.Searchbar
         )}
-        onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
       >
         <MagnifyingGlass
           className={getClasses(
@@ -130,16 +164,14 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           )}
           weight="regular"
           size={24}
+          onClick={handleGoToSearchPage}
         />
-        {id && (
+        {showTag && !!chain && (
           <CWTag
-            label={getChain(id).name}
+            label={chain.name}
             type="input"
-            community={getChain(id)}
-            onClick={() => {
-              setId(null);
-              setSelectedChain(null);
-            }}
+            community={chain}
+            onClick={() => setShowTag(false)}
           />
         )}
         <div
@@ -147,36 +179,81 @@ export const CWSearchBar: FC<SearchBarProps> = ({
             { inputElement: true },
             ComponentType.Searchbar
           )}
-          {...getRootProps()}
         >
           <input
             placeholder={placeholder}
             onInput={handleOnInput}
+            onKeyUp={handleOnKeyUp}
             onKeyDown={handleOnKeyDown}
             disabled={disabled}
-            {...getInputProps()}
-            value={value}
+            value={searchTerm}
           />
         </div>
       </div>
-      {groupedOptions.length > 0 ? (
-        <ul className={getClasses({ ListBox: true })} {...getListboxProps()}>
-          {(groupedOptions as typeof communities).map((option, index) => (
-            <li
-              key={option.id}
-              className={getClasses({ ListBox: true, option: true })}
-              {...getOptionProps({ option, index })}
-            >
-              <CWCommunityAvatar size="medium" community={option} />
-              {option.name}
-            </li>
-          ))}
-        </ul>
-      ) : value.length > 0 && isFocused ? (
-        <div className={getClasses({ ListBox: true, noResults: true })}>
-          <CWText type="b2">No results found</CWText>
+      {showDropdown && (
+        <div className="ListBox">
+          {Object.values(searchResults).flat(1).length > 0 ? (
+            <div className="previews-section">
+              {Object.entries(searchResults).map(([k, v]: [any, any]) => {
+                if (k === SearchScope.Threads && v.length > 0) {
+                  return (
+                    <div className="preview-section" key={k}>
+                      <SectionHeader header="Threads" />
+                      {v.map((res, i) => (
+                        <SearchBarThreadPreviewRow
+                          key={i}
+                          searchResult={res}
+                          searchTerm={searchTerm}
+                        />
+                      ))}
+                    </div>
+                  );
+                } else if (k === SearchScope.Replies && v.length > 0) {
+                  return (
+                    <div className="preview-section" key={k}>
+                      <SectionHeader header="Comments" />
+                      {v.map((res, i) => (
+                        <SearchBarCommentPreviewRow
+                          key={i}
+                          searchResult={res}
+                          searchTerm={searchTerm}
+                        />
+                      ))}
+                    </div>
+                  );
+                } else if (k === SearchScope.Communities && v.length > 0) {
+                  return (
+                    <div className="preview-section" key={k}>
+                      <SectionHeader header="Communities" />
+                      {v.map((res, i) => (
+                        <SearchBarCommunityPreviewRow
+                          key={i}
+                          searchResult={res}
+                        />
+                      ))}
+                    </div>
+                  );
+                } else if (k === SearchScope.Members && v.length > 0) {
+                  return (
+                    <div className="preview-section" key={k}>
+                      <SectionHeader header="Members" />
+                      {v.map((res, i) => (
+                        <SearchBarMemberPreviewRow key={i} searchResult={res} />
+                      ))}
+                    </div>
+                  );
+                } else {
+                  return null;
+                }
+              })}
+            </div>
+          ) : (
+            <div className="no-results">
+              <CWText type="b2">No results found</CWText>
+            </div>
+          )}
         </div>
-      ) : null}
+      )}
     </div>
   );
 };

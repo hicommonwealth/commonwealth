@@ -28,6 +28,7 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
+import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -209,7 +210,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           />
         )}
       </div>
-      <SearchBar />
+      <CWSearchBar placeholder="Search Common" />
       <div className="header-right">
         <div className="MobileMenuContainer">
           <CWIconButton

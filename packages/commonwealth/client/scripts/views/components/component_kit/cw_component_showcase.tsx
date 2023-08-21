@@ -189,7 +189,6 @@ export const ComponentShowcase = () => {
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
   const allChains = app.config.chains.getAll();
   const [chainId, setChainId] = useState(allChains[1]);
-  const [selectedChain, setSelectedChain] = useState(null);
 
   return (
     <div className="ComponentShowcase">
@@ -1247,15 +1246,7 @@ export const ComponentShowcase = () => {
       </div>
       <div className="searchbar-gallery">
         <CWText type="h3">SearchBar</CWText>
-        <CWText type="caption">
-          {`Selected community id: 
-          ${selectedChain ? selectedChain : 'none selected'}`}
-        </CWText>
-        <CWSearchBar
-          options={allChains}
-          placeholder="Search Common"
-          setSelectedChain={setSelectedChain}
-        />
+        <CWSearchBar placeholder="Search Common" />
       </div>
       <div className="Quill">
         <CWText type="h3">Quill Editor</CWText>
