@@ -2,7 +2,7 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { useFetchThreadsQuery } from 'state/api/threads';
@@ -26,6 +26,7 @@ type DiscussionsPageProps = {
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const navigate = useCommonNavigate();
+  const isLoadedRef = useRef(false);
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
@@ -58,6 +59,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     fromDate: dateCursor.fromDate,
   });
 
+  useEffect(() => {
+    return () => {
+      isLoadedRef.current = false;
+    };
+  }, []);
+
+  if (!isInitialLoading && !isLoadedRef.current) isLoadedRef.current = true;
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
   return (
@@ -65,7 +73,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
-        data={isInitialLoading ? [] : threads}
+        data={!isLoadedRef.current ? [] : threads}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
@@ -99,15 +107,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         overscan={200}
         components={{
           EmptyPlaceholder: () =>
-            isInitialLoading ? (
-              <div className='threads-wrapper'>
-                {Array(3).fill({}).map((x, i) =>
-                  <ThreadCard
-                    key={i}
-                    showSkeleton
-                    thread={{} as any}
-                  />
-                )}
+            !isLoadedRef.current ? (
+              <div className="threads-wrapper">
+                {Array(3)
+                  .fill({})
+                  .map((x, i) => (
+                    <ThreadCard key={i} showSkeleton thread={{} as any} />
+                  ))}
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">
