@@ -78,15 +78,15 @@ const editThread = async ({
     // for editing thread stage
     ...(stage && { stage }),
     // for editing thread pinned status
-    ...(pinned !== undefined && { pinned: pinned }),
+    ...(pinned !== undefined && { pinned }),
     // for editing thread spam status
-    ...(spam !== undefined && { spam: spam }),
+    ...(spam !== undefined && { spam }),
     // for editing thread archived status
-    ...(archived !== undefined && { archived: archived }),
+    ...(archived !== undefined && { archived }),
     // for editing thread topic
-    ...(topicId !== undefined && { topicId: topicId }),
+    ...(topicId !== undefined && { topicId }),
     // for editing thread collaborators
-    ...(collaborators !== undefined && { collaborators: collaborators }),
+    ...(collaborators !== undefined && { collaborators }),
   });
 
   return new Thread(response.data.result);
