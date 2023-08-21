@@ -234,7 +234,7 @@ const ReactQuillEditor = ({
               handleToggleMarkdown={handleToggleMarkdown}
               setIsPreviewVisible={setIsPreviewVisible}
               isDisabled={isDisabled}
-              content={getTextFromDelta(contentDelta)}
+              isPreviewDisabled={getTextFromDelta(contentDelta).length < 1}
             />
             <div data-text-editor="name">
               <ReactQuill

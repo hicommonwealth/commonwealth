@@ -55,7 +55,7 @@ type CustomQuillToolbarProps = {
   handleToggleMarkdown: () => void;
   setIsPreviewVisible: React.Dispatch<React.SetStateAction<boolean>>;
   isDisabled?: boolean;
-  content: string;
+  isPreviewDisabled: boolean;
 };
 
 export const CustomQuillToolbar = ({
@@ -64,53 +64,49 @@ export const CustomQuillToolbar = ({
   handleToggleMarkdown,
   isMarkdownEnabled,
   isDisabled = false,
-  content,
-}: CustomQuillToolbarProps) => {
-  const isPreviewDisabled = content.length > 0 ? false : true;
-
-  return (
-    <div id={toolbarId} className="CustomQuillToolbar">
-      <div className={clsx('left-buttons', { isDisabled })}>
-        <div className="section">
-          <button className="ql-header" value={1} />
-          <button className="ql-header" value={2} />
-        </div>
-        <div className="section">
-          <button className="ql-bold"></button>
-          <button className="ql-italic"></button>
-          <button className="ql-strike"></button>
-        </div>
-        <div className="section">
-          <button className="ql-link"></button>
-          <button className="ql-code-block"></button>
-          <button className="ql-blockquote"></button>
-          <button className="ql-image">image</button>
-        </div>
-        <div className="section">
-          <button className="ql-list" value="ordered" />
-          <button className="ql-list" value="bullet" />
-          <button className="ql-list" value="check" />
-        </div>
+  isPreviewDisabled,
+}: CustomQuillToolbarProps) => (
+  <div id={toolbarId} className="CustomQuillToolbar">
+    <div className={clsx('left-buttons', { isDisabled })}>
+      <div className="section">
+        <button className="ql-header" value={1} />
+        <button className="ql-header" value={2} />
       </div>
-      <div className={clsx('right-buttons', { isDisabled })}>
-        <button
-          className={clsx('markdown-button', { enabled: isMarkdownEnabled })}
-          onClick={handleToggleMarkdown}
-        >
-          Markdown
-        </button>
-        <div className="eye-icon">
-          <CWIconButton
-            iconName="eye"
-            iconSize="small"
-            onClick={() => setIsPreviewVisible(true)}
-            disabled={isPreviewDisabled}
-          />
-        </div>
+      <div className="section">
+        <button className="ql-bold"></button>
+        <button className="ql-italic"></button>
+        <button className="ql-strike"></button>
+      </div>
+      <div className="section">
+        <button className="ql-link"></button>
+        <button className="ql-code-block"></button>
+        <button className="ql-blockquote"></button>
+        <button className="ql-image">image</button>
+      </div>
+      <div className="section">
+        <button className="ql-list" value="ordered" />
+        <button className="ql-list" value="bullet" />
+        <button className="ql-list" value="check" />
       </div>
     </div>
-  );
-};
+    <div className={clsx('right-buttons', { isDisabled })}>
+      <button
+        className={clsx('markdown-button', { enabled: isMarkdownEnabled })}
+        onClick={handleToggleMarkdown}
+      >
+        Markdown
+      </button>
+      <div className="eye-icon">
+        <CWIconButton
+          iconName="eye"
+          iconSize="small"
+          onClick={() => setIsPreviewVisible(true)}
+          disabled={isPreviewDisabled}
+        />
+      </div>
+    </div>
+  </div>
+);
 
 type UseMarkdownToolbarHandlersProps = {
   editorRef: MutableRefObject<ReactQuill>;
