@@ -29,7 +29,7 @@ export const Sidebar = ({ isInsideCommunity, showSidebar }) => {
   const [shouldRender, setShouldRender] = useState(showSidebar);
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
-  const { menuName } = useSidebarStore();
+  const { menuName, userToggledVisibility } = useSidebarStore();
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 
@@ -51,48 +51,46 @@ export const Sidebar = ({ isInsideCommunity, showSidebar }) => {
 
   return (
     <div className={showSidebar ? `Sidebar` : `Sidebar onremove`}>
-      {
-        <div className="sidebar-default-menu">
-          <SidebarQuickSwitcher />
-          {app.activeChainId() && isInsideCommunity && (
-            <div className="community-menu">
-              {featureFlags.sessionKeys && (
-                <AccountConnectionIndicator connected={true} />
-              )}
-              {showAdmin && <AdminSection />}
-              {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
-                <div
-                  className={onHomeRoute ? 'home-button active' : 'home-button'}
-                  onClick={() => navigate('/feed')}
-                >
-                  <CWIcon iconName="home" iconSize="small" />
-                  <CWText>Home</CWText>
+      <div className="sidebar-default-menu">
+        <SidebarQuickSwitcher />
+        {app.activeChainId() && isInsideCommunity && (
+          <div className="community-menu">
+            {featureFlags.sessionKeys && (
+              <AccountConnectionIndicator connected={true} />
+            )}
+            {showAdmin && <AdminSection />}
+            {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
+              <div
+                className={onHomeRoute ? 'home-button active' : 'home-button'}
+                onClick={() => navigate('/feed')}
+              >
+                <CWIcon iconName="home" iconSize="small" />
+                <CWText>Home</CWText>
+              </div>
+            )}
+            <DiscussionSection />
+            <GovernanceSection />
+            <ExternalLinksModule />
+            <div className="buttons-container">
+              {isLoggedIn && app.chain && (
+                <div className="subscription-button">
+                  <SubscriptionButton />
                 </div>
               )}
-              <DiscussionSection />
-              <GovernanceSection />
-              <ExternalLinksModule />
-              <div className="buttons-container">
-                {isLoggedIn && app.chain && (
-                  <div className="subscription-button">
-                    <SubscriptionButton />
-                  </div>
-                )}
-                {app.isCustomDomain() && (
-                  <div
-                    className="powered-by"
-                    onClick={() => {
-                      window.open('https://commonwealth.im/');
-                    }}
-                  />
-                )}
-              </div>
+              {app.isCustomDomain() && (
+                <div
+                  className="powered-by"
+                  onClick={() => {
+                    window.open('https://commonwealth.im/');
+                  }}
+                />
+              )}
             </div>
-          )}
-          {menuName === 'createContent' && <CreateContentSidebar />}
-          {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
-        </div>
-      }
+          </div>
+        )}
+        {menuName === 'createContent' && <CreateContentSidebar />}
+        {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
+      </div>
     </div>
   );
 };
