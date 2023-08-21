@@ -123,7 +123,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (fetchCommentsError) notifyError('Failed to load comments');
   }, [fetchCommentsError]);
 
-  const { isWindowMedium } = useBrowserWindow({
+  const { isWindowLarge } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,

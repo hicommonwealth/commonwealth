@@ -97,32 +97,33 @@ export const NewThreadForm = () => {
         topic: threadTopic,
       });
 
-    try {
-      const thread = await createThread({
-        address: app.user.activeAccount.address,
-        kind: threadKind,
-        stage: app.chain.meta.customStages
-          ? parseCustomStages(app.chain.meta.customStages)[0]
-          : ThreadStage.Discussion,
-        chainId: app.activeChainId(),
-        title: threadTitle,
-        topic: threadTopic,
-        body: serializeDelta(threadContentDelta),
-        url: threadUrl,
-        authorProfile: app.user.activeAccount.profile,
-      });
+      try {
+        const thread = await createThread({
+          address: app.user.activeAccount.address,
+          kind: threadKind,
+          stage: app.chain.meta.customStages
+            ? parseCustomStages(app.chain.meta.customStages)[0]
+            : ThreadStage.Discussion,
+          chainId: app.activeChainId(),
+          title: threadTitle,
+          topic: threadTopic,
+          body: serializeDelta(threadContentDelta),
+          url: threadUrl,
+          authorProfile: app.user.activeAccount.profile,
+        });
 
-      setThreadContentDelta(createDeltaFromText(''));
-      clearDraft();
+        setThreadContentDelta(createDeltaFromText(''));
+        clearDraft();
 
-      navigate(`/discussion/${thread.id}`);
-    } catch (err) {
-      if (err.responseJSON.error === 'Login canceled') return;
-      console.error(err);
+        navigate(`/discussion/${thread.id}`);
+      } catch (err) {
+        if (err.responseJSON.error === 'Login canceled') return;
+        console.error(err);
 
-      const error =
-        err?.responseJSON?.error || err?.message || 'Failed to create thread';
-      throw new Error(error);
+        const error =
+          err?.responseJSON?.error || err?.message || 'Failed to create thread';
+        throw new Error(error);
+      }
     } finally {
       setIsSaving(false);
     }
