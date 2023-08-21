@@ -358,6 +358,7 @@ const updateThreadTopicInAllCaches = (
       // filter from old topic query
       if (k[3] === oldTopicId || k[3] === undefined) {
         const existingData: IExistingThreadState = queryClient.getQueryData(k);
+        if (!existingData) return;
         const pages = [...(existingData.pages || [])];
         let foundThreadIndex = -1;
         const foundPageIndex = pages.findIndex((p) => {
