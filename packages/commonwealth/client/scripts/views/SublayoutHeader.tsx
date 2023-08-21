@@ -13,6 +13,7 @@ import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
+import { featureFlags } from '../helpers/feature-flags';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -75,11 +76,14 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               />
             </div>
           )}
-        <CWIconButton
-          iconButtonTheme="black"
-          iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
-          onClick={handleToggle}
-        />
+        {(featureFlags.sidebarToggle ||
+          isWindowSmallInclusive(window.innerWidth)) && (
+          <CWIconButton
+            iconButtonTheme="black"
+            iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
+            onClick={handleToggle}
+          />
+        )}
       </div>
       <SearchBar />
       <div className="header-right">
