@@ -81,10 +81,15 @@ const Sublayout = ({
       <div className="header-and-body-container">
         <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">
-          {showSidebar && <Sidebar isInsideCommunity={hasCommunitySidebar} />}
+          {
+            <Sidebar
+              isInsideCommunity={hasCommunitySidebar}
+              showSidebar={showSidebar}
+            />
+          }
           <div
             className={`body-and-sticky-headers-container 
-            ${menuVisible ? 'menu-visible' : ''} 
+            ${menuVisible ? 'menu-visible' : 'menu-hidden'} 
             ${resizing ? 'resizing' : ''}`}
           >
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />

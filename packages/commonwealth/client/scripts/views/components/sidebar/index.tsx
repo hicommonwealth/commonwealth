@@ -2,7 +2,7 @@ import 'components/sidebar/index.scss';
 import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
@@ -24,8 +24,9 @@ export type SidebarMenuName =
   | 'createContent'
   | 'exploreCommunities';
 
-export const Sidebar = ({ isInsideCommunity }) => {
+export const Sidebar = ({ isInsideCommunity, showSidebar }) => {
   const navigate = useCommonNavigate();
+  const [shouldRender, setShouldRender] = useState(showSidebar);
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
   const { menuName } = useSidebarStore();
@@ -36,48 +37,62 @@ export const Sidebar = ({ isInsideCommunity }) => {
   const isMod = Permissions.isCommunityModerator();
   const showAdmin = app.user && (isAdmin || isMod);
 
+  useEffect(() => {
+    if (showSidebar) {
+      setShouldRender(true);
+    } else {
+      setTimeout(() => setShouldRender(false), 200); // match this with your CSS animation duration
+    }
+  }, [showSidebar]);
+
+  if (!shouldRender) {
+    return null;
+  }
+
   return (
-    <div className="Sidebar">
-      <div className="sidebar-default-menu">
-        <SidebarQuickSwitcher />
-        {app.activeChainId() && isInsideCommunity && (
-          <div className="community-menu">
-            {featureFlags.sessionKeys && (
-              <AccountConnectionIndicator connected={true} />
-            )}
-            {showAdmin && <AdminSection />}
-            {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
-              <div
-                className={onHomeRoute ? 'home-button active' : 'home-button'}
-                onClick={() => navigate('/feed')}
-              >
-                <CWIcon iconName="home" iconSize="small" />
-                <CWText>Home</CWText>
-              </div>
-            )}
-            <DiscussionSection />
-            <GovernanceSection />
-            <ExternalLinksModule />
-            <div className="buttons-container">
-              {isLoggedIn && app.chain && (
-                <div className="subscription-button">
-                  <SubscriptionButton />
+    <div className={showSidebar ? `Sidebar` : `Sidebar onremove`}>
+      {
+        <div className="sidebar-default-menu">
+          <SidebarQuickSwitcher />
+          {app.activeChainId() && isInsideCommunity && (
+            <div className="community-menu">
+              {featureFlags.sessionKeys && (
+                <AccountConnectionIndicator connected={true} />
+              )}
+              {showAdmin && <AdminSection />}
+              {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (
+                <div
+                  className={onHomeRoute ? 'home-button active' : 'home-button'}
+                  onClick={() => navigate('/feed')}
+                >
+                  <CWIcon iconName="home" iconSize="small" />
+                  <CWText>Home</CWText>
                 </div>
               )}
-              {app.isCustomDomain() && (
-                <div
-                  className="powered-by"
-                  onClick={() => {
-                    window.open('https://commonwealth.im/');
-                  }}
-                />
-              )}
+              <DiscussionSection />
+              <GovernanceSection />
+              <ExternalLinksModule />
+              <div className="buttons-container">
+                {isLoggedIn && app.chain && (
+                  <div className="subscription-button">
+                    <SubscriptionButton />
+                  </div>
+                )}
+                {app.isCustomDomain() && (
+                  <div
+                    className="powered-by"
+                    onClick={() => {
+                      window.open('https://commonwealth.im/');
+                    }}
+                  />
+                )}
+              </div>
             </div>
-          </div>
-        )}
-        {menuName === 'createContent' && <CreateContentSidebar />}
-        {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
-      </div>
+          )}
+          {menuName === 'createContent' && <CreateContentSidebar />}
+          {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
+        </div>
+      }
     </div>
   );
 };
