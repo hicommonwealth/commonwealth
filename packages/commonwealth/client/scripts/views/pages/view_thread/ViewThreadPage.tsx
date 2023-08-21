@@ -11,7 +11,6 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -52,6 +51,8 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+
+import 'pages/view_thread/index.scss';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
