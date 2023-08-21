@@ -12,6 +12,8 @@ interface SidebarStore {
   menuVisible: boolean;
   setUserToggledVisibility: (toggled: 'open' | 'closed' | null) => void;
   userToggledVisibility: 'open' | 'closed' | null;
+  recentlyUpdatedVisibility: boolean; // only set if user toggles visibility
+  setRecentlyUpdatedVisibility: (updated: boolean) => void;
   setMenu: ({
     name,
     isVisible,
@@ -49,6 +51,9 @@ export const sidebarStore = createStore<SidebarStore>()(
       set(() => ({ userToggledVisibility: toggled }));
       setUserSidebarVisibility(toggled);
     },
+    recentlyUpdatedVisibility: false,
+    setRecentlyUpdatedVisibility: (updated) =>
+      set(() => ({ recentlyUpdatedVisibility: updated })),
     setMenu: ({ name, isVisible }) =>
       set((state) => ({
         menuName: name,

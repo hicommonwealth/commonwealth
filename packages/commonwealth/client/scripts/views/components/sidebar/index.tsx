@@ -2,7 +2,7 @@ import 'components/sidebar/index.scss';
 import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
@@ -24,12 +24,17 @@ export type SidebarMenuName =
   | 'createContent'
   | 'exploreCommunities';
 
-export const Sidebar = ({ isInsideCommunity, showSidebar }) => {
+export const Sidebar = ({ isInsideCommunity }) => {
   const navigate = useCommonNavigate();
-  const [shouldRender, setShouldRender] = useState(showSidebar);
+  const {
+    menuName,
+    menuVisible,
+    setRecentlyUpdatedVisibility,
+    recentlyUpdatedVisibility,
+  } = useSidebarStore();
+  const [shouldRender, setShouldRender] = useState(menuVisible);
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
-  const { menuName, userToggledVisibility } = useSidebarStore();
 
   const onHomeRoute = pathname === `/${app.activeChainId()}/feed`;
 
@@ -38,19 +43,25 @@ export const Sidebar = ({ isInsideCommunity, showSidebar }) => {
   const showAdmin = app.user && (isAdmin || isMod);
 
   useEffect(() => {
-    if (showSidebar) {
+    if (menuVisible) {
       setShouldRender(true);
     } else {
       setTimeout(() => setShouldRender(false), 200); // match this with your CSS animation duration
     }
-  }, [showSidebar]);
+  }, [menuVisible]);
 
-  if (!shouldRender) {
-    return null;
-  }
+  useEffect(() => {
+    setRecentlyUpdatedVisibility(false);
+  }, []);
+
+  const sidebarClass = useMemo(() => {
+    return `Sidebar ${
+      menuVisible ? (recentlyUpdatedVisibility ? 'onadd' : '') : 'onremove'
+    }`;
+  }, [menuVisible, recentlyUpdatedVisibility]);
 
   return (
-    <div className={showSidebar ? `Sidebar` : `Sidebar onremove`}>
+    <div className={sidebarClass}>
       <div className="sidebar-default-menu">
         <SidebarQuickSwitcher />
         {app.activeChainId() && isInsideCommunity && (

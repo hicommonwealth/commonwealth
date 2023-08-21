@@ -74,19 +74,13 @@ const Sublayout = ({
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const showSidebar = menuVisible;
 
   return (
     <div className="Sublayout">
       <div className="header-and-body-container">
         <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">
-          {
-            <Sidebar
-              isInsideCommunity={hasCommunitySidebar}
-              showSidebar={showSidebar}
-            />
-          }
+          <Sidebar isInsideCommunity={hasCommunitySidebar} />
           <div
             className={`body-and-sticky-headers-container 
             ${menuVisible ? 'menu-visible' : 'menu-hidden'} 

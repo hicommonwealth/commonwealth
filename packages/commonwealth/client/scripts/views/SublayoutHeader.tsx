@@ -28,8 +28,13 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     setMobileMenuName,
     mobileMenuName,
     setUserToggledVisibility,
+    setRecentlyUpdatedVisibility,
   } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
+
+  useEffect(() => {
+    setRecentlyUpdatedVisibility(menuVisible);
+  }, [menuVisible]);
 
   function handleToggle() {
     const isVisible = !menuVisible;
