@@ -59,8 +59,6 @@ const SessionRevalidationModal = ({
       w.enabled
   );
 
-  console.log({ walletSsoSource, walletAddress });
-
   return (
     <Modal
       onClose={onModalClose}
@@ -150,7 +148,7 @@ const SessionRevalidationModal = ({
                   wallets={wallets}
                   hasNoWalletsLink={false}
                   canResetWalletConnect={wcEnabled}
-                  hideSocialLogins={true}
+                  hideSocialLogins={false}
                 />
               )}
             </div>
