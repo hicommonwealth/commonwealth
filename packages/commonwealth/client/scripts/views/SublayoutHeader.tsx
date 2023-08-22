@@ -28,7 +28,7 @@ import axios from 'axios';
 import clsx from 'clsx';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
-import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
+import { CWSearchBar } from './components/component_kit/new_designs/search/CWSearchBar';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;

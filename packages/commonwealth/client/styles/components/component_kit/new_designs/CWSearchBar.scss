@@ -1,5 +1,15 @@
 @import '../../../shared';
 
+@mixin everyRowStyles {
+  cursor: pointer;
+  padding: 8px;
+
+  &:hover {
+    background-color: $neutral-100;
+    border-radius: 6px;
+  }
+}
+
 .Searchbar {
   width: 608px;
   display: flex;
@@ -138,3 +148,68 @@
   }
 }
 
+.SearchBarThreadPreviewRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  @include everyRowStyles;
+
+  .header-row {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+
+    .User {
+      align-items: center;
+      display: flex;
+
+      .user-avatar {
+        position: unset;
+      }
+
+      .username {
+        @include caption;
+
+        font-weight: 500;
+      }
+    }
+
+    .last-updated-text.Text {
+      color: $neutral-500;
+    }
+  }
+
+  .excerpt-text.Text {
+    color: $neutral-600;
+  }
+}
+
+.SearchBarCommentPreviewRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  @include everyRowStyles;
+
+  .last-updated-text.Text {
+    color: $neutral-500;
+  }
+
+  .excerpt-text.Text {
+    color: $neutral-600;
+  }
+}
+
+.SearchBarCommunityPreviewRow {
+  @include everyRowStyles;
+}
+
+.SearchBarMemberPreviewRow {
+  @include everyRowStyles;
+}
+
+.SearchQuillRenderer {
+  max-height: 66px;
+  overflow-y: hidden;
+}
