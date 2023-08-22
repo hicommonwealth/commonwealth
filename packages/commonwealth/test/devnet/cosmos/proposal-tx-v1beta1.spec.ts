@@ -56,12 +56,11 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     isAmino?: boolean
   ) => {
     const msg = encodeMsgSubmitProposal(signer, deposit, content);
-
     const resp = await sendTx(rpcUrlBeta, msg, isAmino);
 
-    expect(isDeliverTxSuccess(resp)).to.be.true;
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
+    expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 
     await waitOneBlock(rpcUrlBeta);
     const activeProposals = await getActiveVotingProposals();
@@ -95,19 +94,6 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
       );
       await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal');
     });
-    it('creates a community spend proposal', async () => {
-      const content = encodeCommunitySpend(
-        `beta spend title`,
-        `beta spend description`,
-        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
-        '100',
-        'stake'
-      );
-      await proposalTest(
-        content,
-        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal'
-      );
-    });
     it('votes NO on an active proposal', async () => {
       await voteTest(VoteOption.VOTE_OPTION_NO);
     });
@@ -120,6 +106,20 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     it('votes YES on an active proposal', async () => {
       await voteTest(VoteOption.VOTE_OPTION_YES);
     });
+    it('creates a community spend proposal', async () => {
+      await waitOneBlock(rpcUrlBeta);
+      const content = encodeCommunitySpend(
+        `beta spend title`,
+        `beta spend description`,
+        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
+        '5',
+        'ustake'
+      );
+      await proposalTest(
+        content,
+        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal'
+      );
+    });
   });
 
   describe('Amino signing', () => {
@@ -129,20 +129,6 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
         `beta text description`
       );
       await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal', true);
-    });
-    it('creates a community spend proposal with legacy amino', async () => {
-      const content = encodeCommunitySpend(
-        `beta spend title amino`,
-        `beta spend description amino`,
-        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
-        '100',
-        'stake'
-      );
-      await proposalTest(
-        content,
-        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-        true
-      );
     });
     it('votes NO on an active proposal with legacy amino', async () => {
       await voteTest(VoteOption.VOTE_OPTION_NO, true);
@@ -155,6 +141,21 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     });
     it('votes YES on an active proposal with legacy amino', async () => {
       await voteTest(VoteOption.VOTE_OPTION_YES, true);
+    });
+    it('creates a community spend proposal with legacy amino', async () => {
+      await waitOneBlock(rpcUrlBeta);
+      const content = encodeCommunitySpend(
+        `beta spend title amino`,
+        `beta spend description amino`,
+        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
+        '5',
+        'ustake'
+      );
+      await proposalTest(
+        content,
+        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
+        true
+      );
     });
   });
 });

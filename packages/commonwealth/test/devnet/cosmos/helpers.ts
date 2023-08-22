@@ -15,7 +15,7 @@ const DEFAULT_FEE: StdFee = {
   amount: [{ amount: '0', denom: 'ustake' }],
 };
 const DEFAULT_MEMO = '';
-export const deposit = new CosmosToken('stake', 100000, false);
+export const deposit = new CosmosToken('ustake', 2000000, false);
 
 export const setupTestSigner = async (rpcUrl: string, isAmino?: boolean) => {
   let signer;
