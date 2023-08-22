@@ -50,14 +50,11 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     isAmino?: boolean
   ) => {
     const msg = encodeMsgSubmitProposal(signer, deposit, content);
-
     const resp = await sendTx(rpcUrl, msg, isAmino);
 
-    console.log('resp.rawLog', resp.rawLog);
-    console.log('content typeUrl', content.typeUrl);
-    // expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
+    expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
@@ -103,7 +100,6 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     });
     it('creates a community spend proposal', async () => {
       await waitOneBlock(rpcUrl);
-      await waitOneBlock(rpcUrl);
       const content = encodeCommunitySpend(
         `v1 spend title`,
         `v1 spend description`,
@@ -136,8 +132,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     });
     // TODO: Unsupported. Un-skip this in
     // https://github.com/hicommonwealth/commonwealth/issues/4821
-    it('creates a community spend proposal with legacy amino', async () => {
-      await waitOneBlock(rpcUrl);
+    it.skip('creates a community spend proposal with legacy amino', async () => {
       await waitOneBlock(rpcUrl);
       const content = encodeCommunitySpend(
         `v1 spend title amino`,

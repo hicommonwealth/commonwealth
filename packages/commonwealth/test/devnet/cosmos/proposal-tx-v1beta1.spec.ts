@@ -56,11 +56,8 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     isAmino?: boolean
   ) => {
     const msg = encodeMsgSubmitProposal(signer, deposit, content);
-
     const resp = await sendTx(rpcUrlBeta, msg, isAmino);
 
-    console.log('resp.rawLog', resp.rawLog);
-    console.log('content typeUrl', content.typeUrl);
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
@@ -111,7 +108,6 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     });
     it('creates a community spend proposal', async () => {
       await waitOneBlock(rpcUrlBeta);
-      await waitOneBlock(rpcUrlBeta); // waiting for pool to get tokens
       const content = encodeCommunitySpend(
         `beta spend title`,
         `beta spend description`,
@@ -148,7 +144,6 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     });
     it('creates a community spend proposal with legacy amino', async () => {
       await waitOneBlock(rpcUrlBeta);
-      await waitOneBlock(rpcUrlBeta); // waiting for pool to get tokens
       const content = encodeCommunitySpend(
         `beta spend title amino`,
         `beta spend description amino`,
