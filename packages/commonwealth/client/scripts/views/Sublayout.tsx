@@ -59,8 +59,8 @@ const Sublayout = ({
     }
 
     const onResize = () => {
-      if (userToggledVisibility === 'false') {
-        setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
+      if (!isWindowSmallInclusive) {
+        setMenu({ name: 'default', isVisible: true });
       }
     };
 

@@ -1,5 +1,4 @@
 import 'components/sidebar/index.scss';
-import { featureFlags } from 'helpers/feature-flags';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
@@ -7,6 +6,7 @@ import { CreateContentSidebar } from '../../menus/create_content_menu';
 import { CommunitySection } from './CommunitySection';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import clsx from 'clsx';
 
 export type SidebarMenuName =
   | 'default'
@@ -26,9 +26,10 @@ export const Sidebar = ({ isInsideCommunity }) => {
   }, []);
 
   const sidebarClass = useMemo(() => {
-    return `Sidebar ${
-      menuVisible ? (recentlyUpdatedVisibility ? 'onadd' : '') : 'onremove'
-    }`;
+    return clsx('Sidebar', {
+      onadd: menuVisible && recentlyUpdatedVisibility,
+      onremove: !menuVisible,
+    });
   }, [menuVisible, recentlyUpdatedVisibility]);
 
   return (
