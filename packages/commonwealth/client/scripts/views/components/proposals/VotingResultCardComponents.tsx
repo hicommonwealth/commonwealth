@@ -14,6 +14,14 @@ import {
   YesNoRejectVotingResultProps,
 } from './voting_result_components';
 
+function safeDivision(num, den) {
+  if (den === 0) {
+    return 0;
+  }
+
+  return num / den;
+}
+
 export const CompletedProposalVotingResultCard = (
   props: CompletedProposalVotingResultProps
 ) => {
@@ -86,14 +94,14 @@ export const AaveVotingResultCard = (props: AaveVotingResultProps) => {
       <div className="results-header">
         <CWText type="d5">{'Yes'}</CWText>
         <CWText type="caption">{`${formatPercent(
-          yesVotesCount / totalVotesCount
+          safeDivision(yesVotesCount, totalVotesCount)
         )}`}</CWText>
       </div>
 
       <div className="results-header">
         <CWText type="d5">{'No'}</CWText>
         <CWText type="caption">{`${formatPercent(
-          noVotesCount / totalVotesCount
+          safeDivision(noVotesCount, totalVotesCount)
         )}`}</CWText>
       </div>
     </div>
@@ -172,28 +180,28 @@ export const YesNoAbstainVetoVotingResultCard = (
       <div className="results-header">
         <CWText type="d5">{'Yes'}</CWText>
         <CWText type="caption">{`${formatPercent(
-          yesVotes / totalVotes
+          safeDivision(yesVotes, totalVotes)
         )}`}</CWText>
       </div>
 
       <div className="results-header">
         <CWText type="d5">{'No'}</CWText>
         <CWText type="caption">{`${formatPercent(
-          noVotes / totalVotes
+          safeDivision(noVotes, totalVotes)
         )}`}</CWText>
       </div>
 
       <div className="results-header">
         <CWText type="d5">{'Abstain'}</CWText>
         <CWText type="caption">{`${formatPercent(
-          abstainVotes / totalVotes
+          safeDivision(abstainVotes, totalVotes)
         )}`}</CWText>
       </div>
 
       <div className="results-header">
         <CWText type="d5">{'Veto'}</CWText>
         <CWText type="caption">{`${formatPercent(
-          vetoVotes / totalVotes
+          safeDivision(vetoVotes, totalVotes)
         )}`}</CWText>
       </div>
     </div>
@@ -228,21 +236,21 @@ export const YesNoRejectVotingResultCard = (
       <div className="results-header">
         <CWText type="d5">{'Yes'}</CWText>
         <CWText type="caption">{`${approveVotes} approved (${formatPercent(
-          approveVotes / totalVotes
+          safeDivision(approveVotes, totalVotes)
         )})`}</CWText>
       </div>
 
       <div className="results-header">
         <CWText type="d5">{'No'}</CWText>
         <CWText type="caption">{`${rejectVotes} rejected (${formatPercent(
-          rejectVotes / totalVotes
+          safeDivision(rejectVotes, totalVotes)
         )})`}</CWText>
       </div>
 
       <div className="results-header">
         <CWText type="d5">{'Abstain'}</CWText>
         <CWText type="caption">{`${removeVotes} remove ${formatPercent(
-          removeVotes / totalVotes
+          safeDivision(removeVotes, totalVotes)
         )}`}</CWText>
       </div>
     </div>
