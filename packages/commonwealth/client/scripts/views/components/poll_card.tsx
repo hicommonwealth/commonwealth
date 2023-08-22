@@ -124,6 +124,7 @@ export type VoteDisplayProps = {
   voteDirectionString: string;
   pollEnded: boolean;
   voteInformation: Array<VoteInformation>;
+  isSnapshot: boolean;
 };
 
 export const VoteDisplay = ({
@@ -131,6 +132,7 @@ export const VoteDisplay = ({
   timeRemaining,
   voteDirectionString,
   voteInformation,
+  isSnapshot,
 }: VoteDisplayProps) => {
   const topResponse = voteInformation.sort(
     (option1, option2) => option2.voteCount - option1.voteCount
@@ -154,7 +156,9 @@ export const VoteDisplay = ({
         </>
       ) : (
         <div className="completed-vote-information">
-          <CWText type="caption">This Poll is Complete</CWText>
+          <CWText type="caption">{`This ${
+            isSnapshot ? 'Proposal' : 'Poll'
+          } is Complete`}</CWText>
           <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
           {voteDirectionString !== '' && (
             <CWText
@@ -407,6 +411,7 @@ export const PollCard = ({
             }
             pollEnded={pollEnded}
             voteInformation={voteInformation}
+            isSnapshot={false}
           />
         )}
       </div>
