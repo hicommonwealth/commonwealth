@@ -19,6 +19,7 @@ import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import moment from 'moment';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -29,6 +30,7 @@ const Errors = {
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
   BalanceCheckFailed: 'Could not verify user token balance',
   ThreadArchived: 'Thread is archived',
+  ParseMentionsFailed: 'Failed to parse mentions',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -40,11 +42,10 @@ export type CreateThreadCommentOptions = {
   parentId: number;
   threadId: number;
   text: string;
-  attachments: any;
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
-  discord_meta?: any;
+  discordMeta?: any;
 };
 
 export type CreateThreadCommentResult = [
@@ -53,26 +54,28 @@ export type CreateThreadCommentResult = [
   TrackOptions
 ];
 
-export async function __createThreadComment({
-  user,
-  address,
-  chain,
-  parentId,
-  threadId,
-  text,
-  attachments,
-  canvasAction,
-  canvasSession,
-  canvasHash,
-  discord_meta,
-}: CreateThreadCommentOptions): Promise<CreateThreadCommentResult> {
+export async function __createThreadComment(
+  this: ServerThreadsController,
+  {
+    user,
+    address,
+    chain,
+    parentId,
+    threadId,
+    text,
+    canvasAction,
+    canvasSession,
+    canvasHash,
+    discordMeta,
+  }: CreateThreadCommentOptions
+): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
     chain: chain.id,
     address: address.address,
   });
   if (!canInteract) {
-    throw new Error(`${Errors.BanError}: ${banError}`);
+    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   // check if thread exists
@@ -80,17 +83,17 @@ export async function __createThreadComment({
     where: { id: threadId },
   });
   if (!thread) {
-    throw new Error(Errors.ThreadNotFound);
+    throw new AppError(Errors.ThreadNotFound);
   }
 
   // check if thread is archived
   if (thread.archived_at) {
-    throw new Error(Errors.ThreadArchived);
+    throw new AppError(Errors.ThreadArchived);
   }
 
   // check if thread is read-only
   if (thread.read_only) {
-    throw new Error(Errors.CantCommentOnReadOnly);
+    throw new AppError(Errors.CantCommentOnReadOnly);
   }
 
   // get parent comment
@@ -104,7 +107,7 @@ export async function __createThreadComment({
       },
     });
     if (!parentComment) {
-      throw new Error(Errors.InvalidParent);
+      throw new AppError(Errors.InvalidParent);
     }
     // check to ensure comments are never nested more than max depth:
     const [commentDepthExceeded] = await getCommentDepth(
@@ -113,7 +116,7 @@ export async function __createThreadComment({
       MAX_COMMENT_DEPTH
     );
     if (commentDepthExceeded) {
-      throw new Error(Errors.NestingTooDeep);
+      throw new AppError(Errors.NestingTooDeep);
     }
   }
 
@@ -140,7 +143,7 @@ export async function __createThreadComment({
           address.address
         );
       } catch (e) {
-        throw new ServerError(Errors.BalanceCheckFailed, e);
+        throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
       }
 
       if (!canReact) {
@@ -175,64 +178,21 @@ export async function __createThreadComment({
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
-    discord_meta,
+    discord_meta: discordMeta,
   };
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
   }
 
-  // create comment and attachments in transaction
-
-  const transaction = await this.models.sequelize.transaction();
-
-  let comment: CommentInstance | null = null;
-  try {
-    comment = await this.models.Comment.create(commentContent, {
-      transaction,
-    });
-
-    // TODO: attachments can likely be handled like mentions (see lines 10 & 11)
-    if (attachments) {
-      if (typeof attachments === 'string') {
-        await this.models.Attachment.create(
-          {
-            attachable: 'comment',
-            attachment_id: comment.id,
-            url: attachments,
-            description: 'image',
-          },
-          { transaction }
-        );
-      } else {
-        await Promise.all(
-          attachments.map((url) =>
-            this.models.Attachment.create(
-              {
-                attachable: 'comment',
-                attachment_id: comment.id,
-                url,
-                description: 'image',
-              },
-              { transaction }
-            )
-          )
-        );
-      }
-    }
-
-    await transaction.commit();
-  } catch (err) {
-    await transaction.rollback();
-    throw err;
-  }
+  const comment = await this.models.Comment.create(commentContent);
 
   // fetch attached objects to return to user
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
-    include: [this.models.Address, this.models.Attachment],
+    include: [this.models.Address],
   });
 
-  const subsTransaction = await this.models.sequelize.transaction();
+  const transaction = await this.models.sequelize.transaction();
   try {
     // auto-subscribe comment author to reactions & child comments
     await this.models.Subscription.create(
@@ -241,10 +201,10 @@ export async function __createThreadComment({
         category_id: NotificationCategories.NewReaction,
         object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
+        comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction: subsTransaction }
+      { transaction }
     );
     await this.models.Subscription.create(
       {
@@ -252,15 +212,15 @@ export async function __createThreadComment({
         category_id: NotificationCategories.NewComment,
         object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
+        comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction: subsTransaction }
+      { transaction }
     );
 
-    await subsTransaction.commit();
+    await transaction.commit();
   } catch (err) {
-    await subsTransaction.rollback();
+    await transaction.rollback();
     await finalComment.destroy();
     throw err;
   }
@@ -286,7 +246,7 @@ export async function __createThreadComment({
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
   } catch (e) {
-    throw new Error('Failed to parse mentions');
+    throw new AppError(Errors.ParseMentionsFailed);
   }
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);

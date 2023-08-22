@@ -72,6 +72,29 @@ html.todesktop .SublayoutHeader {
       gap: 8px;
       -webkit-app-region: no-drag;
 
+      &.session-keys {
+        gap: 12px;
+        height: 40px;
+
+        &.isLoggedIn {
+          padding-right: 20px;
+          border-right: 1px solid $neutral-100;
+          margin-right: 16px;
+        }
+
+        & > div {
+          display: flex;
+        }
+
+        svg {
+          fill: $neutral-500;
+        }
+      }
+
+      & div {
+        display: flex;
+      }
+
       @include extraSmall {
         display: none;
       }
@@ -79,6 +102,13 @@ html.todesktop .SublayoutHeader {
     
     .LoginSelector{
       -webkit-app-region: no-drag;
+    }
+
+    .logout-button {
+      margin-left: 12px;
+      margin-right: 4px;
+      cursor: pointer;
+      fill: $neutral-500;
     }
   }
 }

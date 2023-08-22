@@ -1,12 +1,10 @@
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
-import app from '../state';
 import type ChainInfo from './ChainInfo';
-import type { Comment as CommentT } from './Comment';
-import type { IUniqueId } from './interfaces';
+import { default as CommentT } from './Comment';
 import { Thread as ThreadT } from './Thread';
+import type { IUniqueId } from './interfaces';
 
 class NotificationSubscription {
   public readonly category: string;
@@ -81,8 +79,8 @@ class NotificationSubscription {
       json.created_at,
       json.immediate_email,
       json.chain_id,
-      json.Comment || json.offchain_comment_id,
-      json.Thread || json.offchain_thread_id
+      json.Comment || json.comment_id,
+      json.Thread || json.thread_id
     );
   }
 }
@@ -104,7 +102,10 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
 
   if (Thread) {
     try {
-      modeledThread = app.threads.modelFromServer(Thread);
+      // The `Thread` var here uses /server/models/thread.ts as its type
+      // and we are modeling it to /client/scripts/models/Thread.ts so
+      // using any here to avoid lint error.
+      modeledThread = new ThreadT(Thread as any);
     } catch (e) {
       console.log('error', e);
     }
@@ -114,7 +115,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
 
   if (Comment) {
     try {
-      modeledComment = modelCommentFromServer(Comment);
+      modeledComment = new CommentT({ ...Comment } as any);
     } catch (e) {
       console.log('error', e);
     }

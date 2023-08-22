@@ -1,10 +1,8 @@
 import type { Sequelize } from 'sequelize';
 
 import type { AddressModelStatic } from './models/address';
-import type { AttachmentModelStatic } from './models/attachment';
 import type { BanModelStatic } from './models/ban';
 import type { ChainModelStatic } from './models/chain';
-import type { ChainEntityMetaModelStatic } from './models/chain_entity_meta';
 import type { ChainNodeModelStatic } from './models/chain_node';
 import type { CollaborationModelStatic } from './models/collaboration';
 import type { CommentModelStatic } from './models/comment';
@@ -14,7 +12,6 @@ import type { CommunitySnapshotSpaceModelStatic } from './models/community_snaps
 import type { ContractModelStatic } from './models/contract';
 import type { ContractAbiModelStatic } from './models/contract_abi';
 import type { DiscordBotConfigModelStatic } from './models/discord_bot_config';
-import type { DiscussionDraftModelStatic } from './models/discussion_draft';
 import type { LoginTokenModelStatic } from './models/login_token';
 import type { NotificationModelStatic } from './models/notification';
 import type { NotificationCategoryModelStatic } from './models/notification_category';
@@ -43,7 +40,6 @@ export type Models = {
   Address: AddressModelStatic;
   Ban: BanModelStatic;
   Chain: ChainModelStatic;
-  ChainEntityMeta: ChainEntityMetaModelStatic;
   ChainNode: ChainNodeModelStatic;
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;
@@ -54,13 +50,11 @@ export type Models = {
   CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
-  DiscussionDraft: DiscussionDraftModelStatic;
   DiscordBotConfig: DiscordBotConfigModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
   NotificationsRead: NotificationsReadModelStatic;
-  Attachment: AttachmentModelStatic;
   Comment: CommentModelStatic;
   Poll: PollModelStatic;
   Reaction: ReactionModelStatic;

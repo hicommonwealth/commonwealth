@@ -1,22 +1,25 @@
+import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
-import type Thread from '../../../../../../models/Thread';
+import {
+  useCreateThreadReactionMutation,
+  useDeleteThreadReactionMutation,
+} from 'state/api/threads';
+import Permissions from 'utils/Permissions';
+import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
-import {
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from 'views/components/ReactionButton/helpers';
+import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { LoginModal } from '../../../../../modals/login_modal';
 import './ReactionButton.scss';
-import { useReactionButton } from './useReactionButton';
-import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
+  showSkeleton?: boolean;
   disabled: boolean;
 };
 
@@ -24,25 +27,64 @@ export const ReactionButton = ({
   thread,
   size,
   disabled,
+  showSkeleton,
 }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [reactors, setReactors] = useState<Array<any>>([]);
+  const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const activeAddress = app.user.activeAccount?.address;
+  const thisUserReaction = thread?.associatedReactions?.filter(
+    (r) => r.address === activeAddress
+  );
+  const hasReacted = thisUserReaction?.length !== 0;
+  const reactedId =
+    thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
 
-  const { dislike, hasReacted, isLoading, isUserForbidden, like } =
-    useReactionButton(thread, setReactors);
+  const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
+    useCreateThreadReactionMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
+  const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
+    useDeleteThreadReactionMutation({
+      chainId: app.activeChainId(),
+      address: app.user.activeAccount?.address,
+      threadId: thread.id,
+    });
 
-  const handleSmallVoteClick = async (e) => {
-    e.stopPropagation();
-    e.preventDefault();
+  if (showSkeleton) return <ReactionButtonSkeleton />;
+  const isLoading = isAddingReaction || isDeletingReaction;
+
+  // token balance check if needed
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const isUserForbidden = !isAdmin && app.chain.isGatedTopic(thread.topic?.id);
+
+  const handleVoteClick = async (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    if (isLoading || disabled) return;
+
     if (!app.isLoggedIn() || !app.user.activeAccount) {
       setIsModalOpen(true);
-    } else {
-      onReactionClick(e, hasReacted, dislike, like);
+      return;
     }
-  };
-  const handleSmallVoteMouseEnter = async () => {
-    if (reactors.length === 0) {
-      setReactors(thread.associatedReactions.map((addr) => addr));
+    if (hasReacted) {
+      deleteThreadReaction({
+        chainId: app.activeChainId(),
+        address: app.user.activeAccount.address,
+        threadId: thread.id,
+        reactionId: reactedId as number,
+      }).catch((e) => {
+        console.log(e);
+      });
+    } else {
+      createThreadReaction({
+        chainId: app.activeChainId(),
+        address: activeAddress,
+        threadId: thread.id,
+        reactionType: 'like',
+      }).catch((e) => {
+        console.log(e);
+      });
     }
   };
 
@@ -53,29 +95,15 @@ export const ReactionButton = ({
           voteCount={reactors.length}
           disabled={isUserForbidden || disabled}
           selected={hasReacted}
-          onMouseEnter={handleSmallVoteMouseEnter}
-          onClick={handleSmallVoteClick}
+          onMouseEnter={() => undefined}
+          onClick={handleVoteClick}
           tooltipContent={getDisplayedReactorsForPopup({
             reactors: reactors,
           })}
         />
       ) : (
         <button
-          onMouseEnter={async () => {
-            if (reactors.length === 0) {
-              setReactors(thread.associatedReactions.map((a) => a.address));
-            }
-          }}
-          onClick={async (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-
-            if (!app.isLoggedIn() || !app.user.activeAccount) {
-              setIsModalOpen(true);
-            } else {
-              onReactionClick(e, hasReacted, dislike, like);
-            }
-          }}
+          onClick={handleVoteClick}
           className={`ThreadReactionButton ${
             isLoading || isUserForbidden ? ' disabled' : ''
           }${hasReacted ? ' has-reacted' : ''}`}

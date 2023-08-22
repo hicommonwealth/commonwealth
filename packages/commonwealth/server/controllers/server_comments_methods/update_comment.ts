@@ -13,20 +13,22 @@ import { parseUserMentions } from '../../util/parseUserMentions';
 import { CommentAttributes } from '../../models/comment';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   ThreadNotFoundForComment: 'Thread not found for comment',
   BanError: 'Ban error',
   ParseMentionsFailed: 'Failed to parse mentions',
+  NoId: 'Must provide id',
 };
 
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
   chain: ChainInstance;
-  commentId: number;
+  commentId?: number;
   commentBody: string;
-  attachments?: any;
+  discordMeta?: any;
 };
 
 export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
@@ -39,39 +41,32 @@ export async function __updateComment(
     chain,
     commentId,
     commentBody,
-    attachments,
+    discordMeta,
   }: UpdateCommentOptions
 ): Promise<UpdateCommentResult> {
+  if (!commentId && !discordMeta) {
+    throw new AppError(Errors.NoId);
+  }
+
+  if (discordMeta !== undefined && discordMeta !== null) {
+    const existingComment = await this.models.Comment.findOne({
+      where: { discord_meta: discordMeta },
+    });
+    if (existingComment) {
+      commentId = existingComment.id;
+    } else {
+      throw new AppError(Errors.NoId);
+    }
+  }
+
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
     chain: chain.id,
     address: address.address,
   });
   if (!canInteract) {
-    throw new Error(`${Errors.BanError}: ${banError}`);
+    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
-
-  const attachFiles = async () => {
-    if (attachments && typeof attachments === 'string') {
-      await this.models.Attachment.create({
-        attachable: 'comment',
-        attachment_id: commentId,
-        url: attachments,
-        description: 'image',
-      });
-    } else if (attachments) {
-      await Promise.all(
-        attachments.map((u) =>
-          this.models.Attachment.create({
-            attachable: 'comment',
-            attachment_id: commentId,
-            url: u,
-            description: 'image',
-          })
-        )
-      );
-    }
-  };
 
   const userOwnedAddressIds = (await user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -87,7 +82,7 @@ export async function __updateComment(
     where: { id: comment.thread_id },
   });
   if (!thread) {
-    throw new Error(Errors.ThreadNotFoundForComment);
+    throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
   let latestVersion;
@@ -117,10 +112,9 @@ export async function __updateComment(
     }
   })();
   await comment.save();
-  await attachFiles();
   const finalComment = await this.models.Comment.findOne({
     where: { id: comment.id },
-    include: [this.models.Address, this.models.Attachment],
+    include: [this.models.Address],
   });
 
   const cwUrl = getThreadUrl(thread, comment?.id);
@@ -167,7 +161,7 @@ export async function __updateComment(
       return !alreadyExists;
     });
   } catch (e) {
-    throw new Error(Errors.ParseMentionsFailed);
+    throw new AppError(Errors.ParseMentionsFailed);
   }
 
   // grab mentions to notify tagged users

@@ -2,22 +2,29 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import {
+  useDeleteCommentMutation,
+  useEditCommentMutation,
+  useFetchCommentsQuery,
+  useToggleCommentSpamStatusMutation,
+} from 'state/api/comments';
 import { ContentType } from 'types';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import { notifyError } from '../../../../controllers/app/notifications';
-import type { Comment as CommentType } from '../../../../models/Comment';
-import Thread from '../../../../models/Thread';
-import Permissions from '../../../../utils/Permissions';
 import { CreateComment } from 'views/components/Comments/CreateComment';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 import {
   deserializeDelta,
   serializeDelta,
 } from 'views/components/react_quill_editor/utils';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import { notifyError } from '../../../../controllers/app/notifications';
+import type { Comment as CommentType } from '../../../../models/Comment';
+import Thread from '../../../../models/Thread';
+import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
-import { jumpHighlightComment } from './helpers';
 import './CommentTree.scss';
+import { jumpHighlightComment } from './helpers';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -25,7 +32,6 @@ type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;
   thread: Thread;
   setIsGloballyEditing?: (status: boolean) => void;
-  updatedCommentsCallback: () => void;
   includeSpams: boolean;
   isReplying: boolean;
   setIsReplying: (status: boolean) => void;
@@ -39,7 +45,6 @@ export const CommentTree = ({
   comments,
   thread,
   setIsGloballyEditing,
-  updatedCommentsCallback,
   includeSpams,
   fromDiscordBot,
   isReplying,
@@ -50,6 +55,31 @@ export const CommentTree = ({
 }: CommentsTreeAttrs) => {
   const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
+
+  const { data: allComments = [] } = useFetchCommentsQuery({
+    chainId: app.activeChainId(),
+    threadId: parseInt(`${thread.id}`),
+  });
+
+  const { mutateAsync: deleteComment } = useDeleteCommentMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+    existingNumberOfComments: thread.numberOfComments,
+  });
+
+  const { mutateAsync: editComment } = useEditCommentMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+
+  const { mutateAsync: toggleCommentSpamStatus } =
+    useToggleCommentSpamStatusMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
+
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const [edits, setEdits] = useState<{
     [commentId: number]: {
@@ -67,8 +97,7 @@ export const CommentTree = ({
     Permissions.isCommunityAdmin() ||
     Permissions.isCommunityModerator();
 
-  const isLocked =
-    fromDiscordBot || !!(thread instanceof Thread && thread.readOnly);
+  const isLocked = !!(thread instanceof Thread && thread.readOnly);
 
   useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {
@@ -109,9 +138,9 @@ export const CommentTree = ({
           break;
         }
 
-        const grandchildren = app.comments
-          .getByThread(thread)
-          .filter((c) => c.parentComment === child.id);
+        const grandchildren = allComments.filter(
+          (c) => c.threadId === thread.id && c.parentComment === comment.id
+        );
 
         for (let j = 0; j < grandchildren.length; j++) {
           const grandchild = grandchildren[j];
@@ -139,8 +168,13 @@ export const CommentTree = ({
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              await app.comments.delete(comment, thread.id);
-              updatedCommentsCallback();
+              await deleteComment({
+                commentId: comment.id,
+                canvasHash: comment.canvas_hash,
+                chainId: app.activeChainId(),
+                address: app.user.activeAccount.address,
+                existingNumberOfComments: thread.numberOfComments,
+              });
             } catch (e) {
               console.log(e);
               notifyError('Failed to delete comment.');
@@ -273,7 +307,14 @@ export const CommentTree = ({
       }));
 
       try {
-        await app.comments.edit(comment, serializeDelta(newDelta));
+        await editComment({
+          commentId: comment.id,
+          updatedBody: serializeDelta(newDelta) || comment.text,
+          threadId: thread.id,
+          parentCommentId: comment.parentComment,
+          chainId: app.activeChainId(),
+          address: app.user.activeAccount.address,
+        });
         setEdits((p) => ({
           ...p,
           [comment.id]: {
@@ -283,7 +324,6 @@ export const CommentTree = ({
         }));
         setIsGloballyEditing(false);
         clearEditingLocalStorage(comment.id, ContentType.Comment);
-        updatedCommentsCallback();
       } catch (err) {
         console.error(err);
       } finally {
@@ -341,11 +381,12 @@ export const CommentTree = ({
           buttonType: 'mini-red',
           onClick: async () => {
             try {
-              app.comments
-                .toggleSpam(comment.id, !!comment.markedAsSpamAt)
-                .then(() => {
-                  updatedCommentsCallback && updatedCommentsCallback();
-                });
+              await toggleCommentSpamStatus({
+                commentId: comment.id,
+                isSpam: !comment.markedAsSpamAt,
+                chainId: app.activeChainId(),
+                address: app.user.activeAccount.address,
+              });
             } catch (err) {
               console.log(err);
             }
@@ -365,9 +406,9 @@ export const CommentTree = ({
     return comments_
       .filter((x) => (includeSpams ? true : !x.markedAsSpamAt))
       .map((comment: CommentType<any>) => {
-        const children = app.comments
-          .getByThread(thread)
-          .filter((c) => c.parentComment === comment.id);
+        const children = allComments.filter(
+          (c) => c.threadId === thread.id && c.parentComment === comment.id
+        );
 
         if (isLivingCommentTree(comment, children)) {
           const isCommentAuthor =
@@ -375,7 +416,12 @@ export const CommentTree = ({
 
           const isLast = threadLevel === 8;
 
-          const replyBtnVisible = !!(!isLast && !isLocked && isLoggedIn);
+          const replyBtnVisible = !!(
+            !isLast &&
+            !isLocked &&
+            !fromDiscordBot &&
+            isLoggedIn
+          );
 
           return (
             <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
@@ -399,6 +445,12 @@ export const CommentTree = ({
                   </div>
                 )}
                 <CommentCard
+                  canReply={!!hasJoinedCommunity}
+                  canReact={
+                    !!hasJoinedCommunity ||
+                    isAdmin ||
+                    !app.chain.isGatedTopic(thread.topic.id)
+                  }
                   canEdit={!isLocked && (isCommentAuthor || isAdminOrMod)}
                   editDraft={edits?.[comment.id]?.editDraft || ''}
                   onEditStart={async () => await handleEditStart(comment)}
@@ -428,7 +480,6 @@ export const CommentTree = ({
                   handleIsReplying={handleIsReplying}
                   parentCommentId={parentCommentId}
                   rootThread={thread}
-                  updatedCommentsCallback={updatedCommentsCallback}
                   canComment={canComment}
                 />
               )}

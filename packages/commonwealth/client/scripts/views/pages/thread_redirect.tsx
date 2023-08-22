@@ -1,8 +1,8 @@
+import axios from 'axios';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
-
 import app from 'state';
 import { PageLoading } from './loading';
-import { useCommonNavigate } from 'navigation/helpers';
 
 export default function ThreadRedirect({ identifier }: { identifier: string }) {
   const navigate = useCommonNavigate();
@@ -11,10 +11,17 @@ export default function ThreadRedirect({ identifier }: { identifier: string }) {
     const getThreadCommunity = async () => {
       const threadId = identifier.split('-')[0];
 
-      const res = await app.threads.getThreadCommunityId(threadId);
+      const response = await axios
+        .get(`${app.serverUrl()}/getThreads`, {
+          params: {
+            ids: [threadId],
+          },
+        })
+        .then((r) => r['data']['result'][0])
+        .catch(() => null);
 
-      if (res && res.chain) {
-        navigate(`/discussion/${identifier}`, {}, res.chain);
+      if (response && response.chain) {
+        navigate(`/discussion/${identifier}`, {}, response.chain);
       } else {
         navigate('/error');
       }

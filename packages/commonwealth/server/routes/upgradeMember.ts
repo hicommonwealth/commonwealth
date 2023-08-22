@@ -49,7 +49,7 @@ const upgradeMember = async (
     },
   });
 
-  if (!adminAddress) {
+  if (!adminAddress && !req.user.isAdmin) {
     return next(new AppError(Errors.MustBeAdmin));
   }
 
@@ -82,7 +82,7 @@ const upgradeMember = async (
       },
     });
 
-    if (!otherExistingAdmin) {
+    if (!otherExistingAdmin && !req.user.isAdmin) {
       return next(new AppError(Errors.MustHaveAdmin));
     }
   }
