@@ -16,6 +16,25 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
     address: address,
   });
 
+  const onBanConfirmation = async () => {
+    // ZAK TODO: Update Banned User Table with userProfile
+    if (!address) {
+      notifyError('CW Data error');
+      return;
+    }
+
+    try {
+      await banUser({
+        address,
+        chainId: app.activeChainId(),
+      });
+      onModalClose();
+      notifySuccess('Banned Address');
+    } catch (e) {
+      notifyError('Ban Address Failed');
+    }
+  };
+
   return (
     <React.Fragment>
       <div className="compact-modal-title ban-user">
@@ -30,23 +49,7 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
           <CWButton
             label="Ban Address (just click once and wait)"
             buttonType="primary-red"
-            onClick={async () => {
-              try {
-                // ZAK TODO: Update Banned User Table with userProfile
-                if (!address) {
-                  notifyError('CW Data error');
-                  return;
-                }
-                await banUser({
-                  address,
-                  chainId: app.activeChainId(),
-                });
-                onModalClose();
-                notifySuccess('Banned Address');
-              } catch (e) {
-                notifyError('Ban Address Failed');
-              }
-            }}
+            onClick={onBanConfirmation}
           />
         </div>
       </div>
