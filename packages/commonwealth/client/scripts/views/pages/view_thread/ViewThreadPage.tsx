@@ -34,8 +34,8 @@ import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import { Select } from '../../components/Select';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
-import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
+import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -122,7 +122,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (fetchCommentsError) notifyError('Failed to load comments');
   }, [fetchCommentsError]);
 
-  const { isWindowMedium } = useBrowserWindow({
+  const { isWindowLarge } = useBrowserWindow({
+    // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -232,7 +233,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     NewProfilesController.Instance.isFetched.on('redraw', () => {
       setAreProfilesLoaded(true);
     });
-
     setAreProfilesLoaded(true);
   }, [comments, thread, areProfilesLoaded]);
 
@@ -241,7 +241,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }
 
   if (!app.chain?.meta || isLoading) {
-    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
+    return (
+      <CWContentPage
+        showSkeleton
+        sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
+      />
+    );
   }
 
   if ((!isLoading && !thread) || fetchThreadError) {

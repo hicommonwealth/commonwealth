@@ -73,19 +73,6 @@ export async function processSnapshotMessage(
     });
   }
 
-  // Notifications
-  emitNotifications(
-    this.models,
-    NotificationCategories.SnapshotProposal,
-    snapshotNotificationData.space,
-    { eventType, ...snapshotNotificationData },
-    {
-      notificationCategory: eventType,
-      body: snapshotNotificationData.body,
-      title: snapshotNotificationData.title, // TODO: Decide on what we want for the webhook we emit
-    }
-  );
-
   try {
     if (space || proposal.space) {
       await this.models.SnapshotSpace.findOrCreate({
@@ -134,6 +121,21 @@ export async function processSnapshotMessage(
   this.log.info(
     `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `
   );
+
+  if (associatedCommunities.length > 0) {
+    // Notifications
+    emitNotifications(
+      this.models,
+      NotificationCategories.SnapshotProposal,
+      snapshotNotificationData.space,
+      { eventType, ...snapshotNotificationData },
+      {
+        notificationCategory: eventType,
+        body: snapshotNotificationData.body,
+        title: snapshotNotificationData.title, // TODO: Decide on what we want for the webhook we emit
+      }
+    );
+  }
 
   for (const community of associatedCommunities) {
     const communityId = community.chain_id;

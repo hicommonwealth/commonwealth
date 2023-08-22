@@ -14,7 +14,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
-import { TopicSummaryRow } from './topic_summary_row';
+import { TopicSummaryRow } from './TopicSummaryRow';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
