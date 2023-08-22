@@ -29,13 +29,14 @@ import {
   StorageFetcher,
   Subscriber,
 } from '../../../../src/chains/aave';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const { expect } = chai;
 chai.use(chaiHttp);
 
 describe('Integration tests for Aave', () => {
   const rmq = new MockRabbitMqHandler(
-    getRabbitMQConfig(RABBITMQ_URI),
+    getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.ChainEventsService),
     RascalPublications.ChainEvents
   );
 
@@ -236,19 +237,6 @@ describe('Integration tests for Aave', () => {
       expect(relatedEntity.id, 'Incorrect entity id').to.equal(
         propCreatedEvent.entity_id
       );
-
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain].length
-      ).to.equal(1);
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEntityCUDMain][0]
-      ).to.deep.equal({
-        author: relatedEntity.author,
-        ce_id: relatedEntity.id,
-        chain_id,
-        entity_type_id: relatedEntity.type_id,
-        cud: 'create',
-      });
     });
 
     it('Should process vote cast events', async () => {

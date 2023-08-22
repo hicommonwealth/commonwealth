@@ -4,16 +4,27 @@ import {
   RascalExchanges,
   RascalPublications,
   RascalQueues,
-  RascalRoutingKeys,
   RascalSubscriptions,
 } from './types';
+import { getAllRascalConfigs } from './configuration/rascalConfig';
+
+export enum RascalConfigServices {
+  CommonwealthService = 'commonwealth',
+  ChainEventsService = 'chainEvents',
+  SnapshotService = 'snapshot',
+  DiscobotService = 'discobot',
+}
 
 /**
  * This function builds and returns the configuration json required by Rascal to properly setup and use RabbitMQ.
  * @param rabbitmq_uri The uri of the RabbitMQ instance to connect to.
+ * @param service The service determining which config to return.
  */
-export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
-  let vhost, purge;
+export function getRabbitMQConfig(
+  rabbitmq_uri: string,
+  service: RascalConfigServices
+): Rascal.BrokerConfig {
+  let vhost: string, purge: boolean;
 
   if (
     rabbitmq_uri.includes('localhost') ||
@@ -39,223 +50,100 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
     }
   }
 
-  const queueConfig = {
-    assert: true,
-    purge: purge,
-  };
+  const copyConfigs = (source, target, keys) =>
+    keys.forEach((key) => (target[key] = source[key]));
 
-  const queueOptions = {
-    'x-dead-letter-exchange': RascalExchanges.DeadLetter,
-    'x-dead-letter-routing-key': RascalRoutingKeys.DeadLetter,
-  };
+  const {
+    baseConfig,
+    allExchanges,
+    allPublications,
+    allSubscriptions,
+    allQueues,
+    allBindings,
+  } = getAllRascalConfigs(rabbitmq_uri, vhost, purge);
+  const config = baseConfig;
+  const vhostConfig = config.vhosts[vhost];
+  if (service === RascalConfigServices.CommonwealthService) {
+    copyConfigs(allExchanges, vhostConfig.exchanges, [
+      RascalExchanges.CUD,
+      RascalExchanges.Notifications,
+      RascalExchanges.SnapshotListener,
+      RascalExchanges.Discobot,
+    ]);
+    copyConfigs(allQueues, vhostConfig.queues, [
+      RascalQueues.ChainEventNotificationsCUDMain,
+      RascalQueues.ChainEventNotifications,
+      RascalQueues.SnapshotListener,
+      RascalQueues.DiscordListener,
+    ]);
+    copyConfigs(allBindings, vhostConfig.bindings, [
+      RascalBindings.ChainEventNotificationsCUD,
+      RascalBindings.ChainEventNotifications,
+      RascalBindings.SnapshotListener,
+      RascalBindings.DiscordListener,
+    ]);
+    copyConfigs(allPublications, vhostConfig.publications, [
+      RascalPublications.ChainEventNotificationsCUDMain,
+      RascalPublications.ChainEventNotifications,
+      RascalPublications.SnapshotListener,
+      RascalPublications.DiscordListener,
+    ]);
+    copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
+      RascalSubscriptions.ChainEventNotificationsCUDMain,
+      RascalSubscriptions.ChainEventNotifications,
+      RascalSubscriptions.SnapshotListener,
+      RascalSubscriptions.DiscordListener,
+    ]);
+  } else if (service === RascalConfigServices.ChainEventsService) {
+    copyConfigs(allExchanges, vhostConfig.exchanges, [
+      RascalExchanges.ChainEvents,
+      RascalExchanges.CUD,
+    ]);
+    copyConfigs(allQueues, vhostConfig.queues, [
+      RascalQueues.ChainEvents,
+      RascalQueues.ChainEventNotificationsCUDMain,
+    ]);
+    copyConfigs(allBindings, vhostConfig.bindings, [
+      RascalBindings.ChainEvents,
+      RascalBindings.ChainEventNotificationsCUD,
+    ]);
+    copyConfigs(allPublications, vhostConfig.publications, [
+      RascalPublications.ChainEvents,
+      RascalPublications.ChainEventNotificationsCUDMain,
+    ]);
+    copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
+      RascalSubscriptions.ChainEvents,
+      RascalSubscriptions.ChainEventNotificationsCUDMain,
+    ]);
+  } else if (service === RascalConfigServices.SnapshotService) {
+    copyConfigs(allExchanges, vhostConfig.exchanges, [
+      RascalExchanges.SnapshotListener,
+    ]);
+    copyConfigs(allQueues, vhostConfig.queues, [RascalQueues.SnapshotListener]);
+    copyConfigs(allBindings, vhostConfig.bindings, [
+      RascalBindings.SnapshotListener,
+    ]);
+    copyConfigs(allPublications, vhostConfig.publications, [
+      RascalPublications.SnapshotListener,
+    ]);
+    copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
+      RascalSubscriptions.SnapshotListener,
+    ]);
+  } else if (service === RascalConfigServices.DiscobotService) {
+    copyConfigs(allExchanges, vhostConfig.exchanges, [
+      RascalExchanges.Discobot,
+    ]);
+    copyConfigs(allQueues, vhostConfig.queues, [RascalQueues.DiscordListener]);
+    copyConfigs(allBindings, vhostConfig.bindings, [
+      RascalBindings.DiscordListener,
+    ]);
+    copyConfigs(allPublications, vhostConfig.publications, [
+      RascalPublications.DiscordListener,
+    ]);
+    copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
+      RascalSubscriptions.DiscordListener,
+    ]);
+  }
 
-  const subscriptionConfig = {
-    contentType: 'application/json',
-    retry: {
-      delay: 1000,
-    },
-    prefetch: 10,
-  };
-
-  const publicationConfig = {
-    confirm: true,
-    timeout: 10000,
-    options: {
-      persistent: true,
-    },
-  };
-
-  const exchangeConfig = {
-    assert: true,
-    options: {
-      durable: true,
-    },
-  };
-
-  const config = {
-    vhosts: {
-      [vhost]: {
-        connection: rabbitmq_uri,
-        exchanges: {
-          [RascalExchanges.ChainEvents]: {
-            type: 'fanout',
-            ...exchangeConfig,
-          },
-          [RascalExchanges.SnapshotListener]: {
-            type: 'topic',
-            ...exchangeConfig,
-          },
-          [RascalExchanges.DeadLetter]: {
-            ...exchangeConfig,
-          },
-          [RascalExchanges.CUD]: {
-            type: 'topic',
-            ...exchangeConfig,
-          },
-          [RascalExchanges.Notifications]: {
-            type: 'topic',
-            ...exchangeConfig,
-          },
-        },
-        queues: {
-          [RascalQueues.ChainEvents]: {
-            ...queueConfig,
-            options: queueOptions,
-          },
-          [RascalQueues.ChainEntityCUDMain]: {
-            ...queueConfig,
-            options: queueOptions,
-          },
-          [RascalQueues.ChainEventNotificationsCUDMain]: {
-            ...queueConfig,
-            options: queueOptions,
-          },
-          [RascalQueues.ChainEventNotifications]: {
-            ...queueConfig,
-            options: {
-              ...queueOptions,
-              'x-message-ttl': 600000,
-            },
-          },
-          [RascalQueues.SnapshotProposalNotifications]: {
-            ...queueConfig,
-            options: {
-              ...queueOptions,
-              'x-message-ttl': 600000,
-            },
-          },
-          [RascalQueues.SnapshotListener]: {
-            ...queueConfig,
-            options: queueOptions,
-          },
-          [RascalQueues.DeadLetter]: {
-            ...queueConfig,
-          },
-          [RascalQueues.DiscordListener]: {
-            ...queueConfig,
-          },
-        },
-        bindings: {
-          [RascalBindings.ChainEvents]: {
-            source: RascalExchanges.ChainEvents,
-            destination: RascalQueues.ChainEvents,
-            destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.ChainEvents,
-          },
-          [RascalBindings.ChainEntityCUDMain]: {
-            source: RascalExchanges.CUD,
-            destination: RascalQueues.ChainEntityCUDMain,
-            destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.ChainEntityCUD,
-          },
-          [RascalBindings.ChainEventNotificationsCUD]: {
-            source: RascalExchanges.CUD,
-            destination: RascalQueues.ChainEventNotificationsCUDMain,
-            destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.ChainEventNotificationsCUD,
-          },
-          [RascalBindings.ChainEventNotifications]: {
-            source: RascalExchanges.Notifications,
-            destination: RascalQueues.ChainEventNotifications,
-            destinationType: 'queue',
-            bindingKey: RascalBindings.ChainEventNotifications,
-          },
-          [RascalBindings.SnapshotProposalNotifications]: {
-            source: RascalExchanges.Notifications,
-            destination: RascalQueues.SnapshotProposalNotifications,
-            destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.SnapshotProposalNotifications,
-          },
-          [RascalBindings.SnapshotListener]: {
-            source: RascalExchanges.SnapshotListener,
-            destination: RascalQueues.SnapshotListener,
-            destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.SnapshotListener,
-          },
-          [RascalBindings.DeadLetter]: {
-            source: RascalExchanges.DeadLetter,
-            destination: RascalQueues.DeadLetter,
-            destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.DeadLetter,
-          },
-          [RascalBindings.DiscordListener]: {
-            source: RascalExchanges.SnapshotListener,
-            destination: RascalQueues.DiscordListener,
-            destinationType: 'queue',
-            bindingKey: RascalRoutingKeys.DiscordListener,
-          },
-        },
-        publications: {
-          [RascalPublications.ChainEvents]: {
-            exchange: RascalExchanges.ChainEvents,
-            routingKey: RascalRoutingKeys.ChainEvents,
-            ...publicationConfig,
-          },
-          [RascalPublications.ChainEntityCUDMain]: {
-            exchange: RascalExchanges.CUD,
-            routingKey: RascalRoutingKeys.ChainEntityCUD,
-            ...publicationConfig,
-          },
-          [RascalPublications.ChainEventNotificationsCUDMain]: {
-            exchange: RascalExchanges.CUD,
-            routingKey: RascalRoutingKeys.ChainEventNotificationsCUD,
-            ...publicationConfig,
-          },
-          [RascalPublications.ChainEventNotifications]: {
-            exchange: RascalExchanges.Notifications,
-            routingKey: RascalRoutingKeys.ChainEventNotifications,
-            ...publicationConfig,
-          },
-          [RascalPublications.SnapshotProposalNotifications]: {
-            exchange: RascalExchanges.Notifications,
-            routingKey: RascalRoutingKeys.SnapshotProposalNotifications,
-            ...publicationConfig,
-          },
-          [RascalPublications.SnapshotListener]: {
-            exchange: RascalExchanges.SnapshotListener,
-            routingKey: RascalRoutingKeys.SnapshotListener,
-            ...publicationConfig,
-          },
-          [RascalPublications.DiscordListener]: {
-            exchange: RascalExchanges.SnapshotListener,
-            routingKey: RascalRoutingKeys.DiscordListener,
-            ...publicationConfig,
-          },
-        },
-        subscriptions: {
-          [RascalSubscriptions.ChainEvents]: {
-            queue: RascalQueues.ChainEvents,
-            ...subscriptionConfig,
-          },
-          [RascalSubscriptions.ChainEntityCUDMain]: {
-            queue: RascalQueues.ChainEntityCUDMain,
-            ...subscriptionConfig,
-          },
-          [RascalSubscriptions.ChainEventNotificationsCUDMain]: {
-            queue: RascalQueues.ChainEventNotificationsCUDMain,
-            ...subscriptionConfig,
-          },
-          [RascalSubscriptions.ChainEventNotifications]: {
-            queue: RascalQueues.ChainEventNotifications,
-            ...subscriptionConfig,
-          },
-          [RascalSubscriptions.SnapshotProposalNotifications]: {
-            queue: RascalQueues.SnapshotProposalNotifications,
-            ...subscriptionConfig,
-          },
-          [RascalSubscriptions.SnapshotListener]: {
-            queue: RascalQueues.SnapshotListener,
-            ...subscriptionConfig,
-          },
-          [RascalSubscriptions.DiscordListener]: {
-            queue: RascalQueues.DiscordListener,
-            ...subscriptionConfig,
-          },
-        },
-      },
-    },
-  };
-
-  // the above configuration is correct but Rascal has some type issues
-  return <Rascal.BrokerConfig>config;
+  return config;
 }

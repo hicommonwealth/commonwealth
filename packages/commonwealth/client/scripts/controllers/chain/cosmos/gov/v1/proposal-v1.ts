@@ -59,7 +59,7 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public get title(): string {
-    return this.data.title || this._metadata?.title;
+    return this.data.title || this._metadata?.title || '(title unavailable)';
   }
 
   public get description() {
