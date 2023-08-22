@@ -51,6 +51,7 @@
     border-color: $neutral-400;
     background-color: $neutral-200;
     pointer-events: none;
+    cursor: not-allowed;
 
     .reactions-container {
       color: $neutral-400;
@@ -61,7 +62,7 @@
     }
   }
 
-  &:hover {
+  &:hover:not(.disabled) {
     color: $primary-600;
     border: 1px solid $primary-600;
 
@@ -70,7 +71,6 @@
         color: $primary-600;
       }
     }
-
   }
 
   &:focus {

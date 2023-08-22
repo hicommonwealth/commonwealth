@@ -15,6 +15,7 @@ import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSm
 import { LoginModal } from '../../../../../modals/login_modal';
 import './ReactionButton.scss';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
+import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type ReactionButtonProps = {
   thread: Thread;
@@ -36,7 +37,8 @@ export const ReactionButton = ({
     (r) => r.address === activeAddress
   );
   const hasReacted = thisUserReaction?.length !== 0;
-  const reactedId = thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
+  const reactedId =
+    thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
 
   const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
     useCreateThreadReactionMutation({
@@ -101,52 +103,55 @@ export const ReactionButton = ({
           })}
         />
       ) : (
-        <button
-          onClick={handleVoteClick}
-          className={`ThreadReactionButton ${
-            isLoading || isUserForbidden ? ' disabled' : ''
-          }${hasReacted ? ' has-reacted' : ''}`}
-        >
-          {reactors.length > 0 ? (
-            <CWTooltip
-              content={getDisplayedReactorsForPopup({
-                reactors,
-              })}
-              renderTrigger={(handleInteraction) => (
-                <div
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                >
-                  <div className="reactions-container">
-                    <CWIcon
-                      iconName="upvote"
-                      iconSize="small"
-                      {...(hasReacted && { weight: 'fill' })}
-                    />
-                    <div
-                      className={`reactions-count ${
-                        hasReacted ? ' has-reacted' : ''
-                      }`}
-                    >
-                      {reactors.length}
+        <TooltipWrapper disabled={disabled} text="Join community to upvote">
+          <button
+            disabled={disabled}
+            onClick={handleVoteClick}
+            className={`ThreadReactionButton ${
+              isLoading || isUserForbidden || disabled ? ' disabled' : ''
+            }${hasReacted ? ' has-reacted' : ''}`}
+          >
+            {reactors.length && !disabled > 0 ? (
+              <CWTooltip
+                content={getDisplayedReactorsForPopup({
+                  reactors,
+                })}
+                renderTrigger={(handleInteraction) => (
+                  <div
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  >
+                    <div className="reactions-container">
+                      <CWIcon
+                        iconName="upvote"
+                        iconSize="small"
+                        {...(hasReacted && { weight: 'fill' })}
+                      />
+                      <div
+                        className={`reactions-count ${
+                          hasReacted ? ' has-reacted' : ''
+                        }`}
+                      >
+                        {reactors.length}
+                      </div>
                     </div>
                   </div>
+                )}
+              />
+            ) : (
+              <div className="reactions-container">
+                <CWIcon iconName="upvote" iconSize="small" />
+                <div
+                  className={`reactions-count ${
+                    hasReacted ? ' has-reacted' : ''
+                  }`}
+                >
+                  {reactors.length}
                 </div>
-              )}
-            />
-          ) : (
-            <div className="reactions-container">
-              <CWIcon iconName="upvote" iconSize="small" />
-              <div
-                className={`reactions-count ${
-                  hasReacted ? ' has-reacted' : ''
-                }`}
-              >
-                {reactors.length}
               </div>
-            </div>
-          )}
-        </button>
+            )}
+          </button>
+        </TooltipWrapper>
       )}
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
