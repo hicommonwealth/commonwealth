@@ -16,22 +16,34 @@ import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
 import { CWText } from '../component_kit/cw_text';
 import { VoteListing } from './vote_listing';
-import { CompletedProposalVotingResultCard } from './VotingResultCardComponents';
+import {
+  AaveVotingResultCard,
+  CompletedProposalVotingResultCard,
+  SimpleYesApprovalVotingResultCard,
+  VotingResultCard,
+  YesNoAbstainVetoVotingResultCard,
+  YesNoRejectVotingResultCard,
+} from './VotingResultCardComponents';
 
 type BaseVotingResultProps = {
   proposal: AnyProposal;
   votes: Array<IVote<any>>;
 };
 
-type VotingResultProps = {
+export type VotingResultProps = {
   abstainVotes?: Array<IVote<any>>;
   noVotes: Array<IVote<any>>;
   yesVotes: Array<IVote<any>>;
   proposal: AnyProposal;
+  isInCard?: boolean;
 };
 
 export const VotingResult = (props: VotingResultProps) => {
-  const { abstainVotes, noVotes, yesVotes, proposal } = props;
+  const { abstainVotes, noVotes, yesVotes, proposal, isInCard } = props;
+
+  if (isInCard) {
+    return <VotingResultCard {...props} />;
+  }
 
   return (
     <div className="VotingResult">
@@ -120,14 +132,19 @@ export const CompletedProposalVotingResult = (
   );
 };
 
-type SimpleYesApprovalVotingResultProps = {
+export type SimpleYesApprovalVotingResultProps = {
   approvedCount: number;
+  isInCard?: boolean;
 } & BaseVotingResultProps;
 
 export const SimpleYesApprovalVotingResult = (
   props: SimpleYesApprovalVotingResultProps
 ) => {
-  const { approvedCount, proposal, votes } = props;
+  const { approvedCount, proposal, votes, isInCard } = props;
+
+  if (isInCard) {
+    return <SimpleYesApprovalVotingResultCard {...props} />;
+  }
 
   return (
     <div className="VotingResult">
@@ -141,13 +158,14 @@ export const SimpleYesApprovalVotingResult = (
   );
 };
 
-type AaveVotingResultProps = {
+export type AaveVotingResultProps = {
   noBalanceString: string;
   noVotesCount: number;
   proposal: AaveProposal;
   votes: Array<AaveProposalVote>;
   yesBalanceString: string;
   yesVotesCount: number;
+  isInCard?: boolean;
 };
 
 export const AaveVotingResult = (props: AaveVotingResultProps) => {
@@ -158,7 +176,12 @@ export const AaveVotingResult = (props: AaveVotingResultProps) => {
     votes,
     yesBalanceString,
     yesVotesCount,
+    isInCard,
   } = props;
+
+  if (isInCard) {
+    return <AaveVotingResultCard {...props} />;
+  }
 
   return (
     <div className="VotingResult">
@@ -200,7 +223,7 @@ export const AaveVotingResult = (props: AaveVotingResultProps) => {
   );
 };
 
-type YesNoAbstainVetoVotingResultProps = {
+export type YesNoAbstainVetoVotingResultProps = {
   proposal: CosmosProposal;
   votes: Array<CosmosVote>;
   isInCard?: boolean;
@@ -210,7 +233,10 @@ export const YesNoAbstainVetoVotingResult = (
   props: YesNoAbstainVetoVotingResultProps
 ) => {
   const { proposal, votes, isInCard } = props;
-  console.log(isInCard);
+
+  if (isInCard) {
+    return <YesNoAbstainVetoVotingResultCard {...props} />;
+  }
 
   return (
     <div className={clsx('VotingResult', { card: isInCard })}>
@@ -258,15 +284,20 @@ export const YesNoAbstainVetoVotingResult = (
   );
 };
 
-type YesNoRejectVotingResultProps = {
+export type YesNoRejectVotingResultProps = {
   proposal: NearSputnikProposal;
   votes: Array<NearSputnikVote>;
+  isInCard?: boolean;
 };
 
 export const YesNoRejectVotingResult = (
   props: YesNoRejectVotingResultProps
 ) => {
-  const { proposal, votes } = props;
+  const { proposal, votes, isInCard } = props;
+
+  if (isInCard) {
+    return <YesNoRejectVotingResultCard {...props} />;
+  }
 
   return (
     <div className="VotingResult">

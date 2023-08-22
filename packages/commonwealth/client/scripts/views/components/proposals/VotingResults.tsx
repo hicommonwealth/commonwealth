@@ -32,7 +32,13 @@ export const VotingResults = (props: VotingResultsProps) => {
 
   // handle aave separately
   if (proposal && proposal instanceof AaveProposal) {
-    return <AaveProposalResult proposal={proposal} votes={votes} />;
+    return (
+      <AaveProposalResult
+        proposal={proposal}
+        votes={votes}
+        isInCard={isInCard}
+      />
+    );
   }
 
   // Map voting type to component

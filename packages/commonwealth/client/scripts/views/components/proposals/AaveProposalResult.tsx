@@ -6,7 +6,7 @@ import { AaveProposalVote } from '../../../controllers/chain/ethereum/aave/propo
 import app from '../../../state/index';
 import { AaveVotingResult } from './voting_result_components';
 
-export function AaveProposalResult({ proposal, votes }) {
+export function AaveProposalResult({ proposal, votes, isInCard }) {
   const yesVotes: AaveProposalVote[] = votes.filter((v) => !!v.choice);
 
   const yesBalance = yesVotes.reduce(
@@ -34,6 +34,7 @@ export function AaveProposalResult({ proposal, votes }) {
       votes={votes}
       yesBalanceString={yesBalanceString}
       yesVotesCount={yesVotes.length}
+      isInCard={isInCard}
     />
   );
 }

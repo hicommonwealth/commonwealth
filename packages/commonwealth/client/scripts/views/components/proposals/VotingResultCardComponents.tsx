@@ -1,7 +1,18 @@
 import clsx from 'clsx';
 import React from 'react';
+import { NearSputnikVoteString } from '../../../controllers/chain/near/sputnik/types';
+import { formatPercent } from '../../../helpers/index';
 import { CWText } from '../component_kit/cw_text';
-import { CompletedProposalVotingResultProps } from './voting_result_components';
+import { roundVote } from './aave_proposal_card_detail';
+import { VoteListing } from './vote_listing';
+import {
+  AaveVotingResultProps,
+  CompletedProposalVotingResultProps,
+  SimpleYesApprovalVotingResultProps,
+  VotingResultProps,
+  YesNoAbstainVetoVotingResultProps,
+  YesNoRejectVotingResultProps,
+} from './voting_result_components';
 
 export const CompletedProposalVotingResultCard = (
   props: CompletedProposalVotingResultProps
@@ -44,6 +55,195 @@ export const CompletedProposalVotingResultCard = (
       <div className="results-header">
         <CWText type="d5">{'Veto'}</CWText>
         <CWText type="caption">{`${noWithVetoPct}%`}</CWText>
+      </div>
+    </div>
+  );
+};
+
+export const AaveVotingResultCard = (props: AaveVotingResultProps) => {
+  const {
+    noBalanceString,
+    noVotesCount,
+    proposal,
+    votes,
+    yesBalanceString,
+    yesVotesCount,
+  } = props;
+
+  const totalVotesCount = yesVotesCount + noVotesCount;
+
+  return (
+    <div className={clsx('ResultsSection', 'TopBorder')}>
+      <div className="results-header">
+        <CWText type="b1" fontWeight="bold">
+          {'Results'}
+        </CWText>
+        <CWText type="caption">{`${formatPercent(
+          proposal.turnout
+        )} of token holders`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'Yes'}</CWText>
+        <CWText type="caption">{`${formatPercent(
+          yesVotesCount / totalVotesCount
+        )}`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'No'}</CWText>
+        <CWText type="caption">{`${formatPercent(
+          noVotesCount / totalVotesCount
+        )}`}</CWText>
+      </div>
+    </div>
+  );
+};
+
+export const VotingResultCard = (props: VotingResultProps) => {
+  const { abstainVotes, noVotes, yesVotes, proposal } = props;
+
+  return (
+    <div className={clsx('ResultsSection', 'TopBorder')}>
+      <div className="results-header">
+        <CWText type="b1" fontWeight="bold">
+          {'Results'}
+        </CWText>
+        <CWText type="caption">{`${
+          yesVotes.length + noVotes.length + yesVotes
+        } total votes`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'Yes'}</CWText>
+        <CWText type="caption">{`${yesVotes.length} votes`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'No'}</CWText>
+        <CWText type="caption">{`${noVotes.length} votes`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'Abstain'}</CWText>
+        <CWText type="caption">{`${abstainVotes.length} votes`}</CWText>
+      </div>
+    </div>
+  );
+};
+
+export const SimpleYesApprovalVotingResultCard = (
+  props: SimpleYesApprovalVotingResultProps
+) => {
+  const { approvedCount, proposal, votes } = props;
+
+  return (
+    <div className={clsx('ResultsSection', 'TopBorder')}>
+      <div className="results-header">
+        <CWText type="b1" fontWeight="bold">
+          {'Results'}
+        </CWText>
+        <CWText type="caption">{`${approvedCount} approved`}</CWText>
+      </div>
+    </div>
+  );
+};
+
+export const YesNoAbstainVetoVotingResultCard = (
+  props: YesNoAbstainVetoVotingResultProps
+) => {
+  const { proposal, votes, isInCard } = props;
+
+  const yesVotes = votes.filter((v) => v.choice === 'Yes').length;
+  const noVotes = votes.filter((v) => v.choice === 'No').length;
+  const abstainVotes = votes.filter((v) => v.choice === 'Abstain').length;
+  const vetoVotes = votes.filter((v) => v.choice === 'NoWithVeto').length;
+  const totalVotes = votes.length;
+
+  return (
+    <div className={clsx('ResultsSection', 'TopBorder')}>
+      <div className="results-header">
+        <CWText type="b1" fontWeight="bold">
+          {'Results'}
+        </CWText>
+        <CWText type="caption">{`${votes.length} total votes`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'Yes'}</CWText>
+        <CWText type="caption">{`${formatPercent(
+          yesVotes / totalVotes
+        )}`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'No'}</CWText>
+        <CWText type="caption">{`${formatPercent(
+          noVotes / totalVotes
+        )}`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'Abstain'}</CWText>
+        <CWText type="caption">{`${formatPercent(
+          abstainVotes / totalVotes
+        )}`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'Veto'}</CWText>
+        <CWText type="caption">{`${formatPercent(
+          vetoVotes / totalVotes
+        )}`}</CWText>
+      </div>
+    </div>
+  );
+};
+
+export const YesNoRejectVotingResultCard = (
+  props: YesNoRejectVotingResultProps
+) => {
+  const { proposal, votes } = props;
+
+  const approveVotes = votes.filter(
+    (v) => v.choice === NearSputnikVoteString.Approve
+  ).length;
+  const rejectVotes = votes.filter(
+    (v) => v.choice === NearSputnikVoteString.Reject
+  ).length;
+  const removeVotes = votes.filter(
+    (v) => v.choice === NearSputnikVoteString.Remove
+  ).length;
+  const totalVotes = votes.length;
+
+  return (
+    <div className={clsx('ResultsSection', 'TopBorder')}>
+      <div className="results-header">
+        <CWText type="b1" fontWeight="bold">
+          {'Results'}
+        </CWText>
+        <CWText type="caption">{`${votes.length} total votes`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'Yes'}</CWText>
+        <CWText type="caption">{`${approveVotes} approved (${formatPercent(
+          approveVotes / totalVotes
+        )})`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'No'}</CWText>
+        <CWText type="caption">{`${rejectVotes} rejected (${formatPercent(
+          rejectVotes / totalVotes
+        )})`}</CWText>
+      </div>
+
+      <div className="results-header">
+        <CWText type="d5">{'Abstain'}</CWText>
+        <CWText type="caption">{`${removeVotes} remove ${formatPercent(
+          removeVotes / totalVotes
+        )}`}</CWText>
       </div>
     </div>
   );
