@@ -16,6 +16,16 @@ import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import { featureFlags } from 'helpers/feature-flags';
 import { matchRoutes, useLocation } from 'react-router-dom';
+import { sidebarStore } from 'state/ui/sidebar';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
+
+const resetSidebarState = () => {
+  if (isWindowSmallInclusive(window.innerWidth)) {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  } else {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
+  }
+};
 
 const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(
@@ -36,25 +46,20 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
 
   const newTree = currentTree;
 
-  localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-    newTree
-  );
+  localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
+    JSON.stringify(newTree);
 };
 
 const AdminSectionComponent = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
-  const [
-    isEditTopicThresholdsModalOpen,
-    setIsEditTopicThresholdsModalOpen,
-  ] = React.useState<boolean>(false);
-  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] = React.useState<
-    boolean
-  >(false);
-  const [isNewTopicModalOpen, setIsNewTopicModalOpen] = React.useState<boolean>(
-    false
-  );
+  const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
+    React.useState<boolean>(false);
+  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
+    React.useState<boolean>(false);
+  const [isNewTopicModalOpen, setIsNewTopicModalOpen] =
+    React.useState<boolean>(false);
 
   const matchesManageCommunityRoute = matchRoutes(
     [{ path: '/manage' }, { path: ':scope/manage' }],
@@ -80,6 +85,7 @@ const AdminSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -101,6 +107,7 @@ const AdminSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -124,7 +131,7 @@ const AdminSectionComponent = () => {
             isUpdated: false,
             onClick: (e, toggle: boolean) => {
               e.preventDefault();
-
+              resetSidebarState();
               handleRedirectClicks(
                 navigate,
                 e,
@@ -148,6 +155,7 @@ const AdminSectionComponent = () => {
       hasDefaultToggle: false,
       onClick: (e) => {
         e.preventDefault();
+        resetSidebarState();
         setIsNewTopicModalOpen(true);
       },
     },
@@ -161,6 +169,7 @@ const AdminSectionComponent = () => {
       hasDefaultToggle: false,
       onClick: (e) => {
         e.preventDefault();
+        resetSidebarState();
         setIsOrderTopicsModalOpen(true);
       },
     },
@@ -174,6 +183,7 @@ const AdminSectionComponent = () => {
       hasDefaultToggle: false,
       onClick: (e) => {
         e.preventDefault();
+        resetSidebarState();
         setIsEditTopicThresholdsModalOpen(true);
       },
     },
@@ -206,6 +216,7 @@ const AdminSectionComponent = () => {
     hasDefaultToggle: toggleTreeState['toggledState'],
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
+      resetSidebarState();
       setAdminToggleTree('toggledState', toggle);
     },
     displayData: adminGroupData,
