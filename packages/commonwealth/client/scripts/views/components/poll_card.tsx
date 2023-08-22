@@ -212,7 +212,7 @@ export const ResultsSection = ({
   } else {
     numOptionsBeyondPreview = voteInformation.length - ENDED_PREVIEW_MAX;
   }
-  //here
+
   return (
     <div className="ResultsSection">
       {!isPreview && (

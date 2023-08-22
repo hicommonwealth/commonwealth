@@ -252,11 +252,11 @@ export const CWContentPageCard = (props: ContentPageCardProps) => {
     <CWCard className="ContentPageCard">
       <div className="header-container">
         <CWText type="h5" fontWeight="semiBold">
-          <div className={'collapsableButton'}>
+          <div className="collapsableButton">
             <CWIconButton
               iconButtonTheme="black"
               iconName={isCollapsed ? 'chevronRight' : 'chevronDown'}
-              iconSize={'small'}
+              iconSize="small"
               onClick={() => {
                 setIsCollapsed(!isCollapsed);
               }}

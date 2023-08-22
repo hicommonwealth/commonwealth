@@ -913,7 +913,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         fetchedPower={!!power}
                         identifier={identifier}
                         proposal={snapshotProposal}
-                        scores={[]} // unused?
                         space={space}
                         symbol={symbol}
                         totals={totals}
