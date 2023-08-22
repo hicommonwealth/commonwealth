@@ -3,5 +3,6 @@
   --require @babel/register
   --require source-map-support/register
   --require ignore-styles
+  --require ./utils/localStorageUtils.ts
   --timeout 20000
   --exit
