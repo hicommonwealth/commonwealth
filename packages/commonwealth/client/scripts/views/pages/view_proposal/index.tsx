@@ -35,12 +35,12 @@ type ViewProposalPageAttrs = {
   type?: string;
 };
 
-export function useProposalData(proposalId, typeProp) {
-  const [error, setError] = useState(null);
-  const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
-  const hasFetchedProposalRef = useRef(false);
+export function useProposalData(proposalId, typeProp, ignoreInitChain = false) {
   const forceRerender = useForceRerender();
-  useInitChainIfNeeded(app);
+  useInitChainIfNeeded(app, ignoreInitChain);
+  const hasFetchedProposalRef = useRef(false);
+  const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
+  const [error, setError] = useState(null);
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const { metadata } = useProposalMetadata({ app, proposal });
 
@@ -64,7 +64,6 @@ export function useProposalData(proposalId, typeProp) {
       let resolvedType = typeProp;
       if (!typeProp) {
         resolvedType = chainToProposalSlug(app.chain.meta);
-        console.log(resolvedType);
       }
 
       try {
@@ -74,7 +73,6 @@ export function useProposalData(proposalId, typeProp) {
       } catch (e) {
         // special case handling for completed cosmos proposals
         if (app.chain.base === ChainBase.CosmosSDK) {
-          console.log('loading cosmos proposal');
           try {
             const cosmosProposal = await (
               app.chain as Cosmos
@@ -116,11 +114,11 @@ const ViewProposalPage = ({
 }: ViewProposalPageAttrs) => {
   const proposalId = identifier.split('-')[0];
   const navigate = useCommonNavigate();
-  const [votingModalOpen, setVotingModalOpen] = useState(false);
   const { error, metadata, isAdapterLoaded, proposal } = useProposalData(
     proposalId,
     typeProp
   );
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
 
   if (!isAdapterLoaded || !proposal) {
     return <PageLoading message="Loading..." />;

@@ -58,10 +58,6 @@ import { Select } from '../../components/Select';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { useProposalData } from '../view_proposal/index';
-import {
-  ProposalInformationCard,
-  ProposalPollCardContainer,
-} from '../view_proposal/ProposalPollCard';
 import { useSnapshotProposalData } from '../view_snapshot_proposal/index';
 import { SnapshotInformationCard } from '../view_snapshot_proposal/snapshot_information_card';
 import { SnapshotPollCardContainer } from '../view_snapshot_proposal/snapshot_poll_card_container';
@@ -144,7 +140,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { error, metadata, isAdapterLoaded, proposal } = useProposalData(
     proposalId,
-    undefined
+    null,
+    proposalId != null
   );
 
   const forceRerender = useForceRerender();

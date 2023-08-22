@@ -25,7 +25,8 @@ import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
 
 export function useSnapshotProposalData(snapshotProposalId, snapshotId) {
-  const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
+  const [snapshotProposal, setSnapshotProposal] =
+    useState<SnapshotProposal | null>(null);
   const [space, setSpace] = useState<SnapshotSpace | null>(null);
   const [voteResults, setVoteResults] = useState<VoteResults | null>(null);
   const [power, setPower] = useState<Power | null>(null);
@@ -51,11 +52,11 @@ export function useSnapshotProposalData(snapshotProposalId, snapshotId) {
     app.user?.activeAccount?.address || app.user?.addresses?.[0]?.address;
   const activeChainId = app.activeChainId();
   const proposalAuthor = useMemo(() => {
-    if (!proposal || !activeChainId) {
+    if (!snapshotProposal || !activeChainId) {
       return null;
     }
-    return new AddressInfo(null, proposal.author, activeChainId, null);
-  }, [activeChainId, proposal]);
+    return new AddressInfo(null, snapshotProposal.author, activeChainId, null);
+  }, [activeChainId, snapshotProposal]);
 
   const loadVotes = useCallback(
     async (snapId: string, proposalId: string) => {
@@ -71,7 +72,7 @@ export function useSnapshotProposalData(snapshotProposalId, snapshotId) {
         (p) => p.id === proposalId
       );
 
-      setProposal(currentProposal);
+      setSnapshotProposal(currentProposal);
 
       const currentSpace = app.snapshot.space;
       setSpace(currentSpace);
@@ -108,7 +109,7 @@ export function useSnapshotProposalData(snapshotProposalId, snapshotId) {
   }, [snapshotId, snapshotProposalId]);
 
   return {
-    snapshotProposal: proposal,
+    snapshotProposal,
     proposalAuthor,
     votes,
     symbol,
