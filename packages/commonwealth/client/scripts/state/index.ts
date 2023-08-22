@@ -19,8 +19,17 @@ import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
 import { Capacitor } from '@capacitor/core';
-import { platform } from '@todesktop/client-core';
 import { ChainStore, NodeStore } from 'stores';
+
+let platformModule;
+
+import('@todesktop/client-core')
+  .then((module) => {
+    platformModule = module.platform;
+  })
+  .catch((error) => {
+    console.error('Failed to load module: ', error);
+  });
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -186,7 +195,7 @@ const app: IApp = {
   },
   platform: () => {
     // Using Desktop API to determine if the platform is desktop
-    if (platform.todesktop.isDesktopApp()) {
+    if (platformModule && platformModule?.platform?.todesktop.isDesktopApp()) {
       return 'desktop';
     } else {
       // If not desktop, get the platform from Capacitor
