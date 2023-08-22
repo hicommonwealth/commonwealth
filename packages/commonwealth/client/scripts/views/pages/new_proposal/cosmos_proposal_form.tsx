@@ -38,10 +38,11 @@ export const CosmosProposalForm = () => {
       <CWLabel label="Proposal Type" />
       <CWRadioGroup
         name="cosmos-proposal-type"
-        onChange={(value) => {
+        onChange={(e) => {
+          const value = e.target.value as 'textProposal' | 'communitySpend';
           setCosmosProposalType(value);
         }}
-        toggledOption="textProposal"
+        toggledOption={cosmosProposalType}
         options={[
           { label: 'Text Proposal', value: 'textProposal' },
           { label: 'Community Spend', value: 'communitySpend' },

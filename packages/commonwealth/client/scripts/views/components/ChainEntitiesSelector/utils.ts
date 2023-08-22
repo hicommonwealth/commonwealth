@@ -8,7 +8,6 @@ export const filterChainEntities = (ce: ChainEntity, searchTerm: string) => {
 
   return (
     ce.typeId.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ce.title?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
     chainEntityTypeToProposalName(ce.type)
       .toLowerCase()
       .includes(searchTerm.toLowerCase())

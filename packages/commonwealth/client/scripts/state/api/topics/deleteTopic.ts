@@ -24,7 +24,8 @@ const useDeleteTopicMutation = () => {
       await queryClient.invalidateQueries({
         queryKey: [ApiEndpoints.BULK_TOPICS, variables.chainId],
       });
-      await app.threads.listingStore.removeTopic(variables.topicName);
+      // TODO: add a new method in thread cache to deal with this
+      // await app.threads.listingStore.removeTopic(variables.topicName);
     },
   });
 };

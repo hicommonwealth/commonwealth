@@ -36,7 +36,7 @@ import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import { CWRadioButton } from './cw_radio_button';
 import type { RadioButtonType } from './cw_radio_button';
-import { CWContentPageCard } from './cw_content_page';
+import { CWContentPageCard } from './CWContentPage';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
@@ -1208,26 +1208,6 @@ export const ComponentShowcase = () => {
             disabled
           />
         </div>
-      </div>
-      <div className="Quill">
-        <CWText type="h3">Quill Editor</CWText>
-        <div className="editor-toggle">
-          <CWToggle
-            size={'small'}
-            checked={isEditorDisabled}
-            onChange={() => {
-              setIsEditorDisabled((prev) => !prev);
-            }}
-          />
-          <CWText type="caption">
-            Editor {isEditorDisabled ? 'Disabled' : 'Enabled'}
-          </CWText>
-        </div>
-        <ReactQuillEditor
-          contentDelta={threadContentDelta}
-          setContentDelta={setThreadContentDelta}
-          isDisabled={isEditorDisabled}
-        />
       </div>
       <div className="upvote-gallery">
         <CWText type="h3">Upvote</CWText>

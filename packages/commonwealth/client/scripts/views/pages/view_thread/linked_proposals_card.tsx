@@ -15,7 +15,7 @@ import type ChainEntity from '../../../models/ChainEntity';
 import type Thread from '../../../models/Thread';
 import type { ThreadStage } from '../../../models/types';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
 import { Modal } from '../../components/component_kit/cw_modal';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -57,13 +57,11 @@ const LinkedProposal = ({
 };
 
 type LinkedProposalsCardProps = {
-  onChangeHandler: (stage: ThreadStage, links?: Link[]) => void;
   showAddProposalButton: boolean;
   thread: Thread;
 };
 
 export const LinkedProposalsCard = ({
-  onChangeHandler,
   thread,
   showAddProposalButton,
 }: LinkedProposalsCardProps) => {
@@ -173,7 +171,6 @@ export const LinkedProposalsCard = ({
         className="LinkedProposalsCardModal"
         content={
           <UpdateProposalStatusModal
-            onChangeHandler={onChangeHandler}
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
           />

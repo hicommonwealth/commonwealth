@@ -3,15 +3,14 @@ import type { RabbitMQSubscription } from 'common-common/src/serviceConsumer';
 import { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
-  RabbitMQController,
   getRabbitMQConfig,
+  RabbitMQController,
 } from 'common-common/src/rabbitmq';
 import {
-  RascalSubscriptions,
   AbstractRabbitMQController,
+  RascalSubscriptions,
 } from 'common-common/src/rabbitmq/types';
 import Rollbar from 'rollbar';
-import { SubstrateTypes } from 'chain-events/src/types';
 
 import models from '../database/database';
 import { RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../config';
@@ -22,7 +21,23 @@ import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
 import type { Ithis as ChainEventsProcessorContextType } from './MessageProcessors/ChainEventsQueue';
 import { processChainEvents } from './MessageProcessors/ChainEventsQueue';
 import v8 from 'v8';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
 
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  enabled: require.main === module,
+  service: ServiceKey.ChainEventsConsumer,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 const log = factory.getLogger(formatFilename(__filename));
 
 log.info(
@@ -105,7 +120,9 @@ async function main() {
   let rmqController: RabbitMQController;
   try {
     rmqController = new RabbitMQController(
-      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI),
+      <BrokerConfig>(
+        getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.ChainEventsService)
+      ),
       rollbar
     );
     await rmqController.init();
@@ -122,6 +139,8 @@ async function main() {
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
+
+  isServiceHealthy = true;
 }
 
 if (require.main === module) main();
