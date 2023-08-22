@@ -192,11 +192,7 @@ export const User = ({
 
   const userFinal = avatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
-      <Avatar
-        url={profile?.avatarUrl}
-        size={16}
-        address={profile?.id}
-      />
+      <Avatar url={profile?.avatarUrl} size={16} address={profile?.id} />
     </div>
   ) : (
     <div
@@ -234,9 +230,7 @@ export const User = ({
                   profile.name
                 ) : (
                   <>
-                    <div>
-                      {profile.name}
-                    </div>
+                    <div>{profile.name}</div>
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
@@ -296,11 +290,7 @@ export const User = ({
           }}
         >
           <div className="user-avatar">
-            <Avatar
-              url={profile?.avatarUrl}
-              size={32}
-              address={profile?.id}
-            />
+            <Avatar url={profile?.avatarUrl} size={32} address={profile?.id} />
           </div>
           <div className="user-name">
             {app.chain && app.chain.base === ChainBase.Substrate && (
@@ -367,7 +357,7 @@ export const User = ({
       <Modal
         content={
           <BanUserModal
-            profile={profile}
+            address={profile.address}
             onModalClose={() => setIsModalOpen(false)}
           />
         }

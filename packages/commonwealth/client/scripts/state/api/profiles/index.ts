@@ -1,3 +1,9 @@
+import useBanProfileByAddressMutation from './banProfileByAddress';
+import useGetProfilesByAddressesQuery from './getProfilesByAddresses';
 import useSearchProfilesQuery from './searchProfiles';
 
-export { useSearchProfilesQuery };
+export {
+  useBanProfileByAddressMutation,
+  useGetProfilesByAddressesQuery,
+  useSearchProfilesQuery,
+};

@@ -1,20 +1,20 @@
-import React from 'react';
-
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import $ from 'jquery';
-
-import type MinimumProfile from '../../models/MinimumProfile';
+import React from 'react';
 import app from 'state';
+import { useBanProfileByAddressMutation } from 'state/api/profiles';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
-  profile: MinimumProfile;
+  address: string;
 };
 
-export const BanUserModal = (props: BanUserModalAttrs) => {
-  const { profile, onModalClose } = props;
+export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
+  const { mutateAsync: banUser } = useBanProfileByAddressMutation({
+    chainId: app.activeChainId(),
+    address: address,
+  });
 
   return (
     <React.Fragment>
@@ -33,14 +33,13 @@ export const BanUserModal = (props: BanUserModalAttrs) => {
             onClick={async () => {
               try {
                 // ZAK TODO: Update Banned User Table with userProfile
-                if (!profile.address) {
+                if (!address) {
                   notifyError('CW Data error');
                   return;
                 }
-                await $.post('/api/banAddress', {
-                  jwt: app.user.jwt,
-                  address: profile.address,
-                  chain_id: app.activeChainId(),
+                await banUser({
+                  address,
+                  chainId: app.activeChainId(),
                 });
                 onModalClose();
                 notifySuccess('Banned Address');
