@@ -1,4 +1,4 @@
-_Certified fresh by Nakul Manchanda 230627._
+_Authored by Nakul Manchanda 230627._
 
 # Query Optimization
 

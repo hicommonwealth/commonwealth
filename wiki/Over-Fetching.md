@@ -1,4 +1,4 @@
-_Certified fresh by Nakul Manchanda, 230629._
+_Authored by Nakul Manchanda, 230629._
 
 # Data Over-Fetching
 This pertains to situations where we retrieve more data than required. This is commonly observed when Sequelize queries behind endpoints extract excessive information.

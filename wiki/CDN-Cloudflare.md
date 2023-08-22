@@ -1,4 +1,4 @@
-_Certified fresh by Nakul Manchanda, 230714._
+_Authored by Nakul Manchanda, 230714._
 
 # Content Delivery Network (CDN)
 

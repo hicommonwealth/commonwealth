@@ -1,4 +1,4 @@
-_Certified fresh by Alex Young, 230718._
+_Authored by Alex Young, 230718._
 
 ## Overview
 

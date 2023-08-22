@@ -4,7 +4,7 @@ All work must be associated with a ticket (GitHub issue), and this ticket must h
 
 If an engineer opens a new ticket, it can be either in-scope of a current project, or out-of-scope. 
 
-Engineers are welcome to open several pull requests to close an outstanding ticket. Such PRs can be either _dependent_ or _sequential_ (i.e., independent), and should be flagged accordingly, so that blocking PRs are prioritized for merging.
+Engineers are welcome to open several pull requests to close an outstanding ticket. Such PRs can be either _dependent_ or _sequential_ (i.e., independent), and should be flagged accordingly, so that blocking PRs are prioritized for merging. See the [Agile Development "Story Point Estimation" section](./Agile-Development.md#story-point-estimation) for further context.
 
 All new tickets should be set to "no status" for the current cycle. Work should not begin until an engineer has been assigned to the ticket, and it has been assigned an "in progress" status.
 

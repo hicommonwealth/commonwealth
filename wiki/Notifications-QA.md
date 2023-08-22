@@ -1,4 +1,4 @@
-_Certified fresh by Timothee Legros, 230803._
+_Authored by Timothee Legros, 230803._
 
 # Prerequisites
 ## Subscriptions
