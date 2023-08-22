@@ -250,7 +250,12 @@ export const CWContentPageCard = (props: ContentPageCardProps) => {
 
   return (
     <CWCard className="ContentPageCard">
-      <div className="header-container">
+      <div
+        className="header-container"
+        onClick={() => {
+          setIsCollapsed(!isCollapsed);
+        }}
+      >
         <CWText type="h5" fontWeight="semiBold">
           <div className="collapsableButton">
             <CWIconButton
