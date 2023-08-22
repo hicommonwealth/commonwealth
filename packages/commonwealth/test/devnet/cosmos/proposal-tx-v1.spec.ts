@@ -89,19 +89,6 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
       const content = encodeTextProposal(`v1 title`, `v1 description`);
       await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal');
     });
-    it('creates a community spend proposal', async () => {
-      const content = encodeCommunitySpend(
-        `v1 spend title`,
-        `v1 spend description`,
-        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
-        '100',
-        'stake'
-      );
-      await proposalTest(
-        content,
-        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal'
-      );
-    });
     it('votes NO on an active proposal', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_NO);
     });
@@ -114,27 +101,26 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     it('votes YES on an active proposal', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_YES);
     });
+    it('creates a community spend proposal', async () => {
+      await waitOneBlock(rpcUrl);
+      await waitOneBlock(rpcUrl);
+      const content = encodeCommunitySpend(
+        `v1 spend title`,
+        `v1 spend description`,
+        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
+        '5',
+        'ustake'
+      );
+      await proposalTest(
+        content,
+        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal'
+      );
+    });
   });
   describe('Amino Signer', () => {
     it('creates a text proposal with legacy amino', async () => {
       const content = encodeTextProposal(`v1 title`, `v1 description`);
       await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal', true);
-    });
-    // TODO: Unsupported. Un-skip this in
-    // https://github.com/hicommonwealth/commonwealth/issues/4821
-    it.skip('creates a community spend proposal with legacy amino', async () => {
-      const content = encodeCommunitySpend(
-        `v1 spend title amino`,
-        `v1 spend description amino`,
-        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
-        '10',
-        'stake'
-      );
-      await proposalTest(
-        content,
-        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-        true
-      );
     });
     it('votes NO on an active proposal with legacy amino', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_NO, true);
@@ -147,6 +133,24 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     });
     it('votes YES on an active proposal with legacy amino', async () => {
       await voteTest(VoteOptionV1.VOTE_OPTION_YES, true);
+    });
+    // TODO: Unsupported. Un-skip this in
+    // https://github.com/hicommonwealth/commonwealth/issues/4821
+    it('creates a community spend proposal with legacy amino', async () => {
+      await waitOneBlock(rpcUrl);
+      await waitOneBlock(rpcUrl);
+      const content = encodeCommunitySpend(
+        `v1 spend title amino`,
+        `v1 spend description amino`,
+        'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
+        '5',
+        'ustake'
+      );
+      await proposalTest(
+        content,
+        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
+        true
+      );
     });
   });
 });
