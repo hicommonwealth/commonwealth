@@ -12,7 +12,7 @@ import {
 } from './voting_result_components';
 import { VotingResults } from './VotingResults';
 
-export function YesNoAbstainVetoResult({ votes, proposal, inCardDisplay }) {
+export function YesNoAbstainVetoResult({ votes, proposal, isInCard }) {
   // return different voting results on completed cosmos proposal, as voters are not available
   if (proposal.completed && (proposal as CosmosProposal).data?.state?.tally) {
     const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal).data
@@ -43,6 +43,7 @@ export function YesNoAbstainVetoResult({ votes, proposal, inCardDisplay }) {
         noWithVetoResults={formatCurrency(noWithVeto)}
         yesPct={getPct(yes)}
         yesResults={formatCurrency(yes)}
+        isInCard={isInCard}
       />
     );
   } else {
@@ -50,6 +51,7 @@ export function YesNoAbstainVetoResult({ votes, proposal, inCardDisplay }) {
       <YesNoAbstainVetoVotingResult
         proposal={proposal as CosmosProposal}
         votes={votes}
+        isInCard={isInCard}
       />
     );
   }

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 
 import 'components/proposals/voting_actions.scss';
@@ -53,7 +54,7 @@ type VotingActionsProps = {
   proposal: AnyProposal;
   toggleVotingModal: (newModalState: boolean) => void;
   votingModalOpen: boolean;
-  isCardDisplay?: boolean;
+  isInCard?: boolean;
 };
 
 export const VotingActions = (props: VotingActionsProps) => {
@@ -62,13 +63,13 @@ export const VotingActions = (props: VotingActionsProps) => {
     proposal,
     toggleVotingModal,
     votingModalOpen,
-    isCardDisplay,
+    isInCard,
   } = props;
 
   const [amount, setAmount] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
   const [conviction, setConviction] = useState<number>();
-  const buttonClass = isCardDisplay ? 'button-row-card' : 'button-row';
+  const buttonClass = isInCard ? 'button-row-card' : 'button-row';
   // conviction isn't used anywhere?
 
   useEffect(() => {
@@ -431,7 +432,12 @@ export const VotingActions = (props: VotingActionsProps) => {
   }
 
   return (
-    <div className="VotingActions">
+    <div
+      className={clsx(
+        { VotingActions: !isInCard },
+        { VotingActionsCard: isInCard }
+      )}
+    >
       <CWText type="h4" className="voting-actions-header">
         Cast Your Vote
       </CWText>

@@ -181,7 +181,7 @@ const ViewProposalPage = ({
           {proposal.data?.messages && (
             <JSONDisplay data={proposal.data.messages} title="Messages" />
           )}
-          <VotingResults proposal={proposal} inCardDisplay={false} />
+          <VotingResults proposal={proposal} isInCard={false} />
           <VotingActions
             onModalClose={onModalClose}
             proposal={proposal}

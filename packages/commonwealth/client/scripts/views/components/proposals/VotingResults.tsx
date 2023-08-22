@@ -14,10 +14,10 @@ import { DefaultVotingResult } from './votingResults/DefaultVotingResult';
 import { YesNoAbstainVetoResult } from './YesNoAbstainVetoResult';
 import { YesNoRejectResult } from './YesNoRejectResult';
 
-type VotingResultsProps = { proposal: AnyProposal; inCardDisplay: boolean };
+type VotingResultsProps = { proposal: AnyProposal; isInCard: boolean };
 
 export const VotingResults = (props: VotingResultsProps) => {
-  const { proposal, inCardDisplay } = props;
+  const { proposal, isInCard } = props;
   const forceRerender = useForceRerender();
 
   const votes = proposal.getVotes();
@@ -54,10 +54,6 @@ export const VotingResults = (props: VotingResultsProps) => {
   }
 
   return (
-    <VotingComponent
-      proposal={proposal}
-      votes={votes}
-      inCardDisplay={inCardDisplay}
-    />
+    <VotingComponent proposal={proposal} votes={votes} isInCard={isInCard} />
   );
 };

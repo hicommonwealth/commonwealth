@@ -41,3 +41,34 @@
     margin-bottom: 8px;
   }
 }
+
+.VotingActionsCard {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  padding: 16px;
+
+  .button-row {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+
+    .Button {
+      flex: 1;
+    }
+  }
+
+  .button-row-card {
+    overflow: auto;
+
+    .Button {
+      display: inline-block;
+      width:107px;
+    }
+  }
+
+  .voting-actions-header.Text {
+    margin-bottom: 8px;
+  }
+}

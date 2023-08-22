@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 
 import 'components/proposals/voting_result_components.scss';
@@ -15,6 +16,7 @@ import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
 import { CWText } from '../component_kit/cw_text';
 import { VoteListing } from './vote_listing';
+import { CompletedProposalVotingResultCard } from './VotingResultCardComponents';
 
 type BaseVotingResultProps = {
   proposal: AnyProposal;
@@ -57,7 +59,7 @@ export const VotingResult = (props: VotingResultProps) => {
   );
 };
 
-type CompletedProposalVotingResultProps = {
+export type CompletedProposalVotingResultProps = {
   abstainPct: string;
   abstainResults: string;
   noPct: string;
@@ -66,6 +68,7 @@ type CompletedProposalVotingResultProps = {
   noWithVetoResults: string;
   yesPct: string;
   yesResults: string;
+  isInCard: boolean;
 };
 
 export const CompletedProposalVotingResult = (
@@ -80,7 +83,12 @@ export const CompletedProposalVotingResult = (
     noWithVetoResults,
     yesPct,
     yesResults,
+    isInCard,
   } = props;
+
+  if (isInCard) {
+    return <CompletedProposalVotingResultCard {...props} />;
+  }
 
   return (
     <div className="VotingResult">
@@ -195,15 +203,17 @@ export const AaveVotingResult = (props: AaveVotingResultProps) => {
 type YesNoAbstainVetoVotingResultProps = {
   proposal: CosmosProposal;
   votes: Array<CosmosVote>;
+  isInCard?: boolean;
 };
 
 export const YesNoAbstainVetoVotingResult = (
   props: YesNoAbstainVetoVotingResultProps
 ) => {
-  const { proposal, votes } = props;
+  const { proposal, votes, isInCard } = props;
+  console.log(isInCard);
 
   return (
-    <div className="VotingResult">
+    <div className={clsx('VotingResult', { card: isInCard })}>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
           {`Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`}

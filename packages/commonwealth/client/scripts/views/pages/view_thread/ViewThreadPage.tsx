@@ -942,16 +942,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 {proposal.title}
                               </CWText>
                             </div>
-                            <VotingResults
-                              proposal={proposal}
-                              inCardDisplay={true}
-                            />
                             <VotingActions
                               onModalClose={onModalClose}
                               proposal={proposal}
                               toggleVotingModal={toggleVotingModal}
                               votingModalOpen={votingModalOpen}
-                              isCardDisplay={true}
+                              isInCard={true}
+                            />
+                            <VotingResults
+                              proposal={proposal}
+                              isInCard={true}
                             />
                           </CWCard>
                         }
