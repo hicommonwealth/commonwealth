@@ -1,11 +1,12 @@
 import { StatsDController } from 'common-common/src/statsd';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
-import { JWT_SECRET } from '../config';
+import { JWT_SECRET, CW_SCHEDULER_SECRET } from '../config';
 import type { DB } from '../models';
 import '../types';
 import { initMagicAuth } from './magic';
 import { initSocialAccountAuth } from './socialAccount';
+import { initBearerAuth } from './httpBearer';
 
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
@@ -45,6 +46,7 @@ export function setupPassport(models: DB) {
   initDefaultUserAuth(models);
   initSocialAccountAuth(models);
   initMagicAuth(models);
+  initBearerAuth('cwSchedulerStrategy', CW_SCHEDULER_SECRET);
 
   passport.serializeUser<any>((user, done) => {
     StatsDController.get().increment('cw.users.logged_in');
