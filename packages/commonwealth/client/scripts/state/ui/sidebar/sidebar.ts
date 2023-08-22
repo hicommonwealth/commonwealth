@@ -1,4 +1,5 @@
 import { createStore } from 'zustand/vanilla';
+import { persist } from 'zustand/middleware';
 import { devtools } from 'zustand/middleware';
 import { createBoundedUseStore } from 'state/ui/utils';
 import { SidebarMenuName } from 'views/components/sidebar';
@@ -23,44 +24,45 @@ interface SidebarStore {
   }) => void;
 }
 
-const setUserSidebarVisibility = (state: 'open' | 'closed' | null) => {
-  if (state) {
-    localStorage.setItem('user-sidebar-visibility', state);
-  } else {
-    localStorage.removeItem('user-sidebar-visibility');
-  }
-};
-
-const userSidebarPreference = localStorage.getItem('user-sidebar-visibility');
-
-const initialMenuVisible =
-  userSidebarPreference === 'closed'
-    ? false
-    : userSidebarPreference === 'open'
-    ? true
-    : !isWindowSmallInclusive(window.innerWidth);
-
 export const sidebarStore = createStore<SidebarStore>()(
-  devtools((set) => ({
-    mobileMenuName: null,
-    setMobileMenuName: (name) => set(() => ({ mobileMenuName: name })),
-    menuName: 'default',
-    menuVisible: initialMenuVisible,
-    userToggledVisibility: userSidebarPreference as 'open' | 'closed' | null,
-    setUserToggledVisibility: (toggled) => {
-      set(() => ({ userToggledVisibility: toggled }));
-      setUserSidebarVisibility(toggled);
-    },
-    recentlyUpdatedVisibility: false,
-    setRecentlyUpdatedVisibility: (updated) =>
-      set(() => ({ recentlyUpdatedVisibility: updated })),
-    setMenu: ({ name, isVisible }) =>
-      set((state) => ({
-        menuName: name,
-        menuVisible:
-          typeof isVisible === 'boolean' ? isVisible : state.menuVisible,
-      })),
-  }))
+  devtools(
+    persist(
+      (set, get) => ({
+        mobileMenuName: null,
+        setMobileMenuName: (name) => set(() => ({ mobileMenuName: name })),
+        menuName: 'default',
+        menuVisible: true,
+        userToggledVisibility: null,
+        setUserToggledVisibility: (toggled) => {
+          set(() => ({ userToggledVisibility: toggled }));
+          set((state) => ({
+            menuVisible:
+              state.userToggledVisibility === 'closed'
+                ? false
+                : state.userToggledVisibility === 'open'
+                ? true
+                : !isWindowSmallInclusive(window.innerWidth),
+          }));
+        },
+        recentlyUpdatedVisibility: false,
+        setRecentlyUpdatedVisibility: (updated) =>
+          set(() => ({ recentlyUpdatedVisibility: updated })),
+        setMenu: ({ name, isVisible }) =>
+          set((state) => ({
+            menuName: name,
+            menuVisible:
+              typeof isVisible === 'boolean' ? isVisible : state.menuVisible,
+          })),
+      }),
+      {
+        name: 'sidebar-store', // unique name
+        partialize: (state) => ({
+          userToggledVisibility: state.userToggledVisibility,
+          menuVisible: state.menuVisible,
+        }), // persist only userToggledVisibility and menuVisible
+      }
+    )
+  )
 );
 
 const useSidebarStore = createBoundedUseStore(sidebarStore);

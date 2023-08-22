@@ -54,8 +54,6 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
 
   function handleToggle() {
     const isVisible = !menuVisible;
-    const sidebar = document.getElementsByClassName('Sidebar')[0];
-    if (sidebar) sidebar.classList.toggle('onremove', !isVisible);
     setMenu({ name: menuName, isVisible });
     setTimeout(() => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
@@ -196,7 +194,6 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     </>
   ) : (
     <div className="SublayoutHeader">
-      {/* <div className="header-left"> */}
       <div
         className={`header-left ${
           app.platform() === 'desktop' ? 'desktop' : ''

@@ -7,7 +7,6 @@ import app from 'state';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import type { MenuItem } from '../component_kit/types';
 import useSidebarStore from 'state/ui/sidebar';
-import user from 'server/models/user';
 
 export const ExploreCommunitiesSidebar = () => {
   const { setMenu, userToggledVisibility } = useSidebarStore();

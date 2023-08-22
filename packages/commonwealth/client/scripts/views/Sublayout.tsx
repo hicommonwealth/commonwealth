@@ -9,6 +9,7 @@ import { AppMobileMenus } from './AppMobileMenus';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
+import clsx from 'clsx';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -21,14 +22,13 @@ const Sublayout = ({
   hasCommunitySidebar,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible, mobileMenuName, userToggledVisibility } =
+  const { menuVisible, mobileMenuName, userToggledVisibility, setMenu } =
     useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const { isWindowSmallInclusive } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
   });
-  const { setMenu } = useSidebarStore();
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -59,7 +59,7 @@ const Sublayout = ({
     }
 
     const onResize = () => {
-      if (userToggledVisibility === null) {
+      if (userToggledVisibility === 'false') {
         setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
       }
     };
@@ -82,9 +82,11 @@ const Sublayout = ({
         <div className="sidebar-and-body-container">
           <Sidebar isInsideCommunity={hasCommunitySidebar} />
           <div
-            className={`body-and-sticky-headers-container 
-            ${menuVisible ? 'menu-visible' : 'menu-hidden'} 
-            ${resizing ? 'resizing' : ''}`}
+            className={clsx('body-and-sticky-headers-container', {
+              'menu-visible': menuVisible,
+              'menu-hidden': !menuVisible,
+              resizing,
+            })}
           >
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 

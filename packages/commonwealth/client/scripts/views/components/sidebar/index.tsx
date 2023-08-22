@@ -20,15 +20,6 @@ export const Sidebar = ({ isInsideCommunity }) => {
     setRecentlyUpdatedVisibility,
     recentlyUpdatedVisibility,
   } = useSidebarStore();
-  const [shouldRender, setShouldRender] = useState(menuVisible);
-
-  useEffect(() => {
-    if (menuVisible) {
-      setShouldRender(true);
-    } else {
-      setTimeout(() => setShouldRender(false), 200); // match this with your CSS animation duration
-    }
-  }, [menuVisible]);
 
   useEffect(() => {
     setRecentlyUpdatedVisibility(false);
