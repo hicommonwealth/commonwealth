@@ -212,7 +212,6 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
       >
         {carat}
         <CWText>{title}</CWText>
-        {/* rightIcon && <div className="right-icon">{rightIcon}</div> */}
       </div>
       {toggled && (
         <div className="sections-container">

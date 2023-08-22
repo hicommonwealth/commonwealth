@@ -10,22 +10,18 @@ import Thread from '../../../models/Thread';
 
 import app from 'state';
 import { ContentType } from 'types';
-import { User } from 'views/components/user/user';
-import { CWButton } from '../component_kit/new_designs/cw_button';
-import { CWText } from '../component_kit/cw_text';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWValidationText } from '../component_kit/cw_validation_text';
+import { CommentEditor } from './CommentEditor/CommentEditor';
+import { ArchiveMsg } from './ArchiveMsg/ArchiveMsg';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import {
   createDeltaFromText,
   getTextFromDelta,
-  ReactQuillEditor,
+
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { useDraft } from 'hooks/useDraft';
 import { useCreateCommentMutation } from 'state/api/comments';
 import Permissions from '../../../utils/Permissions';
-import clsx from 'clsx';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 
 type CreateCommentProps = {
@@ -142,8 +138,6 @@ export const CreateComment = ({
     userFailsThreshold ||
     !canComment;
 
-  const decimals = getDecimals(app.chain);
-
   const cancel = (e) => {
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
@@ -160,68 +154,28 @@ export const CreateComment = ({
 
   return (
     <>
-      { rootThread.archivedAt === null ? (
-            <div className="CreateComment">
-              <div className="attribution-row">
-                <div className="attribution-left-content">
-                  <CWText type="caption">
-                    {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
-                  </CWText>
-                  <CWText
-                    type="caption"
-                    fontWeight="medium"
-                    className={clsx('user-link-text', { disabled: !canComment })}
-                  >
-                    <User user={author} hideAvatar linkify />
-                  </CWText>
-                </div>
-                {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
-              </div>
-              <ReactQuillEditor
-                className="editor"
-                contentDelta={contentDelta}
-                setContentDelta={setContentDelta}
-                isDisabled={!canComment}
-                tooltipLabel="Join community to comment"
-              />
-              {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-                <CWText className="token-req-text">
-                  Commenting in {activeTopic?.name} requires{' '}
-                  {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-                  {app.chain.meta.default_symbol}.{' '}
-                  {userBalance && (
-                    <>
-                      You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-                      {app.chain.meta.default_symbol}.
-                    </>
-                  )}
-                </CWText>
-              )}
-              <div className="form-bottom">
-                <div className="form-buttons">
-                  {editorValue.length > 0 && (
-                    <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
-                  )}
-                  <CWButton
-                    buttonWidth="wide"
-                    disabled={disabled && !isAdmin}
-                    onClick={handleSubmitComment}
-                    label="Submit"
-                  />
-                </div>
-              </div>
-            </div>
-          ): (
-              <div className="archive-msg-container">
-                <div className="archive-msg">
-                <CWIcon
-                  iconName="archiveTrayFilled"
-                  iconSize="small"
-                />
-                {`This thread was archived on ${rootThread.archivedAt.format('MM/DD/YYYY')}, meaning it can no longer be edited or commented on.`}
-                </div>
-              </div>
-            )
+      { rootThread.archivedAt === null ? ( 
+        <CommentEditor
+          parentType={parentType}
+          canComment={canComment}
+          handleSubmitComment={handleSubmitComment}
+          errorMsg={errorMsg}
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
+          tokenPostingThreshold={tokenPostingThreshold}
+          activeTopic={activeTopic}
+          userBalance={userBalance}
+          disabled={disabled}
+          cancel={cancel}
+          isAdmin={isAdmin}
+          author={author}
+          editorValue={editorValue}
+        />
+      ): (
+            <ArchiveMsg
+              archivedAt={rootThread.archivedAt}
+            />
+          )
         }
     </>
 

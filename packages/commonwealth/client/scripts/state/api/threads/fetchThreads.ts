@@ -181,7 +181,7 @@ const useFetchThreadsQuery = (
     ...(() => {
       if (isFetchBulkThreadsProps(props)) {
         return {
-          getNextPageParam: (lastPage, pages) => lastPage.pageParam,
+          getNextPageParam: (lastPage, _pages) => lastPage.pageParam,
         };
       }
     })(),

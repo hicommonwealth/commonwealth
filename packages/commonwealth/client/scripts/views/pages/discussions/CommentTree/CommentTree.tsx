@@ -445,7 +445,7 @@ export const CommentTree = ({
                   </div>
                 )}
                 <CommentCard
-                  threadArchivedAt={thread.archivedAt}
+                  threadArchived={!!thread.archivedAt}
                   canReply={!!hasJoinedCommunity && !thread.archivedAt}
                   canReact={
                     !thread.archivedAt &&

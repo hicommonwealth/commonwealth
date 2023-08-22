@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import Thread from 'models/Thread';
 import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
