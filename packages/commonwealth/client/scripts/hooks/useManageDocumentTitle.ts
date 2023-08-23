@@ -3,12 +3,14 @@ import app from '../state';
 
 const useManageDocumentTitle = (title: string, obj?: any, attr?: string) => {
   useEffect(() => {
-    if (obj) {
+    document.title = `${app.chain.meta.name} – ${title}`;
+  }, [title]);
+
+  useEffect(() => {
+    if (obj && obj[attr]) {
       document.title = `${app.chain.meta.name} – ${obj[attr]}`;
-    } else {
-      document.title = `${app.chain.meta.name} – ${title}`;
     }
-  }, [obj ? obj : null]);
+  }, [obj, attr]);
 }
 
 export default useManageDocumentTitle;
