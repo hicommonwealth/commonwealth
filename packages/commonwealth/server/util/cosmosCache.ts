@@ -25,11 +25,11 @@ export function cosmosLCDDuration(req) {
 
   if (proposalStatus) {
     if (activeProposalCodes.some((c) => c === +proposalStatus)) {
-      // ACTIVE PROPOSALS: 5 minute cache
-      duration = 60 * 5;
+      // ACTIVE PROPOSALS: 10 seconds cache
+      duration = 10;
     } else if (completedProposalCodes.some((c) => c === +proposalStatus)) {
-      // COMPLETED PROPOSALS: cache 15 minutes
-      duration = 60 * 15;
+      // COMPLETED PROPOSALS: cache 30 seconds
+      duration = 30;
     }
   } else if (/\/proposals\/\d+\/(votes|tally|deposits)/.test(url)) {
     // live proposal voting data: cache 6 seconds
@@ -70,14 +70,14 @@ export const cosmosRPCDuration = (body) => {
     // chain PARAMS: cache long-term (5 days)
     duration = 60 * 60 * 24 * 5;
   } else if (/(0801|0802)/.test(body?.params?.data)) {
-    // ACTIVE PROPOSALS: 5 minutes
+    // ACTIVE PROPOSALS: 10 seconds
     // RPC specific codes from cosmJS requests:
     // 0801 = 'DepositPeriod', 0802 = 'VotingPeriod'
-    duration = 60 * 5;
+    duration = 10;
   } else if (/(0803|0804|0805)/.test(body?.params?.data)) {
-    // COMPLETED PROPOSALS: 15 minutes
+    // COMPLETED PROPOSALS: 30 seconds
     // 0803 = 'Passed', 0804 = 'Rejected', 0805 = 'Failed'
-    duration = 60 * 15;
+    duration = 30;
   }
   return duration;
 };

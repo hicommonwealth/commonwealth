@@ -90,7 +90,7 @@ export class Comment<T extends IUniqueId> {
       ? versionHistory[0].timestamp
       : null;
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
-    this.deleted = deleted_at?.lnegth > 0 ? true : false;
+    this.deleted = deleted_at?.length > 0 ? true : false;
     this.canvasAction = canvas_action;
     this.canvasSession = canvas_session;
     this.canvasHash = canvas_hash;

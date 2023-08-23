@@ -32,6 +32,7 @@ interface SearchThreadsProps {
   limit: number;
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
+  threadTitleOnly?: boolean;
 
   enabled?: boolean;
 }
@@ -43,6 +44,7 @@ const searchThreads = async ({
   limit,
   orderBy,
   orderDirection,
+  threadTitleOnly,
 }: SearchThreadsProps & { pageParam: number }) => {
   const {
     data: { result },
@@ -59,6 +61,7 @@ const searchThreads = async ({
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
+        thread_title_only: threadTitleOnly,
       },
     }
   );
@@ -71,6 +74,7 @@ const useSearchThreadsQuery = ({
   limit,
   orderBy,
   orderDirection,
+  threadTitleOnly,
 
   enabled = true,
 }: SearchThreadsProps) => {
@@ -92,6 +96,7 @@ const useSearchThreadsQuery = ({
         limit,
         orderBy,
         orderDirection,
+        threadTitleOnly,
       }),
     {
       getNextPageParam: (lastPage) => {

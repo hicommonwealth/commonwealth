@@ -9,7 +9,7 @@ import 'pages/view_thread/poll_cards.scss';
 import app from 'state';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { PollEditorModal } from '../../modals/poll_editor_modal';

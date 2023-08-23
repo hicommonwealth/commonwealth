@@ -1,18 +1,15 @@
 import React from 'react';
-
 import { isDefaultStage, pluralize, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
-
-import 'pages/overview/topic_summary_row.scss';
-
+import 'pages/overview/TopicSummaryRow.scss';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { slugify } from 'utils';
 import { CWTag } from 'views/components/component_kit/cw_tag';
-import { Skeleton } from '../../components/Skeleton';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -21,7 +18,7 @@ import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 import { NewThreadTag } from '../discussions/NewThreadTag';
 import { getLastUpdated, isHot } from '../discussions/helpers';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { TopicSummaryRowSkeleton } from './TopicSummaryRowSkeleton';
 
 type TopicSummaryRowProps = {
   monthlyThreads: Array<Thread>;
@@ -38,6 +35,8 @@ export const TopicSummaryRow = ({
 }: TopicSummaryRowProps) => {
   const navigate = useCommonNavigate();
 
+  if (isLoading) return <TopicSummaryRowSkeleton />;
+
   const topSortedThreads = monthlyThreads
     .sort((a, b) => {
       const aLastUpdated = a.lastCommentedOn || a.createdAt;
@@ -52,44 +51,29 @@ export const TopicSummaryRow = ({
     <div className="TopicSummaryRow">
       <div className="topic-column">
         <div className="name-and-count">
-          {isLoading ?
-            <Skeleton count={2} /> :
-            <>
-              <CWText
-                type="h4"
-                fontWeight="semiBold"
-                className="topic-name-text"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(`/discussions/${encodeURI(topic.name)}`);
-                }}
-              >
-                {topic.name}
-              </CWText>
-              <CWText
-                type="caption"
-                fontWeight="medium"
-                className="threads-count-text"
-              >
-                {topic.totalThreads || 0} Threads
-              </CWText>
-            </>
-          }
+          <CWText
+            type="h4"
+            fontWeight="semiBold"
+            className="topic-name-text"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(`/discussions/${encodeURI(topic.name)}`);
+            }}
+          >
+            {topic.name}
+          </CWText>
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className="threads-count-text"
+          >
+            {topic.totalThreads || 0} Threads
+          </CWText>
         </div>
-        {!isLoading && topic.description && <CWText type="b2">{topic.description}</CWText>}
+        {topic.description && <CWText type="b2">{topic.description}</CWText>}
       </div>
       <div className="recent-threads-column">
-        {isLoading ? Array(2).fill(undefined).map((x, idx) =>
-          <div key={idx}>
-            <div className={getClasses<{ isLoading?: boolean }>(
-              { isLoading },
-              'recent-thread-row'
-            )}>
-              <Skeleton count={4} />
-            </div>
-            {idx !== threadsToDisplay.length - 1 && <CWDivider />}
-          </div>
-        ) : threadsToDisplay.map((thread, idx) => {
+        {threadsToDisplay.map((thread, idx) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`

@@ -1,3 +1,5 @@
+_Authored by Timothee Legros, 230803._
+
 # Prerequisites
 ## Subscriptions
 - Be logged in on a new account with MetaMask that has no pre-existing joined communities.
@@ -168,8 +170,6 @@ Cannot QA Snapshot notifications until [#4667][10] is completed.
 
 ## Notifications
 Cannot QA chain-event notifications until [#4667][10] is completed.
-
-
 
 
 [1]: https://commonwealth.im/ethereum/discussions
