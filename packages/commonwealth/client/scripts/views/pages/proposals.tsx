@@ -79,7 +79,7 @@ const ProposalsPage = () => {
     };
   }, [setSubstrateLoading]);
 
-  useManageDocumentTitle(`${app.chain.meta.name} – Proposals`);
+  useManageDocumentTitle('Proposals');
 
   const {
     data: activeCosmosProposals,

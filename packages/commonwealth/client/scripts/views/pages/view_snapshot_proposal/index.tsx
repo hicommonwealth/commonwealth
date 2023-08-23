@@ -82,7 +82,7 @@ export const ViewSnapshotProposalPage = ({
     return new AddressInfo(null, proposal.author, activeChainId, null);
   }, [proposal, activeChainId]);
 
-  useManageDocumentTitle(`${app.chain.meta.name} – ${proposal.title}`);
+  useManageDocumentTitle('View snapshot proposal', proposal, 'title');
 
   const { isWindowLarge } = useBrowserWindow({});
 

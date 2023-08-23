@@ -52,6 +52,7 @@ import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 import { useSearchParams } from 'react-router-dom';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 import 'pages/view_thread/index.scss';
 
@@ -240,13 +241,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setAreProfilesLoaded(true);
   }, [comments, thread, areProfilesLoaded]);
 
-  useEffect(() => {
-    if (thread && thread.title) {
-      document.title = `${app.chain.meta.name} – ${thread.title}`;
-    } else {
-      document.title = `${app.chain.meta.name} – View thread`;
-    }
-  }, [thread]);
+  useManageDocumentTitle('View thread', thread, 'title');
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;

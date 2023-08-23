@@ -43,7 +43,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
     spaceSubscription !== undefined
   );
 
-  useManageDocumentTitle(`${app.chain.meta.name} – Snapshots`);
+  useManageDocumentTitle('Snapshots');
 
   useNecessaryEffect(() => {
     const fetch = async () => {

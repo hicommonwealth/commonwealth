@@ -63,7 +63,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
-  useManageDocumentTitle(`${app.chain.meta.name} – Discussions`);
+  useManageDocumentTitle('Discussions');
 
   return (
     <div className="DiscussionsPage">

@@ -65,7 +65,7 @@ const ViewProposalPage = ({
     };
   }, [proposal, forceRerender]);
 
-  useManageDocumentTitle(`${app.chain.meta.name} – ${proposal.title}`);
+  useManageDocumentTitle('View proposal', proposal, 'title');
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
