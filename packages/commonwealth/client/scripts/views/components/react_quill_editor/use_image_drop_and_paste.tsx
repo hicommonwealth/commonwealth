@@ -44,9 +44,6 @@ export const useImageDropAndPaste = ({
           imageType = 'image/png';
         }
 
-        const selectedIndex =
-          editor.getSelection()?.index || editor.getLength() || 0;
-
         // filter out ops that contain a base64 image
         const opsWithoutBase64Images: DeltaOperation[] = (
           editor.getContents() || []
@@ -72,11 +69,32 @@ export const useImageDropAndPaste = ({
           app.user.jwt
         );
 
+        const selectedIndex = editor.getSelection()?.index;
+        const text: string = editor.getText();
+        let blankEditor = false;
+        let lineBreak = '\n';
+
+        // When Quill editor is blank, getLength returns 1
+        if (editor.getLength() > 1) {
+          if (text[selectedIndex - 1] && text[selectedIndex]) {
+            lineBreak = '\n\n';
+          }
+        } else {
+          blankEditor = true;
+        }
+
         // insert image op at the selected index
         if (isMarkdownEnabled) {
           editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
         } else {
-          editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl);
+          if (!blankEditor) {
+            editor.insertText(selectedIndex, lineBreak);
+          }
+          if (selectedIndex === 0) {
+            editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl);
+          } else {
+            editor.insertEmbed(selectedIndex + 1, 'image', uploadedFileUrl);
+          }
         }
         setContentDelta({
           ...editor.getContents(),

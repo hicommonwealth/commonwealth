@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import MagicUrl from 'quill-magic-url';
 import ImageUploader from 'quill-image-uploader';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 import { SerializableDeltaStatic } from './utils';
 import { getTextFromDelta } from './utils';
@@ -61,6 +62,7 @@ const ReactQuillEditor = ({
   const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   // ref is used to prevent rerenders when selection
   // is changed, since rerenders bug out the editor
@@ -194,6 +196,10 @@ const ReactQuillEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
 
+  const handleDragStart = () => setIsDraggingOver(true);
+
+  const handleDragStop = () => setIsDraggingOver(false);
+
   const showTooltip = isDisabled && isHovering;
 
   return (
@@ -236,51 +242,67 @@ const ReactQuillEditor = ({
               isDisabled={isDisabled}
               isPreviewDisabled={getTextFromDelta(contentDelta).length < 1}
             />
-            <div data-text-editor="name">
-              <ReactQuill
-                ref={editorRef}
-                className={clsx('QuillEditor', className, {
-                  markdownEnabled: isMarkdownEnabled,
-                })}
-                placeholder={placeholder}
-                tabIndex={tabIndex}
-                theme="snow"
-                bounds={`[data-text-editor="name"]`}
-                value={contentDelta}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                onChange={handleChange}
-                onChangeSelection={(selection: RangeStatic) => {
-                  if (!selection) {
-                    return;
-                  }
-                  lastSelectionRef.current = selection;
-                }}
-                formats={isMarkdownEnabled ? [] : undefined}
-                modules={{
-                  toolbar: {
-                    container: `#${toolbarId}`,
-                    handlers: isMarkdownEnabled
-                      ? markdownToolbarHandlers
-                      : undefined,
-                  },
-                  imageDropAndPaste: {
-                    handler: handleImageDropAndPaste,
-                  },
-                  clipboard: {
-                    matchers: clipboardMatchers,
-                  },
-                  mention,
-                  magicUrl: !isMarkdownEnabled,
-                  keyboard: isMarkdownEnabled
-                    ? markdownKeyboardShortcuts
-                    : undefined,
-                  imageUploader: {
-                    upload: handleImageUploader,
-                  },
-                }}
-              />
-            </div>
+            <DragDropContext onDragEnd={handleDragStop}>
+              <Droppable droppableId="quillEditor">
+                {(provided) => (
+                  <div
+                    className={`${isDraggingOver ? 'ondragover' : ''}`}
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    onDragOver={handleDragStart}
+                    onDragLeave={handleDragStop}
+                    onDrop={handleDragStop}
+                  >
+                    <div data-text-editor="name">
+                      <ReactQuill
+                        ref={editorRef}
+                        className={clsx('QuillEditor', className, {
+                          markdownEnabled: isMarkdownEnabled,
+                        })}
+                        placeholder={placeholder}
+                        tabIndex={tabIndex}
+                        theme="snow"
+                        bounds={`[data-text-editor="name"]`}
+                        value={contentDelta}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        onChange={handleChange}
+                        onChangeSelection={(selection: RangeStatic) => {
+                          if (!selection) {
+                            return;
+                          }
+                          lastSelectionRef.current = selection;
+                        }}
+                        formats={isMarkdownEnabled ? [] : undefined}
+                        modules={{
+                          toolbar: {
+                            container: `#${toolbarId}`,
+                            handlers: isMarkdownEnabled
+                              ? markdownToolbarHandlers
+                              : undefined,
+                          },
+                          imageDropAndPaste: {
+                            handler: handleImageDropAndPaste,
+                          },
+                          clipboard: {
+                            matchers: clipboardMatchers,
+                          },
+                          mention,
+                          magicUrl: !isMarkdownEnabled,
+                          keyboard: isMarkdownEnabled
+                            ? markdownKeyboardShortcuts
+                            : undefined,
+                          imageUploader: {
+                            upload: handleImageUploader,
+                          },
+                        }}
+                      />
+                    </div>
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </>
         )}
       </div>
