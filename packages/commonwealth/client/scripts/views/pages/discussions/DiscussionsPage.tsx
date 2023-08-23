@@ -97,6 +97,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 localStorage[`${app.activeChainId()}-discussions-scrollY`] =
                   scrollEle.scrollTop;
               }}
+              onCommentBtnClick={() =>
+                navigate(`${discussionLink}?focusEditor=true`)
+              }
             />
           );
         }}
