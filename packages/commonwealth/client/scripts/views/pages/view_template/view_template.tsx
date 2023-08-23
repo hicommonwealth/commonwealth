@@ -141,8 +141,8 @@ const ViewTemplatePage = () => {
               setFormState((prevState) => {
                 const newState = { ...prevState };
                 const form = {};
-                field.struct.form_fields.forEach((field) => {
-                  form[field.input.field_ref] = null;
+                field.struct.form_fields.forEach((nestField) => {
+                  form[nestField.input.field_ref] = null;
                 });
                 newState[field.struct.field_ref] = form;
                 return newState;
