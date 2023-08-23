@@ -1,11 +1,7 @@
-import { IChainEntityKind } from 'chain-events/src';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import {
-  chainEntityTypeToProposalShortName,
-  getProposalUrlPath,
-} from 'identifiers';
+import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import moment from 'moment';
 import React, { useEffect } from 'react';
@@ -168,9 +164,7 @@ export const ThreadCard = ({
                   <CWTag
                     key={`${link.source}-${link.identifier}`}
                     type="proposal"
-                    label={`${chainEntityTypeToProposalShortName(
-                      'proposal' as IChainEntityKind
-                    )} 
+                    label={`Prop 
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''

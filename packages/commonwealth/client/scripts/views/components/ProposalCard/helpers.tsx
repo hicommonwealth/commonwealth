@@ -7,10 +7,6 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
 import { blocknumToDuration, formatNumberLong } from 'helpers';
-import {
-  chainEntityTypeToProposalShortName,
-  proposalSlugToChainEntityType,
-} from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus } from '../../../models/types';
 import moment from 'moment';
@@ -140,6 +136,4 @@ export const getStatusText = (proposal: AnyProposal) => {
 };
 
 export const getPrimaryTagText = (proposal: AnyProposal) => `
-  ${chainEntityTypeToProposalShortName(
-    proposalSlugToChainEntityType(proposal.slug)
-  )} ${proposal.shortIdentifier}`;
+  Prop ${proposal.shortIdentifier}`;

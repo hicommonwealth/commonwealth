@@ -10,11 +10,8 @@ import {
   getUniqueEntityKey,
   SupportedNetwork,
 } from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types';
-import type { ProposalType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import getFetch from 'helpers/getFetch';
-import { proposalSlugToChainEntityType } from '../../identifiers';
 import ChainEntity from '../../models/ChainEntity';
 import ChainEvent from '../../models/ChainEvent';
 import type ChainInfo from '../../models/ChainInfo';
