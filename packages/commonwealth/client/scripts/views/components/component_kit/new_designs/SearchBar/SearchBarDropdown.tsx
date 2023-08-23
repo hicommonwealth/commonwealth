@@ -73,7 +73,7 @@ export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
     searchTerm.length > 0 && Object.values(searchResults).flat(1).length > 0;
 
   return (
-    <div className="ListBox">
+    <div className="SearchBarDropdown">
       {showResults ? (
         <div className="previews-section">
           {Object.entries(searchResults).map(([scope, results]) => (
