@@ -1,11 +1,6 @@
 import React from 'react';
 
-import {
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-  ProposalType,
-} from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 
 import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
@@ -40,9 +35,8 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
 
   const newTree = currentTree;
 
-  localStorage[
-    `${app.activeChainId()}-governance-toggle-tree`
-  ] = JSON.stringify(newTree);
+  localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
+    JSON.stringify(newTree);
 }
 
 export const GovernanceSection = () => {
@@ -54,8 +48,6 @@ export const GovernanceSection = () => {
     app.chain &&
     (app.chain.base === ChainBase.CosmosSDK ||
       app.chain.network === ChainNetwork.Sputnik ||
-      (app.chain.base === ChainBase.Substrate &&
-        app.chain.network !== ChainNetwork.Plasm) ||
       app.chain.network === ChainNetwork.Compound ||
       app.chain.network === ChainNetwork.Aave ||
       // app.chain.network === ChainNetwork.CommonProtocol ||
@@ -72,31 +64,13 @@ export const GovernanceSection = () => {
     app.chain?.base === ChainBase.Ethereum &&
     !!app.chain?.meta.snapshot?.length;
 
-  const showReferenda =
-    isNotOffchain &&
-    app.chain?.base === ChainBase.Substrate &&
-    app.chain.network !== ChainNetwork.Darwinia &&
-    app.chain.network !== ChainNetwork.HydraDX;
-
   const showProposals =
     (isNotOffchain &&
-      app.chain?.base === ChainBase.Substrate &&
-      app.chain.network !== ChainNetwork.Darwinia) ||
-    (app.chain?.base === ChainBase.CosmosSDK &&
+      app.chain?.base === ChainBase.CosmosSDK &&
       app.chain.network !== ChainNetwork.Terra) ||
     app.chain?.network === ChainNetwork.Sputnik ||
     app.chain?.network === ChainNetwork.Compound ||
     app.chain?.network === ChainNetwork.Aave;
-
-  const showTreasury =
-    isNotOffchain &&
-    app.chain?.base === ChainBase.Substrate &&
-    app.chain.network !== ChainNetwork.Centrifuge;
-
-  const showTips =
-    isNotOffchain &&
-    app.chain?.base === ChainBase.Substrate &&
-    app.chain.network !== ChainNetwork.Centrifuge;
 
   // ---------- Build Toggle Tree ---------- //
   const governanceDefaultToggleTree: ToggleTree = {
@@ -118,26 +92,8 @@ export const GovernanceSection = () => {
           children: {},
         },
       }),
-      ...(showTreasury && {
-        Treasury: {
-          toggledState: false,
-          children: {},
-        },
-      }),
-      ...(showReferenda && {
-        Referenda: {
-          toggledState: false,
-          children: {},
-        },
-      }),
       ...(showProposals && {
         Proposals: {
-          toggledState: false,
-          children: {},
-        },
-      }),
-      ...(showTips && {
-        Tips: {
           toggledState: false,
           children: {},
         },
@@ -147,15 +103,13 @@ export const GovernanceSection = () => {
 
   // Check if an existing toggle tree is stored
   if (!localStorage[`${app.activeChainId()}-governance-toggle-tree`]) {
-    localStorage[
-      `${app.activeChainId()}-governance-toggle-tree`
-    ] = JSON.stringify(governanceDefaultToggleTree);
+    localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
+      JSON.stringify(governanceDefaultToggleTree);
   } else if (
     !verifyCachedToggleTree('governance', governanceDefaultToggleTree)
   ) {
-    localStorage[
-      `${app.activeChainId()}-governance-toggle-tree`
-    ] = JSON.stringify(governanceDefaultToggleTree);
+    localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
+      JSON.stringify(governanceDefaultToggleTree);
   }
 
   const toggleTreeState = JSON.parse(
@@ -168,42 +122,7 @@ export const GovernanceSection = () => {
   );
 
   const matchesProposalRoute = matchRoutes(
-    [
-      { path: '/proposals' },
-      { path: ':scope/proposals' },
-      { path: `/proposal/${ProposalType.SubstrateDemocracyProposal}` },
-      { path: `:scope/proposal/${ProposalType.SubstrateDemocracyProposal}` },
-    ],
-    location
-  );
-
-  const matchesReferendaRoute = matchRoutes(
-    [
-      { path: '/referenda' },
-      { path: ':scope/referenda' },
-      { path: `/proposal/${ProposalType.SubstrateDemocracyReferendum}` },
-      { path: `:scope/proposal/${ProposalType.SubstrateDemocracyReferendum}` },
-    ],
-    location
-  );
-
-  const matchesTreasuryRoute = matchRoutes(
-    [
-      { path: '/treasury' },
-      { path: ':scope/treasury' },
-      { path: `/proposal/${ProposalType.SubstrateTreasuryProposal}` },
-      { path: `:scope/proposal/${ProposalType.SubstrateTreasuryProposal}` },
-    ],
-    location
-  );
-
-  const matchesTipsRoute = matchRoutes(
-    [
-      { path: '/tips' },
-      { path: ':scope/tips' },
-      { path: `/proposal/${ProposalType.SubstrateTreasuryTip}` },
-      { path: `:scope/proposal/${ProposalType.SubstrateTreasuryTip}` },
-    ],
+    [{ path: '/proposals' }, { path: ':scope/proposals' }],
     location
   );
 
@@ -309,73 +228,6 @@ export const GovernanceSection = () => {
     displayData: null,
   };
 
-  // Treasury
-  const treasuryData: SectionGroupAttrs = {
-    title: 'Treasury',
-    containsChildren: false,
-    hasDefaultToggle: showTreasury
-      ? toggleTreeState['children']['Treasury']['toggledState']
-      : false,
-    onClick: (e, toggle: boolean) => {
-      e.preventDefault();
-      handleRedirectClicks(
-        navigate,
-        e,
-        '/treasury',
-        app.activeChainId(),
-        () => {
-          setGovernanceToggleTree('children.Treasury.toggledState', toggle);
-        }
-      );
-    },
-    isVisible: showTreasury,
-    isUpdated: true,
-    isActive: !!matchesTreasuryRoute,
-    displayData: null,
-  };
-
-  const referendaData: SectionGroupAttrs = {
-    title: 'Referenda',
-    containsChildren: false,
-    hasDefaultToggle: showReferenda
-      ? toggleTreeState['children']['Referenda']['toggledState']
-      : false,
-    onClick: (e, toggle: boolean) => {
-      e.preventDefault();
-      handleRedirectClicks(
-        navigate,
-        e,
-        '/referenda',
-        app.activeChainId(),
-        () => {
-          setGovernanceToggleTree('children.Referenda.toggledState', toggle);
-        }
-      );
-    },
-    isVisible: showReferenda,
-    isUpdated: true,
-    isActive: !!matchesReferendaRoute,
-    displayData: null,
-  };
-
-  const tipsData: SectionGroupAttrs = {
-    title: 'Tips',
-    containsChildren: false,
-    hasDefaultToggle: showTips
-      ? toggleTreeState['children']['Tips']['toggledState']
-      : false,
-    onClick: (e, toggle: boolean) => {
-      e.preventDefault();
-      handleRedirectClicks(navigate, e, '/tips', app.activeChainId(), () => {
-        setGovernanceToggleTree('children.Tips.toggledState', toggle);
-      });
-    },
-    isVisible: showTips,
-    isUpdated: true,
-    isActive: !!matchesTipsRoute,
-    displayData: null,
-  };
-
   // Delegate
   const delegateData: SectionGroupAttrs = {
     title: 'Delegate',
@@ -405,10 +257,7 @@ export const GovernanceSection = () => {
     membersData,
     snapshotData,
     delegateData,
-    treasuryData,
-    referendaData,
     proposalsData,
-    tipsData,
   ];
 
   if (!hasProposals) governanceGroupData = [membersData];

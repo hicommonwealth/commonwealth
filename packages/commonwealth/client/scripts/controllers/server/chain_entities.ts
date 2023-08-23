@@ -18,7 +18,6 @@ import type ChainInfo from '../../models/ChainInfo';
 import app from 'state';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
-  if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
   if (c.base === ChainBase.CosmosSDK) return SupportedNetwork.Cosmos;
   if (c.network === ChainNetwork.ERC20) return SupportedNetwork.ERC20;
   if (c.network === ChainNetwork.ERC721) return SupportedNetwork.ERC721;

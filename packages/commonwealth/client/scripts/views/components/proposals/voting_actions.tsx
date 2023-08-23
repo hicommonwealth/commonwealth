@@ -272,7 +272,6 @@ export const VotingActions = (props: VotingActionsProps) => {
     />
   );
 
-  // substrate: multi-deposit approve
   const multiDepositApproveButton = (
     <CWButton
       disabled={!canVote || votingModalOpen}
