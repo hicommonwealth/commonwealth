@@ -20,7 +20,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.accounts = new SubstrateAccounts(this.app);
   }
 
-  public async initApi(additionalOptions?) {
+  public async initApi() {
     if (this.apiInitialized) return;
     await this.accounts.init();
     await super.initApi();

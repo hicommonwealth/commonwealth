@@ -175,7 +175,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public abstract base: ChainBase;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
-  public networkError: string;
 
   public readonly meta: ChainInfo;
   public readonly block: IBlockInfo;
