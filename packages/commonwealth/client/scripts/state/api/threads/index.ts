@@ -10,7 +10,6 @@ import useAddThreadLinksMutation from './addThreadLinks';
 import useDeleteThreadLinksMutation from './deleteThreadLinks';
 import useGetThreadsByIdQuery from './getThreadsById';
 import useGetThreadsByLinkQuery from './getThreadsByLink';
-import useToggleThreadArchiveMutation from './toggleArchive';
 
 export {
   useCreateThreadReactionMutation,
@@ -24,5 +23,4 @@ export {
   useGetThreadsByIdQuery,
   useGetThreadsByLinkQuery,
   useSearchThreadsQuery,
-  useToggleThreadArchiveMutation,
 };
