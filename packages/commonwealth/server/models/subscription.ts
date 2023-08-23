@@ -106,6 +106,8 @@ export default (
         { fields: ['thread_id'] },
       ],
       validate: {
+        // The validation checks defined here are replicated exactly at the database level using CONSTRAINTS
+        // on the Subscriptions table itself. Any update here MUST be made at the database level too.
         validSubscription() {
           switch (this.category_id) {
             case NotificationCategories.ChainEvent:
