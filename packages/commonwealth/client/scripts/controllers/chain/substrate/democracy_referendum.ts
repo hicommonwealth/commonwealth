@@ -22,7 +22,6 @@ import type Substrate from './adapter';
 import type SubstrateDemocracy from './democracy';
 import type SubstrateDemocracyProposal from './democracy_proposal';
 import type SubstrateChain from './shared';
-import type { SubstrateTreasuryProposal } from './treasury_proposal';
 
 export enum DemocracyConviction {
   None = 0,
@@ -308,7 +307,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
   //   this referendum was created approximately when the found proposal concluded.
   public getProposalOrMotion(
     preimage?
-  ): SubstrateDemocracyProposal | SubstrateTreasuryProposal | undefined {
+  ): SubstrateDemocracyProposal | undefined {
     // ensure all modules have loaded
     if (!this._Chain.app.isModuleReady) return;
 
@@ -320,14 +319,6 @@ export class SubstrateDemocracyReferendum extends Proposal<
         return p.hash === this.hash;
       });
     if (democracyProposal) return democracyProposal;
-
-    // search for treasury proposal for approveProposal only (not rejectProposal)
-    if (
-      preimage?.section === 'treasury' &&
-      preimage?.method === 'approveProposal'
-    ) {
-      return chain.treasury?.store.getByIdentifier(preimage.args[0]);
-    }
 
     console.log(
       'could not find matching proposal or motion for referendum: ',

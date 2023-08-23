@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { isNotNil } from 'helpers/typeGuards';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
@@ -92,11 +91,6 @@ export const ProposalCard = ({
         <CWText title={title} fontWeight="semiBold" noWrap>
           {title}
         </CWText>
-        {proposal instanceof SubstrateTreasuryProposal && (
-          <CWText className="proposal-amount-text">
-            {proposal.value?.format(true)}
-          </CWText>
-        )}
         {proposal instanceof SubstrateDemocracyReferendum && (
           <CWText className="proposal-amount-text">{proposal.threshold}</CWText>
         )}

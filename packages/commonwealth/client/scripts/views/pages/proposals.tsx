@@ -34,7 +34,7 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
   if (app.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
-    return [chain.treasury, chain.democracyProposals, chain.democracy];
+    return [chain.democracyProposals, chain.democracy];
   } else if (app.chain.base === ChainBase.CosmosSDK) {
     const chain = app.chain as Cosmos;
     return [chain.governance];

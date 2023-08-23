@@ -58,8 +58,6 @@ const NewContractTemplatePage = lazy(
 );
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
-const TreasuryPage = lazy(() => import('views/pages/treasury'));
-
 const ManageCommunityPage = lazy(
   () => import('views/pages/manage_community/ManageCommunityPage')
 );
@@ -329,15 +327,6 @@ const CommonDomainRoutes = () => [
       ]
     : []),
   // CONTRACTS END
-
-  // TREASURY
-  <Route
-    path="/:scope/treasury"
-    element={withLayout(TreasuryPage, {
-      scoped: true,
-    })}
-  />,
-  // TREASURY END
 
   // SITE ADMIN
   <Route

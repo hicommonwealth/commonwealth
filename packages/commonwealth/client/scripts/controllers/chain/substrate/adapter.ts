@@ -4,7 +4,6 @@ import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateAccounts from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
-import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import type { IApp } from 'state';
 import type ChainInfo from '../../../models/ChainInfo';
 import IChainAdapter from '../../../models/IChainAdapter';
@@ -15,7 +14,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public accounts: SubstrateAccounts;
   public democracyProposals: SubstrateDemocracyProposals;
   public democracy: SubstrateDemocracy;
-  public treasury: SubstrateTreasury;
 
   public readonly base = ChainBase.Substrate;
 
@@ -30,7 +28,6 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     this.accounts = new SubstrateAccounts(this.app);
     this.democracyProposals = new SubstrateDemocracyProposals(this.app);
     this.democracy = new SubstrateDemocracy(this.app);
-    this.treasury = new SubstrateTreasury(this.app);
   }
 
   public async initApi(additionalOptions?) {
@@ -54,7 +51,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
     await super.deinit();
     this.chain.deinitEventLoop();
     await Promise.all(
-      [this.democracyProposals, this.democracy, this.treasury].map((m) =>
+      [this.democracyProposals, this.democracy].map((m) =>
         m.initialized ? m.deinit() : Promise.resolve()
       )
     );

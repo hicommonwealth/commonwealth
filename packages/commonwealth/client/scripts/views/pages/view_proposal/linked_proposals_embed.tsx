@@ -6,7 +6,6 @@ import { ProposalType } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { idToProposal } from 'identifiers';
 
 import 'pages/view_proposal/linked_proposals_embed.scss';
@@ -18,8 +17,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 
 export type LinkedSubstrateProposal =
   | SubstrateDemocracyProposal
-  | SubstrateDemocracyReferendum
-  | SubstrateTreasuryProposal;
+  | SubstrateDemocracyReferendum;
 
 type LinkedProposalsEmbedProps = {
   proposal: LinkedSubstrateProposal;
@@ -122,83 +120,6 @@ export const LinkedProposalsEmbed = (props: LinkedProposalsEmbedProps) => {
               )}
             </>
           )}
-      </div>
-    );
-  } else if (proposal instanceof SubstrateTreasuryProposal) {
-    const democracyProposals = (
-      (app.chain as Substrate).democracyProposals?.store?.getAll() || []
-    ).filter(
-      (p) =>
-        p.preimage?.section === 'treasury' &&
-        (p.preimage?.method === 'approveProposal' ||
-          p.preimage?.method === 'rejectProposal') &&
-        p.preimage?.args[0] === proposal.identifier
-    );
-
-    const referenda = (
-      (app.chain as Substrate).democracy?.store?.getAll() || []
-    ).filter(
-      (r) =>
-        r.preimage?.section === 'treasury' &&
-        (r.preimage?.method === 'approveProposal' ||
-          r.preimage?.method === 'rejectProposal') &&
-        r.preimage?.args[0] === proposal.identifier
-    );
-
-    if (democracyProposals.length === 0 && referenda.length === 0) {
-      return;
-    }
-
-    return (
-      <div className="LinkedProposalsEmbed">
-        {democracyProposals.map((p) => (
-          <>
-            <CWText fontWeight="semiBold">
-              Democracy Proposal ${p.shortIdentifier}
-            </CWText>
-            <CWText>
-              {p.preimage?.method === 'approveProposal' &&
-                'Approves this proposal'}
-              {p.preimage?.method === 'rejectProposal' &&
-                'Rejects this proposal'}
-            </CWText>
-            {app.activeChainId() && (
-              <CWButton
-                buttonType="tertiary-blue"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(
-                    `/proposal/${ProposalType.SubstrateDemocracyProposal}/${p.identifier}`
-                  );
-                }}
-                label="Go to democracy proposal"
-              />
-            )}
-          </>
-        ))}
-        {referenda.map((r) => (
-          <>
-            <CWText fontWeight="semiBold">Referendum {r.identifier}</CWText>
-            <CWText>
-              {r.preimage?.method === 'approveProposal' &&
-                'Approves this proposal'}
-              {r.preimage?.method === 'rejectProposal' &&
-                'Rejects this proposal'}
-            </CWText>
-            {app.activeChainId() && (
-              <CWButton
-                buttonType="tertiary-blue"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(
-                    `/proposal/${ProposalType.SubstrateDemocracyReferendum}/${r.identifier}`
-                  );
-                }}
-                label="Go to referendum"
-              />
-            )}
-          </>
-        ))}
       </div>
     );
   }

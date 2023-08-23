@@ -7,7 +7,6 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 
 import { blocknumToDuration, formatNumberLong } from 'helpers';
 import {
@@ -170,11 +169,6 @@ export const getSecondaryTagText = (proposal: AnyProposal) => {
     return originatingProposalOrMotion instanceof SubstrateDemocracyProposal
       ? `PROP #${originatingProposalOrMotion.identifier}`
       : 'MISSING PROP';
-  } else if (
-    proposal instanceof SubstrateTreasuryProposal &&
-    !proposal.data.index
-  ) {
-    return 'MISSING DATA';
   } else {
     return null;
   }

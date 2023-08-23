@@ -36,7 +36,6 @@ import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 
 type CannotVoteProps = { label: string };
 
@@ -75,8 +74,7 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   if (
     proposal instanceof SubstrateDemocracyProposal ||
-    proposal instanceof SubstrateDemocracyReferendum ||
-    proposal instanceof SubstrateTreasuryProposal
+    proposal instanceof SubstrateDemocracyReferendum
   ) {
     return null;
   }
