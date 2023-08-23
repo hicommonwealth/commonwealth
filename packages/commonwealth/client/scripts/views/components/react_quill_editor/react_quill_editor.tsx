@@ -197,10 +197,19 @@ const ReactQuillEditor = ({
   }, [editorRef]);
 
   useEffect(() => {
-    if (shouldFocus && editorRef && editorRef.current) {
-      editorRef.current.focus();
+    if (shouldFocus) {
+      // Important: We need to initially focus the editor and then focus it again after
+      // a small delay. Some code higher up in the tree will cause the quill
+      // editor to remount/redraw because of some force re-renders use emitters. This causes
+      // the editor to remain focused while losing the text cursor and not being able to type.
+      editorRef && editorRef.current && editorRef.current.focus();
+      setTimeout(
+        () => editorRef && editorRef.current && editorRef.current.focus(),
+        200
+      );
     }
-  }, [shouldFocus]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const showTooltip = isDisabled && isHovering;
 
