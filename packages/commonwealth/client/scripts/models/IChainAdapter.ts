@@ -181,9 +181,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public readonly block: IBlockInfo;
 
   public app: IApp;
-  public version: string;
-  public name: string;
-  public runtimeName: string;
   public gatedTopics: IGatedTopic[];
 
   constructor(meta: ChainInfo, app: IApp) {

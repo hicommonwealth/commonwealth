@@ -1,53 +1,30 @@
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import type Cosmos from 'controllers/chain/cosmos/adapter';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
-import type Substrate from 'controllers/chain/substrate/adapter';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import 'pages/proposals.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { ProposalCard } from 'views/components/ProposalCard';
 import { PageNotFound } from 'views/pages/404';
-import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import type ProposalModule from '../../models/ProposalModule';
 import { CardsCollection } from '../components/cards_collection';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { getStatusText } from '../components/ProposalCard/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
-import {
-  CompoundProposalStats,
-  SubstrateProposalStats,
-} from '../components/proposals/proposals_explainers';
+import { CompoundProposalStats } from '../components/proposals/proposals_explainers';
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
 } from 'state/api/proposals';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getModules(): ProposalModule<any, any, any>[] {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base === ChainBase.CosmosSDK) {
-    const chain = app.chain as Cosmos;
-    return [chain.governance];
-  } else {
-    throw new Error('invalid chain');
-  }
-}
-
 const ProposalsPage = () => {
   const [isLoading, setLoading] = useState(
     !app.chain || !app.chain.loaded || !app.chain.apiInitialized
   );
-  const [isSubstrateLoading, setSubstrateLoading] = useState(false);
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
-  const onSubstrate = app.chain?.base === ChainBase.Substrate;
   const onCompound = app.chain?.network === ChainNetwork.Compound;
   const onAave = app.chain?.network === ChainNetwork.Aave;
   const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
@@ -63,17 +40,6 @@ const ProposalsPage = () => {
       });
     };
   }, [setLoading]);
-
-  useEffect(() => {
-    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
-
-    return () => {
-      app.chainModuleReady.off('ready', () => {
-        setSubstrateLoading(false);
-        app.chainModuleReady.removeAllListeners();
-      });
-    };
-  }, [setSubstrateLoading]);
 
   const {
     data: activeCosmosProposals,
@@ -94,13 +60,6 @@ const ProposalsPage = () => {
     onCosmos && isCosmosCompletedProposalsLoadingRQ;
 
   if (isLoading) {
-    if (
-      app.chain?.base === ChainBase.Substrate &&
-      (app.chain as Substrate).chain?.timedOut
-    ) {
-      return <ErrorPage message="Could not connect to chain" />;
-    }
-
     if (app.chain?.failed) {
       return (
         <PageNotFound
@@ -112,10 +71,6 @@ const ProposalsPage = () => {
 
     return <PageLoading message="Connecting to chain" />;
   }
-
-  const modLoading = loadSubstrateModules('Proposals', getModules);
-
-  if (isSubstrateLoading) return modLoading;
 
   const activeCompoundProposals =
     onCompound &&
