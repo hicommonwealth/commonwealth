@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { useDebounce } from 'usehooks-ts';
 
-import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
+import app from '../state';
 import { useSearchThreadsQuery } from '../state/api/threads';
 import { useSearchCommentsQuery } from '../state/api/comments';
 import { useSearchChainsQuery } from '../state/api/chains';
 import { useSearchProfilesQuery } from '../state/api/profiles';
 import { SearchScope } from '../models/SearchQuery';
-import app from '../state';
+import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 
 const NUM_RESULTS_PER_SECTION = 2;
 
@@ -32,33 +32,33 @@ const useSearchResults = (
 
   const { data: threadsData } = useSearchThreadsQuery({
     ...sharedQueryOptions,
-    enabled: queryEnabled,
+    enabled: queryEnabled && filters.includes('threads'),
   });
 
   const { data: commentsData } = useSearchCommentsQuery({
     ...sharedQueryOptions,
-    enabled: queryEnabled,
+    enabled: queryEnabled && filters.includes('replies'),
   });
 
   const { data: chainsData } = useSearchChainsQuery({
     ...sharedQueryOptions,
-    enabled: queryEnabled,
+    enabled: queryEnabled && filters.includes('communities'),
   });
 
   const { data: profilesData } = useSearchProfilesQuery({
     ...sharedQueryOptions,
     includeRoles: false,
-    enabled: queryEnabled,
+    enabled: queryEnabled && filters.includes('members'),
   });
 
   const searchResults = useMemo(() => {
     return {
-      [SearchScope.Threads]: filters.includes("threads") ? threadsData?.pages?.[0]?.results || [] : [],
-      [SearchScope.Replies]: filters.includes("replies") ? commentsData?.pages?.[0]?.results || [] : [],
-      [SearchScope.Communities]: filters.includes("communities") ? chainsData?.pages?.[0]?.results || [] : [],
-      [SearchScope.Members]: filters.includes("members") ? profilesData?.pages?.[0]?.results || [] : [],
+      [SearchScope.Threads]: threadsData?.pages?.[0]?.results || [],
+      [SearchScope.Replies]: commentsData?.pages?.[0]?.results || [],
+      [SearchScope.Communities]: chainsData?.pages?.[0]?.results || [],
+      [SearchScope.Members]: profilesData?.pages?.[0]?.results || [],
     };
-  }, [threadsData, chainsData, profilesData, commentsData, filters]);
+  }, [threadsData, chainsData, profilesData, commentsData]);
 
   return { searchResults };
 };

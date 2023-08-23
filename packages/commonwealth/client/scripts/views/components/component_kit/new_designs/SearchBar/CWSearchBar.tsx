@@ -2,14 +2,14 @@ import React, { FC, ChangeEvent, useState } from 'react';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import type { NavigateOptions, To } from 'react-router';
 
-import { CWTag } from '../cw_tag';
+import app from '../../../../../state';
 import { ComponentType } from '../../types';
 import { getClasses } from '../../helpers';
 import SearchQuery from '../../../../../models/SearchQuery';
-import app from '../../../../../state';
 import { notifyError } from '../../../../../controllers/app/notifications';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import useSearchResults from '../../../../../hooks/useSearchResults';
+import { CWTag } from '../cw_tag';
 import { SearchBarDropdown } from './SearchBarDropdown';
 
 import './CWSearchBar.scss';
@@ -51,16 +51,12 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const chainId = app.activeChainId() || 'all_chains';
   const chain = app.config.chains.getById(chainId);
   const [searchTerm, setSearchTerm] = useState('');
-  const { searchResults } = useSearchResults(
-    searchTerm,
-    [
-      'threads',
-      'replies',
-      chainId === 'all_chains' ? 'communities' : null,
-      'members',
-    ],
-    3
-  );
+  const { searchResults } = useSearchResults(searchTerm, [
+    'threads',
+    'replies',
+    chainId === 'all_chains' ? 'communities' : null,
+    'members',
+  ]);
 
   const resetSearchBar = () => setSearchTerm('');
 
