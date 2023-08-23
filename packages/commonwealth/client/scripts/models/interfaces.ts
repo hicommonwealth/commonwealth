@@ -49,8 +49,7 @@ export interface IChainModule<C extends Coin, A extends Account> {
 }
 
 // Implemented by a chain's account module. Store for account objects.
-export interface IAccountsModule<C extends Coin, A extends Account>
-  extends StorageModule {
+export interface IAccountsModule<A extends Account> extends StorageModule {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
   get(address: string, keytype?: string, ignoreProfile?: boolean): A;

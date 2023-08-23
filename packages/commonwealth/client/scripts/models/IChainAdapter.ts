@@ -39,7 +39,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   }
 
   public abstract chain: IChainModule<C, A>;
-  public abstract accounts: IAccountsModule<C, A>;
+  public abstract accounts: IAccountsModule<A>;
   public readonly communityBanner?: string;
 
   protected _serverLoaded: boolean;

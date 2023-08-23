@@ -1,7 +1,5 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
-import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import Account from '../../../models/Account';
@@ -32,9 +30,7 @@ export class SubstrateAccount extends Account {
   }
 }
 
-class SubstrateAccounts
-  implements IAccountsModule<SubstrateCoin, SubstrateAccount>
-{
+class SubstrateAccounts implements IAccountsModule<SubstrateAccount> {
   private _initialized = false;
 
   public get initialized() {
