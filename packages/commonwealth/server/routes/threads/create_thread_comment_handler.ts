@@ -62,14 +62,14 @@ export const createThreadCommentHandler = async (
       canvasAction,
       canvasSession,
       canvasHash,
-      discord_meta,
+      discordMeta: discord_meta,
     });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
   }
 
-  controllers.analytics.track(analyticsOptions);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, comment);
 };

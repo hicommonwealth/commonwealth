@@ -1,7 +1,7 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
 import BN from 'bn.js';
 import moment from 'moment';
-import { longify } from '@cosmjs/stargate/build/queries/utils';
+import { longify } from '@cosmjs/stargate/build/queryclient';
 import {
   QueryDepositsResponseSDKType,
   QueryTallyResultResponseSDKType,
@@ -59,7 +59,7 @@ export class CosmosProposalV1 extends Proposal<
   }
 
   public get title(): string {
-    return this.data.title || this._metadata?.title;
+    return this.data.title || this._metadata?.title || '(title unavailable)';
   }
 
   public get description() {
@@ -290,7 +290,7 @@ export class CosmosProposalV1 extends Proposal<
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
-    const cosm = await import('@cosmjs/stargate/build/queries/utils');
+    const cosm = await import('@cosmjs/stargate/build/queryclient');
     const msg: MsgDepositEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
       value: {

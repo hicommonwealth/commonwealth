@@ -6,11 +6,7 @@ export { default as NodeStore } from './NodeStore';
 export { default as NotificationStore } from './NotificationStore';
 export { default as NewProfileStore } from './NewProfileStore';
 export { default as ProposalStore } from './ProposalStore';
-export { default as ReactionStore } from './ReactionStore';
-export { default as ReactionCountsStore } from './ReactionCountsStore';
-export { default as ThreadUniqueAddressesCountStore } from './ThreadUniqueAddressesCountStore';
 export { default as Store } from './Store';
-export { default as RecentListingStore } from './RecentListingStore';
 export { default as PersistentStore } from './PersistentStore';
 
 export { UpdateType } from './interfaces';

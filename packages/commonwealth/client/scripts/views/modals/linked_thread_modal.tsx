@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 
 import 'modals/linked_thread_modal.scss';
 
-import type Thread from '../../models/Thread';
+import { notifyError } from 'controllers/app/notifications';
+import { getAddedAndDeleted } from 'helpers/threads';
+import { LinkSource } from 'models/Thread';
+import app from 'state';
+import {
+  useAddThreadLinksMutation,
+  useDeleteThreadLinksMutation,
+} from 'state/api/threads';
 import { ThreadSelector } from 'views/components/thread_selector';
+import type Thread from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
-import { LinkSource } from 'models/Thread';
-import { getAddedAndDeleted } from 'helpers/threads';
 
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];
@@ -27,6 +31,16 @@ export const LinkedThreadModal = ({
   const [tempLinkedThreads, setTempLinkedThreads] =
     useState<Array<Thread>>(initialLinkedThreads);
 
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+
+  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
       tempLinkedThreads,
@@ -37,7 +51,8 @@ export const LinkedThreadModal = ({
 
     try {
       if (toAdd.length) {
-        const updatedThread = await app.threads.addLinks({
+        const updatedThread = await addThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map((el) => ({
             source: LinkSource.Thread,
@@ -50,7 +65,8 @@ export const LinkedThreadModal = ({
       }
 
       if (toDelete.length) {
-        const updatedThread = await app.threads.deleteLinks({
+        const updatedThread = await deleteThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Thread,
@@ -63,7 +79,7 @@ export const LinkedThreadModal = ({
 
       onModalClose();
 
-      if (links) {
+      if (links && onSave) {
         onSave(links);
       }
     } catch (err) {

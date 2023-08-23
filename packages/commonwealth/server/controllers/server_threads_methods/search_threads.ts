@@ -36,36 +36,6 @@ export async function __searchThreads(
     orderDirection,
   }: SearchThreadsOptions
 ): Promise<SearchThreadsResult> {
-  if (threadTitleOnly) {
-    // TODO: move this into a different route/function?
-    const encodedSearchTerm = encodeURIComponent(searchTerm);
-    const params: any = {
-      title: {
-        [Op.or]: [
-          { [Op.iLike]: `%${encodedSearchTerm}%` },
-          { [Op.iLike]: `%${searchTerm}%` },
-        ],
-      },
-    };
-    if (chain) {
-      params.chain = chain.id;
-    }
-    const threads = await this.models.Thread.findAll({
-      where: params,
-      limit: limit,
-      attributes: {
-        exclude: ['body', 'plaintext', 'version_history'],
-      },
-      include: [
-        {
-          model: this.models.Address,
-          as: 'Address',
-        },
-      ],
-    });
-    return threads;
-  }
-
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {
     limit: limit || 10,
@@ -104,11 +74,17 @@ export async function __searchThreads(
 
   const chainWhere = bind.chain ? '"Threads".chain = $chain AND' : '';
 
+  let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
+  if (!threadTitleOnly) {
+    // for full search, use search column too
+    searchWhere += ` OR query @@ "Threads"._search`;
+  }
+
   const sqlBaseQuery = `
     SELECT
       "Threads".id,
       "Threads".title,
-      "Threads".body,
+      ${threadTitleOnly ? '' : `"Threads".body,`}
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,
@@ -122,7 +98,7 @@ export async function __searchThreads(
     WHERE
       ${chainWhere}
       "Threads".deleted_at IS NULL AND
-      query @@ "Threads"._search
+      ${searchWhere}
     ${paginationSort}
   `;
 
@@ -135,7 +111,7 @@ export async function __searchThreads(
     WHERE
       ${chainWhere}
       "Threads".deleted_at IS NULL AND
-      query @@ "Threads"._search
+      ${searchWhere}
   `;
 
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([

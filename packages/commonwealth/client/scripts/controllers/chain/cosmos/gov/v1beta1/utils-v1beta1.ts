@@ -7,6 +7,7 @@ import {
   ProposalStatus,
   TextProposal,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import moment from 'moment';
 
 import { Any } from 'cosmjs-types/google/protobuf/any';
@@ -14,14 +15,16 @@ import {
   MsgSubmitProposalEncodeObject,
   MsgVoteEncodeObject,
 } from '@cosmjs/stargate';
-import { longify } from '@cosmjs/stargate/build/queries/utils';
+import { longify } from '@cosmjs/stargate/build/queryclient';
 
 import type {
+  CoinObject,
   CosmosProposalState,
-  CosmosToken,
+  CosmosProposalType,
   ICosmosProposal,
   ICosmosProposalTally,
 } from 'controllers/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { CosmosApiType } from '../../chain';
 
 /* -- v1beta1-specific methods: -- */
@@ -90,7 +93,14 @@ const fetchProposalsByStatus = async (
     }
     return proposalsByStatus;
   } catch (e) {
-    console.error(`Error fetching proposals by status ${status}`, e);
+    // Since these are combined requests, we opt to fail silently and
+    // return an empty array instead of throwing an error. This way, we can
+    // still display the proposals that were successfully fetched.
+    // If an error message is preferred, throw here instead of returning [].
+    console.error(
+      `Error fetching proposals by status ${ProposalStatus[status]}`,
+      e
+    );
     return [];
   }
 };
@@ -144,16 +154,37 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
   const status = stateEnumToString(p.status);
   // TODO: support more types
   const { title, description } = TextProposal.decode(content.value);
+  const isCommunitySpend = content.typeUrl?.includes(
+    'CommunityPoolSpendProposal'
+  );
+  let type: CosmosProposalType = 'text';
+  let spendRecipient: string;
+  let spendAmount: CoinObject[];
+  if (isCommunitySpend) {
+    const spend = CommunityPoolSpendProposal.decode(content.value);
+    type = 'communitySpend';
+    spendRecipient = spend.recipient;
+    spendAmount = spend.amount[0]
+      ? [
+          new CosmosToken(
+            spend.amount[0]?.denom?.toUpperCase(),
+            spend.amount[0]?.amount
+          ).toCoinObject(),
+        ]
+      : [];
+  }
   return {
     identifier: p.proposalId.toString(),
-    type: 'text',
+    type,
     title,
     description,
-    submitTime: moment.unix(p.submitTime.valueOf() / 1000),
-    depositEndTime: moment.unix(p.depositEndTime.valueOf() / 1000),
-    votingEndTime: moment.unix(p.votingEndTime.valueOf() / 1000),
-    votingStartTime: moment.unix(p.votingStartTime.valueOf() / 1000),
+    submitTime: moment.unix(p.submitTime.seconds.toNumber()),
+    depositEndTime: moment.unix(p.depositEndTime.seconds.toNumber()),
+    votingEndTime: moment.unix(p.votingEndTime.seconds.toNumber()),
+    votingStartTime: moment.unix(p.votingStartTime.seconds.toNumber()),
     proposer: null,
+    spendRecipient,
+    spendAmount,
     state: {
       identifier: p.proposalId.toString(),
       completed: isCompleted(status),
@@ -211,5 +242,27 @@ export const encodeTextProposal = (title: string, description: string): Any => {
   return Any.fromPartial({
     typeUrl: '/cosmos.gov.v1beta1.TextProposal',
     value: Uint8Array.from(TextProposal.encode(tProp).finish()),
+  });
+};
+
+// TODO: support multiple amount types
+export const encodeCommunitySpend = (
+  title: string,
+  description: string,
+  recipient: string,
+  amount: string,
+  denom: string
+): Any => {
+  const coinAmount = [{ amount, denom }];
+  const spend = CommunityPoolSpendProposal.fromPartial({
+    title,
+    description,
+    recipient,
+    amount: coinAmount,
+  });
+  const prop = CommunityPoolSpendProposal.encode(spend).finish();
+  return Any.fromPartial({
+    typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
+    value: prop,
   });
 };

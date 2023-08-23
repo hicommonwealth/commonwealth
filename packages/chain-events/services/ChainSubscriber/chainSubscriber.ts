@@ -15,14 +15,14 @@ import {
 } from '../ChainEventsConsumer/ChainEventHandlers';
 import {
   CHAIN_EVENT_SERVICE_SECRET,
+  CHAIN_SUBSCRIBER_INDEX,
   CW_DATABASE_URI,
   CW_SERVER_URL,
   NUM_CHAIN_SUBSCRIBERS,
   RABBITMQ_URI,
   REPEAT_TIME,
-  ROLLBAR_SERVER_TOKEN,
-  CHAIN_SUBSCRIBER_INDEX,
   ROLLBAR_ENV,
+  ROLLBAR_SERVER_TOKEN,
 } from '../config';
 
 import {
@@ -32,7 +32,23 @@ import {
 } from './util';
 import type { ChainAttributes, IListenerInstances } from './types';
 import v8 from 'v8';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
 
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  enabled: require.main === module,
+  service: ServiceKey.ChainEventsSubscriber,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 const log = factory.getLogger(formatFilename(__filename));
 
 log.info(
@@ -168,7 +184,9 @@ export async function initSubscriberTools(): Promise<{
   );
 
   const producer = new RabbitMqHandler(
-    <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI),
+    <BrokerConfig>(
+      getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.ChainEventsService)
+    ),
     RascalPublications.ChainEvents
   );
   try {
@@ -292,6 +310,7 @@ export async function runSubscriberAsServer() {
       return await processChains(producer, chains, rollbar);
     };
     setInterval(main, REPEAT_TIME * 60000);
+    isServiceHealthy = true;
   } catch (e) {
     log.error('Fatal error occurred', e);
     rollbar.critical('Fatal error occurred', e);

@@ -240,6 +240,7 @@ const ReactQuillEditor = ({
               handleToggleMarkdown={handleToggleMarkdown}
               setIsPreviewVisible={setIsPreviewVisible}
               isDisabled={isDisabled}
+              isPreviewDisabled={getTextFromDelta(contentDelta).length < 1}
             />
             <DragDropContext onDragEnd={handleDragStop}>
               <Droppable droppableId="quillEditor">
