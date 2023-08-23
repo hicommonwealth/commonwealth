@@ -52,6 +52,7 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+import { LinkedUrlCard } from './linked_url_card';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -549,6 +550,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             allowLinking={isAuthor || isAdminOrMod}
                           />
                         )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(true
+              ? [
+                  {
+                    label: 'Links',
+                    item: (
+                      <div className="cards-column">
+                        <LinkedUrlCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                        />
                       </div>
                     ),
                   },

@@ -144,11 +144,6 @@ export const NewThreadForm = () => {
               isSelected={threadKind === ThreadKind.Discussion}
               onClick={() => setThreadKind(ThreadKind.Discussion)}
             />
-            <CWTab
-              label={capitalize(ThreadKind.Link)}
-              isSelected={threadKind === ThreadKind.Link}
-              onClick={() => setThreadKind(ThreadKind.Link)}
-            />
           </CWTabBar>
         </div>
         <div className="new-thread-body">
