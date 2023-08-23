@@ -229,6 +229,12 @@ const CustomDomainRoutes = () => {
         <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
       }
     />,
+    <Route
+      path="/archived"
+      element={withLayout(DiscussionsPage, {
+        scoped: true,
+      })}
+    />,
     // DISCUSSIONS END
 
     // CONTRACTS

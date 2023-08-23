@@ -36,6 +36,7 @@ interface FetchBulkThreadsProps extends CommonProps {
   stage?: string;
   includePinnedThreads?: boolean;
   orderBy?: 'newest' | 'oldest' | 'mostLikes' | 'mostComments';
+  onArchivePage?: boolean;
 }
 
 interface FetchActiveThreadsProps extends CommonProps {
@@ -129,7 +130,7 @@ const fetchBulkThreads = (props) => {
           orderBy:
             featuredFilterQueryMap[props.orderBy] ||
             featuredFilterQueryMap.newest,
-            ...((props.archivePage) && { archived: true }),
+            ...((props.onArchivePage) && { archived: true }),
         },
       }
     );

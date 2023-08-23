@@ -45,7 +45,7 @@ export const DiscussionSection = () => {
     location
   );
   const matchesArchivedRoute = matchRoutes(
-    [{ path: '/discussions/Archived' }, { path: ':scope/discussions/Archived' }],
+    [{ path: '/archived' }, { path: ':scope/archived' }],
     location
   );
   const matchesDiscussionsTopicRoute = matchRoutes(
@@ -164,7 +164,7 @@ export const DiscussionSection = () => {
         handleRedirectClicks(
           navigate,
           e,
-          `/discussions/Archived`,
+          `/archived`,
           app.activeChainId(),
           () => {
             setDiscussionsToggleTree(`children.Archived.toggledState`, toggle);

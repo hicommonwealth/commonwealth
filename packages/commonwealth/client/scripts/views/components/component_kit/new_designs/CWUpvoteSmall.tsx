@@ -46,7 +46,7 @@ const CWUpvoteSmall = ({
               onMouseLeave={handleInteraction}
             >
               <CWThreadAction
-                action= "upvote"
+                action="upvote"
                 threadArchived={threadArchived}
                 selected={selected}
                 label={String(voteCount)}

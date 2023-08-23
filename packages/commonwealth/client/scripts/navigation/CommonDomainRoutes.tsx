@@ -292,6 +292,12 @@ const CommonDomainRoutes = () => [
         />,
       ]
     : []),
+  <Route
+    path="/:scope/archived"
+    element={withLayout(DiscussionsPage, {
+      scoped: true,
+    })}
+  />,
   // DISCUSSIONS END
 
   // CONTRACTS

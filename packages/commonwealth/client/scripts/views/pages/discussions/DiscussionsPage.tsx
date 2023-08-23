@@ -46,6 +46,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
 
+  const onArchivePage = location.pathname === `/${app.activeChainId()}/archived`;
+
   const { fetchNextPage, data, isInitialLoading } = useFetchThreadsQuery({
     chainId: app.activeChainId(),
     queryType: 'bulk',
@@ -57,7 +59,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     orderBy: featuredFilter,
     toDate: dateCursor.toDate,
     fromDate: dateCursor.fromDate,
-    ...((topicName === 'Archived') && { archivePage: true }),
+    onArchivePage: onArchivePage,
   });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -76,9 +78,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
           if (!includeSpamThreads && thread.markedAsSpamAt) return null;
 
-          if (topicName !== 'Archived' && !includeArchivedThreads && thread.archivedAt !== null) return null;
+          if (!onArchivePage && !includeArchivedThreads && thread.archivedAt !== null) return null;
 
-          if (topicName === 'Archived' && thread.archivedAt === null) return null;
+          if (onArchivePage && thread.archivedAt === null) return null;
 
           const canReact =
             hasJoinedCommunity && !thread.lockedAt && !thread.archivedAt;
@@ -132,7 +134,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 onIncludeSpamThreads={setIncludeSpamThreads}
                 isIncludingArchivedThreads={includeArchivedThreads}
                 onIncludeArchivedThreads={setIncludeArchivedThreads}
-                onArchivePage={topicName === 'Archived'}
+                onArchivePage={onArchivePage}
               />
             );
           },
