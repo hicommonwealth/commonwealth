@@ -34,9 +34,8 @@ test.describe('Discussion Page Tests', () => {
 
     let time = Date.now();
 
-    let textBox = await getQuillTextBox(page);
     let commentText = `test comment made at ${time}`;
-    await textBox.fill(commentText);
+    await fillQuillTextBox(page, commentText);
 
     await page.getByRole('button', { name: 'Submit' }).click();
 
@@ -54,9 +53,8 @@ test.describe('Discussion Page Tests', () => {
 
     time = Date.now();
 
-    textBox = await getQuillTextBox(page);
     commentText = `test comment updated at ${time}`;
-    await textBox.fill(commentText);
+    await fillQuillTextBox(page, commentText);
 
     await page.getByRole('button', { name: 'Save' }).click();
 
@@ -86,13 +84,12 @@ test.describe('Discussion Page Tests', () => {
   });
 });
 
-async function getQuillTextBox(page) {
-  let textBox;
-  do {
-    textBox = await page.locator('.ql-editor');
-  } while (!textBox);
-
-  return textBox;
+async function fillQuillTextBox(page, commentText) {
+  await expect(async () => {
+    const textBox = await page.locator('.ql-editor');
+    await textBox.fill(commentText);
+    await expect(page.locator('.ql-editor')).toHaveText(commentText);
+  }).toPass();
 }
 
 // performs upvote for the specified parent class.

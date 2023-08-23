@@ -20,7 +20,7 @@ import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import type { AnyProposal } from '../../../models/types';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { TipDetail } from '../tip_detail';

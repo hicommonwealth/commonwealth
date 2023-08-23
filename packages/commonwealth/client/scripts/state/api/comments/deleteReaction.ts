@@ -5,11 +5,15 @@ import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteReactionProps {
+  chainId: string;
+  address: string;
   canvasHash: string;
   reactionId: number;
 }
 
 const deleteReaction = async ({
+  chainId,
+  address,
   canvasHash,
   reactionId,
 }: DeleteReactionProps) => {
@@ -20,10 +24,11 @@ const deleteReaction = async ({
   } = await app.sessions.signDeleteCommentReaction({
     comment_id: canvasHash,
   });
-
   return await axios
     .delete(`${app.serverUrl()}/reactions/${reactionId}`, {
       data: {
+        author_chain: chainId,
+        address: address,
         jwt: app.user.jwt,
         canvas_action: action,
         canvas_session: session,
