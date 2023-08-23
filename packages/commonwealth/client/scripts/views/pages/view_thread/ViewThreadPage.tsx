@@ -555,21 +555,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   },
                 ]
               : []),
-            ...(true
-              ? [
-                  {
-                    label: 'Links',
-                    item: (
-                      <div className="cards-column">
-                        <LinkedUrlCard
-                          thread={thread}
-                          allowLinking={isAuthor || isAdminOrMod}
-                        />
-                      </div>
-                    ),
-                  },
-                ]
-              : []),
+            ...[
+              {
+                label: 'Links',
+                item: (
+                  <div className="cards-column">
+                    <LinkedUrlCard
+                      thread={thread}
+                      allowLinking={isAuthor || isAdminOrMod}
+                    />
+                  </div>
+                ),
+              },
+            ],
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
               ? [
                   {

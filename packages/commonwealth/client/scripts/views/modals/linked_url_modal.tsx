@@ -16,6 +16,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { UrlSelector } from '../components/url_link_selector/url_selector';
+import { CWText } from '../components/component_kit/cw_text';
 
 type LinkedUrlModalProps = {
   urlLinks: Link[];
@@ -51,7 +52,6 @@ export const LinkedUrlModal = ({
       initialUrlLinks,
       'identifier'
     );
-
     let links: Thread['links'];
 
     try {
@@ -119,25 +119,52 @@ export const LinkedUrlModal = ({
     setNewUrl('');
   };
 
+  const disableAdd =
+    !newUrl?.startsWith('https://') ||
+    !newUrl.includes('.') ||
+    newTitle == '' ||
+    newTitle == null;
   return (
     <div className="LinkedThreadModal">
       <div className="compact-modal-title">
-        <h3>Add Webpage Links</h3>
+        <h3>Add external links</h3>
         <CWIconButton iconName="close" onClick={onModalClose} />
       </div>
       <div className="compact-modal-body">
         <div className="link-input">
+          <CWText>New link details</CWText>
           <CWTextInput
             placeholder="https://..."
             value={newUrl}
             onInput={(e) => setNewUrl(e.target.value)}
+            inputValidationFn={(e) => {
+              if (!e.startsWith('https://') || !newUrl.includes('.')) {
+                return ['failure', 'Must be a valid link'];
+              } else {
+                return ['success', 'Input validated'];
+              }
+            }}
           />
           <CWTextInput
             placeholder="Title"
             value={newTitle}
             onInput={(e) => setNewTitle(e.target.value)}
           />
-          <CWIconButton iconName="plus" onClick={handleAddThread} />
+          <div
+            style={{
+              display: 'flex',
+              marginLeft: '3px',
+              marginBottom: '15px',
+              marginTop: '5px',
+            }}
+          >
+            <CWText style={{ marginRight: '3px' }}>Add link</CWText>
+            <CWIconButton
+              disabled={disableAdd}
+              iconName="plusCircle"
+              onClick={handleAddThread}
+            />
+          </div>
         </div>
         <UrlSelector urlsToSet={tempLinkedUrls} onSelect={handleSelectThread} />
 
