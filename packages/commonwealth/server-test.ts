@@ -478,6 +478,17 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
   );
 };
 
+export const setupSecretTestEndpoints = (appAttach: Express) => {
+  appAttach.post(
+    '/job/secretEnpoint',
+    passport.authenticate('cwSchedulerStrategy', { session: false }),
+    async function secretMiddleware(req, res) {
+      log.info('/job/secretEnpoint called');
+      return res.json({ status: 'Success' });
+    }
+  );
+};
+
 const banCache = new BanCache(models);
 const globalActivityCache = new GlobalActivityCache(models);
 globalActivityCache.start();
@@ -495,6 +506,7 @@ setupAPI(
 );
 setupCosmosProxy(app, models);
 setupCacheTestEndpoints(app);
+setupSecretTestEndpoints(app);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
