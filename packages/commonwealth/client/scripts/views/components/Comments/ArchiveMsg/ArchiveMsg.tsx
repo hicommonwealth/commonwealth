@@ -2,9 +2,13 @@ import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import moment from 'moment';
 
+type ArchiveMsgProps = {
+  archivedAt: moment.Moment | null;
+}
+
 export const ArchiveMsg = ({
   archivedAt,
-}) => {
+}: ArchiveMsgProps) => {
   return (
     <div className="archive-msg-container">
       <div className="archive-msg">

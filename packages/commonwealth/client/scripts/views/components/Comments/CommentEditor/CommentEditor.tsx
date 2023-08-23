@@ -25,11 +25,12 @@ type CommentEditorProps = {
   userBalance: BN;
   disabled: boolean;
   cancel: (e: any) => void;
+  isAdmin: boolean;
   author: Account;
   editorValue: string;
 };
 
-export const CommentEditor = ({ 
+export const CommentEditor = ({
   parentType,
   canComment,
   handleSubmitComment,
@@ -44,7 +45,7 @@ export const CommentEditor = ({
   isAdmin,
   author,
   editorValue,
-}) => {
+}: CommentEditorProps ) => {
 
   const decimals = getDecimals(app.chain);
 

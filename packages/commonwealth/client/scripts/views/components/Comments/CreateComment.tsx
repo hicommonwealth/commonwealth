@@ -4,7 +4,6 @@ import BN from 'bn.js';
 
 import 'components/Comments/CreateComment.scss';
 import { notifyError } from 'controllers/app/notifications';
-import { weiToTokens, getDecimals } from 'helpers';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
@@ -154,7 +153,7 @@ export const CreateComment = ({
 
   return (
     <>
-      { rootThread.archivedAt === null ? ( 
+      { rootThread.archivedAt === null ? (
         <CommentEditor
           parentType={parentType}
           canComment={canComment}
