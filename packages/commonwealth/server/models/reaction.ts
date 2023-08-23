@@ -3,7 +3,6 @@ import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { ChainAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
-import { StatsDController } from 'common-common/src/statsd';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -64,9 +63,6 @@ export default (
               });
               if (thread) {
                 thread.increment('reaction_count');
-                StatsDController.get().increment('cw.hook.reaction-count', {
-                  thread_id: String(thread_id),
-                });
               }
             }
 
@@ -77,18 +73,12 @@ export default (
               if (comment) {
                 comment.increment('reaction_count');
                 thread_id = Number(comment.get('thread_id'));
-                StatsDController.get().increment('cw.hook.reaction-count', {
-                  thread_id: String(thread_id),
-                });
               }
             }
           } catch (error) {
             log.error(
               `incrementing thread reaction count afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`
             );
-            StatsDController.get().increment('cw.reaction-count-error', {
-              thread_id: String(thread_id),
-            });
           }
         },
         afterDestroy: async (reaction: ReactionInstance) => {
@@ -102,9 +92,6 @@ export default (
               });
               if (thread) {
                 thread.decrement('reaction_count');
-                StatsDController.get().decrement('cw.hook.reaction-count', {
-                  thread_id: String(thread_id),
-                });
               }
             }
 
@@ -115,18 +102,12 @@ export default (
               if (comment) {
                 thread_id = Number(comment.get('thread_id'));
                 comment.decrement('reaction_count');
-                StatsDController.get().decrement('cw.hook.reaction-count', {
-                  thread_id: String(thread_id),
-                });
               }
             }
           } catch (error) {
             log.error(
               `incrementing thread reaction count afterDestroy: thread_id ${thread_id} comment_id ${comment_id} ${error}`
             );
-            StatsDController.get().increment('cw.hook.reaction-count-error', {
-              thread_id: String(thread_id),
-            });
           }
         },
       },

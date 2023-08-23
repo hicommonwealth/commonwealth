@@ -4,7 +4,6 @@ import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { ChainAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
-import { StatsDController } from 'common-common/src/statsd';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -97,15 +96,11 @@ export default (
             });
             if (thread) {
               thread.increment('comment_count');
-              StatsDController.get().increment('cw.hook.comment-count', {
-                thread_id,
-              });
             }
           } catch (error) {
-            log.error(`incrementing comment count error afterCreate: ${error}`);
-            StatsDController.get().increment('cw.hook.comment-count-error', {
-              thread_id,
-            });
+            log.error(
+              `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`
+            );
           }
         },
         afterDestroy: async (comment: CommentInstance) => {
@@ -117,17 +112,11 @@ export default (
             });
             if (thread) {
               thread.decrement('comment_count');
-              StatsDController.get().decrement('cw.hook.comment-count', {
-                thread_id,
-              });
             }
           } catch (error) {
             log.error(
-              `incrementing comment count error afterDestroy: ${error}`
+              `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`
             );
-            StatsDController.get().increment('cw.hook.comment-count-error', {
-              thread_id,
-            });
           }
         },
       },
