@@ -52,7 +52,6 @@ const NewContractTemplatePage = lazy(
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
 
 const TreasuryPage = lazy(() => import('views/pages/treasury'));
-const TipsPage = lazy(() => import('views/pages/tips'));
 
 const ManageCommunityPage = lazy(
   () => import('views/pages/manage_community/ManageCommunityPage')
@@ -272,12 +271,6 @@ const CustomDomainRoutes = () => {
     <Route
       path="/treasury"
       element={withLayout(TreasuryPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
-      path="/tips"
-      element={withLayout(TipsPage, {
         scoped: true,
       })}
     />,

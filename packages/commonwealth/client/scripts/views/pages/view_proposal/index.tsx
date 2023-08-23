@@ -3,7 +3,6 @@ import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import useForceRerender from 'hooks/useForceRerender';
@@ -23,7 +22,6 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
@@ -122,11 +120,6 @@ const ViewProposalPage = ({
       true
     );
     navigate(newPath, { replace: true });
-  }
-
-  // special case loading for tips
-  if (proposal instanceof SubstrateTreasuryTip) {
-    return <TipDetail proposal={proposal} />;
   }
 
   const toggleVotingModal = (newModalState: boolean) => {
