@@ -336,7 +336,9 @@ const updateThreadTopicInAllCaches = (
     if (
       k[2] === cacheTypes.ACTIVE_THREADS ||
       (k[2] === cacheTypes.SINGLE_THREAD &&
-        (k[3] === threadId || (k[3] as number[])?.includes(threadId)))
+        (k[3] === threadId ||
+          ((k[3] as number[])?.length &&
+            (k[3] as number[])?.includes(threadId))))
     ) {
       const existingData: IExistingThreadState = queryClient.getQueryData(k);
       const updatedThreads = [...existingData]; // threads array
