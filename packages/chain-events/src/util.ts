@@ -7,7 +7,6 @@ import type {
   IEventLabel,
 } from './interfaces';
 import { SupportedNetwork } from './interfaces';
-import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
 import {
   Listener as CompoundListener,
   Label as CompoundLabel,
@@ -23,8 +22,6 @@ import { ethers } from 'ethers';
 
 export function Label(chain: string, event: CWEvent): IEventLabel {
   switch (event.network) {
-    case SupportedNetwork.Substrate:
-      return SubstrateLabel(event.blockNumber, chain, event.data);
     case SupportedNetwork.Aave:
       return AaveLabel(event.blockNumber, chain, event.data);
     case SupportedNetwork.Compound:

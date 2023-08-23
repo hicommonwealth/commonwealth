@@ -3,7 +3,6 @@
  */
 import type { ChainEventInstance } from '../services/database/models/chain_event';
 
-import * as SubstrateTypes from './chains/substrate/types';
 import * as CompoundTypes from './chains/compound/types';
 import * as AaveTypes from './chains/aave/types';
 import * as CosmosTypes from './chains/cosmos/types';
@@ -11,21 +10,18 @@ import type { Api as CompoundApi } from './chains/compound/types';
 import type { Api as AaveApi } from './chains/aave/types';
 import type { Listener } from './Listener';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { Interface, LogDescription } from '@ethersproject/abi/src.ts/interface';
+import { Interface } from '@ethersproject/abi/src.ts/interface';
 
 // add other events here as union types
 export type IChainEntityKind =
-  | SubstrateTypes.EntityKind
   | CompoundTypes.EntityKind
   | AaveTypes.EntityKind
   | CosmosTypes.EntityKind;
 export type IChainEventData =
-  | SubstrateTypes.IEventData
   | CompoundTypes.IEventData
   | AaveTypes.IEventData
   | CosmosTypes.IEventData;
 export type IChainEventKind =
-  | SubstrateTypes.EventKind
   | CompoundTypes.EventKind
   | AaveTypes.EventKind
   | CosmosTypes.EventKind;
@@ -39,7 +35,6 @@ export type IAnyListener = Listener<
 >;
 
 export const ChainEventKinds = [
-  ...SubstrateTypes.EventKinds,
   ...CompoundTypes.EventKinds,
   ...AaveTypes.EventKinds,
   ...CosmosTypes.EventKinds,

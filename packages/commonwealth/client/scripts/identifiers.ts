@@ -1,7 +1,7 @@
 import type { IChainEntityKind } from 'chain-events/src';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import type { ProposalStore } from 'stores';
-import { requiresTypeSlug, slugify } from 'utils';
+import { slugify } from 'utils';
 import type ChainInfo from './models/ChainInfo';
 import type NotificationSubscription from './models/NotificationSubscription';
 import type ProposalModule from './models/ProposalModule';
@@ -16,11 +16,8 @@ export const getProposalUrlPath = (
   chainId?: string
 ): string => {
   let basePath: string;
-  const useTypeSlug = requiresTypeSlug(type);
   if (type === ProposalType.Thread) {
     basePath = `/discussion/${id}`;
-  } else if (useTypeSlug) {
-    basePath = `/proposal/${type}/${id}`;
   } else {
     basePath = `/proposal/${id}`;
   }
@@ -60,15 +57,6 @@ export const proposalSlugToClass = () => {
   }
   if (app.chain.base === ChainBase.CosmosSDK) {
     mmap.set(ProposalType.CosmosProposal, (app.chain as any).governance);
-  }
-  if (
-    app.chain.network === ChainNetwork.Kusama ||
-    app.chain.network === ChainNetwork.Polkadot
-  ) {
-    mmap.set(
-      ProposalType.SubstrateTechnicalCommitteeMotion,
-      (app.chain as any).technicalCommittee
-    );
   }
   if (app.chain.network === ChainNetwork.Compound) {
     mmap.set(ProposalType.CompoundProposal, (app.chain as any).governance);
