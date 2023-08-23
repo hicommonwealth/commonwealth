@@ -28,6 +28,7 @@ type CreateCommentProps = {
   parentCommentId?: number;
   rootThread: Thread;
   canComment: boolean;
+  shouldFocusEditor?: boolean;
 };
 
 export const CreateComment = ({
@@ -35,6 +36,7 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   canComment,
+  shouldFocusEditor = false,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -169,6 +171,7 @@ export const CreateComment = ({
           isAdmin={isAdmin}
           author={author}
           editorValue={editorValue}
+          shouldFocus={shouldFocusEditor}
         />
       ): (
             <ArchiveMsg

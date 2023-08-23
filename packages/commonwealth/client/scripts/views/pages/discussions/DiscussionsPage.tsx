@@ -100,6 +100,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 localStorage[`${app.activeChainId()}-discussions-scrollY`] =
                   scrollEle.scrollTop;
               }}
+              onCommentBtnClick={() =>
+                navigate(`${discussionLink}?focusEditor=true`)
+              }
             />
           );
         }}
@@ -108,14 +111,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         components={{
           EmptyPlaceholder: () =>
             isInitialLoading ? (
-              <div className='threads-wrapper'>
-                {Array(3).fill({}).map((x, i) =>
-                  <ThreadCard
-                    key={i}
-                    showSkeleton
-                    thread={{} as any}
-                  />
-                )}
+              <div className="threads-wrapper">
+                {Array(3)
+                  .fill({})
+                  .map((x, i) => (
+                    <ThreadCard key={i} showSkeleton thread={{} as any} />
+                  ))}
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">

@@ -70,7 +70,7 @@ export const ReactionButton = ({
     if (hasReacted) {
       deleteThreadReaction({
         chainId: app.activeChainId(),
-        address: app.user.activeAccount.address,
+        address: app.user.activeAccount?.address,
         threadId: thread.id,
         reactionId: reactedId as number,
       }).catch((e) => {
@@ -103,40 +103,45 @@ export const ReactionButton = ({
           })}
         />
       ) : (
-        <button
-          onClick={handleVoteClick}
-          className={`ThreadReactionButton ${
-            isLoading || isUserForbidden || !!thread.archivedAt ? ' disabled' : ''
-          }${hasReacted ? ' has-reacted' : ''}`}
-        >
-          {reactors.length > 0 ? (
-            <CWTooltip
-              content={getDisplayedReactorsForPopup({
-                reactors,
-              })}
-              renderTrigger={(handleInteraction) => (
-                <div
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                >
-                  <div className="reactions-container">
-                    <CWIcon
-                      iconName="upvote"
-                      iconSize="small"
-                      {...(hasReacted && { weight: 'fill' })}
-                    />
-                    <div
-                      className={`reactions-count ${
-                        hasReacted ? ' has-reacted' : ''
-                      }`}
-                    >
-                      {reactors.length}
-                    </div>
+        reactors.length > 0 ? (
+          <CWTooltip
+          content={getDisplayedReactorsForPopup({
+            reactors,
+          })}
+          renderTrigger={(handleInteraction) => (
+            <button
+              onClick={handleVoteClick}
+              className={`ThreadReactionButton ${isLoading || isUserForbidden || !!thread.archivedAt ? ' disabled' : ''
+                }${hasReacted ? ' has-reacted' : ''}`}
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+            >
+              <div
+              >
+                <div className="reactions-container">
+                  <CWIcon
+                    iconName="upvote"
+                    iconSize="small"
+                    {...(hasReacted && { weight: 'fill' })}
+                  />
+                  <div
+                    className={`reactions-count ${
+                      hasReacted ? ' has-reacted' : ''
+                    }`}
+                  >
+                    {reactors.length}
                   </div>
                 </div>
-              )}
-            />
-          ) : (
+              </div>
+            </button>
+          )}
+        />
+        ) : (
+          <button
+            onClick={handleVoteClick}
+            className={`ThreadReactionButton ${isLoading || isUserForbidden || !!thread.archivedAt ? ' disabled' : ''
+              }${hasReacted ? ' has-reacted' : ''}`}
+          >
             <div className="reactions-container">
               <CWIcon iconName="upvote" iconSize="small" />
               <div
@@ -147,8 +152,8 @@ export const ReactionButton = ({
                 {reactors.length}
               </div>
             </div>
-          )}
-        </button>
+          </button>
+        )
       )}
       <Modal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}

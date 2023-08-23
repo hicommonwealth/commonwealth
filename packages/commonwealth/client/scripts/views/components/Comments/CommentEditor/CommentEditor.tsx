@@ -28,6 +28,7 @@ type CommentEditorProps = {
   isAdmin: boolean;
   author: Account;
   editorValue: string;
+  shouldFocus: boolean;
 };
 
 export const CommentEditor = ({
@@ -45,6 +46,7 @@ export const CommentEditor = ({
   isAdmin,
   author,
   editorValue,
+  shouldFocus,
 }: CommentEditorProps ) => {
 
   const decimals = getDecimals(app.chain);
@@ -72,6 +74,7 @@ export const CommentEditor = ({
         setContentDelta={setContentDelta}
         isDisabled={!canComment}
         tooltipLabel="Join community to comment"
+        shouldFocus={shouldFocus}
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">

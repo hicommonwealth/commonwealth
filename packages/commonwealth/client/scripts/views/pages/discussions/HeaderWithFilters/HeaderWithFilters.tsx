@@ -166,7 +166,11 @@ export const HeaderWithFilters = ({
       )}
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
-          {isUndefined(topic) ? 'All Discussions' : topic}
+          {
+            isUndefined(topic)
+              ? ( onArchivePage ? 'Archived' : 'All Discussions')
+              : topic
+          }
         </CWText>
         <div className="count-and-button">
           <CWText

@@ -4,9 +4,7 @@ import type Thread from '../../models/Thread';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import {
-  useToggleThreadArchiveMutation,
-} from 'state/api/threads';
+import { useEditThreadMutation } from 'state/api/threads';
 
 import {
   notifyError,
@@ -22,16 +20,19 @@ export const ArchiveThreadModal = ({
   onModalClose,
   thread,
 }: ArchiveThreadModalProps) => {
-  const { mutateAsync: toggleArchive } = useToggleThreadArchiveMutation({
+  const { mutateAsync: editThread } = useEditThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
+    currentStage: thread.stage,
+    currentTopicId: thread.topic.id,
   });
 
   const handleArchiveThread = async () => {
-    toggleArchive({
+    editThread({
       threadId: thread.id,
       chainId: app.activeChainId(),
-      isArchived: !!thread.archivedAt,
+      archived: !thread.archivedAt,
+      address: app.user?.activeAccount?.address,
     })
     .then(() => {
       notifySuccess(`Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`);
