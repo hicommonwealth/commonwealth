@@ -10,9 +10,9 @@ import app from '../../../../../state';
 import { notifyError } from '../../../../../controllers/app/notifications';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import useSearchResults from '../../../../../hooks/useSearchResults';
-import { SearchBarDropdown } from './dropdown';
+import { SearchBarDropdown } from './SearchBarDropdown';
 
-import 'components/component_kit/new_designs/CWSearchBar.scss';
+import './CWSearchBar.scss';
 
 type BaseSearchBarProps = {
   placeholder?: string;
@@ -51,12 +51,16 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const chainId = app.activeChainId() || 'all_chains';
   const chain = app.config.chains.getById(chainId);
   const [searchTerm, setSearchTerm] = useState('');
-  const { searchResults } = useSearchResults(searchTerm, [
-    'threads',
-    'replies',
-    chainId === 'all_chains' ? 'communities' : null,
-    'members',
-  ]);
+  const { searchResults } = useSearchResults(
+    searchTerm,
+    [
+      'threads',
+      'replies',
+      chainId === 'all_chains' ? 'communities' : null,
+      'members',
+    ],
+    3
+  );
 
   const resetSearchBar = () => setSearchTerm('');
 

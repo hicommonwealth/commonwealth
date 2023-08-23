@@ -12,7 +12,7 @@ import { CWButton } from './new_designs/cw_button';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWTooltip } from './new_designs/CWTooltip';
-import { CWSearchBar } from './new_designs/search/CWSearchBar';
+import { CWSearchBar } from './new_designs/SearchBar';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -1226,7 +1226,7 @@ export const ComponentShowcase = () => {
       </div>
       <div className="searchbar-gallery">
         <CWText type="h3">SearchBar</CWText>
-        <CWSearchBar placeholder="Search Common" />
+        <CWSearchBar />
       </div>
       <div className="Quill">
         <CWText type="h3">Quill Editor</CWText>
