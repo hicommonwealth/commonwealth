@@ -26,7 +26,6 @@ const NotificationSettingsPage = lazy(
   () => import('views/pages/notification_settings')
 );
 
-const ReferendaPage = lazy(() => import('views/pages/referenda'));
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
@@ -188,12 +187,6 @@ const CommonDomainRoutes = () => [
   // NOTIFICATIONS END
 
   // GOVERNANCE
-  <Route
-    path="/:scope/referenda"
-    element={withLayout(ReferendaPage, {
-      scoped: true,
-    })}
-  />,
   <Route
     path="/:scope/proposals"
     element={withLayout(ProposalsPage, {

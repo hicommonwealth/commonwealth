@@ -23,8 +23,6 @@ import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { AaveViewProposalDetail } from './aave_summary';
-import type { LinkedSubstrateProposal } from './linked_proposals_embed';
-import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
@@ -150,9 +148,6 @@ const ViewProposalPage = ({
       }
       subBody={
         <>
-          <LinkedProposalsEmbed
-            proposal={proposal as LinkedSubstrateProposal}
-          />
           {proposal instanceof AaveProposal && (
             <AaveViewProposalDetail proposal={proposal} />
           )}

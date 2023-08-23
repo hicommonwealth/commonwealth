@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 
 import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { isNotNil } from 'helpers/typeGuards';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
@@ -12,12 +11,7 @@ import { slugify } from 'utils';
 import { CWCard } from '../component_kit/cw_card';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';
-import {
-  getPrimaryTagText,
-  getSecondaryTagText,
-  getStatusClass,
-  getStatusText,
-} from './helpers';
+import { getPrimaryTagText, getStatusClass, getStatusText } from './helpers';
 import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useProposalMetadata } from 'hooks/cosmos/useProposalMetadata';
@@ -36,8 +30,6 @@ export const ProposalCard = ({
   const [title, setTitle] = useState(proposal.title);
   const { metadata } = useProposalMetadata({ app, proposal });
   const forceRerender = useForceRerender();
-
-  const secondaryTagText = getSecondaryTagText(proposal);
 
   useEffect(() => {
     if (metadata?.title) setTitle(metadata?.title);
@@ -84,16 +76,10 @@ export const ProposalCard = ({
       <div className="proposal-card-metadata">
         <div className="tag-row">
           <ProposalTag label={getPrimaryTagText(proposal)} />
-          {isNotNil(secondaryTagText) && (
-            <ProposalTag label={secondaryTagText} />
-          )}
         </div>
         <CWText title={title} fontWeight="semiBold" noWrap>
           {title}
         </CWText>
-        {proposal instanceof SubstrateDemocracyReferendum && (
-          <CWText className="proposal-amount-text">{proposal.threshold}</CWText>
-        )}
         {proposal instanceof AaveProposal &&
           proposal.ipfsData?.shortDescription && (
             <CWText type="caption">

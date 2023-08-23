@@ -32,10 +32,7 @@ function getModules(): ProposalModule<any, any, any>[] {
   if (!app || !app.chain || !app.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base === ChainBase.Substrate) {
-    const chain = app.chain as Substrate;
-    return [chain.democracyProposals, chain.democracy];
-  } else if (app.chain.base === ChainBase.CosmosSDK) {
+  if (app.chain.base === ChainBase.CosmosSDK) {
     const chain = app.chain as Cosmos;
     return [chain.governance];
   } else {
@@ -120,13 +117,6 @@ const ProposalsPage = () => {
 
   if (isSubstrateLoading) return modLoading;
 
-  // active proposals
-  const activeDemocracyProposals =
-    onSubstrate &&
-    (app.chain as Substrate).democracyProposals.store
-      .getAll()
-      .filter((p) => !p.completed);
-
   const activeCompoundProposals =
     onCompound &&
     (app.chain as Compound).governance.store
@@ -147,10 +137,10 @@ const ProposalsPage = () => {
       .getAll()
       .filter((p) => !p.completed)
       .sort((p1, p2) => p2.data.id - p1.data.id);
+
   const activeProposalContent = isLoadingCosmosActiveProposals ? (
     <CWSpinner />
-  ) : !activeDemocracyProposals?.length &&
-    !activeCosmosProposals?.length &&
+  ) : !activeCosmosProposals?.length &&
     !activeCompoundProposals?.length &&
     !activeAaveProposals?.length &&
     !activeSputnikProposals?.length ? (
@@ -160,13 +150,10 @@ const ProposalsPage = () => {
       </div>,
     ]
   ) : (
-    (activeDemocracyProposals || [])
-      .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
-      .concat(
-        (activeCosmosProposals || []).map((proposal) => (
-          <ProposalCard key={proposal.identifier} proposal={proposal} />
-        ))
-      )
+    (activeCosmosProposals || [])
+      .map((proposal) => (
+        <ProposalCard key={proposal.identifier} proposal={proposal} />
+      ))
       .concat(
         (activeCompoundProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
@@ -192,13 +179,6 @@ const ProposalsPage = () => {
         ))
       )
   );
-
-  // inactive proposals
-  const inactiveDemocracyProposals =
-    onSubstrate &&
-    (app.chain as Substrate).democracyProposals.store
-      .getAll()
-      .filter((p) => p.completed);
 
   // lazy-loaded in useGetCompletedProposals
   const inactiveCosmosProposals = onCosmos && completedCosmosProposals;
@@ -226,8 +206,7 @@ const ProposalsPage = () => {
 
   const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
     <CWSpinner />
-  ) : !inactiveDemocracyProposals?.length &&
-    !inactiveCosmosProposals?.length &&
+  ) : !inactiveCosmosProposals?.length &&
     !inactiveCompoundProposals?.length &&
     !inactiveAaveProposals?.length &&
     !inactiveSputnikProposals?.length ? (
@@ -236,16 +215,12 @@ const ProposalsPage = () => {
         No past proposals
       </div>,
     ]
+  ) : inactiveCosmosProposals?.length || [] ? (
+    inactiveCosmosProposals.map((proposal) => (
+      <ProposalCard key={proposal.identifier} proposal={proposal} />
+    ))
   ) : (
-    (inactiveDemocracyProposals || [])
-      .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
-      .concat(
-        inactiveCosmosProposals?.length
-          ? inactiveCosmosProposals.map((proposal) => (
-              <ProposalCard key={proposal.identifier} proposal={proposal} />
-            ))
-          : []
-      )
+    []
       .concat(
         (inactiveCompoundProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
@@ -274,13 +249,6 @@ const ProposalsPage = () => {
 
   return (
     <div className="ProposalsPage">
-      {onSubstrate && (
-        <SubstrateProposalStats
-          nextLaunchBlock={
-            (app.chain as Substrate).democracyProposals.nextLaunchBlock
-          }
-        />
-      )}
       {onCompound && <CompoundProposalStats chain={app.chain as Compound} />}
       <CardsCollection content={activeProposalContent} header="Active" />
       <CardsCollection content={inactiveProposalContent} header="Inactive" />
