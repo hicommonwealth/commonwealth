@@ -102,12 +102,21 @@ class NotificationsController {
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
-      const requestData = Object.fromEntries(
-        Object.entries(data.options).map(([k, v]) => [
-          k.replace(/([A-Z])/g, '_$1').toLowerCase(),
-          v,
-        ])
-      );
+      let untypedData: {
+        categoryId: NotificationCategories;
+        options?: {
+          chainId?: string;
+          threadId?: number;
+          commentId?: number;
+          snapshotId?: string;
+        };
+      } = data;
+      const requestData = {
+        chain_id: untypedData.options?.chainId,
+        thread_id: untypedData.options?.threadId,
+        comment_id: untypedData.options?.commentId,
+        snapshot_id: untypedData.options?.snapshotId,
+      };
 
       return post(
         '/createSubscription',
