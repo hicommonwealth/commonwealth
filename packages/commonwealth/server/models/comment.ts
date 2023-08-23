@@ -4,6 +4,10 @@ import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { ChainAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
+import { StatsDController } from 'common-common/src/statsd';
+
+import { factory, formatFilename } from 'common-common/src/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 export type CommentAttributes = {
   thread_id: string;
@@ -86,20 +90,44 @@ export default (
       hooks: {
         afterCreate: async (comment: CommentInstance) => {
           const { Thread } = sequelize.models;
-          const thread = await Thread.findOne({
-            where: { id: comment.thread_id },
-          });
-          if (thread) {
-            thread.increment('comment_count');
+          const thread_id = comment.thread_id;
+          try {
+            const thread = await Thread.findOne({
+              where: { id: thread_id },
+            });
+            if (thread) {
+              thread.increment('comment_count');
+              StatsDController.get().increment('cw.hook.comment-count', {
+                thread_id,
+              });
+            }
+          } catch (error) {
+            log.error(`incrementing comment count error afterCreate: ${error}`);
+            StatsDController.get().increment('cw.hook.comment-count-error', {
+              thread_id,
+            });
           }
         },
         afterDestroy: async (comment: CommentInstance) => {
-          const { Thread, Address } = sequelize.models;
-          const thread = await Thread.findOne({
-            where: { id: comment.thread_id },
-          });
-          if (thread) {
-            thread.decrement('comment_count');
+          const { Thread } = sequelize.models;
+          const thread_id = comment.thread_id;
+          try {
+            const thread = await Thread.findOne({
+              where: { id: thread_id },
+            });
+            if (thread) {
+              thread.decrement('comment_count');
+              StatsDController.get().decrement('cw.hook.comment-count', {
+                thread_id,
+              });
+            }
+          } catch (error) {
+            log.error(
+              `incrementing comment count error afterDestroy: ${error}`
+            );
+            StatsDController.get().increment('cw.hook.comment-count-error', {
+              thread_id,
+            });
           }
         },
       },
