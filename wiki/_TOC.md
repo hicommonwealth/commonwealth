@@ -48,7 +48,6 @@
   - [Request Handler Optimization](Request-Handler-Optimization.md)
 - [Observability](Observability.md)
 
-
 **Chain Events**
 - [Overview](Chain-Events-Overview.md)
 - [Environment Variables](Chain-Events-Environment-Variables.md)
