@@ -1,3 +1,5 @@
+_Authored by Mark Hedelberg 230727._
+
 To develop and test new features for different chains, we use containerized testnet deployments (AKA devnets).
 
 ## Cosmos SDK
