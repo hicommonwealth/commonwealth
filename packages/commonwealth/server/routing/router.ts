@@ -185,7 +185,6 @@ import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { searchChainsHandler } from '../routes/chains/search_chains_handler';
-import recomputeCounts from '../routes/recomputeCounts';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -1365,14 +1364,6 @@ function setupRouter(
     'post',
     '/getSubscribedChains',
     getSubscribedChains.bind(this, models)
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/recomputeCounts',
-    passport.authenticate('jwt', { session: false }),
-    recomputeCounts.bind(this, models)
   );
 
   app.use(endpoint, router);
