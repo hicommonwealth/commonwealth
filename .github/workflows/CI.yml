@@ -17,7 +17,7 @@ jobs:
         node: [ 18 ]
     name: Commonwealth E2E Test
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 10
 
     services:
       postgres:
