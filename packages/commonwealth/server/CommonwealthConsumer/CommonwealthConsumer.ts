@@ -14,6 +14,14 @@ import { processChainEventNotificationsCUD } from './messageProcessors/chainEven
 import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';
 import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
+// CommonwealthConsumer is a server that consumes (and processes) RabbitMQ messages
+// from external apps or services (like the Snapshot Service). It exists because we
+// don't want to modify the Commonwealth database directly from external apps/services.
+// You would use the script if you are starting an external service that transmits messages
+// to the CommonwealthConsumer and you want to ensure that the CommonwealthConsumer is
+// properly handling/processing those messages. Using the script is rarely necessary in
+// local development.
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {

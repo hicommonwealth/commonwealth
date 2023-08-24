@@ -38,6 +38,7 @@ type ReactQuillEditorProps = {
   setContentDelta: (d: SerializableDeltaStatic) => void;
   isDisabled?: boolean;
   tooltipLabel?: string;
+  shouldFocus?: boolean;
 };
 
 // ReactQuillEditor is a custom wrapper for the react-quill component
@@ -49,6 +50,7 @@ const ReactQuillEditor = ({
   setContentDelta,
   isDisabled = false,
   tooltipLabel = 'Join community',
+  shouldFocus = false,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -199,6 +201,21 @@ const ReactQuillEditor = ({
   const handleDragStart = () => setIsDraggingOver(true);
 
   const handleDragStop = () => setIsDraggingOver(false);
+
+  useEffect(() => {
+    if (shouldFocus) {
+      // Important: We need to initially focus the editor and then focus it again after
+      // a small delay. Some code higher up in the tree will cause the quill
+      // editor to remount/redraw because of some force re-renders use emitters. This causes
+      // the editor to remain focused while losing the text cursor and not being able to type.
+      editorRef && editorRef.current && editorRef.current.focus();
+      setTimeout(
+        () => editorRef && editorRef.current && editorRef.current.focus(),
+        200
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const showTooltip = isDisabled && isHovering;
 
