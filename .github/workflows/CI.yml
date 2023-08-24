@@ -303,7 +303,7 @@ jobs:
         ports:
          - 3000:3000
       cosmos_test_app:
-        image: irowan/heroku-csdk
+        image: mhagel1/csdk-v1
         ports:
          - 5050:5050
       cosmos_beta_test_app:

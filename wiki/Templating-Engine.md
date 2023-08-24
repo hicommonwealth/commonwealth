@@ -1,7 +1,5 @@
 # This is the main documentation page for Templating Engine module. 
 
-
-
   - [Proposal Templates](proposal-templates)
   - [Template API Routes](template-oas)
   - [Templating JSON Schema - HEAD](template-schema)
