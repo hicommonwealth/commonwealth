@@ -1,13 +1,13 @@
 import React, { FC } from 'react';
 import { CheckCircle, Warning } from '@phosphor-icons/react';
 
-import 'components/component_kit/new_designs/CWTextInput.scss';
 import { CWLabel } from '../cw_label';
 import { CWText } from '../cw_text';
 import type { ValidationStatus } from '../cw_validation_text';
 import { getClasses } from '../helpers';
-
 import { ComponentType } from '../types';
+
+import 'components/component_kit/new_designs/CWTextInput.scss';
 
 type TextInputSize = 'small' | 'large';
 
@@ -49,7 +49,6 @@ type InputStyleProps = {
 type InputInternalStyleProps = {
   hasLeftIcon?: boolean;
   hasRightIcon?: boolean;
-  isTyping?: boolean;
 };
 
 type TextInputProps = BaseTextInputProps &
@@ -101,7 +100,6 @@ export const useTextInputWithValidation = () => {
   const [inputTimeout, setInputTimeout] = React.useState<
     NodeJS.Timeout | undefined
   >();
-  const [isTyping, setIsTyping] = React.useState<boolean>(false);
   const [statusMessage, setStatusMessage] = React.useState<
     string | undefined
   >();
@@ -112,8 +110,6 @@ export const useTextInputWithValidation = () => {
   return {
     inputTimeout,
     setInputTimeout,
-    isTyping,
-    setIsTyping,
     statusMessage,
     setStatusMessage,
     validationStatus,
@@ -191,7 +187,6 @@ export const CWTextInput = (props: TextInputProps) => {
             validationStatus: validationProps.validationStatus,
             disabled,
             displayOnly,
-            isTyping: validationProps.isTyping,
             hasLeftIcon: !!iconLeft,
             hasRightIcon: !!iconRight,
             darkMode,
@@ -206,17 +201,14 @@ export const CWTextInput = (props: TextInputProps) => {
             if (onInput) onInput(e);
 
             if (e.currentTarget.value?.length === 0) {
-              validationProps.setIsTyping(false);
               validationProps.setValidationStatus(undefined);
               validationProps.setStatusMessage(undefined);
             } else {
               e.stopPropagation();
-              validationProps.setIsTyping(true);
               clearTimeout(validationProps.inputTimeout);
               const timeout = e.currentTarget.value?.length > 3 ? 250 : 1000;
               validationProps.setInputTimeout(
                 setTimeout(() => {
-                  validationProps.setIsTyping(false);
                   if (inputValidationFn && e.currentTarget.value?.length > 3) {
                     const result = inputValidationFn(e.currentTarget.value);
                     validationProps.setValidationStatus(result[0]);
@@ -229,7 +221,6 @@ export const CWTextInput = (props: TextInputProps) => {
           onBlur={(e) => {
             if (inputValidationFn) {
               if (e.target.value?.length === 0) {
-                validationProps.setIsTyping(false);
                 validationProps.setValidationStatus(undefined);
                 validationProps.setStatusMessage(undefined);
               } else {
