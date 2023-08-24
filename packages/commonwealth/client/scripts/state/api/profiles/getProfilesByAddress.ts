@@ -12,6 +12,11 @@ interface FetchProfilesByAddressProps {
   profileAddresses: string[];
 }
 
+// "profileId": 98000,
+// "name": "Marcc",
+// "address": "0x067a7910789f214A13E195a025F881E9B59C4D76",
+// "lastActive": "2023-06-20T15:29:49.887Z",
+// "avatarUrl": null
 const fetchProfilesByAddress = async ({
   currentChainId,
   profileAddresses,
@@ -40,11 +45,15 @@ const fetchProfilesByAddress = async ({
   });
 };
 
+interface UseFetchProfilesByAddressQuery extends FetchProfilesByAddressProps {
+  apiEnabled?: boolean;
+}
 const useFetchProfilesByAddressQuery = ({
   currentChainId,
   profileChainIds,
   profileAddresses,
-}: FetchProfilesByAddressProps) => {
+  apiEnabled = true,
+}: UseFetchProfilesByAddressQuery) => {
   return useQuery({
     queryKey: [
       ApiEndpoints.FETCH_PROFILES,
@@ -59,6 +68,7 @@ const useFetchProfilesByAddressQuery = ({
         profileChainIds,
       }),
     staleTime: PROFILES_STALE_TIME,
+    enabled: apiEnabled,
   });
 };
 

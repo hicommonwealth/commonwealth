@@ -44,6 +44,7 @@ export const User = ({
     currentChainId: app.activeChainId(),
     profileAddresses: [userAddress],
     profileChainIds: [userChainId],
+    apiEnabled: !!(userAddress && userChainId),
   });
 
   const profile = users?.[0] || {};
