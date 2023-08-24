@@ -1,4 +1,4 @@
-import models from '../server/database';
+import models from '../../server/database';
 
 export async function recomputeCounts() {
   return models.sequelize.transaction(async (t) => {
