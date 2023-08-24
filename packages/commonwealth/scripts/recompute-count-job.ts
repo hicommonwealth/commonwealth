@@ -1,10 +1,10 @@
-import type { DB } from '../models';
+import models from '../server/database';
 
-export async function recomputeCounts(queryInterface: DB) {
-  return queryInterface.sequelize.transaction(async (t) => {
+export async function recomputeCounts() {
+  return models.sequelize.transaction(async (t) => {
     console.log('Add comment reaction count');
     console.time('Add comment reaction count');
-    await queryInterface.sequelize.query(
+    await models.sequelize.query(
       ` -- SELECT DISTINCT reaction FROM "Reactions" 
       ;with reactionCntByComment AS (
         SELECT SUM(CASE WHEN reaction='like' THEN 1 ELSE -1 END) as cnt, comment_id
@@ -24,7 +24,7 @@ export async function recomputeCounts(queryInterface: DB) {
     // TODO: add comments reaction
     console.log('Add thread reaction count');
     console.time('Add thread reaction count');
-    await queryInterface.sequelize.query(
+    await models.sequelize.query(
       `
       ;with reactionCntByThread AS (
         SELECT SUM(CASE WHEN reaction='like' THEN 1 ELSE -1 END) as cnt, r.thread_id
@@ -43,7 +43,7 @@ export async function recomputeCounts(queryInterface: DB) {
 
     console.log('Add thread comment count');
     console.time('Add thread comment count');
-    await queryInterface.sequelize.query(
+    await models.sequelize.query(
       `
       ;with commentCntByThread AS (
         SELECT count(id) as cnt,thread_id
@@ -63,7 +63,7 @@ export async function recomputeCounts(queryInterface: DB) {
 
     console.log('Add thread max notification id');
     console.time('Add thread max notification id');
-    await queryInterface.sequelize.query(
+    await models.sequelize.query(
       `
       ;with maxNotificationIdByThread AS (
         SELECT max(id) as max_id,thread_id
@@ -83,3 +83,13 @@ export async function recomputeCounts(queryInterface: DB) {
     console.timeEnd('Add thread max notification id');
   });
 }
+
+recomputeCounts()
+  .then(() => {
+    console.log('done');
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.log(err);
+    process.exit(1);
+  });

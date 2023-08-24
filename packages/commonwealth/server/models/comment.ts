@@ -9,6 +9,9 @@ import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
+import { factory, formatFilename } from 'common-common/src/logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export type CommentAttributes = {
   thread_id: string;
   address_id: number;
