@@ -47,11 +47,25 @@ module.exports = {
         { transaction }
       );
 
+      const namespaces = await queryInterface.sequelize.query(
+        `
+        SELECT nspname as schema
+        FROM pg_extension e
+                 JOIN pg_namespace n ON n.oid = e.extnamespace
+        WHERE extname = 'dblink';
+      `,
+        { transaction, raw: true, type: 'SELECT' }
+      );
+
+      if (namespaces.length === 0) {
+        throw new Error('dblink extension not installed');
+      }
+
       await queryInterface.sequelize.query(
         `
         CREATE TEMPORARY TABLE merged_entity_link AS
         WITH chain_entities AS MATERIALIZED (SELECT id AS entity_id, type, type_id, chain
-                                             FROM heroku_ext.dblink(
+                                             FROM ${namespaces[0].schema}.dblink(
                                                           '${ceUrl}',
                                                           'SELECT id, type, type_id, chain FROM "ChainEntities";'
                                                       ) AS type_ids(id integer, type varchar(255), type_id varchar(255), chain varchar(255)))
