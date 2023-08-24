@@ -495,7 +495,6 @@ setupAPI(
 );
 setupCosmosProxy(app, models);
 setupCacheTestEndpoints(app);
-setupSecretTestEndpoints(app);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,

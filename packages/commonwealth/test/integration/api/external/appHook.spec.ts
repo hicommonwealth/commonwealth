@@ -137,17 +137,3 @@ export async function del(
 
   return JSON.parse(res.text);
 }
-
-export async function postBearer(
-  path: string,
-  val: Record<string, unknown> = null,
-  expectedApp = app,
-  token = ''
-) {
-  return chai
-    .request(expectedApp)
-    .post(path)
-    .set('Accept', 'application/json')
-    .set('Authorization', `Bearer ${token}`)
-    .send(val);
-}

@@ -1370,8 +1370,8 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/job/recomputeCounts',
-    passport.authenticate('cwSchedulerStrategy', { session: false }),
+    '/recomputeCounts',
+    passport.authenticate('jwt', { session: false }),
     recomputeCounts.bind(this, models)
   );
 
