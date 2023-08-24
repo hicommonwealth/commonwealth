@@ -14,6 +14,7 @@ export const ApiEndpoints = {
   BULK_TOPICS: '/bulkTopics',
   FETCH_COMMENTS: '/viewComments',
   FETCH_THREADS: '/threads',
+  FETCH_PROFILES: '/getAddressProfile',
   DISCORD_CHANNELS: '/getDiscordChannels',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
