@@ -1,6 +1,6 @@
 import { notifyError, notifyInfo } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
 import {
@@ -38,6 +38,7 @@ import { CWText } from '../components/component_kit/cw_text';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
+  const [showSidebar, setShowSidebar] = useState(true);
 
   useEffect(() => {
     if (!app.isLoggedIn()) {
@@ -256,7 +257,7 @@ const NewThreadPage = () => {
                     buttonType="mini-black"
                     label="Add Action"
                     onClick={(e) => {
-                      e.preventDefault();
+                      setShowSidebar(true);
                     }}
                   />
                 </div>
@@ -265,8 +266,12 @@ const NewThreadPage = () => {
           ),
         },
       ]}
-      showSidebar={true}
-      showRightSidebar
+      showSidebar
+      showRightSidebar={showSidebar}
+      lowPadding
+      onCloseRightSidebar={() => {
+        setShowSidebar(false);
+      }}
     ></CWContentPage>
   );
 };

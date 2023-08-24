@@ -76,6 +76,7 @@ type ContentPageProps = {
   showRightSidebar?: boolean;
   rightSidebarContent?: ContentPageSidebarItem[];
   onCloseRightSidebar?: () => void;
+  lowPadding?: boolean;
 };
 
 export const CWContentPage = ({
@@ -115,6 +116,7 @@ export const CWContentPage = ({
   showHeader = true,
   showRightSidebar = false,
   onCloseRightSidebar,
+  lowPadding = false,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -227,7 +229,11 @@ export const CWContentPage = ({
 
   return (
     <div className="ContentPageContainer">
-      <div className={ComponentType.ContentPage}>
+      <div
+        className={`${ComponentType.ContentPage}${
+          lowPadding ? ' LowPadding' : ''
+        }`}
+      >
         {!showTabs ? (
           <div className="sidebar-view">
             {mainBody}
@@ -273,9 +279,6 @@ export const CWContentPage = ({
           </div>
         )}
       </div>
-      <div
-        style={{ width: '50px', height: '100vh', backgroundColor: 'red' }}
-      ></div>
       {showRightSidebar && (
         <div className="RightSidebar">
           <div className="CloseButtonContainer">

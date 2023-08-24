@@ -4,7 +4,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 24px;
+  // padding: 24px;
   width: 100%;
 
   &.isModal {
@@ -12,7 +12,7 @@
   }
 
   @include mediumSmallInclusive {
-    width: 100%;
+    // width: 100%;
   }
 
   .new-thread-header {
@@ -28,14 +28,14 @@
     width: 100%;
 
     @include smallInclusive {
-      flex-direction: column;
+      // flex-direction: column;
     }
 
     .new-thread-form-inputs {
       display: flex;
       flex-direction: column;
       gap: 16px;
-      width: 768px;
+      width: 100%;
 
       @include mediumInclusive {
         width: 100%;

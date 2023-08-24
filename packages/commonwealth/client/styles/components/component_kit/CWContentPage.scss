@@ -51,6 +51,11 @@
   display: flex;
   flex: 1;
 
+  &.LowPadding {
+    padding: 56px;
+    padding-right: 0px;
+  }
+
   @include contentPadding;
 
   .sidebar-view {
