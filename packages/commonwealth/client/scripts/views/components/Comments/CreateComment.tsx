@@ -26,6 +26,9 @@ import { useCreateCommentMutation } from 'state/api/comments';
 import Permissions from '../../../utils/Permissions';
 import clsx from 'clsx';
 import { getTokenBalance } from 'helpers/token_balance_helper';
+import { SessionKeyError } from 'controllers/server/sessions';
+import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import { Modal } from 'views/components/component_kit/cw_modal';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -84,7 +87,11 @@ export const CreateComment = ({
     }
   }, [tokenPostingThreshold]);
 
-  const { mutateAsync: createComment } = useCreateCommentMutation({
+  const {
+    mutateAsync: createComment,
+    error: createCommentError,
+    reset: resetCreateCommentMutation,
+  } = useCreateCommentMutation({
     threadId: rootThread.id,
     chainId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -119,9 +126,13 @@ export const CreateComment = ({
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
     } catch (err) {
-      const errMsg = err?.responseJSON?.error || 'Failed to create comment';
-      if (errMsg === 'Login canceled') return;
-      notifyError(errMsg);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      const errMsg = err?.responseJSON?.error || err?.message;
+      console.error(errMsg);
+
+      notifyError('Failed to create comment');
       setErrorMsg(errMsg);
     } finally {
       setSendingComment(false);
@@ -156,56 +167,73 @@ export const CreateComment = ({
     saveDraft(contentDelta);
   }, [handleIsReplying, saveDraft, contentDelta]);
 
+  const sessionKeyValidationError =
+    createCommentError instanceof SessionKeyError && createCommentError;
+
   return (
-    <div className="CreateComment">
-      <div className="attribution-row">
-        <div className="attribution-left-content">
-          <CWText type="caption">
-            {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
-          </CWText>
-          <CWText
-            type="caption"
-            fontWeight="medium"
-            className={clsx('user-link-text', { disabled: !canComment })}
-          >
-            <User user={app.user.activeAccount} hideAvatar linkify />
-          </CWText>
+    <>
+      <div className="CreateComment">
+        <div className="attribution-row">
+          <div className="attribution-left-content">
+            <CWText type="caption">
+              {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
+            </CWText>
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className={clsx('user-link-text', { disabled: !canComment })}
+            >
+              <User user={app.user.activeAccount} hideAvatar linkify />
+            </CWText>
+          </div>
+          {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
         </div>
-        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
+        <ReactQuillEditor
+          className="editor"
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
+          isDisabled={!canComment}
+          tooltipLabel="Join community to comment"
+        />
+        {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
+          <CWText className="token-req-text">
+            Commenting in {activeTopic?.name} requires{' '}
+            {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
+            {app.chain.meta.default_symbol}.{' '}
+            {userBalance && (
+              <>
+                You have {weiToTokens(userBalance.toString(), decimals)}{' '}
+                {app.chain.meta.default_symbol}.
+              </>
+            )}
+          </CWText>
+        )}
+        <div className="form-bottom">
+          <div className="form-buttons">
+            {editorValue.length > 0 && (
+              <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
+            )}
+            <CWButton
+              buttonWidth="wide"
+              disabled={disabled && !isAdmin}
+              onClick={handleSubmitComment}
+              label="Submit"
+            />
+          </div>
+        </div>
       </div>
-      <ReactQuillEditor
-        className="editor"
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-        isDisabled={!canComment}
-        tooltipLabel="Join community to comment"
-      />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {activeTopic?.name} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
-      <div className="form-bottom">
-        <div className="form-buttons">
-          {editorValue.length > 0 && (
-            <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
-          )}
-          <CWButton
-            buttonWidth="wide"
-            disabled={disabled && !isAdmin}
-            onClick={handleSubmitComment}
-            label="Submit"
+      <Modal
+        isFullScreen={false}
+        content={
+          <SessionRevalidationModal
+            onModalClose={resetCreateCommentMutation}
+            walletSsoSource={sessionKeyValidationError.ssoSource}
+            walletAddress={sessionKeyValidationError.address}
           />
-        </div>
-      </div>
-    </div>
+        }
+        onClose={resetCreateCommentMutation}
+        open={!!sessionKeyValidationError}
+      />
+    </>
   );
 };

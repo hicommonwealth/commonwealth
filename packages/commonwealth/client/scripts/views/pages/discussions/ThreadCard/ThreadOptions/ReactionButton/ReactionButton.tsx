@@ -16,6 +16,8 @@ import { LoginModal } from '../../../../../modals/login_modal';
 import './ReactionButton.scss';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
+import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 type ReactionButtonProps = {
   thread: Thread;
@@ -40,17 +42,25 @@ export const ReactionButton = ({
   const reactedId =
     thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
 
-  const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
-    useCreateThreadReactionMutation({
-      chainId: app.activeChainId(),
-      threadId: thread.id,
-    });
-  const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
-    useDeleteThreadReactionMutation({
-      chainId: app.activeChainId(),
-      address: app.user.activeAccount?.address,
-      threadId: thread.id,
-    });
+  const {
+    mutateAsync: createThreadReaction,
+    isLoading: isAddingReaction,
+    error: createThreadReactionError,
+    reset: resetCreateThreadReactionMutation,
+  } = useCreateThreadReactionMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+  const {
+    mutateAsync: deleteThreadReaction,
+    isLoading: isDeletingReaction,
+    error: deleteThreadReactionError,
+    reset: resetDeleteThreadReactionMutation,
+  } = useDeleteThreadReactionMutation({
+    chainId: app.activeChainId(),
+    address: app.user.activeAccount?.address,
+    threadId: thread.id,
+  });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
   const isLoading = isAddingReaction || isDeletingReaction;
@@ -75,7 +85,10 @@ export const ReactionButton = ({
         threadId: thread.id,
         reactionId: reactedId as number,
       }).catch((e) => {
-        console.log(e);
+        if (e instanceof SessionKeyError) {
+          return;
+        }
+        console.error(e?.responseJSON?.error || e?.message);
       });
     } else {
       createThreadReaction({
@@ -84,10 +97,23 @@ export const ReactionButton = ({
         threadId: thread.id,
         reactionType: 'like',
       }).catch((e) => {
-        console.log(e);
+        if (e instanceof SessionKeyError) {
+          return;
+        }
+        console.error(e?.responseJSON?.error || e?.message);
       });
     }
   };
+
+  const sessionKeyValidationError =
+    (createThreadReactionError instanceof SessionKeyError &&
+      createThreadReactionError) ||
+    (deleteThreadReactionError instanceof SessionKeyError &&
+      deleteThreadReactionError);
+
+  const resetSessionRevalidationModal = createThreadReactionError
+    ? resetCreateThreadReactionMutation
+    : resetDeleteThreadReactionMutation;
 
   return (
     <>
@@ -158,6 +184,18 @@ export const ReactionButton = ({
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
+      />
+      <Modal
+        isFullScreen={false}
+        content={
+          <SessionRevalidationModal
+            onModalClose={resetSessionRevalidationModal}
+            walletSsoSource={sessionKeyValidationError.ssoSource}
+            walletAddress={sessionKeyValidationError.address}
+          />
+        }
+        onClose={resetSessionRevalidationModal}
+        open={!!sessionKeyValidationError}
       />
     </>
   );

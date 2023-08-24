@@ -12,6 +12,9 @@ import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { useEditThreadMutation } from 'state/api/threads';
+import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 type EditBodyProps = {
   title: string;
@@ -39,7 +42,11 @@ export const EditBody = (props: EditBodyProps) => {
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>(false);
 
-  const { mutateAsync: editThread } = useEditThreadMutation({
+  const {
+    mutateAsync: editThread,
+    reset: resetEditThreadMutation,
+    error: editThreadError,
+  } = useEditThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
@@ -97,37 +104,53 @@ export const EditBody = (props: EditBodyProps) => {
       notifySuccess('Thread successfully edited');
       threadUpdatedCallback(title, newBody);
     } catch (err) {
-      const error =
-        err.responseJSON && err.responseJSON.error
-          ? err.responseJSON.error
-          : 'Failed to edit thread';
-      console.log(error);
-      notifyError(error);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      console.error(err?.responseJSON?.error || err?.message);
+      notifyError('Failed to edit thread');
     } finally {
       setSaving(false);
     }
   };
 
+  const sessionKeyValidationError =
+    editThreadError instanceof SessionKeyError && editThreadError;
+
   return (
-    <div className="EditBody">
-      <ReactQuillEditor
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-      />
-      <div className="buttons-row">
-        <CWButton
-          label="Cancel"
-          disabled={saving}
-          buttonType="tertiary"
-          onClick={cancel}
+    <>
+      <div className="EditBody">
+        <ReactQuillEditor
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
         />
-        <CWButton
-          label="Save"
-          buttonWidth="wide"
-          disabled={saving}
-          onClick={save}
-        />
+        <div className="buttons-row">
+          <CWButton
+            label="Cancel"
+            disabled={saving}
+            buttonType="tertiary"
+            onClick={cancel}
+          />
+          <CWButton
+            label="Save"
+            buttonWidth="wide"
+            disabled={saving}
+            onClick={save}
+          />
+        </div>
       </div>
-    </div>
+      <Modal
+        isFullScreen={false}
+        content={
+          <SessionRevalidationModal
+            onModalClose={resetEditThreadMutation}
+            walletSsoSource={sessionKeyValidationError.ssoSource}
+            walletAddress={sessionKeyValidationError.address}
+          />
+        }
+        onClose={resetEditThreadMutation}
+        open={!!sessionKeyValidationError}
+      />
+    </>
   );
 };

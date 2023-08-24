@@ -10,7 +10,6 @@ import {
 } from 'state/api/comments';
 import { ContentType } from 'types';
 import { CreateComment } from 'views/components/Comments/CreateComment';
-import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 import {
   deserializeDelta,
   serializeDelta,
@@ -25,6 +24,9 @@ import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import './CommentTree.scss';
 import { jumpHighlightComment } from './helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -53,7 +55,6 @@ export const CommentTree = ({
   setParentCommentId,
   canComment,
 }: CommentsTreeAttrs) => {
-  const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
 
   const { data: allComments = [] } = useFetchCommentsQuery({
@@ -61,7 +62,11 @@ export const CommentTree = ({
     threadId: parseInt(`${thread.id}`),
   });
 
-  const { mutateAsync: deleteComment } = useDeleteCommentMutation({
+  const {
+    mutateAsync: deleteComment,
+    reset: resetDeleteCommentMutation,
+    error: deleteCommentError,
+  } = useDeleteCommentMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
     existingNumberOfComments: thread.numberOfComments,
@@ -175,9 +180,12 @@ export const CommentTree = ({
                 address: app.user.activeAccount.address,
                 existingNumberOfComments: thread.numberOfComments,
               });
-            } catch (e) {
-              console.log(e);
-              notifyError('Failed to delete comment.');
+            } catch (err) {
+              if (err instanceof SessionKeyError) {
+                return;
+              }
+              console.error(err?.responseJSON?.error || err?.message);
+              notifyError('Failed to delete comment');
             }
           },
         },
@@ -494,12 +502,26 @@ export const CommentTree = ({
       });
   };
 
+  const sessionKeyValidationError =
+    deleteCommentError instanceof SessionKeyError && deleteCommentError;
+
   return (
-    <div className="CommentsTree">
-      {comments && recursivelyGatherComments(comments, comments[0], 0)}
-      {commentError && (
-        <CWValidationText message={commentError} status="failure" />
-      )}
-    </div>
+    <>
+      <div className="CommentsTree">
+        {comments && recursivelyGatherComments(comments, comments[0], 0)}
+      </div>
+      <Modal
+        isFullScreen={false}
+        content={
+          <SessionRevalidationModal
+            onModalClose={resetDeleteCommentMutation}
+            walletSsoSource={sessionKeyValidationError.ssoSource}
+            walletAddress={sessionKeyValidationError.address}
+          />
+        }
+        onClose={resetDeleteCommentMutation}
+        open={!!sessionKeyValidationError}
+      />
+    </>
   );
 };
