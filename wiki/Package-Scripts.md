@@ -1,16 +1,13 @@
 _Documentation for [the Commonwealth package.json file](../packages/commonwealth/package.json)._
 
-_Entries with an asterisk have been flagged for removal._
-
-// TODO: Ensure TOC is sync'd
-
 **CONTENTS**
 - [Build Scripts](#build-scripts)
   - [build-all](#build-all)
   - [build-app](#build-app)
-  - [build-consumer](#build-consumer)
-  - [build:css](#buildcss)*
+  - [build:css](#buildcss)
+  - [heroku-postbuild](#heroku-postbuild)
 - [CI Scripts](#ci-scripts)
+  - [start-ci](#start-ci)
   - [wait-server](#wait-server)
 - [Database Scripts](#database-scripts)
   - [clean-db](#clean-db)
@@ -25,6 +22,18 @@ _Entries with an asterisk have been flagged for removal._
   - [migrate-db](#migrate-db)
   - [migrate-db-down](#migrate-db-down)
   - [migrate-server](#migrate-server)
+  - [psql](#psql)
+  - [reset-db](#reset-db)
+  - [reset-frack-db](#reset-frack-db)
+- [Docker](#docker)
+  -[start-docker-setup](#start-docker-setup)
+  -[start-containers](#start-containers)
+- [Linting & Formatting](#linting--formatting)
+  - [format](#format)
+  - [lint](#lint)
+  - [lint-all](#lint-all)
+  - [lint-branch](#lint-branch)
+  - [style-lint](#style-lint)
 - [Mobile](#mobile)
   - [build-android](#build-android)
   - [build-ios](#build-ios)
@@ -33,17 +42,39 @@ _Entries with an asterisk have been flagged for removal._
   - [start-android](#start-android)
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
-  - [compress-images](#compress-images)*
+  - [compress-images](#compress-images)
+  - [datadog-db-setup](#datadog-db-setup)
+  - [send-notification-digest-emails](#send-notification-digest-emails)
+  - [start-prerender](#start-prerender)
+- [Playwright](#playwright)
+  - [e2e-start-server](#e2e-start-server)
+  - [gen-e2e](#gen-e2e)
+  - [test-e2e](#test-e2e)
+  - [test-e2e-serial](#test-e2e-serial)
 - [Storybook](#storybook)
   - [storybook](#storybook-1)
   - [build-storybook](#build-storybook)*
 - [Testing](#testing)
+  - [integration-test](#integration-test)
+  - [test](#test)
+  - [test-api](#test-api)
+  - [test-client](#test-client)
+  - [test-consumer](#test-consumer)
+  - [test-devnet](#test-devnet)
+  - [test-emit-notif](#test-emit-notif)
+  - [test-events](#test-events)
+  - [test-integration-util](#test-integration-util)
+  - [test-query](#test-query)
+  - [test-select](#test-select)
+  - [test-suite](#test-suite)
   - [unit-test](#unit-test)
   - [unit-test:watch](#unit-testwatch)
 - [TSNode](#tsnode)
   - [listen](#listen)
   - [start](#start)
-  - [sync-entities](#sync-entities)
+- [TypeScript](#typescript)
+  - [build-consumer](#build-consumer)
+  - [check-types](#check-types)
 - [Webpack](#webpack)
   - [bundle-report](#bundle-report)
   - [profile](#profile)
@@ -65,20 +96,12 @@ Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/web
 
 Description: Builds project, allocating max 4096MB memory to Node; runs webpack based on webpack.prod.config.js file.
 
-## build-consumer
-
-Definition: `tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsconfig.consumer.json`
-
-Description: Runs a compilation based on tsconfig.consumer.json; does not emit files; replaces alias with relative paths post-compilation.
-
 ## build:css
-
-_Deprecated; recommend for removal._
 
 Definition: `NODE_ENV=production build client/styles/shared.scss` 
 
-Considerations: Why do we have a separate CSS build? Who uses it? And does it even work? We don't appear to have a `build` command that it could modify.
-    
+Considerations: Why do we have a separate CSS build? Who uses it? And does it even work? We don't appear to have a `build` command that it could modify. Deprecated; recommend removal.
+
 ## heroku-postbuild
 
 Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
@@ -87,6 +110,14 @@ Description: Builds project on Heroku, using get-max-old-space-size.sh to dynami
 
 # CI Scripts
 
+## start-ci
+
+Definition: `FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts`
+
+Description: Used by our CI tool to start the server.
+
+Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file?
+
 ## wait-server
 
 Definition: `chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh`
@@ -94,6 +125,8 @@ Definition: `chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh`
 Description: Used for CI. Waits for the server to be ready (start serving on port 8080)
 
 Contributor: Kurtis Assad
+
+Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file?
 
 # Database Scripts
 
@@ -105,7 +138,7 @@ Description: This executes series of 'cleaner' functions that delete unnecessary
 
 Considerations: Engineers will almost never need to use this locally (unless they have purposefully create a large number of test notifications). This script was authored at the request of Jake Naviasky; we should confer with him as to the long-term value of this script.
 
-Author: Timothee Legros
+Contributor: Timothee Legros
 
 ## create-migration
 
@@ -171,6 +204,14 @@ Definition: `npx sequelize db:migrate:undo`
 
 Description: Undoes the last-run Sequelize migration.
 
+## migrate-server
+
+Definition: `heroku run npx sequelize db:migrate --debug`
+
+Description: Runs a database migration on the Heroku dyno in debug mode.
+
+Considerations: The current script name does not sufficiently indicate its relationship to Heroku.
+
 ## psql
 
 Definition: `chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh`
@@ -191,13 +232,19 @@ Description: Synchronizes `beta-db` with `frack-db`. Good for undoing migration 
 
 Considerations: Clarify documentation.
 
-# TypeScript
+# Docker
 
-## check-types
+## start-docker-setup
 
-Definition: `tsc --noEmit`
+Definition: `chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh`
 
-Description: Runs a compilation of TypeScript files based on tsconfig.json; does not emit files.
+Description: Run in a new project or repo when first setting up remote docker containers. See [start-docker-setup-help.sh](../packages/commonwealth/scripts/start-docker-setup-help.sh) for further documentation.
+
+## start-containers
+
+Definition: `chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh`
+
+Description: Start remote Docker containers; see [start-docker-containers.sh](../packages/commonwealth/scripts/start-docker-containers.sh) for further documentation.
 
 # Linting & Formatting
 
@@ -238,40 +285,6 @@ Definition: `stylelint client/styles/*`
 Description: Lints SCSS files.
 
 Considerations: Why lint styles separately? Why not just include .scss file extension in [lint](#lint) and [lint-all](#lint-all) scripts (which currently only target .ts files)?
-
-# Playwright
-
-## e2e-start-server
-
-Definition: `ETH_RPC=e2e-test yarn start`
-
-Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
-
-Contributor: Kurtis Assad
-
-## gen-e2e
-
-Definition: `npx playwright codegen`
-
-Description: Starts Playwright's test generation feature. This will open up a browser window and allow developers to click around on-screen and autogenerate Playwright code according to actions performed. [Loom example](https://www.loom.com/share/b1b36c7d7fae4b079b380ec2a61da25c)
-
-Contributor: Kurtis Assad
-
-## test-e2e
-
-Definition: `TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 4 ./test/e2e/e2eRegular/*`
-
-Description: Runs Playwright tests using the playwright.config.ts file.
-
-Contributor: Kurtis Assad
-
-## test-e2e-serial
-
-Definition: `TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*`
-
-Description: Runs e2e tests one at a time, to avoid problems of parallel execution.
-
-Contributor: Kurtis Assad
 
 # Mobile
 
@@ -329,7 +342,63 @@ Contributor: Dillon Chen
 
 ## compress-images
 
-_Deprecated, recommend removal._
+Definition: `npx ts-node -T ./scripts/compressImages.ts`
+
+Considerations: (per author) Deprecated; recommend removal.
+
+## datadog-db-setup
+
+Definition: `chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh`
+
+Description: Helper script to complete DataDog Postgres account setup, scripts, and required config. Allows us Heroku database monitoring and stats. See [ReadMe](../packages/commonwealth/README.md) for more information on using DataDog.
+
+Contributor: Nakul Manchanda
+
+## send-notification-digest-emails
+
+Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
+
+Description: Schedules a daily task for sending notification email digests.
+
+## start-prerender
+
+Definition: `ts-node --project tsconfig.json server/scripts/runPrerenderService.ts`
+
+Considerations: Deprecated; recommend removal. Referenced script no longer exists.
+
+# Playwright
+
+## e2e-start-server
+
+Definition: `ETH_RPC=e2e-test yarn start`
+
+Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
+
+Contributor: Kurtis Assad
+
+## gen-e2e
+
+Definition: `npx playwright codegen`
+
+Description: Starts Playwright's test generation feature. This will open up a browser window and allow developers to click around on-screen and autogenerate Playwright code according to actions performed. [Loom example](https://www.loom.com/share/b1b36c7d7fae4b079b380ec2a61da25c)
+
+Contributor: Kurtis Assad
+
+## test-e2e
+
+Definition: `TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/e2eRegular/*`
+
+Description: Runs Playwright tests using the playwright.config.ts file.
+
+Contributor: Kurtis Assad
+
+## test-e2e-serial
+
+Definition: `TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*`
+
+Description: Runs e2e tests one at a time, to avoid problems of parallel execution.
+
+Contributor: Kurtis Assad
 
 # Storybook
 
@@ -343,19 +412,22 @@ Contributor: Daniel Martins
 
 ## build-storybook
 
-_Deprecated, recommend removal._
-
 Definition `storybook build`
 
 Description:  Compiles Storybook instance for deployment.
 
 Contributor: Daniel Martins
 
+Considerations: Deprecated; recommend removal. Not used by Storybook / Design System team.
+
 # Testing
 
-_Open considerations: When and why do we invoke `nyc` and `NODE_ENV=test` in our scripts? No clear rhyme or reason in our use._
-
-_`nyc` runs IstanbulJS, which tracks and reports how much of our source code is covered by tests._
+Open considerations:
+- When and why do we invoke `nyc` and `NODE_ENV=test` in our scripts? No clear rhyme or reason to our use.
+  - `nyc` runs IstanbulJS, which tracks and reports how much of our source code is covered by tests. `NODE_ENV=test` sets a global variable that changes how select parts of our wallet and chain infrastructure runs.
+- Do we need so many different scripts for specifying which part of the codebase we want to test? Would a generic test script, taking a directory as argument, suffice?
+  - See e.g. [test-select](#test-select)
+- Any test scripts we remove, we should ensure their respective invocations in `CI.yml` are replaced with appropriate definitions.
 
 ## integration-test
 
@@ -420,7 +492,7 @@ Description: Runs tests living in the top level of our integration folder, where
 
 Considerations: The script name might misleadingly suggest that this script would pick out specifically the /util subfolder in the /integration directory. Might we be better off moving the three top-level scripts (e.g. databaseCleaner.spec.ts) into a dedicated subfolder, and targeting that?
 
-Author: Timothee Legros
+Contributor: Timothee Legros
 
 ## test-query
 
@@ -430,13 +502,7 @@ Description: Executes testQuery.ts, which runs a select query on chains, for unc
 
 Considerations: Why do we have this? Is a "test-" prefix name misleading, given that it is not, strictly speaking, a test (in the same sense as our ts-mocha scripts).
 
-Author: Timothee Legros
-
-## test-scripts
-
-Definition: `ts-mocha --project tsconfig.json test/integration/enforceDataConsistency.spec.ts`
-
-Description: Runs only the enforceDataConsistency.spec.ts test, of the three /integration folder "utils."
+Contributor: Timothee Legros
 
 ## test-select
 
@@ -488,11 +554,19 @@ Description: Used to start the Commonwealth app in development. Runs both the ba
 
 Considerations: Follow up with Kurtis; see #2247
 
-## sync-entities
+# TypeScript
 
-Definition: `ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)`
+## build-consumer
 
-Description: See full documentation in [enforceDataConsistency.ts](../packages/commonwealth/server/scripts/enforceDataConsistency.ts).
+Definition: `tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsconfig.consumer.json`
+
+Description: Runs a compilation based on tsconfig.consumer.json; does not emit files; replaces alias with relative paths post-compilation.
+
+## check-types
+
+Definition: `tsc --noEmit`
+
+Description: Runs a compilation of TypeScript files based on tsconfig.json; does not emit files.
 
 # Webpack
 
@@ -511,30 +585,14 @@ Description: Runs build webpack analyzer.
 Considerations: Deprecated; recommend removal. Appears to be redundant with `bundle-report`. As of 22-08-03 #all-eng conversation, appears to be unused. See also [stats.sh](../packages/commonwealth/stats.sh) for possible removal.
 
 
-# Undocumented & in-progress
+## start-consumer
 
-"start-consumer": "ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script",
-"start-prerender": "ts-node --project tsconfig.json server/scripts/runPrerenderService.ts",
-"start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
+Definition: `ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script`
 
-"send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
-"migrate-server": "heroku run npx sequelize db:migrate --debug",
-"start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
+Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 
+## start-all
 
-"datadog-db-setup": "chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh",
+Definition: `concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'`
 
-
-//ADDED BY TIMOTHEE
-
-
-
-
-"start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
-"start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
-
-
-// ADDED BY KURTIS
-"sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'",
-"wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
-
+Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app server, and the CommonwealthConsumer script) concurrently with the `concurrently` package.
