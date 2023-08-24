@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import type { IEventHandler, CWEvent } from 'chain-events/src';
+import type { CWEvent, IEventHandler } from 'chain-events/src';
 
 import ceModels, { sequelize } from '../services/database/database';
 import cwModels from '../../commonwealth/server/database';
@@ -13,13 +13,16 @@ import {
 } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import type { BrokerConfig } from 'rascal';
 import {
-  MockRabbitMQController,
   getRabbitMQConfig,
+  MockRabbitMQController,
 } from 'common-common/src/rabbitmq';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const log = factory.getLogger(formatFilename(__filename));
 const rmqController = new MockRabbitMQController(
-  <BrokerConfig>getRabbitMQConfig('localhost')
+  <BrokerConfig>(
+    getRabbitMQConfig('localhost', RascalConfigServices.ChainEventsService)
+  )
 );
 
 const handleEventFn = async (

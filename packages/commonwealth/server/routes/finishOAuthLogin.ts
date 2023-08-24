@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import type { DB } from '../models';
 import { redirectWithLoginError } from './finishEmailLogin';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
   const token = req.query.token;
@@ -50,19 +50,27 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
     scope: 'withPrivateData',
   });
 
+  const serverAnalyticsController = new ServerAnalyticsController();
+
   if (existingUser) {
     req.login(existingUser, async (err) => {
       if (err) {
-        serverAnalyticsTrack({
-          event: MixpanelLoginEvent.LOGIN_FAILED,
-          isCustomDomain: null,
-        });
+        serverAnalyticsController.track(
+          {
+            event: MixpanelLoginEvent.LOGIN_FAILED,
+            isCustomDomain: null,
+          },
+          req
+        );
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
       }
-      serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN_COMPLETED,
-        isCustomDomain: null,
-      });
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          isCustomDomain: null,
+        },
+        req
+      );
 
       return res.redirect('/?loggedin=true&confirmation=success');
     });
@@ -89,16 +97,22 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
 
     req.login(newUser, (err) => {
       if (err) {
-        serverAnalyticsTrack({
-          event: MixpanelLoginEvent.LOGIN_FAILED,
-          isCustomDomain: null,
-        });
+        serverAnalyticsController.track(
+          {
+            event: MixpanelLoginEvent.LOGIN_FAILED,
+            isCustomDomain: null,
+          },
+          req
+        );
         return redirectWithLoginError(res, 'Could not log in with OAuth user');
       }
-      serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN_COMPLETED,
-        isCustomDomain: null,
-      });
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          isCustomDomain: null,
+        },
+        req
+      );
 
       return res.redirect('/?loggedin=true&confirmation=success');
     });

@@ -16,6 +16,7 @@ import { IdRow, InputRow } from 'views/components/metadata_rows';
 import {
   defaultChainRows,
   ethChainRows,
+  updateAdminOnCreateCommunity,
 } from 'views/pages/create_community/chain_input_rows';
 import type { EthChainFormState } from 'views/pages/create_community/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
@@ -231,6 +232,8 @@ export const EthDaoForm = (props: EthChainFormState) => {
             }
 
             await initAppState(false);
+            await updateAdminOnCreateCommunity(id);
+
             navigate(`/${res.result.chain?.id}`);
           } catch (err) {
             notifyError(

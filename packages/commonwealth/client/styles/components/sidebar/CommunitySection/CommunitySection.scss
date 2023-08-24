@@ -1,0 +1,44 @@
+@import '../../../shared';
+
+.community-menu {
+  background-color: $neutral-25;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-width: $sidebar-width;
+  overflow-y: auto;
+  width: $sidebar-width;
+
+  @include smallInclusive {
+    width: calc(100vw - $quick-switcher-width);
+  }
+
+  .home-button {
+    align-items: center;
+    display: flex;
+    padding: 8px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $primary-50;
+    }
+
+    &.active {
+      background-color: $primary-100;
+    }
+
+    svg {
+      margin-right: 4px;
+    }
+  }
+
+  .buttons-container {
+    margin-top: 24px;
+
+    .subscription-button {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+  }
+}
