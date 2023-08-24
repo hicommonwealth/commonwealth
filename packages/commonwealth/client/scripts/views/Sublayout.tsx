@@ -22,8 +22,7 @@ const Sublayout = ({
   hasCommunitySidebar,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible, mobileMenuName, userToggledVisibility, setMenu } =
-    useSidebarStore();
+  const { menuVisible, mobileMenuName, setMenu } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const { isWindowSmallInclusive } = useBrowserWindow({
     onResize: () => setResizing(true),
