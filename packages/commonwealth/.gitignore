@@ -40,6 +40,9 @@ tx.json
 # Webpack profiling
 stats.json
 
+# playwright test output
+summary.json
+
 # Test account artefacts
 test_accounts.txt
 
