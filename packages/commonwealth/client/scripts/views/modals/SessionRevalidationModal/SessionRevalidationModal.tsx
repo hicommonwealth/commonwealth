@@ -75,7 +75,7 @@ const SessionRevalidationModal = ({
                 onClick={onModalClose}
               />
             </div>
-            <CWText>
+            <CWText className="info">
               It looks like the session for your address has expired. Just a
               fancy way of saying you may need to log in again.
             </CWText>

@@ -25,6 +25,9 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -36,7 +39,7 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector = topics.filter((t) => {
+  const topicsForSelector = topics?.filter((t) => {
     return (
       isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
     );
@@ -62,7 +65,11 @@ export const NewThreadForm = () => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const { mutateAsync: createThread } = useCreateThreadMutation({
+  const {
+    mutateAsync: createThread,
+    error: createThreadError,
+    reset: resetCreateThreadMutation,
+  } = useCreateThreadMutation({
     chainId: app.activeChainId(),
   });
 
@@ -89,41 +96,30 @@ export const NewThreadForm = () => {
     setIsSaving(true);
 
     try {
-      await app.sessions.signThread(app.user.activeAccount.address, {
-        community: app.activeChainId(),
+      const thread = await createThread({
+        address: app.user.activeAccount.address,
+        kind: threadKind,
+        stage: app.chain.meta.customStages
+          ? parseCustomStages(app.chain.meta.customStages)[0]
+          : ThreadStage.Discussion,
+        chainId: app.activeChainId(),
         title: threadTitle,
-        body: deltaString,
-        link: threadUrl,
         topic: threadTopic,
+        body: serializeDelta(threadContentDelta),
+        url: threadUrl,
+        authorProfile: app.user.activeAccount.profile,
       });
 
-      try {
-        const thread = await createThread({
-          address: app.user.activeAccount.address,
-          kind: threadKind,
-          stage: app.chain.meta.customStages
-            ? parseCustomStages(app.chain.meta.customStages)[0]
-            : ThreadStage.Discussion,
-          chainId: app.activeChainId(),
-          title: threadTitle,
-          topic: threadTopic,
-          body: serializeDelta(threadContentDelta),
-          url: threadUrl,
-          authorProfile: app.user.activeAccount.profile,
-        });
+      setThreadContentDelta(createDeltaFromText(''));
+      clearDraft();
 
-        setThreadContentDelta(createDeltaFromText(''));
-        clearDraft();
-
-        navigate(`/discussion/${thread.id}`);
-      } catch (err) {
-        if (err.responseJSON.error === 'Login canceled') return;
-        console.error(err);
-
-        const error =
-          err?.responseJSON?.error || err?.message || 'Failed to create thread';
-        throw new Error(error);
+      navigate(`/discussion/${thread.id}`);
+    } catch (err) {
+      if (err instanceof SessionKeyError) {
+        return;
       }
+      console.error(err?.responseJSON?.error || err?.message);
+      notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
     }
@@ -138,6 +134,9 @@ export const NewThreadForm = () => {
   };
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
+
+  const sessionKeyValidationError =
+    createThreadError instanceof SessionKeyError && createThreadError;
 
   return (
     <>
@@ -219,6 +218,18 @@ export const NewThreadForm = () => {
         </div>
       </div>
       {JoinCommunityModals}
+      <Modal
+        isFullScreen={false}
+        content={
+          <SessionRevalidationModal
+            onModalClose={resetCreateThreadMutation}
+            walletSsoSource={sessionKeyValidationError.ssoSource}
+            walletAddress={sessionKeyValidationError.address}
+          />
+        }
+        onClose={resetCreateThreadMutation}
+        open={!!sessionKeyValidationError}
+      />
     </>
   );
 };

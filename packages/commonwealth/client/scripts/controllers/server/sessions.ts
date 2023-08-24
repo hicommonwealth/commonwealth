@@ -6,7 +6,10 @@ import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
-import { ChainBase, WalletId } from '../../../../../common-common/src/types';
+import {
+  ChainBase,
+  WalletSsoSource,
+} from '../../../../../common-common/src/types';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import {
@@ -17,7 +20,18 @@ import {
   SolanaSessionController,
   NEARSessionController,
 } from './sessionSigners';
-import { getWalletName } from '../../helpers/wallet';
+
+export class SessionKeyError extends Error {
+  readonly address: string;
+  readonly ssoSource: WalletSsoSource;
+
+  constructor({ name, message, address, ssoSource }) {
+    super(message);
+    this.name = name;
+    this.address = address;
+    this.ssoSource = ssoSource;
+  }
+}
 
 export async function signSessionWithAccount<T extends { address: string }>(
   wallet: IWebWallet<T>,
@@ -203,45 +217,13 @@ class SessionsController {
       const matchingAccount = app.user.addresses.find(
         (a) => a.address === address
       );
-      const walletName = getWalletName(matchingAccount!.walletId);
 
-      // Some login methods may require a single sign-on redirect, and take
-      // the user away from this page, so this promise might never resolve
-      const { openSessionRevalidation } = await import(
-        'views/modals/session_revalidation_modal'
-      );
-      const signerAddress: string = await new Promise((resolve, reject) => {
-        openSessionRevalidation({
-          walletAddress: address,
-          walletName,
-          walletSsoSource: matchingAccount.walletSsoSource,
-          canvasChainId,
-          onVerified: (verifiedAddress) => resolve(verifiedAddress),
-          onClose: () => {
-            const err = new Error();
-            (err as any).responseJSON = { error: 'Login canceled' };
-            reject(err);
-          },
-        });
+      throw new SessionKeyError({
+        name: 'Authentication Error',
+        message: 'Session key expired',
+        address,
+        ssoSource: matchingAccount.walletSsoSource,
       });
-
-      // The user may have signed using a different account
-      const sessionReauthed = await controller.hasAuthenticatedSession(
-        canvasChainId,
-        address
-      );
-      if (!sessionReauthed) {
-        const err = new Error();
-        const { formatAddress } = await import(
-          'views/components/user/user_block'
-        );
-        (err as any).responseJSON = {
-          error: `Expected the address ${formatAddress(
-            address
-          )}, but this wallet has address ${formatAddress(signerAddress)}.`,
-        };
-        throw err;
-      }
     }
 
     const { session, action, hash } = await controller.sign(
