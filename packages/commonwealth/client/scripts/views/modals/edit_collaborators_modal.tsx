@@ -10,7 +10,6 @@ import {
   useDeleteThreadCollaboratorsMutation,
 } from 'state/api/threads';
 import { useDebounce } from 'usehooks-ts';
-import NewProfilesController from '../../controllers/server/newProfiles';
 import type Thread from '../../models/Thread';
 import type { IThreadCollaborator } from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -127,10 +126,8 @@ export const EditCollaboratorsModal = ({
                   }
                 >
                   <User
-                    user={NewProfilesController.Instance.getProfile(
-                      c.chain_id,
-                      c.Address.address
-                    )}
+                    userAddress={c.Address.address}
+                    userChainId={c.chain_id}
                   />
                 </div>
               ))
@@ -149,12 +146,7 @@ export const EditCollaboratorsModal = ({
             <div className="collaborator-rows-container">
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
-                  <User
-                    user={NewProfilesController.Instance.getProfile(
-                      c.chain,
-                      c.address
-                    )}
-                  />
+                  <User userAddress={c.address} userChainId={c.chain} />
                   <CWIconButton
                     iconName="close"
                     iconSize="small"

@@ -6,7 +6,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { User } from 'views/components/user/user';
-import AddressInfo from '../../../models/AddressInfo';
 import { CWText } from '../../components/component_kit/cw_text';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
@@ -51,18 +50,20 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       : decodedTitle;
 
   const actorName = (
-    <User
-      user={
-        new AddressInfo(null, author_address, author_chain ?? chain_id, null)
-      }
-      linkify
-      avatarSize={16}
+    <span
       onClick={(e: any) => {
         e.preventDefault();
         e.stopPropagation();
         navigate(`/${author_chain}/account/${author_address}`);
       }}
-    />
+    >
+      <User
+        userAddress={author_address}
+        userChainId={author_chain}
+        shouldLinkProfile
+        avatarSize={16}
+      />
+    </span>
   );
 
   const isComment = category === 'new-comment-creation';

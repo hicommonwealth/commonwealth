@@ -1,25 +1,27 @@
-import React, { useState } from 'react';
 import moment from 'moment';
+import React, { useState } from 'react';
 
 import 'pages/notifications/notification_row.scss';
 import AddressInfo from '../../../models/AddressInfo';
 
-import type { NotificationRowProps } from './notification_row';
-import { Label as ChainEventLabel } from 'chain-events/src';
 import type { CWEvent } from 'chain-events/src';
+import { Label as ChainEventLabel } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
+import type { NotificationRowProps } from './notification_row';
 
-import app from 'state';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { getClasses } from '../../components/component_kit/helpers';
-import { User } from 'views/components/user/user';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { getBatchNotificationFields } from './helpers';
-import { UserGallery } from '../../components/user/user_gallery';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useNavigate } from 'react-router';
+import app from 'state';
+import { User } from 'views/components/user/user';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { getClasses } from '../../components/component_kit/helpers';
+import { UserGallery } from '../../components/user/user_gallery';
+import { getBatchNotificationFields } from './helpers';
 
-export const ChainEventNotificationRow = (props: Omit<NotificationRowProps, 'allRead'>) => {
+export const ChainEventNotificationRow = (
+  props: Omit<NotificationRowProps, 'allRead'>
+) => {
   const { notification, onListPage } = props;
 
   const navigate = useCommonNavigate();
@@ -139,15 +141,9 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
     >
       {authorInfo.length === 1 ? (
         <User
-          user={
-            new AddressInfo(
-              null,
-              (authorInfo[0] as [string, string])[1],
-              (authorInfo[0] as [string, string])[0],
-              null
-            )
-          }
-          avatarOnly
+          userAddress={(authorInfo[0] as [string, string])[1]}
+          userChainId={(authorInfo[0] as [string, string])[0]}
+          shouldShowAvatarOnly
           avatarSize={26}
         />
       ) : (
