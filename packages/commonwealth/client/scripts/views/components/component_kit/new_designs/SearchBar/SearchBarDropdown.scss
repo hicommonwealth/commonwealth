@@ -1,16 +1,6 @@
 @import '../../../../../../styles/shared';
 @import './CWSearchBar.scss';
 
-@mixin everyRowStyles {
-  cursor: pointer;
-  padding: 8px;
-
-  &:hover {
-    background-color: $neutral-100;
-    border-radius: 6px;
-  }
-}
-
 .SearchBarDropdown {
   position: absolute;
   top: calc(100% + 4px);
