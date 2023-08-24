@@ -16,7 +16,7 @@ import { LoginModal } from '../../../../../modals/login_modal';
 import './ReactionButton.scss';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
-import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { SessionKeyError } from 'controllers/server/sessions';
 
 type ReactionButtonProps = {
@@ -62,6 +62,15 @@ export const ReactionButton = ({
     threadId: thread.id,
   });
 
+  const resetSessionRevalidationModal = createThreadReactionError
+    ? resetCreateThreadReactionMutation
+    : resetDeleteThreadReactionMutation;
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetSessionRevalidationModal,
+    error: createThreadReactionError || deleteThreadReactionError,
+  });
+
   if (showSkeleton) return <ReactionButtonSkeleton />;
   const isLoading = isAddingReaction || isDeletingReaction;
 
@@ -104,16 +113,6 @@ export const ReactionButton = ({
       });
     }
   };
-
-  const sessionKeyValidationError =
-    (createThreadReactionError instanceof SessionKeyError &&
-      createThreadReactionError) ||
-    (deleteThreadReactionError instanceof SessionKeyError &&
-      deleteThreadReactionError);
-
-  const resetSessionRevalidationModal = createThreadReactionError
-    ? resetCreateThreadReactionMutation
-    : resetDeleteThreadReactionMutation;
 
   return (
     <>
@@ -185,18 +184,7 @@ export const ReactionButton = ({
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-      <Modal
-        isFullScreen={false}
-        content={
-          <SessionRevalidationModal
-            onModalClose={resetSessionRevalidationModal}
-            walletSsoSource={sessionKeyValidationError.ssoSource}
-            walletAddress={sessionKeyValidationError.address}
-          />
-        }
-        onClose={resetSessionRevalidationModal}
-        open={!!sessionKeyValidationError}
-      />
+      {RevalidationModal}
     </>
   );
 };

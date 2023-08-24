@@ -24,8 +24,7 @@ import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import './CommentTree.scss';
 import { jumpHighlightComment } from './helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { SessionKeyError } from 'controllers/server/sessions';
 
 const MAX_THREAD_LEVEL = 8;
@@ -72,9 +71,22 @@ export const CommentTree = ({
     existingNumberOfComments: thread.numberOfComments,
   });
 
-  const { mutateAsync: editComment } = useEditCommentMutation({
+  const {
+    mutateAsync: editComment,
+    reset: resetEditCommentMutation,
+    error: editCommentError,
+  } = useEditCommentMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
+  });
+
+  const resetSessionRevalidationModal = deleteCommentError
+    ? resetDeleteCommentMutation
+    : resetEditCommentMutation;
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetSessionRevalidationModal,
+    error: deleteCommentError || editCommentError,
   });
 
   const { mutateAsync: toggleCommentSpamStatus } =
@@ -333,7 +345,11 @@ export const CommentTree = ({
         setIsGloballyEditing(false);
         clearEditingLocalStorage(comment.id, ContentType.Comment);
       } catch (err) {
-        console.error(err);
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        console.error(err?.responseJSON?.error || err?.message);
+        notifyError('Failed to edit comment');
       } finally {
         setEdits((p) => ({
           ...p,
@@ -502,26 +518,12 @@ export const CommentTree = ({
       });
   };
 
-  const sessionKeyValidationError =
-    deleteCommentError instanceof SessionKeyError && deleteCommentError;
-
   return (
     <>
       <div className="CommentsTree">
         {comments && recursivelyGatherComments(comments, comments[0], 0)}
       </div>
-      <Modal
-        isFullScreen={false}
-        content={
-          <SessionRevalidationModal
-            onModalClose={resetDeleteCommentMutation}
-            walletSsoSource={sessionKeyValidationError.ssoSource}
-            walletAddress={sessionKeyValidationError.address}
-          />
-        }
-        onClose={resetDeleteCommentMutation}
-        open={!!sessionKeyValidationError}
-      />
+      {RevalidationModal}
     </>
   );
 };

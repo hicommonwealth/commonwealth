@@ -12,8 +12,7 @@ import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { useEditThreadMutation } from 'state/api/threads';
-import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { SessionKeyError } from 'controllers/server/sessions';
 
 type EditBodyProps = {
@@ -50,6 +49,11 @@ export const EditBody = (props: EditBodyProps) => {
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetEditThreadMutation,
+    error: editThreadError,
   });
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -114,9 +118,6 @@ export const EditBody = (props: EditBodyProps) => {
     }
   };
 
-  const sessionKeyValidationError =
-    editThreadError instanceof SessionKeyError && editThreadError;
-
   return (
     <>
       <div className="EditBody">
@@ -139,18 +140,7 @@ export const EditBody = (props: EditBodyProps) => {
           />
         </div>
       </div>
-      <Modal
-        isFullScreen={false}
-        content={
-          <SessionRevalidationModal
-            onModalClose={resetEditThreadMutation}
-            walletSsoSource={sessionKeyValidationError.ssoSource}
-            walletAddress={sessionKeyValidationError.address}
-          />
-        }
-        onClose={resetEditThreadMutation}
-        open={!!sessionKeyValidationError}
-      />
+      {RevalidationModal}
     </>
   );
 };

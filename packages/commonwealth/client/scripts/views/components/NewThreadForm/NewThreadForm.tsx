@@ -25,8 +25,7 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { SessionKeyError } from 'controllers/server/sessions';
 
 export const NewThreadForm = () => {
@@ -71,6 +70,11 @@ export const NewThreadForm = () => {
     reset: resetCreateThreadMutation,
   } = useCreateThreadMutation({
     chainId: app.activeChainId(),
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetCreateThreadMutation,
+    error: createThreadError,
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -134,9 +138,6 @@ export const NewThreadForm = () => {
   };
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
-
-  const sessionKeyValidationError =
-    createThreadError instanceof SessionKeyError && createThreadError;
 
   return (
     <>
@@ -218,18 +219,7 @@ export const NewThreadForm = () => {
         </div>
       </div>
       {JoinCommunityModals}
-      <Modal
-        isFullScreen={false}
-        content={
-          <SessionRevalidationModal
-            onModalClose={resetCreateThreadMutation}
-            walletSsoSource={sessionKeyValidationError.ssoSource}
-            walletAddress={sessionKeyValidationError.address}
-          />
-        }
-        onClose={resetCreateThreadMutation}
-        open={!!sessionKeyValidationError}
-      />
+      {RevalidationModal}
     </>
   );
 };

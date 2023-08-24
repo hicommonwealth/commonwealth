@@ -27,8 +27,7 @@ import Permissions from '../../../utils/Permissions';
 import clsx from 'clsx';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 import { SessionKeyError } from 'controllers/server/sessions';
-import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -95,6 +94,11 @@ export const CreateComment = ({
     threadId: rootThread.id,
     chainId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetCreateCommentMutation,
+    error: createCommentError,
   });
 
   const handleSubmitComment = async () => {
@@ -222,18 +226,7 @@ export const CreateComment = ({
           </div>
         </div>
       </div>
-      <Modal
-        isFullScreen={false}
-        content={
-          <SessionRevalidationModal
-            onModalClose={resetCreateCommentMutation}
-            walletSsoSource={sessionKeyValidationError.ssoSource}
-            walletAddress={sessionKeyValidationError.address}
-          />
-        }
-        onClose={resetCreateCommentMutation}
-        open={!!sessionKeyValidationError}
-      />
+      {RevalidationModal}
     </>
   );
 };

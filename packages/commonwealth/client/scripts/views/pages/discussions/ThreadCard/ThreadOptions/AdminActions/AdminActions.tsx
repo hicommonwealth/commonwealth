@@ -23,7 +23,7 @@ import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
-import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { SessionKeyError } from 'controllers/server/sessions';
 
 export type AdminActionsProps = {
@@ -78,6 +78,11 @@ export const AdminActions = ({
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetDeleteThreadMutation,
+    error: deleteThreadError,
   });
 
   const { mutateAsync: toggleSpam } = useToggleThreadSpamMutation({
@@ -255,9 +260,6 @@ export const AdminActions = ({
     );
   };
 
-  const sessionKeyValidationError =
-    deleteThreadError instanceof SessionKeyError && deleteThreadError;
-
   return (
     <>
       <span
@@ -410,18 +412,7 @@ export const AdminActions = ({
         open={isEditCollaboratorsModalOpen}
       />
 
-      <Modal
-        isFullScreen={false}
-        content={
-          <SessionRevalidationModal
-            onModalClose={resetDeleteThreadMutation}
-            walletSsoSource={sessionKeyValidationError.ssoSource}
-            walletAddress={sessionKeyValidationError.address}
-          />
-        }
-        onClose={resetDeleteThreadMutation}
-        open={!!sessionKeyValidationError}
-      />
+      {RevalidationModal}
     </>
   );
 };

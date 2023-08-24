@@ -12,7 +12,7 @@ import { Modal } from '../component_kit/cw_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { getDisplayedReactorsForPopup } from './helpers';
 import { SessionKeyError } from 'controllers/server/sessions';
-import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
@@ -42,6 +42,15 @@ export const CommentReactionButton = ({
     commentId: comment.id,
     chainId: app.activeChainId(),
     threadId: comment.threadId,
+  });
+
+  const resetSessionRevalidationModal = createCommentReactionError
+    ? resetCreateCommentReaction
+    : resetDeleteCommentReaction;
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetSessionRevalidationModal,
+    error: createCommentReactionError || deleteCommentReactionError,
   });
 
   const activeAddress = app.user.activeAccount?.address;
@@ -91,16 +100,6 @@ export const CommentReactionButton = ({
     }
   };
 
-  const sessionKeyValidationError =
-    (createCommentReactionError instanceof SessionKeyError &&
-      createCommentReactionError) ||
-    (deleteCommentReactionError instanceof SessionKeyError &&
-      deleteCommentReactionError);
-
-  const resetSessionRevalidationModal = createCommentReactionError
-    ? resetCreateCommentReaction
-    : resetDeleteCommentReaction;
-
   return (
     <>
       <Modal
@@ -109,18 +108,7 @@ export const CommentReactionButton = ({
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
-      <Modal
-        isFullScreen={false}
-        content={
-          <SessionRevalidationModal
-            onModalClose={resetSessionRevalidationModal}
-            walletSsoSource={sessionKeyValidationError.ssoSource}
-            walletAddress={sessionKeyValidationError.address}
-          />
-        }
-        onClose={resetSessionRevalidationModal}
-        open={!!sessionKeyValidationError}
-      />
+      {RevalidationModal}
       <CWUpvoteSmall
         voteCount={likes}
         disabled={disabled}
