@@ -432,7 +432,6 @@ export const GovernanceSection = () => {
     hasDefaultToggle: toggleTreeState['toggledState'],
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      resetSidebarState();
       setGovernanceToggleTree('toggledState', toggle);
     },
     displayData: governanceGroupData,

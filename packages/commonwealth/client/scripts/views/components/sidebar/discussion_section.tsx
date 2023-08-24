@@ -226,7 +226,6 @@ export const DiscussionSection = () => {
     hasDefaultToggle: toggleTreeState['toggledState'],
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      resetSidebarState();
       setDiscussionsToggleTree('toggledState', toggle);
     },
     displayData: discussionsGroupData,

@@ -216,7 +216,6 @@ const AdminSectionComponent = () => {
     hasDefaultToggle: toggleTreeState['toggledState'],
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
-      resetSidebarState();
       setAdminToggleTree('toggledState', toggle);
     },
     displayData: adminGroupData,
