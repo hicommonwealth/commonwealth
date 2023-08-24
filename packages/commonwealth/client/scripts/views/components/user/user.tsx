@@ -194,7 +194,7 @@ export const User = ({
     <div className="User avatar-only" key={profile?.address || '-'}>
       <Avatar
         url={profile?.avatarUrl}
-        size={16}
+        size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
         address={profile?.id}
       />
     </div>
@@ -298,7 +298,7 @@ export const User = ({
           <div className="user-avatar">
             <Avatar
               url={profile?.avatarUrl}
-              size={32}
+              size={profile?.avatarUrl ? 36 : 32}
               address={profile?.id}
             />
           </div>
