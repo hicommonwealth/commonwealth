@@ -17,6 +17,7 @@ jobs:
         node: [ 18 ]
     name: Commonwealth E2E Test
     runs-on: ubuntu-latest
+    timeout-minutes: 1
 
     services:
       postgres:
@@ -99,6 +100,7 @@ jobs:
         node: [ 18 ]
     name: Commonwealth E2E Test Serial
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       postgres:
@@ -175,6 +177,7 @@ jobs:
         node: [ 18 ]
     name: Code Quality checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -218,6 +221,7 @@ jobs:
         node: [ 18 ]
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       postgres:
@@ -279,6 +283,7 @@ jobs:
   commonwealth-devnet-tests:
     name: Devnet Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         node: [ 18 ]
@@ -384,6 +389,7 @@ jobs:
         node: [ 18 ]
     name: Chain Events Integration and Unit Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       postgres:
