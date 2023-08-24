@@ -11,10 +11,8 @@ Closes: #TODO
 <!-- Brief description of solution, if bug, to be added once issue is resolved. -->
 
 ## Test Plan
-- Unit tested the `FIXME()` call.
-- CA (click around) tested on local and frack:
-  - TODO page
-  - 
+<!-- Add steps for QA to verify the feature or bug works as specified. -->
+<!-- If no QA needed (e.g. for test changes), please specify. -->
 
 ## Deployment Plan
 <!--- Omit if unneeded -->
