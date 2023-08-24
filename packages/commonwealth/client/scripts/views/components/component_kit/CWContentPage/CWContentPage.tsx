@@ -16,6 +16,7 @@ import { CWTab, CWTabBar } from '../cw_tabs';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';
+import { CWIconButton } from '../cw_icon_button';
 
 export type ContentPageSidebarItem = {
   label: string;
@@ -71,6 +72,10 @@ type ContentPageProps = {
   showSkeleton?: boolean;
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
+  showHeader?: boolean;
+  showRightSidebar?: boolean;
+  rightSidebarContent?: ContentPageSidebarItem[];
+  onCloseRightSidebar?: () => void;
 };
 
 export const CWContentPage = ({
@@ -107,6 +112,9 @@ export const CWContentPage = ({
   showSkeleton,
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
+  showHeader = true,
+  showRightSidebar = false,
+  onCloseRightSidebar,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -174,16 +182,18 @@ export const CWContentPage = ({
 
   const mainBody = (
     <div className="main-body-container">
-      <div className="header">
-        {typeof title === 'string' ? (
-          <CWText type="h3" fontWeight="semiBold">
-            {title}
-          </CWText>
-        ) : (
-          title
-        )}
-        {!isEditing ? authorAndPublishInfoRow : <></>}
-      </div>
+      {showHeader && (
+        <div className="header">
+          {typeof title === 'string' ? (
+            <CWText type="h3" fontWeight="semiBold">
+              {title}
+            </CWText>
+          ) : (
+            title
+          )}
+          {!isEditing ? authorAndPublishInfoRow : <></>}
+        </div>
+      )}
       {subHeader}
 
       {isEditing ? authorAndPublishInfoRow : <></>}
@@ -216,49 +226,70 @@ export const CWContentPage = ({
   );
 
   return (
-    <div className={ComponentType.ContentPage}>
-      {!showTabs ? (
-        <div className="sidebar-view">
-          {mainBody}
-          {showSidebar && (
-            <div className="sidebar">
-              {sidebarComponents?.map((c) => (
-                <React.Fragment key={c.label}>{c.item}</React.Fragment>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="tabs-view">
-          <CWTabBar>
-            <CWTab
-              label={contentBodyLabel}
-              onClick={() => {
-                setTabSelected(0);
-              }}
-              isSelected={tabSelected === 0}
-            />
-            {sidebarComponents?.map((item, i) => (
+    <div className="ContentPageContainer">
+      <div className={ComponentType.ContentPage}>
+        {!showTabs ? (
+          <div className="sidebar-view">
+            {mainBody}
+            {showSidebar && (
+              <div className="sidebar">
+                {sidebarComponents?.map((c) => (
+                  <React.Fragment key={c.label}>{c.item}</React.Fragment>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="tabs-view">
+            <CWTabBar>
               <CWTab
-                key={item.label}
-                label={item.label}
+                label={contentBodyLabel}
                 onClick={() => {
-                  setTabSelected(i + 1);
+                  setTabSelected(0);
                 }}
-                isSelected={tabSelected === i + 1}
+                isSelected={tabSelected === 0}
               />
-            ))}
-          </CWTabBar>
-          {tabSelected === 0 && mainBody}
-          {sidebarComponents?.length >= 1 &&
-            tabSelected === 1 &&
-            sidebarComponents[0].item}
-          {sidebarComponents?.length >= 2 &&
-            tabSelected === 2 &&
-            sidebarComponents[1].item}
-          {sidebarComponents?.length === 3 &&
-            tabSelected === 3 &&
-            sidebarComponents[2].item}
+              {sidebarComponents?.map((item, i) => (
+                <CWTab
+                  key={item.label}
+                  label={item.label}
+                  onClick={() => {
+                    setTabSelected(i + 1);
+                  }}
+                  isSelected={tabSelected === i + 1}
+                />
+              ))}
+            </CWTabBar>
+            {tabSelected === 0 && mainBody}
+            {sidebarComponents?.length >= 1 &&
+              tabSelected === 1 &&
+              sidebarComponents[0].item}
+            {sidebarComponents?.length >= 2 &&
+              tabSelected === 2 &&
+              sidebarComponents[1].item}
+            {sidebarComponents?.length === 3 &&
+              tabSelected === 3 &&
+              sidebarComponents[2].item}
+          </div>
+        )}
+      </div>
+      <div
+        style={{ width: '50px', height: '100vh', backgroundColor: 'red' }}
+      ></div>
+      {showRightSidebar && (
+        <div className="RightSidebar">
+          <div className="CloseButtonContainer">
+            <CWIconButton
+              iconName="close"
+              iconSize="small"
+              className="close-button"
+              onClick={() => {
+                if (onCloseRightSidebar) {
+                  onCloseRightSidebar();
+                }
+              }}
+            />
+          </div>
         </div>
       )}
     </div>

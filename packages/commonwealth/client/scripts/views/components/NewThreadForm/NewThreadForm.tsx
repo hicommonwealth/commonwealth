@@ -25,6 +25,7 @@ import {
   serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import { CWContentPageCard } from '../component_kit/CWContentPage';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();

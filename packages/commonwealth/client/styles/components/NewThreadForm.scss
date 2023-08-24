@@ -100,7 +100,7 @@
       flex-direction: column;
       height: 360px;
       overflow-y: auto;
-      width: 200px;
+      // width: 200px;
 
       @include visibleScrollbar(light);
 
@@ -131,4 +131,12 @@
   .JoinCommunityBanner {
     margin-top: 8px;
   }
+}
+
+.ActionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
 }
