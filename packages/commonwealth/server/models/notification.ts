@@ -10,9 +10,6 @@ import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
-
 export type NotificationAttributes = {
   id: number;
   notification_data: string;
@@ -69,7 +66,9 @@ export default (
               });
             }
           } catch (error) {
-            log.error(`incrementing thread notif afterCreate: ${error}`);
+            log.error(
+              `incrementing thread notif for thread ${thread_id} afterCreate: ${error}`
+            );
             StatsDController.get().increment('cw.hook.thread-notif-error', {
               thread_id: String(thread_id),
             });

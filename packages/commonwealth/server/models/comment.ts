@@ -9,9 +9,6 @@ import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
-
 export type CommentAttributes = {
   thread_id: string;
   address_id: number;
@@ -105,10 +102,9 @@ export default (
               });
             }
           } catch (error) {
-            log.error(`incrementing comment count error afterCreate: ${error}`);
-            StatsDController.get().increment('cw.hook.comment-count-error', {
-              thread_id,
-            });
+            log.error(
+              `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`
+            );
           }
         },
         afterDestroy: async (comment: CommentInstance) => {
@@ -126,7 +122,7 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing comment count error afterDestroy: ${error}`
+              `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`
             );
             StatsDController.get().increment('cw.hook.comment-count-error', {
               thread_id,
