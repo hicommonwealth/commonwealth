@@ -1,0 +1,121 @@
+'use strict';
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    const ceUrl =
+      'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events' ||
+      process.env.DATABASE_URL;
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.sequelize.query(
+        `
+        DELETE FROM "Subscriptions" S
+        USING "Chains" C
+         WHERE S.chain_id = C.id AND S.category_id = 'chain-event' AND C.base = 'substrate';
+      `,
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        DELETE FROM "Notifications" N
+        USING "Chains" C
+        WHERE N.chain_id = C.id AND N.category_id = 'chain-event' AND C.base = 'substrate';
+      `,
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        CREATE TEMPORARY TABLE extracted_identifiers AS
+        WITH Extracted AS (
+            SELECT
+                T.id as thread_id,
+                link_array.element AS link_element,
+                link_array.ordinality AS link_index
+            FROM "Threads" T
+                     JOIN "Chains" C ON C.id = T.chain
+                     CROSS JOIN LATERAL jsonb_array_elements(T.links) WITH ORDINALITY link_array(element, ordinality)
+            WHERE T.links @> '[{"source": "proposal"}]' AND C.base = 'substrate'
+              AND link_array.element->>'source' = 'proposal'
+        )
+        SELECT
+                link_element->>'identifier' AS link_identifier,
+                Extracted.thread_id,
+                Extracted.link_index
+        FROM Extracted;
+      `,
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        CREATE TEMPORARY TABLE merged_entity_link AS
+        WITH chain_entities AS MATERIALIZED (SELECT id AS entity_id, type, type_id, chain
+                                             FROM heroku_ext.dblink(
+                                                          '${ceUrl}',
+                                                          'SELECT id, type, type_id, chain FROM "ChainEntities";'
+                                                      ) AS type_ids(id integer, type varchar(255), type_id varchar(255), chain varchar(255)))
+        SELECT *
+        FROM chain_entities ce
+                 JOIN extracted_identifiers ei ON ce.entity_id::text = ei.link_identifier;
+      `,
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        DO
+        $$
+            DECLARE
+                r RECORD;
+            BEGIN
+                FOR r IN (SELECT * FROM merged_entity_link)
+                    LOOP
+                        UPDATE "Threads"
+                        SET links = CASE
+                                        WHEN r.type = 'treasury-proposal' THEN jsonb_set(
+                                                jsonb_set(links, ARRAY [r.link_index::text, 'source'], '"web"'),
+                                                ARRAY [r.link_index::text, 'identifier'],
+                                                ('"https://' || r.chain || '.subscan.io/treasury/' || r.type_id || '"')::jsonb)
+                                        WHEN r.type = 'democracy-referendum' THEN jsonb_set(
+                                                jsonb_set(links, ARRAY [r.link_index::text, 'source'], '"web"'),
+                                                ARRAY [r.link_index::text, 'identifier'],
+                                                ('"https://' || r.chain || '.subscan.io/referenda/' || r.type_id || '"')::jsonb)
+                                        WHEN r.type = 'democracy-proposal' THEN jsonb_set(
+                                                jsonb_set(links, ARRAY [r.link_index::text, 'source'], '"web"'),
+                                                ARRAY [r.link_index::text, 'identifier'],
+                                                ('"https://' || r.chain || '.subscan.io/democracy_proposal/' || r.type_id ||
+                                                 '"')::jsonb)
+                                        WHEN r.type = 'tip-proposal' THEN jsonb_set(
+                                                jsonb_set(links, ARRAY [r.link_index::text, 'source'], '"web"'),
+                                                ARRAY [r.link_index::text, 'identifier'],
+                                                ('"https://' || r.chain || '.subscan.io/treasury_tip/' || r.type_id || '"')::jsonb)
+                                        ELSE links
+                            END
+                        WHERE id = r.thread_id;
+                    END LOOP;
+            END
+        $$
+        LANGUAGE plpgsql;
+      `,
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        DROP TABLE extracted_identifiers;
+      `,
+        { transaction }
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        DROP TABLE merged_entity_link;
+      `,
+        { transaction }
+      );
+    });
+  },
+
+  down: async (queryInterface, Sequelize) => {},
+};
