@@ -15,7 +15,7 @@
 
   .sidebar-and-body-container {
     display: flex;
-    height: 100%;
+    height: calc(100% - #{$global-header-height});
     overflow: hidden;
     width: 100%;
 
