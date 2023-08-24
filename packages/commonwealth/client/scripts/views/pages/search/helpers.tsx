@@ -3,8 +3,8 @@ import React, { useMemo } from 'react';
 
 import 'pages/search/index.scss';
 
+import { useGetProfilesByAddressesQuery } from 'client/scripts/state/api/profiles';
 import app from 'state';
-import NewProfilesController from '../../../controllers/server/newProfiles';
 import ChainInfo from '../../../models/ChainInfo';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
@@ -212,15 +212,17 @@ type MemberResultRowProps = {
   setRoute: any;
 };
 const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
-  const chain = addr.addresses[0].chain;
-  const address = addr.addresses[0].address;
-  const profile: MinimumProfile = NewProfilesController.Instance.getProfile(
-    chain,
-    address
-  );
+  const { chain, address } = addr.addresses[0];
+  const { data: users } = useGetProfilesByAddressesQuery({
+    profileChainIds: [chain],
+    profileAddresses: [address],
+    currentChainId: app.activeChainId(),
+    apiCallEnabled: !!(chain && address),
+  });
+  const profile: MinimumProfile = users?.[0];
 
   const handleClick = () => {
-    setRoute(`/profile/id/${profile.id}`, {}, null);
+    setRoute(`/profile/id/${profile?.id}`, {}, null);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) {

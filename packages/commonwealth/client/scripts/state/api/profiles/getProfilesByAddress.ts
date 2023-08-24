@@ -46,13 +46,13 @@ const fetchProfilesByAddress = async ({
 };
 
 interface UseFetchProfilesByAddressQuery extends FetchProfilesByAddressProps {
-  apiEnabled?: boolean;
+  apiCallEnabled?: boolean;
 }
 const useFetchProfilesByAddressQuery = ({
   currentChainId,
   profileChainIds,
   profileAddresses,
-  apiEnabled = true,
+  apiCallEnabled = true,
 }: UseFetchProfilesByAddressQuery) => {
   return useQuery({
     queryKey: [
@@ -68,7 +68,7 @@ const useFetchProfilesByAddressQuery = ({
         profileChainIds,
       }),
     staleTime: PROFILES_STALE_TIME,
-    enabled: apiEnabled,
+    enabled: apiCallEnabled,
   });
 };
 
