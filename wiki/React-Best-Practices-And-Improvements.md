@@ -131,7 +131,7 @@ The same is true for event handler definitions, like `onClick`. Define the handl
 
 Pre-commit, we should run `yarn format`, which runs the `prettier` library to ensure our code is well-formatted.
 
-Down the line we [may want to invole the Husky library in this process](https://prettier.io/docs/en/precommit.html).
+Down the line we [may want to involve the Husky library in this process](https://prettier.io/docs/en/precommit.html).
 
 ### Example component composition
 

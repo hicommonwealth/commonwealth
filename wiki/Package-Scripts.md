@@ -1,6 +1,7 @@
-_Documentation for [the Commonwealth package.json file](../packages/commonwealth/package.json)._
+This entry documents [the Commonwealth package.json file](../packages/commonwealth/package.json). `Package.json` scripts should always be organized alphabetically. If you add a script, you *must* add documentation in this file describing (1) what it does (2) when engineers might use it.
 
-**CONTENTS**
+# Contents
+
 - [Build Scripts](#build-scripts)
   - [build-all](#build-all)
   - [build-app](#build-app)
@@ -26,8 +27,8 @@ _Documentation for [the Commonwealth package.json file](../packages/commonwealth
   - [reset-db](#reset-db)
   - [reset-frack-db](#reset-frack-db)
 - [Docker](#docker)
-  -[start-docker-setup](#start-docker-setup)
   -[start-containers](#start-containers)
+  -[start-docker-setup](#start-docker-setup)
 - [Linting & Formatting](#linting--formatting)
   - [format](#format)
   - [lint](#lint)
@@ -52,8 +53,8 @@ _Documentation for [the Commonwealth package.json file](../packages/commonwealth
   - [test-e2e](#test-e2e)
   - [test-e2e-serial](#test-e2e-serial)
 - [Storybook](#storybook)
+  - [build-storybook](#build-storybook)
   - [storybook](#storybook-1)
-  - [build-storybook](#build-storybook)*
 - [Testing](#testing)
   - [integration-test](#integration-test)
   - [test](#test)
@@ -69,26 +70,26 @@ _Documentation for [the Commonwealth package.json file](../packages/commonwealth
   - [test-suite](#test-suite)
   - [unit-test](#unit-test)
   - [unit-test:watch](#unit-testwatch)
-- [TSNode](#tsnode)
-  - [listen](#listen)
-  - [start](#start)
 - [TypeScript](#typescript)
   - [build-consumer](#build-consumer)
   - [check-types](#check-types)
-- [Webpack](#webpack)
+- [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
+  - [listen](#listen)
   - [profile](#profile)
-
+  - [start](#start)
+  - [start-all](#start-all)
+  - [start-consumer](#start-consumer)
 
 # Build Scripts
 
 ## build-all
 
-Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
+Definition: `yarn build-app && yarn build-consumer`
 
 Description: Builds app based on webpack.prod.config.js file, as well as the build-consumer script
 
-Considerations: Eliminate redundancy by invoking [build-app](#build-app) in definition.
+Considerations: Merely an aggregate script of `build-app` and `build-consumer`; may not be necessary. **Flagged for possible removal.**
 
 ## build-app
     
@@ -100,13 +101,13 @@ Description: Builds project, allocating max 4096MB memory to Node; runs webpack 
 
 Definition: `NODE_ENV=production build client/styles/shared.scss` 
 
-Considerations: Why do we have a separate CSS build? Who uses it? And does it even work? We don't appear to have a `build` command that it could modify. Deprecated; recommend removal.
+Considerations: Why do we have a separate CSS build? Who uses it? And does it even work? We don't appear to have a `build` command that it could modify. **Deprecated; recommend removal.**
 
 ## heroku-postbuild
 
 Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
 
-Description: Builds project on Heroku, using get-max-old-space-size.sh to dynamically allocate memory; runs webpack and build-consumer script
+Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dynamically allocate memory, then running webpack and the [build-consumer](#build-consumer) script
 
 # CI Scripts
 
@@ -116,17 +117,17 @@ Definition: `FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts`
 
 Description: Used by our CI tool to start the server.
 
-Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file?
+Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file? **Flagged for possible removal.**
 
 ## wait-server
 
 Definition: `chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh`
 
-Description: Used for CI. Waits for the server to be ready (start serving on port 8080)
+Description: Used for CI. Waits for the server to be ready (start serving on port 8080).
 
 Contributor: Kurtis Assad
 
-Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file?
+Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file? **Flagged for possible removal.**
 
 # Database Scripts
 
@@ -136,7 +137,7 @@ Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
 
 Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily. 
 
-Considerations: Engineers will almost never need to use this locally (unless they have purposefully create a large number of test notifications). This script was authored at the request of Jake Naviasky; we should confer with him as to the long-term value of this script.
+Considerations: Engineers will almost never need to use this locally (unless they have purposefully create a large number of test notifications). This script was authored at the request of Jake Naviasky; we should confer with him as to the long-term value of this script. **Flagged for possible removal.**
 
 Contributor: Timothee Legros
 
@@ -177,8 +178,6 @@ Description: Exports the local Postgres database to a dump file, `local_save.dum
 Definition: `chmod u+x scripts/load-db.sh && ./scripts/load-db.sh`
 
 Description: Loads database following the `load-db.sh` script. Looks for dump file `latest.dump` by default; if script is called with an argument, the value of DUMP_NAME will be updated to that argument's value.
-
-Considerations: Should we reconcile various dump names in different scripts to be consistent?
 
 ## load-db-limit 
 
@@ -228,31 +227,31 @@ Description: Resets the local database.
 
 Definition: `heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack`
 
-Description: Synchronizes `beta-db` with `frack-db`. Good for undoing migration script run in previous commit to frack.
-
-Considerations: Clarify documentation.
+Description: Synchronizes `beta-db` (used for QA) against the `frack-db` (used for CDN cache testing). Good for undoing migration script run in previous commit to Frack. See [Testing Environments](./Testing-Environments.md) entry for more info.
 
 # Docker
-
-## start-docker-setup
-
-Definition: `chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh`
-
-Description: Run in a new project or repo when first setting up remote docker containers. See [start-docker-setup-help.sh](../packages/commonwealth/scripts/start-docker-setup-help.sh) for further documentation.
 
 ## start-containers
 
 Definition: `chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh`
 
-Description: Start remote Docker containers; see [start-docker-containers.sh](../packages/commonwealth/scripts/start-docker-containers.sh) for further documentation.
+Description: Starts remote Docker containers; see [start-docker-containers.sh](../packages/commonwealth/scripts/start-docker-containers.sh) for further documentation.
+
+## start-docker-setup
+
+Definition: `chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh`
+
+Description: To be run in a new project or repo when first setting up remote docker containers. See [start-docker-setup-help.sh](../packages/commonwealth/scripts/start-docker-setup-help.sh) for further documentation.
 
 # Linting & Formatting
+
+Open considerations: Given our Prettier pre-commit hook, this amount of linting and formatting commands may be unnecessary. 
 
 ## format
 
 Definition: `prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .`
 
-Description: Autoformats files using config file prettierrc.json
+Description: Autoformats files using config `prettierrc.json` config.
 
 ## lint
 
@@ -260,7 +259,7 @@ Definition: `./scripts/lint-new-work.sh`
 
 Description: Lints new work, according to script file `lint-new-work.sh`. 
 
-Considerations: Problematically, only checks .ts files. Name is misleading. Redundancy with [lint-branch](#lint-branch) script.
+Considerations: Problematically, only checks .ts files. Name is misleading. Redundancy with [lint-branch](#lint-branch) script. **Flagged for possible removal.**
 
 ## lint-all
 
@@ -268,7 +267,7 @@ Definition: `eslint client/\\**/*.{ts,tsx} server/\\**/*.ts`
 
 Description: Only lints changed files on current branch. 
 
-Considerations: May be better renamed "lint-changes"
+Considerations: May be more clearly renamed "lint-changes".
 
 ## lint-branch
 
@@ -276,7 +275,7 @@ Definition: `./scripts/lint-branch.sh`
 
 Description: Redundant with [lint](#lint) script, which uses 'git status' instead of 'git diff' but is build toward the same action (isolating changed files for linting).
 
-Considerations: Recommend eliminating either [lint](#lint) or [lint-branch](#lint-branch) scripts. Problematically, lint-branch only checks .ts files.
+Considerations: Recommend eliminating either [lint](#lint) or [lint-branch](#lint-branch) scripts. Problematically, lint-branch only checks .ts files. **Flagged for possible removal.**
 
 ## style-lint
 
@@ -284,11 +283,11 @@ Definition: `stylelint client/styles/*`
 
 Description: Lints SCSS files.
 
-Considerations: Why lint styles separately? Why not just include .scss file extension in [lint](#lint) and [lint-all](#lint-all) scripts (which currently only target .ts files)?
+Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint](#lint) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
 
 # Mobile
 
-_Open question: Are these still in use?_
+Open considerations: Are these still in use?
 
 ## build-android 
 
@@ -306,7 +305,7 @@ Description: Uses Capacitor library to build app for iOS based on webpack.config
 
 Contributor: Dillon Chen
 
-## open-ios
+## open-android
 
 Definition: `NODE_ENV=mobile npx cap open android`
 
@@ -344,7 +343,9 @@ Contributor: Dillon Chen
 
 Definition: `npx ts-node -T ./scripts/compressImages.ts`
 
-Considerations: (per author) Deprecated; recommend removal.
+Considerations: (per contributor) **Deprecated; recommend removal.**
+
+Contributor: Kurtis Assad
 
 ## datadog-db-setup
 
@@ -360,11 +361,13 @@ Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 
 Description: Schedules a daily task for sending notification email digests.
 
+Considerations: Script name might be worth shortening.
+
 ## start-prerender
 
 Definition: `ts-node --project tsconfig.json server/scripts/runPrerenderService.ts`
 
-Considerations: Deprecated; recommend removal. Referenced script no longer exists.
+Considerations: Referenced prerender script no longer exists. **Deprecated; recommend removal.** 
 
 # Playwright
 
@@ -402,14 +405,6 @@ Contributor: Kurtis Assad
 
 # Storybook
 
-## storybook
-
-Definition: `storybook dev -p 6006`
-
-Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
-
-Contributor: Daniel Martins
-
 ## build-storybook
 
 Definition `storybook build`
@@ -418,7 +413,15 @@ Description:  Compiles Storybook instance for deployment.
 
 Contributor: Daniel Martins
 
-Considerations: Deprecated; recommend removal. Not used by Storybook / Design System team.
+Considerations: Not used by Storybook / Design System team. **Deprecated; recommend removal.**
+
+## storybook
+
+Definition: `storybook dev -p 6006`
+
+Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
+
+Contributor: Daniel Martins
 
 # Testing
 
@@ -449,32 +452,31 @@ Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integrati
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
-
 ## test-client
 
 Definition: `webpack-dev-server --config webpack/webpack.config.test.js`
 
 Description: Ostensibly used to test only client-side code.
 
-Considerations: The `webpack.config.test.js` file referenced does not exist. Deprecated; recommend removal.
+Considerations: The `webpack.config.test.js` file referenced does not exist. **Deprecated; recommend removal.**
 
 ## test-consumer
 
 Definition: `ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000`
 
-Description: 
+Considerations: The `consumer.test.ts` file referenced does not exist. **Deprecated; recommend removal.**
 
 ## test-devnet
 
 Definition: `nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts`
 
-Description: Runs all tests in our /devnet folder.
+Description: Runs all tests in our `/devnet`` folder.
 
 ## test-emit-notif 
 
 Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/emitNotifications.spec.ts`
 
-Description: Runs only the emitNotifications.spec.ts test, of the three /integration folder "utils."
+Description: Runs only the `emitNotifications.spec.ts` test, of the three `/integration`` folder "utils."
 
 ## test-events
 
@@ -482,7 +484,7 @@ Definition: `nyc ts-mocha --project tsconfig.json ./test/integration/events/*.sp
 
 Description: Ostensibly used to test all events in our integration folder.
 
-Considerations: Misleading name (should be integration-scoped). More importantly, we do not have an /events folder inside our /integration directory. Deprecated; recommend removal.
+Considerations: Misleading name (should be integration-scoped). More importantly, we do not have an /events folder inside our /integration directory. **Deprecated; recommend removal.**
 
 ## test-integration-util
 
@@ -516,7 +518,7 @@ Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/**/*.spec
 
 Description: Runs all tests in our /test directory.
 
-Considerations: This is equivalent to our `test` script but with `NODE_ENV=test` added. Why? Do we actually need both versions?
+Considerations: This is equivalent to our `test` script but with `NODE_ENV=test` added. Why? Do we actually need both versions? **Flagged for possible removal.**
 
 ## unit-test
 
@@ -538,22 +540,6 @@ Considerations: This script breaks our more usual test script syntax, which typi
 
 Contributor: Ryan Bennett
 
-# TSNode
-
-## listen
-
-Definition: `RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts`
-
-Description: Runs ts-node, a TypeScript execution engine for NodeJS, in listening mode for changes, following tsconfig.json and using [server.ts](../packages/commonwealth/server.ts) as the entry file.
-
-## start
-
-Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
-
-Description: Used to start the Commonwealth app in development. Runs both the backend and frontend server.
-
-Considerations: Follow up with Kurtis; see #2247
-
 # TypeScript
 
 ## build-consumer
@@ -568,7 +554,7 @@ Definition: `tsc --noEmit`
 
 Description: Runs a compilation of TypeScript files based on tsconfig.json; does not emit files.
 
-# Webpack
+# Webpack && TSNode
 
 ## bundle-report    
 
@@ -576,23 +562,34 @@ Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
     
 Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.js](../packages/commonwealth/webpack/webpack.prod.config.js), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
 
+## listen
+
+Definition: `RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts`
+
+Description: Runs ts-node, a TypeScript execution engine for NodeJS, in listening mode for changes, following tsconfig.json and using [server.ts](../packages/commonwealth/server.ts) as the entry file.
+
 ## profile 
 
 Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.dev.config.js --json --profile > webpack-stats.json`
 
 Description: Runs build webpack analyzer. 
 
-Considerations: Deprecated; recommend removal. Appears to be redundant with `bundle-report`. As of 22-08-03 #all-eng conversation, appears to be unused. See also [stats.sh](../packages/commonwealth/stats.sh) for possible removal.
+Considerations: **Deprecated; recommend removal.** Appears to be redundant with `bundle-report`. As of 22-08-03 #all-eng conversation, appears to be unused. See also [stats.sh](../packages/commonwealth/stats.sh) for possible removal.
 
+## start
 
-## start-consumer
+Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
 
-Definition: `ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script`
-
-Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
+Description: Windows-compatible start script. Used to start the Commonwealth app in development. 
 
 ## start-all
 
 Definition: `concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'`
 
 Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app server, and the CommonwealthConsumer script) concurrently with the `concurrently` package.
+
+## start-consumer
+
+Definition: `ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script`
+
+Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
