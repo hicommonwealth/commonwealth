@@ -2,9 +2,14 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const ceUrl =
-      process.env.CE_DATABASE_URL ||
-      'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events';
+    const ceUrl = process.env.CE_DATABASE_URL;
+
+    if (!ceUrl) {
+      console.warn(
+        'CE_DATABASE_URL env var not set. Substrate proposal links not updated.'
+      );
+      return;
+    }
 
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
