@@ -195,4 +195,9 @@ $width: 360px;
       @include gallery-grid(8px, column);
     }
   }
+
+  .tooltip {
+    @include gallery-grid(32px, column);
+    align-items: center;
+  }
 }

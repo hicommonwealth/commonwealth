@@ -13,34 +13,59 @@ import { parseUserMentions } from '../../util/parseUserMentions';
 import { CommentAttributes } from '../../models/comment';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   ThreadNotFoundForComment: 'Thread not found for comment',
   BanError: 'Ban error',
   ParseMentionsFailed: 'Failed to parse mentions',
+  NoId: 'Must provide id',
 };
 
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
   chain: ChainInstance;
-  commentId: number;
+  commentId?: number;
   commentBody: string;
+  discordMeta?: any;
 };
 
 export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
 
 export async function __updateComment(
   this: ServerCommentsController,
-  { user, address, chain, commentId, commentBody }: UpdateCommentOptions
+  {
+    user,
+    address,
+    chain,
+    commentId,
+    commentBody,
+    discordMeta,
+  }: UpdateCommentOptions
 ): Promise<UpdateCommentResult> {
+  if (!commentId && !discordMeta) {
+    throw new AppError(Errors.NoId);
+  }
+
+  if (discordMeta !== undefined && discordMeta !== null) {
+    const existingComment = await this.models.Comment.findOne({
+      where: { discord_meta: discordMeta },
+    });
+    if (existingComment) {
+      commentId = existingComment.id;
+    } else {
+      throw new AppError(Errors.NoId);
+    }
+  }
+
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
     chain: chain.id,
     address: address.address,
   });
   if (!canInteract) {
-    throw new Error(`${Errors.BanError}: ${banError}`);
+    throw new AppError(`${Errors.BanError}: ${banError}`);
   }
 
   const userOwnedAddressIds = (await user.getAddresses())
@@ -57,7 +82,7 @@ export async function __updateComment(
     where: { id: comment.thread_id },
   });
   if (!thread) {
-    throw new Error(Errors.ThreadNotFoundForComment);
+    throw new AppError(Errors.ThreadNotFoundForComment);
   }
 
   let latestVersion;
@@ -136,7 +161,7 @@ export async function __updateComment(
       return !alreadyExists;
     });
   } catch (e) {
-    throw new Error(Errors.ParseMentionsFailed);
+    throw new AppError(Errors.ParseMentionsFailed);
   }
 
   // grab mentions to notify tagged users

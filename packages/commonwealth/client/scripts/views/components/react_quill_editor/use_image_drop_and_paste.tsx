@@ -69,40 +69,32 @@ export const useImageDropAndPaste = ({
           app.user.jwt
         );
 
-        const selectedIndex: number = editor.getSelection()?.index;
+        const selectedIndex = editor.getSelection()?.index;
         const text: string = editor.getText();
-        const blankEditor: boolean = editor.getLength() === 1;
-        const isEndOfLine: boolean = text[selectedIndex].endsWith('\n');
-        let middleOfText = false;
+        let blankEditor = false;
+        let lineBreak = '\n';
 
-        // adds line break to insert image above or below text
-        if (!blankEditor) {
-          let lineBreak = '\n';
+        // When Quill editor is blank, getLength returns 1
+        if (editor.getLength() > 1) {
           if (text[selectedIndex - 1] && text[selectedIndex]) {
             lineBreak = '\n\n';
-            middleOfText = true;
           }
-
-          editor.setText(
-            text
-              .slice(0, selectedIndex)
-              .concat(lineBreak)
-              .concat(text.slice(selectedIndex))
-          );
         } else {
-          editor.setText('\n'.concat(text));
+          blankEditor = true;
         }
-
-        const destinationIndex: number =
-          (isEndOfLine && !blankEditor) || middleOfText
-            ? selectedIndex + 1
-            : selectedIndex;
 
         // insert image op at the selected index
         if (isMarkdownEnabled) {
-          editor.insertText(destinationIndex, `![image](${uploadedFileUrl})`);
+          editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
         } else {
-          editor.insertEmbed(destinationIndex, 'image', uploadedFileUrl);
+          if (!blankEditor) {
+            editor.insertText(selectedIndex, lineBreak);
+          }
+          if (selectedIndex === 0) {
+            editor.insertEmbed(selectedIndex, 'image', uploadedFileUrl);
+          } else {
+            editor.insertEmbed(selectedIndex + 1, 'image', uploadedFileUrl);
+          }
         }
         setContentDelta({
           ...editor.getContents(),

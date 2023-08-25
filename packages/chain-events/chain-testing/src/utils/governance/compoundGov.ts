@@ -155,21 +155,52 @@ export class compoundGovernor implements IGovernor {
     let txReceipt;
     if (currBalance.lt(tokensNeeded)) {
       try {
+        const binanceWalletAddress =
+          '0xF977814e90dA44bFA03b6295A0616a897441aceC';
+        const binanceWalletTokensAvailable = provider.utils.toBN(
+          await compToken.methods.balanceOf(binanceWalletAddress).call()
+        );
         txReceipt = await compToken.methods
-          .transfer(accounts, tokensNeeded)
+          .transfer(accounts, binanceWalletTokensAvailable)
           .send({
-            from: '0xF977814e90dA44bFA03b6295A0616a897441aceC',
+            from: binanceWalletAddress,
             gasLimit: 100000,
           });
-      } catch {
-        txReceipt = await compToken.methods
-          .transfer(accounts, tokensNeeded)
-          .send({
-            from: '0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7',
-            gasLimit: 100000,
-          });
+      } catch (e) {
+        console.error('Failed to transfer tokens from binance wallet', e);
+      }
+
+      const newBalance = provider.utils.toBN(
+        await compToken.methods.balanceOf(accounts).call()
+      );
+
+      if (newBalance.lt(tokensNeeded)) {
+        try {
+          const fundWalletAddress =
+            '0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7';
+          const fundWalletTokensAvailable = provider.utils.toBN(
+            await compToken.methods.balanceOf(fundWalletAddress).call()
+          );
+          txReceipt = await compToken.methods
+            .transfer(accounts, fundWalletTokensAvailable)
+            .send({
+              from: fundWalletAddress,
+              gasLimit: 100000,
+            });
+        } catch (e) {
+          console.log('Failed to transfer tokens from fund wallet', e);
+        }
       }
     }
+
+    const newBalance = provider.utils.toBN(
+      await compToken.methods.balanceOf(accounts).call()
+    );
+    if (newBalance.lt(tokensNeeded)) {
+      console.error('Not enough tokens in binance and fund wallet');
+      return;
+    }
+
     try {
       txReceipt = await compToken.methods
         .delegate(accounts)

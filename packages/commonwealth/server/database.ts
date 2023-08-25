@@ -5,7 +5,6 @@ import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';
 import ChainFactory from './models/chain';
-import ChainEntityMetaFactory from './models/chain_entity_meta';
 import ChainNodeFactory from './models/chain_node';
 import CollaborationFactory from './models/collaboration';
 import CommentFactory from './models/comment';
@@ -15,7 +14,6 @@ import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
-import DiscussionDraftFactory from './models/discussion_draft';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
@@ -53,7 +51,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
           log.trace(msg);
         },
   dialectOptions:
-    process.env.NODE_ENV !== 'production'
+    process.env.NODE_ENV !== 'production' || process.env.NO_SSL
       ? { requestTimeout: 40000 }
       : DATABASE_URI ===
         'postgresql://commonwealth:edgeware@localhost/commonwealth'
@@ -72,7 +70,6 @@ const models: Models = {
   Ban: BanFactory(sequelize, DataTypes),
   Chain: ChainFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
-  ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
   ContractAbi: ContractAbiFactory(sequelize, DataTypes),
@@ -88,7 +85,6 @@ const models: Models = {
   Template: TemplateFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
-  DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),

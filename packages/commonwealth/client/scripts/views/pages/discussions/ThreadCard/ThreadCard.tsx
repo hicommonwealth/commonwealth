@@ -12,26 +12,27 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { getClasses } from 'views/components/component_kit/helpers';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import AddressInfo from '../../../../models/AddressInfo';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
-import { CWTag } from 'views/components/component_kit/cw_tag';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { getClasses } from 'views/components/component_kit/helpers';
-import { isNewThread } from '../NewThreadTag';
 import { isHot } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
+import './ThreadCard.scss';
+import { CardSkeleton } from './ThreadCardSkeleton';
 import { ThreadOptions } from './ThreadOptions';
 import { AdminActionsProps } from './ThreadOptions/AdminActions';
 import { ReactionButton } from './ThreadOptions/ReactionButton';
-import './ThreadCard.scss';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
   onStageTagClick?: (stage: ThreadStage) => any;
-  threadHref: string;
+  threadHref?: string;
+  showSkeleton?: boolean;
+  canReact?: boolean;
 };
 
 export const ThreadCard = ({
@@ -40,7 +41,6 @@ export const ThreadCard = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -51,16 +51,22 @@ export const ThreadCard = ({
   onBodyClick,
   onStageTagClick,
   threadHref,
+  showSkeleton,
+  canReact = true,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
   }, []);
+
+  if (showSkeleton)
+    return (
+      <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
+    );
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -93,11 +99,7 @@ export const ThreadCard = ({
         key={thread.id}
       >
         {!isWindowSmallInclusive && (
-          <ReactionButton
-            thread={thread}
-            size="big"
-            disabled={!hasJoinedCommunity}
-          />
+          <ReactionButton thread={thread} size="big" disabled={!canReact} />
         )}
         <div className="content-wrapper">
           <div className="content-header">
@@ -106,7 +108,6 @@ export const ThreadCard = ({
                 new AddressInfo(null, thread.author, thread.authorChain, null)
               }
               publishDate={moment(thread.createdAt).format('l')}
-              isNew={isNewThread(thread.createdAt)}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {
@@ -128,7 +129,7 @@ export const ThreadCard = ({
                 {thread.title}
               </CWText>
             </div>
-            <div className='content-top-tags'>
+            <div className="content-top-tags">
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
               {linkedSnapshots.length > 0 && (
@@ -200,7 +201,6 @@ export const ThreadCard = ({
               onSpamToggle={onSpamToggle}
               onLockToggle={onLockToggle}
               onPinToggle={onPinToggle}
-              onTopicChange={onTopicChange}
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onCollaboratorsEdit={onCollaboratorsEdit}

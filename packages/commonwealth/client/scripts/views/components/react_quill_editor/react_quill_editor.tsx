@@ -240,20 +240,20 @@ const ReactQuillEditor = ({
               handleToggleMarkdown={handleToggleMarkdown}
               setIsPreviewVisible={setIsPreviewVisible}
               isDisabled={isDisabled}
+              isPreviewDisabled={getTextFromDelta(contentDelta).length < 1}
             />
-
-            <div data-text-editor="name">
-              <DragDropContext onDragEnd={handleDragStop}>
-                <Droppable droppableId="quillEditor">
-                  {(provided) => (
-                    <div
-                      className={`${isDraggingOver ? 'ondragover' : ''}`}
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      onDragOver={handleDragStart}
-                      onDragLeave={handleDragStop}
-                      onDrop={handleDragStop}
-                    >
+            <DragDropContext onDragEnd={handleDragStop}>
+              <Droppable droppableId="quillEditor">
+                {(provided) => (
+                  <div
+                    className={`${isDraggingOver ? 'ondragover' : ''}`}
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    onDragOver={handleDragStart}
+                    onDragLeave={handleDragStop}
+                    onDrop={handleDragStop}
+                  >
+                    <div data-text-editor="name">
                       <ReactQuill
                         ref={editorRef}
                         className={clsx('QuillEditor', className, {
@@ -297,12 +297,12 @@ const ReactQuillEditor = ({
                           },
                         }}
                       />
-                      {provided.placeholder}
                     </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            </div>
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </>
         )}
       </div>
