@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import 'components/snapshot_proposal_selector.scss';
+import 'components/url_link_selector.scss';
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
@@ -14,7 +14,6 @@ type UrlSelectorProps = {
 
 export const UrlSelector = ({ onSelect, urlsToSet }: UrlSelectorProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false);
   const queryLength = searchTerm?.trim()?.length;
 
   const getEmptyContentMessage = () => {
@@ -61,7 +60,7 @@ export const UrlSelector = ({ onSelect, urlsToSet }: UrlSelectorProps) => {
   );
 
   return (
-    <div className="SnapshotProposalSelector">
+    <div className="UrlLinkSelector">
       <CWTextInput
         placeholder="Search for urls"
         iconRightonClick={handleClearButtonClick}
@@ -71,7 +70,7 @@ export const UrlSelector = ({ onSelect, urlsToSet }: UrlSelectorProps) => {
       />
 
       <QueryList
-        loading={loading}
+        loading={false}
         options={urlsToSet}
         components={{ EmptyPlaceholder: EmptyComponent }}
         renderItem={renderItem}
