@@ -3,8 +3,9 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const ceUrl =
-      'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events' ||
-      process.env.DATABASE_URL;
+      process.env.CE_DATABASE_URL ||
+      'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events';
+
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
         `
