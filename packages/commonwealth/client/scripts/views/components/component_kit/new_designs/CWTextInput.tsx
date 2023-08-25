@@ -33,7 +33,6 @@ export type BaseTextInputProps = {
   tabIndex?: number;
   instructionalMessage?: string;
   manualStatusMessage?: string;
-  manualValidationStatus?: ValidationStatus;
 };
 
 type InputStyleProps = {
@@ -70,31 +69,29 @@ export const MessageRow: FC<MessageRowProps> = ({
   statusMessage,
   validationStatus,
   instructionalMessage,
-}) => {
-  return (
-    <div className={getClasses({}, 'MessageRow')}>
-      {label && <CWLabel label={label} />}
-      {instructionalMessage && <CWLabel label={instructionalMessage} />}
-      {hasFeedback && (
-        <>
-          <div className={getClasses({ validationStatus }, 'icon')}>
-            {validationStatus === 'success' && <CheckCircle weight="fill" />}
-            {validationStatus === 'failure' && <Warning weight="fill" />}
-          </div>
-          <CWText
-            type="caption"
-            className={getClasses<{ status: ValidationStatus }>(
-              { status: validationStatus },
-              'feedback-message-text'
-            )}
-          >
-            {statusMessage}
-          </CWText>
-        </>
-      )}
-    </div>
-  );
-};
+}) => (
+  <div className={getClasses({}, 'MessageRow')}>
+    {label && <CWLabel label={label} />}
+    {instructionalMessage && <CWLabel label={instructionalMessage} />}
+    {hasFeedback && (
+      <>
+        <div className={getClasses({ validationStatus }, 'icon')}>
+          {validationStatus === 'success' && <CheckCircle weight="fill" />}
+          {validationStatus === 'failure' && <Warning weight="fill" />}
+        </div>
+        <CWText
+          type="caption"
+          className={getClasses<{ status: ValidationStatus }>(
+            { status: validationStatus },
+            'feedback-message-text'
+          )}
+        >
+          {statusMessage}
+        </CWText>
+      </>
+    )}
+  </div>
+);
 
 export const useTextInputWithValidation = () => {
   const [inputTimeout, setInputTimeout] = React.useState<
@@ -146,7 +143,6 @@ export const CWTextInput = (props: TextInputProps) => {
     tabIndex,
     displayOnly,
     manualStatusMessage = '',
-    manualValidationStatus = '',
     instructionalMessage,
   } = props;
 
@@ -168,9 +164,7 @@ export const CWTextInput = (props: TextInputProps) => {
         <MessageRow
           label={label}
           statusMessage={manualStatusMessage || validationProps.statusMessage}
-          validationStatus={
-            manualValidationStatus || validationProps.validationStatus
-          }
+          validationStatus={validationProps.validationStatus}
         />
       )}
       <div className={getClasses({ fullWidth }, 'input-and-icon-container')}>
@@ -197,20 +191,20 @@ export const CWTextInput = (props: TextInputProps) => {
           maxLength={maxLength}
           name={name}
           placeholder={placeholder}
-          onInput={(e) => {
+          onInput={(e: any) => {
             if (onInput) onInput(e);
 
-            if (e.currentTarget.value?.length === 0) {
+            if (e.target.value?.length === 0) {
               validationProps.setValidationStatus(undefined);
               validationProps.setStatusMessage(undefined);
             } else {
               e.stopPropagation();
               clearTimeout(validationProps.inputTimeout);
-              const timeout = e.currentTarget.value?.length > 3 ? 250 : 1000;
+              const timeout = e.target.value?.length > 3 ? 250 : 1000;
               validationProps.setInputTimeout(
                 setTimeout(() => {
-                  if (inputValidationFn && e.currentTarget.value?.length > 3) {
-                    const result = inputValidationFn(e.currentTarget.value);
+                  if (inputValidationFn && e.target.value?.length > 3) {
+                    const result = inputValidationFn(e.target.value);
                     validationProps.setValidationStatus(result[0]);
                     validationProps.setStatusMessage(result[1]);
                   }
@@ -224,7 +218,7 @@ export const CWTextInput = (props: TextInputProps) => {
                 validationProps.setValidationStatus(undefined);
                 validationProps.setStatusMessage(undefined);
               } else {
-                const result = inputValidationFn(e.currentTarget.value);
+                const result = inputValidationFn(e.target.value);
                 validationProps.setValidationStatus(result[0]);
                 validationProps.setStatusMessage(result[1]);
               }
@@ -248,18 +242,14 @@ export const CWTextInput = (props: TextInputProps) => {
         <MessageRow
           instructionalMessage={instructionalMessage}
           statusMessage={manualStatusMessage || validationProps.statusMessage}
-          validationStatus={
-            manualValidationStatus || validationProps.validationStatus
-          }
+          validationStatus={validationProps.validationStatus}
         />
       )}
       {label && (
         <MessageRow
           hasFeedback={!!inputValidationFn}
           statusMessage={manualStatusMessage || validationProps.statusMessage}
-          validationStatus={
-            manualValidationStatus || validationProps.validationStatus
-          }
+          validationStatus={validationProps.validationStatus}
         />
       )}
     </div>
