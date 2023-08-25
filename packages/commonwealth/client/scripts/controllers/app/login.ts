@@ -144,28 +144,6 @@ export async function completeClientLogin(account: Account) {
   }
 }
 
-export async function updateLastVisited(
-  activeEntity: ChainInfo,
-  updateFrontend?: boolean
-) {
-  if (!app.isLoggedIn()) return;
-  try {
-    const timestamp = moment();
-    const obj = { activeEntity: activeEntity.id, timestamp };
-    const value = JSON.stringify(obj);
-    if (updateFrontend) {
-      app.user.lastVisited[activeEntity.id] = new Date().toISOString();
-    }
-    await $.post(`${app.serverUrl()}/writeUserSetting`, {
-      jwt: app.user.jwt,
-      key: 'lastVisited',
-      value,
-    });
-  } catch (e) {
-    console.log('Could not update lastVisited:', e);
-  }
-}
-
 export async function updateActiveAddresses({
   chain,
   shouldRedraw = true,
@@ -226,7 +204,6 @@ export function updateActiveUser(data) {
 
     app.user.setSiteAdmin(false);
     app.user.setDisableRichText(false);
-    app.user.setLastVisited({});
     app.user.setUnseenPosts({});
 
     app.user.setActiveAccounts([]);
@@ -258,7 +235,6 @@ export function updateActiveUser(data) {
 
     app.user.setSiteAdmin(data.isAdmin);
     app.user.setDisableRichText(data.disableRichText);
-    app.user.setLastVisited(data.lastVisited);
     app.user.setUnseenPosts(data.unseenPosts);
   }
 }
@@ -307,7 +283,7 @@ export async function unlinkLogin(account: AddressInfo) {
   app.roles.deleteRole({
     address: account,
     chain: account.chain.id,
-  })
+  });
   // Remove from all address stores in the frontend state.
   // This might be more gracefully handled by calling initAppState again.
   let index = app.user.activeAccounts.indexOf(account);

@@ -47,7 +47,6 @@ type StatusResp = {
     selectedChain: ChainInstance;
     isAdmin: boolean;
     disableRichText: boolean;
-    lastVisited: string;
     starredCommunities: StarredCommunityAttributes[];
     unseenPosts: { [chain: string]: number };
   };
@@ -132,24 +131,17 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
 
   const unfilteredAddresses = await user.getAddresses();
   // TODO: fetch all this data with a single query
-  const [
-    addresses,
-    socialAccounts,
-    selectedChain,
-    isAdmin,
-    disableRichText,
-    lastVisited,
-  ] = await Promise.all([
-    unfilteredAddresses.filter(
-      (address) =>
-        !!address.verified && chains.map((c) => c.id).includes(address.chain)
-    ),
-    user.getSocialAccounts(),
-    user.getSelectedChain(),
-    user.isAdmin,
-    user.disableRichText,
-    user.lastVisited,
-  ]);
+  const [addresses, socialAccounts, selectedChain, isAdmin, disableRichText] =
+    await Promise.all([
+      unfilteredAddresses.filter(
+        (address) =>
+          !!address.verified && chains.map((c) => c.id).includes(address.chain)
+      ),
+      user.getSocialAccounts(),
+      user.getSelectedChain(),
+      user.isAdmin,
+      user.disableRichText,
+    ]);
 
   // look up my roles & private communities
   const myAddressIds: number[] = Array.from(
@@ -170,10 +162,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   /**
    * Purpose of this section is to count the number of threads that have new updates grouped by community
    */
-  const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
-  const commsAndChains2 = await getChainActivity(addresses);
-  console.log('commsAndChains: ', commsAndChains);
-  console.log('commsAndChains2: ', commsAndChains2);
+  const commsAndChains = await getChainActivity(addresses);
   const unseenPosts = {};
   let query = ``;
   let replacements = [];
@@ -325,7 +314,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       selectedChain,
       isAdmin,
       disableRichText,
-      lastVisited: JSON.parse(lastVisited),
       starredCommunities,
       unseenPosts,
     },

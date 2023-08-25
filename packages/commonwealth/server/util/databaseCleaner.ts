@@ -220,11 +220,12 @@ export default class DatabaseCleaner {
         await this._models.sequelize.query(
           `
             CREATE TEMPORARY TABLE sub_ids_to_delete as (
-              WITH user_ids_to_delete as MATERIALIZED (
-                  SELECT U.id, U.updated_at
+              WITH user_ids_to_delete AS MATERIALIZED (
+                  SELECT U.id
                   FROM "Users" U
-                  WHERE U.updated_at < NOW() - interval '12 months'
-                  ORDER BY U.updated_at
+                  LEFT JOIN "Addresses" A ON U.id = A.user_id
+                  WHERE A.last_active < NOW() - INTERVAL '12 months' OR A.last_active IS NULL
+                  GROUP BY U.id
               )
               SELECT S.id
               FROM "Subscriptions" S

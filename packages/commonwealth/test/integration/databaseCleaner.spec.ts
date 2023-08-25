@@ -195,8 +195,8 @@ describe('DatabaseCleaner Tests', () => {
       const oldUser = <any>(
         await models.sequelize.query(
           `
-        INSERT INTO "Users"(email, created_at, updated_at, "lastVisited", "emailNotificationInterval")
-        VALUES ('dbCleanerOld@test.com', NOW() - INTERVAL '1 year' - INTERVAL '2 days', NOW() - INTERVAL '1 year' - INTERVAL '2 days', '{}', 'never')
+        INSERT INTO "Users"(email, created_at, updated_at, "emailNotificationInterval")
+        VALUES ('dbCleanerOld@test.com', NOW() - INTERVAL '1 year' - INTERVAL '2 days', NOW() - INTERVAL '1 year' - INTERVAL '2 days', 'never')
         RETURNING id;
       `,
           { type: QueryTypes.INSERT, raw: true }
@@ -206,8 +206,8 @@ describe('DatabaseCleaner Tests', () => {
       const newUser = <any>(
         await models.sequelize.query(
           `
-        INSERT INTO "Users"(email, created_at, updated_at, "lastVisited", "emailNotificationInterval")
-        VALUES ('dbCleanerNew@test.com', NOW(), NOW(), '{}', 'never')
+        INSERT INTO "Users"(email, created_at, updated_at, "emailNotificationInterval")
+        VALUES ('dbCleanerNew@test.com', NOW(), NOW(), 'never')
         RETURNING id;
       `,
           { type: QueryTypes.INSERT, raw: true }

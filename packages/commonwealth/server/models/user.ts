@@ -17,7 +17,6 @@ export type UserAttributes = {
   id?: number;
   emailVerified?: boolean;
   isAdmin?: boolean;
-  lastVisited?: string;
   disableRichText?: boolean;
   emailNotificationInterval?: EmailNotificationInterval;
   selected_chain_id?: number | null;
@@ -90,11 +89,6 @@ export default (
         allowNull: false,
       },
       isAdmin: { type: dataTypes.BOOLEAN, defaultValue: false },
-      lastVisited: {
-        type: dataTypes.TEXT,
-        allowNull: false,
-        defaultValue: '{}',
-      },
       disableRichText: {
         type: dataTypes.BOOLEAN,
         defaultValue: false,
