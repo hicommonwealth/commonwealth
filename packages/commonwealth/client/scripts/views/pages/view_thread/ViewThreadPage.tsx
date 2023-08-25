@@ -52,6 +52,7 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+import { useSearchParams } from 'react-router-dom';
 import { LinkedUrlCard } from './linked_url_card';
 
 export type ThreadPrefetch = {
@@ -95,6 +96,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const [searchParams] = useSearchParams();
+  const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
   const {
     data,
@@ -470,6 +473,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <CreateComment
                       rootThread={thread}
                       canComment={canComment}
+                      shouldFocusEditor={shouldFocusCommentEditor}
                     />
                     {showBanner && (
                       <JoinCommunityBanner
