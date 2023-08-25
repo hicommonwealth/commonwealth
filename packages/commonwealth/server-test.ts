@@ -496,14 +496,14 @@ setupAPI(
 setupCosmosProxy(app, models);
 setupCacheTestEndpoints(app);
 
-const rollbar = new Rollbar({
-  accessToken: ROLLBAR_SERVER_TOKEN,
-  environment: ROLLBAR_ENV,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
+// const rollbar = new Rollbar({
+//   accessToken: ROLLBAR_SERVER_TOKEN,
+//   environment: ROLLBAR_ENV,
+//   captureUncaught: true,
+//   captureUnhandledRejections: true,
+// });
 
-setupErrorHandlers(app, rollbar);
+// setupErrorHandlers(app, rollbar);
 setupServer();
 
 export const resetDatabase = () => resetServer();
