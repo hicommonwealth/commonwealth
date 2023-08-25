@@ -5,10 +5,7 @@ import 'modals/edit_collaborators_modal.scss';
 import React, { useState } from 'react';
 import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import app from 'state';
-import {
-  useAddThreadCollaboratorsMutation,
-  useDeleteThreadCollaboratorsMutation,
-} from 'state/api/threads';
+import { useEditThreadMutation } from 'state/api/threads';
 import { useDebounce } from 'usehooks-ts';
 import NewProfilesController from '../../controllers/server/newProfiles';
 import type Thread from '../../models/Thread';
@@ -26,6 +23,10 @@ type EditCollaboratorsModalProps = {
   onCollaboratorsUpdated: (newEditors: IThreadCollaborator[]) => void;
 };
 
+interface IThreadCollaboratorWithId extends IThreadCollaborator {
+  id: number;
+}
+
 export const EditCollaboratorsModal = ({
   onModalClose,
   thread,
@@ -34,24 +35,19 @@ export const EditCollaboratorsModal = ({
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  const { mutateAsync: addThreadCollaborators } =
-    useAddThreadCollaboratorsMutation({
-      chainId: app.activeChainId(),
-      threadId: thread.id,
-    });
-
-  const { mutateAsync: deleteThreadCollaborators } =
-    useDeleteThreadCollaboratorsMutation({
-      chainId: app.activeChainId(),
-      threadId: thread.id,
-    });
+  const { mutateAsync: editThread } = useEditThreadMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+    currentStage: thread.stage,
+    currentTopicId: thread.topic.id,
+  });
 
   const [searchResults, setSearchResults] = useState<
     Array<RoleInstanceWithPermissionAttributes>
   >([]);
   const [collaborators, setCollaborators] = useState<
-    Array<IThreadCollaborator>
-  >(thread.collaborators);
+    Array<IThreadCollaboratorWithId>
+  >(thread.collaborators as any);
 
   useNecessaryEffect(() => {
     const fetchMembers = async () => {
@@ -87,7 +83,7 @@ export const EditCollaboratorsModal = ({
     }
   }, [debouncedSearchTerm]);
 
-  const handleUpdateCollaborators = (c: IThreadCollaborator) => {
+  const handleUpdateCollaborators = (c: IThreadCollaboratorWithId) => {
     const updated = collaborators.find((_c) => _c.address === c.address)
       ? collaborators.filter((_c) => _c.address !== c.address)
       : collaborators.concat([c]);
@@ -121,6 +117,7 @@ export const EditCollaboratorsModal = ({
                   className="collaborator-row"
                   onClick={() =>
                     handleUpdateCollaborators({
+                      id: c.Address.id,
                       address: c.Address.address,
                       chain: c.Address.chain,
                     })
@@ -185,45 +182,36 @@ export const EditCollaboratorsModal = ({
                 (c1) =>
                   !thread.collaborators.some((c2) => c1.address === c2.address)
               );
-
-              if (newCollaborators.length > 0) {
-                try {
-                  const updatedCollaborators = await addThreadCollaborators({
-                    threadId: thread.id,
-                    newCollaborators: newCollaborators,
-                    chainId: app.activeChainId(),
-                    address: app.user.activeAccount.address,
-                  });
-                  notifySuccess('Collaborators added');
-                  onCollaboratorsUpdated &&
-                    onCollaboratorsUpdated(updatedCollaborators);
-                } catch (err) {
-                  const error =
-                    err?.responseJSON?.error || 'Failed to add collaborators';
-                  notifyError(error);
-                }
-              }
-
-              const removedCollaborators = thread.collaborators.filter(
+              const removedCollaborators = (thread.collaborators as any).filter(
                 (c1) => !collaborators.some((c2) => c1.address === c2.address)
               );
 
-              if (removedCollaborators.length > 0) {
+              if (
+                newCollaborators.length > 0 ||
+                removedCollaborators.length > 0
+              ) {
                 try {
-                  const updatedCollaborators = await deleteThreadCollaborators({
+                  const updatedThread = await editThread({
                     threadId: thread.id,
-                    updatedCollaborators: removedCollaborators,
                     chainId: app.activeChainId(),
                     address: app.user.activeAccount.address,
+                    collaborators: {
+                      ...(newCollaborators.length > 0 && {
+                        toAdd: newCollaborators.map((x) => x.id),
+                      }),
+                      ...(removedCollaborators.length > 0 && {
+                        toRemove: removedCollaborators.map((x) => x.id),
+                      }),
+                    },
                   });
-                  notifySuccess('Collaborators removed');
+                  notifySuccess('Collaborators updated');
                   onCollaboratorsUpdated &&
-                    onCollaboratorsUpdated(updatedCollaborators);
+                    onCollaboratorsUpdated(updatedThread.collaborators);
                 } catch (err) {
-                  const errMsg =
+                  const error =
                     err?.responseJSON?.error ||
-                    'Failed to remove collaborators';
-                  notifyError(errMsg);
+                    'Failed to update collaborators';
+                  notifyError(error);
                 }
               }
 
