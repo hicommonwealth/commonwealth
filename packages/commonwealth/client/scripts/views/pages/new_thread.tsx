@@ -266,6 +266,79 @@ const NewThreadPage = () => {
           ),
         },
       ]}
+      rightSidebarContent={[
+        {
+          label: 'Create Snapshot',
+          item: (
+            <div className="SelectableCard">
+              <CWContentPageCard
+                header="Create Snapshot"
+                content={
+                  <div className="ActionCard">
+                    <CWText type="b2">
+                      Creates snapshot from existing text.
+                    </CWText>
+                  </div>
+                }
+              />
+            </div>
+          ),
+        },
+        {
+          label: 'Link Snapshot',
+          item: (
+            <div className="SelectableCard">
+              <CWContentPageCard
+                header="Link Snapshot"
+                content={
+                  <div className="ActionCard">
+                    <CWText type="b2">
+                      Search through snapshots show the poll directly on the
+                      thread page
+                    </CWText>
+                  </div>
+                }
+              />
+            </div>
+          ),
+        },
+        {
+          label: 'Create new template',
+          item: (
+            <div className="SelectableCard">
+              <CWContentPageCard
+                header="Create new template"
+                content={
+                  <div className="ActionCard">
+                    <CWText type="b2">
+                      Search through snapshots show the poll directly on the
+                      thread page
+                    </CWText>
+                  </div>
+                }
+              />
+            </div>
+          ),
+        },
+        {
+          label: 'Add existing template',
+          item: (
+            <div className="SelectableCard">
+              <CWContentPageCard
+                header="Add existing template"
+                content={
+                  <div className="ActionCard">
+                    <CWText type="b2">
+                      Search through snapshots show the poll directly on the
+                      thread page
+                    </CWText>
+                  </div>
+                }
+              />
+            </div>
+          ),
+        },
+      ]}
       showSidebar
       showRightSidebar={showSidebar}
       lowPadding

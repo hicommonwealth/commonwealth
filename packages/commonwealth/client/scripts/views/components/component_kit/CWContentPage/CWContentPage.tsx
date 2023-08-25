@@ -115,6 +115,7 @@ export const CWContentPage = ({
   sidebarComponentsSkeletonCount = 2,
   showHeader = true,
   showRightSidebar = false,
+  rightSidebarContent,
   onCloseRightSidebar,
   lowPadding = false,
 }: ContentPageProps) => {
@@ -292,6 +293,11 @@ export const CWContentPage = ({
                 }
               }}
             />
+          </div>
+          <div className="RightSidebarContent">
+            {rightSidebarContent?.map((c) => (
+              <React.Fragment key={c.label}>{c.item}</React.Fragment>
+            ))}
           </div>
         </div>
       )}

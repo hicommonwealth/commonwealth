@@ -126,4 +126,11 @@
       position: relative;
     }
   }
+
+  .RightSidebarContent {
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    margin-top: 16px;
+  }
 }

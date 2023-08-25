@@ -140,3 +140,16 @@
   padding: 16px;
   width: 100%;
 }
+
+.ContentPageCard.Card {
+  width: 220px;
+}
+
+.SelectableCard {
+  cursor: pointer;
+  border-radius: 5px;
+
+  &:hover {
+    box-shadow: $elevation-2;
+  }
+}
