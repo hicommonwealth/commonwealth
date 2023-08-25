@@ -5,7 +5,7 @@ import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { Link } from 'models/Thread';
-import { UrlSelectorItem } from './url_selector_item';
+import { UrlSelectorItem } from './UrlSelectorItem';
 
 type UrlSelectorProps = {
   onSelect: (link: Link) => void;

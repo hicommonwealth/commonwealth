@@ -53,7 +53,7 @@ import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 import { useSearchParams } from 'react-router-dom';
-import { LinkedUrlCard } from './linked_url_card';
+import { LinkedUrlCard } from './LinkedUrlCard';
 
 export type ThreadPrefetch = {
   [identifier: string]: {

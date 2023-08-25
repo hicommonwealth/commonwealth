@@ -1,4 +1,4 @@
-import { UrlSelector } from './url_selector';
-import { UrlSelectorItem } from './url_selector_item';
+import { UrlSelector } from './UrlSelector';
+import { UrlSelectorItem } from './UrlSelectorItem';
 
 export { UrlSelector, UrlSelectorItem };

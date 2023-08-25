@@ -15,7 +15,7 @@ import type Thread from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { UrlSelector } from '../components/url_link_selector/url_selector';
+import { UrlSelector } from '../components/url_link_selector/UrlSelector';
 import { CWText } from '../components/component_kit/cw_text';
 
 type LinkedUrlModalProps = {
