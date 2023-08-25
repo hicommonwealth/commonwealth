@@ -1,16 +1,11 @@
 import { useEffect } from 'react';
 import app from '../state';
 
-const useManageDocumentTitle = (title: string, obj?: any, attr?: string) => {
+const useManageDocumentTitle = (title: string, details?: string) => {
   useEffect(() => {
-    document.title = `${app.chain.meta.name} – ${title}`;
-  }, [title]);
-
-  useEffect(() => {
-    if (obj && obj[attr]) {
-      document.title = `${app.chain.meta.name} – ${obj[attr]}`;
-    }
-  }, [obj, attr]);
-}
+    const displayTitle = details || title;
+    document.title = `${app.chain.meta.name} – ${displayTitle}`;
+  }, [details, title]);
+};
 
 export default useManageDocumentTitle;

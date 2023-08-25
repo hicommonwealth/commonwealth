@@ -241,7 +241,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setAreProfilesLoaded(true);
   }, [comments, thread, areProfilesLoaded]);
 
-  useManageDocumentTitle('View thread', thread, 'title');
+  useManageDocumentTitle('View thread', thread?.title);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
