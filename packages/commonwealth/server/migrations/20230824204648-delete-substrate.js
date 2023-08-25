@@ -37,7 +37,7 @@ module.exports = {
             SELECT
                 T.id as thread_id,
                 link_array.element AS link_element,
-                link_array.ordinality AS link_index
+                link_array.ordinality - 1 AS link_index
             FROM "Threads" T
                      JOIN "Chains" C ON C.id = T.chain
                      CROSS JOIN LATERAL jsonb_array_elements(T.links) WITH ORDINALITY link_array(element, ordinality)
