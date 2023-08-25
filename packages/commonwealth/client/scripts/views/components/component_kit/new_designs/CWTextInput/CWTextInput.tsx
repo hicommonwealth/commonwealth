@@ -4,7 +4,7 @@ import type { ValidationStatus } from '../../cw_validation_text';
 import { MessageRow } from './MessageRow';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
-import { useTextInputWithValidation } from '../../../../../hooks/useTextInputWithValidation';
+import { useTextInputWithValidation } from './useTextInputWithValidation';
 
 import './CWTextInput.scss';
 
