@@ -49,6 +49,7 @@ export const EditBody = (props: EditBodyProps) => {
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
+    currentTopicId: thread.topic.id,
   });
 
   const { RevalidationModal } = useSessionRevalidationModal({
@@ -97,9 +98,6 @@ export const EditBody = (props: EditBodyProps) => {
         newBody: JSON.stringify(contentDelta) || thread.body,
         newTitle: title || thread.title,
         threadId: thread.id,
-        topicId: thread.topic.id,
-        kind: thread.kind,
-        stage: thread.stage,
         authorProfile: app.user.activeAccount.profile,
         address: app.user.activeAccount.address,
         chainId: app.activeChainId(),

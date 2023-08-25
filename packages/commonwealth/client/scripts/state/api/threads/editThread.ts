@@ -4,33 +4,63 @@ import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import { ThreadStage } from 'models/types';
 import app from 'state';
-import { updateThreadInAllCaches } from './helpers/cache';
+import {
+  updateThreadInAllCaches,
+  updateThreadTopicInAllCaches,
+} from './helpers/cache';
 import { updateThreadCountsByStageChange } from './helpers/counts';
 
 interface EditThreadProps {
   address: string;
   chainId: string;
   threadId: number;
-  topicId: number;
-  kind: 'discussion' | 'link';
-  stage: string;
-  newBody: string;
-  newTitle: string;
+  // for edit profile
+  newBody?: string;
+  newTitle?: string;
   url?: string;
-  authorProfile: MinimumProfile;
+  authorProfile?: MinimumProfile;
+  // for editing thread locked status
+  readOnly?: boolean;
+  // for editing thread stage
+  stage?: string;
+  // for editing thread pinned status
+  pinned?: boolean;
+  // for editing thread spam status
+  spam?: boolean;
+  // for editing thread archive status
+  archived?: boolean;
+  // for editing thread topic
+  topicId?: number;
+  // for editing thread collaborators
+  collaborators?: {
+    toAdd?: number[];
+    toRemove?: number[];
+  };
 }
 
 const editThread = async ({
   address,
   chainId,
   threadId,
-  topicId,
-  kind,
-  stage,
+  // for edit profile
   newBody,
   newTitle,
   url,
   authorProfile,
+  // for editing thread locked status
+  readOnly,
+  // for editing thread stage
+  stage,
+  // for editing thread pinned status
+  pinned,
+  // for editing thread spam status
+  spam,
+  // for editing thread archived status
+  archived,
+  // for editing thread topic
+  topicId,
+  // for editing thread collaborators
+  collaborators,
 }: EditThreadProps) => {
   const {
     action = null,
@@ -45,16 +75,30 @@ const editThread = async ({
   });
 
   const response = await axios.patch(`${app.serverUrl()}/threads/${threadId}`, {
+    // common payload
     author_chain: chainId,
-    author: JSON.stringify(authorProfile),
     address: address,
     chain: chainId,
-    kind: kind,
-    stage: stage,
-    body: encodeURIComponent(newBody),
-    title: encodeURIComponent(newTitle),
-    url,
     jwt: app.user.jwt,
+    // for edit profile
+    ...(url && { url }),
+    ...(newBody && { body: encodeURIComponent(newBody) }),
+    ...(newTitle && { title: encodeURIComponent(newTitle) }),
+    ...(authorProfile && { author: JSON.stringify(authorProfile) }),
+    // for editing thread locked status
+    ...(readOnly !== undefined && { locked: readOnly }),
+    // for editing thread stage
+    ...(stage && { stage }),
+    // for editing thread pinned status
+    ...(pinned !== undefined && { pinned }),
+    // for editing thread spam status
+    ...(spam !== undefined && { spam }),
+    // for editing thread archived status
+    ...(archived !== undefined && { archived }),
+    // for editing thread topic
+    ...(topicId !== undefined && { topicId }),
+    // for editing thread collaborators
+    ...(collaborators !== undefined && { collaborators }),
     canvas_action: action,
     canvas_session: session,
     canvas_hash: hash,
@@ -67,18 +111,32 @@ interface UseEditThreadMutationProps {
   chainId: string;
   threadId: number;
   currentStage: ThreadStage;
+  currentTopicId: number;
 }
 
 const useEditThreadMutation = ({
   chainId,
   threadId,
   currentStage,
+  currentTopicId,
 }: UseEditThreadMutationProps) => {
   return useMutation({
     mutationFn: editThread,
     onSuccess: async (updatedThread) => {
       // Update community level thread counters variables
-      updateThreadCountsByStageChange(currentStage, updatedThread.stage);
+      if (currentStage !== updatedThread.stage) {
+        updateThreadCountsByStageChange(currentStage, updatedThread.stage);
+      }
+
+      // add/remove thread from different caches if the topic id was changed
+      if (updatedThread.topic.id !== currentTopicId) {
+        updateThreadTopicInAllCaches(
+          chainId,
+          threadId,
+          updatedThread.topic,
+          currentTopicId
+        );
+      }
 
       updateThreadInAllCaches(chainId, threadId, updatedThread);
 
