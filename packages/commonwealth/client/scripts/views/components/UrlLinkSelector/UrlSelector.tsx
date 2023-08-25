@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import 'components/url_link_selector.scss';
+import 'components/UrlLinkSelector.scss';
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
