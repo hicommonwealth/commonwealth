@@ -6,7 +6,7 @@ import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 import { useTextInputWithValidation } from '../../../../../hooks/useTextInputWithValidation';
 
-import 'components/component_kit/new_designs/CWTextInput.scss';
+import './CWTextInput.scss';
 
 type TextInputSize = 'small' | 'large';
 
@@ -54,7 +54,7 @@ type TextInputProps = BaseTextInputProps &
   InputInternalStyleProps &
   React.HTMLAttributes<HTMLDivElement>;
 
-export const CWTextInput = (props: TextInputProps) => {
+const CWTextInput = (props: TextInputProps) => {
   const validationProps = useTextInputWithValidation();
 
   const {
@@ -195,3 +195,5 @@ export const CWTextInput = (props: TextInputProps) => {
     </div>
   );
 };
+
+export default CWTextInput;

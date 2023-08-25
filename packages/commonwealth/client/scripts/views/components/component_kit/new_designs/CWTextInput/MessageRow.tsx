@@ -6,6 +6,8 @@ import { getClasses } from '../../helpers';
 import { CWLabel } from '../../cw_label';
 import { CWText } from '../../cw_text';
 
+import './MessageRow.scss';
+
 interface MessageRowProps {
   hasFeedback?: boolean;
   label?: string | React.ReactNode;
