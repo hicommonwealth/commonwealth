@@ -15,7 +15,7 @@
   - [Sequelize](Sequelize.md)
   - [Discobot](Discobot.md)
   - [React Notes](React-Notes.md)
-  - [Package.json Scripts](Package.json-Scripts.md)
+  - [Package.json Scripts](Package-Scripts.md)
   - [Custom Domains](Custom-Domains.md)
   - [Testing Environments](Testing-Environments.md)
   - [Database](Database.md)
