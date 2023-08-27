@@ -83,7 +83,9 @@ export const useImageDropAndPaste = ({
           blankEditor = true;
         }
 
-        // insert image op at the selected index
+        // Insert image op at the selected index.
+        // If editor is not blank, must insert a line break
+        // for the image to be in the middle of text
         if (isMarkdownEnabled) {
           editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
         } else {
