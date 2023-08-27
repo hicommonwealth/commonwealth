@@ -1,20 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
+import { RangeStatic } from 'quill';
 import MagicUrl from 'quill-magic-url';
 import ImageUploader from 'quill-image-uploader';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import clsx from 'clsx';
 
 import { SerializableDeltaStatic } from './utils';
 import { getTextFromDelta } from './utils';
-
 import { PreviewModal } from '../../modals/preview_modal';
 import { Modal } from '../component_kit/cw_modal';
-
-import 'components/react_quill/react_quill_editor.scss';
-import 'react-quill/dist/quill.snow.css';
 import { nextTick } from 'process';
-
-import { openConfirmation } from 'views/modals/confirmation_modal';
+import { openConfirmation } from '../../modals/confirmation_modal';
 import { LoadingIndicator } from './loading_indicator';
 import { useMention } from './use_mention';
 import { useClipboardMatchers } from './use_clipboard_matchers';
@@ -22,10 +19,11 @@ import { useImageDropAndPaste } from './use_image_drop_and_paste';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 import { useImageUploader } from './use_image_uploader';
-import { RangeStatic } from 'quill';
 import { convertTwitterLinksToEmbeds } from './twitter_embed';
-import clsx from 'clsx';
-import QuillTooltip from 'views/components/react_quill_editor/QuillTooltip';
+import QuillTooltip from './QuillTooltip';
+
+import 'components/react_quill/react_quill_editor.scss';
+import 'react-quill/dist/quill.snow.css';
 
 Quill.register('modules/magicUrl', MagicUrl);
 Quill.register('modules/imageUploader', ImageUploader);
@@ -197,11 +195,10 @@ const ReactQuillEditor = ({
     }, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
-  
-  const handleDragStart = () => setIsDraggingOver(true);
 
+  const handleDragStart = () => setIsDraggingOver(true);
   const handleDragStop = () => setIsDraggingOver(false);
- 
+
   useEffect(() => {
     if (shouldFocus) {
       // Important: We need to initially focus the editor and then focus it again after

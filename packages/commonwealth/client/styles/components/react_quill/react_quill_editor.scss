@@ -7,6 +7,7 @@
   border-top-right-radius: 6px;
   border: none !important;
   background-color: $neutral-25;
+  border-bottom: 1px solid $neutral-200 !important;
 
   .left-buttons,
   .right-buttons {
@@ -111,7 +112,6 @@
     max-height: 512px;
     overflow-y: scroll;
     border: none !important;
-    border-top: 1px solid $neutral-200 !important;
   }
 
   .ql-editor {
