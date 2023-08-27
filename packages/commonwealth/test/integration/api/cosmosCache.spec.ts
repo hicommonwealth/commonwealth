@@ -108,37 +108,28 @@ describe('Cosmos Cache', () => {
       await rpcTestIsCached(bodyString, expectedKey);
     };
     it('should cache passed proposals', async () => {
-      await rpcProposalsCacheExpectedTest('0803', 60 * 15);
+      await rpcProposalsCacheExpectedTest('0803', 30);
     });
     it('should cache passed proposals (paginated request - 0803220a0a080000000000000087)', async () => {
-      await rpcProposalsCacheExpectedTest(
-        '0803220a0a080000000000000087',
-        60 * 15
-      );
+      await rpcProposalsCacheExpectedTest('0803220a0a080000000000000087', 30);
     });
     it('should cache passed proposals (paginated request - 0803220a0a080000000000000100)', async () => {
-      await rpcProposalsCacheExpectedTest(
-        '0803220a0a080000000000000100',
-        60 * 15
-      );
+      await rpcProposalsCacheExpectedTest('0803220a0a080000000000000100', 30);
     });
     it('should cache passed proposals (paginated request - 0803220a0a080000000000000189)', async () => {
-      await rpcProposalsCacheExpectedTest(
-        '0803220a0a080000000000000189',
-        60 * 15
-      );
+      await rpcProposalsCacheExpectedTest('0803220a0a080000000000000189', 30);
     });
     it('should cache rejected proposals', async () => {
-      await rpcProposalsCacheExpectedTest('0804', 60 * 15);
+      await rpcProposalsCacheExpectedTest('0804', 30);
     });
     it('should cache failed proposals', async () => {
-      await rpcProposalsCacheExpectedTest('0805', 60 * 15);
+      await rpcProposalsCacheExpectedTest('0805', 30);
     });
     it('should cache deposit period proposals', async () => {
-      await rpcProposalsCacheExpectedTest('0801', 60 * 5);
+      await rpcProposalsCacheExpectedTest('0801', 10);
     });
     it('should cache voting period proposals', async () => {
-      await rpcProposalsCacheExpectedTest('0802', 60 * 5);
+      await rpcProposalsCacheExpectedTest('0802', 10);
     });
     it('should cache an individual proposal', async () => {
       const body = {
@@ -320,19 +311,19 @@ describe('Cosmos Cache', () => {
       lcdTestDuration(6, url);
     });
     it('should cache deposit period proposals', async () => {
-      await lcdProposalsCacheExpectedTest('1', 60 * 5);
+      await lcdProposalsCacheExpectedTest('1', 10);
     });
     it('should cache voting period proposals', async () => {
-      await lcdProposalsCacheExpectedTest('2', 60 * 5);
+      await lcdProposalsCacheExpectedTest('2', 10);
     });
     it('should cache passed proposals', async () => {
-      await lcdProposalsCacheExpectedTest('3', 60 * 15);
+      await lcdProposalsCacheExpectedTest('3', 30);
     });
     it('should cache rejected proposals', async () => {
-      await lcdProposalsCacheExpectedTest('4', 60 * 15);
+      await lcdProposalsCacheExpectedTest('4', 30);
     });
     it('should cache failed proposals', async () => {
-      await lcdProposalsCacheExpectedTest('5', 60 * 15);
+      await lcdProposalsCacheExpectedTest('5', 30);
     });
     it('should cache deposit params requests', async () => {
       await lcdParamsCacheExpectedTest('deposit', 60 * 60 * 24 * 5);

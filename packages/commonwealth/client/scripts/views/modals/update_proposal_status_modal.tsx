@@ -19,7 +19,7 @@ import app from 'state';
 import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
-  useEditThreadStageMutation,
+  useEditThreadMutation,
 } from 'state/api/threads';
 import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
@@ -87,10 +87,11 @@ export const UpdateProposalStatusModal = ({
   const showChainEvents =
     !isCosmos && app.chainEntities.store.get(thread.chain)?.length > 0;
 
-  const { mutateAsync: editThreadStage } = useEditThreadStageMutation({
+  const { mutateAsync: editThread } = useEditThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
+    currentTopicId: thread.topic.id,
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
@@ -106,7 +107,8 @@ export const UpdateProposalStatusModal = ({
   const handleSaveChanges = async () => {
     // set stage
     try {
-      await editThreadStage({
+      await editThread({
+        address: app.user.activeAccount.address,
         chainId: app.activeChainId(),
         threadId: thread.id,
         stage: tempStage,

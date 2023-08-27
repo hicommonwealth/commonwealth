@@ -304,15 +304,22 @@ export const ChainMetadataRows = ({
       const verification_token = uuidv4();
       await app.discord.createConfig(verification_token);
 
+      const isCustomDomain = app.isCustomDomain();
+
       window.open(
         `https://discord.com/oauth2/authorize?client_id=${
           process.env.DISCORD_CLIENT_ID
         }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-          `${window.location.origin}`
+          `${
+            !isCustomDomain ? window.location.origin : 'https://commonwealth.im'
+          }`
         )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
+            redirect_domain: isCustomDomain
+              ? window.location.origin
+              : undefined,
           })
         )}`,
         '_parent'
@@ -349,15 +356,22 @@ export const ChainMetadataRows = ({
 
       await app.discord.createConfig(verification_token);
 
+      const isCustomDomain = app.isCustomDomain();
+
       window.open(
         `https://discord.com/oauth2/authorize?client_id=${
           process.env.DISCORD_CLIENT_ID
         }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-          `${window.location.origin}`
+          `${
+            !isCustomDomain ? window.location.origin : 'https://commonwealth.im'
+          }`
         )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
+            redirect_domain: isCustomDomain
+              ? window.location.origin
+              : undefined,
           })
         )}`,
         '_parent'

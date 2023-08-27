@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 import app from 'state';
-import { useEditThreadTopicMutation } from 'state/api/threads';
+import { useEditThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { TopicSelector } from '../components/topic_selector';
@@ -25,20 +24,20 @@ export const ChangeThreadTopicModal = ({
     chainId: app.activeChainId(),
   });
 
-  const { mutateAsync: editThreadTopic } = useEditThreadTopicMutation({
+  const { mutateAsync: editThread } = useEditThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
+    currentStage: thread.stage,
+    currentTopicId: thread.topic.id,
   });
 
   const handleSaveChanges = async () => {
     try {
-      await editThreadTopic({
+      await editThread({
         chainId: app.activeChainId(),
         address: app.user.activeAccount.address,
         threadId: thread.id,
-        topicName: activeTopic.name,
-        newTopicId: activeTopic.id,
-        oldTopicId: thread?.topic?.id,
+        topicId: activeTopic.id,
       });
 
       onModalClose && onModalClose();
