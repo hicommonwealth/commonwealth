@@ -217,6 +217,19 @@ export default class DatabaseCleaner {
 
     while (shouldContinueSubDelete()) {
       await this._models.sequelize.transaction(async (t) => {
+        // user has no addresses at all, and user was last updated before a year ago
+        const noAccountsAndIsOldUser = `
+          COUNT(A.user_id) = 0 AND MIN(U.updated_at) < NOW() - INTERVAL '12 months'
+        `;
+        // user has no addresses that were active within the last year
+        const noActiveAccountsQuery = `
+          SUM(
+            CASE
+              WHEN A.last_active >= NOW() - INTERVAL '12 months' THEN 1
+              ELSE 0
+            END
+          ) = 0
+        `;
         await this._models.sequelize.query(
           `
             CREATE TEMPORARY TABLE sub_ids_to_delete as (
@@ -225,12 +238,7 @@ export default class DatabaseCleaner {
                 FROM "Users" U
                 LEFT JOIN "Addresses" A ON U.id = A.user_id
                 GROUP BY U.id
-                HAVING SUM(
-                  CASE
-                    WHEN A.last_active >= NOW() - INTERVAL '12 months' THEN 1
-                    ELSE 0
-                  END
-                ) = 0
+                HAVING (${noAccountsAndIsOldUser}) OR (${noActiveAccountsQuery})
               )
               SELECT S.id
               FROM "Subscriptions" S
