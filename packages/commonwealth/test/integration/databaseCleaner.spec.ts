@@ -5,7 +5,7 @@ import DatabaseCleaner from '../../server/util/databaseCleaner';
 import models from '../../server/database';
 import sinon from 'sinon';
 import { NotificationCategories } from 'common-common/src/types';
-import { QueryTypes } from 'sequelize';
+import { QueryTypes, Sequelize } from 'sequelize';
 import { RedisCache } from 'common-common/src/redisCache';
 import { REDIS_URL } from '../../server/config';
 
@@ -191,28 +191,31 @@ describe('DatabaseCleaner Tests', () => {
       );
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
-      // raw query so we can set updated_at manually
-      const oldUser = <any>(
-        await models.sequelize.query(
-          `
-        INSERT INTO "Users"(email, created_at, updated_at, "emailNotificationInterval")
-        VALUES ('dbCleanerOld@test.com', NOW() - INTERVAL '1 year' - INTERVAL '2 days', NOW() - INTERVAL '1 year' - INTERVAL '2 days', 'never')
-        RETURNING id;
-      `,
-          { type: QueryTypes.INSERT, raw: true }
-        )
-      )[0][0];
+      // create old user and address
+      const oldUser = await models.User.createWithProfile(models, {
+        email: 'dbCleanerTest@old.com',
+        emailVerified: true,
+      });
+      const addrOld = await models.Address.create({
+        user_id: oldUser.id,
+        address: '0x1234',
+        chain: 'ethereum',
+        verification_token: 'blah',
+        last_active: Sequelize.literal(`NOW() - INTERVAL '13 months'`) as any,
+      });
 
-      const newUser = <any>(
-        await models.sequelize.query(
-          `
-        INSERT INTO "Users"(email, created_at, updated_at, "emailNotificationInterval")
-        VALUES ('dbCleanerNew@test.com', NOW(), NOW(), 'never')
-        RETURNING id;
-      `,
-          { type: QueryTypes.INSERT, raw: true }
-        )
-      )[0][0];
+      // create new user and address
+      const newUser = await models.User.createWithProfile(models, {
+        email: 'dbCleanerTest@new.com',
+        emailVerified: true,
+      });
+      const addrNew = await models.Address.create({
+        user_id: newUser.id,
+        address: '0x2345',
+        chain: 'ethereum',
+        verification_token: 'blah',
+        last_active: Sequelize.literal(`NOW()`) as any,
+      });
 
       const newSub = await models.Subscription.create({
         subscriber_id: newUser.id,

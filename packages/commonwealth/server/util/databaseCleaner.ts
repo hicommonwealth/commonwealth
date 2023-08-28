@@ -221,16 +221,21 @@ export default class DatabaseCleaner {
           `
             CREATE TEMPORARY TABLE sub_ids_to_delete as (
               WITH user_ids_to_delete AS MATERIALIZED (
-                  SELECT U.id
-                  FROM "Users" U
-                  LEFT JOIN "Addresses" A ON U.id = A.user_id
-                  WHERE A.last_active < NOW() - INTERVAL '12 months' OR A.last_active IS NULL
-                  GROUP BY U.id
+                SELECT U.id
+                FROM "Users" U
+                LEFT JOIN "Addresses" A ON U.id = A.user_id
+                GROUP BY U.id
+                HAVING SUM(
+                  CASE
+                    WHEN A.last_active >= NOW() - INTERVAL '12 months' THEN 1
+                    ELSE 0
+                  END
+                ) = 0
               )
               SELECT S.id
               FROM "Subscriptions" S
-                       JOIN user_ids_to_delete UD ON UD.id = S.subscriber_id
-              ORDER BY UD.updated_at
+                JOIN user_ids_to_delete UD ON UD.id = S.subscriber_id
+              ORDER BY UD.id
               LIMIT ?
             );
         `,
