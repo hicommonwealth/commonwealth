@@ -25,6 +25,10 @@ export const CWTooltip = ({
 }: TooltipProps) => {
   const popoverProps = usePopover();
 
+  if (!content) {
+    return renderTrigger(popoverProps.handleInteraction);
+  }
+
   return (
     <>
       {renderTrigger(popoverProps.handleInteraction)}
