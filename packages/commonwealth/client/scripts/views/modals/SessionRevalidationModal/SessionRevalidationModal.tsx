@@ -120,7 +120,7 @@ const SessionRevalidationModal = ({
                       label="email address"
                       placeholder="your-email@email.com"
                       onInput={(e) => setEmail(e.target.value)}
-                      onEnterKey={onEmailLogin}
+                      onenterkey={onEmailLogin}
                     />
                   ) : (
                     <CWSpinner />
