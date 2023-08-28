@@ -196,7 +196,7 @@ describe('DatabaseCleaner Tests', () => {
         email: 'dbCleanerTest@old.com',
         emailVerified: true,
       });
-      const addrOld = await models.Address.create({
+      await models.Address.create({
         user_id: oldUser.id,
         address: '0x1234',
         chain: 'ethereum',
@@ -209,7 +209,7 @@ describe('DatabaseCleaner Tests', () => {
         email: 'dbCleanerTest@new.com',
         emailVerified: true,
       });
-      const addrNew = await models.Address.create({
+      await models.Address.create({
         user_id: newUser.id,
         address: '0x2345',
         chain: 'ethereum',
