@@ -37,7 +37,7 @@ export async function setActiveAccount(
   const chain = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
 
-  if (!role || role.is_user_default) {
+  if (!role) {
     app.user.ephemerallySetActiveAccount(account);
     if (
       app.user.activeAccounts.filter((a) => isSameAccount(a, account))
@@ -307,7 +307,7 @@ export async function unlinkLogin(account: AddressInfo) {
   app.roles.deleteRole({
     address: account,
     chain: account.chain.id,
-  })
+  });
   // Remove from all address stores in the frontend state.
   // This might be more gracefully handled by calling initAppState again.
   let index = app.user.activeAccounts.indexOf(account);
