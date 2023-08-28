@@ -4,7 +4,7 @@ To develop and test new features for different chains, we use containerized test
 
 ## Cosmos SDK
 
-Note: Currently, the sandbox communities csdk and csdk-beta are on a minimal heroku plan, so they restart intermittently. This means they work fine for manual testing, but created proposals will only persist until the heroku app resets.
+Note: Currently, the sandbox communities csdk, csdk-beta, and evmos-dev are on a minimal heroku plan, so they restart intermittently. This means they work fine for manual testing, but created proposals will only persist until the heroku app resets.
 
 ### Version 0.46.11 (`gov` module v1)
 
@@ -57,13 +57,21 @@ CI community (ephemeral spin-up for automated tests):
 * http://localhost:8080/evmos-dev-ci
 * CI tests reference Docker image at https://hub.docker.com/repository/docker/mhagel1/evmos-dev
 
-# How to [deploy updates](https://dashboard.heroku.com/apps/cosmos-devnet/deploy/heroku-container):
+# How to [deploy updates to a sandbox](https://dashboard.heroku.com/apps/cosmos-devnet/deploy/heroku-container) (v1 for example):
 1. In terminal go to packages/chain-events/cosmos-chain-testing/v1 directory
-2. `heroku login`
-2. `heroku container:push web` to apply your changes to the heroku app
-3. `heroku container:release web` - A new build and deployment will be triggered.
+2. `heroku git:remote -a evmos-devnet`
+3. `heroku login`
+4. `heroku container:push web` to apply your changes to the heroku app
+5. `heroku container:release web` - A new build and deployment will be triggered.
 
-Local Dev CSDK:   
+# How to deploy updates to a CI deployment:
+1. Create a remote Docker Hub repo called (for ex) "csdk-v1"
+2. In terminal go to packages/chain-events/cosmos-chain-testing/v1 directory
+3. `docker build -t {your-docker-remote-hub}/csdk-v1 .`
+4. `docker push {your-docker-remote-hub}/csdk-v1`
+5. If you use a new docker remote, update the reference for tests in CI.yml
+
+Local Development:
 If you ever need to run devnets locally on your machine, there are three helper scripts
 ```
 yarn cosmos:build # build & start first time only - this takes several minutes
@@ -101,3 +109,4 @@ a shared address for this purpose.
     `extra cute enough manage arctic acid ball divide reduce turtle pony duck remind short find feature tooth steak fix assault vote sad cattle roof`
 
 - Go to http://localhost:8080/evmos-dev and join community. You should be able to create proposals and vote.
+- Note: Set gas to zero. There is an issue with displaying tokens correctly, but this address should have tokens. See https://github.com/hicommonwealth/commonwealth/issues/4909s

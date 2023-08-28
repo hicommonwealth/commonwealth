@@ -70,8 +70,8 @@ dasel put -r toml -t bool -f $CONFIG_FOLDER/app.toml -v "true" '.grpc-web.enable
 
 echo $COW_MNEMONIC | evmosd keys add cow --recover --keyring-backend test --home $EVMOS_HOME --algo $KEYALGO
 # make cow a validator:
-evmosd add-genesis-account "cow" 100000000000000000000000000aevmos --keyring-backend test --chain-id $EVMOS_CHAIN_ID --home "$EVMOS_HOME"
-evmosd gentx "cow" 1000000000000000000000aevmos --keyring-backend test --chain-id $EVMOS_CHAIN_ID --home "$EVMOS_HOME"
+evmosd add-genesis-account "cow" 10000000000000000000000000aevmos --keyring-backend test --chain-id $EVMOS_CHAIN_ID --home "$EVMOS_HOME"
+evmosd gentx "cow" 200000000000000000000000aevmos --keyring-backend test --chain-id $EVMOS_CHAIN_ID --home "$EVMOS_HOME"
 evmosd collect-gentxs --chain-id $EVMOS_CHAIN_ID --home "$EVMOS_HOME"
 evmosd keys list
 
