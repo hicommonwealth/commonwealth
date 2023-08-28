@@ -78,11 +78,6 @@ export async function setActiveAccount(
     notifyError('Could not set active account');
   }
 
-  // update is_user_default
-  app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
-    r.is_user_default = false;
-  });
-  role.is_user_default = true;
   app.user.ephemerallySetActiveAccount(account);
   if (
     app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
