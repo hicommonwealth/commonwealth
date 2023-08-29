@@ -285,7 +285,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       };
     } else {
       // if the chain does have activePosts convert the set of ids to simply the length of the set
-      unseenPosts[name].activePosts = unseenPosts[name].activePosts.size;
+      unseenPosts[name].activePosts = unseenPosts[name].activePosts?.size || 0;
     }
   }
   /**
