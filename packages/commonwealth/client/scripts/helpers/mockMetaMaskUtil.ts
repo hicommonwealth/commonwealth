@@ -30,7 +30,7 @@ export class MockMetaMaskProvider {
     if (data[0] == this.web3.defaultAccount) {
       return personalSign({
         privateKey: Buffer.from(this.privateKey.substring(2), 'hex'),
-        data: JSON.parse(data[1]),
+        data: data[1],
       });
     }
   }
