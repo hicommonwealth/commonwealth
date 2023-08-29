@@ -67,7 +67,7 @@ const SessionRevalidationModal = ({
         <div className="SessionRevalidationModal">
           <div className="compact-modal-body">
             <div className="header">
-              <CWText type="h4">Session expired</CWText>
+              <CWText type="h4">Address logged out</CWText>
               <X
                 weight="light"
                 size={20}
@@ -76,12 +76,12 @@ const SessionRevalidationModal = ({
               />
             </div>
             <CWText className="info">
-              It looks like the session for your address has expired. Just a
-              fancy way of saying you may need to log in again.
+              It looks like the login session for this address{' '}
+              <strong>{formatAddress(walletAddress)}</strong> has expired. Just
+              a fancy way of saying you may need to log in again.
             </CWText>
             <CWText className="info">
-              To renew your session for the address{' '}
-              <strong>{formatAddress(walletAddress)}</strong>, log in with{' '}
+              To continue what you were doing, log in with{' '}
               {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown
                 ? walletSsoSource
                 : 'the wallet that you used'}{' '}
