@@ -1,7 +1,7 @@
-import { fetchLatestNotifProposalIds } from '../../server/cosmos-gov-notifications';
 import { resetDatabase } from '../../server-test';
 import models from '../../server/database';
 import { expect } from 'chai';
+import { fetchLatestNotifProposalIds } from '../../server/cosmos-gov-notifications/index';
 
 async function createFakeProposalNotification(
   proposalId: string,
