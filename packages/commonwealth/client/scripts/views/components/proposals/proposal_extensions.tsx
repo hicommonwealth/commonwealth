@@ -14,6 +14,7 @@ import { BalanceInfo } from 'views/components/proposals/balance_info';
 import { ConvictionsChooser } from 'views/components/proposals/convictions_chooser';
 import { CWText } from '../component_kit/cw_text';
 import { CWTextInput } from '../component_kit/cw_text_input';
+import { useDepositParamsQuery } from 'state/api/chainParams/fetchDepositParams';
 
 type ProposalExtensionsProps = {
   proposal: AnyProposal;
@@ -34,6 +35,9 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
     if (setDemocracyVoteAmount) setDemocracyVoteAmount(0);
     if (setCosmosDepositAmount) setCosmosDepositAmount(0);
   }, []);
+
+  const { data: cosmosDepositParams } = useDepositParamsQuery();
+  const minDeposit = cosmosDepositParams?.minDeposit;
 
   if (proposal instanceof SubstrateDemocracyReferendum) {
     if (!setDemocracyVoteConviction) return <CWText>Misconfigured</CWText>;
@@ -68,10 +72,7 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
 
     return (
       <div className="ProposalExtensions">
-        <CWText>
-          Must deposit at least:{' '}
-          {(app.chain as Cosmos).governance.minDeposit.format()}
-        </CWText>
+        <CWText>Must deposit at least: {minDeposit?.format()}</CWText>
         <CWTextInput
           placeholder={`Amount to deposit (${app.chain?.chain?.denom})`}
           onInput={(e) => {

@@ -121,22 +121,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       }
     }
 
-    await Promise.all([
-      this.fetchPoolParams(),
-      this.fetchBlock(), // Poll for new block immediately
-      this.fetchStakingParams(),
-    ]);
-  }
-
-  private async fetchPoolParams(): Promise<void> {
-    try {
-      const {
-        pool: { bondedTokens },
-      } = await this._api.staking.pool();
-      this._staked = this.coins(new BN(bondedTokens));
-    } catch (e) {
-      console.error('Error fetching pool params: ', e);
-    }
+    await this.fetchBlock(); // Poll for new block immediately
   }
 
   private async fetchBlock(): Promise<void> {
@@ -156,15 +141,20 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
   }
 
-  private async fetchStakingParams(): Promise<void> {
-    try {
-      const {
-        params: { bondDenom },
-      } = await this._api.staking.params();
-      this._denom = bondDenom;
-    } catch (e) {
-      console.error('Error fetching staking params: ', e);
-    }
+  public async fetchPoolParams(): Promise<CosmosToken> {
+    const {
+      pool: { bondedTokens },
+    } = await this._api.staking.pool();
+    this._staked = this.coins(new BN(bondedTokens));
+    return this._staked;
+  }
+
+  public async fetchStakingParams(): Promise<string> {
+    const {
+      params: { bondDenom },
+    } = await this._api.staking.params();
+    this._denom = bondDenom;
+    return this._denom;
   }
 
   public async deinit(): Promise<void> {
