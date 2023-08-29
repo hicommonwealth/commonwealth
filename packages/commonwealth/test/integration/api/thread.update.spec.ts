@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
-import { resetDatabase } from '../../../server-test';
+import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
 
 chai.use(chaiHttp);
@@ -57,7 +57,141 @@ describe('Thread Patch Update', () => {
     }
   });
 
-  describe('BLAH', () => {
-    expect(1).to.be.true;
+  describe('update thread', () => {
+    it('should update thread attributes as owner', async () => {
+      const { result: thread } = await modelUtils.createThread({
+        chainId: 'ethereum',
+        address: userAddress,
+        jwt: userJWT,
+        title: 'test1',
+        body: 'body1',
+        kind: 'discussion',
+        stage: 'discussion',
+        topicName: 't1',
+        topicId: undefined,
+      });
+
+      const res = await chai.request
+        .agent(app)
+        .patch(`/api/threads/${thread.id}`)
+        .set('Accept', 'application/json')
+        .send({
+          author_chain: thread.chain,
+          chain: thread.chain,
+          address: userAddress,
+          jwt: userJWT,
+          title: 'newTitle',
+          body: 'newBody',
+          stage: 'voting',
+          locked: true,
+          archived: true,
+          topicName: 'newTopic',
+        });
+
+      expect(res.status).to.equal(200);
+      expect(res.body.result).to.contain({
+        id: thread.id,
+        chain: 'ethereum',
+        title: 'newTitle',
+        body: 'newBody',
+        stage: 'voting',
+      });
+      expect(res.body.result.topic.name).to.equal('newTopic');
+      expect(res.body.result.locked).to.not.be.null;
+      expect(res.body.result.archived).to.not.be.null;
+    });
+
+    it('should not allow non-admin to set pinned or spam', async () => {
+      const { result: thread } = await modelUtils.createThread({
+        chainId: 'ethereum',
+        address: userAddress,
+        jwt: userJWT,
+        title: 'test2',
+        body: 'body2',
+        kind: 'discussion',
+        stage: 'discussion',
+        topicName: 't2',
+        topicId: undefined,
+      });
+
+      {
+        const res = await chai.request
+          .agent(app)
+          .patch(`/api/threads/${thread.id}`)
+          .set('Accept', 'application/json')
+          .send({
+            author_chain: thread.chain,
+            chain: thread.chain,
+            address: userAddress,
+            jwt: userJWT,
+            pinned: true,
+          });
+        expect(res.status).to.equal(400);
+      }
+
+      {
+        const res = await chai.request
+          .agent(app)
+          .patch(`/api/threads/${thread.id}`)
+          .set('Accept', 'application/json')
+          .send({
+            author_chain: thread.chain,
+            chain: thread.chain,
+            address: userAddress,
+            jwt: userJWT,
+            spam: true,
+          });
+        expect(res.status).to.equal(400);
+      }
+    });
+
+    it('should allow admin to set pinned or spam', async () => {
+      // non-admin creates thread
+      const { result: thread } = await modelUtils.createThread({
+        chainId: 'ethereum',
+        address: userAddress,
+        jwt: userJWT,
+        title: 'test2',
+        body: 'body2',
+        kind: 'discussion',
+        stage: 'discussion',
+        topicName: 't2',
+        topicId: undefined,
+      });
+
+      // admin sets thread as pinned
+      {
+        const res = await chai.request
+          .agent(app)
+          .patch(`/api/threads/${thread.id}`)
+          .set('Accept', 'application/json')
+          .send({
+            author_chain: thread.chain,
+            chain: thread.chain,
+            address: adminAddress,
+            jwt: adminJWT,
+            pinned: true,
+          });
+        expect(res.status).to.equal(200);
+        expect(res.body.result.pinned).to.be.true;
+      }
+
+      // admin sets thread as spam
+      {
+        const res = await chai.request
+          .agent(app)
+          .patch(`/api/threads/${thread.id}`)
+          .set('Accept', 'application/json')
+          .send({
+            author_chain: thread.chain,
+            chain: thread.chain,
+            address: adminAddress,
+            jwt: adminJWT,
+            spam: true,
+          });
+        expect(res.status).to.equal(200);
+        expect(!!res.body.result.marked_as_spam_at).to.be.true;
+      }
+    });
   });
 });

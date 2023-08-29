@@ -30,7 +30,6 @@
     "test-integration-util": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts",
     "test-select": "NODE_ENV=test nyc ts-mocha --project tsconfig.json",
     "test-api": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'",
-    "test-thread-update": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/thread.update.spec.ts'",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
     "test-consumer": "ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts",
