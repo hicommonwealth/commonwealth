@@ -1,6 +1,8 @@
-This is the starter page for the Commonwealth Code Style Guide. Here we document requirements for all code written for the Commonwealth App. This is an evolving document, and is expected to be authoritative if not exhaustively complete. 
+This is the starter page for the Commonwealth Code Style Guide. Here we document requirements for all code written for the Commonwealth App. 
 
-- Code requirements this document *should* generally follow [[RFC 2119](https://www.rfc-editor.org/rfc/rfc2119)](https://www.rfc-editor.org/rfc/rfc2119).
+This page includes a mix of aspirational ideals for our codebase and descriptive requirements of how code _must_ be written. Divergences between ideal and actual have been explicitly flagged, but few or none of the practices  delineated are consistently or fully implemented in our present codebase (230815).
+
+- Code requirements this document *should* generally follow [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 - Unless otherwise noted, code styles in this guideline are for NodeJS & TypeScript.
 
 ## Baseline Language Requirements
