@@ -35,10 +35,13 @@ import { TopicSelector } from '../components/topic_selector';
 import 'components/NewThreadForm.scss';
 import { CWButton as OldCWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { Modal } from '../components/component_kit/cw_modal';
+import { UpdateProposalStatusModal } from '../modals/update_proposal_status_modal';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [linkSnapshotModalOpen, setLinkSnapshotModalOpen] = useState(false);
 
   useEffect(() => {
     if (!app.isLoggedIn()) {
@@ -288,6 +291,17 @@ const NewThreadPage = () => {
           label: 'Link Snapshot',
           item: (
             <div className="SelectableCard">
+              {/* <Modal
+                className="LinkedProposalsCardModal"
+                content={
+                  <UpdateProposalStatusModal
+                    thread={thread}
+                    onModalClose={() => setLinkSnapshotModalOpen(false)}
+                  />
+                }
+                onClose={() => setLinkSnapshotModalOpen(false)}
+                open={linkSnapshotModalOpen}
+              /> */}
               <CWContentPageCard
                 header="Link Snapshot"
                 content={
