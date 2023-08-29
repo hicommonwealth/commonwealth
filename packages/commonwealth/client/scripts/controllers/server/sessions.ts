@@ -247,7 +247,7 @@ class SessionsController {
   ) {
     const { session, action, hash } = await this.sign(address, 'thread', {
       community: community || '',
-      title,
+      title: encodeURIComponent(title),
       body: encodeURIComponent(body),
       link: link || '',
       topic: topic || '',
