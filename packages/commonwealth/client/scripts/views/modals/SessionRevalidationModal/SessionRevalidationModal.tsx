@@ -76,17 +76,17 @@ const SessionRevalidationModal = ({
               />
             </div>
             <CWText className="info">
-              The address that you are trying to use,{' '}
-              <strong>{formatAddress(walletAddress)}</strong>, needs to be
-              verified.
+              The login session for your address{' '}
+              <strong>{formatAddress(walletAddress)}</strong> has expired.
             </CWText>
             <CWText className="info">
               To continue what you were doing, log in with{' '}
               {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown
-                ? walletSsoSource
+                ? walletSsoSource[0].toUpperCase() + walletSsoSource.slice(1)
                 : 'your wallet'}{' '}
               again:
             </CWText>
+            <br />
             <div>
               {walletSsoSource === WalletSsoSource.Google ? (
                 <CWAuthButton
