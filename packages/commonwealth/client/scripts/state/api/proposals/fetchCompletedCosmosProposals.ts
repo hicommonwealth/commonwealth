@@ -2,8 +2,17 @@ import app from 'state';
 import { useQuery } from '@tanstack/react-query';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { getCompletedProposals } from 'controllers/chain/cosmos/gov/utils';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import { ChainBase } from 'common-common/src/types';
 
-const fetchCompletedProposals = async () => {
+// completed proposals never change, so we can cache
+// the old ones forever. React Query will load new
+// ones in the background, and update if needed.
+const COMPLETED_PROPOSALS_CACHE_TIME = Infinity;
+// 15sec - don't need constant pinging here
+const COMPLETED_PROPOSALS_STALE_TIME = 1000 * 15;
+
+const fetchCompletedProposals = async (): Promise<CosmosProposal[]> => {
   return getCompletedProposals(app.chain as Cosmos);
 };
 
@@ -14,16 +23,13 @@ interface CompletedProposalsProps {
 const useCompletedCosmosProposalsQuery = ({
   isApiReady,
 }: CompletedProposalsProps) => {
-  const cosmosChain = app.chain as Cosmos;
   return useQuery({
     queryKey: ['completedProposals', { chain: app.activeChainId() }],
     queryFn: fetchCompletedProposals,
-    enabled: isApiReady,
+    enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     retry: 3,
-    // completed proposals never change, so we can cache
-    // the old ones forever. React Query will load new
-    // ones in the background.
-    cacheTime: Infinity,
+    cacheTime: COMPLETED_PROPOSALS_CACHE_TIME,
+    staleTime: COMPLETED_PROPOSALS_STALE_TIME,
   });
 };
 

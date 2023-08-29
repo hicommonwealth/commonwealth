@@ -336,7 +336,9 @@ const updateThreadTopicInAllCaches = (
     if (
       k[2] === cacheTypes.ACTIVE_THREADS ||
       (k[2] === cacheTypes.SINGLE_THREAD &&
-        (k[3] === threadId || (k[3] as number[])?.includes(threadId)))
+        (k[3] === threadId ||
+          ((k[3] as number[])?.length &&
+            (k[3] as number[])?.includes(threadId))))
     ) {
       const existingData: IExistingThreadState = queryClient.getQueryData(k);
       const updatedThreads = [...existingData]; // threads array
@@ -358,6 +360,7 @@ const updateThreadTopicInAllCaches = (
       // filter from old topic query
       if (k[3] === oldTopicId || k[3] === undefined) {
         const existingData: IExistingThreadState = queryClient.getQueryData(k);
+        if (!existingData) return;
         const pages = [...(existingData.pages || [])];
         let foundThreadIndex = -1;
         const foundPageIndex = pages.findIndex((p) => {

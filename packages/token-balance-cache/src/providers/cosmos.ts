@@ -4,7 +4,7 @@ import {
   setupBankExtension,
   setupStakingExtension,
 } from '@cosmjs/stargate';
-import { Bech32 } from '@cosmjs/encoding';
+import { toBech32, fromBech32 } from '@cosmjs/encoding';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { BalanceType } from 'common-common/src/types';
 
@@ -39,8 +39,8 @@ export default class CosmosBalanceProvider extends BalanceProvider<
     if (!node.bech32) {
       throw new Error('No cosmos prefix found!');
     }
-    const { data } = Bech32.decode(address);
-    const encodedAddress = Bech32.encode(node.bech32, data);
+    const { data } = fromBech32(address);
+    const encodedAddress = toBech32(node.bech32, data);
 
     const api = await this.getExternalProvider(node);
 
