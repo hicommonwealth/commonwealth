@@ -53,3 +53,5 @@ class SnapshotSpace extends ContractBase {
     return this.proposalIdCache;
   }
 }
+
+export default SnapshotSpace;

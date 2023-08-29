@@ -10,7 +10,10 @@ class CrowdfundContract extends ContractBase {
 
   constructor(contractAddress: string) {
     super(contractAddress, abi);
-    this.weth = new this.web3.eth.Contract(wethAbi as AbiItem[], '');
+    this.weth = new this.web3.eth.Contract(
+      wethAbi as AbiItem[],
+      '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6'
+    );
   }
 
   async back(prop: BackParams): Promise<void> {

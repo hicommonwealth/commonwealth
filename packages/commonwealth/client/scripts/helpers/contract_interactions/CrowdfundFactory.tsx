@@ -9,7 +9,11 @@ class CrowdfundFactory extends ContractBase {
     super(contractAddress, abi);
   }
   async createProject(prop: CreateProjectParams): Promise<string> {
-    const farcasterContract = new this.web3.eth.Contract([] as AbiItem[], '');
+    //TODO:
+    const farcasterContract = new this.web3.eth.Contract(
+      [] as AbiItem[],
+      '0xDA107A1CAf36d198B12c16c7B6a1d1C795978C42'
+    );
     //TODO: fetch this based on ID
     const farcasterAddress = '';
 
@@ -18,7 +22,7 @@ class CrowdfundFactory extends ContractBase {
       _ipfsHash: this.web3.utils.asciiToHex(''),
       _url: this.web3.utils.asciiToHex(prop.url),
       _beneficiary: farcasterAddress,
-      _acceptedToken: 'Weth Address here', //TODO
+      _acceptedToken: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6', //Goerli WETH
       _threshold: prop.amountToFund,
       _deadline: prop.deadline,
     };
