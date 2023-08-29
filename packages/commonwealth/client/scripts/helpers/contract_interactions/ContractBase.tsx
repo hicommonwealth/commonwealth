@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import IWebWallet from 'client/scripts/models/IWebWallet';
 
-class ContractBase {
+abstract class ContractBase {
   protected contract;
   public contractAddress;
   protected wallet: IWebWallet<any>;
