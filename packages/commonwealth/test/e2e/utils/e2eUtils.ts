@@ -175,7 +175,6 @@ export async function createInitialUser() {
         '2023-07-14 13:03:56.196-07',
         false,
         false,
-        '{}',
         false,
         NULL,
         'never'
