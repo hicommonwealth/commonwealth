@@ -5,6 +5,8 @@ import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { AllCosmosProposals } from './proposalFetching';
 
 export function uint8ArrayToNumberBE(bytes) {
+  if (!bytes) return 0;
+
   let value = 0;
   for (let i = 0; i < bytes.length; i++) {
     value = (value << 8) + bytes[i];

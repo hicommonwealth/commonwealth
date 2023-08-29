@@ -15,6 +15,7 @@ import {
 } from './util';
 import { GovExtension, QueryClient, setupGovExtension } from '@cosmjs/stargate';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { PageRequest } from 'common-common/src/cosmos-ts/src/codegen/cosmos/base/query/v1beta1/pagination';
 
 export type AllCosmosProposals = {
   v1: { [chainId: string]: ProposalSDKType[] };
@@ -65,13 +66,33 @@ async function fetchLatestCosmosProposalV1(
   chain: ChainInstance
 ): Promise<ProposalSDKType[]> {
   const client = await getCosmosClient<GovV1Client>(chain);
-  const { proposals } = await client.proposals({
-    proposalStatus: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
-    depositor: '',
-    voter: '',
-  });
-  log.info(`Fetched ${proposals.length} proposals from ${chain.id}`);
-  return [proposals[proposals.length - 1]];
+  let nextKey: Uint8Array, finalProposalsPage: ProposalSDKType[];
+  do {
+    const { proposals, pagination } = await client.proposals({
+      proposalStatus: ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
+      depositor: '',
+      voter: '',
+      pagination: nextKey ? ({ key: nextKey } as PageRequest) : undefined,
+    });
+    finalProposalsPage = proposals;
+    if (pagination.next_key) {
+      if (Number(pagination.total) != 0) {
+        const newNextKey = numberToUint8ArrayBE(Number(pagination.total));
+        if (nextKey != newNextKey) {
+          nextKey = newNextKey;
+        } else {
+          nextKey = numberToUint8ArrayBE(0);
+        }
+      } else nextKey = pagination.next_key;
+    }
+  } while (uint8ArrayToNumberBE(nextKey) > 0);
+
+  log.info(
+    `Fetched proposal ${
+      finalProposalsPage[finalProposalsPage.length - 1].id
+    } from ${chain.id}`
+  );
+  return [finalProposalsPage[finalProposalsPage.length - 1]];
 }
 
 /**
@@ -88,21 +109,25 @@ async function fetchUpToLatestCosmosProposalV1(
   const client = await getCosmosClient<GovV1Client>(chain);
 
   const proposals: ProposalSDKType[] = [];
-  let shouldContinue = false;
   do {
+    let proposal: ProposalSDKType;
     try {
-      const { proposal } = await client.proposal({
+      const result = await client.proposal({
         proposalId: numberToLong(proposalId),
       });
-      if (proposal) {
-        proposals.push(proposal);
-        proposalId++;
-        shouldContinue = true;
-      }
+      proposal = result.proposal;
     } catch (e) {
-      // TODO: @Timothee - handle proposal not found error differently from other errors
+      if (!e.message.includes('rpc error: code = NotFound')) {
+        // TODO: @Timothee rollbar error reporting + datadog metrics
+        log.error(e);
+      }
     }
-  } while (shouldContinue);
+
+    if (proposal) {
+      proposals.push(proposal);
+      proposalId++;
+    } else break;
+  } while (true);
 
   return proposals;
 }
@@ -115,7 +140,7 @@ async function fetchLatestCosmosProposalV1Beta1(
   chain: ChainInstance
 ): Promise<Proposal[]> {
   const client = await getCosmosClient<GovV1Beta1ClientType>(chain);
-  let nextKey, finalProposalsPage;
+  let nextKey: Uint8Array, finalProposalsPage: Proposal[];
   do {
     const { proposals, pagination } = await client.gov.proposals(
       ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
@@ -128,7 +153,7 @@ async function fetchLatestCosmosProposalV1Beta1(
       if (!pagination?.total.isZero()) {
         const newNextKey = numberToUint8ArrayBE(pagination.total.toNumber());
         if (nextKey != newNextKey) {
-          nextKey = numberToUint8ArrayBE(pagination.total.toNumber());
+          nextKey = newNextKey;
         } else {
           nextKey = numberToUint8ArrayBE(0);
         }
@@ -159,7 +184,7 @@ async function fetchUpToLatestCosmosProposalV1Beta1(
 
   const proposals: Proposal[] = [];
   do {
-    let proposal;
+    let proposal: Proposal;
     try {
       const result = await client.gov.proposal(proposalId);
       proposal = result.proposal;
@@ -198,21 +223,21 @@ export async function fetchUpToLatestCosmosProposals(
   log.info(
     `Fetching up to the latest proposals from ${JSON.stringify(
       v1Chains.map((c) => c.id)
-    )} v1 gov chains` +
+    )} v1 gov chain(s)` +
       ` and ${JSON.stringify(
         v1Beta1Chains.map((c) => c.id)
-      )} v1beta1 gov chains`
+      )} v1beta1 gov chain(s)`
   );
 
   const [v1Proposals, v1BetaProposals] = await Promise.all([
     Promise.all(
       v1Chains.map((c) =>
-        fetchUpToLatestCosmosProposalV1(latestProposalIds[c.id], c)
+        fetchUpToLatestCosmosProposalV1(latestProposalIds[c.id] + 1, c)
       )
     ),
     Promise.all(
       v1Beta1Chains.map((c) =>
-        fetchUpToLatestCosmosProposalV1Beta1(latestProposalIds[c.id], c)
+        fetchUpToLatestCosmosProposalV1Beta1(latestProposalIds[c.id] + 1, c)
       )
     ),
   ]);
@@ -247,7 +272,6 @@ export async function fetchLatestProposals(
     Promise.all(v1Chains.map((c) => fetchLatestCosmosProposalV1(c))),
     Promise.all(v1Beta1Chains.map((c) => fetchLatestCosmosProposalV1Beta1(c))),
   ]);
-  console.log('Finished fetching proposals', v1Beta1Proposals);
   return mapChainsToProposals(
     v1Chains,
     v1Beta1Chains,

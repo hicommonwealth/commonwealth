@@ -58,11 +58,15 @@ function filterProposals(proposals: AllCosmosProposals) {
     const chainProposals = proposals.v1[chainId];
     const filteredProposalsForChain = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
-      return (
-        p.submit_time && p.submit_time.getTime() > Date.now() - 1000 * 60 * 120
-      );
+      const submitTime = new Date(p.submit_time);
+      return submitTime.getTime() > Date.now() - 1000 * 60 * 120;
     });
 
+    log.info(
+      `Filtered out ${
+        chainProposals.length - filteredProposalsForChain.length
+      } proposals for chain ${chainId}`
+    );
     filteredProposals.v1[chainId] = filteredProposalsForChain;
   }
 
@@ -76,6 +80,11 @@ function filterProposals(proposals: AllCosmosProposals) {
       );
     });
 
+    log.info(
+      `Filtered out ${
+        chainProposals.length - filteredProposalsForChain.length
+      } proposals for chain ${chainId}`
+    );
     filteredProposals.v1Beta1[chainId] = filteredProposalsForChain;
   }
 
@@ -99,20 +108,24 @@ async function emitProposalNotifications(proposals: AllCosmosProposals) {
           network: SupportedNetwork.Cosmos,
           event_data: {
             kind: EventKind.SubmitProposal,
-            id: proposal.id.toString(10),
+            id: proposal.id,
             content: {
               // TODO: multiple typeUrls for v1 proposals? - is this data even needed
               typeUrl: proposal.messages[0].type_url,
-              value: Buffer.from(proposal.messages[0].value).toString('hex'),
+              value: proposal.messages[0].value,
             },
-            submitTime: Math.round(proposal.submit_time.getTime() / 1000),
+            submitTime: Math.round(
+              new Date(proposal.submit_time).getTime() / 1000
+            ),
             depositEndTime: Math.round(
-              proposal.deposit_end_time.getTime() / 1000
+              new Date(proposal.deposit_end_time).getTime() / 1000
             ),
             votingStartTime: Math.round(
-              proposal.voting_start_time.getTime() / 1000
+              new Date(proposal.voting_start_time).getTime() / 1000
             ),
-            votingEndTime: Math.round(proposal.voting_end_time.getTime()),
+            votingEndTime: Math.round(
+              new Date(proposal.voting_end_time).getTime()
+            ),
             finalTallyResult: proposal.final_tally_result,
             totalDeposit: coinToCoins(proposal.total_deposit),
           },
