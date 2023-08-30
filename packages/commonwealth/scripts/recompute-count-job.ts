@@ -87,7 +87,6 @@ export async function recomputeCounts() {
 recomputeCounts()
   .then(() => {
     console.log('done');
-    process.exit(0);
   })
   .catch((err) => {
     console.log(err);
