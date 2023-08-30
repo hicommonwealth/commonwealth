@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { updateLastVisited } from 'controllers/app/login';
 import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
@@ -71,11 +70,6 @@ const useCreateCommentMutation = ({
       queryClient.setQueryData(key, () => {
         return [...comments, newComment];
       });
-
-      // TODO: these types of async calls should also have a dedicated react query handler
-      // update last visisted
-      updateLastVisited(app.chain.meta, true);
-
       updateThreadInAllCaches(chainId, threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });

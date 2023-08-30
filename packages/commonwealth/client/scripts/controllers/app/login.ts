@@ -41,7 +41,7 @@ export async function setActiveAccount(
   const chain = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
 
-  if (!role || role.is_user_default) {
+  if (!role) {
     app.user.ephemerallySetActiveAccount(account);
     if (
       app.user.activeAccounts.filter((a) => isSameAccount(a, account))
@@ -82,11 +82,6 @@ export async function setActiveAccount(
     notifyError('Could not set active account');
   }
 
-  // update is_user_default
-  app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
-    r.is_user_default = false;
-  });
-  role.is_user_default = true;
   app.user.ephemerallySetActiveAccount(account);
   if (
     app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
@@ -146,28 +141,6 @@ export async function completeClientLogin(account: Account) {
     }
   } catch (e) {
     console.trace(e);
-  }
-}
-
-export async function updateLastVisited(
-  activeEntity: ChainInfo,
-  updateFrontend?: boolean
-) {
-  if (!app.isLoggedIn()) return;
-  try {
-    const timestamp = moment();
-    const obj = { activeEntity: activeEntity.id, timestamp };
-    const value = JSON.stringify(obj);
-    if (updateFrontend) {
-      app.user.lastVisited[activeEntity.id] = new Date().toISOString();
-    }
-    await $.post(`${app.serverUrl()}/writeUserSetting`, {
-      jwt: app.user.jwt,
-      key: 'lastVisited',
-      value,
-    });
-  } catch (e) {
-    console.log('Could not update lastVisited:', e);
   }
 }
 
@@ -231,7 +204,6 @@ export function updateActiveUser(data) {
 
     app.user.setSiteAdmin(false);
     app.user.setDisableRichText(false);
-    app.user.setLastVisited({});
     app.user.setUnseenPosts({});
 
     app.user.setActiveAccounts([]);
@@ -264,7 +236,6 @@ export function updateActiveUser(data) {
 
     app.user.setSiteAdmin(data.isAdmin);
     app.user.setDisableRichText(data.disableRichText);
-    app.user.setLastVisited(data.lastVisited);
     app.user.setUnseenPosts(data.unseenPosts);
   }
 }

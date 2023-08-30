@@ -47,11 +47,6 @@ import {
   GetBulkThreadsResult,
   __getBulkThreads,
 } from './server_threads_methods/get_bulk_threads';
-import {
-  ArchiveOrUnarchiveThreadOptions,
-  ArchiveOrUnarchiveThreadResult,
-  __archiveOrUnarchiveThread,
-} from './server_threads_methods/archive_or_unarchive_thread';
 
 /**
  * Implements methods related to threads
@@ -120,11 +115,5 @@ export class ServerThreadsController {
     options: GetBulkThreadsOptions
   ): Promise<GetBulkThreadsResult> {
     return __getBulkThreads.call(this, options);
-  }
-
-  async archiveOrUnarchiveThread(
-    options: ArchiveOrUnarchiveThreadOptions
-  ): Promise<ArchiveOrUnarchiveThreadResult> {
-    return __archiveOrUnarchiveThread.call(this, options);
   }
 }

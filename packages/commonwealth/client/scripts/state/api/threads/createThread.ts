@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { updateLastVisited } from 'controllers/app/login';
 import MinimumProfile from 'models/MinimumProfile';
 import Thread from 'models/Thread';
 import Topic from 'models/Topic';
@@ -83,9 +82,6 @@ const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
               : totalThreadsInCommunityForVoting,
         })
       );
-      const activeEntity = app.chain;
-      updateLastVisited(activeEntity.meta, true);
-
       return newThread;
     },
   });

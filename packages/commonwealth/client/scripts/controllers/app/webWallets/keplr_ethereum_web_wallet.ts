@@ -24,7 +24,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Evmos;
-  public readonly specificChains = ['evmos', 'injective'];
+  public readonly specificChains = ['evmos', 'injective', 'evmos-dev'];
 
   public get available() {
     return !!window.keplr;
@@ -120,7 +120,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           // use the RPC url as hack, which will break some querying functionality but not signing.
           rest: app.chain.meta.node.altWalletUrl || url,
           bip44: {
-            coinType: 118,
+            coinType: 60,
           },
           bech32Config: {
             bech32PrefixAccAddr: `${bech32Prefix}`,
@@ -133,24 +133,28 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           currencies: [
             {
               coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
-              coinDecimals: app.chain.meta.decimals || 6,
+              coinMinimalDenom: `a${app.chain.meta.default_symbol.toLowerCase()}`,
+              coinDecimals: 18,
             },
           ],
           feeCurrencies: [
             {
               coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
-              coinDecimals: app.chain.meta.decimals || 6,
+              coinMinimalDenom: `a${app.chain.meta.default_symbol.toLowerCase()}`,
+              coinDecimals: 18,
+              gasPriceStep: {
+                low: 0,
+                average: 25000000000,
+                high: 40000000000,
+              },
             },
           ],
           stakeCurrency: {
             coinDenom: app.chain.meta.default_symbol,
-            coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
-            coinDecimals: app.chain.meta.decimals || 6,
+            coinMinimalDenom: `a${app.chain.meta.default_symbol.toLowerCase()}`,
+            coinDecimals: 18,
           },
-          gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
-          features: ['stargate'],
+          features: ['eth-address-gen', 'eth-key-sign'],
         };
         await window.keplr.experimentalSuggestChain(info);
         await window.keplr.enable(this._chainId);

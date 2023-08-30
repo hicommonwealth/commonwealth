@@ -147,6 +147,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
               coinDenom: app.chain.meta.default_symbol,
               coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
+              gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
             },
           ],
           stakeCurrency: {
@@ -154,8 +155,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
             coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
             coinDecimals: app.chain.meta.decimals || 6,
           },
-          gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
-          features: ['stargate'],
+          features: [],
         };
         await window.keplr.experimentalSuggestChain(info);
         await window.keplr.enable(this._chainId);
