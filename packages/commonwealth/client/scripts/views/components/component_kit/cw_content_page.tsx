@@ -10,6 +10,7 @@ import Topic from '../../../models/Topic';
 import { ThreadStage } from '../../../models/types';
 import { AuthorAndPublishInfo } from '../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../pages/discussions/ThreadCard/ThreadOptions';
+import { FocusType } from '../../pages/discussions/ThreadCard/ThreadOptions/ThreadOptions';
 import { CWCard } from './cw_card';
 import { CWIconButton } from './cw_icon_button';
 import { CWTab, CWTabBar } from './cw_tabs';
@@ -73,6 +74,10 @@ type ContentPageProps = {
   hasPendingEdits?: boolean;
   canUpdateThread?: boolean;
   showTabs?: boolean;
+  threadOptionFocused?;
+  setThreadOptionFocused?;
+  votes?;
+  voteView?;
 };
 
 export const CWContentPage = ({
@@ -108,6 +113,10 @@ export const CWContentPage = ({
   hasPendingEdits,
   canUpdateThread,
   showTabs = false,
+  threadOptionFocused,
+  setThreadOptionFocused,
+  voteView,
+  votes,
 }: ContentPageProps) => {
   const [tabSelected, setTabSelected] = useState<number>(0);
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
@@ -181,11 +190,15 @@ export const CWContentPage = ({
             hasPendingEdits={hasPendingEdits}
             onProposalStageChange={onProposalStageChange}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+            threadOptionFocused={threadOptionFocused}
+            setThreadOptionFocused={setThreadOptionFocused}
+            votes={votes}
           />
         )}
 
       {subBody}
-      {comments}
+      {threadOptionFocused === FocusType.comment ? comments : null}
+      {threadOptionFocused === FocusType.votes ? voteView : null}
     </div>
   );
 

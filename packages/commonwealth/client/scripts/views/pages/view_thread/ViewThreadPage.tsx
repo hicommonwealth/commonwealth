@@ -57,10 +57,12 @@ import { QuillRenderer } from '../../components/react_quill_editor/quill_rendere
 import { Select } from '../../components/Select';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { FocusType } from '../discussions/ThreadCard/ThreadOptions/ThreadOptions';
 import { useProposalData } from '../view_proposal/index';
 import { useSnapshotProposalData } from '../view_snapshot_proposal/index';
 import { SnapshotInformationCard } from '../view_snapshot_proposal/snapshot_information_card';
 import { SnapshotPollCardContainer } from '../view_snapshot_proposal/snapshot_poll_card_container';
+import { SnapshotVotesTable } from '../view_snapshot_proposal/snapshot_votes_table';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -137,6 +139,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     validatedAgainstStrategies,
     loadVotes,
   } = useSnapshotProposalData(snapshotProposalId, snapshotId);
+
+  const [threadOptionFocused, setThreadOptionFocused] = useState(
+    FocusType.comment
+  );
 
   const { error, metadata, isAdapterLoaded, proposal } = useProposalData(
     proposalId,
@@ -691,6 +697,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             </ExternalLink>
           )
         }
+        threadOptionFocused={threadOptionFocused}
+        setThreadOptionFocused={setThreadOptionFocused}
         thread={thread}
         onLockToggle={(isLock) => {
           setIsGloballyEditing(false);
@@ -755,6 +763,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           }));
         }}
         hasPendingEdits={!!editsToSave}
+        votes={snapshotProposalId ? votes : null}
         body={(threadOptionsComp) => (
           <div className="thread-content">
             {isEditingBody ? (
@@ -801,11 +810,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 ) : !isGloballyEditing && isLoggedIn ? (
                   <>
                     {threadOptionsComp}
-                    <CreateComment
-                      updatedCommentsCallback={updatedCommentsCallback}
-                      rootThread={thread}
-                      canComment={canComment}
-                    />
+                    {threadOptionFocused === FocusType.comment ? (
+                      <CreateComment
+                        updatedCommentsCallback={updatedCommentsCallback}
+                        rootThread={thread}
+                        canComment={canComment}
+                      />
+                    ) : null}
                     {showBanner && (
                       <JoinCommunityBanner
                         onClose={handleCloseBanner}
@@ -818,6 +829,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             )}
           </div>
         )}
+        voteView={
+          votes.length > 0 && (
+            <SnapshotVotesTable
+              choices={snapshotProposal.choices}
+              symbol={symbol}
+              voters={votes}
+            />
+          )
+        }
         comments={
           <>
             {comments.length > 0 && (

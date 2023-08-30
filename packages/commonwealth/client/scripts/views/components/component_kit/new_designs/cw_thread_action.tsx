@@ -69,6 +69,7 @@ type CWThreadActionProps = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   label?: string;
   selected?: boolean;
+  style?;
 };
 
 interface TooltipWrapperProps {
@@ -120,6 +121,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   onClick,
   label,
   selected,
+  style,
 }) => {
   const handleClick = (e) => {
     if (disabled) {
@@ -139,6 +141,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
           {
             disabled,
             upvoteSelected,
+            style,
           },
           ComponentType.ThreadAction
         )}

@@ -54,3 +54,9 @@
     }
   }
 }
+
+.blueUnderline {
+  margin-bottom: -2px;
+  border-radius: 0;
+  border-bottom: 2px solid $primary-500;
+}

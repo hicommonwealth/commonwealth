@@ -20,7 +20,15 @@ type OptionsProps = AdminActionsProps & {
   shareEndpoint?: string;
   canUpdateThread?: boolean;
   totalComments?: number;
+  threadOptionFocused: FocusType;
+  setThreadOptionFocused?;
+  votes?;
 };
+
+export enum FocusType {
+  'comment',
+  'votes',
+}
 
 export const ThreadOptions = ({
   thread,
@@ -41,6 +49,9 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
+  threadOptionFocused,
+  setThreadOptionFocused,
+  votes,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -89,6 +100,26 @@ export const ThreadOptions = ({
             label={`${pluralize(totalComments, 'Comment')}`}
             action="comment"
             disabled={!hasJoinedCommunity}
+            onClick={() => setThreadOptionFocused(FocusType.comment)}
+            style={
+              votes && threadOptionFocused === FocusType.comment
+                ? 'blueUnderline'
+                : ''
+            }
+          />
+        )}
+
+        {votes && (
+          <CWThreadAction
+            label={`${pluralize(totalComments, 'Vote')}`}
+            action="comment"
+            disabled={!hasJoinedCommunity}
+            onClick={() => setThreadOptionFocused(FocusType.votes)}
+            style={
+              votes && threadOptionFocused === FocusType.votes
+                ? 'blueUnderline'
+                : ''
+            }
           />
         )}
 
