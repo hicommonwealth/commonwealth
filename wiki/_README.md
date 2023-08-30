@@ -6,7 +6,7 @@ For a complete list of entries, see our [Table of Contents](_TOC.md)
 
 # Updating the docs: How & when
 
-Whenever a code change PR breaks (or makes obsolete) existing documentation, the relevant entry should be updated. This docs update should be included within the PR itself, as part of the PR—just as one would update unit tests alongside a breaking code change.
+Whenever a code change PR breaks (or makes obsolete) existing documentation, the relevant entry should be updated. This documentation update should be included within the PR itself, similar to how one would update unit tests alongside a breaking code change.
 
 Similarly, whenever a PR adds codebase functionality where either:
 
@@ -16,6 +16,18 @@ Similarly, whenever a PR adds codebase functionality where either:
 ...then that PR should include a new documentation entry as part of its purview.
 
 At least for the duration of 2023, as we implement this new system, any PR that updates or contributes to our documentation wiki should tag @gdjohnson (the documentarian) on Github.
+
+# Documentation language
+
+## Must, Should, & May
+
+Per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119), the following prescriptive language should be consistently used across documentation in order to specify the strength of given guideliens or requirements:
+
+1. **MUST**: This word, or the term "REQUIRED," conveys that the definition is an absolute requirement of the specification.
+2. **MUST NOT**: This phrase conveys that the definition is an absolute prohibition of the specification.
+3. **SHOULD**: This word, or the adjective "RECOMMENDED", conveys that there may exist valid reasons in particular circumstances to ignore a particular item, but the full implications must be understood and carefully weighed before choosing a different course.
+4. **SHOULD NOT** This phrase, or the phrase "NOT RECOMMENDED" conveys that there may exist valid reasons in particular circumstances when the particular behavior is acceptable or even useful, but the full implications should be understood and the case carefully weighed before implementing any behavior described with this label.
+5. **MAY**   This word, or the adjective "OPTIONAL", mean that an item is truly optional. 
 
 # Tracking documentation status
 
