@@ -70,7 +70,6 @@ export async function createTestEntities() {
               email: `test${i - 1}@gmail.com`,
               emailVerified: true,
               isAdmin: true,
-              lastVisited: '{}',
             },
           })
         )[0]

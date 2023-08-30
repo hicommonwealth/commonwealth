@@ -87,4 +87,4 @@ module.exports = {
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: ['plugin:@tanstack/eslint-plugin-query/recommended'],
-};
+}
