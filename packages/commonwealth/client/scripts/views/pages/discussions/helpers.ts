@@ -145,7 +145,7 @@ export const sortByFeaturedFilter = (t: Thread[], featuredFilter) => {
 
   // if (featuredFilter === ThreadFeaturedFilterTypes.LatestActivity) {
   //   return [...t].sort((a, b) =>
-  //     moment(a.latestActivity).diff(moment(b.latestActivity))
+  //     moment(b.latestActivity).diff(moment(a.latestActivity))
   //   );
   // }
 

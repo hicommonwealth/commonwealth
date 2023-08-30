@@ -199,6 +199,7 @@ export class Thread implements IUniqueId {
     canvasHash,
     links,
     discord_meta,
+    latest_activity,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -275,7 +276,7 @@ export class Thread implements IUniqueId {
       reactionType,
       addressesReacted
     );
-    // this.latestActivity = latest_activity ? moment(latest_activity) : null;
+    this.latestActivity = latest_activity ? moment(latest_activity) : null;
   }
 }
 

@@ -236,12 +236,12 @@ export const HeaderWithFilters = ({
                   label: 'Comments',
                   iconLeft: 'chatDots',
                 },
-                // {
-                //   id: 5,
-                //   value: ThreadFeaturedFilterTypes.LatestActivity,
-                //   label: 'Latest Activity',
-                //   iconLeft: 'bellRinging',
-                // },
+                {
+                  id: 5,
+                  value: ThreadFeaturedFilterTypes.LatestActivity,
+                  label: 'Latest Activity',
+                  iconLeft: 'bellRinging',
+                },
               ]}
             />
           </div>
