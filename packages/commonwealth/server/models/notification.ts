@@ -5,6 +5,7 @@ import type {
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ModelInstance, ModelStatic } from './types';
+import { StatsDController } from 'common-common/src/statsd';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
@@ -60,11 +61,17 @@ export default (
                 { max_notif_id: id },
                 { where: { id: thread_id } }
               );
+              StatsDController.get().increment('cw.hook.thread-notif-update', {
+                thread_id: String(thread_id),
+              });
             }
           } catch (error) {
             log.error(
               `incrementing thread notif for thread ${thread_id} afterCreate: ${error}`
             );
+            StatsDController.get().increment('cw.hook.thread-notif-error', {
+              thread_id: String(thread_id),
+            });
           }
         },
       },
