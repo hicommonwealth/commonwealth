@@ -20,7 +20,34 @@
 - **Script Exit**: Ensure scripts terminate correctly in both successful and error scenarios.
 - **Error Handling**: In case of errors, utilize `process.exit(non-zero code)` to exit the script.
 - **Logging**: Implement console logs at the beginning and end of the script. Also, log the duration it took for the script to execute.
-- **Testing**: It's recommended to test on the Heroku Scheduler in the development environment before deploying to production.
+- **Testing**: Always test on the Heroku Scheduler in the development environment before deploying to production.
+- **Unit/Integration Tests**: Incorporate unit and integration tests to safeguard against script failures due to future refactors.
+
+### Sample Code
+- **Purpose**: The sample code demonstrates how to structure a script to ensure it runs correctly when executed directly or imported. This structure aids in integrating scripts with unit tests and ensures proper exit when running on the scheduler.
+- **Error Handling**: The code includes a try-catch block to handle any potential errors during execution.
+  
+```javascript
+export async function recomputeCounts() {
+  // Your code here
+}
+
+if (!module.parent) {
+  console.log('recompute job started');
+  recomputeCounts()
+    .then(() => {
+      console.log('recompute job completed successfully');
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.log('recompute job exit with error');
+      console.log(err);
+      process.exit(1);
+    });
+}
+```
+
+By following these best practices and using the provided sample code as a template, you can ensure that your scripts run efficiently and effectively on the Heroku Scheduler.
 
 ### Debugging
 - **Console Logs**: Use console logs for initial debugging during trial runs.
