@@ -10,6 +10,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { coinToCoins, EventKind } from 'chain-events/src/chains/cosmos/types';
 import { SupportedNetwork } from 'chain-events/src';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -100,10 +101,6 @@ async function emitProposalNotifications(proposals: AllCosmosProposals) {
         NotificationCategories.ChainEvent,
         chainId,
         {
-          // TODO: remove need for an id, block number, and queued
-          id: 1,
-          block_number: 1,
-          queued: 1,
           chain: chainId,
           network: SupportedNetwork.Cosmos,
           event_data: {
@@ -129,7 +126,7 @@ async function emitProposalNotifications(proposals: AllCosmosProposals) {
             finalTallyResult: proposal.final_tally_result,
             totalDeposit: coinToCoins(proposal.total_deposit),
           },
-        }
+        } as ChainEventAttributes // TODO: @Timothee refactor necessary data for chain-event notifications after object_id PR #4586 is merged
       );
     }
   }
@@ -143,9 +140,6 @@ async function emitProposalNotifications(proposals: AllCosmosProposals) {
         chainId,
         {
           // TODO: remove need for an id, block number, and queued
-          id: 1,
-          block_number: 1,
-          queued: 1,
           chain: chainId,
           network: SupportedNetwork.Cosmos,
           event_data: {
@@ -163,7 +157,7 @@ async function emitProposalNotifications(proposals: AllCosmosProposals) {
             finalTallyResult: proposal.finalTallyResult,
             totalDeposit: coinToCoins(proposal.totalDeposit),
           },
-        }
+        } as ChainEventAttributes // TODO: @Timothee refactor necessary data for chain-event notifications after object_id PR #4586 is merged
       );
     }
   }

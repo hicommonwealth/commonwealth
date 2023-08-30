@@ -111,7 +111,7 @@ export default async (
   for (const nr of notificationsRead) {
     let chainEvent;
     // if the Notification instance defines a chain_event_id then this is a chain-event notification so parse it
-    if (nr.Notification.chain_event_id) {
+    if (nr.Notification.category_id === 'chain-event') {
       chainEvent = JSON.parse(nr.Notification.notification_data);
     }
     // creates an object for each subscription for which we have a NotificationsRead instance.
