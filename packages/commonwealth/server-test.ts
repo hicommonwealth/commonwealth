@@ -98,6 +98,7 @@ const resetServer = (debug = false): Promise<void> => {
         email: 'drewstone329@gmail.com',
         emailVerified: true,
         isAdmin: true,
+        lastVisited: '{}',
       });
 
       const nodes = [
@@ -495,13 +496,14 @@ setupAPI(
 setupCosmosProxy(app, models);
 setupCacheTestEndpoints(app);
 
-const rollbar = {
-  error: () => null,
-  log: () => null,
-  critical: () => null,
-};
+const rollbar = new Rollbar({
+  accessToken: ROLLBAR_SERVER_TOKEN,
+  environment: ROLLBAR_ENV,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
 
-setupErrorHandlers(app, rollbar as Rollbar);
+setupErrorHandlers(app, rollbar);
 setupServer();
 
 export const resetDatabase = () => resetServer();
