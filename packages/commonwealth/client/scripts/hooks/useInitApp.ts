@@ -9,7 +9,6 @@ const useInitApp = () => {
   useEffect(() => {
     Promise.all([axios.get(`${app.serverUrl()}/domain`), initAppState()])
       .then(([domainResp]) => {
-        debugger;
         return domainResp.data;
       })
       .then(({ customDomain: serverCustomDomain }) => {
