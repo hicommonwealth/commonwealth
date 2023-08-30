@@ -3,6 +3,7 @@ import { Secp256k1HdWallet, StdFee } from '@cosmjs/amino';
 import { DeliverTxResponse } from '@cosmjs/stargate';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
+
 import {
   getSigningClient,
   getTMClient,
