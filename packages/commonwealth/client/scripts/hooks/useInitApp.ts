@@ -20,7 +20,7 @@ const useInitApp = () => {
       })
       .catch((err) => console.log('Failed fetching custom domain', err))
       .finally(() => setIsLoading(false));
-  }, [customDomain]);
+  }, []);
 
   return { isLoading, customDomain };
 };
