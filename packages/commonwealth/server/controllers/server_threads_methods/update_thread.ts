@@ -563,9 +563,12 @@ async function setThreadStage(
     // fetch available stages
     let customStages = [];
     try {
-      customStages = Array.from(JSON.parse(chain.custom_stages))
-        .map((s) => s.toString())
-        .filter((s) => s);
+      const chainStages = JSON.parse(chain.custom_stages);
+      if (Array.isArray(chainStages)) {
+        customStages = Array.from(chainStages)
+          .map((s) => s.toString())
+          .filter((s) => s);
+      }
       if (customStages.length === 0) {
         customStages = [
           'discussion',
@@ -661,8 +664,6 @@ async function updateThreadCollaborators(
       }
     }
 
-    const toUpdate: Partial<ThreadAttributes> = {};
-
     // add collaborators
     if (toAddUnique.length > 0) {
       const collaboratorAddresses = await models.Address.findAll({
@@ -700,10 +701,6 @@ async function updateThreadCollaborators(
         },
         transaction,
       });
-    }
-
-    if (Object.keys(toUpdate).length > 0) {
-      await thread.update(toUpdate, { transaction });
     }
   }
 }
