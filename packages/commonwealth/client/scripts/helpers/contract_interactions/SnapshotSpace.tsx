@@ -2,16 +2,15 @@ import { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
 import { BackParams, SnapshotVoteParams, WithdrawBackParams } from './types';
 import CrowdfundContract from './CrowdfundContract';
-
-const abi = [];
-const farcasterHookAbi = [];
+import spaceAbi from './abis/spaceABI';
+import farcasterHookAbi from './abis/farcasterHookABI';
 
 class SnapshotSpace extends ContractBase {
   private crowdfundContract;
   public proposalIdCache;
 
   constructor(contractAddress: string, crowdFundAddress: string) {
-    super(contractAddress, abi);
+    super(contractAddress, spaceAbi);
     this.crowdfundContract = new CrowdfundContract(crowdFundAddress);
   }
 

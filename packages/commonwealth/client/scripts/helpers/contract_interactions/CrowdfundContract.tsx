@@ -1,24 +1,23 @@
 import { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
 import { BackParams, WithdrawBackParams } from './types';
-
-const abi = [];
-const wethAbi = [];
+import crowdfundAbi from './abis/CrowdfundABI';
+import erc20Abi from './abis/Erc20ABI';
 
 class CrowdfundContract extends ContractBase {
   private weth;
 
   constructor(contractAddress: string) {
-    super(contractAddress, abi);
+    super(contractAddress, crowdfundAbi);
     this.weth = new this.web3.eth.Contract(
-      wethAbi as AbiItem[],
+      erc20Abi as AbiItem[],
       '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6'
     );
   }
 
   async back(prop: BackParams): Promise<void> {
     const convertedAmount = this.toBN(prop.amount).mul(this.toBN(1e18));
-    await this.weth.mehthods
+    await this.weth.methods
       .approve(this.contractAddress, convertedAmount)
       .send({ from: this.wallet.accounts[0] });
     await this.contract.methods
