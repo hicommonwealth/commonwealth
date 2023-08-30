@@ -102,7 +102,7 @@ class NotificationsController {
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
-      let untypedData: {
+      const untypedData: {
         categoryId: NotificationCategories;
         options?: {
           chainId?: string;
