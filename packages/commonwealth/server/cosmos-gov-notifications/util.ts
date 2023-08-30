@@ -10,6 +10,7 @@ import { SupportedNetwork } from 'chain-events/src';
 import { coinToCoins, EventKind } from 'chain-events/src/chains/cosmos/types';
 import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -112,12 +113,13 @@ export function filterProposals(proposals: AllCosmosProposals) {
     v1Beta1: {},
   };
 
+  const twoHoursAgo = new Date(Date.now() - 1000 * 60 * 120);
   for (const chainId in proposals.v1) {
     const chainProposals = proposals.v1[chainId];
     const filteredProposalsForChain = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
       const submitTime = new Date(p.submit_time);
-      return submitTime.getTime() > Date.now() - 1000 * 60 * 120;
+      return submitTime.getTime() > twoHoursAgo.getTime();
     });
 
     log.info(
@@ -132,10 +134,7 @@ export function filterProposals(proposals: AllCosmosProposals) {
     const chainProposals = proposals.v1Beta1[chainId];
     const filteredProposalsForChain = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
-      return (
-        p.submitTime &&
-        p.submitTime.seconds.toNumber() > Date.now() / 1000 - 1000 * 60 * 120
-      );
+      return fromTimestamp(p.submitTime).getTime() > twoHoursAgo.getTime();
     });
 
     log.info(

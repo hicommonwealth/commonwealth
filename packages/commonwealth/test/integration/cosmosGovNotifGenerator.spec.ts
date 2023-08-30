@@ -2,7 +2,10 @@ import { resetDatabase } from '../../server-test';
 import models from '../../server/database';
 import { expect } from 'chai';
 
-import { fetchLatestNotifProposalIds } from '../../server/cosmos-gov-notifications/util';
+import {
+  fetchLatestNotifProposalIds,
+  filterProposals,
+} from '../../server/cosmos-gov-notifications/util';
 import {
   ProposalSDKType,
   ProposalStatusSDKType,
@@ -12,6 +15,7 @@ import {
   toTimestamp,
 } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { AllCosmosProposals } from '../../server/cosmos-gov-notifications/proposalFetching';
 
 async function createFakeProposalNotification(
   proposalId: string,
@@ -31,6 +35,11 @@ async function createFakeProposalNotification(
   return notifData;
 }
 
+type GovTypeMapping = {
+  v1: ProposalSDKType;
+  v1Beta1: Proposal;
+};
+
 /**
  * Creates a fake Cosmos v1 or v1beta1 governance proposal. The deposit end time is set to 1 day after the submit time,
  * the voting start time is set to 2 days after the submit time, and the voting end time is set to 3 days after the
@@ -39,11 +48,11 @@ async function createFakeProposalNotification(
  * @param proposalId The id of the proposal. If not provided, 1 will be used.
  * @param submitTimeMs The submit time in milliseconds. If not provided, the current time will be used.
  */
-function createFakeProposal(
-  govType: 'v1' | 'v1Beta1',
+function createFakeProposal<T extends keyof GovTypeMapping>(
+  govType: T,
   proposalId: number = 1,
   submitTimeMs: number = Date.now()
-) {
+): GovTypeMapping[T] {
   const submitTime = new Date(submitTimeMs);
 
   if (govType === 'v1') {
@@ -64,7 +73,7 @@ function createFakeProposal(
       total_deposit: [{ denom: 'random', amount: '1' }],
       metadata: 'random',
     };
-    return proposal;
+    return proposal as GovTypeMapping[T];
   } else {
     const proposal: Proposal = {
       proposalId: numberToLong(proposalId),
@@ -87,7 +96,7 @@ function createFakeProposal(
       votingEndTime: toTimestamp(new Date(submitTime.getTime() + 86400000 * 3)),
       totalDeposit: [{ denom: 'random', amount: '1' }],
     };
-    return proposal;
+    return proposal as GovTypeMapping[T];
   }
 }
 
@@ -126,7 +135,37 @@ describe.only('Cosmos Governance Notification Generator', () => {
       );
     });
 
-    it('filterProposals: should filter out old proposals', async () => {});
+    it('filterProposals: should filter out old proposals', async () => {
+      const validKyveProposal = createFakeProposal('v1', 3);
+      const validOsmosisProposal = createFakeProposal('v1Beta1', 3);
+      const oneDayAgo = Date.now() - 60000 * 60 * 24;
+      const threeHoursAgo = Date.now() - 60000 * 180;
+      const allProposals: AllCosmosProposals = {
+        v1: {
+          kyve: [
+            createFakeProposal('v1', 1, oneDayAgo),
+            createFakeProposal('v1', 2, threeHoursAgo),
+            validKyveProposal,
+          ],
+        },
+        v1Beta1: {
+          osmosis: [
+            createFakeProposal('v1Beta1', 1, oneDayAgo),
+            createFakeProposal('v1Beta1', 2, threeHoursAgo),
+            validOsmosisProposal,
+          ],
+        },
+      };
+      const filteredProposals = filterProposals(allProposals);
+      expect(filteredProposals).to.deep.equal({
+        v1: {
+          kyve: [validKyveProposal],
+        },
+        v1Beta1: {
+          osmosis: [validOsmosisProposal],
+        },
+      });
+    });
 
     it('emitProposalNotifications: should emit proposal notifications', async () => {});
   });
