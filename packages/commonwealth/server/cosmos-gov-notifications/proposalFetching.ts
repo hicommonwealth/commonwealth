@@ -22,10 +22,10 @@ export type AllCosmosProposals = {
   v1Beta1: { [chainId: string]: Proposal[] };
 };
 
-type GovV1Beta1ClientType = QueryClient & GovExtension;
-type CosmosClientType = (QueryClient & GovExtension) | GovV1Client;
+export type GovV1Beta1ClientType = QueryClient & GovExtension;
+type CosmosClientType = GovV1Beta1ClientType | GovV1Client;
 
-const CosmosClients: Record<string, CosmosClientType> = {};
+export const CosmosClients: Record<string, CosmosClientType> = {};
 const log = factory.getLogger(formatFilename(__filename));
 
 async function getCosmosClient<

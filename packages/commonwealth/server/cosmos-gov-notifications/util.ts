@@ -119,7 +119,7 @@ export function filterProposals(proposals: AllCosmosProposals) {
     const filteredProposalsForChain = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
       const submitTime = new Date(p.submit_time);
-      return submitTime.getTime() > twoHoursAgo.getTime();
+      return !!submitTime && submitTime.getTime() > twoHoursAgo.getTime();
     });
 
     log.info(
@@ -134,7 +134,8 @@ export function filterProposals(proposals: AllCosmosProposals) {
     const chainProposals = proposals.v1Beta1[chainId];
     const filteredProposalsForChain = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
-      return fromTimestamp(p.submitTime).getTime() > twoHoursAgo.getTime();
+      const submitTime = fromTimestamp(p.submitTime);
+      return !!submitTime && submitTime.getTime() > twoHoursAgo.getTime();
     });
 
     log.info(
@@ -146,6 +147,16 @@ export function filterProposals(proposals: AllCosmosProposals) {
   }
 
   return filteredProposals;
+}
+
+function formatProposalDates(date: string | Date): number {
+  if (typeof date === 'string') {
+    return new Date(date).getTime();
+  } else if (date instanceof Date) {
+    return date.getTime();
+  } else {
+    throw new Error('Invalid date format');
+  }
 }
 
 export async function emitProposalNotifications(proposals: AllCosmosProposals) {
@@ -167,18 +178,10 @@ export async function emitProposalNotifications(proposals: AllCosmosProposals) {
               typeUrl: proposal.messages[0].type_url,
               value: proposal.messages[0].value,
             },
-            submitTime: Math.round(
-              new Date(proposal.submit_time).getTime() / 1000
-            ),
-            depositEndTime: Math.round(
-              new Date(proposal.deposit_end_time).getTime() / 1000
-            ),
-            votingStartTime: Math.round(
-              new Date(proposal.voting_start_time).getTime() / 1000
-            ),
-            votingEndTime: Math.round(
-              new Date(proposal.voting_end_time).getTime()
-            ),
+            submitTime: formatProposalDates(proposal.submit_time),
+            depositEndTime: formatProposalDates(proposal.deposit_end_time),
+            votingStartTime: formatProposalDates(proposal.voting_start_time),
+            votingEndTime: formatProposalDates(proposal.voting_end_time),
             finalTallyResult: proposal.final_tally_result,
             totalDeposit: coinToCoins(proposal.total_deposit),
           },

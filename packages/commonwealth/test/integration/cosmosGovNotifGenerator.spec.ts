@@ -3,6 +3,7 @@ import models from '../../server/database';
 import { expect } from 'chai';
 
 import {
+  emitProposalNotifications,
   fetchLatestNotifProposalIds,
   filterProposals,
 } from '../../server/cosmos-gov-notifications/util';
@@ -15,7 +16,23 @@ import {
   toTimestamp,
 } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { AllCosmosProposals } from '../../server/cosmos-gov-notifications/proposalFetching';
+import {
+  AllCosmosProposals,
+  CosmosClients,
+  GovV1Beta1ClientType,
+} from '../../server/cosmos-gov-notifications/proposalFetching';
+import {
+  QueryProposalRequest,
+  QueryProposalsRequest,
+  QueryProposalResponseSDKType,
+  QueryProposalsResponseSDKType,
+} from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query';
+import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
+import {
+  QueryProposalResponse,
+  QueryProposalsResponse,
+} from 'cosmjs-types/cosmos/gov/v1beta1/query';
+import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
 
 async function createFakeProposalNotification(
   proposalId: string,
@@ -167,11 +184,56 @@ describe.only('Cosmos Governance Notification Generator', () => {
       });
     });
 
-    it('emitProposalNotifications: should emit proposal notifications', async () => {});
+    it('emitProposalNotifications: should emit proposal notifications', async () => {
+      const validKyveProposal = createFakeProposal('v1', 3);
+      const validOsmosisProposal = createFakeProposal('v1Beta1', 3);
+      await emitProposalNotifications({
+        v1: {
+          kyve: [validKyveProposal],
+        },
+        v1Beta1: {
+          osmosis: [validOsmosisProposal],
+        },
+      });
+    });
   });
 
   describe('generateCosmosGovNotifications tests', () => {
+    before('mock Cosmos clients', async () => {
+      CosmosClients['kyve'] = {
+        async proposal(
+          params: QueryProposalRequest
+        ): Promise<QueryProposalResponseSDKType> {
+          return {} as any;
+        },
+
+        async proposals(
+          params: QueryProposalsRequest
+        ): Promise<QueryProposalsResponseSDKType> {
+          return {} as any;
+        },
+      } as GovV1Client;
+
+      CosmosClients['osmosis'] = {
+        async proposals(
+          proposalStatus: ProposalStatus,
+          depositor: string,
+          voter: string,
+          paginationKey?: Uint8Array
+        ): Promise<QueryProposalsResponse> {
+          return {} as any;
+        },
+
+        async proposal(
+          proposalId: GovProposalId
+        ): Promise<QueryProposalResponse> {
+          return {} as any;
+        },
+      } as unknown as GovV1Beta1ClientType;
+    });
+
     it('should not generate notifications if there are no new proposals', async () => {});
+
     it('should not generate notifications if there are no cosmos chains', async () => {});
     it('should generate cosmos gov notifications', async () => {});
   });
