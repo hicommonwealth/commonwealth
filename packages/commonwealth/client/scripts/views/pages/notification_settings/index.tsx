@@ -1,9 +1,9 @@
-import { NotificationCategories } from 'common-common/src/types';
-import useForceRerender from 'hooks/useForceRerender';
-import moment from 'moment';
-import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/notification_settings/index.scss';
 import React, { useEffect, useState } from 'react';
+
+import { NotificationCategories } from 'common-common/src/types';
+import useForceRerender from '../../../hooks/useForceRerender';
+import moment from 'moment';
+import { useCommonNavigate } from '../../../navigation/helpers';
 import app from 'state';
 import AddressInfo from '../../../models/AddressInfo';
 import NotificationSubscription from '../../../models/NotificationSubscription';
@@ -24,6 +24,9 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
+import { notifySuccess } from '../../../controllers/app/notifications';
+
+import '../../../../styles/pages/notification_settings/index.scss';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -54,9 +57,12 @@ const NotificationSettingsPage = () => {
   ) => {
     if (hasSomeInAppSubs) {
       await app.user.notifications.disableSubscriptions(subs);
+      notifySuccess('Unsubscribed!');
     } else {
       await app.user.notifications.enableSubscriptions(subs);
+      notifySuccess('Subscribed!');
     }
+
     forceRerender();
   };
 
@@ -69,11 +75,6 @@ const NotificationSettingsPage = () => {
     } else {
       await app.user.notifications.enableImmediateEmails(subs);
     }
-    forceRerender();
-  };
-
-  const handleUnsubscribe = async (subscription: NotificationSubscription) => {
-    await app.user.notifications.deleteSubscription(subscription);
     forceRerender();
   };
 
@@ -467,11 +468,15 @@ const NotificationSettingsPage = () => {
                         <div key={sub.id}>
                           <div className="subscription-row-desktop">
                             <SubscriptionRowTextContainer subscription={sub} />
-                            <CWText type="b2">{getTimeStamp()}</CWText>
+                            <CWText type="b2">
+                              {sub.isActive ? getTimeStamp() : 'Unsubscribed'}
+                            </CWText>
                             {getUser()}
                             <SubscriptionRowMenu
                               subscription={sub}
-                              onUnsubscribe={handleUnsubscribe}
+                              onUnsubscribe={() =>
+                                handleSubscriptions(sub.isActive, [sub])
+                              }
                             />
                           </div>
                           <div className="subscription-row-mobile">
@@ -481,19 +486,23 @@ const NotificationSettingsPage = () => {
                               />
                               <SubscriptionRowMenu
                                 subscription={sub}
-                                onUnsubscribe={handleUnsubscribe}
+                                onUnsubscribe={() =>
+                                  handleSubscriptions(sub.isActive, [sub])
+                                }
                               />
                             </div>
                             <div className="subscription-row-mobile-bottom">
                               {getUser()}
-                              {getTimeStamp() && (
-                                <CWText
-                                  type="caption"
-                                  className="subscription-list-header-text"
-                                >
-                                  subscribed
-                                </CWText>
-                              )}
+                              {sub.isActive
+                                ? getTimeStamp() && (
+                                    <CWText
+                                      type="caption"
+                                      className="subscription-list-header-text"
+                                    >
+                                      subscribed
+                                    </CWText>
+                                  )
+                                : 'Unsubscribed'}
                               <CWText
                                 type="caption"
                                 fontWeight="medium"

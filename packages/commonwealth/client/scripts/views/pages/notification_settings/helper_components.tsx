@@ -167,7 +167,7 @@ export const SubscriptionRowMenu = ({
         )}
         menuItems={[
           {
-            label: 'Unsubscribe',
+            label: subscription.isActive ? 'Unsubscribe' : 'Subscribe',
             iconLeft: 'close',
             isSecondary: true,
             onClick: () => onUnsubscribe(subscription),

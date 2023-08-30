@@ -1,20 +1,25 @@
+import React, { useState } from 'react';
 import moment from 'moment';
 import type { DeltaStatic } from 'quill';
-import React, { useState } from 'react';
+
 import app from 'state';
-import type Comment from 'models/Comment';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
-import { CWTag } from 'views/components/component_kit/cw_tag';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
-import { ReactQuillEditor } from 'views/components/react_quill_editor';
-import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
-import { deserializeDelta } from 'views/components/react_quill_editor/utils';
-import { SharePopover } from 'views/components/share_popover';
+import useUserActiveAccount from '../../../../hooks/useUserActiveAccount';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
+import type Comment from '../../../../models/Comment';
+import { CWButton } from '../../../components/component_kit/new_designs/cw_button';
+import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWTag } from '../../../components/component_kit/cw_tag';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { CommentReactionButton } from '../../../components/ReactionButton/CommentReactionButton';
+import { ReactQuillEditor } from '../../../components/react_quill_editor';
+import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
+import { deserializeDelta } from '../../../components/react_quill_editor/utils';
+import { SharePopover } from '../../../components/share_popover';
+import { CWThreadAction } from '../../../components/component_kit/new_designs/cw_thread_action';
+import useForceRerender from '../../../../hooks/useForceRerender';
+import { getCommentSubscriptions, handleToggleSubscription } from '../helpers';
+
 import './CommentCard.scss';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type CommentCardProps = {
   // Edit
@@ -67,8 +72,29 @@ export const CommentCard = ({
   // actual comment
   comment,
 }: CommentCardProps) => {
+  const forceRerender = useForceRerender();
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const isSubscribed = () => {
+    const [newCommentSub, newReactionSub] = getCommentSubscriptions(comment);
+
+    return newCommentSub?.isActive && newReactionSub?.isActive;
+  };
+
+  const handleToggleSubscribe = async () => {
+    const [newCommentSub, newReactionSub] = getCommentSubscriptions(comment);
+
+    await handleToggleSubscription(
+      null,
+      newCommentSub,
+      newReactionSub,
+      newCommentSub?.isActive && newReactionSub?.isActive
+    );
+
+    forceRerender();
+  };
 
   return (
     <div className="comment-body">
@@ -136,6 +162,14 @@ export const CommentCard = ({
                   }}
                 />
               )}
+
+              <CWThreadAction
+                action="subscribe"
+                onClick={handleToggleSubscribe}
+                selected={!isSubscribed()}
+                label={isSubscribed() ? 'Unsubscribe' : 'Subscribe'}
+                disabled={!hasJoinedCommunity}
+              />
 
               {(canEdit || canDelete) && (
                 <PopoverMenu

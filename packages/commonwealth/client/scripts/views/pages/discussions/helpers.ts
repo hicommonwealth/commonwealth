@@ -1,12 +1,15 @@
-import { notifySuccess } from 'controllers/app/notifications';
-import moment from 'moment';
 import { Dispatch, SetStateAction } from 'react';
+
+import { notifySuccess } from '../../../controllers/app/notifications';
+import moment from 'moment';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 import type Thread from '../../../models/Thread';
+import Comment from '../../../models/Comment';
 import { NotificationCategories } from 'common-common/src/types';
-import app from 'state';
+import app from '../../../state';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { ThreadFeaturedFilterTypes } from '../../../models/types';
+import { bundleSubs } from '../notification_settings/helpers';
 
 export const getLastUpdated = (thread: Thread) => {
   const { lastCommentedOn } = thread;
@@ -40,10 +43,10 @@ export const orderDiscussionsbyLastComment = (a, b) => {
 };
 
 export const handleToggleSubscription = async (
-  thread: Thread,
-  commentSubscription: NotificationSubscription,
-  reactionSubscription: NotificationSubscription,
-  isSubscribed: boolean,
+  thread?: Thread,
+  commentSubscription?: NotificationSubscription,
+  reactionSubscription?: NotificationSubscription,
+  isSubscribed?: boolean,
   setIsSubscribed?: Dispatch<SetStateAction<boolean>>
 ) => {
   if (!commentSubscription || !reactionSubscription) {
@@ -88,6 +91,29 @@ export const getReactionSubscription = (thread: Thread) => {
       v.objectId === thread.uniqueIdentifier &&
       v.category === NotificationCategories.NewReaction
   );
+};
+
+export const getCommentSubscriptions = (comment: Comment<any>) => {
+  const commentSubs = Object.values(
+    bundleSubs(
+      app?.user.notifications.subscriptions.filter(
+        (s) =>
+          s.category !== 'chain-event' &&
+          s.Chain?.id === app.activeChainId() &&
+          s.Comment?.id == comment.id &&
+          (s.category === 'new-comment-creation' ||
+            s.category === 'new-reaction')
+      )
+    )
+  ).flat(1);
+
+  const newCommentSub =
+    commentSubs.filter((s) => s.category === 'new-comment-creation')[0] ||
+    null;
+  const newReactionSub =
+    commentSubs.filter((s) => s.category === 'new-reaction')[0] || null;
+
+  return [newCommentSub, newReactionSub];
 };
 
 export const getThreadSubScriptionMenuItem = (
