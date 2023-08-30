@@ -3,6 +3,15 @@ import { COSMOS_GOV_V1_CHAIN_IDS } from '../config';
 import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { AllCosmosProposals } from './proposalFetching';
+import models from '../database';
+import { ChainBase, NotificationCategories } from 'common-common/src/types';
+import emitNotifications from '../util/emitNotifications';
+import { SupportedNetwork } from 'chain-events/src';
+import { coinToCoins, EventKind } from 'chain-events/src/chains/cosmos/types';
+import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
+import { factory, formatFilename } from 'common-common/src/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export function uint8ArrayToNumberBE(bytes) {
   if (!bytes) return 0;
@@ -60,4 +69,153 @@ export function mapChainsToProposals(
       {}
     ),
   };
+}
+
+export async function fetchCosmosNotifChains() {
+  return await models.Chain.findAll({
+    where: {
+      base: ChainBase.CosmosSDK,
+      has_chain_events_listener: true,
+    },
+    include: [
+      {
+        model: models.ChainNode,
+        required: true,
+      },
+    ],
+  });
+}
+
+export async function fetchLatestNotifProposalIds(
+  chainIds: string[]
+): Promise<Record<string, number>> {
+  const result = (await models.sequelize.query(
+    `
+    SELECT
+    chain_id, MAX(notification_data::jsonb -> 'event_data' ->> 'id') as proposal_id
+    FROM "Notifications"
+    WHERE category_id = 'chain-event' AND chain_id IN (?)
+    GROUP BY chain_id;
+  `,
+    { raw: true, type: 'SELECT', replacements: [chainIds] }
+  )) as { chain_id: string; proposal_id: string }[];
+
+  return result.reduce(
+    (acc, item) => ({ ...acc, [item.chain_id]: +item.proposal_id }),
+    {}
+  );
+}
+
+export function filterProposals(proposals: AllCosmosProposals) {
+  const filteredProposals: AllCosmosProposals = {
+    v1: {},
+    v1Beta1: {},
+  };
+
+  for (const chainId in proposals.v1) {
+    const chainProposals = proposals.v1[chainId];
+    const filteredProposalsForChain = chainProposals.filter((p) => {
+      // proposal cannot be older than 2 hours
+      const submitTime = new Date(p.submit_time);
+      return submitTime.getTime() > Date.now() - 1000 * 60 * 120;
+    });
+
+    log.info(
+      `Filtered out ${
+        chainProposals.length - filteredProposalsForChain.length
+      } proposals for chain ${chainId}`
+    );
+    filteredProposals.v1[chainId] = filteredProposalsForChain;
+  }
+
+  for (const chainId in proposals.v1Beta1) {
+    const chainProposals = proposals.v1Beta1[chainId];
+    const filteredProposalsForChain = chainProposals.filter((p) => {
+      // proposal cannot be older than 2 hours
+      return (
+        p.submitTime &&
+        p.submitTime.seconds.toNumber() > Date.now() / 1000 - 1000 * 60 * 120
+      );
+    });
+
+    log.info(
+      `Filtered out ${
+        chainProposals.length - filteredProposalsForChain.length
+      } proposals for chain ${chainId}`
+    );
+    filteredProposals.v1Beta1[chainId] = filteredProposalsForChain;
+  }
+
+  return filteredProposals;
+}
+
+export async function emitProposalNotifications(proposals: AllCosmosProposals) {
+  for (const chainId in proposals.v1) {
+    const chainProposals = proposals.v1[chainId];
+    for (const proposal of chainProposals) {
+      await emitNotifications(
+        models,
+        NotificationCategories.ChainEvent,
+        chainId,
+        {
+          chain: chainId,
+          network: SupportedNetwork.Cosmos,
+          event_data: {
+            kind: EventKind.SubmitProposal,
+            id: proposal.id,
+            content: {
+              // TODO: multiple typeUrls for v1 proposals? - is this data even needed
+              typeUrl: proposal.messages[0].type_url,
+              value: proposal.messages[0].value,
+            },
+            submitTime: Math.round(
+              new Date(proposal.submit_time).getTime() / 1000
+            ),
+            depositEndTime: Math.round(
+              new Date(proposal.deposit_end_time).getTime() / 1000
+            ),
+            votingStartTime: Math.round(
+              new Date(proposal.voting_start_time).getTime() / 1000
+            ),
+            votingEndTime: Math.round(
+              new Date(proposal.voting_end_time).getTime()
+            ),
+            finalTallyResult: proposal.final_tally_result,
+            totalDeposit: coinToCoins(proposal.total_deposit),
+          },
+        } as ChainEventAttributes // TODO: @Timothee refactor necessary data for chain-event notifications after object_id PR #4586 is merged
+      );
+    }
+  }
+
+  for (const chainId in proposals.v1Beta1) {
+    const chainProposals = proposals.v1Beta1[chainId];
+    for (const proposal of chainProposals) {
+      await emitNotifications(
+        models,
+        NotificationCategories.ChainEvent,
+        chainId,
+        {
+          // TODO: remove need for an id, block number, and queued
+          chain: chainId,
+          network: SupportedNetwork.Cosmos,
+          event_data: {
+            kind: EventKind.SubmitProposal,
+            id: proposal.proposalId.toString(10),
+            content: {
+              // TODO: multiple typeUrls for v1 proposals? - is this data even needed
+              typeUrl: proposal.content.typeUrl,
+              value: Buffer.from(proposal.content.value).toString('hex'),
+            },
+            submitTime: proposal.submitTime.seconds.toNumber(),
+            depositEndTime: proposal.depositEndTime.seconds.toNumber(),
+            votingStartTime: proposal.votingStartTime.seconds.toNumber(),
+            votingEndTime: proposal.votingEndTime.seconds.toNumber(),
+            finalTallyResult: proposal.finalTallyResult,
+            totalDeposit: coinToCoins(proposal.totalDeposit),
+          },
+        } as ChainEventAttributes // TODO: @Timothee refactor necessary data for chain-event notifications after object_id PR #4586 is merged
+      );
+    }
+  }
 }
