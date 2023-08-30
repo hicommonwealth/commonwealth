@@ -1,6 +1,6 @@
 import React from 'react';
 import app from 'state';
-import { useGetProfilesByAddressesQuery } from 'state/api/profiles';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { formatAddressShort } from 'utils';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -17,7 +17,7 @@ export const ThreadSelectorItem = ({
   onClick,
   isSelected,
 }: ThreadSelectorItemProps) => {
-  const { data: users } = useGetProfilesByAddressesQuery({
+  const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [(thread?.authorChain as any)?.id || thread?.authorChain],
     profileAddresses: [thread?.author],
     currentChainId: app.activeChainId(),

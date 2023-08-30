@@ -14,15 +14,15 @@ export const getDisplayedReactorsForPopup = ({
 }: ReactorProps) => {
   const slicedReactors = reactors
     .slice(0, MAX_VISIBLE_REACTING_ACCOUNTS)
-    .map((rxn) => {
+    .map((reactorAddress) => {
       return (
         <div
-          key={rxn + '#' + (app.chain?.id || app.chain)}
+          key={reactorAddress + '#' + (app.chain?.id || app.chain)}
           style={{ display: 'flex', width: '120px' }}
         >
           <CWText noWrap>
             <User
-              userAddress={rxn}
+              userAddress={reactorAddress}
               userChainId={app.chain.id}
               shouldLinkProfile
             />

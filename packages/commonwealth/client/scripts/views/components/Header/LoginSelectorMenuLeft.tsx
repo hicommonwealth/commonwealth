@@ -12,7 +12,7 @@ import { UserBlock } from 'views/components/user/user_block';
 import { LoginModal } from 'views/modals/login_modal';
 
 import 'components/Header/LoginSelectorMenu.scss';
-import { useGetProfilesByAddressesQuery } from 'state/api/profiles';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 
 export const LoginSelectorMenuLeft = () => {
   const navigate = useCommonNavigate();
@@ -25,7 +25,7 @@ export const LoginSelectorMenuLeft = () => {
     typeof activeAccount.chain === 'string'
       ? activeAccount.chain
       : activeAccount.chain?.id;
-  const { data: users } = useGetProfilesByAddressesQuery({
+  const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [chain],
     profileAddresses: [activeAccount.address],
     currentChainId: app.activeChainId(),

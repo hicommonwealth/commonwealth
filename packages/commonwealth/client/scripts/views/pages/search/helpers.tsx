@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 
 import 'pages/search/index.scss';
 
-import { useGetProfilesByAddressesQuery } from 'state/api/profiles';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import app from 'state';
 import ChainInfo from '../../../models/ChainInfo';
 import type MinimumProfile from '../../../models/MinimumProfile';
@@ -213,7 +213,7 @@ type MemberResultRowProps = {
 };
 const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   const { chain, address } = addr.addresses[0];
-  const { data: users } = useGetProfilesByAddressesQuery({
+  const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [chain],
     profileAddresses: [address],
     currentChainId: app.activeChainId(),

@@ -3,7 +3,7 @@ import 'components/user/user.scss';
 import { capitalize } from 'lodash';
 import React from 'react';
 import app from 'state';
-import { useGetProfilesByAddressesQuery } from 'state/api/profiles';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
@@ -25,7 +25,7 @@ export const UserBlock = (props: {
 }) => {
   const { compact, searchTerm, showChainName, user } = props;
 
-  const { data: users } = useGetProfilesByAddressesQuery({
+  const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [(user?.chain as any)?.id],
     profileAddresses: [user?.address],
     currentChainId: app.activeChainId(),

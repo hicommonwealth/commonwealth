@@ -40,20 +40,20 @@ const fetchProfilesByAddress = async ({
   });
 };
 
-interface UseFetchProfilesByAddressQuery extends FetchProfilesByAddressProps {
+interface UseFetchProfilesByAddressesQuery extends FetchProfilesByAddressProps {
   apiCallEnabled?: boolean;
 }
-const useFetchProfilesByAddressQuery = ({
+const useFetchProfilesByAddressesQuery = ({
   currentChainId,
   profileChainIds,
   profileAddresses,
   apiCallEnabled = true,
-}: UseFetchProfilesByAddressQuery) => {
+}: UseFetchProfilesByAddressesQuery) => {
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       ApiEndpoints.FETCH_PROFILES,
-      // we should not cache by current chain as it can break logic for DISCOURAGED_NONREACTIVE_getProfilesByAddress
+      // we should not cache by currentChainId as it can break logic for DISCOURAGED_NONREACTIVE_fetchProfilesByAddress
       // currentChainId,
       ...profileChainIds,
       ...profileAddresses,
@@ -69,7 +69,7 @@ const useFetchProfilesByAddressQuery = ({
   });
 };
 
-export const DISCOURAGED_NONREACTIVE_getProfilesByAddress = (
+export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = (
   chainId,
   address
 ) => {
@@ -86,4 +86,4 @@ export const DISCOURAGED_NONREACTIVE_getProfilesByAddress = (
   );
 };
 
-export default useFetchProfilesByAddressQuery;
+export default useFetchProfilesByAddressesQuery;

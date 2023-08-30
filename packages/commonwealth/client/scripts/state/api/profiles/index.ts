@@ -1,11 +1,11 @@
 import useBanProfileByAddressMutation from './banProfileByAddress';
-import useGetProfilesByAddressesQuery from './getProfilesByAddress';
+import useFetchProfilesByAddressesQuery from './fetchProfilesByAddress';
 import useSearchProfilesQuery from './searchProfiles';
 import useUpdateProfileByAddressMutation from './updateProfileByAddress';
 
 export {
   useBanProfileByAddressMutation,
-  useGetProfilesByAddressesQuery,
+  useFetchProfilesByAddressesQuery,
   useSearchProfilesQuery,
   useUpdateProfileByAddressMutation,
 };

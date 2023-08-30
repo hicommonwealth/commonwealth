@@ -32,7 +32,7 @@ import {
 } from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
-import { DISCOURAGED_NONREACTIVE_getProfilesByAddress } from '../state/api/profiles/getProfilesByAddress';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
 import type { ProfileRowProps } from '../views/components/component_kit/cw_profiles_list';
 import {
   breakpointFnValidator,
@@ -94,7 +94,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     onAction: true,
   });
 
-  const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation({});
+  const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation();
 
   useBrowserWindow({
     onResize: () =>
@@ -371,20 +371,20 @@ const useWallets = (walletProps: IuseWalletProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      await DISCOURAGED_NONREACTIVE_getProfilesByAddress(
-        primaryAccount.profile.chain,
-        primaryAccount.profile.address
-      ).then((res) => {
-        const data = res[0];
-        primaryAccount.profile.initialize(
-          data?.name,
-          data.address,
-          data?.avatarUrl,
-          data.id,
+      const updatedProfiles =
+        await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
           primaryAccount.profile.chain,
-          data?.lastActive
+          primaryAccount.profile.address
         );
-      });
+      const currentUserUpdatedProfile = updatedProfiles[0];
+      primaryAccount.profile.initialize(
+        currentUserUpdatedProfile?.name,
+        currentUserUpdatedProfile.address,
+        currentUserUpdatedProfile?.avatarUrl,
+        currentUserUpdatedProfile.id,
+        primaryAccount.profile.chain,
+        currentUserUpdatedProfile?.lastActive
+      );
     } catch (e) {
       console.log(e);
       notifyError('Failed to create account. Please try again.');
@@ -435,10 +435,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
           address: primaryAccount.profile.address,
           name: username,
           avatarUrl,
-        }).then(() => {
-          // we should trigger a redraw emit manually
-          NewProfilesController.Instance.isFetched.emit('redraw');
         });
+        // we should trigger a redraw emit manually
+        NewProfilesController.Instance.isFetched.emit('redraw');
       }
       if (walletProps.onSuccess) walletProps.onSuccess();
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account

@@ -7,7 +7,7 @@ import NewProfilesController from '../controllers/server/newProfiles';
 import BN from 'bn.js';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
-import { DISCOURAGED_NONREACTIVE_getProfilesByAddress } from 'state/api/profiles/getProfilesByAddress';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 
 class Account {
   public readonly address: string;
@@ -81,7 +81,7 @@ class Account {
       // As an effort to gradually migrate, this method is used. After this account controller is
       // de-side-effected (all api calls removed from here). Then we would be in a better position to
       // remove this discouraged method
-      DISCOURAGED_NONREACTIVE_getProfilesByAddress(chain?.id, address).then(
+      DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(chain?.id, address).then(
         (res) => {
           const data = res[0];
           updatedProfile.initialize(

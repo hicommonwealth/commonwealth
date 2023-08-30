@@ -58,7 +58,7 @@ interface UseUpdateProfileByAddressMutation {
 
 const useUpdateProfileByAddressMutation = ({
   addressesWithChainsToUpdate,
-}: UseUpdateProfileByAddressMutation) => {
+}: UseUpdateProfileByAddressMutation = {}) => {
   return useMutation({
     mutationFn: updateProfileByAddress,
     onSuccess: async (updatedProfile) => {

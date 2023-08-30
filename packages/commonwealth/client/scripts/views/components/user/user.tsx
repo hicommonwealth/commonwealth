@@ -3,7 +3,7 @@ import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
-import { useGetProfilesByAddressesQuery } from 'state/api/profiles';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { Avatar } from 'views/components/Avatar';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
@@ -40,7 +40,7 @@ export const User = ({
   avatarSize = 16,
   role,
 }: UserAttrs) => {
-  const { data: users } = useGetProfilesByAddressesQuery({
+  const { data: users } = useFetchProfilesByAddressesQuery({
     currentChainId: app.activeChainId(),
     profileAddresses: [userAddress],
     profileChainIds: [userChainId],
