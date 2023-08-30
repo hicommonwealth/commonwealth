@@ -84,12 +84,16 @@ export async function recomputeCounts() {
   });
 }
 
-recomputeCounts()
-  .then(() => {
-    console.log('done');
-    process.exit(0);
-  })
-  .catch((err) => {
-    console.log(err);
-    process.exit(1);
-  });
+if (!module.parent) {
+  console.log('recompute job started');
+  recomputeCounts()
+    .then(() => {
+      console.log('recompute job completed successfully');
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.log('recompute job exit with error');
+      console.log(err);
+      process.exit(1);
+    });
+}
