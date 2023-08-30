@@ -160,6 +160,7 @@ export class Thread implements IUniqueId {
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
   public readonly discord_meta: any;
+  public latestThreadActivity: Moment;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -198,6 +199,7 @@ export class Thread implements IUniqueId {
     canvasHash,
     links,
     discord_meta,
+    latest_thread_activity,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -231,6 +233,7 @@ export class Thread implements IUniqueId {
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
+    latest_thread_activity?: string;
   }) {
     this.author = Address.address;
     this.title = getDecodedString(title);
@@ -273,6 +276,9 @@ export class Thread implements IUniqueId {
       reactionType,
       addressesReacted
     );
+    this.latestThreadActivity = latest_thread_activity
+      ? moment(latest_thread_activity)
+      : null;
   }
 }
 

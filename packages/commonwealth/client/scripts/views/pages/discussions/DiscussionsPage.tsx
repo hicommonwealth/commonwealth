@@ -62,6 +62,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
+  console.log({ threads });
 
   useManageDocumentTitle('Discussions');
 

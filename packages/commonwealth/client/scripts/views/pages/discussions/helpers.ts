@@ -143,6 +143,12 @@ export const sortByFeaturedFilter = (t: Thread[], featuredFilter) => {
     );
   }
 
+  if (featuredFilter === ThreadFeaturedFilterTypes.LatestActivity) {
+    return [...t].sort((a, b) =>
+      moment(a.latestThreadActivity).diff(moment(b.latestThreadActivity))
+    );
+  }
+
   // Default: Assuming featuredFilter === 'newest'
   return [...t].sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
 };

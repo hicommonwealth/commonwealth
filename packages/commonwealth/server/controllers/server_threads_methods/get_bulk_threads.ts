@@ -68,6 +68,8 @@ export async function __getBulkThreads(
     'numberOfComments:desc': 'threads_number_of_comments DESC',
     'numberOfLikes:asc': 'threads_total_likes ASC',
     'numberOfLikes:desc': 'threads_total_likes DESC',
+    'latestActivity:asc': 'latest_thread_activity ASC',
+    'latestActivity:desc': 'latest_thread_activity DESC',
   };
 
   // get response threads from query
@@ -88,7 +90,8 @@ export async function __getBulkThreads(
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
-        collaborators
+        collaborators, 
+        threads.latest_thread_activity as latest_thread_activity
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
@@ -105,7 +108,8 @@ export async function __getBulkThreads(
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
               )
-            ) AS collaborators
+            ) AS collaborators,
+          latest_comments.latest_thread_activity as latest_thread_activity
         FROM "Threads" t
         LEFT JOIN "Collaborations" AS collaborations
         ON t.id = collaborations.thread_id
@@ -118,6 +122,12 @@ export async function __getBulkThreads(
             GROUP BY thread_id
         ) comments
         ON t.id = comments.thread_id
+        LEFT JOIN (
+          SELECT thread_id, MAX(created_at) AS latest_thread_activity
+          FROM "Comments"
+          GROUP BY thread_id
+        ) latest_comments
+        ON t.id = latest_comments.thread_id
         LEFT JOIN (
             SELECT thread_id,
             COUNT(r.id)::int AS total_likes,
@@ -137,7 +147,7 @@ export async function __getBulkThreads(
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
-          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
+          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments, latest_comments.latest_thread_activity,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes)
           ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
         ) threads
@@ -170,6 +180,12 @@ export async function __getBulkThreads(
     throw new ServerError('Could not fetch threads');
   }
 
+  console.log({
+    responseThreads: responseThreads.length,
+    what: orderByQueries[orderBy],
+    orderBy: orderBy,
+  });
+
   // transform thread response
   let threads = responseThreads.map(async (t) => {
     const collaborators = JSON.parse(t.collaborators[0]).address?.length
@@ -177,6 +193,8 @@ export async function __getBulkThreads(
       : [];
 
     const last_edited = getLastEdited(t);
+
+    console.log(t);
 
     const data = {
       id: t.thread_id,
@@ -211,6 +229,7 @@ export async function __getBulkThreads(
       reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
       marked_as_spam_at: t.marked_as_spam_at,
       archived_at: t.archived_at,
+      latest_thread_activity: t.latest_thread_activity,
     };
     if (t.topic_id) {
       data['topic'] = {
