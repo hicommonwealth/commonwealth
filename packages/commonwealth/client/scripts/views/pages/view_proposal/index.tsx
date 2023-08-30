@@ -20,7 +20,7 @@ import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import type { AnyProposal } from '../../../models/types';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { TipDetail } from '../tip_detail';
@@ -31,6 +31,7 @@ import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
 import { useAaveProposalsQuery } from 'state/api/proposals';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -64,6 +65,8 @@ const ViewProposalPage = ({
       proposal?.isFetched.removeAllListeners();
     };
   }, [proposal, forceRerender]);
+
+  useManageDocumentTitle('View proposal', proposal?.title);
 
   const onAave = app.chain?.network === ChainNetwork.Aave;
   const fetchAaveData = onAave && isAdapterLoaded;

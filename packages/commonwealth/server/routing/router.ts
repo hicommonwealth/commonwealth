@@ -72,13 +72,8 @@ import getUploadSignature from '../routes/getUploadSignature';
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
 import deletePoll from '../routes/deletePoll';
-import updateThreadStage from '../routes/updateThreadStage';
-import updateThreadPrivacy from '../routes/updateThreadPrivacy';
-import updateThreadPinned from '../routes/updateThreadPinned';
 import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
-import addEditors, { addEditorValidation } from '../routes/addEditors';
-import deleteEditors from '../routes/deleteEditors';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
 import updateProfileNew from '../routes/updateNewProfile';
@@ -86,7 +81,6 @@ import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
 import createTopic from '../routes/createTopic';
-import updateThreadTopic from '../routes/updateThreadTopic';
 import updateTopic from '../routes/topics/updateTopic';
 import orderTopics from '../routes/orderTopics';
 import editTopic from '../routes/editTopic';
@@ -156,9 +150,7 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
-import markThreadAsSpam from '../routes/spam/markThreadAsSpam';
 import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
-import unmarkThreadAsSpam from '../routes/spam/unmarkThreadAsSpam';
 import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
 
 import { ServerThreadsController } from '../controllers/server_threads_controller';
@@ -173,14 +165,11 @@ import { ServerProposalsController } from '../controllers/server_proposals_contr
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
-import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { archiveThreadHandler } from '../routes/threads/archive_thread_handler';
-import { unarchiveThreadHandler } from '../routes/threads/unarchive_thread_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
@@ -488,27 +477,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateThreadStage',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadStage.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/updateThreadPrivacy',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadPrivacy.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/updateThreadPinned',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadPinned.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
     '/updateVote',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -607,28 +575,10 @@ function setupRouter(
 
   registerRoute(
     router,
-    'post',
-    '/addEditors',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    addEditorValidation,
-    addEditors.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/deleteEditors',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    deleteEditors.bind(this, models)
-  );
-  registerRoute(
-    router,
     'delete',
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     deleteThreadHandler.bind(this, serverControllers)
   );
@@ -739,14 +689,6 @@ function setupRouter(
     databaseValidationService.validateChain,
     createTopic.bind(this, models)
   );
-
-  registerRoute(
-    router,
-    'post',
-    '/updateThreadTopic',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadTopic.bind(this, models)
-  );
   registerRoute(
     router,
     'post',
@@ -817,13 +759,8 @@ function setupRouter(
     'delete',
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     deleteReactionHandler.bind(this, serverControllers)
-  );
-  registerRoute(
-    router,
-    'get',
-    '/comments/:id/reactions',
-    getCommentReactionsHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
@@ -1193,20 +1130,6 @@ function setupRouter(
   registerRoute(
     router,
     'put',
-    '/threads/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    markThreadAsSpam.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/threads/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    unmarkThreadAsSpam.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'put',
     '/comments/:id/spam',
     passport.authenticate('jwt', { session: false }),
     markCommentAsSpam.bind(this, models)
@@ -1217,22 +1140,6 @@ function setupRouter(
     '/comments/:id/spam',
     passport.authenticate('jwt', { session: false }),
     unmarkCommentAsSpam.bind(this, models)
-  );
-
-  // thread archive
-  registerRoute(
-    router,
-    'put',
-    '/threads/:id/archive',
-    passport.authenticate('jwt', { session: false }),
-    archiveThreadHandler.bind(this, serverControllers)
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/threads/:id/archive',
-    passport.authenticate('jwt', { session: false }),
-    unarchiveThreadHandler.bind(this, serverControllers)
   );
 
   // login

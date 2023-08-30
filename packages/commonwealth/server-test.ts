@@ -99,7 +99,6 @@ const resetServer = (debug = false): Promise<void> => {
         email: 'drewstone329@gmail.com',
         emailVerified: true,
         isAdmin: true,
-        lastVisited: '{}',
       });
 
       const nodes = [

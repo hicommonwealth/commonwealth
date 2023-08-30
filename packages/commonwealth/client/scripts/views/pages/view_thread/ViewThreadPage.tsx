@@ -11,7 +11,6 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -34,8 +33,8 @@ import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import { Select } from '../../components/Select';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
-import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
+import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -52,6 +51,10 @@ import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+import { useSearchParams } from 'react-router-dom';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+
+import 'pages/view_thread/index.scss';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -94,6 +97,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const [searchParams] = useSearchParams();
+  const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
   const {
     data,
@@ -122,7 +127,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (fetchCommentsError) notifyError('Failed to load comments');
   }, [fetchCommentsError]);
 
-  const { isWindowMedium } = useBrowserWindow({
+  const { isWindowLarge } = useBrowserWindow({
+    // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -232,16 +238,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     NewProfilesController.Instance.isFetched.on('redraw', () => {
       setAreProfilesLoaded(true);
     });
-
     setAreProfilesLoaded(true);
   }, [comments, thread, areProfilesLoaded]);
+
+  useManageDocumentTitle('View thread', thread?.title);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
 
   if (!app.chain?.meta || isLoading) {
-    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
+    return (
+      <CWContentPage
+        showSkeleton
+        sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
+      />
+    );
   }
 
   if ((!isLoading && !thread) || fetchThreadError) {
@@ -464,6 +476,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <CreateComment
                       rootThread={thread}
                       canComment={canComment}
+                      shouldFocusEditor={shouldFocusCommentEditor}
                     />
                     {showBanner && (
                       <JoinCommunityBanner
