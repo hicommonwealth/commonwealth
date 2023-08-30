@@ -38,18 +38,6 @@ class NewProfilesController {
     }, 200);
   }
 
-  public getProfile(chain: string, address: string) {
-    const existingProfile = this._store.getByAddress(address);
-    if (existingProfile !== undefined) {
-      return existingProfile;
-    }
-    const profile = new MinimumProfile(address, chain);
-    this._store.add(profile);
-    this._unfetched.set(profile.address, profile);
-    this._fetchNewProfiles();
-    return profile;
-  }
-
   public async updateProfileForAccount(address, data, shouldRedraw = true) {
     try {
       const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {

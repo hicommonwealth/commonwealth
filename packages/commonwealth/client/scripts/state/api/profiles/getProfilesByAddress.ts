@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
-import { ApiEndpoints } from 'state/api/config';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 
 const PROFILES_STALE_TIME = 30 * 1_000; // 3 minutes
 
@@ -12,11 +12,6 @@ interface FetchProfilesByAddressProps {
   profileAddresses: string[];
 }
 
-// "profileId": 98000,
-// "name": "Marcc",
-// "address": "0x067a7910789f214A13E195a025F881E9B59C4D76",
-// "lastActive": "2023-06-20T15:29:49.887Z",
-// "avatarUrl": null
 const fetchProfilesByAddress = async ({
   currentChainId,
   profileAddresses,
@@ -55,9 +50,11 @@ const useFetchProfilesByAddressQuery = ({
   apiCallEnabled = true,
 }: UseFetchProfilesByAddressQuery) => {
   return useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       ApiEndpoints.FETCH_PROFILES,
-      currentChainId,
+      // we should not cache by current chain as it can break logic for DISCOURAGED_NONREACTIVE_getProfilesByAddress
+      // currentChainId,
       ...profileChainIds,
       ...profileAddresses,
     ],
@@ -70,6 +67,23 @@ const useFetchProfilesByAddressQuery = ({
     staleTime: PROFILES_STALE_TIME,
     enabled: apiCallEnabled,
   });
+};
+
+export const DISCOURAGED_NONREACTIVE_getProfilesByAddress = (
+  chainId,
+  address
+) => {
+  return queryClient.fetchQuery(
+    [ApiEndpoints.FETCH_PROFILES, chainId, address],
+    {
+      queryFn: () =>
+        fetchProfilesByAddress({
+          currentChainId: chainId,
+          profileChainIds: [chainId],
+          profileAddresses: [address],
+        }),
+    }
+  );
 };
 
 export default useFetchProfilesByAddressQuery;
