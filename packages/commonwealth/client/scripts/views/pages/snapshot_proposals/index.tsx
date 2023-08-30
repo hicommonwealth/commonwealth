@@ -1,7 +1,8 @@
+import React, { useMemo, useState } from 'react';
+
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
-import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
@@ -10,6 +11,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { SnapshotProposalCard } from './SnapshotProposalCard';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type SnapshotProposalsPageProps = {
   topic?: string;
@@ -41,6 +43,8 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
   const [hasSubscription, setHasSubscription] = useState<boolean>(
     spaceSubscription !== undefined
   );
+
+  useManageDocumentTitle('Snapshots');
 
   useNecessaryEffect(() => {
     const fetch = async () => {
