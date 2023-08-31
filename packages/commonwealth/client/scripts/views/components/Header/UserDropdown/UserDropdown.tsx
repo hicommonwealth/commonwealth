@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
 
@@ -18,17 +18,13 @@ import { Modal } from 'views/components/component_kit/cw_modal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { UserDropdownItem } from './UserDropdownItem';
-import { ChainBase, WalletSsoSource } from 'common-common/src/types';
-import { chainBaseToCanvasChainId } from 'canvas';
+import { WalletSsoSource } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
+import useCheckAuthenticatedAddresses from 'views/components/Header/UserDropdown/useCheckAuthenticatedAddresses';
 
 const UserDropdown = () => {
   const navigate = useCommonNavigate();
-  const [authenticatedAddresses, setAuthenticatedAddresses] = useState<{
-    [address: string]: boolean;
-  }>({});
-
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
@@ -39,34 +35,10 @@ const UserDropdown = () => {
     walletAddress: string;
   }>(null);
 
+  const { authenticatedAddresses } = useCheckAuthenticatedAddresses();
+
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
-
-  const chainBase = app.chain?.base;
-  const idOrPrefix =
-    chainBase === ChainBase.CosmosSDK
-      ? app.chain?.meta.bech32Prefix
-      : app.chain?.meta.node?.ethChainId;
-  const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
-
-  useEffect(() => {
-    const promises = app.user.activeAccounts.map(async (activeAccount) => {
-      const isAuth = await app.sessions
-        .getSessionController(chainBase)
-        .hasAuthenticatedSession(canvasChainId, activeAccount.address);
-
-      return {
-        [activeAccount.address]: isAuth,
-      };
-    });
-
-    Promise.all(promises).then((response) => {
-      const reduced = response.reduce((acc, curr) => {
-        return { ...acc, ...curr };
-      }, {});
-      setAuthenticatedAddresses(reduced);
-    });
-  }, [canvasChainId, chainBase]);
 
   const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
     (account) => {
