@@ -169,11 +169,9 @@ export async function emitProposalNotifications(
   for (const chainId in proposals.v1) {
     const chainProposals = proposals.v1[chainId];
     for (const proposal of chainProposals) {
-      await emitNotifications(
-        models,
-        NotificationCategories.ChainEvent,
-        chainId,
-        {
+      await emitNotifications(models, {
+        categoryId: NotificationCategories.ChainEvent,
+        data: {
           chain: chainId,
           network: SupportedNetwork.Cosmos,
           event_data: {
@@ -191,20 +189,17 @@ export async function emitProposalNotifications(
             finalTallyResult: proposal.final_tally_result,
             totalDeposit: coinToCoins(proposal.total_deposit),
           },
-        } as ChainEventAttributes // TODO: @Timothee refactor necessary data for chain-event notifications after object_id PR #4586 is merged
-      );
+        },
+      });
     }
   }
 
   for (const chainId in proposals.v1Beta1) {
     const chainProposals = proposals.v1Beta1[chainId];
     for (const proposal of chainProposals) {
-      await emitNotifications(
-        models,
-        NotificationCategories.ChainEvent,
-        chainId,
-        {
-          // TODO: remove need for an id, block number, and queued
+      await emitNotifications(models, {
+        categoryId: NotificationCategories.ChainEvent,
+        data: {
           chain: chainId,
           network: SupportedNetwork.Cosmos,
           event_data: {
@@ -222,8 +217,8 @@ export async function emitProposalNotifications(
             finalTallyResult: proposal.finalTallyResult,
             totalDeposit: coinToCoins(proposal.totalDeposit),
           },
-        } as ChainEventAttributes // TODO: @Timothee refactor necessary data for chain-event notifications after object_id PR #4586 is merged
-      );
+        },
+      });
     }
   }
 }
