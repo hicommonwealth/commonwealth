@@ -13,15 +13,8 @@ type UrlSelectorProps = {
 };
 
 export const UrlSelector = ({ onSelect, urlsToSet }: UrlSelectorProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const queryLength = searchTerm?.trim()?.length;
-
   const getEmptyContentMessage = () => {
-    if (queryLength > 0 && queryLength < 5) {
-      return 'Query too short';
-    } else if (queryLength >= 5 && !searchTerm.length) {
-      return 'No links found';
-    } else if (!urlsToSet?.length) {
+    if (!urlsToSet?.length) {
       return 'No linked URLs yet';
     }
   };
@@ -47,28 +40,12 @@ export const UrlSelector = ({ onSelect, urlsToSet }: UrlSelectorProps) => {
     return;
   }
 
-  const handleClearButtonClick = () => {
-    setSearchTerm('');
-  };
-
-  const handleInputChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
   const EmptyComponent = () => (
     <div className="empty-component">{getEmptyContentMessage()}</div>
   );
 
   return (
     <div className="UrlLinkSelector">
-      <CWTextInput
-        placeholder="Search for urls"
-        iconRightonClick={handleClearButtonClick}
-        value={searchTerm}
-        iconRight="close"
-        onInput={handleInputChange}
-      />
-
       <QueryList
         loading={false}
         options={urlsToSet}
