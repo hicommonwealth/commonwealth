@@ -2,7 +2,7 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { useFetchThreadsQuery } from 'state/api/threads';
@@ -26,7 +26,6 @@ type DiscussionsPageProps = {
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const navigate = useCommonNavigate();
-  const isLoadedRef = useRef(false);
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
@@ -59,13 +58,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     fromDate: dateCursor.fromDate,
   });
 
-  useEffect(() => {
-    return () => {
-      isLoadedRef.current = false;
-    };
-  }, []);
-
-  if (!isInitialLoading && !isLoadedRef.current) isLoadedRef.current = true;
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
   return (
@@ -73,7 +65,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
-        data={!isLoadedRef.current ? [] : threads}
+        data={isInitialLoading ? [] : threads}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
@@ -107,7 +99,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         overscan={200}
         components={{
           EmptyPlaceholder: () =>
-            !isLoadedRef.current ? (
+            isInitialLoading ? (
               <div className="threads-wrapper">
                 {Array(3)
                   .fill({})

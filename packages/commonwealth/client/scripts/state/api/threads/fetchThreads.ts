@@ -62,7 +62,8 @@ const useDateCursor = ({
 
   useEffect(() => {
     const updater = () => {
-      const { toDate, fromDate } = getToAndFromDatesRangesForThreadsTimelines(dateRange)
+      const { toDate, fromDate } =
+        getToAndFromDatesRangesForThreadsTimelines(dateRange);
       setDateCursor({ toDate, fromDate });
     };
 
@@ -107,7 +108,7 @@ const getFetchThreadsQueryKey = (props) => {
       props.topicsPerThread,
     ];
   }
-}
+};
 
 const fetchBulkThreads = (props) => {
   return async ({ pageParam = 1 }) => {
@@ -141,11 +142,10 @@ const fetchBulkThreads = (props) => {
 
     return {
       data: transformedData,
-      pageParam:
-        transformedData.threads.length > 0 ? pageParam + 1 : undefined,
+      pageParam: transformedData.threads.length > 0 ? pageParam + 1 : undefined,
     };
   };
-}
+};
 
 const fetchActiveThreads = (props) => {
   return async () => {
@@ -163,7 +163,7 @@ const fetchActiveThreads = (props) => {
     // transform response
     return response.data.result.map((c) => new Thread(c));
   };
-}
+};
 
 const useFetchThreadsQuery = (
   props: FetchBulkThreadsProps | FetchActiveThreadsProps
@@ -174,8 +174,8 @@ const useFetchThreadsQuery = (
   const chosenQueryType = queryTypeToRQMap[queryType]({
     queryKey: getFetchThreadsQueryKey(props),
     queryFn: (() => {
-      if (isFetchBulkThreadsProps(props)) return fetchBulkThreads(props)
-      if (isFetchActiveThreadsProps(props)) return fetchActiveThreads(props)
+      if (isFetchBulkThreadsProps(props)) return fetchBulkThreads(props);
+      if (isFetchActiveThreadsProps(props)) return fetchActiveThreads(props);
     })(),
     ...(() => {
       if (isFetchBulkThreadsProps(props)) {
@@ -185,6 +185,7 @@ const useFetchThreadsQuery = (
       }
     })(),
     staleTime: THREADS_STALE_TIME,
+    keepPreviousData: true,
   });
 
   if (isFetchBulkThreadsProps(props)) {
