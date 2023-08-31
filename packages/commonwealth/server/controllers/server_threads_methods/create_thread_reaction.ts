@@ -137,16 +137,17 @@ export async function __createThreadReaction(
 
   // build notification options
   const notificationOptions: EmitOptions = {
-    categoryId: NotificationCategories.NewReaction,
-    objectId: `discussion_${thread.id}`,
-    notificationData: {
-      created_at: new Date(),
-      thread_id: thread.id,
-      root_title: thread.title,
-      root_type: 'discussion',
-      chain_id: finalReaction.chain,
-      author_address: finalReaction.Address.address,
-      author_chain: finalReaction.Address.chain,
+    notification: {
+      categoryId: NotificationCategories.NewReaction,
+      data: {
+        created_at: new Date(),
+        thread_id: thread.id,
+        root_title: thread.title,
+        root_type: 'discussion',
+        chain_id: finalReaction.chain,
+        author_address: finalReaction.Address.address,
+        author_chain: finalReaction.Address.chain,
+      },
     },
     webhookData: {
       user: finalReaction.Address.address,

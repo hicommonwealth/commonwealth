@@ -133,15 +133,6 @@ export class UserController {
     this._notifications = notifications;
   }
 
-  private _lastVisited: object;
-  public get lastVisited(): object {
-    return this._lastVisited;
-  }
-
-  private _setLastVisited(lastVisited: object): void {
-    this._lastVisited = lastVisited;
-  }
-
   private _starredCommunities: StarredCommunity[];
   public get starredCommunities(): StarredCommunity[] {
     return this._starredCommunities;
@@ -292,10 +283,6 @@ export class UserController {
 
   public setNotifications(notifications: NotificationsController): void {
     this._setNotifications(notifications);
-  }
-
-  public setLastVisited(lastVisited: object): void {
-    this._setLastVisited(lastVisited);
   }
 
   public setStarredCommunities(star: StarredCommunity[]): void {

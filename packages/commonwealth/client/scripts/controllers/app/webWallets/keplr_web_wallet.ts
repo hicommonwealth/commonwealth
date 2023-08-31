@@ -1,4 +1,8 @@
-import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
+import type {
+  AccountData,
+  OfflineDirectSigner,
+  OfflineSigner,
+} from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 import type { SessionPayload } from '@canvas-js/interfaces';
 
@@ -19,7 +23,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _enabling = false;
   private _chainId: string;
   private _chain: string;
-  private _offlineSigner: OfflineDirectSigner;
+  private _offlineSigner: OfflineDirectSigner | OfflineSigner;
 
   public readonly name = WalletId.Keplr;
   public readonly label = 'Keplr';
@@ -143,6 +147,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
               coinDenom: app.chain.meta.default_symbol,
               coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
+              gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
             },
           ],
           stakeCurrency: {
@@ -150,8 +155,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
             coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
             coinDecimals: app.chain.meta.decimals || 6,
           },
-          gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
-          features: ['stargate'],
+          features: [],
         };
         await window.keplr.experimentalSuggestChain(info);
         await window.keplr.enable(this._chainId);
@@ -159,7 +163,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
 
-      this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
+      this._offlineSigner = await window.keplr.getOfflineSignerAuto(
+        this._chainId
+      );
       this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;
       this._enabling = false;

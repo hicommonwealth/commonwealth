@@ -99,18 +99,19 @@ const editComment = async (
     // dispatch notifications to subscribers of the comment/thread
     emitNotifications(
       models,
-      NotificationCategories.CommentEdit,
-      '',
       {
-        created_at: new Date(),
-        thread_id: comment.thread_id,
-        root_title,
-        root_type: ProposalType.Thread,
-        comment_id: +finalComment.id,
-        comment_text: finalComment.text,
-        chain_id: finalComment.chain,
-        author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+        categoryId: NotificationCategories.CommentEdit,
+        data: {
+          created_at: new Date(),
+          thread_id: comment.thread_id,
+          root_title,
+          root_type: ProposalType.Thread,
+          comment_id: +finalComment.id,
+          comment_text: finalComment.text,
+          chain_id: finalComment.chain,
+          author_address: finalComment.Address.address,
+          author_chain: finalComment.Address.chain,
+        },
       },
       // don't send webhook notifications for edits
       {
@@ -173,18 +174,20 @@ const editComment = async (
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
         emitNotifications(
           models,
-          NotificationCategories.NewMention,
-          `user-${mentionedAddress.User.id}`,
           {
-            created_at: new Date(),
-            thread_id: +comment.thread_id,
-            root_title,
-            root_type: ProposalType.Thread,
-            comment_id: +finalComment.id,
-            comment_text: finalComment.text,
-            chain_id: finalComment.chain,
-            author_address: finalComment.Address.address,
-            author_chain: finalComment.Address.chain,
+            categoryId: NotificationCategories.NewMention,
+            data: {
+              mentioned_user_id: mentionedAddress.User.id,
+              created_at: new Date(),
+              thread_id: +comment.thread_id,
+              root_title,
+              root_type: ProposalType.Thread,
+              comment_id: +finalComment.id,
+              comment_text: finalComment.text,
+              chain_id: finalComment.chain,
+              author_address: finalComment.Address.address,
+              author_chain: finalComment.Address.chain,
+            },
           },
           null,
           [finalComment.Address.address]
