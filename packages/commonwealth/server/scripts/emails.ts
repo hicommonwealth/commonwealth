@@ -6,11 +6,9 @@ import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
 import { Op } from 'sequelize';
 import type {
-  IPostNotificationData,
+  IForumNotificationData,
   IChainEventNotificationData,
-  ICommunityNotificationData,
-  SnapshotEventType,
-  SnapshotNotification,
+  ISnapshotNotificationData,
 } from '../../shared/types';
 import {
   formatAddressShort,
@@ -30,10 +28,9 @@ const log = factory.getLogger(formatFilename(__filename));
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-
 const getForumNotificationCopy = async (
   models: DB,
-  notification_data: IPostNotificationData,
+  notification_data: IForumNotificationData,
   category_id
 ) => {
   // unpack notification_data
@@ -127,10 +124,7 @@ const getForumNotificationCopy = async (
     title: root_title,
     chain: chain_id,
   };
-  const proposalPath = getThreadUrl(
-    pseudoProposal,
-    comment_id,
-  );
+  const proposalPath = getThreadUrl(pseudoProposal, comment_id);
   return [
     emailSubjectLine,
     authorName,
@@ -145,17 +139,13 @@ const getForumNotificationCopy = async (
 
 export const createImmediateNotificationEmailObject = async (
   notification_data:
-    | IPostNotificationData
-    | ICommunityNotificationData
+    | IForumNotificationData
     | IChainEventNotificationData
-    | (SnapshotNotification & { eventType: SnapshotEventType }),
+    | ISnapshotNotificationData,
   category_id,
   models
 ) => {
-  if (
-    (<IChainEventNotificationData>notification_data).block_number &&
-    (<IChainEventNotificationData>notification_data).event_data
-  ) {
+  if (category_id === NotificationCategories.ChainEvent) {
     const ceInstance = <IChainEventNotificationData>notification_data;
     // construct compatible CW event from DB by inserting network from type
     const evt: CWEvent = {
@@ -206,7 +196,7 @@ export const createImmediateNotificationEmailObject = async (
       authorPath,
     ] = await getForumNotificationCopy(
       models,
-      notification_data as IPostNotificationData,
+      notification_data as IForumNotificationData,
       category_id
     );
     return {

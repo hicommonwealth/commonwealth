@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
 import getFetch from 'helpers/getFetch';
@@ -16,8 +14,6 @@ export const subscribeToThread = async (
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription
 ) => {
-  const adjustedId = `discussion_${threadId}`;
-
   if (bothActive) {
     await app.user.notifications.disableSubscriptions([
       commentSubscription,
@@ -28,14 +24,14 @@ export const subscribeToThread = async (
     return Promise.resolve();
   } else if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
-      app.user.notifications.subscribe(
-        NotificationCategories.NewReaction,
-        adjustedId
-      ),
-      app.user.notifications.subscribe(
-        NotificationCategories.NewComment,
-        adjustedId
-      ),
+      app.user.notifications.subscribe({
+        categoryId: NotificationCategories.NewReaction,
+        options: { threadId: Number(threadId) },
+      }),
+      app.user.notifications.subscribe({
+        categoryId: NotificationCategories.NewComment,
+        options: { threadId: Number(threadId) },
+      }),
     ]);
 
     notifySuccess('Subscribed!');
