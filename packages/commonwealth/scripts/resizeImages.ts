@@ -83,6 +83,8 @@ async function uploadToS3AndReplace(
 
     try {
       resp = await fetch(
+        // Replace the cloudflare url with the AWS url. This is so we can bypass cloudlfare in order not to run into
+        // captchas.
         datum[field].replace(
           'assets.commonwealth.im',
           'assets.commonwealth.im.s3.amazonaws.com'
@@ -120,6 +122,8 @@ async function uploadToS3AndReplace(
 
     const newImage = await s3.upload(params).promise();
 
+    // although it gets added to the assets.commonwealth.im bucket, the location of the newImage object points
+    // to the bucket directly. We want to swap this out with the cloudflare url.
     const newLocation = newImage.Location.replace(
       's3.amazonaws.com/assets.commonwealth.im',
       'assets.commonwealth.im'
