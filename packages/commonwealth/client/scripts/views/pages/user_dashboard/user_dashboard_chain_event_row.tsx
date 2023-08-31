@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type { IEventLabel } from '../../../../../../chain-events/src';
 import ChainInfo from '../../../models/ChainInfo';
+import { Skeleton } from '../../components/Skeleton';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import type { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
@@ -13,12 +14,48 @@ type UserDashboardChainEventRowProps = {
   blockNumber: number;
   chain: ChainInfo;
   label: IEventLabel;
+  showSkeleton?: boolean;
+};
+
+export const UserDashboardChainEventRowSkeleton = () => {
+  return (
+    <div className="UserDashboardChainEventRow">
+      <div className="chain-event-icon-container">
+        <Skeleton height={20} width={20} />
+      </div>
+      <div className="chain-event-text-container w-full">
+        <div className="community-title">
+          <CWCommunityAvatar community={{} as any} showSkeleton />
+          <div className="ml-8">
+            <CWText type="caption" fontWeight="medium">
+              <Skeleton width={50} />
+            </CWText>
+          </div>
+          <div className="dot">.</div>
+          <CWText type="caption" fontWeight="medium" className="block">
+            <Skeleton width={50} />
+          </CWText>
+        </div>
+
+        <CWText className="row-top-text">
+          <Skeleton width={200} />
+        </CWText>
+        <div>
+          <Skeleton width={'90%'} />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export const UserDashboardChainEventRow = (
   props: UserDashboardChainEventRowProps
 ) => {
-  const { blockNumber, chain, label } = props;
+  const { blockNumber, chain, label, showSkeleton } = props;
+
+  if (showSkeleton) {
+    return <UserDashboardChainEventRowSkeleton />;
+  }
 
   return (
     <Link
