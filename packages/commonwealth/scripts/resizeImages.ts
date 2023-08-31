@@ -14,6 +14,9 @@ import models, { sequelize } from '../server/database';
 
 const s3 = new AWS.S3();
 
+const startChainsFrom = process.argv[2];
+const startProfilesFrom = process.argv[3];
+
 async function resizeImage(data: Buffer, contentType: string) {
   if (
     !contentType.includes('jpeg') &&
@@ -90,7 +93,13 @@ async function resizeChains() {
       order: [['id', 'DESC']],
     });
 
-  await uploadToS3AndReplace(getNthChain, 'icon_url', updateChain, 'Chain');
+  await uploadToS3AndReplace(
+    getNthChain,
+    'icon_url',
+    updateChain,
+    'Chain',
+    startChainsFrom ? parseInt(startChainsFrom) : 0
+  );
 }
 
 async function resizeProfiles() {
@@ -118,14 +127,21 @@ async function resizeProfiles() {
     getNthProfile,
     'avatar_url',
     updateProfile,
-    'Profile'
+    'Profile',
+    startProfilesFrom ? parseInt(startProfilesFrom) : 0
   );
 }
 
 // This function is not turned into a Promise.all because if every call was executed async, it will flood cloudflare
 // and cause this to be flagged it as a bot. It will then need to solve a captcha in order to retrieve the image.
-async function uploadToS3AndReplace(dataSupplier, field, updateFunction, name) {
-  let i = 0;
+async function uploadToS3AndReplace(
+  dataSupplier,
+  field,
+  updateFunction,
+  name,
+  startFrom
+) {
+  let i = startFrom;
   // loop through the dataSupplier, until we hit the end.
   for (let datum = await dataSupplier(i); ; datum = await dataSupplier(i++)) {
     if (datum.length === 0) {
@@ -197,8 +213,13 @@ async function uploadToS3AndReplace(dataSupplier, field, updateFunction, name) {
 
 async function main() {
   try {
-    await resizeChains();
-    await resizeProfiles();
+    if (startChainsFrom !== '-1') {
+      await resizeChains();
+    }
+
+    if (startProfilesFrom !== '-1') {
+      await resizeProfiles();
+    }
   } catch (e) {
     console.log(e);
     console.log('Failed to resize all images. Exiting script');
