@@ -482,7 +482,6 @@ const createChain = async (
         subscriber_id: req.user.id,
         category_id: NotificationCategories.NewThread,
         chain_id: chain.id,
-        object_id: chain.id,
         is_active: true,
       },
     });
