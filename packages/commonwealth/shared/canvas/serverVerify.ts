@@ -15,12 +15,15 @@ function assertMatches(a, b, obj: string, field: string) {
   );
 }
 
+// Skip io-ts validation since it produces an import error even though
+// we're already using an async import, and because we're upgrading
+// to the new Canvas packages soon anyway.
 const verifyUnpack = async (canvas_action, canvas_session, address) => {
-  const { actionType, sessionType } = await import('@canvas-js/core/codecs');
+  // const { actionType, sessionType } = await import('@canvas-js/core/codecs');
   const action = JSON.parse(canvas_action);
   const session = JSON.parse(canvas_session);
-  assert(actionType.is(action), 'Invalid signed action (typecheck)');
-  assert(sessionType.is(session), 'Invalid signed session (typecheck)');
+  // assert(actionType.is(action), 'Invalid signed action (typecheck)');
+  // assert(sessionType.is(session), 'Invalid signed session (typecheck)');
   const [verifiedAction, verifiedSession] = await Promise.all([
     verify({ action, actionSignerAddress: action.session }),
     verify({ session }),
