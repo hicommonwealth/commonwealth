@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-import app, { LoginState, initAppState } from '../state';
+import app, { initAppState } from '../state';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
