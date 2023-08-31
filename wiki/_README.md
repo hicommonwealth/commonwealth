@@ -127,5 +127,5 @@ Used for all significant updates, or changes of note.
 
 # Change Log
 
-230831: Updated and certified fresh by Graham Johnson (#).
-230808: Authored by Graham Johnson.
+- 230831: Updated and certified fresh by Graham Johnson.
+- 230808: Authored by Graham Johnson.
