@@ -3,7 +3,7 @@ import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
-import { ThreadAttributes } from '../../models/thread';
+import { Link, ThreadAttributes } from '../../models/thread';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import {
@@ -47,6 +47,7 @@ export type CreateThreadOptions = {
   canvasSession?: any;
   canvasHash?: any;
   discordMeta?: any;
+  links: Link[];
 };
 
 export type CreateThreadResult = [
@@ -73,6 +74,7 @@ export async function __createThread(
     canvasSession,
     canvasHash,
     discordMeta,
+    links,
   }: CreateThreadOptions
 ): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
@@ -137,6 +139,7 @@ export async function __createThread(
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
     discord_meta: discordMeta,
+    links: links,
   };
 
   // begin essential database changes within transaction

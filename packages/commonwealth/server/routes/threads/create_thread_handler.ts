@@ -1,4 +1,4 @@
-import { ThreadAttributes } from '../../models/thread';
+import { Link, ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -15,6 +15,7 @@ type CreateThreadRequestBody = {
   canvas_session?: any;
   canvas_hash?: any;
   discord_meta?: any;
+  links?: Link[];
 };
 type CreateThreadResponse = ThreadAttributes;
 
@@ -37,6 +38,7 @@ export const createThreadHandler = async (
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
     discord_meta,
+    links,
   } = req.body;
 
   const [thread, notificationOptions, analyticsOptions] =
@@ -56,6 +58,7 @@ export const createThreadHandler = async (
       canvasSession,
       canvasHash,
       discordMeta: discord_meta,
+      links: links,
     });
 
   for (const n of notificationOptions) {

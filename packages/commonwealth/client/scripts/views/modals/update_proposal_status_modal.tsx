@@ -361,3 +361,56 @@ export const UpdateProposalStatusModal = ({
     </div>
   );
 };
+
+type LinkSnapshotInitialThreadModalProps = {
+  onModalClose: () => void;
+  onSave: (snapshot: Pick<SnapshotProposal, 'id' | 'title'>) => void;
+};
+
+export const LinkSnapshotInitialThreadModal = ({
+  onModalClose,
+  onSave,
+}: LinkSnapshotInitialThreadModalProps) => {
+  const [tempSnapshotProposals, setTempSnapshotProposals] = useState<
+    Array<Pick<SnapshotProposal, 'id' | 'title'>>
+  >([]);
+
+  const handleSelectProposal = (sn: SnapshotProposal) => {
+    const isSelected = tempSnapshotProposals.find(({ id }) => sn.id === id);
+
+    setTempSnapshotProposals(
+      isSelected ? [] : [{ id: sn.id, title: sn.title }]
+    );
+  };
+
+  return (
+    <div className="UpdateProposalStatusModal">
+      <div className="compact-modal-title">
+        <h3>Link Snapshot</h3>
+      </div>
+      <div className="compact-modal-body">
+        <SnapshotProposalSelector
+          onSelect={handleSelectProposal}
+          snapshotProposalsToSet={tempSnapshotProposals}
+        />
+
+        <div className="buttons-row">
+          <CWButton
+            label="Cancel"
+            buttonType="secondary-blue"
+            onClick={onModalClose}
+          />
+          <CWButton
+            label="Save changes"
+            onClick={() => {
+              if (tempSnapshotProposals.length > 0) {
+                onSave(tempSnapshotProposals[0]);
+              }
+              onModalClose();
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};

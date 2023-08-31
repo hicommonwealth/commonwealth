@@ -36,12 +36,16 @@ import 'components/NewThreadForm.scss';
 import { CWButton as OldCWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { Modal } from '../components/component_kit/cw_modal';
-import { UpdateProposalStatusModal } from '../modals/update_proposal_status_modal';
+import { LinkSnapshotInitialThreadModal } from '../modals/update_proposal_status_modal';
+import { Link, LinkSource } from 'models/Thread';
+import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
   const [showSidebar, setShowSidebar] = useState(false);
   const [linkSnapshotModalOpen, setLinkSnapshotModalOpen] = useState(false);
+  const [linkedSnapshotProposal, setLinkedSnapshotProposal] =
+    useState<Link>(null);
 
   useEffect(() => {
     if (!app.isLoggedIn()) {
@@ -132,6 +136,7 @@ const NewThreadPage = () => {
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
         authorProfile: app.user.activeAccount.profile,
+        links: linkedSnapshotProposal ? [linkedSnapshotProposal] : undefined,
       });
 
       setThreadContentDelta(createDeltaFromText(''));
@@ -291,21 +296,58 @@ const NewThreadPage = () => {
           label: 'Link Snapshot',
           item: (
             <div className="SelectableCard">
-              {/* <Modal
+              <Modal
                 className="LinkedProposalsCardModal"
                 content={
-                  <UpdateProposalStatusModal
-                    thread={thread}
-                    onModalClose={() => setLinkSnapshotModalOpen(false)}
+                  <LinkSnapshotInitialThreadModal
+                    onModalClose={() => {
+                      setLinkSnapshotModalOpen(false);
+                    }}
+                    onSave={async (snapshot) => {
+                      let enrichedSnapshot;
+                      if (app.chain.meta.snapshot?.length === 1) {
+                        enrichedSnapshot = {
+                          id: `${app.chain.meta.snapshot[0]}/${snapshot.id}`,
+                          title: snapshot.title,
+                        };
+                      } else {
+                        await loadMultipleSpacesData(
+                          app.chain.meta.snapshot
+                        ).then((data) => {
+                          for (const { space: _space, proposals } of data) {
+                            const matchingSnapshot = proposals.find(
+                              (sn) => sn.id === snapshot.id
+                            );
+                            if (matchingSnapshot) {
+                              enrichedSnapshot = {
+                                id: `${_space.id}/${snapshot.id}`,
+                                title: snapshot.title,
+                              };
+                              break;
+                            }
+                          }
+                        });
+                      }
+
+                      setLinkedSnapshotProposal({
+                        source: LinkSource.Snapshot,
+                        identifier: String(enrichedSnapshot.id),
+                        title: enrichedSnapshot.title,
+                      });
+                      setLinkSnapshotModalOpen(false);
+                    }}
                   />
                 }
                 onClose={() => setLinkSnapshotModalOpen(false)}
                 open={linkSnapshotModalOpen}
-              /> */}
+              />
               <CWContentPageCard
                 header="Link Snapshot"
                 content={
-                  <div className="ActionCard">
+                  <div
+                    className="ActionCard"
+                    onClick={() => setLinkSnapshotModalOpen(true)}
+                  >
                     <CWText type="b2">
                       Search through snapshots show the poll directly on the
                       thread page

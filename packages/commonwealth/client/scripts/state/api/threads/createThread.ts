@@ -2,11 +2,12 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { updateLastVisited } from 'controllers/app/login';
 import MinimumProfile from 'models/MinimumProfile';
-import Thread from 'models/Thread';
+import Thread, { Link } from 'models/Thread';
 import Topic from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import app from 'state';
 import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
+
 import { addThreadInAllCaches } from './helpers/cache';
 
 interface CreateThreadProps {
@@ -20,6 +21,7 @@ interface CreateThreadProps {
   url?: string;
   readOnly?: boolean;
   authorProfile: MinimumProfile;
+  links?: Link[];
 }
 
 const createThread = async ({
@@ -33,6 +35,7 @@ const createThread = async ({
   url,
   readOnly,
   authorProfile,
+  links,
 }: CreateThreadProps) => {
   const {
     action = null,
@@ -63,6 +66,7 @@ const createThread = async ({
     canvas_action: action,
     canvas_session: session,
     canvas_hash: hash,
+    links,
   });
 
   return new Thread(response.data.result);
