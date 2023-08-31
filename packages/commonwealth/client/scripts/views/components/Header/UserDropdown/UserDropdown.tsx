@@ -127,7 +127,7 @@ const UserDropdown = () => {
             className={clsx('UserDropdownTriggerButton', { isOpen })}
             onClick={onClick}
           >
-            <User avatarSize={24} user={user} />
+            <User avatarSize={24} user={user} onClick={() => null} />
             <CWIcon
               iconName={isOpen ? 'caretUp' : 'caretDown'}
               iconSize="small"
