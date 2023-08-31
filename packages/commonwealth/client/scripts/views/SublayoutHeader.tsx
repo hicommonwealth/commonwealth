@@ -133,7 +133,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             />
             <CWIconButton
               iconButtonTheme="black"
-              iconName="paperPlaneTilt"
+              iconName="bookOpen"
               onClick={() =>
                 window.open('https://docs.commonwealth.im/commonwealth/')
               }
