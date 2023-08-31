@@ -55,8 +55,9 @@ const useFetchProfilesByAddressesQuery = ({
       ApiEndpoints.FETCH_PROFILES,
       // we should not cache by currentChainId as it can break logic for DISCOURAGED_NONREACTIVE_fetchProfilesByAddress
       // currentChainId,
-      ...profileChainIds,
-      ...profileAddresses,
+      // sort the chain/address ids by ascending so the keys are always in the same order
+      ...[...profileChainIds].sort((a, b) => a.localeCompare(b)),
+      ...[...profileAddresses].sort((a, b) => a.localeCompare(b)),
     ],
     queryFn: () =>
       fetchProfilesByAddress({
