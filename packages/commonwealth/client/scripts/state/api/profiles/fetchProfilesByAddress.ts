@@ -70,8 +70,8 @@ const useFetchProfilesByAddressesQuery = ({
 };
 
 export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = (
-  chainId,
-  address
+  chainId: string,
+  address: string
 ) => {
   return queryClient.fetchQuery(
     [ApiEndpoints.FETCH_PROFILES, chainId, address],
