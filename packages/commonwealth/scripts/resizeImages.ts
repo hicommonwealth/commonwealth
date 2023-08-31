@@ -6,6 +6,7 @@
 
 import type { S3 } from 'aws-sdk';
 import AWS from 'aws-sdk';
+import * as https from 'https';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import sharp from 'sharp';
@@ -63,6 +64,11 @@ async function resizeImage(data: Buffer, contentType: string) {
   return b.data;
 }
 
+// required in order to disable SSL verification
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: false,
+});
+
 // This function is not turned into a Promise.all because if every call was executed async, it will flood cloudflare
 // and cause this to be flagged it as a bot. It will then need to solve a captcha in order to retrieve the image.
 async function uploadToS3AndReplace(
@@ -72,12 +78,21 @@ async function uploadToS3AndReplace(
   transaction,
   name
 ) {
-  for (const datum of data.slice(0, 20)) {
+  for (const datum of data) {
     let resp;
 
     try {
-      resp = await fetch(datum[field]);
+      resp = await fetch(
+        datum[field].replace(
+          'assets.commonwealth.im',
+          'assets.commonwealth.im.s3.amazonaws.com'
+        ),
+        {
+          agent: httpsAgent,
+        }
+      );
     } catch (e) {
+      console.log(e);
       console.log(`Failed to get image for ${datum[field]}`);
       continue;
     }
@@ -105,12 +120,15 @@ async function uploadToS3AndReplace(
 
     const newImage = await s3.upload(params).promise();
 
-    console.log(
-      `Success for ${name} ${datum.id} with new url ${newImage.Location}`
+    const newLocation = newImage.Location.replace(
+      's3.amazonaws.com/assets.commonwealth.im',
+      'assets.commonwealth.im'
     );
-    await updateFunction(datum.id, newImage.Location);
+
+    console.log(`Success for ${name} ${datum.id} with new url ${newLocation}`);
+    await updateFunction(datum.id, newLocation);
     await models.Chain.update(
-      { icon_url: newImage.Location },
+      { icon_url: newLocation },
       { where: { id: datum.id }, transaction }
     );
   }
