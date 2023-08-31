@@ -1,5 +1,4 @@
 import type { Action, Session } from '@canvas-js/interfaces';
-import { import_ } from '@brillout/import';
 
 import {
   createSiweMessage,
@@ -11,28 +10,6 @@ import {
 } from '../adapters/chain/cosmos/keys';
 import { caip2ToChainBase } from './chainMappings';
 import { ChainBase } from '../../../common-common/src/types';
-
-// Direct import works on the client but fails on the server because of ESM incompatibility
-// If it fails, fall back to a patched async `import` call in @brillout/import
-const importCanvas = async () => {
-  try {
-    const canvas = await import('@canvas-js/interfaces');
-    return canvas;
-  } catch (err) {
-    const canvas = await import_('@canvas-js/interfaces');
-    return canvas;
-  }
-};
-
-// const importChainEthereum = async () => {
-//   try {
-//     const canvas = await import('@canvas-js/chain-ethereum');
-//     return canvas;
-//   } catch (err) {
-//     const canvas = await import_('@canvas-js/chain-ethereum');
-//     return canvas;
-//   }
-// };
 
 // TODO: verify payload is not expired
 export const verify = async ({
@@ -61,7 +38,6 @@ export const verify = async ({
     // verify ethereum signature
     if (action) {
       const ethersUtils = (await import('ethers')).utils;
-      // const canvasEthereum = await importChainEthereum();
       const { domain, types, message } = getEIP712SignableAction(actionPayload);
       delete types.EIP712Domain;
       const recoveredAddr = ethersUtils.verifyTypedData(
@@ -103,7 +79,7 @@ export const verify = async ({
       !action &&
       bech32.bech32.decode(sessionPayload.from).prefix === 'terra'
     ) {
-      const canvas = await importCanvas();
+      const canvas = await import('@canvas-js/interfaces');
       const prefix = cosmEncoding.fromBech32(sessionPayload.from).prefix;
       const signDocDigest = new cosmCrypto.Sha256(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload))
@@ -132,7 +108,7 @@ export const verify = async ({
     // verify cosmos-ethereum sessions (actions are verified like other cosmos chains)
     if (!action && signature.startsWith('0x')) {
       const ethUtil = await import('ethereumjs-util');
-      const canvas = await importCanvas();
+      const canvas = await import('@canvas-js/interfaces');
       const msgHash = ethUtil.hashPersonalMessage(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload))
       );
@@ -190,7 +166,7 @@ export const verify = async ({
       // - launchpad sessions (legacy) have signature of format { pubkey, signature, chain_id }
       //   and chain_id needs to be stripped and attached to signDoc instead
       // - stargate sessions (ADR-036) have signature of format { pubkey, signature }
-      const canvas = await importCanvas();
+      const canvas = await import('@canvas-js/interfaces');
       const {
         pub_key,
         signature: predecodedSignature,
@@ -230,7 +206,7 @@ export const verify = async ({
   } else if (chainBase === ChainBase.Solana) {
     const nacl = await import('tweetnacl');
     const bs58 = await import('bs58');
-    const canvas = await importCanvas();
+    const canvas = await import('@canvas-js/interfaces');
     // verify solana signature (action, session)
     const stringPayload = action
       ? canvas.serializeActionPayload(actionPayload)
@@ -252,7 +228,7 @@ export const verify = async ({
     const bs58 = await import('bs58');
     // verify near signature (action, session)
     if (action) {
-      const canvas = await importCanvas();
+      const canvas = await import('@canvas-js/interfaces');
       const stringPayload = canvas.serializeActionPayload(actionPayload);
       const message = new TextEncoder().encode(stringPayload);
       const publicKey = nearlib.PublicKey.fromString(actionSignerAddress);
@@ -268,7 +244,7 @@ export const verify = async ({
       // NEAR doesn't provide a way for .near address to be mapped to public keys, so
       // we should either store more data on NEAR logins, or push session creation to
       // the NEAR wallet altogether.
-      const canvas = await importCanvas();
+      const canvas = await import('@canvas-js/interfaces');
       const stringPayload = canvas.serializeSessionPayload(sessionPayload);
       const message = new TextEncoder().encode(stringPayload);
       const { signature: signatureEncoded, publicKey: publicKeyEncoded } =
@@ -288,7 +264,7 @@ export const verify = async ({
   } else if (chainBase === ChainBase.Substrate) {
     // verify substrate signature (action, session)
     const polkadotUtil = await import('@polkadot/util-crypto');
-    const canvas = await importCanvas();
+    const canvas = await import('@canvas-js/interfaces');
     const stringPayload = action
       ? canvas.serializeActionPayload(actionPayload)
       : canvas.serializeSessionPayload(sessionPayload);

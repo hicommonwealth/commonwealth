@@ -1,5 +1,4 @@
 import { verify } from './verify';
-import { import_ } from '@brillout/import';
 
 function assert(condition: unknown, message?: string): asserts condition {
   if (!condition) {
@@ -17,7 +16,7 @@ function assertMatches(a, b, obj: string, field: string) {
 }
 
 const verifyUnpack = async (canvas_action, canvas_session, address) => {
-  const { actionType, sessionType } = await import_('@canvas-js/core/codecs');
+  const { actionType, sessionType } = await import('@canvas-js/core/codecs');
   const action = JSON.parse(canvas_action);
   const session = JSON.parse(canvas_session);
   assert(actionType.is(action), 'Invalid signed action (typecheck)');
