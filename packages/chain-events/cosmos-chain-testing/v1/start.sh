@@ -6,7 +6,7 @@ SCRIPT_NAME=$(basename "$0")
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
 PORT=5050
-IMAGE_NAME=heroku-csdk
+IMAGE_NAME=csdk-v1
 
 if [ "$1" = "--build" ]; then
     cd $SCRIPT_DIR

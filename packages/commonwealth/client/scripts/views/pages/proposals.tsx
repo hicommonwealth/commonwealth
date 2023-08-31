@@ -26,6 +26,7 @@ import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
 } from 'state/api/proposals';
+import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -50,6 +51,12 @@ const ProposalsPage = () => {
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
+  const onSubstrate = app.chain?.base === ChainBase.Substrate;
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const onAave = app.chain?.network === ChainNetwork.Aave;
+  const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
+  const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
+
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
 
@@ -72,19 +79,25 @@ const ProposalsPage = () => {
     };
   }, [setSubstrateLoading]);
 
+  useManageDocumentTitle('Proposals');
+
   const {
     data: activeCosmosProposals,
-    isLoading: isCosmosActiveProposalsLoading,
+    isLoading: isLoadingCosmosActiveProposalsRQ,
   } = useActiveCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
+  const isLoadingCosmosActiveProposals =
+    onCosmos && isLoadingCosmosActiveProposalsRQ;
 
   const {
     data: completedCosmosProposals,
-    isLoading: isCosmosCompletedProposalsLoading,
+    isLoading: isCosmosCompletedProposalsLoadingRQ,
   } = useCompletedCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
+  const isLoadingCosmosCompletedProposals =
+    onCosmos && isCosmosCompletedProposalsLoadingRQ;
 
   if (isLoading) {
     if (
@@ -105,12 +118,6 @@ const ProposalsPage = () => {
 
     return <PageLoading message="Connecting to chain" />;
   }
-
-  const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-  const onCompound = app.chain && app.chain.network === ChainNetwork.Compound;
-  const onAave = app.chain && app.chain.network === ChainNetwork.Aave;
-  const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;
-  const onCosmos = app.chain && app.chain.base === ChainBase.CosmosSDK;
 
   const modLoading = loadSubstrateModules('Proposals', getModules);
 
@@ -143,8 +150,7 @@ const ProposalsPage = () => {
       .getAll()
       .filter((p) => !p.completed)
       .sort((p1, p2) => p2.data.id - p1.data.id);
-
-  const activeProposalContent = isCosmosActiveProposalsLoading ? (
+  const activeProposalContent = isLoadingCosmosActiveProposals ? (
     <CWSpinner />
   ) : !activeDemocracyProposals?.length &&
     !activeCosmosProposals?.length &&
@@ -221,7 +227,7 @@ const ProposalsPage = () => {
       .filter((p) => p.completed)
       .sort((p1, p2) => p2.data.id - p1.data.id);
 
-  const inactiveProposalContent = isCosmosCompletedProposalsLoading ? (
+  const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
     <CWSpinner />
   ) : !inactiveDemocracyProposals?.length &&
     !inactiveCosmosProposals?.length &&
