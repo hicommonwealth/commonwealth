@@ -130,8 +130,6 @@ const EditProfileComponent = () => {
     if (Object.keys(profileUpdate)?.length > 0) {
       updateProfile({ ...profileUpdate, profileId: profile.id })
         .then(() => {
-          // manually trigger a redraw
-          NewProfilesController.Instance.isFetched.emit('redraw');
           navigate(`/profile/id/${profile.id}`);
         })
         .catch((err) => {
