@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-import app, { initAppState } from '../state';
+import app, { LoginState, initAppState } from '../state';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
@@ -76,7 +76,11 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               if (app.isCustomDomain()) {
                 navigate('/', {}, null);
               } else {
-                navigate('/dashboard/for-you', {}, null);
+                if (isLoggedIn) {
+                  navigate('/dashboard/for-you', {}, null);
+                } else {
+                  navigate('/dashboard/global', {}, null);
+                }
               }
             }}
           />
@@ -184,7 +188,11 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             if (app.isCustomDomain()) {
               navigate('/', {}, null);
             } else {
-              navigate('/dashboard/for-you', {}, null);
+              if (isLoggedIn) {
+                navigate('/dashboard/for-you', {}, null);
+              } else {
+                navigate('/dashboard/global', {}, null);
+              }
             }
           }}
         />
