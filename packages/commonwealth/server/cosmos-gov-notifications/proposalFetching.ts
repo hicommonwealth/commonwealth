@@ -75,7 +75,7 @@ async function fetchLatestCosmosProposalV1(
       pagination: nextKey ? ({ key: nextKey } as PageRequest) : undefined,
     });
     finalProposalsPage = proposals;
-    if (pagination.next_key) {
+    if (pagination?.next_key) {
       if (Number(pagination.total) != 0) {
         const newNextKey = numberToUint8ArrayBE(Number(pagination.total));
         if (nextKey != newNextKey) {
@@ -87,12 +87,14 @@ async function fetchLatestCosmosProposalV1(
     }
   } while (uint8ArrayToNumberBE(nextKey) > 0);
 
-  log.info(
-    `Fetched proposal ${
-      finalProposalsPage[finalProposalsPage.length - 1].id
-    } from ${chain.id}`
-  );
-  return [finalProposalsPage[finalProposalsPage.length - 1]];
+  if (finalProposalsPage.length > 0) {
+    log.info(
+      `Fetched proposal ${
+        finalProposalsPage[finalProposalsPage.length - 1].id
+      } from ${chain.id}`
+    );
+    return [finalProposalsPage[finalProposalsPage.length - 1]];
+  } else return [];
 }
 
 /**
@@ -140,6 +142,7 @@ async function fetchLatestCosmosProposalV1Beta1(
   chain: ChainInstance
 ): Promise<Proposal[]> {
   const client = await getCosmosClient<GovV1Beta1ClientType>(chain);
+
   let nextKey: Uint8Array, finalProposalsPage: Proposal[];
   do {
     const { proposals, pagination } = await client.gov.proposals(
@@ -161,12 +164,14 @@ async function fetchLatestCosmosProposalV1Beta1(
     }
   } while (uint8ArrayToNumberBE(nextKey) > 0);
 
-  log.info(
-    `Fetched proposal ${finalProposalsPage[
-      finalProposalsPage.length - 1
-    ].proposalId.toNumber()} from ${chain.id}`
-  );
-  return [finalProposalsPage[finalProposalsPage.length - 1]];
+  if (finalProposalsPage.length > 0) {
+    log.info(
+      `Fetched proposal ${finalProposalsPage[
+        finalProposalsPage.length - 1
+      ].proposalId.toNumber()} from ${chain.id}`
+    );
+    return [finalProposalsPage[finalProposalsPage.length - 1]];
+  } else return [];
 }
 
 /**

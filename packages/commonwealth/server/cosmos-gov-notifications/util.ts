@@ -3,7 +3,6 @@ import { COSMOS_GOV_V1_CHAIN_IDS } from '../config';
 import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { AllCosmosProposals } from './proposalFetching';
-import models from '../database';
 import { ChainBase, NotificationCategories } from 'common-common/src/types';
 import emitNotifications from '../util/emitNotifications';
 import { SupportedNetwork } from 'chain-events/src';
@@ -11,6 +10,7 @@ import { coinToCoins, EventKind } from 'chain-events/src/chains/cosmos/types';
 import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
+import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -72,7 +72,7 @@ export function mapChainsToProposals(
   };
 }
 
-export async function fetchCosmosNotifChains() {
+export async function fetchCosmosNotifChains(models: DB) {
   return await models.Chain.findAll({
     where: {
       base: ChainBase.CosmosSDK,
@@ -88,8 +88,11 @@ export async function fetchCosmosNotifChains() {
 }
 
 export async function fetchLatestNotifProposalIds(
+  models: DB,
   chainIds: string[]
 ): Promise<Record<string, number>> {
+  if (chainIds.length === 0) return {};
+
   const result = (await models.sequelize.query(
     `
     SELECT
@@ -159,7 +162,10 @@ function formatProposalDates(date: string | Date): number {
   }
 }
 
-export async function emitProposalNotifications(proposals: AllCosmosProposals) {
+export async function emitProposalNotifications(
+  models: DB,
+  proposals: AllCosmosProposals
+) {
   for (const chainId in proposals.v1) {
     const chainProposals = proposals.v1[chainId];
     for (const proposal of chainProposals) {
