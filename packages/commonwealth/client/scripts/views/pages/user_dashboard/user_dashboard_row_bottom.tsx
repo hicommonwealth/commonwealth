@@ -55,19 +55,17 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     forceRerender();
   };
 
-  const adjustedId = `discussion_${threadId}`;
+  const commentSubscription =
+    app.user.notifications.findNotificationSubscription({
+      categoryId: NotificationCategories.NewComment,
+      options: { threadId: Number(threadId) },
+    });
 
-  const commentSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === adjustedId &&
-      v.category === NotificationCategories.NewComment
-  );
-
-  const reactionSubscription = app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === adjustedId &&
-      v.category === NotificationCategories.NewReaction
-  );
+  const reactionSubscription =
+    app.user.notifications.findNotificationSubscription({
+      categoryId: NotificationCategories.NewReaction,
+      options: { threadId: Number(threadId) },
+    });
 
   const bothActive =
     commentSubscription?.isActive && reactionSubscription?.isActive;
