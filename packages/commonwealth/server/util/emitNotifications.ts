@@ -101,19 +101,21 @@ export default async function emitNotifications(
 
   // get notification if it already exists
   let notification: NotificationInstance;
-  notification = await models.Notification.findOne(
-    isChainEventData
-      ? {
-          where: {
-            chain_event_id: chainEvent.id,
-          },
-        }
-      : {
-          where: {
-            notification_data: JSON.stringify(notification_data),
-          },
-        }
-  );
+  if (isChainEventData && chainEvent.id) {
+    // Cosmos notifications don't have a chain-event id but will never be duplicated due to the nature of
+    // the fetching mechanism
+    notification = await models.Notification.findOne({
+      where: {
+        chain_event_id: chainEvent.id,
+      },
+    });
+  } else {
+    notification = await models.Notification.findOne({
+      where: {
+        notification_data: JSON.stringify(notification_data),
+      },
+    });
+  }
 
   // if the notification does not yet exist create it here
   if (!notification) {
