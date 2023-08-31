@@ -35,7 +35,7 @@ export const LinkedUrlCard = ({ thread, allowLinking }: LinkedUrlCardProps) => {
               <div className="links-container">
                 {linkedUrls.map((t) => {
                   return (
-                    <Link key={t.identifier} to={t.identifier}>
+                    <Link key={t.identifier} to={t.identifier} target="_blank">
                       {t.title}
                     </Link>
                   );
