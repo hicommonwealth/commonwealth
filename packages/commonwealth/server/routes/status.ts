@@ -8,7 +8,10 @@ import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/comm
 import type { NotificationCategoryInstance } from 'server/models/notification_category';
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
-import type { EmailNotificationInterval } from 'server/models/user';
+import type {
+  EmailNotificationInterval,
+  UserInstance,
+} from 'server/models/user';
 import { JWT_SECRET } from '../config';
 import { sequelize } from '../database';
 import type { DB } from '../models';
@@ -44,7 +47,6 @@ type StatusResp = {
     selectedChain: ChainInstance;
     isAdmin: boolean;
     disableRichText: boolean;
-    lastVisited: string;
     starredCommunities: StarredCommunityAttributes[];
     unseenPosts: { [chain: string]: number };
   };
@@ -121,7 +123,7 @@ const getChainStatus = async (models: DB) => {
   };
 };
 
-export const getUserStatus = async (models: DB, user) => {
+export const getUserStatus = async (models: DB, user: UserInstance) => {
   const chains = await models.Chain.findAll({
     where: { active: true },
     attributes: ['id'],
@@ -129,31 +131,24 @@ export const getUserStatus = async (models: DB, user) => {
 
   const unfilteredAddresses = await user.getAddresses();
   // TODO: fetch all this data with a single query
-  const [
-    addresses,
-    socialAccounts,
-    selectedChain,
-    isAdmin,
-    disableRichText,
-    lastVisited,
-  ] = await Promise.all([
-    unfilteredAddresses.filter(
-      (address) =>
-        !!address.verified && chains.map((c) => c.id).includes(address.chain)
-    ),
-    user.getSocialAccounts(),
-    user.getSelectedChain(),
-    user.isAdmin,
-    user.disableRichText,
-    user.lastVisited,
-  ]);
+  const [addresses, socialAccounts, selectedChain, isAdmin, disableRichText] =
+    await Promise.all([
+      unfilteredAddresses.filter(
+        (address) =>
+          !!address.verified && chains.map((c) => c.id).includes(address.chain)
+      ),
+      user.getSocialAccounts(),
+      user.getSelectedChain(),
+      user.isAdmin,
+      user.disableRichText,
+    ]);
 
   // look up my roles & private communities
   const myAddressIds: number[] = Array.from(
     addresses.map((address) => address.id)
   );
 
-  const rolesPromise = findAllRoles(models, {
+  const roles = await findAllRoles(models, {
     where: { address_id: { [Op.in]: myAddressIds } },
     include: [models.Address],
   });
@@ -167,7 +162,7 @@ export const getUserStatus = async (models: DB, user) => {
   /**
    * Purpose of this section is to count the number of threads that have new updates grouped by community
    */
-  const commsAndChains = Object.entries(JSON.parse(user.lastVisited));
+  const commsAndChains = await getChainActivity(addresses);
   const unseenPosts = {};
   let query = ``;
   let replacements = [];
@@ -207,8 +202,7 @@ export const getUserStatus = async (models: DB, user) => {
   );
 
   // wait for all the promises to resolve
-  const [roles, starredCommunities, threadNum] = await Promise.all([
-    rolesPromise,
+  const [starredCommunities, threadNum] = await Promise.all([
     starredCommunitiesPromise,
     threadNumPromise,
   ]);
@@ -291,7 +285,7 @@ export const getUserStatus = async (models: DB, user) => {
       };
     } else {
       // if the chain does have activePosts convert the set of ids to simply the length of the set
-      unseenPosts[name].activePosts = unseenPosts[name].activePosts.size;
+      unseenPosts[name].activePosts = unseenPosts[name].activePosts?.size || 0;
     }
   }
   /**
@@ -320,7 +314,6 @@ export const getUserStatus = async (models: DB, user) => {
       selectedChain,
       isAdmin,
       disableRichText,
-      lastVisited: JSON.parse(lastVisited),
       starredCommunities,
       unseenPosts,
     },
@@ -389,3 +382,16 @@ export const status = async (
     throw new ServerError('something broke', error);
   }
 };
+
+type ChainActivity = [chain: string, timestamp: string][];
+
+function getChainActivity(
+  addresses: AddressInstance[]
+): Promise<ChainActivity> {
+  return Promise.all(
+    addresses.map(async (address) => {
+      const { chain, last_active } = address;
+      return [chain, last_active.toISOString()];
+    })
+  );
+}

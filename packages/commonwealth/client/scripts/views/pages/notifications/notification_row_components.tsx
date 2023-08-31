@@ -104,7 +104,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   const { handleSetMarkingRead, markingRead, notification, allRead } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
 
-  const { category } = notification.subscription;
+  const category = notification.categoryId;
 
   const navigate = useNavigate();
 

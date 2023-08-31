@@ -6,7 +6,7 @@ import type { DB } from '../models';
 const Op = Sequelize.Op;
 const MAX_NOTIF = 40;
 
-export enum NotificationCategories {
+export enum RouteNotificationCategories {
   ChainEvents = 'chain-event',
   Discussion = 'discussion',
 }
@@ -17,7 +17,7 @@ export const Errors = {
 
 export default async (
   models: DB,
-  notificationCategory: NotificationCategories,
+  notificationCategory: RouteNotificationCategories,
   req: Request,
   res: Response,
   next: NextFunction
@@ -45,12 +45,12 @@ export default async (
   }
 
   const notificationWhereOptions = {};
-  if (notificationCategory === NotificationCategories.ChainEvents) {
+  if (notificationCategory === RouteNotificationCategories.ChainEvents) {
     notificationWhereOptions['category_id'] =
-      NotificationCategories.ChainEvents;
+      RouteNotificationCategories.ChainEvents;
   } else {
     notificationWhereOptions['category_id'] = {
-      [Op.ne]: NotificationCategories.ChainEvents,
+      [Op.ne]: RouteNotificationCategories.ChainEvents,
     };
   }
 

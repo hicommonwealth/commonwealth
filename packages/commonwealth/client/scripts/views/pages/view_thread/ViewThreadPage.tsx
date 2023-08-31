@@ -11,7 +11,6 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -53,6 +52,9 @@ import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 import { useSearchParams } from 'react-router-dom';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+
+import 'pages/view_thread/index.scss';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -238,6 +240,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     });
     setAreProfilesLoaded(true);
   }, [comments, thread, areProfilesLoaded]);
+
+  useManageDocumentTitle('View thread', thread?.title);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;

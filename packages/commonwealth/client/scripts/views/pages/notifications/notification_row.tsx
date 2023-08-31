@@ -25,7 +25,7 @@ export const NotificationRow = (props: NotificationRowProps) => {
 
   useEffect(() => setMarkingRead(allRead), [allRead]);
 
-  const { category } = notification.subscription;
+  const category = notification.categoryId;
 
   if (category === NotificationCategories.ChainEvent) {
     return (
