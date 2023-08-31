@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import app from 'state';
+import app, { initAppState } from 'state';
 import { User } from 'views/components/user/user';
 
 import './UserDropdown.scss';
@@ -22,6 +22,36 @@ import { WalletSsoSource } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
 import useCheckAuthenticatedAddresses from 'views/components/Header/UserDropdown/useCheckAuthenticatedAddresses';
+
+/* used for logout */
+import WebWalletController from 'controllers/app/web_wallets';
+import { WalletId } from 'common-common/src/types';
+import axios from 'axios';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { setDarkMode } from 'helpers/darkMode';
+
+const resetWalletConnectSession = async () => {
+  /**
+   * Imp to reset wc session on logout as otherwise, subsequent login attempts will fail
+   */
+  const walletConnectWallet = WebWalletController.Instance.getByName(
+    WalletId.WalletConnect
+  );
+  await walletConnectWallet.reset();
+};
+
+const handleLogout = async () => {
+  try {
+    await axios.get(`${app.serverUrl()}/logout`);
+    await initAppState();
+    await resetWalletConnectSession();
+    notifySuccess('Logged out');
+    setDarkMode(false);
+  } catch (err) {
+    notifyError('Something went wrong during logging out.');
+    window.location.reload();
+  }
+};
 
 const UserDropdown = () => {
   const navigate = useCommonNavigate();
@@ -119,6 +149,11 @@ const UserDropdown = () => {
             ),
             preventClosing: true,
             onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
+          },
+          {
+            type: 'default',
+            label: 'Logout',
+            onClick: () => handleLogout(),
           },
         ]}
         onOpenChange={(open) => setIsOpen(open)}
