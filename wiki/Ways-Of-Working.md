@@ -15,8 +15,7 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
 
 # Development Process Overview
 
-1. We follow an Agile work philosophy.
- See [Agile Manifesto](https://agilemanifesto.org/) for context.
+1. We follow an Agile work philosophy. See [Agile Manifesto](https://agilemanifesto.org/) for context.
 2. We track work through GitHub's project board, using tickets' "Project" metadata. See [Project Management Flow](#project-management-flow) for full context.
 3. We use team standups to sync up on project status and share updates. Standups take place on Mondays, Tuesdays, and Thursdays at 12:00 EST. See [Standup](#standup) section for full context.
 
