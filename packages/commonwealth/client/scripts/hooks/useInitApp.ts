@@ -9,9 +9,7 @@ const useInitApp = () => {
   useEffect(() => {
     Promise.all([axios.get(`${app.serverUrl()}/domain`), initAppState()])
       .then(([domainResp]) => {
-        return domainResp.data;
-      })
-      .then(({ customDomain: serverCustomDomain }) => {
+        const serverCustomDomain = domainResp.data.customDomain;
         if (serverCustomDomain) {
           app.setCustomDomain(serverCustomDomain);
         }
