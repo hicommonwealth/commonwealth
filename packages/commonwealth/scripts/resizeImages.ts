@@ -69,16 +69,73 @@ const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
 });
 
+async function resizeChains() {
+  const updateChain = async (id, location, transaction) => {
+    await models.Chain.update(
+      { icon_url: location },
+      { where: { id: id }, transaction }
+    );
+  };
+
+  const getNthChain = async (n) =>
+    await models.Chain.findAll({
+      where: {
+        icon_url: {
+          [Op.ne]: null,
+          [Op.ne]: '',
+        },
+      },
+      offset: n,
+      limit: 1,
+      order: [['id', 'DESC']],
+    });
+
+  await uploadToS3AndReplace(getNthChain, 'icon_url', updateChain, 'Chain');
+}
+
+async function resizeProfiles() {
+  const updateProfile = async (id, location, transaction) => {
+    await models.Profile.update(
+      { avatar_url: location },
+      { where: { id: id }, transaction }
+    );
+  };
+
+  const getNthProfile = async (n) =>
+    await models.Profile.findAll({
+      where: {
+        avatar_url: {
+          [Op.ne]: null,
+          [Op.ne]: '',
+        },
+      },
+      offset: n,
+      limit: 1,
+      order: [['id', 'DESC']],
+    });
+
+  await uploadToS3AndReplace(
+    getNthProfile,
+    'avatar_url',
+    updateProfile,
+    'Profile'
+  );
+}
+
 // This function is not turned into a Promise.all because if every call was executed async, it will flood cloudflare
 // and cause this to be flagged it as a bot. It will then need to solve a captcha in order to retrieve the image.
-async function uploadToS3AndReplace(
-  data,
-  field,
-  updateFunction,
-  transaction,
-  name
-) {
-  for (const datum of data) {
+async function uploadToS3AndReplace(dataSupplier, field, updateFunction, name) {
+  let i = 0;
+  // loop through the dataSupplier, until we hit the end.
+  for (let datum = await dataSupplier(i); ; datum = await dataSupplier(i++)) {
+    if (datum.length === 0) {
+      return;
+    }
+    datum = datum[0];
+    console.log(
+      `Processing ${datum[field]}. This is the ${i} in the ${name}s table`
+    );
+    const transaction = await sequelize.transaction();
     let resp;
 
     try {
@@ -129,69 +186,22 @@ async function uploadToS3AndReplace(
       'assets.commonwealth.im'
     );
 
-    console.log(`Success for ${name} ${datum.id} with new url ${newLocation}`);
-    await updateFunction(datum.id, newLocation);
-    await models.Chain.update(
-      { icon_url: newLocation },
-      { where: { id: datum.id }, transaction }
+    console.log(
+      `Successfully resized ${name} ${datum.id} with new url ${newLocation}`
     );
+    await updateFunction(datum.id, newLocation, transaction);
+
+    await transaction.commit();
   }
 }
 
 async function main() {
-  const updateChain = async (id, location) => {
-    await models.Chain.update(
-      { icon_url: location },
-      { where: { id: id }, transaction }
-    );
-  };
-  const updateProfile = async (id, location) => {
-    await models.Profile.update(
-      { avatar_url: location },
-      { where: { id: id }, transaction }
-    );
-  };
-  const chains = await models.Chain.findAll({
-    where: {
-      icon_url: {
-        [Op.ne]: null,
-        [Op.ne]: '',
-      },
-    },
-  });
-  const profiles = await models.Profile.findAll({
-    where: {
-      avatar_url: {
-        [Op.ne]: null,
-        [Op.ne]: '',
-      },
-    },
-  });
-  const transaction = await sequelize.transaction();
-
   try {
-    await Promise.all([
-      uploadToS3AndReplace(
-        chains,
-        'icon_url',
-        updateChain,
-        transaction,
-        'community'
-      ),
-      uploadToS3AndReplace(
-        profiles,
-        'avatar_url',
-        updateProfile,
-        transaction,
-        'profile'
-      ),
-    ]);
-    // commit changes to db if all passes
-    await transaction.commit();
+    await resizeChains();
+    await resizeProfiles();
   } catch (e) {
     console.log(e);
-    console.log('Failed to compressImages, rolling back db changes');
-    await transaction.rollback();
+    console.log('Failed to resize all images. Exiting script');
   }
 }
 
