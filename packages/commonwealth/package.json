@@ -42,7 +42,7 @@
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
-    "send-cosmos-notifs": "ts-node --project tsconfig.json server/cosmos-gov-notifications/index.ts",
+    "send-cosmos-notifs": "ts-node --project tsconfig.json server/cosmos-gov-notifications/generateCosmosGovNotifications.ts",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts",
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "start-android": "npx cap run android",
