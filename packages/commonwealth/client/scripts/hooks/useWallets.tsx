@@ -649,7 +649,6 @@ const useWallets = (walletProps: IuseWalletProps) => {
     console.log('Started new session for', wallet.chain, chainId);
 
     // ensure false for newlyCreated / linking vars on revalidate
-    onAccountVerified(account, false, false);
     if (isMobile) {
       if (setSignerAccount) setSignerAccount(account);
       if (setIsNewlyCreated) setIsNewlyCreated(false);

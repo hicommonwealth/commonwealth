@@ -17,6 +17,7 @@ import _ from 'underscore';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import { X } from '@phosphor-icons/react';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 interface SessionRevalidationModalProps {
   onModalClose: () => void;
@@ -43,8 +44,25 @@ const SessionRevalidationModal = ({
     onModalClose: () => {
       // do nothing, let the user close out of session revalidation
     },
-    onSuccess: () => {
+    onSuccess: (signedAddress) => {
       onModalClose();
+
+      if (signedAddress !== walletAddress) {
+        openConfirmation({
+          title: 'Address mismatch',
+          description: (
+            <CWText>
+              Expected the address <b>{formatAddress(walletAddress)}</b>, but
+              the wallet you signed in with has address{' '}
+              <b>{formatAddress(signedAddress)}</b>.
+              <br />
+              Please try sign again with expected address.
+            </CWText>
+          ),
+          buttons: [],
+          className: 'AddressMismatch',
+        });
+      }
     },
   });
 
