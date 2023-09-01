@@ -69,11 +69,6 @@ import setDefaultRole from '../routes/setDefaultRole';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
-import createPoll from '../routes/createPoll';
-import getPolls from '../routes/getPolls';
-import deletePoll from '../routes/deletePoll';
-import updateVote from '../routes/updateVote';
-import viewVotes from '../routes/viewVotes';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
 import updateProfileNew from '../routes/updateNewProfile';
@@ -159,6 +154,7 @@ import { ServerNotificationsController } from '../controllers/server_notificatio
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
 import { ServerChainsController } from '../controllers/server_chains_controller';
+import { ServerPollsController } from '../controllers/server_polls_controller';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
@@ -175,7 +171,10 @@ import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { searchChainsHandler } from '../routes/chains/search_chains_handler';
-import { ServerPollsController } from 'server/controllers/server_polls_controller';
+import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
+import { getThreadPollsHandler } from '../routes/threads/get_thread_polls';
+import { deletePollHandler } from '../routes/polls/delete_poll_handler';
+import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -447,44 +446,48 @@ function setupRouter(
     databaseValidationService.validateChain,
     updateThreadHandler.bind(this, serverControllers)
   );
+
+  // polls
   registerRoute(
     router,
     'post',
-    '/createPoll',
+    '/threads/:id/polls',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    createPoll.bind(this, models)
+    createThreadPollHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
     'get',
-    '/getPolls',
+    '/threads/:id/polls',
     databaseValidationService.validateChain,
-    getPolls.bind(this, models)
+    getThreadPollsHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
     'delete',
-    '/deletePoll',
-    passport.authenticate('jwt', { session: false }),
-    deletePoll.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/updateVote',
+    '/polls/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    updateVote.bind(this, models, tokenBalanceCache)
+    deletePollHandler.bind(this, serverControllers)
+  );
+  registerRoute(
+    router,
+    'put',
+    '/polls/:id/votes',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    updatePollVoteHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
     'get',
-    '/viewVotes',
+    '/polls/:id/votes',
     databaseValidationService.validateChain,
-    viewVotes.bind(this, models)
+    getThreadPollsHandler.bind(this, serverControllers)
   );
 
   registerRoute(

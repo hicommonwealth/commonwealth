@@ -47,11 +47,10 @@ class PollsController {
 
   public async fetchPolls(chainId: string, threadId: number) {
     await $.ajax({
-      url: `${app.serverUrl()}/getPolls`,
+      url: `${app.serverUrl()}/threads/${threadId}/polls`,
       type: 'GET',
       data: {
         chain: chainId,
-        thread_id: threadId,
       },
       success: (response) => {
         for (const poll of response.result) {
@@ -86,17 +85,16 @@ class PollsController {
       args;
 
     await $.ajax({
-      url: `${app.serverUrl()}/createPoll`,
+      url: `${app.serverUrl()}/threads/${threadId}/polls`,
       type: 'POST',
       data: {
         chain: app.activeChainId(),
-        thread_id: threadId,
-        prompt,
-        options: JSON.stringify(options),
-        custom_duration: customDuration?.split(' ')[0],
         author_chain: authorChain,
         address,
         jwt: app.user.jwt,
+        prompt,
+        options: JSON.stringify(options),
+        custom_duration: customDuration?.split(' ')[0],
       },
       success: (response) => {
         const modeledPoll = modelFromServer(response.result);
@@ -118,16 +116,22 @@ class PollsController {
     });
   }
 
-  public async deletePoll(args: { threadId: number; pollId: number }) {
-    const { threadId, pollId } = args;
+  public async deletePoll(args: {
+    authorChain: string;
+    address: string;
+    threadId: number;
+    pollId: number;
+  }) {
+    const { authorChain, address, threadId, pollId } = args;
     await $.ajax({
-      url: `${app.serverUrl()}/deletePoll`,
+      url: `${app.serverUrl()}/polls/${pollId}`,
       type: 'DELETE',
       data: {
-        thread_id: threadId,
-        poll_id: pollId,
         chain_id: app.activeChainId(),
+        author_chain: authorChain,
+        address,
         jwt: app.user.jwt,
+        poll_id: pollId,
       },
       success: (response) => {
         // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder

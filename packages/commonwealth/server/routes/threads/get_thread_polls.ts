@@ -1,6 +1,6 @@
-import { PollAttributes } from 'server/models/poll';
-import { ServerControllers } from 'server/routing/router';
-import { TypedRequest, TypedResponse, success } from 'server/types';
+import { PollAttributes } from '../../models/poll';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',

@@ -1,14 +1,14 @@
-import { PollAttributes } from 'server/models/poll';
-import { ServerControllers } from 'server/routing/router';
-import { TypedRequest, TypedResponse, success } from 'server/types';
+import { PollAttributes } from '../../models/poll';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 type CreateThreadPollParams = {
   id: string;
 };
 export type CreateThreadPollBody = {
   prompt: string;
-  options: any;
-  custom_duration: any;
+  options: string;
+  custom_duration?: string;
 };
 export type CreateThreadPollResponse = PollAttributes;
 

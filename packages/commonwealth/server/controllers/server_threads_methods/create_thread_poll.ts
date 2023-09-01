@@ -1,11 +1,11 @@
 import moment from 'moment';
 import { AppError } from '../../../../common-common/src/errors';
 import { ServerThreadsController } from '../server_threads_controller';
-import { PollAttributes } from 'server/models/poll';
-import { UserInstance } from 'server/models/user';
-import { AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
-import { validateOwner } from 'server/util/validateOwner';
+import { PollAttributes } from '../../models/poll';
+import { UserInstance } from '../../models/user';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -20,8 +20,8 @@ export type CreateThreadPollOptions = {
   chain: ChainInstance;
   threadId: number;
   prompt: string;
-  options: any;
-  customDuration: any;
+  options: string;
+  customDuration?: string;
 };
 export type CreateThreadPollResult = PollAttributes;
 
@@ -37,21 +37,22 @@ export async function __createThreadPoll(
     customDuration,
   }: CreateThreadPollOptions
 ): Promise<CreateThreadPollResult> {
+  let finalCustomDuration: string | number = '';
   if (customDuration && customDuration !== 'Infinite') {
-    customDuration = Number(customDuration);
+    finalCustomDuration = Number(finalCustomDuration);
     if (
-      !Number.isInteger(customDuration) ||
-      customDuration < 0 ||
-      customDuration > 31
+      !Number.isInteger(finalCustomDuration) ||
+      finalCustomDuration < 0 ||
+      finalCustomDuration > 31
     ) {
       throw new AppError(Errors.InvalidDuration);
     }
   }
   const ends_at =
-    customDuration === 'Infinite'
+    finalCustomDuration === 'Infinite'
       ? null
-      : customDuration
-      ? moment().add(customDuration, 'days').toDate()
+      : finalCustomDuration
+      ? moment().add(finalCustomDuration, 'days').toDate()
       : moment().add(5, 'days').toDate();
 
   const thread = await this.models.Thread.findOne({

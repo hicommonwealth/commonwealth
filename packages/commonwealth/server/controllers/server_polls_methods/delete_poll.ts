@@ -1,8 +1,8 @@
 import { ServerThreadsController } from '../server_threads_controller';
-import { validateOwner } from 'server/util/validateOwner';
-import { UserInstance } from 'server/models/user';
-import { AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
+import { validateOwner } from '../../util/validateOwner';
+import { UserInstance } from '../../models/user';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
 import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {

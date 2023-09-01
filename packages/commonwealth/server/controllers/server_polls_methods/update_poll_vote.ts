@@ -1,12 +1,12 @@
+import moment from 'moment';
+
 import { UserInstance } from 'server/models/user';
 import { ServerThreadsController } from '../server_threads_controller';
-import { VoteAttributes } from 'server/models/vote';
-import { AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
-import { AppError } from '../../../../common-common/src/errors';
-import moment from 'moment';
-import validateTopicThreshold from 'server/util/validateTopicThreshold';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
+import { VoteAttributes } from '../../models/vote';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
+import validateTopicThreshold from '../../util/validateTopicThreshold';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',

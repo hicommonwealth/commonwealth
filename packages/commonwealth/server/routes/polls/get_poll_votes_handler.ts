@@ -4,7 +4,7 @@ import { TypedRequest, TypedResponse, success } from 'server/types';
 type GetPollVotesParams = {
   id: string;
 };
-export type GetPollVotesResponse = null;
+type GetPollVotesResponse = null;
 
 export const getPollVotesHandler = async (
   controllers: ServerControllers,

@@ -33,7 +33,7 @@ export class ServerPollsController {
     return __getPollVotes.call(this, options);
   }
 
-  async updatePollVotes(
+  async updatePollVote(
     options: UpdatePollVoteOptions
   ): Promise<UpdatePollVoteResult> {
     return __updatePollVote.call(this, options);
