@@ -27,13 +27,13 @@ You _must not_ change the title or description of someone else's Github story or
 
 ## Tickets
 
-Engineers are welcome to open up new tickets. These _should_ be set to "No Status," for the current work cycle (e.g. "Cycle 6"), via the issue's "projects" metadata. Next a ticket is "teed up" (assigned the Teed Up label) by a lead or project manager.
+Engineers are welcome to open up new tickets. These _should_ be set to "No Status," for the current work cycle (e.g. "Cycle 6"). This can be done either in the ticket's "projects" metadata (found in the right-hand side bar when opening a new GitHub issue), or from within the relevant [sprint board](https://github.com/orgs/hicommonwealth/projects/). 
 
-If you would like to tee-up a ticket, DM the relevant lead/PM. Do not move any stories out of our Backlog (i.e., out of the "No Status" label) yourself. 
+Next, a ticket is "Teed Up" (moved to the "Teed Up" stage) by a lead or project manager. An engineer who wishes for a ticket to be Teed Up should DM the relevant lead/PM. Only leads Tee Up tickets.
 
-Work _should not_ begin on a ticket until (1) an engineer has been assigned to the ticket (2) it has been assigned a [story-point value](#story-point-estimation) (3) it has been assigned an "In Progress" status label.
+Work _should not_ begin on a ticket until (1) an engineer has been assigned to the ticket by a lead (2) the engineer has given the ticket a [story-point value](#story-point-estimation) (3) the engineer has moved the ticket to "In Progress."
 
-Typically, engineers _should_ only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be marked as "In Progress"). 
+Typically, engineers _should_ only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be moved to "In Progress"). 
 
 ### Blockers
 
@@ -76,8 +76,8 @@ Occasionally, quality checks will erroneously flag code which is used throughout
 
 # Standup
 
-1. Standups are currently M, T, & Th at 12:00 EST for 15 minutes, followed by an optional "parking lot" if there are further items that need discussing. 
-2. Please make sure all your stories are up-to-date before standup, and have been assigned the correct status. 
+1. Standups are currently M, T, & Th at 12:00 EST for 15 minutes, followed by an optional 15 minute "parking lot" if there are further items that need discussing. 
+2. Please make sure all your stories are up-to-date before standup, and have the correct project state (Teed Up, In Progress, etc). 
     - Remember to associate any PRs you submit with the ticket it closes (and automation will do the rest).
 3. When you give your standup, try to stay concise, providing a general status update for various tickets, and briefly flagging any complications.
     - Tickets and PRs should be referenced by both their assigned numbers (e.g. "#4572") and their descriptive titles.
@@ -95,7 +95,7 @@ Currently, Product team is responsible for QA'ing the day's release on Beta befo
 
 Engineering is responsible for informing Product that release on Beta is ready for QA. Effectively, this means everything that is ready for QA that day has been deployed to Beta. 
 
-Our Beta/QA server can be found at `qa.commonwealth.im`.
+Our Beta/QA server can be found at `qa.commonwealth.im`. Custom domains are available at `osmosis.qa.commonwealth.im` and `dydx.qa.commonwealth.im`.
 
 # Change Log
 
