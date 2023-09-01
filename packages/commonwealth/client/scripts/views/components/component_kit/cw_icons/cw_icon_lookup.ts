@@ -122,7 +122,7 @@ export const iconLookup = {
   pin: withPhosphorIcon(PushPin),
   plus: Icons.CWPlus,
   plusCircle: Icons.CWPlusCircle,
-  plusCirclePhosphor: withPhosphorIcon(PlusCircle),
+  plusCirclePhosphor: (props) => withPhosphorIcon(PlusCircle)(props),
   polkadot: Icons.CWPolkadot,
   polygon: Icons.CWPolygon,
   question: withPhosphorIcon(Question),

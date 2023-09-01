@@ -13,6 +13,8 @@ import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { featureFlags } from 'helpers/feature-flags';
 import Permissions from '../../utils/Permissions';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { AnchorType } from 'views/components/component_kit/cw_popover/cw_popover';
 
 const resetSidebarState = () => {
   sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -178,7 +180,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         {
           label: 'Connect Discord',
           iconLeft: 'discord',
-          onClick: async (e) => {
+          onClick: async () => {
             try {
               const verification_token = uuidv4();
               await app.discord.createConfig(verification_token);
@@ -287,6 +289,17 @@ export const CreateContentMenu = () => {
   );
 };
 
+interface MouseEnterOrLeaveProps {
+  e: React.MouseEvent<AnchorType>;
+  isMenuOpen?: boolean;
+  isTooltipOpen?: boolean;
+  handleInteraction: (e: React.MouseEvent<AnchorType>) => void;
+}
+
+interface HandleIconClickProps extends MouseEnterOrLeaveProps {
+  onClick: (e: React.MouseEvent<AnchorType>) => void;
+}
+
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -301,16 +314,75 @@ export const CreateContentPopover = () => {
     return;
   }
 
+  const handleIconClick = ({
+    e,
+    isMenuOpen,
+    isTooltipOpen,
+    handleInteraction,
+    onClick,
+  }: HandleIconClickProps) => {
+    // close tooltip on menu click
+    if (!isMenuOpen && isTooltipOpen) {
+      handleInteraction(e);
+    }
+    onClick(e);
+  };
+
+  const handleMouseEnter = ({
+    e,
+    isMenuOpen,
+    handleInteraction,
+  }: MouseEnterOrLeaveProps) => {
+    // prevent showing tooltip if menu is opened
+    if (isMenuOpen) {
+      return;
+    }
+    handleInteraction(e);
+  };
+
+  const handleMouseLeave = ({
+    e,
+    isTooltipOpen,
+    handleInteraction,
+  }: MouseEnterOrLeaveProps) => {
+    // handleInteraction just toggles the value, so here prevent showing
+    // the tooltip when you moving mouse away from the icon
+    if (!isTooltipOpen) {
+      return;
+    }
+    handleInteraction(e);
+  };
+
   return (
     <PopoverMenu
       menuItems={getCreateContentMenuItems(navigate)}
-      renderTrigger={(onclick) => (
-        <CWIconButton
-          iconButtonTheme="black"
-          iconName={
-            featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
-          }
-          onClick={onclick}
+      renderTrigger={(onClick, isMenuOpen) => (
+        <CWTooltip
+          content="Create content"
+          placement="bottom"
+          renderTrigger={(handleInteraction, isTooltipOpen) => (
+            <CWIconButton
+              iconButtonTheme="black"
+              iconName={
+                featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
+              }
+              onClick={(e) =>
+                handleIconClick({
+                  e,
+                  isMenuOpen,
+                  isTooltipOpen,
+                  handleInteraction,
+                  onClick,
+                })
+              }
+              onMouseEnter={(e) =>
+                handleMouseEnter({ e, isMenuOpen, handleInteraction })
+              }
+              onMouseLeave={(e) =>
+                handleMouseLeave({ e, isTooltipOpen, handleInteraction })
+              }
+            />
+          )}
         />
       )}
     />
