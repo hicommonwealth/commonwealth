@@ -9,15 +9,21 @@ import { User } from 'views/components/user/user';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWText } from '../../components/component_kit/cw_text';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { UserDashboardRowTopSkeleton } from './UserDashboardRowTopSkeleton';
 
 type UserDashboardRowTopProps = {
   activityData: any;
   category: string;
+  showSkeleton?: boolean;
 };
 
 export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
-  const { activityData, category } = props;
+  const { activityData, category, showSkeleton } = props;
   const navigate = useCommonNavigate();
+
+  if (showSkeleton) {
+    return <UserDashboardRowTopSkeleton />;
+  }
 
   const {
     created_at,
