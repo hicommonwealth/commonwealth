@@ -21,6 +21,7 @@ export const deleteReactionHandler = async (
 
   await controllers.reactions.deleteReaction({
     user: req.user,
+    address: req.address,
     reactionId,
   });
 

@@ -51,10 +51,6 @@ const getTextRows = (
   } else if (subscription.Comment) {
     // TODO Gabe 9/7/22 - comment headers should link to comments
 
-    // const parentThread = app.threads.getById(
-    //   Number(subscription.comment.threadId)
-    // );
-
     // const commentUrl = getProposalUrlPath(
     //   subscription.Thread.slug,
     //   `${subscription.Thread.identifier}-${slugify(subscription.Thread.title)}`,
@@ -107,7 +103,7 @@ const getTextRows = (
     return (
       <div
         className="header-row"
-        onClick={() => setRoute(`/${subscription.Chain.id}`)}
+        onClick={() => setRoute(`/${subscription.chainId}`)}
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}

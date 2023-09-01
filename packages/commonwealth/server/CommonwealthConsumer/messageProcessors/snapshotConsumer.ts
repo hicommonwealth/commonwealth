@@ -2,14 +2,14 @@ import axios from 'axios';
 import { StatsDController } from 'common-common/src/statsd';
 import type { Logger } from 'typescript-logging';
 import emitNotifications from '../../util/emitNotifications';
-import type { SnapshotNotification } from '../../../shared/types';
 import { SnapshotEventType } from '../../../shared/types';
 import { NotificationCategories } from 'common-common/src/types';
 import type { DB } from '../../models';
+import { RmqSnapshotNotification } from 'common-common/src/rabbitmq/types/snapshotNotification';
 
 export async function processSnapshotMessage(
   this: { models: DB; log: Logger },
-  data: SnapshotNotification
+  data: RmqSnapshotNotification.RmqMsgType
 ) {
   const { space, id, title, body, choices, start, expire } = data;
 
@@ -73,19 +73,6 @@ export async function processSnapshotMessage(
     });
   }
 
-  // Notifications
-  emitNotifications(
-    this.models,
-    NotificationCategories.SnapshotProposal,
-    snapshotNotificationData.space,
-    { eventType, ...snapshotNotificationData },
-    {
-      notificationCategory: eventType,
-      body: snapshotNotificationData.body,
-      title: snapshotNotificationData.title, // TODO: Decide on what we want for the webhook we emit
-    }
-  );
-
   try {
     if (space || proposal.space) {
       await this.models.SnapshotSpace.findOrCreate({
@@ -134,6 +121,25 @@ export async function processSnapshotMessage(
   this.log.info(
     `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `
   );
+
+  if (associatedCommunities.length > 0) {
+    // Notifications
+    emitNotifications(
+      this.models,
+      {
+        categoryId: NotificationCategories.SnapshotProposal,
+        data: {
+          eventType,
+          ...snapshotNotificationData,
+        },
+      },
+      {
+        notificationCategory: eventType,
+        body: snapshotNotificationData.body,
+        title: snapshotNotificationData.title, // TODO: Decide on what we want for the webhook we emit
+      }
+    );
+  }
 
   for (const community of associatedCommunities) {
     const communityId = community.chain_id;

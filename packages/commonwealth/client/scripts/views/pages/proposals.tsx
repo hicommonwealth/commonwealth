@@ -1,12 +1,9 @@
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
-import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
-import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { useGetCompletedCosmosProposals } from 'hooks/cosmos/useGetCompletedCosmosProposals';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import 'pages/proposals.scss';
 import React, { useEffect, useState } from 'react';
@@ -25,6 +22,11 @@ import {
   CompoundProposalStats,
   SubstrateProposalStats,
 } from '../components/proposals/proposals_explainers';
+import {
+  useActiveCosmosProposalsQuery,
+  useCompletedCosmosProposalsQuery,
+} from 'state/api/proposals';
+import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -47,15 +49,13 @@ const ProposalsPage = () => {
     !app.chain || !app.chain.loaded || !app.chain.apiInitialized
   );
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
-  const [
-    isCosmosCompletedProposalsLoading,
-    setIsCosmosCompletedProposalsLoading,
-  ] = useState(false);
-  const [
-    isCosmosCompletedProposalsLoadingMore,
-    setIsCosmosCompletedProposalsLoadingMore,
-  ] = useState(false);
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
+
+  const onSubstrate = app.chain?.base === ChainBase.Substrate;
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const onAave = app.chain?.network === ChainNetwork.Aave;
+  const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
+  const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
 
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
@@ -79,12 +79,25 @@ const ProposalsPage = () => {
     };
   }, [setSubstrateLoading]);
 
-  const { completedCosmosProposals } = useGetCompletedCosmosProposals({
-    app,
-    setIsLoading: setIsCosmosCompletedProposalsLoading,
-    setIsLoadingMore: setIsCosmosCompletedProposalsLoadingMore,
-    isApiReady: app.chain?.apiInitialized,
+  useManageDocumentTitle('Proposals');
+
+  const {
+    data: activeCosmosProposals,
+    isLoading: isLoadingCosmosActiveProposalsRQ,
+  } = useActiveCosmosProposalsQuery({
+    isApiReady: !!app.chain?.apiInitialized,
   });
+  const isLoadingCosmosActiveProposals =
+    onCosmos && isLoadingCosmosActiveProposalsRQ;
+
+  const {
+    data: completedCosmosProposals,
+    isLoading: isCosmosCompletedProposalsLoadingRQ,
+  } = useCompletedCosmosProposalsQuery({
+    isApiReady: !!app.chain?.apiInitialized,
+  });
+  const isLoadingCosmosCompletedProposals =
+    onCosmos && isCosmosCompletedProposalsLoadingRQ;
 
   if (isLoading) {
     if (
@@ -106,12 +119,6 @@ const ProposalsPage = () => {
     return <PageLoading message="Connecting to chain" />;
   }
 
-  const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-  const onCompound = app.chain && app.chain.network === ChainNetwork.Compound;
-  const onAave = app.chain && app.chain.network === ChainNetwork.Aave;
-  const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;
-  const onCosmos = app.chain && app.chain.base === ChainBase.CosmosSDK;
-
   const modLoading = loadSubstrateModules('Proposals', getModules);
 
   if (isSubstrateLoading) return modLoading;
@@ -122,14 +129,6 @@ const ProposalsPage = () => {
     (app.chain as Substrate).democracyProposals.store
       .getAll()
       .filter((p) => !p.completed);
-
-  const activeCosmosProposals =
-    onCosmos &&
-    (app.chain as Cosmos).governance.store
-      .getAll()
-      .map((p) => p as CosmosProposal | CosmosProposalV1)
-      .filter((p) => !p.completed)
-      .sort((a, b) => +b.identifier - +a.identifier);
 
   const activeCompoundProposals =
     onCompound &&
@@ -151,49 +150,51 @@ const ProposalsPage = () => {
       .getAll()
       .filter((p) => !p.completed)
       .sort((p1, p2) => p2.data.id - p1.data.id);
-
-  const activeProposalContent =
-    !activeDemocracyProposals?.length &&
+  const activeProposalContent = isLoadingCosmosActiveProposals ? (
+    <CWSpinner />
+  ) : !activeDemocracyProposals?.length &&
     !activeCosmosProposals?.length &&
     !activeCompoundProposals?.length &&
     !activeAaveProposals?.length &&
-    !activeSputnikProposals?.length
-      ? [
-          <div key="no-active" className="no-proposals">
-            No active proposals
-          </div>,
-        ]
-      : (activeDemocracyProposals || [])
-          .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
-          .concat(
-            (activeCosmosProposals || []).map((proposal) => (
-              <ProposalCard key={proposal.identifier} proposal={proposal} />
-            ))
-          )
-          .concat(
-            (activeCompoundProposals || []).map((proposal, i) => (
-              <ProposalCard key={i} proposal={proposal} />
-            ))
-          )
-          .concat(
-            (activeAaveProposals || []).map((proposal, i) => (
-              <ProposalCard
-                key={i}
+    !activeSputnikProposals?.length ? (
+    [
+      <div key="no-active" className="no-proposals">
+        No active proposals
+      </div>,
+    ]
+  ) : (
+    (activeDemocracyProposals || [])
+      .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
+      .concat(
+        (activeCosmosProposals || []).map((proposal) => (
+          <ProposalCard key={proposal.identifier} proposal={proposal} />
+        ))
+      )
+      .concat(
+        (activeCompoundProposals || []).map((proposal, i) => (
+          <ProposalCard key={i} proposal={proposal} />
+        ))
+      )
+      .concat(
+        (activeAaveProposals || []).map((proposal, i) => (
+          <ProposalCard
+            key={i}
+            proposal={proposal}
+            injectedContent={
+              <AaveProposalCardDetail
                 proposal={proposal}
-                injectedContent={
-                  <AaveProposalCardDetail
-                    proposal={proposal}
-                    statusText={getStatusText(proposal)}
-                  />
-                }
+                statusText={getStatusText(proposal)}
               />
-            ))
-          )
-          .concat(
-            (activeSputnikProposals || []).map((proposal, i) => (
-              <ProposalCard key={i} proposal={proposal} />
-            ))
-          );
+            }
+          />
+        ))
+      )
+      .concat(
+        (activeSputnikProposals || []).map((proposal, i) => (
+          <ProposalCard key={i} proposal={proposal} />
+        ))
+      )
+  );
 
   // inactive proposals
   const inactiveDemocracyProposals =
@@ -226,7 +227,7 @@ const ProposalsPage = () => {
       .filter((p) => p.completed)
       .sort((p1, p2) => p2.data.id - p1.data.id);
 
-  const inactiveProposalContent = isCosmosCompletedProposalsLoading ? (
+  const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
     <CWSpinner />
   ) : !inactiveDemocracyProposals?.length &&
     !inactiveCosmosProposals?.length &&
@@ -243,11 +244,9 @@ const ProposalsPage = () => {
       .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
       .concat(
         inactiveCosmosProposals?.length
-          ? inactiveCosmosProposals
-              .map((proposal) => (
-                <ProposalCard key={proposal.identifier} proposal={proposal} />
-              ))
-              .concat(isCosmosCompletedProposalsLoadingMore && <CWSpinner />)
+          ? inactiveCosmosProposals.map((proposal) => (
+              <ProposalCard key={proposal.identifier} proposal={proposal} />
+            ))
           : []
       )
       .concat(

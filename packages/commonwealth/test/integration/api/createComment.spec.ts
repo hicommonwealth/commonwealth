@@ -41,7 +41,7 @@ describe('createComment Integration Tests', () => {
     );
 
     response.should.have.status(400);
-    chai.assert.equal(response.error, Errors.MissingTextOrAttachment);
+    chai.assert.equal(response.error, Errors.MissingText);
   });
 
   it('should return an error response if an invalid parent id is specified', async () => {

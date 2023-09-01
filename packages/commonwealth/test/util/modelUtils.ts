@@ -155,7 +155,6 @@ export interface ThreadArgs {
   topicId?: number;
   body?: string;
   url?: string;
-  attachments?: string[];
   readOnly?: boolean;
 }
 
@@ -183,7 +182,6 @@ export const createThread = async (args: ThreadArgs) => {
       title: encodeURIComponent(title),
       body: encodeURIComponent(body),
       kind,
-      'attachments[]': undefined,
       topic_name: topicName,
       topic_id: topicId,
       url,
@@ -252,7 +250,6 @@ export const createComment = async (args: CommentArgs) => {
       chain,
       address,
       parent_id: parentCommentId,
-      'attachments[]': undefined,
       text,
       jwt,
     });
@@ -278,7 +275,6 @@ export const editComment = async (args: EditCommentArgs) => {
       author_chain: chain,
       address,
       body: encodeURIComponent(text),
-      'attachments[]': undefined,
       jwt,
       chain: community ? undefined : chain,
       community,
@@ -414,10 +410,10 @@ export const updateRole = async (args: AssignRoleArgs) => {
 };
 
 export interface SubscriptionArgs {
-  object_id: string | number;
   jwt: any;
   is_active: boolean;
   category: string;
+  chain_id: string;
 }
 
 export const createSubscription = async (args: SubscriptionArgs) => {

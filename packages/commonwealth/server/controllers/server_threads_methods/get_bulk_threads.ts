@@ -7,7 +7,7 @@ import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import { getLastEdited } from '../../util/getLastEdited';
 
 export type GetBulkThreadsOptions = {
-  chain: ChainInstance;
+  chain?: ChainInstance;
   stage: string;
   topicId: number;
   includePinnedThreads: boolean;
@@ -16,6 +16,7 @@ export type GetBulkThreadsOptions = {
   orderBy: string;
   fromDate: string;
   toDate: string;
+  archived: boolean;
 };
 
 export type GetBulkThreadsResult = {
@@ -37,6 +38,7 @@ export async function __getBulkThreads(
     orderBy,
     fromDate,
     toDate,
+    archived,
   }: GetBulkThreadsOptions
 ): Promise<GetBulkThreadsResult> {
   // query params that bind to sql query
@@ -52,7 +54,7 @@ export async function __getBulkThreads(
       page: _page,
       limit: _limit,
       offset: _offset,
-      chain: chain.id,
+      ...(chain && { chain: chain.id }),
       ...(stage && { stage }),
       ...(topicId && { topic_id: topicId }),
     };
@@ -66,6 +68,8 @@ export async function __getBulkThreads(
     'numberOfComments:desc': 'threads_number_of_comments DESC',
     'numberOfLikes:asc': 'threads_total_likes ASC',
     'numberOfLikes:desc': 'threads_total_likes DESC',
+    'latestActivity:asc': 'latest_activity ASC',
+    'latestActivity:desc': 'latest_activity DESC',
   };
 
   // get response threads from query
@@ -86,11 +90,13 @@ export async function __getBulkThreads(
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
-        collaborators
+        collaborators,
+        threads.latest_activity AS latest_activity
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
+          COALESCE(latest_comments.latest_comment_date, t.created_at) AS latest_activity,
           t.marked_as_spam_at,
           t.archived_at,
           t.updated_at AS thread_updated,
@@ -117,6 +123,13 @@ export async function __getBulkThreads(
         ) comments
         ON t.id = comments.thread_id
         LEFT JOIN (
+          SELECT thread_id, MAX(created_at) AS latest_comment_date
+          FROM "Comments"
+          WHERE deleted_at IS NULL
+          GROUP BY thread_id
+        ) latest_comments
+        ON t.id = latest_comments.thread_id
+        LEFT JOIN (
             SELECT thread_id,
             COUNT(r.id)::int AS total_likes,
             STRING_AGG(ad.address::text, ',') AS addresses_reacted,
@@ -129,13 +142,14 @@ export async function __getBulkThreads(
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          AND t.chain = $chain
+          ${chain ? ` AND t.chain = $chain` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
+          ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes)
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes, latest_comments.latest_comment_date)
           ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
         ) threads
       ON threads.address_id = addr.id
@@ -167,25 +181,11 @@ export async function __getBulkThreads(
     throw new ServerError('Could not fetch threads');
   }
 
-  const processLinks = async (thread) => {
-    let chain_entity_meta = [];
-    if (thread.links) {
-      const ces = thread.links.filter((item) => item.source === 'proposal');
-      if (ces.length > 0) {
-        chain_entity_meta = ces.map((ce: Link) => {
-          return { ce_id: parseInt(ce.identifier), title: ce.title };
-        });
-      }
-    }
-    return { chain_entity_meta };
-  };
-
   // transform thread response
   let threads = responseThreads.map(async (t) => {
     const collaborators = JSON.parse(t.collaborators[0]).address?.length
       ? t.collaborators.map((c) => JSON.parse(c))
       : [];
-    const { chain_entity_meta } = await processLinks(t);
 
     const last_edited = getLastEdited(t);
 
@@ -206,7 +206,6 @@ export async function __getBulkThreads(
       locked_at: t.thread_locked,
       links: t.links,
       collaborators,
-      chain_entity_meta,
       has_poll: t.has_poll,
       last_commented_on: t.last_commented_on,
       plaintext: t.plaintext,
@@ -223,6 +222,7 @@ export async function __getBulkThreads(
       reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
       marked_as_spam_at: t.marked_as_spam_at,
       archived_at: t.archived_at,
+      latest_activity: t.latest_activity,
     };
     if (t.topic_id) {
       data['topic'] = {
@@ -238,7 +238,9 @@ export async function __getBulkThreads(
 
   const countsQuery = `
      SELECT id, title, stage FROM "Threads"
-     WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
+     WHERE ${
+       chain ? 'chain = $chain AND' : ''
+     } (stage = 'proposal_in_review' OR stage = 'voting')`;
 
   const threadsInVoting: ThreadInstance[] = await this.models.sequelize.query(
     countsQuery,
@@ -247,8 +249,9 @@ export async function __getBulkThreads(
       type: QueryTypes.SELECT,
     }
   );
-  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting')
-    .length;
+  const numVotingThreads = threadsInVoting.filter(
+    (t) => t.stage === 'voting'
+  ).length;
 
   threads = await Promise.all(threads);
 

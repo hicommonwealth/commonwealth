@@ -1,22 +1,17 @@
-// This is a const and not an enum because of a weird webpack error.
-// It has the same syntax, though, so it should be OK, as long as we don't
-// modify any of the values.
-// eslint-disable-next-line
-export const NotificationCategories = {
-  NewComment: 'new-comment-creation',
-  NewThread: 'new-thread-creation',
-  NewCommunity: 'new-community-creation',
-  NewRoleCreation: 'new-role-creation',
-  NewMention: 'new-mention',
-  NewReaction: 'new-reaction',
-  NewCollaboration: 'new-collaboration',
-  ThreadEdit: 'thread-edit',
-  CommentEdit: 'comment-edit',
-  ChainEvent: 'chain-event',
-  EntityEvent: 'entity-event',
-  NewSnapshot: 'new-snapshot',
-  SnapshotProposal: 'snapshot-proposal',
-};
+export enum NotificationCategories {
+  NewComment = 'new-comment-creation',
+  NewThread = 'new-thread-creation',
+  NewMention = 'new-mention',
+  NewReaction = 'new-reaction',
+  NewCollaboration = 'new-collaboration',
+  ThreadEdit = 'thread-edit',
+  CommentEdit = 'comment-edit',
+  ChainEvent = 'chain-event',
+  SnapshotProposal = 'snapshot-proposal',
+}
+
+export type NotificationCategory =
+  typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
@@ -156,19 +151,27 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
+export type DiscordAction =
+  | 'create'
+  | 'update'
+  | 'thread-delete'
+  | 'comment-delete';
+
 export interface IDiscordMessage {
-  user: {
+  user?: {
     id: string;
     username: string;
   };
   title?: string;
   content: string;
   message_id: string;
-  channel_id: string;
-  parent_channel_id: string;
-  guild_id: string;
+  channel_id?: string;
+  parent_channel_id?: string;
+  guild_id?: string;
   imageUrls?: string[];
+  action: DiscordAction;
 }
+
 export type HttpMethod =
   | 'get'
   | 'post'

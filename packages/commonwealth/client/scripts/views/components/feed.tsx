@@ -5,9 +5,8 @@ import 'components/feed.scss';
 
 import type DashboardActivityNotification from '../../models/DashboardActivityNotification';
 
-import { UserDashboardRow } from '../pages/user_dashboard/FeedRow/UserDashboardRow';
 import { PageNotFound } from '../pages/404';
-import { CWSpinner } from './component_kit/cw_spinner';
+import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
 type FeedProps = {
   fetchData: () => Promise<any>;
@@ -15,6 +14,7 @@ type FeedProps = {
   defaultCount?: number;
   onFetchedDataCallback?: (data: any) => DashboardActivityNotification;
   customScrollParent?: HTMLElement;
+  isChainEventsRow?: boolean;
 };
 
 const DEFAULT_COUNT = 10;
@@ -25,6 +25,7 @@ export const Feed = ({
   noFeedMessage,
   onFetchedDataCallback,
   customScrollParent,
+  isChainEventsRow,
 }: FeedProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
@@ -61,7 +62,24 @@ export const Feed = ({
     getData();
   }, []);
 
-  if (loading) return <CWSpinner />;
+  if (loading) {
+    return (
+      <div className="Feed">
+        <Virtuoso
+          customScrollParent={customScrollParent}
+          totalCount={4}
+          style={{ height: '100%' }}
+          itemContent={(i) => (
+            <UserDashboardRow
+              key={i}
+              isChainEventsRow={isChainEventsRow}
+              showSkeleton
+            />
+          )}
+        />
+      </div>
+    );
+  }
 
   if (error) {
     console.error('Error rendering feed', error);

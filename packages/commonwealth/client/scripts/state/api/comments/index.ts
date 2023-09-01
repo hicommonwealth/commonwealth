@@ -1,11 +1,23 @@
+// comments
+import useFetchCommentsQuery from './fetchComments';
+import useEditCommentMutation from './editComment';
+import useCreateCommentMutation from './createComment';
+import useDeleteCommentMutation from './deleteComment';
+import useToggleCommentSpamStatusMutation from './toggleCommentSpamStatus';
+import useSearchCommentsQuery from './searchComments';
+// comment reactions
 import useCreateCommentReactionMutation from './createReaction';
 import useDeleteCommentReactionMutation from './deleteReaction';
-import useFetchCommentReactionsQuery from './fetchReaction';
-import useSearchCommentsQuery from './searchComments';
 
 export {
+  // comments
+  useFetchCommentsQuery,
+  useEditCommentMutation,
+  useCreateCommentMutation,
+  useDeleteCommentMutation,
+  useToggleCommentSpamStatusMutation,
+  useSearchCommentsQuery,
+  // comment reactions
   useCreateCommentReactionMutation,
   useDeleteCommentReactionMutation,
-  useFetchCommentReactionsQuery,
-  useSearchCommentsQuery,
 };

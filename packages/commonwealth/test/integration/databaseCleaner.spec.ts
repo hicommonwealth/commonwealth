@@ -5,14 +5,13 @@ import DatabaseCleaner from '../../server/util/databaseCleaner';
 import models from '../../server/database';
 import sinon from 'sinon';
 import { NotificationCategories } from 'common-common/src/types';
-import { QueryTypes } from 'sequelize';
+import { Sequelize } from 'sequelize';
 import { RedisCache } from 'common-common/src/redisCache';
-import { REDIS_URL } from '../../server/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('DatabaseCleaner Tests', () => {
+describe('DatabaseCleaner Tests', () => {
   let mockRedis: sinon.SinonStubbedInstance<RedisCache>;
 
   before('Reset database', async () => {
@@ -22,7 +21,7 @@ describe.only('DatabaseCleaner Tests', () => {
   describe('Tests when the cleaner runs', () => {
     let clock: sinon.SinonFakeTimers;
 
-    before(function () {
+    beforeEach(function () {
       const now = new Date();
       now.setUTCHours(8);
       now.setUTCMinutes(0);
@@ -32,7 +31,7 @@ describe.only('DatabaseCleaner Tests', () => {
       clock = sinon.useFakeTimers(now);
     });
 
-    after(function () {
+    afterEach(function () {
       clock.restore();
     });
 
@@ -152,13 +151,13 @@ describe.only('DatabaseCleaner Tests', () => {
       const eightyEightDaysAgo = new Date(now);
       eightyEightDaysAgo.setUTCDate(now.getUTCDate() - 88);
 
-      const ninetyTwoDaysAgo = new Date(now);
-      ninetyTwoDaysAgo.setUTCDate(now.getUTCDate() - 92);
+      const hundredDaysAgo = new Date(now);
+      hundredDaysAgo.setUTCDate(now.getUTCDate() - 100);
 
       // create old notification
       await models.Notification.create({
         notification_data: 'testing',
-        created_at: ninetyTwoDaysAgo,
+        created_at: hundredDaysAgo,
         chain_id: 'ethereum',
         category_id: 'new-thread-creation',
       });
@@ -191,33 +190,36 @@ describe.only('DatabaseCleaner Tests', () => {
       );
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
-      // raw query so we can set updated_at manually
-      const oldUser = <any>(
-        await models.sequelize.query(
-          `
-        INSERT INTO "Users"(email, created_at, updated_at, "lastVisited", "emailNotificationInterval")
-        VALUES ('dbCleanerOld@test.com', NOW() - INTERVAL '1 year' - INTERVAL '2 days', NOW() - INTERVAL '1 year' - INTERVAL '2 days', '{}', 'never')
-        RETURNING id;
-      `,
-          { type: QueryTypes.INSERT, raw: true }
-        )
-      )[0][0];
+      // create old user and address
+      const oldUser = await models.User.createWithProfile(models, {
+        email: 'dbCleanerTest@old.com',
+        emailVerified: true,
+      });
+      await models.Address.create({
+        user_id: oldUser.id,
+        address: '0x1234',
+        chain: 'ethereum',
+        verification_token: 'blah',
+        last_active: Sequelize.literal(`NOW() - INTERVAL '13 months'`) as any,
+      });
 
-      const newUser = <any>(
-        await models.sequelize.query(
-          `
-        INSERT INTO "Users"(email, created_at, updated_at, "lastVisited", "emailNotificationInterval")
-        VALUES ('dbCleanerNew@test.com', NOW(), NOW(), '{}', 'never')
-        RETURNING id;
-      `,
-          { type: QueryTypes.INSERT, raw: true }
-        )
-      )[0][0];
+      // create new user and address
+      const newUser = await models.User.createWithProfile(models, {
+        email: 'dbCleanerTest@new.com',
+        emailVerified: true,
+      });
+      await models.Address.create({
+        user_id: newUser.id,
+        address: '0x2345',
+        chain: 'ethereum',
+        verification_token: 'blah',
+        last_active: Sequelize.literal(`NOW()`) as any,
+      });
 
       const newSub = await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewThread,
-        object_id: 'ethereum',
+        chain_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });
@@ -225,7 +227,7 @@ describe.only('DatabaseCleaner Tests', () => {
       const oldSub = await models.Subscription.create({
         subscriber_id: oldUser.id,
         category_id: NotificationCategories.NewThread,
-        object_id: 'ethereum',
+        chain_id: 'ethereum',
         is_active: true,
         immediate_email: false,
       });

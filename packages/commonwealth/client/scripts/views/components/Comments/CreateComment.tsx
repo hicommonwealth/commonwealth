@@ -22,6 +22,7 @@ import {
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { useDraft } from 'hooks/useDraft';
+import { useCreateCommentMutation } from 'state/api/comments';
 import Permissions from '../../../utils/Permissions';
 import clsx from 'clsx';
 import { getTokenBalance } from 'helpers/token_balance_helper';
@@ -30,16 +31,16 @@ type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
   rootThread: Thread;
-  updatedCommentsCallback: () => void;
   canComment: boolean;
+  shouldFocusEditor?: boolean;
 };
 
 export const CreateComment = ({
   handleIsReplying,
   parentCommentId,
   rootThread,
-  updatedCommentsCallback,
   canComment,
+  shouldFocusEditor = false,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -70,7 +71,8 @@ export const CreateComment = ({
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
 
   useEffect(() => {
-    setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
+    activeTopic?.id &&
+      setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic?.id));
   }, [activeTopic]);
 
   useEffect(() => {
@@ -86,56 +88,44 @@ export const CreateComment = ({
     }
   }, [tokenPostingThreshold]);
 
-  useEffect(() => {
-    setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic.id));
-  }, [activeTopic]);
+  const { mutateAsync: createComment } = useCreateCommentMutation({
+    threadId: rootThread.id,
+    chainId: app.activeChainId(),
+    existingNumberOfComments: rootThread.numberOfComments || 0,
+  });
 
-  useEffect(() => {
-    if (!tokenPostingThreshold.isZero() && !balanceLoading) {
-      setBalanceLoading(true);
-      if (!app.user.activeAccount?.tokenBalance) {
-        getTokenBalance().then(() => {
-          setUserBalance(app.user.activeAccount?.tokenBalance);
-        });
-      } else {
-        setUserBalance(app.user.activeAccount?.tokenBalance);
-      }
-    }
-  }, [tokenPostingThreshold]);
-
-  const handleSubmitComment = async (e) => {
-    e.stopPropagation();
+  const handleSubmitComment = async () => {
     setErrorMsg(null);
     setSendingComment(true);
 
     const chainId = app.activeChainId();
 
     try {
-      const res = await app.comments.create(
-        author.address,
-        rootThread.id,
-        chainId,
-        serializeDelta(contentDelta),
-        parentCommentId
-      );
+      const newComment: any = await createComment({
+        threadId: rootThread.id,
+        chainId: chainId,
+        address: author.address,
+        parentCommentId: parentCommentId,
+        unescapedText: serializeDelta(contentDelta),
+        existingNumberOfComments: rootThread.numberOfComments || 0,
+      });
 
-      updatedCommentsCallback();
       setErrorMsg(null);
       setContentDelta(createDeltaFromText(''));
       clearDraft();
 
       setTimeout(() => {
         // Wait for dom to be updated before scrolling to comment
-        jumpHighlightComment(res.id);
+        jumpHighlightComment(newComment.id);
       }, 100);
 
       // TODO: Instead of completely refreshing notifications, just add the comment to subscriptions
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
     } catch (err) {
-      console.error(err);
-      notifyError(err.message || 'Comment submission failed.');
-      setErrorMsg(err.message);
+      const errMsg = err?.responseJSON?.error || 'Failed to create comment';
+      notifyError(errMsg);
+      setErrorMsg(errMsg);
     } finally {
       setSendingComment(false);
 
@@ -145,13 +135,15 @@ export const CreateComment = ({
     }
   };
 
-  const userFailsThreshold = app.chain.isGatedTopic(activeTopic.id);
+  const userFailsThreshold = app.chain.isGatedTopic(activeTopic?.id);
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 ||
     sendingComment ||
     userFailsThreshold ||
     !canComment;
+
+  const decimals = getDecimals(app.chain);
 
   const cancel = (e) => {
     e.stopPropagation();
@@ -186,31 +178,28 @@ export const CreateComment = ({
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>
       <div onClick={(e) => e.stopPropagation()}>
-        <ReactQuillEditor
-          className="editor"
-          contentDelta={contentDelta}
-          setContentDelta={setContentDelta}
-        />
+      <ReactQuillEditor
+        className="editor"
+        contentDelta={contentDelta}
+        setContentDelta={setContentDelta}
+        isDisabled={!canComment}
+        tooltipLabel="Join community to comment"
+        shouldFocus={shouldFocusEditor}
+      />
       </div>
-      {app.activeChainId &&
-        tokenPostingThreshold &&
-        tokenPostingThreshold.gt(new BN(0)) && (
-          <CWText className="token-req-text">
-            Commenting in {activeTopic?.name} requires{' '}
-            {weiToTokens(
-              tokenPostingThreshold.toString(),
-              getDecimals(app.chain)
-            )}{' '}
-            {app.chain.meta.default_symbol}.{' '}
-            {userBalance && app.user.activeAccount && (
-              <>
-                You have{' '}
-                {weiToTokens(userBalance.toString(), getDecimals(app.chain))}{' '}
-                {app.chain.meta.default_symbol}.
-              </>
-            )}
-          </CWText>
-        )}
+      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
+        <CWText className="token-req-text">
+          Commenting in {activeTopic?.name} requires{' '}
+          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
+          {app.chain.meta.default_symbol}.{' '}
+          {userBalance && (
+            <>
+              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
+              {app.chain.meta.default_symbol}.
+            </>
+          )}
+        </CWText>
+      )}
       <div className="form-bottom">
         <div className="form-buttons">
           {editorValue.length > 0 && (

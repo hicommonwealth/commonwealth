@@ -1,20 +1,16 @@
-import ChainEntityController from 'controllers/server/chain_entities';
-import DiscordController from 'controllers/server/discord';
-import { WebSocketController } from 'controllers/server/socket';
-import { EventEmitter } from 'events';
-import { ChainStore, NodeStore } from 'stores';
+import { ChainCategoryType } from 'common-common/src/types';
+import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import SnapshotController from 'controllers/chain/snapshot';
-import CommentsController from 'controllers/server/comments';
+import ChainEntityController from 'controllers/server/chain_entities';
 import CommunitiesController from 'controllers/server/communities';
 import ContractsController from 'controllers/server/contracts';
-import NewProfilesController from 'controllers/server/newProfiles';
+import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
 import { RolesController } from 'controllers/server/roles';
 import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
-import ThreadsController from 'controllers/server/threads';
-import ThreadUniqueAddressesCount from 'controllers/server/threadUniqueAddressesCount';
+import { WebSocketController } from 'controllers/server/socket';
 import { UserController } from 'controllers/server/user';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
@@ -30,6 +26,7 @@ import {
   GetTokenOptions,
 } from '@capacitor-firebase/messaging';
 import { platform } from '@todesktop/client-core';
+import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -70,10 +67,7 @@ export interface IApp {
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
 
-  // Threads
-  threads: ThreadsController;
-  threadUniqueAddressesCount: ThreadUniqueAddressesCount;
-  comments: CommentsController;
+  // Polls
   polls: PollsController;
 
   // Proposals
@@ -141,6 +135,9 @@ export interface IApp {
   customDomainId(): string;
 
   setCustomDomain(d: string): void;
+
+  // bandaid fix to skip next deinit chain on layout.tsx transition
+  skipDeinitChain: boolean;
 }
 
 // INJECT DEPENDENCIES
@@ -165,10 +162,7 @@ const app: IApp = {
   chainModuleReady: new EventEmitter().setMaxListeners(100),
   isModuleReady: false,
 
-  // Thread
-  threads: ThreadsController.Instance,
-  threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
-  comments: new CommentsController(),
+  // Polls
   polls: new PollsController(),
 
   // Proposals
@@ -252,13 +246,13 @@ const app: IApp = {
   setCustomDomain: (d) => {
     app._customDomainId = d;
   },
+  skipDeinitChain: false,
 };
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedChain = true,
-  customDomain = null,
   shouldRedraw = true
 ): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -369,10 +363,6 @@ export async function initAppState(
           app.user.setSelectedChain(
             ChainInfo.fromJSON(data.result.user.selectedChain)
           );
-        }
-
-        if (customDomain) {
-          app.setCustomDomain(customDomain);
         }
 
         resolve();

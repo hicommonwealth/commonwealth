@@ -1,12 +1,4 @@
 import { Op } from 'sequelize';
-import { bech32 } from 'bech32';
-import bs58 from 'bs58';
-import { configure as configureStableStringify } from 'safe-stable-stringify';
-
-import type { KeyringOptions } from '@polkadot/keyring/types';
-import { hexToU8a, stringToHex } from '@polkadot/util';
-import type { KeypairType } from '@polkadot/util-crypto/types';
-import * as ethUtil from 'ethereumjs-util';
 
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -27,18 +19,9 @@ import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySignature from '../util/verifySignature';
 
-import type { SessionPayload } from '@canvas-js/interfaces';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const log = factory.getLogger(formatFilename(__filename));
-
-// can't import from canvas es module, so we reimplement stringify here
-const sortedStringify = configureStableStringify({
-  bigint: false,
-  circularValue: Error,
-  strict: true,
-  deterministic: true,
-});
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
@@ -126,13 +109,11 @@ const processAddress = async (
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       });
       await models.Subscription.create({
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       });
       addressInstance.user_id = newUser.id;
@@ -262,17 +243,24 @@ const verifyAddress = async (
       where: { id: newAddress.user_id },
     });
     req.login(user, (err) => {
+      const serverAnalyticsController = new ServerAnalyticsController();
       if (err) {
-        serverAnalyticsTrack({
-          event: MixpanelLoginEvent.LOGIN_FAILED,
-          isCustomDomain: null,
-        });
+        serverAnalyticsController.track(
+          {
+            event: MixpanelLoginEvent.LOGIN_FAILED,
+            isCustomDomain: null,
+          },
+          req
+        );
         return next(err);
       }
-      serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN_COMPLETED,
-        isCustomDomain: null,
-      });
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          isCustomDomain: null,
+        },
+        req
+      );
 
       return res.json({
         status: 'Success',

@@ -1,9 +1,9 @@
 import 'components/Profile/Profile.scss';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import $ from 'jquery';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import AddressInfo from '../../../models/AddressInfo';
+import Comment from '../../../models/Comment';
 import NewProfile from '../../../models/NewProfile';
 import Thread from '../../../models/Thread';
 import { PageNotFound } from '../../pages/404';
@@ -42,9 +42,9 @@ const Profile = ({ profileId }: ProfileProps) => {
       });
 
       setProfile(new NewProfile(result.profile));
-      setThreads(result.threads.map((t) => app.threads.modelFromServer(t)));
+      setThreads(result.threads.map((t) => new Thread(t)));
       const responseComments = result.comments.map((c) =>
-        modelCommentFromServer(c)
+        new Comment(c)
       );
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = result.commentThreads.find(
@@ -116,22 +116,21 @@ const Profile = ({ profileId }: ProfileProps) => {
         style={
           profile.backgroundImage
             ? {
-                backgroundImage: `url(${backgroundUrl})`,
-                backgroundRepeat: `${
-                  backgroundImageBehavior === ImageBehavior.Fill
-                    ? 'no-repeat'
-                    : 'repeat'
+              backgroundImage: `url(${backgroundUrl})`,
+              backgroundRepeat: `${backgroundImageBehavior === ImageBehavior.Fill
+                  ? 'no-repeat'
+                  : 'repeat'
                 }`,
-                backgroundSize:
-                  backgroundImageBehavior === ImageBehavior.Fill
-                    ? 'cover'
-                    : '100px',
-                backgroundPosition:
-                  backgroundImageBehavior === ImageBehavior.Fill
-                    ? 'center'
-                    : '56px 56px',
-                backgroundAttachment: 'fixed',
-              }
+              backgroundSize:
+                backgroundImageBehavior === ImageBehavior.Fill
+                  ? 'cover'
+                  : '100px',
+              backgroundPosition:
+                backgroundImageBehavior === ImageBehavior.Fill
+                  ? 'center'
+                  : '56px 56px',
+              backgroundAttachment: 'fixed',
+            }
             : {}
         }
       >

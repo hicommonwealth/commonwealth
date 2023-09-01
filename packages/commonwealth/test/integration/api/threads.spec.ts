@@ -10,8 +10,8 @@ import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thre
 import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
 import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_thread_handler';
-import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';
-import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
+import { Errors as updateThreadPinnedErrors } from 'server/routes/threads/update_thread_handler';
+import { Errors as updateThreadPrivacyErrors } from 'server/routes/threads/update_thread_handler';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
 import app, { resetDatabase } from '../../../server-test';
@@ -432,9 +432,7 @@ describe('Thread Tests', () => {
         });
 
         expect(cRes.error).to.not.be.null;
-        expect(cRes.error).to.be.equal(
-          CreateCommentErrors.MissingTextOrAttachment
-        );
+        expect(cRes.error).to.be.equal(CreateCommentErrors.MissingText);
       });
 
       it('should fail to create a comment on a non-existent thread', async () => {
@@ -487,7 +485,6 @@ describe('Thread Tests', () => {
             kind: thread_kind,
             stage: thread_stage,
             body: thread.body,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: userJWT,
           });
@@ -513,7 +510,6 @@ describe('Thread Tests', () => {
             kind: thread_kind,
             stage: thread_stage,
             body: thread.body,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: adminJWT,
           });
@@ -543,13 +539,12 @@ describe('Thread Tests', () => {
             kind: thread_kind,
             stage: thread_stage,
             body: null,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: adminJWT,
           });
         expect(res.body.error).to.not.be.null;
         expect(res.status).to.be.equal(400);
-        expect(res.body.error).to.be.equal(EditThreadErrors.NoBodyOrAttachment);
+        expect(res.body.error).to.be.equal(EditThreadErrors.NoBody);
       });
 
       it('should succeed in updating a thread body', async () => {
@@ -570,7 +565,6 @@ describe('Thread Tests', () => {
             kind: thread_kind,
             stage: thread_stage,
             body: newBody,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: adminJWT,
           });
@@ -597,7 +591,6 @@ describe('Thread Tests', () => {
             stage: thread_stage,
             body: thread.body,
             title: newTitle,
-            'attachments[]': null,
             read_only: readOnly,
             jwt: adminJWT,
           });
@@ -669,70 +662,6 @@ describe('Thread Tests', () => {
           });
         expect(res.status).to.be.equal(200);
         expect(res.body.result.read_only).to.be.false;
-      });
-
-      it('should fail without read_only', async () => {
-        const res = await chai
-          .request(app)
-          .post('/api/updateThreadPrivacy')
-          .set('Accept', 'application/json')
-          .send({
-            thread_id: tempThread.id,
-            jwt: adminJWT,
-          });
-        expect(res.status).to.be.equal(400);
-        expect(res.body.error).to.be.equal(
-          updateThreadPrivacyErrors.NoReadOnly
-        );
-      });
-
-      it('should fail without thread_id', async () => {
-        const res = await chai
-          .request(app)
-          .post('/api/updateThreadPrivacy')
-          .set('Accept', 'application/json')
-          .send({
-            read_only: 'true',
-            jwt: adminJWT,
-          });
-        expect(res.status).to.be.equal(400);
-        expect(res.body.error).to.be.equal(
-          updateThreadPrivacyErrors.NoThreadId
-        );
-      });
-
-      it('should fail with an invalid thread_id', async () => {
-        const res = await chai
-          .request(app)
-          .post('/api/updateThreadPrivacy')
-          .set('Accept', 'application/json')
-          .send({
-            thread_id: 123458,
-            read_only: 'true',
-            jwt: adminJWT,
-          });
-        expect(res.status).to.be.equal(400);
-        expect(res.body.error).to.be.equal(updateThreadPrivacyErrors.NoThread);
-      });
-
-      it('should fail if not an admin or author', async () => {
-        // create new user + jwt
-        const res = await modelUtils.createAndVerifyAddress({ chain });
-        const newUserJWT = jwt.sign(
-          { id: res.user_id, email: res.email },
-          JWT_SECRET
-        );
-        const res2 = await chai
-          .request(app)
-          .post('/api/updateThreadPrivacy')
-          .set('Accept', 'application/json')
-          .send({
-            thread_id: tempThread.id,
-            read_only: 'true',
-            jwt: newUserJWT,
-          });
-        expect(res2.status).to.be.equal(400);
-        expect(res2.body.error).to.be.equal(updateThreadPrivacyErrors.NotAdmin);
       });
     });
 
@@ -932,24 +861,6 @@ describe('Thread Tests', () => {
           .send({ thread_id: pinThread, jwt: adminJWT });
         expect(res2.body.status).to.be.equal('Success');
         expect(res2.body.result.pinned).to.be.false;
-      });
-
-      it('admin fails to toggle without thread', async () => {
-        const res2 = await chai
-          .request(app)
-          .post('/api/updateThreadPinned')
-          .set('Accept', 'application/json')
-          .send({ jwt: adminJWT });
-        expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.NoThread);
-      });
-
-      it('user fails to toggle pin', async () => {
-        const res2 = await chai
-          .request(app)
-          .post('/api/updateThreadPinned')
-          .set('Accept', 'application/json')
-          .send({ thread_id: pinThread, jwt: userJWT });
-        expect(res2.body.error).to.be.equal(updateThreadPinnedErrors.NotAdmin);
       });
     });
   });

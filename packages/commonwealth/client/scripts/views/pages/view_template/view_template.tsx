@@ -30,6 +30,7 @@ export enum TemplateComponents {
   INPUT = 'input',
   DROPDOWN = 'dropdown',
   FUNCTIONFORM = 'function',
+  STRUCTFORM = 'struct',
 }
 
 type Json = {
@@ -158,6 +159,18 @@ const ViewTemplatePage = () => {
               });
 
               break;
+            case TemplateComponents.STRUCTFORM:
+              setFormState((prevState) => {
+                const newState = { ...prevState };
+                const form = {};
+                field.struct.form_fields.forEach((nestField) => {
+                  form[nestField.input.field_ref] = null;
+                });
+                newState[field.struct.field_ref] = form;
+                return newState;
+              });
+              break;
+
             default:
               break;
           }
@@ -346,9 +359,14 @@ const ViewTemplatePage = () => {
                   const newState = { ...prevState };
 
                   if (nested_field_ref) {
-                    newState[nested_field_ref][nested_index][
-                      field[component].field_ref
-                    ] = e.target.value;
+                    if (nested_index) {
+                      newState[nested_field_ref][nested_index][
+                        field[component].field_ref
+                      ] = e.target.value;
+                    } else {
+                      newState[nested_field_ref][field[component].field_ref] =
+                        e.target.value;
+                    }
                   } else {
                     newState[field[component].field_ref] = e.target.value;
                   }
@@ -374,6 +392,21 @@ const ViewTemplatePage = () => {
             })
           );
 
+          functionComponents.push(<CWDivider />);
+          return functionComponents;
+        }
+        case TemplateComponents.STRUCTFORM: {
+          const functionComponents = [
+            <CWDivider />,
+            <CWText type="h3">{field[component].field_label}</CWText>,
+          ];
+
+          functionComponents.push(
+            ...renderTemplate(
+              field[component].form_fields,
+              field[component].field_ref
+            )
+          );
           functionComponents.push(<CWDivider />);
           return functionComponents;
         }

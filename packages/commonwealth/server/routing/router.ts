@@ -1,8 +1,14 @@
 import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
+import useragent from 'express-useragent';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+
+import {
+  methodNotAllowedMiddleware,
+  registerRoute,
+} from '../middleware/methodNotAllowed';
 
 import domain from '../routes/domain';
 import { status } from '../routes/status';
@@ -47,7 +53,7 @@ import disableSubscriptions from '../routes/subscription/disableSubscriptions';
 import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
 import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
 import viewNotifications, {
-  NotificationCategories,
+  RouteNotificationCategories,
 } from '../routes/viewNotifications';
 import viewUserActivity from '../routes/viewUserActivity';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
@@ -66,19 +72,8 @@ import getUploadSignature from '../routes/getUploadSignature';
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
 import deletePoll from '../routes/deletePoll';
-import updateThreadStage from '../routes/updateThreadStage';
-import updateThreadPrivacy from '../routes/updateThreadPrivacy';
-import updateThreadPinned from '../routes/updateThreadPinned';
 import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
-import fetchEntityTitle from '../routes/fetchEntityTitle';
-import updateChainEntityTitle from '../routes/updateChainEntityTitle';
-import addEditors, { addEditorValidation } from '../routes/addEditors';
-import deleteEditors from '../routes/deleteEditors';
-import createDraft from '../routes/drafts/createDraft';
-import deleteDraft from '../routes/drafts/deleteDraft';
-import editDraft from '../routes/drafts/editDraft';
-import getDrafts from '../routes/drafts/getDrafts';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
 import updateProfileNew from '../routes/updateNewProfile';
@@ -105,7 +100,6 @@ import updateChainPriority from '../routes/updateChainPriority';
 
 import startSsoLogin from '../routes/startSsoLogin';
 import finishSsoLogin from '../routes/finishSsoLogin';
-import getEntityMeta from '../routes/getEntityMeta';
 import getTokenForum from '../routes/getTokenForum';
 import tokenBalance from '../routes/tokenBalance';
 import bulkBalances from '../routes/bulkBalances';
@@ -159,9 +153,7 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
-import markThreadAsSpam from '../routes/spam/markThreadAsSpam';
 import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
-import unmarkThreadAsSpam from '../routes/spam/unmarkThreadAsSpam';
 import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
 
 import { ServerThreadsController } from '../controllers/server_threads_controller';
@@ -175,15 +167,14 @@ import { ServerChainsController } from '../controllers/server_chains_controller'
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
-import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { archiveThreadHandler } from '../routes/threads/archive_thread_handler';
-import { unarchiveThreadHandler } from '../routes/threads/unarchive_thread_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
+import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
+import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
@@ -198,10 +189,6 @@ export type ServerControllers = {
   profiles: ServerProfilesController;
   chains: ServerChainsController;
 };
-import {
-  methodNotAllowedMiddleware,
-  registerRoute,
-} from '../middleware/methodNotAllowed';
 
 function setupRouter(
   endpoint: string,
@@ -228,6 +215,8 @@ function setupRouter(
   // ---
 
   const router = express.Router();
+
+  router.use(useragent.express());
 
   // Updating the address
   registerRoute(
@@ -435,6 +424,24 @@ function setupRouter(
   registerRoute(
     router,
     'patch',
+    '/bot/threads',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChainWithTopics,
+    updateThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/threads/:message_id',
+    databaseValidationService.validateBotUser,
+    deleteBotThreadHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -467,27 +474,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateThreadStage',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadStage.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/updateThreadPrivacy',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadPrivacy.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/updateThreadPinned',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadPinned.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
     '/updateVote',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -501,12 +487,7 @@ function setupRouter(
     databaseValidationService.validateChain,
     viewVotes.bind(this, models)
   );
-  registerRoute(
-    router,
-    'get',
-    '/fetchEntityTitle',
-    fetchEntityTitle.bind(this, models)
-  );
+
   registerRoute(
     router,
     'post',
@@ -591,36 +572,10 @@ function setupRouter(
 
   registerRoute(
     router,
-    'post',
-    '/updateChainEntityTitle',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    updateChainEntityTitle.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/addEditors',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    addEditorValidation,
-    addEditors.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/deleteEditors',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    deleteEditors.bind(this, models)
-  );
-  registerRoute(
-    router,
     'delete',
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     deleteThreadHandler.bind(this, serverControllers)
   );
@@ -639,36 +594,6 @@ function setupRouter(
     searchProfilesHandler.bind(this, serverControllers)
   );
   registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
-
-  // discussion drafts
-  registerRoute(
-    router,
-    'post',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    createDraft.bind(this, models)
-  );
-  registerRoute(router, 'get', '/drafts', getDrafts.bind(this, models));
-  registerRoute(
-    router,
-    'delete',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    deleteDraft.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'patch',
-    '/drafts',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    editDraft.bind(this, models)
-  );
 
   registerRoute(
     router,
@@ -697,6 +622,26 @@ function setupRouter(
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     createThreadCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'patch',
+    '/bot/threads/:id/comments',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    updateCommentHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/bot/comments/:message_id',
+    databaseValidationService.validateBotUser,
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteBotCommentHandler.bind(this, serverControllers)
   );
 
   registerRoute(
@@ -811,13 +756,8 @@ function setupRouter(
     'delete',
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     deleteReactionHandler.bind(this, serverControllers)
-  );
-  registerRoute(
-    router,
-    'get',
-    '/comments/:id/reactions',
-    getCommentReactionsHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
@@ -947,7 +887,7 @@ function setupRouter(
     viewCount.bind(this, models, viewCountCache)
   );
 
-  // attachments
+  // uploads
   registerRoute(
     router,
     'post',
@@ -1030,14 +970,18 @@ registerRoute(
     'post',
     '/viewDiscussionNotifications',
     passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(this, models, NotificationCategories.Discussion)
+    viewNotifications.bind(this, models, RouteNotificationCategories.Discussion)
   );
   registerRoute(
     router,
     'post',
     '/viewChainEventNotifications',
     passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(this, models, NotificationCategories.ChainEvents)
+    viewNotifications.bind(
+      this,
+      models,
+      RouteNotificationCategories.ChainEvents
+    )
   );
 
   registerRoute(
@@ -1219,20 +1163,6 @@ registerRoute(
   registerRoute(
     router,
     'put',
-    '/threads/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    markThreadAsSpam.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/threads/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    unmarkThreadAsSpam.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'put',
     '/comments/:id/spam',
     passport.authenticate('jwt', { session: false }),
     markCommentAsSpam.bind(this, models)
@@ -1243,22 +1173,6 @@ registerRoute(
     '/comments/:id/spam',
     passport.authenticate('jwt', { session: false }),
     unmarkCommentAsSpam.bind(this, models)
-  );
-
-  // thread archive
-  registerRoute(
-    router,
-    'put',
-    '/threads/:id/archive',
-    passport.authenticate('jwt', { session: false }),
-    archiveThreadHandler.bind(this, serverControllers)
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/threads/:id/archive',
-    passport.authenticate('jwt', { session: false }),
-    unarchiveThreadHandler.bind(this, serverControllers)
   );
 
   // login
@@ -1351,13 +1265,6 @@ registerRoute(
 
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
-
-  registerRoute(
-    router,
-    'get',
-    '/getEntityMeta',
-    getEntityMeta.bind(this, models)
-  );
 
   // snapshotAPI
   registerRoute(

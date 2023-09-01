@@ -5,15 +5,28 @@ import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {
   InvalidThreadID: 'Invalid thread ID',
-  MissingTextOrAttachment: 'Must provide text or attachment',
+  MissingText: 'Must provide text',
 };
 
 type UpdateThreadRequestBody = {
-  body?: string;
   title?: string;
-  kind?: string;
+  body?: string;
   stage?: string;
   url?: string;
+  locked?: boolean;
+  pinned?: boolean;
+  archived?: boolean;
+  spam?: boolean;
+  topicId?: number;
+  topicName?: string;
+  collaborators?: {
+    toAdd?: number[];
+    toRemove?: number[];
+  };
+  canvasSession?: any;
+  canvasAction?: any;
+  canvasHash?: any;
+  discordMeta?: any;
 };
 type UpdateThreadResponse = ThreadAttributes;
 
@@ -24,21 +37,29 @@ export const updateThreadHandler = async (
 ) => {
   const { user, address, chain } = req;
   const { id } = req.params;
-  const { body, title, stage, url } = req.body;
+  const {
+    title,
+    body,
+    stage,
+    url,
+    locked,
+    pinned,
+    archived,
+    spam,
+    topicId,
+    topicName,
+    collaborators,
+    canvasSession,
+    canvasAction,
+    canvasHash,
+    discordMeta,
+  } = req.body;
 
   const threadId = parseInt(id, 10) || 0;
-  if (!threadId) {
-    throw new AppError(Errors.InvalidThreadID);
-  }
 
-  if (
-    (!body || !body.trim()) &&
-    (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
-  ) {
-    throw new AppError(Errors.MissingTextOrAttachment);
-  }
-
-  const [updatedThread, notificationOptions] =
+  // this is a patch update, so properties should be
+  // `undefined` if they are not intended to be updated
+  const [updatedThread, notificationOptions, analyticsOptions] =
     await controllers.threads.updateThread({
       user,
       address,
@@ -48,10 +69,25 @@ export const updateThreadHandler = async (
       body,
       stage,
       url,
+      locked,
+      pinned,
+      archived,
+      spam,
+      topicId,
+      topicName,
+      collaborators,
+      canvasSession,
+      canvasAction,
+      canvasHash,
+      discordMeta,
     });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
+  }
+
+  for (const a of analyticsOptions) {
+    controllers.analytics.track(a).catch(console.error);
   }
 
   return success(res, updatedThread);

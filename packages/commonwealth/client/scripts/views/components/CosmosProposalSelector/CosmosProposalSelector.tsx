@@ -29,13 +29,11 @@ export const CosmosProposalSelector = ({
     useState(false);
   const [loadingActive, setActiveLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const { activeCosmosProposals, completedCosmosProposals } =
+  const { activeCosmosProposals = [], completedCosmosProposals = [] } =
     useGetAllCosmosProposals({
       app,
       setIsLoadingActiveProposals: setActiveLoading,
       setIsLoadingCompletedProposals: setCompletedProposalsLoading,
-      isLoadingActiveProposals: loadingActive,
-      isLoadingCompletedProposals: loadingCompletedProposals,
       needToInitAPI:
         !app.chain.apiInitialized &&
         app.chain.networkStatus !== ApiStatus.Connecting,

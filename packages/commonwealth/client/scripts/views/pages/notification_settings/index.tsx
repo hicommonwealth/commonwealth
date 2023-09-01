@@ -163,15 +163,11 @@ const NotificationSettingsPage = () => {
 
   // bundled discussion subscriptions
   const bundledSubs = bundleSubs(
-    app?.user.notifications.subscriptions.filter(
-      (x) => x.category !== 'chain-event'
-    )
+    app?.user.notifications.discussionSubscriptions
   );
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
-    app?.user.notifications.subscriptions.filter(
-      (x) => x.category === 'chain-event'
-    )
+    app?.user.notifications.chainEventSubscriptions
   );
 
   const subscribedChainIds =
@@ -441,7 +437,10 @@ const NotificationSettingsPage = () => {
                   checked={false}
                   onChange={() => {
                     app.user.notifications
-                      .subscribe(NotificationCategories.ChainEvent, chain.id)
+                      .subscribe({
+                        categoryId: NotificationCategories.ChainEvent,
+                        options: { chainId: chain.id },
+                      })
                       .then(() => {
                         forceRerender();
                       });

@@ -1,11 +1,10 @@
 import { capitalize } from 'lodash';
 import moment from 'moment';
-
+import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/user_dashboard/user_dashboard_row_top.scss';
 import './UserDashboardRowTop.scss';
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-
 import app from 'state';
 import { User } from 'views/components/user/user';
 import AddressInfo from '../../../../models/AddressInfo';
@@ -13,17 +12,23 @@ import { CWText } from '../../../components/component_kit/cw_text';
 import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
 import EmbeddedThreadCard from './EmbeddedThreadCard/index';
+import { UserDashboardRowTopSkeleton } from './UserDashboardRowTopSkeleton';
 
 type UserDashboardRowTopProps = {
   activityData: any;
   category: string;
   threadText?: string;
   threadAuthor?: string;
+  showSkeleton?: boolean;
 };
 
 export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
-  const { activityData, category, threadText, threadAuthor } = props;
+  const { activityData, category, threadText, threadAuthor, showSkeleton } = props;
   const navigate = useCommonNavigate();
+
+  if (showSkeleton) {
+    return <UserDashboardRowTopSkeleton />;
+  }
 
   const {
     created_at,

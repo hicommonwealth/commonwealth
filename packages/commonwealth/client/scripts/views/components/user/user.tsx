@@ -3,45 +3,24 @@ import { Link } from 'react-router-dom';
 
 import 'components/user/user.scss';
 
-import app from 'state';
 import { ChainBase } from 'common-common/src/types';
+import useForceRerender from 'hooks/useForceRerender';
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import { Avatar } from 'views/components/Avatar';
 import { formatAddressShort } from '../../../../../shared/utils';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
-import { CWButton } from '../component_kit/cw_button';
+import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
+import { CWButton } from '../component_kit/cw_button';
+import { Modal } from '../component_kit/cw_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
-import { Modal } from '../component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
-import useForceRerender from 'hooks/useForceRerender';
-import { Avatar } from 'views/components/Avatar';
-import Permissions from '../../../utils/Permissions';
-
-// Address can be shown in full, autotruncated with formatAddressShort(),
-// or set to a custom max character length
-export type AddressDisplayOptions = {
-  autoTruncate?: boolean;
-  maxCharLength?: number;
-  showFullAddress?: boolean;
-};
-
-type UserAttrs = {
-  addressDisplayOptions?: AddressDisplayOptions; // display full or truncated address
-  avatarOnly?: boolean; // overrides most other properties
-  avatarSize?: number;
-  hideAvatar?: boolean;
-  linkify?: boolean;
-  onClick?: (e: any) => void;
-  popover?: boolean;
-  showAddressWithDisplayName?: boolean; // show address inline with the display name
-  showAsDeleted?: boolean;
-  showRole?: boolean;
-  user: Account | AddressInfo | MinimumProfile | undefined;
-  role?: { permission: string };
-};
+import { UserSkeleton } from './UserSkeleton';
+import type { UserAttrsWithSkeletonProp } from './user.types';
 
 export const User = ({
   avatarOnly,
@@ -56,9 +35,15 @@ export const User = ({
   addressDisplayOptions,
   avatarSize: size,
   role,
-}: UserAttrs) => {
+  showSkeleton,
+}: UserAttrsWithSkeletonProp) => {
+  const avatarSize = size || 16;
+  const showAvatar = user ? !hideAvatar : false;
+
+  const popoverProps = usePopover();
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     NewProfilesController.Instance.isFetched.on('redraw', () => {
@@ -70,15 +55,18 @@ export const User = ({
     });
   }, [forceRerender]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const popoverProps = usePopover();
+  if (showSkeleton) {
+    return (
+      <UserSkeleton
+        avatarOnly={avatarOnly}
+        hideAvatar={hideAvatar}
+        popover={popover}
+        avatarSize={avatarSize}
+      />
+    );
+  }
 
   const { maxCharLength } = addressDisplayOptions || {};
-
-  const avatarSize = size || 16;
-
-  const showAvatar = user ? !hideAvatar : false;
 
   let account: Account;
   let profile: MinimumProfile;
@@ -192,11 +180,7 @@ export const User = ({
 
   const userFinal = avatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
-      <Avatar
-        url={profile?.avatarUrl}
-        size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
-        address={profile?.id}
-      />
+      <Avatar url={profile?.avatarUrl} size={16} address={profile?.id} />
     </div>
   ) : (
     <div
@@ -234,9 +218,7 @@ export const User = ({
                   profile.name
                 ) : (
                   <>
-                    <div>
-                      {profile.name}
-                    </div>
+                    <div>{profile.name}</div>
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
@@ -296,11 +278,7 @@ export const User = ({
           }}
         >
           <div className="user-avatar">
-            <Avatar
-              url={profile?.avatarUrl}
-              size={profile?.avatarUrl ? 36 : 32}
-              address={profile?.id}
-            />
+            <Avatar url={profile?.avatarUrl} size={32} address={profile?.id} />
           </div>
           <div className="user-name">
             {app.chain && app.chain.base === ChainBase.Substrate && (

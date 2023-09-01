@@ -59,14 +59,14 @@ export async function __createCommentReaction(
     where: { id: commentId },
   });
   if (!comment) {
-    throw new Error(`${Errors.CommentNotFound}: ${commentId}`);
+    throw new AppError(`${Errors.CommentNotFound}: ${commentId}`);
   }
 
   const thread = await this.models.Thread.findOne({
     where: { id: comment.thread_id },
   });
   if (!thread) {
-    throw new Error(`${Errors.ThreadNotFoundForComment}: ${commentId}`);
+    throw new AppError(`${Errors.ThreadNotFoundForComment}: ${commentId}`);
   }
 
   // check address ban
@@ -76,7 +76,7 @@ export async function __createCommentReaction(
       address: address.address,
     });
     if (!canInteract) {
-      throw new Error(`${Errors.BanError}: ${banError}`);
+      throw new AppError(`${Errors.BanError}: ${banError}`);
     }
   }
 
@@ -103,9 +103,8 @@ export async function __createCommentReaction(
           address.address
         );
       } catch (e) {
-        throw new ServerError(Errors.BalanceCheckFailed, e);
+        throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
       }
-
       if (!canReact) {
         throw new AppError(Errors.InsufficientTokenBalance);
       }
@@ -140,18 +139,19 @@ export async function __createCommentReaction(
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({
-    categoryId: NotificationCategories.NewReaction,
-    objectId: `comment-${comment.id}`,
-    notificationData: {
-      created_at: new Date(),
-      thread_id: thread.id,
-      comment_id: comment.id,
-      comment_text: comment.text,
-      root_title: thread.title,
-      root_type: null, // What is this for?
-      chain_id: finalReaction.chain,
-      author_address: finalReaction.Address.address,
-      author_chain: finalReaction.Address.chain,
+    notification: {
+      categoryId: NotificationCategories.NewReaction,
+      data: {
+        created_at: new Date(),
+        thread_id: thread.id,
+        comment_id: comment.id,
+        comment_text: comment.text,
+        root_title: thread.title,
+        root_type: null, // What is this for?
+        chain_id: finalReaction.chain,
+        author_address: finalReaction.Address.address,
+        author_chain: finalReaction.Address.chain,
+      },
     },
     webhookData: {
       user: finalReaction.Address.address,
@@ -172,6 +172,10 @@ export async function __createCommentReaction(
     community: chain.id,
     isCustomDomain: null,
   });
+
+  // update address last active
+  address.last_active = new Date();
+  address.save().catch(console.error);
 
   return [finalReaction.toJSON(), allNotificationOptions, allAnalyticsOptions];
 }

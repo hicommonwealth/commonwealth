@@ -39,36 +39,30 @@ export const createThreadHandler = async (
     discord_meta,
   } = req.body;
 
-  const attachments = req.body['attachments[]'];
-
-  const [
-    thread,
-    notificationOptions,
-    analyticsOptions,
-  ] = await controllers.threads.createThread({
-    user,
-    address,
-    chain,
-    title,
-    body,
-    kind,
-    readOnly,
-    topicId: parseInt(topicId, 10) || undefined,
-    topicName,
-    stage,
-    url,
-    attachments,
-    canvasAction,
-    canvasSession,
-    canvasHash,
-    discord_meta,
-  });
+  const [thread, notificationOptions, analyticsOptions] =
+    await controllers.threads.createThread({
+      user,
+      address,
+      chain,
+      title,
+      body,
+      kind,
+      readOnly,
+      topicId: parseInt(topicId, 10) || undefined,
+      topicName,
+      stage,
+      url,
+      canvasAction,
+      canvasSession,
+      canvasHash,
+      discordMeta: discord_meta,
+    });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
   }
 
-  controllers.analytics.track(analyticsOptions);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, thread);
 };
