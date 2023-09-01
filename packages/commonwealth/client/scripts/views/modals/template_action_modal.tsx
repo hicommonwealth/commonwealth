@@ -5,6 +5,8 @@ import 'modals/template_action_modal.scss';
 import app from 'state';
 import Thread, { Link, LinkDisplay, LinkSource } from '../../models/Thread';
 import { filterLinks, getAddedAndDeleted } from '../../helpers/threads';
+import useAddThreadLinksMutation from '../../state/api/threads/addThreadLinks';
+import { useDeleteThreadLinksMutation } from '../../state/api/threads/index';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { TemplateSelector } from '../components/template_action_selector';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -37,6 +39,14 @@ export const TemplateActionModal = ({
   const [fetched, setFetched] = useState(false);
   const [contracts, setContracts] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(false);
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
 
   // Fetch contracts
   const fetchContracts = async () => {
@@ -81,7 +91,7 @@ export const TemplateActionModal = ({
 
   const handleSaveChanges = async () => {
     try {
-      const { toAdd, toDelete } = getAddedAndDeleted(
+      const { toAdd = [], toDelete = [] } = getAddedAndDeleted(
         tempTemplates,
         getInitialTemplates(thread),
         'identifier'
@@ -103,7 +113,8 @@ export const TemplateActionModal = ({
           };
         });
 
-        const updatedThread = await app.threads.addLinks({
+        const updatedThread = await addThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: updatedLinks,
         });
@@ -112,7 +123,8 @@ export const TemplateActionModal = ({
       }
 
       if (toDelete.length > 0) {
-        const updatedThread = await app.threads.deleteLinks({
+        const updatedThread = await deleteThreadLinks({
+          chainId: app.chain.id,
           threadId: thread.id,
           links: toDelete.map(({ identifier }) => {
             const { newIdentifier } = getContractAndCct(identifier, contracts);

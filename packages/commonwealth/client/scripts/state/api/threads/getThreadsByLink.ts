@@ -6,9 +6,9 @@ import { ApiEndpoints } from 'state/api/config';
 
 const THREAD_STALE_TIME = 5000; // 5 seconds
 
-interface GetThreadsByLinkProps {
+export interface GetThreadsByLinkProps {
   chainId: string;
-  link: Link;
+  link: Link[];
   enabled: boolean;
 }
 

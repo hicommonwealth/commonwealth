@@ -11,7 +11,6 @@ import DeliveryMechanism from 'models/DeliveryMechanism';
 import app from 'state';
 
 import { NotificationStore } from 'stores';
-import Notification from '../../models/Notification';
 import { NotificationCategories } from 'common-common/src/types';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 

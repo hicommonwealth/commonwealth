@@ -12,13 +12,12 @@ import SearchController from 'controllers/server/search';
 import SessionsController from 'controllers/server/sessions';
 import { WebSocketController } from 'controllers/server/socket';
 import { UserController } from 'controllers/server/user';
+import { EventEmitter } from 'events';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
 import axios from 'axios';
-import { updateActiveUser } from 'controllers/app/login';
-import { ChainCategoryType } from 'common-common/src/types';
 import { Capacitor } from '@capacitor/core';
 import { initializeApp } from 'firebase/app';
 import {

@@ -6,7 +6,7 @@ import 'components/feed.scss';
 import type DashboardActivityNotification from '../../models/DashboardActivityNotification';
 
 import { PageNotFound } from '../pages/404';
-import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
+import { UserDashboardRow } from '../pages/user_dashboard/FeedRow/UserDashboardRow';
 
 type FeedProps = {
   fetchData: () => Promise<any>;
@@ -74,6 +74,7 @@ export const Feed = ({
               key={i}
               isChainEventsRow={isChainEventsRow}
               showSkeleton
+              notification={}
             />
           )}
         />

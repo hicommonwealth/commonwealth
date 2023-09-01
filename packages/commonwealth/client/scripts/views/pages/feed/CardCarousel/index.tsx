@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SnapshotProposalCard } from '../../snapshot_proposals/snapshot_proposal_card';
 import 'components/ProposalCard/ProposalCard.scss';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 
@@ -10,6 +9,7 @@ import {
   isWindowMediumSmallInclusive,
 } from 'views/components/component_kit/helpers';
 import { SnapshotProposal } from 'client/scripts/helpers/snapshot_utils';
+import { SnapshotProposalCard } from '../../snapshot_proposals/SnapshotProposalCard';
 
 export const CardCarousel = ({ fetchActiveProposals }) => {
   const [currentProposalsIdx, setCurrentProposalsIdx] = useState(0);
