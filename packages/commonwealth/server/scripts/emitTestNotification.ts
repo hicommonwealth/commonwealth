@@ -305,6 +305,19 @@ async function main() {
  * In order to execute this script on Frack, Frick, Beta, or any Heroku environment you must run
  * the yarn script (yarn emit-notification) on a Heroku one-off dyno.
  * To run a one-off dyno use `heroku run bash -a [app-name]`.
+ *
+ * If the mock (`-m`) option is used multiple times in succession, the same notification data will be re-emitted.
+ * This may make it appear like no new notification has been created but closer inspection of the notification ID
+ * will make it clear that a new notification was created with the same data. Additionally, emitting a non-mocked
+ * notification means the script picks a random notification (with a matching chain ID or snapshot space). This means
+ * if a mock notification was created first, we cannot guarantee that the non-mocked notification links to a real
+ * chain event. Therefore, the default is to emit a non-mocked notification and a mocked notification should only be
+ * used in rare circumstances such as in local testing when implementing a new chain event or snapshot notification
+ * type.
+ *
+ * Example usage: `yarn emit-notification -c dydx -w [your-wallet-address]`. This finds a random old dydx
+ * chain-event notification and re-emits it as if it were a brand new notification. Since it replaces an old
+ * (but real) notification, it links to a real proposal.
  */
 if (require.main === module) {
   main()
