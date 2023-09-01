@@ -413,10 +413,10 @@ export const updateRole = async (args: AssignRoleArgs) => {
 };
 
 export interface SubscriptionArgs {
-  object_id: string | number;
   jwt: any;
   is_active: boolean;
   category: string;
+  chain_id: string;
 }
 
 export const createSubscription = async (args: SubscriptionArgs) => {

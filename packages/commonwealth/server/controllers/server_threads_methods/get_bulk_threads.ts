@@ -68,6 +68,8 @@ export async function __getBulkThreads(
     'numberOfComments:desc': 'threads_number_of_comments DESC',
     'numberOfLikes:asc': 'threads_total_likes ASC',
     'numberOfLikes:desc': 'threads_total_likes DESC',
+    'latestActivity:asc': 'latest_activity ASC',
+    'latestActivity:desc': 'latest_activity DESC',
   };
 
   // get response threads from query
@@ -88,11 +90,13 @@ export async function __getBulkThreads(
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
-        collaborators
+        collaborators,
+        threads.latest_activity AS latest_activity
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
+          COALESCE(latest_comments.latest_comment_date, t.created_at) AS latest_activity,
           t.marked_as_spam_at,
           t.archived_at,
           t.updated_at AS thread_updated,
@@ -112,6 +116,13 @@ export async function __getBulkThreads(
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
         LEFT JOIN (
+          SELECT thread_id, MAX(created_at) AS latest_comment_date
+          FROM "Comments"
+          WHERE deleted_at IS NULL
+          GROUP BY thread_id
+        ) latest_comments
+        ON t.id = latest_comments.thread_id
+        LEFT JOIN (
             SELECT thread_id,
             STRING_AGG(ad.address::text, ',') AS addresses_reacted,
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
@@ -130,7 +141,7 @@ export async function __getBulkThreads(
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), t.comment_count,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes, latest_comments.latest_comment_date)
           ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
         ) threads
       ON threads.address_id = addr.id
@@ -203,6 +214,7 @@ export async function __getBulkThreads(
       reactionType: t.reaction_type ? t.reaction_type.split(',') : [],
       marked_as_spam_at: t.marked_as_spam_at,
       archived_at: t.archived_at,
+      latest_activity: t.latest_activity,
     };
     if (t.topic_id) {
       data['topic'] = {

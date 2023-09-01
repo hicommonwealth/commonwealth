@@ -67,6 +67,9 @@
   - [Preventing Data Loss](RabbitMQ-Preventing-Data-Loss.md)
   - [FAQ](RabbitMQ-FAQ.md)
 
+**Notifications**
+  - [QA](Notifications-QA.md)
+
 **Pattern Library &etc**
 - [Bouncing in Pure React](Bouncing-In-Pure-React.md)
 - [Debouncing in Pure React](Debouncing-in-Pure-React.md)
