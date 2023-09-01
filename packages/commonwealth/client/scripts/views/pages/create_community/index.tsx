@@ -23,24 +23,17 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
-  Erc20Community = 'ercToken',
-  Erc721Community = 'ercNFT',
+  Erc20Community = 'ERC20',
+  Erc721Community = 'NFT',
   SubstrateCommunity = 'Substrate',
   SputnikDao = 'Sputnik(V2)',
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
-  SplToken = 'SolanaToken',
+  SplToken = 'solana',
   Polygon = 'Polygon',
   AbiFactory = 'AbiFactory',
   CommonProtocol = 'CommonProtocol',
 }
-
-const ADMIN_ONLY_TABS = [
-  CommunityType.SubstrateCommunity,
-  CommunityType.Cosmos,
-  CommunityType.EthDao,
-  CommunityType.SputnikDao,
-];
 
 type CreateCommunityProps = {
   type?: string;
@@ -50,9 +43,9 @@ const getFormType = (type: string) => {
   switch (type) {
     case 'starter':
       return CommunityType.StarterCommunity;
-    case 'erc20':
+    case 'ERC20':
       return CommunityType.Erc20Community;
-    case 'erc721':
+    case 'NFT':
       return CommunityType.Erc721Community;
     case 'sputnik':
       return CommunityType.SputnikDao;
@@ -66,37 +59,10 @@ const getFormType = (type: string) => {
       return CommunityType.Polygon;
     case 'solana':
       return CommunityType.SplToken;
-    case 'protocol':
+    case 'CommonProtocol':
       return CommunityType.CommonProtocol;
     default:
       return CommunityType.StarterCommunity;
-  }
-};
-
-const getTypeUrl = (type: CommunityType): string => {
-  switch (type) {
-    case CommunityType.StarterCommunity:
-      return 'starter';
-    case CommunityType.Erc20Community:
-      return 'erc20';
-    case CommunityType.Erc721Community:
-      return 'erc721';
-    case CommunityType.SputnikDao:
-      return 'sputnik';
-    case CommunityType.SubstrateCommunity:
-      return 'substrate';
-    case CommunityType.Cosmos:
-      return 'cosmos';
-    case CommunityType.EthDao:
-      return 'ethdao';
-    case CommunityType.Polygon:
-      return 'polygon';
-    case CommunityType.SplToken:
-      return 'solana';
-    case CommunityType.CommonProtocol:
-      return 'protocol'
-    default:
-      return 'starter';
   }
 };
 
@@ -162,11 +128,11 @@ const CreateCommunity = (props: CreateCommunityProps) => {
     switch (type) {
       case 'starter':
         return <StarterCommunityForm />;
-      case 'erc20':
+      case 'ERC20':
         return (
           <ERC20Form ethChains={ethChains} ethChainNames={ethChainNames} />
         );
-      case 'erc721':
+      case 'NFT':
         return (
           <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
         );
@@ -186,7 +152,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
         );
       case 'solana':
         return <SplTokenForm />;
-      case "protocol":
+      case 'CommonProtocol':
         return <ProtocolCommunityForm />;
       default:
         return <StarterCommunityForm />;
@@ -198,28 +164,6 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       <CWText type="h3" fontWeight="semiBold">
         New Commonwealth Community
       </CWText>
-      <CWTabBar>
-        {Object.values(CommunityType)
-          .filter((t) => {
-            return (
-              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
-              t !== CommunityType.AbiFactory
-            );
-          })
-          .map((t, i) => {
-            return (
-              <CWTab
-                key={i}
-                label={t.toString()}
-                isSelected={currentForm === t}
-                onClick={() => {
-                  setCurrentForm(t);
-                  navigate(`/createCommunity/${getTypeUrl(t)}`);
-                }}
-              />
-            );
-          })}
-      </CWTabBar>
       {Object.keys(ethChainNames).length !== 0 ? (
         getCurrentForm()
       ) : (
