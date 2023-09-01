@@ -23,6 +23,7 @@ import { FeedbackModal } from 'views/modals/feedback_modal';
 import clsx from 'clsx';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -93,23 +94,50 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             })}
           >
             <CreateContentPopover />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="compassPhosphor"
-              onClick={() => navigate('/communities', {}, null)}
+            <CWTooltip
+              content="Explore communities"
+              placement="bottom"
+              renderTrigger={(handleInteraction) => (
+                <CWIconButton
+                  iconButtonTheme="black"
+                  iconName="compassPhosphor"
+                  onClick={() => navigate('/communities', {}, null)}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                />
+              )}
             />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="question"
-              onClick={() => setIsFeedbackModalOpen(true)}
+
+            <CWTooltip
+              content="Send feedback"
+              placement="bottom"
+              renderTrigger={(handleInteraction) => (
+                <CWIconButton
+                  iconButtonTheme="black"
+                  iconName="question"
+                  onClick={() => setIsFeedbackModalOpen(true)}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                />
+              )}
             />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="bookOpenText"
-              onClick={() =>
-                window.open('https://docs.commonwealth.im/commonwealth/')
-              }
+
+            <CWTooltip
+              content="Help"
+              placement="bottom"
+              renderTrigger={(handleInteraction) => (
+                <CWIconButton
+                  iconButtonTheme="black"
+                  iconName="bookOpenText"
+                  onClick={() =>
+                    window.open('https://docs.commonwealth.im/commonwealth/')
+                  }
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                />
+              )}
             />
+
             {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
           </div>
           {isLoggedIn && <UserDropdown />}
