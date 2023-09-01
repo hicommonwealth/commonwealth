@@ -38,6 +38,8 @@ import type { WebhookModelStatic } from './models/webhook';
 import type { CommunityContractTemplateStatic } from './models/community_contract_template';
 import type { CommunityContractTemplateMetadataStatic } from './models/community_contract_metadata';
 import type { TemplateModelStatic } from './models/template';
+import type { DeliveryMechanismModelStatic } from './models/delivery_mechanisms';
+import type { SubscriptionDeliveryModelStatic } from './models/subscription_delivery';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -56,6 +58,7 @@ export type Models = {
   CommunityBanner: CommunityBannerModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
   DiscordBotConfig: DiscordBotConfigModelStatic;
+  DeliveryMechanism: DeliveryMechanismModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
@@ -73,6 +76,7 @@ export type Models = {
   StarredCommunity: StarredCommunityModelStatic;
   SnapshotProposal: SnapshotProposalModelStatic;
   Subscription: SubscriptionModelStatic;
+  SubscriptionDelivery: SubscriptionDeliveryModelStatic;
   SnapshotSpace: SnapshotSpaceModelStatic;
   Token: TokenModelStatic;
   TaggedThread: TaggedThreadModelStatic;

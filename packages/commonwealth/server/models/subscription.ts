@@ -19,6 +19,7 @@ import type {
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
+import type { SubscriptionDeliveryAttributes } from './subscription_delivery';
 
 export type SubscriptionAttributes = {
   subscriber_id: number;
@@ -27,6 +28,7 @@ export type SubscriptionAttributes = {
   id?: number;
   is_active?: boolean;
   immediate_email?: boolean;
+  delivery_interval?: string; // added attribute
   created_at?: Date;
   updated_at?: Date;
   chain_id?: string;
@@ -40,6 +42,7 @@ export type SubscriptionAttributes = {
   Chain?: ChainAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
+  SubscriptionDelivery?: SubscriptionDeliveryAttributes[];
 };
 
 export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
@@ -83,6 +86,7 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
+      delivery_interval: { type: dataTypes.STRING, allowNull: true },
       // TODO: change allowNull to false once subscription refactor is implemented
       chain_id: { type: dataTypes.STRING, allowNull: true },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
@@ -129,6 +133,10 @@ export default (
     models.Subscription.belongsTo(models.Comment, {
       foreignKey: 'offchain_comment_id',
       targetKey: 'id',
+    });
+    models.Subscription.belongsToMany(models.DeliveryMechanism, {
+      through: 'SubscriptionDelivery',
+      foreignKey: 'subscription_id',
     });
   };
 

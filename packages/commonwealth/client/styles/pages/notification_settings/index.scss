@@ -29,6 +29,14 @@
     padding: 16px;
   }
 
+  .firebase-notification-section {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 12px;
+  }
+
   .email-management-section {
     margin-bottom: 40px;
     display: flex;
@@ -133,6 +141,16 @@
     border-bottom: 1px solid $neutral-100;
     display: flex;
     gap: 16px;
+
+    .platform-warning {
+      margin-left: 50px;
+      margin-top: 12px;
+      width: 100px; /* You can adjust this value as per your design */
+    }
+    
+    .platform-warning-text {
+      word-wrap: break-word;
+    }
 
     .notification-row-header {
       @include communityBundleColumns;

@@ -5,6 +5,7 @@ import { initAppState } from 'state';
 import { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { isSameAccount } from 'helpers';
+import axios from 'axios';
 import $ from 'jquery';
 
 import moment from 'moment';
@@ -13,10 +14,9 @@ import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
-import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
 import { CosmosExtension } from '@magic-ext/cosmos';
-import axios from 'axios';
+import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -37,10 +37,6 @@ export async function setActiveAccount(
 ): Promise<void> {
   const chain = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
-
-  if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-    await app.chain.activeAddressHasToken(account.address);
-  }
 
   if (!role || role.is_user_default) {
     app.user.ephemerallySetActiveAccount(account);
@@ -187,6 +183,8 @@ export async function updateActiveAddresses({
       .filter((addr) => addr),
     shouldRedraw
   );
+
+  getTokenBalance();
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {

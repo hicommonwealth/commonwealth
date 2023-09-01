@@ -1,6 +1,6 @@
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useEffect } from 'react';
 import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
 import { HelpMenuPopover } from 'views/menus/help_menu';
@@ -20,14 +20,37 @@ type SublayoutHeaderProps = {
 
 export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
   const navigate = useCommonNavigate();
-  const { menuVisible, setMenu, menuName, setMobileMenuName, mobileMenuName } =
-    useSidebarStore();
+  const {
+    menuVisible,
+    setMenu,
+    menuName,
+    setMobileMenuName,
+    mobileMenuName,
+    setUserToggledVisibility,
+  } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
+
+  function handleToggle() {
+    const isVisible = !menuVisible;
+    const sidebar = document.getElementsByClassName('Sidebar')[0];
+    if (sidebar) sidebar.classList.toggle('onremove', !isVisible);
+    setMenu({ name: menuName, isVisible });
+    setTimeout(() => {
+      setUserToggledVisibility(isVisible ? 'open' : 'closed');
+    }, 200);
+  }
 
   return (
     <div className="SublayoutHeader">
-      <div className="header-left">
+      {/* <div className="header-left"> */}
+      <div
+        className={`header-left ${
+          app.platform() === 'desktop' ? 'desktop' : ''
+        }`}
+      >
+        {app.platform() === 'desktop' && <CWDivider isVertical />}
         <CWIconButton
+          className="logo"
           iconName="commonLogo"
           iconButtonTheme="black"
           iconSize="xl"
@@ -42,23 +65,21 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
         {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
           app.activeChainId() && (
-            <CWCommunityAvatar
-              size="large"
-              community={app.chain.meta}
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
+            <div className="community-avatar-container">
+              <CWCommunityAvatar
+                size="large"
+                community={app.chain.meta}
+                onClick={() => {
+                  navigate('/discussions');
+                }}
+              />
+            </div>
           )}
-        {onMobile && app.activeChainId() && (
-          <CWIconButton
-            iconButtonTheme="black"
-            iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
-            onClick={() => {
-              setMenu({ name: menuName, isVisible: !menuVisible });
-            }}
-          />
-        )}
+        <CWIconButton
+          iconButtonTheme="black"
+          iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
+          onClick={handleToggle}
+        />
       </div>
       <SearchBar />
       <div className="header-right">

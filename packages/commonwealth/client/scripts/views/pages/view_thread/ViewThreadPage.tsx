@@ -1,7 +1,6 @@
 import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { modelReactionCountFromServer } from 'controllers/server/comments';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -45,7 +44,7 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { CommentsTree } from '../discussions/CommentTree';
+import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
@@ -59,6 +58,7 @@ import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { TemplateActionCard } from './template_action_card';
 import { ViewTemplateFormCard } from './view_template_form_card';
 import ViewTemplateForm from '../view_template/view_template_form';
+import { SnapshotCreationCard } from './snapshot_creation_card';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -95,8 +95,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
-  const [commentSortType, setCommentSortType] =
-    useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
+  const [commentSortType, setCommentSortType] = useState<
+    CommentsFeaturedFilterTypes
+  >(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
@@ -185,20 +186,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       .fetchThreadsFromId([+threadId])
       .then((res) => {
         const t = res[0];
-        if (t) {
-          const reactions = app.reactions.getByPost(t);
-          t.associatedReactions = reactions
-            .filter((r) => r.reaction === 'like')
-            .map((r) => {
-              return {
-                id: r.id,
-                type: 'like',
-                address: r.author,
-              };
-            });
-
-          setThread(t);
-        }
+        if (t) setThread(t);
         setThreadFetchCompleted(true);
       })
       .catch(() => {
@@ -278,19 +266,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             }),
           });
 
-          // app.reactionCounts.deinit()
           for (const rc of reactionCounts) {
-            const id = app.reactionCounts.store.getIdentifier({
+            const id = app.comments.reactionCountsStore.getIdentifier({
               threadId: rc.thread_id,
               proposalId: rc.proposal_id,
               commentId: rc.comment_id,
             });
 
-            app.reactionCounts.store.add(
+            app.comments.reactionCountsStore.add(
               modelReactionCountFromServer({ ...rc, id })
             );
 
-            app.reactionCounts.isFetched.emit('redraw', rc.comment_id);
+            app.comments.isReactionFetched.emit('redraw', rc.comment_id);
           }
         })
         .catch(() => {
@@ -503,6 +490,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isAuthor ||
     isAdminOrMod;
 
+  // Todo who should actually be able to view this
+  const canCreateSnapshotProposal =
+    app.chain?.meta?.snapshot?.length > 0 && (isAuthor || isAdminOrMod);
+
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
@@ -510,9 +501,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showLinkedTemplateOptions = linkedTemplates.length > 0;
 
+  const hasSnapshotProposal = thread.links.find(x => x.source === 'snapshot')
+
   const canComment =
     !!hasJoinedCommunity ||
-    (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
+    (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
 
   const handleLinkedThreadChange = (links: Thread['links']) => {
     const updatedThread = new Thread({
@@ -545,6 +538,35 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setThread(newThread);
   };
 
+  const handleNewSnapshotChange = async ({
+    id,
+    snapshot_title,
+  }: {
+    id: string;
+    snapshot_title: string;
+  }) => {
+    const newLink: Link = {
+      source: LinkSource.Snapshot,
+      identifier: id,
+      title: snapshot_title,
+    };
+    const toAdd = [newLink]; // Add this line to create an array with the new link
+
+    if (toAdd.length > 0) {
+      await app.threads.addLinks({
+        threadId: thread.id,
+        links: toAdd,
+      });
+    }
+
+    const newThread = {
+      ...thread,
+      links: [...thread.links, newLink],
+    } as Thread;
+
+    setThread(newThread);
+  };
+
   const editsToSave = localStorage.getItem(
     `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
   );
@@ -560,6 +582,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const fromDiscordBot =
+    thread.discord_meta !== null && thread.discord_meta !== undefined;
+
+  const showLocked =
+    (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
 
   return (
     <>
@@ -586,6 +613,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           )
         }
         author={app.chain.accounts.get(thread.author)}
+        discord_meta={thread.discord_meta}
         collaborators={thread.collaborators}
         createdAt={thread.createdAt}
         updatedAt={thread.updatedAt}
@@ -674,6 +702,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           <div className="thread-content">
             {isEditingBody ? (
               <>
+                {/*// TODO editing thread */}
                 {threadOptionsComp}
                 <EditBody
                   title={title}
@@ -687,15 +716,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ) : (
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
-                {showLinkedTemplateOptions &&
-                linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
-                  <ViewTemplateForm
-                    address={linkedTemplates[0]?.identifier.split('/')[1]}
-                    slug={linkedTemplates[0]?.identifier.split('/')[2]}
-                    setTemplateNickname={null}
-                  />
-                )}
-              {thread.readOnly ? (
+                {thread.readOnly || fromDiscordBot ? (
                   <>
                     {threadOptionsComp}
                     {!thread.readOnly && thread.markedAsSpamAt && (
@@ -712,10 +733,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         </CWText>
                       </div>
                     )}
-                    {thread.readOnly && !thread.markedAsSpamAt && (
+                    {showLocked && (
                       <LockMessage
                         lockedAt={thread.lockedAt}
                         updatedAt={thread.updatedAt}
+                        fromDiscordBot={fromDiscordBot}
                       />
                     )}
                   </>
@@ -772,7 +794,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 />
               </div>
             )}
-            <CommentsTree
+            <CommentTree
               comments={sortedComments}
               includeSpams={includeSpamThreads}
               thread={thread}
@@ -783,6 +805,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               parentCommentId={parentCommentId}
               setParentCommentId={setParentCommentId}
               canComment={canComment}
+              fromDiscordBot={fromDiscordBot}
             />
           </>
         }
@@ -790,65 +813,81 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           [
             ...(showLinkedProposalOptions || showLinkedThreadOptions
               ? [
-                  {
-                    label: 'Links',
-                    item: (
-                      <div className="cards-column">
-                        {showLinkedProposalOptions && (
-                          <LinkedProposalsCard
-                            onChangeHandler={handleLinkedProposalChange}
-                            thread={thread}
-                            showAddProposalButton={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                        {showLinkedThreadOptions && (
-                          <LinkedThreadsCard
-                            thread={thread}
-                            allowLinking={isAuthor || isAdminOrMod}
-                            onChangeHandler={handleLinkedThreadChange}
-                          />
-                        )}
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Links',
+                  item: (
+                    <div className="cards-column">
+                      {showLinkedProposalOptions && (
+                        <LinkedProposalsCard
+                          onChangeHandler={handleLinkedProposalChange}
+                          thread={thread}
+                          showAddProposalButton={isAuthor || isAdminOrMod}
+                        />
+                      )}
+                      {showLinkedThreadOptions && (
+                        <LinkedThreadsCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                          onChangeHandler={handleLinkedThreadChange}
+                        />
+                      )}
+                    </div>
+                  ),
+                },
+              ]
+              : []),
+            ...(canCreateSnapshotProposal && !hasSnapshotProposal
+              ? [
+                {
+                  label: 'Snapshot',
+                  item: (
+                    <div className="cards-column">
+                      <SnapshotCreationCard
+                        thread={thread}
+                        allowSnapshotCreation={isAuthor || isAdminOrMod}
+                        onChangeHandler={handleNewSnapshotChange}
+                      />
+                    </div>
+                  ),
+                },
+              ]
               : []),
             ...(polls?.length > 0 ||
-            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
               ? [
-                  {
-                    label: 'Polls',
-                    item: (
-                      <div className="cards-column">
-                        {[
-                          ...new Map(
-                            polls?.map((poll) => [poll.id, poll])
-                          ).values(),
-                        ].map((poll: Poll) => {
-                          return (
-                            <ThreadPollCard
-                              poll={poll}
-                              key={poll.id}
-                              onVote={() => setInitializedPolls(false)}
-                              showDeleteButton={isAuthor || isAdmin}
-                              onDelete={() => {
-                                setInitializedPolls(false);
-                              }}
-                            />
-                          );
-                        })}
-                        {isAuthor &&
-                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                            <ThreadPollEditorCard
-                              thread={thread}
-                              threadAlreadyHasPolling={!polls?.length}
-                              onPollCreate={() => setInitializedPolls(false)}
-                            />
-                          )}
-                      </div>
-                    ),
-                  },
-                ]
+                {
+                  label: 'Polls',
+                  item: (
+                    <div className="cards-column">
+                      {[
+                        ...new Map(
+                          polls?.map((poll) => [poll.id, poll])
+                        ).values(),
+                      ].map((poll: Poll) => {
+                        return (
+                          <ThreadPollCard
+                            poll={poll}
+                            key={poll.id}
+                            onVote={() => setInitializedPolls(false)}
+                            showDeleteButton={isAuthor || isAdmin}
+                            onDelete={() => {
+                              setInitializedPolls(false);
+                            }}
+                          />
+                        );
+                      })}
+                      {isAuthor &&
+                        (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                          <ThreadPollEditorCard
+                            thread={thread}
+                            threadAlreadyHasPolling={!polls?.length}
+                            onPollCreate={() => setInitializedPolls(false)}
+                          />
+                        )}
+                    </div>
+                  ),
+                },
+              ]
               : []),
             ...(showLinkedTemplateOptions &&
           linkedTemplates[0]?.display !== LinkDisplay.inline

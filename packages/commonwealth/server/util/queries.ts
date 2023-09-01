@@ -1,5 +1,6 @@
 import type { IPagination } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
+import { TypedPaginatedResult } from 'server/types';
 
 /*
 These methods are for generating the sequelize formatting for
@@ -59,7 +60,9 @@ export type PaginationSqlOptions = {
   limit?: number;
   page?: number;
   orderBy?: string;
+  orderBySecondary?: string;
   orderDirection?: 'ASC' | 'DESC';
+  orderDirectionSecondary?: 'ASC' | 'DESC';
   nullsLast?: boolean;
 };
 export type PaginationSqlResult = {
@@ -72,19 +75,46 @@ export type PaginationSqlResult = {
 };
 export type PaginationSqlBind = PaginationSqlResult['bind'];
 
+export const validateOrderDirection = (
+  orderDirection: string,
+  allowEmpty?: boolean
+): boolean => {
+  if (allowEmpty && !orderDirection) {
+    return true;
+  }
+  return ['ASC', 'DESC'].includes(orderDirection);
+};
+
 export const buildPaginationSql = (
   options: PaginationSqlOptions
 ): PaginationSqlResult => {
-  const { limit, page, orderBy, orderDirection, nullsLast } = options;
+  const {
+    limit,
+    page,
+    orderBy,
+    orderBySecondary,
+    orderDirection,
+    orderDirectionSecondary,
+    nullsLast,
+  } = options;
   let sql = '';
   const bind: PaginationSqlBind = {};
   if (typeof limit === 'number') {
     sql += `ORDER BY ${orderBy} `;
-    if (['ASC', 'DESC'].includes(orderDirection)) {
+    if (validateOrderDirection(orderDirection)) {
       sql += `${orderDirection} `;
       if (nullsLast) {
         sql += 'NULLS LAST ';
       }
+    } else {
+      sql += 'DESC ';
+    }
+  }
+  // TODO: check if nullsLast works with secondary order
+  if (orderBy && orderBySecondary) {
+    sql += `, ${orderBySecondary} `;
+    if (validateOrderDirection(orderDirectionSecondary)) {
+      sql += `${orderDirectionSecondary} `;
     } else {
       sql += 'DESC ';
     }
@@ -99,3 +129,17 @@ export const buildPaginationSql = (
   }
   return { sql, bind };
 };
+
+export function buildPaginatedResponse<T>(
+  items: T[],
+  totalResults: number,
+  bind: PaginationSqlBind
+): TypedPaginatedResult<T> {
+  return {
+    results: items,
+    limit: bind.limit,
+    page: Math.floor(bind.offset / bind.limit) + 1,
+    totalPages: Math.floor(totalResults / bind.limit) + 1,
+    totalResults,
+  };
+}

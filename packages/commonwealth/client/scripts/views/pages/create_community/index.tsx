@@ -18,7 +18,8 @@ import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
 import { ProtocolCommunityForm } from './protocol_community';
 import { PolygonForm } from './polygon_form';
-import { useParams } from 'react-router';
+import { useCommonNavigate } from 'navigation/helpers';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -41,8 +42,79 @@ const ADMIN_ONLY_TABS = [
   CommunityType.SputnikDao,
 ];
 
-const CreateCommunity = () => {
-  const { communityType } = useParams();
+type CreateCommunityProps = {
+  type?: string;
+};
+
+const getFormType = (type: string) => {
+  switch (type) {
+    case 'starter':
+      return CommunityType.StarterCommunity;
+    case 'erc20':
+      return CommunityType.Erc20Community;
+    case 'erc721':
+      return CommunityType.Erc721Community;
+    case 'sputnik':
+      return CommunityType.SputnikDao;
+    case 'substrate':
+      return CommunityType.SubstrateCommunity;
+    case 'cosmos':
+      return CommunityType.Cosmos;
+    case 'ethdao':
+      return CommunityType.EthDao;
+    case 'polygon':
+      return CommunityType.Polygon;
+    case 'solana':
+      return CommunityType.SplToken;
+    case 'protocol':
+      return CommunityType.CommonProtocol;
+    default:
+      return CommunityType.StarterCommunity;
+  }
+};
+
+const getTypeUrl = (type: CommunityType): string => {
+  switch (type) {
+    case CommunityType.StarterCommunity:
+      return 'starter';
+    case CommunityType.Erc20Community:
+      return 'erc20';
+    case CommunityType.Erc721Community:
+      return 'erc721';
+    case CommunityType.SputnikDao:
+      return 'sputnik';
+    case CommunityType.SubstrateCommunity:
+      return 'substrate';
+    case CommunityType.Cosmos:
+      return 'cosmos';
+    case CommunityType.EthDao:
+      return 'ethdao';
+    case CommunityType.Polygon:
+      return 'polygon';
+    case CommunityType.SplToken:
+      return 'solana';
+    case CommunityType.CommonProtocol:
+      return 'protocol'
+    default:
+      return 'starter';
+  }
+};
+
+const CreateCommunity = (props: CreateCommunityProps) => {
+  const { type } = props;
+  const navigate = useCommonNavigate();
+
+  useEffect(() => {
+    if (!type) {
+      navigate('/createCommunity/starter');
+    } else {
+      setCurrentForm(getFormType(type));
+    }
+  }, [type]);
+
+  const [currentForm, setCurrentForm] = useState<CommunityType>(
+    getFormType(type)
+  );
   const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
     useEthChainFormState();
 
@@ -87,37 +159,37 @@ const CreateCommunity = () => {
   }, [ethChains]);
 
   const getCurrentForm = () => {
-    switch (communityType) {
-      case CommunityType.StarterCommunity:
+    switch (type) {
+      case 'starter':
         return <StarterCommunityForm />;
-      case CommunityType.Erc20Community:
+      case 'erc20':
         return (
           <ERC20Form ethChains={ethChains} ethChainNames={ethChainNames} />
         );
-      case CommunityType.Erc721Community:
+      case 'erc721':
         return (
           <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
         );
-      case CommunityType.SputnikDao:
+      case 'sputnik':
         return <SputnikForm />;
-      case CommunityType.SubstrateCommunity:
+      case 'substrate':
         return <SubstrateForm />;
-      case CommunityType.Cosmos:
+      case 'cosmos':
         return <CosmosForm />;
-      case CommunityType.EthDao:
+      case 'ethdao':
         return (
           <EthDaoForm ethChains={ethChains} ethChainNames={ethChainNames} />
         );
-      case CommunityType.Polygon:
+      case 'polygon':
         return (
           <PolygonForm ethChains={ethChains} ethChainNames={ethChainNames} />
         );
-      case CommunityType.SplToken:
+      case 'solana':
         return <SplTokenForm />;
-      case CommunityType.CommonProtocol:
+      case "protocol":
         return <ProtocolCommunityForm />;
       default:
-        throw new Error(`Invalid community type: ${communityType}`);
+        return <StarterCommunityForm />;
     }
   };
 
@@ -126,7 +198,35 @@ const CreateCommunity = () => {
       <CWText type="h3" fontWeight="semiBold">
         New Commonwealth Community
       </CWText>
-      {getCurrentForm()}
+      <CWTabBar>
+        {Object.values(CommunityType)
+          .filter((t) => {
+            return (
+              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
+              t !== CommunityType.AbiFactory
+            );
+          })
+          .map((t, i) => {
+            return (
+              <CWTab
+                key={i}
+                label={t.toString()}
+                isSelected={currentForm === t}
+                onClick={() => {
+                  setCurrentForm(t);
+                  navigate(`/createCommunity/${getTypeUrl(t)}`);
+                }}
+              />
+            );
+          })}
+      </CWTabBar>
+      {Object.keys(ethChainNames).length !== 0 ? (
+        getCurrentForm()
+      ) : (
+        <div className="SpinnerContainer">
+          <CWSpinner />
+        </div>
+      )}
     </div>
   );
 };

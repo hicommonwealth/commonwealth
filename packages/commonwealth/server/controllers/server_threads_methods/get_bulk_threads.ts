@@ -78,7 +78,7 @@ export async function __getBulkThreads(
         threads.marked_as_spam_at,
         threads.archived_at,
         thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
-        threads.read_only, threads.body, threads.stage,
+        threads.read_only, threads.body, threads.stage, threads.discord_meta,
         threads.has_poll, threads.plaintext,
         threads.url, threads.pinned, COALESCE(threads.number_of_comments,0) as threads_number_of_comments,
         threads.reaction_ids, threads.reaction_type, threads.addresses_reacted, COALESCE(threads.total_likes, 0) as threads_total_likes,
@@ -95,7 +95,7 @@ export async function __getBulkThreads(
           t.archived_at,
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
-          t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
+          t.chain AS thread_chain, t.read_only, t.body, t.discord_meta, comments.number_of_comments,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes,
           t.has_poll,
           t.plaintext,
@@ -198,6 +198,7 @@ export async function __getBulkThreads(
       kind: t.kind,
       stage: t.stage,
       read_only: t.read_only,
+      discord_meta: t.discord_meta,
       pinned: t.pinned,
       chain: t.thread_chain,
       created_at: t.thread_created,
@@ -246,9 +247,8 @@ export async function __getBulkThreads(
       type: QueryTypes.SELECT,
     }
   );
-  const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
-  ).length;
+  const numVotingThreads = threadsInVoting.filter((t) => t.stage === 'voting')
+    .length;
 
   threads = await Promise.all(threads);
 

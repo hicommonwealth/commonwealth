@@ -21,6 +21,7 @@ coverage/
 *.csv
 cache/
 stats.json
+serviceAccountKey.json
 
 # Database downloads
 latest.dump

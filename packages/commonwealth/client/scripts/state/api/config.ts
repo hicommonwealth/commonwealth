@@ -12,4 +12,13 @@ export const ApiEndpoints = {
   // endpoint builder functions like getEndpoint(id) => /endpoint/:id should have camel cased keys
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
   BULK_TOPICS: '/bulkTopics',
+  DISCORD_CHANNELS: '/getDiscordChannels',
+
+  getCommentReactions: (commentId: number) =>
+    `/comments/${commentId}/reactions`,
+
+  searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
+  searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
+  searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
+  searchChains: (searchTerm: string) => `/chains?search=${searchTerm}`,
 };

@@ -9,10 +9,15 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { CommunityType } from '../pages/create_community';
 
 const resetSidebarState = () => {
-  sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  if (sidebarStore.getState().userToggledVisibility !== 'open') {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  } else {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
+  }
 };
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
@@ -260,7 +265,10 @@ export const CreateContentSidebar = () => {
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            setMenu({ name: 'default', isVisible: false });
+            const isSidebarOpen = Boolean(
+              sidebarStore.getState().userToggledVisibility
+            );
+            setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },
       }}
@@ -288,12 +296,13 @@ export const CreateContentMenu = () => {
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   if (
     !isLoggedIn ||
     !app.chain ||
     !app.activeChainId() ||
-    !app.user.activeAccount
+    !hasJoinedCommunity
   ) {
     return;
   }
