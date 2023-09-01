@@ -65,7 +65,9 @@ const UserDropdown = () => {
     walletAddress: string;
   }>(null);
 
-  const { authenticatedAddresses } = useCheckAuthenticatedAddresses();
+  const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
+    recheck: isOpen,
+  });
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
@@ -85,10 +87,6 @@ const UserDropdown = () => {
           />
         ),
         onClick: async () => {
-          if (isActive) {
-            return;
-          }
-
           if (signed) {
             return await setActiveAccount(account);
           }

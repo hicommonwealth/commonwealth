@@ -3,7 +3,13 @@ import app from 'state';
 import { chainBaseToCanvasChainId } from 'canvas';
 import { ChainBase } from 'common-common/src/types';
 
-const useCheckAuthenticatedAddresses = () => {
+interface UseCheckAuthenticatedAddressesProps {
+  recheck: boolean;
+}
+
+const useCheckAuthenticatedAddresses = ({
+  recheck,
+}: UseCheckAuthenticatedAddressesProps) => {
   const userActiveAccounts = app.user.activeAccounts;
   const chainBase = app.chain?.base;
   const idOrPrefix =
@@ -17,6 +23,10 @@ const useCheckAuthenticatedAddresses = () => {
   }>({});
 
   useEffect(() => {
+    if (!recheck) {
+      return;
+    }
+
     const promises = userActiveAccounts.map(async (activeAccount) => {
       const isAuth = await app.sessions
         .getSessionController(chainBase)
@@ -31,7 +41,7 @@ const useCheckAuthenticatedAddresses = () => {
       const reduced = response.reduce((acc, curr) => ({ ...acc, ...curr }), {});
       setAuthenticatedAddresses(reduced);
     });
-  }, [canvasChainId, chainBase, userActiveAccounts]);
+  }, [canvasChainId, chainBase, userActiveAccounts, recheck]);
 
   return { authenticatedAddresses };
 };

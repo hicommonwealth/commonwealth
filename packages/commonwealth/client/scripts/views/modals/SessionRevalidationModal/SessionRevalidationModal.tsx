@@ -18,6 +18,7 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import { X } from '@phosphor-icons/react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { setActiveAccount } from 'controllers/app/login';
 
 interface SessionRevalidationModalProps {
   onModalClose: () => void;
@@ -44,9 +45,11 @@ const SessionRevalidationModal = ({
     onModalClose: () => {
       // do nothing, let the user close out of session revalidation
     },
-    onSuccess: (signedAddress) => {
+    onSuccess: async (signedAddress) => {
       onModalClose();
 
+      // if user tries to sign in with different address than
+      // expected for session key revalidation
       if (signedAddress !== walletAddress) {
         openConfirmation({
           title: 'Address mismatch',
@@ -62,6 +65,11 @@ const SessionRevalidationModal = ({
           buttons: [],
           className: 'AddressMismatch',
         });
+      } else {
+        const updatedAddress = app.user.activeAccounts.find(
+          (addr) => addr.address === walletAddress
+        );
+        await setActiveAccount(updatedAddress);
       }
     },
   });
