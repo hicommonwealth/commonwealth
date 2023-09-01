@@ -1,5 +1,5 @@
-import { ServerControllers } from 'server/routing/router';
-import { TypedRequest, TypedResponse, success } from 'server/types';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 type GetPollVotesParams = {
   id: string;

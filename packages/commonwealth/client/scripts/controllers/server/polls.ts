@@ -6,6 +6,7 @@ import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
 import PollStore from 'stores/PollStore';
 import Poll from '../../models/Poll';
 import Vote from '../../models/Vote';
+import axios from 'axios';
 
 export const modelFromServer = (poll) => {
   const {
@@ -84,10 +85,9 @@ class PollsController {
     const { threadId, prompt, options, customDuration, authorChain, address } =
       args;
 
-    await $.ajax({
-      url: `${app.serverUrl()}/threads/${threadId}/polls`,
-      type: 'POST',
-      data: {
+    const response = await axios.post(
+      `${app.serverUrl()}/threads/${threadId}/polls`,
+      {
         chain: app.activeChainId(),
         author_chain: authorChain,
         address,
@@ -95,25 +95,16 @@ class PollsController {
         prompt,
         options,
         custom_duration: customDuration?.split(' ')[0],
-      },
-      success: (response) => {
-        const modeledPoll = modelFromServer(response.result);
-        // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
-        // This is an exception until polls get migrated to react query
-        updateThreadInAllCaches(app.activeChainId(), threadId, {
-          hasPoll: true,
-        });
-        this._store.add(modeledPoll);
-      },
-      error: (err) => {
-        console.log('Failed to initialize polling');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to initialize polling'
-        );
-      },
+      }
+    );
+
+    const modeledPoll = modelFromServer(response.data.result);
+    // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
+    // This is an exception until polls get migrated to react query
+    updateThreadInAllCaches(app.activeChainId(), threadId, {
+      hasPoll: true,
     });
+    this._store.add(modeledPoll);
   }
 
   public async deletePoll(args: {

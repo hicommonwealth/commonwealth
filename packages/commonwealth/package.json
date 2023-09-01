@@ -57,7 +57,6 @@
     "stylelint": "stylelint client/styles/*",
     "test": "nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
     "test-api": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'",
-    "test-api-polls": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/polls.spec.ts'",
     "test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
     "test-consumer": "ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000",
     "test-devnet": "nyc ts-mocha --project tsconfig.json './test/devnet/**/*.spec.ts'",

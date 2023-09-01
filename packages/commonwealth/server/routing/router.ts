@@ -175,7 +175,7 @@ import { createThreadPollHandler } from '../routes/threads/create_thread_poll_ha
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls';
 import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
-import { getPollVotesHandler } from 'server/routes/polls/get_poll_votes_handler';
+import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
