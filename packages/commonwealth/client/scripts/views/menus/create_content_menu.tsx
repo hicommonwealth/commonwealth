@@ -14,7 +14,11 @@ import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { featureFlags } from 'helpers/feature-flags';
 import Permissions from '../../utils/Permissions';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { AnchorType } from 'views/components/component_kit/cw_popover/cw_popover';
+import {
+  handleIconClick,
+  handleMouseEnter,
+  handleMouseLeave,
+} from 'views/menus/utils';
 
 const resetSidebarState = () => {
   sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -289,17 +293,6 @@ export const CreateContentMenu = () => {
   );
 };
 
-interface MouseEnterOrLeaveProps {
-  e: React.MouseEvent<AnchorType>;
-  isMenuOpen?: boolean;
-  isTooltipOpen?: boolean;
-  handleInteraction: (e: React.MouseEvent<AnchorType>) => void;
-}
-
-interface HandleIconClickProps extends MouseEnterOrLeaveProps {
-  onClick: (e: React.MouseEvent<AnchorType>) => void;
-}
-
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
@@ -313,45 +306,6 @@ export const CreateContentPopover = () => {
   ) {
     return;
   }
-
-  const handleIconClick = ({
-    e,
-    isMenuOpen,
-    isTooltipOpen,
-    handleInteraction,
-    onClick,
-  }: HandleIconClickProps) => {
-    // close tooltip on menu click
-    if (!isMenuOpen && isTooltipOpen) {
-      handleInteraction(e);
-    }
-    onClick(e);
-  };
-
-  const handleMouseEnter = ({
-    e,
-    isMenuOpen,
-    handleInteraction,
-  }: MouseEnterOrLeaveProps) => {
-    // prevent showing tooltip if menu is opened
-    if (isMenuOpen) {
-      return;
-    }
-    handleInteraction(e);
-  };
-
-  const handleMouseLeave = ({
-    e,
-    isTooltipOpen,
-    handleInteraction,
-  }: MouseEnterOrLeaveProps) => {
-    // handleInteraction just toggles the value, so here prevent showing
-    // the tooltip when you moving mouse away from the icon
-    if (!isTooltipOpen) {
-      return;
-    }
-    handleInteraction(e);
-  };
 
   return (
     <PopoverMenu
