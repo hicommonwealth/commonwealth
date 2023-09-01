@@ -10,6 +10,7 @@ import {
 import { SubscriptionInstance } from '../models/subscription';
 import { factory, formatFilename } from 'common-common/src/logging';
 import emitNotifications from '../util/emitNotifications';
+import { DATABASE_URI } from '../config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -294,6 +295,11 @@ async function main() {
   log.info('Notification successfully emitted');
 }
 
+/**
+ * In order to execute this script on Frack, Frick, Beta, or any Heroku environment you must run
+ * the yarn script (yarn emit-notification) on a Heroku one-off dyno.
+ * To run a one-off dyno use `heroku run bash -a [app-name]`.
+ */
 if (require.main === module) {
   main()
     .then(() => {
