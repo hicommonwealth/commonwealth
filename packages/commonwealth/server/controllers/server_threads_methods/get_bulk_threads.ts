@@ -141,7 +141,7 @@ export async function __getBulkThreads(
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), t.comment_count,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes, latest_comments.latest_comment_date)
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, latest_comments.latest_comment_date)
           ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
         ) threads
       ON threads.address_id = addr.id
