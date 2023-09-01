@@ -13,9 +13,9 @@ export const getPollVotesHandler = async (
 ) => {
   const { id: pollId } = req.params;
 
-  await controllers.polls.getPollVotes({
+  const votes = await controllers.polls.getPollVotes({
     pollId: parseInt(pollId, 10),
   });
 
-  return success(res, null);
+  return success(res, votes);
 };

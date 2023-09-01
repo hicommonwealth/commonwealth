@@ -20,7 +20,7 @@ export type CreateThreadPollOptions = {
   chain: ChainInstance;
   threadId: number;
   prompt: string;
-  options: string;
+  options: string[];
   customDuration?: string;
 };
 export type CreateThreadPollResult = PollAttributes;
@@ -95,7 +95,7 @@ export async function __createThreadPoll(
         thread_id: thread.id,
         chain_id: thread.chain,
         prompt,
-        options,
+        options: JSON.stringify(options),
         ends_at,
       },
       { transaction }

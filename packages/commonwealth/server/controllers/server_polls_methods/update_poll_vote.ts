@@ -16,6 +16,7 @@ export const Errors = {
   PollingClosed: 'Polling already finished',
   BalanceCheckFailed: 'Could not verify user token balance',
   InsufficientTokenBalance: 'Insufficient token balance',
+  ParseError: 'Failed to parse poll options',
 };
 
 export type UpdatePollVoteOptions = {
@@ -43,12 +44,16 @@ export async function __updatePollVote(
   }
 
   // Ensure user has passed a valid poll response
-  let selected_option;
-  try {
-    const pollOptions = JSON.parse(poll.options);
-    selected_option = pollOptions.find((o: string) => o === option);
-    if (!option) throw new AppError(Errors.InvalidOption);
-  } catch (e) {
+  const pollOptions = (() => {
+    try {
+      return JSON.parse(poll.options);
+    } catch (err) {
+      throw new AppError(Errors.ParseError);
+    }
+  })();
+
+  const selectedOption = pollOptions.find((o: string) => o === option);
+  if (!selectedOption) {
     throw new AppError(Errors.InvalidOption);
   }
 
@@ -90,7 +95,7 @@ export async function __updatePollVote(
     return this.models.Vote.create(
       {
         ...voteData,
-        option: selected_option,
+        option: selectedOption,
       },
       { transaction }
     );

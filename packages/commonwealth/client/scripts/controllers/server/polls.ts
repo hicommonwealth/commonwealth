@@ -93,7 +93,7 @@ class PollsController {
         address,
         jwt: app.user.jwt,
         prompt,
-        options: JSON.stringify(options),
+        options,
         custom_duration: customDuration?.split(' ')[0],
       },
       success: (response) => {
