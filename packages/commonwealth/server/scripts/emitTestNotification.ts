@@ -151,11 +151,17 @@ async function setupNotification(
   }
 
   if (existingNotifications.length === 0) {
-    throw new Error(
-      `No existing chain-event notification found for ${
-        chainId || snapshotId
-      }. ` + `Please try a different ${chainId ? 'chain id' : 'snapshot id'}.`
-    );
+    let msg: string;
+    if (chainId) {
+      msg =
+        `No existing chain-event notification found for ${chainId}. ` +
+        `Please use a chain id that has existing notifications e.g. dydx`;
+    } else {
+      msg =
+        `No existing snapshot-proposal notification found for ${snapshotId}. ` +
+        `Please use a snapshot id that has existing notifications e.g. stgdao.eth`;
+    }
+    throw new Error(msg);
   }
 
   const existingNotif = existingNotifications[0];
