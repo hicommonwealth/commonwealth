@@ -23,13 +23,81 @@ enum SupportedNotificationSpaces {
 }
 
 const ceNotifications = {
-  [SupportedNotificationChains.dydx]: {},
-  [SupportedNotificationChains.osmosis]: {},
+  [SupportedNotificationChains.dydx]: {
+    queued: 0,
+    id: 123456789,
+    block_number: 17477983,
+    event_data: {
+      id: 999999999,
+      kind: 'proposal-created',
+      values: ['0'],
+      targets: ['0xE710CEd57456D3A16152c32835B5FB4E72D9eA5b'],
+      endBlock: 17510899,
+      executor: '0x64c7d40c07EFAbec2AafdC243bF59eaF2195c6dc',
+      ipfsHash:
+        '0x5aca381042cb641c1000126d5a183c38b17492eb60a86910973d0c3f1e867f43',
+      proposer: '0xB933AEe47C438f22DE0747D57fc239FE37878Dd1',
+      strategy: '0x90Dfd35F4a0BB2d30CDf66508085e33C353475D9',
+      calldatas: ['randomcalldatas'],
+      signatures: ['transfer(address,address,uint256)'],
+      startBlock: 17484576,
+    },
+    network: 'aave',
+    chain: 'dydx',
+    updated_at: '2023-06-19T11:50:52.308Z',
+    created_at: '2023-06-19T11:50:52.262Z',
+  },
 };
 
 const snapshotNotifications = {
-  [SupportedNotificationSpaces.stgdao]: {},
+  [SupportedNotificationSpaces.stgdao]: {
+    eventType: 'proposal/created',
+    space: SupportedNotificationSpaces.stgdao,
+    id: '0xrandomid',
+    title: 'Test Snapshot Proposal Title',
+    body: 'Test snapshot proposal body',
+    choices: ['Yes', 'No', 'Abstain'],
+    start: 1691423562,
+    expire: 1691872844,
+  },
 };
+
+async function getExistingNotifications(
+  transaction: Transaction,
+  chainId?: string,
+  snapshotId?: string
+): Promise<NotificationInstance[]> {
+  let existingNotifications: NotificationInstance[];
+  if (chainId) {
+    log.info(`Replacing a real notification for chain: ${chainId}`);
+    existingNotifications = await models.Notification.findAll({
+      where: {
+        category_id: NotificationCategories.ChainEvent,
+        chain_id: chainId,
+      },
+      order: Sequelize.literal(`RANDOM()`),
+      limit: 1,
+      transaction,
+    });
+  } else {
+    log.info(`Replacing a real notification for snapshot space: ${snapshotId}`);
+    existingNotifications = await models.Notification.findAll({
+      where: {
+        category_id: NotificationCategories.SnapshotProposal,
+        [Sequelize.Op.and]: [
+          Sequelize.literal(
+            `notification_data::jsonb ->> 'space' = '${snapshotId}'`
+          ),
+        ],
+      },
+      order: Sequelize.literal('RANDOM()'),
+      limit: 1,
+      transaction,
+    });
+  }
+
+  return existingNotifications;
+}
 
 /**
  * Creates a notification. IF mockNotification is true, then a fake notification is created. If mock is false, then
@@ -51,41 +119,34 @@ async function setupNotification(
     throw new Error('Must provide either a chainId or a snapshotId');
   }
 
-  if (mockNotification && chainId) {
-    return ceNotifications[chainId];
-  } else if (mockNotification && snapshotId) {
-    return snapshotNotifications[snapshotId];
-  }
-
   let existingNotifications: NotificationInstance[];
-  if (chainId) {
-    log.info(`Replacing a real notification for chain: ${chainId}`);
-    existingNotifications = await models.Notification.findAll({
+  if (mockNotification && chainId) {
+    const existingCeMockNotif = await models.Notification.findAll({
       where: {
         category_id: NotificationCategories.ChainEvent,
         chain_id: chainId,
-      },
-      order: Sequelize.literal(
-        `notification_data::jsonb -> 'event_data' ->> 'id'`
-      ),
-      limit: 1,
-      transaction,
-    });
-  } else {
-    log.info(`Replacing a real notification for snapshot space: ${snapshotId}`);
-    existingNotifications = await models.Notification.findAll({
-      where: {
-        category_id: NotificationCategories.SnapshotProposal,
         [Sequelize.Op.and]: [
           Sequelize.literal(
-            `notification_data::jsonb ->> 'space' = '${snapshotId}'`
+            `notification_data::jsonb -> 'event_data' ->> 'id' = '${ceNotifications[chainId].event_data.id}'`
           ),
         ],
       },
-      order: [['created_at', 'DESC']],
-      limit: 1,
-      transaction,
+      logging: console.log,
     });
+
+    if (existingCeMockNotif.length > 0)
+      existingNotifications = existingCeMockNotif;
+    else return JSON.stringify(ceNotifications[chainId]);
+  } else if (mockNotification && snapshotId) {
+    return JSON.stringify(snapshotNotifications[snapshotId]);
+  }
+
+  if (!existingNotifications) {
+    existingNotifications = await getExistingNotifications(
+      transaction,
+      chainId,
+      snapshotId
+    );
   }
 
   if (existingNotifications.length === 0) {
@@ -215,8 +276,12 @@ async function main() {
 
     await transaction.commit();
   } catch (e) {
-    await transaction?.rollback();
+    await transaction.rollback();
     throw e;
+  }
+
+  if (!notifData) {
+    throw new Error('No notification data found');
   }
 
   await emitNotifications(models, {
@@ -235,7 +300,7 @@ if (require.main === module) {
       process.exit(0);
     })
     .catch((err) => {
-      log.error(err);
+      console.log('Failed to emit a notification:', err);
       process.exit(1);
     });
 }
