@@ -208,7 +208,7 @@ async function main() {
       type: 'number',
       demandOption: false,
       conflicts: 'wallet_address',
-      description: 'uUser id of the user to generate a test notification for',
+      description: 'User id of the user to generate a test notification for',
     },
     mock_notification: {
       alias: 'm',
