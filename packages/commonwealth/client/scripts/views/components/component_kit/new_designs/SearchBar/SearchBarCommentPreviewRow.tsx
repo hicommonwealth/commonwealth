@@ -7,6 +7,8 @@ import { CWText } from '../../cw_text';
 import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';
 import { QuillRenderer } from '../../../react_quill_editor/quill_renderer';
 
+import './SearchBarCommentPreviewRow.scss';
+
 interface SearchBarCommentPreviewRowProps {
   searchResult: ReplyResult;
   searchTerm?: string;

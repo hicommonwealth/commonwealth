@@ -5,6 +5,8 @@ import { useCommonNavigate } from '../../../../../navigation/helpers';
 import ChainInfo from '../../../../../models/ChainInfo';
 import { CommunityLabel } from '../../../community_label';
 
+import './SearchBarCommunityPreviewRow.scss';
+
 interface SearchBarCommunityPreviewRowProps {
   searchResult: CommunityResult;
   searchTerm?: string;

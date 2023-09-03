@@ -5,6 +5,8 @@ import { MemberResult } from '../../../../../views/pages/search/helpers';
 import { User } from '../../../user/user';
 import NewProfilesController from '../../../../../controllers/server/newProfiles';
 
+import './SearchBarMemberPreviewRow.scss';
+
 interface SearchBarMemberPreviewRowProps {
   searchResult: MemberResult;
   searchTerm?: string;

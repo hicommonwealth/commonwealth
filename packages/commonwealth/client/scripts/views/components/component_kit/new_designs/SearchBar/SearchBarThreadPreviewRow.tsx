@@ -9,6 +9,8 @@ import { renderTruncatedHighlights } from '../../../react_quill_editor/highlight
 import { QuillRenderer } from '../../../react_quill_editor/quill_renderer';
 import { User } from '../../../user/user';
 
+import './SearchBarThreadPreviewRow.scss';
+
 interface SearchBarThreadPreviewRowProps {
   searchResult: ThreadResult;
   searchTerm?: string;
