@@ -1,7 +1,6 @@
 import type { CWEvent } from 'chain-events/src';
 import { Label as ChainEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
-import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/user_dashboard_row.scss';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -13,12 +12,40 @@ import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
 import { UserDashboardRowTop } from './user_dashboard_row_top';
 
 type UserDashboardRowProps = {
-  notification: DashboardActivityNotification;
+  notification?: DashboardActivityNotification;
+  showSkeleton?: boolean;
+  isChainEventsRow?: boolean;
 };
 
 export const UserDashboardRow = (props: UserDashboardRowProps) => {
-  const { notification } = props;
-  const navigate = useCommonNavigate();
+  const { notification, showSkeleton, isChainEventsRow } = props;
+
+  if (showSkeleton) {
+    if (isChainEventsRow) {
+      return (
+        <UserDashboardChainEventRow
+          blockNumber={0}
+          chain={{} as any}
+          label={{} as any}
+          showSkeleton
+        />
+      );
+    }
+
+    return (
+      <div className="UserDashboardRow">
+        <UserDashboardRowTop activityData="" category="" showSkeleton />
+        <UserDashboardRowBottom
+          threadId=""
+          commentId=""
+          chainId=""
+          commentCount={0}
+          commenters={[]}
+          showSkeleton
+        />
+      </div>
+    );
+  }
 
   const {
     commentCount,

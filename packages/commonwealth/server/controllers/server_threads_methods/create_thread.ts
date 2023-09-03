@@ -225,7 +225,6 @@ export async function __createThread(
   await this.models.Subscription.create({
     subscriber_id: user.id,
     category_id: NotificationCategories.NewComment,
-    object_id: `discussion_${finalThread.id}`,
     thread_id: finalThread.id,
     chain_id: finalThread.chain,
     is_active: true,
@@ -233,54 +232,10 @@ export async function __createThread(
   await this.models.Subscription.create({
     subscriber_id: user.id,
     category_id: NotificationCategories.NewReaction,
-    object_id: `discussion_${finalThread.id}`,
     thread_id: finalThread.id,
     chain_id: finalThread.chain,
     is_active: true,
   });
-
-  // auto-subscribe NewThread subscribers to NewComment as well
-  // findOrCreate because redundant creation if author is also subscribed to NewThreads
-  const location = finalThread.chain;
-  try {
-    await this.models.sequelize.query(
-      `
-    WITH irrelevant_subs AS (
-      SELECT id
-      FROM "Subscriptions"
-      WHERE subscriber_id IN (
-        SELECT subscriber_id FROM "Subscriptions" WHERE category_id = ? AND object_id = ?
-      ) AND category_id = ? AND object_id = ? AND thread_id = ? AND chain_id = ? AND is_active = true
-    )
-    INSERT INTO "Subscriptions"
-    (subscriber_id, category_id, object_id, thread_id, chain_id, is_active, created_at, updated_at)
-    SELECT subscriber_id, ? as category_id, ? as object_id, ? as thread_id, ? as
-     chain_id, true as is_active, NOW() as created_at, NOW() as updated_at
-    FROM "Subscriptions"
-    WHERE category_id = ? AND object_id = ? AND id NOT IN (SELECT id FROM irrelevant_subs);
-  `,
-      {
-        raw: true,
-        type: 'RAW',
-        replacements: [
-          NotificationCategories.NewThread,
-          location,
-          NotificationCategories.NewComment,
-          `discussion_${finalThread.id}`,
-          finalThread.id,
-          finalThread.chain,
-          NotificationCategories.NewComment,
-          `discussion_${finalThread.id}`,
-          finalThread.id,
-          finalThread.chain,
-          NotificationCategories.NewThread,
-          location,
-        ],
-      }
-    );
-  } catch (e) {
-    console.log(e);
-  }
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(body);
@@ -313,17 +268,18 @@ export async function __createThread(
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({
-    categoryId: NotificationCategories.NewThread,
-    objectId: location,
-    notificationData: {
-      created_at: new Date(),
-      thread_id: finalThread.id,
-      root_type: ProposalType.Thread,
-      root_title: finalThread.title,
-      comment_text: finalThread.body,
-      chain_id: finalThread.chain,
-      author_address: finalThread.Address.address,
-      author_chain: finalThread.Address.chain,
+    notification: {
+      categoryId: NotificationCategories.NewThread,
+      data: {
+        created_at: new Date(),
+        thread_id: finalThread.id,
+        root_type: ProposalType.Thread,
+        root_title: finalThread.title,
+        comment_text: finalThread.body,
+        chain_id: finalThread.chain,
+        author_address: finalThread.Address.address,
+        author_chain: finalThread.Address.chain,
+      },
     },
     webhookData: {
       user: finalThread.Address.address,
@@ -344,17 +300,19 @@ export async function __createThread(
         return; // some Addresses may be missing users, e.g. if the user removed the address
       }
       allNotificationOptions.push({
-        categoryId: NotificationCategories.NewMention,
-        objectId: `user-${mentionedAddress.User.id}`,
-        notificationData: {
-          created_at: new Date(),
-          thread_id: finalThread.id,
-          root_type: ProposalType.Thread,
-          root_title: finalThread.title,
-          comment_text: finalThread.body,
-          chain_id: finalThread.chain,
-          author_address: finalThread.Address.address,
-          author_chain: finalThread.Address.chain,
+        notification: {
+          categoryId: NotificationCategories.NewMention,
+          data: {
+            mentioned_user_id: mentionedAddress.User.id,
+            created_at: new Date(),
+            thread_id: finalThread.id,
+            root_type: ProposalType.Thread,
+            root_title: finalThread.title,
+            comment_text: finalThread.body,
+            chain_id: finalThread.chain,
+            author_address: finalThread.Address.address,
+            author_chain: finalThread.Address.chain,
+          },
         },
         webhookData: null,
         excludeAddresses: [finalThread.Address.address],

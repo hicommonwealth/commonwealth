@@ -4,16 +4,26 @@ import { PORT } from '../../../server/config';
 test.describe('Commonwealth Homepage', () => {
   test('Amount of bundles has not increased', async ({ page }) => {
     const loadedJsBundles = [];
+    const apiCalls = [];
     // Enable network interception
     await page.route('*/**', (route) => {
       // Filter requests for JavaScript files
-      if (route.request().resourceType() === 'script') {
+      const resourceType = route.request().resourceType();
+      if (resourceType === 'script') {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const initializerUrl = route.request()._initializer.url;
         if (initializerUrl.startsWith('http://localhost')) {
           loadedJsBundles.push(initializerUrl);
           console.log(`Loaded in bundle: ${initializerUrl}`);
+        }
+      } else if (resourceType === 'xhr') {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const initializerUrl = route.request()._initializer.url;
+        if (initializerUrl.startsWith('http://localhost')) {
+          apiCalls.push(initializerUrl);
+          console.log(`Made api request: ${initializerUrl}`);
         }
       }
       route.continue();
@@ -22,6 +32,9 @@ test.describe('Commonwealth Homepage', () => {
     await page.goto(`http://localhost:${PORT}/`);
 
     while (loadedJsBundles.length < 4) {
+      await page.waitForTimeout(100); // Wait for a short interval before checking again
+    }
+    while (apiCalls.length < 2) {
       await page.waitForTimeout(100); // Wait for a short interval before checking again
     }
 
@@ -36,6 +49,7 @@ test.describe('Commonwealth Homepage', () => {
 
     await page.waitForTimeout(100);
     expect(loadedJsBundles.length).toEqual(4);
+    expect(apiCalls.length).toEqual(2);
   });
 
   test('Check Login Modal', async ({ page }) => {

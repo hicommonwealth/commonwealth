@@ -33,7 +33,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
     app.runWhenReady(() => {
       setIsLoaded(app.chain.loaded);
     });
-  }, [app.chain?.loaded]);
+  }, []);
 
   useEffect(() => {
     app.loginStateEmitter.on('redraw', forceRerender);
@@ -41,7 +41,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
     return () => {
       app.loginStateEmitter.off('redraw', forceRerender);
     };
-  }, [app.loginState]);
+  }, [forceRerender]);
 
   // wait for chain
   if (app.chain?.failed) {
@@ -101,12 +101,7 @@ const NewProposalPage = (props: NewProposalPageProps) => {
   const getBody = () => {
     if (!app.user.activeAccount) {
       return <CWText>Must be logged in</CWText>;
-    } else if (
-      app.chain?.network === ChainNetwork.Plasm ||
-      // TODO: remove this once evmos is supported.
-      // See https://github.com/hicommonwealth/commonwealth/issues/3986
-      app.chain?.id === 'evmos'
-    ) {
+    } else if (app.chain?.network === ChainNetwork.Plasm) {
       return <CWText>Feature not supported yet for this community</CWText>;
     } else {
       return getForm(internalType);

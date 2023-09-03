@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import 'pages/notifications/notification_row.scss';
 
-import type { IPostNotificationData } from 'types';
+import type { IForumNotificationData } from 'types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 
 import app from 'state';
@@ -51,7 +51,7 @@ const jumpHighlightNotification = (
   }
 };
 
-const getNotificationFields = (category, data: IPostNotificationData) => {
+const getNotificationFields = (category, data: IForumNotificationData) => {
   const {
     created_at,
     thread_id,
@@ -151,7 +151,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
 
 export const getBatchNotificationFields = (
   category,
-  data: IPostNotificationData[]
+  data: IForumNotificationData[]
 ) => {
   if (data.length === 1) {
     return getNotificationFields(category, data[0]);
