@@ -104,7 +104,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             />
           )}
         </div>
-        <SearchBar />
+        <CWSearchBar />
         <div className="header-right">
           <div className="MobileMenuContainer">
             <CWIconButton

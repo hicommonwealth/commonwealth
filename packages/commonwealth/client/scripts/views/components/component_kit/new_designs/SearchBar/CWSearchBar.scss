@@ -23,6 +23,14 @@
   border-radius: 6px;
   color: $neutral-800;
 
+  @include smallInclusive {
+    width: 100%;
+  }
+
+  @include extraSmall {
+    display: none;
+  }
+
   &:hover {
     border: 1px solid $primary-600;
   }
