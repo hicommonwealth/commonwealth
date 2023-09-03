@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import moment from 'moment';
 
 import { useCommonNavigate } from '../../../../../navigation/helpers';
-import { ThreadResult } from '../../../../../views/pages/search/helpers';
+import { ThreadResult } from '../../../../pages/search/helpers';
 import AddressInfo from '../../../../../models/AddressInfo';
 import { CWText } from '../../cw_text';
 import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';

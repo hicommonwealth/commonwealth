@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useCommonNavigate } from '../../../../../navigation/helpers';
-import { MemberResult } from '../../../../../views/pages/search/helpers';
+import { MemberResult } from '../../../../pages/search/helpers';
 import { User } from '../../../user/user';
 import NewProfilesController from '../../../../../controllers/server/newProfiles';
 

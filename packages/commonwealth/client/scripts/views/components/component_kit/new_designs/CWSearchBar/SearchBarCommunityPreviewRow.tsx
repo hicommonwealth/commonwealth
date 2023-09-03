@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { CommunityResult } from '../../../../../views/pages/search/helpers';
+import { CommunityResult } from '../../../../pages/search/helpers';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import ChainInfo from '../../../../../models/ChainInfo';
 import { CommunityLabel } from '../../../community_label';
