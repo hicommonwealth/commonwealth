@@ -51,14 +51,18 @@ export const handleToggleSubscription = async (
 ) => {
   if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
-      app.user.notifications.subscribe(
-        NotificationCategories.NewReaction,
-        thread.uniqueIdentifier
-      ),
-      app.user.notifications.subscribe(
-        NotificationCategories.NewComment,
-        thread.uniqueIdentifier
-      ),
+      app.user.notifications.subscribe({
+        categoryId: NotificationCategories.NewReaction,
+        options: {
+          threadId: thread.id,
+        },
+      }),
+      app.user.notifications.subscribe({
+        categoryId: NotificationCategories.NewComment,
+        options: {
+          threadId: thread.id,
+        },
+      }),
     ]);
     notifySuccess('Subscribed!');
   } else if (isSubscribed) {
@@ -78,19 +82,17 @@ export const handleToggleSubscription = async (
 };
 
 export const getCommentSubscription = (thread: Thread) => {
-  return app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === thread.uniqueIdentifier &&
-      v.category === NotificationCategories.NewComment
-  );
+  return app.user.notifications.findNotificationSubscription({
+    categoryId: NotificationCategories.NewComment,
+    options: { threadId: thread.id },
+  });
 };
 
 export const getReactionSubscription = (thread: Thread) => {
-  return app.user.notifications.subscriptions.find(
-    (v) =>
-      v.objectId === thread.uniqueIdentifier &&
-      v.category === NotificationCategories.NewReaction
-  );
+  return app.user.notifications.findNotificationSubscription({
+    categoryId: NotificationCategories.NewReaction,
+    options: { threadId: thread.id },
+  });
 };
 
 export const getCommentSubscriptions = (comment: Comment<any>) => {
@@ -166,6 +168,12 @@ export const sortByFeaturedFilter = (t: Thread[], featuredFilter) => {
   if (featuredFilter === ThreadFeaturedFilterTypes.MostLikes) {
     return [...t].sort(
       (a, b) => b.associatedReactions.length - a.associatedReactions.length
+    );
+  }
+
+  if (featuredFilter === ThreadFeaturedFilterTypes.LatestActivity) {
+    return [...t].sort((a, b) =>
+      moment(b.latestActivity).diff(moment(a.latestActivity))
     );
   }
 
