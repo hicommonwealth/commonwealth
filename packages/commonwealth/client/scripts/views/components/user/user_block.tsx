@@ -1,17 +1,13 @@
 /* eslint-disable no-script-url */
 import React from 'react';
-
 import { capitalize } from 'lodash';
-
 import 'components/user/user.scss';
-
-import app from 'state';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import type { AddressDisplayOptions } from './user';
+import type { AddressDisplayOptions } from './user.types';
 import { getClasses } from '../component_kit/helpers';
 
 export const UserBlock = (props: {
