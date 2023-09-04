@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 
-import fs from 'fs';
+const fs = require('fs').promises;
 import path from 'path';
 import { Client } from 'pg';
 
@@ -13,7 +13,6 @@ if (process.argv.length < 4) {
 
 // The purpose of this script is to record the failures of e2e tests, and then return a list of e2e tests that are
 // mature (Not flaky). These non-flaky tests will then be moved into the mature suite.
-console.log(process.env.AUXILIARY_DB_URL);
 const db = new Client({
   connectionString: process.env.AUXILIARY_DB_URL,
 });
@@ -22,7 +21,7 @@ const db = new Client({
 const matureGraduationDays = 14;
 
 async function detectMatureE2e(
-  failingTestDirectory: string,
+  testSummaryPath: string,
   flakyTestDirectory: string,
   matureTestDirectory: string
 ) {
@@ -36,10 +35,25 @@ async function detectMatureE2e(
     `);
 
   try {
-    const failedTests = fs.readdirSync(failingTestDirectory);
+    const data = await fs.readFile(testSummaryPath, 'utf8');
+    const testFailures = JSON.parse(data)['failed'];
+
+    // test results look like: e2eRegular/createCommunity.spec.ts:54:7. We want to remove the line info
+    // and get only unique files.
+    const uniqueTestFailures = Array.from(
+      new Set(
+        testFailures.map((t) => {
+          const parts = t.split(':');
+          parts.pop();
+          parts.pop();
+
+          return parts.join(':');
+        })
+      )
+    );
 
     // upsert failed tests in db
-    for (const testName of failedTests) {
+    for (const testName of uniqueTestFailures) {
       await db.query(
         `
          INSERT INTO matureE2eTests (name, date_of_last_failure)
@@ -54,7 +68,7 @@ async function detectMatureE2e(
     const graduatedTests = await db.query(
       `
       SELECT name from matureE2eTests
-      WHERE date_of_last_failure <= NOW() - $1 * INTERVAL '1 day'
+      WHERE date_of_last_failure >= NOW() - $1 * INTERVAL '1 day'
     `,
       [matureGraduationDays]
     );
@@ -73,7 +87,7 @@ async function detectMatureE2e(
   } catch (error) {
     console.error(`Error reading directory: ${error.message}`);
   } finally {
-    db.end(); // Close the database connection
+    db.end();
   }
 }
 
