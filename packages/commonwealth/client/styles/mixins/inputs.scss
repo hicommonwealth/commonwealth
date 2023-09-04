@@ -1,5 +1,4 @@
 @mixin inputStyles {
-  height: auto !important;
   background-color: $white;
   border-radius: 4px;
   border: 1px solid $neutral-200;
@@ -32,12 +31,6 @@
     }
   }
 
-  &.isTyping {
-    border-color: $primary-500;
-    box-shadow: 0px 2px 2px -1px rgba(0, 0, 0, 0.12),
-      0px 0px 0px 3px $primary-100;
-  }
-
   &.success {
     border-color: $green-500;
     background-color: $green-50;
@@ -51,11 +44,15 @@
   &.disabled {
     background-color: $neutral-100;
     border-color: $neutral-200;
-    color: $neutral-500;
+    color: $neutral-400;
     cursor: not-allowed;
 
     &::placeholder {
-      color: $neutral-500;
+      color: $neutral-400;
+    }
+
+    &:hover {
+      border-color: $neutral-200;
     }
   }
 

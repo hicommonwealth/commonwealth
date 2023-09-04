@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 
 import type { ValidationStatus } from '../../cw_validation_text';
 import { MessageRow } from './MessageRow';

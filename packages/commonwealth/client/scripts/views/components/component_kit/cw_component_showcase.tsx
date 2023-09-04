@@ -1268,7 +1268,17 @@ export const ComponentShowcase = () => {
           darkMode
           placeholder="Type here"
         />
-        <CWTextArea name="Textarea" label="Text area" placeholder="Type here" />
+        <CWTextArea
+          name="Textarea"
+          label="Text area"
+          placeholder="Placeholder"
+        />
+        <CWTextArea
+          name="Textarea"
+          label="Text area"
+          placeholder="Placeholder"
+          disabled
+        />
         <CWCoverImageUploader
           uploadCompleteCallback={(url: string) => {
             notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
