@@ -114,7 +114,7 @@ jobs:
       - name: Detect Mature e2e Test
         env:
           MISC_DATABASE_URL: ${{ secrets.AUXILIARY_DB_URL }}
-        run: ts-node detectMatureE2e.ts packages/commonwealth/summary.json packages/commonwealth/test/e2e/e2eRegular packages/commonwealth/test/e2e/e2eRegular/mature
+        run: ts-node detectMatureE2e.ts packages/commonwealth/summary.json packages/commonwealth/test/e2e packages/commonwealth/test/e2e/mature
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5

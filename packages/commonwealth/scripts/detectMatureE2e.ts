@@ -68,21 +68,33 @@ async function detectMatureE2e(
     const graduatedTests = await db.query(
       `
       SELECT name from matureE2eTests
-      WHERE date_of_last_failure >= NOW() - $1 * INTERVAL '1 day'
+      WHERE date_of_last_failure <= NOW() - $1 * INTERVAL '1 day'
     `,
       [matureGraduationDays]
     );
 
     for (const test of graduatedTests.rows) {
       const testFileName = test.name;
-      fs.rename(
-        path.join(flakyTestDirectory, testFileName),
-        path.join(matureTestDirectory, testFileName),
-        function (err) {
-          if (err)
-            console.log(`Failed to move file ${testFileName}. Error:\n${err}`);
+      const maturePath = path.join(matureTestDirectory, testFileName);
+
+      try {
+        await fs.mkdir(path.dirname(maturePath));
+      } catch (e) {
+        if (e.code === 'EEXIST') {
+          // do nothing because directory already exists
+        } else {
+          console.error('failed to create directory', e);
         }
-      );
+      }
+
+      try {
+        await fs.rename(
+          path.join(flakyTestDirectory, testFileName),
+          maturePath
+        );
+      } catch (e) {
+        console.log(`Failed to move file ${testFileName}. Error:\n${e}`);
+      }
     }
   } catch (error) {
     console.error(`Error reading directory: ${error.message}`);
