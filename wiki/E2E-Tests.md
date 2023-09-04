@@ -31,3 +31,15 @@ When e2e tests fail we record a video of the failed run.
 * Locally - These video is stored in the test-results folder. They are named after the name of the test that failed
 and produced it.
 * CI - These videos are stored in the artifacts. They can be found and downlaoded at the bottom of the summary page
+
+## Mature e2e test detection
+Due to the complex nature of e2e tests, often times they are flaky. Flaky tests reduces our confidence that the test
+itself has captured and surfaces an issue when it fails. In theory, the best way to solve this, is to ensure that the
+e2e tests themselves are not flaky. Sometimes this is not feasible (For example, if a test is flaky 1/20 times, it will
+be difficult to know that it is flaky in the first place). In order to prevent this loss of confidence, but still be
+able to run tests to determine if they are flaky, we have come up with the regular/mature e2e suites.
+
+The way this works is the following. We have a script called detectMatureE2e.ts. It is run on the CI on push to master.
+It checks the latest test runs, and tracks its failures in the [AUXILLARY_DATABASE](wiki/Database.md). After a certain
+period of time, it takes these test that have not failed, and puts them in the mature e2e suite, which is then required
+on merge.
