@@ -98,9 +98,8 @@ export const getReactionSubscription = (thread: Thread) => {
 export const getCommentSubscriptions = (comment: Comment<any>) => {
   const commentSubs = Object.values(
     bundleSubs(
-      app?.user.notifications.subscriptions.filter(
+      app?.user.notifications.discussionSubscriptions.filter(
         (s) =>
-          s.category !== 'chain-event' &&
           s.Chain?.id === app.activeChainId() &&
           s.Comment?.id == comment.id &&
           (s.category === 'new-comment-creation' ||

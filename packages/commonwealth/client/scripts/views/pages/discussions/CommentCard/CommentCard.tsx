@@ -3,7 +3,6 @@ import moment from 'moment';
 import type { DeltaStatic } from 'quill';
 
 import app from 'state';
-import useUserActiveAccount from '../../../../hooks/useUserActiveAccount';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import type Comment from '../../../../models/Comment';
 import { CWButton } from '../../../components/component_kit/new_designs/cw_button';
@@ -16,8 +15,6 @@ import { QuillRenderer } from '../../../components/react_quill_editor/quill_rend
 import { deserializeDelta } from '../../../components/react_quill_editor/utils';
 import { SharePopover } from '../../../components/share_popover';
 import { CWThreadAction } from '../../../components/component_kit/new_designs/cw_thread_action';
-import useForceRerender from '../../../../hooks/useForceRerender';
-import { getCommentSubscriptions, handleToggleSubscription } from '../helpers';
 
 import './CommentCard.scss';
 
@@ -45,6 +42,9 @@ type CommentCardProps = {
   canToggleSpam?: boolean;
   // actual comment
   comment: Comment<any>;
+  isSubscribed?: (comment: Comment<any>) => boolean;
+  handleToggleSubscribe?: (comment: Comment<any>) => Promise<void>;
+  hasJoinedCommunity?: boolean;
 };
 
 export const CommentCard = ({
@@ -71,30 +71,12 @@ export const CommentCard = ({
   canToggleSpam,
   // actual comment
   comment,
+  isSubscribed,
+  handleToggleSubscribe,
+  hasJoinedCommunity,
 }: CommentCardProps) => {
-  const forceRerender = useForceRerender();
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
-
-  const isSubscribed = () => {
-    const [newCommentSub, newReactionSub] = getCommentSubscriptions(comment);
-
-    return newCommentSub?.isActive && newReactionSub?.isActive;
-  };
-
-  const handleToggleSubscribe = async () => {
-    const [newCommentSub, newReactionSub] = getCommentSubscriptions(comment);
-
-    await handleToggleSubscription(
-      null,
-      newCommentSub,
-      newReactionSub,
-      newCommentSub?.isActive && newReactionSub?.isActive
-    );
-
-    forceRerender();
-  };
 
   return (
     <div className="comment-body">
@@ -165,9 +147,9 @@ export const CommentCard = ({
 
               <CWThreadAction
                 action="subscribe"
-                onClick={handleToggleSubscribe}
-                selected={!isSubscribed()}
-                label={isSubscribed() ? 'Unsubscribe' : 'Subscribe'}
+                onClick={() => handleToggleSubscribe(comment)}
+                selected={!isSubscribed(comment)}
+                label={isSubscribed(comment) ? 'Unsubscribe' : 'Subscribe'}
                 disabled={!hasJoinedCommunity}
               />
 

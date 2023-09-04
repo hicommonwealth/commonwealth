@@ -1,30 +1,34 @@
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
-import app from 'state';
+import type { DeltaStatic } from 'quill';
+
+import { ContentType } from '../../../../../../shared/types';
+import useUserLoggedIn from '../../../../hooks/useUserLoggedIn';
+import useUserActiveAccount from '../../../../hooks/useUserActiveAccount';
+import useForceRerender from '../../../../hooks/useForceRerender';
+import app from '../../../../state';
 import {
   useDeleteCommentMutation,
   useEditCommentMutation,
   useFetchCommentsQuery,
   useToggleCommentSpamStatusMutation,
-} from 'state/api/comments';
-import { ContentType } from 'types';
-import { CreateComment } from 'views/components/Comments/CreateComment';
-import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
+} from '../../../../state/api/comments';
+import { CreateComment } from '../../../components/Comments/CreateComment';
+import { CWValidationText } from '../../../components/component_kit/cw_validation_text';
 import {
   deserializeDelta,
   serializeDelta,
-} from 'views/components/react_quill_editor/utils';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import { notifyError } from '../../../../controllers/app/notifications';
+} from '../../../components/react_quill_editor/utils';
+import { openConfirmation } from '../../../modals/confirmation_modal';
 import type { Comment as CommentType } from '../../../../models/Comment';
 import Thread from '../../../../models/Thread';
+import { notifyError } from '../../../../controllers/app/notifications';
 import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
-import './CommentTree.scss';
 import { jumpHighlightComment } from './helpers';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { getCommentSubscriptions, handleToggleSubscription } from '../helpers';
+
+import './CommentTree.scss';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -53,6 +57,7 @@ export const CommentTree = ({
   setParentCommentId,
   canComment,
 }: CommentsTreeAttrs) => {
+  const forceRerender = useForceRerender();
   const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
 
@@ -396,6 +401,24 @@ export const CommentTree = ({
     });
   };
 
+  const handleToggleSubscribe = async (comment: CommentType<any>) => {
+    const [newCommentSub, newReactionSub] = getCommentSubscriptions(comment);
+
+    await handleToggleSubscription(
+      null,
+      newCommentSub,
+      newReactionSub,
+      newCommentSub?.isActive && newReactionSub?.isActive
+    );
+
+    forceRerender();
+  };
+
+  const isSubscribed = (comment: CommentType<any>) => {
+    const [newCommentSub, newReactionSub] = getCommentSubscriptions(comment);
+    return newCommentSub?.isActive && newReactionSub?.isActive;
+  };
+
   const recursivelyGatherComments = (
     comments_: CommentType<any>[],
     parentComment: CommentType<any>,
@@ -473,6 +496,9 @@ export const CommentTree = ({
                   onSpamToggle={async () => await handleFlagMarkAsSpam(comment)}
                   canToggleSpam={!isLocked && (isCommentAuthor || isAdminOrMod)}
                   comment={comment}
+                  isSubscribed={isSubscribed}
+                  handleToggleSubscribe={handleToggleSubscribe}
+                  hasJoinedCommunity={!!hasJoinedCommunity}
                 />
               </div>
               {isReplying && parentCommentId === comment.id && (
