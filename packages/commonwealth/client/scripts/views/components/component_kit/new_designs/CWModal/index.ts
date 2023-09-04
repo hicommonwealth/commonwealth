@@ -1,5 +1,6 @@
+import CWModal from "./CWModal";
 import { CWModalBody } from "./CWModalBody";
 import { CWModalFooter } from "./CWModalFooter";
 import { CWModalHeader } from "./CWModalHeader";
 
-export { CWModalBody, CWModalFooter, CWModalHeader };
+export { CWModal, CWModalBody, CWModalFooter, CWModalHeader };
