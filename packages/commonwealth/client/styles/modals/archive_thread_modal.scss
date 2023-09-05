@@ -17,6 +17,10 @@
     .warning-text {
       font-size: 14px;
 
+      .Text {
+        line-height: 20px;
+      }
+
       .Text.top, .Text.middle {
         margin-bottom: 20px;
       }
