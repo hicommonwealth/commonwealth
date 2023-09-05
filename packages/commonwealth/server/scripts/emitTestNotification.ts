@@ -3,14 +3,10 @@ import yargs from 'yargs';
 import models from '../database';
 import { NotificationCategories } from 'common-common/src/types';
 import Sequelize, { Transaction } from 'sequelize';
-import {
-  NotificationAttributes,
-  NotificationInstance,
-} from '../models/notification';
+import { NotificationInstance } from '../models/notification';
 import { SubscriptionInstance } from '../models/subscription';
 import { factory, formatFilename } from 'common-common/src/logging';
 import emitNotifications from '../util/emitNotifications';
-import { DATABASE_URI } from '../config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -23,17 +19,19 @@ enum SupportedNotificationSpaces {
   stgdao = 'stgdao.eth',
 }
 
+const randomInt = () => Math.floor(Math.random() * (2 ** 31 - 1)) + 1;
+const propCreateBlock = randomInt();
 const ceNotifications = {
   [SupportedNotificationChains.dydx]: {
     queued: 0,
-    id: 123456789,
-    block_number: 17477983,
+    id: randomInt(),
+    block_number: propCreateBlock,
     event_data: {
-      id: 999999999,
+      id: randomInt(),
       kind: 'proposal-created',
       values: ['0'],
       targets: ['0xE710CEd57456D3A16152c32835B5FB4E72D9eA5b'],
-      endBlock: 17510899,
+      endBlock: propCreateBlock + 33_000,
       executor: '0x64c7d40c07EFAbec2AafdC243bF59eaF2195c6dc',
       ipfsHash:
         '0x5aca381042cb641c1000126d5a183c38b17492eb60a86910973d0c3f1e867f43',
@@ -41,7 +39,7 @@ const ceNotifications = {
       strategy: '0x90Dfd35F4a0BB2d30CDf66508085e33C353475D9',
       calldatas: ['randomcalldatas'],
       signatures: ['transfer(address,address,uint256)'],
-      startBlock: 17484576,
+      startBlock: propCreateBlock + 7_000,
     },
     network: 'aave',
     chain: 'dydx',
@@ -50,16 +48,21 @@ const ceNotifications = {
   },
 };
 
+const startTime = randomInt();
+const randomString = Array.from(
+  { length: 64 },
+  () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]
+).join('');
 const snapshotNotifications = {
   [SupportedNotificationSpaces.stgdao]: {
     eventType: 'proposal/created',
     space: SupportedNotificationSpaces.stgdao,
-    id: '0xrandomid',
+    id: `0x${randomString}`,
     title: 'Test Snapshot Proposal Title',
     body: 'Test snapshot proposal body',
     choices: ['Yes', 'No', 'Abstain'],
-    start: 1691423562,
-    expire: 1691872844,
+    start: startTime,
+    expire: startTime + 450_000,
   },
 };
 
@@ -100,16 +103,6 @@ async function getExistingNotifications(
   return existingNotifications;
 }
 
-/**
- * Creates a notification. IF mockNotification is true, then a fake notification is created. If mock is false, then
- * an existing notification is found, deleted, and a new one is created with the exact same data. This allows us to
- * update the primary key (id) of the notification. In other words, we are pretending we just received an old event and
- * are emitting a notification for it.
- * @param transaction
- * @param mockNotification
- * @param chainId
- * @param snapshotId
- */
 async function setupNotification(
   transaction: Transaction,
   mockNotification: boolean,
@@ -122,21 +115,25 @@ async function setupNotification(
 
   let existingNotifications: NotificationInstance[];
   if (mockNotification && chainId) {
+    // handles the case where a mock notification is emitted multiple times
+    // this is necessary because chain-event notifications have a unique constraint on the id
     const existingCeMockNotif = await models.Notification.findAll({
       where: {
         category_id: NotificationCategories.ChainEvent,
         chain_id: chainId,
+        chain_event_id: ceNotifications[chainId].id,
         [Sequelize.Op.and]: [
           Sequelize.literal(
             `notification_data::jsonb -> 'event_data' ->> 'id' = '${ceNotifications[chainId].event_data.id}'`
           ),
         ],
       },
-      logging: console.log,
+      transaction,
     });
 
     if (existingCeMockNotif.length > 0)
       existingNotifications = existingCeMockNotif;
+    // if the mock does not already exist then we can just return the mock data, so it is emitted as a brand new notif
     else return JSON.stringify(ceNotifications[chainId]);
   } else if (mockNotification && snapshotId) {
     return JSON.stringify(snapshotNotifications[snapshotId]);
