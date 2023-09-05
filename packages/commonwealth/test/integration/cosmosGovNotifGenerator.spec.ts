@@ -34,12 +34,8 @@ import {
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
 import { generateCosmosGovNotifications } from '../../server/cosmos-gov-notifications/generateCosmosGovNotifications';
-import {
-  BalanceType,
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-} from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import { createCosmosChains } from '../util/cosmosNotifications';
 
 async function createFakeProposalNotification(
   proposalId: string,
@@ -180,53 +176,7 @@ function createMockClients(
   } as unknown as GovV1Beta1ClientType;
 }
 
-async function createCosmosChains() {
-  await models.sequelize.transaction(async (transaction) => {
-    const kyveNode = await models.ChainNode.create({
-      url: 'https://rpc-eu-1.kyve.network/',
-      alt_wallet_url: 'https://api-eu-1.kyve.network/',
-      name: 'KYVE Network',
-      balance_type: BalanceType.Cosmos,
-    });
-
-    const osmosisNode = await models.ChainNode.create({
-      url: 'https://rpc.osmosis.zone',
-      alt_wallet_url: 'https://rest.cosmos.directory/osmosis',
-      name: 'Osmosis',
-      balance_type: BalanceType.Cosmos,
-    });
-
-    await models.Chain.create(
-      {
-        id: 'kyve',
-        name: 'KYVE',
-        network: ChainNetwork.Kyve,
-        type: ChainType.Chain,
-        base: ChainBase.CosmosSDK,
-        has_chain_events_listener: true,
-        chain_node_id: kyveNode.id,
-        default_symbol: 'KYVE',
-      },
-      { transaction }
-    );
-
-    await models.Chain.create(
-      {
-        id: 'osmosis',
-        name: 'Osmosis',
-        network: ChainNetwork.Osmosis,
-        type: ChainType.Chain,
-        base: ChainBase.CosmosSDK,
-        has_chain_events_listener: true,
-        chain_node_id: osmosisNode.id,
-        default_symbol: 'OSMO',
-      },
-      { transaction }
-    );
-  });
-}
-
-describe.only('Cosmos Governance Notification Generator', () => {
+describe('Cosmos Governance Notification Generator', () => {
   before('Reset database', async () => {
     await resetDatabase();
   });
@@ -292,19 +242,6 @@ describe.only('Cosmos Governance Notification Generator', () => {
         },
       });
     });
-
-    it.skip('emitProposalNotifications: should emit proposal notifications', async () => {
-      const validKyveProposal = createFakeProposal('v1', 3);
-      const validOsmosisProposal = createFakeProposal('v1Beta1', 3);
-      await emitProposalNotifications(models, {
-        v1: {
-          kyve: [validKyveProposal],
-        },
-        v1Beta1: {
-          osmosis: [validOsmosisProposal],
-        },
-      });
-    });
   });
 
   describe('generateCosmosGovNotifications tests', () => {
@@ -335,7 +272,7 @@ describe.only('Cosmos Governance Notification Generator', () => {
         [createFakeProposal('v1Beta1', 7), createFakeProposal('v1Beta1', 8)]
       );
 
-      await generateCosmosGovNotifications(models);
+      await generateCosmosGovNotifications();
 
       const notifications = await models.Notification.findAll({
         where: {
@@ -349,7 +286,7 @@ describe.only('Cosmos Governance Notification Generator', () => {
     it('should not generate notifications if there are no new proposals', async () => {
       await createCosmosChains();
       createMockClients();
-      await generateCosmosGovNotifications(models);
+      await generateCosmosGovNotifications();
 
       const notifications = await models.Notification.findAll({
         where: {
@@ -366,7 +303,7 @@ describe.only('Cosmos Governance Notification Generator', () => {
         [createFakeProposal('v1Beta1', 7), createFakeProposal('v1Beta1', 8)]
       );
 
-      await generateCosmosGovNotifications(models);
+      await generateCosmosGovNotifications();
 
       const notifications = await models.Notification.findAll({
         where: {
@@ -404,7 +341,7 @@ describe.only('Cosmos Governance Notification Generator', () => {
         [createFakeProposal('v1', v1ExistingNotifPropId + 1)],
         [createFakeProposal('v1Beta1', v1Beta1ExistingNotifPropId + 1)]
       );
-      await generateCosmosGovNotifications(models);
+      await generateCosmosGovNotifications();
       const notifications = await models.Notification.findAll({
         where: {
           category_id: 'chain-event',

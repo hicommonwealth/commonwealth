@@ -15,7 +15,7 @@ import models from '../database';
 const log = factory.getLogger(formatFilename(__filename));
 
 // TODO: @Timothee rollbar/datadog reporting + error handling such that one failure does not eliminate all notifs
-export async function generateCosmosGovNotifications(models: DB) {
+export async function generateCosmosGovNotifications() {
   // fetch chains to generate notifications for
   const chains = await fetchCosmosNotifChains(models);
 
@@ -57,4 +57,4 @@ export async function generateCosmosGovNotifications(models: DB) {
 }
 
 if (require.main === module)
-  generateCosmosGovNotifications(models).then(() => process.exit(0));
+  generateCosmosGovNotifications().then(() => process.exit(0));
