@@ -9,7 +9,6 @@ import {
   fetchLatestNotifProposalIds,
   filterProposals,
 } from './util';
-import { DB } from '../models';
 import models from '../database';
 
 const log = factory.getLogger(formatFilename(__filename));
