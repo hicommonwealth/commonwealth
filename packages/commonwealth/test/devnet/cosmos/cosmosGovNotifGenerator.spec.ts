@@ -23,18 +23,6 @@ const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
 const lcdUrl = `http://localhost:8080/cosmosLCD/${idV1}`;
 let content: Any;
 
-// localCsdkV1: {
-//   url: 'http://localhost:8080/cosmosLCD/csdk-v1',
-//     name: 'Cosmos SDK v0.46.11 Gov v1 devnet',
-//     balance_type: BalanceType.Cosmos,
-//     alt_wallet_url: 'http://localhost:8080/cosmosAPI/csdk-v1',
-// },
-// localCsdkV1beta1: {
-//   url: 'http://localhost:8080/cosmosAPI/csdk-beta-ci',
-//     name: 'Cosmos SDK v0.46.11 Gov v1beta1 devnet',
-//     balance_type: BalanceType.Cosmos,
-// }
-
 describe('Cosmos Governance Notification Generator with real proposals', () => {
   describe('v1 proposals', () => {
     content = encodeTextProposal(`v1 title`, `v1 description`);
@@ -49,7 +37,7 @@ describe('Cosmos Governance Notification Generator with real proposals', () => {
       });
 
       await models.Chain.create({
-        id: 'gov-v1-devnet',
+        id: 'cosmos-gov-v1-devnet',
         name: 'v1',
         network: 'gov-v1-devnet' as ChainNetwork,
         type: ChainType.Chain,
