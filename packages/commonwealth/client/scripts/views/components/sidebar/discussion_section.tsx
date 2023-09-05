@@ -151,28 +151,6 @@ export const DiscussionSection = () => {
       },
       displayData: null,
     },
-    {
-      title: 'Archived',
-      rightIcon: <CWIcon iconName="archiveTray" iconSize="small" />,
-      containsChildren: false,
-      hasDefaultToggle: false,
-      isVisible: true,
-      isUpdated: true,
-      isActive: !!matchesArchivedRoute,
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/archived`,
-          app.activeChainId(),
-          () => {
-            setDiscussionsToggleTree(`children.Archived.toggledState`, toggle);
-          }
-        );
-      },
-      displayData: null,
-    },
     app.activeChainId() === 'near' && {
       title: 'Sputnik Daos',
       containsChildren: false,
@@ -232,6 +210,31 @@ export const DiscussionSection = () => {
       discussionsGroupData.push(discussionSectionGroup);
     }
   }
+
+  const archivedSectionGroup: SectionGroupAttrs = {
+    title: 'Archived',
+    rightIcon: <CWIcon iconName="archiveTray" iconSize="small" />,
+    containsChildren: false,
+    hasDefaultToggle: false,
+    isVisible: true,
+    isUpdated: true,
+    isActive: !!matchesArchivedRoute,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      handleRedirectClicks(
+        navigate,
+        e,
+        `/archived`,
+        app.activeChainId(),
+        () => {
+          setDiscussionsToggleTree(`children.Archived.toggledState`, toggle);
+        }
+      );
+    },
+    displayData: null,
+  }
+
+  discussionsGroupData.push(archivedSectionGroup);
 
   const sidebarSectionData: SidebarSectionAttrs = {
     title: discussionsLabel,
