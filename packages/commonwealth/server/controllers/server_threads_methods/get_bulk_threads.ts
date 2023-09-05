@@ -96,7 +96,7 @@ export async function __getBulkThreads(
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
-          COALESCE(t.last_commented_on, t.created_at) AS latest_activity,
+          t.max_notif_id AS latest_activity,
           t.marked_as_spam_at,
           t.archived_at,
           t.updated_at AS thread_updated,
@@ -133,9 +133,9 @@ export async function __getBulkThreads(
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
-          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), t.comment_count,
+          GROUP BY (t.id, t.max_notif_id, t.comment_count,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
-          ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
+          ORDER BY t.pinned DESC, t.max_notif_id DESC
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "Topics" topics
