@@ -18,7 +18,7 @@ jobs:
         node: [ 18 ]
     name: Commonwealth E2E Test
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
 
     services:
       postgres:
@@ -423,7 +423,7 @@ jobs:
         node: [ 18 ]
     name: Chain Events Integration and Unit Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
 
     services:
       postgres:
