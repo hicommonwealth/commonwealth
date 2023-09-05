@@ -126,7 +126,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">
-                There are no threads matching your filter.
+                {
+                  onArchivePage
+                  ? 'There are currently no archived threads'
+                  : 'There are no threads matching your filter.'
+                }
               </CWText>
             ),
           Header: () => {
