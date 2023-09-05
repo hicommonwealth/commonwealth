@@ -117,17 +117,19 @@ export async function post(
 export async function del(
   path: string,
   val: Record<string, unknown>,
-  expectError = false
+  expectError = false,
+  expectedApp = app
 ) {
   const res = <any>(
     await chai
-      .request(app)
+      .request(expectedApp)
       .delete(path)
       .set('Accept', 'application/json')
       .send(val)
   );
 
   if (!expectError) {
+    console.log(res.text);
     assert.equal(res.statusCode, 200);
   } else if (res.text === 'Unauthorized') {
     return res;

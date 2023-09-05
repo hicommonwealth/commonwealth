@@ -40,6 +40,7 @@
     "open-ios": "NODE_ENV=mobile npx cap open ios",
     "profile": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.dev.config.js --json --profile > webpack-stats.json",
     "psql": "chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh",
+    "recompute-counts": "npx ts-node -T ./scripts/recompute-count-job.ts",
     "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
     "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
