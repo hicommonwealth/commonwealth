@@ -35,6 +35,7 @@ export enum ThreadFeaturedFilterTypes {
   Oldest = 'oldest',
   MostLikes = 'mostLikes',
   MostComments = 'mostComments',
+  LatestActivity = 'latestActivity',
 }
 
 export enum CommentsFeaturedFilterTypes {

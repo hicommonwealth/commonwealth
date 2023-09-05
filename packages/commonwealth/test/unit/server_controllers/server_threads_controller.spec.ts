@@ -84,16 +84,12 @@ describe('ServerThreadsController', () => {
 
       expect(newReaction).to.be.ok;
 
-      expect(notificationOptions).to.have.property(
-        'categoryId',
-        'new-reaction'
-      );
-      expect(notificationOptions).to.have.property('objectId', 'discussion_4');
+      expect(notificationOptions).to.have.property('notification');
+      const { notification } = notificationOptions;
+      expect(notification).to.have.property('categoryId', 'new-reaction');
 
-      expect(notificationOptions).to.have.property('notificationData');
-      const { notificationData } = notificationOptions;
-      expect(notificationData).to.have.property('created_at');
-      expect(notificationData).to.include({
+      expect(notification.data).to.have.property('created_at');
+      expect(notification.data).to.include({
         thread_id: 4,
         root_title: 'Big Thread!',
         root_type: 'discussion',
@@ -419,7 +415,7 @@ describe('ServerThreadsController', () => {
 
   describe('#createThreadComment', () => {
     it('should create a thread comment', async () => {
-      const user = {};
+      const user = { id: 1, save: async () => ({}) };
       const address = {
         id: 1,
         address: '0x123',
@@ -1360,9 +1356,9 @@ describe('ServerThreadsController', () => {
       expect(thread.stage).to.equal(stage);
 
       expect(notificationOptions).to.have.length(1);
-      expect(notificationOptions[0]).to.include({
+      expect(notificationOptions[0]).to.have.property('notification');
+      expect(notificationOptions[0].notification).to.include({
         categoryId: 'new-thread-creation',
-        objectId: 'ethereum',
       });
       expect(notificationOptions[0].webhookData).to.include({
         user: '0x123',
@@ -1373,7 +1369,7 @@ describe('ServerThreadsController', () => {
         chain: 'ethereum',
         body: 'hello',
       });
-      expect(notificationOptions[0].notificationData).to.include({
+      expect(notificationOptions[0].notification.data).to.include({
         thread_id: 1,
         root_type: 'discussion',
         root_title: 'mythread',
