@@ -15,9 +15,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^8.0.2",
     "artillery": "^2.0.0-34",
-    "artillery-engine-playwright": "^0.3.1",
-    "faker": "^6.6.6"
+    "artillery-engine-playwright": "^0.3.1"
   },
   "devDependencies": {
     "@datadog/datadog-api-client": "^1.15.0",
