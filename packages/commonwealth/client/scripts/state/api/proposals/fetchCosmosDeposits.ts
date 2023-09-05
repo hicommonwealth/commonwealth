@@ -29,7 +29,7 @@ const useCosmosDeposits = (proposal: AnyProposal) => {
   const proposalId = proposal?.identifier;
   const turnout = proposal?.turnout; // using this as a dependency in case proposal is refetched
   return useQuery({
-    queryKey: ['deposit', { chainId, proposalId, turnout }],
+    queryKey: ['deposit', { chainId, proposalId, turnout, proposal }],
     queryFn: () => fetchCosmosDeposits(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK &&
