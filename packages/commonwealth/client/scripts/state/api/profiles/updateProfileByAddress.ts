@@ -1,10 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import MinimumProfile from 'models/MinimumProfile';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface UpdateProfileByAddressProps {
   address: string;
+  chain: string;
   profileId?: number;
   name?: string;
   email?: string;
@@ -15,6 +17,8 @@ interface UpdateProfileByAddressProps {
 }
 
 const updateProfileByAddress = async ({
+  address,
+  chain,
   profileId,
   bio,
   name,
@@ -24,7 +28,7 @@ const updateProfileByAddress = async ({
   socials,
 }: UpdateProfileByAddressProps) => {
   // TODO: ideally this should return a response
-  await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
+  const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
     profileId,
     bio,
     name,
@@ -35,16 +39,17 @@ const updateProfileByAddress = async ({
     jwt: app.user.jwt,
   });
 
-  // TEMP: return the updated fields which we would expect from API
-  return {
+  const responseProfile = response.data.result.profile;
+  const updatedProfile = new MinimumProfile(address, chain);
+  updatedProfile.initialize(
+    responseProfile.name,
+    address,
+    responseProfile.avatarUrl,
     profileId,
-    bio,
-    name,
-    email,
-    backgroundImage,
-    avatarUrl,
-    socials,
-  };
+    chain,
+    responseProfile.lastActive
+  );
+  return updatedProfile;
 };
 
 interface AddressesWithChainsToUpdate {
@@ -69,8 +74,7 @@ const useUpdateProfileByAddressMutation = ({
         // TEMP: since we don't get the updated data from API, we will cancel existing and refetch profile
         // data for the current specified adddress/chain key pair
         if (existingProfile) {
-          queryClient.cancelQueries(key);
-          queryClient.refetchQueries(key);
+          queryClient.setQueryData(key, () => updatedProfile);
         }
       });
 

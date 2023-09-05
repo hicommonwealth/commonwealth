@@ -1,12 +1,12 @@
 import axios from 'axios';
+import 'components/edit_profile.scss';
+import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import _ from 'underscore';
-import 'components/edit_profile.scss';
-import { notifyError } from 'controllers/app/notifications';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import _ from 'underscore';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import MinimumProfile from '../../models/MinimumProfile';
@@ -24,9 +24,8 @@ import { CWSpinner } from './component_kit/cw_spinner';
 import { CWText } from './component_kit/cw_text';
 import { CWTextInput } from './component_kit/cw_text_input';
 import { LinkedAddresses } from './linked_addresses';
-import { createDeltaFromText, ReactQuillEditor } from './react_quill_editor';
+import { ReactQuillEditor, createDeltaFromText } from './react_quill_editor';
 import { deserializeDelta, serializeDelta } from './react_quill_editor/utils';
-import NewProfilesController from 'controllers/server/newProfiles';
 
 enum EditProfileError {
   None,
@@ -128,7 +127,12 @@ const EditProfileComponent = () => {
       );
 
     if (Object.keys(profileUpdate)?.length > 0) {
-      updateProfile({ ...profileUpdate, profileId: profile.id })
+      updateProfile({
+        ...profileUpdate,
+        profileId: profile.id,
+        address: app.user.activeAccount?.address,
+        chain: app.user.activeAccount?.chain,
+      })
         .then(() => {
           navigate(`/profile/id/${profile.id}`);
         })

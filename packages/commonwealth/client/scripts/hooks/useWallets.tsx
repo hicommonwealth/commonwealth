@@ -433,6 +433,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       if (username || avatarUrl) {
         await updateProfile({
           address: primaryAccount.profile.address,
+          chain: primaryAccount.profile.chain,
           name: username,
           avatarUrl,
         });
