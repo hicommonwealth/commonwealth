@@ -76,7 +76,11 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               if (app.isCustomDomain()) {
                 navigate('/', {}, null);
               } else {
-                navigate('/dashboard/for-you', {}, null);
+                if (isLoggedIn) {
+                  navigate('/dashboard/for-you', {}, null);
+                } else {
+                  navigate('/dashboard/global', {}, null);
+                }
               }
             }}
           />
@@ -184,7 +188,11 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             if (app.isCustomDomain()) {
               navigate('/', {}, null);
             } else {
-              navigate('/dashboard/for-you', {}, null);
+              if (isLoggedIn) {
+                navigate('/dashboard/for-you', {}, null);
+              } else {
+                navigate('/dashboard/global', {}, null);
+              }
             }
           }}
         />
