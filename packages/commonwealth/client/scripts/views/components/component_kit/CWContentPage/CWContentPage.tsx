@@ -51,7 +51,7 @@ type ContentPageProps = {
   readOnly?: boolean;
   lockedAt?: moment.Moment;
   showSidebar?: boolean;
-  sidebarComponents?: SidebarComponents;
+  sidebarComponents?: Array<ContentPageSidebarItem>;
   subBody?: ReactNode;
   subHeader?: ReactNode;
   viewCount?: number;

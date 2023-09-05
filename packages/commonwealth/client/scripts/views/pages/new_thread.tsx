@@ -39,6 +39,7 @@ import { Modal } from '../components/component_kit/cw_modal';
 import { LinkSnapshotInitialThreadModal } from '../modals/update_proposal_status_modal';
 import { Link, LinkSource } from 'models/Thread';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
+import { Link as ReactRouterLink } from 'react-router-dom';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
@@ -164,6 +165,58 @@ const NewThreadPage = () => {
 
   if (!app.chain) return <PageLoading />;
 
+  const sidebarComponents = [
+    {
+      label: 'Add Action',
+      item: (
+        <CWContentPageCard
+          header="Add Actions"
+          content={
+            <div className="ActionCard">
+              <CWText type="b2">
+                Add Actions such as proposals on-chain actions, polls, and or
+                links to existing discussions and more
+              </CWText>
+              <OldCWButton
+                buttonType="mini-black"
+                label="Add Action"
+                onClick={(e) => {
+                  setShowSidebar(true);
+                }}
+              />
+            </div>
+          }
+        />
+      ),
+    },
+    ...(linkedSnapshotProposal
+      ? [
+          {
+            label: 'Linked Snapshot',
+            item: (
+              <CWContentPageCard
+                header="Linked Snapshot"
+                content={
+                  <div className="ActionCard">
+                    <ReactRouterLink
+                      to={`https://snapshot.org/#/${
+                        linkedSnapshotProposal.identifier.split('/')[0]
+                      }/proposal/${
+                        linkedSnapshotProposal.identifier.split('/')[1]
+                      }`}
+                      target="_blank"
+                    >
+                      Snapshot: {linkedSnapshotProposal.title}
+                    </ReactRouterLink>
+                  </div>
+                }
+              />
+            ),
+          },
+        ]
+      : []),
+  ];
+
   return (
     <CWContentPage
       showHeader={false}
@@ -249,31 +302,7 @@ const NewThreadPage = () => {
           {JoinCommunityModals}
         </>
       )}
-      sidebarComponents={[
-        {
-          label: 'Add Action',
-          item: (
-            <CWContentPageCard
-              header="Add Actions"
-              content={
-                <div className="ActionCard">
-                  <CWText type="b2">
-                    Add Actions such as proposals on-chain actions, polls, and
-                    or links to existing discussions and more
-                  </CWText>
-                  <OldCWButton
-                    buttonType="mini-black"
-                    label="Add Action"
-                    onClick={(e) => {
-                      setShowSidebar(true);
-                    }}
-                  />
-                </div>
-              }
-            />
-          ),
-        },
-      ]}
+      sidebarComponents={sidebarComponents}
       rightSidebarContent={[
         {
           label: 'Create Snapshot',
