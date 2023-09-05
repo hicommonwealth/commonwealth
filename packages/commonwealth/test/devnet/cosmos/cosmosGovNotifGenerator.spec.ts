@@ -9,6 +9,12 @@ import { Any } from 'cosmjs-types/google/protobuf/any';
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import { generateCosmosGovNotifications } from '../../../server/cosmos-gov-notifications/generateCosmosGovNotifications';
 import { resetDatabase } from '../../../server-test';
+import {
+  BalanceType,
+  ChainBase,
+  ChainNetwork,
+  ChainType,
+} from 'common-common/src/types';
 
 const { expect, assert } = chai;
 
@@ -17,11 +23,41 @@ const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
 const lcdUrl = `http://localhost:8080/cosmosLCD/${idV1}`;
 let content: Any;
 
+// localCsdkV1: {
+//   url: 'http://localhost:8080/cosmosLCD/csdk-v1',
+//     name: 'Cosmos SDK v0.46.11 Gov v1 devnet',
+//     balance_type: BalanceType.Cosmos,
+//     alt_wallet_url: 'http://localhost:8080/cosmosAPI/csdk-v1',
+// },
+// localCsdkV1beta1: {
+//   url: 'http://localhost:8080/cosmosAPI/csdk-beta-ci',
+//     name: 'Cosmos SDK v0.46.11 Gov v1beta1 devnet',
+//     balance_type: BalanceType.Cosmos,
+// }
+
 describe('Cosmos Governance Notification Generator with real proposals', () => {
   describe('v1 proposals', () => {
     content = encodeTextProposal(`v1 title`, `v1 description`);
     before('Reset database and create proposal', async () => {
       await resetDatabase();
+
+      const devnetNode = await models.ChainNode.create({
+        url: lcdUrl,
+        name: 'Cosmos SDK v0.46.11 Gov v1 devnet',
+        balance_type: BalanceType.Cosmos,
+        alt_wallet_url: rpcUrl,
+      });
+
+      await models.Chain.create({
+        id: 'gov-v1-devnet',
+        name: 'v1',
+        network: 'gov-v1-devnet' as ChainNetwork,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: true,
+        chain_node_id: devnetNode.id,
+        default_symbol: 'V1',
+      });
 
       const { signerAddress } = await setupTestSigner(rpcUrl);
       const msg = encodeMsgSubmitProposal(signerAddress, deposit, content);
