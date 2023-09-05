@@ -191,6 +191,7 @@ const useFetchThreadsQuery = (
       }
     })(),
     staleTime: THREADS_STALE_TIME,
+    keepPreviousData: true,
   });
 
   if (isFetchBulkThreadsProps(props)) {

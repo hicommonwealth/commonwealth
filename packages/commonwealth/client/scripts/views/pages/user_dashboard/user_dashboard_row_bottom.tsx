@@ -4,16 +4,17 @@ import { NotificationCategories } from 'common-common/src/types';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
+import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
+import type NotificationSubscription from '../../../models/NotificationSubscription';
 import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
 import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
+import { UserDashboardRowBottomSkeleton } from './UserDashboardRowBottomSkeleton';
 import { subscribeToThread } from './helpers';
-import type NotificationSubscription from '../../../models/NotificationSubscription';
-import useForceRerender from 'hooks/useForceRerender';
 
 type UserDashboardRowBottomProps = {
   commentCount: number;
@@ -21,11 +22,23 @@ type UserDashboardRowBottomProps = {
   chainId: string;
   commentId?: string;
   commenters: ProfileWithAddress[];
+  showSkeleton?: boolean;
 };
 
 export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
-  const { threadId, commentCount, commentId, chainId, commenters } = props;
+  const {
+    threadId,
+    commentCount,
+    commentId,
+    chainId,
+    commenters,
+    showSkeleton,
+  } = props;
   const forceRerender = useForceRerender();
+
+  if (showSkeleton) {
+    return <UserDashboardRowBottomSkeleton />;
+  }
 
   const setSubscription = async (
     subThreadId: string,
