@@ -17,6 +17,14 @@ const db = new Client({
   connectionString: process.env.AUXILIARY_DB_URL,
 });
 
+function getDistinctFiles(file) {
+  const parts = file.split(':');
+  parts.pop();
+  parts.pop();
+
+  return parts.join(':');
+}
+
 // after the test is stable for this many days, graduate it into the mature suite.
 const matureGraduationDays = 14;
 
@@ -37,33 +45,55 @@ async function detectMatureE2e(
   try {
     const data = await fs.readFile(testSummaryPath, 'utf8');
     const testFailures = JSON.parse(data)['failed'];
+    const testSuccesses = JSON.parse(data)['passed'];
 
     // test results look like: e2eRegular/createCommunity.spec.ts:54:7. We want to remove the line info
     // and get only unique files.
     const uniqueTestFailures = Array.from(
       new Set(
         testFailures.map((t) => {
-          const parts = t.split(':');
-          parts.pop();
-          parts.pop();
+          getDistinctFiles(t);
+        })
+      )
+    );
 
-          return parts.join(':');
+    // we need passed tests to ensure that they are in the database so that we can track how long they pass for.
+    const uniqueTestSuccesses = Array.from(
+      new Set(
+        testFailures.map((t) => {
+          getDistinctFiles(t);
         })
       )
     );
 
     // upsert failed tests in db
-    for (const testName of uniqueTestFailures) {
-      await db.query(
-        `
+    await Promise.all(
+      uniqueTestSuccesses.map((testName) => {
+        db.query(
+          `
          INSERT INTO matureE2eTests (name, date_of_last_failure)
          VALUES ($1, NOW())
          ON CONFLICT (name) DO UPDATE
          SET date_of_last_failure = EXCLUDED.date_of_last_failure;
       `,
-        [testName]
-      );
-    }
+          [testName]
+        );
+      })
+    );
+
+    // insert passing tests if they don't exist.
+    await Promise.all(
+      uniqueTestSuccesses.map((testName) => {
+        db.query(
+          `
+         INSERT INTO matureE2eTests (name, date_of_last_failure)
+         VALUES ($1, NOW())
+         ON CONFLICT (name) DO NOTHING
+      `,
+          [testName]
+        );
+      })
+    );
 
     const graduatedTests = await db.query(
       `
