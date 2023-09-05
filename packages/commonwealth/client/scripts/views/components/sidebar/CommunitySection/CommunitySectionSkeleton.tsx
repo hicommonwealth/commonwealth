@@ -18,7 +18,7 @@ export const CommunitySectionSkeleton = ({
           >
             <Skeleton width={'100%'} height={25} />
             <div className="community-menu-skeleton-section-items">
-              {Array.from({ length: itemsPerSection }).map((x, i) => (
+              {Array.from({ length: itemsPerSection }).map((n, i) => (
                 <div key={i}>
                   <Skeleton width={'90%'} height={20} />
                 </div>

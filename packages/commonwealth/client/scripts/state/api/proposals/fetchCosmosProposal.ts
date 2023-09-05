@@ -26,7 +26,7 @@ const useCosmosProposal = ({
 }: CosmosProposalQueryProps) => {
   const chainId = app.activeChainId();
   return useQuery({
-    queryKey: ['proposal', chainId, proposalId],
+    queryKey: ['proposal', { chainId, proposalId }],
     queryFn: () => fetchCosmosProposal(proposalId),
     enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     staleTime: PROPOSAL_STALE_TIME,

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import 'components/proposals/proposal_extensions.scss';
-import type Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
@@ -34,7 +33,7 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
   React.useEffect(() => {
     if (setDemocracyVoteAmount) setDemocracyVoteAmount(0);
     if (setCosmosDepositAmount) setCosmosDepositAmount(0);
-  }, []);
+  }, [setCosmosDepositAmount, setDemocracyVoteAmount]);
 
   const { data: cosmosDepositParams } = useDepositParamsQuery();
   const minDeposit = cosmosDepositParams?.minDeposit;

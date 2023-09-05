@@ -54,7 +54,7 @@ const useProposalMetadataQuery = (proposal: AnyProposal) => {
   const chainId = app.activeChainId();
   const proposalId = proposal?.identifier;
   return useQuery({
-    queryKey: ['proposalMetadata', chainId, proposalId],
+    queryKey: ['proposalMetadata', { chainId, proposalId }],
     queryFn: () => fetchProposalMetadata(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK && isCosmosV1 && !!proposalId,

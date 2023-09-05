@@ -29,7 +29,7 @@ const useCosmosTally = (proposal: AnyProposal) => {
   const proposalId = proposal?.identifier;
   const support = proposal?.support; // using this as a dependency in case proposal is refetched
   return useQuery({
-    queryKey: ['tally', chainId, proposalId, support],
+    queryKey: ['tally', { chainId, proposalId, support }],
     queryFn: () => fetchCosmosTally(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK &&

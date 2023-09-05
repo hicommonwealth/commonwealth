@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import type { ICosmosProposal } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { Any } from 'common-common/src/cosmos-ts/src/codegen/google/protobuf/any';

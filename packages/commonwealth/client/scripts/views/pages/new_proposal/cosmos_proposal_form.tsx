@@ -11,7 +11,6 @@ import {
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import {
   useDepositParamsQuery,
-  usePoolParamsQuery,
   useStakingParamsQuery,
 } from 'state/api/chainParams';
 
