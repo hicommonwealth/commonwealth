@@ -70,6 +70,15 @@ const useFetchProfilesByAddressesQuery = ({
   });
 };
 
+// Some of the core logic in the app is non-reactive like the Account.ts file. These non-reactive
+// touch points call the api directly. After the RQ migration we needed to move them to react but
+// moving the core logic all at once isn't a very good option. As a gradual migration process to use
+// proper state and react'ive code, we created this method. It provides a link to get the benefits of
+// react query like cache/stale timer and more in non-react files. As the name suggests its discouraged
+// to use and should be avoided at all costs. If this is used anywhere, then it should follow the underlying
+// reason of its creation.
+// TODO: After account controller is de-side-effected (all api calls removed). Then we would be in a better
+// position to remove this discouraged method
 export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = (
   chainId: string,
   address: string
