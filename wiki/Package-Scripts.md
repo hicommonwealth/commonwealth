@@ -363,6 +363,14 @@ Description: Schedules a daily task for sending notification email digests.
 
 Considerations: Script name might be worth shortening.
 
+## send-cosmos-notifs
+
+Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
+
+Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
+
+Contributor: Timothee Legros
+
 ## start-prerender
 
 Definition: `ts-node --project tsconfig.json server/scripts/runPrerenderService.ts`
