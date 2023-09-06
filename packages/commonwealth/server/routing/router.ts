@@ -176,6 +176,7 @@ import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { getChainsHandler } from '../routes/chains/get_chains_handler';
 import { getChainNodesHandler } from '../routes/chains/get_chain_nodes_handler';
+import viewChainActivity from '../routes/viewChainActivity';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -974,6 +975,13 @@ function setupRouter(
     '/viewGlobalActivity',
     viewGlobalActivity.bind(this, models, globalActivityCache)
   );
+  registerRoute(
+    router,
+    'get',
+    '/viewChainActivity',
+    viewChainActivity.bind(this, models)
+  );
+
   registerRoute(
     router,
     'post',
