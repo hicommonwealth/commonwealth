@@ -30,9 +30,7 @@ const exportMembersList = async (
     return next(new AppError(Errors.NotAdmin));
   }
 
-  // implement your logic here
-
-  const { chainId } = req.body; // assuming chainId is passed in the request body
+  const { chainId } = req.body;
 
   const chain = await models.Chain.findOne({
     where: {
@@ -45,8 +43,6 @@ const exportMembersList = async (
   }
 
   try {
-    // implement your logic here
-
     const data = await models.sequelize.query(
       `
       SELECT 
