@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ChainBase } from 'common-common/src/types';
-import Cosmos from 'controllers/chain/cosmos/adapter';
+import React, { useState, useEffect } from 'react';
+import _ from 'lodash';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import useForceRerender from 'hooks/useForceRerender';
-import { useProposalMetadata } from 'hooks/cosmos/useProposalMetadata';
 import {
   chainToProposalSlug,
   getProposalUrlPath,
@@ -23,6 +21,7 @@ import { CollapsibleProposalBody } from '../../components/collapsible_body_text'
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
+import { Skeleton } from '../../components/Skeleton';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
@@ -31,6 +30,13 @@ import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import {
+  useCosmosProposalMetadataQuery,
+  useCosmosProposal,
+  useCosmosTally,
+  useCosmosVotes,
+  useCosmosDeposits,
+} from 'state/api/proposals';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -46,16 +52,33 @@ const ViewProposalPage = ({
   const forceRerender = useForceRerender();
   useInitChainIfNeeded(app);
 
-  const hasFetchedProposalRef = useRef(false);
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
+  const [title, setTitle] = useState<string>(proposal?.title);
+  const [description, setDescription] = useState<string>(proposal?.description);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
-  const { metadata } = useProposalMetadata({ app, proposal });
+  const { data: cosmosProposal } = useCosmosProposal({
+    isApiReady: !!app.chain.apiInitialized,
+    proposalId,
+  });
+  const { data: metadata, isFetching: isFetchingMetadata } =
+    useCosmosProposalMetadataQuery(proposal);
+  useCosmosVotes(proposal);
+  useCosmosTally(proposal);
+  useCosmosDeposits(proposal);
 
   useEffect(() => {
-    if (metadata?.title) forceRerender();
-  }, [metadata?.title, forceRerender]);
+    setProposal(cosmosProposal);
+    setTitle(cosmosProposal?.title);
+    setDescription(cosmosProposal?.description);
+  }, [cosmosProposal]);
+
+  useEffect(() => {
+    if (_.isEmpty(metadata)) return;
+    setTitle(metadata?.title);
+    setDescription(metadata?.description || metadata?.summary);
+  }, [metadata]);
 
   useEffect(() => {
     proposal?.isFetched.once('redraw', forceRerender);
@@ -67,35 +90,22 @@ const ViewProposalPage = ({
 
   useManageDocumentTitle('View proposal', proposal?.title);
 
+  const getProposalFromStore = () => {
+    let resolvedType = typeProp;
+    if (!typeProp) {
+      resolvedType = chainToProposalSlug(app.chain.meta);
+    }
+    return idToProposal(resolvedType, proposalId);
+  };
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
-      if (hasFetchedProposalRef.current) return;
-      hasFetchedProposalRef.current = true;
-
-      let resolvedType = typeProp;
-      if (!typeProp) {
-        resolvedType = chainToProposalSlug(app.chain.meta);
-      }
-
       try {
-        const proposalFromStore = idToProposal(resolvedType, proposalId);
+        const proposalFromStore = getProposalFromStore();
         setProposal(proposalFromStore);
         setError(null);
       } catch (e) {
-        // special case handling for completed cosmos proposals
-        if (app.chain.base === ChainBase.CosmosSDK) {
-          try {
-            const cosmosProposal = await (
-              app.chain as Cosmos
-            ).governance.getProposal(+proposalId);
-            setProposal(cosmosProposal);
-            setError(null);
-          } catch (err) {
-            setError('Proposal not found');
-          }
-        } else {
-          setError('Proposal not found');
-        }
+        console.log(`#${proposalId} Not found in store. `, e);
       }
     };
 
@@ -109,7 +119,7 @@ const ViewProposalPage = ({
     }
   }, [isAdapterLoaded, proposalId]);
 
-  if (!isAdapterLoaded || !proposal) {
+  if (!isAdapterLoaded) {
     return <PageLoading message="Loading..." />;
   }
 
@@ -117,14 +127,20 @@ const ViewProposalPage = ({
     return <PageNotFound message={error} />;
   }
 
+  const proposalTitle = title || proposal?.title;
+  const proposalDescription = description || proposal?.description;
+
   // replace path with correct slug
-  if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
-    const newPath = getProposalUrlPath(
-      proposal.slug,
-      `${proposalId}-${slugify(proposal.title)}`,
-      true
-    );
-    navigate(newPath, { replace: true });
+  if (proposal?.slug) {
+    const slugTitle = slugify(proposalTitle);
+    if (identifier !== `${proposalId}-${slugTitle}`) {
+      const newPath = getProposalUrlPath(
+        proposal.slug,
+        `${proposalId}-${slugTitle}`,
+        true
+      );
+      navigate(newPath, { replace: true });
+    }
   }
 
   // special case loading for tips
@@ -142,9 +158,10 @@ const ViewProposalPage = ({
 
   return (
     <CWContentPage
-      title={proposal.title}
-      author={proposal.author}
-      createdAt={proposal.createdAt}
+      showSkeleton={!proposal}
+      title={proposalTitle}
+      author={proposal?.author}
+      createdAt={proposal?.createdAt}
       updatedAt={null}
       subHeader={
         <ProposalSubheader
@@ -154,8 +171,8 @@ const ViewProposalPage = ({
         />
       }
       body={() =>
-        !!proposal.description && (
-          <CollapsibleProposalBody proposal={proposal} />
+        proposalDescription && (
+          <CollapsibleProposalBody doc={proposalDescription} />
         )
       }
       subBody={
@@ -166,12 +183,18 @@ const ViewProposalPage = ({
           {proposal instanceof AaveProposal && (
             <AaveViewProposalDetail proposal={proposal} />
           )}
-          {metadata && <JSONDisplay data={metadata} title="Metadata" />}
-          {proposal.data?.messages && (
+          {isFetchingMetadata ? (
+            <Skeleton height={94.4} />
+          ) : (
+            !_.isEmpty(metadata) && (
+              <JSONDisplay data={metadata} title="Metadata" />
+            )
+          )}
+          {!_.isEmpty(proposal?.data?.messages) && (
             <JSONDisplay data={proposal.data.messages} title="Messages" />
           )}
           {proposal instanceof CosmosProposal &&
-            proposal.data.type === 'communitySpend' && (
+            proposal?.data?.type === 'communitySpend' && (
               <JSONDisplay
                 data={{
                   recipient: proposal.data?.spendRecipient,

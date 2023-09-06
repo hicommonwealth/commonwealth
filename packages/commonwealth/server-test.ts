@@ -112,7 +112,12 @@ const resetServer = (debug = false): Promise<void> => {
           'Ropsten Testnet',
           '3',
         ],
-        ['https://rpc-juno.ecostake.com', 'Juno', null, BalanceType.Cosmos],
+        [
+          'https://rpc-osmosis.ecostake.com',
+          'Osmosis',
+          null,
+          BalanceType.Cosmos,
+        ],
         [
           'https://cosmos-devnet.herokuapp.com/rpc',
           'Cosmos SDK v0.46.11 devnet',
@@ -122,7 +127,7 @@ const resetServer = (debug = false): Promise<void> => {
         ],
       ];
 
-      const [edgewareNode, mainnetNode, testnetNode, junoNode, csdkNode] =
+      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkNode] =
         await Promise.all(
           nodes.map(([url, name, eth_chain_id, balance_type, alt_wallet_url]) =>
             models.ChainNode.create({
@@ -177,16 +182,16 @@ const resetServer = (debug = false): Promise<void> => {
         chain_node_id: testnetNode.id,
       });
       await models.Chain.create({
-        id: 'juno',
+        id: 'osmosis',
         network: ChainNetwork.Osmosis,
-        default_symbol: 'JUNO',
-        name: 'Juno',
+        default_symbol: 'OSMO',
+        name: 'Osmosis',
         icon_url: '/static/img/protocols/cosmos.png',
         active: true,
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
-        chain_node_id: junoNode.id,
+        chain_node_id: osmosisNode.id,
       });
       await models.Chain.create({
         id: 'csdk',
