@@ -80,7 +80,8 @@ export function processProposalSettledPromises(
   const v1Proposals: ProposalSDKType[][] = [];
   for (const result of v1ProposalResults) {
     if (result.status === 'rejected') {
-      log.error(result.reason);
+      console.error('Fetching v1 proposal failed.', result.reason);
+      log.error('Fetching v1 proposal failed.', result.reason);
       rollbar?.error(result.reason);
     } else {
       v1Proposals.push(result.value);
@@ -90,7 +91,8 @@ export function processProposalSettledPromises(
   const v1Beta1Proposals: Proposal[][] = [];
   for (const result of v1Beta1ProposalResults) {
     if (result.status === 'rejected') {
-      log.error(result.reason);
+      console.error('Fetching v1beta1 proposal failed.', result.reason);
+      log.error('Fetching v1beta1 proposal failed.', result.reason);
       rollbar?.error(result.reason);
     } else {
       v1Beta1Proposals.push(result.value);
@@ -208,6 +210,8 @@ export async function emitProposalNotifications(
           },
         });
       } catch (e) {
+        console.error('Error emitting v1 proposal notification', e);
+        log.error('Error emitting v1 proposal notification', e);
         log.error(e);
         rollbar?.error(e);
       }
@@ -241,6 +245,8 @@ export async function emitProposalNotifications(
           },
         });
       } catch (e) {
+        console.error('Error emitting v1beta1 proposal notification', e);
+        log.error('Error emitting v1beta1 proposal notification', e);
         log.error(e);
         rollbar?.error(e);
       }

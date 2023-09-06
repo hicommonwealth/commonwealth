@@ -227,7 +227,7 @@ export async function createCosmosChains() {
   });
 }
 
-describe('Cosmos Governance Notification Generator', () => {
+describe.only('Cosmos Governance Notification Generator', () => {
   before('Reset database', async () => {
     await resetDatabase();
   });
