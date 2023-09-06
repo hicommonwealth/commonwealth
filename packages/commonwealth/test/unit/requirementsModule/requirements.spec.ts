@@ -1,3 +1,4 @@
+import { assert, expect } from 'chai';
 import { Requirement } from 'server/util/requirementsModule/requirmentsTypes';
 import validateGroupMembership, {
   validateGroupMembershipResponse,
@@ -13,6 +14,6 @@ describe('validateGroupMembership', () => {
       requirements
     );
 
-    expect(result.isValid).toBe(true);
+    assert.equal(result.isValid, true);
   });
 });
