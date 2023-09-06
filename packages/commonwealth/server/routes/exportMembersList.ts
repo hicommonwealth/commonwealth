@@ -12,12 +12,11 @@ export const Errors = {
 };
 
 type exportMembersListReq = {
-  // define your request parameters here
   chainId: string;
 };
 
 type exportMembersListResp = {
-  // define your response parameters here
+  data: any;
 };
 
 const exportMembersList = async (
