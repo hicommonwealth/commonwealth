@@ -262,6 +262,7 @@ async function main() {
           'A mock notification will not link to a real chain-event or snapshot-proposal.',
       },
     })
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     .check((argv) => {
       if (!argv.mock_notification) return true;
 
