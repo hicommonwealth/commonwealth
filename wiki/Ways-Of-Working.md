@@ -5,9 +5,11 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
 - [Development Process Overview](#development-process-overview)
 - [Project Management Flow](#project-management-flow)
   * [Tickets](#tickets)
+    + [Questions](#questions)
     + [Blockers](#blockers)
     + [Story Point Estimation](#story-point-estimation)
   * [Pull Requests](#pull-requests)
+    + [Draft PRs](#draft-prs)
     + [Github Quality Checks](#github-quality-checks)
 - [Standup](#standup)
 - [Deployment and QA schedule](#deployment-and-qa-schedule)
@@ -66,7 +68,9 @@ Points _may_ always be increased mid-implementation, but a justification _must_ 
 
 ## Pull Requests
 
-PRs should always reference their instigating ticket in the description, by number. As of 230906, test plans should be included with every code-changing PR, as part of our road to automated testing.
+PRs must always reference their instigating ticket in the description by number. GitHub uses [a set of keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) to automatically link PRs with referenced issues. Linked issues are automatically closed by their relevant PRs. 
+
+As of 230906, test plans should be included with every code-changing PR, as part of our road to automated testing.
 
 Engineers are welcome to open several pull requests to close an outstanding ticket. Such PRs can be either "dependent" (i.e., blocking) or "sequential" (i.e., logically independent), and should be flagged accordingly, so that depended-upon (i.e. blocking) PRs are prioritized for merging. 
 
