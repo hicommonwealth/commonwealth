@@ -1,7 +1,7 @@
 import { AddressAttributes } from 'server/models/address';
 import { Requirement } from './requirmentsTypes';
 
-type validateGroupMembershipResponse = {
+export type validateGroupMembershipResponse = {
   isValid: boolean;
   messages?: {
     requirement: Requirement;
