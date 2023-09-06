@@ -70,8 +70,13 @@ const config: HardhatUserConfig = {
       },
     ],
   },
+  paths: {
+    sources: './src/eth/contracts',
+    artifacts: './src/eth/artifacts',
+    cache: './src/eth/cache',
+  },
   typechain: {
-    outDir: './types',
+    outDir: './src/eth/types',
     target: 'ethers-v5',
   },
 };

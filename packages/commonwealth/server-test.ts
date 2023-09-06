@@ -42,6 +42,7 @@ import {
 } from '../common-common/src/cacheKeyUtils';
 
 import { factory, formatFilename } from 'common-common/src/logging';
+import { RedisCache } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -483,8 +484,9 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
 const banCache = new BanCache(models);
 const globalActivityCache = new GlobalActivityCache(models);
 globalActivityCache.start();
+const redisCache = new RedisCache();
+
 setupPassport(models);
-// TODO: mock RabbitMQController
 setupAPI(
   '/api',
   app,
@@ -493,7 +495,8 @@ setupAPI(
   tokenBalanceCache,
   banCache,
   globalActivityCache,
-  databaseValidationService
+  databaseValidationService,
+  redisCache
 );
 setupCosmosProxy(app, models);
 setupCacheTestEndpoints(app);
