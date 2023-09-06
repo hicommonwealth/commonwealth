@@ -32,7 +32,7 @@ async function createTestProposal(rpcUrl: string, content: Any) {
   expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 }
 
-describe.only('Cosmos Governance Notification Generator with real proposals', () => {
+describe('Cosmos Governance Notification Generator with real proposals', () => {
   describe('v1 proposals', () => {
     before('Setup DB objects and create proposal', async () => {
       await models.Chain.update(
