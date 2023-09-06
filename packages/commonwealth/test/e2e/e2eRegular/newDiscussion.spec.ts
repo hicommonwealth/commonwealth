@@ -1,7 +1,12 @@
 import { test } from '@playwright/test';
 import { PORT } from '../../../server/config';
 import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks.spec';
-import { addAddressIfNone, login } from '../utils/e2eUtils';
+import {
+  addAddressIfNone,
+  login,
+  testAddress,
+  testDb,
+} from '../utils/e2eUtils';
 
 test.beforeEach(async () => {
   await createTestEntities();
@@ -26,5 +31,10 @@ test.describe('New Discussion Page Tests', () => {
     await page.getByRole('button', { name: 'Submit' }).click();
 
     await page.waitForURL(/^.*-test-thread$/i);
+
+    // delete thread for cleanup
+    const match = page.url().match(/\/(\d+)-/);
+    const threadId = match[1];
+    await testDb.query(`DELETE from "Threads" where id = ${threadId}`);
   });
 });
