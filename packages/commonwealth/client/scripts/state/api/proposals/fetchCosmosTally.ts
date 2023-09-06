@@ -24,12 +24,18 @@ const fetchCosmosTally = async (
   }
 };
 
+const getCosmosVotesQueryKey = (proposal: AnyProposal) => {
+  return [
+    'cosmosTally',
+    app.activeChainId(),
+    proposal?.identifier,
+    proposal?.support,
+  ];
+};
+
 const useCosmosTally = (proposal: AnyProposal) => {
-  const chainId = app.activeChainId();
-  const proposalId = proposal?.identifier;
-  const support = proposal?.support; // using this as a dependency in case proposal is refetched
   return useQuery({
-    queryKey: ['tally', { chainId, proposalId, support, proposal }],
+    queryKey: getCosmosVotesQueryKey(proposal),
     queryFn: () => fetchCosmosTally(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK &&

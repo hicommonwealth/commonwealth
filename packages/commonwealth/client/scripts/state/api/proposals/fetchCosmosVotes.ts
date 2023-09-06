@@ -24,12 +24,18 @@ const fetchCosmosVotes = async (
   }
 };
 
+const getCosmosVotesQueryKey = (proposal: AnyProposal) => {
+  return [
+    'cosmosVotes',
+    app.activeChainId(),
+    proposal?.identifier,
+    proposal?.turnout,
+  ];
+};
+
 const useCosmosVotes = (proposal: AnyProposal) => {
-  const chainId = app.activeChainId();
-  const proposalId = proposal?.identifier;
-  const turnout = proposal?.turnout; // using this as a dependency in case proposal is refetched
   return useQuery({
-    queryKey: ['votes', { chainId, proposalId, turnout, proposal }],
+    queryKey: getCosmosVotesQueryKey(proposal),
     queryFn: () => fetchCosmosVotes(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK &&
