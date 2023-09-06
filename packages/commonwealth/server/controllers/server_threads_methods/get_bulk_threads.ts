@@ -96,7 +96,7 @@ export async function __getBulkThreads(
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
-          COALESCE(latest_comments.latest_comment_date, t.created_at) AS latest_activity,
+          COALESCE(t.last_commented_on, t.created_at) AS latest_activity,
           t.marked_as_spam_at,
           t.archived_at,
           t.updated_at AS thread_updated,
@@ -116,13 +116,6 @@ export async function __getBulkThreads(
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
         LEFT JOIN (
-          SELECT thread_id, MAX(created_at) AS latest_comment_date
-          FROM "Comments"
-          WHERE deleted_at IS NULL
-          GROUP BY thread_id
-        ) latest_comments
-        ON t.id = latest_comments.thread_id
-        LEFT JOIN (
             SELECT thread_id,
             STRING_AGG(ad.address::text, ',') AS addresses_reacted,
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
@@ -141,7 +134,7 @@ export async function __getBulkThreads(
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
           GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), t.comment_count,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, latest_comments.latest_comment_date)
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
           ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
         ) threads
       ON threads.address_id = addr.id
