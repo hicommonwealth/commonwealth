@@ -160,7 +160,7 @@ export class Thread implements IUniqueId {
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
   public readonly discord_meta: any;
-  public readonly latestActivity: number;
+  public readonly latestActivity: Moment;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -276,7 +276,9 @@ export class Thread implements IUniqueId {
       reactionType,
       addressesReacted
     );
-    this.latestActivity = Number(latest_activity || '0');
+    this.latestActivity = last_commented_on
+      ? moment(last_commented_on)
+      : moment(created_at);
   }
 }
 
