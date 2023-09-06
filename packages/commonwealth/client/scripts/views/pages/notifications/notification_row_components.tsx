@@ -7,11 +7,7 @@ import AddressInfo from '../../../models/AddressInfo';
 import type { NotificationRowProps } from './notification_row';
 import type { CWEvent } from 'chain-events/src';
 import { Label as ChainEventLabel, SupportedNetwork } from 'chain-events/src';
-import {
-  ChainNetwork,
-  NotificationCategories,
-  ProposalType,
-} from 'common-common/src/types';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 
 import app from 'state';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
