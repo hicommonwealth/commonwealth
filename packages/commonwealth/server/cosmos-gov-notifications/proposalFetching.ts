@@ -18,6 +18,8 @@ import { GovExtension, QueryClient, setupGovExtension } from '@cosmjs/stargate';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { PageRequest } from 'common-common/src/cosmos-ts/src/codegen/cosmos/base/query/v1beta1/pagination';
 import Rollbar from 'rollbar';
+import { createLCDClient } from 'common-common/src/cosmos-ts/src/codegen/cosmos/lcd';
+import * as tm from '@cosmjs/tendermint-rpc';
 
 export type AllCosmosProposals = {
   v1: { [chainId: string]: ProposalSDKType[] };
@@ -36,17 +38,17 @@ async function getCosmosClient<
   if (CosmosClients[chain.id]) return CosmosClients[chain.id] as CosmosClient;
 
   if (COSMOS_GOV_V1_CHAIN_IDS.includes(chain.id)) {
-    const { createLCDClient } = await import(
-      'common-common/src/cosmos-ts/src/codegen/cosmos/lcd'
-    );
     const result = await createLCDClient({
       restEndpoint: chain.ChainNode.alt_wallet_url,
     });
 
     CosmosClients[chain.id] = result.cosmos.gov.v1;
+
+    if (!CosmosClients[chain.id]) {
+      throw new Error(`Failed to create Cosmos client for chain ${chain.id}`);
+    }
     return CosmosClients[chain.id] as CosmosClient;
   } else {
-    const tm = await import('@cosmjs/tendermint-rpc');
     const tmClient = await tm.Tendermint34Client.connect(
       chain.ChainNode.url || chain.ChainNode.private_url
     );
@@ -54,6 +56,10 @@ async function getCosmosClient<
       tmClient,
       setupGovExtension
     );
+
+    if (!CosmosClients[chain.id]) {
+      throw new Error(`Failed to create Cosmos client for chain ${chain.id}`);
+    }
     return CosmosClients[chain.id] as CosmosClient;
   }
 }

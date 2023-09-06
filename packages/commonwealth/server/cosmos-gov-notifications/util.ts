@@ -80,9 +80,8 @@ export function processProposalSettledPromises(
   const v1Proposals: ProposalSDKType[][] = [];
   for (const result of v1ProposalResults) {
     if (result.status === 'rejected') {
-      console.error('Fetching v1 proposal failed.', result.reason);
       log.error('Fetching v1 proposal failed.', result.reason);
-      rollbar?.error(result.reason);
+      rollbar?.error('Fetching v1 proposal failed.', result.reason);
     } else {
       v1Proposals.push(result.value);
     }
@@ -91,9 +90,8 @@ export function processProposalSettledPromises(
   const v1Beta1Proposals: Proposal[][] = [];
   for (const result of v1Beta1ProposalResults) {
     if (result.status === 'rejected') {
-      console.error('Fetching v1beta1 proposal failed.', result.reason);
       log.error('Fetching v1beta1 proposal failed.', result.reason);
-      rollbar?.error(result.reason);
+      rollbar?.error('Fetching v1beta1 proposal failed.', result.reason);
     } else {
       v1Beta1Proposals.push(result.value);
     }
