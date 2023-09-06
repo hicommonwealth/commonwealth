@@ -379,6 +379,14 @@ Description: Starts the app server with the ETH_RPC env variable set to “e2e-t
 
 Contributor: Kurtis Assad
 
+## emit-notification
+
+Definition: `ts-node --project tsconfig.json server/scripts/emitTestNotification.ts`
+
+Description: Emits a chain-event or snapshot notification. Run `yarn emit-notification --help` to see options.
+
+Contributor: Timothee Legros
+
 ## gen-e2e
 
 Definition: `npx playwright codegen`
