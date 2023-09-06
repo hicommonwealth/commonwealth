@@ -228,6 +228,7 @@ export async function createTestEntities() {
               'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
             active: true,
             default_symbol: 'cmn',
+            custom_domain: 'customdomain.com',
           },
         })
       )[0],
@@ -243,6 +244,7 @@ export async function createTestEntities() {
               'https://pbs.twimg.com/profile_images/1562880197376020480/6R_gefq8_400x400.jpg',
             active: true,
             default_symbol: 'cmntest2',
+            custom_domain: 'customdomain.com',
           },
         }).catch((e) => console.log(e))
       )[0],
@@ -424,16 +426,4 @@ export async function createTestEntities() {
   } catch (e) {
     console.log(e);
   }
-}
-
-if (process.env.TEST_ENV !== 'playwright') {
-  beforeEach(async () => {
-    await clearTestEntities();
-
-    await createTestEntities();
-  });
-
-  afterEach(async () => {
-    await clearTestEntities();
-  });
 }

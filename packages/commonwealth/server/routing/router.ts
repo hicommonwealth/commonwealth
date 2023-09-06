@@ -129,6 +129,7 @@ import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import createChainNode from '../routes/createChainNode';
+import { RedisCache } from 'common-common/src/redisCache';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -159,6 +160,7 @@ import { ServerNotificationsController } from '../controllers/server_notificatio
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
 import { ServerChainsController } from '../controllers/server_chains_controller';
+import { ServerProposalsController } from '../controllers/server_proposals_controller';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
@@ -177,6 +179,8 @@ import { searchProfilesHandler } from '../routes/profiles/search_profiles_handle
 import { getChainsHandler } from '../routes/chains/get_chains_handler';
 import { getChainNodesHandler } from '../routes/chains/get_chain_nodes_handler';
 import exportMembersList from '../routes/exportMembersList';
+import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
+import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -186,6 +190,7 @@ export type ServerControllers = {
   analytics: ServerAnalyticsController;
   profiles: ServerProfilesController;
   chains: ServerChainsController;
+  proposals: ServerProposalsController;
 };
 
 function setupRouter(
@@ -196,7 +201,8 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
-  databaseValidationService: DatabaseValidationService
+  databaseValidationService: DatabaseValidationService,
+  redisCache: RedisCache
 ) {
   // controllers
 
@@ -208,6 +214,7 @@ function setupRouter(
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     chains: new ServerChainsController(models, tokenBalanceCache, banCache),
+    proposals: new ServerProposalsController(models, redisCache),
   };
 
   // ---
@@ -1295,6 +1302,21 @@ function setupRouter(
     'post',
     '/getSubscribedChains',
     getSubscribedChains.bind(this, models)
+  );
+
+  // Proposal routes
+  registerRoute(
+    router,
+    'get',
+    '/proposals',
+    getProposalsHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/proposalVotes',
+    getProposalVotesHandler.bind(this, serverControllers)
   );
 
   app.use(endpoint, router);
