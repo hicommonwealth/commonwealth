@@ -8,28 +8,32 @@ import {
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import { generateCosmosGovNotifications } from '../../../server/cosmos-gov-notifications/generateCosmosGovNotifications';
-import { resetDatabase } from '../../../server-test';
-import {
-  BalanceType,
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-} from 'common-common/src/types';
-import { CosmosApiType } from 'controllers/chain/cosmos/chain';
-import {
-  getRPCClient,
-  getTMClient,
-} from 'controllers/chain/cosmos/chain.utils';
+import sinon from 'sinon';
 
 const { expect, assert } = chai;
 
 const v1ChainId = 'csdk-v1';
+const v1RpcUrl = `http://localhost:8080/cosmosAPI/${v1ChainId}`;
+const v1Content = encodeTextProposal(`v1 title`, `v1 description`);
+
 const v1Beta1ChainId = 'csdk-beta-ci';
+const v1Beta1RpcUrl = `http://localhost:8080/cosmosAPI/${v1Beta1ChainId}`;
+const v1Beta1Content = encodeTextProposal(
+  `beta text title`,
+  `beta text description`
+);
+
+async function createTestProposal(rpcUrl: string, content: Any) {
+  const { signerAddress } = await setupTestSigner(rpcUrl);
+  const msg = encodeMsgSubmitProposal(signerAddress, deposit, content);
+  const resp = await sendTx(rpcUrl, msg);
+  expect(resp.transactionHash).to.not.be.undefined;
+  expect(resp.rawLog).to.not.be.undefined;
+  expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
+}
 
 describe.only('Cosmos Governance Notification Generator with real proposals', () => {
   describe('v1 proposals', () => {
-    const content = encodeTextProposal(`v1 title`, `v1 description`);
-    const rpcUrl = `http://localhost:8080/cosmosAPI/${v1ChainId}`;
     before('Setup DB objects and create proposal', async () => {
       await models.Chain.update(
         { has_chain_events_listener: false },
@@ -40,12 +44,7 @@ describe.only('Cosmos Governance Notification Generator with real proposals', ()
         { where: { id: v1ChainId } }
       );
 
-      const { signerAddress } = await setupTestSigner(rpcUrl);
-      const msg = encodeMsgSubmitProposal(signerAddress, deposit, content);
-      const resp = await sendTx(rpcUrl, msg);
-      expect(resp.transactionHash).to.not.be.undefined;
-      expect(resp.rawLog).to.not.be.undefined;
-      expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
+      await createTestProposal(v1RpcUrl, v1Content);
     });
 
     beforeEach(async () => {
@@ -54,7 +53,7 @@ describe.only('Cosmos Governance Notification Generator with real proposals', ()
       });
     });
 
-    it('should generate a cosmos gov v1 notification', async () => {
+    it('should generate a single cosmos gov v1 notification when there are no existing notifications', async () => {
       await generateCosmosGovNotifications();
       const notifications = await models.Notification.findAll({
         where: {
@@ -74,15 +73,39 @@ describe.only('Cosmos Governance Notification Generator with real proposals', ()
       });
       expect(notifications.length).to.equal(1);
     });
+
+    it('should generate notifications for all v1 proposals proposals since the last known notification', async () => {
+      await generateCosmosGovNotifications();
+      await createTestProposal(v1RpcUrl, v1Content);
+      await createTestProposal(v1RpcUrl, v1Content);
+      await generateCosmosGovNotifications();
+      const notifications = await models.Notification.findAll({
+        where: {
+          category_id: 'chain-event',
+        },
+      });
+      expect(notifications.length).to.equal(3);
+    });
+
+    it('should not generate any notifications for proposals older than 2 hours', async () => {
+      await generateCosmosGovNotifications();
+      await createTestProposal(v1RpcUrl, v1Content);
+
+      const clock = sinon.useFakeTimers(Date.now());
+      await clock.tickAsync(60_000 * 60 * 3); // advance time by 3 hours
+      await generateCosmosGovNotifications();
+
+      const notifications = await models.Notification.findAll({
+        where: {
+          category_id: 'chain-event',
+        },
+      });
+      expect(notifications.length).to.equal(1);
+      clock.restore();
+    });
   });
 
   describe('v1beta1 proposals', () => {
-    const content = encodeTextProposal(
-      `beta text title`,
-      `beta text description`
-    );
-    const rpcUrlBeta = `http://localhost:8080/cosmosAPI/${v1Beta1ChainId}`;
-
     before('Setup DB objects and create proposal', async () => {
       await models.Chain.update(
         { has_chain_events_listener: false },
@@ -93,14 +116,7 @@ describe.only('Cosmos Governance Notification Generator with real proposals', ()
         { where: { id: v1Beta1ChainId } }
       );
 
-      const { signerAddress } = await setupTestSigner(rpcUrlBeta);
-
-      const msg = encodeMsgSubmitProposal(signerAddress, deposit, content);
-      const resp = await sendTx(rpcUrlBeta, msg);
-
-      expect(resp.transactionHash).to.not.be.undefined;
-      expect(resp.rawLog).to.not.be.undefined;
-      expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
+      await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
     });
 
     beforeEach(async () => {
@@ -109,7 +125,7 @@ describe.only('Cosmos Governance Notification Generator with real proposals', ()
       });
     });
 
-    it('should generate a single cosmos gov v1beta1 notification', async () => {
+    it('should generate a single cosmos gov v1beta1 notification when there are no existing notifications', async () => {
       await generateCosmosGovNotifications();
       const notifications = await models.Notification.findAll({
         where: {
@@ -128,6 +144,84 @@ describe.only('Cosmos Governance Notification Generator with real proposals', ()
         },
       });
       expect(notifications.length).to.equal(1);
+    });
+
+    it('should generate notifications for multiple v1Beta1 proposals since the last known notification', async () => {
+      await generateCosmosGovNotifications();
+      await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
+      await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
+      await generateCosmosGovNotifications();
+      const notifications = await models.Notification.findAll({
+        where: {
+          category_id: 'chain-event',
+        },
+      });
+      expect(notifications.length).to.equal(3);
+    });
+
+    it('should not generate any notifications for proposals older than 2 hours', async () => {
+      await generateCosmosGovNotifications();
+      await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
+
+      const clock = sinon.useFakeTimers(Date.now());
+      await clock.tickAsync(60_000 * 60 * 3); // advance time by 3 hours
+      await generateCosmosGovNotifications();
+
+      const notifications = await models.Notification.findAll({
+        where: {
+          category_id: 'chain-event',
+        },
+      });
+      expect(notifications.length).to.equal(1);
+      clock.restore();
+    });
+  });
+
+  describe('v1 and v1beta1 proposals', () => {
+    before('Setup DB objects and create proposal', async () => {
+      await models.Chain.update(
+        { has_chain_events_listener: true },
+        { where: { id: [v1Beta1ChainId, v1ChainId] } }
+      );
+    });
+
+    beforeEach(async () => {
+      await models.Notification.destroy({
+        truncate: true,
+      });
+    });
+
+    it('should generate notifications for all v1 and v1beta1 proposals proposals since the last known notification', async () => {
+      await generateCosmosGovNotifications();
+      await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
+      await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
+      await createTestProposal(v1RpcUrl, v1Content);
+      await createTestProposal(v1RpcUrl, v1Content);
+      await generateCosmosGovNotifications();
+
+      const notifications = await models.Notification.findAll({
+        where: {
+          category_id: 'chain-event',
+        },
+      });
+      expect(notifications.length).to.equal(6);
+    });
+
+    it('should not generate any notifications for proposals older than 2 hours', async () => {
+      await generateCosmosGovNotifications();
+      await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
+      await createTestProposal(v1RpcUrl, v1Content);
+
+      const clock = sinon.useFakeTimers(Date.now());
+      await clock.tickAsync(60_000 * 60 * 3); // advance time by 3 hours
+      await generateCosmosGovNotifications();
+
+      const notifications = await models.Notification.findAll({
+        where: {
+          category_id: 'chain-event',
+        },
+      });
+      expect(notifications.length).to.equal(2);
     });
   });
 });
