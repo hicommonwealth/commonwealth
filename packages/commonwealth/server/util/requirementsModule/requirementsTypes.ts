@@ -1,11 +1,8 @@
-type LengthConstrainedString<N extends number> = string & {
-  _lengthConstraint: N;
-};
 
 type ContractSource = {
   source_type: 'erc20' | 'erc721';
   chain_id: string;
-  contract_address: LengthConstrainedString<42>;
+  contract_address: string;
 };
 
 type NativeSource = {
@@ -24,7 +21,7 @@ type ThresholdData = {
 };
 
 type AllowlistData = {
-  allow: LengthConstrainedString<42>[];
+  allow: string[];
 };
 
 export type Requirement =

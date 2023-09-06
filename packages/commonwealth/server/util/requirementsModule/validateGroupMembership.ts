@@ -1,5 +1,5 @@
 import { AddressAttributes } from 'server/models/address';
-import { Requirement } from './requirmentsTypes';
+import { Requirement } from './requirementsTypes';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 
 export type validateGroupMembershipResponse = {

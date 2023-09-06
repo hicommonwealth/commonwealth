@@ -1,5 +1,5 @@
 import { assert, expect } from 'chai';
-import { Requirement } from 'server/util/requirementsModule/requirmentsTypes';
+import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
 import validateGroupMembership, {
   validateGroupMembershipResponse,
 } from 'server/util/requirementsModule/validateGroupMembership';

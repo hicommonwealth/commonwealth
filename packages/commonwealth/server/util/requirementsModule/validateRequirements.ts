@@ -1,4 +1,4 @@
-import { Requirement } from './requirmentsTypes';
+import { Requirement } from './requirementsTypes';
 
 /**
  * validates a set of requirements against the schema
