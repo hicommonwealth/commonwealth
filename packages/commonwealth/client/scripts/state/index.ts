@@ -14,7 +14,6 @@ import SessionsController from 'controllers/server/sessions';
 import { WebSocketController } from 'controllers/server/socket';
 import { UserController } from 'controllers/server/user';
 import { EventEmitter } from 'events';
-import $ from 'jquery';
 import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
