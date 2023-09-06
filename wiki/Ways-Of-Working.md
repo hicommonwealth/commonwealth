@@ -35,6 +35,12 @@ Work _should not_ begin on a ticket until (1) an engineer has been assigned to t
 
 Typically, engineers _should_ only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be moved to "In Progress"). 
 
+### Questions
+
+If an implementing engineer has questions about a ticket, these should be left as a comment on the GitHub issue itself (rather than in Slack DMs, where the record will be buried).
+
+Questions must tag a specific individual. Typically, they should only tag one person, since multi-tags frequently lead to responsibility deferrals (i.e. each tagged individual assumes the other has it covered). 
+
 ### Blockers
 
 The "blocked" label is the official source of truth as to whether a story is considered blocked. Unless it has such a label, a story should not be considered blocked or referenced as blocked. This is to prevent miscommunication across the team. 
@@ -60,11 +66,19 @@ Points _may_ always be increased mid-implementation, but a justification _must_ 
 
 ## Pull Requests
 
-PRs should always reference their instigating ticket in the description, by number.
+PRs should always reference their instigating ticket in the description, by number. As of 230906, test plans should be included with every code-changing PR, as part of our road to automated testing.
 
 Engineers are welcome to open several pull requests to close an outstanding ticket. Such PRs can be either "dependent" (i.e., blocking) or "sequential" (i.e., logically independent), and should be flagged accordingly, so that depended-upon (i.e. blocking) PRs are prioritized for merging. 
 
-Close your own PR: if it's ready for QA, tag a reviewer, complain in a Slack channel, or send a DM. 
+Close your own PR: if it's ready for QA, tag a reviewer, complain in a Slack channel, or send a DM.
+
+### Draft PRs
+
+PRs that are not yet ready for Codeowner Review should be opened as drafts. Drafts should typically include some estimation of when review-ready code is expected to land.
+
+If a non-draft PR is assessed by a codeowner as not yet ready for review, or needing further work, it should be reassigned draft status. 
+
+In the case of a Design Review (not to be confused with a Codeowner Review), any feedback that isn't unambiguously positive should result in status changing back to draft for remaining work.
 
 ### Github Quality Checks
 
