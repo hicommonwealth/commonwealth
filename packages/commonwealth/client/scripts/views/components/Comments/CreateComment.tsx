@@ -32,6 +32,7 @@ type CreateCommentProps = {
   parentCommentId?: number;
   rootThread: Thread;
   canComment: boolean;
+  shouldFocusEditor?: boolean;
 };
 
 export const CreateComment = ({
@@ -39,6 +40,7 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   canComment,
+  shouldFocusEditor = false,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -185,6 +187,7 @@ export const CreateComment = ({
         setContentDelta={setContentDelta}
         isDisabled={!canComment}
         tooltipLabel="Join community to comment"
+        shouldFocus={shouldFocusEditor}
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">

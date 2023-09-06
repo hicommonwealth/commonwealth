@@ -32,6 +32,7 @@ type CardProps = AdminActionsProps & {
   threadHref?: string;
   showSkeleton?: boolean;
   canReact?: boolean;
+  onCommentBtnClick?: () => any;
 };
 
 export const ThreadCard = ({
@@ -52,6 +53,7 @@ export const ThreadCard = ({
   threadHref,
   showSkeleton,
   canReact = true,
+  onCommentBtnClick = () => null,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -206,6 +208,7 @@ export const ThreadCard = ({
               onEditCancel={onEditCancel}
               onEditConfirm={onEditConfirm}
               hasPendingEdits={hasPendingEdits}
+              onCommentBtnClick={onCommentBtnClick}
             />
           </div>
         </div>

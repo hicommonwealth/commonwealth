@@ -210,7 +210,6 @@ const app: IApp = {
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedChain = true,
-  customDomain = null,
   shouldRedraw = true
 ): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -293,10 +292,6 @@ export async function initAppState(
           app.user.setSelectedChain(
             ChainInfo.fromJSON(data.result.user.selectedChain)
           );
-        }
-
-        if (customDomain) {
-          app.setCustomDomain(customDomain);
         }
 
         resolve();

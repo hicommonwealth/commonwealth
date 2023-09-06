@@ -40,35 +40,34 @@ export const UserBlock = (props: {
 
   const highlightedAddress = highlightSearchTerm
     ? (() => {
-        const queryStart = profile?.address.toLowerCase().indexOf(searchTerm);
-        const queryEnd = queryStart + searchTerm.length;
+      const queryStart = profile?.address.toLowerCase().indexOf(searchTerm);
+      const queryEnd = queryStart + searchTerm.length;
 
-        return (
-          <>
-            <span>{profile?.address.slice(0, queryStart)}</span>
-            <mark>{profile?.address.slice(queryStart, queryEnd)}</mark>
-            <span>
-              {profile?.address.slice(queryEnd, profile?.address.length)}
-            </span>
-          </>
-        );
-      })()
+      return (
+        <>
+          <span>{profile?.address.slice(0, queryStart)}</span>
+          <mark>{profile?.address.slice(queryStart, queryEnd)}</mark>
+          <span>
+            {profile?.address.slice(queryEnd, profile?.address.length)}
+          </span>
+        </>
+      );
+    })()
     : null;
 
   const children = (
     <>
       <div className="user-block-center">
         <div
-          className={`user-block-address${
-            profile?.address ? '' : 'no-address'
-          }`}
+          className={`user-block-address${profile?.address ? '' : 'no-address'
+            }`}
         >
           <div>
             {highlightSearchTerm
               ? highlightedAddress
               : `${profile?.address.slice(0, 8)}...${profile?.address.slice(
-                  -5
-                )}`}
+                -5
+              )}`}
           </div>
           {profile?.address && showChainName && (
             <div className="address-divider"> · </div>

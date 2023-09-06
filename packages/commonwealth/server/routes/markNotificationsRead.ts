@@ -22,7 +22,10 @@ export default async (
   }
 
   let idOptions;
-  if (typeof req.body['notification_ids[]'] === 'string') {
+  if (
+    typeof req.body['notification_ids[]'] === 'string' ||
+    typeof req.body['notification_ids[]'] === 'number'
+  ) {
     idOptions = req.body['notification_ids[]'];
   } else {
     idOptions = req.body['notification_ids[]'].map((n) => +n);

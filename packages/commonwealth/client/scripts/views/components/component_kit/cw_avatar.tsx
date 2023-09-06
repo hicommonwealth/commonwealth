@@ -1,9 +1,7 @@
-import React from 'react';
-
-import Jdenticon from 'react-jdenticon';
-
 import 'components/component_kit/cw_avatar.scss';
-
+import React from 'react';
+import Jdenticon from 'react-jdenticon';
+import { Skeleton } from '../Skeleton';
 import { ComponentType } from './types';
 
 type BaseAvatarProps = {
@@ -11,6 +9,17 @@ type BaseAvatarProps = {
 };
 
 type AvatarProps = BaseAvatarProps & { avatarUrl: string };
+
+export const CWAvatarSkeleton = ({ size }: BaseAvatarProps) => {
+  return (
+    <Skeleton
+      circle
+      className={ComponentType.Avatar}
+      width={size}
+      height={size}
+    />
+  );
+};
 
 export const CWAvatar = (props: AvatarProps) => {
   const { avatarUrl, size } = props;

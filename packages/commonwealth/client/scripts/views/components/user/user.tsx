@@ -12,20 +12,8 @@ import { CWButton } from '../component_kit/cw_button';
 import { Modal } from '../component_kit/cw_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
-
-type UserAttrs = {
-  userAddress: string;
-  userChainId: string;
-  shouldShowAsDeleted?: boolean;
-  shouldShowRole?: boolean;
-  shouldHideAvatar?: boolean;
-  shouldShowAvatarOnly?: boolean;
-  shouldLinkProfile?: boolean;
-  shouldShowPopover?: boolean;
-  shouldShowAddressWithDisplayName?: boolean;
-  avatarSize?: number;
-  role?: { permission: string };
-};
+import { UserSkeleton } from './UserSkeleton';
+import type { UserAttrsWithSkeletonProp } from './user.types';
 
 export const User = ({
   shouldLinkProfile,
@@ -39,13 +27,27 @@ export const User = ({
   shouldShowAddressWithDisplayName,
   avatarSize = 16,
   role,
-}: UserAttrs) => {
+  showSkeleton
+}: UserAttrsWithSkeletonProp) => {
+  const popoverProps = usePopover();
   const { data: users } = useFetchProfilesByAddressesQuery({
     currentChainId: app.activeChainId(),
     profileAddresses: [userAddress],
     profileChainIds: [userChainId],
     apiCallEnabled: !!(userAddress && userChainId),
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  if (showSkeleton) {
+    return (
+      <UserSkeleton
+        shouldShowAvatarOnly={shouldShowAvatarOnly}
+        shouldHideAvatar={shouldHideAvatar}
+        shouldShowPopover={shouldShowPopover}
+        avatarSize={avatarSize}
+      />
+    );
+  }
 
   const profile = users?.[0] || {};
 
@@ -58,9 +60,6 @@ export const User = ({
     app.chain?.meta?.bech32Prefix
   );
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const popoverProps = usePopover();
   const showAvatar = profile ? !shouldHideAvatar : false;
   const loggedInUserIsAdmin =
     Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
