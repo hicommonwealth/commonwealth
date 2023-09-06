@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Commonwealth E2E Test
+    name: Commonwealth E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -100,7 +100,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Commonwealth Mature E2E Test
+    name: Commonwealth Mature E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -183,7 +183,7 @@ jobs:
     strategy:
       matrix:
         node: [ 18 ]
-    name: Commonwealth E2E Test Serial
+    name: Commonwealth E2E Tests Serial
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

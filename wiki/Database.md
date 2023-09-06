@@ -45,8 +45,5 @@ https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle
 ## HEROKU BUILD AGENT CONF VARIABLES
 https://docs.datadoghq.com/agent/basic_agent_usage/heroku/#configuration
 
-## Auxiliary Database (AUXILIARY_DB_URL)
-For data that does not pertain directly to the commonwealth app or its services. We run another database for persistant
-storage. This database contains things such as:
-- Last failure of e2e tests
+
 
