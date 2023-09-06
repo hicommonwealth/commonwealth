@@ -15,6 +15,9 @@ import { ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+/**
+ * Entry-point to generate Cosmos proposal notifications. Uses a polling scheme to fetch created proposals.
+ */
 export async function generateCosmosGovNotifications(rollbar?: Rollbar) {
   // fetch chains to generate notifications for
   const chains = await fetchCosmosNotifChains(models);

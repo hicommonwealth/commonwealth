@@ -71,7 +71,6 @@ async function getCosmosClient<
  * Fetches the most recent (latest) proposal from a Cosmos chain that uses the v1 gov module. Depending on the
  * Cosmos SDK version the chain is built with, the fetching can be optimized by using varying pagination values.
  * See /gov/v1beta1/proposals at https://v1.cosmos.network/rpc/v0.45.1 for more details on pagination values.
- * @param chain
  */
 async function fetchLatestCosmosProposalV1(
   chain: ChainInstance
@@ -111,9 +110,7 @@ async function fetchLatestCosmosProposalV1(
 /**
  * Attempts to fetch the proposal at the given proposalId from a Cosmos chain that uses the v1 gov module. If a proposal
  * with the given id exists, the function attempts to fetch the next proposal. This process repeats until no proposal
- * is found.
- * @param proposalId The proposal id to start fetching proposals at.
- * @param chain
+ * is found at which time all the fetched proposals are returned.
  */
 async function fetchUpToLatestCosmosProposalV1(
   proposalId: number,
@@ -226,11 +223,6 @@ async function fetchUpToLatestCosmosProposalV1Beta1(
 /**
  * Fetches all proposals from the given proposal ids to the latest proposal for each chain. Works for both v1 and
  * v1beta1 gov modules.
- * @param chains
- * @param latestProposalIds
- * @param rollbar
- * @returns {@Link AllCosmosProposals} An object containing all proposals for each chain, separated
- * by gov module version.
  */
 export async function fetchUpToLatestCosmosProposals(
   chains: ChainInstance[],
@@ -276,6 +268,9 @@ export async function fetchUpToLatestCosmosProposals(
   );
 }
 
+/**
+ * Fetches the last/latest proposal for each chain. Works for both v1 and v1beta1 gov modules.
+ */
 export async function fetchLatestProposals(
   chains: ChainInstance[],
   rollbar?: Rollbar

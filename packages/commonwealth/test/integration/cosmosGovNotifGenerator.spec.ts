@@ -10,7 +10,7 @@ import {
 import {
   fetchLatestNotifProposalIds,
   filterProposals,
-} from '../../server/cosmos-gov-notifications/util';
+} from '../../server/cosmosGovNotifications/util';
 import {
   ProposalSDKType,
   ProposalStatusSDKType,
@@ -24,7 +24,7 @@ import {
   AllCosmosProposals,
   CosmosClients,
   GovV1Beta1ClientType,
-} from '../../server/cosmos-gov-notifications/proposalFetching';
+} from '../../server/cosmosGovNotifications/proposalFetching';
 import {
   QueryProposalRequest,
   QueryProposalsRequest,
@@ -37,7 +37,7 @@ import {
   QueryProposalsResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
-import { generateCosmosGovNotifications } from '../../server/cosmos-gov-notifications/generateCosmosGovNotifications';
+import { generateCosmosGovNotifications } from '../../server/cosmosGovNotifications/generateCosmosGovNotifications';
 
 async function createFakeProposalNotification(
   proposalId: string,
