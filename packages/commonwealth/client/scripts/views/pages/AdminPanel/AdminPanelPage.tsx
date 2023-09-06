@@ -8,6 +8,7 @@ import Analytics from './Analytics';
 import DeleteChainTask from './DeleteChainTask';
 import MakeSiteAdminTask from './MakeSiteAdminTask';
 import RPCEndpointTask from './RPCEndpointTask';
+import DownloadMembersListTask from './DownloadMembersListTask';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
@@ -26,6 +27,7 @@ const AdminPanelPage = () => {
       <CWDivider />
       <CWText type="h2">Site Admin Tasks</CWText>
       <DeleteChainTask />
+      <DownloadMembersListTask />
       <RPCEndpointTask />
       <MakeSiteAdminTask />
     </div>

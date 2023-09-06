@@ -176,6 +176,7 @@ import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { getChainsHandler } from '../routes/chains/get_chains_handler';
 import { getChainNodesHandler } from '../routes/chains/get_chain_nodes_handler';
+import exportMembersList from '../routes/exportMembersList';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -229,6 +230,13 @@ function setupRouter(
     '/updateSiteAdmin',
     passport.authenticate('jwt', { session: false }),
     updateSiteAdmin.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/exportMembersList',
+    passport.authenticate('jwt', { session: false }),
+    exportMembersList.bind(this, models)
   );
   registerRoute(router, 'get', '/domain', domain.bind(this, models));
   registerRoute(router, 'get', '/status', status.bind(this, models));
