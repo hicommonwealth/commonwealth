@@ -160,6 +160,18 @@ $width: 360px;
   .form-gallery {
     @include gallery-grid(8px, column);
     width: $width;
+
+    .custom-width-1 {
+      width: 250px;
+    }
+
+    .custom-width-2 {
+      width: 275px;
+    }
+
+    .custom-width-3 {
+      width: 300px;
+    }
   }
 
   .toggle-gallery {
