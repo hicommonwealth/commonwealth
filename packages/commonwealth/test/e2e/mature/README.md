@@ -1,1 +1,0 @@
-Do not manually add tests to this directory. They will be automatically added through github actions.
