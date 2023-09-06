@@ -35,7 +35,7 @@ export const getProposalUrlPath = (
 export const getNotificationUrlPath = (
   subscription: NotificationSubscription
 ): string => {
-  const community = subscription.Chain.id;
+  const community = subscription.chainId;
   const type = subscription.Thread.slug;
   const id = `${subscription.Thread.identifier}-${slugify(
     subscription.Thread.title
@@ -53,10 +53,9 @@ export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
 };
 
 export const proposalSlugToClass = () => {
-  const mmap = new Map<
-    string,
-    ProposalModule<any, any, any>
-  >([[ProposalType.Thread, null]]);
+  const mmap = new Map<string, ProposalModule<any, any, any>>([
+    [ProposalType.Thread, null],
+  ]);
   if (!app.chain) {
     return mmap;
   }

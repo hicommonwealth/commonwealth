@@ -29,6 +29,11 @@ import {
 } from 'state/api/proposals';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
+import {
+  useDepositParamsQuery,
+  usePoolParamsQuery,
+  useStakingParamsQuery,
+} from 'state/api/chainParams';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -87,6 +92,11 @@ const ProposalsPage = () => {
   }, [setSubstrateLoading]);
 
   useManageDocumentTitle('Proposals');
+
+  // lazy load Cosmos chain params
+  useDepositParamsQuery();
+  usePoolParamsQuery();
+  useStakingParamsQuery();
 
   const {
     data: activeCosmosProposals,

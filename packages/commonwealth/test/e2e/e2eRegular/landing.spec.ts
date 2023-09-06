@@ -1,13 +1,16 @@
 import { expect, test } from '@playwright/test';
 import { PORT } from '../../../server/config';
+import { waitForCondition } from '../utils/waitForCondition';
 
 test.describe('Commonwealth Homepage', () => {
   test('Amount of bundles has not increased', async ({ page }) => {
     const loadedJsBundles = [];
+    const apiCalls = [];
     // Enable network interception
     await page.route('*/**', (route) => {
       // Filter requests for JavaScript files
-      if (route.request().resourceType() === 'script') {
+      const resourceType = route.request().resourceType();
+      if (resourceType === 'script') {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const initializerUrl = route.request()._initializer.url;
@@ -15,15 +18,25 @@ test.describe('Commonwealth Homepage', () => {
           loadedJsBundles.push(initializerUrl);
           console.log(`Loaded in bundle: ${initializerUrl}`);
         }
+      } else if (resourceType === 'xhr') {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const initializerUrl = route.request()._initializer.url;
+        if (initializerUrl.startsWith('http://localhost')) {
+          apiCalls.push(initializerUrl);
+          console.log(`Made api request: ${initializerUrl}`);
+        }
       }
       route.continue();
     });
 
     await page.goto(`http://localhost:${PORT}/`);
 
-    while (loadedJsBundles.length < 4) {
-      await page.waitForTimeout(100); // Wait for a short interval before checking again
-    }
+    await waitForCondition(() => loadedJsBundles.length >= 4, 100, 10_000);
+    await page.waitForTimeout(100); // Wait for a short interval before checking again
+
+    await waitForCondition(() => apiCalls.length >= 4, 100, 10_000);
+    await page.waitForTimeout(100); // Wait for a short interval before checking again
 
     // This is loaded in after all other bundles are loaded in. The landing page should have 2 initial bundles and 2
     // Loaded in bundles for the page itself. If it is more, then we have accidentally added an extra bundle into the
@@ -36,6 +49,7 @@ test.describe('Commonwealth Homepage', () => {
 
     await page.waitForTimeout(100);
     expect(loadedJsBundles.length).toEqual(4);
+    expect(apiCalls.length).toEqual(4); // domain, status, chains, nodes
   });
 
   test('Check Login Modal', async ({ page }) => {

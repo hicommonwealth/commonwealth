@@ -10,6 +10,8 @@ import app from 'state';
 
 import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
+import { NotificationCategories } from 'common-common/src/types';
+import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
@@ -82,29 +84,52 @@ class NotificationsController {
   }
 
   private _subscriptions: NotificationSubscription[] = [];
-  public get subscriptions() {
-    return this._subscriptions;
+
+  public get discussionSubscriptions(): NotificationSubscription[] {
+    return this._subscriptions.filter(
+      (s) => s.categoryId !== NotificationCategories.ChainEvent
+    );
   }
 
-  public subscribe(category: string, objectId: string) {
-    const subscription = this.subscriptions.find(
-      (v) => v.category === category && v.objectId === objectId
+  public get chainEventSubscriptions(): NotificationSubscription[] {
+    return this._subscriptions.filter(
+      (s) => s.categoryId === NotificationCategories.ChainEvent
     );
+  }
+
+  public subscribe(data: SubUniqueData) {
+    const subscription = this.findNotificationSubscription(data);
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
+      const untypedData: {
+        categoryId: NotificationCategories;
+        options?: {
+          chainId?: string;
+          threadId?: number;
+          commentId?: number;
+          snapshotId?: string;
+        };
+      } = data;
+      const requestData = {
+        chain_id: untypedData.options?.chainId,
+        thread_id: untypedData.options?.threadId,
+        comment_id: untypedData.options?.commentId,
+        snapshot_id: untypedData.options?.snapshotId,
+      };
+
       return post(
         '/createSubscription',
         {
-          category,
-          object_id: objectId,
+          category: data.categoryId,
+          ...requestData,
           is_active: true,
         },
         (result) => {
           const newSubscription = modelFromServer(result);
           if (newSubscription.category === 'chain-event')
             app.socket.chainEventsNs.addChainEventSubscriptions([
-              newSubscription,
+              newSubscription.chainId,
             ]);
           this._subscriptions.push(newSubscription);
         }
@@ -123,7 +148,7 @@ class NotificationsController {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.enable();
-          if (s.category === 'chain-event') ceSubs.push(s);
+          if (s.category === 'chain-event') ceSubs.push(s.chainId);
         }
         app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
       }
@@ -333,20 +358,22 @@ class NotificationsController {
   }
 
   private parseNotifications(subscriptions) {
-    const ceSubs = [];
+    const ceSubs: string[] = [];
 
     for (const subscriptionJSON of subscriptions) {
-      const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
+      const subscriptionId = subscriptionJSON.subscription_id;
+      const categoryId = subscriptionJSON.category_id;
 
       // save the notification read + notification instances if any
       for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
         const data = {
           is_read: notificationsReadJSON.is_read,
+          subscription_id: subscriptionId,
           ...notificationsReadJSON.Notification,
         };
-        const notification = Notification.fromJSON(data, subscription);
+        const notification = Notification.fromJSON(data);
 
-        if (subscription.category === 'chain-event') {
+        if (categoryId === 'chain-event') {
           if (!this._chainEventStore.getById(notification.id))
             this._chainEventStore.add(notification);
         } else {
@@ -354,7 +381,7 @@ class NotificationsController {
             this._discussionStore.add(notification);
         }
       }
-      if (subscription.category === 'chain-event') ceSubs.push(subscription);
+      if (categoryId === 'chain-event') ceSubs.push(subscriptionJSON.chain_id);
     }
     app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
   }
@@ -383,6 +410,10 @@ class NotificationsController {
     ]);
     this.isLoaded.emit('redraw');
     return Promise.resolve();
+  }
+
+  public findNotificationSubscription(findOptions: SubUniqueData) {
+    return findSubscription(findOptions, this._subscriptions);
   }
 }
 

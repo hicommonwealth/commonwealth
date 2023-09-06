@@ -5,6 +5,7 @@ import { SearchCommentsOptions } from 'server/controllers/server_comments_method
 import { ChainInstance } from 'server/models/chain';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
+import { NotificationCategories } from 'common-common/src/types';
 
 describe('ServerCommentsController', () => {
   describe('#createCommentReaction', () => {
@@ -95,19 +96,15 @@ describe('ServerCommentsController', () => {
 
       expect(newReaction).to.be.ok;
 
-      expect(allNotificationOptions[0]).to.have.property(
+      expect(allNotificationOptions[0]).to.have.property('notification');
+      const { notification } = allNotificationOptions[0];
+      expect(notification).to.have.property(
         'categoryId',
-        'new-reaction'
-      );
-      expect(allNotificationOptions[0]).to.have.property(
-        'objectId',
-        'comment-3'
+        NotificationCategories.NewReaction
       );
 
-      expect(allNotificationOptions[0]).to.have.property('notificationData');
-      const { notificationData } = allNotificationOptions[0];
-      expect(notificationData).to.have.property('created_at');
-      expect(notificationData).to.include({
+      expect(notification.data).to.have.property('created_at');
+      expect(notification.data).to.include({
         thread_id: 4,
         comment_id: 3,
         comment_text: 'my comment body',
@@ -578,15 +575,12 @@ describe('ServerCommentsController', () => {
         text: 'Hello',
       });
 
-      expect(allNotificationOptions[0]).to.have.property(
-        'categoryId',
-        'comment-edit'
-      );
+      expect(allNotificationOptions[0]).to.have.property('notification');
+      const { notification } = allNotificationOptions[0];
+      expect(notification).to.have.property('categoryId', 'comment-edit');
 
-      expect(allNotificationOptions[0]).to.have.property('notificationData');
-      const { notificationData } = allNotificationOptions[0];
-      expect(notificationData).to.have.property('created_at');
-      expect(notificationData).to.include({
+      expect(notification.data).to.have.property('created_at');
+      expect(notification.data).to.include({
         thread_id: 2,
         comment_id: 123,
         comment_text: 'Hello',
