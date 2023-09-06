@@ -82,6 +82,7 @@ jobs:
       - name: Run e2e tests (yarn test-e2e)
         env:
           PORT: 8080
+          IS_CI: true
           USES_DOCKER_PGSQL: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
