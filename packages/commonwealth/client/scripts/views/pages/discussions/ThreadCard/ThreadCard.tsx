@@ -119,6 +119,7 @@ export const ThreadCard = ({
                 lastUpdated: thread.updatedAt.toISOString(),
               })}
               discord_meta={thread.discord_meta}
+              archivedAt={thread.archivedAt}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}

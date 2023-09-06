@@ -17,6 +17,7 @@ import './AuthorAndPublishInfo.scss';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';
 import moment from 'moment';
 import { NewThreadTag } from '../../NewThreadTag';
+import { ArchiveTrayWithTooltip } from 'views/components/archive_tray_with_tooltip';
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
@@ -39,6 +40,7 @@ export type AuthorAndPublishInfoProps = {
   isSpamThread?: boolean;
   threadStage?: ThreadStage;
   onThreadStageLabelClick?: (threadStage: ThreadStage) => Promise<any>;
+  archivedAt?: moment.Moment;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -58,6 +60,7 @@ export const AuthorAndPublishInfo = ({
   threadStage,
   onThreadStageLabelClick,
   collaboratorsInfo,
+  archivedAt,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
 
@@ -144,6 +147,12 @@ export const AuthorAndPublishInfo = ({
             {`${viewsCount} view${viewsCount > 1 ? 's' : ''}`}
           </CWText>
         </>
+      )}
+
+      {archivedAt && (
+        <ArchiveTrayWithTooltip
+          archivedAt={moment(archivedAt)}
+        />
       )}
 
       {threadStage && (
