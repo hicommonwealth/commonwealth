@@ -68,7 +68,9 @@ Points _may_ always be increased mid-implementation, but a justification _must_ 
 
 ## Pull Requests
 
-PRs must always reference their instigating ticket in the description by number. GitHub uses [a set of keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) to automatically link PRs with referenced issues. Linked issues are automatically closed by their relevant PRs. 
+PRs must always link to their instigating ticket. GitHub uses [a set of keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) to automatically link a PR to referenced issues. Alternatively, PRs may be manually linked via their "Development" sidebar section. 
+
+Linked issues are automatically closed by their relevant PRs. In some exceptional cases—for instance, when referencing the outstanding Documentation Update Ticket (#4800)—GitHub closing keywords should be omitted so as to keep the instigating ticket open when the PR is closed.
 
 As of 230906, test plans should be included with every code-changing PR, as part of our road to automated testing.
 
@@ -117,6 +119,7 @@ Our Beta/QA server can be found at `qa.commonwealth.im`. Custom domains are avai
 
 # Change Log
 
+- 230906: Updated with new requirements for tickets and PRs (#4972).
 - 230831: Merged with Agile-Development.md by Graham Johnson (#4936) and certified fresh.
 - 230823: Migrated from GitHub wiki by Graham Johnson (#4350).
 - 230124: Authored by Forest.
