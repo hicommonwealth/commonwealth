@@ -1,4 +1,4 @@
-function waitForCondition(
+export function waitForCondition(
   conditionFn: () => boolean | Promise<boolean>,
   checkInterval: number = 100,
   timeoutMs: number = 5000

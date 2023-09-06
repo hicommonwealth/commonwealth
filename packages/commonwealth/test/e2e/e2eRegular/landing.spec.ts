@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { PORT } from '../../../server/config';
+import { waitForCondition } from '../utils/waitForCondition';
 
 test.describe('Commonwealth Homepage', () => {
   test('Amount of bundles has not increased', async ({ page }) => {
