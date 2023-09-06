@@ -389,7 +389,6 @@ jobs:
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
-          NO_CLIENT: true
           COSMOS_GOV_V1: ${{ secrets.COSMOS_GOV_V1 }}
 
   chain-event-integration:
