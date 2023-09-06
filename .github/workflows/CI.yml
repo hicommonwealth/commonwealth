@@ -73,13 +73,23 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium
 
+      - name: Install proxy
+        run: npm install -g local-ssl-proxy
+
+      - name: Add custom domain to /etc/hosts
+        run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
+
       - name: Run e2e tests (yarn test-e2e)
-        run: yarn --cwd packages/commonwealth e2e-start-server & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
+        run: |
+          sudo local-ssl-proxy --source 443 --target 8080 &
+          yarn --cwd packages/commonwealth e2e-start-server &
+          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e
+
 
       - name: Upload e2e recordings on failure
         uses: actions/upload-artifact@v3
