@@ -39,6 +39,8 @@ deletion, first create the entity yourself instead, then you can delete your own
 ## Debugging e2e Tests
 When e2e tests fail we record a video of the failed run.
 
+* If you add --debug to the test-e2e command, it will open a debug box which will allow you to step through the code 
+line by line, and allow you to test locators to see which elements it will grab. `npx playwright test --debug ...`
 * Locally - These video is stored in the test-results folder. They are named after the name of the test that failed
 and produced it.
 * CI - These videos are stored in the artifacts. They can be found and downlaoded at the bottom of the summary pag
