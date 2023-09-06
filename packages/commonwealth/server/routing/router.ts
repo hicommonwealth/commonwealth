@@ -174,7 +174,8 @@ import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_h
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
-import { searchChainsHandler } from '../routes/chains/search_chains_handler';
+import { getChainsHandler } from '../routes/chains/get_chains_handler';
+import { getChainNodesHandler } from '../routes/chains/get_chain_nodes_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -316,7 +317,13 @@ function setupRouter(
     router,
     'get',
     '/chains',
-    searchChainsHandler.bind(this, serverControllers)
+    getChainsHandler.bind(this, serverControllers)
+  );
+  registerRoute(
+    router,
+    'get',
+    '/nodes',
+    getChainNodesHandler.bind(this, serverControllers)
   );
 
   registerRoute(
