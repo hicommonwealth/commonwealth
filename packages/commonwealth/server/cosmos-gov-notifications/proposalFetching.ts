@@ -57,7 +57,10 @@ async function getCosmosClient<
       setupGovExtension
     );
 
-    if (!CosmosClients[chain.id]) {
+    if (
+      !CosmosClients[chain.id] ||
+      !(<GovV1Beta1ClientType>CosmosClients[chain.id]).gov
+    ) {
       throw new Error(`Failed to create Cosmos client for chain ${chain.id}`);
     }
     return CosmosClients[chain.id] as CosmosClient;
@@ -149,7 +152,6 @@ async function fetchLatestCosmosProposalV1Beta1(
   chain: ChainInstance
 ): Promise<Proposal[]> {
   const client = await getCosmosClient<GovV1Beta1ClientType>(chain);
-  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>', client.gov);
   let nextKey: Uint8Array, finalProposalsPage: Proposal[];
   do {
     const result = await client.gov.proposals(
