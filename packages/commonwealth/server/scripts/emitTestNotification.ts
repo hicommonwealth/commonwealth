@@ -12,6 +12,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 enum SupportedNotificationChains {
   dydx = 'dydx',
+  kyve = 'kyve',
   osmosis = 'osmosis',
 }
 
@@ -45,6 +46,43 @@ const ceNotifications = {
     chain: 'dydx',
     updated_at: '2023-06-19T11:50:52.308Z',
     created_at: '2023-06-19T11:50:52.262Z',
+  },
+  [SupportedNotificationChains.kyve]: {
+    chain: 'kyve',
+    network: 'cosmos',
+    event_data: {
+      kind: 'msg-submit-proposal',
+      id: '10',
+      content: {
+        typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+        value: '0a087631207469746c65120e7631206465736372697074696f6e',
+      },
+      submitTime: 1694015653,
+      depositEndTime: 1694188453,
+      votingStartTime: 1694015653,
+      votingEndTime: 1694015743,
+      finalTallyResult: { yes: '0', abstain: '0', no: '0', noWithVeto: '0' },
+      totalDeposit: { ustake: '2000000' },
+    },
+  },
+  [SupportedNotificationChains.osmosis]: {
+    chain: 'osmosis',
+    network: 'cosmos',
+    event_data: {
+      kind: 'msg-submit-proposal',
+      id: '11',
+      content: {
+        typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+        value:
+          '0a0f626574612074657874207469746c651215626574612074657874206465736372697074696f6e',
+      },
+      submitTime: 1694015671,
+      depositEndTime: 1694188471,
+      votingStartTime: 1694015671,
+      votingEndTime: 1694015761,
+      finalTallyResult: { yes: '0', abstain: '0', no: '0', noWithVeto: '0' },
+      totalDeposit: { ustake: '2000000' },
+    },
   },
 };
 
@@ -121,7 +159,7 @@ async function setupNotification(
       where: {
         category_id: NotificationCategories.ChainEvent,
         chain_id: chainId,
-        chain_event_id: ceNotifications[chainId].id,
+        chain_event_id: ceNotifications[chainId].id || null,
         [Sequelize.Op.and]: [
           Sequelize.literal(
             `notification_data::jsonb -> 'event_data' ->> 'id' = '${ceNotifications[chainId].event_data.id}'`
@@ -181,48 +219,80 @@ async function setupNotification(
 }
 
 async function main() {
-  const argv = await yargs(hideBin(process.argv)).options({
-    chain_id: {
-      alias: 'c',
-      type: 'string',
-      demandOption: false,
-      conflicts: 'snapshot_id',
-      description:
-        'Name of chain to generate a test chain-event notification for',
-    },
-    snapshot_id: {
-      alias: 's',
-      type: 'string',
-      demandOption: false,
-      conflicts: 'chain',
-      description:
-        'Name of the snapshot space to generate a test snapshot-proposal notification for',
-    },
-    wallet_address: {
-      alias: 'w',
-      type: 'string',
-      demandOption: false,
-      conflicts: 'user_id',
-      description:
-        'Wallet address of the user to generate a test notification for',
-    },
-    user_id: {
-      alias: 'u',
-      type: 'number',
-      demandOption: false,
-      conflicts: 'wallet_address',
-      description: 'User id of the user to generate a test notification for',
-    },
-    mock_notification: {
-      alias: 'm',
-      type: 'boolean',
-      demandOption: true,
-      default: false,
-      description:
-        'Whether to create a mock notification or use a real existing one. ' +
-        'A mock notification will not link to a real chain-event or snapshot-proposal.',
-    },
-  }).argv;
+  const argv = await yargs(hideBin(process.argv))
+    .options({
+      chain_id: {
+        alias: 'c',
+        type: 'string',
+        demandOption: false,
+        conflicts: 'snapshot_id',
+        description:
+          'Name of chain to generate a test chain-event notification for',
+      },
+      snapshot_id: {
+        alias: 's',
+        type: 'string',
+        demandOption: false,
+        conflicts: 'chain',
+        description:
+          'Name of the snapshot space to generate a test snapshot-proposal notification for',
+      },
+      wallet_address: {
+        alias: 'w',
+        type: 'string',
+        demandOption: false,
+        conflicts: 'user_id',
+        description:
+          'Wallet address of the user to generate a test notification for',
+      },
+      user_id: {
+        alias: 'u',
+        type: 'number',
+        demandOption: false,
+        conflicts: 'wallet_address',
+        description: 'User id of the user to generate a test notification for',
+      },
+      mock_notification: {
+        alias: 'm',
+        type: 'boolean',
+        demandOption: true,
+        default: false,
+        description:
+          'Whether to create a mock notification or use a real existing one. ' +
+          'A mock notification will not link to a real chain-event or snapshot-proposal.',
+      },
+    })
+    .check((argv) => {
+      if (!argv.mock_notification) return true;
+
+      if (argv.chain_id) {
+        if (
+          !Object.values(SupportedNotificationChains).includes(
+            argv.chain_id as SupportedNotificationChains
+          )
+        ) {
+          throw new Error(
+            `Chain id must be one of ${Object.values(
+              SupportedNotificationChains
+            )}`
+          );
+        }
+      } else if (argv.snapshot_id) {
+        if (
+          !Object.values(SupportedNotificationSpaces).includes(
+            argv.snapshot_id as SupportedNotificationSpaces
+          )
+        ) {
+          throw new Error(
+            `Snapshot id must be one of ${Object.values(
+              SupportedNotificationSpaces
+            )}`
+          );
+        }
+      }
+
+      return true;
+    }).argv;
 
   const transaction = await models.sequelize.transaction();
   let notifData: string;
