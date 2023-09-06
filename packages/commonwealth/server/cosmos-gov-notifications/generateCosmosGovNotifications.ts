@@ -15,7 +15,6 @@ import { ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-// TODO: @Timothee rollbar/datadog reporting + error handling such that one failure does not eliminate all notifs
 export async function generateCosmosGovNotifications(rollbar?: Rollbar) {
   // fetch chains to generate notifications for
   const chains = await fetchCosmosNotifChains(models);
@@ -41,19 +40,23 @@ export async function generateCosmosGovNotifications(rollbar?: Rollbar) {
   if (chainsWithPropId.length > 0) {
     const newProposals: any = await fetchUpToLatestCosmosProposals(
       chainsWithPropId,
-      latestProposalIds
+      latestProposalIds,
+      rollbar
     );
     // filter proposals e.g. proposals that happened long ago, proposals that don't have full deposits, etc
     const filteredProposals = filterProposals(newProposals);
-    await emitProposalNotifications(models, filteredProposals);
+    await emitProposalNotifications(models, filteredProposals, rollbar);
   }
 
   // if a proposal id cannot be found, fetch the latest proposal from the chain
   const missingPropIdChains = chains.filter((c) => !latestProposalIds[c.id]);
   if (missingPropIdChains.length > 0) {
-    const missingProposals = await fetchLatestProposals(missingPropIdChains);
+    const missingProposals = await fetchLatestProposals(
+      missingPropIdChains,
+      rollbar
+    );
     const filteredProposals = filterProposals(missingProposals);
-    await emitProposalNotifications(models, filteredProposals);
+    await emitProposalNotifications(models, filteredProposals, rollbar);
   }
 }
 

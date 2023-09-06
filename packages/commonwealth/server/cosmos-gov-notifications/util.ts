@@ -7,7 +7,6 @@ import { ChainBase, NotificationCategories } from 'common-common/src/types';
 import emitNotifications from '../util/emitNotifications';
 import { SupportedNetwork } from 'chain-events/src';
 import { coinToCoins, EventKind } from 'chain-events/src/chains/cosmos/types';
-import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { DB } from '../models';
@@ -148,34 +147,20 @@ export function filterProposals(proposals: AllCosmosProposals) {
   const twoHoursAgo = new Date(Date.now() - 1000 * 60 * 120);
   for (const chainId in proposals.v1) {
     const chainProposals = proposals.v1[chainId];
-    const filteredProposalsForChain = chainProposals.filter((p) => {
+    filteredProposals.v1[chainId] = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
       const submitTime = new Date(p.submit_time);
       return !!submitTime && submitTime.getTime() > twoHoursAgo.getTime();
     });
-
-    log.info(
-      `Filtered out ${
-        chainProposals.length - filteredProposalsForChain.length
-      } proposals for chain ${chainId}`
-    );
-    filteredProposals.v1[chainId] = filteredProposalsForChain;
   }
 
   for (const chainId in proposals.v1Beta1) {
     const chainProposals = proposals.v1Beta1[chainId];
-    const filteredProposalsForChain = chainProposals.filter((p) => {
+    filteredProposals.v1Beta1[chainId] = chainProposals.filter((p) => {
       // proposal cannot be older than 2 hours
       const submitTime = fromTimestamp(p.submitTime);
       return !!submitTime && submitTime.getTime() > twoHoursAgo.getTime();
     });
-
-    log.info(
-      `Filtered out ${
-        chainProposals.length - filteredProposalsForChain.length
-      } proposals for chain ${chainId}`
-    );
-    filteredProposals.v1Beta1[chainId] = filteredProposalsForChain;
   }
 
   return filteredProposals;
@@ -193,61 +178,72 @@ function formatProposalDates(date: string | Date): number {
 
 export async function emitProposalNotifications(
   models: DB,
-  proposals: AllCosmosProposals
+  proposals: AllCosmosProposals,
+  rollbar?: Rollbar
 ) {
   for (const chainId in proposals.v1) {
     const chainProposals = proposals.v1[chainId];
     for (const proposal of chainProposals) {
-      await emitNotifications(models, {
-        categoryId: NotificationCategories.ChainEvent,
-        data: {
-          chain: chainId,
-          network: SupportedNetwork.Cosmos,
-          event_data: {
-            kind: EventKind.SubmitProposal,
-            id: proposal.id,
-            content: {
-              // TODO: multiple typeUrls for v1 proposals? - is this data even needed
-              typeUrl: proposal.messages[0].type_url,
-              value: proposal.messages[0].value,
+      try {
+        await emitNotifications(models, {
+          categoryId: NotificationCategories.ChainEvent,
+          data: {
+            chain: chainId,
+            network: SupportedNetwork.Cosmos,
+            event_data: {
+              kind: EventKind.SubmitProposal,
+              id: proposal.id,
+              content: {
+                // TODO: multiple typeUrls for v1 proposals? - is this data even needed
+                typeUrl: proposal.messages[0].type_url,
+                value: proposal.messages[0].value,
+              },
+              submitTime: formatProposalDates(proposal.submit_time),
+              depositEndTime: formatProposalDates(proposal.deposit_end_time),
+              votingStartTime: formatProposalDates(proposal.voting_start_time),
+              votingEndTime: formatProposalDates(proposal.voting_end_time),
+              finalTallyResult: proposal.final_tally_result,
+              totalDeposit: coinToCoins(proposal.total_deposit),
             },
-            submitTime: formatProposalDates(proposal.submit_time),
-            depositEndTime: formatProposalDates(proposal.deposit_end_time),
-            votingStartTime: formatProposalDates(proposal.voting_start_time),
-            votingEndTime: formatProposalDates(proposal.voting_end_time),
-            finalTallyResult: proposal.final_tally_result,
-            totalDeposit: coinToCoins(proposal.total_deposit),
           },
-        },
-      });
+        });
+      } catch (e) {
+        log.error(e);
+        rollbar?.error(e);
+      }
     }
   }
 
   for (const chainId in proposals.v1Beta1) {
     const chainProposals = proposals.v1Beta1[chainId];
     for (const proposal of chainProposals) {
-      await emitNotifications(models, {
-        categoryId: NotificationCategories.ChainEvent,
-        data: {
-          chain: chainId,
-          network: SupportedNetwork.Cosmos,
-          event_data: {
-            kind: EventKind.SubmitProposal,
-            id: proposal.proposalId.toString(10),
-            content: {
-              // TODO: multiple typeUrls for v1 proposals? - is this data even needed
-              typeUrl: proposal.content.typeUrl,
-              value: Buffer.from(proposal.content.value).toString('hex'),
+      try {
+        await emitNotifications(models, {
+          categoryId: NotificationCategories.ChainEvent,
+          data: {
+            chain: chainId,
+            network: SupportedNetwork.Cosmos,
+            event_data: {
+              kind: EventKind.SubmitProposal,
+              id: proposal.proposalId.toString(10),
+              content: {
+                // TODO: multiple typeUrls for v1 proposals? - is this data even needed
+                typeUrl: proposal.content.typeUrl,
+                value: Buffer.from(proposal.content.value).toString('hex'),
+              },
+              submitTime: proposal.submitTime.seconds.toNumber(),
+              depositEndTime: proposal.depositEndTime.seconds.toNumber(),
+              votingStartTime: proposal.votingStartTime.seconds.toNumber(),
+              votingEndTime: proposal.votingEndTime.seconds.toNumber(),
+              finalTallyResult: proposal.finalTallyResult,
+              totalDeposit: coinToCoins(proposal.totalDeposit),
             },
-            submitTime: proposal.submitTime.seconds.toNumber(),
-            depositEndTime: proposal.depositEndTime.seconds.toNumber(),
-            votingStartTime: proposal.votingStartTime.seconds.toNumber(),
-            votingEndTime: proposal.votingEndTime.seconds.toNumber(),
-            finalTallyResult: proposal.finalTallyResult,
-            totalDeposit: coinToCoins(proposal.totalDeposit),
           },
-        },
-      });
+        });
+      } catch (e) {
+        log.error(e);
+        rollbar?.error(e);
+      }
     }
   }
 }

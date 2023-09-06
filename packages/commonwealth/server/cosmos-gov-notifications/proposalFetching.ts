@@ -263,12 +263,9 @@ export async function fetchUpToLatestCosmosProposals(
   );
 }
 
-/**
- *
- * @param chains
- */
 export async function fetchLatestProposals(
-  chains: ChainInstance[]
+  chains: ChainInstance[],
+  rollbar?: Rollbar
 ): Promise<AllCosmosProposals> {
   if (chains.length === 0) return { v1: {}, v1Beta1: {} };
 
@@ -290,7 +287,8 @@ export async function fetchLatestProposals(
 
   const { v1Proposals, v1Beta1Proposals } = processProposalSettledPromises(
     v1ProposalResults,
-    v1Beta1ProposalResults
+    v1Beta1ProposalResults,
+    rollbar
   );
 
   return mapChainsToProposals(
