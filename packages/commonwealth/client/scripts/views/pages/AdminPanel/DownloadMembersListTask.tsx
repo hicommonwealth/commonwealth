@@ -45,8 +45,18 @@ const DownloadMembersListTask = () => {
               const res = await getCSVContent({ id: communityId });
 
               // Download CSV
-              const csvContent = res
-                .map((obj) => Object.values(obj).join(','))
+              const labels = [
+                'address',
+                'profile_name',
+                'thread_count',
+                'comment_count',
+                'reaction_count',
+              ];
+              const csvContent = [
+                labels,
+                ...res.map((obj) => Object.values(obj)),
+              ]
+                .map((row) => row.join(','))
                 .join('\n');
               const blob = new Blob([csvContent], {
                 type: 'text/csv;charset=utf-8;',
