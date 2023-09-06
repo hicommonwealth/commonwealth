@@ -14,6 +14,7 @@ import { CWUpvote } from './new_designs/cw_upvote';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTextInput } from './new_designs/CWTextInput';
+import { CWSearchBar } from './new_designs/CWSearchBar';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -53,6 +54,7 @@ import {
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
+import app from 'state';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -186,6 +188,8 @@ export const ComponentShowcase = () => {
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
+  const allChains = app.config.chains.getAll();
+  const [chainId, setChainId] = useState(allChains[1]);
 
   return (
     <div className="ComponentShowcase">
@@ -522,7 +526,14 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Input Tag</CWText>
-          <CWTag label="Display name" type="input" />
+          {chainId && (
+            <CWTag
+              label={allChains[1].name}
+              type="input"
+              community={allChains[1]}
+              onClick={() => setChainId(null)}
+            />
+          )}
         </div>
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
@@ -1436,6 +1447,10 @@ export const ComponentShowcase = () => {
           <CWText>Disabled</CWText>
           <CWUpvote voteCount={99999} disabled />
         </div>
+      </div>
+      <div className="searchbar-gallery">
+        <CWText type="h3">SearchBar</CWText>
+        <CWSearchBar />
       </div>
       <div className="Quill">
         <CWText type="h3">Quill Editor</CWText>
