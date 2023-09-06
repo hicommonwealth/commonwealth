@@ -11,6 +11,7 @@ import { ChainEventAttributes } from 'chain-events/services/database/models/chai
 import { factory, formatFilename } from 'common-common/src/logging';
 import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { DB } from '../models';
+import Rollbar from 'rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -70,6 +71,34 @@ export function mapChainsToProposals(
       {}
     ),
   };
+}
+
+export function processProposalSettledPromises(
+  v1ProposalResults: PromiseSettledResult<ProposalSDKType[]>[],
+  v1Beta1ProposalResults: PromiseSettledResult<Proposal[]>[],
+  rollbar?: Rollbar
+) {
+  const v1Proposals: ProposalSDKType[][] = [];
+  for (const result of v1ProposalResults) {
+    if (result.status === 'rejected') {
+      log.error(result.reason);
+      rollbar?.error(result.reason);
+    } else {
+      v1Proposals.push(result.value);
+    }
+  }
+
+  const v1Beta1Proposals: Proposal[][] = [];
+  for (const result of v1Beta1ProposalResults) {
+    if (result.status === 'rejected') {
+      log.error(result.reason);
+      rollbar?.error(result.reason);
+    } else {
+      v1Beta1Proposals.push(result.value);
+    }
+  }
+
+  return { v1Proposals, v1Beta1Proposals };
 }
 
 export async function fetchCosmosNotifChains(models: DB) {

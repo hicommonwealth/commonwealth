@@ -11,11 +11,13 @@ import {
   filterV1GovChains,
   mapChainsToProposals,
   numberToUint8ArrayBE,
+  processProposalSettledPromises,
   uint8ArrayToNumberBE,
 } from './util';
 import { GovExtension, QueryClient, setupGovExtension } from '@cosmjs/stargate';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { PageRequest } from 'common-common/src/cosmos-ts/src/codegen/cosmos/base/query/v1beta1/pagination';
+import Rollbar from 'rollbar';
 
 export type AllCosmosProposals = {
   v1: { [chainId: string]: ProposalSDKType[] };
@@ -120,8 +122,7 @@ async function fetchUpToLatestCosmosProposalV1(
       proposal = result.proposal;
     } catch (e) {
       if (!e.message.includes('rpc error: code = NotFound')) {
-        // TODO: @Timothee rollbar error reporting + datadog metrics
-        log.error(e);
+        throw e;
       }
     }
 
@@ -195,8 +196,7 @@ async function fetchUpToLatestCosmosProposalV1Beta1(
       proposal = result.proposal;
     } catch (e) {
       if (!e.message.includes('rpc error: code = NotFound')) {
-        // TODO: @Timothee rollbar error reporting + datadog metrics
-        log.error(e);
+        throw e;
       }
     }
 
@@ -215,12 +215,14 @@ async function fetchUpToLatestCosmosProposalV1Beta1(
  * v1beta1 gov modules.
  * @param chains
  * @param latestProposalIds
+ * @param rollbar
  * @returns {@Link AllCosmosProposals} An object containing all proposals for each chain, separated
  * by gov module version.
  */
 export async function fetchUpToLatestCosmosProposals(
   chains: ChainInstance[],
-  latestProposalIds: Record<string, number>
+  latestProposalIds: Record<string, number>,
+  rollbar?: Rollbar
 ): Promise<AllCosmosProposals> {
   if (chains.length === 0) return { v1: {}, v1Beta1: {} };
 
@@ -234,24 +236,30 @@ export async function fetchUpToLatestCosmosProposals(
       )} v1beta1 gov chain(s)`
   );
 
-  const [v1Proposals, v1BetaProposals] = await Promise.all([
-    Promise.all(
+  const [v1ProposalResults, v1BetaProposalResults] = await Promise.all([
+    Promise.allSettled(
       v1Chains.map((c) =>
         fetchUpToLatestCosmosProposalV1(latestProposalIds[c.id] + 1, c)
       )
     ),
-    Promise.all(
+    Promise.allSettled(
       v1Beta1Chains.map((c) =>
         fetchUpToLatestCosmosProposalV1Beta1(latestProposalIds[c.id] + 1, c)
       )
     ),
   ]);
 
+  const { v1Proposals, v1Beta1Proposals } = processProposalSettledPromises(
+    v1ProposalResults,
+    v1BetaProposalResults,
+    rollbar
+  );
+
   return mapChainsToProposals(
     v1Chains,
     v1Beta1Chains,
     v1Proposals,
-    v1BetaProposals
+    v1Beta1Proposals
   );
 }
 
@@ -273,10 +281,18 @@ export async function fetchLatestProposals(
         v1Beta1Chains.map((c) => c.id)
       )} v1beta1 gov chains`
   );
-  const [v1Proposals, v1Beta1Proposals] = await Promise.all([
-    Promise.all(v1Chains.map((c) => fetchLatestCosmosProposalV1(c))),
-    Promise.all(v1Beta1Chains.map((c) => fetchLatestCosmosProposalV1Beta1(c))),
+  const [v1ProposalResults, v1Beta1ProposalResults] = await Promise.all([
+    Promise.allSettled(v1Chains.map((c) => fetchLatestCosmosProposalV1(c))),
+    Promise.allSettled(
+      v1Beta1Chains.map((c) => fetchLatestCosmosProposalV1Beta1(c))
+    ),
   ]);
+
+  const { v1Proposals, v1Beta1Proposals } = processProposalSettledPromises(
+    v1ProposalResults,
+    v1Beta1ProposalResults
+  );
+
   return mapChainsToProposals(
     v1Chains,
     v1Beta1Chains,

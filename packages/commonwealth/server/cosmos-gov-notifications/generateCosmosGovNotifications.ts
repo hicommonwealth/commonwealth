@@ -10,11 +10,13 @@ import {
   filterProposals,
 } from './util';
 import models from '../database';
+import Rollbar from 'rollbar';
+import { ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 // TODO: @Timothee rollbar/datadog reporting + error handling such that one failure does not eliminate all notifs
-export async function generateCosmosGovNotifications() {
+export async function generateCosmosGovNotifications(rollbar?: Rollbar) {
   // fetch chains to generate notifications for
   const chains = await fetchCosmosNotifChains(models);
 
@@ -55,5 +57,19 @@ export async function generateCosmosGovNotifications() {
   }
 }
 
-if (require.main === module)
-  generateCosmosGovNotifications().then(() => process.exit(0));
+if (require.main === module) {
+  const rollbar = new Rollbar({
+    accessToken: ROLLBAR_SERVER_TOKEN,
+    environment: ROLLBAR_ENV,
+    captureUncaught: true,
+    captureUnhandledRejections: true,
+  });
+
+  generateCosmosGovNotifications(rollbar)
+    .then(() => process.exit(0))
+    .catch((err) => {
+      log.error(err);
+      rollbar.error(err);
+      process.exit(1);
+    });
+}
