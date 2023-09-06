@@ -10,14 +10,15 @@ on:
       - master
 
 jobs:
-  # These tests run slowly, so run them in a separate job
+  # These tests run slowly, so run them in a separate job. NOTE: if you change the name of this job, also change
+  # Its references in this file
   e2e-tests-Parallel:
     strategy:
       matrix:
         node: [ 18 ]
     name: Commonwealth E2E Test
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
 
     services:
       postgres:
@@ -92,7 +93,36 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage-report
-          path: coverage# These tests run slowly, so run them in a separate job
+          path: packages/commonwealth/summary.json
+
+  detect-mature-e2e:
+    name: Detect Mature e2e tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: e2e-tests-Parallel
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push' # Only run on push to master
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Detect Mature e2e Test
+        env:
+          MISC_DATABASE_URL: ${{ secrets.AUXILIARY_DB_URL }}
+        run: ts-node detectMatureE2e.ts packages/commonwealth/summary.json packages/commonwealth/test/e2e packages/commonwealth/test/e2e/mature
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: move-file
+          title: "[Automated] Move file from ./test/new to ./test/mature"
+          body: "Automated pull request to move a file from ./test/new to ./test/mature."
 
   e2e-tests-serial:
     strategy:
@@ -393,7 +423,7 @@ jobs:
         node: [ 18 ]
     name: Chain Events Integration and Unit Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
 
     services:
       postgres:
