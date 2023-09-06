@@ -1,7 +1,6 @@
 import { ProposalType } from 'common-common/src/types';
 import type ChainEntity from 'models/ChainEntity';
 import moment, { Moment } from 'moment';
-import app from 'state';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';

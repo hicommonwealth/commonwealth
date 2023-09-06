@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
 
-import type Webhook from '../../models/Webhook';
 import { NotificationCategories } from 'common-common/src/types';
+import type Webhook from '../../models/Webhook';
 import {
   DydxChainNotificationTypes,
   EdgewareChainNotificationTypes,
   KulupuChainNotificationTypes,
   KusamaChainNotificationTypes,
   PolkadotChainNotificationTypes,
-} from 'helpers/chain_notification_types';
+} from '../../helpers/chain_notification_types';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/webhook_settings_modal.scss';
+import '../../../styles/modals/webhook_settings_modal.scss';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;
@@ -57,6 +61,7 @@ export const WebhookSettingsModal = ({
 
     return (
       <CWCheckbox
+        className="checkbox"
         key={label}
         value=""
         checked={allValuesPresent}
@@ -82,7 +87,7 @@ export const WebhookSettingsModal = ({
   return (
     <div className="WebhookSettingsModal">
       <CWModalHeader label="Webhook Settings" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <CWText>Which events should trigger this webhook?</CWText>
         <div className="checkbox-section">
           <CWText type="h5" fontWeight="semiBold">
@@ -103,15 +108,21 @@ export const WebhookSettingsModal = ({
             )}
           </div>
         )}
-      </div>
-      <div className="compact-modal-footer">
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
         <CWButton
           label="Save settings"
           buttonType="primary"
           buttonHeight="sm"
           onClick={() => updateWebhook(webhook, selectedCategories)}
         />
-      </div>
+      </CWModalFooter>
     </div>
   );
 };

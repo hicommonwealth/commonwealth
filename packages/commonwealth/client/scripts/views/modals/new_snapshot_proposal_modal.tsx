@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
-import { NewSnapshotProposalForm } from '../pages/new_snapshot_proposal';
-import app from 'state';
 import type Thread from '../../models/Thread';
+import app from '../../state';
+import { NewSnapshotProposalForm } from '../pages/new_snapshot_proposal';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/new_snapshot_proposal_modal.scss';
+import '../../../styles/modals/new_snapshot_proposal_modal.scss';
 
 type NewSnapshotProposalModalProps = {
   thread: Thread;
@@ -41,7 +44,7 @@ export const NewSnapshotProposalModal = ({
   return (
     <div className="NewSnapshotProposalModal">
       <CWModalHeader label="Create New Snapshot" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody>
         {snapshotOptions.length > 0 ? (
           <>
             <CWDropdown
@@ -64,7 +67,7 @@ export const NewSnapshotProposalModal = ({
             onSave={onSave}
           />
         )}
-      </div>
+      </CWModalBody>
     </div>
   );
 };

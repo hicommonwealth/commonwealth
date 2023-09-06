@@ -3,9 +3,12 @@ import React from 'react';
 import AddressInfo from '../../models/AddressInfo';
 import Vote from '../../models/Vote';
 import { User } from '../components/user/user';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/offchain_voting_modal.scss';
+import '../../../styles/modals/offchain_voting_modal.scss';
 
 type OffchainVotingModalProps = {
   onModalClose: () => void;
@@ -24,7 +27,7 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
   return (
     <div className="OffchainVotingModal">
       <CWModalHeader label="Votes" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody className="OffchainVotingModalBody">
         <div className="download-link">
           <a
             onClick={(e) => {
@@ -60,7 +63,7 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
             <div className="offchain-poll-voter-choice">{vote.option}</div>
           </div>
         ))}
-      </div>
+      </CWModalBody>
     </div>
   );
 };

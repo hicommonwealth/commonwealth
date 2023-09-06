@@ -1,33 +1,36 @@
 import React, { useState } from 'react';
 
-import { parseCustomStages, threadStageToLabel } from 'helpers';
+import type ChainEntity from '../../models/ChainEntity';
+import type Thread from '../../models/Thread';
+import { ChainBase } from 'common-common/src/types';
+import app from '../../state';
+import { parseCustomStages, threadStageToLabel } from '../../helpers';
 import {
   SnapshotProposal,
   loadMultipleSpacesData,
-} from 'helpers/snapshot_utils';
-import type ChainEntity from '../../models/ChainEntity';
-import type Thread from '../../models/Thread';
+} from '../../helpers/snapshot_utils';
 import { ThreadStage } from '../../models/types';
-import { SelectList } from '../components/component_kit/cw_select_list';
-
-import { ChainBase } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
-import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
-import { Link, LinkSource } from 'models/Thread';
-import app from 'state';
 import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
   useEditThreadMutation,
-} from 'state/api/threads';
+} from '../../state/api/threads';
+import { notifyError } from '../../controllers/app/notifications';
+import { CosmosProposal } from '../../controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import { filterLinks, getAddedAndDeleted } from '../../helpers/threads';
+import { Link, LinkSource } from '../../models/Thread';
+import { SelectList } from '../components/component_kit/cw_select_list';
 import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/update_proposal_status_modal.scss';
+import '../../../styles/modals/update_proposal_status_modal.scss';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -315,7 +318,7 @@ export const UpdateProposalStatusModal = ({
         label="Update proposal status"
         onModalClose={onModalClose}
       />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <SelectList
           defaultValue={
             tempStage
@@ -349,21 +352,21 @@ export const UpdateProposalStatusModal = ({
             proposalsToSet={tempCosmosProposals}
           />
         )}
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary"
-            buttonHeight="sm"
-            onClick={onModalClose}
-          />
-          <CWButton
-            buttonType="primary"
-            buttonHeight="sm"
-            label="Save changes"
-            onClick={handleSaveChanges}
-          />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          buttonType="primary"
+          buttonHeight="sm"
+          label="Save changes"
+          onClick={handleSaveChanges}
+        />
+      </CWModalFooter>
     </div>
   );
 };

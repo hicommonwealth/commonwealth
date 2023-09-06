@@ -2,16 +2,23 @@ import React from 'react';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
 
-import app from 'state';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import app from '../../state';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
 import AddressInfo from '../../models/AddressInfo';
 import NewProfile from '../../models/NewProfile';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/delete_address_modal.scss';
+import '../../../styles/modals/delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
   profile: NewProfile;
@@ -73,7 +80,7 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         icon="danger"
         onModalClose={closeModal}
       />
-      <div className="body">
+      <CWModalBody>
         <CWText>
           Address will be removed from the following linked profile.
         </CWText>
@@ -93,21 +100,21 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
           <CWText>Are you sure you want to remove this address?</CWText>
           <CWTruncatedAddress address={address} />
         </div>
-        <div className="actions">
-          <CWButton
-            label="Delete"
-            buttonType="destructive"
-            onClick={(e: React.MouseEvent) => onDeleteAddress(e, props)}
-            buttonHeight="sm"
-          />
-          <CWButton
-            label="Cancel"
-            buttonType="primary"
-            onClick={closeModal}
-            buttonHeight="sm"
-          />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          onClick={closeModal}
+          buttonHeight="sm"
+        />
+        <CWButton
+          label="Delete"
+          buttonType="destructive"
+          onClick={(e: React.MouseEvent) => onDeleteAddress(e, props)}
+          buttonHeight="sm"
+        />
+      </CWModalFooter>
     </div>
   );
 };

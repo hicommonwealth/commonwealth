@@ -14,7 +14,7 @@ import { CWText } from './cw_text';
 import { CWNoAuthMethodsAvailable, CWAuthButton } from './cw_auth_button';
 import { CWDivider } from './cw_divider';
 import { getClasses } from './helpers';
-import { CWModalHeader } from '../../modals/CWModalHeader';
+import { CWModalBody, CWModalHeader } from './new_designs/CWModal';
 
 import 'components/component_kit/cw_wallets_list.scss';
 
@@ -94,18 +94,20 @@ export const AccountSelector = (props: AccountSelectorProps) => {
   return (
     <div className="AccountSelector">
       <CWModalHeader onModalClose={onModalClose} />
-      {accounts.map((account, idx) => {
-        return (
-          <LinkAccountItem
-            key={`${account.address}-${idx}`}
-            account={account}
-            walletChain={walletChain}
-            walletNetwork={walletNetwork}
-            onSelect={onSelect}
-            idx={idx}
-          />
-        );
-      })}
+      <CWModalBody>
+        {accounts.map((account, idx) => {
+          return (
+            <LinkAccountItem
+              key={`${account.address}-${idx}`}
+              account={account}
+              walletChain={walletChain}
+              walletNetwork={walletNetwork}
+              onSelect={onSelect}
+              idx={idx}
+            />
+          );
+        })}
+      </CWModalBody>
     </div>
   );
 };

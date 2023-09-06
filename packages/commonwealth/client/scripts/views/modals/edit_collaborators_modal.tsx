@@ -1,24 +1,31 @@
 import React, { useState } from 'react';
 import { isEqual } from 'lodash';
-
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
-import app from 'state';
-import { useEditThreadMutation } from 'state/api/threads';
 import { useDebounce } from 'usehooks-ts';
-import NewProfilesController from '../../controllers/server/newProfiles';
+
+import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import type Thread from '../../models/Thread';
 import type { IThreadCollaborator } from '../../models/Thread';
+import app from '../../state';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
+import useNecessaryEffect from '../../hooks/useNecessaryEffect';
+import { useEditThreadMutation } from '../../state/api/threads';
+import NewProfilesController from '../../controllers/server/newProfiles';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { User } from '../components/user/user';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/edit_collaborators_modal.scss';
+import '../../../styles/modals/edit_collaborators_modal.scss';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;
@@ -96,8 +103,7 @@ export const EditCollaboratorsModal = ({
   return (
     <div className="EditCollaboratorsModal">
       <CWModalHeader label="Edit collaborators" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
-        <>body section</>
+      <CWModalBody>
         <div className="section">
           <CWTextInput
             label="Search Members"
@@ -168,61 +174,60 @@ export const EditCollaboratorsModal = ({
             </div>
           )}
         </div>
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary"
-            buttonHeight="sm"
-            onClick={onModalClose}
-          />
-          <CWButton
-            disabled={isEqual(thread.collaborators, collaborators)}
-            label="Save changes"
-            buttonType="primary"
-            buttonHeight="sm"
-            onClick={async () => {
-              const newCollaborators = collaborators.filter(
-                (c1) =>
-                  !thread.collaborators.some((c2) => c1.address === c2.address)
-              );
-              const removedCollaborators = (thread.collaborators as any).filter(
-                (c1) => !collaborators.some((c2) => c1.address === c2.address)
-              );
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          disabled={isEqual(thread.collaborators, collaborators)}
+          label="Save changes"
+          buttonType="primary"
+          buttonHeight="sm"
+          onClick={async () => {
+            const newCollaborators = collaborators.filter(
+              (c1) =>
+                !thread.collaborators.some((c2) => c1.address === c2.address)
+            );
+            const removedCollaborators = (thread.collaborators as any).filter(
+              (c1) => !collaborators.some((c2) => c1.address === c2.address)
+            );
 
-              if (
-                newCollaborators.length > 0 ||
-                removedCollaborators.length > 0
-              ) {
-                try {
-                  const updatedThread = await editThread({
-                    threadId: thread.id,
-                    chainId: app.activeChainId(),
-                    address: app.user.activeAccount.address,
-                    collaborators: {
-                      ...(newCollaborators.length > 0 && {
-                        toAdd: newCollaborators.map((x) => x.id),
-                      }),
-                      ...(removedCollaborators.length > 0 && {
-                        toRemove: removedCollaborators.map((x) => x.id),
-                      }),
-                    },
-                  });
-                  notifySuccess('Collaborators updated');
-                  onCollaboratorsUpdated &&
-                    onCollaboratorsUpdated(updatedThread.collaborators);
-                } catch (err) {
-                  const error =
-                    err?.responseJSON?.error ||
-                    'Failed to update collaborators';
-                  notifyError(error);
-                }
+            if (
+              newCollaborators.length > 0 ||
+              removedCollaborators.length > 0
+            ) {
+              try {
+                const updatedThread = await editThread({
+                  threadId: thread.id,
+                  chainId: app.activeChainId(),
+                  address: app.user.activeAccount.address,
+                  collaborators: {
+                    ...(newCollaborators.length > 0 && {
+                      toAdd: newCollaborators.map((x) => x.id),
+                    }),
+                    ...(removedCollaborators.length > 0 && {
+                      toRemove: removedCollaborators.map((x) => x.id),
+                    }),
+                  },
+                });
+                notifySuccess('Collaborators updated');
+                onCollaboratorsUpdated &&
+                  onCollaboratorsUpdated(updatedThread.collaborators);
+              } catch (err) {
+                const error =
+                  err?.responseJSON?.error || 'Failed to update collaborators';
+                notifyError(error);
               }
+            }
 
-              onModalClose();
-            }}
-          />
-        </div>
-      </div>
+            onModalClose();
+          }}
+        />
+      </CWModalFooter>
     </div>
   );
 };

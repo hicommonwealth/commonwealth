@@ -1,7 +1,7 @@
 @import '../shared';
 
 .ViewTemplateModal {
-  height: 712px;
+  height: auto;
   width: 720px;
   max-height: 84vh;
   max-width: 100vw;
@@ -9,82 +9,64 @@
   position: relative;
   flex-direction: column;
 
-  .compact-modal-body {
-    flex: 1;
+  .CreationRow {
+    gap: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .LabelRow {
     display: flex;
     align-items: flex-start;
-    padding: 24px;
-    overflow-y: auto;
+    justify-content: center;
+    gap: 12px;
     flex-direction: column;
-    gap: 24px;
 
-    .CreationRow {
-      gap: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .LabelRow {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 12px;
-      flex-direction: column;
-
-      .labelText {
-        color: $neutral-600;
-      }
-    }
-
-    .BlobContainer {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 12px;
-      flex-direction: column;
-
-      .labelText {
-        color: $neutral-600;
-      }
-
-      .Blob {
-        background: $neutral-50;
-        border-radius: 5px;
-        display: flex;
-        padding: 8px;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        width: 100%;
-      }
-
-      .BlobDivider {
-        margin-top: 20px;
-      }
-    }
-
-    .TemplateDisplay {
-      display: flex;
-      gap: 12px;
-      flex-direction: column;
-
-      .labelText {
-        color: $neutral-600;
-      }
-
-      .Template {
-        display: flex;
-        gap: 24px;
-        flex-direction: column;
-      }
+    .labelText {
+      color: $neutral-600;
     }
   }
 
-  .compact-modal-footer {
+  .BlobContainer {
     display: flex;
-    height: 72px;
-    padding: 24px;
-    align-items: center;
-    justify-content: flex-end;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px;
+    flex-direction: column;
+
+    .labelText {
+      color: $neutral-600;
+    }
+
+    .Blob {
+      background: $neutral-50;
+      border-radius: 5px;
+      display: flex;
+      padding: 8px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      width: 100%;
+    }
+
+    .BlobDivider {
+      margin-top: 20px;
+    }
+  }
+
+  .TemplateDisplay {
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+
+    .labelText {
+      color: $neutral-600;
+    }
+
+    .Template {
+      display: flex;
+      gap: 24px;
+      flex-direction: column;
+    }
   }
 }

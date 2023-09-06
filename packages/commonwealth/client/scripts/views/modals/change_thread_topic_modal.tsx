@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
+
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
-import app from 'state';
-import { useEditThreadMutation } from 'state/api/threads';
-import { useFetchTopicsQuery } from 'state/api/topics';
+import app from '../../state';
+import { useEditThreadMutation } from '../../state/api/threads';
+import { useFetchTopicsQuery } from '../../state/api/topics';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { TopicSelector } from '../components/topic_selector';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/change_thread_topic_modal.scss';
+import '../../../styles/modals/change_thread_topic_modal.scss';
 
 type ChangeThreadTopicModalProps = {
   onModalClose: () => void;
@@ -51,27 +56,27 @@ export const ChangeThreadTopicModal = ({
   return (
     <div className="ChangeThreadTopicModal">
       <CWModalHeader label="Change topic" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <TopicSelector
           topics={topics}
           value={activeTopic}
           onChange={setActiveTopic}
         />
-        <div className="buttons-row">
-          <CWButton
-            buttonType="secondary"
-            buttonHeight="sm"
-            label="Cancel"
-            onClick={onModalClose}
-          />
-          <CWButton
-            buttonType="primary"
-            buttonHeight="sm"
-            label="Save changes"
-            onClick={handleSaveChanges}
-          />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          buttonType="secondary"
+          buttonHeight="sm"
+          label="Cancel"
+          onClick={onModalClose}
+        />
+        <CWButton
+          buttonType="primary"
+          buttonHeight="sm"
+          label="Save changes"
+          onClick={handleSaveChanges}
+        />
+      </CWModalFooter>
     </div>
   );
 };

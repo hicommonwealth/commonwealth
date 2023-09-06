@@ -1,15 +1,19 @@
 import React from 'react';
 
-import { notifyError } from 'controllers/app/notifications';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import { castVote } from 'helpers/snapshot_utils';
-import { formatNumberShort } from 'adapters/currency';
-import app from 'state';
+import app from '../../state';
+import { notifyError } from '../../controllers/app/notifications';
+import { castVote } from '../../helpers/snapshot_utils';
+import { formatNumberShort } from '../../../../shared/adapters/currency';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/confirm_snapshot_vote_modal.scss';
+import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
 
 type ConfirmSnapshotVoteModalProps = {
   id: string;
@@ -43,7 +47,7 @@ export const ConfirmSnapshotVoteModal = (
   return (
     <div className="ConfirmSnapshotVoteModal">
       <CWModalHeader label="Confirm vote" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <CWText type="h4" fontWeight="semiBold">
           Are you sure you want to vote {proposal.choices[selectedChoice]}?
         </CWText>
@@ -62,48 +66,48 @@ export const ConfirmSnapshotVoteModal = (
             </CWText>
           </div>
         </div>
-        <div className="button-group">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary"
-            buttonHeight="sm"
-            disabled={isSaving}
-            onClick={async (e) => {
-              e.preventDefault();
-              onModalClose();
-            }}
-          />
-          <CWButton
-            label="Vote"
-            buttonType="primary"
-            buttonHeight="sm"
-            disabled={isSaving}
-            onClick={async (e) => {
-              e.preventDefault();
-              setIsSaving(true);
-              const votePayload = {
-                space: space.id,
-                proposal: id,
-                type: 'single-choice',
-                choice: parseInt(selectedChoice) + 1,
-                metadata: JSON.stringify({}),
-              };
-              try {
-                castVote(author.address, votePayload).then(async () => {
-                  await app.snapshot.refreshProposals();
-                  onModalClose();
-                  successCallback();
-                });
-              } catch (err) {
-                console.log(err);
-                const errorMessage = err.message;
-                notifyError(errorMessage);
-              }
-              setIsSaving(false);
-            }}
-          />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          disabled={isSaving}
+          onClick={async (e) => {
+            e.preventDefault();
+            onModalClose();
+          }}
+        />
+        <CWButton
+          label="Vote"
+          buttonType="primary"
+          buttonHeight="sm"
+          disabled={isSaving}
+          onClick={async (e) => {
+            e.preventDefault();
+            setIsSaving(true);
+            const votePayload = {
+              space: space.id,
+              proposal: id,
+              type: 'single-choice',
+              choice: parseInt(selectedChoice) + 1,
+              metadata: JSON.stringify({}),
+            };
+            try {
+              castVote(author.address, votePayload).then(async () => {
+                await app.snapshot.refreshProposals();
+                onModalClose();
+                successCallback();
+              });
+            } catch (err) {
+              console.log(err);
+              const errorMessage = err.message;
+              notifyError(errorMessage);
+            }
+            setIsSaving(false);
+          }}
+        />
+      </CWModalFooter>
     </div>
   );
 };

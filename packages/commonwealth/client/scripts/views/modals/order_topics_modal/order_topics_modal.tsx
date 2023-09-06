@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 
-import { notifyError } from 'controllers/app/notifications';
+import app from '../../../state';
+import { notifyError } from '../../../controllers/app/notifications';
 import type Topic from '../../../models/Topic';
-import app from 'state';
 import DraggableTopicsList from './draggable_topics_list';
 import {
   useFetchTopicsQuery,
   useUpdateFeaturedTopicsOrderMutation,
-} from 'state/api/topics';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+} from '../../../state/api/topics';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWModalHeader } from '../CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../../components/component_kit/new_designs/CWModal';
 
-import 'modals/order_topics_modal.scss';
+import '../../../../styles/modals/order_topics_modal.scss';
 
 type OrderTopicsModalProps = {
   onModalClose: () => void;
@@ -60,7 +64,7 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
   return (
     <div className="OrderTopicsModal">
       <CWModalHeader label="Reorder Topics" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <div className="featured-topic-list">
           {topics.length ? (
             <DraggableTopicsList topics={topics} setTopics={setTopics} />
@@ -68,15 +72,15 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
             <CWText>No Topics to Reorder</CWText>
           )}
         </div>
-        <div className="button">
-          <CWButton
-            buttonType="primary"
-            buttonHeight="sm"
-            onClick={handleSave}
-            label="Save"
-          />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          buttonType="primary"
+          buttonHeight="sm"
+          onClick={handleSave}
+          label="Save"
+        />
+      </CWModalFooter>
     </div>
   );
 };

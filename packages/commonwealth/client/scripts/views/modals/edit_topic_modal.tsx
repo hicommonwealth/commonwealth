@@ -1,27 +1,34 @@
 import React, { useState } from 'react';
+import type { DeltaStatic } from 'quill';
 
+import app from '../../state';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import Topic from '../../models/Topic';
-import app from 'state';
+import { useCommonNavigate } from '../../navigation/helpers';
+import {
+  useDeleteTopicMutation,
+  useEditTopicMutation,
+} from '../../state/api/topics';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
   getTextFromDelta,
   ReactQuillEditor,
 } from '../components/react_quill_editor';
-import type { DeltaStatic } from 'quill';
 import {
   deserializeDelta,
   serializeDelta,
 } from '../components/react_quill_editor/utils';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import { useDeleteTopicMutation, useEditTopicMutation } from 'state/api/topics';
-import { CWModalHeader } from './CWModalHeader';
+import { openConfirmation } from './confirmation_modal';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/edit_topic_modal.scss';
+import '../../../styles/modals/edit_topic_modal.scss';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -64,10 +71,12 @@ export const EditTopicModal = ({
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
+
     if (featuredInNewPost && editorText.length === 0) {
       setErrorMsg('Must provide template.');
       return;
     }
+
     const topicInfo = {
       id,
       description: description,
@@ -81,6 +90,7 @@ export const EditTopicModal = ({
         : null,
       total_threads: topic.totalThreads || 0,
     };
+
     try {
       await editTopic({ topic: new Topic(topicInfo) });
       navigate(`/discussions/${encodeURI(name.toString().trim())}`);
@@ -121,7 +131,7 @@ export const EditTopicModal = ({
   return (
     <div className="EditTopicModal">
       <CWModalHeader label="Edit topic" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <CWTextInput
           label="Name"
           value={name}
@@ -181,7 +191,9 @@ export const EditTopicModal = ({
             tabIndex={3}
           />
         )}
-        <div className="buttons-row">
+      </CWModalBody>
+      <CWModalFooter className="EditTopicModalFooter">
+        <div className="action-buttons">
           <CWButton
             buttonType="primary"
             buttonHeight="sm"
@@ -196,8 +208,14 @@ export const EditTopicModal = ({
             label="Delete topic"
           />
         </div>
-        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
-      </div>
+        {errorMsg && (
+          <CWValidationText
+            className="error-message"
+            message={errorMsg}
+            status="failure"
+          />
+        )}
+      </CWModalFooter>
     </div>
   );
 };

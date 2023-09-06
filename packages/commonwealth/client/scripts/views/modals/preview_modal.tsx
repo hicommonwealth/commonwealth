@@ -2,9 +2,12 @@ import React from 'react';
 import type { DeltaStatic } from 'quill';
 
 import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/preview_modal.scss';
+import '../../../styles/modals/preview_modal.scss';
 
 type PreviewModalProps = {
   doc: DeltaStatic | string;
@@ -23,11 +26,11 @@ export const PreviewModal = ({
         label={title ? `Preview: ${title}` : 'Preview'}
         onModalClose={onModalClose}
       />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <QuillRenderer
           doc={typeof doc === 'string' ? doc : JSON.stringify(doc)}
         />
-      </div>
+      </CWModalBody>
     </div>
   );
 };

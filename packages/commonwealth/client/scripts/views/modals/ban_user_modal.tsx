@@ -1,13 +1,20 @@
 import React from 'react';
 import $ from 'jquery';
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import type MinimumProfile from '../../models/MinimumProfile';
-import app from 'state';
+import app from '../../state';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/ban_user_modal.scss';
+import '../../../styles/modals/ban_user_modal.scss';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
@@ -24,12 +31,12 @@ export const BanUserModal = (props: BanUserModalAttrs) => {
         icon="danger"
         onModalClose={onModalClose}
       />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <div>
           Banning an address prevents it from interacting with the forum.
         </div>
-      </div>
-      <div className="compact-modal-footer">
+      </CWModalBody>
+      <CWModalFooter>
         <CWButton
           label="Ban address"
           buttonType="destructive"
@@ -53,7 +60,7 @@ export const BanUserModal = (props: BanUserModalAttrs) => {
             }
           }}
         />
-      </div>
+      </CWModalFooter>
     </div>
   );
 };

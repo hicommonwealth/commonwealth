@@ -2,38 +2,50 @@
 
 .CWModalHeader {
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   background: $white;
   border-radius: 6px 6px 0px 0px;
   padding: 16px;
 
-  .Frame {
+  .Header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
 
-    .danger-icon {
-      color: $rorange-600;
+    .Frame {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+
+      .danger-icon {
+        color: $rorange-600;
+      }
+
+      .warning-icon {
+        color: $yellow-500;
+      }
+
+      .title-text {
+        font-weight: 500;
+        letter-spacing: -0.01em;
+      }
     }
 
-    .warning-icon {
-      color: $yellow-500;
-    }
+    .close-icon {
+      color: $neutral-500;
 
-    .title-text {
-      font-weight: 500;
-      letter-spacing: -0.01em;
+      &:hover {
+        cursor: pointer;
+        color: $neutral-800;
+      }
     }
   }
 
-  .close-icon {
-    color: $neutral-500;
-
-    &:hover {
-      cursor: pointer;
-      color: $neutral-800;
-    }
+  .Subtitle {
+    color: $neutral-800;
+    font-style: normal;
+    line-height: 16px;
+    font-feature-settings: 'tnum' on, 'lnum' on;
+    margin-top: 8px;
   }
 }

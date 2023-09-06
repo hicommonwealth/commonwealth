@@ -8,10 +8,4 @@
   @include smallInclusive {
     width: 100%;
   }
-
-  .buttons-row {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-  }
 }

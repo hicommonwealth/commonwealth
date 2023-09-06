@@ -1,16 +1,20 @@
 import React from 'react';
 
-import Template from 'models/Template';
+import app from '../../state';
+import Template from '../../models/Template';
+import { renderDisabledTemplate } from '../../helpers/action_template_helpers';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
-import app from 'state';
 import { CWCommunityAvatar } from '../components/component_kit/cw_community_avatar';
 import { User } from '../components/user/user';
 import { CWDivider } from '../components/component_kit/cw_divider';
-import { renderDisabledTemplate } from 'helpers/action_template_helpers';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/view_template_modal.scss';
+import '../../../styles/modals/view_template_modal.scss';
 
 const ViewTemplateModal = ({
   template,
@@ -23,8 +27,8 @@ const ViewTemplateModal = ({
 
   return (
     <div className="ViewTemplateModal">
-      <CWModalHeader label="View template AAA" onModalClose={onClose} />
-      <div className="compact-modal-body">
+      <CWModalHeader label="View template" onModalClose={onClose} />
+      <CWModalBody>
         <div className="CreationRow">
           <CWText type="b2">By</CWText>
           <User user={creator} showAddressWithDisplayName />
@@ -66,15 +70,15 @@ const ViewTemplateModal = ({
             {renderDisabledTemplate(JSON.parse(template.template).form_fields)}
           </div>
         </div>
-      </div>
-      <div className="compact-modal-footer">
+      </CWModalBody>
+      <CWModalFooter>
         <CWButton
           label="Close"
           buttonType="secondary"
           buttonHeight="sm"
           onClick={onClose}
         />
-      </div>
+      </CWModalFooter>
     </div>
   );
 };

@@ -3,18 +3,25 @@ import _ from 'underscore';
 import moment from 'moment';
 
 import type Thread from '../../models/Thread';
-import app from 'state';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { pluralize } from 'helpers';
+import app from '../../state';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
+import { pluralize } from '../../helpers';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { SelectList } from 'views/components/component_kit/cw_select_list';
-import { CWModalHeader } from './CWModalHeader';
+import { SelectList } from '../components/component_kit/cw_select_list';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/poll_editor_modal.scss';
+import '../../../styles/modals/poll_editor_modal.scss';
 
 const getPollDurationCopy = (
   customDuration: string,
@@ -114,7 +121,7 @@ export const PollEditorModal = ({
   return (
     <div className="PollEditorModal">
       <CWModalHeader label="Create Poll" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <CWTextInput
           label="Question"
           placeholder="Do you support this proposal?"
@@ -173,21 +180,21 @@ export const PollEditorModal = ({
             )}
           </div>
         </div>
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary"
-            buttonHeight="sm"
-            onClick={onModalClose}
-          />
-          <CWButton
-            label="Save changes"
-            buttonType="primary"
-            buttonHeight="sm"
-            onClick={handleSavePoll}
-          />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          label="Save changes"
+          buttonType="primary"
+          buttonHeight="sm"
+          onClick={handleSavePoll}
+        />
+      </CWModalFooter>
     </div>
   );
 };

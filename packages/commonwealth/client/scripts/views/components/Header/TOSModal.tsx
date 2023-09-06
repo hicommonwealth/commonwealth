@@ -1,11 +1,15 @@
 import React from 'react';
 
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import app from 'state';
-import { CWModalHeader } from '../../modals/CWModalHeader';
+import app from '../../../state';
+import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/new_designs/cw_button';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../component_kit/new_designs/CWModal';
 
-import 'components/Header/TOSModal.scss';
+import '../../../../styles/components/Header/TOSModal.scss';
 
 type TOSModalProps = {
   onAccept: () => void;
@@ -23,7 +27,7 @@ export const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
         icon="warning"
         onModalClose={onModalClose}
       />
-      <div className="content-wrapper">
+      <CWModalBody>
         <CWText>
           By clicking accept you agree to the community's
           <a href={terms} target="_blank">
@@ -31,15 +35,21 @@ export const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
           </a>
           .
         </CWText>
-      </div>
-      <div className="compact-modal-footer">
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
         <CWButton
           buttonType="primary"
           buttonHeight="sm"
           onClick={onAccept}
           label="Accept"
         />
-      </div>
+      </CWModalFooter>
     </div>
   );
 };

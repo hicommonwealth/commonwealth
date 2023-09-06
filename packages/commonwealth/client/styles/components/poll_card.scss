@@ -141,17 +141,4 @@
   @include smallInclusive {
     width: 100%;
   }
-
-  .modal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .compact-modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    padding: 16px;
-  }
 }

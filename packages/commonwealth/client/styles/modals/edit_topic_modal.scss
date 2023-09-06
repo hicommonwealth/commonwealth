@@ -9,23 +9,21 @@
     width: 100%;
   }
 
-  .compact-modal-body {
+  .EditTopicModalFooter {
     display: flex;
     flex-direction: column;
-    gap: 16px;
 
-    .checkboxes-container {
+    .action-buttons {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 24px;
+      flex-direction: row;
+      justify-content: flex-end;
     }
 
-    .buttons-row {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      width: 100%;
+    .error-message {
+      display: block;
+      align-items: center;
+      text-align: end;
+      margin-top: 0;
     }
   }
 }

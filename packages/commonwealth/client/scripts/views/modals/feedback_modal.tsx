@@ -1,14 +1,18 @@
 import React from 'react';
 import $ from 'jquery';
 
-import app from 'state';
+import app from '../../state';
+import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
-import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/feedback_modal.scss';
+import '../../../styles/modals/feedback_modal.scss';
 
 type FeedbackModalProps = {
   onModalClose: () => void;
@@ -25,7 +29,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
   return (
     <div className="FeedbackModal">
       <CWModalHeader label="Send feedback" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <CWTextArea
           placeholder="Report a bug, or suggest an improvement"
           value={feedbackText}
@@ -33,8 +37,8 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
             setFeedbackText(e.target.value);
           }}
         />
-      </div>
-      <div className="compact-modal-footer">
+      </CWModalBody>
+      <CWModalFooter>
         <CWButton
           buttonType="primary"
           buttonHeight="sm"
@@ -65,7 +69,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
           }}
         />
         {message && <CWValidationText message={message} status={status} />}
-      </div>
+      </CWModalFooter>
     </div>
   );
 };

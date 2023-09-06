@@ -9,30 +9,41 @@ type WarningIcon = 'warning' | 'danger';
 
 type CWModalHeaderProps = {
   label?: string;
+  subheader?: string;
   icon?: WarningIcon;
   onModalClose: () => void;
 };
 
 const CWModalHeader: FC<CWModalHeaderProps> = ({
   label = '',
+  subheader = '',
   icon,
   onModalClose,
 }) => {
   return (
-    <div className="CWModalHeader">
-      <div className="Frame">
-        {icon === 'warning' && (
-          <Warning className="warning-icon" weight="fill" size={24} />
-        )}
-        {icon === 'danger' && (
-          <WarningOctagon className="danger-icon" weight="fill" size={24} />
-        )}
-        <CWText className="title-text" type="h4">
-          {label}
-        </CWText>
+    <>
+      <div className="CWModalHeader">
+        <div className="Header">
+          <div className="Frame">
+            {icon === 'warning' && (
+              <Warning className="warning-icon" weight="fill" size={24} />
+            )}
+            {icon === 'danger' && (
+              <WarningOctagon className="danger-icon" weight="fill" size={24} />
+            )}
+            <CWText className="title-text" type="h4">
+              {label}
+            </CWText>
+          </div>
+          <X className="close-icon" onClick={() => onModalClose()} size={24} />
+        </div>
+        {subheader ? (
+          <CWText className="Subtitle" type="caption" fontWeight="regular">
+            {subheader}
+          </CWText>
+        ) : null}
       </div>
-      <X className="close-icon" onClick={() => onModalClose()} size={24} />
-    </div>
+    </>
   );
 };
 

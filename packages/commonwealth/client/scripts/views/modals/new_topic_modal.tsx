@@ -1,13 +1,16 @@
 import React, { useEffect } from 'react';
 import type { DeltaStatic } from 'quill';
 
+import app from '../../state';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import app from 'state';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useCreateTopicMutation, useFetchTopicsQuery } from 'state/api/topics';
-import { pluralizeWithoutNumberPrefix } from 'helpers';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
+import { useCommonNavigate } from '../../navigation/helpers';
+import {
+  useCreateTopicMutation,
+  useFetchTopicsQuery,
+} from '../../state/api/topics';
+import { pluralizeWithoutNumberPrefix } from '../../helpers';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { TokenDecimalInput } from '../components/token_decimal_input';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
@@ -18,9 +21,13 @@ import {
   ReactQuillEditor,
 } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/new_topic_modal.scss';
+import '../../../styles/modals/new_topic_modal.scss';
 
 type NewTopicModalProps = {
   onModalClose: () => void;
@@ -72,7 +79,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   return (
     <div className="NewTopicModal">
       <CWModalHeader label="New topic" onModalClose={onModalClose} />
-      <div className="compact-modal-body">
+      <CWModalBody>
         <CWTextInput
           label="Name"
           value={name}
@@ -157,32 +164,34 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setContentDelta={setContentDelta}
           />
         )}
-      </div>
-      <div className="compact-modal-footer">
-        <CWButton
-          label="Create topic"
-          buttonType="primary"
-          buttonHeight="sm"
-          disabled={isSaving || !!errorMsg}
-          onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
-            e.preventDefault();
-            try {
-              await createTopic({
-                name,
-                description,
-                featuredInSidebar,
-                featuredInNewPost,
-                tokenThreshold,
-                defaultOffchainTemplate: serializeDelta(contentDelta),
-              });
-              navigate(`/discussions/${encodeURI(name.toString().trim())}`);
-              onModalClose();
-            } catch (err) {
-              setErrorMsg('Error creating topic');
-              setIsSaving(false);
-            }
-          }}
-        />
+      </CWModalBody>
+      <CWModalFooter className="NewTopicModalFooter">
+        <div className="action-buttons">
+          <CWButton
+            label="Create topic"
+            buttonType="primary"
+            buttonHeight="sm"
+            disabled={isSaving || !!errorMsg}
+            onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
+              e.preventDefault();
+              try {
+                await createTopic({
+                  name,
+                  description,
+                  featuredInSidebar,
+                  featuredInNewPost,
+                  tokenThreshold,
+                  defaultOffchainTemplate: serializeDelta(contentDelta),
+                });
+                navigate(`/discussions/${encodeURI(name.toString().trim())}`);
+                onModalClose();
+              } catch (err) {
+                setErrorMsg('Error creating topic');
+                setIsSaving(false);
+              }
+            }}
+          />
+        </div>
         {errorMsg && (
           <CWValidationText
             className="validation-text"
@@ -190,7 +199,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             status="failure"
           />
         )}
-      </div>
+      </CWModalFooter>
     </div>
   );
 };

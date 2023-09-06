@@ -1,20 +1,26 @@
 import React from 'react';
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { getDecimals } from 'helpers';
-import app from 'state';
+import type Topic from '../../models/Topic';
+import app from '../../state';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
+import { getDecimals } from '../../helpers';
 import {
   useFetchTopicsQuery,
   useSetTopicThresholdMutation,
-} from 'state/api/topics';
-import type Topic from '../../models/Topic';
+} from '../../state/api/topics';
 import Permissions from '../../utils/Permissions';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
+import { TokenDecimalInput } from '../components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWModalHeader } from './CWModalHeader';
+import {
+  CWModalBody,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
-import 'modals/edit_topic_thresholds_modal.scss';
+import '../../../styles/modals/edit_topic_thresholds_modal.scss';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
@@ -94,7 +100,7 @@ export const EditTopicThresholdsModal = ({
         label="Edit topic thresholds"
         onModalClose={onModalClose}
       />
-      <div className="compact-modal-body">
+      <CWModalBody className="EditTopicThresholdsBody">
         {topics.length > 0 ? (
           topics
             .sort((a, b) => {
@@ -118,7 +124,7 @@ export const EditTopicThresholdsModal = ({
         ) : (
           <CWText>There are no topics in this community yet</CWText>
         )}
-      </div>
+      </CWModalBody>
     </div>
   );
 };

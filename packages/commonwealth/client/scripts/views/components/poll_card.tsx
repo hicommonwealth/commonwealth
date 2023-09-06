@@ -10,7 +10,11 @@ import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
 import { Modal } from './component_kit/cw_modal';
-import { CWModalHeader } from '../modals/CWModalHeader';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from './component_kit/new_designs/CWModal';
 
 import 'components/poll_card.scss';
 
@@ -310,12 +314,10 @@ export const DeletePollModal: FC<DeletePollModalProps> = ({
         icon="danger"
         onModalClose={handleCloseModal}
       />
-      <div className="compact-modal-body">
-        <div className="modal-body">
-          <CWText>This action cannot be reversed.</CWText>
-        </div>
-      </div>
-      <div className="compact-modal-footer">
+      <CWModalBody>
+        <CWText>This action cannot be reversed.</CWText>
+      </CWModalBody>
+      <CWModalFooter>
         <CWButton
           label="Cancel"
           buttonType="secondary"
@@ -328,7 +330,7 @@ export const DeletePollModal: FC<DeletePollModalProps> = ({
           label="Confirm"
           onClick={handleDeleteClick}
         />
-      </div>
+      </CWModalFooter>
     </div>
   );
 };
