@@ -123,6 +123,7 @@ export async function __getBulkThreads(
             FROM "Reactions" as r
             LEFT JOIN "Addresses" ad
             ON r.address_id = ad.id
+            where r.chain = $chain
             GROUP BY thread_id
         ) reactions
         ON t.id = reactions.thread_id
