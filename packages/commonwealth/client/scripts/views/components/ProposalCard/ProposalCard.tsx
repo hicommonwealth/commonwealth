@@ -21,7 +21,10 @@ import {
 } from './helpers';
 import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
-import { useCosmosTally, useProposalMetadataQuery } from 'state/api/proposals';
+import {
+  useCosmosTally,
+  useCosmosProposalMetadataQuery,
+} from 'state/api/proposals';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;
@@ -36,7 +39,7 @@ export const ProposalCard = ({
   const [title, setTitle] = useState(
     proposal.title || `Proposal ${proposal.identifier}`
   );
-  const { data: metadata } = useProposalMetadataQuery(proposal);
+  const { data: metadata } = useCosmosProposalMetadataQuery(proposal);
   const { isFetching: isFetchingTally } = useCosmosTally(proposal);
 
   const secondaryTagText = getSecondaryTagText(proposal);

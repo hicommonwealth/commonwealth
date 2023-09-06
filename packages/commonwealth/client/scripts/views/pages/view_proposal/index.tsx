@@ -31,7 +31,7 @@ import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
-  useProposalMetadataQuery,
+  useCosmosProposalMetadataQuery,
   useCosmosProposal,
   useCosmosTally,
   useCosmosVotes,
@@ -63,7 +63,7 @@ const ViewProposalPage = ({
     proposalId,
   });
   const { data: metadata, isFetching: isFetchingMetadata } =
-    useProposalMetadataQuery(proposal);
+    useCosmosProposalMetadataQuery(proposal);
   useCosmosVotes(proposal);
   useCosmosTally(proposal);
   useCosmosDeposits(proposal);

@@ -1,6 +1,6 @@
 import { useActiveCosmosProposalsQuery } from './fetchActiveCosmosProposals';
 import { useCompletedCosmosProposalsQuery } from './fetchCompletedCosmosProposals';
-import { useProposalMetadataQuery } from './fetchProposalMetadata';
+import { useCosmosProposalMetadataQuery } from './fetchCosmosProposalMetadata';
 import { useCosmosProposal } from './fetchCosmosProposal';
 import { useCosmosTally } from './fetchCosmosTally';
 import { useCosmosVotes } from './fetchCosmosVotes';
@@ -9,7 +9,7 @@ import { useCosmosDeposits } from './fetchCosmosDeposits';
 export {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
-  useProposalMetadataQuery,
+  useCosmosProposalMetadataQuery,
   useCosmosProposal,
   useCosmosTally,
   useCosmosVotes,

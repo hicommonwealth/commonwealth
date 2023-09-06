@@ -11,7 +11,9 @@ const PROPOSAL_METADATA_CACHE_TIME = Infinity;
 // onchain metadata URI does not change, but the file it points to might:
 const PROPOSAL_METADATA_STALE_TIME = 1000 * 60 * 30;
 
-const fetchProposalMetadata = async (proposal: AnyProposal): Promise<any> => {
+const fetchCosmosProposalMetadata = async (
+  proposal: AnyProposal
+): Promise<any> => {
   if (proposal instanceof CosmosProposalV1 && !!proposal?.data?.metadata) {
     const fileURI = proposal.data.metadata.replace('ipfs://', '');
     const isIPFSFile = isIPFS.cid(fileURI);
@@ -44,16 +46,16 @@ const fetchProposalMetadata = async (proposal: AnyProposal): Promise<any> => {
   return {};
 };
 
-const getProposalMetadataQueryKey = (proposal: AnyProposal) => {
-  return ['proposalMetadata', app.activeChainId(), proposal?.identifier];
+const getCosmosProposalMetadataQueryKey = (proposal: AnyProposal) => {
+  return ['cosmosProposalMetadata', app.activeChainId(), proposal?.identifier];
 };
 
-const useProposalMetadataQuery = (proposal: AnyProposal) => {
+const useCosmosProposalMetadataQuery = (proposal: AnyProposal) => {
   const isCosmosV1 = proposal instanceof CosmosProposalV1;
   const proposalId = proposal?.identifier;
   return useQuery({
-    queryKey: getProposalMetadataQueryKey(proposal),
-    queryFn: () => fetchProposalMetadata(proposal),
+    queryKey: getCosmosProposalMetadataQueryKey(proposal),
+    queryFn: () => fetchCosmosProposalMetadata(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK && isCosmosV1 && !!proposalId,
     cacheTime: PROPOSAL_METADATA_CACHE_TIME,
@@ -61,4 +63,4 @@ const useProposalMetadataQuery = (proposal: AnyProposal) => {
   });
 };
 
-export { useProposalMetadataQuery };
+export { useCosmosProposalMetadataQuery };
