@@ -149,25 +149,30 @@ async function fetchLatestCosmosProposalV1Beta1(
   chain: ChainInstance
 ): Promise<Proposal[]> {
   const client = await getCosmosClient<GovV1Beta1ClientType>(chain);
-
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>', client.gov);
   let nextKey: Uint8Array, finalProposalsPage: Proposal[];
   do {
-    const { proposals, pagination } = await client.gov.proposals(
+    const result = await client.gov.proposals(
       ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED,
       '',
       '',
       nextKey
     );
-    finalProposalsPage = proposals;
-    if (pagination) {
-      if (!pagination?.total.isZero()) {
-        const newNextKey = numberToUint8ArrayBE(pagination.total.toNumber());
+    if (!result) {
+      console.error(`Result is undefined for ${chain.id}`);
+    }
+    finalProposalsPage = result?.proposals;
+    if (result?.pagination) {
+      if (!result.pagination?.total.isZero()) {
+        const newNextKey = numberToUint8ArrayBE(
+          result.pagination.total.toNumber()
+        );
         if (nextKey != newNextKey) {
           nextKey = newNextKey;
         } else {
           nextKey = numberToUint8ArrayBE(0);
         }
-      } else nextKey = pagination?.nextKey;
+      } else nextKey = result.pagination?.nextKey;
     }
   } while (uint8ArrayToNumberBE(nextKey) > 0);
 
