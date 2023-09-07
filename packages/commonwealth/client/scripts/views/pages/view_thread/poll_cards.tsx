@@ -39,6 +39,7 @@ export const ThreadPollEditorCard = ({
         content={
           <div className="PollEditorCard">
             <CWButton
+              className="create-poll-button"
               buttonType="mini-black"
               label="Create poll"
               onClick={(e) => {
