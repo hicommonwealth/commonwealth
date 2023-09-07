@@ -14,10 +14,11 @@ const fetchDepositParams = async (): Promise<CosmosDepositParams> => {
   return getDepositParams(app.chain as Cosmos);
 };
 
-const useDepositParamsQuery = () => {
+// proposal.isPassing depends on staking denom being defined
+const useDepositParamsQuery = (stakingDenom: string) => {
   const chainId = app.activeChainId();
   return useQuery({
-    queryKey: ['depositParams', chainId],
+    queryKey: ['depositParams', chainId, stakingDenom],
     queryFn: fetchDepositParams,
     enabled: app.chain?.base === ChainBase.CosmosSDK,
     cacheTime: DEPOSIT_PARAMS_CACHE_TIME,

@@ -287,9 +287,11 @@ export class CosmosProposalV1 extends Proposal<
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':
-        return this.data.state.totalDeposit.gte(this._Governance.minDeposit)
-          ? ProposalStatus.Passing
-          : ProposalStatus.Failing;
+        return this._Governance.minDeposit
+          ? this.data.state.totalDeposit.gte(this._Governance.minDeposit)
+            ? ProposalStatus.Passing
+            : ProposalStatus.Failing
+          : ProposalStatus.None;
       default:
         return ProposalStatus.None;
     }
