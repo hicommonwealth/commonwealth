@@ -181,6 +181,7 @@ import { getChainNodesHandler } from '../routes/chains/get_chain_nodes_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
+import viewChainActivity from '../routes/viewChainActivity';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -989,6 +990,13 @@ function setupRouter(
     '/viewGlobalActivity',
     viewGlobalActivity.bind(this, models, globalActivityCache)
   );
+  registerRoute(
+    router,
+    'get',
+    '/viewChainActivity',
+    viewChainActivity.bind(this, models)
+  );
+
   registerRoute(
     router,
     'post',
