@@ -10,17 +10,19 @@ import {
 const DEPOSIT_PARAMS_CACHE_TIME = Infinity;
 const DEPOSIT_PARAMS_STALE_TIME = 1000 * 60 * 15;
 
-const fetchDepositParams = async (): Promise<CosmosDepositParams> => {
-  return getDepositParams(app.chain as Cosmos);
+const fetchDepositParams = async (
+  stakingDenom: string
+): Promise<CosmosDepositParams> => {
+  return getDepositParams(app.chain as Cosmos, stakingDenom);
 };
 
-// proposal.isPassing depends on staking denom being defined
 const useDepositParamsQuery = (stakingDenom: string) => {
   const chainId = app.activeChainId();
   return useQuery({
+    // fetchDepositParams depends on stakingDenom being defined
     queryKey: ['depositParams', chainId, stakingDenom],
-    queryFn: fetchDepositParams,
-    enabled: app.chain?.base === ChainBase.CosmosSDK,
+    queryFn: () => fetchDepositParams(stakingDenom),
+    enabled: app.chain?.base === ChainBase.CosmosSDK && !!stakingDenom,
     cacheTime: DEPOSIT_PARAMS_CACHE_TIME,
     staleTime: DEPOSIT_PARAMS_STALE_TIME,
   });
