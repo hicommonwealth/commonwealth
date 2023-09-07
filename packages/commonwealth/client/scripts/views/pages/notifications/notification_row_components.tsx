@@ -19,7 +19,9 @@ import { UserGallery } from '../../components/user/user_gallery';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useNavigate } from 'react-router';
 
-export const ChainEventNotificationRow = (props: Omit<NotificationRowProps, 'allRead'>) => {
+export const ChainEventNotificationRow = (
+  props: Omit<NotificationRowProps, 'allRead'>
+) => {
   const { notification, onListPage } = props;
 
   const navigate = useCommonNavigate();
@@ -100,7 +102,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   const { handleSetMarkingRead, markingRead, notification, allRead } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
 
-  const { category } = notification.subscription;
+  const category = notification.categoryId;
 
   const navigate = useNavigate();
 

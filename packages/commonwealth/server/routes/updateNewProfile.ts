@@ -2,6 +2,7 @@ import type { NextFunction } from 'express';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { failure, success } from '../types';
 import type { DB } from '../models';
+import { ProfileAttributes } from '../models/profile';
 
 export const Errors = {
   NotAuthorized: 'Not authorized',
@@ -22,6 +23,7 @@ type UpdateNewProfileReq = {
 };
 type UpdateNewProfileResp = {
   status: string;
+  profile: ProfileAttributes;
 };
 
 const updateNewProfile = async (
@@ -53,7 +55,7 @@ const updateNewProfile = async (
     return next(new Error(Errors.NotAuthorized));
   }
 
-  const updateStatus = await models.Profile.update(
+  const [updateStatus, rows] = await models.Profile.update(
     {
       ...((email || email === '') && { email }),
       ...(slug && { slug }),
@@ -68,16 +70,18 @@ const updateNewProfile = async (
       where: {
         user_id: req.user.id,
       },
+      returning: true,
     }
   );
 
-  if (!updateStatus) {
+  if (!updateStatus || !rows) {
     return failure(res.status(400), {
       status: 'Failed',
     });
   }
   return success(res, {
     status: 'Success',
+    profile: rows[0].toJSON(),
   });
 };
 

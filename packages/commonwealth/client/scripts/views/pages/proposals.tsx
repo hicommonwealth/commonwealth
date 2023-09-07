@@ -25,8 +25,15 @@ import {
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
+  useAaveProposalsQuery,
 } from 'state/api/proposals';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
+import {
+  useDepositParamsQuery,
+  usePoolParamsQuery,
+  useStakingParamsQuery,
+} from 'state/api/chainParams';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -57,6 +64,11 @@ const ProposalsPage = () => {
   const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
 
+  const { data: cachedAaveProposals, isError } = useAaveProposalsQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
+    chainId: app.chain?.id,
+  });
+
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
 
@@ -80,6 +92,11 @@ const ProposalsPage = () => {
   }, [setSubstrateLoading]);
 
   useManageDocumentTitle('Proposals');
+
+  // lazy load Cosmos chain params
+  useDepositParamsQuery();
+  usePoolParamsQuery();
+  useStakingParamsQuery();
 
   const {
     data: activeCosmosProposals,
@@ -119,9 +136,18 @@ const ProposalsPage = () => {
     return <PageLoading message="Connecting to chain" />;
   }
 
+  if (isError) {
+    return <ErrorPage message="Could not connect to chain" />;
+  }
+
   const modLoading = loadSubstrateModules('Proposals', getModules);
 
   if (isSubstrateLoading) return modLoading;
+
+  let aaveProposals: AaveProposal[];
+  if (onAave)
+    aaveProposals =
+      cachedAaveProposals || (app.chain as Aave).governance.store.getAll();
 
   // active proposals
   const activeDemocracyProposals =
@@ -139,8 +165,7 @@ const ProposalsPage = () => {
 
   const activeAaveProposals =
     onAave &&
-    (app.chain as Aave).governance.store
-      .getAll()
+    aaveProposals
       .filter((p) => !p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
@@ -215,8 +240,7 @@ const ProposalsPage = () => {
 
   const inactiveAaveProposals =
     onAave &&
-    (app.chain as Aave).governance.store
-      .getAll()
+    aaveProposals
       .filter((p) => p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 

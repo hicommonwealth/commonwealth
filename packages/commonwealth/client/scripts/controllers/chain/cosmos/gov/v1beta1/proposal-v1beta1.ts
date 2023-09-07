@@ -147,9 +147,7 @@ export class CosmosProposal extends Proposal<
     throw new Error('unimplemented');
   }
 
-  public async init() {
-    await this.fetchVoteInfo();
-
+  public init() {
     if (!this.initialized) {
       this._initialized = true;
     }
@@ -158,64 +156,64 @@ export class CosmosProposal extends Proposal<
     }
   }
 
-  private async fetchVoteInfo() {
-    const api = this._Chain.api;
-    // only fetch voter data if active
-    if (!this.data.state.completed) {
-      try {
-        const [depositResp, voteResp, tallyResp]: [
-          QueryDepositsResponse,
-          QueryVotesResponse,
-          QueryTallyResultResponse
-        ] = await Promise.all([
-          this.status === 'DepositPeriod'
-            ? api.gov.deposits(this.data.identifier)
-            : Promise.resolve(null),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : api.gov.votes(this.data.identifier),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : api.gov.tally(this.data.identifier),
-        ]);
-        if (depositResp?.deposits) {
-          for (const deposit of depositResp.deposits) {
-            if (deposit.amount && deposit.amount[0]) {
-              this.data.state.depositors.push([
-                deposit.depositor,
-                new BN(deposit.amount[0].amount),
-              ]);
-            }
-          }
+  public async fetchDeposits(): Promise<QueryDepositsResponse> {
+    const deposits = await this._Chain.api.gov.deposits(this._data.identifier);
+    this.setDeposits(deposits);
+    return deposits;
+  }
+
+  public async fetchTally(): Promise<QueryTallyResultResponse> {
+    const tally = await this._Chain.api.gov.tally(this._data.identifier);
+    this.setTally(tally);
+    return tally;
+  }
+
+  public async fetchVotes(): Promise<QueryVotesResponse> {
+    const votes = await this._Chain.api.gov.votes(this._data.identifier);
+    this.setVotes(votes);
+    return votes;
+  }
+
+  public setDeposits(depositResp: QueryDepositsResponse) {
+    if (depositResp?.deposits) {
+      for (const deposit of depositResp.deposits) {
+        if (deposit.amount && deposit.amount[0]) {
+          this.data.state.depositors.push([
+            deposit.depositor,
+            new BN(deposit.amount[0].amount),
+          ]);
         }
-        if (voteResp) {
-          for (const voter of voteResp.votes) {
-            const vote = voteToEnum(voter.option);
-            if (vote) {
-              this.data.state.voters.push([voter.voter, vote]);
-              this.addOrUpdateVote(
-                new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
-              );
-            } else {
-              console.error(
-                `voter: ${voter.voter} has invalid vote option: ${voter.option}`
-              );
-            }
-          }
+      }
+    }
+  }
+
+  public setTally(tallyResp: QueryTallyResultResponse) {
+    if (tallyResp?.tally) {
+      this.data.state.tally = marshalTally(tallyResp?.tally);
+    }
+  }
+
+  public setVotes(votesResp: QueryVotesResponse) {
+    if (votesResp) {
+      for (const vote of votesResp.votes) {
+        const voteChoice = voteToEnum(vote.options[0].option);
+        if (voteChoice) {
+          this.data.state.voters.push([vote.voter, voteChoice]);
+          this.addOrUpdateVote(
+            new CosmosVote(this._Accounts.fromAddress(vote.voter), voteChoice)
+          );
+        } else {
+          console.error(
+            `voter: ${vote.voter} has invalid vote option: ${vote.options[0].option}`
+          );
         }
-        if (tallyResp?.tally) {
-          this.data.state.tally = marshalTally(tallyResp?.tally);
-        }
-      } catch (err) {
-        console.error(`Votes query failed: ${err.message}`);
-      } finally {
-        this.isFetched.emit('redraw');
       }
     }
   }
 
   // TODO: add getters for various vote features: tally, quorum, threshold, veto
   // see: https://blog.chorus.one/an-overview-of-cosmos-hub-governance/
+  // TODO
   get support() {
     if (this.status === 'DepositPeriod') {
       return this._Chain.coins(this.data.state.totalDeposit);
@@ -292,9 +290,11 @@ export class CosmosProposal extends Proposal<
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':
-        return this.data.state.totalDeposit.gte(this._Governance.minDeposit)
-          ? ProposalStatus.Passing
-          : ProposalStatus.Failing;
+        return this._Governance.minDeposit
+          ? this.data.state.totalDeposit.gte(this._Governance.minDeposit)
+            ? ProposalStatus.Passing
+            : ProposalStatus.Failing
+          : ProposalStatus.None;
       default:
         return ProposalStatus.None;
     }

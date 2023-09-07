@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   CWAvatar,
+  CWAvatarSkeleton,
   CWJdenticon,
 } from 'views/components/component_kit/cw_avatar';
 
@@ -11,16 +12,21 @@ enum AvatarSizes {
 
   // TODO: this is to account for sizing in the avatar upload
   Tmp1 = 60,
-  Tmp2 = 108
-};
+  Tmp2 = 108,
+}
 
 interface AvatarProps {
   url: string;
   size?: AvatarSizes;
   address?: number;
+  showSkeleton?: boolean;
 }
 
-export const Avatar = ({ url, size, address }: AvatarProps) => {
+export const Avatar = ({ url, size, address, showSkeleton }: AvatarProps) => {
+  if (showSkeleton) {
+    return <CWAvatarSkeleton size={size} />;
+  }
+
   if (url) {
     return <CWAvatar avatarUrl={url} size={size} />;
   }

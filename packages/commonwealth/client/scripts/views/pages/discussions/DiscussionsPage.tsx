@@ -48,18 +48,19 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
 
-  const { fetchNextPage, data, isInitialLoading } = useFetchThreadsQuery({
-    chainId: app.activeChainId(),
-    queryType: 'bulk',
-    page: 1,
-    limit: 20,
-    topicId: (topics || []).find(({ name }) => name === topicName)?.id,
-    stage: stageName,
-    includePinnedThreads: true,
-    orderBy: featuredFilter,
-    toDate: dateCursor.toDate,
-    fromDate: dateCursor.fromDate,
-  });
+  const { fetchNextPage, data, isInitialLoading, hasNextPage } =
+    useFetchThreadsQuery({
+      chainId: app.activeChainId(),
+      queryType: 'bulk',
+      page: 1,
+      limit: 20,
+      topicId: (topics || []).find(({ name }) => name === topicName)?.id,
+      stage: stageName,
+      includePinnedThreads: true,
+      orderBy: featuredFilter,
+      toDate: dateCursor.toDate,
+      fromDate: dateCursor.fromDate,
+    });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
@@ -103,7 +104,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             />
           );
         }}
-        endReached={() => fetchNextPage()}
+        endReached={() => hasNextPage && fetchNextPage()}
         overscan={200}
         components={{
           EmptyPlaceholder: () =>
