@@ -10,6 +10,6 @@
       "snapshot-listener/*": ["../../packages/snapshot-listener/*"]
     }
   },
-  "include": ["src", "test"],
+  "include": ["src", "test", "./hardhat.config.ts"],
   "exclude": ["./node_modules", "node_modules", "./test", "build", "dist"]
 }

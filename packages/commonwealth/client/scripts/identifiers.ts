@@ -53,10 +53,9 @@ export const chainToProposalSlug = (c: ChainInfo): ProposalType => {
 };
 
 export const proposalSlugToClass = () => {
-  const mmap = new Map<
-    string,
-    ProposalModule<any, any, any>
-  >([[ProposalType.Thread, null]]);
+  const mmap = new Map<string, ProposalModule<any, any, any>>([
+    [ProposalType.Thread, null],
+  ]);
   if (!app.chain) {
     return mmap;
   }

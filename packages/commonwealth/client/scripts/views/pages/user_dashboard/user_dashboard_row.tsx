@@ -58,8 +58,7 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
   } = notification;
 
   if (categoryId === 'chain-event') {
-    const chainEvent: CWEvent = {
-      blockNumber,
+    const chainEvent = {
       network: eventNetwork,
       data: notification.eventData,
     };

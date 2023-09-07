@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { PORT } from '../../../server/config';
+import { waitForCondition } from '../utils/waitForCondition';
 
 test.describe('Commonwealth Homepage', () => {
   test('Amount of bundles has not increased', async ({ page }) => {
@@ -31,12 +32,11 @@ test.describe('Commonwealth Homepage', () => {
 
     await page.goto(`http://localhost:${PORT}/`);
 
-    while (loadedJsBundles.length < 4) {
-      await page.waitForTimeout(100); // Wait for a short interval before checking again
-    }
-    while (apiCalls.length < 2) {
-      await page.waitForTimeout(100); // Wait for a short interval before checking again
-    }
+    await waitForCondition(() => loadedJsBundles.length >= 4, 100, 10_000);
+    await page.waitForTimeout(100); // Wait for a short interval before checking again
+
+    await waitForCondition(() => apiCalls.length >= 4, 100, 10_000);
+    await page.waitForTimeout(100); // Wait for a short interval before checking again
 
     // This is loaded in after all other bundles are loaded in. The landing page should have 2 initial bundles and 2
     // Loaded in bundles for the page itself. If it is more, then we have accidentally added an extra bundle into the
@@ -49,7 +49,7 @@ test.describe('Commonwealth Homepage', () => {
 
     await page.waitForTimeout(100);
     expect(loadedJsBundles.length).toEqual(4);
-    expect(apiCalls.length).toEqual(2);
+    expect(apiCalls.length).toEqual(4); // domain, status, chains, nodes
   });
 
   test('Check Login Modal', async ({ page }) => {
