@@ -8,7 +8,7 @@ import {
   useDeleteCommentReactionMutation,
 } from '../../../state/api/comments';
 import { LoginModal } from '../../modals/login_modal';
-import { Modal } from '../component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { getDisplayedReactorsForPopup } from './helpers';
 
@@ -77,7 +77,7 @@ export const CommentReactionButton = ({
 
   return (
     <>
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}

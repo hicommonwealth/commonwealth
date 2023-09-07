@@ -14,7 +14,7 @@ import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
-import { Modal } from '../component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { useCommonNavigate } from 'navigation/helpers';
 import useForceRerender from 'hooks/useForceRerender';
 import { Avatar } from 'views/components/Avatar';
@@ -192,11 +192,7 @@ export const User = ({
 
   const userFinal = avatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
-      <Avatar
-        url={profile?.avatarUrl}
-        size={16}
-        address={profile?.id}
-      />
+      <Avatar url={profile?.avatarUrl} size={16} address={profile?.id} />
     </div>
   ) : (
     <div
@@ -234,9 +230,7 @@ export const User = ({
                   profile.name
                 ) : (
                   <>
-                    <div>
-                      {profile.name}
-                    </div>
+                    <div>{profile.name}</div>
                     <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
@@ -296,11 +290,7 @@ export const User = ({
           }}
         >
           <div className="user-avatar">
-            <Avatar
-              url={profile?.avatarUrl}
-              size={32}
-              address={profile?.id}
-            />
+            <Avatar url={profile?.avatarUrl} size={32} address={profile?.id} />
           </div>
           <div className="user-name">
             {app.chain && app.chain.base === ChainBase.Substrate && (
@@ -364,7 +354,7 @@ export const User = ({
           )}
         </div>
       )}
-      <Modal
+      <CWModal
         content={
           <BanUserModal
             profile={profile}

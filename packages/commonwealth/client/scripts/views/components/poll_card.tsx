@@ -9,8 +9,8 @@ import { CWProgressBar } from './component_kit/cw_progress_bar';
 import { CWRadioButton } from './component_kit/cw_radio_button';
 import { CWText } from './component_kit/cw_text';
 import { getClasses } from './component_kit/helpers';
-import { Modal } from './component_kit/cw_modal';
 import {
+  CWModal,
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
@@ -387,7 +387,7 @@ export const PollCard = ({
         <CWText type="b2" className="poll-title-text">
           {proposalTitle}
         </CWText>
-        <Modal
+        <CWModal
           content={
             <DeletePollModal
               onClickDelete={async () => {

@@ -3,11 +3,11 @@ import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 
 import { uuidv4 } from '../../lib/util';
-import { Modal } from '../components/component_kit/cw_modal';
 import type { ButtonProps } from '../components/component_kit/new_designs/cw_button';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import {
+  CWModal,
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
@@ -47,7 +47,7 @@ const ConfirmationModal = ({
   ));
 
   return (
-    <Modal
+    <CWModal
       content={
         <div className="ConfirmationModal">
           <CWModalHeader label={title} icon="warning" onModalClose={onClose} />

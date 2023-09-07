@@ -8,13 +8,12 @@ import IWebWallet from '../../../models/IWebWallet';
 import app from 'state';
 import { addressSwapper } from 'utils';
 import { User } from '../user/user';
-import { Modal } from './cw_modal';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWText } from './cw_text';
 import { CWNoAuthMethodsAvailable, CWAuthButton } from './cw_auth_button';
 import { CWDivider } from './cw_divider';
 import { getClasses } from './helpers';
-import { CWModalBody, CWModalHeader } from './new_designs/CWModal';
+import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 
 import 'components/component_kit/cw_wallets_list.scss';
 
@@ -166,7 +165,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                   }
                 }}
               />
-              <Modal
+              <CWModal
                 content={
                   <AccountSelector
                     accounts={wallet.accounts}

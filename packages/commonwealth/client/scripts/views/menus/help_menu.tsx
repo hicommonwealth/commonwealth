@@ -4,7 +4,7 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { FeedbackModal } from '../modals/feedback_modal';
-import { Modal } from '../components/component_kit/cw_modal';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import useSidebarStore from 'state/ui/sidebar';
 import { featureFlags } from 'helpers/feature-flags';
 
@@ -32,7 +32,7 @@ export const HelpMenu = () => {
           },
         ]}
       />
-      <Modal
+      <CWModal
         content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
@@ -66,7 +66,7 @@ export const HelpMenuPopover = () => {
           },
         ]}
       />
-      <Modal
+      <CWModal
         content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}

@@ -18,7 +18,7 @@ import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
 import { featureFlags } from 'helpers/feature-flags';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from './components/component_kit/new_designs/CWModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setDarkMode } from 'helpers/darkMode';
@@ -159,14 +159,14 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           )}
         </div>
       </div>
-      <Modal
+      <CWModal
         content={
           <FeedbackModal onModalClose={() => setIsFeedbackModalOpen(false)} />
         }
         onClose={() => setIsFeedbackModalOpen(false)}
         open={isFeedbackModalOpen}
       />
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}

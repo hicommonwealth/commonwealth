@@ -12,7 +12,7 @@ import $ from 'jquery';
 import app, { initAppState } from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { setDarkMode } from 'helpers/darkMode';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 
 import 'components/Header/LoginSelectorMenu.scss';
@@ -88,7 +88,7 @@ export const LoginSelectorMenuRight = ({
           <CWText type="caption">Logout</CWText>
         </div>
       </div>
-      <Modal
+      <CWModal
         content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}

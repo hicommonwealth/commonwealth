@@ -7,7 +7,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import { UserBlock } from 'views/components/user/user_block';
 import { isSameAccount } from 'helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 
@@ -113,7 +113,7 @@ export const LoginSelectorMenuLeft = () => {
       >
         <CWText type="caption">Connect a new address</CWText>
       </div>
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}

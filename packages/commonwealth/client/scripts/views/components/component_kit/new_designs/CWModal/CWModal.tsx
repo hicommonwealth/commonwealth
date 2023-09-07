@@ -37,8 +37,7 @@ const CWModal = (props: {
       <div
         className={`${getClasses<{ isFullScreen?: boolean }>(
           { isFullScreen },
-          'CWModal'
-          // ComponentType.Modal
+          ComponentType.Modal
         )} ${className}`}
       >
         {content}

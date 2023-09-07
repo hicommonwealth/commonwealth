@@ -12,7 +12,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import { Modal } from '../component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { useCommonNavigate } from 'navigation/helpers';
 import { featureFlags } from 'helpers/feature-flags';
 import { matchRoutes, useLocation } from 'react-router-dom';
@@ -36,25 +36,20 @@ const setAdminToggleTree = (path: string, toggle: boolean) => {
 
   const newTree = currentTree;
 
-  localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-    newTree
-  );
+  localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
+    JSON.stringify(newTree);
 };
 
 const AdminSectionComponent = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
-  const [
-    isEditTopicThresholdsModalOpen,
-    setIsEditTopicThresholdsModalOpen,
-  ] = React.useState<boolean>(false);
-  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] = React.useState<
-    boolean
-  >(false);
-  const [isNewTopicModalOpen, setIsNewTopicModalOpen] = React.useState<boolean>(
-    false
-  );
+  const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
+    React.useState<boolean>(false);
+  const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
+    React.useState<boolean>(false);
+  const [isNewTopicModalOpen, setIsNewTopicModalOpen] =
+    React.useState<boolean>(false);
 
   const matchesManageCommunityRoute = matchRoutes(
     [{ path: '/manage' }, { path: ':scope/manage' }],
@@ -216,14 +211,14 @@ const AdminSectionComponent = () => {
   return (
     <React.Fragment>
       <SidebarSectionGroup {...sidebarSectionData} />
-      <Modal
+      <CWModal
         content={
           <NewTopicModal onModalClose={() => setIsNewTopicModalOpen(false)} />
         }
         onClose={() => setIsNewTopicModalOpen(false)}
         open={isNewTopicModalOpen}
       />
-      <Modal
+      <CWModal
         content={
           <OrderTopicsModal
             onModalClose={() => setIsOrderTopicsModalOpen(false)}
@@ -232,7 +227,7 @@ const AdminSectionComponent = () => {
         onClose={() => setIsOrderTopicsModalOpen(false)}
         open={isOrderTopicsModalOpen}
       />
-      <Modal
+      <CWModal
         content={
           <EditTopicThresholdsModal
             onModalClose={() => setIsEditTopicThresholdsModalOpen(false)}

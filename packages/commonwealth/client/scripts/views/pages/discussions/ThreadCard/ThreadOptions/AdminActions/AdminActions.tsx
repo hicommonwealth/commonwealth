@@ -5,7 +5,7 @@ import {
   useDeleteThreadMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
@@ -367,7 +367,7 @@ export const AdminActions = ({
         />
       </span>
 
-      <Modal
+      <CWModal
         content={
           <ChangeThreadTopicModal
             thread={thread}
@@ -378,7 +378,7 @@ export const AdminActions = ({
         open={isChangeTopicModalOpen}
       />
 
-      <Modal
+      <CWModal
         content={
           <UpdateProposalStatusModal
             onChangeHandler={(s) =>
@@ -392,7 +392,7 @@ export const AdminActions = ({
         open={isUpdateProposalStatusModalOpen}
       />
 
-      <Modal
+      <CWModal
         content={
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}

@@ -7,7 +7,7 @@ import { SerializableDeltaStatic } from './utils';
 import { getTextFromDelta } from './utils';
 
 import { PreviewModal } from '../../modals/preview_modal';
-import { Modal } from '../component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
@@ -230,7 +230,7 @@ const ReactQuillEditor = ({
       >
         {showTooltip && <QuillTooltip label={tooltipLabel} />}
         {isUploading && <LoadingIndicator />}
-        <Modal
+        <CWModal
           content={
             <PreviewModal
               doc={

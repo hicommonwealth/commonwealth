@@ -10,7 +10,7 @@ import { WebhookSettingsModal } from 'views/modals/webhook_settings_modal';
 import type Webhook from '../../../models/Webhook';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { Modal } from '../../components/component_kit/cw_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 
@@ -146,7 +146,7 @@ export const WebhooksForm = () => {
                   iconSize="small"
                   onClick={() => deleteWebhook(webhook)}
                 />
-                <Modal
+                <CWModal
                   content={
                     <WebhookSettingsModal
                       onModalClose={() => setIsModalOpen(false)}

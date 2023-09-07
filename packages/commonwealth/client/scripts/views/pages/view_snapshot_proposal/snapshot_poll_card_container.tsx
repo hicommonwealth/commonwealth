@@ -9,7 +9,7 @@ import moment from 'moment';
 
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
-import { Modal } from '../../components/component_kit/cw_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 
 type SnapshotProposalCardsProps = {
   activeUserAddress: string;
@@ -134,7 +134,7 @@ export const SnapshotPollCardContainer = (
         tooltipErrorMessage={voteErrorText}
         isPreview={false}
       />
-      <Modal
+      <CWModal
         content={
           <ConfirmSnapshotVoteModal
             space={space}

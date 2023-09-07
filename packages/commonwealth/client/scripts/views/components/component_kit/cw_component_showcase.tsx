@@ -40,7 +40,7 @@ import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
-import { Modal } from './cw_modal';
+import { CWModal } from './new_designs/CWModal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../Avatar';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -191,7 +191,7 @@ export const ComponentShowcase = () => {
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
-      <Modal
+      <CWModal
         content={<div>hi</div>}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
@@ -233,7 +233,7 @@ export const ComponentShowcase = () => {
         }
       />
 
-      <Modal
+      <CWModal
         content={
           <div>
             <CWText>hi</CWText>

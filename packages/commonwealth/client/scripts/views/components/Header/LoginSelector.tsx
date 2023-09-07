@@ -14,7 +14,7 @@ import { CWButton as CWButtonNew } from '../component_kit/new_designs/cw_button'
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
-import { Modal } from '../component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import useForceRerender from 'hooks/useForceRerender';
 import { LoginSelectorMenuLeft } from 'views/components/Header/LoginSelectorMenuLeft';
 import { LoginSelectorMenuRight } from 'views/components/Header/LoginSelectorMenuRight';
@@ -78,7 +78,7 @@ export const LoginSelector = () => {
             onClick={() => setIsLoginModalOpen(true)}
           />
         </div>
-        <Modal
+        <CWModal
           content={
             <LoginModal onModalClose={() => setIsLoginModalOpen(false)} />
           }

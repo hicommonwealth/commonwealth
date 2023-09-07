@@ -37,7 +37,7 @@ export const Modal = (props: {
       <div
         className={`${getClasses<{ isFullScreen?: boolean }>(
           { isFullScreen },
-          ComponentType.Modal
+          ComponentType.OldModal
         )} ${className}`}
       >
         {content}

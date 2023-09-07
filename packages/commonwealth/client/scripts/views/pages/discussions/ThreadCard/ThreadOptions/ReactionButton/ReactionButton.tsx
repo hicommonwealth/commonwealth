@@ -8,7 +8,7 @@ import {
 import Permissions from 'utils/Permissions';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
@@ -101,22 +101,21 @@ export const ReactionButton = ({
             reactors: reactors,
           })}
         />
-      ) : (
-        reactors.length > 0 ? (
-          <CWTooltip
+      ) : reactors.length > 0 ? (
+        <CWTooltip
           content={getDisplayedReactorsForPopup({
             reactors,
           })}
           renderTrigger={(handleInteraction) => (
             <button
               onClick={handleVoteClick}
-              className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
-                }${hasReacted ? ' has-reacted' : ''}`}
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
+              className={`ThreadReactionButton ${
+                isLoading || isUserForbidden ? ' disabled' : ''
+              }${hasReacted ? ' has-reacted' : ''}`}
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
             >
-              <div
-              >
+              <div>
                 <div className="reactions-container">
                   <CWIcon
                     iconName="upvote"
@@ -135,26 +134,24 @@ export const ReactionButton = ({
             </button>
           )}
         />
-        ) : (
-          <button
-            onClick={handleVoteClick}
-            className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
-              }${hasReacted ? ' has-reacted' : ''}`}
-          >
-            <div className="reactions-container">
-              <CWIcon iconName="upvote" iconSize="small" />
-              <div
-                className={`reactions-count ${
-                  hasReacted ? ' has-reacted' : ''
-                }`}
-              >
-                {reactors.length}
-              </div>
+      ) : (
+        <button
+          onClick={handleVoteClick}
+          className={`ThreadReactionButton ${
+            isLoading || isUserForbidden ? ' disabled' : ''
+          }${hasReacted ? ' has-reacted' : ''}`}
+        >
+          <div className="reactions-container">
+            <CWIcon iconName="upvote" iconSize="small" />
+            <div
+              className={`reactions-count ${hasReacted ? ' has-reacted' : ''}`}
+            >
+              {reactors.length}
             </div>
-          </button>
-        )
+          </div>
+        </button>
       )}
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}

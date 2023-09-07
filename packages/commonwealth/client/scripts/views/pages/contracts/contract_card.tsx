@@ -10,7 +10,7 @@ import app from 'state';
 
 import 'pages/contracts/contract_card.scss';
 import { useCommonNavigate } from 'navigation/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import React, { useState } from 'react';
 import ManageContractTemplateModal, {
   ManageContractTemplateModalProps,
@@ -165,7 +165,7 @@ export const ContractCard = ({
             </CWText>
           )}
         </div>
-        <Modal
+        <CWModal
           content={
             <ManageContractTemplateModal
               contractId={manageContractTemplateModalData?.contractId}
