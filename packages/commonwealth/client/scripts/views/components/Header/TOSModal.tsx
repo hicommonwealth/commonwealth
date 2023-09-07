@@ -17,8 +17,7 @@ type TOSModalProps = {
 };
 
 export const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
-  const chain = app.chain ? app.chain.meta : null;
-  const terms = app.chain ? chain.terms : null;
+  const terms = app.chain?.meta?.terms;
 
   return (
     <div className="TOSModal">

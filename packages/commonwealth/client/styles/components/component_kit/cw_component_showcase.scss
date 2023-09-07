@@ -13,6 +13,12 @@ $width: 360px;
   padding: 24px;
   width: 100%;
 
+  .modal-gallery {
+    @include gallery-grid(8px, row);
+
+    margin-top: -32px;
+  }
+
   .basic-gallery {
     @include gallery-grid(8px, column);
     width: $width;

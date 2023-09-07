@@ -35,7 +35,7 @@ const CWModalHeader: FC<CWModalHeaderProps> = ({
               {label}
             </CWText>
           </div>
-          <X className="close-icon" onClick={() => onModalClose()} size={24} />
+          <X className="close-icon" onClick={onModalClose} size={24} />
         </div>
         {subheader ? (
           <CWText className="Subtitle" type="caption" fontWeight="regular">

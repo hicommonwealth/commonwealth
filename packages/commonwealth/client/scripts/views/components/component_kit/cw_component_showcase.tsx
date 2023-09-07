@@ -55,6 +55,7 @@ import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
 import app from 'state';
+import { Size } from './new_designs/CWModal/CWModal';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -176,8 +177,9 @@ export const ComponentShowcase = () => {
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
-    useState<boolean>(false);
+  const [modalSize, setModalSize] = useState<Size>('small');
+  const [modalType, setModalType] = useState<string>('Small');
+  const [isFullScreenModal, setIsFullScreenModal] = useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
@@ -191,16 +193,13 @@ export const ComponentShowcase = () => {
   const allChains = app.config.chains.getAll();
   const [chainId, setChainId] = useState(allChains[1]);
 
-  return (
-    <div className="ComponentShowcase">
-      <AvatarUpload scope="community" />
-      <AvatarUpload size="large" scope="community" />
-      <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
+  const renderModal = (size: Size, type: string) => {
+    return (
       <CWModal
         content={
           <>
             <CWModalHeader
-              label="A simple modal"
+              label={`A ${type} modal`}
               onModalClose={() => setIsModalOpen(false)}
             />
             <CWModalBody>
@@ -210,12 +209,34 @@ export const ComponentShowcase = () => {
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
+        size={size}
+        isFullScreen={isFullScreenModal}
       />
-      <CWButton label="Toast" onClick={() => notifySuccess('message')} />
-      <CWButton
-        label="Full Screen Modal"
-        onClick={() => setIsFullScreenModalOpen(true)}
-      />
+    );
+  };
+
+  const setModal = (size: string) => {
+    setModalSize(size as Size);
+    setModalType(size);
+    setIsFullScreenModal(size === 'full screen');
+    setIsModalOpen(true);
+  };
+
+  return (
+    <div className="ComponentShowcase">
+      <AvatarUpload scope="community" />
+      <AvatarUpload size="large" scope="community" />
+      <CWText type="h3">Modals</CWText>
+      <div className="modal-gallery">
+        <CWButton label="Small Modal" onClick={() => setModal('small')} />
+        <CWButton label="Medium Modal" onClick={() => setModal('medium')} />
+        <CWButton label="Large Modal" onClick={() => setModal('large')} />
+        <CWButton
+          label="Full Screen Modal"
+          onClick={() => setModal('full screen')}
+        />
+      </div>
+      {renderModal(modalSize, modalType)}
       <CWButton
         label="Confirmation Modal"
         onClick={() =>
@@ -247,22 +268,7 @@ export const ComponentShowcase = () => {
           })
         }
       />
-      <CWModal
-        content={
-          <>
-            <CWModalHeader
-              label="A simple full screen modal"
-              onModalClose={() => setIsFullScreenModalOpen(false)}
-            />
-            <CWModalBody>
-              <CWText>hi</CWText>
-            </CWModalBody>
-          </>
-        }
-        isFullScreen
-        onClose={() => setIsFullScreenModalOpen(false)}
-        open={isFullScreenModalOpen}
-      />
+      <CWButton label="Toast" onClick={() => notifySuccess('message')} />
       <div className="basic-gallery">
         <CWText type="h3">Popover Menu</CWText>
         <PopoverMenu

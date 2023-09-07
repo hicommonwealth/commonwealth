@@ -6,6 +6,8 @@ import { ComponentType } from '../../types';
 
 import './CWModal.scss';
 
+export type Size = 'small' | 'medium' | 'large';
+
 // Backdrop is needed for modal clickaway events
 const Backdrop = React.forwardRef<
   HTMLDivElement,
@@ -21,11 +23,19 @@ const Backdrop = React.forwardRef<
 const CWModal = (props: {
   content: React.ReactNode;
   isFullScreen?: boolean;
+  size?: Size;
   onClose: () => void;
   open: boolean;
   className?: string;
 }) => {
-  const { content, isFullScreen, onClose, open, className } = props;
+  const {
+    content,
+    isFullScreen,
+    size = 'small',
+    onClose,
+    open,
+    className,
+  } = props;
 
   return (
     <ModalUnstyled
@@ -35,8 +45,8 @@ const CWModal = (props: {
       disableEnforceFocus
     >
       <div
-        className={`${getClasses<{ isFullScreen?: boolean }>(
-          { isFullScreen },
+        className={`${getClasses(
+          { isFullScreen, size },
           ComponentType.Modal
         )} ${className}`}
       >
