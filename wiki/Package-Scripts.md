@@ -69,7 +69,6 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
   - [listen](#listen)
-  - [profile](#profile)
   - [start](#start)
   - [start-all](#start-all)
   - [start-consumer](#start-consumer)
@@ -504,14 +503,6 @@ Description:  Runs webpack-bundle-analyzer library to display breakdown of bundl
 Definition: `RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts`
 
 Description: Runs ts-node, a TypeScript execution engine for NodeJS, in listening mode for changes, following tsconfig.json and using [server.ts](../packages/commonwealth/server.ts) as the entry file.
-
-## profile 
-
-Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.dev.config.js --json --profile > webpack-stats.json`
-
-Description: Runs build webpack analyzer. 
-
-Considerations: **Deprecated; recommend removal.** Appears to be redundant with `bundle-report`. As of 22-08-03 #all-eng conversation, appears to be unused. See also [stats.sh](../packages/commonwealth/stats.sh) for possible removal.
 
 ## start
 
