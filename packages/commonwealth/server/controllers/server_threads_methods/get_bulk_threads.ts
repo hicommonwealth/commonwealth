@@ -120,6 +120,10 @@ export async function __getBulkThreads(
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
             STRING_AGG(r.id::text, ',') AS reaction_ids
             FROM "Reactions" as r
+            JOIN "Threads" t2 
+            ON r.thread_id = t2.id and t2.chain = $chain ${
+              topicId ? ` AND t2.topic_id = $topic_id ` : ''
+            }
             LEFT JOIN "Addresses" ad
             ON r.address_id = ad.id
             where r.chain = $chain
