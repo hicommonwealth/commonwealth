@@ -4,14 +4,10 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
 
 - [Build Scripts](#build-scripts)
   - [build-all](#build-all)
-  - [build-app](#build-app)
-  - [build:css](#buildcss)
   - [heroku-postbuild](#heroku-postbuild)
 - [CI Scripts](#ci-scripts)
-  - [start-ci](#start-ci)
   - [wait-server](#wait-server)
 - [Database Scripts](#database-scripts)
-  - [clean-db](#clean-db)
   - [create-migration](#create-migration)
   - [db-all](#db-all)
   - [dump-db](#dump-db)
@@ -43,13 +39,10 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [start-android](#start-android)
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
-  - [compress-images](#compress-images)
   - [datadog-db-setup](#datadog-db-setup)
   - [send-notification-digest-emails](#send-notification-digest-emails)
-  - [start-prerender](#start-prerender)
 - [Playwright](#playwright)
   - [e2e-start-server](#e2e-start-server)
-  - [gen-e2e](#gen-e2e)
   - [test-e2e](#test-e2e)
   - [test-e2e-serial](#test-e2e-serial)
 - [Storybook](#storybook)
@@ -89,20 +82,6 @@ Definition: `yarn build-app && yarn build-consumer`
 
 Description: Builds app based on webpack.prod.config.js file, as well as the build-consumer script
 
-Considerations: Merely an aggregate script of `build-app` and `build-consumer`; may not be necessary. **Flagged for possible removal.**
-
-## build-app
-    
-Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress`
-
-Description: Builds project, allocating max 4096MB memory to Node; runs webpack based on webpack.prod.config.js file.
-
-## build:css
-
-Definition: `NODE_ENV=production build client/styles/shared.scss` 
-
-Considerations: Why do we have a separate CSS build? Who uses it? And does it even work? We don't appear to have a `build` command that it could modify. **Deprecated; recommend removal.**
-
 ## heroku-postbuild
 
 Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
@@ -110,14 +89,6 @@ Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space
 Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dynamically allocate memory, then running webpack and the [build-consumer](#build-consumer) script
 
 # CI Scripts
-
-## start-ci
-
-Definition: `FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts`
-
-Description: Used by our CI tool to start the server.
-
-Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file? **Flagged for possible removal.**
 
 ## wait-server
 
@@ -127,19 +98,7 @@ Description: Used for CI. Waits for the server to be ready (start serving on por
 
 Contributor: Kurtis Assad
 
-Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file? **Flagged for possible removal.**
-
 # Database Scripts
-
-## clean-db
-
-Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
-
-Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily. 
-
-Considerations: Engineers will almost never need to use this locally (unless they have purposefully create a large number of test notifications). This script was authored at the request of Jake Naviasky; we should confer with him as to the long-term value of this script. **Flagged for possible removal.**
-
-Contributor: Timothee Legros
 
 ## create-migration
 
@@ -202,14 +161,6 @@ Description: Migrates database, using migration files in `./server/migration` di
 Definition: `npx sequelize db:migrate:undo`
 
 Description: Undoes the last-run Sequelize migration.
-
-## migrate-server
-
-Definition: `heroku run npx sequelize db:migrate --debug`
-
-Description: Runs a database migration on the Heroku dyno in debug mode.
-
-Considerations: The current script name does not sufficiently indicate its relationship to Heroku.
 
 ## psql
 
@@ -339,14 +290,6 @@ Contributor: Dillon Chen
 
 # Other services
 
-## compress-images
-
-Definition: `npx ts-node -T ./scripts/compressImages.ts`
-
-Considerations: (per contributor) **Deprecated; recommend removal.**
-
-Contributor: Kurtis Assad
-
 ## datadog-db-setup
 
 Definition: `chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh`
@@ -362,12 +305,6 @@ Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 Description: Schedules a daily task for sending notification email digests.
 
 Considerations: Script name might be worth shortening.
-
-## start-prerender
-
-Definition: `ts-node --project tsconfig.json server/scripts/runPrerenderService.ts`
-
-Considerations: Referenced prerender script no longer exists. **Deprecated; recommend removal.** 
 
 # Playwright
 
@@ -386,14 +323,6 @@ Definition: `ts-node --project tsconfig.json server/scripts/emitTestNotification
 Description: Emits a chain-event or snapshot notification. Run `yarn emit-notification --help` to see options.
 
 Contributor: Timothee Legros
-
-## gen-e2e
-
-Definition: `npx playwright codegen`
-
-Description: Starts Playwright's test generation feature. This will open up a browser window and allow developers to click around on-screen and autogenerate Playwright code according to actions performed. [Loom example](https://www.loom.com/share/b1b36c7d7fae4b079b380ec2a61da25c)
-
-Contributor: Kurtis Assad
 
 ## test-e2e
 
