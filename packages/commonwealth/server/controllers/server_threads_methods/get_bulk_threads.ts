@@ -101,8 +101,8 @@ export async function __getBulkThreads(
           t.archived_at,
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
-          t.chain AS thread_chain, t.read_only, t.body, t.discord_meta, comments.number_of_comments,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes,
+          t.chain AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, t.reaction_count AS total_likes,
           t.has_poll,
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
@@ -116,13 +116,6 @@ export async function __getBulkThreads(
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
         LEFT JOIN (
-            SELECT thread_id, COUNT(*)::int AS number_of_comments
-            FROM "Comments"
-            WHERE deleted_at IS NULL
-            GROUP BY thread_id
-        ) comments
-        ON t.id = comments.thread_id
-        LEFT JOIN (
           SELECT thread_id, MAX(created_at) AS latest_comment_date
           FROM "Comments"
           WHERE deleted_at IS NULL
@@ -131,7 +124,6 @@ export async function __getBulkThreads(
         ON t.id = latest_comments.thread_id
         LEFT JOIN (
             SELECT thread_id,
-            COUNT(r.id)::int AS total_likes,
             STRING_AGG(ad.address::text, ',') AS addresses_reacted,
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
             STRING_AGG(r.id::text, ',') AS reaction_ids
@@ -148,8 +140,8 @@ export async function __getBulkThreads(
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
-          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, reactions.total_likes, latest_comments.latest_comment_date)
+          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), t.comment_count,
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, latest_comments.latest_comment_date)
           ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
         ) threads
       ON threads.address_id = addr.id

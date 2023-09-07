@@ -11,7 +11,7 @@
   },
   "keywords": [],
   "scripts": {
-    "build-contracts": "cd src/eth && npx hardhat compile",
+    "build-contracts": "npx hardhat compile",
     "lint": "../../scripts/lint-new-work.sh",
     "lint-all": "eslint './**/*.ts'",
     "check-types": "tsc --noEmit",

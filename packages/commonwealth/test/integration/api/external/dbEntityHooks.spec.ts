@@ -12,6 +12,8 @@ import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
 import type { UserInstance } from 'server/models/user';
 import type { ProfileAttributes } from '../../../../server/models/profile';
+import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../../../../server/config';
 
 const Op = Sequelize.Op;
 
@@ -25,10 +27,16 @@ export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
+export let testJwtToken: string;
 
 export async function clearTestEntities() {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Reaction.destroy({
+    where: {
+      [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+    },
+    force: true,
+  });
   await models.Collaboration.destroy({
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
@@ -324,6 +332,11 @@ export async function createTestEntities() {
           )[0]
       )
     ))
+  );
+
+  testJwtToken = jwt.sign(
+    { id: testUsers[0].id, email: testUsers[0].email },
+    JWT_SECRET
   );
 }
 

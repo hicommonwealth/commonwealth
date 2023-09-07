@@ -189,9 +189,17 @@
     gap: 8px;
 
     .close-container {
+      background-color: $neutral-100;
       display: flex;
       margin-left: 8px;
+
+      &:hover {
+        > svg {
+          background-color: $neutral-200;
+        }
+      }
     }
+
 
     .tag-text.Text {
       font-size: 14px;
@@ -206,10 +214,22 @@
     &:hover {
       background-color: $neutral-200;
 
+      .close-container {
+        background-color: $neutral-200;
+
+        > svg {
+          background-color: $neutral-200;
+        }
+      }
+
       .tag-text.Text,
       .tag-icon.Icon {
         color: $neutral-900;
       }
+    }
+
+    &.container:hover {
+      background-color: $neutral-200;
     }
   }
 
@@ -260,4 +280,17 @@
     }
   }
 
+  &.action {
+    display: grid;
+    align-items: center;
+    color: $neutral-500;
+    width: fit-content;
+    height: fit-content;
+    padding: 0;
+
+    &:hover {
+      cursor: pointer;
+      color: $neutral-600;
+    }
+  }
 }
