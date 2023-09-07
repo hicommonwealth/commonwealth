@@ -35,18 +35,20 @@ const getCosmosVotesQueryKey = (proposal: AnyProposal, poolParams: number) => {
 };
 
 // TODO: depends on staked
-const useCosmosVotes = (proposal: AnyProposal, poolParams: number) => {
+const useCosmosProposalVotesQuery = (
+  proposal: AnyProposal,
+  poolParams: number
+) => {
   return useQuery({
     queryKey: getCosmosVotesQueryKey(proposal, poolParams),
     queryFn: () => fetchCosmosVotes(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK &&
       !_.isEmpty(proposal) &&
-      // !!poolParams && TODO
       !proposal.completed,
     staleTime: VOTES_STALE_TIME,
     cacheTime: VOTES_CACHE_TIME,
   });
 };
 
-export { useCosmosVotes };
+export { useCosmosProposalVotesQuery };

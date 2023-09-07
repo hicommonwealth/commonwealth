@@ -30,14 +30,14 @@ import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
-import { useAaveProposalsQuery } from 'state/api/proposals';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
+  useAaveProposalsQuery,
   useCosmosProposalMetadataQuery,
-  useCosmosProposal,
-  useCosmosTally,
-  useCosmosVotes,
-  useCosmosDeposits,
+  useCosmosProposalQuery,
+  useCosmosProposalTallyQuery,
+  useCosmosProposalVotesQuery,
+  useCosmosProposalDepositsQuery,
 } from 'state/api/proposals';
 import {
   useDepositParamsQuery,
@@ -64,7 +64,7 @@ const ViewProposalPage = ({
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
-  const { data: cosmosProposal } = useCosmosProposal({
+  const { data: cosmosProposal } = useCosmosProposalQuery({
     isApiReady: !!app.chain.apiInitialized,
     proposalId,
   });
@@ -72,9 +72,9 @@ const ViewProposalPage = ({
     useCosmosProposalMetadataQuery(proposal);
   const { data: poolData } = usePoolParamsQuery();
   useDepositParamsQuery();
-  useCosmosVotes(proposal);
-  useCosmosTally(proposal);
-  useCosmosDeposits(proposal, +poolData);
+  useCosmosProposalVotesQuery(proposal, +poolData);
+  useCosmosProposalTallyQuery(proposal);
+  useCosmosProposalDepositsQuery(proposal, +poolData);
 
   useEffect(() => {
     setProposal(cosmosProposal);

@@ -28,7 +28,6 @@ const getCosmosDepositsQueryKey = (
   proposal: AnyProposal,
   poolParams: number
 ) => {
-  console.log('* getCosmosDepositsQueryKey poolParams ', poolParams);
   return [
     'cosmosDeposits',
     app.activeChainId(),
@@ -38,7 +37,10 @@ const getCosmosDepositsQueryKey = (
   ];
 };
 
-const useCosmosDeposits = (proposal: AnyProposal, poolParams: number) => {
+const useCosmosProposalDepositsQuery = (
+  proposal: AnyProposal,
+  poolParams: number
+) => {
   return useQuery({
     queryKey: getCosmosDepositsQueryKey(proposal, poolParams),
     queryFn: () => fetchCosmosDeposits(proposal),
@@ -53,4 +55,4 @@ const useCosmosDeposits = (proposal: AnyProposal, poolParams: number) => {
   });
 };
 
-export { useCosmosDeposits };
+export { useCosmosProposalDepositsQuery };
