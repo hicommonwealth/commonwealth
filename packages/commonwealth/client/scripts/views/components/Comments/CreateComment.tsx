@@ -66,6 +66,7 @@ export const CreateComment = ({
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
+  console.log('author => ', author);
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
@@ -104,7 +105,7 @@ export const CreateComment = ({
       const newComment: any = await createComment({
         threadId: rootThread.id,
         chainId: chainId,
-        address: author.address,
+        address: author?.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -172,8 +173,8 @@ export const CreateComment = ({
             className={clsx('user-link-text', { disabled: !canComment })}
           >
             <User
-              userAddress={author.address}
-              userChainId={author.chain.id}
+              userAddress={author?.address}
+              userChainId={author?.chain.id}
               shouldHideAvatar
               shouldLinkProfile
             />
