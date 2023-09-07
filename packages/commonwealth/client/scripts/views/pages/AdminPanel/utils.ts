@@ -42,3 +42,12 @@ export const updateSiteAdmin = async ({
     jwt: app.user.jwt,
   });
 };
+
+export const getCSVContent = async ({ id }: { id: string }) => {
+  const res = await axios.post(`${app.serverUrl()}/exportMembersList`, {
+    chainId: id,
+    jwt: app.user.jwt,
+  });
+
+  return res.data.result.data[0];
+};
