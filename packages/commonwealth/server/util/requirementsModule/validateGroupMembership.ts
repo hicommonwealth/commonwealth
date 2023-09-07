@@ -1,6 +1,7 @@
-import { AddressAttributes } from 'server/models/address';
-import { Requirement } from './requirementsTypes';
+import { AllowlistData, Requirement, ThresholdData } from './requirementsTypes';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
+import { ChainNetwork } from '../../../../common-common/src/types';
+import { toBN } from 'web3-utils';
 
 export type validateGroupMembershipResponse = {
   isValid: boolean;
@@ -17,12 +18,114 @@ export type validateGroupMembershipResponse = {
  * @param tbc initialized Token Balance Cache instance
  * @returns validateGroupMembershipResponse validity and messages on requirements that failed
  */
-export default function validateGroupMembership(
+export default async function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
   tbc?: TokenBalanceCache
-): validateGroupMembershipResponse {
-  return {
+): Promise<validateGroupMembershipResponse> {
+  const response: validateGroupMembershipResponse = {
     isValid: true,
+    messages: [],
   };
+  const checks = requirements.map(async (requirement) => {
+    let checkResult: { result: boolean; message: string };
+    switch (requirement.rule) {
+      case 'threshold': {
+        checkResult = await _thresholdCheck(userAddress, requirement.data, tbc);
+        break;
+      }
+      case 'allow': {
+        checkResult = await _allowlistCheck(
+          userAddress,
+          requirement.data as AllowlistData
+        );
+        break;
+      }
+      default:
+        checkResult = {
+          result: false,
+          message: 'Invalid Requirment',
+        };
+        break;
+    }
+    if (!checkResult.result) {
+      response.isValid = false;
+      response.messages.push({
+        requirement,
+        message: checkResult.message,
+      });
+    }
+  });
+  await Promise.all(checks);
+  return response;
+}
+
+async function _thresholdCheck(
+  userAddress: string,
+  thresholdData: ThresholdData,
+  tbc: TokenBalanceCache
+): Promise<{ result: boolean; message: string }> {
+  try {
+    let chainNetwork: ChainNetwork;
+    let contractAddress: string;
+    switch (thresholdData.source.source_type) {
+      case 'erc20': {
+        chainNetwork = ChainNetwork.ERC20;
+        contractAddress = thresholdData.source.contract_address;
+        break;
+      }
+      case 'erc721': {
+        chainNetwork = ChainNetwork.ERC721;
+        contractAddress = thresholdData.source.contract_address;
+        break;
+      }
+      case 'eth_native': {
+        chainNetwork = ChainNetwork.Ethereum;
+        break;
+      }
+      case 'cosmos_native': {
+        chainNetwork = ChainNetwork.Osmosis;
+        break;
+      }
+      default:
+        break;
+    }
+    const balance = await tbc.fetchUserBalanceWithChain(
+      chainNetwork,
+      userAddress,
+      thresholdData.source.chain_id,
+      contractAddress
+    );
+
+    const result = toBN(balance).gt(toBN(thresholdData.threshold));
+    return {
+      result,
+      message: !result
+        ? `User Balance of ${balance} below threshold ${thresholdData.threshold}`
+        : 'pass',
+    };
+  } catch (error) {
+    return {
+      result: false,
+      message: `Error: ${error.message}`,
+    };
+  }
+}
+
+async function _allowlistCheck(
+  userAddress: string,
+  allowlistData: AllowlistData
+): Promise<{ result: boolean; message: string }> {
+  try {
+    const result = allowlistData.allow.includes(userAddress);
+    return {
+      result,
+      message: !result ? 'User Address not in Allowlist' : 'pass',
+    };
+  } catch (error) {
+    return {
+      result: false,
+      message: `Error: ${error.message}`,
+    };
+  }
 }

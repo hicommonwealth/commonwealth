@@ -210,20 +210,10 @@ export class TokenBalanceCache
   // in a context where a chain node only has a single balance provider.
   public async fetchUserBalance(
     network: ChainNetwork,
+    nodeId: number,
     userAddress: string,
-    contractAddress?: string,
-    nodeId?: number,
-    chainId?: string
+    contractAddress?: string
   ): Promise<string> {
-    if ((!nodeId && !chainId) || (nodeId && chainId)) {
-      throw new Error('Must provide on of nodeId or chainId');
-    }
-    if (chainId) {
-      nodeId = this._chainIds[chainId];
-      if (!nodeId) {
-        throw new Error('Invalid Chain Id');
-      }
-    }
     let bp: string;
     try {
       const providersResult = await this.getBalanceProviders(nodeId);
@@ -265,6 +255,25 @@ export class TokenBalanceCache
     } else {
       throw new Error('Query failed');
     }
+  }
+
+  public async fetchUserBalanceWithChain(
+    network: ChainNetwork,
+    userAddress: string,
+    chainId: string,
+    contractAddress?: string
+  ): Promise<string> {
+    const nodeId = this._chainIds[chainId];
+    if (!nodeId) {
+      throw new Error('Invalid Chain Id');
+    }
+    const balance = await this.fetchUserBalance(
+      network,
+      nodeId,
+      userAddress,
+      contractAddress
+    );
+    return balance;
   }
 
   private async _refreshNodes() {
