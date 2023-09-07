@@ -38,8 +38,8 @@ export const CosmosProposalForm = () => {
   const author = app.user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
 
-  useStakingParamsQuery();
-  const { data, isLoading } = useDepositParamsQuery();
+  const { data: stakingDenom } = useStakingParamsQuery();
+  const { data, isLoading } = useDepositParamsQuery(stakingDenom);
   const minDeposit = data?.minDeposit;
 
   return (
