@@ -42,7 +42,7 @@ import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
-import { CWModal } from './new_designs/CWModal';
+import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import type { ValidationStatus } from './cw_validation_text';
 import { AvatarUpload } from '../Avatar';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -197,7 +197,17 @@ export const ComponentShowcase = () => {
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
       <CWModal
-        content={<div>hi</div>}
+        content={
+          <>
+            <CWModalHeader
+              label="A simple modal"
+              onModalClose={() => setIsModalOpen(false)}
+            />
+            <CWModalBody>
+              <CWText>hi</CWText>
+            </CWModalBody>
+          </>
+        }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
@@ -237,16 +247,17 @@ export const ComponentShowcase = () => {
           })
         }
       />
-
       <CWModal
         content={
-          <div>
-            <CWText>hi</CWText>
-            <CWIconButton
-              iconName="close"
-              onClick={() => setIsFullScreenModalOpen(false)}
+          <>
+            <CWModalHeader
+              label="A simple full screen modal"
+              onModalClose={() => setIsFullScreenModalOpen(false)}
             />
-          </div>
+            <CWModalBody>
+              <CWText>hi</CWText>
+            </CWModalBody>
+          </>
         }
         isFullScreen
         onClose={() => setIsFullScreenModalOpen(false)}
