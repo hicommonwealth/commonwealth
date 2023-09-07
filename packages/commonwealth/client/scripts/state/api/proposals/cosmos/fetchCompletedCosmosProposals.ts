@@ -23,8 +23,9 @@ interface CompletedProposalsProps {
 const useCompletedCosmosProposalsQuery = ({
   isApiReady,
 }: CompletedProposalsProps) => {
+  const chainId = app.activeChainId();
   return useQuery({
-    queryKey: ['completedProposals', { chain: app.activeChainId() }],
+    queryKey: ['completedProposals', chainId],
     queryFn: fetchCompletedProposals,
     enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     retry: 3,

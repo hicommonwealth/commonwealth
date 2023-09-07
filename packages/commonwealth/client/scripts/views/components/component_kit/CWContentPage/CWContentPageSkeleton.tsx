@@ -51,14 +51,16 @@ export const CWContentPageSkeleton = ({ sidebarComponentsSkeletonCount }) => {
         {mainBody}
         {sidebarComponentsSkeletonCount > 0 && (
           <div className="sidebar">
-            {Array.from({ length: sidebarComponentsSkeletonCount }).map(() => (
-              <div className="cards-column">
-                <Skeleton width={'80%'} />
-                <Skeleton width={'100%'} />
-                <Skeleton width={'50%'} />
-                <Skeleton width={'75%'} />
-              </div>
-            ))}
+            {Array.from({ length: sidebarComponentsSkeletonCount }).map(
+              (n, i) => (
+                <div className="cards-column" key={i}>
+                  <Skeleton width={'80%'} />
+                  <Skeleton width={'100%'} />
+                  <Skeleton width={'50%'} />
+                  <Skeleton width={'75%'} />
+                </div>
+              )
+            )}
           </div>
         )}
       </div>
