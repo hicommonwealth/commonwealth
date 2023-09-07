@@ -24,22 +24,25 @@ const fetchCosmosVotes = async (
   }
 };
 
-const getCosmosVotesQueryKey = (proposal: AnyProposal) => {
+const getCosmosVotesQueryKey = (proposal: AnyProposal, poolParams: number) => {
   return [
     'cosmosVotes',
     app.activeChainId(),
     proposal?.identifier,
     proposal?.turnout,
+    poolParams, // turnout depends on chain.staked set by poolParams
   ];
 };
 
-const useCosmosVotes = (proposal: AnyProposal) => {
+// TODO: depends on staked
+const useCosmosVotes = (proposal: AnyProposal, poolParams: number) => {
   return useQuery({
-    queryKey: getCosmosVotesQueryKey(proposal),
+    queryKey: getCosmosVotesQueryKey(proposal, poolParams),
     queryFn: () => fetchCosmosVotes(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK &&
       !_.isEmpty(proposal) &&
+      // !!poolParams && TODO
       !proposal.completed,
     staleTime: VOTES_STALE_TIME,
     cacheTime: VOTES_CACHE_TIME,

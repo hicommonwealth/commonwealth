@@ -231,12 +231,14 @@ export class CosmosProposal extends Proposal<
 
   get turnout() {
     if (this.status === 'DepositPeriod') {
-      if (this.data.state.totalDeposit.eqn(0)) {
+      console.log('* staked', this._Chain.staked);
+      if (this.data.state.totalDeposit.eqn(0) || !this._Chain.staked) {
         return 0;
       } else {
         const ratioInPpm = +this.data.state.totalDeposit
           .muln(1_000_000)
           .div(this._Chain.staked);
+        console.log('* ratioInPpm', ratioInPpm);
         return +ratioInPpm / 1_000_000;
       }
     }

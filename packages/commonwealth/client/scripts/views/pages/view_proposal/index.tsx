@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainNetwork } from 'common-common/src/types';
 import _ from 'lodash';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
@@ -39,6 +39,10 @@ import {
   useCosmosVotes,
   useCosmosDeposits,
 } from 'state/api/proposals';
+import {
+  useDepositParamsQuery,
+  usePoolParamsQuery,
+} from 'state/api/chainParams';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -66,9 +70,11 @@ const ViewProposalPage = ({
   });
   const { data: metadata, isFetching: isFetchingMetadata } =
     useCosmosProposalMetadataQuery(proposal);
+  const { data: poolData } = usePoolParamsQuery();
+  useDepositParamsQuery();
   useCosmosVotes(proposal);
   useCosmosTally(proposal);
-  useCosmosDeposits(proposal);
+  useCosmosDeposits(proposal, +poolData);
 
   useEffect(() => {
     setProposal(cosmosProposal);
