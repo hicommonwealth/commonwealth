@@ -39,10 +39,7 @@ import {
   useCosmosProposalVotesQuery,
   useCosmosProposalDepositsQuery,
 } from 'state/api/proposals';
-import {
-  useDepositParamsQuery,
-  usePoolParamsQuery,
-} from 'state/api/chainParams';
+import { usePoolParamsQuery } from 'state/api/chainParams';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -71,7 +68,6 @@ const ViewProposalPage = ({
   const { data: metadata, isFetching: isFetchingMetadata } =
     useCosmosProposalMetadataQuery(proposal);
   const { data: poolData } = usePoolParamsQuery();
-  useDepositParamsQuery();
   useCosmosProposalVotesQuery(proposal, +poolData);
   useCosmosProposalTallyQuery(proposal);
   useCosmosProposalDepositsQuery(proposal, +poolData);
