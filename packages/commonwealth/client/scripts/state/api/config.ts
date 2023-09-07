@@ -16,6 +16,8 @@ export const ApiEndpoints = {
   FETCH_THREADS: '/threads',
   FETCH_PROFILES: '/getAddressProfile',
   DISCORD_CHANNELS: '/getDiscordChannels',
+  FETCH_PROPOSALS: '/proposals',
+  FETCH_PROPOSAL_VOTES: '/proposalVotes',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,

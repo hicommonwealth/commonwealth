@@ -1,11 +1,11 @@
 import { utils } from 'ethers';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import 'pages/new_proposal/aave_proposal_form.scss';
 
-import type { Executor } from 'common-common/src/eth/types';
 import { notifyError } from 'controllers/app/notifications';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
+import { AaveExecutor } from 'controllers/chain/ethereum/aave/api';
 import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import app from 'state';
 import { User } from 'views/components/user/user';
@@ -25,13 +25,23 @@ export const AaveProposalForm = () => {
     Array<AaveProposalState>
   >([defaultStateItem]);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [executor, setExecutor] = useState<Executor | string>();
+  const [executor, setExecutor] = useState('');
   const [ipfsHash, setIpfsHash] = useState();
   const [proposer, setProposer] = useState('');
   const [tabCount, setTabCount] = useState(1);
+  const [executorList, setExecutorList] = useState<AaveExecutor[]>([]);
 
   const author = app.user.activeAccount;
   const aave = app.chain as Aave;
+
+  useEffect(() => {
+    const getExecutors = async () => {
+      const executors = await aave.governance.api.getAaveExecutors();
+      setExecutorList(executors);
+    };
+
+    getExecutors();
+  }, []);
 
   const updateAaveProposalState = <K extends keyof AaveProposalState>(
     index: number,
@@ -65,7 +75,7 @@ export const AaveProposalForm = () => {
       <div className="row-with-label">
         <CWLabel label="Executor" />
         <div className="executors-container">
-          {aave.governance.api.Executors.map((r) => (
+          {executorList.map((r) => (
             <div
               key={r.address}
               className={`executor ${
@@ -229,7 +239,7 @@ export const AaveProposalForm = () => {
           const _ipfsHash = utils.formatBytes32String(ipfsHash);
 
           const details: AaveProposalArgs = {
-            executor: executor as string,
+            executor,
             targets,
             values,
             calldatas,

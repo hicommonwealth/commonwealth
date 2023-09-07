@@ -5,9 +5,11 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
 - [Development Process Overview](#development-process-overview)
 - [Project Management Flow](#project-management-flow)
   * [Tickets](#tickets)
+    + [Questions](#questions)
     + [Blockers](#blockers)
     + [Story Point Estimation](#story-point-estimation)
   * [Pull Requests](#pull-requests)
+    + [Draft PRs](#draft-prs)
     + [Github Quality Checks](#github-quality-checks)
 - [Standup](#standup)
 - [Deployment and QA schedule](#deployment-and-qa-schedule)
@@ -35,6 +37,12 @@ Work _should not_ begin on a ticket until (1) an engineer has been assigned to t
 
 Typically, engineers _should_ only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be moved to "In Progress"). 
 
+### Questions
+
+If an implementing engineer has questions about a ticket, these should be left as a comment on the GitHub issue itself (rather than in Slack DMs, where the record will be buried).
+
+Questions must tag a specific individual. Typically, they should only tag one person, since multi-tags frequently lead to responsibility deferrals (i.e. each tagged individual assumes the other has it covered). 
+
 ### Blockers
 
 The "blocked" label is the official source of truth as to whether a story is considered blocked. Unless it has such a label, a story should not be considered blocked or referenced as blocked. This is to prevent miscommunication across the team. 
@@ -60,11 +68,23 @@ Points _may_ always be increased mid-implementation, but a justification _must_ 
 
 ## Pull Requests
 
-PRs should always reference their instigating ticket in the description, by number.
+PRs must always link to their instigating ticket. GitHub uses [a set of keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) to automatically link a PR to referenced issues. Alternatively, PRs may be manually linked via their "Development" sidebar section. 
+
+Linked issues are automatically closed by their relevant PRs. In some exceptional cases—for instance, when referencing the outstanding Documentation Update Ticket (#4800)—GitHub closing keywords should be omitted so as to keep the instigating ticket open when the PR is closed.
+
+As of 230906, test plans should be included with every code-changing PR, as part of our road to automated testing.
 
 Engineers are welcome to open several pull requests to close an outstanding ticket. Such PRs can be either "dependent" (i.e., blocking) or "sequential" (i.e., logically independent), and should be flagged accordingly, so that depended-upon (i.e. blocking) PRs are prioritized for merging. 
 
-Close your own PR: if it's ready for QA, tag a reviewer, complain in a Slack channel, or send a DM. 
+Close your own PR: if it's ready for QA, tag a reviewer, complain in a Slack channel, or send a DM.
+
+### Draft PRs
+
+PRs that are not yet ready for Codeowner Review should be opened as drafts. Drafts should typically include some estimation of when review-ready code is expected to land.
+
+If a non-draft PR is assessed by a codeowner as not yet ready for review, or needing further work, it should be reassigned draft status. 
+
+In the case of a Design Review (not to be confused with a Codeowner Review), any feedback that isn't unambiguously positive should result in status changing back to draft for remaining work.
 
 ### Github Quality Checks
 
@@ -99,6 +119,7 @@ Our Beta/QA server can be found at `qa.commonwealth.im`. Custom domains are avai
 
 # Change Log
 
+- 230906: Updated with new requirements for tickets and PRs (#4972).
 - 230831: Merged with Agile-Development.md by Graham Johnson (#4936) and certified fresh.
 - 230823: Migrated from GitHub wiki by Graham Johnson (#4350).
 - 230124: Authored by Forest.
