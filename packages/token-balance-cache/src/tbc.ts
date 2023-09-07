@@ -53,6 +53,7 @@ export class TokenBalanceCache
 {
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider<any> } = {};
+  private _chainIds: { [id: string]: number };
   private _lastQueryTime = 0;
   private statsDSender: TbcStatsDSender = new TbcStatsDSender();
   private cacheContents = { zero: 0, nonZero: 0 };
@@ -209,10 +210,20 @@ export class TokenBalanceCache
   // in a context where a chain node only has a single balance provider.
   public async fetchUserBalance(
     network: ChainNetwork,
-    nodeId: number,
     userAddress: string,
-    contractAddress?: string
+    contractAddress?: string,
+    nodeId?: number,
+    chainId?: string
   ): Promise<string> {
+    if ((!nodeId && !chainId) || (nodeId && chainId)) {
+      throw new Error('Must provide on of nodeId or chainId');
+    }
+    if (chainId) {
+      nodeId = this._chainIds[chainId];
+      if (!nodeId) {
+        throw new Error('Invalid Chain Id');
+      }
+    }
     let bp: string;
     try {
       const providersResult = await this.getBalanceProviders(nodeId);
@@ -262,6 +273,9 @@ export class TokenBalanceCache
     const nodes = await this._nodesProvider(lastQueryTime);
     for (const n of nodes) {
       this._nodes[n.id] = n;
+      if (n.eth_chain_id) {
+        this._chainIds[n.eth_chain_id.toString()] = n.id;
+      } //TODO extend to cosmos when added
     }
   }
 
