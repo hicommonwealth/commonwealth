@@ -1,5 +1,4 @@
-import type { CWEvent } from 'chain-events/src';
-import { Label as ChainEventLabel } from 'chain-events/src';
+import type { CWEvent, IEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
 import 'pages/user_dashboard/user_dashboard_row.scss';
 import React from 'react';
@@ -15,10 +14,11 @@ type UserDashboardRowProps = {
   notification?: DashboardActivityNotification;
   showSkeleton?: boolean;
   isChainEventsRow?: boolean;
+  label?: IEventLabel;
 };
 
 export const UserDashboardRow = (props: UserDashboardRowProps) => {
-  const { notification, showSkeleton, isChainEventsRow } = props;
+  const { notification, showSkeleton, isChainEventsRow, label } = props;
 
   if (showSkeleton) {
     if (isChainEventsRow) {
@@ -58,14 +58,6 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
   } = notification;
 
   if (categoryId === 'chain-event') {
-    const chainEvent: CWEvent = {
-      blockNumber,
-      network: eventNetwork,
-      data: notification.eventData,
-    };
-
-    const label = ChainEventLabel(chain, chainEvent);
-
     const chainInfo = app.config.chains.getById(chain);
 
     return (

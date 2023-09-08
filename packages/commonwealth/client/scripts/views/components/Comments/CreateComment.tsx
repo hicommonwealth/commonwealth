@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import BN from 'bn.js';
 
@@ -7,21 +7,20 @@ import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
+import { getTokenBalance } from 'helpers/token_balance_helper';
+import { useDraft } from 'hooks/useDraft';
 import app from 'state';
+import { useCreateCommentMutation } from 'state/api/comments';
 import { ContentType } from 'types';
-import { CommentEditor } from './CommentEditor/CommentEditor';
-import { ArchiveMsg } from './ArchiveMsg/ArchiveMsg';
+import Permissions from '../../../utils/Permissions';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import {
   createDeltaFromText,
   getTextFromDelta,
-
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
-import { useDraft } from 'hooks/useDraft';
-import { useCreateCommentMutation } from 'state/api/comments';
-import Permissions from '../../../utils/Permissions';
-import { getTokenBalance } from 'helpers/token_balance_helper';
+import { CommentEditor } from './CommentEditor/CommentEditor';
+import { ArchiveMsg } from './ArchiveMsg/ArchiveMsg';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -62,6 +61,7 @@ export const CreateComment = ({
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
+  console.log('author => ', author);
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
@@ -100,7 +100,7 @@ export const CreateComment = ({
       const newComment: any = await createComment({
         threadId: rootThread.id,
         chainId: chainId,
-        address: author.address,
+        address: author?.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,

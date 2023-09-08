@@ -63,7 +63,12 @@ export const CommentEditor = ({
             fontWeight="medium"
             className={clsx('user-link-text', { disabled: !canComment })}
           >
-            <User user={author} hideAvatar linkify />
+            <User
+              userAddress={author?.address}
+              userChainId={author?.chain.id}
+              shouldHideAvatar
+              shouldLinkProfile
+            />
           </CWText>
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}

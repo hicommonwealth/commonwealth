@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
+import React, { useEffect, useState } from 'react';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/Header/LoginSelector.scss';
 
+import useForceRerender from 'hooks/useForceRerender';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import app from 'state';
+import { LoginSelectorMenuLeft } from 'views/components/Header/LoginSelectorMenuLeft';
+import { LoginSelectorMenuRight } from 'views/components/Header/LoginSelectorMenuRight';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import { CWButton } from '../component_kit/cw_button';
-import { CWButton as CWButtonNew } from '../component_kit/new_designs/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
-import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { Modal } from '../component_kit/cw_modal';
-import useForceRerender from 'hooks/useForceRerender';
-import { LoginSelectorMenuLeft } from 'views/components/Header/LoginSelectorMenuLeft';
-import { LoginSelectorMenuRight } from 'views/components/Header/LoginSelectorMenuRight';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import { CWButton as CWButtonNew } from '../component_kit/new_designs/cw_button';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -90,7 +90,7 @@ export const LoginSelector = () => {
     );
   }
 
-  if (!profileLoadComplete && NewProfilesController.Instance.allLoaded()) {
+  if (!profileLoadComplete) {
     setProfileLoadComplete(true);
   }
 
@@ -128,7 +128,13 @@ export const LoginSelector = () => {
                 className="left-button"
                 onClick={leftMenuProps.handleInteraction}
               >
-                <User user={app.user.addresses[0]} />
+                <User
+                  userAddress={app.user.addresses[0].address}
+                  userChainId={
+                    app.user.addresses[0].chain?.id ||
+                    app.user.addresses[0].profile?.chain
+                  }
+                />
               </div>
 
               <Popover content={<LoginSelectorMenuLeft />} {...leftMenuProps} />

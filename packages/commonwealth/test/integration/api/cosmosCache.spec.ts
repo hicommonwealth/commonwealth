@@ -16,7 +16,7 @@ import {
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
 
-const v1beta1ChainId = 'juno';
+const v1beta1ChainId = 'osmosis';
 
 function verifyNoCacheResponse(res) {
   expect(res.body).to.not.be.null;

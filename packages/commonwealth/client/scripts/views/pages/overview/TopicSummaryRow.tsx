@@ -1,15 +1,15 @@
-import React from 'react';
 import { isDefaultStage, pluralize, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
-import type Thread from '../../../models/Thread';
-import type Topic from '../../../models/Topic';
-import 'pages/overview/TopicSummaryRow.scss';
 import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/overview/TopicSummaryRow.scss';
+import React from 'react';
 import app from 'state';
 import { slugify } from 'utils';
 import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import type Thread from '../../../models/Thread';
+import type Topic from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -30,7 +30,7 @@ export const TopicSummaryRow = ({
   monthlyThreads = [],
   pinnedThreads = [],
   topic,
-  isLoading
+  isLoading,
 }: TopicSummaryRowProps) => {
   const navigate = useCommonNavigate();
 
@@ -98,10 +98,11 @@ export const TopicSummaryRow = ({
                 <div className="row-top">
                   <div className="user-and-date-row">
                     <User
-                      user={user}
-                      showAddressWithDisplayName
+                      userAddress={user.address}
+                      userChainId={user.chain?.id || user.profile?.chain}
+                      shouldShowAddressWithDisplayName
+                      shouldLinkProfile
                       avatarSize={24}
-                      linkify
                     />
                     <CWText className="last-updated-text">•</CWText>
                     <CWText
