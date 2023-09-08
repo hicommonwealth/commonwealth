@@ -499,6 +499,7 @@ export const CommentTree = ({
                   isSubscribed={isSubscribed}
                   handleToggleSubscribe={handleToggleSubscribe}
                   hasJoinedCommunity={!!hasJoinedCommunity}
+                  isCommentAuthor={isCommentAuthor}
                 />
               </div>
               {isReplying && parentCommentId === comment.id && (

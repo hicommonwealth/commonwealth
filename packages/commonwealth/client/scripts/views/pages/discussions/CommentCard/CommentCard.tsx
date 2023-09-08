@@ -45,6 +45,7 @@ type CommentCardProps = {
   isSubscribed?: (comment: Comment<any>) => boolean;
   handleToggleSubscribe?: (comment: Comment<any>) => Promise<void>;
   hasJoinedCommunity?: boolean;
+  isCommentAuthor?: boolean;
 };
 
 export const CommentCard = ({
@@ -74,6 +75,7 @@ export const CommentCard = ({
   isSubscribed,
   handleToggleSubscribe,
   hasJoinedCommunity,
+  isCommentAuthor,
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
@@ -145,13 +147,15 @@ export const CommentCard = ({
                 />
               )}
 
-              <CWThreadAction
-                action="subscribe"
-                onClick={() => handleToggleSubscribe(comment)}
-                selected={!isSubscribed(comment)}
-                label={isSubscribed(comment) ? 'Unsubscribe' : 'Subscribe'}
-                disabled={!hasJoinedCommunity}
-              />
+              {isCommentAuthor && (
+                <CWThreadAction
+                  action="subscribe"
+                  onClick={() => handleToggleSubscribe(comment)}
+                  selected={!isSubscribed(comment)}
+                  label={isSubscribed(comment) ? 'Unsubscribe' : 'Subscribe'}
+                  disabled={!hasJoinedCommunity}
+                />
+              )}
 
               {(canEdit || canDelete) && (
                 <PopoverMenu
