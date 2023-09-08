@@ -9,15 +9,19 @@ import {
   encodeCommunitySpend,
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import {
+  useDepositParamsQuery,
+  useStakingParamsQuery,
+} from 'state/api/chainParams';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { useCommonNavigate } from 'navigation/helpers';
+import { Skeleton } from '../../components/Skeleton';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
@@ -34,9 +38,11 @@ export const CosmosProposalForm = () => {
   const author = app.user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
 
-  return !cosmos.governance.initialized ? (
-    <CWSpinner />
-  ) : (
+  const { data: stakingDenom } = useStakingParamsQuery();
+  const { data, isLoading } = useDepositParamsQuery(stakingDenom);
+  const minDeposit = data?.minDeposit;
+
+  return (
     <>
       <CWLabel label="Proposal Type" />
       <CWRadioGroup
@@ -65,14 +71,18 @@ export const CosmosProposalForm = () => {
           setDescription(e.target.value);
         }}
       />
-      <CWTextInput
-        label={`Deposit (${cosmos.governance.minDeposit?.denom})`}
-        placeholder={`Min: ${+cosmos.governance.minDeposit}`}
-        defaultValue={+cosmos.governance.minDeposit}
-        onInput={(e) => {
-          setDeposit(+e.target.value);
-        }}
-      />
+      {isLoading ? (
+        <Skeleton className="TextInput" style={{ height: 62 }} />
+      ) : (
+        <CWTextInput
+          label={`Deposit (${minDeposit?.denom})`}
+          placeholder={`Min: ${+minDeposit}`}
+          defaultValue={+minDeposit}
+          onInput={(e) => {
+            setDeposit(+e.target.value);
+          }}
+        />
+      )}
       {cosmosProposalType !== 'textProposal' && (
         <CWTextInput
           label="Recipient"
@@ -85,7 +95,7 @@ export const CosmosProposalForm = () => {
       )}
       {cosmosProposalType !== 'textProposal' && (
         <CWTextInput
-          label={`Amount (${cosmos.governance.minDeposit?.denom})`}
+          label={`Amount (${minDeposit?.denom})`}
           placeholder="12345"
           defaultValue=""
           onInput={(e) => {
@@ -101,12 +111,8 @@ export const CosmosProposalForm = () => {
           let prop: ProtobufAny;
 
           const _deposit = deposit
-            ? new CosmosToken(
-                cosmos.governance.minDeposit?.denom,
-                deposit,
-                false
-              )
-            : cosmos.governance.minDeposit;
+            ? new CosmosToken(minDeposit?.denom, deposit, false)
+            : minDeposit;
 
           if (cosmosProposalType === 'textProposal') {
             prop = encodeTextProposal(title, description);
@@ -116,7 +122,7 @@ export const CosmosProposalForm = () => {
               description,
               recipient,
               payoutAmount.toString(),
-              cosmos.governance.minDeposit?.denom
+              minDeposit?.denom
             );
           } else {
             throw new Error('Unknown Cosmos proposal type.');
