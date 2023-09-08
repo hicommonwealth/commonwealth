@@ -1,13 +1,12 @@
-import React, { FC } from 'react';
 import moment from 'moment';
+import React, { FC } from 'react';
 
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import { ThreadResult } from '../../../../pages/search/helpers';
-import AddressInfo from '../../../../../models/AddressInfo';
-import { CWText } from '../../cw_text';
 import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';
 import { QuillRenderer } from '../../../react_quill_editor/quill_renderer';
 import { User } from '../../../user/user';
+import { CWText } from '../../cw_text';
 
 import './SearchBarThreadPreviewRow.scss';
 
@@ -34,14 +33,8 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
     <div className="SearchBarThreadPreviewRow" onClick={handleClick}>
       <div className="header-row">
         <User
-          user={
-            new AddressInfo(
-              searchResult.address_id,
-              searchResult.address,
-              searchResult.address_chain,
-              null
-            )
-          }
+          userChainId={searchResult.chain}
+          userAddress={searchResult.address}
         />
         <CWText className="last-updated-text">•</CWText>
         <CWText type="caption" className="last-updated-text">

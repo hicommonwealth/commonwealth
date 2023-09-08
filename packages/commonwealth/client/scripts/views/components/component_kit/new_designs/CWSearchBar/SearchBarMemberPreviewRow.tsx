@@ -3,7 +3,6 @@ import React, { FC } from 'react';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import { MemberResult } from '../../../../pages/search/helpers';
 import { User } from '../../../user/user';
-import NewProfilesController from '../../../../../controllers/server/newProfiles';
 
 import './SearchBarMemberPreviewRow.scss';
 
@@ -26,10 +25,7 @@ export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
 
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
-      <User
-        user={NewProfilesController.Instance.getProfile(chain, address)}
-        linkify
-      />
+      <User userAddress={address} userChainId={chain} shouldLinkProfile />
     </div>
   );
 };

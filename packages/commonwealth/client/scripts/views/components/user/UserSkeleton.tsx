@@ -7,15 +7,15 @@ import { Skeleton } from '../Skeleton';
 import type { UserAttrs } from './user.types';
 
 export const UserSkeleton = ({
-  avatarOnly,
-  hideAvatar,
-  popover,
+  shouldShowAvatarOnly,
+  shouldHideAvatar,
+  shouldShowPopover,
   avatarSize: size,
 }: Partial<UserAttrs>) => {
   const avatarSize = size || 16;
 
   // just return the avatar only
-  if (avatarOnly) {
+  if (shouldShowAvatarOnly) {
     return (
       <div className="User avatar-only">
         <Avatar url={''} size={16} address={0} showSkeleton />
@@ -26,7 +26,7 @@ export const UserSkeleton = ({
   // base user info
   const userInfo = (
     <div className="User">
-      {!hideAvatar && (
+      {!shouldHideAvatar && (
         <Avatar url={''} size={avatarSize} address={0} showSkeleton={true} />
       )}
       <div className="user-display-name username ml-8">
@@ -36,7 +36,7 @@ export const UserSkeleton = ({
   );
 
   // with popover wrapper
-  if (popover) {
+  if (shouldShowPopover) {
     return <div className="user-popover-wrapper">{userInfo}</div>;
   }
 

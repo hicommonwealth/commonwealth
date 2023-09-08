@@ -79,6 +79,7 @@ export const CommentCard = ({
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
+  const author = app.chain.accounts.get(comment.author);
 
   return (
     <div className="comment-body">
@@ -87,7 +88,8 @@ export const CommentCard = ({
           <span>[deleted]</span>
         ) : (
           <AuthorAndPublishInfo
-            authorInfo={app.chain.accounts.get(comment.author)}
+            authorAddress={author.address}
+            authorChainId={author.chain?.id || author?.profile?.chain}
             publishDate={moment(comment.createdAt).format('l')}
             discord_meta={comment.discord_meta}
           />

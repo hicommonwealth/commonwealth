@@ -1,20 +1,19 @@
-import React, { useMemo } from 'react';
 import moment from 'moment';
+import React, { useMemo } from 'react';
 
 import 'pages/search/index.scss';
 
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import type MinimumProfile from '../../../models/MinimumProfile';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import app from 'state';
+import ChainInfo from '../../../models/ChainInfo';
+import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
-import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import { User } from '../../components/user/user';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
-import ChainInfo from '../../../models/ChainInfo';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { User } from '../../components/user/user';
 
 export type ThreadResult = {
   id: number;
@@ -63,14 +62,8 @@ const ThreadResultRow = ({
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
-            user={
-              new AddressInfo(
-                thread.address_id,
-                thread.address,
-                thread.address_chain,
-                null
-              )
-            }
+            userAddress={thread.address}
+            userChainId={thread.address_chain}
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -142,14 +135,8 @@ const ReplyResultRow = ({
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
-            user={
-              new AddressInfo(
-                comment.address_id,
-                comment.address,
-                comment.address_chain,
-                null
-              )
-            }
+            userAddress={comment.address}
+            userChainId={comment.address_chain}
           />
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}
@@ -225,15 +212,17 @@ type MemberResultRowProps = {
   setRoute: any;
 };
 const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
-  const chain = addr.addresses[0].chain;
-  const address = addr.addresses[0].address;
-  const profile: MinimumProfile = NewProfilesController.Instance.getProfile(
-    chain,
-    address
-  );
+  const { chain, address } = addr.addresses[0];
+  const { data: users } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [chain],
+    profileAddresses: [address],
+    currentChainId: app.activeChainId(),
+    apiCallEnabled: !!(chain && address),
+  });
+  const profile: MinimumProfile = users?.[0];
 
   const handleClick = () => {
-    setRoute(`/profile/id/${profile.id}`, {}, null);
+    setRoute(`/profile/id/${profile?.id}`, {}, null);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) {
@@ -243,11 +232,12 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   return (
     <div key={address} className="member-result-row" onClick={handleClick}>
       <User
-        user={profile}
-        showRole
-        linkify
+        userAddress={address}
+        userChainId={chain}
+        shouldShowRole
+        shouldLinkProfile
         avatarSize={32}
-        showAddressWithDisplayName
+        shouldShowAddressWithDisplayName
       />
     </div>
   );
