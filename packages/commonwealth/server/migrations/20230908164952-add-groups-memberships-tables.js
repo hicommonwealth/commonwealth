@@ -29,7 +29,11 @@ module.exports = {
             allowNull: false,
             references: { model: 'Groups', key: 'id' },
           },
-          address_id: { type: Sequelize.INTEGER, allowNull: false },
+          address_id: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            references: { model: 'Address', key: 'id' },
+          },
           last_checked: { type: Sequelize.DATE, allowNull: false },
         },
         { transaction: t }
