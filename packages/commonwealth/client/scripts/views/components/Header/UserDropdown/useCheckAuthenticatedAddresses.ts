@@ -23,10 +23,6 @@ const useCheckAuthenticatedAddresses = ({
   }>({});
 
   useEffect(() => {
-    if (!recheck) {
-      return;
-    }
-
     const promises = userActiveAccounts.map(async (activeAccount) => {
       const isAuth = await app.sessions
         .getSessionController(chainBase)
