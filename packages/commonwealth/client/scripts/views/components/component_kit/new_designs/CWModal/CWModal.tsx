@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import ModalUnstyled from '@mui/base/Modal';
 
 import { getClasses } from '../../helpers';
@@ -7,6 +7,15 @@ import { ComponentType } from '../../types';
 import './CWModal.scss';
 
 export type Size = 'small' | 'medium' | 'large';
+
+interface CWModalProps {
+  content: React.ReactNode;
+  isFullScreen?: boolean;
+  size?: Size;
+  onClose: () => void;
+  open: boolean;
+  className?: string;
+}
 
 // Backdrop is needed for modal clickaway events
 const Backdrop = React.forwardRef<
@@ -20,23 +29,14 @@ const Backdrop = React.forwardRef<
   return <div ref={ref} {...other} />;
 });
 
-const CWModal = (props: {
-  content: React.ReactNode;
-  isFullScreen?: boolean;
-  size?: Size;
-  onClose: () => void;
-  open: boolean;
-  className?: string;
+const CWModal: FC<CWModalProps> = ({
+  content,
+  isFullScreen,
+  size,
+  onClose,
+  open,
+  className,
 }) => {
-  const {
-    content,
-    isFullScreen,
-    size = 'small',
-    onClose,
-    open,
-    className,
-  } = props;
-
   return (
     <ModalUnstyled
       open={open}
