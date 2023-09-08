@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react';
 import { utils } from 'ethers';
+import React, { useEffect, useState } from 'react';
 
 import 'pages/new_proposal/aave_proposal_form.scss';
 
+import { notifyError } from 'controllers/app/notifications';
+import type Aave from 'controllers/chain/ethereum/aave/adapter';
+import { AaveExecutor } from 'controllers/chain/ethereum/aave/api';
+import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -15,10 +19,6 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
-import type Aave from 'controllers/chain/ethereum/aave/adapter';
-import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
-import { notifyError } from 'controllers/app/notifications';
-import { AaveExecutor } from 'controllers/chain/ethereum/aave/api';
 
 export const AaveProposalForm = () => {
   const [aaveProposalState, setAaveProposalState] = useState<
@@ -57,7 +57,13 @@ export const AaveProposalForm = () => {
     <div className="AaveProposalForm">
       <div className="row-with-label">
         <CWLabel label="Proposer (you)" />
-        <User user={author} linkify popover showAddressWithDisplayName />
+        <User
+          userAddress={author.address}
+          userChainId={author.chain?.id || author.profile?.chain}
+          shouldLinkProfile
+          shouldShowPopover
+          shouldShowAddressWithDisplayName
+        />
       </div>
       <CWTextInput
         label="IPFS Hash"
