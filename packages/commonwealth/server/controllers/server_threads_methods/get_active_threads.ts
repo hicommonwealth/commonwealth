@@ -1,4 +1,3 @@
-import getThreadsWithCommentCount from '../../util/getThreadCommentsCount';
 import { ServerThreadsController } from '../server_threads_controller';
 import { ChainInstance } from '../../models/chain';
 import { ThreadAttributes } from '../../models/thread';
@@ -57,18 +56,14 @@ export async function __getActiveThreads(
 
   allRecentTopicThreadsRaw = allRecentTopicThreadsRaw.flat();
 
-  const allRecentTopicThreads = allRecentTopicThreadsRaw.map((t) => {
-    return t.toJSON();
-  });
-
-  const allThreadsWithCommentsCount = await getThreadsWithCommentCount({
-    threads: allRecentTopicThreads,
-    models: this.models,
-    chainId: chain.id,
+  const allRecentTopicThreads = allRecentTopicThreadsRaw.map((thread) => {
+    const t = thread.toJSON();
+    t.numberOfComments = t.comment_count || 0;
+    return t;
   });
 
   communityTopics.forEach((topic) => {
-    const threadsWithCommentsCount = allThreadsWithCommentsCount.filter(
+    const threadsWithCommentsCount = allRecentTopicThreads.filter(
       (thread) => thread.topic_id === topic.id
     );
     allThreads.push(...(threadsWithCommentsCount || []));

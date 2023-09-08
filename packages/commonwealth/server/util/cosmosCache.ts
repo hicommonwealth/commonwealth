@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 const oneBlock = 6; // typical Cosmos block time is ~6 seconds
-const defaultCacheDuration = 60 * 10; // 10 minutes
+const defaultCacheDuration = null; // do not cache unless specified
 
 export function calcCosmosRPCCacheKeyDuration(req, res, next) {
   const body = parseReqBody(req);
@@ -9,7 +9,7 @@ export function calcCosmosRPCCacheKeyDuration(req, res, next) {
   // cosmosRPCDuration and cosmosRPCKey are defined below
   // TX Response: do not cache and call next()
   req.cacheDuration = cosmosRPCDuration(body);
-  if (req.cacheDuration === null) return next();
+  if (!req.cacheDuration) return next();
   req.cacheKey = cosmosRPCKey(req, body);
 
   return next();
@@ -45,6 +45,8 @@ export function cosmosLCDDuration(req) {
 }
 
 export function calcCosmosLCDCacheKeyDuration(req, res, next) {
+  if (/BROADCAST/.test(req.body?.mode)) return next(); // TX broadcast: do not cache
+  if (/\/cosmos\/tx\/v1beta1/.test(req.url)) return next(); // TX request: do not cache
   const duration = cosmosLCDDuration(req);
   req.cacheDuration = duration;
   req.cacheKey = req.originalUrl;

@@ -4,6 +4,7 @@ import type { ChainEventNotification } from 'types';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import Notification from '../../../models/Notification';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
+import { NotificationCategories } from 'common-common/src/types';
 
 export class ChainEventsNamespace {
   private ceNs: Socket;
@@ -23,11 +24,14 @@ export class ChainEventsNamespace {
     );
   }
 
-  public addChainEventSubscriptions(subs: NotificationSubscription[]) {
+  /**
+   * Takes a list of chain ids which are considered socket.io room keys and subscribes to those rooms.
+   * @param chainIds
+   */
+  public addChainEventSubscriptions(chainIds: string[]) {
     if (this._isConnected) {
       const roomsToJoin = [];
-      for (const sub of subs) {
-        const chain = sub?.Chain?.id || sub.Chain;
+      for (const chain of chainIds) {
         if (!this.subscriptionRoomsJoined.has(chain)) {
           roomsToJoin.push(chain);
           this.subscriptionRoomsJoined.add(chain);
@@ -46,10 +50,9 @@ export class ChainEventsNamespace {
     if (this._isConnected) {
       const roomsToLeave = [];
       for (const sub of subs) {
-        const chain = sub?.Chain?.id || sub.Chain;
-        if (this.subscriptionRoomsJoined.has(chain)) {
-          roomsToLeave.push(chain);
-          this.subscriptionRoomsJoined.delete(chain);
+        if (this.subscriptionRoomsJoined.has(sub.chainId)) {
+          roomsToLeave.push(sub.chainId);
+          this.subscriptionRoomsJoined.delete(sub.chainId);
         }
       }
 
@@ -63,21 +66,28 @@ export class ChainEventsNamespace {
   }
 
   private onChainEvent(notification: ChainEventNotification) {
-    const subscription = app.user.notifications.subscriptions.find(
-      (sub) => sub.getChain === notification.ChainEvent.chain
-    );
+    const subscription = app.user.notifications.findNotificationSubscription({
+      categoryId: NotificationCategories.ChainEvent,
+      options: { chainId: notification.ChainEvent.chain },
+    });
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally
       console.log('Local subscription not found. Re-sync subscriptions!');
       return;
     }
-    const notificationObj = Notification.fromJSON(notification, subscription);
+    const notificationObj = Notification.fromJSON({
+      ...notification,
+      is_read: false,
+      subscription_id: subscription.id,
+    });
     app.user.notifications.update(notificationObj);
   }
 
   private onConnect() {
     this._isConnected = true;
-    this.addChainEventSubscriptions(app.user.notifications.subscriptions);
+    this.addChainEventSubscriptions(
+      app.user.notifications.chainEventSubscriptions.map((s) => s.chainId)
+    );
     console.log('Chain events namespace connected!');
   }
 

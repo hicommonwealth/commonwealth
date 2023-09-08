@@ -283,7 +283,7 @@ jobs:
   commonwealth-devnet-tests:
     name: Devnet Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       matrix:
         node: [ 18 ]
@@ -315,6 +315,10 @@ jobs:
         image: mhagel1/csdk-beta
         ports:
          - 5051:5051
+      evmos_test_app:
+        image: mhagel1/evmos-dev
+        ports:
+         - 5052:5052
       redis:
         image: redis:latest
         ports:
