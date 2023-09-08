@@ -289,13 +289,21 @@ export class UserController {
     this._setStarredCommunities(star);
   }
 
+  public isCommunityStarred(chain: string): boolean {
+    return (
+      this._starredCommunities.findIndex((c) => {
+        return c.chain === chain;
+      }) !== -1
+    );
+  }
+
   public addStarredCommunity(star: StarredCommunity): void {
     this._starredCommunities.push(star);
   }
 
-  public removeStarredCommunity(star: StarredCommunity): void {
+  public removeStarredCommunity(chain: string, userId: number): void {
     const index = this._starredCommunities.findIndex(
-      (s) => s.user_id === star.user_id && s.chain === star.chain
+      (s) => s.user_id === userId && s.chain === chain
     );
     this._starredCommunities.splice(index, 1);
   }
