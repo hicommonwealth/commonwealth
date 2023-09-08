@@ -94,9 +94,9 @@ const ProposalsPage = () => {
   useManageDocumentTitle('Proposals');
 
   // lazy load Cosmos chain params
-  useDepositParamsQuery();
+  const { data: stakingDenom } = useStakingParamsQuery();
+  useDepositParamsQuery(stakingDenom);
   usePoolParamsQuery();
-  useStakingParamsQuery();
 
   const {
     data: activeCosmosProposals,

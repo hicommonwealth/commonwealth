@@ -33,7 +33,7 @@ const getCosmosVotesQueryKey = (proposal: AnyProposal) => {
   ];
 };
 
-const useCosmosTally = (proposal: AnyProposal) => {
+const useCosmosProposalTallyQuery = (proposal: AnyProposal) => {
   return useQuery({
     queryKey: getCosmosVotesQueryKey(proposal),
     queryFn: () => fetchCosmosTally(proposal),
@@ -46,4 +46,4 @@ const useCosmosTally = (proposal: AnyProposal) => {
   });
 };
 
-export { useCosmosTally };
+export { useCosmosProposalTallyQuery };
