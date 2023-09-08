@@ -20,8 +20,8 @@ import moment from 'moment';
 
 import { Countdown } from 'views/components/countdown';
 
-export const getStatusClass = (proposal: AnyProposal) => {
-  if (!proposal.initialized) return '';
+export const getStatusClass = (proposal: AnyProposal, isLoading?: boolean) => {
+  if (isLoading) return '';
   return proposal.isPassing === ProposalStatus.Passing
     ? 'pass'
     : proposal.isPassing === ProposalStatus.Passed
@@ -33,8 +33,8 @@ export const getStatusClass = (proposal: AnyProposal) => {
     : '';
 };
 
-export const getStatusText = (proposal: AnyProposal) => {
-  if (!proposal.initialized) return 'loading...';
+export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
+  if (isLoading) return 'loading...';
   if (proposal.completed && proposal instanceof SubstrateDemocracyProposal) {
     if (proposal.isPassing === ProposalStatus.Passed)
       return 'Passed, moved to referendum';
@@ -146,8 +146,9 @@ export const getStatusText = (proposal: AnyProposal) => {
     return ['Expected to pass and move to referendum, ', countdown];
   if (proposal.isPassing === ProposalStatus.Passing)
     return ['Passing, ', countdown];
-  if (proposal.isPassing === ProposalStatus.Failing)
+  if (proposal.isPassing === ProposalStatus.Failing) {
     return ['Not passing, ', countdown];
+  }
   return '';
 };
 

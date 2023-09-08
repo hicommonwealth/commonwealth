@@ -262,7 +262,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       completeClientLogin(account);
     } else {
       // log in as the new user
-      await initAppState(false, null, shouldRedrawApp);
+      await initAppState(false, shouldRedrawApp);
       if (localStorage.getItem('user-dark-mode-state') === 'on') {
         setDarkMode(true);
       }

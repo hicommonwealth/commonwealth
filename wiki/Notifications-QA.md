@@ -17,7 +17,7 @@ _Authored by Timothee Legros, 230803._
     - The button should be filled with the color blue and display `Notifications On` like in the image below
     - The networks tab should show a single new request to `/createSubscription` which returned the new subscription
 4. Navigate to your notification settings page i.e. [https://commonwealth.im/notification-settings][2]
-    - A new row for the community you subscribed to should be present. 
+    - A new row for the community you subscribed to should be present.
     - When clicking the drop-down a single sub-row should appear showing the new threads subscription.
 5. Navigate back to the discussion page by hitting the back button.
     - The notifications button should still display `Notifications On`.
@@ -63,7 +63,7 @@ _Authored by Timothee Legros, 230803._
     - The `subscribe` button under the thread body should now display `unsubscribe`
 4. Navigate the settings page.
     - A new row should exist under `Discussion` that is associated with the community in which you created the thread.
-    - When clicking the drop-down for that community, 2 rows should appear. One row should be for new comments and one for new reactions on the thread you just created. 
+    - When clicking the drop-down for that community, 2 rows should appear. One row should be for new comments and one for new reactions on the thread you just created.
 5. Run through steps 5-13 of QAing another user's thread subscriptions above.
 
 **Your Comment**
@@ -152,7 +152,7 @@ Cannot QA Snapshot notifications until [#4667][10] is completed.
 
 # Chain Event
 ## Subscriptions
-1. Navigate to your [notifications settings page][2]. 
+1. Navigate to your [notifications settings page][2].
     - Assuming you haven't joined any communities, the `Chain Events` section will be empty.
 2. Join one of these communities (pick one you haven't joined before): osmosis, dydx, tribe, aave, moola-market, impactmarket, autonomies-testnet-dao.
 3. Navigate back to your [notifications settings page][2].

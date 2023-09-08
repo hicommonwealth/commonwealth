@@ -22,7 +22,6 @@ class DashboardActivityNotification {
   // Chain Event Notifications
   public readonly blockNumber?: number;
   public readonly eventData?: IChainEventData;
-  public readonly chainEventId?: number;
   public readonly updatedAt?: moment.Moment;
   public readonly eventNetwork?: SupportedNetwork;
   public readonly chain?: string;
@@ -39,7 +38,6 @@ class DashboardActivityNotification {
     isRead,
     blockNumber,
     eventData,
-    id,
     updatedAt,
     eventNetwork,
     chain,
@@ -75,7 +73,6 @@ class DashboardActivityNotification {
     this._isRead = isRead;
     this.blockNumber = blockNumber;
     this.eventData = eventData;
-    this.chainEventId = id;
     this.updatedAt = moment(updatedAt);
     this.eventNetwork = eventNetwork;
     this.chain = chain;
@@ -96,7 +93,6 @@ class DashboardActivityNotification {
       isRead: json.is_read,
       blockNumber: json.block_number,
       eventData: json.event_data,
-      id: json.id,
       updatedAt: json.updated_at,
       eventNetwork: json.network || json.event_network,
       chain: json.chain,

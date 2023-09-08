@@ -31,7 +31,6 @@ import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
 import models from '../../server/database';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { Role } from '../../server/models/role';
 
 import {
@@ -41,8 +40,6 @@ import {
   createSiweMessage,
 } from '../../shared/adapters/chain/ethereum/keys';
 import { Link, LinkSource } from 'server/models/thread';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const sortedStringify = configureStableStringify({
   bigint: false,
@@ -424,7 +421,8 @@ export interface CreateReactionArgs {
   address: string;
   reaction: string;
   jwt: string;
-  comment_id: number;
+  comment_id?: number;
+  thread_id?: number;
   session: Session;
   sign: (actionPayload: ActionPayload) => string;
 }
@@ -437,6 +435,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
     author_chain,
     reaction,
     comment_id,
+    thread_id,
     session,
     sign,
   } = args;
@@ -472,6 +471,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
       comment_id,
       author_chain,
       jwt,
+      thread_id,
       canvas_session,
       canvas_action,
       canvas_hash,
@@ -581,10 +581,10 @@ export const updateRole = async (args: AssignRoleArgs) => {
 };
 
 export interface SubscriptionArgs {
-  object_id: string | number;
   jwt: any;
   is_active: boolean;
   category: string;
+  chain_id: string;
 }
 
 export const createSubscription = async (args: SubscriptionArgs) => {

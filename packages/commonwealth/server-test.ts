@@ -42,6 +42,7 @@ import {
 } from '../common-common/src/cacheKeyUtils';
 
 import { factory, formatFilename } from 'common-common/src/logging';
+import { RedisCache } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -112,7 +113,12 @@ const resetServer = (debug = false): Promise<void> => {
           'Ropsten Testnet',
           '3',
         ],
-        ['https://rpc-juno.ecostake.com', 'Juno', null, BalanceType.Cosmos],
+        [
+          'https://rpc-osmosis.ecostake.com',
+          'Osmosis',
+          null,
+          BalanceType.Cosmos,
+        ],
         [
           'https://cosmos-devnet.herokuapp.com/rpc',
           'Cosmos SDK v0.46.11 devnet',
@@ -122,7 +128,7 @@ const resetServer = (debug = false): Promise<void> => {
         ],
       ];
 
-      const [edgewareNode, mainnetNode, testnetNode, junoNode, csdkNode] =
+      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkNode] =
         await Promise.all(
           nodes.map(([url, name, eth_chain_id, balance_type, alt_wallet_url]) =>
             models.ChainNode.create({
@@ -177,16 +183,16 @@ const resetServer = (debug = false): Promise<void> => {
         chain_node_id: testnetNode.id,
       });
       await models.Chain.create({
-        id: 'juno',
+        id: 'osmosis',
         network: ChainNetwork.Osmosis,
-        default_symbol: 'JUNO',
-        name: 'Juno',
+        default_symbol: 'OSMO',
+        name: 'Osmosis',
         icon_url: '/static/img/protocols/cosmos.png',
         active: true,
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
-        chain_node_id: junoNode.id,
+        chain_node_id: osmosisNode.id,
       });
       await models.Chain.create({
         id: 'csdk',
@@ -337,13 +343,11 @@ const resetServer = (debug = false): Promise<void> => {
       await models.Subscription.create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewMention,
-        object_id: `user-${drew.id}`,
         is_active: true,
       });
       await models.Subscription.create({
         subscriber_id: drew.id,
         category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${drew.id}`,
         is_active: true,
       });
       await models.SnapshotSpace.create({
@@ -480,8 +484,9 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
 const banCache = new BanCache(models);
 const globalActivityCache = new GlobalActivityCache(models);
 globalActivityCache.start();
+const redisCache = new RedisCache();
+
 setupPassport(models);
-// TODO: mock RabbitMQController
 setupAPI(
   '/api',
   app,
@@ -490,7 +495,8 @@ setupAPI(
   tokenBalanceCache,
   banCache,
   globalActivityCache,
-  databaseValidationService
+  databaseValidationService,
+  redisCache
 );
 setupCosmosProxy(app, models);
 setupCacheTestEndpoints(app);
