@@ -178,8 +178,6 @@ export const ComponentShowcase = () => {
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalSize, setModalSize] = useState<Size>('small');
-  const [modalType, setModalType] = useState<string>('Small');
-  const [isFullScreenModal, setIsFullScreenModal] = useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
@@ -193,13 +191,13 @@ export const ComponentShowcase = () => {
   const allChains = app.config.chains.getAll();
   const [chainId, setChainId] = useState(allChains[1]);
 
-  const renderModal = (size: Size, type: string) => {
+  const renderModal = (size?: Size) => {
     return (
       <CWModal
         content={
           <>
             <CWModalHeader
-              label={`A ${type} modal`}
+              label={`A ${size ? (size as string) : 'full screen'} modal`}
               onModalClose={() => setIsModalOpen(false)}
             />
             <CWModalBody>
@@ -210,15 +208,13 @@ export const ComponentShowcase = () => {
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
         size={size}
-        isFullScreen={isFullScreenModal}
+        isFullScreen={!size}
       />
     );
   };
 
-  const setModal = (size: string) => {
-    setModalSize(size as Size);
-    setModalType(size);
-    setIsFullScreenModal(size === 'full screen');
+  const setModal = (size?: Size) => {
+    setModalSize(size);
     setIsModalOpen(true);
   };
 
@@ -231,12 +227,9 @@ export const ComponentShowcase = () => {
         <CWButton label="Small Modal" onClick={() => setModal('small')} />
         <CWButton label="Medium Modal" onClick={() => setModal('medium')} />
         <CWButton label="Large Modal" onClick={() => setModal('large')} />
-        <CWButton
-          label="Full Screen Modal"
-          onClick={() => setModal('full screen')}
-        />
+        <CWButton label="Full Screen Modal" onClick={() => setModal()} />
       </div>
-      {renderModal(modalSize, modalType)}
+      {renderModal(modalSize)}
       <CWButton
         label="Confirmation Modal"
         onClick={() =>
