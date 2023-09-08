@@ -28,11 +28,11 @@ export const ExploreCommunitiesSidebar = () => {
   };
 
   const starredCommunities = allCommunities.filter((c) => {
-    return c instanceof ChainInfo && app.communities.isStarred(c.id);
+    return c instanceof ChainInfo && app.user.isCommunityStarred(c.id);
   });
 
   const joinedCommunities = allCommunities.filter(
-    (c) => isInCommunity(c) && !app.communities.isStarred(c.id)
+    (c) => isInCommunity(c) && !app.user.isCommunityStarred(c.id)
   );
 
   const communityList: MenuItem[] = [

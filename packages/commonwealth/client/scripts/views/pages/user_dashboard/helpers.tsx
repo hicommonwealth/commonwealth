@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
 import getFetch from 'helpers/getFetch';
@@ -16,8 +14,6 @@ export const subscribeToThread = async (
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription
 ) => {
-  const adjustedId = `discussion_${threadId}`;
-
   if (bothActive) {
     await app.user.notifications.disableSubscriptions([
       commentSubscription,
@@ -28,14 +24,14 @@ export const subscribeToThread = async (
     return Promise.resolve();
   } else if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
-      app.user.notifications.subscribe(
-        NotificationCategories.NewReaction,
-        adjustedId
-      ),
-      app.user.notifications.subscribe(
-        NotificationCategories.NewComment,
-        adjustedId
-      ),
+      app.user.notifications.subscribe({
+        categoryId: NotificationCategories.NewReaction,
+        options: { threadId: Number(threadId) },
+      }),
+      app.user.notifications.subscribe({
+        categoryId: NotificationCategories.NewComment,
+        options: { threadId: Number(threadId) },
+      }),
     ]);
 
     notifySuccess('Subscribed!');
@@ -58,10 +54,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       jwt: app.user.jwt,
     });
   } else if (requestType === DashboardViews.Chain) {
-    const events = await getFetch(`${app.serverUrl()}/ce/events`, {
-      limit: 50,
-      ordered: true,
-    });
+    const events = await getFetch(`${app.serverUrl()}/viewChainActivity`);
 
     if (!Array.isArray(events)) {
       return { status: 'Failure', result: [] };
@@ -83,10 +76,6 @@ export const fetchActivity = async (requestType: DashboardViews) => {
     for (const item of res.result) {
       chainIconUrls[item.id] = item.icon_url;
     }
-
-    // for (const event of events) {
-    //   (<any>events).icon_url = chainIconUrls[event.chain];
-    // }
 
     activity = {
       status: 'Success',

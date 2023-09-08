@@ -1,21 +1,16 @@
 /* eslint-disable no-script-url */
-import React from 'react';
-
-import { capitalize } from 'lodash';
-
 import 'components/user/user.scss';
-
+import { capitalize } from 'lodash';
+import React from 'react';
 import app from 'state';
-import NewProfilesController from '../../../controllers/server/newProfiles';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import type Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import type { AddressDisplayOptions } from './user';
 import { getClasses } from '../component_kit/helpers';
 
 export const UserBlock = (props: {
-  addressDisplayOptions?: AddressDisplayOptions;
   avatarSize?: number;
   compact?: boolean;
   hideOnchainRole?: boolean;
@@ -30,57 +25,49 @@ export const UserBlock = (props: {
 }) => {
   const { compact, searchTerm, showChainName, user } = props;
 
-  let profile;
-
-  if (user instanceof AddressInfo) {
-    if (!user.chain || !user.address) return;
-    profile = NewProfilesController.Instance.getProfile(
-      user.chain.id,
-      user.address
-    );
-  } else if (user instanceof MinimumProfile) {
-    profile = user;
-  } else {
-    profile = NewProfilesController.Instance.getProfile(
-      user.chain.id,
-      user.address
-    );
-  }
+  const { data: users } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [(user?.chain as any)?.id],
+    profileAddresses: [user?.address],
+    currentChainId: app.activeChainId(),
+    apiCallEnabled: !!((user?.chain as any)?.id && user?.address),
+  });
+  const profile = users?.[0];
 
   const highlightSearchTerm =
     profile?.address &&
     searchTerm &&
-    profile.address.toLowerCase().includes(searchTerm);
+    profile?.address.toLowerCase().includes(searchTerm);
 
   const highlightedAddress = highlightSearchTerm
     ? (() => {
-        const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
-        const queryEnd = queryStart + searchTerm.length;
+      const queryStart = profile?.address.toLowerCase().indexOf(searchTerm);
+      const queryEnd = queryStart + searchTerm.length;
 
-        return (
-          <>
-            <span>{profile.address.slice(0, queryStart)}</span>
-            <mark>{profile.address.slice(queryStart, queryEnd)}</mark>
-            <span>
-              {profile.address.slice(queryEnd, profile.address.length)}
-            </span>
-          </>
-        );
-      })()
+      return (
+        <>
+          <span>{profile?.address.slice(0, queryStart)}</span>
+          <mark>{profile?.address.slice(queryStart, queryEnd)}</mark>
+          <span>
+            {profile?.address.slice(queryEnd, profile?.address.length)}
+          </span>
+        </>
+      );
+    })()
     : null;
 
   const children = (
     <>
       <div className="user-block-center">
         <div
-          className={`user-block-address${
-            profile?.address ? '' : 'no-address'
-          }`}
+          className={`user-block-address${profile?.address ? '' : 'no-address'
+            }`}
         >
           <div>
             {highlightSearchTerm
               ? highlightedAddress
-              : `${profile.address.slice(0, 8)}...${profile.address.slice(-5)}`}
+              : `${profile?.address.slice(0, 8)}...${profile?.address.slice(
+                -5
+              )}`}
           </div>
           {profile?.address && showChainName && (
             <div className="address-divider"> · </div>

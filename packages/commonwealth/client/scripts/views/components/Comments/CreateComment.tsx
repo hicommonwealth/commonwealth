@@ -1,37 +1,38 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import BN from 'bn.js';
 
 import 'components/Comments/CreateComment.scss';
 import { notifyError } from 'controllers/app/notifications';
-import { weiToTokens, getDecimals } from 'helpers';
+import { getDecimals, weiToTokens } from 'helpers';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
-import app from 'state';
-import { ContentType } from 'types';
-import { User } from 'views/components/user/user';
-import { CWButton } from '../component_kit/new_designs/cw_button';
-import { CWText } from '../component_kit/cw_text';
-import { CWValidationText } from '../component_kit/cw_validation_text';
-import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-  ReactQuillEditor,
-} from '../react_quill_editor';
-import { serializeDelta } from '../react_quill_editor/utils';
-import { useDraft } from 'hooks/useDraft';
-import { useCreateCommentMutation } from 'state/api/comments';
-import Permissions from '../../../utils/Permissions';
 import clsx from 'clsx';
 import { getTokenBalance } from 'helpers/token_balance_helper';
+import { useDraft } from 'hooks/useDraft';
+import app from 'state';
+import { useCreateCommentMutation } from 'state/api/comments';
+import { ContentType } from 'types';
+import { User } from 'views/components/user/user';
+import Permissions from '../../../utils/Permissions';
+import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
+import { CWText } from '../component_kit/cw_text';
+import { CWValidationText } from '../component_kit/cw_validation_text';
+import { CWButton } from '../component_kit/new_designs/cw_button';
+import {
+  ReactQuillEditor,
+  createDeltaFromText,
+  getTextFromDelta,
+} from '../react_quill_editor';
+import { serializeDelta } from '../react_quill_editor/utils';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
   rootThread: Thread;
   canComment: boolean;
+  shouldFocusEditor?: boolean;
 };
 
 export const CreateComment = ({
@@ -39,6 +40,7 @@ export const CreateComment = ({
   parentCommentId,
   rootThread,
   canComment,
+  shouldFocusEditor = false,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -64,6 +66,7 @@ export const CreateComment = ({
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
+  console.log('author => ', author);
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
@@ -102,7 +105,7 @@ export const CreateComment = ({
       const newComment: any = await createComment({
         threadId: rootThread.id,
         chainId: chainId,
-        address: author.address,
+        address: author?.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -169,7 +172,12 @@ export const CreateComment = ({
             fontWeight="medium"
             className={clsx('user-link-text', { disabled: !canComment })}
           >
-            <User user={author} hideAvatar linkify />
+            <User
+              userAddress={author?.address}
+              userChainId={author?.chain.id}
+              shouldHideAvatar
+              shouldLinkProfile
+            />
           </CWText>
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
@@ -180,6 +188,7 @@ export const CreateComment = ({
         setContentDelta={setContentDelta}
         isDisabled={!canComment}
         tooltipLabel="Join community to comment"
+        shouldFocus={shouldFocusEditor}
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">

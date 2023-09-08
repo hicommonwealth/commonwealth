@@ -16,7 +16,6 @@ import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
-import AddressInfo from '../../../../models/AddressInfo';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
 import { isHot } from '../helpers';
@@ -33,6 +32,7 @@ type CardProps = AdminActionsProps & {
   threadHref?: string;
   showSkeleton?: boolean;
   canReact?: boolean;
+  onCommentBtnClick?: () => any;
 };
 
 export const ThreadCard = ({
@@ -53,6 +53,7 @@ export const ThreadCard = ({
   threadHref,
   showSkeleton,
   canReact = true,
+  onCommentBtnClick = () => null,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -104,9 +105,8 @@ export const ThreadCard = ({
         <div className="content-wrapper">
           <div className="content-header">
             <AuthorAndPublishInfo
-              authorInfo={
-                new AddressInfo(null, thread.author, thread.authorChain, null)
-              }
+              authorAddress={thread.author}
+              authorChainId={thread.authorChain}
               publishDate={moment(thread.createdAt).format('l')}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
@@ -208,6 +208,7 @@ export const ThreadCard = ({
               onEditCancel={onEditCancel}
               onEditConfirm={onEditConfirm}
               hasPendingEdits={hasPendingEdits}
+              onCommentBtnClick={onCommentBtnClick}
             />
           </div>
         </div>

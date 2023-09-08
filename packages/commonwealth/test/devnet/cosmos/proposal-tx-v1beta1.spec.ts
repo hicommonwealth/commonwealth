@@ -16,14 +16,19 @@ import {
   getTMClient,
 } from 'controllers/chain/cosmos/chain.utils';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
-import { deposit, sendTx, setupTestSigner, waitOneBlock } from './helpers';
+import {
+  deposit,
+  sendTx,
+  setupTestSigner,
+  waitOneBlock,
+} from './utils/helpers';
 
 const { expect, assert } = chai;
 
 describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => {
-  // v1beta1 ci devnet
   let rpc: CosmosApiType;
   let signer: string;
+  // v1beta1 CI devnet
   const betaId = 'csdk-beta-ci';
   const rpcUrlBeta = `http://localhost:8080/cosmosAPI/${betaId}`;
 
@@ -63,9 +68,10 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 
     await waitOneBlock(rpcUrlBeta);
+    await waitOneBlock(rpcUrlBeta);
     const activeProposals = await getActiveVotingProposals();
     const onchainProposal = activeProposals[activeProposals.length - 1];
-    expect(onchainProposal?.content?.typeUrl).to.be.eql(expectedProposalType);
+    expect(onchainProposal?.content?.typeUrl).to.eql(expectedProposalType);
   };
 
   const voteTest = async (
@@ -124,6 +130,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
 
   describe('Amino signing', () => {
     it('creates a text proposal with legacy amino', async () => {
+      await waitOneBlock(rpcUrlBeta);
       const content = encodeTextProposal(
         `beta text title`,
         `beta text description`

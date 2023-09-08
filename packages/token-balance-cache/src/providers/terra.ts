@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import axios from 'axios';
 import { BalanceType } from 'common-common/src/types';
-import { toBech32, fromBech32 } from '@cosmjs/encoding';
+import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
 

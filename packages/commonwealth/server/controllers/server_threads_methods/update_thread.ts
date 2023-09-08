@@ -266,16 +266,17 @@ export async function __updateThread(
   const allNotificationOptions: EmitOptions[] = [];
 
   allNotificationOptions.push({
-    categoryId: NotificationCategories.ThreadEdit,
-    objectId: '',
-    notificationData: {
-      created_at: now,
-      thread_id: +finalThread.id,
-      root_type: ProposalType.Thread,
-      root_title: finalThread.title,
-      chain_id: finalThread.chain,
-      author_address: finalThread.Address.address,
-      author_chain: finalThread.Address.chain,
+    notification: {
+      categoryId: NotificationCategories.ThreadEdit,
+      data: {
+        created_at: now,
+        thread_id: +finalThread.id,
+        root_type: ProposalType.Thread,
+        root_title: finalThread.title,
+        chain_id: finalThread.chain,
+        author_address: finalThread.Address.address,
+        author_chain: finalThread.Address.chain,
+      },
     },
     // don't send webhook notifications for edits
     webhookData: null,
@@ -329,17 +330,19 @@ export async function __updateThread(
         return; // some Addresses may be missing users, e.g. if the user removed the address
       }
       allNotificationOptions.push({
-        categoryId: NotificationCategories.NewMention,
-        objectId: `user-${mentionedAddress.User.id}`,
-        notificationData: {
-          created_at: now,
-          thread_id: +finalThread.id,
-          root_type: ProposalType.Thread,
-          root_title: finalThread.title,
-          comment_text: finalThread.body,
-          chain_id: finalThread.chain,
-          author_address: finalThread.Address.address,
-          author_chain: finalThread.Address.chain,
+        notification: {
+          categoryId: NotificationCategories.NewMention,
+          data: {
+            mentioned_user_id: mentionedAddress.User.id,
+            created_at: now,
+            thread_id: +finalThread.id,
+            root_type: ProposalType.Thread,
+            root_title: finalThread.title,
+            comment_text: finalThread.body,
+            chain_id: finalThread.chain,
+            author_address: finalThread.Address.address,
+            author_chain: finalThread.Address.chain,
+          },
         },
         webhookData: null,
         excludeAddresses: [finalThread.Address.address],
@@ -560,9 +563,12 @@ async function setThreadStage(
     // fetch available stages
     let customStages = [];
     try {
-      customStages = Array.from(JSON.parse(chain.custom_stages))
-        .map((s) => s.toString())
-        .filter((s) => s);
+      const chainStages = JSON.parse(chain.custom_stages);
+      if (Array.isArray(chainStages)) {
+        customStages = Array.from(chainStages)
+          .map((s) => s.toString())
+          .filter((s) => s);
+      }
       if (customStages.length === 0) {
         customStages = [
           'discussion',
@@ -658,8 +664,6 @@ async function updateThreadCollaborators(
       }
     }
 
-    const toUpdate: Partial<ThreadAttributes> = {};
-
     // add collaborators
     if (toAddUnique.length > 0) {
       const collaboratorAddresses = await models.Address.findAll({
@@ -697,10 +701,6 @@ async function updateThreadCollaborators(
         },
         transaction,
       });
-    }
-
-    if (Object.keys(toUpdate).length > 0) {
-      await thread.update(toUpdate, { transaction });
     }
   }
 }

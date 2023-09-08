@@ -69,10 +69,10 @@ export async function addAlchemyKey() {
   // If it does exist, update the key
   await testDb.query(`
   UPDATE "ChainNodes"
-  SET 
+  SET
     url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}',
     alt_wallet_url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}'
-  WHERE 
+  WHERE
     eth_chain_id = 1
     AND NOT EXISTS (select 1 from "ChainNodes" where url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}')
   `);
@@ -166,7 +166,6 @@ export async function createInitialUser() {
         updated_at,
         "isAdmin",
         "disableRichText",
-        "lastVisited",
         "emailVerified",
         selected_chain_id,
         "emailNotificationInterval"
@@ -176,7 +175,6 @@ export async function createInitialUser() {
         '2023-07-14 13:03:56.196-07',
         false,
         false,
-        '{}',
         false,
         NULL,
         'never'
