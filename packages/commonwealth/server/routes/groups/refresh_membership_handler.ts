@@ -19,9 +19,7 @@ export const refreshMembershipHandler = async (
 ) => {
   const { user, address, chain } = req;
   const { topic_id: topicId } = req.body;
-  if (typeof topicId !== 'number') {
-    throw new AppError(Errors.InvalidTopicId);
-  }
+
   const result = await controllers.groups.refreshMembership({
     user,
     chain,

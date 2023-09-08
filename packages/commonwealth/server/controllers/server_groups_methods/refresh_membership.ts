@@ -10,7 +10,7 @@ export type RefreshMembershipOptions = {
   topicId: number;
 };
 export type RefreshMembershipResult = {
-  topicId: number;
+  topicId?: number;
   allowed: boolean;
   rejectReason?: string;
 };
@@ -20,7 +20,8 @@ export async function __refreshMembership(
   options: RefreshMembershipOptions
 ): Promise<RefreshMembershipResult> {
   /*
-    TODO: Check membership status of address for groups on specified topic
+    TODO: Check membership status of address for all groups for all topics within the chain,
+    or optionally for the single specified topic
       - if membership missing or stale => recompute, save and return membership
       - else if membership fresh => return membership
 
