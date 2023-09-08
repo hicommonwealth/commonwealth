@@ -5,7 +5,7 @@ import 'pages/notifications/notification_row.scss';
 import AddressInfo from '../../../models/AddressInfo';
 
 import type { NotificationRowProps } from './notification_row';
-import { Label as ChainEventLabel } from 'chain-events/src';
+import { IEventLabel, Label as ChainEventLabel } from 'chain-events/src';
 import type { CWEvent } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
 
@@ -44,7 +44,13 @@ export const ChainEventNotificationRow = (
 
   const chainName = app.config.chains.getById(chainId)?.name;
 
-  const label = ChainEventLabel(chainId, chainEvent);
+  let label: IEventLabel | undefined;
+  try {
+    label = ChainEventLabel(chainId, chainEvent);
+  } catch (e) {
+    console.warn(e);
+    return null;
+  }
 
   if (!label) {
     return (
