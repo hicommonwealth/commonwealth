@@ -20,7 +20,7 @@ interface CosmosProposalQueryProps {
   proposalId: string;
 }
 
-const useCosmosProposal = ({
+const useCosmosProposalQuery = ({
   isApiReady,
   proposalId,
 }: CosmosProposalQueryProps) => {
@@ -34,4 +34,4 @@ const useCosmosProposal = ({
   });
 };
 
-export { useCosmosProposal };
+export { useCosmosProposalQuery };

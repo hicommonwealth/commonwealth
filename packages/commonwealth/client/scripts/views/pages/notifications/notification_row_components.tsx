@@ -1,14 +1,11 @@
 import moment from 'moment';
 import React, { useState } from 'react';
-
 import 'pages/notifications/notification_row.scss';
 import AddressInfo from '../../../models/AddressInfo';
-
-import type { CWEvent } from 'chain-events/src';
-import { Label as ChainEventLabel } from 'chain-events/src';
-import { NotificationCategories } from 'common-common/src/types';
 import type { NotificationRowProps } from './notification_row';
-
+import type { CWEvent } from 'chain-events/src';
+import { Label as ChainEventLabel, SupportedNetwork } from 'chain-events/src';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useNavigate } from 'react-router';
 import app from 'state';
@@ -18,6 +15,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { getClasses } from '../../components/component_kit/helpers';
 import { UserGallery } from '../../components/user/user_gallery';
 import { getBatchNotificationFields } from './helpers';
+import { getProposalUrlPath } from 'identifiers';
 
 export const ChainEventNotificationRow = (
   props: Omit<NotificationRowProps, 'allRead'>
@@ -63,12 +61,32 @@ export const ChainEventNotificationRow = (
     );
   }
 
+  let proposalType: ProposalType;
+  if (chainEvent.network === SupportedNetwork.Cosmos) {
+    proposalType = ProposalType.CosmosProposal;
+  } else if (chainEvent.network === SupportedNetwork.Aave) {
+    proposalType = ProposalType.AaveProposal;
+  } else if (chainEvent.network === SupportedNetwork.Compound) {
+    proposalType = ProposalType.CompoundProposal;
+  }
+
+  if (!proposalType) {
+    return;
+  }
+
+  const path = getProposalUrlPath(
+    proposalType,
+    (chainEvent.data as any).id,
+    false,
+    chainId
+  );
+
   return (
     <div
       className={
         !notification.isRead ? 'NotificationRow unread' : 'NotificationRow'
       }
-      onClick={() => navigate(`/notifications?id=${notification.id}`)}
+      onClick={() => navigate(path)}
     >
       <div className="comment-body">
         <div className="comment-body-top chain-event-notification-top">

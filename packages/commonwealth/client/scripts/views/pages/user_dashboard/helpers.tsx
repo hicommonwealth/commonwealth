@@ -54,10 +54,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       jwt: app.user.jwt,
     });
   } else if (requestType === DashboardViews.Chain) {
-    const events = await getFetch(`${app.serverUrl()}/ce/events`, {
-      limit: 50,
-      ordered: true,
-    });
+    const events = await getFetch(`${app.serverUrl()}/viewChainActivity`);
 
     if (!Array.isArray(events)) {
       return { status: 'Failure', result: [] };
@@ -79,10 +76,6 @@ export const fetchActivity = async (requestType: DashboardViews) => {
     for (const item of res.result) {
       chainIconUrls[item.id] = item.icon_url;
     }
-
-    // for (const event of events) {
-    //   (<any>events).icon_url = chainIconUrls[event.chain];
-    // }
 
     activity = {
       status: 'Success',

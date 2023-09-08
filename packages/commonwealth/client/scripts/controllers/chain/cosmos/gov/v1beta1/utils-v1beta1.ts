@@ -275,7 +275,8 @@ export interface CosmosDepositParams {
 }
 
 export const getDepositParams = async (
-  cosmosChain: Cosmos
+  cosmosChain: Cosmos,
+  stakingDenom?: string
 ): Promise<CosmosDepositParams> => {
   const govController = cosmosChain.governance as CosmosGovernance;
   let minDeposit;
@@ -283,7 +284,7 @@ export const getDepositParams = async (
 
   // TODO: support off-denom deposits
   const depositCoins = depositParams.minDeposit.find(
-    ({ denom }) => denom === cosmosChain.chain.denom
+    ({ denom }) => denom === stakingDenom
   );
   if (depositCoins) {
     minDeposit = new CosmosToken(

@@ -4,7 +4,6 @@ import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import SnapshotController from 'controllers/chain/snapshot';
 import ChainEntityController from 'controllers/server/chain_entities';
-import CommunitiesController from 'controllers/server/communities';
 import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
@@ -56,9 +55,6 @@ export interface IApp {
   // Search
   search: SearchController;
   searchAddressCache: any;
-
-  // Community
-  communities: CommunitiesController;
 
   // Contracts
   contracts: ContractsController;
@@ -140,9 +136,6 @@ const app: IApp = {
 
   // Proposals
   proposalEmitter: new EventEmitter(),
-
-  // Community
-  communities: new CommunitiesController(),
 
   // Contracts
   contracts: new ContractsController(),
