@@ -29,6 +29,7 @@ export async function __updateGroup(
   this: ServerChainsController,
   { requirements }: UpdateGroupOptions
 ): Promise<UpdateGroupResult> {
+  // TODO: require community admin
   if (!validateRequirements(requirements)) {
     throw new AppError(Errors.InvalidRequirements);
   }

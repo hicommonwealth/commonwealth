@@ -16,5 +16,6 @@ export async function __deleteGroup(
   this: ServerChainsController,
   options: DeleteGroupOptions
 ): Promise<DeleteGroupResult> {
+  // TODO: require community admin
   // TODO: delete all memberships for group along with group itself
 }

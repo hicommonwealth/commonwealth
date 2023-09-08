@@ -30,6 +30,7 @@ export async function __createGroup(
   this: ServerChainsController,
   { requirements }: CreateGroupOptions
 ): Promise<CreateGroupResult> {
+  // TODO: require community admin
   if (!validateRequirements(requirements)) {
     throw new AppError(Errors.InvalidRequirements);
   }
