@@ -32,7 +32,7 @@ module.exports = {
           address_id: {
             type: Sequelize.INTEGER,
             allowNull: false,
-            references: { model: 'Address', key: 'id' },
+            references: { model: 'Addresses', key: 'id' },
           },
           last_checked: { type: Sequelize.DATE, allowNull: false },
         },
