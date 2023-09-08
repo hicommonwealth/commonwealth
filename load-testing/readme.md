@@ -17,32 +17,72 @@ This guide will help you set up and perform load tests with Artillery, both on y
 
 ## Getting Started with Load Testing
 
-First, based on `env.local.sh`, create a `.env` file. It should include:
-
-```makefile
-JWT=eyJWT
-USER_ADDRESS=0xAABCDEF
-POST_THREAD_ID=11875
-ENV=local
-REPORT_DIR=output
-TEST_LOCATION=us-east-1
-TEST_NAME=commonwealth-api-threads
-DD_API_KEY=lldjfs
-DD_APP_KEY=lsdfsjsldk
-DD_SITE=us5.datadoghq.com
-```
-
-Next, install the necessary packages with `yarn install`.
-
-## Performing Tests Locally
-
-To initiate the tests locally, run:
+### Running Load Tests locally
 
 ```bash
+cd load-testing
+cp env.local.sh .env
+yarn install
 yarn test-load
 ```
 
+First, based on `env.local.sh`, we created a `.env` file.
+Replace `JWT` token, `USER_ADDRESS` with your own 
+
+```makefile
+# ---------------------------
+# Scenario Configuration
+# ---------------------------
+# Environment variable to choose the target URL
+ENV=local
+
+# Name of the scenario file (without the .yml extension)
+TEST_NAME=commonwealth-api-threads
+
+# Community to test
+TEST_COMMUNITY=cmn-protocol
+
+# ID of the thread to open and post during the test
+# TEST_THREAD_ID should belong to TEST_COMMUNITY
+TEST_THREAD_ID=11875
+
+# ---------------------------
+# User Configuration
+# ---------------------------
+# JWT token for authentication (replace with your JWT token)
+JWT=eyJWT
+
+# User address for the test (replace with your address)
+USER_ADDRESS=0xAABCDEF
+
+# ---------------------------
+# Result Configuration
+# ---------------------------
+# Directory where the output will be stored (created locally)
+REPORT_DIR=output
+
+# ---------------------------
+# AWS Configuration
+# ---------------------------
+# AWS region for the test (acts as a label for the filename if not running on AWS)
+TEST_LOCATION=us-east-1
+
+# ---------------------------
+# DataDog Configuration (Optional)
+# ---------------------------
+# DataDog API key (optional)
+DD_API_KEY=lldjfs
+
+# DataDog application key (optional)
+DD_APP_KEY=lsdfsjsldk
+
+# DataDog site (optional)
+DD_SITE=us5.datadoghq.com
+```
+
 These tests are executed on your local system but will connect to remote URLs, providing a good performance measure from your actual location.
+
+### Run test metrics to datadog
 
 For running tests and reporting metrics on the new [Artillery Dashobaord](https://us5.datadoghq.com/dashboard/z7m-wbf-b2z/artillery) on Datadog, use:
 

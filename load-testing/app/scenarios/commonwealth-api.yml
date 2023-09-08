@@ -53,33 +53,33 @@ scenarios:
           qs:
             jwt: "{{$processEnvironment.JWT}}"
       - get:
-          url: "/cmn-protocol"
+          url: "/{{$processEnvironment.TEST_COMMUNITY}}"
       - get:
           url: "/api/bulkOffchain"
           qs:
-            chain: "cmn-protocol"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
             community:
             jwt: "{{$processEnvironment.JWT}}"
       - post:
           url: "/api/selectChain"
           form:
-            chain: "cmn-protocol"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
             auth: true
             jwt: "{{$processEnvironment.JWT}}"
       - post:
           url: "/api/threadsUsersCountAndAvatars"
           json:
-            chain: "cmn-protocol"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
             threads: []
       - get:
           url: "/api/bulkTopics"
           qs:
-            chain: "cmn-protocol"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
       - get:
           name: "/api/activeThreads"
           url: "/api/threads"
           qs:
-            chain: "cmn-protocol"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
             active: true
             threads_per_topic: 3
           capture:
@@ -90,8 +90,8 @@ scenarios:
           name: "/api/selectThread"
           url: "/api/threads"
           qs:
-            thread_ids[]: 11875
-            chain: "cmn-protocol"
+            thread_ids[]: "{{$processEnvironment.TEST_THREAD_ID}}"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
           capture:
             json: "$.result[0].id"
             as: "threadId"
@@ -100,7 +100,7 @@ scenarios:
           name: "/api/bulkThreads"
           url: "/api/threads"
           qs:
-            chain: "cmn-protocol"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
             bulk: true
             limit: 20
             page: 0
@@ -126,11 +126,11 @@ scenarios:
       - post:
           url: "/api/viewGlobalActivity"
       - post:
-          url: "/api/threads/{{$processEnvironment.POST_THREAD_ID}}/comments"
+          url: "/api/threads/{{$processEnvironment.TEST_THREAD_ID}}/comments"
           json:
-            author_chain: "cmn-protocol"
-            chain: "cmn-protocol"
-            thread_id: {{$processEnvironment.POST_THREAD_ID}}
+            author_chain: "{{$processEnvironment.TEST_COMMUNITY}}"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
+            thread_id: {{$processEnvironment.TEST_THREAD_ID}}
             parent_id: null
             text: "%7B%22ops%22%3A%5B%7B%22insert%22%3A%22{{ comment }}%5Cn%22%7D%5D%2C%22___isMarkdown%22%3Atrue%7D"
             address: "{{$processEnvironment.USER_ADDRESS}}"
@@ -145,8 +145,8 @@ scenarios:
       - post:
           url: "/api/comments/{{commentId}}/reactions"
           form:
-            author_chain: "cmn-protocol"
-            chain: "cmn-protocol"
+            author_chain: "{{$processEnvironment.TEST_COMMUNITY}}"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
             address: "{{$processEnvironment.USER_ADDRESS}}"
             reaction: "like"
             jwt: "{{$processEnvironment.JWT}}"

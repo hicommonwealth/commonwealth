@@ -26,10 +26,12 @@ scenarios:
   - name: "Read Endpoints"
     flow:
       - get:
+          url: "/{{$processEnvironment.TEST_COMMUNITY}}"
+      - get:
           name: "/api/activeThreads"
           url: "/api/threads"
           qs:
-            chain: "cmn-protocol"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
             active: true
             threads_per_topic: 3
           capture:
@@ -40,8 +42,8 @@ scenarios:
           name: "/api/selectThread"
           url: "/api/threads"
           qs:
-            thread_ids[]: 11875
-            chain: "cmn-protocol"
+            thread_ids[]: "{{$processEnvironment.TEST_THREAD_ID}}"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
           capture:
             json: "$.result[0].id"
             as: "threadId"
@@ -50,7 +52,7 @@ scenarios:
           name: "/api/bulkThreads"
           url: "/api/threads"
           qs:
-            chain: "cmn-protocol"
+            chain: "{{$processEnvironment.TEST_COMMUNITY}}"
             bulk: true
             limit: 20
             page: 0

@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "https://www.artillery.io/docs/reference/engines/http",
   "scripts": {
-    "test-load": "npx dotenv-run-script create-report-dir && npx dotenv-run-script artillery-local",
-    "test-aws": "npx dotenv-run-script create-report-dir && npx dotenv-run-script artillery-aws && npx dotenv-run-script artillery-html",
-    "test-load-dd": "npx dotenv-run-script post-datadog & (npx dotenv-run-script create-report-dir && npx dotenv-run-script artillery-local && npx dotenv-run-script artillery-html)",
+    "test-load": "dotenv-run-script create-report-dir && dotenv-run-script artillery-local",
+    "test-aws": "dotenv-run-script create-report-dir && dotenv-run-script artillery-aws && dotenv-run-script artillery-html",
+    "test-load-dd": "dotenv-run-script post-datadog & (dotenv-run-script create-report-dir && dotenv-run-script artillery-local && dotenv-run-script artillery-html)",
     "create-report-dir": "mkdir -p ${REPORT_DIR}",
     "post-datadog": "node post-datadog-metrics.js",
     "artillery-local": "artillery run --dotenv .env -o ${REPORT_DIR}/report-${ENV}-${TEST_LOCATION}-${TEST_NAME}.json --environment ${ENV} app/scenarios/${TEST_NAME}.yml",
@@ -17,7 +17,8 @@
   "dependencies": {
     "@faker-js/faker": "^8.0.2",
     "artillery": "^2.0.0-34",
-    "artillery-engine-playwright": "^0.3.1"
+    "artillery-engine-playwright": "^0.3.1",
+    "dotenv-run-script": "^0.3.0"
   },
   "devDependencies": {
     "@datadog/datadog-api-client": "^1.15.0",
