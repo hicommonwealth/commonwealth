@@ -3,6 +3,12 @@ import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { UserInstance } from '../../models/user';
+import validateRequirements from '../../util/requirementsModule/validateRequirements';
+import { AppError } from '../../../../common-common/src/errors';
+
+const Errors = {
+  InvalidRequirements: 'Invalid requirements',
+};
 
 export type UpdateGroupOptions = {
   user: UserInstance;
@@ -21,8 +27,11 @@ export type UpdateGroupResult = {
 
 export async function __updateGroup(
   this: ServerChainsController,
-  options: UpdateGroupOptions
+  { requirements }: UpdateGroupOptions
 ): Promise<UpdateGroupResult> {
+  if (!validateRequirements(requirements)) {
+    throw new AppError(Errors.InvalidRequirements);
+  }
   // TODO: delete all existing memberships for group before update
   return [
     {

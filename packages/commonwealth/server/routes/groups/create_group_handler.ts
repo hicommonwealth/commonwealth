@@ -3,7 +3,6 @@ import { ServerControllers } from '../../routing/router';
 import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { AppError } from '../../../../common-common/src/errors';
-import validateRequirements from '../../util/requirementsModule/validateRequirements';
 
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
@@ -28,7 +27,7 @@ export const createGroupHandler = async (
   if (!metadata) {
     throw new AppError(Errors.InvalidMetadata);
   }
-  if (!requirements || !validateRequirements(requirements)) {
+  if (!requirements) {
     throw new AppError(Errors.InvalidRequirements);
   }
   if (topics) {

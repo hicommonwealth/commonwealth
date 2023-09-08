@@ -3,6 +3,12 @@ import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { UserInstance } from '../../models/user';
+import validateRequirements from '../../util/requirementsModule/validateRequirements';
+import { AppError } from '../../../../common-common/src/errors';
+
+const Errors = {
+  InvalidRequirements: 'Invalid requirements',
+};
 
 export type CreateGroupOptions = {
   user: UserInstance;
@@ -22,8 +28,11 @@ export type CreateGroupResult = {
 
 export async function __createGroup(
   this: ServerChainsController,
-  options: CreateGroupOptions
+  { requirements }: CreateGroupOptions
 ): Promise<CreateGroupResult> {
+  if (!validateRequirements(requirements)) {
+    throw new AppError(Errors.InvalidRequirements);
+  }
   /*
     TODO:
       - validate schema
