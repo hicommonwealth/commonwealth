@@ -6,6 +6,7 @@ import { GroupAttributes } from './group';
 export type MembershipAttributes = {
   group_id: number;
   address_id: number;
+  reject_reason?: string;
   last_checked: Date;
 
   // associations
@@ -24,6 +25,7 @@ export default (
     {
       group_id: { type: dataTypes.INTEGER, allowNull: false },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
+      reject_reason: { type: dataTypes.STRING, allowNull: true },
       last_checked: { type: dataTypes.DATE, allowNull: false },
     },
     {
@@ -36,6 +38,10 @@ export default (
   Membership.associate = (models) => {
     models.Membership.belongsTo(models.Group, {
       foreignKey: 'group_id',
+      targetKey: 'id',
+    });
+    models.Membership.belongsTo(models.Address, {
+      foreignKey: 'address_id',
       targetKey: 'id',
     });
   };

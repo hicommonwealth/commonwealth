@@ -20,7 +20,6 @@ module.exports = {
         },
         { transaction: t }
       );
-
       await queryInterface.createTable(
         'Memberships',
         {
@@ -34,8 +33,26 @@ module.exports = {
             allowNull: false,
             references: { model: 'Addresses', key: 'id' },
           },
+          reject_reason: { type: Sequelize.STRING, allowNull: true },
           last_checked: { type: Sequelize.DATE, allowNull: false },
         },
+        { transaction: t }
+      );
+    })
+    await queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.addIndex(
+        'Groups',
+        { fields: ['chain_id'] },
+        { transaction: t }
+      );
+      await queryInterface.addIndex(
+        'Memberships',
+        { fields: ['group_id'] },
+        { transaction: t }
+      );
+      await queryInterface.addIndex(
+        'Memberships',
+        { fields: ['address_id'] },
         { transaction: t }
       );
     })
