@@ -165,8 +165,8 @@ describe('Thread Patch Update', () => {
         stage: 'discussion',
         topicName: 't2',
         topicId: undefined,
-        session: adminSession.session,
-        sign: adminSession.sign,
+        session: userSession.session,
+        sign: userSession.sign,
       });
 
       // admin sets thread as pinned
