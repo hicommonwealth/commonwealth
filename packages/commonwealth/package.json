@@ -67,7 +67,7 @@
     "test-query": "ts-node server/scripts/testQuery.ts",
     "test-select": "NODE_ENV=test nyc ts-mocha --project tsconfig.json",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
-    "transpile-server": "tsc --project ./tsconfig.json && tsc-alias",
+    "transpile-server": "tsc --project ./tsconfig.prod.json && tsc-alias",
     "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'",
     "unit-test:watch": "NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
