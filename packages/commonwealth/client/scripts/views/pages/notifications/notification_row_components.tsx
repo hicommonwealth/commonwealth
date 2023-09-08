@@ -3,8 +3,12 @@ import React, { useState } from 'react';
 import 'pages/notifications/notification_row.scss';
 import AddressInfo from '../../../models/AddressInfo';
 import type { NotificationRowProps } from './notification_row';
+import {
+  IEventLabel,
+  Label as ChainEventLabel,
+  SupportedNetwork,
+} from 'chain-events/src';
 import type { CWEvent } from 'chain-events/src';
-import { Label as ChainEventLabel, SupportedNetwork } from 'chain-events/src';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useNavigate } from 'react-router';
@@ -42,7 +46,13 @@ export const ChainEventNotificationRow = (
 
   const chainName = app.config.chains.getById(chainId)?.name;
 
-  const label = ChainEventLabel(chainId, chainEvent);
+  let label: IEventLabel | undefined;
+  try {
+    label = ChainEventLabel(chainId, chainEvent);
+  } catch (e) {
+    console.warn(e);
+    return;
+  }
 
   if (!label) {
     return (
