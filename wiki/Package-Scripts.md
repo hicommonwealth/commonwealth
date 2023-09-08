@@ -6,7 +6,6 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [build-all](#build-all)
   - [build-app](#build-app)
   - [build:css](#buildcss)
-  - [heroku-postbuild](#heroku-postbuild)
 - [CI Scripts](#ci-scripts)
   - [start-ci](#start-ci)
   - [wait-server](#wait-server)
@@ -71,7 +70,6 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [unit-test](#unit-test)
   - [unit-test:watch](#unit-testwatch)
 - [TypeScript](#typescript)
-  - [build-consumer](#build-consumer)
   - [check-types](#check-types)
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
@@ -82,14 +80,6 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [start-consumer](#start-consumer)
 
 # Build Scripts
-
-## build-all
-
-Definition: `yarn build-app && yarn build-consumer`
-
-Description: Builds app based on webpack.prod.config.js file, as well as the build-consumer script
-
-Considerations: Merely an aggregate script of `build-app` and `build-consumer`; may not be necessary. **Flagged for possible removal.**
 
 ## build-app
     
@@ -102,12 +92,6 @@ Description: Builds project, allocating max 4096MB memory to Node; runs webpack 
 Definition: `NODE_ENV=production build client/styles/shared.scss` 
 
 Considerations: Why do we have a separate CSS build? Who uses it? And does it even work? We don't appear to have a `build` command that it could modify. **Deprecated; recommend removal.**
-
-## heroku-postbuild
-
-Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
-
-Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dynamically allocate memory, then running webpack and the [build-consumer](#build-consumer) script
 
 # CI Scripts
 
@@ -549,12 +533,6 @@ Considerations: This script breaks our more usual test script syntax, which typi
 Contributor: Ryan Bennett
 
 # TypeScript
-
-## build-consumer
-
-Definition: `tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsconfig.consumer.json`
-
-Description: Runs a compilation based on tsconfig.consumer.json; does not emit files; replaces alias with relative paths post-compilation.
 
 ## check-types
 

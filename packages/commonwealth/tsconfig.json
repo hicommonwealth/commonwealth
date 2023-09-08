@@ -16,14 +16,9 @@
     }
   },
   "include": [
-    "./client",
-    "./client/scripts",
     "./shared",
-    "./test",
-    "./globals.d.ts",
     "./server",
-    "./server.ts",
-    "./scripts"
+    "./server.ts"
   ],
   "exclude": ["./node_modules"]
 }
