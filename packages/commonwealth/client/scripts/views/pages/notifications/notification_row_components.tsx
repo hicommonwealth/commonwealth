@@ -5,7 +5,11 @@ import 'pages/notifications/notification_row.scss';
 import AddressInfo from '../../../models/AddressInfo';
 
 import type { NotificationRowProps } from './notification_row';
-import { IEventLabel, Label as ChainEventLabel, SupportedNetwork } from 'chain-events/src';
+import {
+  IEventLabel,
+  Label as ChainEventLabel,
+  SupportedNetwork,
+} from 'chain-events/src';
 import type { CWEvent } from 'chain-events/src';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 
@@ -50,7 +54,7 @@ export const ChainEventNotificationRow = (
     label = ChainEventLabel(chainId, chainEvent);
   } catch (e) {
     console.warn(e);
-    return null;
+    return;
   }
 
   if (!label) {
