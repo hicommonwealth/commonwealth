@@ -7,8 +7,6 @@ import type AaveApi from './api';
 import type AaveChain from './chain';
 
 import AaveProposal from './proposal';
-import getFetch from 'helpers/getFetch';
-import { BigNumber } from 'ethers';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import axios from 'axios';
 import { ApiEndpoints } from 'state/api/config';

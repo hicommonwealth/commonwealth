@@ -13,7 +13,10 @@ import { BalanceInfo } from 'views/components/proposals/balance_info';
 import { ConvictionsChooser } from 'views/components/proposals/convictions_chooser';
 import { CWText } from '../component_kit/cw_text';
 import { CWTextInput } from '../component_kit/cw_text_input';
-import { useDepositParamsQuery } from 'state/api/chainParams/fetchDepositParams';
+import {
+  useDepositParamsQuery,
+  useStakingParamsQuery,
+} from 'state/api/chainParams';
 
 type ProposalExtensionsProps = {
   proposal: AnyProposal;
@@ -35,7 +38,8 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
     if (setCosmosDepositAmount) setCosmosDepositAmount(0);
   }, [setCosmosDepositAmount, setDemocracyVoteAmount]);
 
-  const { data: cosmosDepositParams } = useDepositParamsQuery();
+  const { data: stakingDenom } = useStakingParamsQuery();
+  const { data: cosmosDepositParams } = useDepositParamsQuery(stakingDenom);
   const minDeposit = cosmosDepositParams?.minDeposit;
 
   if (proposal instanceof SubstrateDemocracyReferendum) {
