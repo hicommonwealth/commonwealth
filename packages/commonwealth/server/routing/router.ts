@@ -1366,7 +1366,7 @@ function setupRouter(
   registerRoute(
     router,
     'put',
-    '/groups',
+    '/groups/:id',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,

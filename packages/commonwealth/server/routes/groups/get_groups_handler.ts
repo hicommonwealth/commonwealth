@@ -1,6 +1,6 @@
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
-import { GetGroupsResult } from 'server/controllers/server_groups_methods/get_groups';
+import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
 
 type GetGroupsQueryQuery = {
   members?: string;

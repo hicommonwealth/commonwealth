@@ -1,8 +1,8 @@
 import { ChainInstance } from 'server/models/chain';
 import { ServerChainsController } from '../server_chains_controller';
-import { AddressInstance } from 'server/models/address';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
-import { UserInstance } from 'server/models/user';
+import { AddressInstance } from '../../models/address';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import { UserInstance } from '../../models/user';
 
 export type CreateGroupOptions = {
   user: UserInstance;

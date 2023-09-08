@@ -1,5 +1,5 @@
 import { ServerChainsController } from '../server_chains_controller';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 export type GetGroupsOptions = {
   withMembers?: boolean;

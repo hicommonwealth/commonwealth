@@ -1,6 +1,11 @@
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
-import { RefreshMembershipResult } from 'server/controllers/server_groups_methods/refresh_membership';
+import { RefreshMembershipResult } from '../../controllers/server_groups_methods/refresh_membership';
+import { AppError } from '../../../../common-common/src/errors';
+
+const Errors = {
+  InvalidTopicId: 'Invalid topic ID',
+};
 
 type RefreshMembershipBody = {
   topic_id: number;
@@ -14,6 +19,9 @@ export const refreshMembershipHandler = async (
 ) => {
   const { user, address, chain } = req;
   const { topic_id: topicId } = req.body;
+  if (typeof topicId !== 'number') {
+    throw new AppError(Errors.InvalidTopicId);
+  }
   const result = await controllers.groups.refreshMembership({
     user,
     chain,

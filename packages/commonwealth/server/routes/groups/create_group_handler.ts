@@ -1,7 +1,15 @@
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
-import { CreateGroupResult } from 'server/controllers/server_groups_methods/create_group';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import { AppError } from '../../../../common-common/src/errors';
+import validateRequirements from '../../util/requirementsModule/validateRequirements';
+
+const Errors = {
+  InvalidMetadata: 'Invalid metadata',
+  InvalidRequirements: 'Invalid requirements',
+  InvalidTopics: 'Invalid topics',
+};
 
 type CreateGroupBody = {
   metadata: any; // TODO: use proper type
@@ -17,6 +25,19 @@ export const createGroupHandler = async (
 ) => {
   const { user, address, chain } = req;
   const { metadata, requirements, topics } = req.body;
+  if (!metadata) {
+    throw new AppError(Errors.InvalidMetadata);
+  }
+  if (!requirements || !validateRequirements(requirements)) {
+    throw new AppError(Errors.InvalidRequirements);
+  }
+  if (topics) {
+    for (const topicId of topics) {
+      if (typeof topicId !== 'number') {
+        throw new AppError(Errors.InvalidTopics);
+      }
+    }
+  }
   const result = await controllers.groups.createGroup({
     user,
     chain,
