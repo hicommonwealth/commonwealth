@@ -25,7 +25,7 @@ module.exports = {
       );
 
       await queryInterface.createTable(
-        'LastProcessedEvmBlock',
+        'LastProcessedEvmBlocks',
         {
           chain_node_id: {
             type: Sequelize.INTEGER,
