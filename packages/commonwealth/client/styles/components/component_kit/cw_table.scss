@@ -1,0 +1,56 @@
+@import '../../shared';
+
+.Table {
+  table{
+    border-collapse: collapse;
+    font-family: $font-family-neue-haas-unica;
+
+    thead {
+      background-color: $neutral-50;
+
+      tr {
+        th {
+          div.header-content {
+            padding: 14px 16px;
+            gap: 4px;
+            display: flex;
+
+            .header-text {
+              display: flex;
+              align-items: center;
+              font-size: 14px;
+              line-height: 20px;
+              letter-spacing: 0.14px;
+            }
+
+            .icon-container {
+              height: 24px;
+              width: 24px;
+              border-radius: $border-radius-corners-wider;
+              padding: 4px;
+
+              .Icon {
+                &.arrow-up-blue, &.arrow-down-blue {
+                  fill: none;
+                }
+              }
+
+              &:hover {
+                background-color: $neutral-100;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $neutral-200;
+        td {
+          padding: 14px 16px;
+        }
+      }
+    }
+  }
+}

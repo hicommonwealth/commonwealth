@@ -52,6 +52,35 @@ import type { IconProps, IconStyleProps } from './types';
 //   }
 // }
 
+export const CWArrowDownBlue500 = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="none"
+      viewBox="0 0 16 16"
+      {...otherProps}
+    >
+      <path d="M8 2.5V13.5" stroke="#338FFF" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M3.5 9L8 13.5L12.5 9" stroke="#338FFF" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  );
+};
+
 export const CWArrowFatUp = (props: IconProps) => {
   const {
     className,
@@ -225,6 +254,64 @@ export const CWArrowRight = (props: IconProps) => {
         d="M29.764 16.418a.482.482 0 000-.836L16.727 8.065a.483.483 0 00-.724.418V15h-13.5a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h13.5v6.517c0 .371.402.603.724.418l13.037-7.517z"
         clipRule="evenodd"
       ></path>
+    </svg>
+  );
+};
+
+export const CWArrowUpBlue500 = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="none"
+      viewBox="0 0 16 16"
+      {...otherProps}
+    >
+    <path d="M8 13.5V2.5" stroke="#338FFF" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M3.5 7L8 2.5L12.5 7" stroke="#338FFF" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  );
+};
+
+export const CWArrowUpNeutral400 = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="none"
+      viewBox="0 0 16 16"
+      {...otherProps}
+    >
+      <path d="M8 13.5V2.5" stroke="#A09DA1" stroke-linecap="round" stroke-linejoin="round"> </path>
+      <path d="M3.5 7L8 2.5L12.5 7" stroke="#A09DA1" stroke-linecap="round" stroke-linejoin="round"></path>
     </svg>
   );
 };

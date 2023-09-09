@@ -52,6 +52,7 @@ import {
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
+import { CWTable } from './cw_table';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -1363,6 +1364,10 @@ export const ComponentShowcase = () => {
             />
           )}
         />
+      </div>
+      <div className="table">
+        <CWText type="h3">Table</CWText>
+        <CWTable />
       </div>
     </div>
   );
