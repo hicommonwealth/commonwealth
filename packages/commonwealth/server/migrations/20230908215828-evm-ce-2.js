@@ -18,7 +18,7 @@ module.exports = {
           },
           contract_address: { type: Sequelize.STRING, allowNull: false },
           event_signature: { type: Sequelize.STRING, allowNull: false },
-          kind: { type: Sequelize.STRING, allowNull: true },
+          kind: { type: Sequelize.STRING, allowNull: false },
           unique: ['chain_node_id', 'contract_address', 'event_signature'],
         },
         { transaction }
