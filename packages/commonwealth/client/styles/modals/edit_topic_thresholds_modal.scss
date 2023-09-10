@@ -1,6 +1,8 @@
 @import '../shared';
 
 .EditTopicThresholdsModal {
+  width: 100%;
+
   .EditTopicThresholdsBody {
     display: flex;
     flex-direction: column;

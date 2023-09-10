@@ -4,10 +4,11 @@
   display: flex;
   flex-direction: column;
   height: 400px;
+  width: 100%;
 
   .OffchainVotingModalBody {
     overflow-y: auto;
-    width: 640px;
+    width: 100%;
 
     @include extraSmall {
       width: initial;
