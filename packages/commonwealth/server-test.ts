@@ -117,12 +117,14 @@ const resetServer = (debug = false): Promise<void> => {
           'https://rpc-osmosis.ecostake.com',
           'Osmosis',
           null,
+          'osmosis',
           BalanceType.Cosmos,
         ],
         [
           'https://cosmos-devnet.herokuapp.com/rpc',
           'Cosmos SDK v0.46.11 devnet',
           null,
+          'csdkbetaci',
           BalanceType.Cosmos,
           'https://cosmos-devnet.herokuapp.com/lcd/',
         ],
@@ -130,17 +132,26 @@ const resetServer = (debug = false): Promise<void> => {
 
       const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkNode] =
         await Promise.all(
-          nodes.map(([url, name, eth_chain_id, balance_type, alt_wallet_url]) =>
-            models.ChainNode.create({
+          nodes.map(
+            ([
               url,
               name,
-              eth_chain_id: eth_chain_id ? +eth_chain_id : null,
-              balance_type:
-                balance_type || eth_chain_id
-                  ? BalanceType.Ethereum
-                  : BalanceType.Substrate,
+              eth_chain_id,
+              cosmos_chain_id,
+              balance_type,
               alt_wallet_url,
-            })
+            ]) =>
+              models.ChainNode.create({
+                url,
+                name,
+                eth_chain_id: eth_chain_id ? +eth_chain_id : null,
+                cosmos_chain_id: cosmos_chain_id || null,
+                balance_type:
+                  balance_type || eth_chain_id
+                    ? BalanceType.Ethereum
+                    : BalanceType.Substrate,
+                alt_wallet_url,
+              })
           )
         );
 

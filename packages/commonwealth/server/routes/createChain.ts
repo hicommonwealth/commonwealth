@@ -52,6 +52,8 @@ export const Errors = {
     'The id for this chain already exists, please choose another id',
   ChainNameExists:
     'The name for this chain already exists, please choose another name',
+  ChainNameExistsForNode:
+    'The chain name for this node already exists, please choose another name',
   InvalidIconUrl: 'Icon url must begin with https://',
   InvalidWebsite: 'Website must begin with https://',
   InvalidDiscord: 'Discord must begin with https://',
@@ -271,6 +273,7 @@ const createChain = async (
   const {
     id,
     name,
+    cosmos_chain_id,
     default_symbol,
     icon_url,
     description,
@@ -309,10 +312,21 @@ const createChain = async (
     return next(new AppError(Errors.ChainNameExists));
   }
 
+  const oldChainNode = await models.ChainNode.findOne({
+    where: { [Op.or]: [{ cosmos_chain_id: req.body.cosmos_chain_id }] },
+  });
+  if (
+    oldChainNode &&
+    oldChainNode.cosmos_chain_id === req.body.cosmos_chain_id
+  ) {
+    return next(new AppError(Errors.ChainNameExistsForNode));
+  }
+
   const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
     where: { url },
     defaults: {
       eth_chain_id,
+      cosmos_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
       balance_type:
