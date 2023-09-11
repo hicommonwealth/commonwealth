@@ -1,9 +1,10 @@
-import type { Action, Session } from '@canvas-js/interfaces';
 import moment from 'moment';
 import type { DeltaStatic } from 'quill';
 import React, { useState, useEffect } from 'react';
 import app from 'state';
 import { verify } from 'canvas';
+import type { Action, Session } from '@canvas-js/interfaces';
+import type Comment from 'models/Comment';
 
 import type Comment from 'models/Comment';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
@@ -11,6 +12,8 @@ import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popove
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
@@ -20,7 +23,6 @@ import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { SharePopover } from 'views/components/share_popover';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type CommentCardProps = {
   // Edit
@@ -75,6 +77,7 @@ export const CommentCard = ({
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
+  const author = app.chain.accounts.get(comment.author);
 
   const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
     useState<boolean>(false);
@@ -111,7 +114,8 @@ export const CommentCard = ({
           <span>[deleted]</span>
         ) : (
           <AuthorAndPublishInfo
-            authorInfo={app.chain.accounts.get(comment.author)}
+            authorAddress={author.address}
+            authorChainId={author.chain?.id || author?.profile?.chain}
             publishDate={moment(comment.createdAt).format('l')}
             discord_meta={comment.discord_meta}
           />

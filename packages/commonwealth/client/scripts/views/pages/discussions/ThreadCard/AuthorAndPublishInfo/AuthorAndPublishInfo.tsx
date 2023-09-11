@@ -1,10 +1,6 @@
-import React from 'react';
 import { threadStageToLabel } from 'helpers';
-import type Account from '../../../../../models/Account';
-import AddressInfo from '../../../../../models/AddressInfo';
-import MinimumProfile from '../../../../../models/MinimumProfile';
-import { IThreadCollaborator } from '../../../../../models/Thread';
-import { ThreadStage } from '../../../../../models/types';
+import moment from 'moment';
+import React from 'react';
 import {
   Popover,
   usePopover,
@@ -12,15 +8,17 @@ import {
 import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
-import { User } from 'views/components/user/user';
-import './AuthorAndPublishInfo.scss';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';
-import moment from 'moment';
+import { User } from 'views/components/user/user';
+import { IThreadCollaborator } from '../../../../../models/Thread';
+import { ThreadStage } from '../../../../../models/types';
 import { NewThreadTag } from '../../NewThreadTag';
+import './AuthorAndPublishInfo.scss';
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
-  authorInfo: Account | AddressInfo | MinimumProfile | undefined;
+  authorAddress: string;
+  authorChainId: string;
   discord_meta?: {
     user: { id: string; username: string };
     channel_id: string;
@@ -43,7 +41,8 @@ export type AuthorAndPublishInfoProps = {
 
 export const AuthorAndPublishInfo = ({
   isHot,
-  authorInfo,
+  authorAddress,
+  authorChainId,
   isLocked,
   lockedAt,
   lastUpdated,
@@ -71,10 +70,11 @@ export const AuthorAndPublishInfo = ({
     <div className="AuthorAndPublishInfo">
       <User
         avatarSize={24}
-        user={authorInfo}
-        popover
-        linkify
-        showAddressWithDisplayName={
+        userAddress={authorAddress}
+        userChainId={authorChainId}
+        shouldShowPopover
+        shouldLinkProfile
+        shouldShowAddressWithDisplayName={
           fromDiscordBot ? false : showUserAddressWithInfo
         }
       />
@@ -112,11 +112,10 @@ export const AuthorAndPublishInfo = ({
                   {collaboratorsInfo.map(({ address, chain }) => {
                     return (
                       <User
-                        linkify
+                        shouldLinkProfile
                         key={address}
-                        user={
-                          new AddressInfo({ id: null, address, chainId: chain })
-                        }
+                        userAddress={address}
+                        userChainId={chain}
                       />
                     );
                   })}

@@ -1,8 +1,6 @@
 import React from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
-import AddressInfo from '../../../models/AddressInfo';
-import ChainInfo from '../../../models/ChainInfo';
 import { CWText } from '../component_kit/cw_text';
 
 const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
@@ -16,22 +14,17 @@ export const getDisplayedReactorsForPopup = ({
 }: ReactorProps) => {
   const slicedReactors = reactors
     .slice(0, MAX_VISIBLE_REACTING_ACCOUNTS)
-    .map((rxn) => {
+    .map((reactorAddress) => {
       return (
         <div
-          key={rxn + '#' + (app.chain?.id || app.chain)}
+          key={reactorAddress + '#' + (app.chain?.id || app.chain)}
           style={{ display: 'flex', width: '120px' }}
         >
           <CWText noWrap>
             <User
-              user={
-                new AddressInfo({
-                  id: null,
-                  address: rxn,
-                  chainId: app.chain.id,
-                })
-              }
-              linkify
+              userAddress={reactorAddress}
+              userChainId={app.chain.id}
+              shouldLinkProfile
             />
           </CWText>
         </div>

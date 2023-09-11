@@ -2,18 +2,17 @@ import { ChainNetwork, WalletSsoSource } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import 'components/component_kit/cw_wallets_list.scss';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import AddressInfo from '../../../models/AddressInfo';
-import IWebWallet from '../../../models/IWebWallet';
 import React from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
+import IWebWallet from '../../../models/IWebWallet';
 import { User } from '../user/user';
+import { CWAuthButton, CWNoAuthMethodsAvailable } from './cw_auth_button';
+import { CWDivider } from './cw_divider';
 import { CWIconButton } from './cw_icon_button';
 import { Modal } from './cw_modal';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWText } from './cw_text';
-import { CWNoAuthMethodsAvailable, CWAuthButton } from './cw_auth_button';
-import { CWDivider } from './cw_divider';
 import { getClasses } from './helpers';
 
 const LinkAccountItem = (props: {
@@ -50,14 +49,9 @@ const LinkAccountItem = (props: {
       <div className="account-item-avatar">
         <div className="account-user">
           <User
-            user={
-              new AddressInfo({
-                id: null,
-                address,
-                chainId: app.chain?.id || walletNetwork,
-              })
-            }
-            avatarOnly
+            userAddress={address}
+            userChainId={app.chain?.id || walletNetwork}
+            shouldShowAvatarOnly
             avatarSize={40}
           />
         </div>
@@ -67,14 +61,9 @@ const LinkAccountItem = (props: {
         <div className="account-item-address">
           <div className="account-user">
             <User
-              user={
-                new AddressInfo({
-                  id: null,
-                  address,
-                  chainId: app.chain?.id || walletNetwork,
-                })
-              }
-              hideAvatar
+              userAddress={address}
+              userChainId={app.chain?.id || walletNetwork}
+              shouldHideAvatar
             />
           </div>
         </div>

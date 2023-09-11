@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
+import { featureFlags } from 'helpers/feature-flags';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
-import AddressInfo from '../../../models/AddressInfo';
+import { useToggleCommunityStarMutation } from 'state/api/communities';
+import useSidebarStore from 'state/ui/sidebar';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -11,9 +14,6 @@ import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
-import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import useSidebarStore from 'state/ui/sidebar';
-import { featureFlags } from 'helpers/feature-flags';
 
 type CWSidebarMenuItemProps = {
   isStarred?: boolean;
@@ -23,6 +23,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
   const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
+  const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
   if (props.type === 'default') {
     const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
@@ -76,20 +77,18 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           <div className="roles-and-star">
             <User
               avatarSize={18}
-              avatarOnly
-              user={
-                new AddressInfo({
-                  id: roles[0].address_id,
-                  address: roles[0].address,
-                  chainId: roles[0].address_chain || roles[0].chain_id,
-                })
-              }
+              shouldShowAvatarOnly
+              userAddress={roles[0].address}
+              userChainId={roles[0].address_chain || roles[0].chain_id}
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
-                await app.communities.setStarred(item.id);
+                await toggleCommunityStar({
+                  chain: item.id,
+                  isAlreadyStarred: app.user.isCommunityStarred(item.id),
+                });
                 setIsStarred((prevState) => !prevState);
               }}
             />
@@ -132,7 +131,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             ...item,
             isStarred:
               item.type === 'community'
-                ? app.communities.isStarred(item.community.id)
+                ? app.user.isCommunityStarred(item.community.id)
                 : false,
           };
 

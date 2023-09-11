@@ -1,32 +1,30 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import _ from 'underscore';
-import type { DeltaStatic } from 'quill';
-
 import 'components/edit_profile.scss';
-
-import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import NewProfilesController from '../../controllers/server/newProfiles';
+import type { DeltaStatic } from 'quill';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import app from 'state';
+import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
+import _ from 'underscore';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import MinimumProfile from '../../models/MinimumProfile';
 import NewProfile from '../../models/NewProfile';
-import { CWButton } from './component_kit/cw_button';
-import { CWTextInput } from './component_kit/cw_text_input';
+import { PageNotFound } from '../pages/404';
 import { AvatarUpload } from './Avatar';
-import { CWSpinner } from './component_kit/cw_spinner';
-import { CWText } from './component_kit/cw_text';
+import { CWButton } from './component_kit/cw_button';
+import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
+import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
 import { CWDivider } from './component_kit/cw_divider';
 import { CWForm } from './component_kit/cw_form';
 import { CWFormSection } from './component_kit/cw_form_section';
 import { CWSocials } from './component_kit/cw_socials';
-import type { ImageBehavior } from './component_kit/cw_cover_image_uploader';
-import { CWCoverImageUploader } from './component_kit/cw_cover_image_uploader';
-import { PageNotFound } from '../pages/404';
+import { CWSpinner } from './component_kit/cw_spinner';
+import { CWText } from './component_kit/cw_text';
+import { CWTextInput } from './component_kit/cw_text_input';
 import { LinkedAddresses } from './linked_addresses';
-import { createDeltaFromText, ReactQuillEditor } from './react_quill_editor';
+import { ReactQuillEditor, createDeltaFromText } from './react_quill_editor';
 import { deserializeDelta, serializeDelta } from './react_quill_editor/utils';
 
 enum EditProfileError {
@@ -55,6 +53,13 @@ const EditProfileComponent = () => {
   const [displayNameValid, setDisplayNameValid] = useState(true);
   const [account, setAccount] = useState<Account>();
   const backgroundImageRef = useRef<Image>();
+
+  const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation({
+    addressesWithChainsToUpdate: addresses?.map((a) => ({
+      address: a.address,
+      chain: a.chain.id,
+    })),
+  });
 
   const getProfile = async () => {
     try {
@@ -101,35 +106,6 @@ const EditProfileComponent = () => {
     setLoading(false);
   };
 
-  const updateProfile = async (profileUpdate: any) => {
-    try {
-      const response = await axios.post(`${app.serverUrl()}/updateProfile/v2`, {
-        profileId: profile.id,
-        ...profileUpdate,
-        jwt: app.user.jwt,
-      });
-
-      if (response.data.status === 'Success') {
-        setTimeout(() => {
-          // refresh profiles in store
-          addresses.forEach((a) => {
-            NewProfilesController.Instance.updateProfileForAccount(
-              a.address,
-              profileUpdate
-            );
-          });
-          setLoading(false);
-          navigate(`/profile/id/${profile.id}`);
-        }, 1500);
-      }
-    } catch (err) {
-      setTimeout(() => {
-        setLoading(false);
-        notifyError(err.responseJSON?.error || 'Something went wrong.');
-      }, 1500);
-    }
-  };
-
   const checkForUpdates = () => {
     const profileUpdate: any = {};
 
@@ -152,13 +128,25 @@ const EditProfileComponent = () => {
       );
 
     if (Object.keys(profileUpdate)?.length > 0) {
-      updateProfile(profileUpdate);
+      updateProfile({
+        ...profileUpdate,
+        profileId: profile.id,
+        address: app.user.activeAccount?.address,
+        chain: app.user.activeAccount?.chain,
+      })
+        .then(() => {
+          navigate(`/profile/id/${profile.id}`);
+        })
+        .catch((err) => {
+          notifyError(err?.responseJSON?.error || 'Something went wrong.');
+        });
     } else {
       setTimeout(() => {
-        setLoading(false);
         navigate(`/profile/id/${profile.id}`);
       }, 1500);
     }
+
+    setLoading(false);
   };
 
   const handleSaveProfile = () => {

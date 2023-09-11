@@ -4,15 +4,14 @@ import { notifyError } from 'controllers/app/notifications';
 
 import 'pages/manage_community/manage_roles.scss';
 
+import axios from 'axios';
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { User } from 'views/components/user/user';
-import AddressInfo from '../../../models/AddressInfo';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import RoleInfo from '../../../models/RoleInfo';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { useCommonNavigate } from 'navigation/helpers';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import axios from 'axios';
 
 type ManageRoleRowProps = {
   label: string;
@@ -134,18 +133,11 @@ export const ManageRoles = ({
           return (
             <div className="role-row" key={addr.id}>
               <User
-                user={
-                  new AddressInfo({
-                    id: addr.id,
-                    address: addr.address,
-                    chainId: role.chain_id,
-                    walletId: addr.walletId,
-                    walletSsoSource: addr.walletSsoSource,
-                  })
-                } // role.Address, // make AddressInfo?
-                popover
-                linkify
-                hideAvatar
+                userAddress={addr.address}
+                userChainId={role.chain_id}
+                shouldShowPopover
+                shouldLinkProfile
+                shouldHideAvatar
               />
               <CWIcon
                 iconName="close"

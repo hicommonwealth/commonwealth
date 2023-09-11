@@ -5,7 +5,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/notification_settings/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import AddressInfo from '../../../models/AddressInfo';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
@@ -19,11 +18,11 @@ import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
-import { bundleSubs } from './helpers';
 import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
+import { bundleSubs } from './helpers';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -422,25 +421,15 @@ const NotificationSettingsPage = () => {
                         if (sub.Thread?.chain) {
                           return (
                             <User
-                              user={
-                                new AddressInfo({
-                                  id: null,
-                                  address: sub.Thread.author,
-                                  chainId: sub.Thread.chain,
-                                })
-                              }
+                              userAddress={sub.Thread.author}
+                              userChainId={sub.Thread.chain}
                             />
                           );
                         } else if (sub.Comment?.chain) {
                           return (
                             <User
-                              user={
-                                new AddressInfo({
-                                  id: null,
-                                  address: sub.Comment.author,
-                                  chainId: sub.Comment.chain,
-                                })
-                              }
+                              userAddress={sub.Comment.author}
+                              userChainId={sub.Comment.chain}
                             />
                           );
                         } else {

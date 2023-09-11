@@ -70,6 +70,7 @@ const ManageCommunityPage = () => {
         ...(profile.roles[0] || {}),
         Address: profile.addresses[0],
         id: profile.addresses[0].id,
+        displayName: profile.profile_name || 'Anonymous',
       };
     });
   }, [searchResults]);

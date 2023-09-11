@@ -150,16 +150,9 @@ export const CWContentPage = ({
         {...(thread?.updatedAt && {
           lastUpdated: thread.updatedAt.toISOString(),
         })}
-        authorInfo={
-            author &&
-            new AddressInfo({
-              id: null,
-              address: author?.address,
-              chainId:
-                  typeof author.chain === 'string'
-                      ? author.chain
-                      : author.chain.id,
-            })
+        authorAddress={author?.address}
+        authorChainId={
+          typeof author.chain === 'string' ? author.chain : author.chain.id
         }
         collaboratorsInfo={collaborators}
         publishDate={

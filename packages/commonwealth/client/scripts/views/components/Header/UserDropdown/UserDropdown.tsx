@@ -160,7 +160,11 @@ const UserDropdown = () => {
             className={clsx('UserDropdownTriggerButton', { isOpen })}
             onClick={onClick}
           >
-            <User avatarSize={24} user={user} onClick={() => null} />
+            <User
+              avatarSize={24}
+              userAddress={user.address}
+              userChainId={user.chain?.id}
+            />
             <CWIcon
               iconName={isOpen ? 'caretUp' : 'caretDown'}
               iconSize="small"
