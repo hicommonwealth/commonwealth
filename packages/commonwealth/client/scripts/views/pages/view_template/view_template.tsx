@@ -48,9 +48,15 @@ type Json = {
   };
 };
 
-const ViewTemplatePage = () => {
+type ViewTemplateFormProps = {
+  contract_address?: string;
+  slug?: string;
+  setTemplateNickname(name: string): any;
+};
+
+const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
   const navigate = useCommonNavigate();
-  const params = useParams();
+  const params = formData ?? useParams();
   const [formState, setFormState] = useState({});
   const [json, setJson] = useState<Json>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -71,11 +77,18 @@ const ViewTemplatePage = () => {
     });
 
     if (!contractInStore || !templateMetadata) {
+      if (formData) return <div>No Contract Available</div>;
       navigate('/404', {}, null);
     }
 
     setCurrentContract(contractInStore);
     setTemplateNickname(templateMetadata.cctmd.nickname);
+    if (
+      params.setTemplateNickname &&
+      typeof params.setTemplateNickname === 'function'
+    ) {
+      params.setTemplateNickname(templateMetadata.cctmd.nickname);
+    }
 
     app.contracts
       .getTemplatesForContract(contractInStore.id)
@@ -403,11 +416,12 @@ const ViewTemplatePage = () => {
   };
 
   if (!json) {
+    if (formData) return <div>No Contract Available</div>;
     return;
   }
 
   return (
-    <div className="ViewTemplatePage">
+    <div className={formData ? 'ViewTemplateForm' : 'ViewTemplatePage'}>
       <CWBreadcrumbs
         breadcrumbs={[
           { label: 'Contracts', path: `/contracts`, navigate },

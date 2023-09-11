@@ -26,7 +26,7 @@ import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource } from '../../../models/Thread';
+import { Link, LinkSource, LinkDisplay } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -52,6 +52,9 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 import { useSearchParams } from 'react-router-dom';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import { TemplateActionCard } from './templateActionCard';
+import { ViewTemplateFormCard } from './viewTemplateFormCard';
+import ViewTemplate from '../view_template/view_template';
 
 import 'pages/view_thread/index.scss';
 
@@ -97,6 +100,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const [searchParams] = useSearchParams();
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
+  const [hideTemplate, setHideTemplate] = useState(false);
 
   const {
     data,
@@ -243,6 +247,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+  const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
@@ -257,11 +262,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
+  const showTemplateOptions = isAuthor || isAdminOrMod;
+  const showLinkedTemplateOptions = linkedTemplates.length > 0;
+
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
   const canComment =
     !!hasJoinedCommunity ||
     (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
+
+  const handleLinkedTemplateChange = (links: Link[]) => {};
 
   const handleNewSnapshotChange = async ({
     id,
@@ -419,6 +429,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ) : (
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
+                {showLinkedTemplateOptions &&
+                  linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
+                    <ViewTemplate
+                      contract_address={
+                        linkedTemplates[0]?.identifier.split('/')[1]
+                      }
+                      slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                      setTemplateNickname={null}
+                    />
+                  )}
                 {thread.readOnly || fromDiscordBot ? (
                   <>
                     {threadOptionsComp}
@@ -584,6 +604,37 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               onPollCreate={() => setInitializedPolls(false)}
                             />
                           )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showLinkedTemplateOptions &&
+            linkedTemplates[0]?.display !== LinkDisplay.inline
+              ? [
+                  {
+                    label: 'View Template',
+                    item: (
+                      <div className="cards-column">
+                        <ViewTemplateFormCard
+                          address={linkedTemplates[0]?.identifier.split('/')[1]}
+                          slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                        />
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showTemplateOptions
+              ? [
+                  {
+                    label: 'Template',
+                    item: (
+                      <div className="cards-column">
+                        <TemplateActionCard
+                          thread={thread}
+                          onChangeHandler={handleLinkedTemplateChange}
+                        />
                       </div>
                     ),
                   },
