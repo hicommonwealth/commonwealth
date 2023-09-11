@@ -45,7 +45,7 @@ const Web3LoginPage = () => {
         {
           jwt: app.user.jwt,
           token,
-        }
+        },
       );
 
       if (status === 'Success') {
@@ -55,8 +55,13 @@ const Web3LoginPage = () => {
       } else {
         console.error('Unknown error occurred', status, result);
       }
-    } catch (e) {
-      setErrorMsg(e.responseJSON.error);
+    } catch (err) {
+      let msg = 'Failed to log in.';
+
+      if (err.response?.data?.status === 400 && err.response?.data?.error) {
+        msg = err.response.data.error;
+        setErrorMsg(msg);
+      }
     }
   };
 

@@ -86,7 +86,7 @@ const FinishNearLogin = () => {
       const chainId = 'mainnet';
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
-        chainId
+        chainId,
       );
 
       // We do not add blockInfo for NEAR
@@ -95,7 +95,7 @@ const FinishNearLogin = () => {
         WalletId.NearWallet,
         chain.id,
         sessionPublicAddress,
-        null
+        null,
       );
 
       const canvasMessage = constructCanvasMessage(
@@ -104,7 +104,7 @@ const FinishNearLogin = () => {
         acct.address,
         sessionPublicAddress,
         +new Date(),
-        null // no blockhash
+        null, // no blockhash
       );
 
       setIsNewAccount(newAcct.newlyCreated);
@@ -117,7 +117,7 @@ const FinishNearLogin = () => {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
-        canvas.serializeSessionPayload(canvasMessage)
+        canvas.serializeSessionPayload(canvasMessage),
       );
 
       await acct.validate(signature, canvasMessage.sessionIssued, chainId);
@@ -135,9 +135,12 @@ const FinishNearLogin = () => {
 
       setValidatedAccount(acct);
     } catch (err) {
-      setValidationError(
-        err.responseJSON ? err.responseJSON.error : err.message
-      );
+      let msg = 'Failed to validate wallet';
+
+      if (err.response?.data?.status === 400 && err.response?.data?.error) {
+        msg = err.response?.data?.error;
+      }
+      setValidationError(msg);
       return;
     }
 
@@ -199,7 +202,7 @@ const FinishNearLogin = () => {
 
         const res = await $.post(
           `${app.serverUrl()}/createChain`,
-          chainCreateArgs
+          chainCreateArgs,
         );
 
         await initAppState(false);
@@ -272,7 +275,7 @@ const FinishNearLogin = () => {
 
     const wallet = new WalletAccount(
       (app.chain as Near).chain.api,
-      'commonwealth_near'
+      'commonwealth_near',
     );
 
     if (wallet.isSignedIn()) {

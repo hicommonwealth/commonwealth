@@ -68,7 +68,7 @@ class PollsController {
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
-            : 'Failed to fetch thread polls'
+            : 'Failed to fetch thread polls',
         );
       },
     });
@@ -112,7 +112,7 @@ class PollsController {
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
-            : 'Failed to initialize polling'
+            : 'Failed to initialize polling',
         );
       },
     });
@@ -142,7 +142,7 @@ class PollsController {
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
-            : 'Failed to delete poll'
+            : 'Failed to delete poll',
         );
       },
     });

@@ -56,7 +56,7 @@ export const EditCollaboratorsModal = ({
           app.activeChainId(),
           30,
           1,
-          true
+          true,
         );
 
         const results: Array<RoleInstanceWithPermissionAttributes> =
@@ -66,7 +66,8 @@ export const EditCollaboratorsModal = ({
               Address: profile.addresses[0],
             }))
             .filter(
-              (role) => role.Address.address !== app.user.activeAccount?.address
+              (role) =>
+                role.Address.address !== app.user.activeAccount?.address,
             );
 
         setSearchResults(results);
@@ -172,10 +173,10 @@ export const EditCollaboratorsModal = ({
             onClick={async () => {
               const newCollaborators = collaborators.filter(
                 (c1) =>
-                  !thread.collaborators.some((c2) => c1.address === c2.address)
+                  !thread.collaborators.some((c2) => c1.address === c2.address),
               );
               const removedCollaborators = (thread.collaborators as any).filter(
-                (c1) => !collaborators.some((c2) => c1.address === c2.address)
+                (c1) => !collaborators.some((c2) => c1.address === c2.address),
               );
 
               if (
@@ -200,10 +201,15 @@ export const EditCollaboratorsModal = ({
                   onCollaboratorsUpdated &&
                     onCollaboratorsUpdated(updatedThread.collaborators);
                 } catch (err) {
-                  const error =
-                    err?.responseJSON?.error ||
-                    'Failed to update collaborators';
-                  notifyError(error);
+                  let msg = 'Failed to update collaborators';
+
+                  if (
+                    err.response?.data?.status === 400 &&
+                    err.response?.data?.error
+                  ) {
+                    msg = err.response.data.error;
+                    notifyError(msg);
+                  }
                 }
               }
 

@@ -203,7 +203,7 @@ const app: IApp = {
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedChain = true,
-  shouldRedraw = true
+  shouldRedraw = true,
 ): Promise<void> {
   try {
     const [
@@ -235,18 +235,18 @@ export async function initAppState(
         app.config.chains.add(
           ChainInfo.fromJSON({
             ChainNode: app.config.nodes.getById(
-              chainsWithSnapshots.chain.chain_node_id
+              chainsWithSnapshots.chain.chain_node_id,
             ),
             snapshot: chainsWithSnapshots.snapshot,
             ...chainsWithSnapshots.chain,
-          })
+          }),
         );
       });
 
     app.roles.setRoles(statusRes.result.roles);
     app.config.notificationCategories =
       statusRes.result.notificationCategories.map((json) =>
-        NotificationCategory.fromJSON(json)
+        NotificationCategory.fromJSON(json),
       );
     app.config.chainCategoryMap = statusRes.result.chainCategoryMap;
 
@@ -282,7 +282,7 @@ export async function initAppState(
     }
 
     app.user.setStarredCommunities(
-      statusRes.result.user ? statusRes.result.user.starredCommunities : []
+      statusRes.result.user ? statusRes.result.user.starredCommunities : [],
     );
     // update the selectedChain, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
@@ -292,12 +292,15 @@ export async function initAppState(
       statusRes.result.user.selectedChain
     ) {
       app.user.setSelectedChain(
-        ChainInfo.fromJSON(statusRes.result.user.selectedChain)
+        ChainInfo.fromJSON(statusRes.result.user.selectedChain),
       );
     }
   } catch (err) {
-    app.loadingError =
-      err.responseJSON?.error || 'Error loading application state';
+    const msg = 'Error leading application state';
+    if (err.response?.data?.status === 400 && err.response?.data?.error) {
+      app.loadingError = err.response.data.error || msg;
+    }
+
     throw err;
   }
 }

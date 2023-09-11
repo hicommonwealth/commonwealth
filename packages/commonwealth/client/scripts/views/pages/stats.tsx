@@ -123,11 +123,13 @@ const StatsPage = () => {
             roles,
             threads,
             activeAccounts,
-          })
+          }),
         );
       } catch (err) {
-        if (err.responseJSON?.error) {
-          setError(err.responseJSON.error);
+        let msg = 'Failed to get communtiy stats';
+        if (err.response?.data?.status === 400 && err.response?.data?.error) {
+          msg = err.response.data.error;
+          setError(msg);
         } else if (err.responseText) {
           setError(err.responseText);
         } else {

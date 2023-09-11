@@ -83,7 +83,7 @@ export const NewThreadForm = () => {
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
       deltaString,
-      !!hasTopics
+      !!hasTopics,
     );
 
     setIsSaving(true);
@@ -127,7 +127,7 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      topicsForSelector.find((t) => t.name.includes('General')) || null
+      topicsForSelector.find((t) => t.name.includes('General')) || null,
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
