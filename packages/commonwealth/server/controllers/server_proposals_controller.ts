@@ -118,7 +118,6 @@ export class ServerProposalsController {
         {
           model: this.models.ChainNode,
           required: true,
-          attributes: ['id', 'private_url', 'url'],
         },
       ],
     });
@@ -129,7 +128,7 @@ export class ServerProposalsController {
 
     // only Aave and Compound contracts on Ethereum are supported: ChainNode.id = 37 is the Ethereum RPC
     if (
-      chain.ChainNode.id != 37 ||
+      chain.ChainNode.name !== 'Ethereum (Mainnet)' ||
       (chain.network !== ChainNetwork.Aave &&
         chain.network !== ChainNetwork.Compound &&
         chain.base !== 'ethereum')
