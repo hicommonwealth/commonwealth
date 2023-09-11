@@ -3709,12 +3709,21 @@
   resolved "https://registry.yarnpkg.com/@juggle/resize-observer/-/resize-observer-3.4.0.tgz#08d6c5e20cf7e4cc02fd181c4b0c225cd31dbb60"
   integrity sha512-dfLbk+PwWvFzSxwk3n5ySL0hfBog779o8h68wK/7/APo/7cgyWp5jcXockbxdk5kFRkbeXWm4Fbi9FrdN381sA==
 
-"@keplr-wallet/types@^0.12.21":
-  version "0.12.21"
-  resolved "https://registry.yarnpkg.com/@keplr-wallet/types/-/types-0.12.21.tgz#2124f93f7cd13bf078775f25f0edef11d7936f79"
-  integrity sha512-VkWQ9iWZioY9z7pj8/wD0AP1T0reYz7tlRgW/etvpZOiKtKNA9eH5Khd4us30ps/P6pAj+H53GdjERC15U3tpQ==
+"@keplr-wallet/types@0.12.23", "@keplr-wallet/types@^0.12.23":
+  version "0.12.23"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/types/-/types-0.12.23.tgz#14db97b0d4a4f340279fd078bd0d1d741a0a79f6"
+  integrity sha512-PRnsoGswlWV5bwyqGw1o5dKCEY33s8Mgxd7HeqTX9L+Pj6TAapnBlyCxhXBp74W0QySIMe8it37VjhJqa9QWxA==
   dependencies:
     long "^4.0.0"
+
+"@keplr-wallet/unit@^0.12.23":
+  version "0.12.23"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/unit/-/unit-0.12.23.tgz#94692ac211dce9e52a121e8e390d5ac93197f489"
+  integrity sha512-8dVlzKSId2/cXzb2WSDUJJa7wNTwq2YVpAQAJT1DB+e+KL4QtVwfN+Muiv/Z9JzCuS/g9tjJn6tKx0aY3IpSbw==
+  dependencies:
+    "@keplr-wallet/types" "0.12.23"
+    big-integer "^1.6.48"
+    utility-types "^3.10.0"
 
 "@libp2p/interfaces@^3.3.1":
   version "3.3.2"
@@ -8930,7 +8939,7 @@ big-integer@1.6.36:
   resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.36.tgz#78631076265d4ae3555c04f85e7d9d2f3a071a36"
   integrity sha512-t70bfa7HYEA1D9idDbmuv7YbsbVkQ+Hp+8KFSul4aE5e/i1bjCNIRYJZlA8Q8p0r9T8cF/RVvwUgRA//FydEyg==
 
-big-integer@1.6.x, big-integer@^1.6.44:
+big-integer@1.6.x, big-integer@^1.6.44, big-integer@^1.6.48:
   version "1.6.51"
   resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.51.tgz#0df92a5d9880560d3ff2d5fd20245c889d130686"
   integrity sha512-GPEid2Y9QU1Exl1rpO9B2IPJGHPSupF5GnVIP0blYvNOMer2bTvSWs1jGOUg04hTmu67nmLsQ9TBo1puaotBHg==
@@ -25878,6 +25887,11 @@ utila@~0.4:
   version "0.4.0"
   resolved "https://registry.npmjs.org/utila/-/utila-0.4.0.tgz"
   integrity sha1-ihagXURWV6Oupe7MWxKk+lN5dyw=
+
+utility-types@^3.10.0:
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.10.0.tgz#ea4148f9a741015f05ed74fd615e1d20e6bed82b"
+  integrity sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==
 
 utils-merge@1.0.1, utils-merge@1.x.x, utils-merge@^1.0.1:
   version "1.0.1"
