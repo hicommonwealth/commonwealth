@@ -124,7 +124,6 @@ async function createNewMagicUser({
       {
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       },
       { transaction }
@@ -135,7 +134,6 @@ async function createNewMagicUser({
       {
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       },
       { transaction }

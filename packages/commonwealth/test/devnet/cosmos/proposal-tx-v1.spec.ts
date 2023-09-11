@@ -1,4 +1,5 @@
 import chai from 'chai';
+import { isDeliverTxSuccess } from '@cosmjs/stargate';
 
 import {
   ProposalStatus as ProposalStatusV1,
@@ -17,12 +18,16 @@ import {
   getCompletedProposalsV1,
 } from 'controllers/chain/cosmos/gov/v1/utils-v1';
 import { LCD } from 'chain-events/src/chains/cosmos/types';
-import { deposit, sendTx, setupTestSigner, waitOneBlock } from './helpers';
-import { isDeliverTxSuccess } from '@cosmjs/stargate';
+import {
+  deposit,
+  sendTx,
+  setupTestSigner,
+  waitOneBlock,
+} from './utils/helpers';
 
 const { expect, assert } = chai;
 
-const idV1 = 'csdk-v1'; // CI devnet
+const idV1 = 'csdk-v1'; // V1 CI devnet
 const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;
 const lcdUrl = `http://localhost:8080/cosmosLCD/${idV1}`;
 
@@ -57,11 +62,13 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 
     await waitOneBlock(rpcUrl);
+    await waitOneBlock(rpcUrl);
+    await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
     const onchainProposal = activeProposals[activeProposals?.length - 1];
-    expect(
-      (onchainProposal?.messages?.[0] as any)?.content?.['@type']
-    ).to.be.eql(expectedProposalType);
+    expect((onchainProposal?.messages?.[0] as any)?.content?.['@type']).to.eql(
+      expectedProposalType
+    );
   };
 
   const voteTest = async (

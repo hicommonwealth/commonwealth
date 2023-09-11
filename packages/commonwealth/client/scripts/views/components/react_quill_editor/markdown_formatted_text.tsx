@@ -14,7 +14,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
 import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
 import { renderTruncatedHighlights } from './highlighter';
-import removeMarkdown from 'markdown-to-text';
+import removeMd from 'remove-markdown';
 import { QuillRendererProps } from './quill_renderer';
 import { loadScript } from 'helpers';
 import { debounce } from 'lodash';
@@ -97,9 +97,14 @@ export const MarkdownFormattedText = ({
       return <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }}></div>;
     }
 
-    // get text from doc and replace new lines with spaces
-    const docText = removeMarkdown(doc).replace(/\n/g, ' ').replace(/\+/g, ' ');
+    let docText = doc;
+    try {
+      docText = removeMd(doc).replace(/\n/g, ' ').replace(/\+/g, ' ');
+    } catch (e) {
+      docText = doc;
+    }
 
+    // get text from doc and replace new lines with spaces
     const textWithHighlights = renderTruncatedHighlights(searchTerm, docText);
 
     // wrap all elements in span to avoid container-based positioning

@@ -1,10 +1,10 @@
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { getProposalUrlPath } from 'identifiers';
-import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
-import 'pages/discussions/index.scss';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
+
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { getProposalUrlPath } from 'identifiers';
+import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
@@ -19,6 +19,9 @@ import { useFetchTopicsQuery } from '../../../state/api/topics';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+
+import 'pages/discussions/index.scss';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -45,20 +48,23 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
 
-  const { fetchNextPage, data, isInitialLoading } = useFetchThreadsQuery({
-    chainId: app.activeChainId(),
-    queryType: 'bulk',
-    page: 1,
-    limit: 20,
-    topicId: (topics || []).find(({ name }) => name === topicName)?.id,
-    stage: stageName,
-    includePinnedThreads: true,
-    orderBy: featuredFilter,
-    toDate: dateCursor.toDate,
-    fromDate: dateCursor.fromDate,
-  });
+  const { fetchNextPage, data, isInitialLoading, hasNextPage } =
+    useFetchThreadsQuery({
+      chainId: app.activeChainId(),
+      queryType: 'bulk',
+      page: 1,
+      limit: 20,
+      topicId: (topics || []).find(({ name }) => name === topicName)?.id,
+      stage: stageName,
+      includePinnedThreads: true,
+      orderBy: featuredFilter,
+      toDate: dateCursor.toDate,
+      fromDate: dateCursor.fromDate,
+    });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
+
+  useManageDocumentTitle('Discussions');
 
   return (
     <div className="DiscussionsPage">
@@ -98,7 +104,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             />
           );
         }}
-        endReached={() => fetchNextPage()}
+        endReached={() => hasNextPage && fetchNextPage()}
         overscan={200}
         components={{
           EmptyPlaceholder: () =>

@@ -1,3 +1,5 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { notifyError } from 'controllers/app/notifications';
 import {
   getPower,
@@ -11,7 +13,6 @@ import {
 } from 'helpers/snapshot_utils';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { LinkSource } from 'models/Thread';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useGetThreadsByLinkQuery } from 'state/api/threads';
 import AddressInfo from '../../../models/AddressInfo';
@@ -25,6 +26,7 @@ import { SnapshotInformationCard } from './snapshot_information_card';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { SnapshotVotesTable } from './snapshot_votes_table';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type ViewSnapshotProposalPageProps = {
   identifier: string;
@@ -79,6 +81,8 @@ export const ViewSnapshotProposalPage = ({
     }
     return new AddressInfo(null, proposal.author, activeChainId, null);
   }, [proposal, activeChainId]);
+
+  useManageDocumentTitle('View snapshot proposal', proposal?.title);
 
   const { isWindowLarge } = useBrowserWindow({});
 

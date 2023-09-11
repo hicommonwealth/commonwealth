@@ -14,7 +14,6 @@ function fmtAddr(addr: string) {
  * such that we can display a notification regarding its contents.
  */
 export const Label: LabelerFilter = (
-  blockNumber: number,
   chainId: string,
   data: IEventData
 ): IEventLabel => {

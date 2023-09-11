@@ -5,6 +5,10 @@ import type {
   NotificationsReadInstance,
 } from './notifications_read';
 import type { ModelInstance, ModelStatic } from './types';
+import { StatsDController } from 'common-common/src/statsd';
+
+import { factory, formatFilename } from 'common-common/src/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 export type NotificationAttributes = {
   id: number;
@@ -41,6 +45,36 @@ export default (
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
     },
     {
+      hooks: {
+        afterCreate: async (notification) => {
+          let id, category_id, thread_id;
+          const { Thread } = sequelize.models;
+          try {
+            ({ id, category_id, thread_id } = notification);
+            if (
+              ['new-thread-creation', 'new-comment-creation'].includes(
+                category_id
+              ) &&
+              thread_id
+            ) {
+              await Thread.update(
+                { max_notif_id: id },
+                { where: { id: thread_id } }
+              );
+              StatsDController.get().increment('cw.hook.thread-notif-update', {
+                thread_id: String(thread_id),
+              });
+            }
+          } catch (error) {
+            log.error(
+              `incrementing thread notif for thread ${thread_id} afterCreate: ${error}`
+            );
+            StatsDController.get().increment('cw.hook.thread-notif-error', {
+              thread_id: String(thread_id),
+            });
+          }
+        },
+      },
       tableName: 'Notifications',
       underscored: true,
       createdAt: 'created_at',

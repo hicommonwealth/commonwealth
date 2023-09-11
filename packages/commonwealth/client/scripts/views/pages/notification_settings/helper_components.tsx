@@ -4,18 +4,17 @@ import type { NavigateOptions, To } from 'react-router';
 import { getNotificationUrlPath } from 'identifiers';
 
 import 'pages/notification_settings/helper_components.scss';
-import AddressInfo from '../../../models/AddressInfo';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 
+import { useCommonNavigate } from 'navigation/helpers';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { User } from '../../components/user/user';
 import { getNotificationTypeText } from './helpers';
-import { useCommonNavigate } from 'navigation/helpers';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
 const getTextRows = (
   subscription: NotificationSubscription,
@@ -71,15 +70,9 @@ const getTextRows = (
             fontWeight="bold"
           >
             <User
-              hideAvatar
-              user={
-                new AddressInfo(
-                  null,
-                  subscription.Comment.author,
-                  subscription.Comment.chain,
-                  null
-                )
-              }
+              shouldHideAvatar
+              userAddress={subscription.Comment.author}
+              userChainId={subscription.Comment.chain}
             />
             's
           </CWText>
@@ -103,7 +96,7 @@ const getTextRows = (
     return (
       <div
         className="header-row"
-        onClick={() => setRoute(`/${subscription.Chain.id}`)}
+        onClick={() => setRoute(`/${subscription.chainId}`)}
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
