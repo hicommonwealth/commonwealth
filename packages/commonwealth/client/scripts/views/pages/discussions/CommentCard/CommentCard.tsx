@@ -4,10 +4,8 @@ import React, { useState, useEffect } from 'react';
 import app from 'state';
 import { verify } from 'canvas';
 import type { Action, Session } from '@canvas-js/interfaces';
-import type Comment from 'models/Comment';
 
 import type Comment from 'models/Comment';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTag } from 'views/components/component_kit/cw_tag';

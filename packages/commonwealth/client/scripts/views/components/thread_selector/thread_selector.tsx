@@ -50,7 +50,11 @@ export const ThreadSelector = ({
           id: t.id,
           title: t.title,
           chain: t.chain,
-          Address: new AddressInfo(t.address_id, t.address, t.address_chain),
+          Address: new AddressInfo({
+            id: t.address_id,
+            address: t.address,
+            chainId: t.address_chain,
+          }),
         } as any)
     );
   }, [threadsData]);
