@@ -12,7 +12,6 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useSidebarStore from 'state/ui/sidebar';
 import { featureFlags } from 'helpers/feature-flags';
-import { SidebarHeader } from '../component_kit/CWSidebarHeader';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();

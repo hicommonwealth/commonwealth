@@ -43,7 +43,6 @@ export const CommunitySection = ({ showSkeleton }) => {
           <CWText>Home</CWText>
         </div>
       )}
-      {/* <SidebarHeader /> */}
       <DiscussionSection />
       <GovernanceSection />
       <ExternalLinksModule />

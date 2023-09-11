@@ -46,7 +46,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
      * Imp to reset wc session on logout as subsequent login attempts fail
      */
     const walletConnectWallet = WebWalletController.Instance.getByName(
-      WalletId.WalletConnect
+      WalletId.WalletConnect,
     );
     await walletConnectWallet.reset();
   };
@@ -87,16 +87,6 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
-            app.activeChainId() && (
-              <CWCommunityAvatar
-                size="large"
-                community={app.chain.meta}
-                onClick={() => {
-                  navigate('/discussions');
-                }}
-              />
-            )}
           {onMobile && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
@@ -197,16 +187,6 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
-          app.activeChainId() && (
-            <CWCommunityAvatar
-              size="large"
-              community={app.chain.meta}
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
-          )}
         {onMobile && app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"

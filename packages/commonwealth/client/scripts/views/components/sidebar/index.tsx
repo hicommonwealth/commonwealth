@@ -18,15 +18,11 @@ export const Sidebar = ({ isInsideCommunity }) => {
 
   return (
     <div className="Sidebar">
-      <div style={{ backgroundColor: '#F7F7F7' }}>
-        <SidebarHeader />
-      </div>
+      {app.chain && <SidebarHeader />}
       <div className="sidebar-default-menu">
         <SidebarQuickSwitcher />
         {isInsideCommunity && (
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <CommunitySection showSkeleton={!app.activeChainId()} />
-          </div>
+          <CommunitySection showSkeleton={!app.activeChainId()} />
         )}
         {menuName === 'createContent' && <CreateContentSidebar />}
         {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
