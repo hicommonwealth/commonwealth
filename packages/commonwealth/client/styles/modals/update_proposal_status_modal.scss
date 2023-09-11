@@ -1,14 +1,9 @@
 @import '../shared';
 
 .UpdateProposalStatusModal {
-  overflow: unset;
   width: 100%;
 
   @include smallInclusive {
     width: 100%;
-  }
-
-  .CWModalBody {
-    overflow: unset;
   }
 }

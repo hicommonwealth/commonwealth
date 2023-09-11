@@ -15,6 +15,7 @@ interface CWModalProps {
   onClose: () => void;
   open: boolean;
   className?: string;
+  visibleOverflow?: boolean;
 }
 
 // Backdrop is needed for modal clickaway events
@@ -32,28 +33,27 @@ const Backdrop = React.forwardRef<
 const CWModal: FC<CWModalProps> = ({
   content,
   isFullScreen,
-  size,
+  size = 'small',
   onClose,
   open,
   className,
-}) => {
-  return (
-    <ModalUnstyled
-      open={open}
-      onClose={onClose}
-      slots={{ backdrop: Backdrop }}
-      disableEnforceFocus
+  visibleOverflow,
+}) => (
+  <ModalUnstyled
+    open={open}
+    onClose={onClose}
+    slots={{ backdrop: Backdrop }}
+    disableEnforceFocus
+  >
+    <div
+      className={`${getClasses(
+        { isFullScreen, size, visibleOverflow },
+        ComponentType.Modal
+      )} ${className}`}
     >
-      <div
-        className={`${getClasses(
-          { isFullScreen, size },
-          ComponentType.Modal
-        )} ${className}`}
-      >
-        {content}
-      </div>
-    </ModalUnstyled>
-  );
-};
+      {content}
+    </div>
+  </ModalUnstyled>
+);
 
 export default CWModal;

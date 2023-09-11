@@ -390,6 +390,7 @@ export const AdminActions = ({
         }
         onClose={() => setIsUpdateProposalStatusModalOpen(false)}
         open={isUpdateProposalStatusModalOpen}
+        visibleOverflow
       />
 
       <CWModal

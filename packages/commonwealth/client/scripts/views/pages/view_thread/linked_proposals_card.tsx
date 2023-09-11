@@ -176,6 +176,7 @@ export const LinkedProposalsCard = ({
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
+        visibleOverflow
       />
     </>
   );
