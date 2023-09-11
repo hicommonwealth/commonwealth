@@ -13,6 +13,7 @@ import {
 import { DB } from '../../models';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import { RedisCache } from 'common-common/src/redisCache';
 
 export type GetProposalsOptions = {
   chainId: string;
@@ -26,8 +27,7 @@ export async function __getProposals(
   this: ServerProposalsController,
   { chainId }: GetProposalsOptions,
   provider: providers.Web3Provider,
-  contractInfo: ContractInfo,
-  models: DB
+  contractInfo: ContractInfo
 ): Promise<GetProposalsResult> {
   let formattedProposals: GetProposalsResult = [];
   if (contractInfo.type === ChainNetwork.Aave) {
@@ -38,10 +38,9 @@ export async function __getProposals(
     formattedProposals = proposals.map((p) => formatAaveProposal(p));
   } else if (contractInfo.type === ChainNetwork.Compound) {
     const proposals = await getCompoundProposals(
-      contractInfo.govVersion,
       contractInfo.address,
       provider,
-      models
+      this.redisCache
     );
     formattedProposals = proposals.map((p) => formatCompoundBravoProposal(p));
   } else {

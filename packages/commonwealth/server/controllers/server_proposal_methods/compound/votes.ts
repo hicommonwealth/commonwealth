@@ -1,5 +1,5 @@
 import { BigNumber, providers } from 'ethers';
-import { getCompoundGovContract } from './util';
+import { getCompoundGovContractAndVersion } from './compoundVersion';
 import { CompoundVoteEvents, GovVersion } from './types';
 import {
   GovernorAlpha,
@@ -7,6 +7,7 @@ import {
   GovernorCompatibilityBravo,
 } from 'common-common/src/eth/types';
 import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
+import { RedisCache } from 'common-common/src/redisCache';
 
 export function formatCompoundProposalVote(
   vote: CompoundVoteEvents
@@ -21,16 +22,18 @@ export function formatCompoundProposalVote(
 }
 
 export async function getCompoundProposalVotes(
-  govVersion: GovVersion,
   compoundGovAddress: string,
   provider: providers.Web3Provider,
-  proposalId: string
+  proposalId: string,
+  redisCache: RedisCache
 ): Promise<CompoundVoteEvents[]> {
-  const contract = getCompoundGovContract(
-    govVersion,
-    compoundGovAddress,
-    provider
-  );
+  const { contract, version: govVersion } =
+    await getCompoundGovContractAndVersion(
+      redisCache,
+      compoundGovAddress,
+      provider
+    );
+
   let events;
   if (govVersion === GovVersion.Alpha) {
     const typedContract = <GovernorAlpha>contract;

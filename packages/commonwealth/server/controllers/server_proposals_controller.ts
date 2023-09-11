@@ -14,8 +14,6 @@ import {
   GetProposalVotesResult,
 } from './server_proposal_methods/get_proposal_votes';
 
-import { GovVersion } from './server_proposal_methods/compound/types';
-
 export type SupportedProposalNetworks =
   | ChainNetwork.Aave
   | ChainNetwork.Compound;
@@ -23,7 +21,6 @@ export type SupportedProposalNetworks =
 export type ContractInfo = {
   address: string;
   type: SupportedProposalNetworks;
-  govVersion: GovVersion;
 };
 
 export class ServerProposalsController {
@@ -83,7 +80,6 @@ export class ServerProposalsController {
     return {
       address: contract.Contract.address,
       type: contract.Contract.type,
-      govVersion: <GovVersion>contract.Contract.gov_version,
     };
   }
 

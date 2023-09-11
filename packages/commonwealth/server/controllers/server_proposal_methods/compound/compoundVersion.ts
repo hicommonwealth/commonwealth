@@ -1,16 +1,20 @@
-import { Contract, providers } from 'ethers';
+import { providers } from 'ethers';
 import {
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
-  Governor,
   GovernorAlpha__factory,
   GovernorBravoDelegate__factory,
-  Governor__factory,
   GovernorCompatibilityBravo__factory,
 } from 'common-common/src/eth/types';
 import { GovVersion } from './types';
-import { TypedEvent } from 'common-common/src/eth/types/commons';
+import { RedisCache } from 'common-common/src/redisCache';
+import { RedisNamespaces } from 'common-common/src/types';
+
+type ContractAndVersion = {
+  version: GovVersion;
+  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo;
+}
 
 /**
  * This function determines which compound contract version is being used at the given address. Note that the returned
@@ -18,13 +22,10 @@ import { TypedEvent } from 'common-common/src/eth/types/commons';
  * @param compoundGovAddress
  * @param provider
  */
-export async function getCompoundGovContractAndVersion(
+async function deriveCompoundGovContractAndVersion(
   compoundGovAddress: string,
   provider: providers.Web3Provider
-): Promise<{
-  version: GovVersion;
-  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo;
-}> {
+): Promise<ContractAndVersion> {
   try {
     const contract = GovernorAlpha__factory.connect(
       compoundGovAddress,
@@ -58,7 +59,7 @@ export async function getCompoundGovContractAndVersion(
   }
 }
 
-export function getCompoundGovContract(
+function getCompoundGovContract(
   govVersion: GovVersion,
   compoundGovAddress: string,
   provider: providers.Web3Provider
@@ -81,48 +82,33 @@ export function getCompoundGovContract(
   }
 }
 
-/**
- * Used to fetch events in a batched manner (e.g. 500 blocks at a time) if the given RPC provider has a block limit.
- * @param contract
- * @param queryFilterEvents
- */
-export async function getEvents<
-  ContractType extends Contract,
-  EventType extends TypedEvent<any>
->(
-  contract: ContractType,
-  queryFilterEvents: (
-    contract: ContractType,
-    fromBlock?: number,
-    toBlock?: number | 'latest'
-  ) => Promise<EventType[]>
-): Promise<EventType[]> {
-  const MAX_BLOCKS_PER_QUERY = 500;
+export async function getCompoundGovContractAndVersion(
+  redis: RedisCache,
+  compoundGovAddress: string,
+  provider: providers.Web3Provider
+): Promise<ContractAndVersion> {
+  const govVersion = await redis.getKey(
+    RedisNamespaces.Compound_Gov_Version,
+    compoundGovAddress
+  ) as GovVersion | undefined;
 
-  let result: EventType[] | EventType[][];
-  try {
-    result = await queryFilterEvents(contract);
+  if (!govVersion) {
+    const result = await deriveCompoundGovContractAndVersion(
+      compoundGovAddress,
+      provider
+    );
+    await redis.setKey(
+      RedisNamespaces.Compound_Gov_Version,
+      compoundGovAddress,
+      result.version
+    );
     return result;
-  } catch (e) {
-    if (e.message.includes('range')) {
-      console.log(
-        'Querying all blocks failed. Retrying with multiple smaller block ranges...'
-      );
-    } else {
-      console.error(e);
-      return;
-    }
   }
 
-  const latestBlock = await contract.provider.getBlockNumber();
-  let startBlock = 0;
-  const eventPromises: Promise<EventType[]>[] = [];
-  while (startBlock <= latestBlock) {
-    const toBlock = Math.min(startBlock + MAX_BLOCKS_PER_QUERY, latestBlock);
-    eventPromises.push(queryFilterEvents(contract, startBlock, toBlock));
-    startBlock = toBlock + 1;
-  }
-
-  result = await Promise.all(eventPromises);
-  return result.flat();
+  const contract = getCompoundGovContract(
+    govVersion,
+    compoundGovAddress,
+    provider
+  );
+  return { version: govVersion, contract };
 }

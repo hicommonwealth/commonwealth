@@ -132,6 +132,7 @@ export enum RedisNamespaces {
   Global_Response = 'global_response',
   Test_Redis = 'test_redis',
   Database_Cleaner = 'database_cleaner',
+  Compound_Gov_Version = 'compound_gov_version',
 }
 
 export interface ISnapshotNotification {

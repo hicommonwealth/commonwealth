@@ -7,11 +7,7 @@ import {
 import { TypedEvent } from 'common-common/src/eth/types/commons';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { ProposalState } from 'chain-events/src/chains/compound/types';
-import { DB } from '../../../models';
-import {
-  getCompoundGovContract,
-  getCompoundGovContractAndVersion,
-} from './util';
+import { getCompoundGovContractAndVersion } from './compoundVersion';
 import {
   CompoundProposalType,
   GovVersion,
@@ -20,6 +16,7 @@ import {
   ProposalDataType,
   ResolvedProposalPromises,
 } from './types';
+import { RedisCache } from 'common-common/src/redisCache';
 
 export function formatCompoundBravoProposal(
   proposalData: ProposalDataType
@@ -52,39 +49,21 @@ export function formatCompoundBravoProposal(
 }
 
 export async function getCompoundProposals(
-  govVersion: GovVersion | undefined,
   compoundGovAddress: string,
   provider: providers.Web3Provider,
-  models: DB
+  redisCache: RedisCache
 ): Promise<ProposalDataType[]> {
-  console.log(
-    `Fetching Compound proposals for ${compoundGovAddress}, with gov version ${govVersion}`
-  );
-  let contract:
-    | GovernorAlpha
-    | GovernorBravoDelegate
-    | GovernorCompatibilityBravo;
-  let govVersionFinal = govVersion;
-  if (!govVersion) {
-    const result = await getCompoundGovContractAndVersion(
+  const { contract, version: govVersion } =
+    await getCompoundGovContractAndVersion(
+      redisCache,
       compoundGovAddress,
       provider
     );
-    contract = result.contract;
-    govVersionFinal = result.version;
-    // save the gov version to the db, so we don't need to find it again
-    await models.Contract.update(
-      { gov_version: result.version },
-      { where: { address: compoundGovAddress } }
-    );
-  } else {
-    contract = getCompoundGovContract(govVersion, compoundGovAddress, provider);
-  }
 
   await contract.deployed();
   let proposalArrays: ResolvedProposalPromises;
   let initialProposalId: number;
-  switch (govVersionFinal) {
+  switch (govVersion) {
     case GovVersion.Alpha:
       initialProposalId = 1;
       proposalArrays = await getProposalAsync(
@@ -105,7 +84,7 @@ export async function getCompoundProposals(
       );
       break;
     default:
-      throw new Error(`Invalid Compound contract version: ${govVersionFinal}`);
+      throw new Error(`Invalid Compound contract version: ${govVersion}`);
   }
 
   const [proposalCreatedEvents, proposals, proposalStates] = proposalArrays;
@@ -121,7 +100,7 @@ export async function getCompoundProposals(
     });
   }
 
-  if (govVersionFinal === GovVersion.OzBravo) {
+  if (govVersion === GovVersion.OzBravo) {
     allProposalData
       .sort((p) => +p.rawProposal.startBlock)
       .forEach((p, i) => (p.identifier = String(i)));

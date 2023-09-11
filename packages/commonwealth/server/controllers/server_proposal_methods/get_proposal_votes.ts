@@ -38,10 +38,10 @@ export async function __getProposalVotes(
     votes = votesArgs.map((vote) => formatAaveProposalVote(vote));
   } else if (contractInfo.type === ChainNetwork.Compound) {
     const votesArgs = await getCompoundProposalVotes(
-      contractInfo.govVersion,
       contractInfo.address,
       provider,
-      proposalId
+      proposalId,
+      this.redisCache
     );
     votes = votesArgs.map((vote) => formatCompoundProposalVote(vote));
   } else {
