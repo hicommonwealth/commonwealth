@@ -58,7 +58,7 @@ export class ServerProposalsController {
         {
           model: this.models.Contract,
           required: true,
-          attributes: ['address', 'type', 'gov_version'],
+          attributes: ['address', 'type'],
         },
       ],
     });
