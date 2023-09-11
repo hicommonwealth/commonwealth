@@ -479,6 +479,67 @@ export const createReaction = async (args: CreateReactionArgs) => {
   return res.body;
 };
 
+export interface CreateThreadReactionArgs {
+  author_chain: string;
+  chain: string;
+  address: string;
+  reaction: string;
+  jwt: string;
+  thread_id?: number;
+  session: Session;
+  sign: (actionPayload: ActionPayload) => string;
+}
+
+export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
+  const {
+    chain,
+    address,
+    jwt,
+    author_chain,
+    reaction,
+    thread_id,
+    session,
+    sign,
+  } = args;
+
+  const actionPayload: ActionPayload = {
+    app: session.payload.app,
+    block: session.payload.block,
+    call: 'reactThread',
+    callArgs: { thread_id, value: reaction },
+    chain: 'eip155:1',
+    from: session.payload.from,
+    timestamp: Date.now(),
+  };
+  const action: Action = {
+    type: 'action',
+    payload: actionPayload,
+    session: session.payload.sessionAddress,
+    signature: sign(actionPayload),
+  };
+  const canvas_session = sortedStringify(session);
+  const canvas_action = sortedStringify(action);
+  const canvas_hash = ''; // getActionHash(action)
+  // TODO
+
+  const res = await chai.request
+    .agent(app)
+    .post(`/api/threads/${thread_id}/reactions`)
+    .set('Accept', 'application/json')
+    .send({
+      chain,
+      address,
+      reaction,
+      author_chain,
+      jwt,
+      thread_id,
+      canvas_session,
+      canvas_action,
+      canvas_hash,
+    });
+  return res.body;
+};
+
 export interface EditTopicArgs {
   jwt: any;
   address: string;
