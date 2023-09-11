@@ -1,18 +1,32 @@
-// TODO: @Timothee remove when filling in stubs
-/* eslint-disable */
-// @ts-nocheck
-
 import { getBlocks } from './blocks';
 import { parseBlocks } from './blocks';
 import { EvmEventSourceInstance } from '../../models/evmEventSource';
+import models from '../../database';
 
-async function getEventSources(): Promise<EvmEventSourceInstance[]> {
+export type EventRpcSources = Record<string, EvmEventSourceInstance[]>;
+
+async function getEventSources(): Promise<EventRpcSources> {
   // this function needs to first fetch all chain-event subscription chains
   // then we fetch all contract addresses and chain node ids (through either
   // CommunityContracts or ChainNodes) before fetching all event sources
   // that match the contract address and chain node id.
   // Thus this function will only return event sources on which there are
   // active chain-event subscriptions.
+  const eventSources = await models.EvmEventSource.findAll();
+
+  return eventSources.reduce((acc, eventSource) => {
+    if (!eventSource.ChainNode) {
+      // TODO: log and report error
+      return acc;
+    }
+
+    const url = eventSource.ChainNode.private_url || eventSource.ChainNode.url;
+    if (!acc[url]) {
+      acc[url] = [eventSource];
+    }
+    acc[url].push(eventSource);
+    return acc;
+  }, {});
 }
 
 async function emitChainEventNotifs(events: any): Promise<void> {
@@ -26,30 +40,56 @@ async function emitChainEventNotifs(events: any): Promise<void> {
   // will need to join with the Chains table as well
 }
 
-async function processChain(
+export async function processChain(
+  rpc: string,
   eventSources: EvmEventSourceInstance[]
 ): Promise<void> {
-  // get lastProcessedEvmBlock
-  const startBlockNum = 0;
+  try {
+    // get lastProcessedEvmBlock
+    const startBlockNum = 0;
 
-  const blocks = await getBlocks(startBlockNum);
-  const events = await parseBlocks(eventSources, blocks);
-  await emitChainEventNotifs(events);
+    const blocks = await getBlocks(startBlockNum);
+    const events = await parseBlocks(eventSources, blocks);
+    await emitChainEventNotifs(events);
 
-  // update lastProcessedEvmBlock
+    // update lastProcessedEvmBlock
+  } catch (e) {}
 }
 
-async function scheduleBlockFetching(
-  eventSources: EvmEventSourceInstance[],
-  interval: number
+/**
+ * Schedules processFn execution for each chainNode RPC in eventRpcSources. processFn execution is scheduled
+ * evenly across the interval time so that blocks are not fetched all at once for all chainNodes. For example,
+ * if there are 2 chainNodes and the interval is 4000ms, then processFn will be called for chainNode1 at T=0ms
+ * and at T=2000ms and for chainNode2. This would repeat every 4000ms so the next call for chainNode1 would be
+ * at T=4000ms and for chainNode2 at T=6000ms.
+ * @param eventRpcSources An object where the keys are chainNode RPCs and the values are EvmEventSourceInstance arrays
+ * @param interval Time in milliseconds between each fetch of a ChainNode's blocks
+ * @param processFn WARNING: must never throw an error. Errors thrown by processFn will not be caught.
+ */
+export function scheduleBlockFetching(
+  eventRpcSources: EventRpcSources,
+  interval: number,
+  processFn: (
+    rpc: string,
+    eventSources: EvmEventSourceInstance[]
+  ) => Promise<void>
 ) {
-  // schedule processChain execution by chainNode
-  // chainNodes should be evenly distributed in the interval time
-  // for example if interval is 2 minutes and there are 4 chain nodes
-  // then processChain should be called for a new chainNode every 30 seconds
-  // average execution time for each chainNode should be reported to datadog so
-  // this scheduling algo can be improved over time
-  await processChain(eventSources);
+  if (!Object.keys(eventRpcSources).length) {
+    return;
+  }
+
+  const rpcs = Object.keys(eventRpcSources);
+  const betweenInterval = interval / rpcs.length;
+
+  rpcs.forEach((rpc, index) => {
+    const initialDelay = index * betweenInterval;
+
+    setTimeout(() => {
+      processFn(rpc, eventRpcSources[rpc]);
+
+      setInterval(processFn, interval, rpc, eventRpcSources[rpc]);
+    }, initialDelay);
+  });
 }
 
 /**
@@ -60,7 +100,5 @@ async function scheduleBlockFetching(
 export async function startEvmPolling(interval: number) {
   const eventSources = await getEventSources();
 
-  await scheduleBlockFetching(eventSources, interval);
-
-  return setInterval(scheduleBlockFetching, interval, eventSources, interval);
+  scheduleBlockFetching(eventSources, interval, processChain);
 }
