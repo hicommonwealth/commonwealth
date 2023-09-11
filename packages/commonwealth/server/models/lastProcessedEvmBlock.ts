@@ -3,7 +3,7 @@ import Sequelize, { DataTypes } from 'sequelize';
 import { DB } from '../models';
 
 export type LastProcessedEvmBlockAttributes = {
-  id: number;
+  chain_node_id: number;
   block_number: number;
 };
 
