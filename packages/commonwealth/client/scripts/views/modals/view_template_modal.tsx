@@ -31,7 +31,11 @@ const ViewTemplateModal = ({
       <CWModalBody>
         <div className="CreationRow">
           <CWText type="b2">By</CWText>
-          <User user={creator} showAddressWithDisplayName />
+          <User
+            userAddress={creator.address}
+            userChainId={creator.chain?.id || creator?.profile?.chain}
+            shouldShowAddressWithDisplayName
+          />
           <CWText type="b2">•</CWText>
           <CWText type="b2">Created in</CWText>
           <CWCommunityAvatar

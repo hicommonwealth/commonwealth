@@ -1,11 +1,11 @@
 import React from 'react';
 
-import app from 'state';
 import moment from 'moment';
+import app from 'state';
 import { CWCard } from 'views/components/component_kit/cw_card';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
+import { CWText } from 'views/components/component_kit/cw_text';
 import {
   displayOptions,
   ManageContractTemplateModalProps,
@@ -13,8 +13,8 @@ import {
 
 import 'pages/contracts/contract_template_card.scss';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { User } from '../../components/user/user';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
+import { User } from '../../components/user/user';
 
 type ContractTemplateCardProps = {
   contractId: number;
@@ -137,7 +137,11 @@ export const ContractTemplateCard = ({
                   {info.label}
                 </CWText>
                 <div className="enabledby-row">
-                  <User user={enabler} showAddressWithDisplayName />
+                  <User
+                    userAddress={enabler.address}
+                    userChainId={enabler.chain?.id || enabler?.profile?.chain}
+                    shouldShowAddressWithDisplayName
+                  />
                   <div className="text-group">
                     <CWText type="caption">on</CWText>
                     <CWText type="caption" fontWeight="medium">

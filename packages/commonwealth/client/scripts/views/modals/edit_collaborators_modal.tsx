@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { isEqual } from 'lodash';
 import { useDebounce } from 'usehooks-ts';
-
-import type { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import type Thread from '../../models/Thread';
 import type { IThreadCollaborator } from '../../models/Thread';
 import app from '../../state';
@@ -12,7 +10,6 @@ import {
 } from '../../controllers/app/notifications';
 import useNecessaryEffect from '../../hooks/useNecessaryEffect';
 import { useEditThreadMutation } from '../../state/api/threads';
-import NewProfilesController from '../../controllers/server/newProfiles';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
@@ -24,6 +21,7 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 
 import '../../../styles/modals/edit_collaborators_modal.scss';
 
@@ -130,10 +128,8 @@ export const EditCollaboratorsModal = ({
                   }
                 >
                   <User
-                    user={NewProfilesController.Instance.getProfile(
-                      c.chain_id,
-                      c.Address.address
-                    )}
+                    userAddress={c.Address.address}
+                    userChainId={c.chain_id}
                   />
                 </div>
               ))
@@ -152,12 +148,7 @@ export const EditCollaboratorsModal = ({
             <div className="collaborator-rows-container">
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
-                  <User
-                    user={NewProfilesController.Instance.getProfile(
-                      c.chain,
-                      c.address
-                    )}
-                  />
+                  <User userAddress={c.address} userChainId={c.chain} />
                   <CWIconButton
                     iconName="close"
                     iconSize="small"

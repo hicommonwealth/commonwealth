@@ -1,34 +1,46 @@
-import { useCommonNavigate } from 'navigation/helpers';
+import { setActiveAccount } from 'controllers/app/login';
+import { isSameAccount } from 'helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { setActiveAccount } from 'controllers/app/login';
-import { UserBlock } from 'views/components/user/user_block';
-import { isSameAccount } from 'helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWModal } from '../component_kit/new_designs/CWModal';
-import { LoginModal } from 'views/modals/login_modal';
+import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { UserBlock } from 'views/components/user/user_block';
+import { LoginModal } from 'views/modals/login_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 
 import 'components/Header/LoginSelectorMenu.scss';
-import NewProfilesController from '../../../controllers/server/newProfiles';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 
 export const LoginSelectorMenuLeft = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [profileId, setProfileId] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
+  const chain =
+    typeof activeAccount.chain === 'string'
+      ? activeAccount.chain
+      : activeAccount.chain?.id;
+  const { data: users } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [chain],
+    profileAddresses: [activeAccount.address],
+    currentChainId: app.activeChainId(),
+  });
+  const profileId = users?.[0]?.id;
 
   const changeSelectedAddress = () => {
-    const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
     setSelectedAddress(activeAccount.address);
     forceRerender();
   };
 
   useEffect(() => {
+    setSelectedAddress(activeAccount.address);
+
     // force rerender when new address is connected
     app.user.isFetched.on('redraw', () => {
       changeSelectedAddress();
@@ -39,20 +51,6 @@ export const LoginSelectorMenuLeft = () => {
         changeSelectedAddress();
       });
     };
-  }, []);
-
-  useEffect(() => {
-    const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
-    const chain =
-      typeof activeAccount.chain === 'string'
-        ? activeAccount.chain
-        : activeAccount.chain?.id;
-    const profile = NewProfilesController.Instance.getProfile(
-      chain,
-      activeAccount.address
-    );
-    setProfileId(profile.id);
-    setSelectedAddress(activeAccount.address);
   }, []);
 
   const { activeAccounts } = app.user;
