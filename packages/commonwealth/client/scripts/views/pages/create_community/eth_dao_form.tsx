@@ -15,7 +15,7 @@ import { CWValidationText } from 'views/components/component_kit/cw_validation_t
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import {
   defaultChainRows,
-  ethChainRows,
+  EthChainRows,
   updateAdminOnCreateCommunity,
 } from 'views/pages/create_community/chain_input_rows';
 import type { EthChainFormState } from 'views/pages/create_community/types';
@@ -34,6 +34,7 @@ import {
   useChainFormState,
   useEthChainFormFields,
 } from './hooks';
+import { ETHEREUM_MAINNET } from './index';
 
 export const EthDaoForm = (props: EthChainFormState) => {
   const { ethChainNames, ethChains } = props;
@@ -55,8 +56,10 @@ export const EthDaoForm = (props: EthChainFormState) => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    ethChainFormFields.setNodeUrl(ethChains[1].url);
-  }, []);
+    if (!ethChainFormFields.chainString) {
+      ethChainFormFields.setChainString(ETHEREUM_MAINNET);
+    }
+  }, [ethChainFormFields]);
 
   const validAddress = isAddress(ethChainFormFields.address);
   const disableField = !validAddress || !chainFormState.loaded;
@@ -135,7 +138,7 @@ export const EthDaoForm = (props: EthChainFormState) => {
 
   return (
     <div className="CreateCommunityForm">
-      {ethChainRows(
+      {EthChainRows(
         { ethChainNames, ethChains },
         { ...ethChainFormFields, ...chainFormState }
       )}

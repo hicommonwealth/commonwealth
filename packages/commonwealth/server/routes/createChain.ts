@@ -310,8 +310,9 @@ const createChain = async (
   }
 
   const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
-    where: { url },
+    where: { [Op.or]: [{ url }, { eth_chain_id }] },
     defaults: {
+      url,
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
