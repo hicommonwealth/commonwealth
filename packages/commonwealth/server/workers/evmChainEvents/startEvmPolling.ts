@@ -1,5 +1,4 @@
-import { getBlocks } from './blocks';
-import { parseBlocks } from './blocks';
+import { getEvents } from './logs';
 import { EvmEventSourceInstance } from '../../models/evmEventSource';
 import models from '../../database';
 
@@ -44,15 +43,30 @@ export async function processChain(
   rpc: string,
   eventSources: EvmEventSourceInstance[]
 ): Promise<void> {
-  try {
-    // get lastProcessedEvmBlock
-    const startBlockNum = 0;
+  if (!eventSources.length) {
+    return;
+  }
 
-    const blocks = await getBlocks(startBlockNum);
-    const events = await parseBlocks(eventSources, blocks);
+  try {
+    const startBlock = await models.LastProcessedEvmBlock.findOne({
+      where: {
+        chain_node_id: eventSources[0].chain_node_id,
+      },
+    });
+
+    const { events, lastBlockNum } = await getEvents(
+      rpc,
+      eventSources,
+      startBlock?.block_number
+    );
+
     await emitChainEventNotifs(events);
 
-    // update lastProcessedEvmBlock
+    // save new block number
+    // no need to transactionalize emitNotifications and save new block number
+    // since duplicate notifications are not possible
+    startBlock.block_number = lastBlockNum;
+    startBlock.save();
   } catch (e) {}
 }
 
@@ -95,9 +109,18 @@ export function scheduleBlockFetching(
 /**
  * Starts an infinite loop that periodically fetches and parses blocks from
  * relevant EVM blockchains. Events parsed from these blocks are emitted
- * as chain-event notifications.
+ * as chain-event notifications. The interval between each fetch is specified in milliseconds and should be
+ * no less than 500k ms (500 seconds) so that we support any EVM chain that has an average block time of
+ * 1 second or more (block fetching is limited to 500 blocks per interval). The recommended interval
+ * is 60_000 ms (60 seconds).
  */
 export async function startEvmPolling(interval: number) {
+  if (interval < 500_000) {
+    throw new Error(
+      `Interval for EVM polling must be at least 500_000 ms (500 seconds)`
+    );
+  }
+
   const eventSources = await getEventSources();
 
   scheduleBlockFetching(eventSources, interval, processChain);
