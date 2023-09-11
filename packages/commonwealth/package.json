@@ -48,7 +48,7 @@
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "start-android": "npx cap run android",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
-    "start-consumer": "ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script",
+    "start-consumer": "ts-node --project ./tsconfig.consumer.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script",
     "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
     "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
     "start-external-webpack": "NODE_ENV=production NO_PRERENDER=true NO_SSL=true ts-node -P tsconfig.server.json -T ./server.ts",
