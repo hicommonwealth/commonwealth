@@ -7,4 +7,8 @@
   @include smallInclusive {
     width: 100%;
   }
+
+  .CWModalBody {
+    overflow: unset;
+  }
 }
