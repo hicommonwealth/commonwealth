@@ -3,6 +3,7 @@ import { expect } from '@playwright/test';
 import * as process from 'process';
 import { Sequelize } from 'sequelize';
 import { DATABASE_URI } from '../../../server/config';
+import { dbClient, testAddress } from '../globalSetup';
 
 // Logs in user for specific chain
 export async function login(page) {
@@ -31,12 +32,6 @@ export async function login(page) {
   }).toPass();
 }
 
-// This connection is used to speed up tests, so we don't need to load in all the models with the associated
-// imports. This can only be used with raw sql queries.
-export const testDb = new Sequelize(DATABASE_URI, { logging: false });
-
-export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
-
 export async function addAlchemyKey() {
   const apiKey = process.env.ETH_ALCHEMY_API_KEY;
   if (!apiKey) {
@@ -44,12 +39,12 @@ export async function addAlchemyKey() {
   }
 
   // If chainNode for eth doesn't exist, add it and add key.
-  const ethChainNodeExists = await testDb.query(
+  const ethChainNodeExists = await dbClient.query(
     'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1'
   );
   if (ethChainNodeExists[0].length === 0) {
     try {
-      await testDb.query(`
+      await dbClient.query(`
         INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name)
         VALUES (37, 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}', 1,
          'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4', 'ethereum', 'Ethereum (Mainnet)');
@@ -67,7 +62,7 @@ export async function addAlchemyKey() {
   }
 
   // If it does exist, update the key
-  await testDb.query(`
+  await dbClient.query(`
   UPDATE "ChainNodes"
   SET
     url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}',
@@ -80,7 +75,7 @@ export async function addAlchemyKey() {
 
 // removes default user from the db. Subsequent login will need to go through the profile creation screen
 export async function removeUser() {
-  const userExists = await testDb.query(
+  const userExists = await dbClient.query(
     `select 1 from "Addresses" where address = '${testAddress}'`
   );
 
@@ -109,11 +104,11 @@ export async function removeUser() {
     WHERE address = '${testAddress}';
 `;
 
-  await testDb.query(removeQuery);
+  await dbClient.query(removeQuery);
 }
 
 export async function createAddress(chain, profileId, userId) {
-  await testDb.query(`
+  await dbClient.query(`
     INSERT INTO "Addresses" (
       address,
       chain,
@@ -153,13 +148,13 @@ export async function createAddress(chain, profileId, userId) {
 }
 
 export async function createInitialUser() {
-  const userExists = await testDb.query(
+  const userExists = await dbClient.query(
     `select 1 from "Addresses" where address = '${testAddress}' and chain = 'ethereum'`
   );
 
   if (userExists[0].length > 0) return;
 
-  const userId = await testDb.query(`
+  const userId = await dbClient.query(`
   INSERT INTO "Users" (
         email,
         created_at,
@@ -181,7 +176,7 @@ export async function createInitialUser() {
       ) RETURNING id`);
 
   const profileId = (
-    await testDb.query(`
+    await dbClient.query(`
     INSERT INTO "Profiles" (
         user_id,
         created_at,
@@ -205,7 +200,7 @@ export async function createInitialUser() {
 
 // adds user if it doesn't exist. Subsequent login will not need to go through the profile creation screen
 export async function addAddressIfNone(chain) {
-  const addresses = await testDb.query(
+  const addresses = await dbClient.query(
     `select * from "Addresses" where address = '${testAddress}'`
   );
 

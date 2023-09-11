@@ -1,8 +1,9 @@
 import { FullConfig } from '@playwright/test';
-import { clearTestEntities } from './hooks/e2eDbEntityHooks.spec';
+import { dbClient, pgContainer } from './globalSetup';
 
 async function globalTeardown(config: FullConfig) {
-  await clearTestEntities();
+  await dbClient.end();
+  await pgContainer.stop();
 }
 
 export default globalTeardown;
