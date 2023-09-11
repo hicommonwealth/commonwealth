@@ -1,3 +1,6 @@
+// @ts-nocheck
+/* eslint-disable */
+
 import { EvmEventSourceInstance } from '../../models/evmEventSource';
 
 export async function getBlocks(startingBlockNum: number) {}

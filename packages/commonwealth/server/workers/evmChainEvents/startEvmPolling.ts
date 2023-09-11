@@ -1,5 +1,6 @@
 // TODO: @Timothee remove when filling in stubs
 // @ts-nocheck
+/* eslint-disable */
 
 import { getBlocks } from './blocks';
 import { parseBlocks } from './blocks';
