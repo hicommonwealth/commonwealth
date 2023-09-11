@@ -117,6 +117,7 @@ const resetServer = (debug = false): Promise<void> => {
           'https://rpc-osmosis.ecostake.com',
           'Osmosis',
           null,
+          'osmosis',
           BalanceType.Cosmos,
         ],
         [
@@ -130,6 +131,7 @@ const resetServer = (debug = false): Promise<void> => {
           'https://cosmos-devnet.herokuapp.com/rpc',
           'Cosmos SDK v0.46.11 devnet',
           null,
+          'csdkbetaci',
           BalanceType.Cosmos,
           'https://cosmos-devnet.herokuapp.com/lcd/',
         ],
