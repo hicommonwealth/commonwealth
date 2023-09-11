@@ -3,24 +3,19 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.createTable(
-        'EvmEventSources',
-        {
-          id: {
-            type: Sequelize.INTEGER,
-            autoIncrement: true,
-            primaryKey: true,
-          },
-          chain_node_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: { models: 'ChainNodes', key: 'id' },
-          },
-          contract_address: { type: Sequelize.STRING, allowNull: false },
-          event_signature: { type: Sequelize.STRING, allowNull: false },
-          kind: { type: Sequelize.STRING, allowNull: false },
-          unique: ['chain_node_id', 'contract_address', 'event_signature'],
-        },
+      // raw query since `queryInterface.createTable` uniqueKeys option lacks documentation
+      // uses SERIAL rather than GENERATED ALWAYS AS IDENTITY to ensure Sequelize compatibility
+      await queryInterface.sequelize.query(
+        `
+        CREATE TABLE IF NOT EXISTS "EvmEventSources" (
+          id SERIAL PRIMARY KEY,
+          chain_node_id INTEGER NOT NULL REFERENCES "ChainNodes"(id),
+          contract_address VARCHAR(255) NOT NULL,
+          event_signature VARCHAR(255) NOT NULL,
+          kind VARCHAR(255) NOT NULL,
+          CONSTRAINT unique_event_source UNIQUE(chain_node_id, contract_address, event_signature)
+        );
+      `,
         { transaction }
       );
 
@@ -30,7 +25,7 @@ module.exports = {
           chain_node_id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
-            references: { models: 'ChainNodes', key: 'id' },
+            references: { model: 'ChainNodes', key: 'id' },
           },
           block_number: { type: Sequelize.INTEGER, allowNull: false },
         },
