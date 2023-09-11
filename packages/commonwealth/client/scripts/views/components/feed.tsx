@@ -31,13 +31,13 @@ export const Feed = ({
   const [error, setError] = useState<boolean>(false);
   const [data, setData] = useState<DashboardActivityNotification[]>();
   const [currentCount, setCurrentCount] = useState<number>(
-    defaultCount || DEFAULT_COUNT
+    defaultCount || DEFAULT_COUNT,
   );
 
   const loadMore = useCallback(() => {
     return setTimeout(() => {
       setCurrentCount(
-        (prevState) => prevState + (defaultCount || DEFAULT_COUNT)
+        (prevState) => prevState + (defaultCount || DEFAULT_COUNT),
       );
     }, 500);
   }, [setCurrentCount, defaultCount]);
@@ -50,7 +50,7 @@ export const Feed = ({
         setData(
           onFetchedDataCallback
             ? response.result.map((activity) => onFetchedDataCallback(activity))
-            : response.result
+            : response.result,
         );
       } catch (err) {
         setError(true);
