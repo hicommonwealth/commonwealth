@@ -68,9 +68,10 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 
     await waitOneBlock(rpcUrlBeta);
+    await waitOneBlock(rpcUrlBeta);
     const activeProposals = await getActiveVotingProposals();
     const onchainProposal = activeProposals[activeProposals.length - 1];
-    expect(onchainProposal?.content?.typeUrl).to.be.eql(expectedProposalType);
+    expect(onchainProposal?.content?.typeUrl).to.eql(expectedProposalType);
   };
 
   const voteTest = async (
@@ -129,6 +130,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
 
   describe('Amino signing', () => {
     it('creates a text proposal with legacy amino', async () => {
+      await waitOneBlock(rpcUrlBeta);
       const content = encodeTextProposal(
         `beta text title`,
         `beta text description`

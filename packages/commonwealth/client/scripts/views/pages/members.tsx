@@ -4,15 +4,15 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
 import { User } from 'views/components/user/user';
-import MinimumProfile from '../../models/MinimumProfile';
-import { CWText } from '../components/component_kit/cw_text';
-import { MembersSearchBar } from '../components/members_search_bar';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../scripts/helpers/constants';
 import { useSearchProfilesQuery } from '../../../scripts/state/api/profiles';
 import { SearchProfilesResponse } from '../../../scripts/state/api/profiles/searchProfiles';
+import MinimumProfile from '../../models/MinimumProfile';
+import { CWText } from '../components/component_kit/cw_text';
+import { MembersSearchBar } from '../components/members_search_bar';
 
 const MembersPage = () => {
   const containerRef = useRef<VirtuosoHandle>();
@@ -97,11 +97,11 @@ const MembersPage = () => {
           return (
             <div className="member-row" key={index}>
               <User
-                user={profileInfo.profile}
+                userAddress={profileInfo.profile.address}
+                userChainId={profileInfo.profile.chain}
                 role={profileInfo.role}
-                showRole
-                hideAvatar={false}
-                linkify
+                shouldShowRole
+                shouldLinkProfile
               />
             </div>
           );

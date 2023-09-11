@@ -1,0 +1,50 @@
+@import '../../../../../../styles/shared';
+@import './CWSearchBar.scss';
+
+.SearchBarDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px;
+  margin-top: 0px;
+  max-height: 450px;
+  border-radius: 6px;
+  overflow: auto;
+  outline: 0px;
+  z-index: 999;
+  background-color: $white;
+  border: 1px solid $neutral-200;
+  color: $neutral-900;
+  box-shadow: 0px 4px 30px $neutral-200;
+
+  .previews-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+
+      .section-header {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+
+        .section-header-text.Text {
+          color: $neutral-500;
+        }
+      }
+    }
+  }
+
+  .no-results {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+  }
+}

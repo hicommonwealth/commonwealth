@@ -6,6 +6,16 @@ import {
   SearchChainsResult,
   __searchChains,
 } from './server_chains_methods/search_chains';
+import {
+  GetChainsWithSnapshotsOptions,
+  GetChainsWithSnapshotsResult,
+  __getChainsWithSnapshots,
+} from './server_chains_methods/get_chains_with_snapshots';
+import {
+  GetChainNodesOptions,
+  GetChainNodesResult,
+  __getChainNodes,
+} from './server_chains_methods/get_chain_nodes';
 
 /**
  * Implements methods related to chains
@@ -21,5 +31,17 @@ export class ServerChainsController {
     options: SearchChainsOptions
   ): Promise<SearchChainsResult> {
     return __searchChains.call(this, options);
+  }
+
+  async getChainsWithSnapshots(
+    options: GetChainsWithSnapshotsOptions
+  ): Promise<GetChainsWithSnapshotsResult> {
+    return __getChainsWithSnapshots.call(this, options);
+  }
+
+  async getChainNodes(
+    options: GetChainNodesOptions
+  ): Promise<GetChainNodesResult> {
+    return __getChainNodes.call(this, options);
   }
 }

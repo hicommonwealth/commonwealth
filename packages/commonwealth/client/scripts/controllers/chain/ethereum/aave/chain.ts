@@ -41,21 +41,4 @@ export default class AaveChain extends EthereumChain {
     super.deinitEventLoop();
     super.deinitApi();
   }
-
-  public async setDelegate(delegatee: string) {
-    const token = this.aaveApi?.Token;
-    if (!token) throw new Error('No token contract found');
-    const contract = await attachSigner(this.app.user.activeAccount, token);
-    await contract.delegate(delegatee);
-  }
-
-  public async getDelegate(delegator: string, type: 'voting' | 'proposition') {
-    const token = this.aaveApi?.Token;
-    if (!token) throw new Error('No token contract found');
-    const delegate = await token.getDelegateeByType(
-      delegator,
-      type === 'voting' ? 0 : 1
-    );
-    return delegate;
-  }
 }
