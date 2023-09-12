@@ -1,32 +1,30 @@
 import { FullConfig } from '@playwright/test';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
+import * as process from 'process';
 import { Sequelize } from 'sequelize';
+import { sequelizeMigrationUp } from '../util/sequlizeMigration';
 import { createInitialUser } from './utils/e2eUtils';
 
 export let pgContainer;
 
-// This connection is used to speed up tests, so we don't need to load in all the models with the associated
-// imports. This can only be used with raw sql queries.
-export let dbClient;
-
-export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
-
 async function globalSetup(config: FullConfig) {
-  pgContainer = await new PostgreSqlContainer().start();
+  try {
+    pgContainer = await new PostgreSqlContainer().start();
 
-  dbClient = new Sequelize({
-    dialect: 'postgres',
-    host: pgContainer.getHost(),
-    port: pgContainer.getPort(),
-    database: pgContainer.getDatabase(),
-    username: pgContainer.getUsername(),
-    password: pgContainer.getPassword(),
-    logging: false,
-  });
+    // set the connectionURI for tests (cannot export because workers run in different processes)
+    process.env.TEST_DB_CONNECTION_URI = pgContainer.getConnectionUri();
 
-  await dbClient.connect();
+    const sequelize = new Sequelize(process.env.TEST_DB_CONNECTION_URI, {
+      logging: false,
+    });
 
-  await createInitialUser();
+    await sequelizeMigrationUp(sequelize);
+
+    await createInitialUser(sequelize);
+  } catch (e) {
+    console.log(e);
+    process.exit(1);
+  }
 }
 
 export default globalSetup;

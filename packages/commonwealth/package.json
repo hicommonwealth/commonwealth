@@ -341,6 +341,7 @@
     "ts-mocha": "^6.0.0",
     "ts-node-dev": "^2.0.0",
     "tslint": "^5.13.0",
+    "umzug": "^3.3.1",
     "webpack": "^5.75.0",
     "webpack-bundle-analyzer": "^4.4.0",
     "webpack-cli": "^4.10.0",
