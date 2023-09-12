@@ -142,7 +142,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
                 window.open('https://docs.commonwealth.im/commonwealth/')
               }
             />
-            {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
+            {isLoggedIn && <NotificationsMenuPopover />}
           </div>
           {isLoggedIn && <UserDropdown />}
           {isLoggedIn && (
@@ -233,7 +233,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
         <div className="DesktopMenuContainer">
           <CreateContentPopover />
           <HelpMenuPopover />
-          {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
+          {isLoggedIn && <NotificationsMenuPopover />}
         </div>
         <LoginSelector />
       </div>
