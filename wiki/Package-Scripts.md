@@ -8,6 +8,7 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
 - [CI Scripts](#ci-scripts)
   - [wait-server](#wait-server)
 - [Database Scripts](#database-scripts)
+  - [clean-db](#clean-db)
   - [create-migration](#create-migration)
   - [db-all](#db-all)
   - [dump-db](#dump-db)
@@ -92,6 +93,16 @@ Description: Used for CI. Waits for the server to be ready (start serving on por
 Contributor: Kurtis Assad
 
 # Database Scripts
+
+## clean-db
+
+Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
+
+Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily. 
+
+Considerations: Engineers will almost never need to use this locally (unless they have purposefully create a large number of test notifications). This script was authored at the request of Jake Naviasky; we should confer with him as to the long-term value of this script. **Flagged for possible removal.**
+
+Contributor: Timothee Legros
 
 ## create-migration
 
