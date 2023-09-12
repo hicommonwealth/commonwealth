@@ -55,6 +55,7 @@ import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import { TemplateActionCard } from './templateActionCard';
 import { ViewTemplateFormCard } from './viewTemplateFormCard';
 import ViewTemplate from '../view_template/view_template';
+import { featureFlags } from 'helpers/feature-flags';
 
 import 'pages/view_thread/index.scss';
 
@@ -261,8 +262,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
-  const showTemplateOptions = isAuthor || isAdminOrMod;
-  const showLinkedTemplateOptions = linkedTemplates.length > 0;
+  const showTemplateOptions =
+    featureFlags.proposalTemplates && (isAuthor || isAdminOrMod);
+  const showLinkedTemplateOptions =
+    featureFlags.proposalTemplates && linkedTemplates.length > 0;
 
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
