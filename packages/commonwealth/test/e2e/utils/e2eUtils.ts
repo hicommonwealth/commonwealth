@@ -2,8 +2,13 @@
 import { expect } from '@playwright/test';
 import * as process from 'process';
 import { Sequelize } from 'sequelize';
-import { DATABASE_URI } from '../../../server/config';
-import { dbClient, testAddress } from '../globalSetup';
+import { testAddress } from 'web3-utils';
+
+export let dbClient = process.env.TEST_DB_CONNECTION_URI
+  ? new Sequelize(process.env.TEST_DB_CONNECTION_URI, {
+      logging: false,
+    })
+  : null;
 
 // Logs in user for specific chain
 export async function login(page) {
@@ -107,7 +112,16 @@ export async function removeUser() {
   await dbClient.query(removeQuery);
 }
 
-export async function createAddress(chain, profileId, userId) {
+export async function createAddress(
+  chain,
+  profileId,
+  userId,
+  passedDbClient = null
+) {
+  if (passedDbClient) {
+    dbClient = passedDbClient;
+  }
+
   await dbClient.query(`
     INSERT INTO "Addresses" (
       address,
@@ -147,7 +161,11 @@ export async function createAddress(chain, profileId, userId) {
   `);
 }
 
-export async function createInitialUser() {
+export async function createInitialUser(passedDbClient = null) {
+  if (passedDbClient) {
+    dbClient = passedDbClient;
+  }
+
   const userExists = await dbClient.query(
     `select 1 from "Addresses" where address = '${testAddress}' and chain = 'ethereum'`
   );
