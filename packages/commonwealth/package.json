@@ -7,9 +7,9 @@
     "build-all": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",
     "build-consumer": "tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsconfig.consumer.json",
     "build-ios": "NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync ios",
-    "build-storybook": "storybook build",
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "check-types": "tsc --noEmit",
+    "clean-db": "ts-node --project tsconfig.json server/scripts/cleanDb.ts",
     "compress-images": "npx ts-node -T ./scripts/compressImages.ts",
     "create-migration": "npx sequelize migration:generate --name",
     "datadog-db-setup": "chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh",
@@ -51,19 +51,17 @@
     "stylelint": "stylelint client/styles/*",
     "test": "nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
     "test-api": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'",
-    "test-client": "webpack-dev-server --config webpack/webpack.config.test.js",
-    "test-consumer": "ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000",
     "test-devnet": "nyc ts-mocha --project tsconfig.json './test/devnet/**/*.spec.ts'",
     "test-e2e": "TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/e2eRegular/*",
     "test-e2e-serial": "TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*",
     "test-e2e-mature": "TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts test --workers 2 ./test/e2e/mature/*",
-    "test-events": "nyc ts-mocha --project tsconfig.json ./test/integration/events/*.spec.ts",
     "test-integration-util": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts",
     "test-query": "ts-node server/scripts/testQuery.ts",
     "test-select": "NODE_ENV=test nyc ts-mocha --project tsconfig.json",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
     "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'",
-    "unit-test:watch": "NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'"
+    "unit-test:watch": "NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'",
+    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },
   "engines": {
     "node": "18.x"

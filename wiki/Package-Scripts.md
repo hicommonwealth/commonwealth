@@ -40,22 +40,17 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
 - [Other Services](#other-services)
   - [datadog-db-setup](#datadog-db-setup)
   - [send-notification-digest-emails](#send-notification-digest-emails)
+  - [storybook](#storybook)
 - [Playwright](#playwright)
   - [e2e-start-server](#e2e-start-server)
   - [test-e2e](#test-e2e)
   - [test-e2e-serial](#test-e2e-serial)
-- [Storybook](#storybook)
-  - [build-storybook](#build-storybook)
-  - [storybook](#storybook-1)
 - [Testing](#testing)
   - [integration-test](#integration-test)
   - [test](#test)
   - [test-api](#test-api)
-  - [test-client](#test-client)
-  - [test-consumer](#test-consumer)
   - [test-devnet](#test-devnet)
   - [test-emit-notif](#test-emit-notif)
-  - [test-events](#test-events)
   - [test-integration-util](#test-integration-util)
   - [test-query](#test-query)
   - [test-select](#test-select)
@@ -76,9 +71,9 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
 
 ## build-all
 
-Definition: `yarn build-app && yarn build-consumer`
+Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
 
-Description: Builds app based on webpack.prod.config.js file, as well as the build-consumer script
+Description: Runs webpack on our front-end code with 4096MB memory allocated to Node. If successful, fires the build-consumer script.
 
 ## heroku-postbuild
 
@@ -236,8 +231,6 @@ Considerations: Why lint styles separately? Why not just include `.scss` file ex
 
 # Mobile
 
-Open considerations: Are these still in use?
-
 ## build-android 
 
 Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android`
@@ -302,7 +295,13 @@ Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 
 Description: Schedules a daily task for sending notification email digests.
 
-Considerations: Script name might be worth shortening.
+## storybook
+
+Definition: `storybook dev -p 6006`
+
+Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
+
+Contributor: Daniel Martins
 
 # Playwright
 
@@ -338,26 +337,6 @@ Description: Runs e2e tests one at a time, to avoid problems of parallel executi
 
 Contributor: Kurtis Assad
 
-# Storybook
-
-## build-storybook
-
-Definition `storybook build`
-
-Description:  Compiles Storybook instance for deployment.
-
-Contributor: Daniel Martins
-
-Considerations: Not used by Storybook / Design System team. **Deprecated; recommend removal.**
-
-## storybook
-
-Definition: `storybook dev -p 6006`
-
-Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
-
-Contributor: Daniel Martins
-
 # Testing
 
 Open considerations:
@@ -387,20 +366,6 @@ Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integrati
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
-## test-client
-
-Definition: `webpack-dev-server --config webpack/webpack.config.test.js`
-
-Description: Ostensibly used to test only client-side code.
-
-Considerations: The `webpack.config.test.js` file referenced does not exist. **Deprecated; recommend removal.**
-
-## test-consumer
-
-Definition: `ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000`
-
-Considerations: The `consumer.test.ts` file referenced does not exist. **Deprecated; recommend removal.**
-
 ## test-devnet
 
 Definition: `nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts`
@@ -412,14 +377,6 @@ Description: Runs all tests in our `/devnet`` folder.
 Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/emitNotifications.spec.ts`
 
 Description: Runs only the `emitNotifications.spec.ts` test, of the three `/integration`` folder "utils."
-
-## test-events
-
-Definition: `nyc ts-mocha --project tsconfig.json ./test/integration/events/*.spec.ts`
-
-Description: Ostensibly used to test all events in our integration folder.
-
-Considerations: Misleading name (should be integration-scoped). More importantly, we do not have an /events folder inside our /integration directory. **Deprecated; recommend removal.**
 
 ## test-integration-util
 
@@ -436,8 +393,6 @@ Contributor: Timothee Legros
 Definition: `ts-node server/scripts/testQuery.ts`
 
 Description: Executes testQuery.ts, which runs a select query on chains, for unclear-to-this-documentarian reasons.
-
-Considerations: Why do we have this? Is a "test-" prefix name misleading, given that it is not, strictly speaking, a test (in the same sense as our ts-mocha scripts).
 
 Contributor: Timothee Legros
 
