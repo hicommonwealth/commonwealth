@@ -18,7 +18,11 @@ export const Sidebar = ({ isInsideCommunity }) => {
 
   return (
     <div className="Sidebar">
-      {app.chain && <SidebarHeader />}
+      {app.chain && (
+        <div className="sidebar-header-wrapper">
+          <SidebarHeader />
+        </div>
+      )}
       <div className="sidebar-default-menu">
         <SidebarQuickSwitcher />
         {isInsideCommunity && (

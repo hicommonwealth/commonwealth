@@ -10,9 +10,9 @@
   flex-direction: row;
   align-items: center;
   border-right: 1px solid $neutral-200;
-  background-color: #fff;
+  background-color: $white;
 
   .header {
-    padding: 12px;
+    padding: 0px 8px 0px 8px;
   }
 }

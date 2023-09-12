@@ -5,7 +5,6 @@ import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import app, { initAppState } from '../state';
-import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import {
@@ -46,7 +45,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
      * Imp to reset wc session on logout as subsequent login attempts fail
      */
     const walletConnectWallet = WebWalletController.Instance.getByName(
-      WalletId.WalletConnect,
+      WalletId.WalletConnect
     );
     await walletConnectWallet.reset();
   };

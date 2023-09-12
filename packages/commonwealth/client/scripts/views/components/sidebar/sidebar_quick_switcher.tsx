@@ -22,7 +22,7 @@ export const SidebarQuickSwitcher = () => {
     .getAll()
     .sort((a, b) => a.name.localeCompare(b.name))
     .filter(
-      (item) => !!item.node, // only chains with nodes
+      (item) => !!item.node // only chains with nodes
     );
 
   const starredCommunities = allCommunities.filter((item) => {
@@ -36,17 +36,15 @@ export const SidebarQuickSwitcher = () => {
     <div className="SidebarQuickSwitcher">
       <div className="community-nav-bar">
         {isLoggedIn && (
-          <>
-            <CWIconButton
-              iconName={
-                featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
-              }
-              iconButtonTheme="black"
-              onClick={() => {
-                setMenu({ name: 'createContent' });
-              }}
-            />
-          </>
+          <CWIconButton
+            iconName={
+              featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
+            }
+            iconButtonTheme="black"
+            onClick={() => {
+              setMenu({ name: 'createContent' });
+            }}
+          />
         )}
         <CWIconButton
           iconName={featureFlags.sessionKeys ? 'compassPhosphor' : 'compass'}

@@ -3,6 +3,7 @@ import React from 'react';
 
 import app from 'state';
 import { CWCommunityAvatar } from '../../component_kit/cw_community_avatar';
+import { CWText } from '../../component_kit/cw_text';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 
 const SidebarHeader = () => {
@@ -16,7 +17,12 @@ const SidebarHeader = () => {
           navigateToCommunity({ navigate, path: '', chain: app.chain.id })
         }
       />
-      {app.chain && <p className="header">{app.chain.meta.name}</p>}
+
+      {app.chain && (
+        <CWText className="header" type={'h5'}>
+          {app.chain.meta.name}
+        </CWText>
+      )}
     </div>
   );
 };
