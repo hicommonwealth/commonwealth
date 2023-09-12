@@ -31,7 +31,6 @@
     "load-db-local": "psql -h localhost -d commonwealth -U commonwealth -W -f local_save.dump",
     "migrate-db": "npx sequelize db:migrate",
     "migrate-db-down": "npx sequelize db:migrate:undo",
-    "migrate-server": "heroku run npx sequelize db:migrate --debug",
     "open-android": "NODE_ENV=mobile npx cap open ios",
     "open-ios": "NODE_ENV=mobile npx cap open ios",
     "psql": "chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh",

@@ -18,7 +18,6 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [load-db-local](#load-db-local)
   - [migrate-db](#migrate-db)
   - [migrate-db-down](#migrate-db-down)
-  - [migrate-server](#migrate-server)
   - [psql](#psql)
   - [reset-db](#reset-db)
   - [reset-frack-db](#reset-frack-db)
