@@ -10,7 +10,6 @@ module.exports = {
         ALTER TABLE "ChainNodes" ADD CONSTRAINT "Cosmos_chain_id_alphanumeric_lowercase" CHECK (cosmos_chain_id ~ '[a-z0-9]+');
         
         UPDATE "ChainNodes" SET cosmos_chain_id = 'agoric' WHERE name = 'Agoric';
-        UPDATE "ChainNodes" SET cosmos_chain_id = 'gravitybridge' WHERE name = 'Althea';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'acrechain' WHERE name = 'arable-protocol';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'archway' WHERE name = 'Archway';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'bitsong' WHERE name = 'Bitsong';
@@ -19,8 +18,8 @@ module.exports = {
         UPDATE "ChainNodes" SET cosmos_chain_id = 'cerberus' WHERE name = 'Cerberus';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'cheqd' WHERE name = 'Cheqd';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'chihuahua' WHERE name = 'Chihuahua';
-
         UPDATE "ChainNodes" SET cosmos_chain_id = 'composable' WHERE name = 'Composable Finance';
+
         UPDATE "ChainNodes" SET cosmos_chain_id = 'csdkv1' WHERE name = 'cosmos sdk devnet';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'csdkbeta' WHERE name = 'cosmos sdk v0.45.0';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'csdkv1ci' WHERE name = 'cosmos sdk v0.45.0 CI';
@@ -29,6 +28,7 @@ module.exports = {
         UPDATE "ChainNodes" SET cosmos_chain_id = 'evmos' WHERE name = 'Evmos';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'evmosdevci' WHERE name = 'evmos dev ci';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'evmosdev' WHERE name = 'evmos sandbox';
+        UPDATE "ChainNodes" SET cosmos_chain_id = 'gravitybridge' WHERE name = 'Gravity Chain';
         UPDATE "ChainNodes" SET cosmos_chain_id = 'haqq' WHERE name = 'Haqq Network';
 
         UPDATE "ChainNodes" SET cosmos_chain_id = 'injective' WHERE name = 'Injective (Mainnet)';
