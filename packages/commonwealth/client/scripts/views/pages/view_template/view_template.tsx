@@ -51,6 +51,7 @@ type Json = {
 type ViewTemplateFormProps = {
   contract_address?: string;
   slug?: string;
+  isForm?: boolean;
   setTemplateNickname(name: string): any;
 };
 
@@ -75,9 +76,9 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
     const templateMetadata = contractInStore?.ccts?.find((cct) => {
       return cct.cctmd.slug === slug || cct.cctmd.slug === `/${slug}`;
     });
-
+    console.log(contractInStore, slug, contractInStore.ccts, templateMetadata);
     if (!contractInStore || !templateMetadata) {
-      if (formData) return <div>No Contract Available</div>;
+      if (formData.isForm) return <div>No Contract Available</div>;
       navigate('/404', {}, null);
     }
 
@@ -280,7 +281,13 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
           return <CWDivider />;
         case TemplateComponents.TEXT:
           return (
-            <CWText fontStyle={field[component].field_type}>
+            <CWText
+              fontStyle={
+                formData.isForm && field[component].field_type == 'h1'
+                  ? 'h2'
+                  : field[component].field_type
+              }
+            >
               {field[component].field_value}
             </CWText>
           );
@@ -416,24 +423,27 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
   };
 
   if (!json) {
-    if (formData) return <div>No Contract Available</div>;
+    if (formData.isForm) return <div>No Contract Available</div>;
     return;
   }
 
   return (
-    <div className={formData ? 'ViewTemplateForm' : 'ViewTemplatePage'}>
+    <div className={formData.isForm ? 'ViewTemplateForm' : 'ViewTemplatePage'}>
       <CWBreadcrumbs
         breadcrumbs={[
           { label: 'Contracts', path: `/contracts`, navigate },
           { label: templateNickname },
         ]}
       />
-      <CWText type="h3" className="header">
-        {templateNickname}
-      </CWText>
+
+      {!formData.isForm && (
+        <CWText type="h3" className="header">
+          {templateNickname}
+        </CWText>
+      )}
 
       <div className="form">
-        <CWDivider className="divider" />
+        {!formData.isForm && <CWDivider className="divider" />}
 
         {!templateError ? (
           <div className="template">{renderTemplate(json.form_fields)}</div>

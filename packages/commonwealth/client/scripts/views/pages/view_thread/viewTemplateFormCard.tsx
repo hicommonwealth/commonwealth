@@ -15,6 +15,7 @@ export const ViewTemplateFormCard = ({ address, slug }) => {
             contract_address={address}
             slug={slug}
             setTemplateNickname={setNickname}
+            isForm={true}
           />
         </div>
       }

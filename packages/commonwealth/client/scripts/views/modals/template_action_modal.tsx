@@ -84,7 +84,9 @@ export const TemplateActionModal = ({
       (_cct) => String(_cct.templateId) === identifier
     );
 
-    const newIdentifier = `${identifier}/${contract.address}/${cct?.cctmd.slug}`;
+    const newIdentifier = `${identifier}/${
+      contract.address
+    }/${cct?.cctmd.slug.replace('/', '')}`;
 
     return { contract, cct, newIdentifier };
   };

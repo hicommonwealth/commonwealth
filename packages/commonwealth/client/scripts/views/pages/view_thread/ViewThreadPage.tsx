@@ -437,6 +437,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       }
                       slug={linkedTemplates[0]?.identifier.split('/')[2]}
                       setTemplateNickname={null}
+                      isForm={true}
                     />
                   )}
                 {thread.readOnly || fromDiscordBot ? (

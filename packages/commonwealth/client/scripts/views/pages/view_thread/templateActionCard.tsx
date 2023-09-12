@@ -90,12 +90,12 @@ export const TemplateActionCard = ({
   return (
     <div>
       <CWContentPageCard
-        header="Add Template"
+        header="Add contract action"
         content={
           <div className="TemplateActionCard">
             <CWButton
               buttonType="mini-black"
-              label="Add Template"
+              label="Add contract action"
               onClick={() => setIsModalOpen(true)}
             />
             {initialTemplates.length > 0 && (
