@@ -100,7 +100,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const [searchParams] = useSearchParams();
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
-  const [hideTemplate, setHideTemplate] = useState(false);
 
   const {
     data,
@@ -630,10 +629,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     label: 'Template',
                     item: (
                       <div className="cards-column">
-                        <TemplateActionCard
-                          thread={thread}
-                          onChangeHandler={() => {}}
-                        />
+                        <TemplateActionCard thread={thread} />
                       </div>
                     ),
                   },

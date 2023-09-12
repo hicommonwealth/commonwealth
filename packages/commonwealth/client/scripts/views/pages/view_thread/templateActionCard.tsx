@@ -17,7 +17,6 @@ import { useDeleteThreadLinksMutation } from 'state/api/threads';
 
 type TemplateActionCardProps = {
   thread: Thread; // Pass the thread content to the modal
-  onChangeHandler: (links?: Link[]) => void;
 };
 const dropdownOptions: DropdownItemType[] = [
   {
@@ -34,10 +33,7 @@ const dropdownOptions: DropdownItemType[] = [
   },
 ];
 
-export const TemplateActionCard = ({
-  thread,
-  onChangeHandler,
-}: TemplateActionCardProps) => {
+export const TemplateActionCard = ({ thread }: TemplateActionCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDisplay, setSelectedDisplay] = useState<DropdownItemType>(
     dropdownOptions[0]
@@ -83,7 +79,6 @@ export const TemplateActionCard = ({
       });
       const newLinks = newThread.links;
       setInitialTemplates(filterLinks(newLinks, LinkSource.Template));
-      onChangeHandler(newLinks);
     }
   };
 
@@ -115,7 +110,7 @@ export const TemplateActionCard = ({
             isOpen={isModalOpen}
             thread={thread}
             display={selectedDisplay.value as LinkDisplay}
-            onSave={() => onChangeHandler}
+            onSave={() => setIsModalOpen(false)}
             onClose={() => setIsModalOpen(false)}
           />
         }

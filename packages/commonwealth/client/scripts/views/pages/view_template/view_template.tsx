@@ -57,7 +57,7 @@ type ViewTemplateFormProps = {
 
 const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
   const navigate = useCommonNavigate();
-  const params = formData ?? useParams();
+  const params = formData;
   const [formState, setFormState] = useState({});
   const [json, setJson] = useState<Json>(null);
   const [isLoaded, setIsLoaded] = useState(false);
