@@ -24,27 +24,35 @@ const fetchCosmosDeposits = async (
   }
 };
 
-const getCosmosDepositsQueryKey = (proposal: AnyProposal) => {
+const getCosmosDepositsQueryKey = (
+  proposal: AnyProposal,
+  poolParams: number
+) => {
   return [
     'cosmosDeposits',
     app.activeChainId(),
     proposal?.identifier,
     proposal?.turnout, // using this as a dependency in case proposal is refetched
+    poolParams, // turnout depends on chain.staked set by poolParams
   ];
 };
 
-const useCosmosDeposits = (proposal: AnyProposal) => {
+const useCosmosProposalDepositsQuery = (
+  proposal: AnyProposal,
+  poolParams: number
+) => {
   return useQuery({
-    queryKey: getCosmosDepositsQueryKey(proposal),
+    queryKey: getCosmosDepositsQueryKey(proposal, poolParams),
     queryFn: () => fetchCosmosDeposits(proposal),
     enabled:
       app.chain?.base === ChainBase.CosmosSDK &&
       !_.isEmpty(proposal) &&
       !proposal.completed &&
-      proposal.data?.status === 'DepositPeriod',
+      proposal.data?.status === 'DepositPeriod' &&
+      !!poolParams,
     staleTime: DEPOSITS_STALE_TIME,
     cacheTime: DEPOSITS_CACHE_TIME,
   });
 };
 
-export { useCosmosDeposits };
+export { useCosmosProposalDepositsQuery };

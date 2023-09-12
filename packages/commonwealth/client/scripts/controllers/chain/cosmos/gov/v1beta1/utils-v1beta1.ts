@@ -170,7 +170,7 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
     spendAmount = spend.amount[0]
       ? [
           new CosmosToken(
-            spend.amount[0]?.denom?.toUpperCase(),
+            spend.amount[0]?.denom,
             spend.amount[0]?.amount
           ).toCoinObject(),
         ]
@@ -275,7 +275,8 @@ export interface CosmosDepositParams {
 }
 
 export const getDepositParams = async (
-  cosmosChain: Cosmos
+  cosmosChain: Cosmos,
+  stakingDenom?: string
 ): Promise<CosmosDepositParams> => {
   const govController = cosmosChain.governance as CosmosGovernance;
   let minDeposit;
@@ -283,7 +284,7 @@ export const getDepositParams = async (
 
   // TODO: support off-denom deposits
   const depositCoins = depositParams.minDeposit.find(
-    ({ denom }) => denom === cosmosChain.chain.denom
+    ({ denom }) => denom === stakingDenom
   );
   if (depositCoins) {
     minDeposit = new CosmosToken(

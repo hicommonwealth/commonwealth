@@ -8,7 +8,7 @@ const config: PlaywrightTestConfig = {
   globalTeardown: './globalTeardown.ts',
   timeout: 60_000,
   fullyParallel: true,
-  reporter: [['playwright-json-summary-reporter']],
+  reporter: [['list'], ['playwright-json-summary-reporter']],
 };
 
 export default config;
