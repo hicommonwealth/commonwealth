@@ -38,10 +38,6 @@ export const testDb = new Sequelize(DATABASE_URI, { logging: false });
 export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
 
 export async function addAlchemyKey() {
-  console.log(
-    'process.env.ETH_ALCHEMY_API_KEY',
-    process.env.ETH_ALCHEMY_API_KEY
-  );
   const apiKey = process.env.ETH_ALCHEMY_API_KEY;
   if (!apiKey) {
     throw Error('ETH_ALCHEMY_API_KEY not found');

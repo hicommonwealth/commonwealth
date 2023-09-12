@@ -77,7 +77,7 @@ test.describe('Commonwealth Create Community', () => {
   });
 
   test.only('Test create Cosmos community', async ({ page }) => {
-    await page.getByText('Cosmos').click();
+    await page.goto(`http://localhost:${PORT}/createCommunity/cosmos`);
 
     const chainName = Date.now().toString() + getRandomInteger(1, 100000);
     await page.locator('input#NameInput').fill(chainName);
