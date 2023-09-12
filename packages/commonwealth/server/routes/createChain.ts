@@ -1,6 +1,6 @@
 import type { Cluster } from '@solana/web3.js';
 import BN from 'bn.js';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
 import {
   BalanceType,
   ChainBase,
@@ -252,8 +252,9 @@ const createChain = async (
     // TODO: test altWalletUrl if available
 
     // cosmos_chain_id is the canonical identifier for a cosmos chain.
-    // Our convention is to follow the "chain_name" standard established by the Cosmos
-    // Chain Registry: https://github.com/cosmos/chain-registry
+    // Our convention is to follow the "chain_name" standard established by the
+    // Cosmos Chain Registry:
+    // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
     // This community-led registry seeks to track chain info for all Cosmos chains.
     // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
     // It is a lowercase alphanumeric name, like 'osmosis'.
@@ -321,7 +322,7 @@ const createChain = async (
     return next(new AppError(Errors.ChainNameExists));
   }
 
-  if (!!cosmos_chain_id) {
+  if (cosmos_chain_id) {
     const oldChainNode = await models.ChainNode.findOne({
       where: { [Op.or]: [{ cosmos_chain_id }] },
     });
