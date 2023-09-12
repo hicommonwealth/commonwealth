@@ -85,7 +85,7 @@ export const CosmosForm = () => {
       />
       <IdRow id={id} />
       <InputRow
-        title="Chain Name (Cosmos canonical identifier)"
+        title="Registered Cosmos Chain Name"
         value={chainName}
         placeholder={name.toLowerCase()}
         onChangeHandler={(v) => {

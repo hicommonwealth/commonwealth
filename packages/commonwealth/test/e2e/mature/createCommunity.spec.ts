@@ -87,7 +87,7 @@ test.describe('Commonwealth Create Community', () => {
     await iconField.fill(
       'https://assets.commonwealth.im/8c3f1d15-4c21-4fc0-9ea4-6f9bd234eb62.jpg'
     );
-    const chainNameIdField = await page.locator('input[id*=Chain Name]');
+    const chainNameIdField = await page.locator('input[id*=Registered]');
     await chainNameIdField.fill('cosmossdkchain');
 
     await page.click('button.Button.primary-blue');
