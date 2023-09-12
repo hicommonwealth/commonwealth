@@ -48,7 +48,9 @@
 
     background-color: $neutral-25;
     border-right: 1px solid $neutral-200;
-    height: calc(100vh - #{$global-header-height} * 2);
+    height: calc(
+      100vh - (#{$global-header-height} + #{$global-sidebar-header-height})
+    );
     overflow: auto;
     width: calc(calc(#{$sidebar-width} + #{$quick-switcher-width}) + 1px);
 
