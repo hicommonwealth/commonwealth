@@ -152,6 +152,7 @@ const createChain = async (
   // TODO: refactor this to use existing nodes rather than always creating one
 
   let eth_chain_id: number = null;
+  let cosmos_chain_id: string | null = null;
   let url = req.body.node_url;
   let altWalletUrl = req.body.alt_wallet_url;
   let privateUrl: string | undefined;
@@ -249,6 +250,15 @@ const createChain = async (
     }
 
     // TODO: test altWalletUrl if available
+
+    // cosmos_chain_id is the canonical identifier for a cosmos chain.
+    // Our convention is to follow the "chain_name" standard established by the Cosmos
+    // Chain Registry: https://github.com/cosmos/chain-registry
+    // This community-led registry seeks to track chain info for all Cosmos chains.
+    // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
+    // It is a lowercase alphanumeric name, like 'osmosis'.
+    // See: https://github.com/hicommonwealth/commonwealth/issues/4951
+    cosmos_chain_id = req.body.cosmos_chain_id;
   } else if (
     req.body.base === ChainBase.Substrate &&
     req.body.type !== ChainType.Offchain
@@ -273,7 +283,6 @@ const createChain = async (
   const {
     id,
     name,
-    cosmos_chain_id,
     default_symbol,
     icon_url,
     description,
@@ -312,14 +321,13 @@ const createChain = async (
     return next(new AppError(Errors.ChainNameExists));
   }
 
-  const oldChainNode = await models.ChainNode.findOne({
-    where: { [Op.or]: [{ cosmos_chain_id: req.body.cosmos_chain_id }] },
-  });
-  if (
-    oldChainNode &&
-    oldChainNode.cosmos_chain_id === req.body.cosmos_chain_id
-  ) {
-    return next(new AppError(Errors.ChainNameExistsForNode));
+  if (!!cosmos_chain_id) {
+    const oldChainNode = await models.ChainNode.findOne({
+      where: { [Op.or]: [{ cosmos_chain_id }] },
+    });
+    if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
+      return next(new AppError(Errors.ChainNameExistsForNode));
+    }
   }
 
   const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
