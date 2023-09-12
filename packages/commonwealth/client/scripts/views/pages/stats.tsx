@@ -156,6 +156,9 @@ const StatsPage = () => {
 
   return (
     <div className="StatsPage">
+      <CWText type="h2" fontWeight="medium">
+        Analytics
+      </CWText>
       <div className="stat-row dark top">
         <CWText fontWeight="medium">Duration</CWText>
         <CWText fontWeight="medium">New Addresses</CWText>

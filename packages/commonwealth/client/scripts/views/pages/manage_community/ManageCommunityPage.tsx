@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
 import { AccessLevel } from '../../../../../shared/permissions';
+import { CWText } from '../../components/component_kit/cw_text';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import RoleInfo from '../../../models/RoleInfo';
 import Permissions from '../../../utils/Permissions';
@@ -152,6 +153,9 @@ const ManageCommunityPage = () => {
 
   return (
     <div className="ManageCommunityPage">
+      <CWText type="h2" fontWeight="medium">
+        Manage Community
+      </CWText>
       <ChainMetadataRows
         admins={admins}
         chain={app.config.chains.getById(app.activeChainId())}
