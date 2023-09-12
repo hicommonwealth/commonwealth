@@ -271,8 +271,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     !!hasJoinedCommunity ||
     (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
 
-  const handleLinkedTemplateChange = (links: Link[]) => {};
-
   const handleNewSnapshotChange = async ({
     id,
     snapshot_title,
@@ -634,7 +632,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <div className="cards-column">
                         <TemplateActionCard
                           thread={thread}
-                          onChangeHandler={handleLinkedTemplateChange}
+                          onChangeHandler={() => {}}
                         />
                       </div>
                     ),
