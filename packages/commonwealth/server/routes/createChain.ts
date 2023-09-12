@@ -257,7 +257,7 @@ const createChain = async (
     // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
     // This community-led registry seeks to track chain info for all Cosmos chains.
     // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
-    // It is a lowercase alphanumeric name, like 'osmosis'.
+    // It is a lowercase alphanumeric string, like 'osmosis'.
     // See: https://github.com/hicommonwealth/commonwealth/issues/4951
     cosmos_chain_id = req.body.cosmos_chain_id;
   } else if (

@@ -75,6 +75,25 @@ test.describe('Commonwealth Create Community', () => {
 
     await assertAdminCapablities(page, chainName);
   });
+
+  test.only('Test create Cosmos community', async ({ page }) => {
+    await page.getByText('Cosmos').click();
+
+    const chainName = Date.now().toString() + getRandomInteger(1, 100000);
+    await page.locator('input#NameInput').fill(chainName);
+    const rpcField = await page.locator('input[id*=RPC]');
+    await rpcField.fill('https://aura-rpc.tienthuattoan.ventures/');
+    const iconField = await page.locator('input[id*=Icon]');
+    await iconField.fill(
+      'https://assets.commonwealth.im/8c3f1d15-4c21-4fc0-9ea4-6f9bd234eb62.jpg'
+    );
+    const chainNameIdField = await page.locator('input[id*=Chain Name]');
+    await chainNameIdField.fill('cosmossdkchain');
+
+    await page.click('button.Button.primary-blue');
+
+    await assertAdminCapablities(page, chainName);
+  });
 });
 
 async function fillOutERCForm(page, formName, tokenContractAddress, chainName) {
