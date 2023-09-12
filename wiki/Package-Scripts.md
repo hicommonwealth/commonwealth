@@ -18,9 +18,6 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [psql](#psql)
   - [reset-db](#reset-db)
   - [reset-frack-db](#reset-frack-db)
-- [Docker](#docker)
-  -[start-containers](#start-containers)
-  -[start-docker-setup](#start-docker-setup)
 - [Linting & Formatting](#linting--formatting)
   - [format](#format)
   - [lint](#lint)
@@ -155,20 +152,6 @@ Description: Resets the local database.
 Definition: `heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack`
 
 Description: Synchronizes `beta-db` (used for QA) against the `frack-db` (used for CDN cache testing). Good for undoing migration script run in previous commit to Frack. See [Testing Environments](./Testing-Environments.md) entry for more info.
-
-# Docker
-
-## start-containers
-
-Definition: `chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh`
-
-Description: Starts remote Docker containers; see [start-docker-containers.sh](../packages/commonwealth/scripts/start-docker-containers.sh) for further documentation.
-
-## start-docker-setup
-
-Definition: `chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh`
-
-Description: To be run in a new project or repo when first setting up remote docker containers. See [start-docker-setup-help.sh](../packages/commonwealth/scripts/start-docker-setup-help.sh) for further documentation.
 
 # Linting & Formatting
 
