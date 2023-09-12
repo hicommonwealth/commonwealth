@@ -44,6 +44,7 @@ class ChainInfo {
   public communityBanner?: string;
   public discordConfigId?: string;
   public cosmosGovernanceVersion?: string;
+  public discordWebhooksEnabled?: boolean;
 
   public get node() {
     return this.ChainNode;
@@ -83,6 +84,7 @@ class ChainInfo {
     adminOnlyPolling,
     discord_config_id,
     cosmosGovernanceVersion,
+    discordWebhooksEnabled,
   }) {
     this.id = id;
     this.network = network;
@@ -118,6 +120,7 @@ class ChainInfo {
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
     this.cosmosGovernanceVersion = cosmosGovernanceVersion;
+    this.discordWebhooksEnabled = discordWebhooksEnabled;
   }
 
   public static fromJSON({
@@ -153,6 +156,7 @@ class ChainInfo {
     ChainNode,
     admin_only_polling,
     discord_config_id,
+    discord_webhooks_enabled,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -210,6 +214,7 @@ class ChainInfo {
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       cosmosGovernanceVersion: cosmos_governance_version,
+      discordWebhooksEnabled: discord_webhooks_enabled,
     });
   }
 
@@ -274,6 +279,7 @@ class ChainInfo {
     defaultPage,
     hasHomepage,
     chain_node_id,
+    discord_webhooks_enabled,
   }: {
     name?: string;
     description?: string;
@@ -292,6 +298,7 @@ class ChainInfo {
     defaultPage?: DefaultPage;
     hasHomepage?: boolean;
     chain_node_id?: string;
+    discord_webhooks_enabled?: boolean;
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -313,6 +320,7 @@ class ChainInfo {
       default_page: defaultPage,
       has_homepage: hasHomepage,
       chain_node_id,
+      discord_webhooks_enabled,
       jwt: app.user.jwt,
     });
     const updatedChain = r.result;
@@ -333,6 +341,7 @@ class ChainInfo {
     this.defaultPage = updatedChain.default_page;
     this.hasHomepage = updatedChain.has_homepage;
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
+    this.discordWebhooksEnabled = updatedChain.discord_webhooks_enabled;
   }
 }
 

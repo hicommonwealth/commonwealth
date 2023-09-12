@@ -89,6 +89,7 @@ const updateChain = async (
     has_homepage,
     terms,
     chain_node_id,
+    discord_webhooks_enabled,
   } = req.body;
 
   let snapshot = req.body['snapshot[]'];
@@ -197,6 +198,9 @@ const updateChain = async (
   }
   if (chain_node_id) {
     chain.chain_node_id = chain_node_id;
+  }
+  if (discord_webhooks_enabled) {
+    chain.discord_webhooks_enabled = discord_webhooks_enabled;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle

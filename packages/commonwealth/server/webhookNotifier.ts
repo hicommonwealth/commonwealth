@@ -188,13 +188,14 @@ const send = async (models, content: WebhookContent) => {
     }
   }
 
+  const chain = await models.Chain.findOne({
+    where: { id: content?.chain },
+  });
+
   // Second case
   if (!previewImageUrl) {
     if (content.chain) {
       // if the chain has a logo, show it as preview image
-      const chain = await models.Chain.findOne({
-        where: { id: content.chain },
-      });
       if (chain) {
         if (chain.icon_url) {
           previewImageUrl = chain.icon_url.match(`^(http|https)://`)
@@ -274,7 +275,7 @@ const send = async (models, content: WebhookContent) => {
           });
         } else if (
           url.indexOf('discord.com') !== -1 &&
-          actor !== 'Discord Bot'
+          (actor !== 'Discord Bot' || chain?.discord_webhooks_enabled)
         ) {
           // discord webhook format (raw json, for application/json)
           webhookData = isChainEvent
