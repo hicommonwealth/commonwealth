@@ -49,6 +49,10 @@
         border-bottom: 1px solid $neutral-200;
         td {
           padding: 14px 16px;
+
+          div.numeric {
+            text-align: end;
+          }
         }
       }
     }

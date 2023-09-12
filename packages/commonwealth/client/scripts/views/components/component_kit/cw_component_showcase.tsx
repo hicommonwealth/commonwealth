@@ -53,6 +53,7 @@ import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
 import { CWTable } from './cw_table';
+import { makeData, createColumnInfo } from './new_designs/cw_table_data'
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -155,6 +156,9 @@ const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   (acc, el) => ({ ...acc, [el]: true }),
   {} as { [K in BannerType]: boolean }
 );
+
+const rowData = makeData(25)
+const columnInfo = createColumnInfo();
 
 export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
@@ -1367,7 +1371,7 @@ export const ComponentShowcase = () => {
       </div>
       <div className="table">
         <CWText type="h3">Table</CWText>
-        <CWTable />
+        <CWTable columnInfo={columnInfo} rowData={rowData} />
       </div>
     </div>
   );

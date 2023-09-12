@@ -4,6 +4,7 @@ import { CWIcon } from './cw_icons/cw_icon';
 import 'components/component_kit/cw_table.scss';
 import { CWIconButton } from './cw_icon_button';
 import ReactDOM from 'react-dom/client'
+import { CWTag } from './cw_tag';
 
 import {
   ColumnDef,
@@ -14,105 +15,46 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-type Person = {
-  firstName: string
-  lastName: string
-  age: number
-  visits: number
-  progress: number
-  status: 'relationship' | 'complicated' | 'single'
-  createdAt: Date
-  subRows?: Person[]
+type ColumnDescriptor = {
+  key: string;
+  header: string;
+  numeric: boolean;
 }
 
-const range = (len: number) => {
-  const arr = []
-  for (let i = 0; i < len; i++) {
-    arr.push(i)
-  }
-  return arr
-}
+type TableProps = {
+  columnInfo: ColumnDescriptor[];
+  rowData: [];
+};
 
-const newPerson = (): Person => {
-  return {
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    age: faker.random.number(40),
-    visits: faker.random.number(1000),
-    progress: faker.random.number(100),
-    createdAt: faker.date.recent(),
-    status: faker.helpers.shuffle<Person['status']>([
-      'relationship',
-      'complicated',
-      'single',
-    ])[0]!,
-  }
-}
-
-export function makeData(...lens: number[]) {
-  const makeDataLevel = (depth = 0): Person[] => {
-    const len = lens[depth]!
-    return range(len).map((d): Person => {
-      return {
-        ...newPerson(),
-        subRows: lens[depth + 1] ? makeDataLevel(depth + 1) : undefined,
-      }
-    })
-  }
-
-  return makeDataLevel()
-}
-
-export const CWTable = () => {
-  const rerender = React.useReducer(() => ({}), {})[1]
-
+export const CWTable = ({ columnInfo, rowData }) => {
   const [sorting, setSorting] = React.useState<SortingState>([])
 
-  const columns = React.useMemo<ColumnDef<Person>[]>(
-    () => [
-      {
-        accessorKey: 'firstName',
-        header: 'First Name',
-        cell: info => info.getValue(),
-        footer: props => props.column.id,
-      },
-      {
-        accessorFn: row => row.lastName,
-        id: 'lastName',
-        cell: info => info.getValue(),
-        header: () => <span>Last Name</span>,
-        footer: props => props.column.id,
-      },
-      {
-        accessorKey: 'age',
-        header: () => 'Age',
-        footer: props => props.column.id,
-      },
-      {
-        accessorKey: 'visits',
-        header: () => <span>Visits</span>,
-        footer: props => props.column.id,
-      },
-      {
-        accessorKey: 'status',
-        header: 'Status',
-        footer: props => props.column.id,
-      },
-      {
-        accessorKey: 'progress',
-        header: 'Profile Progress',
-        footer: props => props.column.id,
-      },
-      {
-        accessorKey: 'createdAt',
-        header: 'Created At',
-      },
-    ],
+  const columns = React.useMemo<ColumnDef<unknown, any>[]>(
+    () =>
+      columnInfo.map((col) => {
+        return (
+          {
+            accessorKey: col.key,
+            header: col.header,
+            cell: (info) => {
+              if (col.numeric) {
+                return (
+                  <div className='numeric'>
+                    {info.getValue()}
+                  </div>
+                )
+              } else {
+                return info.getValue()
+              }
+            },
+            footer: props => props.column.id,
+          }
+        )
+      }),
     []
   )
 
-  const [data, setData] = React.useState(() => makeData(100))
-  const refreshData = () => setData(() => makeData(100))
+  const [data, setData] = React.useState(() => rowData)
 
   const table = useReactTable({
     data,
@@ -200,13 +142,3 @@ export const CWTable = () => {
     </div>
   )
 }
-
-// const rootElement = document.getElementById('root')
-
-// if (!rootElement) throw new Error('Failed to find the root element')
-
-// ReactDOM.createRoot(rootElement).render(
-//   <React.StrictMode>
-//     <App />
-//   </React.StrictMode>
-// )
