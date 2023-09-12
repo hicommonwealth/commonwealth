@@ -71,6 +71,10 @@ NB. Points != Time! Points are an estimate of complexity, not time. Having said 
 
 Points may always be increased mid-implementation, but a justification must be provided.
 
+## Branches
+
+Branches should be prefixed with an issue number, then the contributor's name, followed by a short descriptive tag e.g. `5007.john-doe.update-sidebar-layout`.
+
 ## Pull Requests
 
 If a PR is marked for review, it must be fully mergeable, without breaking any existing functionality. It should also pass CI and [GitHub Quality Checks](#github-quality-checks).
@@ -132,7 +136,7 @@ Later on Friday we have our Sprint Planning meeting where we tee up the stories 
 
 # Deployment and QA schedule
 
-Agile Release Trains (aka [ART, from SAFe5](https://v5.scaledagileframework.com/agile-release-train/)) run 4.5 days a week, Monday morning through mid-day Friday. We do not deploy on Fridays after 13:00 EST. If QA has been approved by 13:00, we will ship the release; otherwise we don't ship until Monday.
+Agile Release Trains (aka [ART, from SAFe5](https://v5.scaledagileframework.com/agile-release-train/)) run 4 days a week, Monday through Thursday. Aspirationally, deploys are performed before 13:00 EST. If necessary, we may deploy Friday morning before 13:00 EST. If QA has been approved by 13:00, we will ship the release; otherwise we wait until Monday.
 
 Over the course of the day, pull requests are merged into the Master branch on an ad hoc basis. On merge, the code is automatically pushed to our Beta (QA) server. Each morning, before the next round of PR merges, Beta ships a new release to the live site. Typically, a working session (aka "PR Party") is held to make sure everything shippable will be included in the next day's release.
 
@@ -142,9 +146,45 @@ Engineering is responsible for informing Product that release on Beta is ready f
 
 Our Beta/QA server can be found at `qa.commonwealth.im`. Custom domains are available at `osmosis.qa.commonwealth.im` and `dydx.qa.commonwealth.im`.
 
+## GitHub Release & Heroku Deployment Procedure
+
+We use [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository). Releases are bundles of commits organized as tags. Git tags are similar to git branches, insofar as they are versions of the repository, containing a specific iteration in the repo’s history, which may be checked out locally.
+
+Our releases observe the following versioning syntax: `v<MajorVersion>.<CycleNumber>.<IndexNumber>`. As of 230912, our major version is 0, our cycle number is 6, and our index number is 9, thus: `v0.6.9`. For hot fixes to an existing release, an additional suffix should be appended after a hyphen, e.g. `v0.6.9-1`.
+
+Releases must first be created, then QA’d, then deployed to Heroku. All engineers ought, by default, to possess the GitHub permissions required to draft a release. All engineers ought, by default, to possess the Heroku admin permissions required to deploy a release.
+
+Procedure for creating a new GitHub Release:
+
+- Navigate to the [repo’s Releases page](https://github.com/hicommonwealth/commonwealth/releases).
+- Draft a new release.
+- Create and select a new tag, following the versioning syntax described above.
+- Title the release after its tag number (e.g. `v0.6.9`).
+- Before hitting the "Generate release notes" button, manually set the "Previous tag" to the latest deployed version, e.g. `v0.6.8`.
+- Now hit “Generate release notes” to auto-populate the release description with a list of changes since the previous tag.
+- Check “Set as a pre-release,” at the bottom of the form.
+- Publish.
+
+Procedure for QAing a GitHub release:
+
+- Once a release is created, the QA team reviews our Beta (QA) server, which should already contain all versioned changes. 
+- QA must either approve or reject these changes. 
+- If QA finds significant issues with the branch, it will be rejected, and QA must open a GitHub issue enumerating the desired changes. 
+    + A leads retro should be held to understand what went wrong in the product-and-engineering pipeline, to prevent similar problems in the future.
+- If QA finds minor issues with the branch, they may still approve it, but must similarly open a GitHub issue enumerating the desired changes.
+    + These changes should be addressed before the next release.
+
+Procedure for deploying a GitHub release:
+
+- Once QA has approved the changes, the release can be deployed
+- `git push heroku <FullVersionTagname>:master`, e.g. `git push heroku v0.6.9:master`
+- If the tag is not found, run `git fetch origin`
+- If the git remote for Heroku doesn’t exist, run `heroku git:remote —app commonwealthapp`
+- Upon deploy, edit the original GitHub release, moving it from “pre-release” to “latest release”
+
 # Change Log
 
-- 231010: Flagged by Timothee Legros; Deployment and QA schedule section needs to be updated. Merging does not automatically push to Beta.
+- 230912: Added "Github Release & Heroku Deployment Procedure" section (#5062)
 - 230906: Updated with new requirements for tickets and PRs (#4972).
 - 230831: Merged with Agile-Development.md by Graham Johnson (#4936) and certified fresh.
 - 230823: Migrated from GitHub wiki by Graham Johnson (#4350).
