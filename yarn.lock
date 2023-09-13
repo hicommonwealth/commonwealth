@@ -3946,14 +3946,14 @@
   dependencies:
     long "^4.0.0"
 
-  "@keplr-wallet/unit@^0.12.23":
-    version "0.12.23"
-    resolved "https://registry.yarnpkg.com/@keplr-wallet/unit/-/unit-0.12.23.tgz#94692ac211dce9e52a121e8e390d5ac93197f489"
-    integrity sha512-8dVlzKSId2/cXzb2WSDUJJa7wNTwq2YVpAQAJT1DB+e+KL4QtVwfN+Muiv/Z9JzCuS/g9tjJn6tKx0aY3IpSbw==
-    dependencies:
-      "@keplr-wallet/types" "0.12.23"
-      big-integer "^1.6.48"
-      utility-types "^3.10.0"
+"@keplr-wallet/unit@^0.12.23":
+  version "0.12.23"
+  resolved "https://registry.yarnpkg.com/@keplr-wallet/unit/-/unit-0.12.23.tgz#94692ac211dce9e52a121e8e390d5ac93197f489"
+  integrity sha512-8dVlzKSId2/cXzb2WSDUJJa7wNTwq2YVpAQAJT1DB+e+KL4QtVwfN+Muiv/Z9JzCuS/g9tjJn6tKx0aY3IpSbw==
+  dependencies:
+    "@keplr-wallet/types" "0.12.23"
+    big-integer "^1.6.48"
+    utility-types "^3.10.0"
 
 "@libp2p/bootstrap@^8.0.0":
   version "8.0.0"
