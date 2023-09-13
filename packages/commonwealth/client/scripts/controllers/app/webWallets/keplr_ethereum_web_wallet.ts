@@ -12,6 +12,8 @@ declare global {
   interface Window extends KeplrWindow {}
 }
 
+export const ETHERMINT_CHAINS = ['evmos', 'injective', 'evmos-dev'];
+
 class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
   private _accounts: readonly AccountData[];
@@ -24,7 +26,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Evmos;
-  public readonly specificChains = ['evmos', 'injective', 'evmos-dev'];
+  public readonly specificChains = ETHERMINT_CHAINS;
 
   public get available() {
     return !!window.keplr;

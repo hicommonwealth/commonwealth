@@ -20,7 +20,7 @@ import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import clsx from 'clsx';
-import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWButton } from './components/component_kit/new_designs/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
 import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
@@ -119,9 +119,10 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isLoggedIn && <UserDropdown />}
           {!isLoggedIn && (
             <CWButton
-              buttonType="tertiary-black"
-              iconLeft="person"
-              label="Log in"
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Login"
+              buttonWidth="wide"
               onClick={() => setIsLoginModalOpen(true)}
             />
           )}
