@@ -7,6 +7,7 @@ import { ETHERSCAN_JS_API_KEY } from '../config';
 import type { ContractAttributes } from '../models/contract';
 import type { ContractAbiAttributes } from '../models/contract_abi';
 import validateAbi, { hashAbi } from '../util/abiValidation';
+import { NextFunction } from 'express';
 
 export enum Network {
   Mainnet = 'Mainnet',
@@ -129,13 +130,14 @@ type FetchEtherscanContractAbiReq = {
 };
 
 type FetchEtherscanContractAbiResp = {
-  contractAbi: string;
+  contractAbi: Record<string, unknown>[];
 };
 
 export const fetchEtherscanContractAbi = async (
   models: DB,
   req: TypedRequestBody<FetchEtherscanContractAbiReq>,
-  res: TypedResponse<FetchEtherscanContractAbiResp>
+  res: TypedResponse<FetchEtherscanContractAbiResp>,
+  next: NextFunction
 ) => {
   if (!ETHERSCAN_JS_API_KEY) {
     throw new AppError(Errors.NoEtherscanApiKey);
@@ -155,7 +157,7 @@ export const fetchEtherscanContractAbi = async (
     !chainNode.eth_chain_id ||
     !networkIdToName[chainNode.eth_chain_id]
   ) {
-    return new AppError(Errors.InvalidChainNode);
+    return next(new AppError(Errors.InvalidChainNode));
   }
 
   const network = networkIdToName[chainNode.eth_chain_id];
@@ -171,10 +173,10 @@ export const fetchEtherscanContractAbi = async (
     const etherscanContract = response.data.result[0];
     if (etherscanContract && etherscanContract['ABI'] !== '') {
       const abiString = etherscanContract['ABI'];
-      validateAbi(abiString);
+      const abiRecord = validateAbi(abiString);
 
       return success(res, {
-        contractAbi: abiString,
+        contractAbi: abiRecord,
       });
     }
   } else {

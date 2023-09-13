@@ -3,11 +3,12 @@ import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
 
 import { hashAbi } from '../util/abiValidation';
+import { AbiType } from '../../shared/types';
 
 export type ContractAbiAttributes = {
   id: number;
   nickname?: string;
-  abi: Array<Record<string, unknown>>;
+  abi: AbiType;
   abi_hash?: string;
   verified?: boolean;
   created_at?: Date;

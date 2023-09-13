@@ -4,6 +4,7 @@ import { ContractsStore } from 'stores';
 import Contract from '../../models/Contract';
 import app from 'state';
 import type { BalanceType, ContractType } from 'common-common/src/types';
+import { AbiType } from 'shared/types';
 
 type AddCommunityContractTemplateAttributes = {
   slug: string;
@@ -85,7 +86,7 @@ class ContractsController {
     this.update(resultAbi.abi, resultContract);
   }
 
-  public async getAbiFromEtherscan(address: string) {
+  public async getAbiFromEtherscan(address: string): Promise<AbiType> {
     const response: Response = await $.post(
       `${app.serverUrl()}/etherscanAPI/fetchEtherscanContractAbi`,
       {
@@ -274,7 +275,7 @@ class ContractsController {
   }: {
     chain_node_id: number;
     address: string;
-    abi?: string;
+    abi?: AbiType;
   }) {
     try {
       const response = await $.post(`${app.serverUrl()}/contract`, {
@@ -288,24 +289,12 @@ class ContractsController {
       const responseContract = response.result.contract;
       const { id, type, is_factory } = responseContract;
 
-      let abiParsed;
-
-      try {
-        if (abi) {
-          abiParsed = JSON.parse(abi);
-        } else {
-          abiParsed = abi;
-        }
-      } catch (err) {
-        abiParsed = abi;
-      }
-
       const result = new Contract({
         id,
         address,
         chainNodeId: chain_node_id,
         type,
-        abi: abiParsed,
+        abi,
         isFactory: is_factory,
         hasGlobalTemplate: response.result.hasGlobalTemplate,
       });
