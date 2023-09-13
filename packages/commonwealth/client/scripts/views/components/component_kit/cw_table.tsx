@@ -24,7 +24,12 @@ type TableProps = {
 };
 
 export const CWTable = ({ columnInfo, rowData }) => {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([
+    {
+      id: columnInfo[0].key,
+      desc: false
+    }
+  ])
 
   const columns = React.useMemo<ColumnDef<unknown, any>[]>(
     () =>
