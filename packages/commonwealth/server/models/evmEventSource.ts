@@ -8,7 +8,6 @@ export type EvmEventSourceAttributes = {
   chain_node_id: number;
   contract_address: string;
   event_signature: string;
-  event_definition: string;
   kind: string;
 
   Contract?: ContractAttributes;
@@ -38,7 +37,6 @@ export default (
         },
         contract_address: { type: dataTypes.STRING, allowNull: false },
         event_signature: { type: dataTypes.STRING, allowNull: false },
-        event_definition: { type: dataTypes.TEXT, allowNull: false },
         kind: { type: dataTypes.STRING, allowNull: false },
       },
       {
