@@ -40,11 +40,14 @@ import { LinkSnapshotInitialThreadModal } from '../modals/update_proposal_status
 import { Link, LinkSource } from 'models/Thread';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { Link as ReactRouterLink } from 'react-router-dom';
+import { NewSnapshotProposalModal } from '../modals/new_snapshot_proposal_modal';
+import { renderQuillDeltaToText } from 'utils';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
   const [showSidebar, setShowSidebar] = useState(false);
   const [linkSnapshotModalOpen, setLinkSnapshotModalOpen] = useState(false);
+  const [createSnapshotModalOpen, setCreateSnapshotModalOpen] = useState(false);
   const [linkedSnapshotProposal, setLinkedSnapshotProposal] =
     useState<Link>(null);
 
@@ -56,7 +59,7 @@ const NewThreadPage = () => {
     }
   }, [navigate]);
 
-  const { data: topics } = useFetchTopicsQuery({
+  const { data: topics, status } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
 
@@ -64,11 +67,12 @@ const NewThreadPage = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector = topics.filter((t) => {
-    return (
-      isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
-    );
-  });
+  const topicsForSelector =
+    topics?.filter((t) => {
+      return (
+        isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
+      );
+    }) ?? [];
 
   const {
     threadTitle,
@@ -97,7 +101,7 @@ const NewThreadPage = () => {
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
   const isPopulated = useMemo(() => {
-    return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
+    return threadTitle || getTextFromDelta(threadContentDelta)?.length > 0;
   }, [threadContentDelta, threadTitle]);
 
   const handleNewThreadCreation = async () => {
@@ -308,10 +312,44 @@ const NewThreadPage = () => {
           label: 'Create Snapshot',
           item: (
             <div className="SelectableCard">
+              <Modal
+                className="LinkedProposalsCardModal"
+                content={
+                  <NewSnapshotProposalModal
+                    onSave={() => {
+                      console.log('saved');
+                    }}
+                    onModalClose={() => {
+                      // setCreateSnapshotModalOpen(false);
+                      console.log('yo0');
+                    }}
+                    thread={{
+                      id: null,
+                      title: threadTitle,
+                      body: null,
+                      plaintext: renderQuillDeltaToText(threadContentDelta),
+                    }}
+                    fromExistingThread={false}
+                  />
+                }
+                onClose={() => setCreateSnapshotModalOpen(false)}
+                open={createSnapshotModalOpen}
+              />
               <CWContentPageCard
                 header="Create Snapshot"
                 content={
-                  <div className="ActionCard">
+                  <div
+                    className="ActionCard"
+                    onClick={() => {
+                      if (app.chain.meta.snapshot?.length > 0) {
+                        setCreateSnapshotModalOpen(true);
+                      } else {
+                        notifyError(
+                          "This community doesn't have snapshot spaces connected"
+                        );
+                      }
+                    }}
+                  >
                     <CWText type="b2">
                       Creates snapshot from existing text.
                     </CWText>
@@ -375,7 +413,15 @@ const NewThreadPage = () => {
                 content={
                   <div
                     className="ActionCard"
-                    onClick={() => setLinkSnapshotModalOpen(true)}
+                    onClick={() => {
+                      if (app.chain.meta.snapshot?.length > 0) {
+                        setLinkSnapshotModalOpen(true);
+                      } else {
+                        notifyError(
+                          "This community doesn't have snapshot spaces connected"
+                        );
+                      }
+                    }}
                   >
                     <CWText type="b2">
                       Search through snapshots show the poll directly on the

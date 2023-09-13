@@ -163,7 +163,7 @@ export const CWContentPage = ({
         })}
         authorAddress={author?.address}
         authorChainId={
-          typeof author.chain === 'string' ? author.chain : author.chain.id
+          typeof author?.chain === 'string' ? author?.chain : author?.chain.id
         }
         collaboratorsInfo={collaborators}
         publishDate={

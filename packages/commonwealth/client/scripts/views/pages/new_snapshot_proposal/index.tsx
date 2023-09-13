@@ -30,14 +30,18 @@ type NewSnapshotProposalPageProps = {
 
 type NewSnapshotProposalFormProps = {
   snapshotId: string;
-  thread?: Thread;
+  thread?:
+    | Thread
+    | { id: string; title: string; plaintext: string; body: string };
   onSave?: (snapshotInfo: { id: string; snapshot_title: string }) => void;
+  fromExistingThread?: boolean;
 };
 
 export const NewSnapshotProposalForm = ({
   snapshotId,
   thread,
   onSave,
+  fromExistingThread = true,
 }: NewSnapshotProposalFormProps) => {
   const navigate = useCommonNavigate();
 
@@ -138,7 +142,7 @@ export const NewSnapshotProposalForm = ({
           }
         }
       }
-      if (thread && thread.body) {
+      if (thread && thread.body && fromExistingThread) {
         const currentPath = window.location.pathname;
         if (currentPath.includes('/discussion/')) {
           const domain = window.location.origin;
@@ -159,6 +163,11 @@ export const NewSnapshotProposalForm = ({
           const delta = createDeltaFromText(thread.plaintext);
           setContentDelta(delta);
         }
+      }
+
+      if (!fromExistingThread) {
+        const delta = createDeltaFromText(thread.plaintext);
+        setContentDelta(delta);
       }
 
       setForm(initialForm);

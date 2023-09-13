@@ -10,15 +10,19 @@ import type Thread from '../../models/Thread';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
 
 type NewSnapshotProposalModalProps = {
-  thread: Thread;
+  thread:
+    | Thread
+    | { id: string; title: string; plaintext: string; body: string };
   onSave: (snapshotInfo: { id: string; snapshot_title: string }) => void;
   onModalClose: () => void;
+  fromExistingThread?: boolean;
 };
 
 export const NewSnapshotProposalModal = ({
   thread,
   onSave,
   onModalClose,
+  fromExistingThread = true,
 }: NewSnapshotProposalModalProps) => {
   const [selectedSnapshotId, setSelectedSnapshotId] = useState<string | null>(
     null
@@ -58,6 +62,7 @@ export const NewSnapshotProposalModal = ({
                 snapshotId={selectedSnapshotId}
                 thread={thread}
                 onSave={onSave}
+                fromExistingThread={fromExistingThread}
               />
             )}
           </>
@@ -66,6 +71,7 @@ export const NewSnapshotProposalModal = ({
             snapshotId={selectedSnapshotId}
             thread={thread}
             onSave={onSave}
+            fromExistingThread={fromExistingThread}
           />
         )}
       </div>
