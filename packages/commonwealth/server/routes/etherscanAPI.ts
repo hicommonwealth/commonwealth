@@ -7,7 +7,7 @@ import { ETHERSCAN_JS_API_KEY } from '../config';
 import type { ContractAttributes } from '../models/contract';
 import type { ContractAbiAttributes } from '../models/contract_abi';
 import validateAbi from '../util/abiValidation';
-import { hashAbi } from 'utils';
+import { hashAbi } from '../../shared/utils';
 
 export enum Network {
   Mainnet = 'Mainnet',
