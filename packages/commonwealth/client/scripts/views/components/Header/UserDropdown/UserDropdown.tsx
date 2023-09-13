@@ -110,17 +110,21 @@ const UserDropdown = () => {
         placement="bottom-end"
         modifiers={[{ name: 'offset', options: { offset: [0, 3] } }]}
         menuItems={[
-          {
-            type: 'header',
-            label: 'Addresses',
-          },
-          ...addresses,
-          {
-            type: 'default',
-            label: 'Connect a new address',
-            onClick: () => setIsLoginModalOpen(true),
-          },
-          { type: 'divider' },
+          ...(app.user.activeAccounts.length > 0
+            ? [
+                {
+                  type: 'header',
+                  label: 'Addresses',
+                },
+                ...addresses,
+                {
+                  type: 'default',
+                  label: 'Connect a new address',
+                  onClick: () => setIsLoginModalOpen(true),
+                },
+                { type: 'divider' },
+              ]
+            : []),
           {
             type: 'header',
             label: 'Settings',
