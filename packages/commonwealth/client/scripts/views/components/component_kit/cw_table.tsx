@@ -1,10 +1,7 @@
-import faker from 'faker';
 import React from 'react'
 import { CWIcon } from './cw_icons/cw_icon';
 import 'components/component_kit/cw_table.scss';
-import { CWIconButton } from './cw_icon_button';
-import ReactDOM from 'react-dom/client'
-import { CWTag } from './cw_tag';
+import { Avatar } from '../Avatar';
 
 import {
   ColumnDef,
@@ -37,10 +34,19 @@ export const CWTable = ({ columnInfo, rowData }) => {
             accessorKey: col.key,
             header: col.header,
             cell: (info) => {
+              const avatarUrl = info.row.original.avatars[col.key];
+
               if (col.numeric) {
                 return (
                   <div className='numeric'>
                     {info.getValue()}
+                  </div>
+                )
+              } else if(avatarUrl){
+                return (
+                  <div className='avatar-cell'>
+                    <Avatar url={avatarUrl} size={20} />
+                    <div className='text'>{info.getValue()}</div>
                   </div>
                 )
               } else {
@@ -129,7 +135,7 @@ export const CWTable = ({ columnInfo, rowData }) => {
         <tbody>
           {table
             .getRowModel()
-            .rows.slice(0, 10)
+            .rows
             .map(row => {
               return (
                 <tr key={row.id}>

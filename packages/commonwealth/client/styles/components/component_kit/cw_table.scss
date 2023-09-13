@@ -56,6 +56,15 @@
           div.numeric {
             text-align: end;
           }
+
+          div.avatar-cell {
+            display: flex;
+            gap: 8px;
+
+            div.text {
+              white-space: nowrap;
+            }
+          }
         }
       }
     }

@@ -49,15 +49,13 @@ const newCommunity = (): any => {
   const buttonType = faker.helpers.shuffle(buttonTypes)[0];
 
   return {
-    name: <div>
-            {faker.company.companyName()}
-            <img className="community-image" src="https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png" width='20px' height='20px' ></img>
-          </div>,
+    name: faker.company.companyName(),
     description: faker.lorem.paragraph(),
     members: faker.random.number(1000),
     threads: faker.random.number(1000),
     tags: <CWTag label={tagType} iconName={iconName} type={tagType} />,
-    buttons: <CWButton label='button' buttonType={buttonType} iconLeft={iconName} />
+    buttons: <CWButton label='button' buttonType={buttonType} iconLeft={iconName} />,
+    avatars: { name:"https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png" },
   }
 }
 
