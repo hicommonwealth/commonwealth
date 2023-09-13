@@ -284,7 +284,9 @@ export class TokenBalanceCache
       this._nodes[n.id] = n;
       if (n.eth_chain_id) {
         this._chainIds[n.eth_chain_id.toString()] = n.id;
-      } //TODO extend to cosmos when added
+      } else if (n.cosmos_chain_id) {
+        this._chainIds[n.eth_chain_id] = n.id;
+      }
     }
   }
 
