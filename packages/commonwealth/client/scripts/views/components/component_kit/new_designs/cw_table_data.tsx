@@ -49,7 +49,10 @@ const newCommunity = (): any => {
   const buttonType = faker.helpers.shuffle(buttonTypes)[0];
 
   return {
-    name: faker.company.companyName(),
+    name: <div>
+            {faker.company.companyName()}
+            <img className="community-image" src="https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png" width='20px' height='20px' ></img>
+          </div>,
     description: faker.lorem.paragraph(),
     members: faker.random.number(1000),
     threads: faker.random.number(1000),
@@ -71,32 +74,38 @@ export function createColumnInfo() {
     {
       key: 'name',
       header: 'Community',
-      numeric: false
+      numeric: false,
+      sortable: true,
     },
     {
       key: 'description',
       header: "Description",
-      numeric: false
+      numeric: false,
+      sortable: true,
     },
     {
       key: 'members',
       header: 'Members',
-      numeric: true
+      numeric: true,
+      sortable: true,
     },
     {
       key: 'threads',
       header: 'Threads',
-      numeric: true
+      numeric: true,
+      sortable: true,
     },
     {
       key: 'tags',
       header: "Tags",
-      numeric: false
+      numeric: false,
+      sortable: false,
     },
     {
       key: 'buttons',
       header: 'Buttons',
-      numeric: false
+      numeric: false,
+      sortable: false,
     }
   ]
 }

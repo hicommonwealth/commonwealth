@@ -48,13 +48,14 @@ export const CWTable = ({ columnInfo, rowData }) => {
               }
             },
             footer: props => props.column.id,
+            enableSorting: col.sortable,
           }
         )
       }),
     []
   )
 
-  const [data, setData] = React.useState(() => rowData)
+  const [data, _setData] = React.useState(() => rowData)
 
   const table = useReactTable({
     data,
@@ -67,6 +68,28 @@ export const CWTable = ({ columnInfo, rowData }) => {
     getSortedRowModel: getSortedRowModel(),
     debugTable: true,
   })
+
+  const displaySortIcon = (sortDirection: string) => {
+    const sortDirections = {
+      asc: <div className='icon-container'><CWIcon
+              iconName='arrowUpBlue500'
+              iconSize='small'
+              className='arrow-up-blue'
+            /></div>,
+      desc: <div className='icon-container'><CWIcon 
+              iconName='arrowDownBlue500'
+              iconSize='small'
+              className='arrow-down-blue'
+              /></div>,
+      false: <div className='icon-container'><CWIcon
+                iconName='arrowUpNeutral400'
+                iconSize='small'
+                className='arrow-down-blue'
+              /></div>,
+    }
+
+    return sortDirections[sortDirection]
+  }
 
   return (
     <div className="Table">
@@ -92,23 +115,9 @@ export const CWTable = ({ columnInfo, rowData }) => {
                           )}
                         </span>
 
-                        {{
-                          asc: <div className='icon-container'><CWIcon
-                                 iconName='arrowUpBlue500'
-                                 iconSize='small'
-                                 className='arrow-up-blue'
-                                /></div>,
-                          desc: <div className='icon-container'><CWIcon 
-                                  iconName='arrowDownBlue500'
-                                  iconSize='small'
-                                  className='arrow-down-blue'
-                                  /></div>,
-                          false: <div className='icon-container'><CWIcon
-                                   iconName='arrowUpNeutral400'
-                                   iconSize='small'
-                                   className='arrow-down-blue'
-                                  /></div>,
-                        }[header.column.getIsSorted() as string] ?? null}
+                        {header.column.getCanSort()
+                          ? (displaySortIcon(header.column.getIsSorted() as string) ?? null)
+                          : null}
                       </div>
                     )}
                   </th>
