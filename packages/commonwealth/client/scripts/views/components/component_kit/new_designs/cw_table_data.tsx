@@ -77,7 +77,7 @@ export function createColumnInfo() {
     },
     {
       key: 'description',
-      header: "Description",
+      header: 'Description',
       numeric: false,
       sortable: true,
     },
@@ -95,7 +95,7 @@ export function createColumnInfo() {
     },
     {
       key: 'tags',
-      header: "Tags",
+      header: 'Tags',
       numeric: false,
       sortable: false,
     },

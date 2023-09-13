@@ -16,20 +16,27 @@ type ColumnDescriptor = {
   key: string;
   header: string;
   numeric: boolean;
+  sortable: boolean;
+}
+
+type RowData = {
+  avatars?: object;
 }
 
 type TableProps = {
   columnInfo: ColumnDescriptor[];
-  rowData: [];
+  rowData: any[];
 };
 
-export const CWTable = ({ columnInfo, rowData }) => {
+export const CWTable = ({ columnInfo, rowData }: TableProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([
     {
       id: columnInfo[0].key,
       desc: false
     }
   ])
+
+  const [data, _setData] = React.useState(() => rowData)
 
   const columns = React.useMemo<ColumnDef<unknown, any>[]>(
     () =>
@@ -39,7 +46,8 @@ export const CWTable = ({ columnInfo, rowData }) => {
             accessorKey: col.key,
             header: col.header,
             cell: (info) => {
-              const avatarUrl = info.row.original.avatars[col.key];
+              const currentRow = info.row.original as RowData;
+              const avatarUrl = currentRow.avatars[col.key];
 
               if (col.numeric) {
                 return (
@@ -65,8 +73,6 @@ export const CWTable = ({ columnInfo, rowData }) => {
       }),
     []
   )
-
-  const [data, _setData] = React.useState(() => rowData)
 
   const table = useReactTable({
     data,
