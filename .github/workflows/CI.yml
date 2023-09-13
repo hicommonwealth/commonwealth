@@ -113,9 +113,6 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
-
       - name: Cache browsers
         id: playwright-cache
         uses: actions/cache@v3
@@ -175,8 +172,6 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Init Db
-        run: cd packages/commonwealth && npx sequelize db:migrate
 
       - name: Cache browsers
         id: playwright-cache
