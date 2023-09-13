@@ -76,6 +76,9 @@ const UserDropdown = () => {
     (account) => {
       const signed = authenticatedAddresses[account.address];
       const isActive = app.user.activeAccount?.address === account.address;
+      const walletSsoSource = app.user.addresses.find(
+        (address) => address.address === account.address
+      )?.walletSsoSource;
 
       return {
         type: 'default',
@@ -92,7 +95,7 @@ const UserDropdown = () => {
           }
 
           setRevalidationModalData({
-            walletSsoSource: account.walletSsoSource,
+            walletSsoSource: walletSsoSource,
             walletAddress: account.address,
           });
         },
