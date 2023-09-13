@@ -3,6 +3,7 @@ import { PlaywrightTestConfig } from '@playwright/test';
 const config: PlaywrightTestConfig = {
   use: {
     video: 'retain-on-failure',
+    trace: 'on-first-retry',
   },
   globalSetup: './globalSetup.ts',
   globalTeardown: './globalTeardown.ts',
