@@ -111,7 +111,7 @@ const UserDropdown = () => {
         modifiers={[{ name: 'offset', options: { offset: [0, 3] } }]}
         menuItems={[
           ...(app.user.activeAccounts.length > 0
-            ? [
+            ? ([
                 {
                   type: 'header',
                   label: 'Addresses',
@@ -123,7 +123,7 @@ const UserDropdown = () => {
                   onClick: () => setIsLoginModalOpen(true),
                 },
                 { type: 'divider' },
-              ]
+              ] as PopoverMenuItem[])
             : []),
           {
             type: 'header',
