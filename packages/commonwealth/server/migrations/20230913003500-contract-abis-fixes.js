@@ -68,13 +68,6 @@ module.exports = {
         }
       }
 
-      console.log('Setting abi hashes and adding unique abi hash constraint');
-      await queryInterface.sequelize.query(
-        `
-        UPDATE "ContractAbis" SET abi_hash = encode(digest(abi::text, 'sha256'), 'hex');
-      `,
-        { transaction }
-      );
       await queryInterface.addConstraint('ContractAbis', {
         fields: ['abi_hash'],
         type: 'unique',
