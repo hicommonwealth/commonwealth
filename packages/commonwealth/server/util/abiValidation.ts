@@ -2,6 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
 import { Errors } from '../routes/contractAbis/createContractAbi';
+import { hasher } from 'node-object-hash';
 
 /**
  * Parses and validates an ABI string and returns it as an array of Record<string, unknown>
@@ -24,4 +25,15 @@ export default function validateAbi(
     throw new AppError(Errors.InvalidABI);
   }
   return abiAsRecord;
+}
+
+export function hashAbi(abi: object) {
+  const hashInstance = hasher({
+    coerce: true,
+    sort: true,
+    trim: true,
+    alg: 'sha256',
+    enc: 'hex',
+  });
+  return hashInstance.hash(abi);
 }

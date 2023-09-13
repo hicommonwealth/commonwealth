@@ -1,7 +1,8 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
-import { hashAbi } from '../../shared/utils';
+
+import { hashAbi } from '../util/abiValidation';
 
 export type ContractAbiAttributes = {
   id: number;

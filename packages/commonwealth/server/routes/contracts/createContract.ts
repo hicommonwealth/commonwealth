@@ -8,10 +8,9 @@ import type {
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
-import validateAbi from '../../util/abiValidation';
+import validateAbi, { hashAbi } from '../../util/abiValidation';
 import type { ContractAbiInstance } from 'server/models/contract_abi';
 import { validateOwner } from '../../util/validateOwner';
-import { hashAbi } from '../../../shared/utils';
 
 export const Errors = {
   NoType: 'Must provide contract type',
