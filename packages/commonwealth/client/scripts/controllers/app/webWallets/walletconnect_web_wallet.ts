@@ -78,7 +78,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       method: 'personal_sign',
       params: [account.address, message],
     });
-    return signature;
+
+    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
+    return `${domain}/${nonce}/${signature}`;
   }
 
   public async reset() {
