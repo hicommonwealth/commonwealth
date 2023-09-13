@@ -1,24 +1,12 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import type { ModelInstance, ModelStatic } from './types';
-import crypto from 'crypto';
-
-function hashAbi(abi: any) {
-  let stringifiedAbi: any;
-  if (typeof abi === 'string') {
-    stringifiedAbi = JSON.parse(abi);
-  } else {
-    stringifiedAbi = abi;
-  }
-  const hash = crypto.createHash('sha256');
-  hash.update(stringifiedAbi);
-  return hash.digest('hex');
-}
+import { hashAbi } from '../../shared/utils';
 
 export type ContractAbiAttributes = {
   id: number;
   nickname?: string;
-  abi: string;
+  abi: Array<Record<string, unknown>>;
   abi_hash?: string;
   verified?: boolean;
   created_at?: Date;
@@ -54,6 +42,18 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
+      validate: {
+        // this validation function is replicated in the database as the 'chk_contract_abi_array' CHECK constraint
+        // see 20230913003500-contract-abis-fixes.js for the constraint
+        validAbi() {
+          if (!Array.isArray(this.abi)) {
+            throw new Error(
+              `Invalid ABI. The given ABI of type ${typeof this
+                .abi} is not a valid array.`
+            );
+          }
+        },
+      },
       hooks: {
         beforeValidate(instance: ContractAbiInstance) {
           if (!instance.abi_hash) {

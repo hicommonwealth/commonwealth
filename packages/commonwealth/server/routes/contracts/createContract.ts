@@ -11,6 +11,7 @@ import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
 import type { ContractAbiInstance } from 'server/models/contract_abi';
 import { validateOwner } from '../../util/validateOwner';
+import { hashAbi } from 'utils';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -140,9 +141,10 @@ const createContract = async (
   if (abi) {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
+      const abiHash = hashAbi(abiAsRecord);
       contract_abi = await models.ContractAbi.findOne({
         where: {
-          abi: JSON.stringify(abiAsRecord),
+          abi_hash: abiHash,
         },
         transaction: t,
       });
@@ -150,7 +152,8 @@ const createContract = async (
       if (!contract_abi) {
         contract_abi = await models.ContractAbi.create(
           {
-            abi: JSON.stringify(abiAsRecord),
+            abi: abiAsRecord,
+            abi_hash: abiHash,
           },
           { transaction: t }
         );

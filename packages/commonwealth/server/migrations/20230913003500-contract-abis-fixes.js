@@ -93,6 +93,13 @@ module.exports = {
       `,
         { transaction }
       );
+
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "ContractAbis" ADD CONSTRAINT chk_contract_abi_array CHECK (jsonb_typeof(abi) = 'array');
+      `,
+        { transaction }
+      );
     });
   },
 

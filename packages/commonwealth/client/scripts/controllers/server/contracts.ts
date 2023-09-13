@@ -513,14 +513,7 @@ class ContractsController {
           };
         }>;
         if (contractWithTemplate.contract.ContractAbi) {
-          // Necessary because the contract abi was stored as a string in some contracts
-          if (
-            typeof contractWithTemplate.contract.ContractAbi.abi === 'string'
-          ) {
-            abiJson = JSON.parse(contractWithTemplate.contract.ContractAbi.abi);
-          } else {
-            abiJson = contractWithTemplate.contract.ContractAbi.abi;
-          }
+          abiJson = contractWithTemplate.contract.ContractAbi.abi;
         }
         if (contractWithTemplate.ccts) {
           ccts = contractWithTemplate.ccts.map((cct) => {

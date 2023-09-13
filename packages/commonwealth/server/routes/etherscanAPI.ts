@@ -7,6 +7,7 @@ import { ETHERSCAN_JS_API_KEY } from '../config';
 import type { ContractAttributes } from '../models/contract';
 import type { ContractAbiAttributes } from '../models/contract_abi';
 import validateAbi from '../util/abiValidation';
+import { hashAbi } from 'utils';
 
 export enum Network {
   Mainnet = 'Mainnet',
@@ -86,19 +87,35 @@ export const fetchEtherscanContract = async (
     const etherscanContract = response.data.result[0];
     if (etherscanContract && etherscanContract['ABI'] !== '') {
       const abiString = etherscanContract['ABI'];
-      validateAbi(abiString);
-
+      const abiRecord = validateAbi(abiString);
+      const abiHash = hashAbi(abiRecord);
       const nickname = etherscanContract['ContractName'];
-      // Create new ABI
+
       // If source code fetch from etherscan is successful, then the abi is a verified one
-      const [contract_abi] = await models.ContractAbi.findOrCreate({
-        where: { nickname, abi: abiString, verified: true },
+      let contractAbi = await models.ContractAbi.findOne({
+        where: {
+          nickname,
+          abi_hash: abiHash,
+        },
       });
+
+      if (!contractAbi) {
+        contractAbi = await models.ContractAbi.create({
+          nickname,
+          abi: abiRecord,
+          abi_hash: abiHash,
+          verified: true,
+        });
+      } else if (contractAbi && !contractAbi.verified) {
+        contractAbi.verified = true;
+        await contractAbi.save();
+      }
+
       // update contract with new ABI
-      contract.abi_id = contract_abi.id;
+      contract.abi_id = contractAbi.id;
       await contract.save();
       return success(res, {
-        contractAbi: contract_abi.toJSON(),
+        contractAbi: contractAbi.toJSON(),
         contract: contract.toJSON(),
       });
     }

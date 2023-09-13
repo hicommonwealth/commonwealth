@@ -8,6 +8,7 @@ import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { ProposalType } from 'common-common/src/types';
 import { AccessLevel } from './permissions';
 import type { RoleObject } from './types';
+import { hasher } from 'node-object-hash';
 
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
@@ -319,4 +320,15 @@ export function naturalDenomToMinimal(
 
   // 0 decimal places because this is max precision for the chain
   return intPretty.toDec().toString(0);
+}
+
+export function hashAbi(abi: object) {
+  const hashInstance = hasher({
+    coerce: true,
+    sort: true,
+    trim: true,
+    alg: 'sha256',
+    enc: 'hex',
+  });
+  return hashInstance.hash(abi);
 }
