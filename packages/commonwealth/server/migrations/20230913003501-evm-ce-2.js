@@ -3,17 +3,98 @@
 const { QueryTypes } = require('sequelize');
 const { hasher } = require('node-object-hash');
 
+const hashInstance = hasher({
+  coerce: true,
+  sort: true,
+  trim: true,
+  alg: 'sha256',
+  enc: 'hex',
+});
+
+async function getChainNodes(queryInterface, transaction) {
+  console.log('Fetching existing ChainNodes');
+  const ethereumResult = await queryInterface.sequelize.query(
+    `
+        SELECT id
+        FROM "ChainNodes"
+        WHERE "ChainNodes".name = 'Ethereum (Mainnet)'
+        LIMIT 1;
+      `,
+    { transaction, raw: true, type: QueryTypes.SELECT }
+  );
+
+  const mumbaiResult = await queryInterface.sequelize.query(
+    `
+        SELECT id
+        FROM "ChainNodes"
+        WHERE "ChainNodes".name = 'Polygon (Mumbai)'
+        LIMIT 1;
+      `,
+    { transaction, raw: true, type: QueryTypes.SELECT }
+  );
+
+  const celoResult = await queryInterface.sequelize.query(
+    `
+        SELECT id
+        FROM "ChainNodes"
+        WHERE "ChainNodes".name = 'Celo'
+        LIMIT 1;
+      `,
+    { transaction, raw: true, type: QueryTypes.SELECT }
+  );
+
+  console.log('Existing ChainNodes fetched');
+  return [ethereumResult, mumbaiResult, celoResult];
+}
+
+async function findOrCreateAbi(queryInterface, transaction, rawAbi, nickname) {
+  console.log(`Uploading ABI: ${nickname}`);
+  let abi = await queryInterface.sequelize.query(
+    `
+    SELECT id FROM "ContractAbis"
+    WHERE abi_hash = ?;
+  `,
+    {
+      transaction,
+      type: QueryTypes.SELECT,
+      replacements: [hashInstance.hash(rawAbi)],
+    }
+  );
+
+  if (abi.length > 0) {
+    return abi[0].id;
+  }
+
+  const result = await queryInterface.sequelize.query(
+    `
+        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
+        VALUES (
+            ?,
+            true,
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP,
+            ?,
+            ?
+        ) RETURNING id;
+      `,
+    {
+      transaction,
+      raw: true,
+      type: QueryTypes.INSERT,
+      replacements: [
+        JSON.stringify(rawAbi),
+        nickname,
+        hashInstance.hash(rawAbi),
+      ],
+    }
+  );
+
+  return result[0][0].id;
+}
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      const hashInstance = hasher({
-        coerce: true,
-        sort: true,
-        trim: true,
-        alg: 'sha256',
-        enc: 'hex',
-      });
-
       // raw query since `queryInterface.createTable` uniqueKeys option lacks documentation
       // uses SERIAL rather than GENERATED ALWAYS AS IDENTITY to ensure Sequelize compatibility
       console.log('Creating new tables');
@@ -45,37 +126,10 @@ module.exports = {
       );
       console.log('New tables created');
 
-      console.log('Fetching existing ChainNodes');
-      const ethereumResult = await queryInterface.sequelize.query(
-        `
-        SELECT id
-        FROM "ChainNodes"
-        WHERE "ChainNodes".name = 'Ethereum (Mainnet)'
-        LIMIT 1;
-      `,
-        { transaction, raw: true, type: QueryTypes.SELECT }
+      const [ethereumResult, mumbaiResult, celoResult] = await getChainNodes(
+        queryInterface,
+        transaction
       );
-
-      const mumbaiResult = await queryInterface.sequelize.query(
-        `
-        SELECT id
-        FROM "ChainNodes"
-        WHERE "ChainNodes".name = 'Polygon (Mumbai)'
-        LIMIT 1;
-      `,
-        { transaction, raw: true, type: QueryTypes.SELECT }
-      );
-
-      const celoResult = await queryInterface.sequelize.query(
-        `
-        SELECT id
-        FROM "ChainNodes"
-        WHERE "ChainNodes".name = 'Celo'
-        LIMIT 1;
-      `,
-        { transaction, raw: true, type: QueryTypes.SELECT }
-      );
-      console.log('Existing ChainNodes fetched');
 
       let eventSourceRecords = [];
 
@@ -85,74 +139,23 @@ module.exports = {
       if (ethereumResult.length > 0) {
         const ethereumId = ethereumResult[0].id;
 
-        console.log('Uploading Aave, dYdX, and Tribe ABIs');
-        const aaveAbi = await queryInterface.sequelize.query(
-          `
-        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
-        VALUES (
-            ?,
-            true,
-            CURRENT_TIMESTAMP,
-            CURRENT_TIMESTAMP,
-            'Aave Governance V2',
-            ?
-        ) RETURNING id;
-      `,
-          {
-            transaction,
-            raw: true,
-            type: QueryTypes.INSERT,
-            replacements: [
-              JSON.stringify(rawAaveAbi),
-              hashInstance.hash(rawAaveAbi),
-            ],
-          }
+        const aaveAbiId = await findOrCreateAbi(
+          queryInterface,
+          transaction,
+          rawAaveAbi,
+          'AaveGovernanceV2'
         );
-
-        const dydxAbi = await queryInterface.sequelize.query(
-          `
-        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
-        VALUES (
-            ?,
-            true,
-            CURRENT_TIMESTAMP,
-            CURRENT_TIMESTAMP,
-            'DydxGovernor',
-            ?
-        ) RETURNING id;
-      `,
-          {
-            transaction,
-            raw: true,
-            type: QueryTypes.INSERT,
-            replacements: [
-              JSON.stringify(rawDydxAbi),
-              hashInstance.hash(rawDydxAbi),
-            ],
-          }
+        const dydxAbiId = await findOrCreateAbi(
+          queryInterface,
+          transaction,
+          rawDydxAbi,
+          'DydxGovernor'
         );
-
-        const tribeAbi = await queryInterface.sequelize.query(
-          `
-        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
-        VALUES (
-            ?,
-            true,
-            CURRENT_TIMESTAMP,
-            CURRENT_TIMESTAMP,
-            'FeiDAO',
-            ?
-        ) RETURNING id;
-      `,
-          {
-            transaction,
-            raw: true,
-            type: QueryTypes.INSERT,
-            replacements: [
-              JSON.stringify(rawTribeAbi),
-              hashInstance.hash(rawTribeAbi),
-            ],
-          }
+        const tribeAbiId = await findOrCreateAbi(
+          queryInterface,
+          transaction,
+          rawTribeAbi,
+          'FeiDAO'
         );
 
         await queryInterface.sequelize.query(
@@ -171,13 +174,13 @@ module.exports = {
             replacements: [
               aaveAddress,
               ethereumId,
-              aaveAbi[0][0].id,
+              aaveAbiId,
               dydxAddress,
               ethereumId,
-              dydxAbi[0][0].id,
+              dydxAbiId,
               tribeAddress,
               ethereumId,
-              tribeAbi[0][0].id,
+              tribeAbiId,
               [
                 [aaveAddress, ethereumId],
                 [dydxAddress, ethereumId],
@@ -287,27 +290,11 @@ module.exports = {
         const mumbaiId = mumbaiResult[0].id;
 
         console.log('Uploading Mumbai ABIs');
-        const autonomiesAbi = await queryInterface.sequelize.query(
-          `
-        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
-        VALUES (
-            ?,
-            true,
-            CURRENT_TIMESTAMP,
-            CURRENT_TIMESTAMP,
-            'NVMGovernance',
-            ?
-        ) RETURNING id;
-      `,
-          {
-            transaction,
-            raw: true,
-            type: QueryTypes.INSERT,
-            replacements: [
-              JSON.stringify(rawAutonomiesAbi),
-              hashInstance.hash(rawAutonomiesAbi),
-            ],
-          }
+        const autonomiesAbiId = await findOrCreateAbi(
+          queryInterface,
+          transaction,
+          rawAutonomiesAbi,
+          'NVMGovernance'
         );
 
         await queryInterface.sequelize.query(
@@ -319,7 +306,7 @@ module.exports = {
           {
             transaction,
             type: QueryTypes.UPDATE,
-            replacements: [autonomiesAbi[0][0].id, autonomiesAddress, mumbaiId],
+            replacements: [autonomiesAbiId, autonomiesAddress, mumbaiId],
           }
         );
         console.log('Uploaded Mumbai ABIs');
@@ -365,50 +352,17 @@ module.exports = {
         const celoId = celoResult[0].id;
 
         console.log('Uploading Celo ABIs');
-        const impactMarketAbi = await queryInterface.sequelize.query(
-          `
-        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
-        VALUES (
-            ?,
-            true,
-            CURRENT_TIMESTAMP,
-            CURRENT_TIMESTAMP,
-            'PACTDelegator',
-            ?
-        ) RETURNING id;
-      `,
-          {
-            transaction,
-            raw: true,
-            type: QueryTypes.INSERT,
-            replacements: [
-              JSON.stringify(rawImpactMarketAbi),
-              hashInstance.hash(rawImpactMarketAbi),
-            ],
-          }
+        const impactMarketAbiId = await findOrCreateAbi(
+          queryInterface,
+          transaction,
+          rawImpactMarketAbi,
+          'PACTDelegator'
         );
-
-        const moolaMarketAbi = await queryInterface.sequelize.query(
-          `
-        INSERT INTO "ContractAbis" (abi, verified, created_at, updated_at, nickname, abi_hash)
-        VALUES (
-            ?,
-            true,
-            CURRENT_TIMESTAMP,
-            CURRENT_TIMESTAMP,
-            'MoolaGovernorBravoDelegator',
-            ?
-        ) RETURNING id;
-      `,
-          {
-            transaction,
-            raw: true,
-            type: QueryTypes.INSERT,
-            replacements: [
-              JSON.stringify(rawMoolaMarketAbi),
-              hashInstance.hash(rawMoolaMarketAbi),
-            ],
-          }
+        const moolaMarketAbiId = await findOrCreateAbi(
+          queryInterface,
+          transaction,
+          rawMoolaMarketAbi,
+          'MoolaGovernorBravoDelegator'
         );
 
         await queryInterface.sequelize.query(
@@ -426,10 +380,10 @@ module.exports = {
             replacements: [
               impactMarketAddress,
               celoId,
-              impactMarketAbi[0][0].id,
+              impactMarketAbiId,
               moolaMarketAddress,
               celoId,
-              moolaMarketAbi[0][0].id,
+              moolaMarketAbiId,
               [
                 [impactMarketAddress, celoId],
                 [moolaMarketAddress, celoId],
@@ -518,6 +472,20 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.dropTable('EvmEventSources', { transaction });
       await queryInterface.dropTable('LastProcessedEvmBlock', { transaction });
+      await queryInterface.bulkDelete(
+        'ContractAbis',
+        {
+          nickname: [
+            'AaveGovernanceV2',
+            'DydxGovernor',
+            'FeiDAO',
+            'NVMGovernance',
+            'PACTDelegator',
+            'MoolaGovernorBravoDelegator',
+          ],
+        },
+        { transaction }
+      );
     });
   },
 };
