@@ -16,6 +16,30 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+
+    .radio-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .requirement-sub-form {
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      background-color: $neutral-25;
+      border: 1px solid $neutral-200;
+      border-radius: 6px;
+      gap: 16px;
+      width: 100%;
+
+      .requirement-sub-form-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        width: 100%;
+      }
+    }
   }
 
   .action-buttons {

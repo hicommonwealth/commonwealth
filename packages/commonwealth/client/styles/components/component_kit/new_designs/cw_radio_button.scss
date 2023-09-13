@@ -1,11 +1,12 @@
 @import '../../../shared';
 
 .container {
-  position: absolute;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  margin-right: auto;
+  width: fit-content;
 }
 
 .radio-button {
