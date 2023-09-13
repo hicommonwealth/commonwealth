@@ -329,12 +329,14 @@ export const CreateContentPopover = () => {
                   onClick,
                 })
               }
-              onMouseEnter={(e) =>
-                handleMouseEnter({ e, isMenuOpen, handleInteraction })
-              }
-              onMouseLeave={(e) =>
-                handleMouseLeave({ e, isTooltipOpen, handleInteraction })
-              }
+              onMouseEnter={(e) => {
+                if (!featureFlags.sessionKeys) return;
+                handleMouseEnter({ e, isMenuOpen, handleInteraction });
+              }}
+              onMouseLeave={(e) => {
+                if (!featureFlags.sessionKeys) return;
+                handleMouseLeave({ e, isTooltipOpen, handleInteraction });
+              }}
             />
           )}
         />

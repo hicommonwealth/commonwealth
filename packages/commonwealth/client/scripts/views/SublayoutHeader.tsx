@@ -112,35 +112,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               )}
             />
 
-            <CWTooltip
-              content="Send feedback"
-              placement="bottom"
-              renderTrigger={(handleInteraction) => (
-                <CWIconButton
-                  iconButtonTheme="black"
-                  iconName="question"
-                  onClick={() => setIsFeedbackModalOpen(true)}
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                />
-              )}
-            />
-
-            <CWTooltip
-              content="Help"
-              placement="bottom"
-              renderTrigger={(handleInteraction) => (
-                <CWIconButton
-                  iconButtonTheme="black"
-                  iconName="bookOpenText"
-                  onClick={() =>
-                    window.open('https://docs.commonwealth.im/commonwealth/')
-                  }
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                />
-              )}
-            />
+            <HelpMenuPopover />
 
             {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
           </div>
