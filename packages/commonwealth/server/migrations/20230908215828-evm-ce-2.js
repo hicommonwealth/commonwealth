@@ -67,31 +67,6 @@ module.exports = {
       );
       console.log('Existing ChainNodes fetched');
 
-      // Remove abi unique index and use hash index instead
-      console.log('Removing old abi index and setting up for the new one');
-      await queryInterface.removeConstraint(
-        'ContractAbis',
-        'ContractAbis_abi_key',
-        { transaction }
-      );
-      // await queryInterface.removeIndex('ContractAbis', 'ContractAbis_abi_key', { transaction });
-      await queryInterface.sequelize.query(
-        `
-        CREATE EXTENSION IF NOT EXISTS pgcrypto;
-      `,
-        { transaction }
-      );
-      await queryInterface.addColumn(
-        'ContractAbis',
-        'abi_hash',
-        {
-          type: Sequelize.TEXT,
-          allowNull: true,
-        },
-        { transaction }
-      );
-      console.log('New abi_hash column setup');
-
       let eventSourceRecords = [];
 
       const aaveAddress = '0xEC568fffba86c094cf06b22134B23074DFE2252c';
@@ -6044,27 +6019,6 @@ module.exports = {
         });
         console.log('Event sources inserted');
       }
-
-      console.log('Setting abi hashes and adding unique abi hash constraint');
-      await queryInterface.sequelize.query(
-        `
-        UPDATE "ContractAbis" SET abi_hash = encode(digest(abi::text, 'sha256'), 'hex');
-      `,
-        { transaction }
-      );
-      await queryInterface.addConstraint('ContractAbis', {
-        fields: ['abi_hash'],
-        type: 'unique',
-        name: 'ContractAbis_abi_hash_key',
-        transaction,
-      });
-      await queryInterface.sequelize.query(
-        `
-        ALTER TABLE "ContractAbis" ALTER COLUMN abi_hash SET NOT NULL;
-      `,
-        { transaction }
-      );
-      console.log('Migration completed successfully');
     });
   },
 
