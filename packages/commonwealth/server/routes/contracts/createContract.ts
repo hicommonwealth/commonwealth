@@ -11,7 +11,7 @@ import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
 import type { ContractAbiInstance } from 'server/models/contract_abi';
 import { validateOwner } from '../../util/validateOwner';
-import { hashAbi } from 'utils';
+import { hashAbi } from '../../../shared/utils';
 
 export const Errors = {
   NoType: 'Must provide contract type',
