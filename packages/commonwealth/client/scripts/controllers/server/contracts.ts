@@ -189,7 +189,7 @@ class ContractsController {
   }: {
     chain_node_id: number;
     address: string;
-    abi?: AbiType;
+    abi?: string;
   }) {
     try {
       const response = await $.post(`${app.serverUrl()}/contract`, {
@@ -208,7 +208,7 @@ class ContractsController {
         address,
         chainNodeId: chain_node_id,
         type,
-        abi,
+        abi: JSON.parse(abi),
         isFactory: is_factory,
         hasGlobalTemplate: response.result.hasGlobalTemplate,
       });

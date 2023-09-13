@@ -2,6 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
 import { hasher } from 'node-object-hash';
+import { AbiType } from '../../shared/types';
 
 export const Errors = {
   NoContractId: 'Must provide contract id',
@@ -23,9 +24,7 @@ export const Errors = {
  * @returns Array<Record<string, unknown>>
  */
 
-export default function validateAbi(
-  abiString: string
-): Array<Record<string, unknown>> {
+export default function validateAbi(abiString: string): AbiType {
   // Parse ABI to validate it as a properly formatted ABI
   const abiAsRecord: Array<Record<string, unknown>> = JSON.parse(abiString);
   if (!abiAsRecord) {
@@ -38,7 +37,7 @@ export default function validateAbi(
   return abiAsRecord;
 }
 
-export function hashAbi(abi: object) {
+export function hashAbi(abi: AbiType): string {
   const hashInstance = hasher({
     coerce: true,
     sort: true,

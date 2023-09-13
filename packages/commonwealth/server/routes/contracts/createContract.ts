@@ -11,6 +11,8 @@ import { success } from '../../types';
 import validateAbi, { hashAbi } from '../../util/abiValidation';
 import type { ContractAbiInstance } from 'server/models/contract_abi';
 import { validateOwner } from '../../util/validateOwner';
+import { AbiType } from '../../../shared/types';
+import { Transaction } from 'sequelize';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -50,6 +52,33 @@ export type CreateContractResp = {
   contract: ContractAttributes;
   hasGlobalTemplate?: boolean;
 };
+
+async function findOrCreateAbi(
+  abi: AbiType,
+  models: DB,
+  t?: Transaction
+): Promise<ContractAbiInstance> {
+  let contractAbi: ContractAbiInstance;
+  const abiHash = hashAbi(abi);
+  contractAbi = await models.ContractAbi.findOne({
+    where: {
+      abi_hash: abiHash,
+    },
+    transaction: t,
+  });
+
+  if (!contractAbi) {
+    contractAbi = await models.ContractAbi.create(
+      {
+        abi: abi,
+        abi_hash: abiHash,
+      },
+      { transaction: t }
+    );
+  }
+
+  return contractAbi;
+}
 
 const createContract = async (
   models: DB,
@@ -94,7 +123,7 @@ const createContract = async (
 
   let abiAsRecord: Array<Record<string, unknown>>;
   if (abi) {
-    if ((Object.keys(abi) as Array<string>).length === 0) {
+    if ((Object.keys(JSON.parse(abi)) as Array<string>).length === 0) {
       throw new AppError(Errors.InvalidABI);
     }
 
@@ -106,6 +135,11 @@ const createContract = async (
   });
 
   if (oldContract && oldContract.address === address) {
+    if (abi && !oldContract.abi_id) {
+      const contract_abi = await findOrCreateAbi(abiAsRecord, models);
+      oldContract.abi_id = contract_abi.id;
+      await oldContract.save();
+    }
     // contract already exists so attempt to add it to the community if it's not already there
     await models.CommunityContract.findOrCreate({
       where: {
@@ -140,23 +174,7 @@ const createContract = async (
   if (abi) {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
-      const abiHash = hashAbi(abiAsRecord);
-      contract_abi = await models.ContractAbi.findOne({
-        where: {
-          abi_hash: abiHash,
-        },
-        transaction: t,
-      });
-
-      if (!contract_abi) {
-        contract_abi = await models.ContractAbi.create(
-          {
-            abi: abiAsRecord,
-            abi_hash: abiHash,
-          },
-          { transaction: t }
-        );
-      }
+      contract_abi = await findOrCreateAbi(abiAsRecord, models, t);
 
       [contract] = await models.Contract.findOrCreate({
         where: {

@@ -9,7 +9,6 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import app from 'state';
-import { AbiType } from 'shared/types';
 
 import { useCommonNavigate } from 'navigation/helpers';
 
@@ -19,7 +18,7 @@ const AddContractAndAbiForm = () => {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     address: '',
-    abi: [] as AbiType,
+    abi: '',
   });
 
   const handleAddContract = async () => {
@@ -52,7 +51,10 @@ const AddContractAndAbiForm = () => {
 
     if (isAddress(newAddress)) {
       const fetchedAbi = await app.contracts.getAbiFromEtherscan(newAddress);
-      setForm((prevState) => ({ ...prevState, abi: fetchedAbi }));
+      setForm((prevState) => ({
+        ...prevState,
+        abi: JSON.stringify(fetchedAbi),
+      }));
     }
   };
 
@@ -77,12 +79,12 @@ const AddContractAndAbiForm = () => {
 
         <CWTextArea
           label="Contract ABI file"
-          value={JSON.stringify(form.abi)}
+          value={form.abi}
           placeholder="Enter contract's ABI file"
           onInput={(e) =>
             setForm((prevState) => ({
               ...prevState,
-              abi: JSON.parse(e.target.value),
+              abi: e.target.value,
             }))
           }
         />
