@@ -1,8 +1,19 @@
 import { AppError } from 'common-common/src/errors';
 import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
-import { Errors } from '../routes/contractAbis/createContractAbi';
 import { hasher } from 'node-object-hash';
+
+export const Errors = {
+  NoContractId: 'Must provide contract id',
+  NoAbi: 'Must provide abi',
+  ContractAddressExists: 'The address already exists',
+  ChainIDExists:
+    'The id for this chain already exists, please choose another id',
+  ChainNameExists:
+    'The name for this chain already exists, please choose another name',
+  NotAdmin: 'Must be admin',
+  InvalidABI: 'Invalid ABI',
+};
 
 /**
  * Parses and validates an ABI string and returns it as an array of Record<string, unknown>

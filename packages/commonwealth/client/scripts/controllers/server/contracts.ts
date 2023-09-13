@@ -3,7 +3,6 @@ import type { Response } from 'express';
 import { ContractsStore } from 'stores';
 import Contract from '../../models/Contract';
 import app from 'state';
-import type { BalanceType, ContractType } from 'common-common/src/types';
 import { AbiType } from 'shared/types';
 
 type AddCommunityContractTemplateAttributes = {
@@ -54,23 +53,6 @@ class ContractsController {
   }
   public getCommunityContracts() {
     return this._store.getCommunityContracts();
-  }
-
-  public async addContractAbi(
-    contract: Contract,
-    abi: string,
-    nickname: string
-  ) {
-    const response = await $.post(`${app.serverUrl()}/contractAbi`, {
-      jwt: app.user.jwt,
-      contractId: contract.id,
-      abi,
-      nickname,
-    });
-    const resultContract = response['result']['contract'];
-    const resultAbi = response['result']['contractAbi'];
-    this.update(resultAbi.abi, resultContract);
-    return response;
   }
 
   public async checkFetchEtherscanForAbi(address: string) {
@@ -198,74 +180,6 @@ class ContractsController {
       });
       this._store.add(new Contract({ ...currentContractInStore, ccts }));
     }
-  }
-
-  public async add({
-    community,
-    balance_type,
-    chain_node_id,
-    node_url,
-    address,
-    abi,
-    abiNickname,
-    contractType,
-    symbol,
-    token_name,
-    decimals,
-    nickname,
-  }: {
-    community: string;
-    balance_type: BalanceType;
-    chain_node_id: number;
-    node_url: string;
-    address: string;
-    abi?: string;
-    abiNickname?: string;
-    contractType: ContractType;
-    symbol: string;
-    token_name: string;
-    decimals: number;
-    nickname: string;
-  }) {
-    const response = await $.post(`${app.serverUrl()}/contract`, {
-      community,
-      balance_type,
-      chain_node_id,
-      jwt: app.user.jwt,
-      node_url,
-      address,
-      abi,
-      contractType,
-      symbol,
-      token_name,
-      decimals,
-      nickname,
-      abiNickname,
-      chain_id: app.activeChainId(),
-    });
-    const responseContract = response['result']['contract'];
-    const { id, type, is_factory } = responseContract;
-    const result = new Contract({
-      id,
-      address,
-      chainNodeId: chain_node_id,
-      type,
-      decimals,
-      tokenName: token_name,
-      symbol,
-      abi: abi !== undefined ? JSON.parse(abi) : abi,
-      isFactory: is_factory,
-      nickname,
-    });
-    if (this._store.getById(result.id)) {
-      this._store.remove(this._store.getById(result.id));
-    }
-    this._store.add(result);
-    return result;
-  }
-
-  public addToStore(contract: Contract) {
-    return this._store.add(contract);
   }
 
   public async addContractAndAbi({
