@@ -36,7 +36,7 @@ export const CWCommunityAvatar = (props: CommunityAvatarProps) => {
     <div
       className={getClasses<{ onClick: boolean; size: IconSize }>(
         { onClick: !!onClick, size },
-        ComponentType.CommunityAvatar,
+        ComponentType.CommunityAvatar
       )}
       onClick={onClick}
     >

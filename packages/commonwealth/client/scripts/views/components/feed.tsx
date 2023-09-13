@@ -34,13 +34,13 @@ export const Feed = ({
   const [data, setData] = useState<DashboardActivityNotification[]>();
   const [labels, setLabels] = useState<(IEventLabel | undefined)[]>();
   const [currentCount, setCurrentCount] = useState<number>(
-    defaultCount || DEFAULT_COUNT,
+    defaultCount || DEFAULT_COUNT
   );
 
   const loadMore = useCallback(() => {
     return setTimeout(() => {
       setCurrentCount(
-        (prevState) => prevState + (defaultCount || DEFAULT_COUNT),
+        (prevState) => prevState + (defaultCount || DEFAULT_COUNT)
       );
     }, 500);
   }, [setCurrentCount, defaultCount]);
