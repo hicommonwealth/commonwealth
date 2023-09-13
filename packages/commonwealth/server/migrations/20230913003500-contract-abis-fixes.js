@@ -12,12 +12,6 @@ module.exports = {
         'ContractAbis_abi_key',
         { transaction }
       );
-      await queryInterface.sequelize.query(
-        `
-        CREATE EXTENSION IF NOT EXISTS pgcrypto;
-      `,
-        { transaction }
-      );
       await queryInterface.addColumn(
         'ContractAbis',
         'abi_hash',
@@ -87,6 +81,8 @@ module.exports = {
         name: 'ContractAbis_abi_hash_key',
         transaction,
       });
+
+      console.log('Setting abi_hash column to NOT NULL');
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "ContractAbis" ALTER COLUMN abi_hash SET NOT NULL;
@@ -94,6 +90,7 @@ module.exports = {
         { transaction }
       );
 
+      console.log('Adding abi array constraint');
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "ContractAbis" ADD CONSTRAINT chk_contract_abi_array CHECK (jsonb_typeof(abi) = 'array');
