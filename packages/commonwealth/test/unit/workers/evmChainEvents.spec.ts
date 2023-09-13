@@ -105,5 +105,5 @@ describe.only('Tests for EvmChainEvents', () => {
     });
   });
 
-  describe('Tests for fetching event sources');
+  describe('Tests for fetching event sources', () => {});
 });

@@ -37,6 +37,7 @@ async function emitChainEventNotifs(events: any): Promise<void> {
   // Subscriptions(category = 'chain-event', chain_id)
   // Since we need Chain.network in the final event data we
   // will need to join with the Chains table as well
+  console.log();
 }
 
 export async function processChain(
