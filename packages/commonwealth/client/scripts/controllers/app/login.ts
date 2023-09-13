@@ -9,15 +9,12 @@ import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
-import moment from 'moment';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import SocialAccount from '../../models/SocialAccount';
-import { clientAnalyticsTrack } from '../../../../shared/analytics/client-track';
-import { MixpanelLoginEvent } from '../../../../shared/analytics/types';
 
 import { getTokenBalance } from 'helpers/token_balance_helper';
 
@@ -74,6 +71,12 @@ export async function setActiveAccount(
       jwt: app.user.jwt,
       auth: true,
     });
+
+    app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
+      r.is_user_default = false;
+    });
+    role.is_user_default = true;
+
     if (response.status !== 'Success') {
       throw Error(`Unsuccessful status: ${response.status}`);
     }
