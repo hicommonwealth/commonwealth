@@ -172,17 +172,19 @@ const updateChain = async (
     });
   }
 
+  console.log({ website });
+
   if (name) chain.name = name;
   if (description) chain.description = description;
   if (default_symbol) chain.default_symbol = default_symbol;
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
-  if (website) chain.website = website;
-  if (discord) chain.discord = discord;
+  if (website !== null) chain.website = website;
+  if (discord !== null) chain.discord = discord;
   if (element) chain.element = element;
-  if (telegram) chain.telegram = telegram;
-  if (github) chain.github = github;
+  if (telegram !== null) chain.telegram = telegram;
+  if (github !== null) chain.github = github;
   if (hide_projects) chain.hide_projects = hide_projects;
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;
