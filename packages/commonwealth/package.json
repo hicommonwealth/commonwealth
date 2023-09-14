@@ -45,6 +45,7 @@
     "reset-frack-db": "heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
     "start": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts",
+    "start-evm-ce": "ts-node ./server/workers/evmChainEvents/startEvmPolling.ts",
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "start-android": "npx cap run android",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
