@@ -9,8 +9,6 @@ import IWebWallet from '../../../models/IWebWallet';
 import { User } from '../user/user';
 import { CWAuthButton, CWNoAuthMethodsAvailable } from './cw_auth_button';
 import { CWDivider } from './cw_divider';
-import { CWIconButton } from './cw_icon_button';
-import { Modal } from './cw_modal';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';

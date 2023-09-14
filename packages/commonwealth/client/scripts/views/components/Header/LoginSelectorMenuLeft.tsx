@@ -5,7 +5,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { Modal } from 'views/components/component_kit/cw_modal';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { UserBlock } from 'views/components/user/user_block';
