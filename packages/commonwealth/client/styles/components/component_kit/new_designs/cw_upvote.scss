@@ -1,7 +1,7 @@
 @import '../../../shared.scss';
 
 .Upvote {
-  width: 40px;
+  min-width: 40px;
   height: 54px;
   border-radius: 6px;
   border: 1px solid $neutral-200;
@@ -9,11 +9,12 @@
   flex-direction: column;
   align-items: center;
   padding: 8px 4px;
-  gap: 4px;
+  gap: 2px;
   background-color: $white;
+  color: $neutral-400;
 
-  &.default {
-    color: $neutral-500;
+  .Text {
+    color: $neutral-400;
   }
 
   &:focus {
@@ -24,37 +25,47 @@
     cursor: pointer;
     border-color: $primary-600;
     color: $primary-600;
+
+    .Text {
+      color: $primary-600;
+    }
   }
 
   &.active {
     border-color: $primary-500;
     color: $primary-500;
+
+    .Text {
+      color: $primary-500;
+    }
+
+    &:hover {
+      border-color: $primary-600;
+      color: $primary-600;
+
+      .Text {
+        color: $primary-600;
+      }
+    }
   }
 
   &.disabled {
     background-color: $neutral-200;
     border-color: $neutral-400;
-    color: $neutral-400;
-    cursor: default;
+    cursor: not-allowed;
+
+    .Text {
+      color: $neutral-400;
+    }
+
+    &:hover {
+      .Text {
+        color: $neutral-400;
+      }
+
+      svg {
+        fill: $neutral-400;
+      }
+    }
   }
-}
-
-.default {
-  color: $neutral-500;
-}
-
-.upvoted {
-  color: $primary-500;
-}
-
-.hover {
-  color: $primary-600;
-}
-
-.active {
-  color: $primary-500;
-}
-
-.disabled {
-  color: $neutral-400;
 }

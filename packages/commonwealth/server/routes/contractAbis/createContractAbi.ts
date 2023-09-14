@@ -37,7 +37,7 @@ const createContractAbi = async (
   const { contractId, abi, nickname } = req.body;
 
   if (!req.user) {
-    throw new AppError('Not logged in');
+    throw new AppError('Not signed in');
   }
 
   if (!contractId) {
