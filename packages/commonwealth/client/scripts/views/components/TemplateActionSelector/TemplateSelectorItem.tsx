@@ -2,7 +2,7 @@ import React from 'react';
 import { CWCheck } from '../component_kit/cw_icons/cw_icons';
 import { CWText } from '../component_kit/cw_text';
 
-import 'modals/template_action_modal.scss';
+import 'components/TemplateSelectorItem.scss';
 
 type TemplateSelectorItemProps = {
   template: any;
@@ -16,7 +16,7 @@ export const TemplateSelectorItem = ({
   isSelected = false,
 }: TemplateSelectorItemProps) => {
   return (
-    <div className="template-item" onClick={() => onClick(template)}>
+    <div className="TemplateSelectorItem" onClick={() => onClick(template)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
         <CWText fontWeight="medium" truncate noWrap>

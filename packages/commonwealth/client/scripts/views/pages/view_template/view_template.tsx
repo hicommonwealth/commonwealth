@@ -76,7 +76,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
     const templateMetadata = contractInStore?.ccts?.find((cct) => {
       return cct.cctmd.slug === slug || cct.cctmd.slug === `/${slug}`;
     });
-    console.log(contractInStore, slug, contractInStore.ccts, templateMetadata);
+
     if (!contractInStore || !templateMetadata) {
       if (formData.isForm) return <div>No Contract Available</div>;
       navigate('/404', {}, null);

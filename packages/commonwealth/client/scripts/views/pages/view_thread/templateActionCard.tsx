@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
-import { TemplateActionModal } from '../../modals/template_action_modal'; // Import the new modal component
+import { TemplateActionModal } from '../../modals/TemplateActionModal'; // Import the new modal component
 
 import 'pages/view_thread/template_action_card.scss';
 import Thread, { Link, LinkDisplay, LinkSource } from 'models/Thread';

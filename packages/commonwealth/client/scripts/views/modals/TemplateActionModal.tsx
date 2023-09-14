@@ -7,9 +7,9 @@ import Thread, { Link, LinkDisplay, LinkSource } from '../../models/Thread';
 import { filterLinks, getAddedAndDeleted } from '../../helpers/threads';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { TemplateSelector } from '../components/TemplateActionSelector';
-import { CWButton } from '../components/component_kit/cw_button';
 import useAddThreadLinksMutation from 'state/api/threads/addThreadLinks';
 import useDeleteThreadLinksMutation from 'state/api/threads/deleteThreadLinks';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 type TemplateFormModalProps = {
   isOpen: boolean;
@@ -48,11 +48,10 @@ export const TemplateActionModal = ({
     chainId: app.activeChainId(),
     threadId: thread.id,
   });
-  // Fetch contracts
+
   const fetchContracts = async () => {
     setLoading(true);
     const contractsInStore = app.contracts.getCommunityContracts();
-    console.log(contractsInStore);
     setContracts(contractsInStore);
     setFetched(true);
     setLoading(false);
@@ -75,7 +74,7 @@ export const TemplateActionModal = ({
     );
   };
 
-  const getContractAndCct = (identifier, _contracts) => {
+  const getContractAndCct = (identifier) => {
     const contract = contracts.find((c) => {
       return c.ccts.some((cct) => String(cct.templateId) === identifier);
     });
@@ -99,13 +98,10 @@ export const TemplateActionModal = ({
         'identifier'
       );
 
-      console.log('toAdd:', toAdd);
-      console.log('toDelete:', toDelete);
-
       if (toAdd.length > 0) {
         const updatedLinks = toAdd.map(({ identifier, title }) => {
           // Find the contract with the specific templateId in its ccts
-          const { newIdentifier } = getContractAndCct(identifier, contracts);
+          const { newIdentifier } = getContractAndCct(identifier);
 
           return {
             source: LinkSource.Template,
@@ -129,7 +125,7 @@ export const TemplateActionModal = ({
           chainId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map(({ identifier }) => {
-            const { newIdentifier } = getContractAndCct(identifier, contracts);
+            const { newIdentifier } = getContractAndCct(identifier);
 
             return {
               source: LinkSource.Template,
@@ -172,7 +168,6 @@ export const TemplateActionModal = ({
         <div className="buttons-row">
           <CWButton
             label="Cancel"
-            buttonType="secondary-blue"
             onClick={onClose}
           />
           <CWButton label="Save changes" onClick={handleSaveChanges} />

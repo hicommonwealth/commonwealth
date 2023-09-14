@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { CWTextInput } from '../component_kit/cw_text_input';
 import { QueryList } from '../component_kit/cw_query_list';
-import { TemplateSelectorItem } from './templateActionSelectorItem';
+import { TemplateSelectorItem } from './TemplateSelectorItem';
 import Thread from 'models/Thread';
 import app from 'state';
+
+import 'components/TemplateSelector.scss'
 
 type TemplateSelectorProps = {
   onSelect: (template: any) => void;
@@ -16,27 +18,28 @@ type TemplateSelectorProps = {
 export const TemplateSelector = ({
   onSelect,
   tempTemplates,
-  isOpen,
   contracts,
 }: TemplateSelectorProps) => {
   // Add a new state for contracts
   const [loading, setLoading] = useState(false);
-  const [fetched, setFetched] = useState(false);
   const [allTemplates, setAllTemplates] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
     const fetchedTemplates = [];
-    for (const contract of contracts) {
-      const templates = await app.contracts.getTemplatesForContract(
-        contract.id
-      );
-      fetchedTemplates.push(...templates);
+    try{
+      for (const contract of contracts) {
+        const templates = await app.contracts.getTemplatesForContract(
+          contract.id
+        );
+        fetchedTemplates.push(...templates);
+      }
+    } catch {
+      setLoading(false);
     }
     setAllTemplates(fetchedTemplates);
     setLoading(false);
-    setFetched(true);
   }, [contracts]);
 
   // Fetch templates when contracts state changes
@@ -49,7 +52,6 @@ export const TemplateSelector = ({
   const templates = useMemo(() => {
     if (!searchTerm.length) return allTemplates;
     else {
-      console.log(allTemplates);
       return allTemplates.filter(({ name }) =>
         name.toLowerCase().includes(searchTerm.toLowerCase())
       );

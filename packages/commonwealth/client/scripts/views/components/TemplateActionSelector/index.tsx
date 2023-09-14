@@ -1,4 +1,4 @@
-import { TemplateSelectorItem } from './templateActionSelectorItem';
-import { TemplateSelector } from './templateActionSelector';
+import { TemplateSelectorItem } from './TemplateSelectorItem';
+import { TemplateSelector } from './TemplateSelector';
 
 export { TemplateSelector, TemplateSelectorItem };
