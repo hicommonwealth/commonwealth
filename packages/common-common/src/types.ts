@@ -68,6 +68,16 @@ export enum WalletId {
   Ronin = 'ronin',
 }
 
+// 'google', 'github', 'discord', and 'twitter' are passed to magic login directly
+export enum WalletSsoSource {
+  Google = 'google',
+  Github = 'github',
+  Discord = 'discord',
+  Twitter = 'twitter',
+  Email = 'email',
+  Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
+}
+
 export enum ChainCategoryType {
   DeFi = 'DeFi',
   DAO = 'DAO',

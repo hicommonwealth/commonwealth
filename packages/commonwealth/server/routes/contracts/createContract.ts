@@ -69,7 +69,7 @@ const createContract = async (
   } = req.body;
 
   if (!req.user) {
-    throw new AppError('Not logged in');
+    throw new AppError('Not signed in');
   }
 
   const isAdmin = await validateOwner({
