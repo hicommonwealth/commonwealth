@@ -21,6 +21,10 @@
     width: 100%;
     min-width: 0;
 
+    .breadcrumbs {
+      margin-bottom: 16px;
+    }
+
     .dashboard-header {
       display: flex;
       flex-direction: column;

@@ -1,0 +1,120 @@
+@import '../../shared';
+
+.Breadcrumbs {
+  align-items: center;
+  margin: 0;
+  padding-top: 16px;
+  list-style: none;
+  font-size: 0.875rem;
+  color: $neutral-400;
+
+  li {
+    display: flex;
+    align-items: center;
+    &:not(:last-child) {
+      margin-right: 6px;
+      &::after {
+        content: '/';
+        margin-left: 6px;
+      }
+    }
+    a {
+      color: $neutral-400;
+      text-decoration: none;
+      &:hover {
+        color: $neutral-400;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      &::first-letter {
+        text-transform: uppercase;
+      }
+    }
+  }
+  .commonPadding {
+    display: flex;
+    flex-direction: row;
+
+    @include large {
+      padding-left: calc(20px + 2.2rem);
+    }
+
+    @include mediumInclusive {
+      padding-left: 32px;
+    }
+
+    @include small {
+      padding-left: 24px;
+    }
+
+    @include extraSmall {
+      padding-left: 24px;
+    }
+  }
+
+  .discussions {
+    display: flex;
+    padding-left: calc(16px + 1.5rem);
+    flex-direction: row;
+    @include large {
+      padding-left: 40px;
+    }
+
+    @include mediumInclusive {
+      padding-left: 32px;
+    }
+
+    @include small {
+      padding-left: 24px;
+    }
+
+    @include extraSmall {
+      padding-left: 24px;
+    }
+  }
+
+  .members {
+    display: flex;
+    padding-left: calc(12px + 1rem);
+    flex-direction: row;
+  }
+
+  .notifications {
+    @include large {
+      padding-left: 176px;
+    }
+
+    @include mediumInclusive {
+      padding-left: 72px;
+    }
+
+    @include small {
+      padding-left: 56px;
+    }
+
+    @include extraSmall {
+      padding-left: 16px;
+    }
+  }
+
+  .viewProfile {
+    display: flex;
+    padding-left: calc(16px + 1.5rem);
+    flex-direction: row;
+    @include large {
+      padding-left: 80px;
+    }
+
+    @include mediumInclusive {
+      padding-left: 48px;
+    }
+
+    @include small {
+      padding-left: 32px;
+    }
+
+    @include extraSmall {
+      padding-left: 32px;
+    }
+  }
+}

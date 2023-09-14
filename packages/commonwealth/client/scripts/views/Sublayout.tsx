@@ -9,6 +9,7 @@ import { AppMobileMenus } from './AppMobileMenus';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
+import { Breadcrumbs } from './components/Breadcrumbs';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -54,6 +55,7 @@ const Sublayout = ({
           {showSidebar && <Sidebar isInsideCommunity={hasCommunitySidebar} />}
           <div className="body-and-sticky-headers-container">
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
+            <Breadcrumbs />
 
             {isWindowSmallInclusive && mobileMenuName ? (
               <AppMobileMenus />
