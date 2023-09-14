@@ -55,6 +55,7 @@ import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
 import app from 'state';
+import { CWTagInput } from './new_designs/CWTagInput';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -1601,6 +1602,35 @@ export const ComponentShowcase = () => {
               onMouseLeave={handleInteraction}
             />
           )}
+        />
+        <CWText type="h3">Tag Input</CWText>
+        <CWTagInput canAddCustomTags />
+        <CWTagInput
+          tagSuggestions={[
+            'Cosmos',
+            'Aave',
+            'Solana',
+            'Polkadot',
+            'Ethereum',
+            'Binance',
+            'Substrate',
+          ]}
+          placeholder="Add or select a chain"
+          filterMatchingTagSuggestionsOnInputChange
+          canAddCustomTags
+        />
+        <CWTagInput
+          defaultTags={['Cosmos', 'Aave']}
+          tagSuggestions={[
+            'Solana',
+            'Polkadot',
+            'Ethereum',
+            'Binance',
+            'Substrate',
+          ]}
+          placeholder="Add more to your chosen chains"
+          filterMatchingTagSuggestionsOnInputChange
+          canAddCustomTags={false}
         />
       </div>
     </div>
