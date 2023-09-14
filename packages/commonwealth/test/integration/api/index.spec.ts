@@ -108,7 +108,7 @@ describe('API Tests', () => {
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
       expect(res.body.result.user).to.be.not.null;
-      expect(res.body.result.message).to.be.equal('Logged in');
+      expect(res.body.result.message).to.be.equal('Signed in');
     });
   });
 });
