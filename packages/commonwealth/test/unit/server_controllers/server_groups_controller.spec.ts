@@ -3,6 +3,28 @@ import { ServerGroupsController } from 'server/controllers/server_groups_control
 import { AddressInstance } from 'server/models/address';
 import { ChainInstance } from 'server/models/chain';
 import { UserInstance } from 'server/models/user';
+import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+
+const VALID_REQUIREMENTS: Requirement[] = [
+  {
+    rule: 'threshold',
+    data: {
+      threshold: '1000',
+      source: {
+        source_type: 'erc20',
+        chain_id: 'ethereum',
+        contract_address: '0x000',
+      },
+    },
+  },
+  {
+    rule: 'allow',
+    data: {
+      allow: ['0x1', '0x2'],
+    },
+  },
+];
+const INVALID_REQUIREMENTS = 'no an array' as unknown as [];
 
 const createMockedGroupsController = () => {
   const db: any = {};
@@ -55,7 +77,7 @@ describe('ServerGroupsController', () => {
       chain: {} as ChainInstance,
       address: {} as AddressInstance,
       metadata: {},
-      requirements: [],
+      requirements: VALID_REQUIREMENTS,
       topics: [],
     });
     expect(result).to.have.length(1);
@@ -65,6 +87,20 @@ describe('ServerGroupsController', () => {
     expect(result[0]).to.have.property('requirements');
   });
 
+  describe('#createGroup (invalid requirements)', async () => {
+    const controller = createMockedGroupsController();
+    expect(
+      controller.createGroup({
+        user: {} as UserInstance,
+        chain: {} as ChainInstance,
+        address: {} as AddressInstance,
+        metadata: {},
+        requirements: INVALID_REQUIREMENTS,
+        topics: [],
+      })
+    ).to.eventually.be.rejectedWith('Invalid requirements');
+  });
+
   describe('#updateGroup', async () => {
     const controller = createMockedGroupsController();
     const result = await controller.updateGroup({
@@ -72,13 +108,26 @@ describe('ServerGroupsController', () => {
       chain: {} as ChainInstance,
       address: {} as AddressInstance,
       metadata: {},
-      requirements: [],
+      requirements: VALID_REQUIREMENTS,
     });
     expect(result).to.have.length(1);
     expect(result[0]).to.have.property('id');
     expect(result[0]).to.have.property('chain_id');
     expect(result[0]).to.have.property('metadata');
     expect(result[0]).to.have.property('requirements');
+  });
+
+  describe('#updateGroup (invalid requirements)', async () => {
+    const controller = createMockedGroupsController();
+    expect(
+      controller.updateGroup({
+        user: {} as UserInstance,
+        chain: {} as ChainInstance,
+        address: {} as AddressInstance,
+        metadata: {},
+        requirements: INVALID_REQUIREMENTS,
+      })
+    ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 
   describe('#deleteGroup', async () => {
