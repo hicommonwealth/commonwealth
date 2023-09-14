@@ -52,8 +52,8 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 import { useSearchParams } from 'react-router-dom';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import { TemplateActionCard } from './TemplateActionCarddd';
-import { ViewTemplateFormCard } from './ViewTemplateFormCarddd';
+import { TemplateActionCard } from './TemplateActionCard';
+import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import ViewTemplate from '../view_template/view_template';
 import { featureFlags } from 'helpers/feature-flags';
 
