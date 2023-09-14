@@ -1632,6 +1632,7 @@ export const ComponentShowcase = () => {
           filterMatchingTagSuggestionsOnInputChange
           canAddCustomTags={false}
         />
+        <div style={{ height: '500px' }} />
       </div>
     </div>
   );
