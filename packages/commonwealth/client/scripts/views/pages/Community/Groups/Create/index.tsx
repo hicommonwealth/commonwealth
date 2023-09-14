@@ -21,6 +21,17 @@ const requirementTypes = [
 const chainTypes = ['Chain', 'Ethereum', 'Cosmos']; // TODO: get full list
 const conditionTypes = ['Condition', 'More than', 'Equal to', 'Less than'];
 
+const CWRequirementsRadioButton = () => {
+  const Label = (
+    <span className="requirements-radio-btn-label">
+      At least {<CWTextInput containerClassName="input" />} # of all
+      requirements
+    </span>
+  );
+
+  return <CWRadioButton label={Label} value="n-requirements" />;
+};
+
 const RequirementSubForm = ({ onRemove = () => null }) => {
   return (
     <div className="requirement-sub-form">
@@ -128,11 +139,7 @@ const CreateCommunityGroupPage = () => {
               value="all-requirements"
             />
 
-            {/* TODO: this is a tag input */}
-            <CWRadioButton
-              label="At least _ # of all requirements"
-              value="n-requirements"
-            />
+            <CWRequirementsRadioButton />
           </div>
 
           {/* Added Requirements */}

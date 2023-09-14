@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 import { Circle, RadioButton } from '@phosphor-icons/react';
 
 import 'components/component_kit/new_designs/cw_radio_button.scss';
 import { CWText } from '../cw_text';
 
 export type RadioButtonType = {
-  label?: string;
+  label?: string | ReactNode;
   value: string;
   disabled?: boolean;
 };
