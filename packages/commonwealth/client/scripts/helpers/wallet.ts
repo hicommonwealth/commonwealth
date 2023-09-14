@@ -71,7 +71,7 @@ const loginToAxie = async (loginUrl = '') => {
     const stateId = response.data.stateId;
     window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
   } catch (error) {
-    console.log(error || 'Could not login');
+    console.log(error || 'Could not sign in');
   }
 };
 

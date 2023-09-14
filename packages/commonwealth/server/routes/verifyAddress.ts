@@ -35,7 +35,7 @@ export const Errors = {
   InvalidArguments: 'Invalid arguments',
   CouldNotVerifySignature: 'Failed to verify signature',
   BadSecret: 'Invalid jwt secret',
-  BadToken: 'Invalid login token',
+  BadToken: 'Invalid sign in token',
   WrongWallet: 'Verified with different wallet than created',
 };
 
@@ -269,7 +269,7 @@ const verifyAddress = async (
         result: {
           user,
           address,
-          message: 'Logged in',
+          message: 'Signed in',
         },
       });
     });

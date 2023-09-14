@@ -187,7 +187,7 @@ async function loginExistingMagicUser({
   walletSsoSource,
 }: MagicLoginContext): Promise<UserInstance> {
   if (!existingUserInstance) {
-    throw new Error('No user provided to log in');
+    throw new Error('No user provided to sign in');
   }
 
   return sequelize.transaction(async (transaction) => {
@@ -550,7 +550,7 @@ async function magicLoginRoute(
       finalUser = await createNewMagicUser(magicContext);
     }
   } catch (e) {
-    log.error(`Failed to log in user ${JSON.stringify(e, null, 2)}`);
+    log.error(`Failed to sign in user ${JSON.stringify(e, null, 2)}`);
     return cb(e);
   }
 

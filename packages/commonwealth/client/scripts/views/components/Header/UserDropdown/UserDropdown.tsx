@@ -45,7 +45,7 @@ const handleLogout = async () => {
     await axios.get(`${app.serverUrl()}/logout`);
     await initAppState();
     await resetWalletConnectSession();
-    notifySuccess('Logged out');
+    notifySuccess('Signed out');
     setDarkMode(false);
   } catch (err) {
     notifyError('Something went wrong during logging out.');
@@ -157,7 +157,7 @@ const UserDropdown = () => {
           },
           {
             type: 'default',
-            label: 'Logout',
+            label: 'Sign out',
             onClick: () => handleLogout(),
           },
         ]}

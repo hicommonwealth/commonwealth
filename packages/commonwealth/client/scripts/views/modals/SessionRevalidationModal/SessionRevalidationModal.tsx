@@ -102,11 +102,11 @@ const SessionRevalidationModal = ({
               />
             </div>
             <CWText className="info">
-              The login session for your address{' '}
+              The session for your address{' '}
               <strong>{formatAddress(walletAddress)}</strong> has expired.
             </CWText>
             <CWText className="info">
-              To continue what you were doing, log in with{' '}
+              To continue what you were doing, sign in with{' '}
               {walletSsoSource && walletSsoSource !== WalletSsoSource.Unknown
                 ? walletSsoSource[0].toUpperCase() + walletSsoSource.slice(1)
                 : 'your wallet'}{' '}
