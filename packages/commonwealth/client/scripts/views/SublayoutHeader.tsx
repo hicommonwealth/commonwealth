@@ -121,7 +121,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             <CWButton
               buttonType="primary"
               buttonHeight="sm"
-              label="Login"
+              label="Sign in"
               buttonWidth="wide"
               onClick={() => setIsLoginModalOpen(true)}
             />

@@ -110,7 +110,7 @@ export class EthereumSessionController implements ISessionController {
           this.auths[chainId][fromAddress] = { payload, signature };
         } else {
           console.log(
-            'Restored logged-out session:',
+            'Restored signed-out session:',
             this.getAddress(chainId, fromAddress)
           );
         }

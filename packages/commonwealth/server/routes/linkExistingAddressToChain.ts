@@ -18,7 +18,7 @@ export const Errors = {
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
   NeedOriginChain: 'Must provide original chain',
-  NeedLoggedIn: 'Must be logged in',
+  NeedLoggedIn: 'Must be signed in',
   NotVerifiedAddressOrUser: 'Not verified address or user',
   InvalidChain: 'Invalid chain',
 };

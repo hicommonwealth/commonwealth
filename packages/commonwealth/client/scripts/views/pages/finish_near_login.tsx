@@ -151,13 +151,13 @@ const FinishNearLogin = () => {
     const failedTx = searchParams.get('tx_failure');
 
     if (failedTx) {
-      console.log(`Login failed: deleting storage key ${failedTx}`);
+      console.log(`Sign in failed: deleting storage key ${failedTx}`);
 
       if (localStorage[failedTx]) {
         delete localStorage[failedTx];
       }
 
-      setValidationError('Login failed.');
+      setValidationError('Sign in failed.');
       return;
     }
 
@@ -227,7 +227,7 @@ const FinishNearLogin = () => {
   if (validationError) {
     return (
       <>
-        <CWText>NEAR account log in error: {validationError}</CWText>
+        <CWText>NEAR account sign in error: {validationError}</CWText>
         <CWButton
           onClick={(e) => {
             e.preventDefault();

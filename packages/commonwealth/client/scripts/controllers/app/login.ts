@@ -313,7 +313,7 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
   const { CosmosExtension } = await import('@magic-ext/cosmos');
 
   if (isCosmos && !chain) {
-    throw new Error('Must be in a community to login with Cosmos magic link');
+    throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
 
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {

@@ -111,13 +111,13 @@ export const LoginDesktop = ({
                 />
                 <div className="buttons-row email-form-buttons">
                   <CWButton
-                    label="Login with Magic"
+                    label="Sign in with Magic"
                     className="wallet-magic-btn"
                     onClick={onEmailLogin}
                   />
                   <CWButton
                     iconLeft="arrowLeft"
-                    label="Back to login options"
+                    label="Back to sign in options"
                     buttonType="secondary-blue"
                     className="wallet-back-btn"
                     onClick={onNavigateToWalletList}
