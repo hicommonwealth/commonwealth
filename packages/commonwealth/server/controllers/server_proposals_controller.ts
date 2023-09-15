@@ -112,7 +112,7 @@ export class ServerProposalsController {
       attributes: ['network', 'base'],
       include: [
         {
-          model: this.models.ChainNode,
+          model: this.models.ChainNode.scope('withPrivateData'),
           required: true,
         },
       ],
