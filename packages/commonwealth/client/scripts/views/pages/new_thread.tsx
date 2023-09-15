@@ -45,12 +45,16 @@ import { renderQuillDeltaToText } from 'utils';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { TemplateSelector } from '../components/TemplateActionSelector';
 import 'modals/template_action_modal.scss';
+import 'components/TemplateSelectorItem.scss';
+
+import ContractsPage from './contracts';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
   const [showSidebar, setShowSidebar] = useState(false);
   const [linkSnapshotModalOpen, setLinkSnapshotModalOpen] = useState(false);
   const [createSnapshotModalOpen, setCreateSnapshotModalOpen] = useState(false);
+  const [createTemplateModalOpen, setCreateTemplateModalOpen] = useState(false);
   const [linkedSnapshotProposal, setLinkedSnapshotProposal] =
     useState<Link>(null);
   const [linkedTemplateModalOpen, setLinkedTemplateModalOpen] = useState(false);
@@ -502,13 +506,23 @@ const NewThreadPage = () => {
           label: 'Create new template',
           item: (
             <div className="SelectableCard">
+              <Modal
+                content={<ContractsPage />}
+                open={createTemplateModalOpen}
+                onClose={() => {
+                  setCreateTemplateModalOpen(false);
+                }}
+                className="ContractsPageModal"
+              />
               <CWContentPageCard
                 header="Create new template"
+                onClick={() => {
+                  setCreateTemplateModalOpen(true);
+                }}
                 content={
                   <div className="ActionCard">
                     <CWText type="b2">
-                      Search through snapshots show the poll directly on the
-                      thread page
+                      Create a new contract action template.
                     </CWText>
                   </div>
                 }
