@@ -241,6 +241,7 @@ async function main() {
           'is especially useful to test duplicate emission of a notification.',
       },
     })
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     .check((argv) => {
       if (!argv.mock_notification) return true;
 
