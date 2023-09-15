@@ -29,7 +29,7 @@ async function getLogs(
   // rate limits e.g. Alchemy hasa limit of 10k logs while Celo public nodes have a limit of 500.
   if (!startingBlockNum || currentBlockNum - startingBlockNum > 500) {
     // TODO: log and report warning with the exact block range that is skipped
-    startingBlockNum = currentBlockNum - 9999;
+    startingBlockNum = currentBlockNum - 10;
   }
 
   console.log(`Fetching logs from ${startingBlockNum} to ${currentBlockNum}`);
