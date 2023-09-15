@@ -27,7 +27,7 @@ export const User = ({
   shouldShowAddressWithDisplayName,
   avatarSize = 16,
   role,
-  showSkeleton
+  showSkeleton,
 }: UserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
   const { data: users } = useFetchProfilesByAddressesQuery({
@@ -123,7 +123,11 @@ export const User = ({
     >
       {showAvatar && (
         <Link
-          to={profile ? `/profile/id/${profile?.id}` : undefined}
+          to={
+            profile && shouldLinkProfile
+              ? `/profile/id/${profile?.id}`
+              : undefined
+          }
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
