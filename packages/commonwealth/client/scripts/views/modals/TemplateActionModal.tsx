@@ -151,6 +151,8 @@ export const TemplateActionModal = ({
     }
   }, [isOpen, loading, fetched]);
 
+  console.log({ tempTemplates });
+
   return (
     <div className="TemplateActionModal">
       <div className="compact-modal-title">
@@ -166,10 +168,7 @@ export const TemplateActionModal = ({
           isOpen={isOpen}
         />
         <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            onClick={onClose}
-          />
+          <CWButton label="Cancel" onClick={onClose} />
           <CWButton label="Save changes" onClick={handleSaveChanges} />
         </div>
       </div>

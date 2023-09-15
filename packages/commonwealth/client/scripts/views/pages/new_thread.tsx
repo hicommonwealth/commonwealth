@@ -37,11 +37,14 @@ import { CWButton as OldCWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { Modal } from '../components/component_kit/cw_modal';
 import { LinkSnapshotInitialThreadModal } from '../modals/update_proposal_status_modal';
-import { Link, LinkSource } from 'models/Thread';
+import { Link, LinkDisplay, LinkSource } from 'models/Thread';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { NewSnapshotProposalModal } from '../modals/new_snapshot_proposal_modal';
 import { renderQuillDeltaToText } from 'utils';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { TemplateSelector } from '../components/TemplateActionSelector';
+import 'modals/template_action_modal.scss';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
@@ -50,6 +53,34 @@ const NewThreadPage = () => {
   const [createSnapshotModalOpen, setCreateSnapshotModalOpen] = useState(false);
   const [linkedSnapshotProposal, setLinkedSnapshotProposal] =
     useState<Link>(null);
+  const [linkedTemplateModalOpen, setLinkedTemplateModalOpen] = useState(false);
+  const [linkedTemplate, setLinkedTemplate] = useState<Link>(null);
+  const [contracts, setContracts] = useState<Array<any>>([]);
+  const [links, setLinks] = useState<Link[]>([]);
+  const [tempTemplates, setTempTemplates] = useState<any[]>([]);
+
+  const fetchContracts = async () => {
+    const contractsInStore = app.contracts.getCommunityContracts();
+    setContracts(contractsInStore);
+  };
+
+  useEffect(() => {
+    fetchContracts();
+  }, []);
+
+  const getContractAndCct = (identifier) => {
+    const contract = contracts.find((c) => {
+      return c.ccts.some((cct) => cct.templateId === identifier);
+    });
+
+    const cct = contract?.ccts.find((_cct) => _cct.templateId === identifier);
+
+    const newIdentifier = `${identifier}/${
+      contract.address
+    }/${cct?.cctmd.slug.replace('/', '')}`;
+
+    return { contract, cct, newIdentifier };
+  };
 
   useEffect(() => {
     if (!app.isLoggedIn()) {
@@ -141,7 +172,7 @@ const NewThreadPage = () => {
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
         authorProfile: app.user.activeAccount.profile,
-        links: linkedSnapshotProposal ? [linkedSnapshotProposal] : undefined,
+        links: links.length > 0 ? links : undefined,
       });
 
       setThreadContentDelta(createDeltaFromText(''));
@@ -211,6 +242,25 @@ const NewThreadPage = () => {
                       target="_blank"
                     >
                       Snapshot: {linkedSnapshotProposal.title}
+                    </ReactRouterLink>
+                  </div>
+                }
+              />
+            ),
+          },
+        ]
+      : []),
+    ...(linkedTemplate
+      ? [
+          {
+            label: 'Linked Template',
+            item: (
+              <CWContentPageCard
+                header="Linked Template"
+                content={
+                  <div className="ActionCard">
+                    <ReactRouterLink to={''} target="_blank">
+                      Template: {linkedTemplate.title}
                     </ReactRouterLink>
                   </div>
                 }
@@ -316,18 +366,29 @@ const NewThreadPage = () => {
                 className="LinkedProposalsCardModal"
                 content={
                   <NewSnapshotProposalModal
-                    onSave={() => {
-                      console.log('saved');
+                    onSave={(snapshotInfo: {
+                      id: string;
+                      snapshot_title: string;
+                    }) => {
+                      const newLink: Link = {
+                        source: LinkSource.Snapshot,
+                        identifier: snapshotInfo.id,
+                        title: snapshotInfo.snapshot_title,
+                      };
+
+                      setLinkedSnapshotProposal(newLink);
+                      setLinks((prev) => [...prev, newLink]);
                     }}
                     onModalClose={() => {
-                      // setCreateSnapshotModalOpen(false);
-                      console.log('yo0');
+                      setCreateSnapshotModalOpen(false);
                     }}
                     thread={{
                       id: null,
                       title: threadTitle,
                       body: null,
-                      plaintext: renderQuillDeltaToText(threadContentDelta),
+                      plaintext: threadContentDelta
+                        ? renderQuillDeltaToText(threadContentDelta)
+                        : '',
                     }}
                     fromExistingThread={false}
                   />
@@ -337,19 +398,17 @@ const NewThreadPage = () => {
               />
               <CWContentPageCard
                 header="Create Snapshot"
+                onClick={() => {
+                  if (app.chain.meta.snapshot?.length > 0) {
+                    setCreateSnapshotModalOpen(true);
+                  } else {
+                    notifyError(
+                      "This community doesn't have snapshot spaces connected"
+                    );
+                  }
+                }}
                 content={
-                  <div
-                    className="ActionCard"
-                    onClick={() => {
-                      if (app.chain.meta.snapshot?.length > 0) {
-                        setCreateSnapshotModalOpen(true);
-                      } else {
-                        notifyError(
-                          "This community doesn't have snapshot spaces connected"
-                        );
-                      }
-                    }}
-                  >
+                  <div className="ActionCard">
                     <CWText type="b2">
                       Creates snapshot from existing text.
                     </CWText>
@@ -401,6 +460,14 @@ const NewThreadPage = () => {
                         identifier: String(enrichedSnapshot.id),
                         title: enrichedSnapshot.title,
                       });
+                      setLinks((prev) => [
+                        ...prev,
+                        {
+                          source: LinkSource.Snapshot,
+                          identifier: String(enrichedSnapshot.id),
+                          title: enrichedSnapshot.title,
+                        },
+                      ]);
                       setLinkSnapshotModalOpen(false);
                     }}
                   />
@@ -410,19 +477,17 @@ const NewThreadPage = () => {
               />
               <CWContentPageCard
                 header="Link Snapshot"
+                onClick={() => {
+                  if (app.chain.meta.snapshot?.length > 0) {
+                    setLinkSnapshotModalOpen(true);
+                  } else {
+                    notifyError(
+                      "This community doesn't have snapshot spaces connected"
+                    );
+                  }
+                }}
                 content={
-                  <div
-                    className="ActionCard"
-                    onClick={() => {
-                      if (app.chain.meta.snapshot?.length > 0) {
-                        setLinkSnapshotModalOpen(true);
-                      } else {
-                        notifyError(
-                          "This community doesn't have snapshot spaces connected"
-                        );
-                      }
-                    }}
-                  >
+                  <div className="ActionCard">
                     <CWText type="b2">
                       Search through snapshots show the poll directly on the
                       thread page
@@ -455,13 +520,73 @@ const NewThreadPage = () => {
           label: 'Add existing template',
           item: (
             <div className="SelectableCard">
+              <Modal
+                className="LinkedProposalsCardModal"
+                content={
+                  <div className="TemplateActionModal">
+                    <div className="compact-modal-title">
+                      <h3>Add Templates</h3>
+                      <CWIconButton
+                        iconName="close"
+                        onClick={() => setLinkedTemplateModalOpen(false)}
+                      />
+                    </div>
+                    <div className="compact-modal-body">
+                      <TemplateSelector
+                        onSelect={(template: any) => {
+                          console.log({ template });
+                          const { newIdentifier } = getContractAndCct(
+                            template.id
+                          );
+
+                          const templateLink: Link = {
+                            source: LinkSource.Template,
+                            identifier: newIdentifier,
+                            title: template.name,
+                            display: LinkDisplay.sidebar,
+                          };
+
+                          setLinkedTemplate(templateLink);
+                          setTempTemplates([
+                            {
+                              title: template.name,
+                              identifier: String(template.id),
+                            },
+                          ]);
+                        }}
+                        tempTemplates={tempTemplates}
+                        contracts={contracts}
+                        thread={null}
+                        isOpen={true}
+                      />
+                      <div className="buttons-row">
+                        <CWButton
+                          label="Cancel"
+                          onClick={() => setLinkedTemplateModalOpen(false)}
+                        />
+                        <CWButton
+                          label="Save changes"
+                          onClick={() => {
+                            setLinks((prev) => [...prev, linkedTemplate]);
+                            setLinkedTemplateModalOpen(false);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                }
+                onClose={() => setLinkedTemplateModalOpen(false)}
+                open={linkedTemplateModalOpen}
+              />
               <CWContentPageCard
                 header="Add existing template"
+                onClick={() => {
+                  setLinkedTemplateModalOpen(true);
+                }}
                 content={
                   <div className="ActionCard">
                     <CWText type="b2">
-                      Search through snapshots show the poll directly on the
-                      thread page
+                      Add an existing template to the thread.
                     </CWText>
                   </div>
                 }

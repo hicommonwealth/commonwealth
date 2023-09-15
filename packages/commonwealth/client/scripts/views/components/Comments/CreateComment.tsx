@@ -66,8 +66,6 @@ export const CreateComment = ({
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
-  console.log('author => ', author);
-
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
 

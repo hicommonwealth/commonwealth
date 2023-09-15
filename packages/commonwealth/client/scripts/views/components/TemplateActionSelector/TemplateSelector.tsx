@@ -5,12 +5,12 @@ import { TemplateSelectorItem } from './TemplateSelectorItem';
 import Thread from 'models/Thread';
 import app from 'state';
 
-import 'components/TemplateSelector.scss'
+import 'components/TemplateSelector.scss';
 
 type TemplateSelectorProps = {
   onSelect: (template: any) => void;
   tempTemplates: Array<Pick<any, 'identifier' | 'title'>>;
-  thread: Thread;
+  thread: Thread | null;
   isOpen: boolean;
   contracts: Array<any>;
 };
@@ -28,7 +28,7 @@ export const TemplateSelector = ({
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
     const fetchedTemplates = [];
-    try{
+    try {
       for (const contract of contracts) {
         const templates = await app.contracts.getTemplatesForContract(
           contract.id
@@ -61,7 +61,8 @@ export const TemplateSelector = ({
   const renderItem = useCallback(
     (i: number, template: any) => {
       const isSelected = !!tempTemplates.find(
-        ({ identifier }) => String(template.id) === identifier
+        ({ identifier }) =>
+          String(template.id) === identifier || template.id === identifier
       );
 
       return (

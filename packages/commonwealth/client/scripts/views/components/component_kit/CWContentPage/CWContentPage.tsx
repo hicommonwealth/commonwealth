@@ -303,13 +303,14 @@ export const CWContentPage = ({
 type ContentPageCardProps = {
   content: ReactNode;
   header: string;
+  onClick?: () => void;
 };
 
 export const CWContentPageCard = (props: ContentPageCardProps) => {
-  const { content, header } = props;
+  const { content, header, onClick } = props;
 
   return (
-    <CWCard className="ContentPageCard">
+    <CWCard className="ContentPageCard" onClick={onClick}>
       <div className="header-container">
         <CWText type="h5" fontWeight="semiBold">
           {header}
