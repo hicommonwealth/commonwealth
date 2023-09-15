@@ -222,6 +222,7 @@ describe('Cosmos Governance Notification Generator with real proposals', () => {
         },
       });
       expect(notifications.length).to.equal(2);
+      clock.restore();
     });
   });
 });
