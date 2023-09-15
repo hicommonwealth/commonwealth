@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import 'modals/template_action_modal.scss';
+import 'modals/TemplateActionModal.scss';
 
 import app from 'state';
 import Thread, { Link, LinkDisplay, LinkSource } from '../../models/Thread';
@@ -166,10 +166,7 @@ export const TemplateActionModal = ({
           isOpen={isOpen}
         />
         <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            onClick={onClose}
-          />
+          <CWButton label="Cancel" onClick={onClose} />
           <CWButton label="Save changes" onClick={handleSaveChanges} />
         </div>
       </div>

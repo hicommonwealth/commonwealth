@@ -5,7 +5,6 @@ import validateType from 'helpers/validateTypes';
 import type Contract from 'models/Contract';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import app from 'state';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
