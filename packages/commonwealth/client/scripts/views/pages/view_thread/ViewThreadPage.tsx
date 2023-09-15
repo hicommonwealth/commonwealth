@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -25,16 +26,15 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import NewProfilesController from '../../../controllers/server/newProfiles';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import { Select } from '../../components/Select';
-import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -91,7 +91,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false);
-  const [areProfilesLoaded, setAreProfilesLoaded] = useState(false);
   const [isViewMarked, setIsViewMarked] = useState(false);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -128,7 +127,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [fetchCommentsError]);
 
   const { isWindowLarge } = useBrowserWindow({
-    // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -216,30 +214,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         setIsViewMarked(true);
       });
   }, [thread, isViewMarked]);
-
-  useNecessaryEffect(() => {
-    if (!thread || (thread && areProfilesLoaded)) {
-      return;
-    }
-
-    // load profiles
-    NewProfilesController.Instance.getProfile(
-      thread.authorChain,
-      thread.author
-    );
-
-    comments.forEach((comment) => {
-      NewProfilesController.Instance.getProfile(
-        comment.authorChain,
-        comment.author
-      );
-    });
-
-    NewProfilesController.Instance.isFetched.on('redraw', () => {
-      setAreProfilesLoaded(true);
-    });
-    setAreProfilesLoaded(true);
-  }, [comments, thread, areProfilesLoaded]);
 
   useManageDocumentTitle('View thread', thread?.title);
 

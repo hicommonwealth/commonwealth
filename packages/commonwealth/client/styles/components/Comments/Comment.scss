@@ -13,7 +13,7 @@
       height: 100%;
       left: 36px;
       position: relative;
-      top: 12px;
+      top: 16px;
       width: 1px;
 
       &.replying {
@@ -65,10 +65,6 @@
 
       .published-text.Text {
         color: $neutral-500;
-      }
-      .verification-icon {
-        color: $neutral-500;
-        margin-top: 2px;
       }
     }
 

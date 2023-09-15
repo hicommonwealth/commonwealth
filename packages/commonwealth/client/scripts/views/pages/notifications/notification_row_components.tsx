@@ -1,23 +1,25 @@
-import React, { useState } from 'react';
 import moment from 'moment';
-
+import React, { useState } from 'react';
 import 'pages/notifications/notification_row.scss';
 import AddressInfo from '../../../models/AddressInfo';
-
 import type { NotificationRowProps } from './notification_row';
+import {
+  IEventLabel,
+  Label as ChainEventLabel,
+  SupportedNetwork,
+} from 'chain-events/src';
 import type { CWEvent } from 'chain-events/src';
-import { Label as ChainEventLabel, SupportedNetwork } from 'chain-events/src';
-import { NotificationCategories } from 'common-common/src/types';
-
-import app from 'state';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { getClasses } from '../../components/component_kit/helpers';
-import { User } from 'views/components/user/user';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { getBatchNotificationFields } from './helpers';
-import { UserGallery } from '../../components/user/user_gallery';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useNavigate } from 'react-router';
+import app from 'state';
+import { User } from 'views/components/user/user';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { getClasses } from '../../components/component_kit/helpers';
+import { UserGallery } from '../../components/user/user_gallery';
+import { getBatchNotificationFields } from './helpers';
+import { getProposalUrlPath } from 'identifiers';
 
 export const ChainEventNotificationRow = (
   props: Omit<NotificationRowProps, 'allRead'>
@@ -44,7 +46,13 @@ export const ChainEventNotificationRow = (
 
   const chainName = app.config.chains.getById(chainId)?.name;
 
-  const label = ChainEventLabel(chainId, chainEvent);
+  let label: IEventLabel | undefined;
+  try {
+    label = ChainEventLabel(chainId, chainEvent);
+  } catch (e) {
+    console.warn(e);
+    return;
+  }
 
   if (!label) {
     return (
@@ -63,12 +71,32 @@ export const ChainEventNotificationRow = (
     );
   }
 
+  let proposalType: ProposalType;
+  if (chainEvent.network === SupportedNetwork.Cosmos) {
+    proposalType = ProposalType.CosmosProposal;
+  } else if (chainEvent.network === SupportedNetwork.Aave) {
+    proposalType = ProposalType.AaveProposal;
+  } else if (chainEvent.network === SupportedNetwork.Compound) {
+    proposalType = ProposalType.CompoundProposal;
+  }
+
+  if (!proposalType) {
+    return;
+  }
+
+  const path = getProposalUrlPath(
+    proposalType,
+    (chainEvent.data as any).id,
+    false,
+    chainId
+  );
+
   return (
     <div
       className={
         !notification.isRead ? 'NotificationRow unread' : 'NotificationRow'
       }
-      onClick={() => navigate(`/notifications?id=${notification.id}`)}
+      onClick={() => navigate(path)}
     >
       <div className="comment-body">
         <div className="comment-body-top chain-event-notification-top">
@@ -143,21 +171,16 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
     >
       {authorInfo.length === 1 ? (
         <User
-          user={
-            new AddressInfo(
-              null,
-              (authorInfo[0] as [string, string])[1],
-              (authorInfo[0] as [string, string])[0],
-              null
-            )
-          }
-          avatarOnly
+          userAddress={(authorInfo[0] as [string, string])[1]}
+          userChainId={(authorInfo[0] as [string, string])[0]}
+          shouldShowAvatarOnly
           avatarSize={26}
         />
       ) : (
         <UserGallery
           users={authorInfo.map(
-            (auth) => new AddressInfo(null, auth[1], auth[0], null)
+            (auth) =>
+              new AddressInfo({ id: null, address: auth[1], chainId: auth[0] })
           )}
           avatarSize={26}
         />

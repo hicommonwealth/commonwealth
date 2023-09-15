@@ -43,6 +43,7 @@ import {
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainNodeAttributes } from './server/models/chain_node';
+import { RedisCache } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -120,8 +121,8 @@ const resetServer = (debug = false): Promise<void> => {
           balance_type: BalanceType.Ethereum,
         },
         juno: {
-          url: 'https://rpc-juno.ecostake.com',
-          name: 'Juno',
+          url: 'https://rpc-osmosis.ecostake.com',
+          name: 'Osmosis',
           balance_type: BalanceType.Cosmos,
         },
         csdk: {
@@ -132,7 +133,7 @@ const resetServer = (debug = false): Promise<void> => {
         },
       };
 
-      const [edgewareNode, mainnetNode, testnetNode, junoNode, csdkNode] =
+      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkNode] =
         await models.ChainNode.bulkCreate(Object.values(nodes));
 
       // Initialize different chain + node URLs
@@ -174,16 +175,16 @@ const resetServer = (debug = false): Promise<void> => {
         chain_node_id: testnetNode.id,
       });
       await models.Chain.create({
-        id: 'juno',
+        id: 'osmosis',
         network: ChainNetwork.Osmosis,
-        default_symbol: 'JUNO',
-        name: 'Juno',
+        default_symbol: 'OSMO',
+        name: 'Osmosis',
         icon_url: '/static/img/protocols/cosmos.png',
         active: true,
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
-        chain_node_id: junoNode.id,
+        chain_node_id: osmosisNode.id,
       });
       await models.Chain.create({
         id: 'csdk',
@@ -476,8 +477,9 @@ export const setupCacheTestEndpoints = (appAttach: Express) => {
 const banCache = new BanCache(models);
 const globalActivityCache = new GlobalActivityCache(models);
 globalActivityCache.start();
+const redisCache = new RedisCache();
+
 setupPassport(models);
-// TODO: mock RabbitMQController
 setupAPI(
   '/api',
   app,
@@ -486,7 +488,8 @@ setupAPI(
   tokenBalanceCache,
   banCache,
   globalActivityCache,
-  databaseValidationService
+  databaseValidationService,
+  redisCache
 );
 setupCosmosProxy(app, models);
 setupCacheTestEndpoints(app);

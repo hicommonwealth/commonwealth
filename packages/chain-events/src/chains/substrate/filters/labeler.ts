@@ -102,7 +102,6 @@ const edgBalanceFormatter = (chain: string, balance: BalanceString): string => {
  * such that we can display a notification regarding its contents.
  */
 export const Label: LabelerFilter = (
-  blockNumber: number,
   chainId: string,
   data: IEventData
 ): IEventLabel => {
@@ -306,7 +305,7 @@ export const Label: LabelerFilter = (
         heading: 'Democracy Referendum Passed',
         label: dispatchBlock
           ? `Referendum ${referendumIndex} passed, and will be executed on block ${dispatchBlock}.`
-          : `Referendum ${referendumIndex} passed, and was executed on block ${blockNumber}.`,
+          : `Referendum ${referendumIndex} passed.`,
         linkUrl: chainId
           ? `/${chainId}/proposal/referendum/${referendumIndex}`
           : null,

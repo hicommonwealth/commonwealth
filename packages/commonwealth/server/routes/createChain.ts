@@ -41,7 +41,7 @@ export const Errors = {
   NoBase: 'Must provide chain base',
   NoNodeUrl: 'Must provide node url',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
-  InvalidNode: 'Node url returned invalid response',
+  InvalidNode: 'RPC url returned invalid response. Check your node url',
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
@@ -97,7 +97,7 @@ const createChain = async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new AppError('Not logged in'));
+    return next(new AppError('Not signed in'));
   }
   // require Admin privilege for creating Chain/DAO
   if (
@@ -243,7 +243,7 @@ const createChain = async (
       const tmClient = await cosm.Tendermint34Client.connect(url);
       await tmClient.block();
     } catch (err) {
-      return next(new ServerError(Errors.InvalidNode));
+      return next(new AppError(Errors.InvalidNode));
     }
 
     // TODO: test altWalletUrl if available
@@ -256,7 +256,7 @@ const createChain = async (
       try {
         sanitizedSpec = await testSubstrateSpec(spec, req.body.node_url);
       } catch (e) {
-        return next(new ServerError(Errors.InvalidNode));
+        return next(new AppError(Errors.InvalidNode));
       }
     }
   } else {

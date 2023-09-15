@@ -312,7 +312,7 @@ async function main() {
       if (!address) {
         log.error(
           'Wallet address not found. ' +
-            'Make sure the given address is an address you have used to login before.'
+            'Make sure the given address is an address you have used to sign in before.'
         );
         process.exit(1);
       } else {

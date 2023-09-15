@@ -26,6 +26,8 @@ import type {
 } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { CosmosApiType } from '../../chain';
+import Cosmos from '../../adapter';
+import CosmosGovernance from './governance-v1beta1';
 
 /* -- v1beta1-specific methods: -- */
 
@@ -56,6 +58,7 @@ export const asciiLiteralToDecimal = async (n: Uint8Array) => {
   return +new BN(nStr).div(new BN('1000000000000000')) / 1000;
 };
 
+// todo
 export const marshalTally = (tally: TallyResult): ICosmosProposalTally => {
   if (!tally) return null;
   return {
@@ -167,7 +170,7 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
     spendAmount = spend.amount[0]
       ? [
           new CosmosToken(
-            spend.amount[0]?.denom?.toUpperCase(),
+            spend.amount[0]?.denom,
             spend.amount[0]?.amount
           ).toCoinObject(),
         ]
@@ -265,4 +268,35 @@ export const encodeCommunitySpend = (
     typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
     value: prop,
   });
+};
+
+export interface CosmosDepositParams {
+  minDeposit: CosmosToken;
+}
+
+export const getDepositParams = async (
+  cosmosChain: Cosmos,
+  stakingDenom?: string
+): Promise<CosmosDepositParams> => {
+  const govController = cosmosChain.governance as CosmosGovernance;
+  let minDeposit;
+  const { depositParams } = await cosmosChain.chain.api.gov.params('deposit');
+
+  // TODO: support off-denom deposits
+  const depositCoins = depositParams.minDeposit.find(
+    ({ denom }) => denom === stakingDenom
+  );
+  if (depositCoins) {
+    minDeposit = new CosmosToken(
+      depositCoins.denom,
+      new BN(depositCoins.amount)
+    );
+  } else {
+    throw new Error(
+      `Gov minDeposit in wrong denom (${minDeposit}) or stake denom not loaded: 
+      ${cosmosChain.chain.denom}`
+    );
+  }
+  govController.setMinDeposit(minDeposit);
+  return { minDeposit };
 };

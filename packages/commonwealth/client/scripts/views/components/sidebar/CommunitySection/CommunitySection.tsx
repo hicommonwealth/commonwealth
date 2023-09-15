@@ -15,11 +15,13 @@ import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 export const CommunitySection = ({ showSkeleton }) => {
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
+  const { activeAccount } = useUserActiveAccount();
 
   if (showSkeleton) return <CommunitySectionSkeleton />;
 
@@ -30,8 +32,11 @@ export const CommunitySection = ({ showSkeleton }) => {
 
   return (
     <div className="community-menu">
-      {featureFlags.sessionKeys && (
-        <AccountConnectionIndicator connected={true} />
+      {featureFlags.sessionKeys && app.isLoggedIn() && (
+        <AccountConnectionIndicator
+          connected={!!activeAccount}
+          address={activeAccount?.address}
+        />
       )}
       {showAdmin && <AdminSection />}
       {featureFlags.communityHomepage && app.chain?.meta.hasHomepage && (

@@ -64,7 +64,7 @@ const DEFAULT_FEE: StdFee = {
   amount: [{ amount: '300000', denom: 'aevmos' }],
 };
 const DEFAULT_MEMO = '';
-const deposit = new CosmosToken('aevmos', 200000, false);
+const deposit = new CosmosToken('aevmos', 20000000000000000000, false);
 
 export const sendTx = async (lcdUrl, tx) => {
   const { client, signerAddress } = await setupTestSigner(lcdUrl);

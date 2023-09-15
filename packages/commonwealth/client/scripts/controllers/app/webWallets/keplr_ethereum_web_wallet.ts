@@ -12,6 +12,8 @@ declare global {
   interface Window extends KeplrWindow {}
 }
 
+export const ETHERMINT_CHAINS = ['evmos', 'injective', 'evmos-dev'];
+
 class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
   private _accounts: readonly AccountData[];
@@ -24,7 +26,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly label = 'Keplr';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly defaultNetwork = ChainNetwork.Evmos;
-  public readonly specificChains = ['evmos', 'injective', 'evmos-dev'];
+  public readonly specificChains = ETHERMINT_CHAINS;
 
   public get available() {
     return !!window.keplr;
@@ -71,14 +73,14 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload
   ): Promise<string> {
     const keplr = await import('@keplr-wallet/types');
     const canvas = await import('@canvas-js/interfaces');
     const signature = await window.keplr.signEthereum(
       this._chainId,
       account.address,
-      canvas.serializeSessionPayload(canvasMessage),
+      canvas.serializeSessionPayload(canvasSessionPayload),
       keplr.EthSignType.MESSAGE
     );
     return `0x${Buffer.from(signature).toString('hex')}`;
