@@ -8,6 +8,11 @@
   font-size: 0.875rem;
   color: $neutral-400;
 
+  .active {
+    color: #656167;
+    font-weight: 500;
+  }
+
   li {
     display: flex;
     align-items: center;

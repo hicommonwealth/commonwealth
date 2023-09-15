@@ -131,7 +131,7 @@ export const Breadcrumbs = () => {
         {standalone ? (
           <li>
             <CWText type="b2" fontWeight="regular">
-              <a>{pathnames[0].text}</a>
+              <a className="active">{pathnames[0].text}</a>
             </CWText>
           </li>
         ) : (
@@ -159,7 +159,12 @@ export const Breadcrumbs = () => {
             ) : (
               <li key={`${location.key} - ${index}`}>
                 <CWText type="b2" fontWeight="regular">
-                  <a href={path.link}>{path.text}</a>
+                  <a
+                    className={pathnames.length - 1 === index ? 'active' : ''}
+                    href={path.link}
+                  >
+                    {path.text}
+                  </a>
                 </CWText>
               </li>
             );
