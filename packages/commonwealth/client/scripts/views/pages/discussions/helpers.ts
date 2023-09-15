@@ -123,7 +123,10 @@ export const getThreadSubScriptionMenuItem = (
  * function will sort those correctly.
  */
 export const sortPinned = (t: Thread[]) => {
-  return [...t].sort((a, b) => (a.pinned === b.pinned ? 1 : a.pinned ? -1 : 0));
+  return [...t].sort((a, b) => {
+    if (a.pinned === b.pinned) return 0; // return 0 when they are equal
+    return a.pinned ? -1 : 1; // sort based on the pinned status
+  });
 };
 
 /**
