@@ -23,28 +23,13 @@ const randomInt = () => Math.floor(Math.random() * (2 ** 31 - 1)) + 1;
 const propCreateBlock = randomInt();
 const ceNotifications = {
   [SupportedNotificationChains.dydx]: {
-    queued: 0,
-    id: randomInt(),
     block_number: propCreateBlock,
     event_data: {
       id: randomInt(),
       kind: 'proposal-created',
-      values: ['0'],
-      targets: ['0xE710CEd57456D3A16152c32835B5FB4E72D9eA5b'],
-      endBlock: propCreateBlock + 33_000,
-      executor: '0x64c7d40c07EFAbec2AafdC243bF59eaF2195c6dc',
-      ipfsHash:
-        '0x5aca381042cb641c1000126d5a183c38b17492eb60a86910973d0c3f1e867f43',
-      proposer: '0xB933AEe47C438f22DE0747D57fc239FE37878Dd1',
-      strategy: '0x90Dfd35F4a0BB2d30CDf66508085e33C353475D9',
-      calldatas: ['randomcalldatas'],
-      signatures: ['transfer(address,address,uint256)'],
-      startBlock: propCreateBlock + 7_000,
     },
     network: 'aave',
     chain: 'dydx',
-    updated_at: '2023-06-19T11:50:52.308Z',
-    created_at: '2023-06-19T11:50:52.262Z',
   },
 };
 
@@ -121,7 +106,7 @@ async function setupNotification(
       where: {
         category_id: NotificationCategories.ChainEvent,
         chain_id: chainId,
-        chain_event_id: ceNotifications[chainId].id,
+        chain_event_id: ceNotifications[chainId].id || null,
         [Sequelize.Op.and]: [
           Sequelize.literal(
             `notification_data::jsonb -> 'event_data' ->> 'id' = '${ceNotifications[chainId].event_data.id}'`
@@ -181,48 +166,80 @@ async function setupNotification(
 }
 
 async function main() {
-  const argv = await yargs(hideBin(process.argv)).options({
-    chain_id: {
-      alias: 'c',
-      type: 'string',
-      demandOption: false,
-      conflicts: 'snapshot_id',
-      description:
-        'Name of chain to generate a test chain-event notification for',
-    },
-    snapshot_id: {
-      alias: 's',
-      type: 'string',
-      demandOption: false,
-      conflicts: 'chain',
-      description:
-        'Name of the snapshot space to generate a test snapshot-proposal notification for',
-    },
-    wallet_address: {
-      alias: 'w',
-      type: 'string',
-      demandOption: false,
-      conflicts: 'user_id',
-      description:
-        'Wallet address of the user to generate a test notification for',
-    },
-    user_id: {
-      alias: 'u',
-      type: 'number',
-      demandOption: false,
-      conflicts: 'wallet_address',
-      description: 'User id of the user to generate a test notification for',
-    },
-    mock_notification: {
-      alias: 'm',
-      type: 'boolean',
-      demandOption: true,
-      default: false,
-      description:
-        'Whether to create a mock notification or use a real existing one. ' +
-        'A mock notification will not link to a real chain-event or snapshot-proposal.',
-    },
-  }).argv;
+  const argv = await yargs(hideBin(process.argv))
+    .options({
+      chain_id: {
+        alias: 'c',
+        type: 'string',
+        demandOption: false,
+        conflicts: 'snapshot_id',
+        description:
+          'Name of chain to generate a test chain-event notification for',
+      },
+      snapshot_id: {
+        alias: 's',
+        type: 'string',
+        demandOption: false,
+        conflicts: 'chain',
+        description:
+          'Name of the snapshot space to generate a test snapshot-proposal notification for',
+      },
+      wallet_address: {
+        alias: 'w',
+        type: 'string',
+        demandOption: false,
+        conflicts: 'user_id',
+        description:
+          'Wallet address of the user to generate a test notification for',
+      },
+      user_id: {
+        alias: 'u',
+        type: 'number',
+        demandOption: false,
+        conflicts: 'wallet_address',
+        description: 'User id of the user to generate a test notification for',
+      },
+      mock_notification: {
+        alias: 'm',
+        type: 'boolean',
+        demandOption: true,
+        default: false,
+        description:
+          'Whether to create a mock notification or use a real existing one. ' +
+          'A mock notification will not link to a real chain-event or snapshot-proposal.',
+      },
+    })
+    .check((argv) => {
+      if (!argv.mock_notification) return true;
+
+      if (argv.chain_id) {
+        if (
+          !Object.values(SupportedNotificationChains).includes(
+            argv.chain_id as SupportedNotificationChains
+          )
+        ) {
+          throw new Error(
+            `Chain id must be one of ${Object.values(
+              SupportedNotificationChains
+            )}`
+          );
+        }
+      } else if (argv.snapshot_id) {
+        if (
+          !Object.values(SupportedNotificationSpaces).includes(
+            argv.snapshot_id as SupportedNotificationSpaces
+          )
+        ) {
+          throw new Error(
+            `Snapshot id must be one of ${Object.values(
+              SupportedNotificationSpaces
+            )}`
+          );
+        }
+      }
+
+      return true;
+    }).argv;
 
   const transaction = await models.sequelize.transaction();
   let notifData: string;
