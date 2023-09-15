@@ -4,7 +4,7 @@ import { sequelize } from '../database';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoNotificationIds: 'Must specify notification IDs',
 };
 
