@@ -5,17 +5,19 @@ import { CWText } from '../component_kit/cw_text';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import app from 'state';
 
-type BreadcrumbsProps = {
-  standalone?: boolean;
-};
-
-export const Breadcrumbs = ({ standalone }: BreadcrumbsProps) => {
+export const Breadcrumbs = () => {
   const location = useLocation();
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
 
-  const standalonePaths = [
+  let standalone = false;
+
+  /**
+   * An array of paths that are considered standalone pages.
+   */
+
+  const standalonePaths: Array<string> = [
     'explore',
     'dashboard',
     'notifications',
@@ -23,13 +25,25 @@ export const Breadcrumbs = ({ standalone }: BreadcrumbsProps) => {
     'createCommunity',
   ];
 
+  /**
+   * Checks if the current page is a standalone page or if it contains the profileId.
+   *
+   * @param {string} pathname - The pathname of the current location.
+   * @param {string} profileId - The profile ID to check for.
+   * @returns {boolean} True if the page is standalone or contains the profileId, otherwise false.
+   */
   if (
     standalonePaths.includes(location.pathname.split('/')[1]) ||
     location.pathname.includes(String(profileId))
   ) {
     standalone = true;
   }
-
+  /**
+   * Parses the current location pathname into an array of breadcrumb items.
+   *
+   * @param {Object} location - The location object containing pathname information.
+   * @returns {Array} An array of breadcrumb items, each with a text, link, and isParent property.
+   */
   const pathnames = location.pathname
     .split('/')
     .map((x, index, arr) => {
@@ -56,7 +70,13 @@ export const Breadcrumbs = ({ standalone }: BreadcrumbsProps) => {
     })
     .filter((x) => x.text.length > 0);
 
-  const getStyle = (page) => {
+  /**
+   * Determines the style based on the current page.
+   *
+   * @param page - An array of objects representing the page links.
+   * @returns The style associated with the current page.
+   */
+  const getStyle = (page: Array<{ link: string }>) => {
     let path: string;
     path = page[0].link.split('/')[0];
 
@@ -71,8 +91,6 @@ export const Breadcrumbs = ({ standalone }: BreadcrumbsProps) => {
       path = 'members';
     }
 
-    console.log(page);
-
     if (location.pathname.includes(String(profileId))) {
       path = 'viewProfile';
     }
@@ -85,32 +103,26 @@ export const Breadcrumbs = ({ standalone }: BreadcrumbsProps) => {
     }[path];
   };
 
+  /**
+   * Gets the tooltip copy based on the current page.
+   *
+   * @returns The tooltip copy for the current page, or `undefined` if it's not found which is handled in the return.
+   */
+
   const getToolTipCopy = () => {
-    let currentPage: 'admin' | 'discussionsGovernance' | undefined;
+    const pathSegments = location.pathname.split('/');
+    const lastPathSegment = pathSegments[pathSegments.length - 1];
 
-    const discussions = ['discussions', 'overview', 'members'];
-    const admin = ['manage', 'analytics'];
-
-    if (
-      discussions.includes(
-        location.pathname.split('/')[location.pathname.split('/').length - 1]
-      )
-    ) {
-      currentPage = 'discussionsGovernance';
-    } else if (
-      admin.includes(
-        location.pathname.split('/')[location.pathname.split('/').length - 1]
-      )
-    ) {
-      currentPage = 'admin';
-    } else {
-      return;
-    }
-
-    return {
+    const tooltips = {
       admin: 'This is a section, not a selectable page.',
       discussionsGovernance: 'This is an app, not a selectable page.',
-    }[currentPage];
+    };
+
+    if (lastPathSegment in tooltips) {
+      return tooltips[lastPathSegment];
+    }
+
+    return;
   };
 
   return (
@@ -139,11 +151,11 @@ export const Breadcrumbs = ({ standalone }: BreadcrumbsProps) => {
                     onMouseLeave={handleIneraction}
                   >
                     <CWText type="b2" fontWeight="regular">
-                      <a href={path.link}>{path.text}</a>
+                      <a>{path.text}</a>
                     </CWText>
                   </li>
                 )}
-              ></CWTooltip>
+              />
             ) : (
               <li key={`${location.key} - ${index}`}>
                 <CWText type="b2" fontWeight="regular">
