@@ -218,13 +218,22 @@
       font-size: 0.85em;
       margin-top: -2px;
     }
+
+    .user-block-via {
+      font-size: 0.75em;
+      margin-left: 8px;
+      border: 1px solid #ccc;
+      padding: 1px 6px 2px;
+      border-radius: 21px;
+      line-height: 1;
+    }
   }
 
   .user-block-right {
     .user-block-selected {
       text-align: right;
       position: relative;
-      top: -2px;
+      top: 1px;
     }
   }
 
@@ -241,6 +250,10 @@
       .user-block-address {
         font-size: 0.8em;
       }
+    }
+    .user-block-right {
+      display: flex;
+      font-size: 0.8em;
     }
   }
 }

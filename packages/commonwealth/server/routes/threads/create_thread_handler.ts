@@ -1,6 +1,7 @@
 import { ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { verifyThread } from '../../../shared/canvas/serverVerify';
 
 type CreateThreadRequestBody = {
   topic_id: string;
@@ -38,6 +39,14 @@ export const createThreadHandler = async (
     canvas_hash: canvasHash,
     discord_meta,
   } = req.body;
+
+  await verifyThread(canvasAction, canvasSession, canvasHash, {
+    title,
+    body,
+    address: address.address,
+    community: chain.id,
+    topic: topicId ? parseInt(topicId, 10) : null,
+  });
 
   const [thread, notificationOptions, analyticsOptions] =
     await controllers.threads.createThread({
