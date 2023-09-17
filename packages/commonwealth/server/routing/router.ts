@@ -55,6 +55,12 @@ import disableImmediateEmails from '../routes/subscription/disableImmediateEmail
 import viewNotifications, {
   RouteNotificationCategories,
 } from '../routes/viewNotifications';
+import addDeliveryMechanism from '../routes/subscription/addDeliveryMechanism';
+import disableDeliveryMechanism from '../routes/subscription/disableDeliveryMechanism';
+import updateDeliveryMechanism from '../routes/subscription/updateDeliveryMechanism';
+import viewDeliveryMechanisms from '../routes/subscription/viewDeliveryMechanisms';
+import enableSubscriptionDeliveryMechanism from '../routes/subscription/enableSubscriptionDeliveryMechanism';
+import disableSubscriptionDeliveryMechanism from '../routes/subscription/disableSubscriptionDeliveryMechanism';
 import viewUserActivity from '../routes/viewUserActivity';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
 import markNotificationsRead from '../routes/markNotificationsRead';
@@ -131,11 +137,6 @@ import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import createChainNode from '../routes/createChainNode';
-import addDeliveryMechanism from '../routes/subscription/addDeliveryMechanism';
-import disableDeliveryMechanism from '../routes/subscription/disableDeliveryMechanism';
-import updateDeliveryMechanism from '../routes/subscription/updateDeliveryMechanism';
-import viewDeliveryMechanisms from '../routes/subscription/viewDeliveryMechanisms';
-import { RedisCache } from 'common-common/src/redisCache';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -194,6 +195,7 @@ import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
+import { RedisCache } from '../../../common-common/src/redisCache';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -996,6 +998,22 @@ function setupRouter(
     '/viewDeliveryMechanisms',
     passport.authenticate('jwt', { session: false }),
     viewDeliveryMechanisms.bind(this, models)
+  );
+  
+  registerRoute(
+    router,
+    'post',
+    '/enableSubscriptionDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    enableSubscriptionDeliveryMechanism.bind(this, models)
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/disableSubscriptionDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    disableSubscriptionDeliveryMechanism.bind(this, models)
   );
 
   registerRoute(

@@ -2,12 +2,17 @@
 
 @mixin communityBundleColumns {
   display: grid;
-  grid-template-columns: 3fr 2fr 1fr;
+  grid-template-columns: 3fr 1fr 1fr 1fr;
 }
 
 @mixin subscriptionColumns {
   display: grid;
   grid-template-columns: 3fr 1fr 1fr 1fr;
+}
+
+@mixin platformsColumns {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr;
 }
 
 .NotificationSettingsPage {
@@ -113,7 +118,8 @@
   }
 
   .chain-events-section-margin {
-    margin: 0 0 16px 0;
+    // What is the margin for this section?
+    margin: 20px 0 16px 0;
   }
 
   .chain-events-subscriptions-padding {
@@ -122,6 +128,22 @@
 
   .column-header-row {
     @include communityBundleColumns;
+
+    border-bottom: 1px solid $neutral-200;
+    padding: 0 0 8px 40px;
+
+    .column-header-text.Text {
+      color: $neutral-500;
+    }
+
+    .last-column-header-text.Text {
+      color: $neutral-500;
+      justify-self: end;
+    }
+  }
+
+  .platform-column-header-row {
+    @include platformsColumns;
 
     border-bottom: 1px solid $neutral-200;
     padding: 0 0 8px 40px;
@@ -146,6 +168,7 @@
       margin-left: 50px;
       margin-top: 12px;
       width: 100px; /* You can adjust this value as per your design */
+      justify-self: end;
     }
     
     .platform-warning-text {
@@ -154,6 +177,49 @@
 
     .notification-row-header {
       @include communityBundleColumns;
+
+      height: 80px;
+      width: 100%;
+
+      @include extraSmall {
+        .Checkbox {
+          margin-left: 24px;
+
+          .checkbox-label {
+            display: none;
+          }
+        }
+      }
+
+      .left-content-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .avatar-and-name {
+          align-items: center;
+          display: flex;
+          gap: 4px;
+        }
+
+        .subscriptions-count-text.Text {
+          color: $neutral-500;
+          margin-left: 28px;
+        }
+      }
+
+      .dropdown-wrapper {
+        margin-top: 17px;
+      }
+
+      .Toggle {
+        margin-left: 1em;
+        align-self: center;
+      }
+    }
+
+    .platform-row-header {
+      @include platformsColumns;
 
       height: 80px;
       width: 100%;

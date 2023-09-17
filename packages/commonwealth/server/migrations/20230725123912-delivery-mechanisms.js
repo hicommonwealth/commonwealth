@@ -3,17 +3,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
-      // Adding interval to Subscriptions
-      await queryInterface.addColumn(
-        'Subscriptions',
-        'delivery_interval',
-        {
-          type: Sequelize.STRING,
-          allowNull: true,
-        },
-        { transaction: t }
-      );
-
       // Creating DeliveryMechanism table
       await queryInterface.createTable(
         'DeliveryMechanisms',
@@ -50,13 +39,30 @@ module.exports = {
       await queryInterface.createTable(
         'SubscriptionDeliveries',
         {
+          id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+          },
           subscription_id: {
             type: Sequelize.INTEGER,
             allowNull: false,
+            references: {
+              model: 'Subscriptions',
+              key: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
           },
           delivery_mechanism_id: {
             type: Sequelize.INTEGER,
             allowNull: false,
+            references: {
+              model: 'DeliveryMechanisms',
+              key: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
           },
           created_at: Sequelize.DATE,
           updated_at: Sequelize.DATE,
@@ -72,10 +78,10 @@ module.exports = {
       await queryInterface.removeColumn('Subscriptions', 'delivery_interval', {
         transaction: t,
       });
-      await queryInterface.dropTable('DeliveryMechanisms', { transaction: t });
       await queryInterface.dropTable('SubscriptionDeliveries', {
         transaction: t,
       });
+      await queryInterface.dropTable('DeliveryMechanisms', { transaction: t });
     });
   },
 };

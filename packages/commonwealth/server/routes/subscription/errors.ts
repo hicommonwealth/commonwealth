@@ -19,6 +19,9 @@ const Errors = {
   NoMentionDelete: 'Cannot delete mention subscription',
   NoThreadOrComment: 'Must provide thread or comment id',
   BothThreadAndComment: 'Must provide thread or comment id, not both',
+  NoSubscriptionIdOrDeliveryMechanismType:
+    'Must provide subscription id(s) and delivery mechanism type',
+  NoDeliveryMechanismFound: 'No delivery mechanism found',
 };
 
 export default Errors;

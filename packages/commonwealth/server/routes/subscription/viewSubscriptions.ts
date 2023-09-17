@@ -37,6 +37,17 @@ export default async (
       required: false,
       where: { active: true },
     },
+    {
+      model: models.SubscriptionDelivery,
+      as: 'SubscriptionDelivery',
+      include: [
+        // Add this include array
+        {
+          model: models.DeliveryMechanism,
+          as: 'DeliveryMechanism',
+        },
+      ],
+    },
   ];
 
   const subscriptions = await models.Subscription.findAll({
