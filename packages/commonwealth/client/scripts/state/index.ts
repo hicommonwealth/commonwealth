@@ -49,6 +49,12 @@ const firebaseConfig = {
     'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30',
 };
 
+declare global {
+  interface Navigator {
+    standalone?: boolean;
+  }
+}
+
 export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
@@ -115,6 +121,8 @@ export interface IApp {
   isProduction(): boolean;
 
   isNative(win): boolean;
+
+  isStandalone(): boolean;
 
   platform(): string;
 
@@ -205,7 +213,14 @@ const app: IApp = {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
   },
+  isStandalone: () => {
+    return !!window.navigator?.standalone;
+  },
   platform: () => {
+    const userAgent = window.navigator.userAgent;
+    if (/iP(ad|hone|od).+Version\/[\d.]+.*Safari/i.test(userAgent)) {
+      return 'mobile-safari';
+    }
     // Update this to use to Desktop API later to determine platform = desktop
     return Capacitor.getPlatform();
   },

@@ -53,7 +53,22 @@ const chains = [...sortedChainsAndCommunities, ...betaChainsAndCommunities];
 const LandingPage = () => {
   const forceRerender = useForceRerender();
 
-  if (app.loginState !== LoginState.LoggedIn && !app.isNative(window)) {
+  if (app.platform() === 'mobile-safari' && !app.isStandalone()) {
+    return (
+      <div className="AddToHomepage">
+        <CWText className="add-text" type="h3" fontWeight="semiBold">
+          Add Commonwealth to your Homepage.
+        </CWText>
+        <CWText className="add-text">
+          Enjoy easy access to your communities.
+        </CWText>
+      </div>
+    );
+  } else if (
+    app.loginState !== LoginState.LoggedIn &&
+    !app.isNative(window) &&
+    app.platform() !== 'mobile-safari'
+  ) {
     return (
       <div className="LandingPage">
         <Header onLogin={forceRerender} />

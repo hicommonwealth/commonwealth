@@ -9,8 +9,9 @@ const useInitApp = () => {
   useEffect(() => {
     setLoading(true);
 
-    console.log('Checking if on native device');
-    console.log(app.isNative(window));
+    console.log('Checking if on native device', app.isNative(window));
+    console.log(app.platform(), 'platform');
+    console.log(app.isStandalone(), 'app.isStandalone()');
 
     const domainFetch = axios
       .get(`${app.serverUrl()}/domain`)
