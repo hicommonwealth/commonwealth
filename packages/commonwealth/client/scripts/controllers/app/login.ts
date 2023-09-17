@@ -515,13 +515,9 @@ export async function handleSocialLoginCallback({
     );
   }
 
-  // Otherwise, skip Account.validate(), proceed directly to server login
-  const response = await axios.post(`${app.serverUrl()}/auth/magic`, {
-    headers: {
-      Authorization: `Bearer ${bearer}`,
-    },
-    withCredentials: true,
-    data: {
+  const response = await axios.post(
+    `${app.serverUrl()}/auth/magic`,
+    {
       chain: desiredChain?.id,
       jwt: app.user.jwt,
       username: profileMetadata?.username,
@@ -531,7 +527,13 @@ export async function handleSocialLoginCallback({
       signature: authedSignature,
       walletSsoSource,
     },
-  });
+    {
+      headers: {
+        Authorization: `Bearer ${bearer}`,
+      },
+      withCredentials: true,
+    }
+  );
 
   if (response.data.status === 'Success') {
     await initAppState(false);
@@ -545,6 +547,6 @@ export async function handleSocialLoginCallback({
     }
     return magicAddress;
   } else {
-    throw new Error(`Social auth unsuccessful: ${response.status}`);
+    throw new Error(`Social auth unsuccessful: ${response.data.status}`);
   }
 }
