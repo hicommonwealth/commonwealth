@@ -51,8 +51,38 @@
       display: flex;
       gap: 8px;
 
+      &.session-keys {
+        gap: 12px;
+        height: 40px;
+
+        &.isLoggedIn {
+          padding-right: 20px;
+          border-right: 1px solid $neutral-100;
+          margin-right: 14px;
+        }
+
+        & > div {
+          display: flex;
+        }
+
+        svg {
+          fill: $neutral-500;
+        }
+      }
+
+      & div {
+        display: flex;
+      }
+
       @include extraSmall {
         display: none;
+      }
+    }
+
+    .UserDropdownTriggerButton {
+      margin-right: 10px;
+      @include extraSmall {
+        margin-right: 2px;
       }
     }
   }

@@ -272,7 +272,10 @@ const send = async (models, content: WebhookContent) => {
               },
             ],
           });
-        } else if (url.indexOf('discord.com') !== -1) {
+        } else if (
+          url.indexOf('discord.com') !== -1 &&
+          actor !== 'Discord Bot'
+        ) {
           // discord webhook format (raw json, for application/json)
           webhookData = isChainEvent
             ? {
@@ -331,7 +334,7 @@ const send = async (models, content: WebhookContent) => {
           let getChatUsername = url.split('/@');
           getChatUsername = `@${getChatUsername[1]}`;
 
-          const getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
+          const getUpdatesUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`;
           url = `${getUpdatesUrl}/sendMessage`;
 
           webhookData = isChainEvent

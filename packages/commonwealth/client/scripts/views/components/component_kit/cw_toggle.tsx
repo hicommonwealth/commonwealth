@@ -19,16 +19,18 @@ export type ToggleStyleProps = {
 
 type ToggleProps = {
   onChange?: (e?: any) => void;
+  readOnly?: boolean;
 } & ToggleStyleProps;
 
 export const CWToggle = (props: ToggleProps) => {
-  const { className, disabled = false, onChange, checked } = props;
+  const { className, disabled = false, onChange, checked, readOnly } = props;
 
   const params = {
     disabled,
     onChange,
     checked,
     type: 'checkbox',
+    readOnly,
   };
 
   return (

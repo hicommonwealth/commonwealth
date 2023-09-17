@@ -30,10 +30,6 @@ export async function Enrich(
         );
       });
 
-      const dateToUnix = (d?: Date): number | undefined => {
-        if (d) return Math.floor(d.getTime() / 1000);
-        return undefined;
-      };
       if (!proposal) throw new Error('Proposal not found!');
       return {
         blockNumber,
@@ -46,10 +42,10 @@ export async function Enrich(
             typeUrl: proposal.content.typeUrl,
             value: Buffer.from(proposal.content.value).toString('hex'),
           },
-          submitTime: dateToUnix(proposal.submitTime),
-          depositEndTime: dateToUnix(proposal.depositEndTime),
-          votingStartTime: dateToUnix(proposal.votingStartTime),
-          votingEndTime: dateToUnix(proposal.votingEndTime),
+          submitTime: proposal.submitTime.seconds.toNumber(),
+          depositEndTime: proposal.depositEndTime.seconds.toNumber(),
+          votingStartTime: proposal.votingStartTime.seconds.toNumber(),
+          votingEndTime: proposal.votingEndTime.seconds.toNumber(),
         },
       };
     }

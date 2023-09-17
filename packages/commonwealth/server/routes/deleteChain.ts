@@ -8,7 +8,7 @@ import { success } from '../types';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NotAdmin: 'Must be a site admin',
   NeedChainId: 'Must provide chain id',
   NoChain: 'Chain not found',
@@ -62,12 +62,6 @@ const deleteChain = async (
     await new Promise<void>(async (resolve, reject) => {
       try {
         await models.sequelize.transaction(async (t) => {
-          // TODO: need a parallel API call to chain-events to destroy chain-entities there too
-          await models.ChainEntityMeta.destroy({
-            where: { chain: chain.id },
-            transaction: t,
-          });
-
           await models.User.update(
             {
               selected_chain_id: null,

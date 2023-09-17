@@ -2,7 +2,7 @@ import React from 'react';
 
 import type Thread from '../../../models/Thread';
 import 'pages/view_thread/edit_body.scss';
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import app from 'state';
 import { ContentType } from 'types';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
@@ -11,6 +11,9 @@ import type { DeltaStatic } from 'quill';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { useEditThreadMutation } from 'state/api/threads';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 type EditBodyProps = {
   title: string;
@@ -37,6 +40,22 @@ export const EditBody = (props: EditBodyProps) => {
 
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
   const [saving, setSaving] = React.useState<boolean>(false);
+
+  const {
+    mutateAsync: editThread,
+    reset: resetEditThreadMutation,
+    error: editThreadError,
+  } = useEditThreadMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+    currentStage: thread.stage,
+    currentTopicId: thread.topic.id,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetEditThreadMutation,
+    error: editThreadError,
+  });
 
   const cancel = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -75,37 +94,51 @@ export const EditBody = (props: EditBodyProps) => {
 
     try {
       const newBody = JSON.stringify(contentDelta);
-      await app.threads.edit(thread, newBody, title);
+      await editThread({
+        newBody: JSON.stringify(contentDelta) || thread.body,
+        newTitle: title || thread.title,
+        threadId: thread.id,
+        authorProfile: app.user.activeAccount.profile,
+        address: app.user.activeAccount.address,
+        chainId: app.activeChainId(),
+      });
       clearEditingLocalStorage(thread.id, ContentType.Thread);
       notifySuccess('Thread successfully edited');
       threadUpdatedCallback(title, newBody);
     } catch (err) {
-      console.error(err);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      console.error(err?.responseJSON?.error || err?.message);
+      notifyError('Failed to edit thread');
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <div className="EditBody">
-      <ReactQuillEditor
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-      />
-      <div className="buttons-row">
-        <CWButton
-          label="Cancel"
-          disabled={saving}
-          buttonType="tertiary"
-          onClick={cancel}
+    <>
+      <div className="EditBody">
+        <ReactQuillEditor
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
         />
-        <CWButton
-          label="Save"
-          buttonWidth="wide"
-          disabled={saving}
-          onClick={save}
-        />
+        <div className="buttons-row">
+          <CWButton
+            label="Cancel"
+            disabled={saving}
+            buttonType="tertiary"
+            onClick={cancel}
+          />
+          <CWButton
+            label="Save"
+            buttonWidth="wide"
+            disabled={saving}
+            onClick={save}
+          />
+        </div>
       </div>
-    </div>
+      {RevalidationModal}
+    </>
   );
 };

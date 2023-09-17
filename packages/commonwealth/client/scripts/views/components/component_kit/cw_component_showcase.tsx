@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ArrowCircleRight, MagnifyingGlass } from '@phosphor-icons/react';
 
 import 'components/component_kit/cw_component_showcase.scss';
 import 'components/component_kit/new_designs/cw_button.scss';
@@ -11,6 +12,9 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWButton } from './new_designs/cw_button';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWThreadAction } from './new_designs/cw_thread_action';
+import { CWTooltip } from './new_designs/CWTooltip';
+import { CWTextInput } from './new_designs/CWTextInput';
+import { CWSearchBar } from './new_designs/CWSearchBar';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -18,23 +22,22 @@ import { CWIconButton } from './cw_icon_button';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
-import { CWTooltip } from './cw_popover/cw_tooltip';
+import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
 import { CWProgressBar } from './cw_progress_bar';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWTextArea } from './cw_text_area';
-import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
-import { CWTag } from './cw_tag';
+import { CWTag } from './new_designs/cw_tag';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import { CWRadioButton } from './cw_radio_button';
 import type { RadioButtonType } from './cw_radio_button';
-import { CWContentPageCard } from './cw_content_page';
+import { CWContentPageCard } from './CWContentPage';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
@@ -48,6 +51,10 @@ import {
   createDeltaFromText,
   ReactQuillEditor,
 } from 'views/components/react_quill_editor';
+import CWBanner, {
+  BannerType,
+} from 'views/components/component_kit/new_designs/CWBanner';
+import app from 'state';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -89,6 +96,14 @@ const checkboxGroupOptions: Array<CheckboxType> = [
     label: 'Failed',
     value: 'failed',
   },
+];
+
+const bannerTypes: BannerType[] = [
+  'default',
+  'info',
+  'success',
+  'warning',
+  'error',
 ];
 
 const popoverMenuOptions = (): Array<PopoverMenuItem> => {
@@ -138,6 +153,11 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
   ];
 };
 
+const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
+  (acc, el) => ({ ...acc, [el]: true }),
+  {} as { [K in BannerType]: boolean }
+);
+
 export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
     number | undefined
@@ -166,6 +186,10 @@ export const ComponentShowcase = () => {
     createDeltaFromText('')
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
+  const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
+  const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
+  const allChains = app.config.chains.getAll();
+  const [chainId, setChainId] = useState(allChains[1]);
 
   return (
     <div className="ComponentShowcase">
@@ -257,7 +281,7 @@ export const ComponentShowcase = () => {
         <CWText type="h3">Tooltips</CWText>
         <div className="tooltip-row">
           <CWText>Default</CWText>
-          <CWTooltip
+          <CWTooltipOld
             content={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
@@ -273,7 +297,7 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tooltip-row">
           <CWText>Solid background</CWText>
-          <CWTooltip
+          <CWTooltipOld
             content={`
                 I am an informational tool tip here to provide \
                 extra details on things people may need more help on.
@@ -468,6 +492,82 @@ export const ComponentShowcase = () => {
           </div>
         </div>
       </div>
+      <div className="tag-gallery">
+        <CWText type="h3">Tags</CWText>
+        <div className="tag-row">
+          <CWText type="h4">Spam Tag</CWText>
+          <CWTag label="SPAM" type="spam" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Status Tags</CWText>
+          <CWTag label="New" type="new" iconName="newStar" />
+          <CWTag label="Trending" type="trending" iconName="trendUp" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Elements Tags</CWText>
+          <CWTag label="Poll" type="poll" />
+          <CWTag label="Snapshot" type="active" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Stage Tags</CWText>
+          <CWTag label="Stage 1" type="new-stage" classNames="rorange-600" />
+          <CWTag label="Stage 2" type="new-stage" classNames="rorange-400" />
+          <CWTag label="Stage 3" type="new-stage" classNames="yellow-500" />
+          <CWTag label="Stage 4" type="new-stage" classNames="green-600" />
+          <CWTag label="Stage 5" type="new-stage" classNames="green-500" />
+          <CWTag label="Stage 6" type="new-stage" classNames="primary-600" />
+          <CWTag label="Stage 7" type="new-stage" classNames="primary-400" />
+          <CWTag label="Stage 8" type="new-stage" classNames="purple-600" />
+          <CWTag label="Stage 9" type="new-stage" classNames="purple-400" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Proposal Tag</CWText>
+          <CWTag label="Proposal" type="proposal" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Input Tag</CWText>
+          {chainId && (
+            <CWTag
+              label={allChains[1].name}
+              type="input"
+              community={allChains[1]}
+              onClick={() => setChainId(null)}
+            />
+          )}
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Login User Tag</CWText>
+          <CWTag label="mnh7a" type="login" loginIcon="cosmos" />
+          <CWTag label="mnh7a" type="login" loginIcon="discordLogin" />
+          <CWTag label="mnh7a" type="login" loginIcon="envelope" />
+          <CWTag label="mnh7a" type="login" loginIcon="ethereum" />
+          <CWTag label="mnh7a" type="login" loginIcon="octocat" />
+          <CWTag label="mnh7a" type="login" loginIcon="near" />
+          <CWTag label="mnh7a" type="login" loginIcon="polkadot" />
+          <CWTag label="mnh7a" type="login" loginIcon="polygon" />
+          <CWTag label="mnh7a" type="login" loginIcon="twitterNew" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Address Tags</CWText>
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="cosmos" />
+          <CWTag
+            label="0xd83e1...a39bD"
+            type="address"
+            loginIcon="discordLogin"
+          />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="envelope" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="ethereum" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="octocat" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="near" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="polkadot" />
+          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="polygon" />
+          <CWTag
+            label="0xd83e1...a39bD"
+            type="address"
+            loginIcon="twitterNew"
+          />
+        </div>
+      </div>
       <div className="button-gallery">
         <CWText type="h3">Buttons</CWText>
         <div className="button-row">
@@ -504,6 +604,12 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="primary"
+            buttonWidth="full"
+            label="Primary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary"
             label="Primary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
@@ -512,6 +618,13 @@ export const ComponentShowcase = () => {
             iconLeft="person"
             buttonType="primary"
             label="Primary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="primary"
+            buttonWidth="full"
+            label="Primary disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -550,6 +663,12 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
+            buttonWidth="full"
+            label="Secondary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
             label="Secondary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
@@ -557,6 +676,13 @@ export const ComponentShowcase = () => {
           <CWButton
             iconLeft="person"
             label="Secondary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="full"
+            label="Secondary disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -595,6 +721,12 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="tertiary"
+            buttonWidth="full"
+            label="Tertiary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="tertiary"
             label="Tertiary default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
@@ -603,6 +735,13 @@ export const ComponentShowcase = () => {
             buttonType="tertiary"
             iconLeft="person"
             label="Tertiary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="tertiary"
+            buttonWidth="full"
+            label="Tertiary disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -641,6 +780,12 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="destructive"
+            buttonWidth="full"
+            label="Destructive full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="destructive"
             label="Destructive default disabled"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
@@ -649,6 +794,13 @@ export const ComponentShowcase = () => {
             buttonType="destructive"
             iconLeft="trash"
             label="Destructive default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="destructive"
+            buttonWidth="full"
+            label="Destructive disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -877,12 +1029,179 @@ export const ComponentShowcase = () => {
       </div>
       <div className="form-gallery">
         <CWText type="h3">Form fields</CWText>
-        <CWTextInput name="Text field" label="Large" placeholder="Type here" />
+        <CWText type="h5">isCompact = Yes</CWText>
         <CWTextInput
           name="Text field"
-          label="Small"
+          label="Text Input with default width of 240 px"
+          placeholder="Placeholder"
+          isCompact
+        />
+        <div className="custom-width-1">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 250 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-2">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 275 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-3">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 300 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <CWTextInput
+          name="Text field"
+          label="Full width"
+          placeholder="Placeholder"
+          isCompact
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Text Input with instructional message"
+          placeholder="Placeholder"
+          isCompact
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
           placeholder="Type here"
-          size="small"
+          isCompact
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+          isCompact
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons fullWidth"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Disabled"
+          disabled
+          value="Some disabled text"
+          isCompact
+        />
+        <CWTextInput
+          name="Text field dark mode"
+          label="Dark mode"
+          darkMode
+          placeholder="Type here"
+          isCompact
+        />
+        <CWText type="h5">isCompact = No</CWText>
+        <CWTextInput
+          name="Text field"
+          label="Text Input with default width of 240 px"
+          placeholder="Placeholder"
+        />
+        <div className="custom-width-1">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 250 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-2">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 275 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-3">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 300 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <CWTextInput
+          name="Text field"
+          label="Full width"
+          placeholder="Placeholder"
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Text Input with instructional message"
+          placeholder="Placeholder"
+          instructionalMessage="Instructional message"
         />
         <CWTextInput
           name="Form field"
@@ -897,10 +1216,56 @@ export const ComponentShowcase = () => {
           placeholder="Type here"
         />
         <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
-          iconRight="write"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+        />
+        <CWTextInput
+          label="Text field with icons fullWidth"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          fullWidth
         />
         <CWTextInput
           name="Text field"
@@ -914,7 +1279,17 @@ export const ComponentShowcase = () => {
           darkMode
           placeholder="Type here"
         />
-        <CWTextArea name="Textarea" label="Text area" placeholder="Type here" />
+        <CWTextArea
+          name="Textarea"
+          label="Text area"
+          placeholder="Placeholder"
+        />
+        <CWTextArea
+          name="Textarea"
+          label="Text area"
+          placeholder="Placeholder"
+          disabled
+        />
         <CWCoverImageUploader
           uploadCompleteCallback={(url: string) => {
             notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
@@ -1024,8 +1399,7 @@ export const ComponentShowcase = () => {
           />
           <CWThreadAction
             action="upvote"
-            count={1}
-            onClick={() => console.log('Upvote action clicked!!')}
+            onClick={() => console.log('Upvote action clicked!')}
           />
           <CWThreadAction
             action="overflow"
@@ -1049,7 +1423,6 @@ export const ComponentShowcase = () => {
           />
           <CWThreadAction
             action="upvote"
-            count={1}
             onClick={() => console.log('Upvote action clicked!')}
             disabled
           />
@@ -1059,26 +1432,6 @@ export const ComponentShowcase = () => {
             disabled
           />
         </div>
-      </div>
-      <div className="Quill">
-        <CWText type="h3">Quill Editor</CWText>
-        <div className="editor-toggle">
-          <CWToggle
-            size={'small'}
-            checked={isEditorDisabled}
-            onChange={() => {
-              setIsEditorDisabled((prev) => !prev);
-            }}
-          />
-          <CWText type="caption">
-            Editor {isEditorDisabled ? 'Disabled' : 'Enabled'}
-          </CWText>
-        </div>
-        <ReactQuillEditor
-          contentDelta={threadContentDelta}
-          setContentDelta={setThreadContentDelta}
-          isDisabled={isEditorDisabled}
-        />
       </div>
       <div className="upvote-gallery">
         <CWText type="h3">Upvote</CWText>
@@ -1094,6 +1447,10 @@ export const ComponentShowcase = () => {
           <CWText>Disabled</CWText>
           <CWUpvote voteCount={99999} disabled />
         </div>
+      </div>
+      <div className="searchbar-gallery">
+        <CWText type="h3">SearchBar</CWText>
+        <CWSearchBar />
       </div>
       <div className="Quill">
         <CWText type="h3">Quill Editor</CWText>
@@ -1113,6 +1470,137 @@ export const ComponentShowcase = () => {
           contentDelta={threadContentDelta}
           setContentDelta={setThreadContentDelta}
           isDisabled={isEditorDisabled}
+        />
+      </div>
+      <div className="banners">
+        <CWText type="h3">Banners</CWText>
+        <CWButton
+          buttonHeight="sm"
+          label="Restore all banners"
+          onClick={() => setIsBannerVisible(initialBannersState)}
+        />
+        <div className="container">
+          {bannerTypes.map((bannerType, i) => {
+            if (!isBannerVisible[bannerType]) {
+              return null;
+            }
+
+            return (
+              <CWBanner
+                key={i}
+                type={bannerType}
+                title="Default banner"
+                body="This is banner body with custom message"
+                buttons={[{ label: 'Primary' }, { label: 'Secondary' }]}
+                onClose={() => {
+                  setIsBannerVisible((prevState) => ({
+                    ...prevState,
+                    [bannerType]: false,
+                  }));
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+      <div className="alerts">
+        <CWText type="h3">Alerts</CWText>
+        <CWButton
+          buttonHeight="sm"
+          label="Restore all alerts"
+          onClick={() => setIsAlertVisible(initialBannersState)}
+        />
+        <div className="container">
+          {bannerTypes.map((bannerType, i) => {
+            if (!isAlertVisible[bannerType]) {
+              return null;
+            }
+
+            return (
+              <CWBanner
+                key={i}
+                type={bannerType}
+                title="Default alert"
+                body="This is alert body with custom message"
+                onClose={() => {
+                  setIsAlertVisible((prevState) => ({
+                    ...prevState,
+                    [bannerType]: false,
+                  }));
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+      <CWText type="h3">Tooltip</CWText>
+      <div className="tooltip">
+        <CWTooltip
+          content="Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund projects together. Never miss an on-chain event, proposal, or important discussion again."
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <CWText
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            >
+              Commonwealth
+            </CWText>
+          )}
+        />
+        <CWTooltip
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <CWIcon
+              iconName="infoEmpty"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
+          content="Commonwealth labs"
+          placement="top"
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="top"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
+          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam semper justo eget facilisis auctor. Mauris consequat arcu non est semper vestibulum. Nulla nec porta nisi. Nullam eu erat vel arcu finibus imperdiet nec eget mi. Pellentesque enim nibh, consequat eu urna id, rhoncus porta metus. Vestibulum hendrerit felis urna, in tempor purus lobortis sit amet. Etiam pulvinar nisl eu enim laoreet tristique. Nam semper venenatis massa vel finibus."
+          placement="right"
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="right"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="bottom"
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="bottom"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
+        />
+        <CWTooltip
+          content="A tooltip is a non-actionable label for explaining a UI element or feature."
+          placement="left"
+          renderTrigger={(handleInteraction) => (
+            <CWButton
+              label="left"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+            />
+          )}
         />
       </div>
     </div>

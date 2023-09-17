@@ -18,6 +18,13 @@
       gap: 44px;
       align-items: flex-end;
       max-width: 600px;
+
+      .Downloading {
+        display: flex;
+        width: 250px;
+        align-items: center;
+        height: 100%;
+      }
     }
   }
 

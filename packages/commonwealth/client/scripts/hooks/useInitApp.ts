@@ -1,6 +1,6 @@
+import axios from 'axios';
 import React, { useEffect } from 'react';
-import { initAppState } from 'state';
-import app from 'state';
+import app, { initAppState } from 'state';
 
 const useInitApp = () => {
   const [loading, setLoading] = React.useState(false);
@@ -12,23 +12,35 @@ const useInitApp = () => {
     console.log('Checking if on native device');
     console.log(app.isNative(window));
 
+    const domainFetch = axios
+      .get(`${app.serverUrl()}/domain`)
+      .then((res) => res.data)
+      .then(({ customDomain: serverCustomDomain }) => {
+        console.log('Not on native device, setting custom domain.');
+        setCustomDomain(serverCustomDomain);
+        return Promise.resolve(serverCustomDomain);
+      })
+      .catch((err) => console.log('Failed fetching custom domain', err));
+
+    const appStateInit = initAppState(true).catch((err) =>
+      console.log('Failed initializing app state', err)
+    );
+
     if (app.isNative(window)) {
       console.log(
         'On native device, skipping custom domain and initializing app state.'
       );
       console.log('Init app here');
-      initAppState(true).then(() => {
+      appStateInit.then(() => {
         setLoading(false);
       });
     } else {
-      fetch('/api/domain')
-        .then((res) => res.json())
-        .then(({ customDomain: serverCustomDomain }) => {
+      Promise.all([domainFetch, appStateInit])
+        .then(([serverCustomDomain]) => {
           console.log('Not on native device, setting custom domain.');
           setCustomDomain(serverCustomDomain);
           return Promise.resolve(serverCustomDomain);
         })
-        .then((serverCustomDomain) => initAppState(true, serverCustomDomain))
         .catch((err) => console.log('Failed fetching custom domain', err))
         .finally(() => setLoading(false));
     }

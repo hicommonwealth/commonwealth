@@ -13,7 +13,7 @@ import { findOneRole } from '../util/roles';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoChainId: 'Must provide chain ID',
   ReservedId: 'The id is reserved and cannot be used',
   CantChangeNetwork: 'Cannot change chain network',
@@ -25,7 +25,7 @@ export const Errors = {
   InvalidTelegram: 'Telegram must begin with https://t.me/',
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
-  InvalidSnapshot: 'Snapshot must fit the naming pattern of *.eth',
+  InvalidSnapshot: 'Snapshot must fit the naming pattern of *.eth or *.xyz',
   SnapshotOnlyOnEthereum:
     'Snapshot data may only be added to chains with Ethereum base',
   InvalidTerms: 'Terms of Service must begin with https://',
@@ -113,11 +113,12 @@ const updateChain = async (
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     return next(new AppError(Errors.InvalidCustomDomain));
   } else if (
-    snapshot.some(
-      (snapshot_space) =>
-        snapshot_space !== '' &&
-        snapshot_space.slice(snapshot_space.length - 4) !== '.eth'
-    )
+    snapshot.some((snapshot_space) => {
+      const lastFour = snapshot_space.slice(snapshot_space.length - 4);
+      return (
+        snapshot_space !== '' && lastFour !== '.eth' && lastFour !== '.xyz'
+      );
+    })
   ) {
     return next(new AppError(Errors.InvalidSnapshot));
   } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {

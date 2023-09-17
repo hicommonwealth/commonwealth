@@ -8,6 +8,7 @@ class ProposalStore<ProposalT extends IIdentifiable> extends Store<ProposalT> {
     proposal: ProposalT,
     options?: { eqFn?: (a: ProposalT) => boolean; pushToIndex?: number }
   ) {
+    // if the proposal exists already then super.add will serialize it
     super.add(proposal, {
       eqFn: (x) => x.identifier === proposal.identifier,
       ...(options &&

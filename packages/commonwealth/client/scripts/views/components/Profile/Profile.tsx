@@ -1,9 +1,9 @@
 import 'components/Profile/Profile.scss';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import $ from 'jquery';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import AddressInfo from '../../../models/AddressInfo';
+import Comment from '../../../models/Comment';
 import NewProfile from '../../../models/NewProfile';
 import Thread from '../../../models/Thread';
 import { PageNotFound } from '../../pages/404';
@@ -42,10 +42,8 @@ const Profile = ({ profileId }: ProfileProps) => {
       });
 
       setProfile(new NewProfile(result.profile));
-      setThreads(result.threads.map((t) => app.threads.modelFromServer(t)));
-      const responseComments = result.comments.map((c) =>
-        modelCommentFromServer(c)
-      );
+      setThreads(result.threads.map((t) => new Thread(t)));
+      const responseComments = result.comments.map((c) => new Comment(c));
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = result.commentThreads.find(
           (t) => t.id === parseInt(c.threadId, 10)
@@ -56,14 +54,15 @@ const Profile = ({ profileId }: ProfileProps) => {
       setAddresses(
         result.addresses.map((a) => {
           try {
-            return new AddressInfo(
-              a.id,
-              a.address,
-              a.chain,
-              a.keytype,
-              a.wallet_id,
-              a.ghost_address
-            );
+            return new AddressInfo({
+              id: a.id,
+              address: a.address,
+              chainId: a.chain,
+              keytype: a.keytype,
+              walletId: a.wallet_id,
+              walletSsoSource: a.wallet_sso_source,
+              ghostAddress: a.ghost_address,
+            });
           } catch (err) {
             console.error(`Could not return AddressInfo: "${err}"`);
             return null;

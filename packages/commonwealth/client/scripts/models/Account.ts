@@ -1,11 +1,13 @@
-import type { WalletId } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import { ChainType } from 'common-common/src/types';
 import axios from 'axios';
 import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
-import type MinimumProfile from './MinimumProfile';
+import BN from 'bn.js';
 import type ChainInfo from './ChainInfo';
+import MinimumProfile from './MinimumProfile';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 
 class Account {
   public readonly address: string;
@@ -20,8 +22,12 @@ class Account {
 
   private _addressId?: number;
   private _walletId?: WalletId;
+  private _walletSsoSource?: WalletSsoSource;
 
   private _profile?: MinimumProfile;
+
+  private _tokenBalance?: BN;
+
   public get profile() {
     return this._profile;
   }
@@ -32,6 +38,7 @@ class Account {
     ghostAddress,
     addressId,
     walletId,
+    walletSsoSource,
     validationToken,
     sessionPublicAddress,
     validationBlockInfo,
@@ -45,6 +52,7 @@ class Account {
     // optional args
     addressId?: number;
     walletId?: WalletId;
+    walletSsoSource?: WalletSsoSource;
     validationToken?: string;
     sessionPublicAddress?: string;
     validationBlockInfo?: string;
@@ -60,6 +68,7 @@ class Account {
     this.address = address;
     this._addressId = addressId;
     this._walletId = walletId;
+    this._walletSsoSource = walletSsoSource;
     this._validationToken = validationToken;
     this._sessionPublicAddress = sessionPublicAddress;
     this._validationBlockInfo = validationBlockInfo;
@@ -67,10 +76,32 @@ class Account {
     if (profile) {
       this._profile = profile;
     } else if (!ignoreProfile && chain?.id) {
-      this._profile = NewProfilesController.Instance.getProfile(
-        chain.id,
-        address
+      const updatedProfile = new MinimumProfile(address, chain?.id);
+
+      // the `ignoreProfile` var tells that we have to refetch any profile data related to provided
+      // address and chain. This method mimic react query for non-react files and as the name suggests
+      // its discouraged to use and should be avoided at all costs. Its used here because we have some
+      // wallet related code and a lot of other code that depends on the `new Account(...)` instance.
+      // As an effort to gradually migrate, this method is used. After this account controller is
+      // de-side-effected (all api calls removed from here). Then we would be in a better position to
+      // remove this discouraged method
+      DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(chain?.id, address).then(
+        (res) => {
+          const data = res[0];
+          updatedProfile.initialize(
+            data?.name,
+            data.address,
+            data?.avatarUrl,
+            data.id,
+            updatedProfile.chain,
+            data?.lastActive
+          );
+          // manually trigger an update signal when data is fetched
+          NewProfilesController.Instance.isFetched.emit('redraw');
+        }
       );
+
+      this._profile = updatedProfile;
     }
   }
 
@@ -90,6 +121,13 @@ class Account {
     this._walletId = walletId;
   }
 
+  get walletSsoSource() {
+    return this._walletSsoSource;
+  }
+
+  public setWalletSsoSource(walletSsoSource: WalletSsoSource) {
+    this._walletSsoSource = walletSsoSource;
+  }
   get validationToken() {
     return this._validationToken;
   }
@@ -114,15 +152,20 @@ class Account {
     this._sessionPublicAddress = sessionPublicAddress;
   }
 
+  get tokenBalance(): BN {
+    return this._tokenBalance;
+  }
+
+  public setTokenBalance(balance: BN) {
+    this._tokenBalance = balance;
+  }
+
   public async validate(
     signature: string,
     timestamp: number,
     chainId: string | number,
     shouldRedraw = true
   ) {
-    if (!this._validationToken && !this._validationBlockInfo) {
-      throw new Error('no validation token found');
-    }
     if (!signature) {
       throw new Error('signature required for validation');
     }
@@ -135,9 +178,11 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
+      wallet_sso_source: this.walletSsoSource,
       session_public_address: await app.sessions.getOrCreateAddress(
         this.chain.base,
-        chainId.toString()
+        chainId.toString(),
+        this.address
       ),
       session_timestamp: timestamp,
       session_block_data: this.validationBlockInfo,

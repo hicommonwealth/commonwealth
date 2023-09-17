@@ -3,8 +3,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { RabbitMQController } from 'common-common/src/rabbitmq';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
-import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
+import { redisRetryStrategy } from 'common-common/src/redisCache';
 import { StatsDController } from 'common-common/src/statsd';
 import type * as http from 'http';
 import * as jwt from 'jsonwebtoken';
@@ -21,11 +20,7 @@ import type { ExtendedError } from 'socket.io/dist/namespace';
 import { WebsocketNamespaces } from '../../shared/types';
 import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import type { DB } from '../models';
-import {
-  createNamespace,
-  publishToChainEventsRoom,
-  publishToSnapshotRoom,
-} from './createNamespace';
+import { createNamespace, publishToChainEventsRoom } from './createNamespace';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -195,19 +190,9 @@ export async function setupWebSocketServer(
   // provide the redis connection instances to the socket.io adapters
   await io.adapter(<any>createAdapter(pubClient, subClient));
 
-  const redisCache = new RedisCache();
-  console.log('Initializing Redis Cache for WebSockets...');
-  await redisCache.init(REDIS_URL, VULTR_IP);
-  console.log('Redis Cache initialized!');
-  cacheDecorator.setCache(redisCache);
-
   const chainEventsNamespace = createNamespace(
     io,
     WebsocketNamespaces.ChainEvents
-  );
-  const snapshotProposalNamespace = createNamespace(
-    io,
-    WebsocketNamespaces.SnapshotProposals
   );
 
   try {
@@ -215,12 +200,6 @@ export async function setupWebSocketServer(
       publishToChainEventsRoom,
       RascalSubscriptions.ChainEventNotifications,
       { server: chainEventsNamespace }
-    );
-
-    await rabbitMQController.startSubscription(
-      publishToSnapshotRoom,
-      RascalSubscriptions.SnapshotProposalNotifications,
-      { server: snapshotProposalNamespace }
     );
   } catch (e) {
     log.error(

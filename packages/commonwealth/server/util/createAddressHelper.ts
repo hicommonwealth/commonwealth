@@ -1,5 +1,10 @@
 import crypto from 'crypto';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainNetwork,
+  WalletId,
+  WalletSsoSource,
+} from 'common-common/src/types';
 import { bech32 } from 'bech32';
 import type { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
@@ -10,12 +15,14 @@ import type { UserInstance } from '../models/user';
 import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
 import { Errors } from '../routes/createAddress';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { Op } from 'sequelize';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 type CreateAddressReq = {
   address: string;
   chain: string;
   wallet_id: WalletId;
+  wallet_sso_source: WalletSsoSource;
   community?: string;
   keytype?: string;
   block_info?: string;
@@ -94,6 +101,12 @@ export async function createAddressHelper(
     }
   );
 
+  const existingAddressOnOtherChain = await models.Address.scope(
+    'withPrivateData'
+  ).findOne({
+    where: { chain: { [Op.ne]: req.chain }, address: encodedAddress },
+  });
+
   if (existingAddress) {
     // address already exists on another user, only take ownership if
     // unverified and expired
@@ -129,6 +142,7 @@ export async function createAddressHelper(
 
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.wallet_id;
+    existingAddress.wallet_sso_source = req.wallet_sso_source;
 
     const updatedObj = await existingAddress.save();
 
@@ -175,6 +189,7 @@ export async function createAddressHelper(
         keytype: req.keytype,
         last_active,
         wallet_id: req.wallet_id,
+        wallet_sso_source: req.wallet_sso_source,
       });
 
       // if user.id is undefined, the address is being used to create a new user,
@@ -183,13 +198,20 @@ export async function createAddressHelper(
         await createRole(models, newObj.id, req.chain, 'member');
       }
 
-      serverAnalyticsTrack({
-        event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-        chain: req.chain,
-        isCustomDomain: null,
-      });
+      const serverAnalyticsController = new ServerAnalyticsController();
+      serverAnalyticsController.track(
+        {
+          event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
+          chain: req.chain,
+          isCustomDomain: null,
+        },
+        req
+      );
 
-      return { ...newObj.toJSON(), newly_created: true };
+      return {
+        ...newObj.toJSON(),
+        newly_created: !existingAddressOnOtherChain,
+      };
     } catch (e) {
       return next(e);
     }

@@ -1,10 +1,10 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Response } from 'express';
-import Sequelize, { Op } from 'sequelize';
+import Sequelize from 'sequelize';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   InvalidAddress: 'Invalid address',
   RoleDNE: 'Role does not exist',
 };
@@ -32,6 +32,18 @@ const setDefaultRole = async (
   validAddress.last_active = new Date();
   validAddress.is_user_default = true;
   await validAddress.save();
+
+  await models.Address.update(
+    { is_user_default: false },
+    {
+      where: {
+        address: { [Sequelize.Op.ne]: req.body.address },
+        chain: req.body.author_chain,
+        user_id: req.user.id,
+        verified: { [Sequelize.Op.ne]: null },
+      },
+    }
+  );
 
   return res.json({ status: 'Success' });
 };

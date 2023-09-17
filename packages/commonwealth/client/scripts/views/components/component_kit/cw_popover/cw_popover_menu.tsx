@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { PopperPlacementType, PopperOwnProps } from '@mui/base/Popper';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
@@ -24,21 +25,36 @@ export type PopoverMenuItem =
 type PopoverMenuProps = {
   menuItems: Array<PopoverMenuItem>;
   className?: string;
+  onOpenChange?: (isOpen: boolean) => void;
+  placement?: PopperPlacementType;
+  modifiers?: PopperOwnProps['modifiers'];
 } & PopoverTriggerProps;
 
-export const PopoverMenu = (props: PopoverMenuProps) => {
-  const { menuItems, renderTrigger } = props;
-
+export const PopoverMenu = ({
+  menuItems,
+  renderTrigger,
+  className,
+  onOpenChange,
+  placement,
+  modifiers,
+}: PopoverMenuProps) => {
   const popoverProps = usePopover();
+  const { open, setAnchorEl, handleInteraction } = popoverProps;
+
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [onOpenChange, open]);
 
   return (
-    <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
+    <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
       {/* needs to be div instead of fragment so listener can work */}
       <div>
-        {renderTrigger(popoverProps.handleInteraction)}
+        {renderTrigger(handleInteraction, open)}
         <Popover
+          modifiers={modifiers}
+          placement={placement}
           content={
-            <div className={`${ComponentType.PopoverMenu} ${props.className}`}>
+            <div className={`${ComponentType.PopoverMenu} ${className}`}>
               {menuItems.map((item, i) => {
                 if (item.type === 'header') {
                   return (
@@ -79,7 +95,12 @@ export const PopoverMenu = (props: PopoverMenuProps) => {
                         e.stopPropagation();
                         e.preventDefault();
                         onClick(e);
-                        popoverProps.handleInteraction(e);
+
+                        if (item.type === 'default' && item.preventClosing) {
+                          return;
+                        }
+
+                        handleInteraction(e);
                       }}
                       key={i}
                     >

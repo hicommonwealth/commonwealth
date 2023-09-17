@@ -10,7 +10,7 @@ import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 import validateAbi from '../../util/abiValidation';
 import type { ContractAbiInstance } from 'server/models/contract_abi';
-import validateRoles from '../../util/validateRoles';
+import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -69,11 +69,19 @@ const createContract = async (
   } = req.body;
 
   if (!req.user) {
-    throw new AppError('Not logged in');
+    throw new AppError('Not signed in');
   }
 
-  const isAdmin = await validateRoles(models, req.user, 'admin', chain_id);
-  if (!isAdmin) throw new AppError('Must be admin');
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    chainId: chain_id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    throw new AppError('Must be admin');
+  }
 
   const Web3 = (await import('web3-utils')).default;
   if (!Web3.isAddress(address)) {

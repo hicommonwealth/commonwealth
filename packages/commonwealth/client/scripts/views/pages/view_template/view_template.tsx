@@ -22,7 +22,10 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWButton } from '../../components/component_kit/cw_button';
 import type Contract from 'models/Contract';
-import { callContractFunction, get4337Account } from 'controllers/chain/ethereum/callContractFunction';
+import {
+  callContractFunction,
+  get4337Account,
+} from 'controllers/chain/ethereum/callContractFunction';
 import { parseFunctionFromABI } from 'abi_utils';
 import validateType from 'helpers/validateTypes';
 import Web3 from 'web3';
@@ -40,6 +43,7 @@ export enum TemplateComponents {
   INPUT = 'input',
   DROPDOWN = 'dropdown',
   FUNCTIONFORM = 'function',
+  STRUCTFORM = 'struct',
 }
 
 type Json = {
@@ -70,7 +74,7 @@ const ViewTemplatePage = () => {
   const [templateNickname, setTemplateNickname] = useState('');
   const [templateError, setTemplateError] = useState(false);
   const [currentContract, setCurrentContract] = useState<Contract | null>(null);
-  const [erc4337Sender, setErc4337Sender] = useState("");
+  const [erc4337Sender, setErc4337Sender] = useState('');
 
   const loadData = useCallback(() => {
     const { contract_address, slug } = params;
@@ -106,8 +110,8 @@ const ViewTemplatePage = () => {
         } catch (err) {
           console.log('err', err);
         }
-        if(parsedJSON.tx_template.is4337){
-          try{
+        if (parsedJSON.tx_template.is4337) {
+          try {
             WebWalletController.Instance.locateWallet(
               app.user.activeAccount,
               ChainBase.Ethereum
@@ -116,10 +120,12 @@ const ViewTemplatePage = () => {
                 throw new Error('Web3 Api Not Initialized');
               }
               const web3: Web3 = signingWallet.api;
-              get4337Account(web3, signingWallet.accounts[0]).then(addr => setErc4337Sender(addr))
+              get4337Account(web3, signingWallet.accounts[0]).then((addr) =>
+                setErc4337Sender(addr)
+              );
             });
-          } catch{
-            console.log('failed to fetch erc 4337 account')
+          } catch {
+            console.log('failed to fetch erc 4337 account');
           }
         }
         for (const field of parsedJSON.form_fields) {
@@ -166,6 +172,18 @@ const ViewTemplatePage = () => {
               });
 
               break;
+            case TemplateComponents.STRUCTFORM:
+              setFormState((prevState) => {
+                const newState = { ...prevState };
+                const form = {};
+                field.struct.form_fields.forEach((nestField) => {
+                  form[nestField.input.field_ref] = null;
+                });
+                newState[field.struct.field_ref] = form;
+                return newState;
+              });
+              break;
+
             default:
               break;
           }
@@ -299,9 +317,14 @@ const ViewTemplatePage = () => {
                   const newState = { ...prevState };
 
                   if (nested_field_ref) {
-                    newState[nested_field_ref][nested_index][
-                      field[component].field_ref
-                    ] = e.target.value;
+                    if (nested_index) {
+                      newState[nested_field_ref][nested_index][
+                        field[component].field_ref
+                      ] = e.target.value;
+                    } else {
+                      newState[nested_field_ref][field[component].field_ref] =
+                        e.target.value;
+                    }
                   } else {
                     newState[field[component].field_ref] = e.target.value;
                   }
@@ -327,6 +350,21 @@ const ViewTemplatePage = () => {
             })
           );
 
+          functionComponents.push(<CWDivider />);
+          return functionComponents;
+        }
+        case TemplateComponents.STRUCTFORM: {
+          const functionComponents = [
+            <CWDivider />,
+            <CWText type="h3">{field[component].field_label}</CWText>,
+          ];
+
+          functionComponents.push(
+            ...renderTemplate(
+              field[component].form_fields,
+              field[component].field_ref
+            )
+          );
           functionComponents.push(<CWDivider />);
           return functionComponents;
         }
@@ -376,7 +414,7 @@ const ViewTemplatePage = () => {
                 fn: functionAbi,
                 inputArgs: functionArgs,
                 tx_options: txParams,
-                senderERC4337: json.tx_template.is4337 ?? false
+                senderERC4337: json.tx_template.is4337 ?? false,
               });
 
               if (res.status) {
@@ -439,7 +477,11 @@ const ViewTemplatePage = () => {
             onClick={handleCreate}
           />
         </div>
-          {json.tx_template.is4337 && (<CWText>You're acting on behalf of your ERC4337 Account: {erc4337Sender}</CWText> )}
+        {json.tx_template.is4337 && (
+          <CWText>
+            You're acting on behalf of your ERC4337 Account: {erc4337Sender}
+          </CWText>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,5 @@
-import React from 'react';
-
 import 'components/user/user_gallery.scss';
-
-import app from 'state';
+import React from 'react';
 import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import { User } from './user';
@@ -35,10 +32,11 @@ export const UserGallery = (props: UserGalleryProps) => {
         .map((user: Account | AddressInfo) => {
           return (
             <User
-              user={user}
-              avatarOnly
-              showAsDeleted
-              popover={popover}
+              userAddress={user.address}
+              userChainId={user.chain?.id || user.profile?.chain}
+              shouldShowAvatarOnly
+              shouldShowAsDeleted
+              shouldShowPopover={popover}
               avatarSize={avatarSize}
             />
           );

@@ -7,6 +7,7 @@
   border-top-right-radius: 6px;
   border: none !important;
   background-color: $neutral-25;
+  border-bottom: 1px solid $neutral-200 !important;
 
   .left-buttons,
   .right-buttons {
@@ -111,7 +112,6 @@
     max-height: 512px;
     overflow-y: scroll;
     border: none !important;
-    border-top: 1px solid $neutral-200 !important;
   }
 
   .ql-editor {
@@ -122,8 +122,13 @@
     }
   }
 
+  .ondragover {
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23338fff' stroke-width='4' stroke-dasharray='4%2c 4' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
+    caret-color: $primary-500;
+  }
+
   .LoadingIndicator {
-    position: relative;
+    position: absolute;
     left: 50%;
     top: calc(50% + 15px);
 

@@ -43,3 +43,7 @@ stats.json
 
 # Test account artefacts
 test_accounts.txt
+
+/test-results
+
+summary.json

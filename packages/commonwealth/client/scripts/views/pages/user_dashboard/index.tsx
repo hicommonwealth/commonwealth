@@ -1,5 +1,6 @@
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import useBrowserWindow from '../../../hooks/useBrowserWindow';
 import 'pages/user_dashboard/index.scss';
@@ -11,7 +12,6 @@ import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { Feed } from '../../components/feed';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -79,7 +79,7 @@ const UserDashboard = (props: UserDashboardProps) => {
               onClick={() => {
                 if (!loggedIn) {
                   notifyInfo(
-                    'Log in or create an account for custom activity feed'
+                    'Sign in or create an account for custom activity feed'
                   );
                   return;
                 }
@@ -172,6 +172,7 @@ const UserDashboard = (props: UserDashboardProps) => {
               noFeedMessage="Join some communities that have governance to see Chain Events!"
               onFetchedDataCallback={DashboardActivityNotification.fromJSON}
               customScrollParent={scrollElement}
+              isChainEventsRow={true}
             />
           )}
         </>

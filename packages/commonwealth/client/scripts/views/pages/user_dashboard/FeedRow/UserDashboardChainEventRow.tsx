@@ -4,7 +4,7 @@ import ChainInfo from '../../../../models/ChainInfo';
 
 import app from 'state';
 
-import './UserDashboardChainEventRow.scss';
+import '../UserDashboardChainEventRow.scss';
 import type { IEventLabel } from '../../../../../../../chain-events/src';
 import { CWCommunityAvatar } from '../../../components/component_kit/cw_community_avatar';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';

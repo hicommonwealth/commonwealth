@@ -2,7 +2,7 @@ import moment from 'moment';
 import app from 'state';
 import SearchStore from 'stores/SearchStore';
 import { SearchContentType } from 'types';
-import type Thread from '../../models/Thread';
+import Thread from 'models/Thread';
 import SearchQuery, { SearchScope } from '../../models/SearchQuery';
 import type { SearchParams } from '../../models/SearchQuery';
 import axios from 'axios';
@@ -262,7 +262,7 @@ class SearchController {
         throw new Error(`Got unsuccessful status: ${response.status}`);
       }
       return response.data.result.map((rawThread) => {
-        return app.threads.modelFromServer(rawThread);
+        return new Thread(rawThread);
       });
     } catch (e) {
       console.error(e);
@@ -277,24 +277,19 @@ class SearchController {
     page?: number,
     includeRoles?: boolean
   ) => {
-    try {
-      const response = await axios.get(`${app.serverUrl()}/searchProfiles`, {
-        params: {
-          chain: chainScope,
-          search: searchTerm,
-          page_size: pageSize,
-          page,
-          include_roles: includeRoles,
-        },
-      });
-      if (response.data.status !== 'Success') {
-        throw new Error(`Got unsuccessful status: ${response.status}`);
-      }
-      return response.data.result;
-    } catch (e) {
-      console.error(e);
-      return { profiles: [] };
+    const response = await axios.get(`${app.serverUrl()}/profiles`, {
+      params: {
+        chain: chainScope,
+        search: searchTerm,
+        page_size: pageSize,
+        page,
+        include_roles: includeRoles,
+      },
+    });
+    if (response.data.status !== 'Success') {
+      throw new Error(`Got unsuccessful status: ${response.status}`);
     }
+    return response.data.result;
   };
 
   private sortResults = (a, b) => {

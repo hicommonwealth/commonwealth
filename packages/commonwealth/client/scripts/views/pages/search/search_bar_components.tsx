@@ -4,17 +4,20 @@ import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
 
-import app from 'state';
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import AddressInfo from '../../../models/AddressInfo';
+import { useCommonNavigate } from 'navigation/helpers';
 import ChainInfo from '../../../models/ChainInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import { User } from '../../components/user/user';
-import { useCommonNavigate } from 'navigation/helpers';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { User } from '../../components/user/user';
+import {
+  CommunityResult,
+  MemberResult,
+  ReplyResult,
+  ThreadResult,
+} from './helpers';
 
 type SearchChipProps = {
   isActive: boolean;
@@ -42,24 +45,13 @@ export const SearchChip = (props: SearchChipProps) => {
   );
 };
 
-type SearchBarPreviewRowProps = {
-  searchResult: {
-    id?: string;
-    address_id: number;
-    address: string;
-    address_chain: string;
-    proposalid: string;
-    profile_id?: string;
-    title: string;
-    body?: string;
-    text?: string;
-    chain?: string;
-    created_at: string;
-  };
+type SearchBarThreadPreviewRowProps = {
+  searchResult: ThreadResult;
   searchTerm?: string;
 };
-
-export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
+export const SearchBarThreadPreviewRow = (
+  props: SearchBarThreadPreviewRowProps
+) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
 
@@ -67,7 +59,7 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
   const content = decodeURIComponent(searchResult.body);
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.proposalid}`;
+    const path = `/${searchResult.chain}/discussion/${searchResult.id}`;
     navigate(path, {}, null);
   };
 
@@ -75,14 +67,8 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
     <div className="SearchBarThreadPreviewRow" onClick={handleClick}>
       <div className="header-row">
         <User
-          user={
-            new AddressInfo(
-              searchResult.address_id,
-              searchResult.address,
-              searchResult.address_chain,
-              null
-            )
-          }
+          userAddress={searchResult.address}
+          userChainId={searchResult.address_chain}
         />
         <CWText className="last-updated-text">•</CWText>
         <CWText type="caption" className="last-updated-text">
@@ -105,7 +91,13 @@ export const SearchBarThreadPreviewRow = (props: SearchBarPreviewRowProps) => {
   );
 };
 
-export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
+type SearchBarCommentPreviewRowProps = {
+  searchResult: ReplyResult;
+  searchTerm?: string;
+};
+export const SearchBarCommentPreviewRow = (
+  props: SearchBarCommentPreviewRowProps
+) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
 
@@ -138,12 +130,12 @@ export const SearchBarCommentPreviewRow = (props: SearchBarPreviewRowProps) => {
   );
 };
 
-type SearchCommunityPreviewProps = {
-  searchResult: ChainInfo;
+type SearchBarChainPreviewRowProps = {
+  searchResult: CommunityResult;
+  searchTerm?: string;
 };
-
 export const SearchBarCommunityPreviewRow = (
-  props: SearchCommunityPreviewProps
+  props: SearchBarChainPreviewRowProps
 ) => {
   const { searchResult } = props;
   const navigate = useCommonNavigate();
@@ -152,30 +144,35 @@ export const SearchBarCommunityPreviewRow = (
     navigate(`/${searchResult.id}`, {}, null);
   };
 
+  const chainInfo = ChainInfo.fromJSON(searchResult as any);
+
   return (
     <div className="SearchBarCommunityPreviewRow" onClick={handleClick}>
-      <CommunityLabel community={searchResult} />
+      <CommunityLabel community={chainInfo} />
     </div>
   );
 };
 
-export const SearchBarMemberPreviewRow = (props: SearchBarPreviewRowProps) => {
+type SearchBarMemberPreviewRowProps = {
+  searchResult: MemberResult;
+  searchTerm?: string;
+};
+export const SearchBarMemberPreviewRow = (
+  props: SearchBarMemberPreviewRowProps
+) => {
   const { searchResult } = props;
+  const chain = searchResult.addresses[0].chain;
+  const address = searchResult.addresses[0].address;
+
   const navigate = useCommonNavigate();
 
   const handleClick = () => {
-    navigate(`/profile/id/${searchResult.profile_id}`, {}, null);
+    navigate(`/profile/id/${searchResult.id}`, {}, null);
   };
 
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
-      <User
-        user={NewProfilesController.Instance.getProfile(
-          searchResult.chain,
-          searchResult.address
-        )}
-        linkify
-      />
+      <User userAddress={address} userChainId={chain} shouldLinkProfile />
     </div>
   );
 };

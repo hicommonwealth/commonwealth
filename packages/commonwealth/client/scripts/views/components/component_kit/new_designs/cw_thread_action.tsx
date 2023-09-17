@@ -1,10 +1,11 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import {
   ArrowBendUpRight,
-  ArrowFatUp,
   BellSimple,
+  BellSimpleSlash,
   DotsThree,
   ChatCenteredDots,
+  ArrowFatUp,
 } from '@phosphor-icons/react';
 
 import { CWText } from '../cw_text';
@@ -12,40 +13,51 @@ import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
+import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 
 export type ActionType =
+  | 'upvote'
   | 'comment'
+  | 'reply'
   | 'share'
   | 'subscribe'
-  | 'upvote'
   | 'overflow';
 
-const commonProps = (disabled: boolean, isHovering: boolean) => {
+const commonProps = (disabled: boolean) => {
   return {
     className: getClasses({
       disabled,
-      hover: isHovering,
     }),
-    size: '20px',
+    size: '18px',
   };
 };
 
 const renderPhosphorIcon = (
   action: ActionType,
   disabled: boolean,
-  isHovering: boolean
+  selected: boolean
 ) => {
   switch (action) {
-    case 'comment':
-      return <ChatCenteredDots {...commonProps(disabled, isHovering)} />;
-    case 'share':
-      return <ArrowBendUpRight {...commonProps(disabled, isHovering)} />;
-    case 'subscribe':
-      return <BellSimple {...commonProps(disabled, isHovering)} />;
     case 'upvote':
-      return <ArrowFatUp {...commonProps(disabled, isHovering)} />;
+      return (
+        <ArrowFatUp
+          {...commonProps(disabled)}
+          {...(selected ? { weight: 'fill' } : {})}
+        />
+      );
+    case 'comment':
+    case 'reply':
+      return <ChatCenteredDots {...commonProps(disabled)} />;
+    case 'share':
+      return <ArrowBendUpRight {...commonProps(disabled)} />;
+    case 'subscribe':
+      return selected ? (
+        <BellSimple {...commonProps(disabled)} />
+      ) : (
+        <BellSimpleSlash {...commonProps(disabled)} />
+      );
     case 'overflow':
-      return <DotsThree {...commonProps(disabled, isHovering)} />;
+      return <DotsThree {...commonProps(disabled)} />;
     default:
       return null;
   }
@@ -54,53 +66,109 @@ const renderPhosphorIcon = (
 type CWThreadActionProps = {
   disabled?: boolean;
   action?: ActionType;
-  count?: number;
-  onClick: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  label?: string;
+  selected?: boolean;
+};
+
+interface TooltipWrapperProps {
+  disabled: boolean;
+  text: string;
+  children: JSX.Element;
+}
+
+// Tooltip should only wrap the ThreadAction when the button is disabled
+export const TooltipWrapper = ({
+  children,
+  disabled,
+  text,
+}: TooltipWrapperProps) => {
+  if (!disabled) {
+    return <>{children}</>;
+  }
+
+  return (
+    <CWTooltip
+      disablePortal
+      content={text}
+      placement="top"
+      renderTrigger={(handleInteraction) => (
+        <div
+          style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
+          onClick={(e) => {
+            e.preventDefault();
+            if (disabled) return;
+          }}
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+        >
+          {children}
+        </div>
+      )}
+    />
+  );
+};
+
+const getTooltipCopy = (action: ActionType) => {
+  switch (action) {
+    case 'upvote':
+      return 'Join community to upvote';
+    case 'comment':
+      return 'Join community to comment';
+    case 'reply':
+      return 'Join community to reply';
+    case 'overflow':
+      return 'Join community to view more actions';
+    case 'subscribe':
+      return 'Join community to subscribe';
+    default:
+      return '';
+  }
 };
 
 export const CWThreadAction: FC<CWThreadActionProps> = ({
   disabled,
   action,
-  count,
   onClick,
+  label,
+  selected,
 }) => {
-  const [isHovering, setIsHovering] = useState<boolean>(false);
-
-  const handleOnMouseOver = () => {
-    if (!disabled) {
-      setIsHovering(true);
+  const handleClick = (e) => {
+    if (disabled) {
+      return;
     }
+
+    onClick?.(e);
   };
 
-  const handleOnMouseLeave = () => setIsHovering(false);
+  const upvoteSelected = action === 'upvote' && selected;
 
   return (
-    <div
-      className={getClasses(
-        {
-          disabled,
-          hover: isHovering,
-        },
-        ComponentType.ThreadAction
-      )}
-      onMouseOver={handleOnMouseOver}
-      onMouseLeave={handleOnMouseLeave}
-      onClick={onClick}
-    >
-      {renderPhosphorIcon(action, disabled, isHovering)}
-      {action !== 'overflow' && (action || count) && (
-        <CWText
-          className={getClasses({
-            hover: isHovering,
-            default: !isHovering,
+    <TooltipWrapper disabled={disabled} text={getTooltipCopy(action)}>
+      <button
+        onClick={handleClick}
+        className={getClasses(
+          {
             disabled,
-          })}
-          type="caption"
-          fontWeight="regular"
-        >
-          {count ? count : action.charAt(0).toUpperCase() + action.slice(1)}
-        </CWText>
-      )}
-    </div>
+            upvoteSelected,
+          },
+          ComponentType.ThreadAction
+        )}
+      >
+        {renderPhosphorIcon(action, disabled, selected)}
+        {action !== 'overflow' && action && (
+          <CWText
+            className={getClasses({
+              disabled,
+              upvoteSelected,
+            })}
+            type="caption"
+            fontWeight="regular"
+          >
+            {label || action.charAt(0).toUpperCase() + action.slice(1)}
+          </CWText>
+        )}
+      </button>
+    </TooltipWrapper>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SnapshotProposalCard } from '../../snapshot_proposals/snapshot_proposal_card';
+import { SnapshotProposalCard } from '../../snapshot_proposals/SnapshotProposalCard';
 import 'components/ProposalCard/ProposalCard.scss';
 import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
 

@@ -1,6 +1,5 @@
 import type AbridgedThread from '../models/AbridgedThread';
 import AddressInfo from '../models/AddressInfo';
-import app from 'state';
 import { byAscendingCreationDate } from '../helpers';
 
 export interface IAddressCountAndInfo {
@@ -31,14 +30,6 @@ export class ActiveThreadsStore {
     const comments = {};
     const reactions = {};
     const allThreads = this.getThreadsByCommunity(parentEntity);
-    allThreads.forEach((thread) => {
-      const allComments = app.comments.getByThread(thread);
-      comments[thread.id] = allComments;
-      reactions[thread.id] = app.reactions.getByPost(thread);
-      allComments.forEach((c) => {
-        reactions[thread.id].concat(app.reactions.getByPost(c));
-      });
-    });
     allThreads.sort((threadA, threadB) => {
       const totalActivityA =
         comments[threadA.id]?.length + reactions[threadA.id]?.length;
@@ -112,7 +103,11 @@ export class ActiveAddressesStore {
     }
     const communityStore = this._addressesByCommunity[parentEntity];
     if (!communityStore[id]) {
-      const addressInfo = new AddressInfo(id, address.address, chain, null);
+      const addressInfo = new AddressInfo({
+        id: null,
+        address: address.address,
+        chainId: chain,
+      });
       const postCount = 1;
       communityStore[id] = { addressInfo, postCount };
     } else {

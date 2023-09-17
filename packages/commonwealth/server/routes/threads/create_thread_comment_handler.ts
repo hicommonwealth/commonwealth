@@ -2,10 +2,11 @@ import { TypedRequest, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { CommentInstance } from '../../models/comment';
 import { AppError } from '../../../../common-common/src/errors';
+import { verifyComment } from '../../../shared/canvas/serverVerify';
 
 export const Errors = {
   MissingThreadId: 'Must provide valid thread_id',
-  MissingTextOrAttachment: 'Must provide text or attachment',
+  MissingText: 'Must provide text',
 
   MissingRootId: 'Must provide valid thread_id',
   InvalidParent: 'Invalid parent',
@@ -24,6 +25,7 @@ type CreateThreadCommentRequestBody = {
   canvas_action;
   canvas_session;
   canvas_hash;
+  discord_meta;
 };
 type CreateThreadCommentResponse = CommentInstance;
 
@@ -40,19 +42,23 @@ export const createThreadCommentHandler = async (
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
+    discord_meta,
   } = req.body;
 
   if (!threadId) {
     throw new AppError(Errors.MissingThreadId);
   }
-  if (
-    (!text || !text.trim()) &&
-    (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
-  ) {
-    throw new AppError(Errors.MissingTextOrAttachment);
+  if (!text || !text.trim()) {
+    throw new AppError(Errors.MissingText);
   }
 
-  const attachments = req.body['attachments[]'];
+  await verifyComment(canvasAction, canvasSession, canvasHash, {
+    thread_id: parseInt(threadId, 10),
+    text,
+    address: address.address,
+    chain: chain.id,
+    parent_comment_id: parentId,
+  });
 
   const [comment, notificationOptions, analyticsOptions] =
     await controllers.threads.createThreadComment({
@@ -62,17 +68,17 @@ export const createThreadCommentHandler = async (
       parentId,
       threadId: parseInt(threadId, 10),
       text,
-      attachments,
       canvasAction,
       canvasSession,
       canvasHash,
+      discordMeta: discord_meta,
     });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
   }
 
-  controllers.analytics.track(analyticsOptions);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, comment);
 };

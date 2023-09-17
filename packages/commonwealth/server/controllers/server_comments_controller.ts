@@ -8,11 +8,6 @@ import {
   __createCommentReaction,
 } from './server_comments_methods/create_comment_reaction';
 import {
-  GetCommentReactionsOptions,
-  GetCommentReactionsResult,
-  __getCommentReactions,
-} from './server_comments_methods/get_comment_reactions';
-import {
   SearchCommentsOptions,
   SearchCommentsResult,
   __searchComments,
@@ -50,17 +45,7 @@ export class ServerCommentsController {
   }
 
   /**
-   * Returns all reactions for a specified comment.
-   *
-   */
-  async getCommentReactions(
-    options: GetCommentReactionsOptions
-  ): Promise<GetCommentReactionsResult> {
-    return __getCommentReactions.call(this, options);
-  }
-
-  /**
-   * Returns all reactions for a specified comment.
+   * Returns comment search results.
    *
    */
   async searchComments(

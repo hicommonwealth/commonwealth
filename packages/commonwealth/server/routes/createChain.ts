@@ -25,8 +25,8 @@ import { success } from '../types';
 import { RoleInstanceWithPermission } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
@@ -41,7 +41,7 @@ export const Errors = {
   NoBase: 'Must provide chain base',
   NoNodeUrl: 'Must provide node url',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
-  InvalidNode: 'Node url returned invalid response',
+  InvalidNode: 'RPC url returned invalid response. Check your node url',
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
@@ -97,7 +97,7 @@ const createChain = async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new AppError('Not logged in'));
+    return next(new AppError('Not signed in'));
   }
   // require Admin privilege for creating Chain/DAO
   if (
@@ -133,8 +133,10 @@ const createChain = async (
     return next(new AppError(Errors.NoBase));
   }
 
-  if (req.body.icon_url &&
-    (await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB) {
+  if (
+    req.body.icon_url &&
+    (await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB
+  ) {
     throw new AppError(Errors.ImageTooLarge);
   }
 
@@ -241,7 +243,7 @@ const createChain = async (
       const tmClient = await cosm.Tendermint34Client.connect(url);
       await tmClient.block();
     } catch (err) {
-      return next(new ServerError(Errors.InvalidNode));
+      return next(new AppError(Errors.InvalidNode));
     }
 
     // TODO: test altWalletUrl if available
@@ -254,7 +256,7 @@ const createChain = async (
       try {
         sanitizedSpec = await testSubstrateSpec(spec, req.body.node_url);
       } catch (e) {
-        return next(new ServerError(Errors.InvalidNode));
+        return next(new AppError(Errors.InvalidNode));
       }
     }
   } else {
@@ -454,7 +456,7 @@ const createChain = async (
   if (addressToBeAdmin) {
     const newAddress = await models.Address.create({
       user_id: req.user.id,
-      profile_id: addressToBeAdmin.id,
+      profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
       chain: chain.id,
       verification_token: addressToBeAdmin.verification_token,
@@ -480,18 +482,21 @@ const createChain = async (
         subscriber_id: req.user.id,
         category_id: NotificationCategories.NewThread,
         chain_id: chain.id,
-        object_id: chain.id,
         is_active: true,
       },
     });
   }
 
-  serverAnalyticsTrack({
-    chainBase: req.body.base,
-    isCustomDomain: null,
-    communityType: null,
-    event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
-  });
+  const serverAnalyticsController = new ServerAnalyticsController();
+  serverAnalyticsController.track(
+    {
+      chainBase: req.body.base,
+      isCustomDomain: null,
+      communityType: null,
+      event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+    },
+    req
+  );
 
   return success(res, {
     chain: chain.toJSON(),

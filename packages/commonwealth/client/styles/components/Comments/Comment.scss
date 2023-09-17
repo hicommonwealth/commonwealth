@@ -13,7 +13,7 @@
       height: 100%;
       left: 36px;
       position: relative;
-      top: 12px;
+      top: 16px;
       width: 1px;
 
       &.replying {
@@ -66,10 +66,6 @@
       .published-text.Text {
         color: $neutral-500;
       }
-      .verification-icon {
-        color: $neutral-500;
-        margin-top: 2px;
-      }
     }
 
     .comment-footer {
@@ -80,39 +76,6 @@
         align-items: center;
         display: flex;
         gap: 16px;
-
-        .reply-button {
-          align-items: center;
-          cursor: pointer;
-          display: flex;
-          gap: 4px;
-
-          .Icon,
-          .menu-buttons-text.Text {
-            color: $neutral-500;
-          }
-
-          &:hover {
-            .Icon,
-            .menu-buttons-text.Text {
-              color: $neutral-600;
-            }
-          }
-
-          &:active {
-            .Icon,
-            .menu-buttons-text.Text {
-              color: $neutral-800;
-            }
-          }
-
-          &.selected {
-            .Icon,
-            .menu-buttons-text.Text {
-              color: $neutral-800;
-            }
-          }
-        }
       }
 
       .menu-buttons-right {

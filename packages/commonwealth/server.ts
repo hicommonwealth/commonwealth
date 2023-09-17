@@ -18,15 +18,15 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import webpack from 'webpack';
-import webpackDevMiddleware from 'webpack-dev-middleware';
-import webpackHotMiddleware from 'webpack-hot-middleware';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
+  DATABASE_CLEAN_HOUR,
   RABBITMQ_URI,
+  REDIS_URL,
   ROLLBAR_ENV,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
+  VULTR_IP,
 } from './server/config';
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
@@ -45,10 +45,26 @@ import setupCEProxy from './server/util/entitiesProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
-import devWebpackConfig from './webpack/webpack.dev.config.js';
-import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import * as v8 from 'v8';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { databaseCleaner } from './server/util/databaseCleaner';
+import { RedisCache } from 'common-common/src/redisCache';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  service: ServiceKey.Commonwealth,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -93,16 +109,7 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const compiler = DEV
-    ? webpack(devWebpackConfig as any)
-    : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
-  const devMiddleware =
-    DEV && !NO_CLIENT_SERVER
-      ? webpackDevMiddleware(compiler as any, {
-          publicPath: '/build',
-        })
-      : null;
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const sessionStore = new SequelizeStore({
@@ -212,16 +219,6 @@ async function main() {
     //   next();
     // });
 
-    // serve the compiled app
-    if (!NO_CLIENT_SERVER) {
-      if (DEV) {
-        app.use(devMiddleware);
-        app.use(webpackHotMiddleware(compiler));
-      } else {
-        app.use('/build', express.static('build'));
-      }
-    }
-
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
@@ -281,7 +278,12 @@ async function main() {
   let rabbitMQController: RabbitMQController;
   try {
     rabbitMQController = new RabbitMQController(
-      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
+      <BrokerConfig>(
+        getRabbitMQConfig(
+          RABBITMQ_URI,
+          RascalConfigServices.CommonwealthService
+        )
+      )
     );
     await rabbitMQController.init();
   } catch (e) {
@@ -304,6 +306,9 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
+  const redisCache = new RedisCache();
+  await redisCache.init(REDIS_URL, VULTR_IP);
+
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
@@ -324,7 +329,8 @@ async function main() {
     tokenBalanceCache,
     banCache,
     globalActivityCache,
-    dbValidationService
+    dbValidationService,
+    redisCache
   );
 
   // new API
@@ -334,11 +340,34 @@ async function main() {
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupCEProxy(app);
-  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+
+  if (!NO_CLIENT_SERVER) {
+    if (DEV) {
+      // lazy import because we want to keep all of webpacks dependencies in devDependencies
+      const setupWebpackDevServer = (
+        await import('./server/scripts/setupWebpackDevServer')
+      ).default;
+      await setupWebpackDevServer(app);
+    } else {
+      app.use('/build', express.static('build'));
+    }
+  }
+
+  setupAppRoutes(app, models, templateFile, sendFile);
 
   setupErrorHandlers(app, rollbar);
 
-  setupServer(app, rollbar, models, rabbitMQController);
+  setupServer(app, rollbar, models, rabbitMQController, redisCache);
+
+  // database clean-up jobs (should be run after the API so, we don't affect start-up time
+  databaseCleaner.initLoop(
+    models,
+    Number(DATABASE_CLEAN_HOUR),
+    redisCache,
+    rollbar
+  );
+
+  isServiceHealthy = true;
 }
 
 main().catch((e) => console.log(e));

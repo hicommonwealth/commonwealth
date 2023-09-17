@@ -1,22 +1,17 @@
-// This is a const and not an enum because of a weird webpack error.
-// It has the same syntax, though, so it should be OK, as long as we don't
-// modify any of the values.
-// eslint-disable-next-line
-export const NotificationCategories = {
-  NewComment: 'new-comment-creation',
-  NewThread: 'new-thread-creation',
-  NewCommunity: 'new-community-creation',
-  NewRoleCreation: 'new-role-creation',
-  NewMention: 'new-mention',
-  NewReaction: 'new-reaction',
-  NewCollaboration: 'new-collaboration',
-  ThreadEdit: 'thread-edit',
-  CommentEdit: 'comment-edit',
-  ChainEvent: 'chain-event',
-  EntityEvent: 'entity-event',
-  NewSnapshot: 'new-snapshot',
-  SnapshotProposal: 'snapshot-proposal',
-};
+export enum NotificationCategories {
+  NewComment = 'new-comment-creation',
+  NewThread = 'new-thread-creation',
+  NewMention = 'new-mention',
+  NewReaction = 'new-reaction',
+  NewCollaboration = 'new-collaboration',
+  ThreadEdit = 'thread-edit',
+  CommentEdit = 'comment-edit',
+  ChainEvent = 'chain-event',
+  SnapshotProposal = 'snapshot-proposal',
+}
+
+export type NotificationCategory =
+  typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
@@ -71,6 +66,17 @@ export enum WalletId {
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Ronin = 'ronin',
+}
+
+// 'google', 'github', 'discord', and 'twitter' are passed to magic login directly
+export enum WalletSsoSource {
+  Google = 'google',
+  Github = 'github',
+  Discord = 'discord',
+  Twitter = 'twitter',
+  Email = 'email',
+  Apple = 'apple',
+  Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 
 export enum ChainCategoryType {
@@ -136,6 +142,7 @@ export enum RedisNamespaces {
   Function_Response = 'function_response',
   Global_Response = 'global_response',
   Test_Redis = 'test_redis',
+  Database_Cleaner = 'database_cleaner',
 }
 
 export interface ISnapshotNotification {
@@ -154,3 +161,33 @@ export enum DefaultPage {
   Overview = 'default_summary_view',
   Homepage = 'homepage',
 }
+
+export type DiscordAction =
+  | 'create'
+  | 'update'
+  | 'thread-delete'
+  | 'comment-delete';
+
+export interface IDiscordMessage {
+  user?: {
+    id: string;
+    username: string;
+  };
+  title?: string;
+  content: string;
+  message_id: string;
+  channel_id?: string;
+  parent_channel_id?: string;
+  guild_id?: string;
+  imageUrls?: string[];
+  action: DiscordAction;
+}
+
+export type HttpMethod =
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'delete'
+  | 'patch'
+  | 'options'
+  | 'head';

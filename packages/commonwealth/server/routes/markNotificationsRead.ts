@@ -4,7 +4,7 @@ import { sequelize } from '../database';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoNotificationIds: 'Must specify notification IDs',
 };
 
@@ -22,7 +22,10 @@ export default async (
   }
 
   let idOptions;
-  if (typeof req.body['notification_ids[]'] === 'string') {
+  if (
+    typeof req.body['notification_ids[]'] === 'string' ||
+    typeof req.body['notification_ids[]'] === 'number'
+  ) {
     idOptions = req.body['notification_ids[]'];
   } else {
     idOptions = req.body['notification_ids[]'].map((n) => +n);

@@ -160,6 +160,18 @@ $width: 360px;
   .form-gallery {
     @include gallery-grid(8px, column);
     width: $width;
+
+    .custom-width-1 {
+      width: 250px;
+    }
+
+    .custom-width-2 {
+      width: 275px;
+    }
+
+    .custom-width-3 {
+      width: 300px;
+    }
   }
 
   .toggle-gallery {
@@ -171,6 +183,13 @@ $width: 360px;
     }
   }
 
+  .tag-gallery {
+    .tag-row {
+      display: flex;
+      gap: 8px;
+    }
+  }
+  
   .editor-toggle {
     display: flex;
     align-items: center;
@@ -179,5 +198,22 @@ $width: 360px;
     .caption {
       margin-left: 8px;
     }
+  }
+
+  .banners,
+  .alerts {
+    .container {
+      margin-top: 10px;
+      @include gallery-grid(8px, column);
+    }
+  }
+
+  .tooltip {
+    @include gallery-grid(32px, column);
+    align-items: center;
+  }
+
+  .searchbar-gallery {
+    @include gallery-grid(8px, column);
   }
 }

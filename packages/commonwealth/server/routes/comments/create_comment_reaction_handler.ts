@@ -2,6 +2,7 @@ import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
 import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
+import { verifyReaction } from '../../../shared/canvas/serverVerify';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
@@ -43,6 +44,13 @@ export const createCommentReactionHandler = async (
     throw new AppError(Errors.InvalidCommentId);
   }
 
+  await verifyReaction(canvasAction, canvasSession, canvasHash, {
+    comment_id: commentId,
+    address: address.address,
+    chain: chain.id,
+    value: reaction,
+  });
+
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.comments.createCommentReaction({
@@ -56,10 +64,6 @@ export const createCommentReactionHandler = async (
       canvasHash,
     });
 
-  // update address last active
-  address.last_active = new Date();
-  address.save().catch(console.error);
-
   // emit notifications
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
@@ -67,7 +71,7 @@ export const createCommentReactionHandler = async (
 
   // track analytics events
   for (const a of analyticsOptions) {
-    controllers.analytics.track(a).catch(console.error);
+    controllers.analytics.track(a, req).catch(console.error);
   }
 
   return success(res, newReaction);

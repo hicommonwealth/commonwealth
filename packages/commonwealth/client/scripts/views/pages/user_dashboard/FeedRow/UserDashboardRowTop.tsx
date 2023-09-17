@@ -8,10 +8,10 @@ import { Link } from 'react-router-dom';
 
 import app from 'state';
 import { User } from 'views/components/user/user';
-import AddressInfo from '../../../../models/AddressInfo';
 import { CWText } from '../../../components/component_kit/cw_text';
-import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
+import { UserDashboardRowTopSkeleton } from '../UserDashboardRowTopSkeleton';
+import { useCommonNavigate } from 'navigation/helpers';
 import EmbeddedThreadCard from './EmbeddedThreadCard/index';
 
 type UserDashboardRowTopProps = {
@@ -19,11 +19,17 @@ type UserDashboardRowTopProps = {
   category: string;
   threadText?: string;
   threadAuthor?: string;
+  showSkeleton?: boolean;
 };
 
 export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
-  const { activityData, category, threadText, threadAuthor } = props;
+  const { activityData, category, showSkeleton, threadAuthor, threadText } =
+    props;
   const navigate = useCommonNavigate();
+
+  if (showSkeleton) {
+    return <UserDashboardRowTopSkeleton />;
+  }
 
   const {
     created_at,
@@ -57,18 +63,20 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       : decodedTitle;
 
   const actorName = (
-    <User
-      user={
-        new AddressInfo(null, author_address, author_chain ?? chain_id, null)
-      }
-      linkify
-      avatarSize={16}
+    <span
       onClick={(e: any) => {
         e.preventDefault();
         e.stopPropagation();
         navigate(`/${author_chain}/account/${author_address}`);
       }}
-    />
+    >
+      <User
+        userAddress={author_address}
+        userChainId={author_chain}
+        shouldLinkProfile
+        avatarSize={16}
+      />
+    </span>
   );
 
   const isComment = category === 'new-comment-creation';

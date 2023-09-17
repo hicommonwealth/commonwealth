@@ -1,7 +1,7 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
 import BN from 'bn.js';
 import moment from 'moment';
-import { longify } from '@cosmjs/stargate/build/queries/utils';
+import { longify } from '@cosmjs/stargate/build/queryclient';
 import {
   QueryDepositsResponseSDKType,
   QueryTallyResultResponseSDKType,
@@ -131,11 +131,16 @@ export class CosmosProposalV1 extends Proposal<
 
   public updateMetadata(metadata: any) {
     this._metadata = metadata;
+    if (!this.data.title) {
+      this.data.title = metadata.title;
+    }
+    if (!this.data.description) {
+      this.data.description = metadata.description || metadata.summary;
+    }
+    this._Governance.store.update(this);
   }
 
   public async init() {
-    await this.fetchVoteInfo();
-
     if (!this.initialized) {
       this._initialized = true;
     }
@@ -144,59 +149,64 @@ export class CosmosProposalV1 extends Proposal<
     }
   }
 
-  private async fetchVoteInfo() {
-    const lcd = this._Chain.lcd;
+  public async fetchDeposits(): Promise<QueryDepositsResponseSDKType> {
     const proposalId = longify(this.data.identifier);
-    // only fetch voter data if active
-    if (!this.data.state.completed) {
-      try {
-        const [depositResp, voteResp, tallyResp]: [
-          QueryDepositsResponseSDKType,
-          QueryVotesResponseSDKType,
-          QueryTallyResultResponseSDKType
-        ] = await Promise.all([
-          this.status === 'DepositPeriod'
-            ? lcd.cosmos.gov.v1.deposits({ proposalId })
-            : Promise.resolve(null),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : lcd.cosmos.gov.v1.votes({ proposalId }),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : lcd.cosmos.gov.v1.tallyResult({ proposalId }),
-        ]);
-        if (depositResp?.deposits) {
-          for (const deposit of depositResp.deposits) {
-            if (deposit.amount && deposit.amount[0]) {
-              this.data.state.depositors.push([
-                deposit.depositor,
-                new BN(deposit.amount[0].amount),
-              ]);
-            }
-          }
+    const deposits = await this._Chain.lcd.cosmos.gov.v1.deposits({
+      proposalId,
+    });
+    this.setDeposits(deposits);
+    return deposits;
+  }
+
+  public async fetchTally(): Promise<QueryTallyResultResponseSDKType> {
+    const proposalId = longify(this.data.identifier);
+    const tally = await this._Chain.lcd.cosmos.gov.v1.tallyResult({
+      proposalId,
+    });
+    this.setTally(tally);
+    return tally;
+  }
+
+  public async fetchVotes(): Promise<QueryVotesResponseSDKType> {
+    const proposalId = longify(this.data.identifier);
+    const votes = await this._Chain.lcd.cosmos.gov.v1.votes({ proposalId });
+    this.setVotes(votes);
+    return votes;
+  }
+
+  public setDeposits(depositResp: QueryDepositsResponseSDKType) {
+    if (depositResp?.deposits) {
+      for (const deposit of depositResp.deposits) {
+        if (deposit.amount && deposit.amount[0]) {
+          this.data.state.depositors.push([
+            deposit.depositor,
+            new BN(deposit.amount[0].amount),
+          ]);
         }
-        if (voteResp) {
-          for (const voter of voteResp.votes) {
-            const vote = voteToEnumV1(voter.options[0].option);
-            if (vote) {
-              this.data.state.voters.push([voter.voter, vote]);
-              this.addOrUpdateVote(
-                new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
-              );
-            } else {
-              console.error(
-                `voter: ${voter.voter} has invalid vote option: ${voter.options[0].option}`
-              );
-            }
-          }
+      }
+    }
+  }
+
+  public setTally(tallyResp: QueryTallyResultResponseSDKType) {
+    if (tallyResp?.tally) {
+      this.data.state.tally = marshalTallyV1(tallyResp?.tally);
+    }
+  }
+
+  public setVotes(votesResp: QueryVotesResponseSDKType) {
+    if (votesResp) {
+      for (const voter of votesResp.votes) {
+        const vote = voteToEnumV1(voter.options[0].option);
+        if (vote) {
+          this.data.state.voters.push([voter.voter, vote]);
+          this.addOrUpdateVote(
+            new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
+          );
+        } else {
+          console.error(
+            `voter: ${voter.voter} has invalid vote option: ${voter.options[0].option}`
+          );
         }
-        if (tallyResp?.tally) {
-          this.data.state.tally = marshalTallyV1(tallyResp?.tally);
-        }
-      } catch (err) {
-        console.error(`Cosmos vote query failed: ${err.message}`);
-      } finally {
-        this.isFetched.emit('redraw');
       }
     }
   }
@@ -220,7 +230,7 @@ export class CosmosProposalV1 extends Proposal<
 
   get turnout() {
     if (this.status === 'DepositPeriod') {
-      if (this.data.state.totalDeposit.eqn(0)) {
+      if (this.data.state.totalDeposit.eqn(0) || !this._Chain.staked) {
         return 0;
       } else {
         const ratioInPpm = +this.data.state.totalDeposit
@@ -277,9 +287,11 @@ export class CosmosProposalV1 extends Proposal<
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':
-        return this.data.state.totalDeposit.gte(this._Governance.minDeposit)
-          ? ProposalStatus.Passing
-          : ProposalStatus.Failing;
+        return this._Governance.minDeposit
+          ? this.data.state.totalDeposit.gte(this._Governance.minDeposit)
+            ? ProposalStatus.Passing
+            : ProposalStatus.Failing
+          : ProposalStatus.None;
       default:
         return ProposalStatus.None;
     }
@@ -290,7 +302,7 @@ export class CosmosProposalV1 extends Proposal<
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
-    const cosm = await import('@cosmjs/stargate/build/queries/utils');
+    const cosm = await import('@cosmjs/stargate/build/queryclient');
     const msg: MsgDepositEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
       value: {

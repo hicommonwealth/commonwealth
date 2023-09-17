@@ -2,9 +2,12 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 
 import type { AddressAttributes } from './address';
-import type { AttachmentAttributes } from './attachment';
 import type { ChainAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
+import { StatsDController } from 'common-common/src/statsd';
+
+import { factory, formatFilename } from 'common-common/src/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 export type CommentAttributes = {
   thread_id: string;
@@ -24,11 +27,14 @@ export type CommentAttributes = {
   updated_at?: Date;
   deleted_at?: Date;
   marked_as_spam_at?: Date;
+  discord_meta?: any;
 
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
+
+  //counts
+  reaction_count: number;
 };
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
@@ -71,8 +77,59 @@ export default (
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
+      discord_meta: { type: dataTypes.JSONB, allowNull: true },
+
+      //counts
+      reaction_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
+      hooks: {
+        afterCreate: async (comment: CommentInstance) => {
+          const { Thread } = sequelize.models;
+          const thread_id = comment.thread_id;
+          try {
+            const thread = await Thread.findOne({
+              where: { id: thread_id },
+            });
+            if (thread) {
+              thread.increment('comment_count');
+              StatsDController.get().increment('cw.hook.comment-count', {
+                thread_id,
+              });
+            }
+          } catch (error) {
+            log.error(
+              `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`
+            );
+          }
+        },
+        afterDestroy: async (comment: CommentInstance) => {
+          const { Thread } = sequelize.models;
+          const thread_id = comment.thread_id;
+          try {
+            const thread = await Thread.findOne({
+              where: { id: thread_id },
+            });
+            if (thread) {
+              thread.decrement('comment_count');
+              StatsDController.get().decrement('cw.hook.comment-count', {
+                thread_id,
+              });
+            }
+          } catch (error) {
+            log.error(
+              `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`
+            );
+            StatsDController.get().increment('cw.hook.comment-count-error', {
+              thread_id,
+            });
+          }
+        },
+      },
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
@@ -105,13 +162,6 @@ export default (
       foreignKey: 'thread_id',
       constraints: false,
       targetKey: 'id',
-    });
-    models.Comment.hasMany(models.Attachment, {
-      foreignKey: 'attachment_id',
-      constraints: false,
-      scope: {
-        attachable: 'comment',
-      },
     });
     models.Comment.hasMany(models.Reaction, {
       foreignKey: 'comment_id',
