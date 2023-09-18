@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import 'components/component_kit/cw_text_area.scss';
 
@@ -11,12 +11,14 @@ import type { BaseTextInputProps } from './cw_text_input';
 type TextAreaStyleProps = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
+  resizeWithText?: boolean;
 };
 
 type TextAreaProps = BaseTextInputProps & TextAreaStyleProps;
 
 export const CWTextArea = (props: TextAreaProps) => {
   const validationProps = useTextInputWithValidation();
+  const textareaRef = useRef(null);
 
   const {
     autoComplete,
@@ -30,7 +32,17 @@ export const CWTextArea = (props: TextAreaProps) => {
     onInput,
     placeholder,
     tabIndex,
+    resizeWithText = false,
   } = props;
+
+  useEffect(() => {
+    if (resizeWithText) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.minHeight = '152px';
+      textareaRef.current.style.maxHeight = '512px';
+    }
+  }, [value, resizeWithText]);
 
   return (
     <div className={ComponentType.TextArea}>
@@ -55,6 +67,7 @@ export const CWTextArea = (props: TextAreaProps) => {
         maxLength={maxLength}
         name={name}
         placeholder={placeholder}
+        ref={textareaRef}
         onInput={(e) => {
           if (onInput) onInput(e);
 
