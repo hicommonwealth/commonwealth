@@ -95,9 +95,13 @@ module.exports = {
           name: 'bitcoin',
           chunks: 'all',
         },
+        ethersAsync: {
+          test: /[\\/]node_modules[\\/](ethers)[\\/]/,
+          name: 'ethersAsync',
+          chunks: 'all',
+        },
         ethereumAsync: {
-          // this is made into an async chunk (lazy loaded)
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
+          test: /[\\/]node_modules[\\/](@audius|web3|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
           name: 'ethereumAsync',
           chunks: 'all',
         },

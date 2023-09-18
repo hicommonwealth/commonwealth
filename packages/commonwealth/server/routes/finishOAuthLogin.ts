@@ -62,7 +62,7 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
           },
           req
         );
-        return redirectWithLoginError(res, 'Could not log in with OAuth user');
+        return redirectWithLoginError(res, 'Could not sign in with OAuth user');
       }
       serverAnalyticsController.track(
         {
@@ -102,7 +102,7 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
           },
           req
         );
-        return redirectWithLoginError(res, 'Could not log in with OAuth user');
+        return redirectWithLoginError(res, 'Could not sign in with OAuth user');
       }
       serverAnalyticsController.track(
         {
