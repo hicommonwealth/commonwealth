@@ -5,8 +5,8 @@ import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_
 import 'pages/tips.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { ProposalCard } from 'views/components/ProposalCard';
+import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { PageLoading } from 'views/pages/loading';
 import { CardsCollection } from '../components/cards_collection';
 import { CWText } from '../components/component_kit/cw_text';
@@ -49,7 +49,12 @@ const Tip = (props: TipProps) => {
         >
           Beneficiary
         </CWText>
-        <User user={beneficiary} popover showAddressWithDisplayName />
+        <User
+          userAddress={beneficiary.address}
+          userChainId={beneficiary.chain?.id || beneficiary.profile?.chain}
+          shouldShowPopover
+          shouldShowAddressWithDisplayName
+        />
       </div>
     </div>
   );
