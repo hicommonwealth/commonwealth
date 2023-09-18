@@ -5,7 +5,12 @@ import type { UserAttributes } from './user';
 // This Model Purely adds new functionality for these mechanisms, instead of trying to rewrite existing models
 // We could refactor, if desired to include / supersede existing models
 // (such as email notification interval on user, or webhook url on chain), for now those models are unchanged
-export type DeliveryMechanismType = 'browser' | 'ios' | 'desktop' | 'android';
+export type DeliveryMechanismType =
+  | 'browser'
+  | 'ios-native'
+  | 'desktop'
+  | 'android'
+  | 'ios-pwa';
 
 export type DeliveryMechanismAttributes = {
   id?: number;

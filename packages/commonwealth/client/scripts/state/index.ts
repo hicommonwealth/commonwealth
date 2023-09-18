@@ -315,7 +315,7 @@ export async function initAppState(
 
     let tokenRefreshListener = null;
     if (app.loginState === LoginState.LoggedIn) {
-      console.log('Initializing socket connection with JTW:', app.user.jwt);
+      console.log('Initializing socket connection with JWT:', app.user.jwt);
 
       app.firebase();
       // init the websocket connection and the chain-events namespace
@@ -324,13 +324,19 @@ export async function initAppState(
       if (shouldRedraw) {
         app.loginStateEmitter.emit('redraw');
       }
+      // Log the current tokens of the user notifications.deliveryMechanisms
+      const mechanisms = app.user.notifications.deliveryMechanisms;
+      console.log(
+        'Current tokens:',
+        mechanisms.map((mechanism) => mechanism.identifier)
+      );
 
       tokenRefreshListener = FirebaseMessaging.addListener(
         'tokenReceived',
         (token) => {
-          const mechanism = app.user.notifications.deliveryMechanisms.find(
-            (m) => m.type === app.platform()
-          );
+          console.log('Token received:', token);
+          const mechanism = mechanisms.find((m) => m.type === app.platform());
+          console.log('Mechanism:', mechanism);
           // If matching mechanism found, update it on the server
           if (mechanism) {
             app.user.notifications.updateDeliveryMechanism(

@@ -68,20 +68,23 @@ const NotificationSettingsPage = () => {
       'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30';
 
     let _token;
+
+    console.log('Debug: Getting token...');
+
     await FirebaseMessaging.getToken({ vapidKey: vapidKey })
       .then((currentToken) => {
         if (currentToken) {
-          console.log('Current token:', currentToken);
+          console.log('Debug: Current token:', currentToken);
           setToken(currentToken.token);
           _token = currentToken.token;
         } else {
           console.log(
-            'No registration token available. Request permission to generate one.'
+            'Debug: No registration token available. Request permission to generate one.'
           );
         }
       })
       .catch((err) => {
-        console.log('An error occurred while retrieving token. ', err);
+        console.log('Debug: An error occurred while retrieving token. ', err);
       });
     return _token;
   };
@@ -91,38 +94,64 @@ const NotificationSettingsPage = () => {
       (m) => m.type === mechanismType
     );
 
+    console.log('Debug: mechanismType', mechanismType);
+    console.log('Debug: isEnabled', isEnabled);
+    console.log('Debug: mechanism', mechanism);
+
     const platform = app.platform();
 
     const isOnRightPlatform =
-      (mechanismType === DeliveryMechanismType.Ios && platform === 'ios') ||
+      (mechanismType === DeliveryMechanismType.iOSApp && platform === 'ios') ||
       (mechanismType === DeliveryMechanismType.Android &&
         platform === 'android') ||
       (mechanismType === DeliveryMechanismType.Browser && platform === 'web') ||
-      (mechanismType === DeliveryMechanismType.Desktop && platform === 'web');
+      (mechanismType === DeliveryMechanismType.Desktop && platform === 'web') ||
+      (mechanismType === DeliveryMechanismType.ApplePWA &&
+        platform === 'mobile-safari' &&
+        app.isStandalone());
 
-    if (
-      isOnRightPlatform &&
-      (await requestPermission()).receive === 'granted'
-    ) {
-      if (!mechanism && isEnabled) {
-        const _token = await getToken();
-        await app.user.notifications.addDeliveryMechanism(
-          _token,
-          mechanismType,
-          true
-        );
-      } else if (mechanism && isEnabled) {
-        const _token = await getToken();
-        await app.user.notifications.updateDeliveryMechanism(
-          _token,
-          mechanismType,
-          true
-        );
-      } else if (mechanism && !isEnabled) {
-        // If the user wants to disable the delivery mechanism and it exists, we disable it
-        await app.user.notifications.disableMechanism(mechanismType);
+    console.log('Debug: isOnRightPlatform', isOnRightPlatform);
+
+    if (isOnRightPlatform) {
+      if (
+        platform === 'ios' ||
+        platform === 'android' ||
+        platform === 'mobile-safari'
+      ) {
+        const permission = await requestPermission();
+        if (permission.receive !== 'granted') {
+          console.log('Permission not granted. Requesting again...');
+          await requestPermission();
+        }
       }
-      forceRerender();
+      if (
+        platform === 'web' ||
+        platform === 'ios' ||
+        platform === 'android' ||
+        platform === 'mobile-safari'
+      ) {
+        if (!mechanism && isEnabled) {
+          const _token = await getToken();
+          console.log('Debug: _token', _token);
+          await app.user.notifications.addDeliveryMechanism(
+            _token,
+            mechanismType,
+            true
+          );
+        } else if (mechanism && isEnabled) {
+          const _token = await getToken();
+          console.log('Debug: _token', _token);
+          await app.user.notifications.updateDeliveryMechanism(
+            _token,
+            mechanismType,
+            true
+          );
+        } else if (mechanism && !isEnabled) {
+          // If the user wants to disable the delivery mechanism and it exists, we disable it
+          await app.user.notifications.disableMechanism(mechanismType);
+        }
+        forceRerender();
+      }
     }
   };
 
@@ -366,13 +395,17 @@ const NotificationSettingsPage = () => {
         );
         const platform = app.platform();
         const isOnPlatform =
-          (mechanismType === DeliveryMechanismType.Ios && platform === 'ios') ||
+          (mechanismType === DeliveryMechanismType.iOSApp &&
+            platform === 'ios') ||
           (mechanismType === DeliveryMechanismType.Android &&
             platform === 'android') ||
           (mechanismType === DeliveryMechanismType.Browser &&
             platform === 'web') ||
           (mechanismType === DeliveryMechanismType.Desktop &&
-            platform === 'web');
+            platform === 'web') ||
+          (mechanismType === DeliveryMechanismType.ApplePWA &&
+            platform === 'mobile-safari' &&
+            app.isStandalone());
 
         return (
           <div
