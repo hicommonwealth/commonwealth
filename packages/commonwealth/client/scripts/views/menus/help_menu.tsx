@@ -6,7 +6,6 @@ import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_m
 import { FeedbackModal } from '../modals/feedback_modal';
 import { Modal } from '../components/component_kit/cw_modal';
 import useSidebarStore from 'state/ui/sidebar';
-import { featureFlags } from 'helpers/feature-flags';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   handleIconClick,
@@ -71,7 +70,7 @@ export const HelpMenuPopover = () => {
             renderTrigger={(handleInteraction, isTooltipOpen) => (
               <CWIconButton
                 iconButtonTheme="black"
-                iconName={featureFlags.sessionKeys ? 'question' : 'help'}
+                iconName="question"
                 onClick={(e) =>
                   handleIconClick({
                     e,
@@ -82,11 +81,9 @@ export const HelpMenuPopover = () => {
                   })
                 }
                 onMouseEnter={(e) => {
-                  if (!featureFlags.sessionKeys) return;
                   handleMouseEnter({ e, isMenuOpen, handleInteraction });
                 }}
                 onMouseLeave={(e) => {
-                  if (!featureFlags.sessionKeys) return;
                   handleMouseLeave({
                     e,
                     isTooltipOpen,
