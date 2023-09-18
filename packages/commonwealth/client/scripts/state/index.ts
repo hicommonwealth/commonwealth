@@ -24,6 +24,7 @@ import {
   GetTokenOptions,
 } from '@capacitor-firebase/messaging';
 import { ChainStore, NodeStore } from 'stores';
+import { platform, pushNotifications } from '@todesktop/client-core';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -203,6 +204,9 @@ const app: IApp = {
     if (app.isFirebaseInitialized) {
       initializeApp(firebaseConfig);
       app.isFirebaseInitialized;
+      if (app.platform() === 'desktop') {
+        pushNotifications.start('158803639844');
+      }
     }
   },
   isFirebaseInitialized: () => false,
@@ -220,9 +224,12 @@ const app: IApp = {
     const userAgent = window.navigator.userAgent;
     if (/iP(ad|hone|od).+Version\/[\d.]+.*Safari/i.test(userAgent)) {
       return 'mobile-safari';
+    } else if (platform.todesktop.isDesktopApp()) {
+      return 'desktop';
+    } else {
+      // If not desktop, get the platform from Capacitor
+      return Capacitor.getPlatform();
     }
-    // Update this to use to Desktop API later to determine platform = desktop
-    return Capacitor.getPlatform();
   },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,

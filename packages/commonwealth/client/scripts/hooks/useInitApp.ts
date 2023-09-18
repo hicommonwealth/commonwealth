@@ -27,9 +27,9 @@ const useInitApp = () => {
       console.log('Failed initializing app state', err)
     );
 
-    if (app.isNative(window)) {
+    if (app.platform() !== 'web') {
       console.log(
-        'On native device, skipping custom domain and initializing app state.'
+        'On native device or desktop, skipping custom domain and initializing app state.',
       );
       console.log('Init app here');
       appStateInit.then(() => {

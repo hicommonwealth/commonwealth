@@ -23,6 +23,7 @@ import send from '../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SupportedNetwork } from 'chain-events/src';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
+import { sendPushNotification } from './pushNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -98,7 +99,14 @@ export default async function emitNotifications(
   // get all relevant subscriptions
   const subscriptions = await models.Subscription.findAll({
     where: findOptions,
-    include: models.User,
+    include: [
+      models.User,
+      {
+        model: models.SubscriptionDelivery,
+        as: 'SubscriptionDelivery',
+        include: [models.DeliveryMechanism],
+      },
+    ],
   });
 
   // get notification if it already exists
@@ -196,6 +204,22 @@ export default async function emitNotifications(
     if (msg && subscription?.immediate_email && subscription?.User) {
       // kick off async call and immediately return
       sendImmediateNotificationEmail(subscription.User, msg);
+    }
+
+    if (
+      subscription.SubscriptionDelivery &&
+      subscription.SubscriptionDelivery.length > 0
+    ) {
+      for (const delivery of subscription.SubscriptionDelivery) {
+        if (delivery.DeliveryMechanism && delivery.DeliveryMechanism.enabled) {
+          sendPushNotification(
+            delivery.DeliveryMechanism,
+            notification_data,
+            category_id,
+            models
+          );
+        }
+      }
     }
   }
 

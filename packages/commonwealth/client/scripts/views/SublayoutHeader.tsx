@@ -144,8 +144,15 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     </>
   ) : (
     <div className="SublayoutHeader">
-      <div className="header-left">
+      {/* <div className="header-left"> */}
+      <div
+        className={`header-left ${
+          app.platform() === 'desktop' ? 'desktop' : ''
+        }`}
+      >
+        {app.platform() === 'desktop' && <CWDivider isVertical />}
         <CWIconButton
+          className="logo"
           iconName="commonLogo"
           iconButtonTheme="black"
           iconSize="xl"
@@ -164,13 +171,15 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
         {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
           app.activeChainId() && (
-            <CWCommunityAvatar
-              size="large"
-              community={app.chain.meta}
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
+            <div className="community-avatar-container">
+              <CWCommunityAvatar
+                size="large"
+                community={app.chain.meta}
+                onClick={() => {
+                  navigate('/discussions');
+                }}
+              />
+            </div>
           )}
         {onMobile && app.activeChainId() && (
           <CWIconButton
