@@ -9,7 +9,7 @@
   color: $neutral-400;
 
   .active {
-    color: #656167;
+    color: $neutral-500;
     font-weight: 500;
   }
 
@@ -78,9 +78,9 @@
     }
   }
 
-  .members {
+  .governance {
     display: flex;
-    padding-left: calc(12px + 1rem);
+    padding-left: 24px;
     flex-direction: row;
   }
 

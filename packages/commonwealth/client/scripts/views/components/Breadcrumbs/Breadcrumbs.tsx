@@ -80,15 +80,14 @@ export const Breadcrumbs = () => {
     let path: string;
     path = page[0].link.split('/')[0];
 
+    const governancePaths = ['members', 'snapshot', 'proposals'];
+
     if (location.pathname.includes('discussions')) {
       path = 'discussions';
     }
 
-    if (
-      location.pathname.includes('members') ||
-      location.pathname.includes('notifications')
-    ) {
-      path = 'members';
+    if (governancePaths.some((x) => location.pathname.includes(x))) {
+      path = 'governance';
     }
 
     if (location.pathname.includes(String(profileId))) {
@@ -98,7 +97,7 @@ export const Breadcrumbs = () => {
     return {
       notifications: 'notifications',
       discussions: 'discussions',
-      members: 'members',
+      governance: 'governance',
       viewProfile: 'viewProfile',
     }[path];
   };
