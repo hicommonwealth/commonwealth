@@ -1,8 +1,9 @@
 import 'components/Breadcrumbs/Breadcrumbs.scss';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link, useMatches } from 'react-router-dom';
 import { CWText } from '../component_kit/cw_text';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import clsx from 'clsx';
 import app from 'state';
 
 export const Breadcrumbs = () => {
@@ -10,6 +11,10 @@ export const Breadcrumbs = () => {
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
+
+  const matches = useMatches();
+
+  console.log('mat', matches);
 
   let standalone = false;
 
@@ -46,11 +51,11 @@ export const Breadcrumbs = () => {
    */
   const pathnames = location.pathname
     .split('/')
-    .map((x, index, arr) => {
+    .map((pathName, index, arr) => {
       let link: string;
       let isParentBreadcrumb = false;
 
-      if (x === 'profile') {
+      if (pathName === 'profile') {
         link = `/profile/id/${profileId}`;
       } else {
         link = arr.slice(0, index + 1).join('/');
@@ -62,13 +67,15 @@ export const Breadcrumbs = () => {
         isParentBreadcrumb = true;
       }
 
+      console.log('dwecode?', decodeURIComponent(pathName.replace(/\+/g, ' ')));
+
       return {
-        text: x,
+        text: decodeURIComponent(pathName),
         link: link ? link : location.pathname,
         isParent: isParentBreadcrumb,
       };
     })
-    .filter((x) => x.text.length > 0);
+    .filter((pathName) => pathName.text.length > 0);
 
   /**
    * Determines the style based on the current page.
@@ -76,30 +83,32 @@ export const Breadcrumbs = () => {
    * @param page - An array of objects representing the page links.
    * @returns The style associated with the current page.
    */
-  const getStyle = (page: Array<{ link: string }>) => {
-    let path: string;
-    path = page[0].link.split('/')[0];
-
+  const getStyle = () => {
     const governancePaths = ['members', 'snapshot', 'proposals'];
 
     if (location.pathname.includes('discussions')) {
-      path = 'discussions';
+      return 'discussions';
     }
 
-    if (governancePaths.some((x) => location.pathname.includes(x))) {
-      path = 'governance';
+    if (
+      governancePaths.some((governancePath) =>
+        location.pathname.includes(governancePath)
+      )
+    ) {
+      return 'governance';
     }
 
     if (location.pathname.includes(String(profileId))) {
-      path = 'viewProfile';
+      return 'viewProfile';
     }
 
-    return {
-      notifications: 'notifications',
-      discussions: 'discussions',
-      governance: 'governance',
-      viewProfile: 'viewProfile',
-    }[path];
+    if (location.pathname.includes('createCommunity')) {
+      return 'createCommunity';
+    }
+
+    if (location.pathname.includes('notifications')) {
+      return 'notifications';
+    }
   };
 
   /**
@@ -126,11 +135,13 @@ export const Breadcrumbs = () => {
 
   return (
     <nav className="Breadcrumbs">
-      <div className={`${getStyle(pathnames) ?? 'commonPadding'}`}>
+      <div className={`${getStyle() ?? 'commonPadding'}`}>
         {standalone ? (
           <li>
             <CWText type="b2" fontWeight="regular">
-              <a className="active">{pathnames[0].text}</a>
+              <Link className="active standalone" to={'#'}>
+                {pathnames[0].text}
+              </Link>
             </CWText>
           </li>
         ) : (
@@ -150,7 +161,7 @@ export const Breadcrumbs = () => {
                     onMouseLeave={handleIneraction}
                   >
                     <CWText type="b2" fontWeight="regular">
-                      <a>{path.text}</a>
+                      <Link to={null}>{path.text}</Link>
                     </CWText>
                   </li>
                 )}
@@ -158,12 +169,14 @@ export const Breadcrumbs = () => {
             ) : (
               <li key={`${location.key} - ${index}`}>
                 <CWText type="b2" fontWeight="regular">
-                  <a
-                    className={pathnames.length - 1 === index ? 'active' : ''}
-                    href={path.link}
+                  <Link
+                    className={clsx('active', {
+                      pathnames: pathnames.length - 1 === index,
+                    })}
+                    to={path.link}
                   >
                     {path.text}
-                  </a>
+                  </Link>
                 </CWText>
               </li>
             );

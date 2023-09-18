@@ -8,6 +8,20 @@
   font-size: 0.875rem;
   color: $neutral-400;
 
+  @include small {
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+
+  @include extraSmall {
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+
+  .hidden {
+    display: none;
+  }
+
   .active {
     color: $neutral-500;
     font-weight: 500;
@@ -16,6 +30,14 @@
   li {
     display: flex;
     align-items: center;
+
+    @include small {
+      margin-bottom: 16px;
+    }
+
+    @include extraSmall {
+      margin-bottom: 16px;
+    }
     &:not(:last-child) {
       margin-right: 6px;
       &::after {
@@ -35,6 +57,9 @@
         text-transform: uppercase;
       }
     }
+    a.standalone:first-child {
+      cursor: default;
+    }
   }
   .commonPadding {
     display: flex;
@@ -45,7 +70,7 @@
     }
 
     @include mediumInclusive {
-      padding-left: 32px;
+      padding-left: 40px;
     }
 
     @include small {
@@ -57,10 +82,16 @@
     }
   }
 
+  .notifications {
+    display: flex;
+    padding-left: 24px;
+    flex-direction: row;
+  }
+
   .discussions {
     display: flex;
-    padding-left: calc(16px + 1.5rem);
     flex-direction: row;
+
     @include large {
       padding-left: 40px;
     }
@@ -84,22 +115,10 @@
     flex-direction: row;
   }
 
-  .notifications {
-    @include large {
-      padding-left: 176px;
-    }
-
-    @include mediumInclusive {
-      padding-left: 72px;
-    }
-
-    @include small {
-      padding-left: 56px;
-    }
-
-    @include extraSmall {
-      padding-left: 16px;
-    }
+  .createCommunity {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .viewProfile {
