@@ -17,7 +17,7 @@ function getProvider(rpc: string) {
   return new ethers.providers.JsonRpcProvider(rpc);
 }
 
-async function getLogs(
+export async function getLogs(
   evmSource: EvmSource,
   startingBlockNum?: number
 ): Promise<{ logs: Log[]; lastBlockNum: number }> {
@@ -46,7 +46,7 @@ async function getLogs(
   return { logs, lastBlockNum: currentBlockNum };
 }
 
-async function parseLogs(
+export async function parseLogs(
   sources: ContractSources,
   logs: Log[]
 ): Promise<RawEvmEvent[]> {
