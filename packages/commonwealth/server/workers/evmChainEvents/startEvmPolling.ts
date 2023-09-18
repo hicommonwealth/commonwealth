@@ -1,13 +1,10 @@
 import { getEvents } from './logs';
 import models from '../../database';
-import { EvmSource, EvmSources, RawEvmEvent } from './types';
+import { EvmSource, RawEvmEvent } from './types';
 import { QueryTypes } from 'sequelize';
 import { getEventSources } from './getEventSources';
 import emitNotifications from '../../util/emitNotifications';
-import {
-  IChainEventNotificationData,
-  NotificationDataAndCategory,
-} from 'types';
+import { NotificationDataAndCategory } from 'types';
 import { NotificationCategories } from 'common-common/src/types';
 import { ChainAttributes } from '../../models/chain';
 import { ContractAttributes } from '../../models/contract';
@@ -19,7 +16,7 @@ import { ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../../config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-// TODO: can we make this a util singleton for easy across the server?
+// TODO: @Timothee @Jake can we make this a util singleton for easy across the server?
 export const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
   environment: ROLLBAR_ENV,
@@ -68,14 +65,15 @@ async function emitChainEventNotifs(
       data: {
         chain: chain.chain_id,
         network: chain.chain_network as unknown as SupportedNetwork,
+        block_number: event.blockNumber,
         event_data: {
-          block_number: event.blockNumber,
           kind: event.kind,
           // TODO: @Timothee for now all event sources have proposal id as the first argument in the future
           //  we will store raw arguments and use the custom labeling system when pulling/viewing event notifications
-          id: event.args[0].toNumber(),
+          // use toString to accommodate for open zeppelin gov (impact market) proposal id's which are hashes
+          id: event.args[0].toString(),
         },
-      } as IChainEventNotificationData, // TODO: @Timothee type coercion removed once Cosmos Notif Generator merged
+      },
     };
     emitNotifications(models, notification).catch((e) => {
       const msg = `Error occurred while emitting a chain-event notification for event: ${JSON.stringify(

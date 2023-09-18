@@ -30,6 +30,8 @@ async function getLogs(
   if (!startingBlockNum || currentBlockNum - startingBlockNum > 500) {
     // TODO: log and report warning with the exact block range that is skipped
     startingBlockNum = currentBlockNum - 10;
+  } else {
+    startingBlockNum += 1;
   }
 
   console.log(`Fetching logs from ${startingBlockNum} to ${currentBlockNum}`);
