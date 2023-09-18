@@ -46,6 +46,7 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { TemplateSelector } from '../components/TemplateActionSelector';
 import 'modals/template_action_modal.scss';
 import 'components/TemplateSelectorItem.scss';
+import 'pages/view_thread/linked_proposals_card.scss';
 
 import ContractsPage from './contracts';
 
