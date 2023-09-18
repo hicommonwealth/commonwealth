@@ -12,10 +12,8 @@ import {
   isWindowMediumSmallInclusive,
   isWindowSmallInclusive,
 } from './components/component_kit/helpers';
-import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
-import { featureFlags } from 'helpers/feature-flags';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
@@ -37,7 +35,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  return featureFlags.sessionKeys ? (
+  return (
     <>
       <div className="SublayoutHeader">
         <div className="header-left">
@@ -93,7 +91,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             />
           </div>
           <div
-            className={clsx('DesktopMenuContainer', 'session-keys', {
+            className={clsx('DesktopMenuContainer', {
               isLoggedIn,
             })}
           >
@@ -142,65 +140,5 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
         open={isLoginModalOpen}
       />
     </>
-  ) : (
-    <div className="SublayoutHeader">
-      <div className="header-left">
-        <CWIconButton
-          iconName="commonLogo"
-          iconButtonTheme="black"
-          iconSize="xl"
-          onClick={() => {
-            if (app.isCustomDomain()) {
-              navigate('/', {}, null);
-            } else {
-              if (isLoggedIn) {
-                navigate('/dashboard/for-you', {}, null);
-              } else {
-                navigate('/dashboard/global', {}, null);
-              }
-            }
-          }}
-        />
-        {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
-          app.activeChainId() && (
-            <CWCommunityAvatar
-              size="large"
-              community={app.chain.meta}
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
-          )}
-        {onMobile && app.activeChainId() && (
-          <CWIconButton
-            iconButtonTheme="black"
-            iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
-            onClick={() => {
-              setMenu({ name: menuName, isVisible: !menuVisible });
-            }}
-          />
-        )}
-      </div>
-      <CWSearchBar />
-      <div className="header-right">
-        <div className="MobileMenuContainer">
-          <CWIconButton
-            iconName="dotsVertical"
-            iconButtonTheme="black"
-            onClick={() => {
-              setMenu({ name: menuName, isVisible: false });
-              setMobileMenuName(mobileMenuName ? null : 'MainMenu');
-            }}
-          />
-        </div>
-        <div className="DesktopMenuContainer">
-          <CreateContentPopover />
-          <HelpMenuPopover />
-          {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
-        </div>
-        <LoginSelector />
-      </div>
-    </div>
   );
 };
