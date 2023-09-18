@@ -33,10 +33,11 @@ export async function processChainNode(
       },
     });
 
-    const { events, lastBlockNum } = await getEvents(
-      evmSource,
-      startBlock?.block_number
-    );
+    const startBlockNum = startBlock?.block_number
+      ? startBlock.block_number + 1
+      : null;
+
+    const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
 
     await emitChainEventNotifs(chainNodeId, events);
 
