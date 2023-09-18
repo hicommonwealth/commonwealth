@@ -21,7 +21,7 @@ import type { AnyProposal } from '../../../models/types';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
-import { VotingResults } from '../../components/proposals/voting_results';
+import { VotingResults } from '../../components/proposals/VotingResults';
 import { Skeleton } from '../../components/Skeleton';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
