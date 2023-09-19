@@ -42,7 +42,7 @@ export default (
       type: { type: dataTypes.STRING, allowNull: false },
       identifier: { type: dataTypes.STRING, allowNull: false },
       user_id: { type: dataTypes.INTEGER, allowNull: false },
-      enabled: { type: dataTypes.BOOLEAN, defaultValue: true },
+      enabled: { type: dataTypes.BOOLEAN, allowNull: false },
     },
     {
       tableName: 'DeliveryMechanisms',
