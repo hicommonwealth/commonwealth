@@ -52,7 +52,7 @@ import { CWSearchBar } from './new_designs/CWSearchBar';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWButton } from './new_designs/cw_button';
-import { CWForm } from './new_designs/cw_form';
+import { CWForm } from './new_designs/CWForm';
 import { CWTag } from './new_designs/cw_tag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
