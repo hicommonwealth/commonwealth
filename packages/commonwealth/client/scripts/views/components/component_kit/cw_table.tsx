@@ -145,7 +145,7 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
               iconSize='small'
               className='arrow-up-blue'
             /></div>,
-      desc: <div className='icon-container'><CWIcon 
+      desc: <div className='icon-container'><CWIcon
               iconName='arrowDownBlue500'
               iconSize='small'
               className='arrow-down-blue'
