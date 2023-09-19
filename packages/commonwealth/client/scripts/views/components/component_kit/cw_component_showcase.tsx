@@ -229,127 +229,6 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
-      <CWForm
-        validationSchema={validationSchema}
-        onSubmit={(values) => console.log('values => ', values)}
-      >
-        <CWTextInput
-          name="username"
-          placeholder="Username"
-          label="Username"
-          hookToForm
-        />
-        <CWTextInput
-          name="email"
-          placeholder="Email"
-          label="Email"
-          hookToForm
-        />
-        <CWTextInput
-          name="USPhoneNumber"
-          placeholder="US Phone Number"
-          label="US Phone Number"
-          hookToForm
-        />
-        <CWTextInput
-          name="password"
-          placeholder="Password"
-          label="Password"
-          hookToForm
-        />
-        <CWTextArea name="bio" placeholder="Bio" label="Bio" hookToForm />
-        <CWButton label="Submit" />
-      </CWForm>
-      {/* With initial values */}
-      <CWForm
-        initialValues={{
-          username: 'user1',
-          email: 'test@example.com',
-          USPhoneNumber: '+11234567890',
-          password: 'Abc1#$%^&(cahv',
-        }}
-        validationSchema={validationSchema}
-        onSubmit={(values) => console.log('values => ', values)}
-      >
-        <CWTextInput
-          name="username"
-          placeholder="Username"
-          label="Username"
-          hookToForm
-        />
-        <CWTextInput
-          name="email"
-          placeholder="Email"
-          label="Email"
-          hookToForm
-        />
-        <CWTextInput
-          name="USPhoneNumber"
-          placeholder="US Phone Number"
-          label="US Phone Number"
-          hookToForm
-        />
-        <CWTextInput
-          name="password"
-          placeholder="Password"
-          label="Password"
-          hookToForm
-        />
-        <CWButton label="Submit" />
-      </CWForm>
-      {/* With initial values and a reset switch */}
-      <CWForm
-        initialValues={{
-          username: 'user1',
-          email: 'test@example.com',
-          USPhoneNumber: '+11234567890',
-          password: 'Abc1#$%^&(cahv',
-        }}
-        validationSchema={validationSchema}
-        onSubmit={(values) => console.log('values => ', values)}
-      >
-        {(formMethods) => (
-          <>
-            <CWTextInput
-              name="username"
-              placeholder="Username"
-              label="Username"
-              hookToForm
-            />
-            <CWTextInput
-              name="email"
-              placeholder="Email"
-              label="Email"
-              hookToForm
-            />
-            <CWTextInput
-              name="USPhoneNumber"
-              placeholder="US Phone Number"
-              label="US Phone Number"
-              hookToForm
-            />
-            <CWTextInput
-              name="password"
-              placeholder="Password"
-              label="Password"
-              hookToForm
-            />
-            <CWButton
-              label="Reset Form"
-              type="reset"
-              onClick={() =>
-                formMethods.reset({
-                  username: '',
-                  password: '',
-                  email: '',
-                  USPhoneNumber: '',
-                })
-              }
-            />
-            <CWButton label="Submit Form" />
-          </>
-        )}
-      </CWForm>
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
@@ -1759,6 +1638,128 @@ export const ComponentShowcase = () => {
             />
           )}
         />
+        <CWText>Validated Forms</CWText>
+        <CWForm
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          <CWTextInput
+            name="username"
+            placeholder="Username"
+            label="Username"
+            hookToForm
+          />
+          <CWTextInput
+            name="email"
+            placeholder="Email"
+            label="Email"
+            hookToForm
+          />
+          <CWTextInput
+            name="USPhoneNumber"
+            placeholder="US Phone Number"
+            label="US Phone Number"
+            hookToForm
+          />
+          <CWTextInput
+            name="password"
+            placeholder="Password"
+            label="Password"
+            hookToForm
+          />
+          <CWTextArea name="bio" placeholder="Bio" label="Bio" hookToForm />
+          <CWButton label="Submit" />
+        </CWForm>
+        {/* With initial values */}
+        <CWForm
+          initialValues={{
+            username: 'user1',
+            email: 'test@example.com',
+            USPhoneNumber: '+11234567890',
+            password: 'Abc1#$%^&(cahv',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          <CWTextInput
+            name="username"
+            placeholder="Username"
+            label="Username"
+            hookToForm
+          />
+          <CWTextInput
+            name="email"
+            placeholder="Email"
+            label="Email"
+            hookToForm
+          />
+          <CWTextInput
+            name="USPhoneNumber"
+            placeholder="US Phone Number"
+            label="US Phone Number"
+            hookToForm
+          />
+          <CWTextInput
+            name="password"
+            placeholder="Password"
+            label="Password"
+            hookToForm
+          />
+          <CWButton label="Submit" />
+        </CWForm>
+        {/* With initial values and a reset switch */}
+        <CWForm
+          initialValues={{
+            username: 'user1',
+            email: 'test@example.com',
+            USPhoneNumber: '+11234567890',
+            password: 'Abc1#$%^&(cahv',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          {(formMethods) => (
+            <>
+              <CWTextInput
+                name="username"
+                placeholder="Username"
+                label="Username"
+                hookToForm
+              />
+              <CWTextInput
+                name="email"
+                placeholder="Email"
+                label="Email"
+                hookToForm
+              />
+              <CWTextInput
+                name="USPhoneNumber"
+                placeholder="US Phone Number"
+                label="US Phone Number"
+                hookToForm
+              />
+              <CWTextInput
+                name="password"
+                placeholder="Password"
+                label="Password"
+                hookToForm
+              />
+              <CWButton
+                label="Reset Form"
+                type="reset"
+                onClick={() =>
+                  formMethods.reset({
+                    username: '',
+                    password: '',
+                    email: '',
+                    USPhoneNumber: '',
+                  })
+                }
+              />
+              <CWButton label="Submit Form" />
+            </>
+          )}
+        </CWForm>
       </div>
     </div>
   );
