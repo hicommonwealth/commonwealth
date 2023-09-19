@@ -1,8 +1,10 @@
+import 'components/component_kit/cw_select_list.scss';
 import React from 'react';
 import type { GroupBase, Props } from 'react-select';
-import Select from 'react-select';
-
-import 'components/component_kit/cw_select_list.scss';
+import Select, { components } from 'react-select';
+import { CWIcon } from './cw_icons/cw_icon';
+import { getClasses } from './helpers';
+import { ComponentType } from './types';
 
 export const SelectList = <
   Option,
@@ -27,7 +29,26 @@ export const SelectList = <
           maxHeight: '300px',
         }),
       }}
-      className={`SelectList ${props.className || ''}`}
+      components={{
+        DropdownIndicator: () => (
+          <CWIcon className="caret-icon" iconName={'caretDown'} />
+        ),
+        MultiValueRemove: (removeProps) => (
+          <components.MultiValueRemove {...removeProps}>
+            <CWIcon iconName="close" className="close-btn" />
+          </components.MultiValueRemove>
+        ),
+      }}
+      className={getClasses<{
+        isMulti?: boolean;
+        className?: string;
+      }>(
+        {
+          isMulti: props.isMulti,
+          className: props.className,
+        },
+        ComponentType.SelectList
+      )}
     />
   );
 };

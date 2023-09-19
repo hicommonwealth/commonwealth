@@ -1,61 +1,61 @@
-import React, { useState } from 'react';
 import { ArrowCircleRight, MagnifyingGlass } from '@phosphor-icons/react';
+import React, { useState } from 'react';
 
 import 'components/component_kit/cw_component_showcase.scss';
 import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { CWAuthButton } from './cw_auth_button';
 import { CWAccountCreationButton } from './cw_account_creation_button';
+import { CWAuthButton } from './cw_auth_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
-import { CWButton } from './new_designs/cw_button';
-import { CWUpvote } from './new_designs/cw_upvote';
-import { CWThreadAction } from './new_designs/cw_thread_action';
-import { CWTooltip } from './new_designs/CWTooltip';
-import { CWTextInput } from './new_designs/CWTextInput';
-import { CWSearchBar } from './new_designs/CWSearchBar';
-import { CWCard } from './cw_card';
-import type { CheckboxType } from './cw_checkbox';
-import { CWCheckbox } from './cw_checkbox';
-import { CWIconButton } from './cw_icon_button';
-import type { IconName } from './cw_icons/cw_icon_lookup';
-import { iconLookup } from './cw_icons/cw_icon_lookup';
-import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
-import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
-import { CWProgressBar } from './cw_progress_bar';
-import { CWRadioGroup } from './cw_radio_group';
-import { CWTab, CWTabBar } from './cw_tabs';
-import { CWTextArea } from './cw_text_area';
-import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
-import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { CWCollapsible } from './cw_collapsible';
-import { CWTag } from './new_designs/cw_tag';
-import { CWSpinner } from './cw_spinner';
-import { CWDropdown } from './cw_dropdown';
-import { CWRadioButton } from './cw_radio_button';
-import type { RadioButtonType } from './cw_radio_button';
-import { CWContentPageCard } from './CWContentPage';
-import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWFilterMenu } from './cw_popover/cw_filter_menu';
-import { CWCoverImageUploader } from './cw_cover_image_uploader';
-import { Modal } from './cw_modal';
-import type { ValidationStatus } from './cw_validation_text';
-import { AvatarUpload } from '../Avatar';
-import { openConfirmation } from 'views/modals/confirmation_modal';
 import { DeltaStatic } from 'quill';
-import {
-  createDeltaFromText,
-  ReactQuillEditor,
-} from 'views/components/react_quill_editor';
+import app from 'state';
+import { SelectList } from 'views/components/component_kit/cw_select_list';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import app from 'state';
-import { CWTagInput } from './new_designs/CWTagInput';
+import {
+  ReactQuillEditor,
+  createDeltaFromText,
+} from 'views/components/react_quill_editor';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import { AvatarUpload } from '../Avatar';
+import { CWContentPageCard } from './CWContentPage';
+import { CWCard } from './cw_card';
+import type { CheckboxType } from './cw_checkbox';
+import { CWCheckbox } from './cw_checkbox';
+import { CWCollapsible } from './cw_collapsible';
+import { CWCoverImageUploader } from './cw_cover_image_uploader';
+import { CWDropdown } from './cw_dropdown';
+import { CWIconButton } from './cw_icon_button';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { IconName } from './cw_icons/cw_icon_lookup';
+import { iconLookup } from './cw_icons/cw_icon_lookup';
+import { Modal } from './cw_modal';
+import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
+import { CWFilterMenu } from './cw_popover/cw_filter_menu';
+import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
+import { PopoverMenu } from './cw_popover/cw_popover_menu';
+import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
+import { CWProgressBar } from './cw_progress_bar';
+import type { RadioButtonType } from './cw_radio_button';
+import { CWRadioButton } from './cw_radio_button';
+import { CWRadioGroup } from './cw_radio_group';
+import { CWSpinner } from './cw_spinner';
+import { CWTab, CWTabBar } from './cw_tabs';
+import { CWText } from './cw_text';
+import { CWTextArea } from './cw_text_area';
+import { CWThreadVoteButton } from './cw_thread_vote_button';
+import type { ValidationStatus } from './cw_validation_text';
+import { CWSearchBar } from './new_designs/CWSearchBar';
+import { CWTextInput } from './new_designs/CWTextInput';
+import { CWTooltip } from './new_designs/CWTooltip';
+import { CWButton } from './new_designs/cw_button';
+import { CWTag } from './new_designs/cw_tag';
+import { CWThreadAction } from './new_designs/cw_thread_action';
+import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
+import { CWUpvote } from './new_designs/cw_upvote';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -194,6 +194,21 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
+      <CWText type="h3">Multi select list</CWText>
+      <SelectList
+        placeholder="Add or select a chain"
+        isMulti
+        isClearable={false}
+        defaultValue={[{ value: 'solana', label: 'Solana' }]}
+        options={[
+          { value: 'solana', label: 'Solana' },
+          { value: 'polkadot', label: 'Polkadot' },
+          { value: 'ethereum', label: 'Ethereum' },
+          { value: 'substrate', label: 'Substrate' },
+          { value: 'binance', label: 'Binance' },
+        ]}
+      />
+      <div style={{ height: '500px' }} />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
@@ -1603,36 +1618,6 @@ export const ComponentShowcase = () => {
             />
           )}
         />
-        <CWText type="h3">Tag Input</CWText>
-        <CWTagInput canAddCustomTags />
-        <CWTagInput
-          tagSuggestions={[
-            'Cosmos',
-            'Aave',
-            'Solana',
-            'Polkadot',
-            'Ethereum',
-            'Binance',
-            'Substrate',
-          ]}
-          placeholder="Add or select a chain"
-          filterMatchingTagSuggestionsOnInputChange
-          canAddCustomTags
-        />
-        <CWTagInput
-          defaultTags={['Cosmos', 'Aave']}
-          tagSuggestions={[
-            'Solana',
-            'Polkadot',
-            'Ethereum',
-            'Binance',
-            'Substrate',
-          ]}
-          placeholder="Add more to your chosen chains"
-          filterMatchingTagSuggestionsOnInputChange
-          canAddCustomTags={false}
-        />
-        <div style={{ height: '500px' }} />
       </div>
     </div>
   );
