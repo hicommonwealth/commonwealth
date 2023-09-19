@@ -105,17 +105,18 @@ function setupCosmosProxy(app: Express, models: DB) {
     }
   );
 
-  // two cosmos-api proxies for the magic link iframe
+  // cosmos-api proxies for the magic link iframe
+  // - POST to root path
   // - node_info for fetching chain status (used by magic iframe, and magic login flow)
   // - auth/accounts/:address for fetching address status (use by magic iframe)
   app.use(
-    '/magicCosmosAPI/:chain/node_info',
+    '/magicCosmosAPI/:chain/?(node_info)?',
     bodyParser.text(),
     cacheDecorator.cacheMiddleware(
       defaultCacheDuration,
       lookupKeyDurationInReq
     ),
-    async function cosmosProxy(req, res) {
+    async (req, res) => {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
         log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
@@ -138,7 +139,7 @@ function setupCosmosProxy(app: Express, models: DB) {
 
         const response = await axios.get(targetUrl + '/node_info', {
           headers: {
-            origin: 'https://commonwealth.im',
+            origin: 'https://commonwealth.im/?magic_login_proxy=true',
           },
         });
         log.trace(
@@ -151,6 +152,8 @@ function setupCosmosProxy(app: Express, models: DB) {
 
         // magicCosmosAPI is CORS-approved for the magic iframe
         res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', '*');
+        res.setHeader('Access-Control-Allow-Headers', 'content-type');
         return res.send(response.data);
       } catch (err) {
         res.status(500).json({ message: err.message });
