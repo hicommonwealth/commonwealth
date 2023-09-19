@@ -3,6 +3,7 @@ import React from 'react';
 import { useLocation, Link, useMatches } from 'react-router-dom';
 import { CWText } from '../component_kit/cw_text';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import { breadCrumbURLS } from './data';
 import clsx from 'clsx';
 import app from 'state';
 
@@ -76,6 +77,40 @@ export const Breadcrumbs = () => {
       };
     })
     .filter((pathName) => pathName.text.length > 0);
+
+  const generateBreadcrumbs = (
+    currentUrl: string
+  ): { text: string; link: string; isParent: boolean }[] => {
+    const pathSegments = currentUrl
+      .split('/')
+      .filter((segment) => segment.length > 0);
+    const breadcrumbs: { text: string; link: string; isParent: boolean }[] = [];
+
+    for (let i = 0; i < pathSegments.length; i++) {
+      const currentSegment = pathSegments[i];
+      const matchingBreadcrumb = breadCrumbURLS.find(
+        (breadcrumb) => breadcrumb.url === currentSegment
+      );
+
+      if (matchingBreadcrumb) {
+        breadcrumbs.push({
+          text: matchingBreadcrumb.breadcrumb,
+          link: `/${currentSegment}`,
+          isParent: i === 0,
+        });
+      } else if (i === pathSegments.length - 1) {
+        breadcrumbs.push({
+          text: currentSegment,
+          link: `/${currentSegment}`,
+          isParent: false,
+        });
+      }
+    }
+
+    return breadcrumbs;
+  };
+
+  console.log('bread', generateBreadcrumbs(location.pathname));
 
   /**
    * Determines the style based on the current page.
