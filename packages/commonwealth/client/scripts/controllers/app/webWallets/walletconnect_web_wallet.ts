@@ -106,7 +106,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     const EthereumProvider = (await import('@walletconnect/ethereum-provider'))
       .default;
     this._provider = await EthereumProvider.init({
-      projectId: 'a8880f1879d26ba581d2902082a2c7c7', // 927f4643b1e10ad3dbdbdbdaf9c5fbbe (Prod)
+      projectId: '927f4643b1e10ad3dbdbdbdaf9c5fbbe',
       chains: [chainId],
       methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData_v4'],
       showQrModal: true,

@@ -8,7 +8,6 @@ import type Contract from 'models/Contract';
 import type IWebWallet from 'models/IWebWallet';
 import { ethers } from 'ethers';
 import WebWalletController from '../../app/web_wallets';
-import { sendUserOp } from 'helpers/aa_op_builder';
 
 async function sendFunctionCall({
   fn,
@@ -57,33 +56,6 @@ async function sendFunctionCall({
   return txReceipt;
 }
 
-export async function get4337Account (web3: Web3, eoaAddress: string){
-  const abi = [
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        }
-      ],
-      "name": "getAccount",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    }
-  ]
-  const factory = new web3.eth.Contract(abi as AbiItem[], '0xb28A7002bC67e61b31dCe32C079D7146Bf43ae60')
-  const accountAddr = await factory.methods.getAccount(eoaAddress).call();
-  return accountAddr;
-}
-
 /**
  * Uses the current user's ETH wallet to perform a specified contract tx or call.
  *
@@ -99,16 +71,14 @@ export async function callContractFunction({
   fn,
   inputArgs,
   tx_options,
-  senderERC4337
 }: {
   contract: Contract;
   fn: AbiItem;
   inputArgs: string[];
   tx_options?: any;
-  senderERC4337?: boolean
 }): Promise<TransactionReceipt | any> {
   const sender = app.user.activeAccount;
-  console.log(sender)
+  console.log(sender);
   // get querying wallet
   const signingWallet = await WebWalletController.Instance.locateWallet(
     sender,
@@ -123,37 +93,25 @@ export async function callContractFunction({
   const processedArgs = processAbiInputsToDataTypes(fn.inputs, inputArgs);
   const ethersInterface = new ethers.utils.Interface(contract.abi);
   const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);
-  if(!senderERC4337){
-    const functionConfig: {
-      fn: AbiItem;
-      signingWallet: IWebWallet<any>;
-      contract: Contract;
-      functionTx: any;
-      web3: Web3;
-      tx_options?: any;
-    } = {
-      fn,
-      signingWallet,
-      contract,
-      functionTx,
-      web3,
-      tx_options,
-    };
-    const txReceipt: TransactionReceipt | any = await sendFunctionCall(
-      functionConfig
-    );
-    return txReceipt;
-  }else{
-    const accountAddr = await get4337Account(web3, signingWallet.accounts[0])
-    const userOpEvent = await sendUserOp(
-      web3,
-      accountAddr,
-      contract.address,
-      tx_options?.value ?? "0",
-      functionTx 
-      )
-    return await userOpEvent.getTransactionReceipt()
-  }
+  const functionConfig: {
+    fn: AbiItem;
+    signingWallet: IWebWallet<any>;
+    contract: Contract;
+    functionTx: any;
+    web3: Web3;
+    tx_options?: any;
+  } = {
+    fn,
+    signingWallet,
+    contract,
+    functionTx,
+    web3,
+    tx_options,
+  };
+  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
+    functionConfig
+  );
+  return txReceipt;
 }
 
 export function encodeParameters(types, values) {
