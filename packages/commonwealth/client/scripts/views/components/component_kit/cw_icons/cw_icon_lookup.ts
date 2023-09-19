@@ -28,7 +28,6 @@ import {
   Question,
   Compass,
   PaperPlaneTilt,
-  BookOpenText,
   SignOut,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
@@ -53,7 +52,6 @@ export const iconLookup = {
   bellNew: Icons.CWBellNew,
   bellRinging: withPhosphorIcon(BellSimpleRinging),
   bellMuted: withPhosphorIcon(BellSimpleSlash),
-  bookOpenText: withPhosphorIcon(BookOpenText),
   cautionCircle: Icons.CWCautionCircle,
   cautionTriangle: Icons.CWCautionTriangle,
   chatDots: withPhosphorIcon(ChatDots),
@@ -127,7 +125,7 @@ export const iconLookup = {
   pin: withPhosphorIcon(PushPin),
   plus: Icons.CWPlus,
   plusCircle: Icons.CWPlusCircle,
-  plusCirclePhosphor: (props) => withPhosphorIcon(PlusCircle)(props),
+  plusCirclePhosphor: withPhosphorIcon(PlusCircle),
   polkadot: Icons.CWPolkadot,
   polygon: Icons.CWPolygon,
   question: withPhosphorIcon(Question),

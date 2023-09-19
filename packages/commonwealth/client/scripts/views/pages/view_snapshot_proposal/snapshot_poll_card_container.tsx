@@ -27,7 +27,7 @@ type SnapshotProposalCardsProps = {
 };
 
 const enum VotingError {
-  NOT_VALIDATED = 'You cannot vote on this poll or are not signed in.',
+  NOT_VALIDATED = 'You cannot vote on this poll or are not logged in.',
   ALREADY_VOTED = 'Already Submitted Vote',
 }
 

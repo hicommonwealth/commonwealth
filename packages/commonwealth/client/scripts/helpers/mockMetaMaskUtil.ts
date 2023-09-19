@@ -1,9 +1,5 @@
 import Web3 from 'web3';
-import {
-  SignTypedDataVersion,
-  signTypedData,
-  personalSign,
-} from '@metamask/eth-sig-util';
+import { SignTypedDataVersion, signTypedData } from '@metamask/eth-sig-util';
 
 export class MockMetaMaskProvider {
   private privateKey: string;
@@ -26,15 +22,6 @@ export class MockMetaMaskProvider {
     }
   }
 
-  private async personalSign(data: string[]) {
-    if (data[0] == this.web3.defaultAccount) {
-      return personalSign({
-        privateKey: Buffer.from(this.privateKey.substring(2), 'hex'),
-        data: data[1],
-      });
-    }
-  }
-
   public async request(payload: { method: string; params: string[] }) {
     switch (payload.method) {
       case 'eth_getBlockByNumber':
@@ -45,12 +32,8 @@ export class MockMetaMaskProvider {
         return this.web3.eth.getChainId();
       case 'eth_signTypedData_v4':
         return this.signTypedData(payload.params);
-      case 'personal_sign':
-        return this.personalSign(payload.params);
       default:
-        throw Error(
-          `method "${payload.method}" not supported by mock provider`
-        );
+        throw Error('method not supported by mock provider');
     }
   }
 

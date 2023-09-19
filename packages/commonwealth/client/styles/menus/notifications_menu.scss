@@ -1,5 +1,9 @@
 @import '../shared';
 
+.unreads-icon svg {
+  cursor: pointer;
+}
+
 .notifications-container {
   display: flex;
 

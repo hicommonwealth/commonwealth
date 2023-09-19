@@ -78,11 +78,7 @@ interface TooltipWrapperProps {
 }
 
 // Tooltip should only wrap the ThreadAction when the button is disabled
-export const TooltipWrapper = ({
-  children,
-  disabled,
-  text,
-}: TooltipWrapperProps) => {
+const TooltipWrapper = ({ children, disabled, text }: TooltipWrapperProps) => {
   if (!disabled) {
     return <>{children}</>;
   }
@@ -93,15 +89,7 @@ export const TooltipWrapper = ({
       content={text}
       placement="top"
       renderTrigger={(handleInteraction) => (
-        <div
-          style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
-          onClick={(e) => {
-            e.preventDefault();
-            if (disabled) return;
-          }}
-          onMouseEnter={handleInteraction}
-          onMouseLeave={handleInteraction}
-        >
+        <div onMouseEnter={handleInteraction} onMouseLeave={handleInteraction}>
           {children}
         </div>
       )}

@@ -10,7 +10,7 @@ AWS.config.update({
 });
 
 export const Errors = {
-  NotLoggedIn: 'Must be signed in',
+  NotLoggedIn: 'Must be logged in',
   MissingParams: 'Must specify name and mimetype',
   ImageType: 'Can only upload JPG, PNG, GIF, and WEBP images',
 };

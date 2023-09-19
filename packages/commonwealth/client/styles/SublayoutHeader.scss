@@ -79,7 +79,7 @@ html.todesktop .SublayoutHeader {
         &.isLoggedIn {
           padding-right: 20px;
           border-right: 1px solid $neutral-100;
-          margin-right: 14px;
+          margin-right: 16px;
         }
 
         & > div {
@@ -100,11 +100,11 @@ html.todesktop .SublayoutHeader {
       }
     }
 
-    .UserDropdownTriggerButton {
-      margin-right: 10px;
-      @include extraSmall {
-        margin-right: 2px;
-      }
+    .logout-button {
+      margin-left: 12px;
+      margin-right: 4px;
+      cursor: pointer;
+      fill: $neutral-500;
     }
   }
 }

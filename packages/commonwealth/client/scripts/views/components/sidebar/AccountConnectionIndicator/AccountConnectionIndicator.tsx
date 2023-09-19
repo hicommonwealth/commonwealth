@@ -5,47 +5,41 @@ import { CWIdentificationTag } from 'views/components/component_kit/new_designs/
 
 import './AccountConnectionIndicator.scss';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 
 interface AccountConnectionIndicatorProps {
   connected: boolean;
-  address: string;
 }
 
 const AccountConnectionIndicator = ({
   connected,
-  address,
 }: AccountConnectionIndicatorProps) => {
-  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const handleJoinCommunity = () => {
+    console.log('join community click!');
+  };
 
   return (
-    <>
-      <div className="AccountConnectionIndicator">
-        {connected && (
-          <div className="status-address">
-            <CWText fontWeight="medium" type="caption" className="status-text">
-              {connected ? 'Connected' : 'Not connected'}
-            </CWText>
-            <div className="status-row">
-              <div className={clsx('status-light', { connected })} />
-              <CWIdentificationTag address={address} />
-            </div>
-          </div>
-        )}
-
-        <div className="status-button">
-          <CWButton
-            {...(connected ? { iconLeft: 'checkCircleFilled' } : {})}
-            buttonHeight="sm"
-            buttonWidth="full"
-            label={connected ? 'Joined' : 'Join community'}
-            disabled={connected}
-            onClick={handleJoinCommunity}
-          />
-        </div>
+    <div className="AccountConnectionIndicator">
+      <CWText fontWeight="medium" type="caption" className="status-text">
+        {connected ? 'Connected' : 'Not connected'}
+      </CWText>
+      <div className="status-row">
+        <div className={clsx('status-light', { connected })} />
+        <CWIdentificationTag
+          iconLeft="twitterIcon"
+          address="0xc4ED43a303E3ADFA0aa9711f12285C910a1D3499"
+        />
       </div>
-      {JoinCommunityModals}
-    </>
+      <div className="status-button">
+        <CWButton
+          {...(connected ? { iconLeft: 'checkCircleFilled' } : {})}
+          buttonHeight="sm"
+          buttonWidth="full"
+          label={connected ? 'Joined' : 'Join community'}
+          disabled={connected}
+          onClick={handleJoinCommunity}
+        />
+      </div>
+    </div>
   );
 };
 
