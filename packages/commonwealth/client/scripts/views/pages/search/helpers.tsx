@@ -35,19 +35,20 @@ const ThreadResultRow = ({
   searchTerm,
   setRoute,
 }: ThreadResultRowProps) => {
-  let title = '';
-  try {
-    title = decodeURIComponent(thread.title);
-  } catch (err) {
-    title = thread.title;
-  }
+  const title = useMemo(() => {
+    try {
+      return decodeURIComponent(thread.title);
+    } catch (error) {
+      return thread.title;
+    }
+  }, [thread.title]);
 
   const handleClick = () => {
     setRoute(`/discussion/${thread.id}`, {}, thread.chain);
   };
 
   if (app.isCustomDomain() && app.customDomainId() !== thread.chain) {
-    return;
+    return <></>;
   }
 
   return (
@@ -75,6 +76,7 @@ const ThreadResultRow = ({
             hideFormatting={true}
             doc={thread.body}
             searchTerm={searchTerm}
+            markdownCutoffLength={400}
           />
         </CWText>
       </div>

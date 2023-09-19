@@ -170,7 +170,7 @@ export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
     spendAmount = spend.amount[0]
       ? [
           new CosmosToken(
-            spend.amount[0]?.denom?.toUpperCase(),
+            spend.amount[0]?.denom,
             spend.amount[0]?.amount
           ).toCoinObject(),
         ]

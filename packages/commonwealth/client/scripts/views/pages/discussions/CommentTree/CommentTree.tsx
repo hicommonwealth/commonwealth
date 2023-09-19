@@ -27,6 +27,8 @@ import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import { jumpHighlightComment } from './helpers';
 import { getCommentSubscriptions, handleToggleSubscription } from '../helpers';
+import { useSessionRevalidationModal } from '../../../modals/SessionRevalidationModal';
+import { SessionKeyError } from '../../../../controllers/server/sessions';
 
 import './CommentTree.scss';
 
@@ -58,7 +60,6 @@ export const CommentTree = ({
   canComment,
 }: CommentsTreeAttrs) => {
   const forceRerender = useForceRerender();
-  const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
 
   const { data: allComments = [] } = useFetchCommentsQuery({
@@ -66,15 +67,32 @@ export const CommentTree = ({
     threadId: parseInt(`${thread.id}`),
   });
 
-  const { mutateAsync: deleteComment } = useDeleteCommentMutation({
+  const {
+    mutateAsync: deleteComment,
+    reset: resetDeleteCommentMutation,
+    error: deleteCommentError,
+  } = useDeleteCommentMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
     existingNumberOfComments: thread.numberOfComments,
   });
 
-  const { mutateAsync: editComment } = useEditCommentMutation({
+  const {
+    mutateAsync: editComment,
+    reset: resetEditCommentMutation,
+    error: editCommentError,
+  } = useEditCommentMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
+  });
+
+  const resetSessionRevalidationModal = deleteCommentError
+    ? resetDeleteCommentMutation
+    : resetEditCommentMutation;
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetSessionRevalidationModal,
+    error: deleteCommentError || editCommentError,
   });
 
   const { mutateAsync: toggleCommentSpamStatus } =
@@ -180,9 +198,12 @@ export const CommentTree = ({
                 address: app.user.activeAccount.address,
                 existingNumberOfComments: thread.numberOfComments,
               });
-            } catch (e) {
-              console.log(e);
-              notifyError('Failed to delete comment.');
+            } catch (err) {
+              if (err instanceof SessionKeyError) {
+                return;
+              }
+              console.error(err?.responseJSON?.error || err?.message);
+              notifyError('Failed to delete comment');
             }
           },
         },
@@ -330,7 +351,11 @@ export const CommentTree = ({
         setIsGloballyEditing(false);
         clearEditingLocalStorage(comment.id, ContentType.Comment);
       } catch (err) {
-        console.error(err);
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        console.error(err?.responseJSON?.error || err?.message);
+        notifyError('Failed to edit comment');
       } finally {
         setEdits((p) => ({
           ...p,
@@ -522,11 +547,11 @@ export const CommentTree = ({
   };
 
   return (
-    <div className="CommentsTree">
-      {comments && recursivelyGatherComments(comments, comments[0], 0)}
-      {commentError && (
-        <CWValidationText message={commentError} status="failure" />
-      )}
-    </div>
+    <>
+      <div className="CommentsTree">
+        {comments && recursivelyGatherComments(comments, comments[0], 0)}
+      </div>
+      {RevalidationModal}
+    </>
   );
 };

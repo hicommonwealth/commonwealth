@@ -13,7 +13,7 @@ import { findOneRole } from '../util/roles';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoChainId: 'Must provide chain ID',
   ReservedId: 'The id is reserved and cannot be used',
   CantChangeNetwork: 'Cannot change chain network',
