@@ -5,48 +5,111 @@ import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { UserInstance } from '../../models/user';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { AppError } from '../../../../common-common/src/errors';
+import { validateOwner } from 'server/util/validateOwner';
+import { GroupAttributes, GroupMetadata } from 'server/models/group';
+import { Op } from 'sequelize';
+import { sequelize } from 'server/database';
+import validateMetadata from 'server/util/requirementsModule/validateMetadata';
+
+const MAX_GROUPS_PER_CHAIN = 20;
 
 const Errors = {
+  InvalidMetadata: 'Invalid requirements',
   InvalidRequirements: 'Invalid requirements',
+  Unauthorized: 'Unauthorized',
+  MaxGroups: 'Exceeded max number of groups',
+  InvalidTopics: 'Invalid topics',
 };
 
 export type CreateGroupOptions = {
   user: UserInstance;
   chain: ChainInstance;
   address: AddressInstance;
-  metadata: any;
+  metadata: GroupMetadata;
   requirements: Requirement[];
   topics: number[];
 };
-// TODO: replace with GroupInstance after migration is complete
-export type CreateGroupResult = {
-  id: number;
-  chain_id: string;
-  metadata: any;
-  requirements: Requirement[];
-}[];
+
+export type CreateGroupResult = GroupAttributes;
 
 export async function __createGroup(
   this: ServerChainsController,
-  { requirements }: CreateGroupOptions
+  { user, chain, metadata, requirements, topics }: CreateGroupOptions
 ): Promise<CreateGroupResult> {
-  // TODO: require community admin
+  const isAdmin = await validateOwner({
+    models: this.models,
+    user,
+    chainId: chain.id,
+    allowMod: true,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
+    throw new AppError(Errors.Unauthorized);
+  }
+
+  const metadataValidationErr = validateMetadata(metadata);
+  if (metadataValidationErr) {
+    throw new AppError(`${Errors.InvalidMetadata}: ${metadataValidationErr}`);
+  }
+
   if (!validateRequirements(requirements)) {
     throw new AppError(Errors.InvalidRequirements);
   }
-  /*
-    TODO:
-      - validate schema
-      - restrict to 20 groups per chain
-      - save group
-      - optionally add group to each specified topics
-  */
-  return [
-    {
-      id: 1,
-      chain_id: 'ethereum',
-      metadata: {},
-      requirements: [],
+
+  const numChainGroups = await this.models.Group.count({
+    where: {
+      chain_id: chain.id,
     },
-  ];
+  });
+  if (numChainGroups >= MAX_GROUPS_PER_CHAIN) {
+    throw new AppError(Errors.MaxGroups);
+  }
+
+  const existingTopics = await this.models.Topic.findAll({
+    where: {
+      id: {
+        [Op.in]: topics,
+      },
+      chain_id: chain.id,
+    },
+  });
+  if (topics.length !== existingTopics.length) {
+    throw new AppError(Errors.InvalidTopics);
+  }
+
+  const newGroup = await sequelize.transaction(async (transaction) => {
+    // create group
+    const group = await this.models.Group.create(
+      {
+        chain_id: chain.id,
+        metadata,
+        requirements,
+      },
+      { transaction }
+    );
+    if (existingTopics.length > 0) {
+      // add group to all specified topics
+      await this.models.Topic.update(
+        {
+          group_ids: sequelize.fn(
+            'array_append',
+            sequelize.col('group_ids'),
+            group.id
+          ),
+        },
+        {
+          where: {
+            id: {
+              [Op.in]: existingTopics.map(({ id }) => id),
+            },
+          },
+          transaction,
+        }
+      );
+    }
+    return group.toJSON();
+  });
+
+  return newGroup;
 }

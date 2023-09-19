@@ -19,6 +19,7 @@ export type TopicAttributes = {
   deleted_at?: Date;
   token_threshold: string;
   default_offchain_template?: string;
+  group_ids: number[];
 
   // associations
   chain?: ChainAttributes;
@@ -64,6 +65,11 @@ export default (
         defaultValue: '',
       },
       channel_id: { type: dataTypes.STRING, allowNull: true },
+      group_ids: {
+        type: dataTypes.ARRAY(dataTypes.INTEGER),
+        allowNull: false,
+        defaultValue: [],
+      },
     },
     {
       timestamps: true,

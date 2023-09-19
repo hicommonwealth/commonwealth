@@ -1,47 +1,66 @@
 import { ServerChainsController } from '../server_chains_controller';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import { GroupAttributes } from 'server/models/group';
+import { ChainInstance } from 'server/models/chain';
+import { flatten } from 'lodash';
+import { Op } from 'sequelize';
+import Bluebird from 'bluebird';
+import { MembershipAttributes } from 'server/models/membership';
 
 export type GetGroupsOptions = {
+  chain: ChainInstance;
+  addressId?: number;
   withMembers?: boolean;
-  address?: string;
 };
-// TODO: replace with GroupInstance after migration is complete
-export type GetGroupsResult = {
-  id: number;
-  chain_id: string;
-  metadata: any;
-  requirements: Requirement[];
-  members?: {
-    group_id: number;
-    address_id: number;
-    allowed: boolean;
-    last_checked: Date;
-  }[];
-}[];
+
+type GroupWithMemberships = GroupAttributes & {
+  memberships?: MembershipAttributes[];
+};
+export type GetGroupsResult = GroupWithMemberships[];
 
 export async function __getGroups(
   this: ServerChainsController,
-  options: GetGroupsOptions
+  { chain, addressId, withMembers }: GetGroupsOptions
 ): Promise<GetGroupsResult> {
   /*
     TODO: Query groups from DB, optionally include allowed membership
   */
-  return [
-    {
-      id: 1,
-      chain_id: 'ethereum',
-      metadata: {},
-      requirements: [],
-      members: !options.withMembers
-        ? []
-        : [
-            {
-              group_id: 1,
-              address_id: 1,
-              allowed: true,
-              last_checked: new Date(),
-            },
-          ],
+
+  const chainTopics = await this.models.Topic.findAll({
+    where: {
+      chain_id: chain.id,
     },
-  ];
+  });
+
+  const groupIds = flatten(chainTopics.map((topic) => topic.group_ids));
+
+  let groups = await this.models.Group.findAll({
+    where: {
+      id: { [Op.in]: groupIds },
+    },
+  });
+
+  if (withMembers) {
+    // include members with groups
+    const members = await this.models.Membership.findAll({
+      where: {
+        group_id: {
+          [Op.in]: groupIds,
+        },
+      },
+    });
+    const groupIdMembersMap: Record<number, MembershipAttributes[]> =
+      members.reduce((acc, member) => {
+        return {
+          ...acc,
+          [member.group_id]: (acc[member.group_id] || []).concat(member),
+        };
+      }, {});
+    const groupsWithMemberships = groups.map((group) => ({
+      ...group.toJSON(),
+      memberships: groupIdMembersMap[group.id] || [],
+    }));
+    return groupsWithMemberships;
+  }
+
+  return groups.map((group) => group.toJSON());
 }
