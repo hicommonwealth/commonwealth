@@ -27,7 +27,8 @@ export const User = ({
   shouldShowAddressWithDisplayName,
   avatarSize = 16,
   role,
-  showSkeleton
+  showSkeleton,
+  popoverPlacement,
 }: UserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
   const { data: users } = useFetchProfilesByAddressesQuery({
@@ -232,7 +233,13 @@ export const User = ({
       onMouseLeave={popoverProps.handleInteraction}
     >
       {userFinal}
-      {profile && <Popover content={userPopover} {...popoverProps} />}
+      {profile && (
+        <Popover
+          content={userPopover}
+          {...popoverProps}
+          placement={popoverPlacement}
+        />
+      )}
     </div>
   ) : (
     userFinal
