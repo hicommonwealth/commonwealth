@@ -5,7 +5,6 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 import 'menus/notifications_menu.scss';
 
 import app from 'state';
-import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWButton } from '../components/component_kit/cw_button';
 import {
@@ -19,7 +18,6 @@ import { NotificationRow } from '../pages/notifications/notification_row';
 import { isWindowSmallInclusive } from '../components/component_kit/helpers';
 import { byDescendingCreationDate } from 'helpers';
 import clsx from 'clsx';
-import { featureFlags } from 'helpers/feature-flags';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   handleIconClick,
@@ -93,61 +91,41 @@ export const NotificationsMenuPopover = () => {
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
       <div>
-        {featureFlags.sessionKeys ? (
-          <CWTooltip
-            content="Notifications"
-            placement="bottom"
-            renderTrigger={(handleInteraction, isTooltipOpen) => (
-              <div
-                className={clsx('notifications-container', {
-                  'unread-notifications': app.user.notifications.numUnread > 0,
-                })}
-              >
-                <CWIconButton
-                  iconButtonTheme="black"
-                  iconName="bell"
-                  onClick={(e) =>
-                    handleIconClick({
-                      e,
-                      isMenuOpen: popoverProps.open,
-                      isTooltipOpen,
-                      handleInteraction,
-                      onClick: popoverProps.handleInteraction,
-                    })
-                  }
-                  onMouseEnter={(e) =>
-                    handleMouseEnter({
-                      e,
-                      isMenuOpen: popoverProps.open,
-                      handleInteraction,
-                    })
-                  }
-                  onMouseLeave={(e) =>
-                    handleMouseLeave({ e, isTooltipOpen, handleInteraction })
-                  }
-                />
-              </div>
-            )}
-          />
-        ) : (
-          <div>
-            {app.user.notifications.numUnread > 0 ? (
-              <div className="unreads-icon">
-                <CWCustomIcon
-                  iconName="unreads"
-                  onClick={popoverProps.handleInteraction}
-                />
-              </div>
-            ) : (
+        <CWTooltip
+          content="Notifications"
+          placement="bottom"
+          renderTrigger={(handleInteraction, isTooltipOpen) => (
+            <div
+              className={clsx('notifications-container', {
+                'unread-notifications': app.user.notifications.numUnread > 0,
+              })}
+            >
               <CWIconButton
                 iconButtonTheme="black"
                 iconName="bell"
-                onClick={popoverProps.handleInteraction}
+                onClick={(e) =>
+                  handleIconClick({
+                    e,
+                    isMenuOpen: popoverProps.open,
+                    isTooltipOpen,
+                    handleInteraction,
+                    onClick: popoverProps.handleInteraction,
+                  })
+                }
+                onMouseEnter={(e) =>
+                  handleMouseEnter({
+                    e,
+                    isMenuOpen: popoverProps.open,
+                    handleInteraction,
+                  })
+                }
+                onMouseLeave={(e) =>
+                  handleMouseLeave({ e, isTooltipOpen, handleInteraction })
+                }
               />
-            )}
-            <Popover content={<NotificationsMenu />} {...popoverProps} />
-          </div>
-        )}
+            </div>
+          )}
+        />
         <Popover content={<NotificationsMenu />} {...popoverProps} />
       </div>
     </ClickAwayListener>

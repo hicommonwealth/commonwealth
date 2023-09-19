@@ -131,32 +131,53 @@ module.exports = {
         transaction
       );
 
+      console.log('Finding or creating ABIs');
+      const aaveAbiId = await findOrCreateAbi(
+        queryInterface,
+        transaction,
+        rawAaveAbi,
+        'AaveGovernanceV2'
+      );
+      const dydxAbiId = await findOrCreateAbi(
+        queryInterface,
+        transaction,
+        rawDydxAbi,
+        'DydxGovernor'
+      );
+      const tribeAbiId = await findOrCreateAbi(
+        queryInterface,
+        transaction,
+        rawTribeAbi,
+        'FeiDAO'
+      );
+      const autonomiesAbiId = await findOrCreateAbi(
+        queryInterface,
+        transaction,
+        rawAutonomiesAbi,
+        'NVMGovernance'
+      );
+      const impactMarketAbiId = await findOrCreateAbi(
+        queryInterface,
+        transaction,
+        rawImpactMarketAbi,
+        'PACTDelegator'
+      );
+      const moolaMarketAbiId = await findOrCreateAbi(
+        queryInterface,
+        transaction,
+        rawMoolaMarketAbi,
+        'MoolaGovernorBravoDelegator'
+      );
+      console.log('ABI processing complete');
+
       let eventSourceRecords = [];
 
       const aaveAddress = '0xEC568fffba86c094cf06b22134B23074DFE2252c';
       const dydxAddress = '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2';
       const tribeAddress = '0x0BEF27FEB58e857046d630B2c03dFb7bae567494';
+
       if (ethereumResult.length > 0) {
         const ethereumId = ethereumResult[0].id;
-
-        const aaveAbiId = await findOrCreateAbi(
-          queryInterface,
-          transaction,
-          rawAaveAbi,
-          'AaveGovernanceV2'
-        );
-        const dydxAbiId = await findOrCreateAbi(
-          queryInterface,
-          transaction,
-          rawDydxAbi,
-          'DydxGovernor'
-        );
-        const tribeAbiId = await findOrCreateAbi(
-          queryInterface,
-          transaction,
-          rawTribeAbi,
-          'FeiDAO'
-        );
 
         await queryInterface.sequelize.query(
           `
@@ -289,14 +310,6 @@ module.exports = {
       if (mumbaiResult.length > 0) {
         const mumbaiId = mumbaiResult[0].id;
 
-        console.log('Uploading Mumbai ABIs');
-        const autonomiesAbiId = await findOrCreateAbi(
-          queryInterface,
-          transaction,
-          rawAutonomiesAbi,
-          'NVMGovernance'
-        );
-
         await queryInterface.sequelize.query(
           `
             UPDATE "Contracts"
@@ -309,7 +322,6 @@ module.exports = {
             replacements: [autonomiesAbiId, autonomiesAddress, mumbaiId],
           }
         );
-        console.log('Uploaded Mumbai ABIs');
 
         eventSourceRecords = [
           ...eventSourceRecords,
@@ -350,20 +362,6 @@ module.exports = {
       const moolaMarketAddress = '0xde457ed1A713C290C4f8dE1dE0D0308Fc7722937';
       if (celoResult.length > 0) {
         const celoId = celoResult[0].id;
-
-        console.log('Uploading Celo ABIs');
-        const impactMarketAbiId = await findOrCreateAbi(
-          queryInterface,
-          transaction,
-          rawImpactMarketAbi,
-          'PACTDelegator'
-        );
-        const moolaMarketAbiId = await findOrCreateAbi(
-          queryInterface,
-          transaction,
-          rawMoolaMarketAbi,
-          'MoolaGovernorBravoDelegator'
-        );
 
         await queryInterface.sequelize.query(
           `
