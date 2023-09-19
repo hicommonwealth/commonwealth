@@ -187,7 +187,7 @@ const SessionRevalidationModal = ({
                   }
                   hasNoWalletsLink={false}
                   canResetWalletConnect={wcEnabled}
-                  hideSocialLogins
+                  hideSocialLogins={findSelectedWallet().length > 0}
                 />
               )}
             </div>
