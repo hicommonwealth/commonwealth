@@ -169,8 +169,8 @@ const UserDropdown = () => {
           >
             <User
               avatarSize={24}
-              userAddress={user.address}
-              userChainId={user.chain?.id}
+              userAddress={user?.address}
+              userChainId={user?.chain?.id}
             />
             <CWIcon
               iconName={isOpen ? 'caretUp' : 'caretDown'}
