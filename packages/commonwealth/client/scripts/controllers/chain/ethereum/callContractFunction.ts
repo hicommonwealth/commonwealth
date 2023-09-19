@@ -78,7 +78,6 @@ export async function callContractFunction({
   tx_options?: any;
 }): Promise<TransactionReceipt | any> {
   const sender = app.user.activeAccount;
-  console.log(sender);
   // get querying wallet
   const signingWallet = await WebWalletController.Instance.locateWallet(
     sender,
