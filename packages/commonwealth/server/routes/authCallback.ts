@@ -25,7 +25,7 @@ const authCallback = async (
 ) => {
   // 1. fetch addresses associated with selected profile
   if (!req.user?.id) {
-    throw new AppError('User must be signed in');
+    throw new AppError('User must be logged in');
   }
   if (!req.query || !req.query.token) {
     throw new AppError('Invalid querystring');
