@@ -1,4 +1,3 @@
-import moment from 'moment';
 import type { DeltaStatic } from 'quill';
 import React, { useState, useEffect } from 'react';
 import app from 'state';
@@ -114,8 +113,10 @@ export const CommentCard = ({
           <AuthorAndPublishInfo
             authorAddress={author.address}
             authorChainId={author.chain?.id || author?.profile?.chain}
-            publishDate={moment(comment.createdAt).format('l')}
+            publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
+            popoverPlacement="top"
+            showUserAddressWithInfo={false}
           />
         )}
       </div>
