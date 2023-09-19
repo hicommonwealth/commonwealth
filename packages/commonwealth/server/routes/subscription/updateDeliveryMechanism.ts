@@ -4,11 +4,13 @@ import { DeliveryMechanismType } from 'commonwealth/shared/types';
 
 const Errors = {
   NotLoggedIn: 'Thread not found',
-  InvalidInput: 'Invalid permissions',
+  InvalidInput: 'Invalid Input',
+  InvalidEnabled: 'Invalid Enabled, must update either identifier or enabled',
   InvalidDeliveryMechanism: 'Invalid delivery mechanism',
   NoMechanismFound: 'No mechanism found for user',
 };
 
+// Updates either the identifier or enabled field of a delivery mechanism
 export const updateDeliveryMechanism = async (
   models,
   req: Request,
@@ -20,7 +22,7 @@ export const updateDeliveryMechanism = async (
   }
   const { type, identifier, enabled } = req.body;
 
-  if (!type || !identifier) {
+  if (!type) {
     return next(new AppError(Errors.InvalidInput));
   }
 
@@ -36,9 +38,8 @@ export const updateDeliveryMechanism = async (
     return next(new AppError(Errors.NoMechanismFound));
   }
 
-  mechanism.type = type;
-  mechanism.identifier = identifier;
-  mechanism.enabled = enabled;
+  mechanism.identifier = identifier || mechanism.identifier;
+  mechanism.enabled = !!enabled ? enabled : mechanism.enabled;
 
   const updatedMechanism = await mechanism.save();
 

@@ -7,6 +7,7 @@ const Errors = {
   InvalidInput: 'Invalid permissions',
   InvalidDeliveryMechanism: 'Invalid delivery mechanism',
   NoMechanismFound: 'No mechanism found for user',
+  MechanismExists: 'Mechanism already exists for user',
 };
 
 export const addDeliveryMechanism = async (
@@ -18,9 +19,9 @@ export const addDeliveryMechanism = async (
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
-  const { type, identifier } = req.body;
+  const { type, identifier, enabled } = req.body;
 
-  if (!type || !identifier) {
+  if (!type || !identifier || !enabled) {
     return next(new AppError(Errors.InvalidInput));
   }
 
@@ -28,11 +29,23 @@ export const addDeliveryMechanism = async (
     return next(new AppError(Errors.InvalidDeliveryMechanism));
   }
 
+  const existingMechanism = await models.DeliveryMechanism.findOne({
+    where: {
+      type,
+      identifier,
+      user_id: req.user.id,
+    },
+  });
+
+  if (existingMechanism) {
+    return res.json({ status: 'Mechanism Exists', result: existingMechanism });
+  }
+
   const newMechanism = {
     type,
     identifier,
     user_id: req.user.id,
-    enabled: true,
+    enabled: enabled,
   };
 
   const createdMechanism = await models.DeliveryMechanism.create(newMechanism);

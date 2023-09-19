@@ -201,9 +201,9 @@ const app: IApp = {
     defaultChain: 'edgeware',
   },
   firebase: () => {
-    if (app.isFirebaseInitialized) {
+    if (!!app.isFirebaseInitialized) {
       initializeApp(firebaseConfig);
-      app.isFirebaseInitialized;
+      app.isFirebaseInitialized = () => true;
       if (app.platform() === 'desktop') {
         pushNotifications.start('158803639844');
       }
@@ -228,6 +228,7 @@ const app: IApp = {
       return 'desktop';
     } else {
       // If not desktop, get the platform from Capacitor
+      // values will be android, ios, or web
       return Capacitor.getPlatform();
     }
   },
@@ -338,22 +339,34 @@ export async function initAppState(
         mechanisms.map((mechanism) => mechanism.identifier)
       );
 
-      tokenRefreshListener = FirebaseMessaging.addListener(
-        'tokenReceived',
-        (token) => {
-          console.log('Token received:', token);
-          const mechanism = mechanisms.find((m) => m.type === app.platform());
-          console.log('Mechanism:', mechanism);
-          // If matching mechanism found, update it on the server
-          if (mechanism) {
-            app.user.notifications.updateDeliveryMechanism(
-              token.token,
-              mechanism.type,
-              mechanism.enabled
-            );
-          }
+      const platform = app.platform();
+      const updateMechanism = (token, type, enabled) => {
+        const mechanism = mechanisms.find((m) => m.type === platform);
+        if (mechanism) {
+          app.user.notifications.updateDeliveryMechanism(token, type, enabled);
         }
-      );
+      };
+
+      if (platform === 'desktop') {
+        pushNotifications.on('start', (e, token) => {
+          if (!!mechanisms.find((m) => m.type === platform)) {
+            app.user.notifications.addDeliveryMechanism(token, platform, false);
+          }
+        });
+        pushNotifications.on('receive', (payload) => {
+          console.log('Received payload:', payload);
+          if (mechanisms.find((m) => m.type === platform && m.enabled))
+            new Notification('You got a notification');
+        });
+        pushNotifications.on('error', (e, error) =>
+          console.log('Error:', error)
+        );
+        pushNotifications.on('tokenUpdate', updateMechanism);
+      } else {
+        FirebaseMessaging.addListener('tokenReceived', (token) => {
+          updateMechanism(token.token, platform, true);
+        });
+      }
     } else if (
       app.loginState === LoginState.LoggedOut &&
       app.socket.isConnected

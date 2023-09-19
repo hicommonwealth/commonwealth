@@ -50,7 +50,7 @@ const NotificationSettingsPage = () => {
   const [token, setToken] = useState('');
 
   const [currentFrequency, setCurrentFrequency] = useState(
-    app.user.emailInterval,
+    app.user.emailInterval
   );
 
   useEffect(() => {
@@ -70,12 +70,9 @@ const NotificationSettingsPage = () => {
 
     let _token;
 
-    console.log('Debug: Getting token...');
-
     await FirebaseMessaging.getToken({ vapidKey: vapidKey })
       .then((currentToken) => {
         if (currentToken) {
-          console.log('Debug: Current token:', currentToken);
           setToken(currentToken.token);
           _token = currentToken.token;
         } else {
@@ -92,12 +89,8 @@ const NotificationSettingsPage = () => {
 
   const handleToggleDeliveryMechanism = async (mechanismType, isEnabled) => {
     const mechanism = app.user.notifications.deliveryMechanisms.find(
-      (m) => m.type === mechanismType,
+      (m) => m.type === mechanismType
     );
-
-    console.log('Debug: mechanismType', mechanismType);
-    console.log('Debug: isEnabled', isEnabled);
-    console.log('Debug: mechanism', mechanism);
 
     const platform = app.platform();
 
@@ -106,84 +99,41 @@ const NotificationSettingsPage = () => {
       (mechanismType === DeliveryMechanismType.Android &&
         platform === 'android') ||
       (mechanismType === DeliveryMechanismType.Browser && platform === 'web') ||
-      (mechanismType === DeliveryMechanismType.Desktop && platform === 'desktop') ||
+      (mechanismType === DeliveryMechanismType.Desktop &&
+        platform === 'desktop') ||
       (mechanismType === DeliveryMechanismType.ApplePWA &&
         platform === 'mobile-safari' &&
         app.isStandalone());
 
-    console.log('Debug: isOnRightPlatform', isOnRightPlatform);
-
-    // if (isOnRightPlatform) {
-    //   if (
-    //     platform === 'ios' ||
-    //     platform === 'android' ||
-    //     platform === 'mobile-safari'
-    //   ) {
-    //     const permission = await requestPermission();
-    //     if (permission.receive !== 'granted') {
-    //       console.log('Permission not granted. Requesting again...');
-    //       await requestPermission();
-    //     }
-    //   }
-    //   if (
-    //     platform === 'web' ||
-    //     platform === 'ios' ||
-    //     platform === 'android' ||
-    //     platform === 'mobile-safari'
-    //   ) {
-    //     if (!mechanism && isEnabled) {
-    //       const _token = await getToken();
-    //       console.log('Debug: _token', _token);
-    //       await app.user.notifications.addDeliveryMechanism(
-    //         _token,
-    //         mechanismType,
-    //         true
-    //       );
-    //     } else if (mechanism && isEnabled) {
-    //       const _token = await getToken();
-    //       console.log('Debug: _token', _token);
-    //       await app.user.notifications.updateDeliveryMechanism(
-    //         _token,
-    //         mechanismType,
-    //         true
-    //       );
-    //     } else if (mechanism && !isEnabled) {
-    //       // If the user wants to disable the delivery mechanism and it exists, we disable it
-    //       await app.user.notifications.disableMechanism(mechanismType);
-    //     }
-    //     forceRerender();
-    //   }
-    // }
-      
-    if (
-      isOnRightPlatform &&
-      (await requestPermission()).receive === 'granted'
-    ) {
-      if (!mechanism && isEnabled) {
-        const _token = await getToken();
+    if (isOnRightPlatform) {
+      let _token =
+        platform !== 'desktop' &&
+        (await requestPermission()).receive === 'granted'
+          ? await getToken()
+          : null;
+      if (mechanism) {
+        await (isEnabled
+          ? app.user.notifications.updateDeliveryMechanism(
+              _token,
+              mechanismType,
+              isEnabled
+            )
+          : app.user.notifications.disableMechanism(mechanismType));
+      } else if (isEnabled) {
         await app.user.notifications.addDeliveryMechanism(
           _token,
           mechanismType,
-          true,
+          true
         );
-      } else if (mechanism && isEnabled) {
-        const _token = await getToken();
-        await app.user.notifications.updateDeliveryMechanism(
-          _token,
-          mechanismType,
-          true,
-        );
-      } else if (mechanism && !isEnabled) {
-        // If the user wants to disable the delivery mechanism and it exists, we disable it
-        await app.user.notifications.disableMechanism(mechanismType);
       }
+      forceRerender();
     }
   };
 
   const handleSubscriptionDelivery = async (
     selectedItems: DropdownItemType[],
     subs: NotificationSubscription[],
-    initialValues: any,
+    initialValues: any
   ) => {
     const selectedTypes = selectedItems.map((item) => item.value);
 
@@ -193,20 +143,20 @@ const NotificationSettingsPage = () => {
       .map((item) => item.value);
     // Types that were initially deselected but are now selected
     const typesToEnable = selectedTypes.filter(
-      (type) => !initialValues.includes(type),
+      (type) => !initialValues.includes(type)
     );
 
     for (const type of typesToDisable) {
       await app.user.notifications.disableSubscriptionDeliveryMechanism(
         type,
-        subs,
+        subs
       );
     }
 
     for (const type of typesToEnable) {
       await app.user.notifications.enableSubscriptionDeliveryMechanism(
         type,
-        subs,
+        subs
       );
     }
 
@@ -215,7 +165,7 @@ const NotificationSettingsPage = () => {
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
-    subs: NotificationSubscription[],
+    subs: NotificationSubscription[]
   ) => {
     if (hasSomeInAppSubs) {
       await app.user.notifications.disableSubscriptions(subs);
@@ -227,7 +177,7 @@ const NotificationSettingsPage = () => {
 
   const handleEmailSubscriptions = async (
     hasSomeEmailSubs: boolean,
-    subs: NotificationSubscription[],
+    subs: NotificationSubscription[]
   ) => {
     if (hasSomeEmailSubs) {
       await app.user.notifications.disableImmediateEmails(subs);
@@ -414,7 +364,7 @@ const NotificationSettingsPage = () => {
       </div>
       {deliveryMechanismTypes.map((mechanismType) => {
         const mechanism = app?.user.notifications.deliveryMechanisms.find(
-          (m) => m.type === mechanismType,
+          (m) => m.type === mechanismType
         );
         const platform = app.platform();
         const isOnPlatform =
@@ -429,8 +379,6 @@ const NotificationSettingsPage = () => {
           (mechanismType === DeliveryMechanismType.ApplePWA &&
             platform === 'mobile-safari' &&
             app.isStandalone());
-
-        console.log('isOnPlatform', isOnPlatform, 'for', mechanismType);
 
         return (
           <div
@@ -451,14 +399,13 @@ const NotificationSettingsPage = () => {
                 checked={mechanism?.enabled || false}
                 disabled={!isOnPlatform}
                 onChange={() => {
-                  console.log('toggle');
                   if (isOnPlatform) {
                     const newEnabledState = mechanism
                       ? !mechanism.enabled
                       : true;
                     handleToggleDeliveryMechanism(
                       mechanismType,
-                      newEnabledState,
+                      newEnabledState
                     );
                   }
                 }}
@@ -583,7 +530,7 @@ const NotificationSettingsPage = () => {
               value: delivery.type,
             }));
           const wrappedHandleSubscriptionDelivery = (
-            selectedItems: DropdownItemType[],
+            selectedItems: DropdownItemType[]
           ) => {
             handleSubscriptionDelivery(selectedItems, subs, initialValues);
           };
@@ -680,7 +627,7 @@ const NotificationSettingsPage = () => {
               value: delivery.type,
             }));
           const wrappedHandleSubscriptionDelivery = (
-            selectedItems: DropdownItemType[],
+            selectedItems: DropdownItemType[]
           ) => {
             handleSubscriptionDelivery(selectedItems, subs, initialValues);
           };

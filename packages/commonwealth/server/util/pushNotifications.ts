@@ -1,15 +1,14 @@
 import { DeliveryMechanismAttributes } from 'server/models/delivery_mechanisms';
-import { NotificationDataTypes } from './emitNotifications';
 import admin from 'firebase-admin';
 import { DB } from 'server/models';
 import * as serviceAccount from '../../../commonwealth/serviceAccountKey.json';
 import { NotificationCategories } from '../../../common-common/src/types';
 import {
   IChainEventNotificationData,
-  ICommunityNotificationData,
-  IPostNotificationData,
+  IForumNotificationData,
   ISnapshotNotificationData,
-} from 'shared/types';
+  NotificationDataTypes,
+} from '../../shared/types';
 import { getForumNotificationCopy } from '../scripts/emails';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 import { capitalize } from 'lodash';
@@ -86,7 +85,7 @@ export async function createNotificationMessage(
       authorPath,
     ] = await getForumNotificationCopy(
       models,
-      notificationData as IPostNotificationData,
+      notificationData as IForumNotificationData,
       category_id
     );
 
@@ -108,6 +107,7 @@ export async function sendPushNotification(
   category_id: string,
   models: DB
 ) {
+  console.log('Preparing to send push notification...');
   const token = deliveryMechanism.identifier;
 
   // Prepare notification payload
@@ -121,7 +121,7 @@ export async function sendPushNotification(
   let link = message.data.proposalPath;
   if (
     deliveryMechanism.type === 'android' ||
-    deliveryMechanism.type === 'ios'
+    deliveryMechanism.type === 'ios-native'
   ) {
     link = link.replace('http://localhost:8080/', `capacitor://${SERVER_URL}/`);
     link = link.replace(
@@ -143,16 +143,16 @@ export async function sendPushNotification(
     // }, // add back later for deeplinks
     token: token,
   };
+  console.log('Payload:', payload);
 
   switch (deliveryMechanism.type) {
     case 'browser':
-    case 'ios':
+    case 'ios-pwa':
     case 'android':
       // Send push notification to both mobile and web using FCM
       try {
         if (token) {
           const response = await firebase.send(payload);
-          console.log('Successfully sent message:', response);
         }
       } catch (error) {
         console.error('Error sending push notification:', error);
@@ -162,7 +162,6 @@ export async function sendPushNotification(
       try {
         if (token) {
           const response = await firebase.send(payload);
-          console.log('Successfully sent message:', response);
         }
       } catch (error) {
         console.error('Error sending push notification:', error);
