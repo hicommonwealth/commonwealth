@@ -172,26 +172,23 @@ const SessionRevalidationModal = ({
                   </div>
                 </div>
               ) : (
-                <>
-                  <CWWalletsList
-                    useSessionKeyRevalidationFlow={true}
-                    onResetWalletConnect={onResetWalletConnect}
-                    onWalletAddressSelect={onWalletAddressSelect}
-                    onWalletSelect={onWalletSelect}
-                    onConnectAnotherWay={() => setConnectWithEmail(true)}
-                    onSocialLogin={(provider: WalletSsoSource) =>
-                      onSocialLogin(provider)
-                    }
-                    darkMode={false}
-                    wallets={
-                      (findSelectedWallet() as Array<IWebWallet<any>>) ||
-                      wallets
-                    }
-                    hasNoWalletsLink={false}
-                    canResetWalletConnect={wcEnabled}
-                    hideSocialLogins
-                  />
-                </>
+                <CWWalletsList
+                  useSessionKeyRevalidationFlow={true}
+                  onResetWalletConnect={onResetWalletConnect}
+                  onWalletAddressSelect={onWalletAddressSelect}
+                  onWalletSelect={onWalletSelect}
+                  onConnectAnotherWay={() => setConnectWithEmail(true)}
+                  onSocialLogin={(provider: WalletSsoSource) =>
+                    onSocialLogin(provider)
+                  }
+                  darkMode={false}
+                  wallets={
+                    (findSelectedWallet() as Array<IWebWallet<any>>) || wallets
+                  }
+                  hasNoWalletsLink={false}
+                  canResetWalletConnect={wcEnabled}
+                  hideSocialLogins
+                />
               )}
             </div>
           </div>
