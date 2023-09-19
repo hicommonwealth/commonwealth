@@ -41,7 +41,7 @@ export function startHealthCheckLoop({
       await checkFn();
       status = 1;
     } catch (err) {
-      log.error('Health check failed:', err);
+      log.error(err);
     }
     StatsDController.get().gauge(stat, status);
     const durationUntilNextCheck = nextCheckAt - Date.now();
