@@ -26,7 +26,7 @@ type UpdateThreadRequestBody = {
   canvasSession?: any;
   canvasAction?: any;
   canvasHash?: any;
-  discordMeta?: any;
+  discord_meta?: any; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;
 
@@ -52,10 +52,10 @@ export const updateThreadHandler = async (
     canvasSession,
     canvasAction,
     canvasHash,
-    discordMeta,
+    discord_meta: discordMeta,
   } = req.body;
 
-  const threadId = parseInt(id, 10) || 0;
+  const threadId = parseInt(id, 10) || null;
 
   // this is a patch update, so properties should be
   // `undefined` if they are not intended to be updated

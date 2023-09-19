@@ -1,11 +1,10 @@
 import React from 'react';
 
 import 'modals/offchain_voting_modal.scss';
-import AddressInfo from '../../models/AddressInfo';
 import Vote from '../../models/Vote';
 
-import { User } from '../components/user/user';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { User } from '../components/user/user';
 
 type OffchainVotingModalProps = {
   onModalClose: () => void;
@@ -46,18 +45,10 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
           <div className="offchain-poll-voter">
             <div className="offchain-poll-voter-user">
               <User
-                avatarSize={16}
-                popover
-                linkify
-                user={
-                  new AddressInfo(
-                    null,
-                    vote.address,
-                    vote.authorChain,
-                    null,
-                    null
-                  )
-                }
+                shouldShowPopover
+                shouldLinkProfile
+                userAddress={vote.address}
+                userChainId={vote.authorChain}
               />
             </div>
             <div className="offchain-poll-voter-choice">{vote.option}</div>

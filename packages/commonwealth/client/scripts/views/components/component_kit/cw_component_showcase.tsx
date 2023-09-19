@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ArrowCircleRight, MagnifyingGlass } from '@phosphor-icons/react';
 
 import 'components/component_kit/cw_component_showcase.scss';
 import 'components/component_kit/new_designs/cw_button.scss';
@@ -12,6 +13,8 @@ import { CWButton } from './new_designs/cw_button';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWTooltip } from './new_designs/CWTooltip';
+import { CWTextInput } from './new_designs/CWTextInput';
+import { CWSearchBar } from './new_designs/CWSearchBar';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -24,7 +27,6 @@ import { CWProgressBar } from './cw_progress_bar';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWTab, CWTabBar } from './cw_tabs';
 import { CWTextArea } from './cw_text_area';
-import { CWTextInput } from './cw_text_input';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
@@ -54,6 +56,7 @@ import CWBanner, {
 } from 'views/components/component_kit/new_designs/CWBanner';
 import { CWTable } from './cw_table';
 import { makeData, createColumnInfo } from './new_designs/cw_table_data'
+import app from 'state';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -190,6 +193,8 @@ export const ComponentShowcase = () => {
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
+  const allChains = app.config.chains.getAll();
+  const [chainId, setChainId] = useState(allChains[1]);
 
   return (
     <div className="ComponentShowcase">
@@ -526,7 +531,14 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Input Tag</CWText>
-          <CWTag label="Display name" type="input" />
+          {chainId && (
+            <CWTag
+              label={allChains[1].name}
+              type="input"
+              community={allChains[1]}
+              onClick={() => setChainId(null)}
+            />
+          )}
         </div>
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
@@ -1022,12 +1034,179 @@ export const ComponentShowcase = () => {
       </div>
       <div className="form-gallery">
         <CWText type="h3">Form fields</CWText>
-        <CWTextInput name="Text field" label="Large" placeholder="Type here" />
+        <CWText type="h5">isCompact = Yes</CWText>
         <CWTextInput
           name="Text field"
-          label="Small"
+          label="Text Input with default width of 240 px"
+          placeholder="Placeholder"
+          isCompact
+        />
+        <div className="custom-width-1">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 250 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-2">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 275 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-3">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 300 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <CWTextInput
+          name="Text field"
+          label="Full width"
+          placeholder="Placeholder"
+          isCompact
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Text Input with instructional message"
+          placeholder="Placeholder"
+          isCompact
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
           placeholder="Type here"
-          size="small"
+          isCompact
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+          isCompact
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons fullWidth"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Disabled"
+          disabled
+          value="Some disabled text"
+          isCompact
+        />
+        <CWTextInput
+          name="Text field dark mode"
+          label="Dark mode"
+          darkMode
+          placeholder="Type here"
+          isCompact
+        />
+        <CWText type="h5">isCompact = No</CWText>
+        <CWTextInput
+          name="Text field"
+          label="Text Input with default width of 240 px"
+          placeholder="Placeholder"
+        />
+        <div className="custom-width-1">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 250 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-2">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 275 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-3">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 300 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <CWTextInput
+          name="Text field"
+          label="Full width"
+          placeholder="Placeholder"
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Text Input with instructional message"
+          placeholder="Placeholder"
+          instructionalMessage="Instructional message"
         />
         <CWTextInput
           name="Form field"
@@ -1042,10 +1221,56 @@ export const ComponentShowcase = () => {
           placeholder="Type here"
         />
         <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
-          iconRight="write"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+        />
+        <CWTextInput
+          label="Text field with icons fullWidth"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          fullWidth
         />
         <CWTextInput
           name="Text field"
@@ -1059,7 +1284,17 @@ export const ComponentShowcase = () => {
           darkMode
           placeholder="Type here"
         />
-        <CWTextArea name="Textarea" label="Text area" placeholder="Type here" />
+        <CWTextArea
+          name="Textarea"
+          label="Text area"
+          placeholder="Placeholder"
+        />
+        <CWTextArea
+          name="Textarea"
+          label="Text area"
+          placeholder="Placeholder"
+          disabled
+        />
         <CWCoverImageUploader
           uploadCompleteCallback={(url: string) => {
             notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
@@ -1217,6 +1452,10 @@ export const ComponentShowcase = () => {
           <CWText>Disabled</CWText>
           <CWUpvote voteCount={99999} disabled />
         </div>
+      </div>
+      <div className="searchbar-gallery">
+        <CWText type="h3">SearchBar</CWText>
+        <CWSearchBar />
       </div>
       <div className="Quill">
         <CWText type="h3">Quill Editor</CWText>
