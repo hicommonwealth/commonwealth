@@ -16,7 +16,7 @@ type TextAreaStyleProps = {
 };
 
 type TextAreaFormValidationProps = {
-  name: string;
+  name?: string;
   hookToForm?: boolean;
 };
 

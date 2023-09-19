@@ -51,7 +51,7 @@ type InputInternalStyleProps = {
 };
 
 type InputFormValidationProps = {
-  name: string;
+  name?: string;
   hookToForm?: boolean;
 };
 
