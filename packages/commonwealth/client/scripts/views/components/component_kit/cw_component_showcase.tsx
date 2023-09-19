@@ -11,7 +11,7 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
-import { SelectList } from 'views/components/component_kit/cw_select_list';
+import { CWSelectList } from './new_designs/CWSelectList';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
@@ -1604,7 +1604,7 @@ export const ComponentShowcase = () => {
           )}
         />
         <CWText type="h3">Multi select list</CWText>
-        <SelectList
+        <CWSelectList
           placeholder="Add or select a chain"
           isMulti
           isClearable={false}

@@ -6,7 +6,7 @@ import { CWIcon } from '../../cw_icons/cw_icon';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 
-export const SelectList = <
+export const CWSelectList = <
   Option,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
