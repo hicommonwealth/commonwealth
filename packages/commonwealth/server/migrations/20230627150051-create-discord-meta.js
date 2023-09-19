@@ -25,15 +25,9 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.removeColumn('Threads', 'discord_meta', {
-        transaction,
-      });
-      await queryInterface.removeColumn('Comments', 'discord_meta', {
-        transaction,
-      });
-      await queryInterface.removeColumn('Topics', 'channel_id', {
-        transaction,
-      });
+      await queryInterface.removeColumn('Threads', 'discord_meta', { transaction });
+      await queryInterface.removeColumn('Comments', 'discord_meta', { transaction });
+      await queryInterface.removeColumn('Topics', 'channel_id', { transaction });
     });
   },
 };

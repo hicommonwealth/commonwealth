@@ -32,7 +32,7 @@ export const CommunitySection = ({ showSkeleton }) => {
 
   return (
     <div className="community-menu">
-      {featureFlags.sessionKeys && app.isLoggedIn() && (
+      {app.isLoggedIn() && (
         <AccountConnectionIndicator
           connected={!!activeAccount}
           address={activeAccount?.address}

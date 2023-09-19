@@ -137,6 +137,7 @@ import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import createChainNode from '../routes/createChainNode';
+import { RedisCache } from 'common-common/src/redisCache';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -195,7 +196,6 @@ import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
-import { RedisCache } from '../../../common-common/src/redisCache';
 
 export type ServerControllers = {
   threads: ServerThreadsController;

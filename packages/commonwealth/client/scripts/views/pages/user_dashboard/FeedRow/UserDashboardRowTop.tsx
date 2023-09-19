@@ -12,19 +12,15 @@ import { CWText } from '../../../components/component_kit/cw_text';
 import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
 import { UserDashboardRowTopSkeleton } from '../UserDashboardRowTopSkeleton';
 import { useCommonNavigate } from 'navigation/helpers';
-import EmbeddedThreadCard from './EmbeddedThreadCard/index';
 
 type UserDashboardRowTopProps = {
   activityData: any;
   category: string;
-  threadText?: string;
-  threadAuthor?: string;
   showSkeleton?: boolean;
 };
 
 export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
-  const { activityData, category, showSkeleton, threadAuthor, threadText } =
-    props;
+  const { activityData, category, showSkeleton } = props;
   const navigate = useCommonNavigate();
 
   if (showSkeleton) {
@@ -111,14 +107,6 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       </div>
       <div className="comment-preview">
         {<QuillRenderer doc={comment_text} />}
-        {isComment && (
-          <EmbeddedThreadCard
-            threadId={thread_id}
-            threadText={threadText}
-            threadTitle={titleText}
-            threadAuthor={threadAuthor}
-          />
-        )}
       </div>
     </div>
   );

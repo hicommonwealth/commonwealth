@@ -89,7 +89,6 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      // TODO: change allowNull to false once subscription refactor is implemented
       chain_id: { type: dataTypes.STRING, allowNull: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
       comment_id: { type: dataTypes.INTEGER, allowNull: true },

@@ -321,7 +321,6 @@ export async function initAppState(
       ? LoginState.LoggedIn
       : LoginState.LoggedOut;
 
-    let tokenRefreshListener = null;
     if (app.loginState === LoginState.LoggedIn) {
       console.log('Initializing socket connection with JWT:', app.user.jwt);
 

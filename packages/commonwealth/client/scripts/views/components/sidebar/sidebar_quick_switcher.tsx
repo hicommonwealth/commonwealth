@@ -37,9 +37,7 @@ export const SidebarQuickSwitcher = () => {
       <div className="community-nav-bar">
         {isLoggedIn && (
           <CWIconButton
-            iconName={
-              featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
-            }
+            iconName="plusCirclePhosphor"
             iconButtonTheme="black"
             onClick={() => {
               setMenu({ name: 'createContent' });
@@ -47,7 +45,7 @@ export const SidebarQuickSwitcher = () => {
           />
         )}
         <CWIconButton
-          iconName={featureFlags.sessionKeys ? 'compassPhosphor' : 'compass'}
+          iconName="compassPhosphor"
           iconButtonTheme="black"
           onClick={() => {
             setMenu({ name: 'exploreCommunities' });

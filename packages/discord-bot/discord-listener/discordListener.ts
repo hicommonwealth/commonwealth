@@ -114,9 +114,7 @@ const handleMessage = async (
   }
 };
 
-const controller = new RabbitMQController(
-  getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService)
-);
+const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService));
 const initPromise = controller.init();
 
 client.on('ready', () => {

@@ -86,6 +86,7 @@
     "@apollo/client": "^3.3.18",
     "@capacitor-firebase/messaging": "^5.0.1",
     "@brillout/import": "^0.2.2",
+    "@canvas-js/interfaces": "^0.5.0-alpha4",
     "@capacitor/browser": "^4.0.1",
     "@cosmjs/amino": "^0.31.0",
     "@cosmjs/proto-signing": "^0.31.0",

@@ -2032,7 +2032,7 @@
     uuid "^9.0.0"
     ws "^8.13.0"
 
-"@canvas-js/interfaces@0.5.0-alpha4":
+"@canvas-js/interfaces@0.5.0-alpha4", "@canvas-js/interfaces@^0.5.0-alpha4":
   version "0.5.0-alpha4"
   resolved "https://registry.yarnpkg.com/@canvas-js/interfaces/-/interfaces-0.5.0-alpha4.tgz#38aef5d0c53bdf716c46251859a7a0436ca205a7"
   integrity sha512-/Z21gl0p6OyHEP9Yf14o3vPGE6qO7u8HgzU2jihtnxOVe2RxV1C+t7ibqdn0kqhXrKVbZ/NH0Kw1XoC7ihB7jw==

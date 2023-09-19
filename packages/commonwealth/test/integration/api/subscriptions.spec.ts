@@ -17,13 +17,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Subscriptions Tests', () => {
-  let jwtToken,
-    loggedInAddr,
-    loggedInAddrId,
-    loggedInSession,
-    thread,
-    comment,
-    userId: number;
+  let jwtToken, loggedInAddr, loggedInAddrId, loggedInSession, thread, comment, userId: number;
   const chain = 'ethereum';
 
   before('reset database', async () => {
