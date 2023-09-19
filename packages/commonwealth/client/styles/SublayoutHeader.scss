@@ -44,21 +44,25 @@
     .DesktopMenuContainer {
       align-items: center;
       display: flex;
-      gap: 12px;
-      height: 40px;
+      gap: 8px;
 
-      &.isLoggedIn {
-        padding-right: 20px;
-        border-right: 1px solid $neutral-100;
-        margin-right: 14px;
-      }
+      &.session-keys {
+        gap: 12px;
+        height: 40px;
 
-      & > div {
-        display: flex;
-      }
+        &.isLoggedIn {
+          padding-right: 20px;
+          border-right: 1px solid $neutral-100;
+          margin-right: 14px;
+        }
 
-      svg {
-        fill: $neutral-500;
+        & > div {
+          display: flex;
+        }
+
+        svg {
+          fill: $neutral-500;
+        }
       }
 
       & div {

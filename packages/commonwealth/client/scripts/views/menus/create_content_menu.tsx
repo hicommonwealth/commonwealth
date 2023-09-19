@@ -11,6 +11,7 @@ import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { featureFlags } from 'helpers/feature-flags';
 import Permissions from '../../utils/Permissions';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
@@ -316,7 +317,9 @@ export const CreateContentPopover = () => {
           renderTrigger={(handleInteraction, isTooltipOpen) => (
             <CWIconButton
               iconButtonTheme="black"
-              iconName="plusCirclePhosphor"
+              iconName={
+                featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
+              }
               onClick={(e) =>
                 handleIconClick({
                   e,
@@ -327,9 +330,11 @@ export const CreateContentPopover = () => {
                 })
               }
               onMouseEnter={(e) => {
+                if (!featureFlags.sessionKeys) return;
                 handleMouseEnter({ e, isMenuOpen, handleInteraction });
               }}
               onMouseLeave={(e) => {
+                if (!featureFlags.sessionKeys) return;
                 handleMouseLeave({ e, isTooltipOpen, handleInteraction });
               }}
             />
