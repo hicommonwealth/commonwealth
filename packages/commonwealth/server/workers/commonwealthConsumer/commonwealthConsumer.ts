@@ -113,6 +113,7 @@ async function main() {
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
+  isServiceHealthy = true;
 }
 
 if (process.argv[2] === 'run-as-script') {
