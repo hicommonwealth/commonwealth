@@ -34,7 +34,9 @@ CWTable expects two pieces of information: information describing the columns (c
   ]
 }
 
-The columnInfo array is an array of the columns the table will have in the order in which they will appear in the table's header. Objects in the columnInfo array must have 4 keys: `key`, `header`, `numeric`, and `sortable`.
+The columnInfo array is an array of the columns the table will have in the order in which they will appear in the table's header. One important thing to note is that, by default, the table data is sorted (in ascending order) by the first column provided to columnInfo.
+
+Objects in the columnInfo array must have 4 keys: `key`, `header`, `numeric`, and `sortable`.
 
 `key` is a string that must match a key in the rowData objects to which the column corresponds. Let's say you have a table consisting of rows of company data. If you would like a column that displays the data with the key 'name', you specify it here.
 
@@ -42,7 +44,7 @@ The columnInfo array is an array of the columns the table will have in the order
 
 `numeric` is a boolean describing whether the data is numeric or not (data is displayed differently depending on whether it's numeric). Provide `false` if the data is non-numeric. Otherwise, provide `true`.
 
-`sortable` is a boolean describing whether you would like the column to be sortable. If you pass `false`, no arrow will be displayed near the label for this column and sorting will be disabled. Note that if you are passing data that is not a string, number, or date, sorting won't actually work (i.e. items will be re-ordered, but in a mysterious way), even if you set the `sortable` attribute to true. However, the arrow will be there, which makes for a terrble user experience. Be certain that the column's data can be sorted before designating it as sortable. 
+`sortable` is a boolean describing whether you would like the column to be sortable. If you pass `false`, no arrow will be displayed near the label for this column and sorting will be disabled. Note that if you are passing data that is not a string, number, or date, sorting won't actually work (i.e. items will be re-ordered, but in a mysterious way), even if you set the `sortable` attribute to true. However, the arrow will be there, which makes for a terrble user experience. Be certain that the column's data can be sorted before designating it as sortable.
 
 The rowData array has no required keys on the objects within it. However, if any of your columns have data that is displayed along with an avatar, you'll need to make use of the `avatars` object. `avatars` is an object with keys that correspond to keys in the data that have avatars. For instance, if you would like to display the logo of Stark Industries next to the name 'Stark Industries', insert a key-value pair into the `avatars` object where the key matches the associated key in the data and the value is the URL where the avatar can be found (see above data structure).
 */
