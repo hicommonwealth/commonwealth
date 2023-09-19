@@ -19,6 +19,8 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import { X } from '@phosphor-icons/react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { setActiveAccount } from 'controllers/app/login';
+import IWebWallet from 'client/scripts/models/IWebWallet';
+import AddressInfo from 'client/scripts/models/AddressInfo';
 
 interface SessionRevalidationModalProps {
   onModalClose: () => void;
@@ -76,6 +78,15 @@ const SessionRevalidationModal = ({
 
   const chainbase = app.chain?.meta?.base;
   const wallets = WebWalletController.Instance.availableWallets(chainbase);
+
+  const findSelectedWallet = () => {
+    const selectedWallet = app.user.addresses.find(
+      (w) => w.address === walletAddress
+    );
+    return selectedWallet
+      ? [wallets.find((wallet) => wallet.name === selectedWallet.walletId)]
+      : [selectedWallet];
+  };
 
   const wcEnabled = _.any(
     wallets,
@@ -161,21 +172,26 @@ const SessionRevalidationModal = ({
                   </div>
                 </div>
               ) : (
-                <CWWalletsList
-                  useSessionKeyRevalidationFlow={true}
-                  onResetWalletConnect={onResetWalletConnect}
-                  onWalletAddressSelect={onWalletAddressSelect}
-                  onWalletSelect={onWalletSelect}
-                  onConnectAnotherWay={() => setConnectWithEmail(true)}
-                  onSocialLogin={(provider: WalletSsoSource) =>
-                    onSocialLogin(provider)
-                  }
-                  darkMode={false}
-                  wallets={wallets}
-                  hasNoWalletsLink={false}
-                  canResetWalletConnect={wcEnabled}
-                  hideSocialLogins={false}
-                />
+                <>
+                  <CWWalletsList
+                    useSessionKeyRevalidationFlow={true}
+                    onResetWalletConnect={onResetWalletConnect}
+                    onWalletAddressSelect={onWalletAddressSelect}
+                    onWalletSelect={onWalletSelect}
+                    onConnectAnotherWay={() => setConnectWithEmail(true)}
+                    onSocialLogin={(provider: WalletSsoSource) =>
+                      onSocialLogin(provider)
+                    }
+                    darkMode={false}
+                    wallets={
+                      (findSelectedWallet() as Array<IWebWallet<any>>) ||
+                      wallets
+                    }
+                    hasNoWalletsLink={false}
+                    canResetWalletConnect={wcEnabled}
+                    hideSocialLogins
+                  />
+                </>
               )}
             </div>
           </div>
