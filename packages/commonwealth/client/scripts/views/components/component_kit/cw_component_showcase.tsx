@@ -194,21 +194,6 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
-      <CWText type="h3">Multi select list</CWText>
-      <SelectList
-        placeholder="Add or select a chain"
-        isMulti
-        isClearable={false}
-        defaultValue={[{ value: 'solana', label: 'Solana' }]}
-        options={[
-          { value: 'solana', label: 'Solana' },
-          { value: 'polkadot', label: 'Polkadot' },
-          { value: 'ethereum', label: 'Ethereum' },
-          { value: 'substrate', label: 'Substrate' },
-          { value: 'binance', label: 'Binance' },
-        ]}
-      />
-      <div style={{ height: '500px' }} />
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
@@ -1617,6 +1602,20 @@ export const ComponentShowcase = () => {
               onMouseLeave={handleInteraction}
             />
           )}
+        />
+        <CWText type="h3">Multi select list</CWText>
+        <SelectList
+          placeholder="Add or select a chain"
+          isMulti
+          isClearable={false}
+          defaultValue={[{ value: 'solana', label: 'Solana' }]}
+          options={[
+            { value: 'solana', label: 'Solana' },
+            { value: 'polkadot', label: 'Polkadot' },
+            { value: 'ethereum', label: 'Ethereum' },
+            { value: 'substrate', label: 'Substrate' },
+            { value: 'binance', label: 'Binance' },
+          ]}
         />
       </div>
     </div>
