@@ -15,8 +15,8 @@ export const createProposal = async (req: Request, res: Response) => {
     const gov: IGovernor = req.originalUrl.includes('compound')
       ? new compoundGovernor()
       : new aaveGovernor();
-    const id = await gov.createArbitraryProposal(request.accountIndex);
-    res.status(200).json(id).send();
+    const data = await gov.createArbitraryProposal(request.accountIndex);
+    res.status(200).json(data).send();
   } catch (err) {
     console.error(err);
     res

@@ -70,30 +70,37 @@ export async function parseLogs(
     const signature = data.sources.find(
       (s) => s.event_signature === log.topics[0]
     );
-    if (signature) {
-      if (!interfaces[address]) {
-        interfaces[address] = new ethers.utils.Interface(data.abi);
-      }
-      let parsedLog: ethers.utils.LogDescription;
-      try {
-        parsedLog = interfaces[address].parseLog(log);
-      } catch (e) {
-        const msg = `Failed to parse log from contract ${address} with signature ${log.topics[0]}`;
-        logger.error(msg, e);
-        rollbar.error(msg, e);
-        continue;
-      }
-      StatsDController.get().increment('ce.evm.event', {
-        contractAddress: address,
-        kind: signature.kind,
-      });
-      events.push({
-        contractAddress: address,
-        kind: signature.kind,
-        blockNumber: parseInt(log.blockNumber.toString(), 16),
-        args: parsedLog.args,
-      });
+    if (!signature) continue;
+
+    if (!data.abi || !Array.isArray(data.abi) || data.abi.length === 0) {
+      logger.warn(`Invalid ABI for contract ${address}`);
+      rollbar.error(`Invalid ABI for contract ${address}`);
+      continue;
     }
+
+    if (!interfaces[address]) {
+      interfaces[address] = new ethers.utils.Interface(data.abi);
+    }
+
+    let parsedLog: ethers.utils.LogDescription;
+    try {
+      parsedLog = interfaces[address].parseLog(log);
+    } catch (e) {
+      const msg = `Failed to parse log from contract ${address} with signature ${log.topics[0]}`;
+      logger.error(msg, e);
+      rollbar.error(msg, e);
+      continue;
+    }
+    StatsDController.get().increment('ce.evm.event', {
+      contractAddress: address,
+      kind: signature.kind,
+    });
+    events.push({
+      contractAddress: address,
+      kind: signature.kind,
+      blockNumber: parseInt(log.blockNumber.toString(), 16),
+      args: parsedLog.args,
+    });
   }
 
   return events;
@@ -101,9 +108,14 @@ export async function parseLogs(
 
 export async function getEvents(
   evmSource: EvmSource,
-  startingBlockNum?: number
+  startingBlockNum?: number,
+  maxOldBlocks?: number
 ): Promise<{ events: RawEvmEvent[]; lastBlockNum: number }> {
-  const { logs, lastBlockNum } = await getLogs(evmSource, startingBlockNum);
+  const { logs, lastBlockNum } = await getLogs(
+    evmSource,
+    startingBlockNum,
+    maxOldBlocks
+  );
   const events = await parseLogs(evmSource.contracts, logs);
   return { events, lastBlockNum };
 }
