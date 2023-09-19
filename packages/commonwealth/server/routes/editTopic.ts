@@ -11,7 +11,7 @@ import { validateOwner } from '../util/validateOwner';
 // We should consider merging or consolidating somehow, to prevent checks diverging again.
 
 export const Errors = {
-  NotLoggedIn: 'Not signed in',
+  NotLoggedIn: 'Not logged in',
   NoTopicId: 'Must supply topic ID',
   NotAdmin: 'Must be an admin to edit or feature topics',
   NotVerified: 'Must have a verified address to edit or feature topics',

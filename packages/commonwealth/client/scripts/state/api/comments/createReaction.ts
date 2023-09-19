@@ -23,7 +23,7 @@ const createReaction = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signCommentReaction(address, {
+  } = await app.sessions.signCommentReaction({
     comment_id: commentId,
     like: reactionType === 'like',
   });

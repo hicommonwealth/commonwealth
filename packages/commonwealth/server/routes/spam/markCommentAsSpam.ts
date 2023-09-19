@@ -7,7 +7,7 @@ import { findAllRoles } from '../../util/roles';
 
 export const Errors = {
   InvalidCommentId: 'Comment ID invalid',
-  NotLoggedIn: 'Not signed in',
+  NotLoggedIn: 'Not logged in',
   CommentNotFound: 'Could not find Comment',
   NotAdmin: 'Not an admin',
 };

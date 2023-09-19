@@ -203,7 +203,7 @@ export const AaveProposalForm = () => {
           setProposer(app.user?.activeAccount?.address);
 
           if (!proposer) {
-            throw new Error('Invalid address / not signed in');
+            throw new Error('Invalid address / not logged in');
           }
 
           if (!executor) {

@@ -8,7 +8,7 @@ import { Op } from 'sequelize';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
-  NotLoggedIn: 'Not signed in',
+  NotLoggedIn: 'Not logged in',
   NotAuthor: 'Not the Author or Admin',
   NoThread: 'No thread provided',
   NoPoll: 'No poll found',

@@ -75,7 +75,7 @@ export const LoginSelectorMenuRight = ({
                 await initAppState();
                 await resetWalletConnectSession();
 
-                notifySuccess('Signed out');
+                notifySuccess('Logged out');
                 onLogout();
                 setDarkMode(false);
               })
@@ -85,7 +85,7 @@ export const LoginSelectorMenuRight = ({
               });
           }}
         >
-          <CWText type="caption">Sign out</CWText>
+          <CWText type="caption">Logout</CWText>
         </div>
       </div>
       <Modal
