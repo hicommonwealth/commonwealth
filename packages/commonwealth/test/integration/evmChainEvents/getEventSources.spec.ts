@@ -10,7 +10,7 @@ import {
 } from './util';
 import { localRpc } from '../../devnet/evm/evmChainEvents/util';
 
-describe.only('getEventSources', () => {
+describe('getEventSources', () => {
   before(async () => {
     await resetDatabase();
   });

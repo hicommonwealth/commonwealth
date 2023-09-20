@@ -127,7 +127,6 @@ export async function getTestSubscription() {
     where: {
       subscriber_id: user.id,
       category_id: 'chain-event',
-
       chain_id: chain.id,
     },
     defaults: {
