@@ -7,8 +7,8 @@ import { TopicAttributes } from 'server/models/topic';
 import validateGroupMembership from 'server/util/requirementsModule/validateGroupMembership';
 import moment from 'moment';
 import { MembershipInstance } from 'server/models/membership';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import { flatten, uniq } from 'lodash';
+import { ServerError } from '../../../../common-common/src/errors';
 
 const MEMBERSHIP_TTL_SECONDS = 60 * 2;
 
