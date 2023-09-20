@@ -29,15 +29,16 @@ messaging.onBackgroundMessage((payload) => {
     payload
   );
 
-  // Extract values from payload
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: './static/brand_assets.32x32.png',
-    data: {
-      link: payload.data.link,
-    },
-  };
+  if (payload.data && data.title) {
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+      body: payload.notification.body,
+      icon: './static/brand_assets.32x32.png',
+      data: {
+        link: '/notifications',
+      },
+    };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+    self.registration.showNotification(notificationTitle, notificationOptions);
+  }
 });

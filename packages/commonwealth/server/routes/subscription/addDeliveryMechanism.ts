@@ -50,6 +50,24 @@ export const addDeliveryMechanism = async (
 
   const createdMechanism = await models.DeliveryMechanism.create(newMechanism);
 
+  // Get all subscriptions of the user
+  const userSubscriptions = await models.Subscription.findAll({
+    where: {
+      subscriber_id: req.user.id,
+    },
+    raw: true,
+  });
+
+  // Prepare an array of objects to be inserted into the SubscriptionDelivery table
+  // TODO: For production, this will not include the thru table and directly write delivery_type to the Subscription table
+  const subscriptionDeliveries = userSubscriptions.map((subscription) => ({
+    subscription_id: subscription.id,
+    delivery_mechanism_id: createdMechanism.id,
+  }));
+
+  // Use bulkCreate to insert all entries in one query
+  await models.SubscriptionDelivery.bulkCreate(subscriptionDeliveries);
+
   return res.json({ status: 'Success', result: createdMechanism });
 };
 

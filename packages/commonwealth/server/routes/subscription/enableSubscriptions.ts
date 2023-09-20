@@ -37,13 +37,31 @@ export default async (
     return next(new AppError(Errors.NotUsersSubscription));
   }
 
+  // find enabled delivery mechanisms for the user
+  const deliveryMechanisms = await models.DeliveryMechanism.findAll({
+    where: {
+      user_id: req.user.id,
+      enabled: true,
+    },
+  });
+
+  // need to update to prod datamodel
   await sequelize.transaction(async (t) => {
-    await Promise.all(
-      subscriptions.map((s) => {
+    const subscriptionDeliveries = subscriptions
+      .map((s) => {
         s.is_active = true;
-        return s.save({ transaction: t });
+        s.save({ transaction: t });
+        return deliveryMechanisms.map((dm) => ({
+          subscription_id: s.id,
+          delivery_mechanism_id: dm.id,
+        }));
       })
-    );
+      .flat();
+
+    // create a SubscriptionDelivery for each enabled delivery mechanism
+    await models.SubscriptionDelivery.bulkCreate(subscriptionDeliveries, {
+      transaction: t,
+    });
   });
 
   return res.json({ status: 'Success', result: 'Enabled subscriptions' });

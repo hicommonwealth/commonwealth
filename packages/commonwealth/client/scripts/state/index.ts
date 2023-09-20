@@ -348,7 +348,7 @@ export async function initAppState(
 
       if (platform === 'desktop') {
         pushNotifications.on('start', (e, token) => {
-          if (!!mechanisms.find((m) => m.type === platform)) {
+          if (!mechanisms.find((m) => m.type === platform)) {
             app.user.notifications.addDeliveryMechanism(token, platform, false);
           }
         });

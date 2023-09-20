@@ -4,6 +4,7 @@ import { ChainInstance } from '../../models/chain';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ThreadAttributes } from '../../models/thread';
+import { DeliveryMechanismInstance } from '../../models/delivery_mechanisms';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import {
@@ -221,21 +222,51 @@ export async function __createThread(
 
   // -----
 
+  // find enabled delivery mechanisms for the user
+  const deliveryMechanisms: DeliveryMechanismInstance[] =
+    await this.models.DeliveryMechanism.findAll({
+      where: {
+        user_id: user.id,
+        enabled: true,
+      },
+    });
+
   // auto-subscribe thread creator to comments & reactions
-  await this.models.Subscription.create({
+  const commentSubscription = await this.models.Subscription.create({
     subscriber_id: user.id,
     category_id: NotificationCategories.NewComment,
     thread_id: finalThread.id,
     chain_id: finalThread.chain,
     is_active: true,
   });
-  await this.models.Subscription.create({
+  const reactionSubscription = await this.models.Subscription.create({
     subscriber_id: user.id,
     category_id: NotificationCategories.NewReaction,
     thread_id: finalThread.id,
     chain_id: finalThread.chain,
     is_active: true,
   });
+
+  // create a SubscriptionDelivery for each enabled delivery mechanism
+  const commentSubscriptionDeliveries = deliveryMechanisms.map(
+    (deliveryMechanism) =>
+      this.models.SubscriptionDelivery.create({
+        subscription_id: commentSubscription.id,
+        delivery_mechanism_id: deliveryMechanism.id,
+      })
+  );
+  const reactionSubscriptionDeliveries = deliveryMechanisms.map(
+    (deliveryMechanism) =>
+      this.models.SubscriptionDelivery.create({
+        subscription_id: reactionSubscription.id,
+        delivery_mechanism_id: deliveryMechanism.id,
+      })
+  );
+
+  await Promise.all([
+    ...commentSubscriptionDeliveries,
+    ...reactionSubscriptionDeliveries,
+  ]);
 
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(body);

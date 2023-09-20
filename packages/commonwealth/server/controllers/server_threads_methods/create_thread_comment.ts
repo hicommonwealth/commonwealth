@@ -2,6 +2,7 @@ import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
 import { CommentAttributes, CommentInstance } from '../../models/comment';
 import { UserInstance } from '../../models/user';
+import { DeliveryMechanismInstance } from '../../models/delivery_mechanisms';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { getCommentDepth } from '../../util/getCommentDepth';
@@ -196,7 +197,7 @@ export async function __createThreadComment(
   const transaction = await this.models.sequelize.transaction();
   try {
     // auto-subscribe comment author to reactions & child comments
-    await this.models.Subscription.create(
+    const reactionSubscription = await this.models.Subscription.create(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewReaction,
@@ -206,7 +207,7 @@ export async function __createThreadComment(
       },
       { transaction }
     );
-    await this.models.Subscription.create(
+    const commentSubscription = await this.models.Subscription.create(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewComment,
@@ -216,6 +217,37 @@ export async function __createThreadComment(
       },
       { transaction }
     );
+
+    // find enabled delivery mechanisms for the user
+    // To be replaced by prod data model (no thru table)
+    const deliveryMechanisms: DeliveryMechanismInstance[] =
+      await this.models.DeliveryMechanism.findAll({
+        where: {
+          user_id: user.id,
+          enabled: true,
+        },
+      });
+
+    // create a SubscriptionDelivery for each enabled delivery mechanism
+    const reactionSubscriptionDeliveries = deliveryMechanisms.map(
+      (deliveryMechanism) =>
+        this.models.SubscriptionDelivery.create({
+          subscription_id: reactionSubscription.id,
+          delivery_mechanism_id: deliveryMechanism.id,
+        })
+    );
+    const commentSubscriptionDeliveries = deliveryMechanisms.map(
+      (deliveryMechanism) =>
+        this.models.SubscriptionDelivery.create({
+          subscription_id: commentSubscription.id,
+          delivery_mechanism_id: deliveryMechanism.id,
+        })
+    );
+
+    await Promise.all([
+      ...reactionSubscriptionDeliveries,
+      ...commentSubscriptionDeliveries,
+    ]);
 
     await transaction.commit();
   } catch (err) {
