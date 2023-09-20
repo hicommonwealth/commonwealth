@@ -16,6 +16,18 @@ export const bundleSubs = (
   return result;
 };
 
+export const extractSnapshotProposals = (subs) => {
+  const snapshotProposals = [];
+
+  for (const sub of subs) {
+    if (sub.category === 'snapshot-proposal') {
+      snapshotProposals.push(sub);
+    }
+  }
+
+  return snapshotProposals;
+};
+
 export const getNotificationTypeText = (category: string) => {
   if (category === 'new-comment-creation') {
     return 'Comments on';

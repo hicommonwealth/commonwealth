@@ -22,7 +22,7 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
-import { bundleSubs } from './helpers';
+import { bundleSubs, extractSnapshotProposals } from './helpers';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -327,6 +327,183 @@ const NotificationSettingsPage = () => {
         className="discussion-section-margin"
       >
         Discussion
+      </CWText>
+      <div className="column-header-row">
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="column-header-text"
+        >
+          Community
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="column-header-text"
+        >
+          Email
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="last-column-header-text"
+        >
+          In-App
+        </CWText>
+      </div>
+      {Object.entries(bundledSubs)
+        .sort((x, y) => x[0].localeCompare(y[0]))
+        .map(([chainName, subs]) => {
+          const chainInfo = app?.config.chains.getById(chainName);
+          const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
+          const hasSomeInAppSubs = subs.some((s) => s.isActive);
+
+          if (!chainInfo?.id) return null; // handles incomplete loading case
+
+          return (
+            <div key={chainInfo?.id} className="notification-row">
+              <CWCollapsible
+                headerContent={
+                  <div className="notification-row-header">
+                    <div className="left-content-container">
+                      <div className="avatar-and-name">
+                        <CWCommunityAvatar
+                          size="medium"
+                          community={chainInfo}
+                        />
+                        <CWText type="h5" fontWeight="medium">
+                          {chainInfo?.name}
+                        </CWText>
+                      </div>
+                      <CWText type="b2" className="subscriptions-count-text">
+                        {subs.length} subscriptions
+                      </CWText>
+                    </div>
+                    <CWCheckbox
+                      label="Receive Emails"
+                      checked={hasSomeEmailSubs}
+                      onChange={() =>
+                        handleEmailSubscriptions(hasSomeEmailSubs, subs)
+                      }
+                    />
+                    <CWToggle
+                      checked={hasSomeInAppSubs}
+                      onChange={() =>
+                        handleSubscriptions(hasSomeInAppSubs, subs)
+                      }
+                    />
+                  </div>
+                }
+                collapsibleContent={
+                  <div className="subscriptions-list-container">
+                    <div className="subscriptions-list-header">
+                      <CWText
+                        type="caption"
+                        className="subscription-list-header-text"
+                      >
+                        Title
+                      </CWText>
+                      <CWText
+                        type="caption"
+                        className="subscription-list-header-text"
+                      >
+                        Subscribed
+                      </CWText>
+                      <CWText
+                        type="caption"
+                        className="subscription-list-header-text"
+                      >
+                        Author
+                      </CWText>
+                    </div>
+                    {subs.map((sub) => {
+                      const getUser = () => {
+                        if (sub.Thread?.chain) {
+                          return (
+                            <User
+                              userAddress={sub.Thread.author}
+                              userChainId={sub.Thread.chain}
+                            />
+                          );
+                        } else if (sub.Comment?.chain) {
+                          return (
+                            <User
+                              userAddress={sub.Comment.author}
+                              userChainId={sub.Comment.chain}
+                            />
+                          );
+                        } else {
+                          // return empty div to ensure that grid layout is correct
+                          // even in the absence of a user
+                          return <div key={sub.id} />;
+                        }
+                      };
+
+                      const getTimeStamp = () => {
+                        if (sub.Thread) {
+                          return moment(sub.Thread.createdAt).format('l');
+                        } else if (sub.Comment) {
+                          return moment(sub.Comment.createdAt).format('l');
+                        } else {
+                          return null;
+                        }
+                      };
+
+                      return (
+                        <div key={sub.id}>
+                          <div className="subscription-row-desktop">
+                            <SubscriptionRowTextContainer subscription={sub} />
+                            <CWText type="b2">{getTimeStamp()}</CWText>
+                            {getUser()}
+                            <SubscriptionRowMenu
+                              subscription={sub}
+                              onUnsubscribe={handleUnsubscribe}
+                            />
+                          </div>
+                          <div className="subscription-row-mobile">
+                            <div className="subscription-row-mobile-top">
+                              <SubscriptionRowTextContainer
+                                subscription={sub}
+                              />
+                              <SubscriptionRowMenu
+                                subscription={sub}
+                                onUnsubscribe={handleUnsubscribe}
+                              />
+                            </div>
+                            <div className="subscription-row-mobile-bottom">
+                              {getUser()}
+                              {getTimeStamp() && (
+                                <CWText
+                                  type="caption"
+                                  className="subscription-list-header-text"
+                                >
+                                  subscribed
+                                </CWText>
+                              )}
+                              <CWText
+                                type="caption"
+                                fontWeight="medium"
+                                className="subscription-list-header-text"
+                              >
+                                {getTimeStamp()}
+                              </CWText>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                }
+              />
+            </div>
+          );
+        })}
+      <CWText
+        type="h4"
+        fontWeight="semiBold"
+        className="discussion-section-margin"
+      >
+        Snapshots
       </CWText>
       <div className="column-header-row">
         <CWText
