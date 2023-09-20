@@ -1,3 +1,4 @@
+import React from 'react';
 import { VotingResult } from '../voting_result_components';
 
 export function DefaultVotingResult({ votes, proposal, isInCard }) {

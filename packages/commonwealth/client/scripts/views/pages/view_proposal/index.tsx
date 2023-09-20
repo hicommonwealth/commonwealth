@@ -41,30 +41,18 @@ import {
 } from 'state/api/proposals';
 import { usePoolParamsQuery } from 'state/api/chainParams';
 
-type ViewProposalPageAttrs = {
-  identifier: string;
-  type?: string;
-};
-
-const ViewProposalPage = ({
-  identifier,
-  type: typeProp,
-}: ViewProposalPageAttrs) => {
-  const proposalId = identifier.split('-')[0];
-  const navigate = useCommonNavigate();
+export function useProposalData(proposalId, typeProp, ignoreInitChain = false) {
   const forceRerender = useForceRerender();
-  useInitChainIfNeeded(app);
-
-  const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const [title, setTitle] = useState<string>(proposal?.title);
-  const [description, setDescription] = useState<string>(proposal?.description);
-  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  useInitChainIfNeeded(app, ignoreInitChain);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
+  const [proposal, setProposal] = useState<AnyProposal>(undefined);
   const { data: cosmosProposal } = useCosmosProposalQuery({
     isApiReady: !!app.chain.apiInitialized,
     proposalId,
   });
+  const [title, setTitle] = useState<string>(proposal?.title);
+  const [description, setDescription] = useState<string>(proposal?.description);
   const { data: metadata, isFetching: isFetchingMetadata } =
     useCosmosProposalMetadataQuery(proposal);
   const { data: poolData } = usePoolParamsQuery();
@@ -147,6 +135,62 @@ const ViewProposalPage = ({
       afterAdapterLoaded();
     }
   }, [isAdapterLoaded, proposalId]);
+
+  useNecessaryEffect(() => {
+    const afterAdapterLoaded = async () => {
+      try {
+        const proposalFromStore = getProposalFromStore();
+        setProposal(proposalFromStore);
+        setError(null);
+      } catch (e) {
+        console.log(`#${proposalId} Not found in store. `, e);
+      }
+    };
+
+    if (!isAdapterLoaded) {
+      app.chainAdapterReady.on('ready', () => {
+        setIsAdapterLoaded(true);
+        afterAdapterLoaded();
+      });
+    } else {
+      afterAdapterLoaded();
+    }
+  }, [isAdapterLoaded, proposalId]);
+
+  return {
+    error,
+    metadata,
+    isAdapterLoaded,
+    proposal,
+    title,
+    description,
+    isFetchingMetadata,
+  };
+}
+
+type ViewProposalPageAttrs = {
+  identifier: string;
+  type?: string;
+};
+
+const ViewProposalPage = ({
+  identifier,
+  type: typeProp,
+}: ViewProposalPageAttrs) => {
+  const proposalId = identifier.split('-')[0];
+  const navigate = useCommonNavigate();
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const {
+    error,
+    metadata,
+    isAdapterLoaded,
+    proposal,
+    title,
+    description,
+    isFetchingMetadata,
+  } = useProposalData(proposalId, typeProp);
+
+  useManageDocumentTitle('View proposal', proposal?.title);
 
   if (!isAdapterLoaded) {
     return <PageLoading message="Loading..." />;
@@ -232,7 +276,7 @@ const ViewProposalPage = ({
                 title="Community Spend Proposal"
               />
             )}
-          <VotingResults proposal={proposal} />
+          <VotingResults proposal={proposal} isInCard={false} />
           <VotingActions
             onModalClose={onModalClose}
             proposal={proposal}

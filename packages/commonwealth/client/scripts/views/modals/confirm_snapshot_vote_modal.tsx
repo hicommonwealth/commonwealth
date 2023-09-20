@@ -16,7 +16,6 @@ type ConfirmSnapshotVoteModalProps = {
   id: string;
   onModalClose: () => void;
   proposal: SnapshotProposal;
-  scores: any;
   selectedChoice: string;
   snapshot: any;
   space: SnapshotSpace;

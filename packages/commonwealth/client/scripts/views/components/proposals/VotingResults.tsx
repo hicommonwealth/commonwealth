@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import type { AnyProposal } from '../../../models/types';

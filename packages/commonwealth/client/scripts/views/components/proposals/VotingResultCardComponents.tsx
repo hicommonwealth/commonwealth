@@ -118,7 +118,7 @@ export const VotingResultCard = (props: VotingResultProps) => {
           {'Results'}
         </CWText>
         <CWText type="caption">{`${
-          yesVotes.length + noVotes.length + yesVotes
+          yesVotes.length + noVotes.length
         } total votes`}</CWText>
       </div>
 
