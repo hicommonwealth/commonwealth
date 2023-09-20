@@ -1,6 +1,6 @@
 import 'components/Breadcrumbs/Breadcrumbs.scss';
 import React from 'react';
-import { useLocation, Link, useMatches } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { CWText } from '../component_kit/cw_text';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { breadCrumbURLS } from './data';
@@ -12,10 +12,6 @@ export const Breadcrumbs = () => {
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
-
-  const matches = useMatches();
-
-  console.log('mat', matches);
 
   let standalone = false;
 
@@ -44,73 +40,40 @@ export const Breadcrumbs = () => {
   ) {
     standalone = true;
   }
-  /**
-   * Parses the current location pathname into an array of breadcrumb items.
-   *
-   * @param {Object} location - The location object containing pathname information.
-   * @returns {Array} An array of breadcrumb items, each with a text, link, and isParent property.
-   */
-  const pathnames = location.pathname
-    .split('/')
-    .map((pathName, index, arr) => {
-      let link: string;
-      let isParentBreadcrumb = false;
 
-      if (pathName === 'profile') {
+  function generateBreadcrumbs(locationPath: string, breadCrumbData: any[]) {
+    const pathSegments = locationPath
+      .split('/')
+      .filter((segment) => segment.length > 0);
+
+    const breadcrumbs = pathSegments.map((pathSegment, index) => {
+      let link: string;
+      const matchedBreadcrumb = breadCrumbData.find(
+        (breadcrumbItem) =>
+          breadcrumbItem.url === pathSegments.slice(0, index + 1).join('/')
+      );
+
+      if (pathSegment === 'profile') {
         link = `/profile/id/${profileId}`;
       } else {
-        link = arr.slice(0, index + 1).join('/');
+        link = pathSegments.slice(0, index + 1).join('/');
       }
 
       const splitLinks = link.split('/').filter((val) => val.length > 0);
 
-      if (splitLinks.length === 1) {
-        isParentBreadcrumb = true;
-      }
-
-      console.log('dwecode?', decodeURIComponent(pathName.replace(/\+/g, ' ')));
-
       return {
-        text: decodeURIComponent(pathName),
-        link: link ? link : location.pathname,
-        isParent: isParentBreadcrumb,
+        text: matchedBreadcrumb
+          ? matchedBreadcrumb.breadcrumb
+          : decodeURIComponent(pathSegment),
+        link: link ? link : locationPath,
+        isParent: splitLinks.length === 1,
       };
-    })
-    .filter((pathName) => pathName.text.length > 0);
-
-  const generateBreadcrumbs = (
-    currentUrl: string
-  ): { text: string; link: string; isParent: boolean }[] => {
-    const pathSegments = currentUrl
-      .split('/')
-      .filter((segment) => segment.length > 0);
-    const breadcrumbs: { text: string; link: string; isParent: boolean }[] = [];
-
-    for (let i = 0; i < pathSegments.length; i++) {
-      const currentSegment = pathSegments[i];
-      const matchingBreadcrumb = breadCrumbURLS.find(
-        (breadcrumb) => breadcrumb.url === currentSegment
-      );
-
-      if (matchingBreadcrumb) {
-        breadcrumbs.push({
-          text: matchingBreadcrumb.breadcrumb,
-          link: `/${currentSegment}`,
-          isParent: i === 0,
-        });
-      } else if (i === pathSegments.length - 1) {
-        breadcrumbs.push({
-          text: currentSegment,
-          link: `/${currentSegment}`,
-          isParent: false,
-        });
-      }
-    }
+    });
 
     return breadcrumbs;
-  };
+  }
 
-  console.log('bread', generateBreadcrumbs(location.pathname));
+  const pathnames = generateBreadcrumbs(location.pathname, breadCrumbURLS);
 
   /**
    * Determines the style based on the current page.
@@ -174,7 +137,7 @@ export const Breadcrumbs = () => {
         {standalone ? (
           <li>
             <CWText type="b2" fontWeight="regular">
-              <Link className="active standalone" to={'#'}>
+              <Link className="active standalone" to={'/'}>
                 {pathnames[0].text}
               </Link>
             </CWText>
@@ -196,7 +159,7 @@ export const Breadcrumbs = () => {
                     onMouseLeave={handleIneraction}
                   >
                     <CWText type="b2" fontWeight="regular">
-                      <Link to={null}>{path.text}</Link>
+                      <Link to={'/' + path.link}>{path.text}</Link>
                     </CWText>
                   </li>
                 )}
@@ -205,10 +168,10 @@ export const Breadcrumbs = () => {
               <li key={`${location.key} - ${index}`}>
                 <CWText type="b2" fontWeight="regular">
                   <Link
-                    className={clsx('active', {
-                      pathnames: pathnames.length - 1 === index,
+                    className={clsx({
+                      active: pathnames.length - 1 === index,
                     })}
-                    to={path.link}
+                    to={'/' + path.link}
                   >
                     {path.text}
                   </Link>

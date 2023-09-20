@@ -21,7 +21,7 @@ export const breadCrumbURLS = [
   },
   {
     url: 'profile/edit',
-    breadcrumb: 'Profile/Edit',
+    breadcrumb: 'Edit',
   },
   {
     url: 'createCommunity/starter',
@@ -36,6 +36,10 @@ export const breadCrumbURLS = [
     url: 'analytics',
     breadcrumb: 'Analytics',
     isAdmin: true,
+  },
+  {
+    url: 'overview',
+    breadcrumb: 'Overview',
   },
   {
     url: 'dicussions/General',
