@@ -35,6 +35,10 @@ export async function getEventSources(): Promise<EvmSources> {
     { type: QueryTypes.SELECT, raw: true }
   );
 
+  if (abis.length === 0) {
+    return {};
+  }
+
   const eventSources: Omit<
     EvmEventSourceAttributes,
     'id' | 'ChainNode' | 'Contract'
@@ -78,8 +82,14 @@ export async function getEventSources(): Promise<EvmSources> {
   }
 
   for (const abi of abis) {
-    evmSources[abi.chain_node_id].rpc = abi.url || abi.private_url;
-    evmSources[abi.chain_node_id].contracts[abi.contract_address].abi = abi.abi;
+    if (evmSources[abi.chain_node_id]) {
+      evmSources[abi.chain_node_id].rpc = abi.url || abi.private_url;
+
+      if (evmSources[abi.chain_node_id].contracts[abi.contract_address]) {
+        evmSources[abi.chain_node_id].contracts[abi.contract_address].abi =
+          abi.abi;
+      }
+    }
   }
 
   return evmSources;
