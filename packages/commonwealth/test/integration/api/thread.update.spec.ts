@@ -16,13 +16,11 @@ describe('Thread Patch Update', () => {
   let adminUserId;
   let adminAddress;
   let adminAddressId;
-  let adminSession;
 
   let userJWT;
   let userId;
   let userAddress;
   let userAddressId;
-  let userSession;
 
   before(async () => {
     await resetDatabase();
@@ -40,7 +38,6 @@ describe('Thread Patch Update', () => {
         chainOrCommObj: { chain_id: chain },
         role: 'admin',
       });
-      adminSession = { session: adminRes.session, sign: adminRes.sign };
       expect(adminAddress).to.not.be.null;
       expect(adminJWT).to.not.be.null;
       expect(isAdmin).to.not.be.null;
@@ -55,7 +52,6 @@ describe('Thread Patch Update', () => {
         { id: userRes.user_id, email: userRes.email },
         JWT_SECRET
       );
-      userSession = { session: userRes.session, sign: userRes.sign };
       expect(userAddress).to.not.be.null;
       expect(userJWT).to.not.be.null;
     }
@@ -73,8 +69,6 @@ describe('Thread Patch Update', () => {
         stage: 'discussion',
         topicName: 't1',
         topicId: undefined,
-        session: userSession.session,
-        sign: userSession.sign,
       });
 
       const res = await chai.request
@@ -118,8 +112,6 @@ describe('Thread Patch Update', () => {
         stage: 'discussion',
         topicName: 't2',
         topicId: undefined,
-        session: userSession.session,
-        sign: userSession.sign,
       });
 
       {
@@ -165,8 +157,6 @@ describe('Thread Patch Update', () => {
         stage: 'discussion',
         topicName: 't2',
         topicId: undefined,
-        session: userSession.session,
-        sign: userSession.sign,
       });
 
       // admin sets thread as pinned

@@ -225,12 +225,12 @@ export function formatProposalHashShort(hash: string) {
 
 export function formatAddressShort(
   address: string,
-  numberOfVisibleCharacters = 5,
-  numberOfVisibleCharactersTail = 4
+  numberOfVisibleCharacters = 5
 ) {
   if (address.length < 10) return address;
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
-    -numberOfVisibleCharactersTail
+    -numberOfVisibleCharacters,
+    -1
   )}`;
 }
 
