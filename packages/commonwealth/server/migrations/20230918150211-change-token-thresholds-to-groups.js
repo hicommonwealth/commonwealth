@@ -124,10 +124,15 @@ async function findGroup(queryInterface, chain_id, requirements, metadata) {
 
 
 async function addGroupIdToTopic(queryInterface, groupId, topicId) {
-  const updateTopicQuery = `
-    UPDATE "Topics" SET "group_ids" = "group_ids" || ARRAY[${groupId}] WHERE id = ${topicId}
-  `
-  return queryInterface.sequelize.query(updateTopicQuery)
+  try {
+    const updateTopicQuery = `
+      UPDATE "Topics" SET "group_ids" = "group_ids" || ARRAY[${groupId}] WHERE id = ${topicId}
+    `
+    return queryInterface.sequelize.query(updateTopicQuery)
+  } catch (err) {
+    console.error('addGroupIdToTopic error: ', err)
+    return null
+  }
 }
 
 async function insertGroup(queryInterface, chain_id, metadata, requirements) {
@@ -148,7 +153,7 @@ async function insertGroup(queryInterface, chain_id, metadata, requirements) {
     });
     return createdGroupId
   } catch (err) {
-    console.error(err)
+    console.error('insertGroup error: ', err)
     return null
   }
 }
