@@ -100,6 +100,8 @@ const NotificationSettingsPage = () => {
     .map((x) => x.chain)
     .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
 
+  console.log(app.user.notifications, relevantSubscribedChains);
+
   return (
     <div className="NotificationSettingsPage">
       <CWText type="h3" fontWeight="semiBold" className="page-header-text">

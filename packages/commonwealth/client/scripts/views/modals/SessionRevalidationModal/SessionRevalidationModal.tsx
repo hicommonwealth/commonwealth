@@ -19,8 +19,7 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import { X } from '@phosphor-icons/react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { setActiveAccount } from 'controllers/app/login';
-import IWebWallet from 'client/scripts/models/IWebWallet';
-import AddressInfo from 'client/scripts/models/AddressInfo';
+import IWebWallet from '../../../../../client/scripts/models/IWebWallet';
 
 interface SessionRevalidationModalProps {
   onModalClose: () => void;
@@ -83,9 +82,11 @@ const SessionRevalidationModal = ({
     const selectedWallet = app.user.addresses.find(
       (w) => w.address === walletAddress
     );
-    return selectedWallet
-      ? [wallets.find((wallet) => wallet.name === selectedWallet.walletId)]
-      : [selectedWallet];
+    return (
+      selectedWallet && [
+        wallets.find((wallet) => wallet.name === selectedWallet.walletId),
+      ]
+    );
   };
 
   const wcEnabled = _.any(
@@ -172,23 +173,26 @@ const SessionRevalidationModal = ({
                   </div>
                 </div>
               ) : (
-                <CWWalletsList
-                  useSessionKeyRevalidationFlow={true}
-                  onResetWalletConnect={onResetWalletConnect}
-                  onWalletAddressSelect={onWalletAddressSelect}
-                  onWalletSelect={onWalletSelect}
-                  onConnectAnotherWay={() => setConnectWithEmail(true)}
-                  onSocialLogin={(provider: WalletSsoSource) =>
-                    onSocialLogin(provider)
-                  }
-                  darkMode={false}
-                  wallets={
-                    (findSelectedWallet() as Array<IWebWallet<any>>) || wallets
-                  }
-                  hasNoWalletsLink={false}
-                  canResetWalletConnect={wcEnabled}
-                  hideSocialLogins={findSelectedWallet().length > 0}
-                />
+                wallets.length > 0 && (
+                  <CWWalletsList
+                    useSessionKeyRevalidationFlow={true}
+                    onResetWalletConnect={onResetWalletConnect}
+                    onWalletAddressSelect={onWalletAddressSelect}
+                    onWalletSelect={onWalletSelect}
+                    onConnectAnotherWay={() => setConnectWithEmail(true)}
+                    onSocialLogin={(provider: WalletSsoSource) =>
+                      onSocialLogin(provider)
+                    }
+                    darkMode={false}
+                    wallets={
+                      (findSelectedWallet() as Array<IWebWallet<any>>) ||
+                      wallets
+                    }
+                    hasNoWalletsLink={false}
+                    canResetWalletConnect={wcEnabled}
+                    hideSocialLogins={findSelectedWallet().length > 0}
+                  />
+                )
               )}
             </div>
           </div>
