@@ -78,7 +78,7 @@ const SessionRevalidationModal = ({
   const chainbase = app.chain?.meta?.base;
   const wallets = WebWalletController.Instance.availableWallets(chainbase);
 
-  const findSelectedWallet = () => {
+  const findSelectedWallet = (): Array<IWebWallet<any>> => {
     const selectedWallet = app.user.addresses.find(
       (w) => w.address === walletAddress
     );
@@ -184,10 +184,7 @@ const SessionRevalidationModal = ({
                       onSocialLogin(provider)
                     }
                     darkMode={false}
-                    wallets={
-                      (findSelectedWallet() as Array<IWebWallet<any>>) ||
-                      wallets
-                    }
+                    wallets={findSelectedWallet() || wallets}
                     hasNoWalletsLink={false}
                     canResetWalletConnect={wcEnabled}
                     hideSocialLogins={!!findSelectedWallet()}
