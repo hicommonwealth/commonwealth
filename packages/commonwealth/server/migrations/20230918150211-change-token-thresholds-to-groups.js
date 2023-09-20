@@ -33,7 +33,7 @@ module.exports = {
                 "Topics".token_threshold NOT IN ('0', '0000000000000000000')`
       )
 
-      // for each topic...
+      // for each topic, great a new group for it
       for (const topic of topics) {
         console.log('topic: ', topic)
         const {
@@ -44,7 +44,7 @@ module.exports = {
           token_symbol,
           contract_address
         } = topic
-         // create a new group
+         // build new group
         const source =
           ['erc20', 'erc721'].includes(network) ? { source_type: network, chain_id, contract_address } :
           network === 'ethereum' ? { source_type: 'eth_native', chain_id } :
@@ -63,30 +63,19 @@ module.exports = {
             }
           }
         ]
-        const insertGroupQuery = `
-          INSERT INTO "Groups"
-              ("chain_id", "metadata", "requirements", "created_at", "updated_at")
-            VALUES
-              (:chain_id, :metadata, :requirements, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id
-        `
-        try {
-          const [[{ id }]] = await queryInterface.sequelize.query(insertGroupQuery, {
-            replacements: {
-              chain_id,
-              requirements: JSON.stringify(requirements, null, 2),
-              metadata: JSON.stringify(metadata, null, 2)
-            },
-            type: queryInterface.sequelize.QueryTypes.INSERT
-          });
-          // associate group with topic
-          const updateTopicQuery = `
-            UPDATE "Topics" SET "group_ids" = "group_ids" || ARRAY[${id}] WHERE id = ${topic_id}
-          `
-          await await queryInterface.sequelize.query(updateTopicQuery)
-        } catch (err) {
-          console.error(err)
+        // check for existing matching group
+        const existingGroupId = await findGroup(queryInterface, chain_id, requirements, metadata)
+        if (existingGroupId) {
+          // found existing group- add to topic
+          await addGroupIdToTopic(queryInterface, existingGroupId, topic_id)
+        } else {
+          // does not exist- create group then add to topic
+          const createdGroupId = await insertGroup(queryInterface, chain_id, metadata, requirements)
+          if (createdGroupId) {
+            await addGroupIdToTopic(queryInterface, createdGroupId, topic_id)
+          }
         }
-       }
+      }
     })
   },
 
@@ -104,3 +93,62 @@ module.exports = {
     })
   }
 };
+
+async function findGroup(queryInterface, chain_id, requirements, metadata) {
+  try {
+    const findGroupQuery = `
+      SELECT id
+      FROM "Groups"
+      WHERE chain_id = :chain_id AND metadata::text = :metadata::text AND requirements::text = :requirements::text
+    `;
+    const result = await queryInterface.sequelize.query(findGroupQuery, {
+      replacements: {
+        chain_id,
+        requirements: JSON.stringify(requirements, null, 2),
+        metadata: JSON.stringify(metadata, null, 2)
+      },
+      type: queryInterface.sequelize.QueryTypes.SELECT
+    });
+
+    if (result.length > 0) {
+      const { id: existingGroupId } = result[0];
+      return existingGroupId;
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.error('findGroup error:', err);
+    return null;
+  }
+}
+
+
+async function addGroupIdToTopic(queryInterface, groupId, topicId) {
+  const updateTopicQuery = `
+    UPDATE "Topics" SET "group_ids" = "group_ids" || ARRAY[${groupId}] WHERE id = ${topicId}
+  `
+  return queryInterface.sequelize.query(updateTopicQuery)
+}
+
+async function insertGroup(queryInterface, chain_id, metadata, requirements) {
+  const insertGroupQuery = `
+    INSERT INTO "Groups"
+        ("chain_id", "metadata", "requirements", "created_at", "updated_at")
+      VALUES
+        (:chain_id, :metadata, :requirements, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id
+  `
+  try {
+    const [[{ id: createdGroupId }]] = await queryInterface.sequelize.query(insertGroupQuery, {
+      replacements: {
+        chain_id,
+        metadata: JSON.stringify(metadata, null, 2),
+        requirements: JSON.stringify(requirements, null, 2)
+      },
+      type: queryInterface.sequelize.QueryTypes.INSERT
+    });
+    return createdGroupId
+  } catch (err) {
+    console.error(err)
+    return null
+  }
+}
