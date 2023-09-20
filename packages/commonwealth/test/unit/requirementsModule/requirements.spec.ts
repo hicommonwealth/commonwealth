@@ -1,7 +1,7 @@
 import { assert, expect } from 'chai';
 import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
 import validateGroupMembership, {
-  validateGroupMembershipResponse,
+  ValidateGroupMembershipResponse,
 } from 'server/util/requirementsModule/validateGroupMembership';
 
 describe('validateGroupMembership', () => {
@@ -9,7 +9,7 @@ describe('validateGroupMembership', () => {
     const userAddress: string = 'mockUserAddress';
     const requirements: Requirement[] = [];
 
-    const result: validateGroupMembershipResponse = validateGroupMembership(
+    const result: ValidateGroupMembershipResponse = validateGroupMembership(
       userAddress,
       requirements
     );

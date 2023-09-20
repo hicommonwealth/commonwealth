@@ -65,6 +65,15 @@ export async function __updateGroup(
     throw new AppError(Errors.GroupNotFound);
   }
 
+  // update the group
+  const toUpdate: Partial<GroupAttributes> = {};
+  if (typeof metadata !== 'undefined') {
+    toUpdate.metadata = metadata;
+  }
+  if (typeof requirements !== 'undefined') {
+    toUpdate.requirements = requirements;
+  }
+
   await sequelize.transaction(async (transaction) => {
     // delete all existing memberships for group
     await this.models.Membership.destroy({
@@ -73,15 +82,7 @@ export async function __updateGroup(
       },
       transaction,
     });
-
-    // update the group
-    const toUpdate: Partial<GroupAttributes> = {};
-    if (typeof metadata !== 'undefined') {
-      toUpdate.metadata = metadata;
-    }
-    if (typeof requirements !== 'undefined') {
-      toUpdate.requirements = requirements;
-    }
+    // update group
     await group.update(toUpdate, { transaction });
   });
 

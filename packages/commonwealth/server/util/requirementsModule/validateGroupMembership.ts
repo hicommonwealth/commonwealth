@@ -2,7 +2,7 @@ import { AddressAttributes } from 'server/models/address';
 import { Requirement } from './requirementsTypes';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 
-export type validateGroupMembershipResponse = {
+export type ValidateGroupMembershipResponse = {
   isValid: boolean;
   messages?: {
     requirement: Requirement;
@@ -21,7 +21,7 @@ export default function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
   tbc?: TokenBalanceCache
-): validateGroupMembershipResponse {
+): ValidateGroupMembershipResponse {
   return {
     isValid: true,
   };

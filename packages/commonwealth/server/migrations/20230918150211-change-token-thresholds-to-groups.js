@@ -16,7 +16,7 @@ module.exports = {
       )
     })
     await queryInterface.sequelize.transaction(async (t) => {
-      // get threshold values for all topics
+      // get threshold values for all topics greater than zero
        const [topics] = await queryInterface.sequelize.query(
         `SELECT
             "Topics".id as topic_id,
@@ -29,7 +29,8 @@ module.exports = {
           JOIN  "Chains" ON "Chains".id = "Topics".chain_id
           JOIN "CommunityContracts" ON "CommunityContracts".chain_id = "Topics".chain_id
           JOIN "Contracts" ON "Contracts".id = "CommunityContracts".contract_id
-          WHERE "Chains".network IN ('ethereum', 'erc20', 'erc721', 'cosmos')`
+          WHERE "Chains".network IN ('ethereum', 'erc20', 'erc721', 'cosmos') AND
+                "Topics".token_threshold NOT IN ('0', '0000000000000000000')`
       )
 
       // for each topic...
@@ -52,6 +53,7 @@ module.exports = {
         if (!source) {
           throw new Error(`unsupported network for topic: ${JSON.stringify(topic)}`)
         }
+        const metadata = {}
         const requirements = [
           {
             rule: 'threshold',
@@ -65,13 +67,14 @@ module.exports = {
           INSERT INTO "Groups"
               ("chain_id", "metadata", "requirements", "created_at", "updated_at")
             VALUES
-              (:chain_id, '{}', :requirements, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id
+              (:chain_id, :metadata, :requirements, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id
         `
         try {
           const [[{ id }]] = await queryInterface.sequelize.query(insertGroupQuery, {
             replacements: {
               chain_id,
-              requirements: JSON.stringify(requirements)
+              requirements: JSON.stringify(requirements, null, 2),
+              metadata: JSON.stringify(metadata, null, 2)
             },
             type: queryInterface.sequelize.QueryTypes.INSERT
           });
