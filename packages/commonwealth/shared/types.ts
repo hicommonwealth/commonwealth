@@ -5,6 +5,7 @@ import {
   NotificationCategories,
   NotificationCategory,
 } from 'common-common/src/types';
+import { SupportedNetwork } from 'chain-events/src';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
@@ -149,7 +150,17 @@ export interface ICommentEditNotificationData
   comment_text: string;
 }
 
-export interface IChainEventNotificationData extends ChainEventAttributes {}
+export interface IChainEventNotificationData {
+  id?: number;
+  block_number?: number;
+  event_data: any;
+  network: SupportedNetwork;
+  chain: string;
+
+  // TODO: @Timothee remove these once chain-events is removed
+  queued?: number;
+  entity_id?: number;
+}
 
 export type NotificationDataTypes =
   | IForumNotificationData

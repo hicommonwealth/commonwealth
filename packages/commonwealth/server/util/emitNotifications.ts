@@ -113,19 +113,19 @@ export default async function emitNotifications(
 
   // get notification if it already exists
   let notification: NotificationInstance;
-  notification = await models.Notification.findOne(
-    isChainEventData
-      ? {
-          where: {
-            chain_event_id: chainEvent.id,
-          },
-        }
-      : {
-          where: {
-            notification_data: JSON.stringify(notification_data),
-          },
-        }
-  );
+  if (isChainEventData && chainEvent.id) {
+    notification = await models.Notification.findOne({
+      where: {
+        chain_event_id: chainEvent.id,
+      },
+    });
+  } else {
+    notification = await models.Notification.findOne({
+      where: {
+        notification_data: JSON.stringify(notification_data),
+      },
+    });
+  }
 
   // if the notification does not yet exist create it here
   if (!notification) {
