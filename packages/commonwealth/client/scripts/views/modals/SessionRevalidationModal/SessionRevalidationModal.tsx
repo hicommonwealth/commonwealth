@@ -19,7 +19,7 @@ import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/te
 import { X } from '@phosphor-icons/react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { setActiveAccount } from 'controllers/app/login';
-import IWebWallet from '../../../../../client/scripts/models/IWebWallet';
+import IWebWallet from 'models/IWebWallet';
 
 interface SessionRevalidationModalProps {
   onModalClose: () => void;
@@ -190,7 +190,7 @@ const SessionRevalidationModal = ({
                     }
                     hasNoWalletsLink={false}
                     canResetWalletConnect={wcEnabled}
-                    hideSocialLogins={findSelectedWallet().length > 0}
+                    hideSocialLogins={!!findSelectedWallet()}
                   />
                 )
               )}
