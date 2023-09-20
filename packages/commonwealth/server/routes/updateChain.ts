@@ -172,8 +172,6 @@ const updateChain = async (
     });
   }
 
-  console.log({ website });
-
   if (name) chain.name = name;
   if (description) chain.description = description;
   if (default_symbol) chain.default_symbol = default_symbol;
