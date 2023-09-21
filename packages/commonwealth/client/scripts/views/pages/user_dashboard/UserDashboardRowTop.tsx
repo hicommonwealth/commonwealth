@@ -1,14 +1,17 @@
 import { capitalize } from 'lodash';
 import moment from 'moment';
-import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/user_dashboard/user_dashboard_row_top.scss';
+
+import './UserDashboardRowTop.scss';
+
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import app from 'state';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { UserDashboardRowTopSkeleton } from './UserDashboardRowTopSkeleton';
+import { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardRowTopProps = {
   activityData: any;

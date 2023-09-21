@@ -55,6 +55,12 @@ import disableImmediateEmails from '../routes/subscription/disableImmediateEmail
 import viewNotifications, {
   RouteNotificationCategories,
 } from '../routes/viewNotifications';
+import addDeliveryMechanism from '../routes/subscription/addDeliveryMechanism';
+import disableDeliveryMechanism from '../routes/subscription/disableDeliveryMechanism';
+import updateDeliveryMechanism from '../routes/subscription/updateDeliveryMechanism';
+import viewDeliveryMechanisms from '../routes/subscription/viewDeliveryMechanisms';
+import enableSubscriptionDeliveryMechanism from '../routes/subscription/enableSubscriptionDeliveryMechanism';
+import disableSubscriptionDeliveryMechanism from '../routes/subscription/disableSubscriptionDeliveryMechanism';
 import viewUserActivity from '../routes/viewUserActivity';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
 import markNotificationsRead from '../routes/markNotificationsRead';
@@ -958,6 +964,54 @@ function setupRouter(
     '/disableSubscriptions',
     passport.authenticate('jwt', { session: false }),
     disableSubscriptions.bind(this, models)
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/addDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    addDeliveryMechanism.bind(this, models)
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/disableDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    disableDeliveryMechanism.bind(this, models)
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/updateDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    updateDeliveryMechanism.bind(this, models)
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/viewDeliveryMechanisms',
+    passport.authenticate('jwt', { session: false }),
+    viewDeliveryMechanisms.bind(this, models)
+  );
+  
+  registerRoute(
+    router,
+    'post',
+    '/enableSubscriptionDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    enableSubscriptionDeliveryMechanism.bind(this, models)
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/disableSubscriptionDeliveryMechanism',
+    passport.authenticate('jwt', { session: false }),
+    disableSubscriptionDeliveryMechanism.bind(this, models)
   );
 
   registerRoute(

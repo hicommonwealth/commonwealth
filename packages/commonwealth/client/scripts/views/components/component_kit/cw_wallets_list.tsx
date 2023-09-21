@@ -246,6 +246,19 @@ export const CWWalletsList = (props: WalletsListProps) => {
             darkMode={darkMode}
             onClick={() => onSocialLogin('twitter')}
           />
+          {app.isNative && (
+            <CWAuthButton
+              type="apple"
+              label="Apple"
+              darkMode={darkMode}
+              onClick={() =>
+                onSocialLogin(
+                  WalletSsoSource.Apple,
+                  useSessionKeyRevalidationFlow
+                )
+              }
+            />
+          )}
 
           {wallets.length === 0 && (
             <CWNoAuthMethodsAvailable darkMode={darkMode} />

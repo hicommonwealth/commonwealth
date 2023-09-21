@@ -1,10 +1,16 @@
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
+import DeliveryMechanism from './DeliveryMechanism';
 import type ChainInfo from './ChainInfo';
 import { default as CommentT } from './Comment';
 import { Thread as ThreadT } from './Thread';
 import type { IUniqueId } from './interfaces';
+
+interface SubscriptionDelivery {
+  type: string;
+  enabled: boolean;
+}
 
 class NotificationSubscription {
   public readonly category: string;
@@ -13,6 +19,7 @@ class NotificationSubscription {
   public readonly Chain: ChainInfo;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
+  public readonly SubscriptionDelivery: SubscriptionDelivery[];
 
   public readonly id?: number;
 
@@ -29,6 +36,25 @@ class NotificationSubscription {
     this._immediateEmail = false;
   }
 
+  public enableDeliveryOption(deliveryMechType: string) {
+    const deliveryOption = this.SubscriptionDelivery.find(
+      (dm) => dm.type === deliveryMechType
+    );
+    if (deliveryOption) {
+      deliveryOption.enabled = true;
+    } else {
+      this.SubscriptionDelivery.push({ type: deliveryMechType, enabled: true });
+    }
+  }
+
+  public disableDeliveryOption(deliveryMechType: string) {
+    const deliveryOption = this.SubscriptionDelivery.find(
+      (dm) => dm.type === deliveryMechType
+    );
+    if (deliveryOption) {
+      deliveryOption.enabled = false;
+    }
+  }
   private _isActive: boolean;
   public disable() {
     this._isActive = false;
@@ -64,6 +90,7 @@ class NotificationSubscription {
     isActive,
     createdAt,
     immediateEmail,
+    SubscriptionDelivery?: SubscriptionDelivery[],
     Chain?,
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT,
@@ -74,6 +101,7 @@ class NotificationSubscription {
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
+    this.SubscriptionDelivery = SubscriptionDelivery || [];
     this.Chain = Chain;
     this.Comment = comment;
     this.Thread = thread;
@@ -87,6 +115,7 @@ class NotificationSubscription {
       json.is_active,
       json.created_at,
       json.immediate_email,
+      json.SubscriptionDelivery || [],
       json.Chain,
       json.Comment,
       json.Thread,
@@ -102,6 +131,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     is_active,
     created_at,
     immediate_email,
+    SubscriptionDelivery,
     Chain,
     Comment,
     Thread,
@@ -130,6 +160,11 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
       console.log('error', e);
     }
   }
+  const modeledSubscriptionDeliveries: SubscriptionDelivery[] =
+    SubscriptionDelivery.map((subDelivery) => ({
+      type: subDelivery.DeliveryMechanism.type,
+      enabled: subDelivery.DeliveryMechanism.enabled,
+    }));
 
   return new NotificationSubscription(
     id,
@@ -137,6 +172,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     is_active,
     created_at,
     immediate_email,
+    modeledSubscriptionDeliveries,
     Chain,
     modeledComment,
     modeledThread,

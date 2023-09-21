@@ -1,4 +1,4 @@
-import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
+import './UserDashboardChainEventRow.scss';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { IEventLabel } from '../../../../../../chain-events/src';

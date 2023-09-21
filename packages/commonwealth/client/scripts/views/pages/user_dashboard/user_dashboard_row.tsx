@@ -1,6 +1,6 @@
 import type { CWEvent, IEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
-import 'pages/user_dashboard/user_dashboard_row.scss';
+import './UserDashboardRow.scss';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -8,7 +8,7 @@ import type DashboardActivityNotification from '../../../models/DashboardActivit
 import { getClasses } from '../../components/component_kit/helpers';
 import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
 import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
-import { UserDashboardRowTop } from './user_dashboard_row_top';
+import { UserDashboardRowTop } from './UserDashboardRowTop';
 
 type UserDashboardRowProps = {
   notification?: DashboardActivityNotification;

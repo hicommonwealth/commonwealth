@@ -2,6 +2,7 @@
 
 .LoginSelector {
   display: flex;
+  -webkit-app-region: no-drag;
 
   .join-button-container {
     margin-right: 12px;

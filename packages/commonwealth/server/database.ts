@@ -13,6 +13,7 @@ import CommunityContractFactory from './models/community_contract';
 import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
+import DeliveryMechanismFactory from './models/delivery_mechanisms';
 import DiscordBotConfigFactory from './models/discord_bot_config';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
@@ -27,6 +28,7 @@ import SocialAccountFactory from './models/social_account';
 import SsoTokenFactory from './models/sso_token';
 import StarredCommunityFactory from './models/starred_community';
 import SubscriptionFactory from './models/subscription';
+import SubscriptionDeliveryFactory from './models/subscription_delivery';
 import TaggedThreadFactory from './models/tagged_threads';
 import ThreadFactory from './models/thread';
 import TokenFactory from './models/token';
@@ -85,6 +87,7 @@ const models: Models = {
   Template: TemplateFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
+  DeliveryMechanism: DeliveryMechanismFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
@@ -103,6 +106,7 @@ const models: Models = {
   SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
   SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
+  SubscriptionDelivery: SubscriptionDeliveryFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
   User: UserModelFactory(sequelize, DataTypes),

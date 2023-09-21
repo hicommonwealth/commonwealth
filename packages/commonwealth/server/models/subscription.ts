@@ -18,6 +18,7 @@ import type {
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
+import type { SubscriptionDeliveryAttributes } from './subscription_delivery';
 import { NotificationCategories } from 'common-common/src/types';
 
 export enum SubscriptionValidationErrors {
@@ -47,6 +48,7 @@ export type SubscriptionAttributes = {
   Chain?: ChainAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
+  SubscriptionDelivery?: SubscriptionDeliveryAttributes[];
 };
 
 export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
@@ -165,6 +167,10 @@ export default (
     models.Subscription.belongsTo(models.Comment, {
       foreignKey: 'comment_id',
       targetKey: 'id',
+    });
+    models.Subscription.hasMany(models.SubscriptionDelivery, {
+      foreignKey: 'subscription_id',
+      as: 'SubscriptionDelivery',
     });
   };
 

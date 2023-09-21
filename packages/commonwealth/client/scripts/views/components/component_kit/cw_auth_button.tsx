@@ -15,7 +15,7 @@ type AuthButtonStylesProps = {
 
 type AuthButtonProps = {
   onClick?: () => void;
-  type: CustomIconName | 'discord' | 'twitter' | 'github' | 'google';
+  type: CustomIconName | 'discord' | 'twitter' | 'github' | 'google' | 'apple';
   label?: string;
   className?: string;
 } & AuthButtonStylesProps;

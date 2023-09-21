@@ -25,6 +25,17 @@
         color: $neutral-600;
       }
 
+      .selected {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+  
+        svg {
+          fill: $black;
+          width: 18px;
+        }
+      }
+
       &:hover {
         background-color: $neutral-50;
       }

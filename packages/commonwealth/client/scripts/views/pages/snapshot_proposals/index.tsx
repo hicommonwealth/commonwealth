@@ -31,12 +31,10 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   const spaceSubscription = useMemo(
     () =>
-      app.user.notifications.findNotificationSubscription(
-        {
-          categoryId: NotificationCategories.SnapshotProposal,
-          options: { snapshotId },
-        }
-      ),
+      app.user.notifications.findNotificationSubscription({
+        categoryId: NotificationCategories.SnapshotProposal,
+        options: { snapshotId },
+      }),
     [snapshotId]
   );
 

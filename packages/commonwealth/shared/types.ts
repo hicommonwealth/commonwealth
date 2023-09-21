@@ -23,6 +23,14 @@ export type SnapshotProposalNotification = {
   SnapshotProposal: SnapshotProposalAttributes;
 };
 
+export enum DeliveryMechanismType {
+  Browser = 'browser',
+  iOSApp = 'ios-native',
+  Desktop = 'desktop',
+  Android = 'android',
+  ApplePWA = 'ios-pwa',
+}
+
 export type ChainEventNotification = {
   id: number;
   notification_data: string;

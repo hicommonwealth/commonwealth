@@ -2,7 +2,7 @@ import React from 'react';
 
 import { NotificationCategories } from 'common-common/src/types';
 
-import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
+import './UserDashboardRowBottom.scss';
 
 import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';

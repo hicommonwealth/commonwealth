@@ -6,8 +6,11 @@ import 'pages/notification_settings/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import NotificationSubscription from '../../../models/NotificationSubscription';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
+import { CWMultiSelectDropdown } from '../../components/component_kit/cw_dropdown_multi';
+import { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -22,7 +25,13 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
+import { DeliveryMechanismType } from '../../../../../shared/types';
+import {
+  FirebaseMessaging,
+  GetTokenOptions,
+} from '@capacitor-firebase/messaging';
 import { bundleSubs } from './helpers';
+import { pushNotifications } from '@todesktop/client-core';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -38,6 +47,7 @@ const NotificationSettingsPage = () => {
   const [email, setEmail] = useState('');
   const [emailValidated, setEmailValidated] = useState(false);
   const [sentEmail, setSentEmail] = useState(false);
+  const [token, setToken] = useState('');
 
   const [currentFrequency, setCurrentFrequency] = useState(
     app.user.emailInterval
@@ -46,6 +56,112 @@ const NotificationSettingsPage = () => {
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [app?.user.notifications, app.user.emailInterval]);
+
+  // Handler for the 'Request Permission' button
+  const requestPermission = async () => {
+    const permission = await FirebaseMessaging.requestPermissions();
+    return permission;
+  };
+
+  // Handler for the 'Get Token' button
+  const getToken = async () => {
+    const vapidKey =
+      'BDMNzw-2Dm1HcE9hFr3T4Li_pCp_w7L4tCcq-OETD71J1DdC0VgIogt6rC8Hh0bHtTacyZHSoQ1ax5KCU4ZjS30';
+
+    let _token;
+
+    await FirebaseMessaging.getToken({ vapidKey: vapidKey })
+      .then((currentToken) => {
+        if (currentToken) {
+          setToken(currentToken.token);
+          _token = currentToken.token;
+        } else {
+          console.log(
+            'Debug: No registration token available. Request permission to generate one.'
+          );
+        }
+      })
+      .catch((err) => {
+        console.log('Debug: An error occurred while retrieving token. ', err);
+      });
+    return _token;
+  };
+
+  const handleToggleDeliveryMechanism = async (mechanismType, isEnabled) => {
+    const mechanism = app.user.notifications.deliveryMechanisms.find(
+      (m) => m.type === mechanismType
+    );
+
+    const platform = app.platform();
+
+    const isOnRightPlatform =
+      (mechanismType === DeliveryMechanismType.iOSApp && platform === 'ios') ||
+      (mechanismType === DeliveryMechanismType.Android &&
+        platform === 'android') ||
+      (mechanismType === DeliveryMechanismType.Browser && platform === 'web') ||
+      (mechanismType === DeliveryMechanismType.Desktop &&
+        platform === 'desktop') ||
+      (mechanismType === DeliveryMechanismType.ApplePWA &&
+        platform === 'mobile-safari' &&
+        app.isStandalone());
+
+    if (isOnRightPlatform) {
+      let _token =
+        platform !== 'desktop' &&
+        (await requestPermission()).receive === 'granted'
+          ? await getToken()
+          : null;
+      if (mechanism) {
+        await (isEnabled
+          ? app.user.notifications.updateDeliveryMechanism(
+              _token,
+              mechanismType,
+              isEnabled
+            )
+          : app.user.notifications.disableMechanism(mechanismType));
+      } else if (isEnabled) {
+        await app.user.notifications.addDeliveryMechanism(
+          _token,
+          mechanismType,
+          true
+        );
+      }
+      forceRerender();
+    }
+  };
+
+  const handleSubscriptionDelivery = async (
+    selectedItems: DropdownItemType[],
+    subs: NotificationSubscription[],
+    initialValues: any
+  ) => {
+    const selectedTypes = selectedItems.map((item) => item.value);
+
+    // Types that were initially selected but are now deselected
+    const typesToDisable = initialValues
+      .filter((item) => !selectedTypes.includes(item.value))
+      .map((item) => item.value);
+    // Types that were initially deselected but are now selected
+    const typesToEnable = selectedTypes.filter(
+      (type) => !initialValues.includes(type)
+    );
+
+    for (const type of typesToDisable) {
+      await app.user.notifications.disableSubscriptionDeliveryMechanism(
+        type,
+        subs
+      );
+    }
+
+    for (const type of typesToEnable) {
+      await app.user.notifications.enableSubscriptionDeliveryMechanism(
+        type,
+        subs
+      );
+    }
+
+    forceRerender();
+  };
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
@@ -99,6 +215,13 @@ const NotificationSettingsPage = () => {
   const relevantSubscribedChains = app?.user.addresses
     .map((x) => x.chain)
     .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
+
+  const deliveryMechanismTypes = Object.values(DeliveryMechanismType);
+
+  const options = app.user.notifications.deliveryMechanisms.map((mech) => ({
+    label: mech.type.charAt(0).toUpperCase() + mech.type.slice(1),
+    value: mech.type,
+  }));
 
   return (
     <div className="NotificationSettingsPage">
@@ -211,6 +334,97 @@ const NotificationSettingsPage = () => {
           </CWCard>
         </div>
       )}
+      <CWText className="page-subheader-text">
+        Configure which platforms you want to receive notifications to. After
+        you configure them you can directly manage which subscriptions go to
+        which platforms.
+      </CWText>
+      <div className="platform-column-header-row">
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="column-header-text"
+        >
+          Platform
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="last-column-header-text"
+        >
+          Toggle
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="last-column-header-text"
+        >
+          Device Allowed
+        </CWText>
+      </div>
+      {deliveryMechanismTypes.map((mechanismType) => {
+        const mechanism = app?.user.notifications.deliveryMechanisms.find(
+          (m) => m.type === mechanismType
+        );
+        const platform = app.platform();
+        const isOnPlatform =
+          (mechanismType === DeliveryMechanismType.iOSApp &&
+            platform === 'ios') ||
+          (mechanismType === DeliveryMechanismType.Android &&
+            platform === 'android') ||
+          (mechanismType === DeliveryMechanismType.Browser &&
+            platform === 'web') ||
+          (mechanismType === DeliveryMechanismType.Desktop &&
+            platform === 'desktop') ||
+          (mechanismType === DeliveryMechanismType.ApplePWA &&
+            platform === 'mobile-safari' &&
+            app.isStandalone());
+
+        return (
+          <div
+            key={mechanismType}
+            className="notification-row chain-events-subscriptions-padding"
+          >
+            <div className="platform-row-header">
+              <div className="left-content-container">
+                <div className="avatar-and-name">
+                  <CWIcon name={mechanismType} iconName={'home'} />
+                  <CWText type="h5" fontWeight="medium">
+                    {mechanismType.charAt(0).toUpperCase() +
+                      mechanismType.slice(1)}
+                  </CWText>
+                </div>
+              </div>
+              <CWToggle
+                checked={mechanism?.enabled || false}
+                disabled={!isOnPlatform}
+                onChange={() => {
+                  if (isOnPlatform) {
+                    const newEnabledState = mechanism
+                      ? !mechanism.enabled
+                      : true;
+                    handleToggleDeliveryMechanism(
+                      mechanismType,
+                      newEnabledState
+                    );
+                  }
+                }}
+              />
+              {!isOnPlatform && (
+                <div className="platform-warning">
+                  <CWText
+                    isCentered={true}
+                    type="caption"
+                    className="platform-warning-text"
+                  >
+                    Should be on device toggle delivery on.
+                  </CWText>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
       <CWText
         type="h4"
         fontWeight="semiBold"
@@ -236,9 +450,16 @@ const NotificationSettingsPage = () => {
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
           fontWeight="medium"
-          className="last-column-header-text"
+          className="column-header-text"
         >
           In-App
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="last-column-header-text"
+        >
+          Other Methods
         </CWText>
       </div>
       {relevantSubscribedChains
@@ -279,6 +500,16 @@ const NotificationSettingsPage = () => {
                       });
                   }}
                 />
+                <CWMultiSelectDropdown
+                  placeholder={'Options'}
+                  options={options}
+                  containerClassName="subscriptions-option-dropdown"
+                  onSelect={(selectedValues) =>
+                    handleSubscriptionDelivery(selectedValues, [], [])
+                  }
+                  initialValues={[]}
+                  disabled={true}
+                />
               </div>
             </div>
           );
@@ -290,6 +521,20 @@ const NotificationSettingsPage = () => {
           const chainInfo = app.config.chains.getById(chainName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
+          const initialValues = subs
+            .flatMap((sub) => sub.SubscriptionDelivery)
+            .filter((delivery) => delivery.enabled)
+            .map((delivery) => ({
+              label:
+                delivery.type.charAt(0).toUpperCase() + delivery.type.slice(1),
+              value: delivery.type,
+            }));
+          const wrappedHandleSubscriptionDelivery = (
+            selectedItems: DropdownItemType[]
+          ) => {
+            handleSubscriptionDelivery(selectedItems, subs, initialValues);
+          };
+
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
@@ -316,6 +561,15 @@ const NotificationSettingsPage = () => {
                   onChange={() => {
                     handleSubscriptions(hasSomeInAppSubs, subs);
                   }}
+                />
+                <CWMultiSelectDropdown
+                  placeholder={'Options'}
+                  options={options}
+                  containerClassName="subscriptions-option-dropdown"
+                  onSelect={wrappedHandleSubscriptionDelivery}
+                  initialValues={initialValues}
+                  disabled={options.length === 0}
+                  // other props...
                 />
               </div>
             </div>
@@ -346,9 +600,16 @@ const NotificationSettingsPage = () => {
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
           fontWeight="medium"
-          className="last-column-header-text"
+          className="column-header-text"
         >
           In-App
+        </CWText>
+        <CWText
+          type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+          fontWeight="medium"
+          className="last-column-header-text"
+        >
+          Other Methods
         </CWText>
       </div>
       {Object.entries(bundledSubs)
@@ -357,6 +618,19 @@ const NotificationSettingsPage = () => {
           const chainInfo = app?.config.chains.getById(chainName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
+          const initialValues = subs
+            .flatMap((sub) => sub.SubscriptionDelivery)
+            .filter((delivery) => delivery.enabled)
+            .map((delivery) => ({
+              label:
+                delivery.type.charAt(0).toUpperCase() + delivery.type.slice(1),
+              value: delivery.type,
+            }));
+          const wrappedHandleSubscriptionDelivery = (
+            selectedItems: DropdownItemType[]
+          ) => {
+            handleSubscriptionDelivery(selectedItems, subs, initialValues);
+          };
 
           if (!chainInfo?.id) return null; // handles incomplete loading case
 
@@ -391,6 +665,14 @@ const NotificationSettingsPage = () => {
                       onChange={() =>
                         handleSubscriptions(hasSomeInAppSubs, subs)
                       }
+                    />
+                    <CWMultiSelectDropdown
+                      placeholder={'Options'}
+                      options={options}
+                      containerClassName="subscriptions-dropdown"
+                      onSelect={wrappedHandleSubscriptionDelivery}
+                      initialValues={initialValues}
+                      disabled={options.length === 0}
                     />
                   </div>
                 }

@@ -8,7 +8,7 @@ import {
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
-import $ from 'jquery';
+import axios from 'axios';
 import app, { initAppState } from 'state';
 import { notifySuccess } from 'controllers/app/notifications';
 import { setDarkMode } from 'helpers/darkMode';
@@ -70,7 +70,8 @@ export const LoginSelectorMenuRight = ({
         <div
           className="login-menu-item"
           onClick={() => {
-            $.get(`${app.serverUrl()}/logout`)
+            axios
+              .get(`${app.serverUrl()}/logout`, { withCredentials: true })
               .then(async () => {
                 await initAppState();
                 await resetWalletConnectSession();

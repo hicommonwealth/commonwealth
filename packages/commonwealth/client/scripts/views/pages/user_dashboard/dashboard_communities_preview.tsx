@@ -37,7 +37,7 @@ const CommunityPreviewCard = (props: CommunityPreviewCardProps) => {
       interactive
       onClick={(e) => {
         e.preventDefault();
-        navigate(`/${chain.id}`);
+        navigate(`/${chain.id}`, {}, null);
       }}
     >
       <div className="card-top">
@@ -96,7 +96,7 @@ export const DashboardCommunitiesPreview = () => {
       <div className="buttons">
         <CWButton
           onClick={() => {
-            navigate('/communities');
+            navigate(`/communities`, {}, null);
           }}
           label="Explore communities"
           buttonType="mini-black"

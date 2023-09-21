@@ -1,6 +1,8 @@
+import fs from 'fs';
+import https from 'https';
+import http from 'http';
 import type { RabbitMQController } from 'common-common/src/rabbitmq';
 import type { Express } from 'express-serve-static-core';
-import http from 'http';
 import type Rollbar from 'rollbar';
 
 import { PORT } from '../config';
@@ -20,7 +22,19 @@ const setupServer = (
   redisCache: RedisCache
 ) => {
   app.set('port', PORT);
-  const server = http.createServer(app);
+  let server;
+  if (process.env.USE_HTTPS_DEV === 'true') {
+    server = https.createServer(
+      {
+        key: fs.readFileSync('common_dev_key.pem'),
+        cert: fs.readFileSync('common_dev_cert.pem'),
+        passphrase: 'cowmoon',
+      },
+      app
+    );
+  } else {
+    server = http.createServer(app);
+  }
   setupWebSocketServer(server, rollbar, models, rabbitMQController);
   cacheDecorator.setCache(redisCache);
 

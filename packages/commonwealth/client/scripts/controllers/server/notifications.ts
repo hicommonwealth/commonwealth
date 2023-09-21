@@ -9,6 +9,7 @@ import NotificationSubscription, {
 import app from 'state';
 
 import { NotificationStore } from 'stores';
+import DeliveryMechanism from '../../models/DeliveryMechanism';
 import Notification from '../../models/Notification';
 import { NotificationCategories } from 'common-common/src/types';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
@@ -51,6 +52,8 @@ class NotificationsController {
   // notification settings page
   private _chainEventSubscribedChainIds: string[] = [];
 
+  private _deliveryMechanisms: DeliveryMechanism[] = [];
+
   private _numPages = 0;
   private _numUnread = 0;
 
@@ -91,6 +94,13 @@ class NotificationsController {
     );
   }
 
+  public get deliveryMechanisms() {
+    return this._deliveryMechanisms;
+  }
+
+  public set deliveryMechanisms(mechanisms: DeliveryMechanism[]) {
+    this._deliveryMechanisms = mechanisms;
+  }
   public get chainEventSubscriptions(): NotificationSubscription[] {
     return this._subscriptions.filter(
       (s) => s.categoryId === NotificationCategories.ChainEvent
@@ -198,6 +208,42 @@ class NotificationsController {
       () => {
         for (const s of subscriptions) {
           s.disableImmediateEmail();
+        }
+      }
+    );
+  }
+
+  public enableSubscriptionDeliveryMechanism(
+    deliveryMechType: string,
+    subscriptions: NotificationSubscription[]
+  ) {
+    return post(
+      '/enableSubscriptionDeliveryMechanism',
+      {
+        delivery_mechanism_type: deliveryMechType,
+        'subscription_ids[]': subscriptions.map((n) => n.id),
+      },
+      () => {
+        for (const s of subscriptions) {
+          s.enableDeliveryOption(deliveryMechType);
+        }
+      }
+    );
+  }
+
+  public disableSubscriptionDeliveryMechanism(
+    deliveryMechType: string,
+    subscriptions: NotificationSubscription[]
+  ) {
+    return post(
+      '/disableSubscriptionDeliveryMechanism',
+      {
+        delivery_mechanism_type: deliveryMechType,
+        'subscription_ids[]': subscriptions.map((n) => n.id),
+      },
+      () => {
+        for (const s of subscriptions) {
+          s.disableDeliveryOption(deliveryMechType);
         }
       }
     );
@@ -401,12 +447,87 @@ class NotificationsController {
     });
   }
 
+  public getDeliveryMechanisms() {
+    return get('/viewDeliveryMechanisms', {}, (result) => {
+      this._deliveryMechanisms = result.map((mech) =>
+        DeliveryMechanism.modelFromServer(mech)
+      );
+    });
+  }
+
+  public addDeliveryMechanism(
+    identifier: string,
+    type: string,
+    enabled: boolean
+  ) {
+    return post(
+      '/addDeliveryMechanism',
+      {
+        identifier,
+        type,
+        enabled,
+      },
+      (result) => {
+        this._deliveryMechanisms.push(
+          DeliveryMechanism.modelFromServer(result)
+        );
+      }
+    );
+  }
+
+  public updateDeliveryMechanism(
+    identifier: string,
+    type: string,
+    enabled: boolean
+  ) {
+    return post(
+      '/updateDeliveryMechanism',
+      {
+        identifier,
+        type,
+        enabled,
+      },
+      (result) => {
+        const updatedMechanism = DeliveryMechanism.modelFromServer(result);
+        const index = this._deliveryMechanisms.findIndex(
+          (m) => m.id === updatedMechanism.id
+        );
+
+        // if the mechanism was found in the array, replace it
+        if (index !== -1) {
+          this._deliveryMechanisms[index] = updatedMechanism;
+        }
+      }
+    );
+  }
+
+  public disableMechanism(type: string) {
+    return post(
+      '/disableDeliveryMechanism',
+      {
+        type,
+      },
+      (result) => {
+        const updatedMechanism = DeliveryMechanism.modelFromServer(result);
+        const index = this._deliveryMechanisms.findIndex(
+          (m) => m.id === updatedMechanism.id
+        );
+
+        // if the mechanism was found in the array, replace it
+        if (index !== -1) {
+          this._deliveryMechanisms[index] = updatedMechanism;
+        }
+      }
+    );
+  }
+
   public async refresh() {
     await Promise.all([
       this.getDiscussionNotifications(),
       this.getChainEventNotifications(),
       this.getSubscriptions(),
       this.getSubscribedChains(),
+      this.getDeliveryMechanisms(),
     ]);
     this.isLoaded.emit('redraw');
     return Promise.resolve();

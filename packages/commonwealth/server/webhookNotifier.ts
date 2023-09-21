@@ -31,7 +31,7 @@ const REGEX_IMAGE =
 const REGEX_EMOJI =
   /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g;
 
-const getFilteredContent = (content, address) => {
+export const getFilteredContent = (content, address) => {
   if (content.chainEvent && content.chainEventType) {
     // construct compatible CW event from DB by inserting network from type
     const evt = {

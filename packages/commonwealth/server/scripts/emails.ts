@@ -28,7 +28,7 @@ const log = factory.getLogger(formatFilename(__filename));
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-const getForumNotificationCopy = async (
+export const getForumNotificationCopy = async (
   models: DB,
   notification_data: IForumNotificationData,
   category_id

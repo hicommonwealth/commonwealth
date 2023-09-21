@@ -14,6 +14,8 @@ import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import SocialAccount from '../../models/SocialAccount';
+import axios from 'axios';
+
 import { CosmosExtension } from '@magic-ext/cosmos';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 
@@ -241,7 +243,7 @@ export async function createUserWithAddress(
   sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo
 ): Promise<{ account: Account; newlyCreated: boolean }> {
-  const response = await $.post(`${app.serverUrl()}/createAddress`, {
+  const response = await axios.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
     jwt: app.user.jwt,
@@ -250,19 +252,19 @@ export async function createUserWithAddress(
       ? JSON.stringify(validationBlockInfo)
       : null,
   });
-  const id = response.result.id;
+  const id = response.data.result.id;
   const chainInfo = app.config.chains.getById(chain);
   const account = new Account({
     addressId: id,
     address,
     chain: chainInfo,
-    validationToken: response.result.verification_token,
+    validationToken: response.data.result.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,
-    validationBlockInfo: response.result.block_info,
+    validationBlockInfo: response.data.result.block_info,
     ignoreProfile: false,
   });
-  return { account, newlyCreated: response.result.newly_created };
+  return { account, newlyCreated: response.data.result.newly_created };
 }
 
 export async function unlinkLogin(account: AddressInfo) {
@@ -365,6 +367,8 @@ function getProfileMetadata({ provider, userInfo }): {
     return { username: userInfo.name, avatarUrl: userInfo.profile };
   } else if (provider === 'google') {
     return { username: userInfo.name, avatarUrl: userInfo.picture };
+  } else if (provider === 'apple') {
+    return {};
   }
   return {};
 }
@@ -395,7 +399,7 @@ export async function handleSocialLoginCallback(bearer?: string) {
     },
   });
 
-  if (response.status === 'Success') {
+  if (response.data.status === 'Success') {
     await initAppState(false);
     if (app.chain) {
       const c = app.user.selectedChain
@@ -404,6 +408,6 @@ export async function handleSocialLoginCallback(bearer?: string) {
       await updateActiveAddresses({ chain: c });
     }
   } else {
-    throw new Error(`Social auth unsuccessful: ${response.status}`);
+    throw new Error(`Social auth unsuccessful: ${response.data.status}`);
   }
 }

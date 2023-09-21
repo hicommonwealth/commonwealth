@@ -1,4 +1,3 @@
-
 type ContractSource = {
   source_type: 'erc20' | 'erc721';
   chain_id: string;

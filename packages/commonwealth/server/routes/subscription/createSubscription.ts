@@ -116,6 +116,24 @@ export default async (
     },
   });
 
+  // find enabled delivery mechanisms for the user
+  const deliveryMechanisms = await models.DeliveryMechanism.findAll({
+    where: {
+      user_id: req.user.id,
+      enabled: true,
+    },
+  });
+
+  // create a SubscriptionDelivery for each enabled delivery mechanism
+  const subscriptionDeliveries = deliveryMechanisms.map((deliveryMechanism) =>
+    models.SubscriptionDelivery.create({
+      subscription_id: subscription.id,
+      delivery_mechanism_id: deliveryMechanism.id,
+    })
+  );
+
+  await Promise.all(subscriptionDeliveries);
+
   const subJson = subscription.toJSON();
 
   if (chain) {
