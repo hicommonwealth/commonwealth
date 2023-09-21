@@ -31,7 +31,11 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       url: { type: dataTypes.STRING, allowNull: false },
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
-      cosmos_chain_id: { type: dataTypes.STRING, allowNull: true },
+      cosmos_chain_id: {
+        type: dataTypes.STRING,
+        allowNull: true,
+        unique: true,
+      },
       alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
       private_url: { type: dataTypes.STRING, allowNull: true },
       balance_type: { type: dataTypes.STRING, allowNull: false },
