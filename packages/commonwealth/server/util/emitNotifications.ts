@@ -75,8 +75,10 @@ export default async function emitNotifications(
     if (addressModels && addressModels.length > 0) {
       const userIds = addressModels.map((a) => a.user_id);
 
-      // remove duplicates
-      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
+      // remove duplicates and null user_ids
+      const userIdsDedup = userIds.filter(
+        (a, b) => userIds.indexOf(a) === b && a !== null
+      );
       return userIdsDedup;
     } else {
       return [];

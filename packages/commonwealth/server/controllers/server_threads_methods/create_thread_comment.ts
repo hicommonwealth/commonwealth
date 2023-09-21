@@ -228,29 +228,44 @@ export async function __createThreadComment(
         },
       });
 
-    // create a SubscriptionDelivery for each enabled delivery mechanism
-    const reactionSubscriptionDeliveries = deliveryMechanisms.map(
-      (deliveryMechanism) =>
-        this.models.SubscriptionDelivery.create({
-          subscription_id: reactionSubscription.id,
-          delivery_mechanism_id: deliveryMechanism.id,
-        })
-    );
-    const commentSubscriptionDeliveries = deliveryMechanisms.map(
-      (deliveryMechanism) =>
-        this.models.SubscriptionDelivery.create({
-          subscription_id: commentSubscription.id,
-          delivery_mechanism_id: deliveryMechanism.id,
-        })
-    );
+    transaction.afterCommit(async () => {
+      // create a SubscriptionDelivery for each enabled delivery mechanism
+      const reactionSubscriptionDeliveries = deliveryMechanisms.map(
+        async (deliveryMechanism) => {
+          try {
+            return await this.models.SubscriptionDelivery.create({
+              subscription_id: reactionSubscription.id,
+              delivery_mechanism_id: deliveryMechanism.id,
+            });
+          } catch (err) {
+            console.log('Error creating reactionSubscriptionDelivery:', err);
+            throw err;
+          }
+        }
+      );
+      const commentSubscriptionDeliveries = deliveryMechanisms.map(
+        async (deliveryMechanism) => {
+          try {
+            return await this.models.SubscriptionDelivery.create({
+              subscription_id: commentSubscription.id,
+              delivery_mechanism_id: deliveryMechanism.id,
+            });
+          } catch (err) {
+            console.log('Error creating commentSubscriptionDelivery:', err);
+            throw err;
+          }
+        }
+      );
 
-    await Promise.all([
-      ...reactionSubscriptionDeliveries,
-      ...commentSubscriptionDeliveries,
-    ]);
+      await Promise.all([
+        ...reactionSubscriptionDeliveries,
+        ...commentSubscriptionDeliveries,
+      ]);
+    });
 
     await transaction.commit();
   } catch (err) {
+    console.log('Error in transaction:', err);
     await transaction.rollback();
     await finalComment.destroy();
     throw err;
