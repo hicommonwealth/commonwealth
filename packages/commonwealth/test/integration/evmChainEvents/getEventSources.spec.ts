@@ -1,4 +1,4 @@
-import { resetDatabase } from '../../../server-test';
+import { resetDatabase } from '../../util/resetDatabase';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import { expect } from 'chai';
 import {
@@ -27,7 +27,7 @@ describe('getEventSources', () => {
   });
 
   it("should not return sources that don't have an ABI", async () => {
-    const communityContract = await getTestCommunityContract();
+    await getTestCommunityContract();
     const result = await getEventSources();
     expect(result).to.deep.equal({});
   });

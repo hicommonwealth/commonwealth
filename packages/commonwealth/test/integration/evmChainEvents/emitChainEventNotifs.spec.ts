@@ -5,14 +5,14 @@ import {
   getTestSubscription,
 } from './util';
 import { emitChainEventNotifs } from '../../../server/workers/evmChainEvents/emitChainEventNotifs';
-import { resetDatabase } from '../../../server-test';
+import { resetDatabase } from '../../util/resetDatabase';
 import models from '../../../server/database';
 import { expect } from 'chai';
 import { BigNumber, ethers } from 'ethers';
 import { RawEvmEvent } from '../../../server/workers/evmChainEvents/types';
 import { sdk } from '../../devnet/evm/evmChainEvents/util';
 
-describe.only('emitChainEventNotifs', () => {
+describe('emitChainEventNotifs', () => {
   let chainNode: ChainNodeInstance;
   let emitSuccess = false;
   const validEvent: RawEvmEvent = {

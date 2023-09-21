@@ -11,40 +11,65 @@ import {
   localRpc,
   sdk,
 } from '../../devnet/evm/evmChainEvents/util';
-import { rawAaveAbi } from '../../../server/workers/evmChainEvents/hardCodedAbis';
+import {
+  rawAaveAbi,
+  rawDydxAbi,
+} from '../../../server/workers/evmChainEvents/hardCodedAbis';
 import { hashAbi } from '../../../server/util/abiValidation';
 
 export const testChainId = 'aave-test';
+export const testChainIdV2 = 'dydx-test';
 export const testAbiNickname = 'Aave Test Governance V2';
+export const testAbiNicknameV2 = 'DyDx Test Governance V2';
 
-export async function getTestChainNode() {
+export async function getTestChainNode(version?: 'v1' | 'v2') {
+  let rpc: string, name: string;
+  if (!version || version === 'v1') {
+    rpc = localRpc;
+    name = 'Test Node';
+  } else {
+    rpc = 'http://localhost:8546';
+    name = 'Test Node 2';
+  }
+
   const [chainNode, created] = await models.ChainNode.findOrCreate({
     where: {
-      url: localRpc,
+      url: rpc,
       balance_type: BalanceType.Ethereum,
     },
     defaults: {
-      name: 'Test Node',
+      name,
     },
   });
 
   return chainNode;
 }
 
-export async function getTestChain() {
-  const chainNode = await getTestChainNode();
+export async function getTestChain(version?: 'v1' | 'v2') {
+  const chainNode = await getTestChainNode(version);
+
+  let chainId: string, name: string, defaultSymbol: string;
+  if (!version || version === 'v1') {
+    chainId = testChainId;
+    name = 'Aave Test';
+    defaultSymbol = 'AAVE';
+  } else {
+    chainId = testChainIdV2;
+    name = 'DyDx Test';
+    defaultSymbol = 'DYDX';
+  }
 
   const [chain, created] = await models.Chain.findOrCreate({
     where: {
-      id: testChainId,
+      id: chainId,
       chain_node_id: chainNode.id,
     },
     defaults: {
-      name: 'Aave Test',
+      name,
       network: ChainNetwork.Aave,
       type: ChainType.Chain,
       base: ChainBase.Ethereum,
-      default_symbol: 'AAVE',
+      default_symbol: defaultSymbol,
     },
   });
 
@@ -63,29 +88,44 @@ export async function getTestChain() {
   return chain;
 }
 
-export async function getTestAbi() {
+export async function getTestAbi(version?: 'v1' | 'v2') {
+  let hash: string, nickname: string;
+  if (!version || version === 'v1') {
+    hash = hashAbi(rawAaveAbi);
+    nickname = testAbiNickname;
+  } else {
+    hash = hashAbi(rawDydxAbi);
+    nickname = testAbiNicknameV2;
+  }
   const existingAbi = await models.ContractAbi.findOne({
     where: {
-      abi_hash: hashAbi(rawAaveAbi),
-      nickname: testAbiNickname,
+      abi_hash: hash,
+      nickname,
     },
   });
 
   if (existingAbi) return existingAbi;
 
   return await models.ContractAbi.create({
-    abi: rawAaveAbi,
-    nickname: testAbiNickname,
-    abi_hash: hashAbi(rawAaveAbi),
+    abi: !version || version === 'v1' ? rawAaveAbi : rawDydxAbi,
+    nickname: nickname,
+    abi_hash: hash,
   });
 }
 
-export async function getTestContract() {
-  const chainNode = await getTestChainNode();
+export async function getTestContract(version?: 'v1' | 'v2') {
+  const chainNode = await getTestChainNode(version);
+
+  let address: string;
+  if (!version || version === 'v1') {
+    address = sdk.contractAddrs.aave.governance;
+  } else {
+    address = '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2';
+  }
 
   const [contract, created] = await models.Contract.findOrCreate({
     where: {
-      address: sdk.contractAddrs.aave.governance,
+      address,
       chain_node_id: chainNode.id,
     },
   });
@@ -93,9 +133,9 @@ export async function getTestContract() {
   return contract;
 }
 
-export async function getTestCommunityContract() {
-  const contract = await getTestContract();
-  const chain = await getTestChain();
+export async function getTestCommunityContract(version?: 'v1' | 'v2') {
+  const contract = await getTestContract(version);
+  const chain = await getTestChain(version);
 
   const [communityContract, created] =
     await models.CommunityContract.findOrCreate({
@@ -119,8 +159,8 @@ export async function getTestUser() {
   return user;
 }
 
-export async function getTestSubscription() {
-  const chain = await getTestChain();
+export async function getTestSubscription(version?: 'v1' | 'v2') {
+  const chain = await getTestChain(version);
   const user = await getTestUser();
 
   const [sub, created] = await models.Subscription.findOrCreate({
@@ -142,13 +182,21 @@ export async function getTestSubscription() {
   return sub;
 }
 
-export async function getTestSignatures() {
-  const chainNode = await getTestChainNode();
+export async function getTestSignatures(version?: 'v1' | 'v2') {
+  const chainNode = await getTestChainNode(version);
 
+  let contractAddress: string;
+  if (!version || version === 'v1') {
+    contractAddress = sdk.contractAddrs.aave.governance;
+  } else {
+    contractAddress = '0x7E9B1672616FF6D6629Ef2879419aaE79A9018D2';
+  }
+
+  // signatures are the same for v1 and v2
   const [es1, es1Created] = await models.EvmEventSource.findOrCreate({
     where: {
       chain_node_id: chainNode.id,
-      contract_address: sdk.contractAddrs.aave.governance,
+      contract_address: contractAddress,
       event_signature: aavePropCreatedSignature,
       kind: 'proposal-created',
     },
@@ -157,7 +205,7 @@ export async function getTestSignatures() {
   const [es2, es2Created] = await models.EvmEventSource.findOrCreate({
     where: {
       chain_node_id: chainNode.id,
-      contract_address: sdk.contractAddrs.aave.governance,
+      contract_address: contractAddress,
       event_signature: aavePropQueuedSignature,
       kind: 'proposal-queued',
     },
