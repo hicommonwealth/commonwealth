@@ -67,7 +67,7 @@ export async function createNotificationMessage(
       title: title,
       body: `View this notification on Commonwealth.`,
       data: {
-        path: null /* To update when we have a feed */,
+        path: `/notifications`,
       },
     };
   } else if (
@@ -117,30 +117,31 @@ export async function sendPushNotification(
     models
   );
 
-  /* Need to update this for deeplinks */
-  let link = message.data.proposalPath;
-  if (
-    deliveryMechanism.type === 'android' ||
-    deliveryMechanism.type === 'ios-native'
-  ) {
-    link = link.replace('http://localhost:8080/', `capacitor://${SERVER_URL}/`);
-    link = link.replace(
-      'https://commonwealth.im/',
-      `capacitor://${SERVER_URL}`
-    );
-  }
+  // /* Need to update this for deeplinks */
+  // let link = message.data.proposalPath;
+  // if (
+  //   deliveryMechanism.type === 'android' ||
+  //   deliveryMechanism.type === 'ios-native'
+  // ) {
+  //   link = link.replace('http://localhost:8080/', `capacitor://${SERVER_URL}/`);
+  //   link = link.replace(
+  //     'https://commonwealth.im/',
+  //     `capacitor://${SERVER_URL}`
+  //   );
+  // }
 
   const payload = {
     notification: {
       title: message.title,
       body: message.body,
+
       // additional fields specific to your mobile platform (e.g., "badge" for iOS or "icon" for Android)
     },
     // data: {
     //   title: message.title,
     //   body: message.body,
-    //   link: message.data.proposalPath ? message.data.proposalPath : null,
-    // }, // add back later for deeplinks
+    //   path: '/notifications', // this is the shortcut URL
+    // },
     token: token,
   };
   console.log('Payload:', payload);

@@ -5,6 +5,27 @@ importScripts(
   'https://www.gstatic.com/firebasejs/9.7.0/firebase-messaging-compat.js'
 );
 
+self.addEventListener('notificationclick', function (event) {
+  console.debug('SW notification click event', event);
+  const url = '/notifications'; // replacae with deployment full path, i.e https://commonwealth.im/notifications
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then((windowClients) => {
+      // Check if there is already a window/tab open with the target URL
+      for (var i = 0; i < windowClients.length; i++) {
+        var client = windowClients[i];
+        // If so, just focus it.
+        if (client.url === url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // If not, then open the target URL in a new window/tab.
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
+    })
+  );
+});
+
 // Initialize the Firebase app in the service worker by passing in
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
@@ -29,14 +50,11 @@ messaging.onBackgroundMessage((payload) => {
     payload
   );
 
-  if (payload.data && data.title) {
-    const notificationTitle = payload.notification.title;
+  if (payload.data) {
+    const notificationTitle = payload.data.title;
     const notificationOptions = {
-      body: payload.notification.body,
+      body: payload.data.body,
       icon: './static/brand_assets.32x32.png',
-      data: {
-        link: '/notifications',
-      },
     };
 
     self.registration.showNotification(notificationTitle, notificationOptions);
