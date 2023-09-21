@@ -75,10 +75,24 @@ export const CWSelectList = <
             ...baseStyles,
             maxHeight: '300px',
           }),
+          option: (baseStyles, state) => {
+            const base = { ...baseStyles };
+
+            if (state.isSelected) {
+              base.backgroundColor = '#F0EFF0 !important';
+              base.color = 'inherit';
+            }
+
+            return base;
+          },
         }}
         components={{
           DropdownIndicator: () => (
-            <CWIcon className="caret-icon" iconName={'caretDown'} />
+            <CWIcon
+              className="caret-icon"
+              iconName="caretDown"
+              iconSize="small"
+            />
           ),
           MultiValueRemove: (removeProps) => (
             <components.MultiValueRemove {...removeProps}>
