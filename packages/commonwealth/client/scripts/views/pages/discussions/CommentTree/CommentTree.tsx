@@ -414,10 +414,8 @@ export const CommentTree = ({
           const isCommentAuthor =
             comment.author === app.user.activeAccount?.address;
 
-          const isLast = threadLevel === 8;
-
+          const maxReplyLimitReached = threadLevel >= 8;
           const replyBtnVisible = !!(
-            !isLast &&
             !isLocked &&
             !fromDiscordBot &&
             isLoggedIn
@@ -446,6 +444,7 @@ export const CommentTree = ({
                 )}
                 <CommentCard
                   canReply={!!hasJoinedCommunity}
+                  maxReplyLimitReached={maxReplyLimitReached}
                   canReact={
                     !!hasJoinedCommunity ||
                     isAdmin ||

@@ -31,6 +31,7 @@ type CommentCardProps = {
   replyBtnVisible?: boolean;
   onReply?: () => any;
   canReply?: boolean;
+  maxReplyLimitReached: boolean;
   // Reaction
   canReact?: boolean;
   // Spam
@@ -57,6 +58,7 @@ export const CommentCard = ({
   replyBtnVisible,
   onReply,
   canReply,
+  maxReplyLimitReached,
   // reaction
   canReact,
   // spam
@@ -131,7 +133,12 @@ export const CommentCard = ({
               {replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
-                  disabled={!canReply}
+                  disabled={maxReplyLimitReached || !canReply}
+                  tooltipText={
+                    canReply && maxReplyLimitReached
+                      ? 'Nested reply limit reached'
+                      : ''
+                  }
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
