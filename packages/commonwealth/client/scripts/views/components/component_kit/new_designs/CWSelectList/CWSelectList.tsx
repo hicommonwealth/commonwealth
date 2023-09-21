@@ -40,11 +40,9 @@ export const CWSelectList = <
         ),
       }}
       className={getClasses<{
-        isMulti?: boolean;
         className?: string;
       }>(
         {
-          isMulti: props.isMulti,
           className: props.className,
         },
         ComponentType.SelectList

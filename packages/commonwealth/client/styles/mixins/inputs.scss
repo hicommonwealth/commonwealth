@@ -22,9 +22,9 @@
   }
 
   &:focus-within {
-    border-color: $primary-500;
+    border-color: $primary-500 !important;
     box-shadow: 0px 2px 2px -1px rgba(0, 0, 0, 0.12),
-      0px 0px 0px 3px $primary-100;
+      0px 0px 0px 3px $primary-100 !important;
 
     &::placeholder {
       color: $neutral-500;
