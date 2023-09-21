@@ -124,6 +124,7 @@ const resetServer = (debug = false): Promise<void> => {
           'https://cosmos-devnet-beta.herokuapp.com/rpc',
           'Cosmos SDK v0.45.0 devnet',
           null,
+          'csdkv1',
           BalanceType.Cosmos,
           'https://cosmos-devnet-beta.herokuapp.com/lcd/',
         ],
@@ -143,19 +144,28 @@ const resetServer = (debug = false): Promise<void> => {
         testnetNode,
         osmosisNode,
         csdkBetaNode,
-        csdkNode,
+        csdkV1Node,
       ] = await Promise.all(
-        nodes.map(([url, name, eth_chain_id, balance_type, alt_wallet_url]) =>
-          models.ChainNode.create({
+        nodes.map(
+          ([
             url,
             name,
-            eth_chain_id: eth_chain_id ? +eth_chain_id : null,
-            balance_type:
-              balance_type || eth_chain_id
-                ? BalanceType.Ethereum
-                : BalanceType.Substrate,
+            eth_chain_id,
+            cosmos_chain_id,
+            balance_type,
             alt_wallet_url,
-          })
+          ]) =>
+            models.ChainNode.create({
+              url,
+              name,
+              eth_chain_id: eth_chain_id ? +eth_chain_id : null,
+              cosmos_chain_id: cosmos_chain_id || null,
+              balance_type:
+                balance_type || eth_chain_id
+                  ? BalanceType.Ethereum
+                  : BalanceType.Substrate,
+              alt_wallet_url,
+            })
         )
       );
 
@@ -231,7 +241,7 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
-        chain_node_id: csdkNode.id,
+        chain_node_id: csdkV1Node.id,
       });
       const alexContract = await models.Contract.create({
         address: '0xFab46E002BbF0b4509813474841E0716E6730136',
