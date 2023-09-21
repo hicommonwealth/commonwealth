@@ -54,6 +54,7 @@ import {
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
+import { CWCommunityCard } from './cw_community_card';
 import app from 'state';
 
 const displayIcons = (icons) => {
@@ -1602,6 +1603,9 @@ export const ComponentShowcase = () => {
             />
           )}
         />
+      </div>
+      <div className='community-card'>
+            <CWCommunityCard chain={app.config.chains.getById("basindao")} />
       </div>
     </div>
   );

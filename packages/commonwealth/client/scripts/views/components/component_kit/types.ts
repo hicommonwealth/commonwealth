@@ -14,6 +14,7 @@ export enum ComponentType {
   Checkbox = 'Checkbox',
   Collapsible = 'Collapsible',
   CommunityAvatar = 'CommunityAvatar',
+  CommunityCard = 'CommunityCard',
   ContentPage = 'ContentPage',
   CustomIcon = 'CustomIcon',
   Divider = 'Divider',
