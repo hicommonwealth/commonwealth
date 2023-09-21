@@ -8,7 +8,7 @@ import type DashboardActivityNotification from '../../../models/DashboardActivit
 import { getClasses } from '../../components/component_kit/helpers';
 import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
 import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
-import { UserDashboardRowTop } from './FeedRow/UserDashboardRowTop';
+import { UserDashboardRowTop } from './UserDashboardRowTop';
 
 type UserDashboardRowProps = {
   notification?: DashboardActivityNotification;
