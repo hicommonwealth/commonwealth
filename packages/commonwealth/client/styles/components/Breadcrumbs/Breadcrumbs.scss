@@ -70,7 +70,7 @@
     }
 
     @include mediumInclusive {
-      padding-left: 40px;
+      padding-left: 32px;
     }
 
     @include small {
@@ -86,6 +86,27 @@
     display: flex;
     padding-left: 24px;
     flex-direction: row;
+  }
+
+  .notification-management {
+    display: flex;
+    flex-direction: row;
+
+    @include large {
+      padding-left: 178px;
+    }
+
+    @include mediumInclusive {
+      padding-left: 72px;
+    }
+
+    @include small {
+      padding-left: 56px;
+    }
+
+    @include extraSmall {
+      padding-left: 16px;
+    }
   }
 
   .discussions {

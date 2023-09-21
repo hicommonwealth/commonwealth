@@ -14,6 +14,7 @@ export const breadCrumbURLS = [
   {
     url: 'notification-settings',
     breadcrumb: 'Notification Management',
+    className: 'notification-settings',
   },
   {
     url: 'profile/id',
@@ -80,6 +81,10 @@ export const breadCrumbURLS = [
   {
     url: 'dicussion/:id',
     breadcrumb: 'Discussion/:id',
+  },
+  {
+    url: ':id/dicussions',
+    breadcrumb: ':id/Discussions',
   },
   {
     url: 'new',

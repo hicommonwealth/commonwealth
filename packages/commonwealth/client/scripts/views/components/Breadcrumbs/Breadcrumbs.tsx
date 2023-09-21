@@ -4,11 +4,24 @@ import { useLocation, Link } from 'react-router-dom';
 import { CWText } from '../component_kit/cw_text';
 import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
 import { breadCrumbURLS } from './data';
+import { useGetThreadsByIdQuery } from 'state/api/threads';
 import clsx from 'clsx';
 import app from 'state';
 
 export const Breadcrumbs = () => {
   const location = useLocation();
+
+  function extractNumberFromUrl(url) {
+    const match = url.match(/(\d+)/); // Match one or more digits
+    if (match) {
+      return [match[0]];
+    }
+  }
+
+  const { data: threads } = useGetThreadsByIdQuery({
+    chainId: app.activeChainId(),
+    ids: extractNumberFromUrl(location.pathname),
+  });
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
@@ -42,6 +55,7 @@ export const Breadcrumbs = () => {
   }
 
   function generateBreadcrumbs(locationPath: string, breadCrumbData: any[]) {
+    let threadName: string | undefined;
     const pathSegments = locationPath
       .split('/')
       .filter((segment) => segment.length > 0);
@@ -55,16 +69,33 @@ export const Breadcrumbs = () => {
 
       if (pathSegment === 'profile') {
         link = `/profile/id/${profileId}`;
+      } else if (pathSegments[index] === 'discussion') {
+        link = `${pathSegments[index - 1]}/discussions`;
       } else {
         link = pathSegments.slice(0, index + 1).join('/');
       }
 
       const splitLinks = link.split('/').filter((val) => val.length > 0);
 
+      if (
+        index === pathSegments.length - 1 &&
+        extractNumberFromUrl(location.pathname) &&
+        threads &&
+        !location.pathname.includes('%')
+      ) {
+        threadName = threads?.find(
+          (thread: { id: number }) =>
+            thread.id === Number(extractNumberFromUrl(location.pathname))
+        ).title;
+      }
+
       return {
-        text: matchedBreadcrumb
-          ? matchedBreadcrumb.breadcrumb
-          : decodeURIComponent(pathSegment),
+        text:
+          index === pathSegments.length - 1 && !!threadName
+            ? threadName
+            : matchedBreadcrumb
+            ? matchedBreadcrumb.breadcrumb
+            : decodeURIComponent(pathSegment),
         link: link ? link : locationPath,
         isParent: splitLinks.length === 1,
       };
@@ -82,6 +113,14 @@ export const Breadcrumbs = () => {
    * @returns The style associated with the current page.
    */
   const getStyle = () => {
+    const findStyle = breadCrumbURLS.find((page) => {
+      if (!page.className) return;
+      return location.pathname === page.url;
+    });
+
+    if (findStyle) {
+      return findStyle.className;
+    }
     const governancePaths = ['members', 'snapshot', 'proposals'];
 
     if (location.pathname.includes('discussions')) {
@@ -102,6 +141,10 @@ export const Breadcrumbs = () => {
 
     if (location.pathname.includes('createCommunity')) {
       return 'createCommunity';
+    }
+
+    if (location.pathname.includes('notification-settings')) {
+      return 'notification-management';
     }
 
     if (location.pathname.includes('notifications')) {
@@ -137,13 +180,15 @@ export const Breadcrumbs = () => {
         {standalone ? (
           <li>
             <CWText type="b2" fontWeight="regular">
-              <Link className="active standalone" to={'/'}>
+              <Link className="active standalone" to={null}>
                 {pathnames[0].text}
               </Link>
             </CWText>
           </li>
         ) : (
           pathnames.map((path, index) => {
+            const pathText =
+              typeof path.text === 'object' ? path.text.toString() : path.text;
             return path.isParent ? (
               <CWTooltip
                 hasBackground
@@ -159,7 +204,7 @@ export const Breadcrumbs = () => {
                     onMouseLeave={handleIneraction}
                   >
                     <CWText type="b2" fontWeight="regular">
-                      <Link to={'/' + path.link}>{path.text}</Link>
+                      <Link to={'/' + path.link}>{pathText}</Link>
                     </CWText>
                   </li>
                 )}
@@ -173,7 +218,7 @@ export const Breadcrumbs = () => {
                     })}
                     to={'/' + path.link}
                   >
-                    {path.text}
+                    {pathText}
                   </Link>
                 </CWText>
               </li>
