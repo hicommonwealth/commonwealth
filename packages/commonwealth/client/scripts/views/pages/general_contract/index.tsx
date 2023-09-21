@@ -37,16 +37,16 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
     Map<string, Map<number, string>>
   >(new Map<string, Map<number, string>>());
 
-  const fetchContractAbi = async (contract: Contract) => {
-    if (contract.abi === undefined) {
+  const fetchContractAbi = async (_contract: Contract) => {
+    if (_contract.abi === undefined) {
       try {
         // use the contract address to fetch the abi using controller
-        await app.contracts.checkFetchEtherscanForAbi(contract.address);
+        await app.contracts.checkFetchEtherscanForAbi(_contract.address);
         // TODO The UI Should In One Go show the abi form after successfully fetching the abi
         // from etherscan, which it does not do rn
       } catch (err) {
         notifyError(
-          err.message || `Fetching ABI for ${contract.address} failed: ${err}`
+          err.message || `Fetching ABI for ${_contract.address} failed: ${err}`
         );
       }
     }
