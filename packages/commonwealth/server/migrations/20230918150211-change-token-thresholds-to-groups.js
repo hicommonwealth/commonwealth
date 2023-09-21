@@ -30,7 +30,8 @@ module.exports = {
           JOIN "CommunityContracts" ON "CommunityContracts".chain_id = "Topics".chain_id
           JOIN "Contracts" ON "Contracts".id = "CommunityContracts".contract_id
           WHERE "Chains".network IN ('ethereum', 'erc20', 'erc721', 'cosmos') AND
-                "Topics".token_threshold NOT IN ('0', '0000000000000000000')`
+                "Topics".token_threshold NOT IN ('0', '0000000000000000000') AND
+                "Topics".deleted_at IS NULL`
       )
 
       // for each topic, great a new group for it
@@ -126,7 +127,7 @@ async function findGroup(queryInterface, chain_id, requirements, metadata) {
 async function addGroupIdToTopic(queryInterface, groupId, topicId) {
   try {
     const updateTopicQuery = `
-      UPDATE "Topics" SET "group_ids" = "group_ids" || ARRAY[${groupId}] WHERE id = ${topicId}
+      UPDATE "Topics" SET "group_ids" = "group_ids" || ARRAY[${groupId}] WHERE id = ${topicId} AND deleted_at IS NULL
     `
     return queryInterface.sequelize.query(updateTopicQuery)
   } catch (err) {

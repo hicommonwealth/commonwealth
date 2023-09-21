@@ -1,15 +1,15 @@
-import { ChainInstance } from 'server/models/chain';
+import { ChainInstance } from '../../models/chain';
 import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { UserInstance } from '../../models/user';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from 'server/util/validateOwner';
-import { GroupAttributes, GroupMetadata } from 'server/models/group';
+import { validateOwner } from '../../util/validateOwner';
+import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { Op } from 'sequelize';
-import { sequelize } from 'server/database';
-import validateMetadata from 'server/util/requirementsModule/validateMetadata';
+import { sequelize } from '../../database';
+import validateMetadata from '../../util/requirementsModule/validateMetadata';
 
 const MAX_GROUPS_PER_CHAIN = 20;
 

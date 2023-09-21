@@ -1356,6 +1356,7 @@ function setupRouter(
     router,
     'get',
     '/groups',
+    databaseValidationService.validateChain,
     getGroupsHandler.bind(this, serverControllers)
   );
 

@@ -1,8 +1,8 @@
-import { ChainInstance } from 'server/models/chain';
+import { ChainInstance } from '../../models/chain';
 import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../../util/validateOwner';
 import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../../../chain-events/services/database/database';
 
