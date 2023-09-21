@@ -37,8 +37,8 @@
   }
 
   &.failure {
-    border-color: $rorange-600;
-    background-color: $white;
+    border-color: $rorange-600 !important;
+    background-color: $white !important;
   }
 
   &.disabled {
