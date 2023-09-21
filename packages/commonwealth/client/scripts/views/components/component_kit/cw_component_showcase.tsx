@@ -195,6 +195,18 @@ const validationSchema = z.object({
     .max(200, { message: 'Bio must not be more than 200 chars' }),
 });
 
+const chainValidationSchema = z.object({
+  chain: z
+    .array(
+      z.object({
+        value: z.string().nonempty({ message: 'Invalid value' }),
+        label: z.string().nonempty({ message: 'Invalid value' }),
+      })
+    )
+    .min(1, { message: 'At least 1 chain is required' })
+    .nonempty({ message: 'Chains are required' }),
+});
+
 export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
     number | undefined
@@ -1760,6 +1772,30 @@ export const ComponentShowcase = () => {
               <CWButton label="Submit Form" />
             </>
           )}
+        </CWForm>
+        {/* With tag input */}
+        <CWForm
+          className="w-full"
+          validationSchema={chainValidationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          <CWSelectList
+            label="Chain"
+            name="chain"
+            placeholder="Add or select a chain"
+            isMulti
+            isClearable={false}
+            defaultValue={[{ value: 'solana', label: 'Solana' }]}
+            options={[
+              { value: 'solana', label: 'Solana' },
+              { value: 'polkadot', label: 'Polkadot' },
+              { value: 'ethereum', label: 'Ethereum' },
+              { value: 'substrate', label: 'Substrate' },
+              { value: 'binance', label: 'Binance' },
+            ]}
+            hookToForm
+          />
+          <CWButton label="Submit" type="submit" />
         </CWForm>
         <CWText type="h3">Multi select list</CWText>
         <CWSelectList
