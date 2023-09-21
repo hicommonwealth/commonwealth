@@ -106,9 +106,19 @@ function setupCosmosProxy(app: Express, models: DB) {
   );
 
   // cosmos-api proxies for the magic link iframe
-  // - POST to root path
-  // - node_info for fetching chain status (used by magic iframe, and magic login flow)
-  // - auth/accounts/:address for fetching address status (use by magic iframe)
+  // - POST / for node info
+  // - GET /node_info for fetching chain status (used by magic iframe, and magic login flow)
+  // - GET /auth/accounts/:address for fetching address status (use by magic iframe)
+  app.options('/magicCosmosAPI/:chain', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Private-Network', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization, Content-Length, X-Requested-With'
+    );
+    res.send(200);
+  });
   app.use(
     '/magicCosmosAPI/:chain/?(node_info)?',
     bodyParser.text(),
@@ -127,21 +137,32 @@ function setupCosmosProxy(app: Express, models: DB) {
         if (!chain) {
           throw new AppError('Invalid chain');
         }
-        let targetUrl = chain.ChainNode?.alt_wallet_url;
-        if (!targetUrl) {
+        let targetRestUrl = chain.ChainNode?.alt_wallet_url;
+        let targetRpcUrl = chain.ChainNode?.url;
+        if (!targetRestUrl && !targetRpcUrl) {
           const fallback = await models.Chain.findOne({
             where: { id: 'osmosis' },
             include: models.ChainNode,
           });
-          targetUrl = fallback.ChainNode.alt_wallet_url;
+          targetRestUrl = fallback.ChainNode.alt_wallet_url;
+          targetRpcUrl = fallback.ChainNode.url;
         }
-        log.trace(`Found cosmos endpoint: ${targetUrl}`);
+        log.trace(`Found cosmos endpoint: ${targetRestUrl}, ${targetRpcUrl}`);
 
-        const response = await axios.get(targetUrl + '/node_info', {
-          headers: {
-            origin: 'https://commonwealth.im/?magic_login_proxy=true',
-          },
-        });
+        let response;
+        if (req.method === 'POST') {
+          response = await axios.post(targetRpcUrl, req.body, {
+            headers: {
+              origin: 'https://commonwealth.im/?magic_login_proxy=true',
+            },
+          });
+        } else {
+          response = await axios.get(targetRestUrl + '/node_info', {
+            headers: {
+              origin: 'https://commonwealth.im/?magic_login_proxy=true',
+            },
+          });
+        }
         log.trace(
           `Got response from endpoint: ${JSON.stringify(
             response.data,
@@ -156,6 +177,7 @@ function setupCosmosProxy(app: Express, models: DB) {
         res.setHeader('Access-Control-Allow-Headers', 'content-type');
         return res.send(response.data);
       } catch (err) {
+        console.error(err);
         res.status(500).json({ message: err.message });
       }
     }
