@@ -20,6 +20,7 @@ import {
   createDeltaFromText,
 } from 'views/components/react_quill_editor';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
 import { CWContentPageCard } from './CWContentPage';
 import { CWCard } from './cw_card';
@@ -52,6 +53,7 @@ import { CWSearchBar } from './new_designs/CWSearchBar';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWButton } from './new_designs/cw_button';
+import { CWForm } from './new_designs/CWForm';
 import { CWTag } from './new_designs/cw_tag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
@@ -158,6 +160,40 @@ const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   (acc, el) => ({ ...acc, [el]: true }),
   {} as { [K in BannerType]: boolean }
 );
+
+const validationSchema = z.object({
+  email: z
+    .string()
+    .nonempty({ message: 'Email is required' })
+    .email({ message: 'Email must be valid' }),
+  username: z
+    .string()
+    .nonempty({ message: 'Username is required' })
+    .min(3, { message: 'Usrename must have 3 characters' })
+    .regex(/^[a-zA-Z0-9]+$/, {
+      message: 'Username must only contain letters and numbers',
+    }),
+  password: z
+    .string()
+    .nonempty({ message: 'Password is required' })
+    .min(8, { message: 'Password must be 8 characters long' })
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)/, {
+      message:
+        'Password must contain lowercase, uppercase, numbers and special chars',
+    }),
+  USPhoneNumber: z
+    .string()
+    .nonempty({ message: 'Phone number is required' })
+    .regex(/^\+1\d{10}$/, {
+      message:
+        'Phone number must be valid, must match a US phone number pattern',
+    }),
+  bio: z
+    .string()
+    .nonempty({ message: 'Bio is required' })
+    .min(100, { message: 'Bio must be 100 chars long' })
+    .max(200, { message: 'Bio must not be more than 200 chars' }),
+});
 
 export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
@@ -1603,6 +1639,128 @@ export const ComponentShowcase = () => {
             />
           )}
         />
+        <CWText>Validated Forms</CWText>
+        <CWForm
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          <CWTextInput
+            name="username"
+            placeholder="Username"
+            label="Username"
+            hookToForm
+          />
+          <CWTextInput
+            name="email"
+            placeholder="Email"
+            label="Email"
+            hookToForm
+          />
+          <CWTextInput
+            name="USPhoneNumber"
+            placeholder="US Phone Number"
+            label="US Phone Number"
+            hookToForm
+          />
+          <CWTextInput
+            name="password"
+            placeholder="Password"
+            label="Password"
+            hookToForm
+          />
+          <CWTextArea name="bio" placeholder="Bio" label="Bio" hookToForm />
+          <CWButton label="Submit" />
+        </CWForm>
+        {/* With initial values */}
+        <CWForm
+          initialValues={{
+            username: 'user1',
+            email: 'test@example.com',
+            USPhoneNumber: '+11234567890',
+            password: 'Abc1#$%^&(cahv',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          <CWTextInput
+            name="username"
+            placeholder="Username"
+            label="Username"
+            hookToForm
+          />
+          <CWTextInput
+            name="email"
+            placeholder="Email"
+            label="Email"
+            hookToForm
+          />
+          <CWTextInput
+            name="USPhoneNumber"
+            placeholder="US Phone Number"
+            label="US Phone Number"
+            hookToForm
+          />
+          <CWTextInput
+            name="password"
+            placeholder="Password"
+            label="Password"
+            hookToForm
+          />
+          <CWButton label="Submit" />
+        </CWForm>
+        {/* With initial values and a reset switch */}
+        <CWForm
+          initialValues={{
+            username: 'user1',
+            email: 'test@example.com',
+            USPhoneNumber: '+11234567890',
+            password: 'Abc1#$%^&(cahv',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          {(formMethods) => (
+            <>
+              <CWTextInput
+                name="username"
+                placeholder="Username"
+                label="Username"
+                hookToForm
+              />
+              <CWTextInput
+                name="email"
+                placeholder="Email"
+                label="Email"
+                hookToForm
+              />
+              <CWTextInput
+                name="USPhoneNumber"
+                placeholder="US Phone Number"
+                label="US Phone Number"
+                hookToForm
+              />
+              <CWTextInput
+                name="password"
+                placeholder="Password"
+                label="Password"
+                hookToForm
+              />
+              <CWButton
+                label="Reset Form"
+                type="reset"
+                onClick={() =>
+                  formMethods.reset({
+                    username: '',
+                    password: '',
+                    email: '',
+                    USPhoneNumber: '',
+                  })
+                }
+              />
+              <CWButton label="Submit Form" />
+            </>
+          )}
+        </CWForm>
         <CWText type="h3">Multi select list</CWText>
         <CWSelectList
           placeholder="Add or select a chain"
