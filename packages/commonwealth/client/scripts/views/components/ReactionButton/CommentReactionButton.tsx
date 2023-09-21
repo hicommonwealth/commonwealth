@@ -11,6 +11,7 @@ import { LoginModal } from '../../modals/login_modal';
 import { Modal } from '../component_kit/cw_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { getDisplayedReactorsForPopup } from './helpers';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
@@ -22,6 +23,7 @@ export const CommentReactionButton = ({
   disabled,
 }: CommentReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { mutateAsync: createCommentReaction } =
     useCreateCommentReactionMutation({
@@ -85,7 +87,7 @@ export const CommentReactionButton = ({
       />
       <CWUpvoteSmall
         voteCount={likes}
-        disabled={disabled}
+        disabled={!hasJoinedCommunity || disabled}
         selected={hasReacted}
         onMouseEnter={() => undefined}
         onClick={handleVoteClick}
