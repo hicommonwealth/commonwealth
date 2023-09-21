@@ -358,8 +358,8 @@ async function magicLoginRoute(
     username?: string;
     avatarUrl?: string;
     signature: string;
-    sessionPayload: string;
-    magicAddress: string;
+    sessionPayload?: string; // optional because session keys are feature-flagged
+    magicAddress?: string; // optional because session keys are feature-flagged
     walletSsoSource: WalletSsoSource;
   }>,
   decodedMagicToken: MagicUser,
@@ -426,14 +426,16 @@ async function magicLoginRoute(
       signature: req.body.signature,
       payload: JSON.parse(req.body.sessionPayload),
     };
-    if (req.body.magicAddress !== session.payload.from) {
-      throw new Error(
-        'sessionPayload address did not match user-provided magicAddress'
-      );
-    }
-    const valid = await verifyCanvas({ session });
-    if (!valid) {
-      throw new Error('sessionPayload signed with invalid signature');
+    if (process.env.ENFORCE_SESSION_KEYS) {
+      if (req.body.magicAddress !== session.payload.from) {
+        throw new Error(
+          'sessionPayload address did not match user-provided magicAddress'
+        );
+      }
+      const valid = await verifyCanvas({ session });
+      if (!valid) {
+        throw new Error('sessionPayload signed with invalid signature');
+      }
     }
     if (chainToJoin) {
       if (

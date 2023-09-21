@@ -436,81 +436,83 @@ export async function handleSocialLoginCallback({
     magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
   }
 
-  // Sign a session
-  if (isCosmos && desiredChain) {
-    // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
-    const bech32Prefix = desiredChain.bech32Prefix;
-    try {
-      magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
-    } catch (err) {
-      console.error(
-        `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+  try {
+    // Sign a session
+    if (isCosmos && desiredChain) {
+      // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
+      const bech32Prefix = desiredChain.bech32Prefix;
+      try {
+        magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
+      } catch (err) {
+        console.error(
+          `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+        );
+      }
+
+      // Request the cosmos chain ID, since this is used by Magic to generate
+      // the signed message. The API is already used by the Magic iframe,
+      // but they don't expose the results.
+      const nodeInfo = await $.get(
+        `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`
+      );
+      const chainId = nodeInfo.node_info.network;
+
+      const timestamp = +new Date();
+
+      const signer = { signMessage: magic.cosmos.sign };
+      const { signature, sessionPayload } = await signSessionWithMagic(
+        ChainBase.CosmosSDK,
+        signer,
+        magicAddress,
+        timestamp
+      );
+      // TODO: provide blockhash as last argument to signSessionWithMagic
+      signature.signatures[0].chain_id = chainId;
+      await app.sessions.authSession(
+        ChainBase.CosmosSDK, // could be desiredChain.base in the future?
+        chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
+        magicAddress,
+        sessionPayload,
+        JSON.stringify(signature.signatures[0])
+      );
+      authedSessionPayload = JSON.stringify(sessionPayload);
+      authedSignature = JSON.stringify(signature.signatures[0]);
+      console.log(
+        'Reauthenticated Cosmos session from magic address:',
+        magicAddress
+      );
+    } else {
+      const { Web3Provider } = await import('@ethersproject/providers');
+      const { utils } = await import('ethers');
+
+      const provider = new Web3Provider(magic.rpcProvider);
+      const signer = provider.getSigner();
+      const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
+
+      const timestamp = +new Date();
+      const { signature, sessionPayload } = await signSessionWithMagic(
+        ChainBase.Ethereum,
+        signer,
+        checksumAddress,
+        timestamp
+      );
+      // TODO: provide blockhash as last argument to signSessionWithMagic
+
+      await app.sessions.authSession(
+        ChainBase.Ethereum, // could be desiredChain.base in the future?
+        chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
+        checksumAddress,
+        sessionPayload,
+        signature
+      );
+      authedSessionPayload = JSON.stringify(sessionPayload);
+      authedSignature = signature;
+      console.log(
+        'Reauthenticated Ethereum session from magic address:',
+        checksumAddress
       );
     }
-
-    // Request the cosmos chain ID, since this is used by Magic to generate
-    // the signed message. The API is already used by the Magic iframe,
-    // but they don't expose the results.
-    const nodeInfo = await $.get(
-      `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`
-    );
-    const chainId = nodeInfo.node_info.network;
-
-    const timestamp = +new Date();
-
-    const signer = { signMessage: magic.cosmos.sign };
-    const { signature, sessionPayload } = await signSessionWithMagic(
-      ChainBase.CosmosSDK,
-      signer,
-      magicAddress,
-      timestamp
-    );
-    // TODO: provide blockhash as last argument to signSessionWithMagic
-    signature.signatures[0].chain_id = chainId;
-    await app.sessions.authSession(
-      ChainBase.CosmosSDK, // could be desiredChain.base in the future?
-      chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
-      magicAddress,
-      sessionPayload,
-      JSON.stringify(signature.signatures[0])
-    );
-    authedSessionPayload = JSON.stringify(sessionPayload);
-    authedSignature = JSON.stringify(signature.signatures[0]);
-    console.log(
-      'Reauthenticated Cosmos session from magic address:',
-      magicAddress
-    );
-  } else {
-    const { Web3Provider } = await import('@ethersproject/providers');
-    const { utils } = await import('ethers');
-
-    const provider = new Web3Provider(magic.rpcProvider);
-    const signer = provider.getSigner();
-    const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
-
-    const timestamp = +new Date();
-    const { signature, sessionPayload } = await signSessionWithMagic(
-      ChainBase.Ethereum,
-      signer,
-      checksumAddress,
-      timestamp
-    );
-    // TODO: provide blockhash as last argument to signSessionWithMagic
-
-    await app.sessions.authSession(
-      ChainBase.Ethereum, // could be desiredChain.base in the future?
-      chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
-      checksumAddress,
-      sessionPayload,
-      signature
-    );
-    authedSessionPayload = JSON.stringify(sessionPayload);
-    authedSignature = signature;
-    console.log(
-      'Reauthenticated Ethereum session from magic address:',
-      checksumAddress
-    );
-  }
+  } catch (err) {}
 
   // Otherwise, skip Account.validate(), proceed directly to server login
   const response = await $.post({

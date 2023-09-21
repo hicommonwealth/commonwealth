@@ -44,12 +44,14 @@ export const createCommentReactionHandler = async (
     throw new AppError(Errors.InvalidCommentId);
   }
 
-  await verifyReaction(canvasAction, canvasSession, canvasHash, {
-    comment_id: commentId,
-    address: address.address,
-    chain: chain.id,
-    value: reaction,
-  });
+  if (process.env.ENFORCE_SESSION_KEYS) {
+    await verifyReaction(canvasAction, canvasSession, canvasHash, {
+      comment_id: commentId,
+      address: address.address,
+      chain: chain.id,
+      value: reaction,
+    });
+  }
 
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =

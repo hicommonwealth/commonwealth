@@ -52,13 +52,15 @@ export const createThreadCommentHandler = async (
     throw new AppError(Errors.MissingText);
   }
 
-  await verifyComment(canvasAction, canvasSession, canvasHash, {
-    thread_id: parseInt(threadId, 10),
-    text,
-    address: address.address,
-    chain: chain.id,
-    parent_comment_id: parentId,
-  });
+  if (process.env.ENFORCE_SESSION_KEYS) {
+    await verifyComment(canvasAction, canvasSession, canvasHash, {
+      thread_id: parseInt(threadId, 10),
+      text,
+      address: address.address,
+      chain: chain.id,
+      parent_comment_id: parentId,
+    });
+  }
 
   const [comment, notificationOptions, analyticsOptions] =
     await controllers.threads.createThreadComment({

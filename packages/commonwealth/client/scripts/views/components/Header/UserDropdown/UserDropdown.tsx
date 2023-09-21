@@ -84,20 +84,21 @@ const UserDropdown = () => {
         type: 'default',
         label: (
           <UserDropdownItem
-            isSignedIn={signed}
+            isSignedIn={true /*signed*/}
             hasJoinedCommunity={isActive}
             address={account.address}
           />
         ),
         onClick: async () => {
-          if (signed) {
-            return await setActiveAccount(account);
-          }
+          return await setActiveAccount(account);
+          // if (signed) {
+          //   return await setActiveAccount(account);
+          // }
 
-          setRevalidationModalData({
-            walletSsoSource: walletSsoSource,
-            walletAddress: account.address,
-          });
+          // setRevalidationModalData({
+          //   walletSsoSource: walletSsoSource,
+          //   walletAddress: account.address,
+          // });
         },
       };
     }
