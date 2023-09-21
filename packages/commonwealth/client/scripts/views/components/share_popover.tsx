@@ -27,8 +27,9 @@ export const SharePopover = ({
     <PopoverMenu
       menuItems={[
         {
-          iconLeft: 'copy',
-          label: 'Copy URL',
+          iconLeft: 'linkPhosphor',
+          iconLeftSize: 'regular',
+          label: 'Copy link',
           onClick: async () => {
             let urlToCopy = `${domain}${currentRoute}`; // If we copy the thread on discussion page
 
@@ -53,7 +54,8 @@ export const SharePopover = ({
           },
         },
         {
-          iconLeft: 'twitter',
+          iconLeft: 'twitterOutline',
+          iconLeftSize: 'regular',
           label: 'Share on Twitter',
           onClick: async () => {
             if (!commentId) {

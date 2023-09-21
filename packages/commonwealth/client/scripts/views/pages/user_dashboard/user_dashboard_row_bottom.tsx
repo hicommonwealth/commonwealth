@@ -118,8 +118,9 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
         <PopoverMenu
           menuItems={[
             {
-              iconLeft: 'copy',
-              label: 'Copy URL',
+              iconLeft: 'linkPhosphor',
+              iconLeftSize: 'regular',
+              label: 'Copy link',
               onClick: async () => {
                 if (commentId) {
                   await navigator.clipboard.writeText(
@@ -133,7 +134,8 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
               },
             },
             {
-              iconLeft: 'twitter',
+              iconLeft: 'twitterOutline',
+              iconLeftSize: 'regular',
               label: 'Share on Twitter',
               onClick: async () => {
                 if (commentId) {

@@ -183,7 +183,7 @@ export const CommentCard = ({
                   menuItems={[
                     canEdit && {
                       label: 'Edit',
-                      iconLeft: 'write' as const,
+                      iconLeft: 'notePencil' as const,
                       onClick: onEditStart,
                       iconLeftWeight: 'bold' as const,
                     },

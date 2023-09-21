@@ -13,6 +13,7 @@ import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { getDisplayedReactorsForPopup } from './helpers';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
@@ -24,6 +25,7 @@ export const CommentReactionButton = ({
   disabled,
 }: CommentReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const {
     mutateAsync: createCommentReaction,
@@ -111,7 +113,7 @@ export const CommentReactionButton = ({
       {RevalidationModal}
       <CWUpvoteSmall
         voteCount={likes}
-        disabled={disabled}
+        disabled={!hasJoinedCommunity || disabled}
         selected={hasReacted}
         onMouseEnter={() => undefined}
         onClick={handleVoteClick}
