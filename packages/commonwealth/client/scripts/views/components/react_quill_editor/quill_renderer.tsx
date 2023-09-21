@@ -11,6 +11,7 @@ export type QuillRendererProps = {
   searchTerm?: string;
   cutoffLines?: number;
   containerClass?: string;
+  markdownCutoffLength?: number; // Sometimes necessary to prevent large markdown docs from slowing down pages
 };
 
 type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };
@@ -25,6 +26,7 @@ export const QuillRenderer = ({
   hideFormatting,
   cutoffLines,
   containerClass,
+  markdownCutoffLength,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
@@ -79,7 +81,11 @@ export const QuillRenderer = ({
         return (
           <MarkdownFormattedText
             hideFormatting={hideFormatting}
-            doc={docInfo.content}
+            doc={
+              markdownCutoffLength
+                ? docInfo.content.slice(0, markdownCutoffLength)
+                : docInfo.content
+            }
             searchTerm={searchTerm}
             cutoffLines={cutoffLines}
           />
@@ -93,6 +99,7 @@ export const QuillRenderer = ({
     searchTerm,
     docInfo.content,
     docInfo.format,
+    markdownCutoffLength,
   ]);
 
   if (containerClass) {

@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { StatsDController } from 'common-common/src/statsd';
 import type { Logger } from 'typescript-logging';
-import emitNotifications from '../../util/emitNotifications';
-import { SnapshotEventType } from '../../../shared/types';
+import emitNotifications from '../../../util/emitNotifications';
+import { SnapshotEventType } from 'types';
 import { NotificationCategories } from 'common-common/src/types';
-import type { DB } from '../../models';
+import type { DB } from '../../../models';
 import { RmqSnapshotNotification } from 'common-common/src/rabbitmq/types/snapshotNotification';
 
 export async function processSnapshotMessage(

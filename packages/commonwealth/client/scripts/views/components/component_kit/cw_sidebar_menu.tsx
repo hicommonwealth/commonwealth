@@ -7,7 +7,6 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
 import useSidebarStore from 'state/ui/sidebar';
-import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
@@ -78,15 +77,9 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           <div className="roles-and-star">
             <User
               avatarSize={18}
-              avatarOnly
-              user={
-                new AddressInfo(
-                  roles[0].address_id,
-                  roles[0].address,
-                  roles[0].address_chain || roles[0].chain_id,
-                  null
-                )
-              }
+              shouldShowAvatarOnly
+              userAddress={roles[0].address}
+              userChainId={roles[0].address_chain || roles[0].chain_id}
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}

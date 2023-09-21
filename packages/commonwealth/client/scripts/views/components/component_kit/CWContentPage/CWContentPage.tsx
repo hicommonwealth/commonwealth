@@ -150,14 +150,9 @@ export const CWContentPage = ({
         {...(thread?.updatedAt && {
           lastUpdated: thread.updatedAt.toISOString(),
         })}
-        authorInfo={
-          author &&
-          new AddressInfo(
-            null,
-            author?.address,
-            typeof author.chain === 'string' ? author.chain : author.chain.id,
-            null
-          )
+        authorAddress={author?.address}
+        authorChainId={
+          typeof author?.chain === 'string' ? author?.chain : author?.chain?.id
         }
         collaboratorsInfo={collaborators}
         publishDate={
@@ -175,13 +170,7 @@ export const CWContentPage = ({
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
-        {typeof title === 'string' ? (
-          <CWText type="h3" fontWeight="semiBold">
-            {title}
-          </CWText>
-        ) : (
-          title
-        )}
+        {typeof title === 'string' ? <h1 className="title">{title}</h1> : title}
         {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}
