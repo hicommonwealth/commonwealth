@@ -10,6 +10,7 @@ import { DeltaStatic } from 'quill';
 import { renderTruncatedHighlights } from './highlighter';
 import { QuillRendererProps } from './quill_renderer';
 import { countLinesQuill, getTextFromDelta } from './utils';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 
 type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: DeltaStatic;
@@ -66,6 +67,29 @@ export const QuillFormattedText = ({
     // wrap all elements in span to avoid container-based positioning
     return <span>{textWithHighlights}</span>;
   }, [hideFormatting, navigate, openLinksInNewTab, searchTerm, truncatedDoc]);
+
+  (finalDoc as any[])?.forEach((line: any) => {
+    let elements = line[0].props.children;
+    elements?.forEach((el: any, i: number) => {
+      if (el.type === 'a') {
+        elements[i] = (
+          <CWTooltip
+            content={el.props.href}
+            placement="top"
+            renderTrigger={(handleInteraction) => (
+              <div
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+              >
+                {el}
+              </div>
+            )}
+          />
+        );
+        line[0] = <div className="line-with-link">{elements}</div>;
+      }
+    });
+  });
 
   const toggleDisplay = () => setUserExpand(!userExpand);
 
