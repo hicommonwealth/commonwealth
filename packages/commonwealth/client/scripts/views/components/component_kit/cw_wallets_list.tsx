@@ -202,9 +202,6 @@ export const CWWalletsList = (props: WalletsListProps) => {
               />
             </React.Fragment>
           ))}
-          {wallets.length === 0 && (
-            <CWNoAuthMethodsAvailable darkMode={darkMode} />
-          )}
 
           {!hideSocialLogins && (
             <>
@@ -278,6 +275,10 @@ export const CWWalletsList = (props: WalletsListProps) => {
               )
             }
           />
+
+          {wallets.length === 0 && (
+            <CWNoAuthMethodsAvailable darkMode={darkMode} />
+          )}
         </div>
         <div className="wallet-list-links">
           {canResetWalletConnect && (
