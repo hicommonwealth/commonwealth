@@ -2,11 +2,11 @@ import { Op } from 'sequelize';
 
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
+  WalletSsoSource,
 } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -17,7 +17,7 @@ import type { ChainInstance } from '../models/chain';
 import type { ProfileAttributes } from '../models/profile';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
-import verifySignature from '../util/verifySignature';
+import verifySessionSignature from '../util/verifySessionSignature';
 
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
@@ -35,7 +35,7 @@ export const Errors = {
   InvalidArguments: 'Invalid arguments',
   CouldNotVerifySignature: 'Failed to verify signature',
   BadSecret: 'Invalid jwt secret',
-  BadToken: 'Invalid login token',
+  BadToken: 'Invalid sign in token',
   WrongWallet: 'Verified with different wallet than created',
 };
 
@@ -45,6 +45,7 @@ const processAddress = async (
   chain_id: string | number,
   address: string,
   wallet_id: WalletId,
+  wallet_sso_source: WalletSsoSource,
   signature: string,
   user: Express.User,
   sessionAddress: string | null,
@@ -73,7 +74,7 @@ const processAddress = async (
 
   // verify the signature matches the session information = verify ownership
   try {
-    const valid = await verifySignature(
+    const valid = await verifySessionSignature(
       models,
       chain,
       chain_id,
@@ -218,6 +219,7 @@ const verifyAddress = async (
     chain_id,
     address,
     req.body.wallet_id,
+    req.body.wallet_sso_source,
     req.body.signature,
     req.user,
     req.body.session_public_address,
@@ -267,7 +269,7 @@ const verifyAddress = async (
         result: {
           user,
           address,
-          message: 'Logged in',
+          message: 'Signed in',
         },
       });
     });

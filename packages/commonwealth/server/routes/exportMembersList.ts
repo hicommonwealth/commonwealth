@@ -5,7 +5,7 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NotAdmin: 'Must be a site admin',
   CannotExportMembersList: 'Cannot export members list',
   NoChain: 'Chain not found',
