@@ -2,7 +2,7 @@ import moment from 'moment';
 import { expect } from 'chai';
 import { getRelativeTimestamp } from 'helpers/dates';
 
-describe.only('getRelativeTimestamp', () => {
+describe('getRelativeTimestamp', () => {
   it('should return "Less than 1 min ago" for dates less than 1 minute ago', () => {
     const date = moment().subtract(30, 'seconds').toISOString();
     expect(getRelativeTimestamp(date)).to.equal('Less than 1 min ago');
