@@ -325,7 +325,6 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
             // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
             // so we can't use app.chain.meta?.node?.url
             rpcUrl: `${document.location.origin}/magicCosmosAPI/${chain}`,
-            // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
           }),
         ],
   });
@@ -439,14 +438,14 @@ export async function handleSocialLoginCallback({
   // Sign a session
   if (isCosmos && desiredChain) {
     // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
-    const bech32Prefix = desiredChain.bech32Prefix;
-    try {
-      magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
-    } catch (err) {
-      console.error(
-        `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
-      );
-    }
+    // const bech32Prefix = desiredChain.bech32Prefix;
+    // try {
+    //   magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
+    // } catch (err) {
+    //   console.error(
+    //     `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+    //   );
+    // }
 
     // Request the cosmos chain ID, since this is used by Magic to generate
     // the signed message. The API is already used by the Magic iframe,

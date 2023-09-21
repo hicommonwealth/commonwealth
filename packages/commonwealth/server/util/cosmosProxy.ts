@@ -129,33 +129,57 @@ function setupCosmosProxy(app: Express, models: DB) {
     async (req, res) => {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
-        log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
         const chain = await models.Chain.findOne({
-          where: { id: req.params.chain },
+          where: { id: 'cosmos-hub' },
           include: models.ChainNode,
         });
-        if (!chain) {
-          throw new AppError('Invalid chain');
-        }
-        let targetRestUrl = chain.ChainNode?.alt_wallet_url;
-        let targetRpcUrl = chain.ChainNode?.url;
-        if (!targetRestUrl && !targetRpcUrl) {
-          const fallback = await models.Chain.findOne({
-            where: { id: 'osmosis' },
-            include: models.ChainNode,
-          });
-          targetRestUrl = fallback.ChainNode.alt_wallet_url;
-          targetRpcUrl = fallback.ChainNode.url;
-        }
+        const targetRestUrl = chain.ChainNode.alt_wallet_url;
+        const targetRpcUrl = chain.ChainNode.url;
         log.trace(`Found cosmos endpoint: ${targetRestUrl}, ${targetRpcUrl}`);
 
         let response;
         if (req.method === 'POST') {
-          response = await axios.post(targetRpcUrl, req.body, {
-            headers: {
-              origin: 'https://commonwealth.im/?magic_login_proxy=true',
-            },
-          });
+          console.log(0);
+          console.log(req.body);
+          if (
+            req.body.method === 'abci_query' &&
+            req.body.params.path === '/cosmos.auth.v1beta1.Query/Account'
+          ) {
+            // TODO: stub out value, get block height
+            const hexToStr = (hex) =>
+              String.fromCharCode(
+                ...hex.match(/.{1,2}/g).map((c) => parseInt(c, 16))
+              );
+            console.log(hexToStr(req.body.params.data));
+            console.log(1);
+            response = {
+              data: JSON.stringify({
+                jsonrpc: '2.0',
+                id: req.body.id,
+                result: {
+                  response: {
+                    code: 0,
+                    log: '',
+                    info: '',
+                    index: '0',
+                    key: null,
+                    value:
+                      'ClcKIC9jb3Ntb3MuYXV0aC52MWJldGExLkJhc2VBY2NvdW50EjMKLWNvc21vczFyYXpsM2gyZWo0dDZrbmVqOGttd2R2Y2xraGV0ZHVyemp6Z211Yxjih20=',
+                    proofOps: null,
+                    height: '17101151',
+                    codespace: '',
+                  },
+                },
+              }),
+            };
+            res.setHeader('Content-Type', 'application/json');
+          } else {
+            response = await axios.post(targetRpcUrl, req.body, {
+              headers: {
+                origin: 'https://commonwealth.im/?magic_login_proxy=true',
+              },
+            });
+          }
         } else {
           response = await axios.get(targetRestUrl + '/node_info', {
             headers: {
@@ -192,33 +216,14 @@ function setupCosmosProxy(app: Express, models: DB) {
     async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
-        log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);
         const chain = await models.Chain.findOne({
-          where: { id: req.params.chain },
+          where: { id: 'cosmos-hub' },
           include: models.ChainNode,
         });
-        if (!chain) {
-          throw new AppError('Invalid chain');
-        }
-        let targetUrl = chain.ChainNode?.alt_wallet_url;
-        if (!targetUrl) {
-          const fallback = await models.Chain.findOne({
-            where: { id: 'osmosis' },
-            include: models.ChainNode,
-          });
-          targetUrl = fallback.ChainNode.alt_wallet_url;
-        }
-        log.trace(`Found cosmos endpoint: ${targetUrl}`);
-        // special case: rewrite cosmos- prefix to chain specific prefix
-        // either the requested chain or osmo, if we're using the fallback
-        const { words } = bech32.decode(req.params.address);
-        const rewrittenAddress = bech32.encode(
-          chain.ChainNode?.alt_wallet_url ? chain.bech32_prefix : 'osmo',
-          words
-        );
+        const targetUrl = chain.ChainNode.alt_wallet_url;
+
         const rewrite = req.originalUrl
           .replace(req.baseUrl, targetUrl)
-          .replace(req.params.address, rewrittenAddress)
           .replace(`/magicCosmosAPI/${req.params.chain}`, '');
 
         const response = await axios.get(rewrite, {
@@ -238,7 +243,7 @@ function setupCosmosProxy(app: Express, models: DB) {
         if (response?.data?.result?.type === 'cosmos-sdk/BaseAccount') {
           response.data.result.type = 'cosmos-sdk/Account';
           response.data.result.value = {
-            address: rewrittenAddress,
+            address: req.params.address,
             public_key: { type: 'tendermint/PubKeySecp256k1', value: '' },
             account_number: '0',
             sequence: '0',
