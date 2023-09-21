@@ -1,4 +1,4 @@
-import 'pages/feed/index.scss';
+import './index.scss';
 import React from 'react';
 import app from 'state';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
