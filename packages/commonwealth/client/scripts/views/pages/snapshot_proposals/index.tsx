@@ -31,12 +31,10 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   const spaceSubscription = useMemo(
     () =>
-      app.user.notifications.findNotificationSubscription(
-        {
-          categoryId: NotificationCategories.SnapshotProposal,
-          options: { snapshotId },
-        }
-      ),
+      app.user.notifications.findNotificationSubscription({
+        categoryId: NotificationCategories.SnapshotProposal,
+        options: { snapshotId },
+      }),
     [snapshotId]
   );
 
@@ -81,13 +79,15 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
       app.user.notifications
         .subscribe({
           categoryId: NotificationCategories.SnapshotProposal,
-          options: { snapshotId },
+          options: { snapshotId, chainId: app.chain.meta.chainId },
         })
         .then(() => {
           setHasSubscription(true);
         });
     }
   };
+
+  console.log('proposals', NotificationCategories.SnapshotProposal, snapshotId);
 
   return (
     <div className="SnapshotProposalsPage">

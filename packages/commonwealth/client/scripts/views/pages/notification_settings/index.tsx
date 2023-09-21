@@ -87,6 +87,13 @@ const NotificationSettingsPage = () => {
   const bundledSubs = bundleSubs(
     app?.user.notifications.discussionSubscriptions
   );
+
+  // bundled snapshot subscriptions
+  const bundledSnapshotSubs = extractSnapshotProposals(
+    app.user.notifications.discussionSubscriptions
+  );
+
+  console.log('bu', bundledSnapshotSubs);
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
     app?.user.notifications.chainEventSubscriptions
@@ -358,6 +365,8 @@ const NotificationSettingsPage = () => {
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
+          console.log('FIRST:', app.config.chains, chainName);
+
           if (!chainInfo?.id) return null; // handles incomplete loading case
 
           return (
@@ -528,12 +537,14 @@ const NotificationSettingsPage = () => {
           In-App
         </CWText>
       </div>
-      {Object.entries(bundledSubs)
+      {Object.entries(bundledSnapshotSubs)
         .sort((x, y) => x[0].localeCompare(y[0]))
         .map(([chainName, subs]) => {
           const chainInfo = app?.config.chains.getById(chainName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
+
+          console.log('chainInfo', chainInfo);
 
           if (!chainInfo?.id) return null; // handles incomplete loading case
 
