@@ -69,7 +69,7 @@ export const QuillFormattedText = ({
   }, [hideFormatting, navigate, openLinksInNewTab, searchTerm, truncatedDoc]);
 
   (finalDoc as any[])?.forEach((line: any) => {
-    let elements = line[0].props.children;
+    const elements = line[0].props.children;
     elements?.forEach((el: any, i: number) => {
       if (el.type === 'a') {
         elements[i] = (
