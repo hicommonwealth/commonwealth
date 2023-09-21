@@ -396,8 +396,8 @@ export async function handleSocialLoginCallback(bearer?: string) {
       jwt: app.user.jwt,
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
-    }
-  );
+    },
+  });
 
   if (response.data.status === 'Success') {
     await initAppState(false);

@@ -25,27 +25,6 @@
   }
 }
 
-.notifications-container {
-  display: flex;
-
-  &.unread-notifications {
-    position: relative;
-    cursor: pointer;
-
-    &:before {
-      content: '';
-      display: flex;
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      right: 3px;
-      top: 3px;
-      background-color: $pink-500;
-      border-radius: 50%;
-    }
-  }
-}
-
 .NotificationsMenu {
   background-color: $white;
   border: 1px solid $neutral-300;
