@@ -361,6 +361,9 @@
 }
 
 .line-with-link {
-  display: flex;
-  gap: 4px;
+  display: inline;
+
+  div {
+    display: inherit;
+  }
 }
