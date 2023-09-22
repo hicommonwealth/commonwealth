@@ -46,22 +46,22 @@ export const CompletedProposalVotingResultCard = (
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Yes'}</CWText>
+        <CWText>{'Yes'}</CWText>
         <CWText type="caption">{`${yesPct}%`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'No'}</CWText>
+        <CWText>{'No'}</CWText>
         <CWText type="caption">{`${noPct}%`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Abstain'}</CWText>
+        <CWText>{'Abstain'}</CWText>
         <CWText type="caption">{`${abstainPct}%`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Veto'}</CWText>
+        <CWText>{'Veto'}</CWText>
         <CWText type="caption">{`${noWithVetoPct}%`}</CWText>
       </div>
     </div>
@@ -92,14 +92,14 @@ export const AaveVotingResultCard = (props: AaveVotingResultProps) => {
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Yes'}</CWText>
+        <CWText>{'Yes'}</CWText>
         <CWText type="caption">{`${formatPercent(
           safeDivision(yesVotesCount, totalVotesCount)
         )}`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'No'}</CWText>
+        <CWText>{'No'}</CWText>
         <CWText type="caption">{`${formatPercent(
           safeDivision(noVotesCount, totalVotesCount)
         )}`}</CWText>
@@ -123,17 +123,17 @@ export const VotingResultCard = (props: VotingResultProps) => {
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Yes'}</CWText>
+        <CWText>{'Yes'}</CWText>
         <CWText type="caption">{`${yesVotes.length} votes`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'No'}</CWText>
+        <CWText>{'No'}</CWText>
         <CWText type="caption">{`${noVotes.length} votes`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Abstain'}</CWText>
+        <CWText>{'Abstain'}</CWText>
         <CWText type="caption">{`${abstainVotes.length} votes`}</CWText>
       </div>
     </div>
@@ -178,28 +178,28 @@ export const YesNoAbstainVetoVotingResultCard = (
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Yes'}</CWText>
+        <CWText>{'Yes'}</CWText>
         <CWText type="caption">{`${formatPercent(
           safeDivision(yesVotes, totalVotes)
         )}`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'No'}</CWText>
+        <CWText>{'No'}</CWText>
         <CWText type="caption">{`${formatPercent(
           safeDivision(noVotes, totalVotes)
         )}`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Abstain'}</CWText>
+        <CWText>{'Abstain'}</CWText>
         <CWText type="caption">{`${formatPercent(
           safeDivision(abstainVotes, totalVotes)
         )}`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Veto'}</CWText>
+        <CWText>{'Veto'}</CWText>
         <CWText type="caption">{`${formatPercent(
           safeDivision(vetoVotes, totalVotes)
         )}`}</CWText>
@@ -234,21 +234,21 @@ export const YesNoRejectVotingResultCard = (
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Yes'}</CWText>
+        <CWText>{'Yes'}</CWText>
         <CWText type="caption">{`${approveVotes} approved (${formatPercent(
           safeDivision(approveVotes, totalVotes)
         )})`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'No'}</CWText>
+        <CWText>{'No'}</CWText>
         <CWText type="caption">{`${rejectVotes} rejected (${formatPercent(
           safeDivision(rejectVotes, totalVotes)
         )})`}</CWText>
       </div>
 
       <div className="results-header">
-        <CWText type="d2">{'Abstain'}</CWText>
+        <CWText>{'Abstain'}</CWText>
         <CWText type="caption">{`${removeVotes} remove ${formatPercent(
           safeDivision(removeVotes, totalVotes)
         )}`}</CWText>

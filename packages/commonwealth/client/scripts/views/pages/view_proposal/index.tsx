@@ -105,14 +105,20 @@ export function useProposalData(proposalId, typeProp, ignoreInitChain = false) {
       );
 
       if (!foundProposal?.ipfsData) {
-        foundProposal.ipfsDataReady.once('ready', () =>
+        foundProposal?.ipfsDataReady.once('ready', () =>
           setProposal(foundProposal)
         );
       } else {
         setProposal(foundProposal);
       }
     }
-  }, [cachedAaveProposals]);
+  }, [
+    aaveProposalsLoading,
+    cachedAaveProposals,
+    fetchAaveData,
+    proposal,
+    proposalId,
+  ]);
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
