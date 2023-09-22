@@ -20,18 +20,12 @@ export async function __getGroups(
   this: ServerChainsController,
   { chain, addressId, includeMembers }: GetGroupsOptions
 ): Promise<GetGroupsResult> {
-  const chainTopics = await this.models.Topic.findAll({
+  let groups = await this.models.Group.findAll({
     where: {
       chain_id: chain.id,
     },
   });
-
-  const groupIds = flatten(chainTopics.map((topic) => topic.group_ids));
-  let groups = await this.models.Group.findAll({
-    where: {
-      id: { [Op.in]: groupIds },
-    },
-  });
+  const groupIds = groups.map(({ id }) => id);
 
   if (includeMembers) {
     // optionally include members with groups

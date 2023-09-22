@@ -27,7 +27,7 @@ export type CreateGroupOptions = {
   address: AddressInstance;
   metadata: GroupMetadata;
   requirements: Requirement[];
-  topics: number[];
+  topics?: number[];
 };
 
 export type CreateGroupResult = GroupAttributes;
@@ -66,15 +66,16 @@ export async function __createGroup(
     throw new AppError(Errors.MaxGroups);
   }
 
-  const existingTopics = await this.models.Topic.findAll({
+  const topicsToAssociate = await this.models.Topic.findAll({
     where: {
       id: {
-        [Op.in]: topics,
+        [Op.in]: topics || [],
       },
       chain_id: chain.id,
     },
   });
-  if (topics.length !== existingTopics.length) {
+  if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
+    // did not find all specified topics
     throw new AppError(Errors.InvalidTopics);
   }
 
@@ -88,7 +89,7 @@ export async function __createGroup(
       },
       { transaction }
     );
-    if (existingTopics.length > 0) {
+    if (topicsToAssociate.length > 0) {
       // add group to all specified topics
       await this.models.Topic.update(
         {
@@ -101,7 +102,7 @@ export async function __createGroup(
         {
           where: {
             id: {
-              [Op.in]: existingTopics.map(({ id }) => id),
+              [Op.in]: topicsToAssociate.map(({ id }) => id),
             },
           },
           transaction,

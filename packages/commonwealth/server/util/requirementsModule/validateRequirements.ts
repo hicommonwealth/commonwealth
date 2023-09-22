@@ -8,5 +8,8 @@ import { Requirement } from './requirementsTypes';
 export default function validateRequirements(
   requirements: Requirement[]
 ): requirements is Requirement[] {
+  if (!Array.isArray(requirements)) {
+    return false;
+  }
   return true;
 }

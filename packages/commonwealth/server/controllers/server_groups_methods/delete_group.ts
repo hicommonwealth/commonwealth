@@ -4,7 +4,8 @@ import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { AppError } from '../../../../common-common/src/errors';
-import { sequelize } from '../../../../chain-events/services/database/database';
+import { sequelize } from '../../database';
+import { Op } from 'sequelize';
 
 const Errors = {
   Unauthorized: 'Unauthorized',
@@ -47,18 +48,36 @@ export async function __deleteGroup(
   }
 
   await sequelize.transaction(async (transaction) => {
-    // delete all membership of group
+    // remove group from all associated topics
+    await this.models.Topic.update(
+      {
+        group_ids: sequelize.fn(
+          'array_remove',
+          sequelize.col('group_ids'),
+          group.id
+        ),
+      },
+      {
+        where: {
+          group_ids: {
+            [Op.contains]: [group.id],
+          },
+        },
+        transaction,
+      }
+    );
+    // delete all memberships of group
     await this.models.Membership.destroy({
       where: {
         group_id: group.id,
       },
-      transaction,
     });
     // delete group
     await this.models.Group.destroy({
       where: {
         id: group.id,
       },
+      transaction,
     });
   });
 }

@@ -2,9 +2,10 @@ import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import { GroupMetadata } from 'server/models/group';
 
 type UpdateGroupBody = {
-  metadata: any; // TODO: use proper type
+  metadata: GroupMetadata;
   requirements: Requirement[];
 };
 type UpdateGroupResponse = UpdateGroupResult;
