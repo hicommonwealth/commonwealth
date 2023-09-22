@@ -25,8 +25,7 @@ type PopoverProps = {
 
 export type PopoverTriggerProps = {
   renderTrigger: (
-    handleInteraction: (e: React.MouseEvent<AnchorType>) => void,
-    isOpen?: boolean
+    handleInteraction: (e: React.MouseEvent<AnchorType>) => void
   ) => React.ReactNode;
 };
 

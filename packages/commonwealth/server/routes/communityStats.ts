@@ -13,7 +13,7 @@ const communityStats = async (
   const chain = req.chain;
 
   if (!req.user) {
-    return next(new AppError('Not signed in'));
+    return next(new AppError('Not logged in'));
   }
 
   // TODO: factor this pattern into a util

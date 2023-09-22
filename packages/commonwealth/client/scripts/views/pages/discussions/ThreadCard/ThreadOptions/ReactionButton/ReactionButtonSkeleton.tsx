@@ -1,6 +1,6 @@
 import React from 'react';
 import { Skeleton } from 'views/components/Skeleton';
-import './ReactionButtonSkeleton.scss';
+import './ReactionButton.scss';
 
 export const ReactionButtonSkeleton = () => {
   return (
@@ -9,7 +9,7 @@ export const ReactionButtonSkeleton = () => {
         e.stopPropagation();
         e.preventDefault();
       }}
-      className="ReactionButtonSkeleton"
+      className={`ThreadReactionButton showSkeleton`}
     >
       <Skeleton height={52} width={40} />
     </button>

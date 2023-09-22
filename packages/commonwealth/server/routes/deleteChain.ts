@@ -8,7 +8,7 @@ import { success } from '../types';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {
-  NotLoggedIn: 'Not signed in',
+  NotLoggedIn: 'Not logged in',
   NotAdmin: 'Must be a site admin',
   NeedChainId: 'Must provide chain id',
   NoChain: 'Chain not found',

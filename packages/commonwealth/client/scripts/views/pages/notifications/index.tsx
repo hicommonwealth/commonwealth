@@ -12,7 +12,7 @@ const NotificationsPage = () => {
   const [allRead, setAllRead] = useState<boolean>(false);
 
   if (!app.isLoggedIn()) {
-    return <PageError message="This page requires you to be signed in." />;
+    return <PageError message="This page requires you to be logged in." />;
   }
 
   const discussionNotifications =

@@ -17,7 +17,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Subscriptions Tests', () => {
-  let jwtToken, loggedInAddr, loggedInAddrId, loggedInSession, thread, comment, userId: number;
+  let jwtToken, loggedInAddr, loggedInAddrId, thread, comment, userId: number;
   const chain = 'ethereum';
 
   before('reset database', async () => {
@@ -26,7 +26,6 @@ describe('Subscriptions Tests', () => {
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
     loggedInAddrId = result.address_id;
-    loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET
@@ -43,8 +42,6 @@ describe('Subscriptions Tests', () => {
       stage: 'discussion',
       topicName: 't',
       topicId: undefined,
-      session: loggedInSession.session,
-      sign: loggedInSession.sign,
     });
     expect(res).to.not.be.null;
     expect(res.status).to.be.equal('Success');
@@ -56,8 +53,6 @@ describe('Subscriptions Tests', () => {
       jwt: jwtToken,
       text: 'cw4eva',
       thread_id: thread.id,
-      session: loggedInSession.session,
-      sign: loggedInSession.sign,
     });
     expect(res).to.not.be.null;
     expect(res.status).to.be.equal('Success');

@@ -6,7 +6,7 @@ import type { DB } from '../models';
 import { validateOwner } from '../util/validateOwner';
 
 enum OrderTopicsErrors {
-  NoUser = 'Not signed in',
+  NoUser = 'Not logged in',
   NoIds = 'Must supply ordered array of topic IDs',
   NoChain = 'Must supply a chain ID',
   NoPermission = `You do not have permission to order topics`,

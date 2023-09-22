@@ -340,7 +340,9 @@ function getChainActivity(
   return Promise.all(
     addresses.map(async (address) => {
       const { chain, last_active } = address;
-      return [chain, last_active.toISOString()];
+      // Check if last_active is not null before calling toISOString
+      const lastActiveISO = last_active ? last_active.toISOString() : 'N/A';
+      return [chain, lastActiveISO];
     })
   );
 }
