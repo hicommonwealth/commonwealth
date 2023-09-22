@@ -5,21 +5,19 @@ import { CWText } from './cw_text';
 import app from 'state';
 import { CWCommunityAvatar } from './cw_community_avatar';
 import { ComponentType } from './types';
-import { useSearchProfilesQuery } from '../../../state/api/profiles';
-import { 
-  APIOrderBy,
-  APIOrderDirection
-} from '../../../helpers/constants';
 import { CWIcon } from './cw_icons/cw_icon';
 import { pluralizeWithoutNumberPrefix } from '../../../helpers';
 import { CWButton } from './cw_button';
+import { integer } from 'aws-sdk/clients/cloudfront';
 
 type CWCommunityCardProps = {
-  chain: ChainInfo
+  chain: ChainInfo,
+  memberCount: number,
+  threadCount: number,
 }
 
 export const CWCommunityCard = ( props: CWCommunityCardProps) => {
-  const { chain } = props;
+  const { chain, memberCount, threadCount } = props;
 
   const prettifyDescription = (chain: ChainInfo) => {
     return (
@@ -29,18 +27,6 @@ export const CWCommunityCard = ( props: CWCommunityCardProps) => {
     )
   }
 
-  const { data } = useSearchProfilesQuery({
-    chainId: chain.id,
-    searchTerm: '',
-    limit: 10,
-    orderBy: APIOrderBy.LastActive,
-    orderDirection: APIOrderDirection.Desc,
-    includeRoles: true,
-  });
-
-  const num = 12345
-
-  console.log("chains!!! ", data)
   return (
     <div className={ComponentType.CommunityCard}>
       <div className='content-container'>
@@ -66,12 +52,11 @@ export const CWCommunityCard = ( props: CWCommunityCardProps) => {
                 iconSize='small'
               />
             <span className='count'>
-              {/* { data.pages.length } */}
-              {num.toLocaleString('en-US')}
+              {memberCount.toLocaleString('en-US')}
             </span>
 
             <span className='text'>
-              {pluralizeWithoutNumberPrefix(10, 'member')}
+              {pluralizeWithoutNumberPrefix(memberCount, 'member')}
             </span>
 
           </div>
@@ -85,10 +70,10 @@ export const CWCommunityCard = ( props: CWCommunityCardProps) => {
           <div className='thread-data'>
             <CWIcon iconName='notepad' />
             <span className='count'>
-              {num.toLocaleString('en-US')}
+              {threadCount.toLocaleString('en-US')}
             </span>
             <span className='text'>
-              {pluralizeWithoutNumberPrefix(10, 'thread')}
+              {pluralizeWithoutNumberPrefix(threadCount, 'thread')}
             </span>
           </div>
 

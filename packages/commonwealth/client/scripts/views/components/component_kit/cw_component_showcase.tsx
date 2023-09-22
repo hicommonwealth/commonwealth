@@ -1605,7 +1605,11 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div className='community-card'>
-            <CWCommunityCard chain={app.config.chains.getById("basindao")} />
+            <CWCommunityCard
+              chain={app.config.chains.getById("basindao")}
+              memberCount={2623}
+              threadCount={437}
+            />
       </div>
     </div>
   );
