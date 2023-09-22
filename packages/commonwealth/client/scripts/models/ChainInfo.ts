@@ -5,6 +5,7 @@ import RoleInfo from './RoleInfo';
 import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
+import { ETHERMINT_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
 
 class ChainInfo {
   public readonly id: string;
@@ -160,11 +161,15 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
-    const decimals = Contracts
+    let decimals = Contracts
       ? Contracts[0]?.decimals
       : base === ChainBase.CosmosSDK
       ? 6
       : 18;
+
+    if (ETHERMINT_CHAINS.some((c) => c === id)) {
+      decimals = 18;
+    }
 
     // TODO: this is temporary until we have a better way to handle governance versions
     // see: https://github.com/hicommonwealth/commonwealth/issues/3292

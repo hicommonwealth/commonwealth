@@ -89,8 +89,8 @@ jobs:
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
-          yarn --cwd packages/commonwealth e2e-start-server &
-          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e
+          yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
+          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e --forbid-only
 
 
       - name: Archive test status
@@ -169,13 +169,23 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium
 
+      - name: Install proxy
+        run: npm install -g local-ssl-proxy
+
+      - name: Add custom domain to /etc/hosts
+        run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
+
       - name: Run e2e tests (yarn test-e2e)
-        run: yarn --cwd packages/commonwealth e2e-start-server & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e)
         env:
           PORT: 8080
+          IS_CI: true
           USES_DOCKER_PGSQL: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
+        run: |
+          sudo local-ssl-proxy --source 443 --target 8080 &
+          yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
+          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-mature --forbid-only
 
       - name: Archive test status
         uses: actions/upload-artifact@v3
@@ -253,7 +263,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run serial e2e tests (yarn test-e2e-serial)
-        run: yarn --cwd packages/commonwealth e2e-start-server & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-serial)
+        run: yarn --cwd packages/commonwealth e2e-start-server & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
@@ -363,15 +373,15 @@ jobs:
         run: cd packages/commonwealth && npx sequelize db:migrate
 
       - name: Run unit tests
-        run: yarn --cwd packages/commonwealth unit-test
+        run: yarn --cwd packages/commonwealth unit-test --forbid-only
 
       - name: Run API tests
-        run: yarn --cwd packages/commonwealth test-api
+        run: yarn --cwd packages/commonwealth test-api --forbid-only
         env:
           NO_CLIENT: true
 
       - name: Run util integration tests
-        run: yarn --cwd packages/commonwealth test-integration-util
+        run: yarn --cwd packages/commonwealth test-integration-util --forbid-only
         env:
           NO_CLIENT: true
 
@@ -448,7 +458,7 @@ jobs:
           /usr/bin/docker run -d --name chain --network $network_name --network-alias chain -p 8545:8545 -e GITHUB_ACTIONS=true -e CI=true trufflesuite/ganache --fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7 --wallet.unlockedAccounts 0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8;
 
       - name: Run Token Balance Cache Unit Tests
-        run: yarn --cwd packages/token-balance-cache test
+        run: yarn --cwd packages/token-balance-cache test --forbid-only
 
       - name: Stop EVM Chain
         run: docker stop chain
@@ -478,7 +488,7 @@ jobs:
 
       - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet)
+        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet --forbid-only)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
