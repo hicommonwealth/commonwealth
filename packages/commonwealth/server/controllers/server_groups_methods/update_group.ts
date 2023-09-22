@@ -8,7 +8,7 @@ import { AppError } from '../../../../common-common/src/errors';
 import { validateOwner } from '../../util/validateOwner';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import { GroupAttributes, GroupMetadata } from '../../models/group';
-import { sequelize } from '../../../../chain-events/services/database/database';
+import { sequelize } from '../../database';
 
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
@@ -44,14 +44,17 @@ export async function __updateGroup(
     throw new AppError(Errors.Unauthorized);
   }
 
-  if (metadata) {
+  // allow metadata and requirements to be omitted
+  if (typeof metadata !== 'undefined') {
     const metadataValidationErr = validateMetadata(metadata);
     if (metadataValidationErr) {
       throw new AppError(`${Errors.InvalidMetadata}: ${metadataValidationErr}`);
     }
   }
-
-  if (requirements && !validateRequirements(requirements)) {
+  if (
+    typeof requirements !== 'undefined' &&
+    !validateRequirements(requirements)
+  ) {
     throw new AppError(Errors.InvalidRequirements);
   }
 
