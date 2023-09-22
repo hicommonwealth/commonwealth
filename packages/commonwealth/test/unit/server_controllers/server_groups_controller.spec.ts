@@ -12,19 +12,19 @@ const VALID_REQUIREMENTS: Requirement[] = [
       threshold: '1000',
       source: {
         source_type: 'erc20',
-        chain_id: 'ethereum',
-        contract_address: '0x000',
+        evm_chain_id: 1,
+        contract_address: '0x0000000000000000000000000000000000000000',
       },
     },
   },
   {
     rule: 'allow',
     data: {
-      allow: ['0x1', '0x2'],
+      allow: ['0x0000000000000000000000000000000000000000'],
     },
   },
 ];
-const INVALID_REQUIREMENTS = 'no an array' as unknown as [];
+const INVALID_REQUIREMENTS_NOT_ARRAY = ('no an array' as unknown) as [];
 
 const createMockedGroupsController = () => {
   const db: any = {};
@@ -95,7 +95,7 @@ describe('ServerGroupsController', () => {
         chain: {} as ChainInstance,
         address: {} as AddressInstance,
         metadata: {},
-        requirements: INVALID_REQUIREMENTS,
+        requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
         topics: [],
       })
     ).to.eventually.be.rejectedWith('Invalid requirements');
@@ -125,7 +125,7 @@ describe('ServerGroupsController', () => {
         chain: {} as ChainInstance,
         address: {} as AddressInstance,
         metadata: {},
-        requirements: INVALID_REQUIREMENTS,
+        requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
       })
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });

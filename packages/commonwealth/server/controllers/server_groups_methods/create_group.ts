@@ -31,7 +31,10 @@ export async function __createGroup(
   { requirements }: CreateGroupOptions
 ): Promise<CreateGroupResult> {
   // TODO: require community admin
-  validateRequirements(requirements);
+  const validationError = validateRequirements(requirements);
+  if (validationError) {
+    throw new AppError(validationError.message);
+  }
   /*
     TODO:
       - validate schema

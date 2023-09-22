@@ -1,5 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+   "version": "1.0.0",
   "definitions": {
     "ContractSource": {
       "type": "object",
@@ -8,14 +9,15 @@
           "type": "string",
           "enum": ["erc20", "erc721"]
         },
-        "chain_id": {
-          "type": "string"
+        "evm_chain_id": {
+          "type": "number"
         },
         "contract_address": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^0x[a-fA-F0-9]{40}$"
         }
       },
-      "required": ["source_type", "chain_id", "contract_address"]
+      "required": ["source_type", "evm_chain_id", "contract_address"]
     },
     "NativeSource": {
       "type": "object",
@@ -24,11 +26,11 @@
           "type": "string",
           "enum": ["eth_native"]
         },
-        "chain_id": {
-          "type": "string"
+        "evm_chain_id": {
+          "type": "number"
         }
       },
-      "required": ["source_type", "chain_id"]
+      "required": ["source_type", "evm_chain_id"]
     },
     "CosmosSource": {
       "type": "object",
@@ -37,20 +39,21 @@
           "type": "string",
           "enum": ["cosmos_native"]
         },
-        "chain_id": {
+        "cosmos_chain_id": {
           "type": "string"
         },
         "token_symbol": {
           "type": "string"
         }
       },
-      "required": ["source_type", "chain_id", "token_symbol"]
+      "required": ["source_type", "cosmos_chain_id", "token_symbol"]
     },
     "ThresholdData": {
       "type": "object",
       "properties": {
         "threshold": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^[0-9]+$"
         },
         "source": {
           "oneOf": [
@@ -68,7 +71,8 @@
         "allow": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
           }
         }
       },
@@ -91,5 +95,39 @@
       }
     },
     "required": ["rule", "data"]
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "rule": {
+            "const": "threshold"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/definitions/ThresholdData"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "rule": {
+            "const": "allow"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "$ref": "#/definitions/AllowlistData"
+          }
+        }
+      }
+    }
+  ]
 }
