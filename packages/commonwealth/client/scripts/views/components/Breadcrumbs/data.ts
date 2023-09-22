@@ -47,36 +47,8 @@ export const breadCrumbURLS = [
     breadcrumb: 'Discussions/General',
   },
   {
-    url: 'dicussions/Proposal%20Discussion',
-    breadcrumb: 'Discussions/Proposal Discussion',
-  },
-  {
-    url: 'dicussions/DApps%20and%20Tooling',
-    breadcrumb: 'Discussions/DApps and Tooling',
-  },
-  {
-    url: 'dicussions/Liquidity%20Incentives',
-    breadcrumb: 'Discussions/Liquidity Incentives',
-  },
-  {
-    url: 'dicussions/ProtoRev%20Module',
-    breadcrumb: 'Discussions/ProtoRev Module',
-  },
-  {
-    url: 'dicussions/Superfluid%20Staking',
-    breadcrumb: 'Discussions/Superfluid Staking',
-  },
-  {
     url: 'dicussions/Decentralise',
     breadcrumb: 'Discussions/Decentralise',
-  },
-  {
-    url: 'dicussions/Grants%20Program',
-    breadcrumb: 'Discussions/Grants Program',
-  },
-  {
-    url: 'dicussions/Support%20Lab',
-    breadcrumb: 'Discussions/Support Lab',
   },
   {
     url: 'dicussion/:id',
@@ -87,7 +59,7 @@ export const breadCrumbURLS = [
     breadcrumb: ':id/Discussions',
   },
   {
-    url: 'new',
+    url: 'lw',
     breadcrumb: 'New/Discussion',
   },
   {

@@ -89,7 +89,9 @@ export const DashboardCommunitiesPreview = () => {
 
   return (
     <div className="DashboardCommunitiesPreview">
-      <CWText type="h4">Suggested Communities</CWText>
+      <CWText type="h4" className="header">
+        Suggested Communities
+      </CWText>
       <div className="community-preview-cards-collection">
         {sortedChains.length > 3 ? sortedChains.slice(0, 3) : sortedChains}
       </div>

@@ -140,7 +140,7 @@ export const NewThreadForm = () => {
       <div className="NewThreadForm">
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            Proposals
+            New Thread
           </CWText>
         </div>
         <div className="new-thread-header">

@@ -1,8 +1,8 @@
-import 'components/Breadcrumbs/Breadcrumbs.scss';
+import './Breadcrumbs.scss';
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { CWText } from '../component_kit/cw_text';
-import { CWTooltip } from '../component_kit/cw_popover/cw_tooltip';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { breadCrumbURLS } from './data';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
 import clsx from 'clsx';
@@ -54,29 +54,49 @@ export const Breadcrumbs = () => {
     standalone = true;
   }
 
-  function generateBreadcrumbs(locationPath: string, breadCrumbData: any[]) {
+  /**
+   * Generates breadcrumbs based on the given location path and breadcrumb data.
+   *
+   * @param {string} locationPath - The current location path.
+   * @param {any[]} breadcrumbData - An array of breadcrumb data objects.
+   * @returns {Array<{ text: string, link: string, isParent: boolean }>} An array of breadcrumb objects.
+   */
+
+  function generateBreadcrumbs(
+    locationPath: string,
+    breadcrumbData: typeof breadCrumbURLS
+  ) {
     let threadName: string | undefined;
+    let link: string;
     const pathSegments = locationPath
       .split('/')
       .filter((segment) => segment.length > 0);
 
     const breadcrumbs = pathSegments.map((pathSegment, index) => {
-      let link: string;
-      const matchedBreadcrumb = breadCrumbData.find(
+      // Find the matching breadcrumb data for the current path segment.
+      const matchedBreadcrumb = breadcrumbData.find(
         (breadcrumbItem) =>
           breadcrumbItem.url === pathSegments.slice(0, index + 1).join('/')
       );
 
+      // Generate the link based on the current path segment.
       if (pathSegment === 'profile') {
-        link = `/profile/id/${profileId}`;
+        link = `profile/id/${profileId}`;
+      } else if (pathSegment === 'new') {
+        // Remove 'new' segment and generate the link.
+        pathSegments.splice(index, 1);
+        link = `${pathSegments[index - 1]}/new/discussion`;
       } else if (pathSegments[index] === 'discussion') {
+        // Generate the link for 'discussion' segment.
         link = `${pathSegments[index - 1]}/discussions`;
       } else {
+        // Generate a default link for other segments.
         link = pathSegments.slice(0, index + 1).join('/');
       }
 
       const splitLinks = link.split('/').filter((val) => val.length > 0);
 
+      // Determine the thread name if it's the last segment and conditions are met.
       if (
         index === pathSegments.length - 1 &&
         extractNumberFromUrl(location.pathname) &&
@@ -89,13 +109,14 @@ export const Breadcrumbs = () => {
         ).title;
       }
 
+      // Create the breadcrumb object.
       return {
         text:
           index === pathSegments.length - 1 && !!threadName
             ? threadName
             : matchedBreadcrumb
             ? matchedBreadcrumb.breadcrumb
-            : decodeURIComponent(pathSegment),
+            : decodeURIComponent(pathSegments[index]),
         link: link ? link : locationPath,
         isParent: splitLinks.length === 1,
       };
@@ -133,6 +154,10 @@ export const Breadcrumbs = () => {
       )
     ) {
       return 'governance';
+    }
+
+    if (location.pathname.includes('new/discussion')) {
+      return 'new-thread';
     }
 
     if (location.pathname.includes(String(profileId))) {
@@ -188,10 +213,9 @@ export const Breadcrumbs = () => {
         ) : (
           pathnames.map((path, index) => {
             const pathText =
-              typeof path.text === 'object' ? path.text.toString() : path.text;
+              path.text === 'object' ? path.text.toString() : path.text;
             return path.isParent ? (
               <CWTooltip
-                hasBackground
                 content={
                   getToolTipCopy() ||
                   'This is a section, not a selectable page.'
@@ -204,7 +228,14 @@ export const Breadcrumbs = () => {
                     onMouseLeave={handleIneraction}
                   >
                     <CWText type="b2" fontWeight="regular">
-                      <Link to={'/' + path.link}>{pathText}</Link>
+                      <Link
+                        className={clsx({
+                          'disable-active-cursor': index === 0,
+                        })}
+                        to={index !== 0 ? '/' + path.link : null}
+                      >
+                        {pathText}
+                      </Link>
                     </CWText>
                   </li>
                 )}

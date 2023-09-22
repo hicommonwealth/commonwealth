@@ -1,18 +1,19 @@
-@import '../../shared';
+@import '../../../../styles/shared';
 
 .Breadcrumbs {
   align-items: center;
-  list-style: none;
   font-size: 0.875rem;
   color: $neutral-400;
-  background-color: white;
+  background-color: $white;
   min-height: 20px;
-  padding: 10px 0;
+  padding: 5px 0;
 
   position: fixed;
-  max-width: 100%;
-  overflow: auto;
-  z-index: 100;
+  width: 100%;
+  //TODO -- Figure out if mobile is suppose to be sticky or if desktop.
+  //If it's suppose to be sticky on desktop, we have to solve for the zIndex being higher than the sidebar
+  // overflow: auto;
+  z-index: 3;
 
   @include extraSmall {
     position: static;
@@ -26,6 +27,12 @@
   .active {
     color: $neutral-500;
     font-weight: 500;
+  }
+
+  .disable-active-cursor {
+    &:hover {
+      cursor: default;
+    }
   }
 
   li {
@@ -71,7 +78,7 @@
     flex-direction: row;
 
     @include large {
-      padding-left: calc(20px + 2.2rem);
+      padding-left: 56px;
     }
 
     @include mediumInclusive {
@@ -85,6 +92,12 @@
     @include extraSmall {
       padding-left: 24px;
     }
+  }
+
+  .new-thread {
+    display: flex;
+    flex-direction: row;
+    padding-left: 24px;
   }
 
   .notifications {
@@ -145,6 +158,25 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: row;
+    position: fixed;
+    width: 100vw;
+
+    @include large {
+      padding-right: calc(18% + 4.5rem);
+    }
+
+    @include mediumInclusive {
+      padding-right: 32%;
+    }
+
+    @include small {
+      padding-right: 36%;
+    }
+
+    @include extraSmall {
+      padding-right: 60%;
+    }
   }
 
   .viewProfile {
