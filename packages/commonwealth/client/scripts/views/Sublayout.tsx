@@ -79,13 +79,12 @@ const Sublayout = ({
           {showSidebar && <Sidebar isInsideCommunity={hasCommunitySidebar} />}
           <div className="body-and-sticky-headers-container">
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
-            {isVisible && <Breadcrumbs />}
-            {/* <Breadcrumbs /> */}
 
             {isWindowSmallInclusive && mobileMenuName ? (
               <AppMobileMenus />
             ) : (
               <div className="Body">
+                <Breadcrumbs />
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>
