@@ -44,7 +44,7 @@
     "cosmos:stop": "chmod u+x cosmos-chain-testing/v1/stop.sh && ./cosmos-chain-testing/v1/stop.sh && chmod u+x cosmos-chain-testing/v1beta1/stop.sh && ./cosmos-chain-testing/v1beta1/stop.sh && chmod u+x cosmos-chain-testing/ethermint/stop.sh && ./cosmos-chain-testing/ethermint/stop.sh"
   },
   "engines": {
-    "node": "18.x"
+    "node": ">=18.0.0 <18.18.0"
   },
   "repository": {
     "type": "git",
