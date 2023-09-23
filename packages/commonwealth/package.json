@@ -326,7 +326,6 @@
     "html-webpack-plugin": "^5.5.0",
     "ignore-loader": "^0.1.2",
     "ignore-styles": "^5.0.1",
-    "jsdom": "^22.1.0",
     "mocha": "^6.2.2",
     "mock-express-request": "^0.2.2",
     "nyc": "^15.1.0",
