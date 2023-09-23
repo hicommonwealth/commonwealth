@@ -18,8 +18,12 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
+import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import { addressSwapper } from 'utils';
-import NewProfilesController from '../controllers/server/newProfiles';
+import {
+  MixpanelLoginEvent,
+  MixpanelLoginPayload,
+} from '../../../shared/analytics/types';
 import { setDarkMode } from '../helpers/darkMode';
 import {
   getAddressFromWallet,
@@ -28,6 +32,7 @@ import {
 } from '../helpers/wallet';
 import Account from '../models/Account';
 import IWebWallet from '../models/IWebWallet';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
 import type { ProfileRowProps } from '../views/components/component_kit/cw_profiles_list';
 import {
   breakpointFnValidator,
@@ -37,12 +42,9 @@ import type {
   LoginActiveStep,
   LoginSidebarType,
 } from '../views/pages/login/types';
-import useBrowserWindow from './useBrowserWindow';
 import { useBrowserAnalyticsTrack } from './useBrowserAnalyticsTrack';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-} from '../../../shared/analytics/types';
+import useBrowserWindow from './useBrowserWindow';
+import NewProfilesController from '../controllers/server/newProfiles';
 
 type IuseWalletProps = {
   initialBody?: LoginActiveStep;
@@ -91,6 +93,8 @@ const useWallets = (walletProps: IuseWalletProps) => {
   const { trackAnalytics } = useBrowserAnalyticsTrack<MixpanelLoginPayload>({
     onAction: true,
   });
+
+  const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation();
 
   useBrowserWindow({
     onResize: () =>
@@ -246,7 +250,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
       completeClientLogin(account);
     } else {
       // log in as the new user
-      await initAppState(false, null, shouldRedrawApp);
+      await initAppState(false, shouldRedrawApp);
       if (localStorage.getItem('user-dark-mode-state') === 'on') {
         setDarkMode(true);
       }
@@ -367,10 +371,19 @@ const useWallets = (walletProps: IuseWalletProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      await NewProfilesController.Instance.updateProfileForAccount(
-        primaryAccount.profile.address,
-        {},
-        false
+      const updatedProfiles =
+        await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
+          primaryAccount.profile.chain,
+          primaryAccount.profile.address
+        );
+      const currentUserUpdatedProfile = updatedProfiles[0];
+      primaryAccount.profile.initialize(
+        currentUserUpdatedProfile?.name,
+        currentUserUpdatedProfile.address,
+        currentUserUpdatedProfile?.avatarUrl,
+        currentUserUpdatedProfile.id,
+        primaryAccount.profile.chain,
+        currentUserUpdatedProfile?.lastActive
       );
     } catch (e) {
       console.log(e);
@@ -416,16 +429,16 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   // Handle saving profile information
   const onSaveProfileInfo = async () => {
-    const data = {
-      name: username,
-      avatarUrl: avatarUrl,
-    };
     try {
       if (username || avatarUrl) {
-        await NewProfilesController.Instance.updateProfileForAccount(
-          primaryAccount.profile.address,
-          data
-        );
+        await updateProfile({
+          address: primaryAccount.profile.address,
+          chain: primaryAccount.profile.chain,
+          name: username,
+          avatarUrl,
+        });
+        // we should trigger a redraw emit manually
+        NewProfilesController.Instance.isFetched.emit('redraw');
       }
       if (walletProps.onSuccess) walletProps.onSuccess();
       app.loginStateEmitter.emit('redraw'); // redraw app state when fully onboarded with new account

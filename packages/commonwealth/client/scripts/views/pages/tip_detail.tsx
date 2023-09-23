@@ -1,7 +1,6 @@
 import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import 'pages/tip_detail.scss';
 import React from 'react';
-import NewProfilesController from '../../controllers/server/newProfiles';
 import { QuillRenderer } from '../components/react_quill_editor/quill_renderer';
 import { User } from '../components/user/user';
 
@@ -26,18 +25,22 @@ export const TipDetail = (props: TipDetailProps) => {
         <div className="title">{title}</div>
         <div className="proposal-page-row">
           <div className="label">Finder</div>
-          <User user={author} linkify popover showAddressWithDisplayName />
+          <User
+            userAddress={author.address}
+            userChainId={author.chain?.id || author.profile?.chain}
+            shouldLinkProfile
+            shouldShowPopover
+            shouldShowAddressWithDisplayName
+          />
         </div>
         <div className="proposal-page-row">
           <div className="label">Beneficiary</div>
           <User
-            user={NewProfilesController.Instance.getProfile(
-              proposal.author.chain.id,
-              who
-            )}
-            linkify
-            popover
-            showAddressWithDisplayName
+            userAddress={proposal.author.chain.id}
+            userChainId={who}
+            shouldLinkProfile
+            shouldShowPopover
+            shouldShowAddressWithDisplayName
           />
         </div>
         <div className="proposal-page-row">
@@ -65,10 +68,11 @@ export const TipDetail = (props: TipDetailProps) => {
                   <div>{deposit.inDollars}</div>
                 </div>
                 <User
-                  user={account}
-                  linkify
-                  popover
-                  showAddressWithDisplayName
+                  userAddress={account.address}
+                  userChainId={account.chain.id || account.profile?.chain}
+                  shouldLinkProfile
+                  shouldShowPopover
+                  shouldShowAddressWithDisplayName
                 />
               </div>
             ))}

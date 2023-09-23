@@ -15,7 +15,6 @@ import {
 import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
-import { SearchBar } from './pages/search/search_bar';
 import { featureFlags } from 'helpers/feature-flags';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { Modal } from 'views/components/component_kit/cw_modal';
@@ -26,8 +25,9 @@ import WebWalletController from 'controllers/app/web_wallets';
 import { WalletId } from 'common-common/src/types';
 import axios from 'axios';
 import clsx from 'clsx';
-import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWButton } from './components/component_kit/new_designs/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
+import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -95,7 +95,11 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               if (app.isCustomDomain()) {
                 navigate('/', {}, null);
               } else {
-                navigate('/dashboard/for-you', {}, null);
+                if (isLoggedIn) {
+                  navigate('/dashboard/for-you', {}, null);
+                } else {
+                  navigate('/dashboard/global', {}, null);
+                }
               }
             }}
           />
@@ -122,7 +126,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             />
           )}
         </div>
-        <SearchBar />
+        <CWSearchBar />
         <div className="header-right">
           <div className="MobileMenuContainer">
             <CWIconButton
@@ -170,9 +174,10 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           )}
           {!isLoggedIn && (
             <CWButton
-              buttonType="tertiary-black"
-              iconLeft="person"
-              label="Log in"
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Login"
+              buttonWidth="wide"
               onClick={() => setIsLoginModalOpen(true)}
             />
           )}
@@ -209,7 +214,11 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             if (app.isCustomDomain()) {
               navigate('/', {}, null);
             } else {
-              navigate('/dashboard/for-you', {}, null);
+              if (isLoggedIn) {
+                navigate('/dashboard/for-you', {}, null);
+              } else {
+                navigate('/dashboard/global', {}, null);
+              }
             }
           }}
         />
@@ -235,7 +244,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           />
         )}
       </div>
-      <SearchBar />
+      <CWSearchBar />
       <div className="header-right">
         <div className="MobileMenuContainer">
           <CWIconButton

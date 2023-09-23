@@ -3,9 +3,7 @@ import React, { useState } from 'react';
 import app from 'state';
 import {
   useDeleteThreadMutation,
-  useEditThreadPrivacyMutation,
-  useToggleThreadPinMutation,
-  useToggleThreadSpamMutation,
+  useEditThreadMutation,
 } from 'state/api/threads';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
@@ -19,7 +17,6 @@ import {
 } from '../../../../../../controllers/app/notifications';
 import type Thread from '../../../../../../models/Thread';
 import type { IThreadCollaborator } from '../../../../../../models/Thread';
-import Topic from '../../../../../../models/Topic';
 import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
@@ -75,19 +72,11 @@ export const AdminActions = ({
     currentStage: thread.stage,
   });
 
-  const { mutateAsync: toggleSpam } = useToggleThreadSpamMutation({
+  const { mutateAsync: editThread } = useEditThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
-  });
-
-  const { mutateAsync: editThreadPrivacy } = useEditThreadPrivacyMutation({
-    chainId: app.activeChainId(),
-    threadId: thread.id,
-  });
-
-  const { mutateAsync: togglePin } = useToggleThreadPinMutation({
-    chainId: app.activeChainId(),
-    threadId: thread.id,
+    currentStage: thread.stage,
+    currentTopicId: thread.topic.id,
   });
 
   const handleDeleteThread = () => {
@@ -167,10 +156,10 @@ export const AdminActions = ({
           onClick: async () => {
             const isSpam = !thread.markedAsSpamAt;
             try {
-              await toggleSpam({
+              await editThread({
                 chainId: app.activeChainId(),
                 threadId: thread.id,
-                isSpam: isSpam,
+                spam: isSpam,
                 address: app.user?.activeAccount?.address,
               })
                 .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
@@ -189,7 +178,8 @@ export const AdminActions = ({
   };
 
   const handleThreadLockToggle = () => {
-    editThreadPrivacy({
+    editThread({
+      address: app.user.activeAccount.address,
       threadId: thread.id,
       readOnly: !thread.readOnly,
       chainId: app.activeChainId(),
@@ -204,11 +194,16 @@ export const AdminActions = ({
   };
 
   const handleThreadPinToggle = () => {
-    togglePin({
+    editThread({
+      address: app.user.activeAccount.address,
       threadId: thread.id,
       chainId: app.activeChainId(),
+      pinned: !thread.pinned,
     })
-      .then(() => onPinToggle && onPinToggle(!thread.pinned))
+      .then(() => {
+        notifySuccess(thread?.pinned ? 'Unpinned!' : 'Pinned!');
+        onPinToggle && onPinToggle(!thread.pinned);
+      })
       .catch(() => {
         notifyError('Could not update pinned state');
       });

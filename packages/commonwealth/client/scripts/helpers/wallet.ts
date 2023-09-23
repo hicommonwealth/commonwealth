@@ -9,7 +9,7 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
     }
 
     if (wallet.defaultNetwork === 'terra') {
-      return wallet.accounts[0].address;
+      return wallet.accounts[0]?.address;
     }
 
     if (wallet.chain === 'cosmos') {
@@ -17,11 +17,11 @@ const getAddressFromWallet = (wallet: IWebWallet<any>) => {
         return wallet.accounts[0];
       }
 
-      return wallet.accounts[0].address;
+      return wallet.accounts[0]?.address;
     }
 
     if (wallet.chain === 'substrate') {
-      return wallet.accounts[0].address;
+      return wallet.accounts[0]?.address;
     }
   })();
 

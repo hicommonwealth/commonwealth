@@ -288,11 +288,13 @@ export interface CreateReactionArgs {
   address: string;
   reaction: string;
   jwt: string;
-  comment_id: number;
+  comment_id?: number;
+  thread_id?: number;
 }
 
 export const createReaction = async (args: CreateReactionArgs) => {
-  const { chain, address, jwt, author_chain, reaction, comment_id } = args;
+  const { chain, address, jwt, author_chain, reaction, comment_id, thread_id } =
+    args;
   const res = await chai.request
     .agent(app)
     .post(`/api/comments/${comment_id}/reactions`)
@@ -304,6 +306,7 @@ export const createReaction = async (args: CreateReactionArgs) => {
       comment_id,
       author_chain,
       jwt,
+      thread_id,
     });
   return res.body;
 };
@@ -410,10 +413,10 @@ export const updateRole = async (args: AssignRoleArgs) => {
 };
 
 export interface SubscriptionArgs {
-  object_id: string | number;
   jwt: any;
   is_active: boolean;
   category: string;
+  chain_id: string;
 }
 
 export const createSubscription = async (args: SubscriptionArgs) => {

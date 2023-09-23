@@ -1,1 +1,0 @@
-@alexyoung23j please add information about newly supported Rainbow Wallet via WalletConnect here. 

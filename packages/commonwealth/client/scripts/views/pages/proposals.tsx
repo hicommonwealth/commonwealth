@@ -25,7 +25,15 @@ import {
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
+  useAaveProposalsQuery,
 } from 'state/api/proposals';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
+import {
+  useDepositParamsQuery,
+  usePoolParamsQuery,
+  useStakingParamsQuery,
+} from 'state/api/chainParams';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -50,6 +58,17 @@ const ProposalsPage = () => {
   const [isSubstrateLoading, setSubstrateLoading] = useState(false);
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
+  const onSubstrate = app.chain?.base === ChainBase.Substrate;
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const onAave = app.chain?.network === ChainNetwork.Aave;
+  const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
+  const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
+
+  const { data: cachedAaveProposals, isError } = useAaveProposalsQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
+    chainId: app.chain?.id,
+  });
+
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
 
@@ -72,19 +91,30 @@ const ProposalsPage = () => {
     };
   }, [setSubstrateLoading]);
 
+  useManageDocumentTitle('Proposals');
+
+  // lazy load Cosmos chain params
+  const { data: stakingDenom } = useStakingParamsQuery();
+  useDepositParamsQuery(stakingDenom);
+  usePoolParamsQuery();
+
   const {
     data: activeCosmosProposals,
-    isLoading: isCosmosActiveProposalsLoading,
+    isLoading: isLoadingCosmosActiveProposalsRQ,
   } = useActiveCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
+  const isLoadingCosmosActiveProposals =
+    onCosmos && isLoadingCosmosActiveProposalsRQ;
 
   const {
     data: completedCosmosProposals,
-    isLoading: isCosmosCompletedProposalsLoading,
+    isLoading: isCosmosCompletedProposalsLoadingRQ,
   } = useCompletedCosmosProposalsQuery({
     isApiReady: !!app.chain?.apiInitialized,
   });
+  const isLoadingCosmosCompletedProposals =
+    onCosmos && isCosmosCompletedProposalsLoadingRQ;
 
   if (isLoading) {
     if (
@@ -106,15 +136,18 @@ const ProposalsPage = () => {
     return <PageLoading message="Connecting to chain" />;
   }
 
-  const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-  const onCompound = app.chain && app.chain.network === ChainNetwork.Compound;
-  const onAave = app.chain && app.chain.network === ChainNetwork.Aave;
-  const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;
-  const onCosmos = app.chain && app.chain.base === ChainBase.CosmosSDK;
+  if (isError) {
+    return <ErrorPage message="Could not connect to chain" />;
+  }
 
   const modLoading = loadSubstrateModules('Proposals', getModules);
 
   if (isSubstrateLoading) return modLoading;
+
+  let aaveProposals: AaveProposal[];
+  if (onAave)
+    aaveProposals =
+      cachedAaveProposals || (app.chain as Aave).governance.store.getAll();
 
   // active proposals
   const activeDemocracyProposals =
@@ -132,8 +165,7 @@ const ProposalsPage = () => {
 
   const activeAaveProposals =
     onAave &&
-    (app.chain as Aave).governance.store
-      .getAll()
+    aaveProposals
       .filter((p) => !p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
@@ -143,8 +175,7 @@ const ProposalsPage = () => {
       .getAll()
       .filter((p) => !p.completed)
       .sort((p1, p2) => p2.data.id - p1.data.id);
-
-  const activeProposalContent = isCosmosActiveProposalsLoading ? (
+  const activeProposalContent = isLoadingCosmosActiveProposals ? (
     <CWSpinner />
   ) : !activeDemocracyProposals?.length &&
     !activeCosmosProposals?.length &&
@@ -209,8 +240,7 @@ const ProposalsPage = () => {
 
   const inactiveAaveProposals =
     onAave &&
-    (app.chain as Aave).governance.store
-      .getAll()
+    aaveProposals
       .filter((p) => p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
@@ -221,7 +251,7 @@ const ProposalsPage = () => {
       .filter((p) => p.completed)
       .sort((p1, p2) => p2.data.id - p1.data.id);
 
-  const inactiveProposalContent = isCosmosCompletedProposalsLoading ? (
+  const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
     <CWSpinner />
   ) : !inactiveDemocracyProposals?.length &&
     !inactiveCosmosProposals?.length &&
