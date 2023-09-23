@@ -8,32 +8,21 @@ const useInitApp = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    console.log('Checking if on native device');
     console.log(app.platform());
-
-    const domainPromise = app.platform() !== 'web'
-      ? Promise.resolve('')
-      : fetch('/api/domain')
-          .then((res) => res.json())
-          .then(({ customDomain: serverCustomDomain }) => {
-            console.log('Not on native device, setting custom domain.');
+    const isWebPlatform = app.platform() === 'web';
+    const domainPromise = isWebPlatform
+      ? axios
+          .get(`${app.serverUrl()}/domain`)
+          .then((res) => {
+            const serverCustomDomain = res.data.customDomain || '';
             setCustomDomain(serverCustomDomain);
             return serverCustomDomain;
           })
-          .catch((err) => {
-            console.log('Failed fetching custom domain', err);
-            return '';
-          });
+          .catch((err) => console.log('Failed fetching custom domain', err))
+      : Promise.resolve();
 
     Promise.all([domainPromise, initAppState(true)])
-      .then(([serverCustomDomain]) => {
-        if (app.platform() !== 'web') {
-          console.log(
-            'On native device or desktop, skipping custom domain and initializing app state.'
-          );
-        }
-        return serverCustomDomain;
-      })
+      .then(([serverCustomDomain]) => serverCustomDomain)
       .finally(() => setIsLoading(false));
   }, []);
 
