@@ -66,9 +66,8 @@ export const ExploreCommunitiesSidebar = () => {
         label: 'Explore',
         onClick: async () => {
           setTimeout(() => {
-            const isSidebarOpen = Boolean(
-              sidebarStore.getState().userToggledVisibility
-            );
+            const isSidebarOpen =
+              !!sidebarStore.getState().userToggledVisibility;
             setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },

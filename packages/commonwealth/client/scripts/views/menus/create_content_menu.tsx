@@ -266,9 +266,8 @@ export const CreateContentSidebar = () => {
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            const isSidebarOpen = Boolean(
-              sidebarStore.getState().userToggledVisibility
-            );
+            const isSidebarOpen =
+              !!sidebarStore.getState().userToggledVisibility;
             setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },

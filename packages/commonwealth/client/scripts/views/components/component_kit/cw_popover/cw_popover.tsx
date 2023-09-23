@@ -36,7 +36,7 @@ export const usePopover = (): UsePopoverProps => {
     setAnchorEl(anchorEl ? null : e.currentTarget);
   };
 
-  const open = Boolean(anchorEl);
+  const open = !!anchorEl;
   const id = open ? `popover-${uuidv4()}` : undefined;
 
   return {
