@@ -212,19 +212,19 @@ class SessionsController {
       address
     );
 
-    // // Get a new session signature.
-    // if (!hasAuthenticatedSession) {
-    //   const matchingAccount = app.user.addresses.find(
-    //     (a) => a.address === address
-    //   );
+    // Get a new session signature.
+    if (app.config.enforceSessionKeys && !hasAuthenticatedSession) {
+      const matchingAccount = app.user.addresses.find(
+        (a) => a.address === address
+      );
 
-    //   throw new SessionKeyError({
-    //     name: 'Authentication Error',
-    //     message: 'Session key expired',
-    //     address,
-    //     ssoSource: matchingAccount.walletSsoSource,
-    //   });
-    // }
+      throw new SessionKeyError({
+        name: 'Authentication Error',
+        message: 'Session key expired',
+        address,
+        ssoSource: matchingAccount.walletSsoSource,
+      });
+    }
 
     if (!hasAuthenticatedSession) {
       return { session: '', action: '', hash: '' };

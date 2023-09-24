@@ -90,15 +90,14 @@ const UserDropdown = () => {
           />
         ),
         onClick: async () => {
-          return await setActiveAccount(account);
-          // if (signed) {
-          //   return await setActiveAccount(account);
-          // }
+          if (app.config.enforceSessionKeys || signed) {
+            return await setActiveAccount(account);
+          }
 
-          // setRevalidationModalData({
-          //   walletSsoSource: walletSsoSource,
-          //   walletAddress: account.address,
-          // });
+          setRevalidationModalData({
+            walletSsoSource: walletSsoSource,
+            walletAddress: account.address,
+          });
         },
       };
     }
