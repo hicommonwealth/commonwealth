@@ -268,10 +268,10 @@ export const renderQuillDelta = (
             if (k !== 'color' && k !== 'background' && v !== true) return;
             switch (k) {
               case 'bold':
-                result = <b key={ii}>{child.insert}</b>;
+                result = <b key={ii}>{result}</b>;
                 return;
               case 'italic':
-                result = <i key={ii}>{child.insert}</i>;
+                result = <i key={ii}>{result}</i>;
                 return;
               case 'strike':
                 result = <s key={ii}>{result}</s>;
