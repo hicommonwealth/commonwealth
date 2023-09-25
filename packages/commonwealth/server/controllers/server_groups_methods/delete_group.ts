@@ -47,7 +47,7 @@ export async function __deleteGroup(
     throw new AppError(Errors.GroupNotFound);
   }
 
-  await sequelize.transaction(async (transaction) => {
+  await this.models.sequelize.transaction(async (transaction) => {
     // remove group from all associated topics
     await this.models.Topic.update(
       {

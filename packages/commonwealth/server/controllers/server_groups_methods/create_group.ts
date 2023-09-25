@@ -79,38 +79,40 @@ export async function __createGroup(
     throw new AppError(Errors.InvalidTopics);
   }
 
-  const newGroup = await sequelize.transaction(async (transaction) => {
-    // create group
-    const group = await this.models.Group.create(
-      {
-        chain_id: chain.id,
-        metadata,
-        requirements,
-      },
-      { transaction }
-    );
-    if (topicsToAssociate.length > 0) {
-      // add group to all specified topics
-      await this.models.Topic.update(
+  const newGroup = await this.models.sequelize.transaction(
+    async (transaction) => {
+      // create group
+      const group = await this.models.Group.create(
         {
-          group_ids: sequelize.fn(
-            'array_append',
-            sequelize.col('group_ids'),
-            group.id
-          ),
+          chain_id: chain.id,
+          metadata,
+          requirements,
         },
-        {
-          where: {
-            id: {
-              [Op.in]: topicsToAssociate.map(({ id }) => id),
-            },
-          },
-          transaction,
-        }
+        { transaction }
       );
+      if (topicsToAssociate.length > 0) {
+        // add group to all specified topics
+        await this.models.Topic.update(
+          {
+            group_ids: sequelize.fn(
+              'array_append',
+              sequelize.col('group_ids'),
+              group.id
+            ),
+          },
+          {
+            where: {
+              id: {
+                [Op.in]: topicsToAssociate.map(({ id }) => id),
+              },
+            },
+            transaction,
+          }
+        );
+      }
+      return group.toJSON();
     }
-    return group.toJSON();
-  });
+  );
 
   return newGroup;
 }

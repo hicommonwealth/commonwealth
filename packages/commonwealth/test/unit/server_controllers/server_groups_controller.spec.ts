@@ -1,51 +1,107 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
-import { AddressInstance } from 'server/models/address';
+import { AddressAttributes, AddressInstance } from 'server/models/address';
 import { ChainInstance } from 'server/models/chain';
 import { GroupAttributes } from 'server/models/group';
+import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
 import { UserInstance } from 'server/models/user';
 
 const createMockedGroupsController = () => {
+  const groups: GroupAttributes[] = [
+    {
+      id: 1,
+      chain_id: 'ethereum',
+      metadata: {
+        name: 'hello',
+        description: '123',
+      },
+      requirements: [],
+    },
+  ];
+  const topics: TopicAttributes[] = [
+    {
+      id: 1,
+      chain_id: 'ethereum',
+      token_threshold: '1000',
+      name: 'hello',
+      featured_in_sidebar: false,
+      featured_in_new_post: false,
+      group_ids: [1],
+    },
+  ];
+  const memberships: MembershipAttributes[] = [
+    {
+      group_id: 1,
+      address_id: 1,
+      reject_reason: null,
+      last_checked: new Date(),
+    },
+  ];
   const db: any = {
     Topic: {
       findAll: async (): Promise<TopicAttributes[]> => {
-        return [
-          {
-            id: 1,
-            chain_id: 'ethereum',
-            token_threshold: '1000',
-            name: 'hello',
-            featured_in_sidebar: false,
-            featured_in_new_post: false,
-            group_ids: [7],
-          },
-        ];
+        return topics;
       },
+      update: async () => {},
     },
     Group: {
       findAll: async (): Promise<(GroupAttributes & { toJSON: any })[]> => {
-        const obj: GroupAttributes = {
-          id: 7,
-          chain_id: 'ethereum',
-          metadata: {
-            name: 'hello',
-            description: '123',
-          },
-          requirements: [],
-        };
-        return [
-          {
-            ...obj,
-            toJSON: () => obj,
-          },
-        ];
+        return groups.map((group) => ({
+          ...group,
+          memberships,
+          toJSON: () => group,
+        }));
       },
+      create: async (): Promise<GroupAttributes & { toJSON: any }> => ({
+        ...groups[0],
+        toJSON: () => groups[0],
+      }),
+      update: async (): Promise<GroupAttributes> => groups[0],
+      destroy: async () => {},
+      findOne: async () => ({
+        ...groups[0],
+        update: async (): Promise<GroupAttributes> => groups[0],
+        toJSON: () => groups[0],
+      }),
+      count: async () => groups.length,
     },
     Membership: {
       findAll: async () => {
-        return [{}];
+        return memberships.map((membership) => ({
+          ...membership,
+          toJSON: () => membership,
+          update: async () => membership,
+        }));
       },
+      findOrCreate: async () => {
+        const membership = {
+          ...memberships[0],
+          toJSON: () => memberships[0],
+          update: async () => membership,
+        };
+        return [membership, true];
+      },
+      destroy: async () => {},
+    },
+    CommunityRole: {
+      findAll: async () => [
+        {
+          toJSON: () => ({
+            chain_id: 'ethereum',
+            name: 'member',
+            allow: '0',
+            deny: '0',
+            RoleAssignments: [{}],
+          }),
+        },
+      ],
+    },
+    Address: {
+      findAll: async () => [{}],
+    },
+    sequelize: {
+      transaction: async (callback) => callback(),
     },
   };
   const tokenBalanceCache: any = {};
@@ -63,6 +119,7 @@ const createMockParams = () => {
     getAddresses: async () => {
       return [];
     },
+    isAdmin: true,
   } as UserInstance;
   const chain = {} as ChainInstance;
   const address = {} as AddressInstance;
@@ -73,15 +130,15 @@ describe('ServerGroupsController', () => {
   describe('#refreshMembership', async () => {
     const controller = createMockedGroupsController();
     const { user, chain, address } = createMockParams();
-    const result = await controller.refreshMembership({
+    const results = await controller.refreshMembership({
       user,
       chain,
       address,
       topicId: 1,
     });
-    expect(result).to.have.property('topicId');
-    expect(result).to.have.property('allowed');
-    expect(result).to.not.have.property('rejectReason');
+    expect(results[0]).to.have.property('topicId');
+    expect(results[0]).to.have.property('allowed');
+    expect(results[0]).to.have.property('rejectReason', null);
   });
 
   describe('#getGroups', async () => {
@@ -100,7 +157,7 @@ describe('ServerGroupsController', () => {
     expect(result[0].memberships).to.have.length(1);
     expect(result[0].memberships[0]).to.have.property('group_id');
     expect(result[0].memberships[0]).to.have.property('address_id');
-    expect(result[0].memberships[0]).to.have.property('allowed');
+    expect(result[0].memberships[0]).to.have.property('reject_reason');
     expect(result[0].memberships[0]).to.have.property('last_checked');
   });
 
@@ -118,11 +175,10 @@ describe('ServerGroupsController', () => {
       requirements: [],
       topics: [],
     });
-    expect(result).to.have.length(1);
-    expect(result[0]).to.have.property('id');
-    expect(result[0]).to.have.property('chain_id');
-    expect(result[0]).to.have.property('metadata');
-    expect(result[0]).to.have.property('requirements');
+    expect(result).to.have.property('id');
+    expect(result).to.have.property('chain_id');
+    expect(result).to.have.property('metadata');
+    expect(result).to.have.property('requirements');
   });
 
   describe('#updateGroup', async () => {
@@ -139,11 +195,10 @@ describe('ServerGroupsController', () => {
       },
       requirements: [],
     });
-    expect(result).to.have.length(1);
-    expect(result[0]).to.have.property('id');
-    expect(result[0]).to.have.property('chain_id');
-    expect(result[0]).to.have.property('metadata');
-    expect(result[0]).to.have.property('requirements');
+    expect(result).to.have.property('id');
+    expect(result).to.have.property('chain_id');
+    expect(result).to.have.property('metadata');
+    expect(result).to.have.property('requirements');
   });
 
   describe('#deleteGroup', async () => {
