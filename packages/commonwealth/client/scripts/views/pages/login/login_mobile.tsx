@@ -27,6 +27,7 @@ export const LoginMobile = ({
   signerAccount,
   address,
   activeStep,
+  setActiveStep,
   handleSetAvatar,
   handleSetUsername,
   profiles,
@@ -170,7 +171,6 @@ export const LoginMobile = ({
             {!isMagicLoading ? (
               <div className="email-form-wrapper">
                 <CWTextInput
-                  autoFocus={true}
                   label="Email address"
                   placeholder="Email address"
                   className="login-email-field"
@@ -179,14 +179,14 @@ export const LoginMobile = ({
                 />
                 <div className="buttons-row email-form-buttons">
                   <CWButton
-                    label="Sign in with Magic"
+                    label="Login with Magic"
                     buttonType="secondary-blue"
                     className="wallet-magic-btn"
                     onClick={onEmailLogin}
                   />
                   <CWButton
                     iconLeft="arrowLeft"
-                    label="Back to sign in options"
+                    label="Back to login options"
                     buttonType="secondary-blue"
                     className="wallet-back-btn"
                     onClick={onNavigateToWalletList}

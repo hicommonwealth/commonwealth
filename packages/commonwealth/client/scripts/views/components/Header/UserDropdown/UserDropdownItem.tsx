@@ -22,12 +22,14 @@ export const UserDropdownItem = ({
       <CWText type="b2" className="identification">
         {username || formatAddressShort(address, 6)}
       </CWText>
-      {isSignedIn && hasJoinedCommunity && (
+      {hasJoinedCommunity && (
         <span className="check-icon">
           <CWIcon iconSize="small" iconName="checkCircleFilled" />
         </span>
       )}
-      {!isSignedIn && <CWText type="caption">Signed out</CWText>}
+      {!isSignedIn && !hasJoinedCommunity && (
+        <CWText type="caption">Signed out</CWText>
+      )}
     </div>
   );
 };

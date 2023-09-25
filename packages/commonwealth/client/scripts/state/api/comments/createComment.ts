@@ -26,7 +26,7 @@ const createComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signComment(address, {
+  } = await app.sessions.signComment({
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,
