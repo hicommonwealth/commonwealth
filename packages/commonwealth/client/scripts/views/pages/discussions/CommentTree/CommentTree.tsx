@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { DeltaStatic } from 'quill';
 
-import { ContentType } from '../../../../../../shared/types';
 import useUserLoggedIn from '../../../../hooks/useUserLoggedIn';
-import useUserActiveAccount from '../../../../hooks/useUserActiveAccount';
 import useForceRerender from '../../../../hooks/useForceRerender';
 import app from '../../../../state';
 import {
@@ -28,6 +26,7 @@ import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import { jumpHighlightComment } from './helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { getCommentSubscriptions, handleToggleSubscription } from '../helpers';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -56,6 +55,7 @@ export const CommentTree = ({
   setParentCommentId,
   canComment,
 }: CommentsTreeAttrs) => {
+  const forceRerender = useForceRerender();
   const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
 

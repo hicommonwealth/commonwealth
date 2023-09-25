@@ -14,17 +14,6 @@ import { QuillRenderer } from 'views/components/react_quill_editor/quill_rendere
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { SharePopover } from 'views/components/share_popover';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
-import type Comment from '../../../../models/Comment';
-import { CWButton } from '../../../components/component_kit/new_designs/cw_button';
-import { PopoverMenu } from '../../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWTag } from '../../../components/component_kit/cw_tag';
-import { CWText } from '../../../components/component_kit/cw_text';
-import { CommentReactionButton } from '../../../components/ReactionButton/CommentReactionButton';
-import { ReactQuillEditor } from '../../../components/react_quill_editor';
-import { QuillRenderer } from '../../../components/react_quill_editor/quill_renderer';
-import { deserializeDelta } from '../../../components/react_quill_editor/utils';
-import { SharePopover } from '../../../components/share_popover';
-import { CWThreadAction } from '../../../components/component_kit/new_designs/cw_thread_action';
 
 import './CommentCard.scss';
 
