@@ -12,4 +12,13 @@
   @include smallInclusive {
     width: 100%;
   }
+
+  .header {
+    padding-top: 32px;
+    padding-bottom: 32px;
+
+    @include extraSmall {
+      padding-top: 0px;
+    }
+  }
 }

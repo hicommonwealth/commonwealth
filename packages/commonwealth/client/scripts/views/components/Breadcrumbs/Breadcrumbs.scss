@@ -75,13 +75,14 @@
   .commonPadding {
     display: flex;
     flex-direction: row;
+    padding-left: 32px;
 
     @include large {
       padding-left: 56px;
     }
 
-    @include mediumInclusive {
-      padding-left: 32px;
+    @include medium {
+      padding-left: 40px;
     }
 
     @include small {
@@ -153,23 +154,29 @@
     flex-direction: row;
   }
 
+  .admin {
+    display: flex;
+    padding: 8px 0px 8px 24px;
+  }
+
+  .analytics {
+    display: flex;
+    padding: 8px 0px 8px 36px;
+  }
+
   .createCommunity {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: row;
 
-    @media only screen and (min-width: 2560px) {
-      padding-right: 33%;
-      align-items: center;
-    }
     @include large {
-      padding-right: 23%;
+      padding-right: calc(18% + 4px);
       align-items: center;
     }
 
     @include mediumInclusive {
-      padding-right: 32%;
+      padding-right: 30%;
     }
 
     @include small {
@@ -183,22 +190,37 @@
 
   .viewProfile {
     display: flex;
-    padding-left: calc(16px + 1.5rem);
     flex-direction: row;
-    @include large {
-      padding-left: 80px;
-    }
+    margin-left: 80px;
 
     @include mediumInclusive {
-      padding-left: 48px;
+      margin-left: 72px;
     }
 
-    @include small {
-      padding-left: 32px;
+    @include mediumSmallInclusive {
+      margin-left: 48px;
     }
 
-    @include extraSmall {
-      padding-left: 32px;
+    @include smallInclusive {
+      flex-direction: column;
+      margin-left: 32px;
+    }
+  }
+
+  .editProfile {
+    display: flex;
+    flex-direction: row;
+    margin-left: 50px;
+    @include mediumInclusive {
+      margin-left: 50px;
+    }
+
+    @include mediumSmallInclusive {
+      margin-left: 48px;
+    }
+
+    @include smallInclusive {
+      margin-left: 48px;
     }
   }
 }

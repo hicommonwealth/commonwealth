@@ -8,6 +8,17 @@
   padding: 24px;
   padding-right: 0px;
 
+  .header {
+    padding-top: 32px;
+
+    @include small {
+      padding-top: 14px;
+    }
+    @include extraSmall {
+      padding-top: 0px;
+    }
+  }
+
   .member-row {
     padding: 0px;
     margin: 0px;

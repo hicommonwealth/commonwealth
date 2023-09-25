@@ -81,7 +81,7 @@ const MembersPage = () => {
 
   return (
     <div className="MembersPage">
-      <CWText type="h3" fontWeight="medium">
+      <CWText type="h3" fontWeight="medium" className="header">
         Members ({totalResults})
       </CWText>
       <MembersSearchBar

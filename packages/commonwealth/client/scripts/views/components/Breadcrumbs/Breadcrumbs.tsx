@@ -73,10 +73,15 @@ export const Breadcrumbs = () => {
 
     const breadcrumbs = pathSegments.map((pathSegment, index) => {
       // Find the matching breadcrumb data for the current path segment.
-      const matchedBreadcrumb = breadcrumbData.find(
-        (breadcrumbItem) =>
+      const matchedBreadcrumb = breadcrumbData.find((breadcrumbItem) => {
+        // Check if breadcrumbItem.url is falsy or if index is out of bounds
+        if (!breadcrumbItem.url || index >= pathSegments.length) {
+          return false;
+        }
+        return (
           breadcrumbItem.url === pathSegments.slice(0, index + 1).join('/')
-      );
+        );
+      });
 
       // Generate the link based on the current path segment.
       if (pathSegment === 'profile') {
@@ -135,6 +140,9 @@ export const Breadcrumbs = () => {
   const getStyle = () => {
     const findStyle = breadCrumbURLS.find((page) => {
       if (!page.className) return;
+      if (location.pathname.split('/').length > 2) {
+        return location.pathname.includes(page.url);
+      }
       return location.pathname === page.url;
     });
 
@@ -163,10 +171,6 @@ export const Breadcrumbs = () => {
       return 'viewProfile';
     }
 
-    if (location.pathname.includes('createCommunity')) {
-      return 'createCommunity';
-    }
-
     if (location.pathname.includes('notification-settings')) {
       return 'notification-management';
     }
@@ -191,11 +195,21 @@ export const Breadcrumbs = () => {
       discussionsGovernance: 'This is an app, not a selectable page.',
     };
 
-    if (lastPathSegment in tooltips) {
-      return tooltips[lastPathSegment];
-    }
+    const isAdmin = breadCrumbURLS.find(
+      (breadcrumbItem) =>
+        breadcrumbItem.url === lastPathSegment && breadcrumbItem.isAdmin
+    );
 
-    return;
+    const isGovernance = breadCrumbURLS.find(
+      (breadcrumbItem) =>
+        breadcrumbItem.url === lastPathSegment && breadcrumbItem.isGovernance
+    );
+
+    if (isAdmin) {
+      return tooltips.admin;
+    } else if (isGovernance) {
+      return tooltips.discussionsGovernance;
+    }
   };
 
   return (
@@ -216,8 +230,7 @@ export const Breadcrumbs = () => {
             return path.isParent ? (
               <CWTooltip
                 content={
-                  getToolTipCopy() ||
-                  'This is a section, not a selectable page.'
+                  getToolTipCopy() || 'This is an app, not a selectable page.'
                 }
                 placement="bottom"
                 renderTrigger={(handleIneraction) => (

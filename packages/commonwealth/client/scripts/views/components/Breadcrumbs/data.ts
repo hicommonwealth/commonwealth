@@ -1,14 +1,6 @@
 export const breadCrumbURLS = [
   {
-    url: 'dashboard/for-you',
-    breadcrumb: 'Dashboard',
-  },
-  {
-    url: 'dashboard/global',
-    breadcrumb: 'Dashboard',
-  },
-  {
-    url: 'dashboard/chain-events',
+    url: 'dashboard',
     breadcrumb: 'Dashboard',
   },
   {
@@ -23,20 +15,25 @@ export const breadCrumbURLS = [
   {
     url: 'profile/edit',
     breadcrumb: 'Edit',
+    className: 'editProfile',
   },
   {
-    url: 'createCommunity/starter',
+    url: 'createCommunity',
     breadcrumb: 'Create Community',
+    className: 'createCommunity',
+    isParent: true,
   },
   {
     url: 'manage',
     breadcrumb: 'Manage',
     isAdmin: true,
+    className: 'admin',
   },
   {
     url: 'analytics',
     breadcrumb: 'Analytics',
     isAdmin: true,
+    className: 'analytics',
   },
   {
     url: 'overview',
@@ -51,35 +48,21 @@ export const breadCrumbURLS = [
     breadcrumb: 'Discussions/Decentralise',
   },
   {
-    url: 'dicussion/:id',
-    breadcrumb: 'Discussion/:id',
-  },
-  {
-    url: ':id/dicussions',
-    breadcrumb: ':id/Discussions',
-  },
-  {
-    url: 'lw',
-    breadcrumb: 'New/Discussion',
-  },
-  {
     url: 'members',
     breadcrumb: 'Members',
+    isGovernance: true,
   },
   {
     url: 'proposals',
     breadcrumb: 'Proposals',
+    isGovernance: true,
   },
   {
     url: 'proposal/:id',
     breadcrumb: 'Proposal/:id',
   },
   {
-    url: 'snapshot/:id',
+    url: 'snapshot',
     breadcrumb: 'Snapshots',
-  },
-  {
-    url: 'snapshot/:id/:proposalId',
-    breadcrumb: 'Snapshots/:id/:proposalId',
   },
 ];
