@@ -12,7 +12,6 @@
   width: 100%;
   //TODO -- Figure out if mobile is suppose to be sticky or if desktop.
   //If it's suppose to be sticky on desktop, we have to solve for the zIndex being higher than the sidebar
-  // overflow: auto;
   z-index: 3;
 
   @include extraSmall {
@@ -159,11 +158,14 @@
     align-items: center;
     justify-content: center;
     flex-direction: row;
-    position: fixed;
-    width: 100vw;
 
+    @media only screen and (min-width: 2560px) {
+      padding-right: 33%;
+      align-items: center;
+    }
     @include large {
-      padding-right: calc(18% + 4.5rem);
+      padding-right: 23%;
+      align-items: center;
     }
 
     @include mediumInclusive {

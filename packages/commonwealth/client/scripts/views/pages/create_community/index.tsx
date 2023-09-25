@@ -187,7 +187,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
 
   return (
     <div className="CreateCommunityIndex">
-      <CWText type="h3" fontWeight="semiBold">
+      <CWText type="h3" fontWeight="semiBold" className="header">
         New Commonwealth Community
       </CWText>
       <CWTabBar>
