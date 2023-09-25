@@ -68,9 +68,7 @@ jobs:
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
         run: |
           sudo local-ssl-proxy --source 443 --target 8080 &
-          yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
-          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e --forbid-only
-
+          yarn --cwd packages/commonwealth start-e2e test-e2e --forbid-only
 
       - name: Archive test status
         uses: actions/upload-artifact@v3
@@ -131,6 +129,7 @@ jobs:
         run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
 
       - name: Run e2e tests (yarn test-e2e)
+        run: yarn --cwd packages/commonwealth start-e2e test-e2e-mature
         env:
           PORT: 8080
           IS_CI: true
@@ -182,7 +181,6 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-
       - name: Cache browsers
         id: playwright-cache
         uses: actions/cache@v3
@@ -195,7 +193,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run serial e2e tests (yarn test-e2e-serial)
-        run: yarn --cwd packages/commonwealth e2e-start-server & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
+        run: yarn --cwd packages/commonwealth start-e2e test-e2e-mature --forbid-only
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true

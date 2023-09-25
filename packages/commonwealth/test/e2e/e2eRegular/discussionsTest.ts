@@ -1,7 +1,7 @@
 import { expect as pwexpect } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { testThreads } from '../hooks/e2eDbEntityHooks.spec';
+import { testThreads } from '../hooks/e2eDbEntityHooks';
 import { login } from '../utils/e2eUtils';
 
 chai.use(chaiHttp);

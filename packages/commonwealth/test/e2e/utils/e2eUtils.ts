@@ -2,7 +2,8 @@
 import { expect } from '@playwright/test';
 import * as process from 'process';
 import { Sequelize } from 'sequelize';
-import { testAddress } from 'web3-utils';
+
+export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
 
 export let dbClient = process.env.TEST_DB_CONNECTION_URI
   ? new Sequelize(process.env.TEST_DB_CONNECTION_URI, {

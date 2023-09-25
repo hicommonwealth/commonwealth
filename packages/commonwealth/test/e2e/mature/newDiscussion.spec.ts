@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { PORT } from '../../../server/config';
-import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks.spec';
+import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks';
 import {
   addAddressIfNone,
   login,

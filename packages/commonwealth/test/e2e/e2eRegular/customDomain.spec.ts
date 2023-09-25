@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks.spec';
+import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks';
 import { discussionTests } from './discussionsTest';
 
 if (process.env.IS_CI === 'true') {
