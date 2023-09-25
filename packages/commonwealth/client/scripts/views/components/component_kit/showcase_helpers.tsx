@@ -60,7 +60,7 @@ const newCommunity = (): any => {
 }
 
 export function makeData(num: number) {
-  return range(num).map((_): any => {
+  return range(num).map((): any => {
     return {
       ...newCommunity(),
     }
