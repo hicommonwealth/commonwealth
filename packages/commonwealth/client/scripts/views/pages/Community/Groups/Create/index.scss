@@ -43,11 +43,20 @@
       gap: 16px;
       width: 100%;
 
-      .requirement-sub-form-row {
-        display: flex;
+      .requirement-sub-form-row-1,
+      .requirement-sub-form-row-2 {
         align-items: flex-start;
         gap: 12px;
         width: 100%;
+      }
+
+      .requirement-sub-form-row-1 {
+        display: flex;
+      }
+
+      .requirement-sub-form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr 1fr;
       }
     }
   }
