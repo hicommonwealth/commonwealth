@@ -13,7 +13,6 @@
     "bundle-report": "webpack-bundle-analyzer --port 4200 build/stats.json",
     "check-types": "tsc --noEmit",
     "clean-db": "ts-node --project tsconfig.json server/scripts/cleanDb.ts",
-    "compress-images": "npx ts-node -T ./scripts/compressImages.ts",
     "create-migration": "npx sequelize migration:generate --name",
     "datadog-db-setup": "chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh",
     "db-all": "yarn reset-db && yarn load-db && yarn migrate-db",
