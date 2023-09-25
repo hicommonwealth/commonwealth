@@ -11,9 +11,10 @@ import {
   useEditCommentMutation,
   useFetchCommentsQuery,
   useToggleCommentSpamStatusMutation,
-} from '../../../../state/api/comments';
-import { CreateComment } from '../../../components/Comments/CreateComment';
-import { CWValidationText } from '../../../components/component_kit/cw_validation_text';
+} from 'state/api/comments';
+import { ContentType } from 'types';
+import { CreateComment } from 'views/components/Comments/CreateComment';
+import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 import {
   deserializeDelta,
   serializeDelta,
@@ -26,11 +27,7 @@ import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import { jumpHighlightComment } from './helpers';
-import { getCommentSubscriptions, handleToggleSubscription } from '../helpers';
-import { useSessionRevalidationModal } from '../../../modals/SessionRevalidationModal';
-import { SessionKeyError } from '../../../../controllers/server/sessions';
-
-import './CommentTree.scss';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -59,7 +56,7 @@ export const CommentTree = ({
   setParentCommentId,
   canComment,
 }: CommentsTreeAttrs) => {
-  const forceRerender = useForceRerender();
+  const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
 
   const { data: allComments = [] } = useFetchCommentsQuery({
@@ -67,32 +64,15 @@ export const CommentTree = ({
     threadId: parseInt(`${thread.id}`),
   });
 
-  const {
-    mutateAsync: deleteComment,
-    reset: resetDeleteCommentMutation,
-    error: deleteCommentError,
-  } = useDeleteCommentMutation({
+  const { mutateAsync: deleteComment } = useDeleteCommentMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
     existingNumberOfComments: thread.numberOfComments,
   });
 
-  const {
-    mutateAsync: editComment,
-    reset: resetEditCommentMutation,
-    error: editCommentError,
-  } = useEditCommentMutation({
+  const { mutateAsync: editComment } = useEditCommentMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
-  });
-
-  const resetSessionRevalidationModal = deleteCommentError
-    ? resetDeleteCommentMutation
-    : resetEditCommentMutation;
-
-  const { RevalidationModal } = useSessionRevalidationModal({
-    handleClose: resetSessionRevalidationModal,
-    error: deleteCommentError || editCommentError,
   });
 
   const { mutateAsync: toggleCommentSpamStatus } =
@@ -198,12 +178,9 @@ export const CommentTree = ({
                 address: app.user.activeAccount.address,
                 existingNumberOfComments: thread.numberOfComments,
               });
-            } catch (err) {
-              if (err instanceof SessionKeyError) {
-                return;
-              }
-              console.error(err?.responseJSON?.error || err?.message);
-              notifyError('Failed to delete comment');
+            } catch (e) {
+              console.log(e);
+              notifyError('Failed to delete comment.');
             }
           },
         },
@@ -351,11 +328,7 @@ export const CommentTree = ({
         setIsGloballyEditing(false);
         clearEditingLocalStorage(comment.id, ContentType.Comment);
       } catch (err) {
-        if (err instanceof SessionKeyError) {
-          return;
-        }
-        console.error(err?.responseJSON?.error || err?.message);
-        notifyError('Failed to edit comment');
+        console.error(err);
       } finally {
         setEdits((p) => ({
           ...p,
@@ -547,11 +520,11 @@ export const CommentTree = ({
   };
 
   return (
-    <>
-      <div className="CommentsTree">
-        {comments && recursivelyGatherComments(comments, comments[0], 0)}
-      </div>
-      {RevalidationModal}
-    </>
+    <div className="CommentsTree">
+      {comments && recursivelyGatherComments(comments, comments[0], 0)}
+      {commentError && (
+        <CWValidationText message={commentError} status="failure" />
+      )}
+    </div>
   );
 };

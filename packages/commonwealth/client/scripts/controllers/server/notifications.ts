@@ -326,7 +326,7 @@ class NotificationsController {
 
   public getChainEventNotifications() {
     if (!app.user || !app.user.jwt) {
-      throw new Error('must be signed in to refresh notifications');
+      throw new Error('must be logged in to refresh notifications');
     }
 
     const options: NotifOptions = app.isCustomDomain()
@@ -343,7 +343,7 @@ class NotificationsController {
 
   public getDiscussionNotifications() {
     if (!app.user || !app.user.jwt) {
-      throw new Error('must be signed in to refresh notifications');
+      throw new Error('must be logged in to refresh notifications');
     }
     const options: NotifOptions = app.isCustomDomain()
       ? { chain_filter: app.activeChainId(), maxId: undefined }

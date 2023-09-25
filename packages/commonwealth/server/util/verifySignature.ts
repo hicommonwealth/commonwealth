@@ -1,10 +1,12 @@
+import {
+  recoverTypedSignature,
+  SignTypedDataVersion,
+} from '@metamask/eth-sig-util';
 import type { KeyringOptions } from '@polkadot/keyring/types';
 import { hexToU8a, stringToHex } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
-import { verifyMessage } from 'ethers/lib/utils';
-
 import {
   ChainBase,
   NotificationCategories,
@@ -12,14 +14,14 @@ import {
 } from 'common-common/src/types';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
-
-import { createSiweMessage } from '../../shared/adapters/chain/ethereum/keys';
-import { getADR036SignableSession } from '../../shared/adapters/chain/cosmos/keys';
+import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
+import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { addressSwapper } from '../../shared/utils';
 import {
-  createCanvasSessionPayload,
+  chainBaseToCanvasChain,
   chainBaseToCanvasChainId,
-} from '../../shared/canvas';
+  constructCanvasMessage,
+} from '../../shared/adapters/shared';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { ChainInstance } from '../models/chain';
@@ -35,9 +37,9 @@ const sortedStringify = configureStableStringify({
   deterministic: true,
 });
 
-const verifySessionSignature = async (
+const verifySignature = async (
   models: DB,
-  chain: Readonly<ChainInstance>,
+  chain: ChainInstance,
   chain_id: string | number,
   addressModel: AddressInstance,
   user_id: number,
@@ -52,10 +54,10 @@ const verifySessionSignature = async (
   }
 
   // Reconstruct the expected canvas message.
+  const canvasChain = chainBaseToCanvasChain(chain.base);
   const canvasChainId = chainBaseToCanvasChainId(chain.base, chain_id);
-
-  const canvasSessionPayload = createCanvasSessionPayload(
-    chain.base,
+  const canvasMessage = constructCanvasMessage(
+    canvasChain,
     canvasChainId,
     chain.base === ChainBase.Substrate
       ? addressSwapper({
@@ -92,7 +94,7 @@ const verifySessionSignature = async (
       const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(
         address
       );
-      const message = stringToHex(sortedStringify(canvasSessionPayload));
+      const message = stringToHex(sortedStringify(canvasMessage));
 
       const signatureU8a =
         signatureString.slice(0, 2) === '0x'
@@ -111,7 +113,7 @@ const verifySessionSignature = async (
     //
     // ethereum address handling on cosmos chains via metamask
     //
-    const msgBuffer = Buffer.from(sortedStringify(canvasSessionPayload));
+    const msgBuffer = Buffer.from(sortedStringify(canvasMessage));
 
     // toBuffer() doesn't work if there is a newline
     const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
@@ -173,7 +175,7 @@ const verifySessionSignature = async (
           const secpSignature =
             cosmCrypto.Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new cosmCrypto.Sha256(
-            Buffer.from(sortedStringify(canvasSessionPayload))
+            Buffer.from(sortedStringify(canvasMessage))
           ).digest();
 
           isValid = await cosmCrypto.Secp256k1.verifySignature(
@@ -213,8 +215,8 @@ const verifySessionSignature = async (
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
-          const generatedSignDoc = await getADR036SignableSession(
-            Buffer.from(sortedStringify(canvasSessionPayload)),
+          const generatedSignDoc = await validationTokenToSignDoc(
+            Buffer.from(sortedStringify(canvasMessage)),
             generatedAddress
           );
 
@@ -249,29 +251,18 @@ const verifySessionSignature = async (
     // ethereum address handling
     //
     try {
-      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/;
-      const signaturePatternMatch = signaturePattern.exec(signatureString);
-      if (signaturePatternMatch === null) {
-        throw new Error(
-          `Invalid signature: signature did not match ${signaturePattern}`
-        );
-      }
-      const [_, domain, nonce, signatureData] = signaturePatternMatch;
-
-      const siweMessage = createSiweMessage(
-        canvasSessionPayload,
-        domain,
-        nonce
-      );
+      const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
 
       if (addressModel.block_info !== sessionBlockInfo) {
         throw new Error(
           `Eth verification failed for ${addressModel.address}: signed a different block than expected`
         );
       }
-
-      const address = verifyMessage(siweMessage, signatureData);
-
+      const address = recoverTypedSignature({
+        data: typedCanvasMessage,
+        signature: signatureString.trim(),
+        version: SignTypedDataVersion.V4,
+      });
       isValid = addressModel.address.toLowerCase() === address.toLowerCase();
       if (!isValid) {
         log.info(
@@ -294,7 +285,7 @@ const verifySessionSignature = async (
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
 
     isValid = nacl.sign.detached.verify(
-      Buffer.from(sortedStringify(canvasSessionPayload)),
+      Buffer.from(sortedStringify(canvasMessage)),
       Buffer.from(sigObj, 'base64'),
       Buffer.from(publicKey, 'base64')
     );
@@ -309,7 +300,7 @@ const verifySessionSignature = async (
       if (decodedAddress.length === 32) {
         const nacl = await import('tweetnacl');
         isValid = nacl.sign.detached.verify(
-          Buffer.from(sortedStringify(canvasSessionPayload)),
+          Buffer.from(sortedStringify(canvasMessage)),
           bs58.decode(signatureString),
           decodedAddress
         );
@@ -358,4 +349,4 @@ const verifySessionSignature = async (
   return isValid;
 };
 
-export default verifySessionSignature;
+export default verifySignature;

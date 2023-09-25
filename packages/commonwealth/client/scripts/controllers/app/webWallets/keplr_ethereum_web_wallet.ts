@@ -73,14 +73,14 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasSessionPayload: SessionPayload
+    canvasMessage: SessionPayload
   ): Promise<string> {
     const keplr = await import('@keplr-wallet/types');
     const canvas = await import('@canvas-js/interfaces');
     const signature = await window.keplr.signEthereum(
       this._chainId,
       account.address,
-      canvas.serializeSessionPayload(canvasSessionPayload),
+      canvas.serializeSessionPayload(canvasMessage),
       keplr.EthSignType.MESSAGE
     );
     return `0x${Buffer.from(signature).toString('hex')}`;

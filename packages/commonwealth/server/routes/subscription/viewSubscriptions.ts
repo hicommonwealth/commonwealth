@@ -2,7 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 
 export const Errors = {
-  NotLoggedIn: 'Not signed in',
+  NotLoggedIn: 'Not logged in',
 };
 
 export default async (

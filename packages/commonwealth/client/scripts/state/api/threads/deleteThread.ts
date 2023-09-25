@@ -16,23 +16,12 @@ const deleteThread = async ({
   threadId,
   address,
 }: DeleteThreadProps) => {
-  const {
-    session = null,
-    action = null,
-    hash = null,
-  } = await app.sessions.signDeleteThread(address, {
-    thread_id: threadId,
-  });
-
   return await axios.delete(`${app.serverUrl()}/threads/${threadId}`, {
     data: {
       author_chain: chainId,
       chain: chainId,
       address: address,
       jwt: app.user.jwt,
-      canvas_action: action,
-      canvas_session: session,
-      canvas_hash: hash,
     },
   });
 };

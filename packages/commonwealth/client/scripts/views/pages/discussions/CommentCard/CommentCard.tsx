@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import type Comment from 'models/Comment';
 import moment from 'moment';
 import type { DeltaStatic } from 'quill';
-import type { Action, Session } from '@canvas-js/interfaces';
-
-import app from '../../../../state';
-import { verify } from '../../../../../../shared/canvas';
-import { CWIcon } from '../../../components/component_kit/cw_icons/cw_icon';
-import { Modal } from '../../../components/component_kit/cw_modal';
-import { CanvasVerifyDataModal } from '../../../modals/canvas_verify_data_modal';
+import React, { useState } from 'react';
+import app from 'state';
+import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
+import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
+import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { ReactQuillEditor } from 'views/components/react_quill_editor';
+import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
+import { deserializeDelta } from 'views/components/react_quill_editor/utils';
+import { SharePopover } from 'views/components/share_popover';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import type Comment from '../../../../models/Comment';
 import { CWButton } from '../../../components/component_kit/new_designs/cw_button';
@@ -85,34 +90,6 @@ export const CommentCard = ({
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
   const author = app.chain.accounts.get(comment.author);
-
-  const [isCanvasVerifyModalVisible, setIsCanvasVerifyDataModalVisible] =
-    useState<boolean>(false);
-  const [verifiedAction, setVerifiedAction] = useState<Action>();
-  const [verifiedSession, setVerifiedSession] = useState<Session>();
-
-  useEffect(() => {
-    try {
-      const session: Session = JSON.parse(comment.canvasSession);
-      const action: Action = JSON.parse(comment.canvasAction);
-      const actionSignerAddress = session?.payload?.sessionAddress;
-      if (
-        !comment.canvasSession ||
-        !comment.canvasAction ||
-        !actionSignerAddress
-      )
-        return;
-      verify({ session })
-        .then(() => setVerifiedSession(session))
-        .catch((err) => console.log('Could not verify session', err.stack));
-      verify({ action, actionSignerAddress })
-        .then(() => setVerifiedAction(action))
-        .catch((err) => console.log('Could not verify action', err.stack));
-    } catch (err) {
-      console.log('Unexpected error while verifying action/session');
-      return;
-    }
-  }, [comment.canvasAction, comment.canvasSession]);
 
   return (
     <div className="comment-body">
@@ -220,24 +197,6 @@ export const CommentCard = ({
                     },
                   ].filter(Boolean)}
                 />
-              )}
-
-              {isCanvasVerifyModalVisible && (
-                <Modal
-                  content={<CanvasVerifyDataModal obj={comment} />}
-                  onClose={() => setIsCanvasVerifyDataModalVisible(false)}
-                  open={isCanvasVerifyModalVisible}
-                />
-              )}
-              {verifiedAction && verifiedSession && (
-                <CWText
-                  type="caption"
-                  fontWeight="medium"
-                  className="verification-icon"
-                  onClick={() => setIsCanvasVerifyDataModalVisible(true)}
-                >
-                  <CWIcon iconName="check" iconSize="xs" />
-                </CWText>
               )}
             </div>
           )}

@@ -18,7 +18,7 @@ sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  AlreadyLoggedIn: 'Already signed in',
+  AlreadyLoggedIn: 'Already logged in',
   NoEmail: 'Missing email',
   InvalidEmail: 'Invalid email',
   ChainOrCommunityRequired:
@@ -102,7 +102,7 @@ const startEmailLogin = async (
     return res.json({
       status: 'Error',
       message:
-        "You've tried to sign in several times already. " +
+        "You've tried to log in several times already. " +
         `Check your spam folder, or wait ${LOGIN_RATE_LIMIT_MINS} minutes to try again.`,
     });
   }

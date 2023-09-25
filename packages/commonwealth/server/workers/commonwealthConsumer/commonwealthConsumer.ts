@@ -13,6 +13,22 @@ import models from '../../database';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
 import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';
 import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  enabled: require.main === module,
+  service: ServiceKey.CommonwealthConsumer,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
 
 // CommonwealthConsumer is a server that consumes (and processes) RabbitMQ messages
 // from external apps or services (like the Snapshot Service). It exists because we
@@ -97,6 +113,7 @@ async function main() {
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
+  isServiceHealthy = true;
 }
 
 if (process.argv[2] === 'run-as-script') {
