@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 import { Requirement } from './requirementsTypes';
-import requirementsSchema from './requirementsSchema.json';
+import requirementsSchema from './requirementsSchema_v1.json';
 
 const Errors = {
   InvalidRequirements: 'Invalid requirements',
