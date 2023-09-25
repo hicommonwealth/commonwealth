@@ -10,7 +10,6 @@ import {
   useAddThreadLinksMutation,
   useDeleteThreadLinksMutation,
 } from 'state/api/threads';
-import { ThreadSelector } from 'views/components/thread_selector';
 import type Thread from '../../models/Thread';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -137,6 +136,7 @@ export const LinkedUrlModal = ({
             placeholder="https://..."
             value={newUrl}
             onInput={(e) => setNewUrl(e.target.value)}
+            containerClassName="input-label"
             inputValidationFn={(e) => {
               if (!e.startsWith('https://') || !newUrl.includes('.')) {
                 return ['failure', 'Must be a valid link'];
@@ -150,14 +150,7 @@ export const LinkedUrlModal = ({
             value={newTitle}
             onInput={(e) => setNewTitle(e.target.value)}
           />
-          <div
-            style={{
-              display: 'flex',
-              marginLeft: '3px',
-              marginBottom: '15px',
-              marginTop: '5px',
-            }}
-          >
+          <div className="add-button">
             <CWText style={{ marginRight: '3px' }}>Add link</CWText>
             <CWIconButton
               disabled={disableAdd}
