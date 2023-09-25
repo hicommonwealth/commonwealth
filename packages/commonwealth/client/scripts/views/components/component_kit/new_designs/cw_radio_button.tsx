@@ -36,7 +36,7 @@ export const CWRadioButton = (props: RadioButtonProps) => {
     if (!disabled) {
       setIsChecked(!isChecked);
     }
-    onChange();
+    onChange?.();
   };
 
   // For Storybook checked control
