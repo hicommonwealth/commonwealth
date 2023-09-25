@@ -190,7 +190,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
-    expect(err.message).to.include('data.allow');
+    expect(err.message).to.include('allow');
   });
 
   it('should fail for invalid source type', () => {
