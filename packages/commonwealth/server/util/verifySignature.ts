@@ -28,6 +28,7 @@ import type { ChainInstance } from '../models/chain';
 import type { ProfileAttributes } from '../models/profile';
 
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError } from '../../../common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 const sortedStringify = configureStableStringify({
@@ -208,6 +209,77 @@ const verifySignature = async (
         stdSignature.pub_key,
         'cosmos'
       );
+
+      const cosmosChains = await models.Chain.findAll({
+        where: { base: 'cosmos' },
+      });
+
+      const allCosmosAddresses = [];
+      await Promise.all(
+        cosmosChains.map(async (chain) => {
+          const chainAddresses = await models.Address.findAll({
+            where: { chain: chain.id },
+          });
+          allCosmosAddresses.push(...chainAddresses);
+        })
+      );
+      const generatedAddresses = [];
+      const { toHex, fromBech32, toBech32, fromHex } = await import(
+        '@cosmjs/encoding'
+      );
+      cosmosChains?.map((chain) => {
+        const prefix = chain?.bech32_prefix;
+        if (prefix) {
+          // const generatedAddressWithPrefix = cosm.pubkeyToAddress(
+          //   stdSignature.pub_key,
+          //   prefix
+          // );
+
+          // verify cosmjs conversion works:
+          // How to get from one address to another:
+          // Get the hex, then convert to bech32 for the chain you want
+          const dataA = fromBech32(generatedAddress).data;
+          const achainHex = toHex(dataA);
+          // console.log(achainHex); // 0d82b1e7c96dbfa42462fe612932e6bff111d51b
+
+          const generatedAddressWithPrefix = toBech32(
+            prefix,
+            fromHex(achainHex)
+          );
+          // console.log('generatedAddressWithPrefix', generatedAddressWithPrefix); //osmo1l8v5nzznewg9cnfn0peg22mpysdr3a8j0zdd86
+
+          if (!generatedAddresses.includes(generatedAddressWithPrefix)) {
+            generatedAddresses.push(generatedAddressWithPrefix);
+          }
+        }
+      });
+
+      // check db for these addresses:
+      const foundAddresses = [];
+      await Promise.all(
+        generatedAddresses?.map(async (address) => {
+          // const foundAddress = await models.Address.findOne({
+          //   where: { address },
+          // });
+          const foundAddress = allCosmosAddresses.find(
+            (cosmosAddress) => cosmosAddress.address === address
+          );
+          if (foundAddress) {
+            // && foundAddress.user_id !== addressModel.user_id) {
+            // console.log('foundAddress', foundAddress.address);
+            foundAddresses.push(foundAddress.dataValues);
+          }
+        })
+      );
+
+      if (foundAddresses?.length > 0) {
+        // return error with found addresses:
+        throw new Error(
+          `Other addresses found! foundAddresses: ${JSON.stringify(
+            foundAddresses.map((address) => address.address)
+          )}`
+        );
+      }
 
       if (
         generatedAddress === addressModel.address ||

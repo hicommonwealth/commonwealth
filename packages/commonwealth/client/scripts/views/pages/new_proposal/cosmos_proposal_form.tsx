@@ -51,6 +51,10 @@ export const CosmosProposalForm = () => {
     minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals)
   );
 
+  const checkForOtherCosmosAddresses = () => {
+    console.log('check');
+  };
+
   return (
     <>
       <CWLabel label="Proposal Type" />
@@ -148,6 +152,13 @@ export const CosmosProposalForm = () => {
               navigate(`/proposal/${result}`);
             })
             .catch((err) => notifyError(err.message));
+        }}
+      />
+      <CWButton
+        label="Check for other addresses"
+        onClick={(e) => {
+          e.preventDefault();
+          checkForOtherCosmosAddresses();
         }}
       />
     </>
