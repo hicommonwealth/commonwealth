@@ -41,6 +41,8 @@ Work _should not_ begin on a ticket until (1) an engineer has been assigned to t
 
 Typically, engineers _should_ only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be moved to "In Progress"). 
 
+A "high priority" label may also be added by leads to teed-up tickets; these tickets should jump the queue and be worked on next.
+
 ### Questions
 
 If an implementing engineer has questions about a ticket, these should be left as a comment on the GitHub issue itself (rather than in Slack DMs, where the record will be buried).
