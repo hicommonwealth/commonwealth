@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
 import validateRequirements from 'server/util/requirementsModule/validateRequirements';
 
 describe('validateRequirements', () => {
