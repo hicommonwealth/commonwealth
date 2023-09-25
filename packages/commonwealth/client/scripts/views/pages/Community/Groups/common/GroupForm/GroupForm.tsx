@@ -11,7 +11,7 @@ import { ZodError } from 'zod';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
-import { RequirementSubType } from './index.types';
+import { GroupFormProps, RequirementSubType } from './index.types';
 import {
   groupValidationSchema,
   requirementSubFormValidationSchema,
@@ -31,7 +31,7 @@ const CWRequirementsRadioButton = () => {
   return <CWRadioButton label={Label} value="n-requirements" />;
 };
 
-const GroupForm = () => {
+const GroupForm = ({ formType, onSubmit }: GroupFormProps) => {
   const [requirementSubForms, setRequirementSubForms] = useState<
     {
       values: RequirementSubType;
@@ -138,7 +138,7 @@ const GroupForm = () => {
     return !!updatedSubForms.find((x) => Object.keys(x.errors).length > 0);
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     const hasSubFormErrors = validateSubForms();
     if (hasSubFormErrors) {
       return;
@@ -148,6 +148,8 @@ const GroupForm = () => {
       ...values,
       requirements: requirementSubForms.map((x) => x.values),
     };
+
+    await onSubmit(formValues);
   };
 
   return (
@@ -162,10 +164,12 @@ const GroupForm = () => {
       {/* Form header */}
       <div className="header-row">
         <CWText type="h2" fontWeight="semiBold" className="header-text">
-          Create a group
+          {formType === 'create-group' ? 'Create a group' : 'Update your group'}
         </CWText>
         <CWText type="b2">
-          Create attributes-based groups for gating topics within your community
+          {formType === 'create-group'
+            ? 'Create attributes-based groups for gating topics within your community'
+            : 'Update group attributes'}
         </CWText>
       </div>
 
@@ -278,7 +282,11 @@ const GroupForm = () => {
           buttonType="secondary"
           type="button"
         />
-        <CWButton label="Create group" buttonWidth="wide" type="submit" />
+        <CWButton
+          type="submit"
+          buttonWidth="wide"
+          label={formType === 'create-group' ? 'Create group' : 'Update group'}
+        />
       </div>
     </CWForm>
   );
