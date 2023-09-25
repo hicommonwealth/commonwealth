@@ -47,7 +47,7 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [send-notification-digest-emails](#send-notification-digest-emails)
   - [start-prerender](#start-prerender)
 - [Playwright](#playwright)
-  - [e2e-start-server](#e2e-start-server)
+  - [start-e2e](#start-e2e)
   - [gen-e2e](#gen-e2e)
   - [test-e2e](#test-e2e)
   - [test-e2e-serial](#test-e2e-serial)
@@ -362,11 +362,12 @@ Considerations: Referenced prerender script no longer exists. **Deprecated; reco
 
 # Playwright
 
-## e2e-start-server
+## start-e2e
 
-Definition: `ETH_RPC=e2e-test yarn start`
+Definition: `yarn start-e2e [test-suite]`
 
-Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
+Description: Runs a start script to add a postgresql docker container to attach to the test on a random port. Starts the
+test suite specified passed in to the command, or the mature suite by default.
 
 Contributor: Kurtis Assad
 
@@ -390,7 +391,7 @@ Contributor: Kurtis Assad
 
 Definition: `TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/e2eRegular/*`
 
-Description: Runs Playwright tests using the playwright.config.ts file.
+Description: Starts up the webserver via playwright. Runs Playwright tests using the playwright.config.ts file.
 
 Contributor: Kurtis Assad
 
@@ -398,7 +399,7 @@ Contributor: Kurtis Assad
 
 Definition: `TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*`
 
-Description: Runs e2e tests one at a time, to avoid problems of parallel execution.
+Description:  Starts up the webserver via playwright. Runs e2e tests one at a time, to avoid problems of parallel execution.
 
 Contributor: Kurtis Assad
 
