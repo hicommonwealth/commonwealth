@@ -1,34 +1,32 @@
 import React from 'react';
 import type ChainInfo from 'client/scripts/models/ChainInfo';
-import "components/component_kit/cw_community_card.scss"
-import { CWText } from './cw_text';
-import app from 'state';
-import { CWCommunityAvatar } from './cw_community_avatar';
-import { ComponentType } from './types';
-import { CWIcon } from './cw_icons/cw_icon';
-import { pluralizeWithoutNumberPrefix } from '../../../helpers';
-import { CWButton } from './cw_button';
-import { integer } from 'aws-sdk/clients/cloudfront';
+import "./CWRelatedCommunityCard.scss"
+import { CWText } from '../cw_text';
+import { CWCommunityAvatar } from '../cw_community_avatar';
+import { ComponentType } from '../types';
+import { CWIcon } from '../cw_icons/cw_icon';
+import { pluralizeWithoutNumberPrefix } from '../../../../helpers';
+import { CWButton } from '../cw_button';
 
-type CWCommunityCardProps = {
+type CWRelatedCommunityCardProps = {
   chain: ChainInfo,
   memberCount: number,
   threadCount: number,
 }
 
-export const CWCommunityCard = ( props: CWCommunityCardProps) => {
+export const CWRelatedCommunityCard = ( props: CWRelatedCommunityCardProps) => {
   const { chain, memberCount, threadCount } = props;
 
-  const prettifyDescription = (chain: ChainInfo) => {
+  const prettifyDescription = (community: ChainInfo) => {
     return (
-      chain.description[chain.description.length - 1] === '.'
-      ? chain.description
-      : `${chain.description}.`
+      community.description[community.description.length - 1] === '.'
+      ? community.description
+      : `${community.description}.`
     )
   }
 
   return (
-    <div className={ComponentType.CommunityCard}>
+    <div className={ComponentType.RelatedCommunityCard}>
       <div className='content-container'>
         <div className='top-content'>
           <div className='header'>
