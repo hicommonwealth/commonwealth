@@ -240,15 +240,9 @@ export const CWContentPage = ({
             ))}
           </CWTabBar>
           {tabSelected === 0 && mainBody}
-          {sidebarComponents?.length >= 1 &&
-            tabSelected === 1 &&
-            sidebarComponents[0].item}
-          {sidebarComponents?.length >= 2 &&
-            tabSelected === 2 &&
-            sidebarComponents[1].item}
-          {sidebarComponents?.length === 3 &&
-            tabSelected === 3 &&
-            sidebarComponents[2].item}
+          {sidebarComponents.map((s, i) => {
+            return tabSelected === i + 1 && sidebarComponents[i].item;
+          })}
         </div>
       )}
     </div>
