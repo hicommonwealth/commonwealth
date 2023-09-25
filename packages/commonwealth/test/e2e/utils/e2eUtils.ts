@@ -5,8 +5,8 @@ import { Sequelize } from 'sequelize';
 
 export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
 
-export let dbClient = process.env.TEST_DB_CONNECTION_URI
-  ? new Sequelize(process.env.TEST_DB_CONNECTION_URI, {
+export let dbClient = process.env.DATABASE_URL
+  ? new Sequelize(process.env.DATABASE_URL, {
       logging: false,
     })
   : null;

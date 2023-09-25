@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { parseInt } from 'lodash';
 import { PORT } from '../../../server/config';
 import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks';
-import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
+import { addAddressIfNone, dbClient, login } from '../utils/e2eUtils';
 
 test.beforeEach(async () => {
   await createTestEntities();
@@ -13,7 +13,7 @@ test.describe('Discussion Page Tests', () => {
 
   test.beforeEach(async ({ page }) => {
     threadId = (
-      await testDb.query(`
+      await dbClient.query(`
         INSERT INTO "Threads" (address_id, title, body, chain, topic_id, kind, created_at, updated_at)
         VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         RETURNING id;
