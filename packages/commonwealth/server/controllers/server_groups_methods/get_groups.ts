@@ -1,7 +1,6 @@
 import { ServerChainsController } from '../server_chains_controller';
 import { GroupAttributes } from 'server/models/group';
 import { ChainInstance } from 'server/models/chain';
-import { flatten } from 'lodash';
 import { Op, WhereOptions } from 'sequelize';
 import { MembershipAttributes } from 'server/models/membership';
 
@@ -20,7 +19,7 @@ export async function __getGroups(
   this: ServerChainsController,
   { chain, addressId, includeMembers }: GetGroupsOptions
 ): Promise<GetGroupsResult> {
-  let groups = await this.models.Group.findAll({
+  const groups = await this.models.Group.findAll({
     where: {
       chain_id: chain.id,
     },
