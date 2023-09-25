@@ -6,7 +6,7 @@ import {
 } from './server_proposal_methods/get_proposals';
 import { RedisCache } from 'common-common/src/redisCache';
 import { providers } from 'ethers';
-import { ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { ChainNetwork } from 'common-common/src/types';
 import {
   __getProposalVotes,
@@ -72,7 +72,7 @@ export class ServerProposalsController {
       (contract.Contract.type !== ChainNetwork.Aave &&
         contract.Contract.type !== ChainNetwork.Compound)
     ) {
-      throw new ServerError(
+      throw new AppError(
         `Proposal fetching not supported for chain ${chainId}`
       );
     }
@@ -122,14 +122,18 @@ export class ServerProposalsController {
       throw new ServerError(`No RPC URL found for chain ${chainId}`);
     }
 
-    // only Aave and Compound contracts on Ethereum are supported: ChainNode.id = 37 is the Ethereum RPC
+    // only Aave and Compound contracts on Ethereum are supported
+    // Celo and Fantom public nodes are extremely slow/rate limited
+    // so, it is not feasible to fetch proposals from them without
+    // a private node, indexing the chain, or using an existing
+    // indexer like TheGraph or SubQuery
     if (
       chain.ChainNode.name !== 'Ethereum (Mainnet)' ||
       (chain.network !== ChainNetwork.Aave &&
         chain.network !== ChainNetwork.Compound &&
         chain.base !== 'ethereum')
     ) {
-      throw new ServerError(
+      throw new AppError(
         `Proposal fetching not supported for chain ${chainId}`
       );
     }
