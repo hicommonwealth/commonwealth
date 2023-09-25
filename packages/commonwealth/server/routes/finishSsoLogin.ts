@@ -57,7 +57,7 @@ const Errors = {
   TokenBadIssuer: 'Invalid token issuer',
   TokenExpired: 'Token expired',
   TokenBadAddress: 'Invalid token address',
-  AlreadyLoggedIn: 'User is already signed in',
+  AlreadyLoggedIn: 'User is already logged in',
   ReplayAttack: 'Invalid token. Try again',
   AccountCreationFailed: 'Failed to create account',
 };
@@ -253,7 +253,7 @@ const finishSsoLogin = async (
           if (err)
             return redirectWithLoginError(
               res,
-              `Could not sign in with ronin wallet`
+              `Could not log in with ronin wallet`
             );
           serverAnalyticsController.track(
             {
@@ -282,7 +282,7 @@ const finishSsoLogin = async (
             );
             return redirectWithLoginError(
               res,
-              `Could not sign in with ronin wallet`
+              `Could not log in with ronin wallet`
             );
           }
 
@@ -333,7 +333,6 @@ const finishSsoLogin = async (
           user_id: user.id,
           profile_id: profile.id,
           wallet_id: WalletId.Ronin,
-          // wallet_sso_source: null,
         },
         { transaction: t }
       );
@@ -402,7 +401,7 @@ const finishSsoLogin = async (
         if (err)
           return redirectWithLoginError(
             res,
-            `Could not sign in with ronin wallet`
+            `Could not log in with ronin wallet`
           );
         serverAnalyticsController.track(
           {

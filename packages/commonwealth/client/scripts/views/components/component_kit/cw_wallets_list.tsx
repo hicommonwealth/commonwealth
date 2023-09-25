@@ -1,4 +1,4 @@
-import { ChainNetwork, WalletSsoSource } from 'common-common/src/types';
+import type { ChainNetwork } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import 'components/component_kit/cw_wallets_list.scss';
 import type Substrate from 'controllers/chain/substrate/adapter';
@@ -120,13 +120,10 @@ type WalletsListProps = {
   canResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
-  useSessionKeyRevalidationFlow?: boolean;
-  hideSocialLogins?: boolean;
   onResetWalletConnect: () => void;
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onSocialLogin: (
-    type: WalletSsoSource,
-    useSessionKeyRevalidationFlow: boolean
+    type: 'google' | 'twitter' | 'discord' | 'github'
   ) => Promise<void>;
   onWalletAddressSelect: (
     wallet: IWebWallet<any>,
@@ -141,12 +138,10 @@ export const CWWalletsList = (props: WalletsListProps) => {
     canResetWalletConnect,
     hasNoWalletsLink = true,
     wallets,
-    useSessionKeyRevalidationFlow,
     onResetWalletConnect,
     onWalletSelect,
     onWalletAddressSelect,
     onSocialLogin,
-    hideSocialLogins,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -203,35 +198,26 @@ export const CWWalletsList = (props: WalletsListProps) => {
             </React.Fragment>
           ))}
 
-          {!hideSocialLogins && (
-            <>
-              <CWDivider className="wallets-divider" />
+          <CWDivider className="wallets-divider" />
 
-              <CWAuthButton
-                type="google"
-                label="Sign in with Google"
-                darkMode={darkMode}
-                onClick={async () =>
-                  onSocialLogin(
-                    WalletSsoSource.Google,
-                    useSessionKeyRevalidationFlow
-                  )
-                }
-              />
+          <CWAuthButton
+            type="google"
+            label="Sign in with Google"
+            darkMode={darkMode}
+            onClick={async () => onSocialLogin('google')}
+          />
 
-              <CWText
-                type="b2"
-                className={getClasses<{ darkMode?: boolean }>(
-                  { darkMode },
-                  'connect-another-way-link'
-                )}
-              >
-                <a onClick={onConnectAnotherWay}>
-                  Sign in with another email address
-                </a>
-              </CWText>
-            </>
-          )}
+          <CWText
+            type="b2"
+            className={getClasses<{ darkMode?: boolean }>(
+              { darkMode },
+              'connect-another-way-link'
+            )}
+          >
+            <a onClick={onConnectAnotherWay}>
+              Sign in with another email address
+            </a>
+          </CWText>
 
           <CWDivider className="wallets-divider" />
           {/* <CWAuthButton
@@ -245,35 +231,20 @@ export const CWWalletsList = (props: WalletsListProps) => {
             type="discord"
             label="Discord"
             darkMode={darkMode}
-            onClick={async () =>
-              onSocialLogin(
-                WalletSsoSource.Discord,
-                useSessionKeyRevalidationFlow
-              )
-            }
+            onClick={async () => onSocialLogin('discord')}
             className="DiscordAuthButton"
           />
           <CWAuthButton
             type="github"
             label="Github"
             darkMode={darkMode}
-            onClick={() =>
-              onSocialLogin(
-                WalletSsoSource.Github,
-                useSessionKeyRevalidationFlow
-              )
-            }
+            onClick={() => onSocialLogin('github')}
           />
           <CWAuthButton
             type="twitter"
             label="Twitter"
             darkMode={darkMode}
-            onClick={() =>
-              onSocialLogin(
-                WalletSsoSource.Twitter,
-                useSessionKeyRevalidationFlow
-              )
-            }
+            onClick={() => onSocialLogin('twitter')}
           />
 
           {wallets.length === 0 && (
