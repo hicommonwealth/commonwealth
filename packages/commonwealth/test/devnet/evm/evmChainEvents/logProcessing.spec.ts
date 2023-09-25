@@ -29,7 +29,7 @@ chai.use(chaiAsPromised);
  * as expected irrespective of the underlying event type. Most of the tests
  * are interdependent therefore mocha should exit on the first failure.
  */
-describe.only('EVM Chain Events Log Processing Tests', () => {
+describe('EVM Chain Events Log Processing Tests', () => {
   let propCreatedResult: { block: number; proposalId: string },
     propQueuedResult: { block: number },
     abi: AbiType,
