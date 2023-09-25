@@ -23,6 +23,7 @@ import type { LoginProps } from './types';
 export const LoginDesktop = ({
   address,
   activeStep,
+  setActiveStep,
   handleSetAvatar,
   handleSetUsername,
   profiles,
@@ -102,7 +103,6 @@ export const LoginDesktop = ({
             {!isMagicLoading ? (
               <div className="email-form-wrapper">
                 <CWTextInput
-                  autoFocus={true}
                   label="Email address"
                   placeholder="Email address"
                   className="login-email-field"
@@ -111,13 +111,13 @@ export const LoginDesktop = ({
                 />
                 <div className="buttons-row email-form-buttons">
                   <CWButton
-                    label="Sign in with Magic"
+                    label="Login with Magic"
                     className="wallet-magic-btn"
                     onClick={onEmailLogin}
                   />
                   <CWButton
                     iconLeft="arrowLeft"
-                    label="Back to sign in options"
+                    label="Back to login options"
                     buttonType="secondary-blue"
                     className="wallet-back-btn"
                     onClick={onNavigateToWalletList}

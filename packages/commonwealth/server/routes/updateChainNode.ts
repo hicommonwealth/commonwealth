@@ -4,7 +4,7 @@ import type { DB } from '../models';
 import { success } from '../types';
 
 const Errors = {
-  NotLoggedIn: 'Not signed in',
+  NotLoggedIn: 'Not logged in',
   NotAdmin: 'Not an admin',
   NoChainNodeId: 'Must provide chain node ID',
   noChainNodeFound: 'ChainNode not found',

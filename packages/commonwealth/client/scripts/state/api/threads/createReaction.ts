@@ -22,7 +22,7 @@ const createReaction = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signThreadReaction(address, {
+  } = await app.sessions.signThreadReaction({
     thread_id: threadId,
     like: reactionType === 'like',
   });

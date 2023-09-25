@@ -55,7 +55,7 @@ test.describe('Commonwealth Homepage', () => {
   test('Check Login Modal', async ({ page }) => {
     await page.goto(`http://localhost:${PORT}/`);
 
-    const loginButton = await page.getByText('Sign in');
+    const loginButton = await page.getByText('Login');
     expect(loginButton).toBeTruthy();
     await loginButton.click();
     const loginModal = await page.waitForSelector('.LoginDesktop');

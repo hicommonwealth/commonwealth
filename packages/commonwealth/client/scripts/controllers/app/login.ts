@@ -2,20 +2,19 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { initAppState } from 'state';
-import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
+import { WalletId } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { signSessionWithMagic } from 'controllers/server/sessions';
-import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
+import moment from 'moment';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 import SocialAccount from '../../models/SocialAccount';
-
+import { CosmosExtension } from '@magic-ext/cosmos';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
@@ -71,12 +70,6 @@ export async function setActiveAccount(
       jwt: app.user.jwt,
       auth: true,
     });
-
-    app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
-      r.is_user_default = false;
-    });
-    role.is_user_default = true;
-
     if (response.status !== 'Success') {
       throw Error(`Unsuccessful status: ${response.status}`);
     }
@@ -104,13 +97,12 @@ export async function completeClientLogin(account: Account) {
     );
 
     if (!addressInfo && account.addressId) {
-      addressInfo = new AddressInfo({
-        id: account.addressId,
-        address: account.address,
-        chainId: account.chain.id,
-        walletId: account.walletId,
-        walletSsoSource: account.walletSsoSource,
-      });
+      addressInfo = new AddressInfo(
+        account.addressId,
+        account.address,
+        account.chain.id,
+        account.walletId
+      );
       app.user.addresses.push(addressInfo);
     }
 
@@ -220,15 +212,14 @@ export function updateActiveUser(data) {
     app.user.setAddresses(
       data.addresses.map(
         (a) =>
-          new AddressInfo({
-            id: a.id,
-            address: a.address,
-            chainId: a.chain,
-            keytype: a.keytype,
-            walletId: a.wallet_id,
-            walletSsoSource: a.wallet_sso_source,
-            ghostAddress: a.ghost_address,
-          })
+          new AddressInfo(
+            a.id,
+            a.address,
+            a.chain,
+            a.keytype,
+            a.wallet_id,
+            a.ghost_address
+          )
       )
     );
     app.user.setSocialAccounts(
@@ -246,7 +237,6 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  walletSsoSource: WalletSsoSource,
   chain: string,
   sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo
@@ -256,7 +246,6 @@ export async function createUserWithAddress(
     chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
-    wallet_sso_source: walletSsoSource,
     block_info: validationBlockInfo
       ? JSON.stringify(validationBlockInfo)
       : null,
@@ -307,56 +296,40 @@ export async function unlinkLogin(account: AddressInfo) {
   }
 }
 
-async function constructMagic(isCosmos: boolean, chain?: string) {
+async function constructMagic() {
   const { Magic } = await import('magic-sdk');
   const { OAuthExtension } = await import('@magic-ext/oauth');
-  const { CosmosExtension } = await import('@magic-ext/cosmos');
-
-  if (isCosmos && !chain) {
-    throw new Error('Must be in a community to sign in with Cosmos magic link');
-  }
-
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: !isCosmos
-      ? [new OAuthExtension()]
-      : [
-          new OAuthExtension(),
-          new CosmosExtension({
-            // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
-            // so we can't use app.chain.meta?.node?.url
-            rpcUrl: `${document.location.origin}/magicCosmosAPI/${chain}`,
-            // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
-          }),
-        ],
+    extensions: [
+      new OAuthExtension(),
+      new CosmosExtension({
+        // default to Osmosis URL
+        rpcUrl:
+          app.chain?.meta?.node?.url ||
+          app.config.chains.getById('osmosis').node.url,
+      }),
+    ],
   });
 }
 
-export async function startLoginWithMagicLink({
+export async function loginWithMagicLink({
   email,
   provider,
-  redirectTo,
   chain,
-  isCosmos,
 }: {
   email?: string;
-  provider?: WalletSsoSource;
-  redirectTo?: string;
+  provider?: string;
   chain?: string;
-  isCosmos: boolean;
 }) {
-  if (!email && !provider)
-    throw new Error('Must provide email or SSO provider');
-  const magic = await constructMagic(isCosmos, chain);
+  if (!email && !provider) throw new Error('Must provider email or provider');
+  const magic = await constructMagic();
 
   if (email) {
-    // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const address = await handleSocialLoginCallback({ bearer });
-    return { bearer, address };
+    await handleSocialLoginCallback(bearer);
   } else {
-    const params = `?redirectTo=${
-      redirectTo ? encodeURIComponent(redirectTo) : ''
-    }&chain=${chain || ''}&sso=${provider}`;
+    const params = `?chain=${chain || ''}`;
+    // provider-based login
     await magic.oauth.loginWithRedirect({
       provider: provider as any,
       redirectURI: new URL(
@@ -364,11 +337,6 @@ export async function startLoginWithMagicLink({
         window.location.origin
       ).href,
     });
-
-    // magic should redirect away from this page, but we return after 5 sec if it hasn't
-    await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
-    const info = await magic.user.getInfo();
-    return { address: info.publicAddress };
   }
 }
 
@@ -401,118 +369,16 @@ function getProfileMetadata({ provider, userInfo }): {
   return {};
 }
 
-// Given a magic bearer token, generate a session key for the user, and (optionally) also log them in
-export async function handleSocialLoginCallback({
-  bearer,
-  chain,
-  walletSsoSource,
-}: {
-  bearer?: string;
-  chain?: string;
-  walletSsoSource?: string;
-}): Promise<string> {
-  // desiredChain may be empty if social login was initialized from
-  // a page without a chain, in which case we default to an eth login
-  const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
-  const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
-  const magic = await constructMagic(isCosmos, desiredChain?.id);
-
-  // Code up to this line might run multiple times because of extra calls to useEffect().
-  // Those runs will be rejected because getRedirectResult purges the browser search param.
-
-  const result = await magic.oauth.getRedirectResult();
+export async function handleSocialLoginCallback(bearer?: string) {
+  let profileMetadata: { username?: string; avatarUrl?: string } = {};
   if (!bearer) {
+    const magic = await constructMagic();
+    const result = await magic.oauth.getRedirectResult();
+    profileMetadata = getProfileMetadata(result.oauth);
     bearer = result.magic.idToken;
     console.log('Magic redirect result:', result);
   }
 
-  // Get magic metadata
-  const profileMetadata = getProfileMetadata(result.oauth);
-  let magicAddress, authedSessionPayload, authedSignature;
-  if (isCosmos) {
-    magicAddress = result.magic.userMetadata.publicAddress;
-  } else {
-    const { utils } = await import('ethers');
-    magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
-  }
-
-  // Sign a session
-  if (isCosmos && desiredChain) {
-    // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
-    const bech32Prefix = desiredChain.bech32Prefix;
-    try {
-      magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
-    } catch (err) {
-      console.error(
-        `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
-      );
-    }
-
-    // Request the cosmos chain ID, since this is used by Magic to generate
-    // the signed message. The API is already used by the Magic iframe,
-    // but they don't expose the results.
-    const nodeInfo = await $.get(
-      `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`
-    );
-    const chainId = nodeInfo.node_info.network;
-
-    const timestamp = +new Date();
-
-    const signer = { signMessage: magic.cosmos.sign };
-    const { signature, sessionPayload } = await signSessionWithMagic(
-      ChainBase.CosmosSDK,
-      signer,
-      magicAddress,
-      timestamp
-    );
-    // TODO: provide blockhash as last argument to signSessionWithMagic
-    signature.signatures[0].chain_id = chainId;
-    await app.sessions.authSession(
-      ChainBase.CosmosSDK, // could be desiredChain.base in the future?
-      chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
-      magicAddress,
-      sessionPayload,
-      JSON.stringify(signature.signatures[0])
-    );
-    authedSessionPayload = JSON.stringify(sessionPayload);
-    authedSignature = JSON.stringify(signature.signatures[0]);
-    console.log(
-      'Reauthenticated Cosmos session from magic address:',
-      magicAddress
-    );
-  } else {
-    const { Web3Provider } = await import('@ethersproject/providers');
-    const { utils } = await import('ethers');
-
-    const provider = new Web3Provider(magic.rpcProvider);
-    const signer = provider.getSigner();
-    const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
-
-    const timestamp = +new Date();
-    const { signature, sessionPayload } = await signSessionWithMagic(
-      ChainBase.Ethereum,
-      signer,
-      checksumAddress,
-      timestamp
-    );
-    // TODO: provide blockhash as last argument to signSessionWithMagic
-
-    await app.sessions.authSession(
-      ChainBase.Ethereum, // could be desiredChain.base in the future?
-      chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
-      checksumAddress,
-      sessionPayload,
-      signature
-    );
-    authedSessionPayload = JSON.stringify(sessionPayload);
-    authedSignature = signature;
-    console.log(
-      'Reauthenticated Ethereum session from magic address:',
-      checksumAddress
-    );
-  }
-
-  // Otherwise, skip Account.validate(), proceed directly to server login
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {
@@ -522,28 +388,21 @@ export async function handleSocialLoginCallback({
       withCredentials: true,
     },
     data: {
-      chain: desiredChain?.id,
+      chain: app.activeChainId(),
       jwt: app.user.jwt,
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
-      magicAddress,
-      sessionPayload: authedSessionPayload,
-      signature: authedSignature,
-      walletSsoSource,
     },
   });
 
   if (response.status === 'Success') {
     await initAppState(false);
-    // This is code from before desiredChain was implemented, and
-    // may not be necessary anymore:
     if (app.chain) {
       const c = app.user.selectedChain
         ? app.user.selectedChain
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
-    return magicAddress;
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
   }

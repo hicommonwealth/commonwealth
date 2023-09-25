@@ -10,7 +10,7 @@ export default async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new AppError('Not signed in'));
+    return next(new AppError('Not logged in'));
   }
 
   await sequelize.query(

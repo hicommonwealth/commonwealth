@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import $ from 'jquery';
 import type { Action, Session } from '@canvas-js/interfaces';
 
-import { verify } from 'canvas';
+import { CWButton } from '../components/component_kit/cw_button';
+import { verify } from '../../helpers/canvas';
 
 import 'modals/canvas_verify_data_modal.scss';
 
@@ -9,7 +11,7 @@ type CanvasVerifyDataModalProps = {
   obj: any;
 };
 
-export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
+const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
   const { obj } = props;
   const [actionPayload, setActionPayload] = useState<string | null>();
   const [sessionPayload, setSessionPayload] = useState<string | null>();
@@ -39,7 +41,7 @@ export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
         .then((result) => setVerifiedAction(result))
         .catch((err) => console.error('Could not verify action:', err));
     });
-  }, [obj.canvasAction, obj.canvasSession]);
+  }, []);
 
   return (
     <div
@@ -65,6 +67,18 @@ export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
           {sessionPayload && <pre>{sessionPayload}</pre>}
           <pre>{sessionSignature}</pre>
         </div>
+      </div>
+      <div className="compact-modal-actions">
+        <CWButton
+          onClick={(e) => {
+            e.preventDefault();
+            $(e.target).trigger('modalcomplete');
+            setTimeout(() => {
+              $(e.target).trigger('modalexit');
+            }, 0);
+          }}
+          label="Okay"
+        />
       </div>
     </div>
   );
