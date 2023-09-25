@@ -75,8 +75,8 @@ export const CWArrowDownBlue500 = (props: IconProps) => {
       viewBox="0 0 16 16"
       {...otherProps}
     >
-      <path d="M8 2.5V13.5" stroke="#338FFF" stroke-linecap="round" stroke-linejoin="round"></path>
-      <path d="M3.5 9L8 13.5L12.5 9" stroke="#338FFF" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M8 2.5V13.5" stroke="#338FFF" strokeLinecap="round" strokeLinejoin="round"></path>
+      <path d="M3.5 9L8 13.5L12.5 9" stroke="#338FFF" strokeLinecap="round" strokeLinejoin="round"></path>
     </svg>
   );
 };
@@ -281,8 +281,8 @@ export const CWArrowUpBlue500 = (props: IconProps) => {
       viewBox="0 0 16 16"
       {...otherProps}
     >
-    <path d="M8 13.5V2.5" stroke="#338FFF" stroke-linecap="round" stroke-linejoin="round"></path>
-    <path d="M3.5 7L8 2.5L12.5 7" stroke="#338FFF" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M8 13.5V2.5" stroke="#338FFF" strokeLinecap="round" strokeLinejoin="round"></path>
+    <path d="M3.5 7L8 2.5L12.5 7" stroke="#338FFF" strokeLinecap="round" strokeLinejoin="round"></path>
     </svg>
   );
 };
@@ -310,8 +310,8 @@ export const CWArrowUpNeutral400 = (props: IconProps) => {
       viewBox="0 0 16 16"
       {...otherProps}
     >
-      <path d="M8 13.5V2.5" stroke="#A09DA1" stroke-linecap="round" stroke-linejoin="round"> </path>
-      <path d="M3.5 7L8 2.5L12.5 7" stroke="#A09DA1" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="M8 13.5V2.5" stroke="#A09DA1" strokeLinecap="round" strokeLinejoin="round"> </path>
+      <path d="M3.5 7L8 2.5L12.5 7" stroke="#A09DA1" strokeLinecap="round" strokeLinejoin="round"></path>
     </svg>
   );
 };

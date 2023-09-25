@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker';
-import { CWTag } from '../cw_tag';
-import { CWButton } from '../cw_button';
+import { CWTag } from './cw_tag';
+import { CWButton } from './cw_button';
 
 const range = (len: number) => {
   const arr = []

@@ -1,4 +1,4 @@
-@import '../../shared';
+@import '../../../../../styles/shared.scss';
 
 .Table {
   table{
@@ -11,7 +11,7 @@
 
       tr {
         th {
-          div.header-content {
+          .header-content {
             padding: 14px 16px;
             gap: 4px;
             display: flex;
@@ -53,15 +53,15 @@
         td {
           padding: 14px 16px;
 
-          div.numeric {
+          .numeric {
             text-align: end;
           }
 
-          div.avatar-cell {
+          .avatar-cell {
             display: flex;
             gap: 8px;
 
-            div.text {
+            .text {
               white-space: nowrap;
             }
           }

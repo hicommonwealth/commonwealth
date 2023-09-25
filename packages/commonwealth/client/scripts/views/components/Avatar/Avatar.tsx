@@ -13,7 +13,7 @@ enum AvatarSizes {
   // TODO: this is to account for sizing in the avatar upload
   Tmp1 = 60,
   Tmp2 = 108,
-  Tmp3=20,
+  Tmp3 = 20,
 }
 
 interface AvatarProps {
