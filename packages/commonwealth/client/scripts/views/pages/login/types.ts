@@ -1,6 +1,5 @@
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import type { WalletSsoSource } from 'common-common/src/types';
 import type { ProfileRowProps } from '../../components/component_kit/cw_profiles_list';
 
 export type LoginSidebarType =
@@ -41,7 +40,7 @@ export type LoginProps = {
   setSidebarType: (sidebarType: string) => void;
   canResetWalletConnect: boolean;
   onEmailLogin: () => Promise<void>;
-  onSocialLogin: (provider: WalletSsoSource) => Promise<void>;
+  onSocialLogin: (provider: string) => Promise<void>;
   onConnectAnotherWay: () => void;
   onLinkExistingAccount: () => void;
   onCreateNewAccount: () => void;

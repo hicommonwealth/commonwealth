@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -127,6 +126,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [fetchCommentsError]);
 
   const { isWindowLarge } = useBrowserWindow({
+    // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,

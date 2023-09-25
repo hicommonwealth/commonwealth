@@ -79,11 +79,7 @@ export const ViewSnapshotProposalPage = ({
     if (!proposal || !activeChainId) {
       return null;
     }
-    return new AddressInfo({
-      id: null,
-      address: proposal.author,
-      chainId: activeChainId,
-    });
+    return new AddressInfo(null, proposal.author, activeChainId, null);
   }, [proposal, activeChainId]);
 
   useManageDocumentTitle('View snapshot proposal', proposal?.title);

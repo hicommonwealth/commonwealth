@@ -18,7 +18,7 @@ export const Errors = {
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
   NeedOriginChain: 'Must provide original chain',
-  NeedLoggedIn: 'Must be signed in',
+  NeedLoggedIn: 'Must be logged in',
   NotVerifiedAddressOrUser: 'Not verified address or user',
   InvalidChain: 'Invalid chain',
 };
@@ -147,7 +147,6 @@ const linkExistingAddressToChain = async (
         verified: originalAddress.verified,
         keytype: originalAddress.keytype,
         wallet_id: originalAddress.wallet_id,
-        wallet_sso_source: originalAddress.wallet_sso_source,
         last_active: new Date(),
       });
 
