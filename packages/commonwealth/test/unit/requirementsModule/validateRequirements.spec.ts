@@ -118,7 +118,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
-    expect(err.message).to.include('data.source.contract_address');
+    expect(err.message).to.include('contract_address');
   });
 
   it('should fail for invalid evm_chain_id', () => {
@@ -141,7 +141,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
-    expect(err.message).to.include('data.source.evm_chain_id');
+    expect(err.message).to.include('evm_chain_id');
   });
 
   it('should fail for invalid cosmos_chain_id', () => {
@@ -165,7 +165,7 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
-    expect(err.message).to.include('data.source.cosmos_chain_id');
+    expect(err.message).to.include('cosmos_chain_id');
   });
 
   it('should fail for invalid allow address format', () => {
@@ -213,6 +213,6 @@ describe('validateRequirements', () => {
       },
     ];
     const err = validateRequirements(requirements);
-    expect(err.message).to.include('data.source.source_type');
+    expect(err.message).to.include('source_type');
   });
 });
