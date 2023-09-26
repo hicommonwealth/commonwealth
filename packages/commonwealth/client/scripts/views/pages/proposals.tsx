@@ -9,6 +9,7 @@ import app from 'state';
 import { ProposalCard } from 'views/components/ProposalCard';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
+import ErrorPage from 'views/pages/error';
 import { CardsCollection } from '../components/cards_collection';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { getStatusText } from '../components/ProposalCard/helpers';
