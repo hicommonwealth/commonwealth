@@ -45,7 +45,7 @@ function getMockNotification(
       network: 'cosmos',
       event_data: {
         kind: 'msg-submit-proposal',
-        id: '10',
+        id: randomData ? String(randomInt()) : String(constantPropId),
         content: {
           typeUrl: '/cosmos.gov.v1beta1.TextProposal',
           value: '0a087631207469746c65120e7631206465736372697074696f6e',
@@ -63,7 +63,7 @@ function getMockNotification(
       network: 'cosmos',
       event_data: {
         kind: 'msg-submit-proposal',
-        id: '11',
+        id: randomData ? String(randomInt()) : String(constantPropId),
         content: {
           typeUrl: '/cosmos.gov.v1beta1.TextProposal',
           value:
