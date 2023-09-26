@@ -1,7 +1,7 @@
 import {
   fetchLatestProposals,
   fetchUpToLatestCosmosProposals,
-} from './proposalFetching';
+} from './proposalFetching/allProposalFetching';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
   emitProposalNotifications,
@@ -9,9 +9,9 @@ import {
   fetchLatestNotifProposalIds,
   filterProposals,
 } from './util';
-import models from '../database';
+import models from '../../database';
 import Rollbar from 'rollbar';
-import { ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../config';
+import { ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../../config';
 
 const log = factory.getLogger(formatFilename(__filename));
 

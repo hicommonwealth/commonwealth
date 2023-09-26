@@ -7,7 +7,7 @@ import {
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
-import { generateCosmosGovNotifications } from '../../../server/cosmosGovNotifications/generateCosmosGovNotifications';
+import { generateCosmosGovNotifications } from '../../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
 import sinon from 'sinon';
 
 const { expect, assert } = chai;

@@ -10,7 +10,7 @@ import {
 import {
   fetchLatestNotifProposalIds,
   filterProposals,
-} from '../../server/cosmosGovNotifications/util';
+} from '../../server/workers/cosmosGovNotifications/util';
 import {
   ProposalSDKType,
   ProposalStatusSDKType,
@@ -20,11 +20,6 @@ import {
   toTimestamp,
 } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { Proposal, ProposalStatus } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import {
-  AllCosmosProposals,
-  CosmosClients,
-  GovV1Beta1ClientType,
-} from '../../server/cosmosGovNotifications/proposalFetching';
 import {
   QueryProposalRequest,
   QueryProposalsRequest,
@@ -37,7 +32,12 @@ import {
   QueryProposalsResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
-import { generateCosmosGovNotifications } from '../../server/cosmosGovNotifications/generateCosmosGovNotifications';
+import { generateCosmosGovNotifications } from '../../server/workers/cosmosGovNotifications/generateCosmosGovNotifications';
+import { CosmosClients } from '../../server/workers/cosmosGovNotifications/proposalFetching/getCosmosClient';
+import {
+  AllCosmosProposals,
+  GovV1Beta1ClientType,
+} from '../../server/workers/cosmosGovNotifications/proposalFetching/types';
 
 async function createFakeProposalNotification(
   proposalId: string,

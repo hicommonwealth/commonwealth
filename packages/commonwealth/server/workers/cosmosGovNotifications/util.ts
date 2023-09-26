@@ -1,104 +1,14 @@
-import { ChainInstance } from '../models/chain';
-import { COSMOS_GOV_V1_CHAIN_IDS } from '../config';
-import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { AllCosmosProposals } from './proposalFetching';
 import { ChainBase, NotificationCategories } from 'common-common/src/types';
-import emitNotifications from '../util/emitNotifications';
+import emitNotifications from '../../util/emitNotifications';
 import { SupportedNetwork } from 'chain-events/src';
 import { coinToCoins, EventKind } from 'chain-events/src/chains/cosmos/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
-import { DB } from '../models';
+import { DB } from '../../models';
 import Rollbar from 'rollbar';
+import { AllCosmosProposals } from './proposalFetching/types';
 
 const log = factory.getLogger(formatFilename(__filename));
-
-export function uint8ArrayToNumberBE(bytes) {
-  if (!bytes) return 0;
-
-  let value = 0;
-  for (let i = 0; i < bytes.length; i++) {
-    value = (value << 8) + bytes[i];
-  }
-  return value;
-}
-
-export function numberToUint8ArrayBE(num, byteLength = 8) {
-  if (num < 0) {
-    throw new Error('This function only handles non-negative numbers.');
-  }
-
-  const bytes = new Uint8Array(byteLength);
-
-  for (let i = 0; i < byteLength; i++) {
-    bytes[byteLength - 1 - i] = num & 0xff;
-    num >>= 8;
-  }
-
-  return bytes;
-}
-
-export function filterV1GovChains(chains: ChainInstance[]) {
-  const v1Chains = [];
-  const v1Beta1Chains = [];
-
-  chains.forEach((c) => {
-    if (COSMOS_GOV_V1_CHAIN_IDS.includes(c.id)) {
-      v1Chains.push(c);
-    } else {
-      v1Beta1Chains.push(c);
-    }
-  });
-
-  return { v1Chains, v1Beta1Chains };
-}
-
-export function mapChainsToProposals(
-  v1Chains: ChainInstance[],
-  v1Beta1Chains: ChainInstance[],
-  v1Proposals: ProposalSDKType[][],
-  v1Beta1Proposals: Proposal[][]
-): AllCosmosProposals {
-  return {
-    v1: v1Proposals.reduce(
-      (acc, proposals, i) => ({ ...acc, [v1Chains[i].id]: proposals }),
-      {}
-    ),
-    v1Beta1: v1Beta1Proposals.reduce(
-      (acc, proposals, i) => ({ ...acc, [v1Beta1Chains[i].id]: proposals }),
-      {}
-    ),
-  };
-}
-
-export function processProposalSettledPromises(
-  v1ProposalResults: PromiseSettledResult<ProposalSDKType[]>[],
-  v1Beta1ProposalResults: PromiseSettledResult<Proposal[]>[],
-  rollbar?: Rollbar
-) {
-  const v1Proposals: ProposalSDKType[][] = [];
-  for (const result of v1ProposalResults) {
-    if (result.status === 'rejected') {
-      log.error('Fetching v1 proposal failed.', result.reason);
-      rollbar?.error('Fetching v1 proposal failed.', result.reason);
-    } else {
-      v1Proposals.push(result.value);
-    }
-  }
-
-  const v1Beta1Proposals: Proposal[][] = [];
-  for (const result of v1Beta1ProposalResults) {
-    if (result.status === 'rejected') {
-      log.error('Fetching v1beta1 proposal failed.', result.reason);
-      rollbar?.error('Fetching v1beta1 proposal failed.', result.reason);
-    } else {
-      v1Beta1Proposals.push(result.value);
-    }
-  }
-
-  return { v1Proposals, v1Beta1Proposals };
-}
 
 export async function fetchCosmosNotifChains(models: DB) {
   return await models.Chain.findAll({
