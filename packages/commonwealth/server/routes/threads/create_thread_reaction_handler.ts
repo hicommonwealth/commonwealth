@@ -2,6 +2,7 @@ import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
 import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
+import { verifyReaction } from '../../../shared/canvas/serverVerify';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
@@ -41,6 +42,15 @@ export const createThreadReactionHandler = async (
   const threadId = parseInt(req.params.id, 10);
   if (!threadId) {
     throw new AppError(Errors.InvalidThreadId);
+  }
+
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    await verifyReaction(canvasAction, canvasSession, canvasHash, {
+      thread_id: threadId,
+      address: address.address,
+      chain: chain.id,
+      value: reaction,
+    });
   }
 
   // create thread reaction
