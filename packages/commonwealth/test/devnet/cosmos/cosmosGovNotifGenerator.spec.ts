@@ -69,7 +69,7 @@ async function enableChains(chains: string[]) {
   }
 }
 
-describe.only('Cosmos Governance Notification Generator with real proposals', () => {
+describe('Cosmos Governance Notification Generator with real proposals', () => {
   beforeEach('Clear notifications', async () => {
     await models.sequelize.query(`
       DELETE FROM "NotificationsRead";
