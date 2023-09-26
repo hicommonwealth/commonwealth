@@ -1,11 +1,14 @@
 import React from 'react';
 import app from 'state';
+// import { useEditGroupMutation } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import { PageNotFound } from '../../../404';
 import { GroupForm } from '../common/GroupForm';
 import './index.scss';
 
 const UpdateCommunityGroupPage = () => {
+  // const { mutateAsync: editGroup } = useEditGroupMutation();
+
   if (!app.isLoggedIn() || !Permissions.isCommunityAdmin()) {
     return <PageNotFound />;
   }
@@ -51,6 +54,13 @@ const UpdateCommunityGroupPage = () => {
       onSubmit={(values) => {
         // TODO: submit api here
         console.log('values => ', values);
+        // editGroup({
+        //   chainId: app.activeChainId(),
+        //   address: app.user.activeAccount.address,
+        //   groupId: '1',
+        // })
+        //   .then(x => console.log("x => ", x))
+        //   .catch(y => console.log("y => ", y))
       }}
     />
   );
