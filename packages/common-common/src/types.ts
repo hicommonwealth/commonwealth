@@ -1,18 +1,17 @@
-// This is a const and not an enum because of a weird webpack error.
-// It has the same syntax, though, so it should be OK, as long as we don't
-// modify any of the values.
-// eslint-disable-next-line
-export const NotificationCategories = {
-  NewComment: 'new-comment-creation',
-  NewThread: 'new-thread-creation',
-  NewMention: 'new-mention',
-  NewReaction: 'new-reaction',
-  NewCollaboration: 'new-collaboration',
-  ThreadEdit: 'thread-edit',
-  CommentEdit: 'comment-edit',
-  ChainEvent: 'chain-event',
-  SnapshotProposal: 'snapshot-proposal',
-};
+export enum NotificationCategories {
+  NewComment = 'new-comment-creation',
+  NewThread = 'new-thread-creation',
+  NewMention = 'new-mention',
+  NewReaction = 'new-reaction',
+  NewCollaboration = 'new-collaboration',
+  ThreadEdit = 'thread-edit',
+  CommentEdit = 'comment-edit',
+  ChainEvent = 'chain-event',
+  SnapshotProposal = 'snapshot-proposal',
+}
+
+export type NotificationCategory =
+  typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
   Thread = 'discussion',

@@ -15,7 +15,7 @@
   - [Sequelize](Sequelize.md)
   - [Discobot](Discobot.md)
   - [React Notes](React-Notes.md)
-  - [Package.json Scripts](Package.json-Scripts.md)
+  - [Package.json Scripts](Package-Scripts.md)
   - [Custom Domains](Custom-Domains.md)
   - [Testing Environments](Testing-Environments.md)
   - [Database](Database.md)
@@ -66,6 +66,9 @@
   - [Management Panel](RabbitMQ-Management-Panel.md)
   - [Preventing Data Loss](RabbitMQ-Preventing-Data-Loss.md)
   - [FAQ](RabbitMQ-FAQ.md)
+
+**Notifications**
+  - [QA](Notifications-QA.md)
 
 **Pattern Library &etc**
 - [Bouncing in Pure React](Bouncing-In-Pure-React.md)

@@ -20,14 +20,17 @@ import type { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
 import { ethers } from 'ethers';
 
-export function Label(chain: string, event: CWEvent): IEventLabel {
+export function Label(
+  chain: string,
+  event: Omit<CWEvent, 'blockNumber'>
+): IEventLabel {
   switch (event.network) {
     case SupportedNetwork.Aave:
-      return AaveLabel(event.blockNumber, chain, event.data);
+      return AaveLabel(chain, event.data);
     case SupportedNetwork.Compound:
-      return CompoundLabel(event.blockNumber, chain, event.data);
+      return CompoundLabel(chain, event.data);
     case SupportedNetwork.Cosmos:
-      return CosmosLabel(event.blockNumber, chain, event.data);
+      return CosmosLabel(chain, event.data);
     default:
       throw new Error(`Invalid network: ${event.network}`);
   }

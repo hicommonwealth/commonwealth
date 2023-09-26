@@ -163,7 +163,6 @@ export interface IEventLabel {
 
 // a function that prepares chain data for user display
 export type LabelerFilter = (
-  blockNumber: number,
   chainId: string,
   data: IChainEventData,
   ...formatters

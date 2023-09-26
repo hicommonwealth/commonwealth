@@ -133,15 +133,6 @@ export class UserController {
     this._notifications = notifications;
   }
 
-  private _lastVisited: object;
-  public get lastVisited(): object {
-    return this._lastVisited;
-  }
-
-  private _setLastVisited(lastVisited: object): void {
-    this._lastVisited = lastVisited;
-  }
-
   private _starredCommunities: StarredCommunity[];
   public get starredCommunities(): StarredCommunity[] {
     return this._starredCommunities;
@@ -294,21 +285,25 @@ export class UserController {
     this._setNotifications(notifications);
   }
 
-  public setLastVisited(lastVisited: object): void {
-    this._setLastVisited(lastVisited);
-  }
-
   public setStarredCommunities(star: StarredCommunity[]): void {
     this._setStarredCommunities(star);
+  }
+
+  public isCommunityStarred(chain: string): boolean {
+    return (
+      this._starredCommunities.findIndex((c) => {
+        return c.chain === chain;
+      }) !== -1
+    );
   }
 
   public addStarredCommunity(star: StarredCommunity): void {
     this._starredCommunities.push(star);
   }
 
-  public removeStarredCommunity(star: StarredCommunity): void {
+  public removeStarredCommunity(chain: string, userId: number): void {
     const index = this._starredCommunities.findIndex(
-      (s) => s.user_id === star.user_id && s.chain === star.chain
+      (s) => s.user_id === userId && s.chain === chain
     );
     this._starredCommunities.splice(index, 1);
   }

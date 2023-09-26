@@ -24,7 +24,7 @@ import {
   ITXModalData,
 } from '../../../models/interfaces';
 import WebWalletController from '../../app/web_wallets';
-import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
+import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
 import {
   getLCDClient,
@@ -32,6 +32,8 @@ import {
   getSigningClient,
   getTMClient,
 } from './chain.utils';
+import EthSigningClient from './eth_signing_client';
+import { ETHERMINT_CHAINS } from '../../app/webWallets/keplr_ethereum_web_wallet';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -119,22 +121,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       }
     }
 
-    await Promise.all([
-      this.fetchPoolParams(),
-      this.fetchBlock(), // Poll for new block immediately
-      this.fetchStakingParams(),
-    ]);
-  }
-
-  private async fetchPoolParams(): Promise<void> {
-    try {
-      const {
-        pool: { bondedTokens },
-      } = await this._api.staking.pool();
-      this._staked = this.coins(new BN(bondedTokens));
-    } catch (e) {
-      console.error('Error fetching pool params: ', e);
-    }
+    await this.fetchBlock(); // Poll for new block immediately
   }
 
   private async fetchBlock(): Promise<void> {
@@ -154,15 +141,20 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
   }
 
-  private async fetchStakingParams(): Promise<void> {
-    try {
-      const {
-        params: { bondDenom },
-      } = await this._api.staking.params();
-      this._denom = bondDenom;
-    } catch (e) {
-      console.error('Error fetching staking params: ', e);
-    }
+  public async fetchPoolParams(): Promise<CosmosToken> {
+    const {
+      pool: { bondedTokens },
+    } = await this._api.staking.pool();
+    this._staked = this.coins(new BN(bondedTokens));
+    return this._staked;
+  }
+
+  public async fetchStakingParams(): Promise<string> {
+    const {
+      params: { bondDenom },
+    } = await this._api.staking.params();
+    this._denom = bondDenom;
+    return this._denom;
   }
 
   public async deinit(): Promise<void> {
@@ -173,9 +165,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     account: CosmosAccount,
     tx: EncodeObject
   ): Promise<readonly Event[]> {
+    const chain = this._app.chain;
     // TODO: error handling
     // TODO: support multiple wallets
-    if (this._app.chain.network === ChainNetwork.Terra) {
+    if (chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
     const wallet = WebWalletController.Instance.getByName(
@@ -186,10 +179,27 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       await wallet.enable();
     }
     const cosm = await import('@cosmjs/stargate');
-    const client = await getSigningClient(
-      this._app.chain.meta.node.url,
-      wallet.offlineSigner
-    );
+    const dbId = chain.meta.id;
+    let client;
+
+    // TODO: To check if ethermint, we can get slip44 cointype from Cosmos Chain Directory instead of hardcoding
+    if (ETHERMINT_CHAINS.some((c) => c === dbId)) {
+      const chainId = wallet.getChainId();
+
+      client = await EthSigningClient(
+        {
+          restUrl: `${window.location.origin}/cosmosLCD/${dbId}`,
+          chainId,
+          path: dbId,
+        },
+        wallet.offlineSigner
+      );
+    } else {
+      client = await getSigningClient(
+        chain.meta.node.url,
+        wallet.offlineSigner
+      );
+    }
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?

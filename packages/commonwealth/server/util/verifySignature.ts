@@ -328,13 +328,11 @@ const verifySignature = async (
       await models.Subscription.create({
         subscriber_id: user.id,
         category_id: NotificationCategories.NewMention,
-        object_id: `user-${user.id}`,
         is_active: true,
       });
       await models.Subscription.create({
         subscriber_id: user.id,
         category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${user.id}`,
         is_active: true,
       });
       addressModel.user_id = user.id;
