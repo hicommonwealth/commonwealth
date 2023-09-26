@@ -170,15 +170,11 @@ export const User = ({
       {profile && (
         <div className="UserPopover" onClick={(e) => e.stopPropagation()}>
           <div className="user-avatar">
-<<<<<<< HEAD
             <Avatar
               url={profile?.avatarUrl}
               size={profile?.avatarUrl ? 36 : 32}
               address={profile?.id}
             />
-=======
-            <Avatar url={profile?.avatarUrl} size={32} address={profile?.id} />
->>>>>>> master
           </div>
           <div className="user-name">
             {app.chain && app.chain.base === ChainBase.Substrate && (
