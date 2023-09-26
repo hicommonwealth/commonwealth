@@ -31,14 +31,10 @@ async function startE2e() {
 
   console.log('Database migration finished');
 
-  try {
-    spawnSync('yarn', [suiteToRun], { stdio: 'inherit' });
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
+  const returnValue = spawnSync('yarn', [suiteToRun], { stdio: 'inherit' });
+  if (returnValue.status) {
+    process.exit(returnValue.status);
   }
 }
 
-startE2e().catch(() => {
-  process.exit(1);
-});
+startE2e().then();
