@@ -40,7 +40,7 @@ export const createThreadHandler = async (
     discord_meta,
   } = req.body;
 
-  if (process.env.ENFORCE_SESSION_KEYS) {
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
     await verifyThread(canvasAction, canvasSession, canvasHash, {
       title,
       body,

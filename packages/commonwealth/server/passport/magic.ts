@@ -426,7 +426,7 @@ async function magicLoginRoute(
       signature: req.body.signature,
       payload: JSON.parse(req.body.sessionPayload),
     };
-    if (process.env.ENFORCE_SESSION_KEYS) {
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
       if (req.body.magicAddress !== session.payload.from) {
         throw new Error(
           'sessionPayload address did not match user-provided magicAddress'

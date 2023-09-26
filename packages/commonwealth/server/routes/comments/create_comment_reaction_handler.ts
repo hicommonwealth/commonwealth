@@ -44,7 +44,7 @@ export const createCommentReactionHandler = async (
     throw new AppError(Errors.InvalidCommentId);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS) {
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       comment_id: commentId,
       address: address.address,

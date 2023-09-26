@@ -52,7 +52,7 @@ export const createThreadCommentHandler = async (
     throw new AppError(Errors.MissingText);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS) {
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
     await verifyComment(canvasAction, canvasSession, canvasHash, {
       thread_id: parseInt(threadId, 10),
       text,

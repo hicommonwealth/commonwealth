@@ -44,7 +44,7 @@ export const createThreadReactionHandler = async (
     throw new AppError(Errors.InvalidThreadId);
   }
 
-  if (process.env.ENFORCE_SESSION_KEYS) {
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       thread_id: threadId,
       address: address.address,
