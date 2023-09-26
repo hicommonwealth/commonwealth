@@ -7,6 +7,7 @@ import { hexToU8a, stringToHex } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
+import _ from 'lodash';
 import {
   ChainBase,
   NotificationCategories,
@@ -29,6 +30,7 @@ import type { ProfileAttributes } from '../models/profile';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError } from '../../../common-common/src/errors';
+import { sign } from 'jsonwebtoken';
 const log = factory.getLogger(formatFilename(__filename));
 
 const sortedStringify = configureStableStringify({
@@ -210,76 +212,142 @@ const verifySignature = async (
         'cosmos'
       );
 
+      interface Bech32Address {
+        address: string;
+        userId?: number;
+      }
+
+      interface HexAddress {
+        hex: string;
+        bech32Address: Bech32Address;
+      }
+
+      interface Signer {
+        hexAddress: string;
+        bech32Addresses: Bech32Address[];
+      }
+
+      const { toHex, fromBech32, toBech32, fromHex } = await import(
+        '@cosmjs/encoding'
+      );
+
       const cosmosChains = await models.Chain.findAll({
-        where: { base: 'cosmos' },
+        where: { base: 'cosmos', type: 'chain' },
       });
 
-      const allCosmosAddresses = [];
+      const allCosmosAddresses: HexAddress[] = [];
       await Promise.all(
         cosmosChains.map(async (chain) => {
           const chainAddresses = await models.Address.findAll({
             where: { chain: chain.id },
           });
-          allCosmosAddresses.push(...chainAddresses);
+          const hexAddresses: HexAddress[] = chainAddresses.map((address) => {
+            try {
+              const { dataValues } = address;
+              if (!dataValues.address.startsWith('0x')) {
+                const dataA = fromBech32(dataValues.address).data;
+                const aHex = toHex(dataA);
+
+                return {
+                  hex: aHex,
+                  bech32Address: {
+                    address: dataValues.address,
+                    userId: dataValues.user_id,
+                  },
+                };
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          });
+          allCosmosAddresses.push(...hexAddresses);
         })
       );
-      const generatedAddresses = [];
-      const { toHex, fromBech32, toBech32, fromHex } = await import(
-        '@cosmjs/encoding'
-      );
-      cosmosChains?.map((chain) => {
-        const prefix = chain?.bech32_prefix;
-        if (prefix) {
-          // const generatedAddressWithPrefix = cosm.pubkeyToAddress(
-          //   stdSignature.pub_key,
-          //   prefix
-          // );
 
-          // verify cosmjs conversion works:
-          // How to get from one address to another:
-          // Get the hex, then convert to bech32 for the chain you want
-          const dataA = fromBech32(generatedAddress).data;
-          const achainHex = toHex(dataA);
-          // console.log(achainHex); // 0d82b1e7c96dbfa42462fe612932e6bff111d51b
+      // const generatedAddresses: HexAddress[] = [];
 
-          const generatedAddressWithPrefix = toBech32(
-            prefix,
-            fromHex(achainHex)
-          );
-          // console.log('generatedAddressWithPrefix', generatedAddressWithPrefix); //osmo1l8v5nzznewg9cnfn0peg22mpysdr3a8j0zdd86
+      // cosmosChains?.map((chain) => {
+      //   const prefix = chain?.bech32_prefix;
+      //   if (prefix) {
+      //     // verify cosmjs conversion works:
+      //     // How to get from one address to another:
+      //     // Get the hex, then convert to bech32 for the chain you want
+      //     const dataA = fromBech32(generatedAddress).data;
+      //     const achainHex = toHex(dataA);
 
-          if (!generatedAddresses.includes(generatedAddressWithPrefix)) {
-            generatedAddresses.push(generatedAddressWithPrefix);
-          }
-        }
-      });
+      //     const generatedAddressWithPrefix = toBech32(
+      //       prefix,
+      //       fromHex(achainHex)
+      //     );
+
+      //     const hexAddress: HexAddress = {
+      //       hex: achainHex,
+      //       bech32Address: {
+      //         address: generatedAddressWithPrefix,
+      //         userId: null,
+      //       },
+      //     };
+
+      //     if (
+      //       generatedAddresses.findIndex(
+      //         (address) => address.bech32Address === hexAddress.bech32Address
+      //       ) === -1
+      //     ) {
+      //       generatedAddresses.push(hexAddress);
+      //     }
+      //   }
+      // });
 
       // check db for these addresses:
-      const foundAddresses = [];
-      await Promise.all(
-        generatedAddresses?.map(async (address) => {
-          // const foundAddress = await models.Address.findOne({
-          //   where: { address },
-          // });
-          const foundAddress = allCosmosAddresses.find(
-            (cosmosAddress) => cosmosAddress.address === address
-          );
-          if (foundAddress) {
-            // && foundAddress.user_id !== addressModel.user_id) {
-            // console.log('foundAddress', foundAddress.address);
-            foundAddresses.push(foundAddress.dataValues);
-          }
-        })
-      );
+      // const foundAddresses: HexAddress[] = [];
+      // await Promise.all(
+      //   generatedAddresses?.map(async (hexAddress) => {
+      //     // const foundAddress = await models.Address.findOne({
+      //     //   where: { address },
+      //     // });
+      //     const foundAddress = allCosmosAddresses.find(
+      //       (cosmosAddress) =>
+      //         cosmosAddress.address === hexAddress.bech32Address
+      //     );
+      //     if (foundAddress) {
+      //       const foundHexAddress: HexAddress = {
+      //         hex: hexAddress.hex,
+      //         bech32Address: {
+      //           address: foundAddress.address,
+      //           userId: foundAddress.user_id,
+      //         },
+      //       };
 
-      if (foundAddresses?.length > 0) {
-        // return error with found addresses:
-        throw new Error(
-          `Other addresses found! foundAddresses: ${JSON.stringify(
-            foundAddresses.map((address) => address.address)
-          )}`
-        );
+      //       foundAddresses.push(foundHexAddress);
+      //     }
+      //   })
+      // );
+
+      const signers = [];
+      if (allCosmosAddresses?.length > 0) {
+        // sort them by hex into unique signers
+        for (const hexAddress of allCosmosAddresses) {
+          if (hexAddress?.hex) {
+            // Create a new signer object.
+            const signer: Signer = {
+              hexAddress: hexAddress?.hex,
+              bech32Addresses: [],
+            };
+
+            // Find all of the bech32 addresses that are associated with the signer's hex address.
+            const bech32Addresses = allCosmosAddresses
+              .filter((dbAddress) => dbAddress?.hex === hexAddress.hex)
+              .map((dbAddress) => dbAddress.bech32Address);
+
+            // Add the bech32 addresses to the signer object.
+            signer.bech32Addresses = _.uniqBy(bech32Addresses, 'address');
+
+            signers.push(signer); //37444
+          }
+        }
       }
+
+      const uniqueSigners = _.uniqBy(signers, 'hexAddress'); //33604
 
       if (
         generatedAddress === addressModel.address ||
