@@ -1,7 +1,5 @@
 import { StatsDController } from 'common-common/src/statsd';
 import {
-  ChainBase,
-  ChainType,
   NotificationCategories,
 } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
@@ -72,8 +70,10 @@ export default async function emitNotifications(
     if (addressModels && addressModels.length > 0) {
       const userIds = addressModels.map((a) => a.user_id);
 
-      // remove duplicates
-      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
+      // remove duplicates and null user_ids
+      const userIdsDedup = userIds.filter(
+        (a, b) => userIds.indexOf(a) === b && a !== null
+      );
       return userIdsDedup;
     } else {
       return [];
@@ -102,8 +102,6 @@ export default async function emitNotifications(
   // get notification if it already exists
   let notification: NotificationInstance;
   if (isChainEventData && chainEvent.id) {
-    // Cosmos notifications don't have a chain-event id but will never be duplicated due to the nature of
-    // the fetching mechanism
     notification = await models.Notification.findOne({
       where: {
         chain_event_id: chainEvent.id,

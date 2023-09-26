@@ -20,89 +20,95 @@ enum SupportedNotificationSpaces {
   stgdao = 'stgdao.eth',
 }
 
-const randomInt = () => Math.floor(Math.random() * (2 ** 31 - 1)) + 1;
-const propCreateBlock = randomInt();
-const ceNotifications = {
-  [SupportedNotificationChains.dydx]: {
-    queued: 0,
-    id: randomInt(),
-    block_number: propCreateBlock,
-    event_data: {
-      id: randomInt(),
-      kind: 'proposal-created',
-      values: ['0'],
-      targets: ['0xE710CEd57456D3A16152c32835B5FB4E72D9eA5b'],
-      endBlock: propCreateBlock + 33_000,
-      executor: '0x64c7d40c07EFAbec2AafdC243bF59eaF2195c6dc',
-      ipfsHash:
-        '0x5aca381042cb641c1000126d5a183c38b17492eb60a86910973d0c3f1e867f43',
-      proposer: '0xB933AEe47C438f22DE0747D57fc239FE37878Dd1',
-      strategy: '0x90Dfd35F4a0BB2d30CDf66508085e33C353475D9',
-      calldatas: ['randomcalldatas'],
-      signatures: ['transfer(address,address,uint256)'],
-      startBlock: propCreateBlock + 7_000,
-    },
-    network: 'aave',
-    chain: 'dydx',
-    updated_at: '2023-06-19T11:50:52.308Z',
-    created_at: '2023-06-19T11:50:52.262Z',
-  },
-  [SupportedNotificationChains.kyve]: {
-    chain: 'kyve',
-    network: 'cosmos',
-    event_data: {
-      kind: 'msg-submit-proposal',
-      id: '10',
-      content: {
-        typeUrl: '/cosmos.gov.v1beta1.TextProposal',
-        value: '0a087631207469746c65120e7631206465736372697074696f6e',
-      },
-      submitTime: 1694015653,
-      depositEndTime: 1694188453,
-      votingStartTime: 1694015653,
-      votingEndTime: 1694015743,
-      finalTallyResult: { yes: '0', abstain: '0', no: '0', noWithVeto: '0' },
-      totalDeposit: { ustake: '2000000' },
-    },
-  },
-  [SupportedNotificationChains.osmosis]: {
-    chain: 'osmosis',
-    network: 'cosmos',
-    event_data: {
-      kind: 'msg-submit-proposal',
-      id: '11',
-      content: {
-        typeUrl: '/cosmos.gov.v1beta1.TextProposal',
-        value:
-          '0a0f626574612074657874207469746c651215626574612074657874206465736372697074696f6e',
-      },
-      submitTime: 1694015671,
-      depositEndTime: 1694188471,
-      votingStartTime: 1694015671,
-      votingEndTime: 1694015761,
-      finalTallyResult: { yes: '0', abstain: '0', no: '0', noWithVeto: '0' },
-      totalDeposit: { ustake: '2000000' },
-    },
-  },
-};
+function getMockNotification(
+  randomData: boolean,
+  chain?: string,
+  snapshot?: string
+) {
+  const constantBlockNumber = 987654321;
+  const constantPropId = 999999999;
 
-const startTime = randomInt();
-const randomString = Array.from(
-  { length: 64 },
-  () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]
-).join('');
-const snapshotNotifications = {
-  [SupportedNotificationSpaces.stgdao]: {
-    eventType: 'proposal/created',
-    space: SupportedNotificationSpaces.stgdao,
-    id: `0x${randomString}`,
-    title: 'Test Snapshot Proposal Title',
-    body: 'Test snapshot proposal body',
-    choices: ['Yes', 'No', 'Abstain'],
-    start: startTime,
-    expire: startTime + 450_000,
-  },
-};
+  const randomInt = () => Math.floor(Math.random() * (2 ** 31 - 1)) + 1;
+
+  const ceNotifications = {
+    [SupportedNotificationChains.dydx]: {
+      block_number: randomData ? randomInt() : constantBlockNumber,
+      event_data: {
+        id: randomData ? randomInt() : constantPropId,
+        kind: 'proposal-created',
+      },
+      network: 'aave',
+      chain: 'dydx',
+    },
+    [SupportedNotificationChains.kyve]: {
+      chain: 'kyve',
+      network: 'cosmos',
+      event_data: {
+        kind: 'msg-submit-proposal',
+        id: '10',
+        content: {
+          typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+          value: '0a087631207469746c65120e7631206465736372697074696f6e',
+        },
+        submitTime: 1694015653,
+        depositEndTime: 1694188453,
+        votingStartTime: 1694015653,
+        votingEndTime: 1694015743,
+        finalTallyResult: { yes: '0', abstain: '0', no: '0', noWithVeto: '0' },
+        totalDeposit: { ustake: '2000000' },
+      },
+    },
+    [SupportedNotificationChains.osmosis]: {
+      chain: 'osmosis',
+      network: 'cosmos',
+      event_data: {
+        kind: 'msg-submit-proposal',
+        id: '11',
+        content: {
+          typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+          value:
+            '0a0f626574612074657874207469746c651215626574612074657874206465736372697074696f6e',
+        },
+        submitTime: 1694015671,
+        depositEndTime: 1694188471,
+        votingStartTime: 1694015671,
+        votingEndTime: 1694015761,
+        finalTallyResult: { yes: '0', abstain: '0', no: '0', noWithVeto: '0' },
+        totalDeposit: { ustake: '2000000' },
+      },
+    },
+  };
+
+  const constantStartTime = 987654321;
+  const constantId = '0x123456789';
+
+  const startTime = randomInt();
+  const randomString = Array.from(
+    { length: 64 },
+    () => 'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]
+  ).join('');
+
+  const snapshotNotifications = {
+    [SupportedNotificationSpaces.stgdao]: {
+      eventType: 'proposal/created',
+      space: SupportedNotificationSpaces.stgdao,
+      id: randomData ? `0x${randomString}` : constantId,
+      title: 'Test Snapshot Proposal Title',
+      body: 'Test snapshot proposal body',
+      choices: ['Yes', 'No', 'Abstain'],
+      start: randomData ? startTime : constantStartTime,
+      expire: randomData ? startTime + 450_000 : constantStartTime + 450_000,
+    },
+  };
+
+  if (chain) {
+    return ceNotifications[chain];
+  } else if (snapshot) {
+    return snapshotNotifications[snapshot];
+  } else {
+    throw new Error('Must provide either a chain or snapshot space');
+  }
+}
 
 async function getExistingNotifications(
   transaction: Transaction,
@@ -144,6 +150,7 @@ async function getExistingNotifications(
 async function setupNotification(
   transaction: Transaction,
   mockNotification: boolean,
+  dontReplace: boolean,
   chainId?: string,
   snapshotId?: string
 ): Promise<string> {
@@ -153,28 +160,30 @@ async function setupNotification(
 
   let existingNotifications: NotificationInstance[];
   if (mockNotification && chainId) {
+    const mockNotif = getMockNotification(!dontReplace, chainId);
     // handles the case where a mock notification is emitted multiple times
     // this is necessary because chain-event notifications have a unique constraint on the id
     const existingCeMockNotif = await models.Notification.findAll({
       where: {
         category_id: NotificationCategories.ChainEvent,
         chain_id: chainId,
-        chain_event_id: ceNotifications[chainId].id || null,
+        chain_event_id: mockNotif.id || null,
         [Sequelize.Op.and]: [
           Sequelize.literal(
-            `notification_data::jsonb -> 'event_data' ->> 'id' = '${ceNotifications[chainId].event_data.id}'`
+            `notification_data::jsonb -> 'event_data' ->> 'id' = '${mockNotif.event_data.id}'`
           ),
         ],
       },
       transaction,
     });
 
-    if (existingCeMockNotif.length > 0)
+    if (existingCeMockNotif.length > 0 && !dontReplace) {
       existingNotifications = existingCeMockNotif;
-    // if the mock does not already exist then we can just return the mock data, so it is emitted as a brand new notif
-    else return JSON.stringify(ceNotifications[chainId]);
+    } else return JSON.stringify(mockNotif);
   } else if (mockNotification && snapshotId) {
-    return JSON.stringify(snapshotNotifications[snapshotId]);
+    return JSON.stringify(
+      getMockNotification(!dontReplace, undefined, snapshotId)
+    );
   }
 
   if (!existingNotifications) {
@@ -200,21 +209,21 @@ async function setupNotification(
   }
 
   const existingNotif = existingNotifications[0];
-  log.info(`Replacing existing notification with id ${existingNotif.id}`);
 
-  await models.NotificationsRead.destroy({
-    where: {
-      notification_id: existingNotif.id,
-    },
-    transaction,
-  });
-  await existingNotif.destroy({ transaction });
-  log.info(`Deleted the existing notification and notifications read.`);
+  if (!dontReplace) {
+    log.info(`Replacing existing notification with id ${existingNotif.id}`);
+    await models.NotificationsRead.destroy({
+      where: {
+        notification_id: existingNotif.id,
+      },
+      transaction,
+    });
+    await existingNotif.destroy({ transaction });
+    log.info(`Deleted the existing notification and notifications read.`);
+  }
 
   const newNotifData = existingNotif.toJSON();
 
-  // const result = await models.Notification.create(newNotifData, { transaction });
-  // log.info(`Created a new (replicated) notification with id ${result.id}`);
   return newNotifData.notification_data;
 }
 
@@ -260,6 +269,14 @@ async function main() {
         description:
           'Whether to create a mock notification or use a real existing one. ' +
           'A mock notification will not link to a real chain-event or snapshot-proposal.',
+      },
+      dont_replace: {
+        alias: 'd',
+        type: 'boolean',
+        default: false,
+        description:
+          'Whether to replace an existing notification if it is found or emit the same notification. This option' +
+          'is especially useful to test duplicate emission of a notification.',
       },
     })
     // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -345,6 +362,7 @@ async function main() {
     notifData = await setupNotification(
       transaction,
       argv.mock_notification,
+      argv.dont_replace,
       argv.chain_id,
       argv.snapshot_id
     );

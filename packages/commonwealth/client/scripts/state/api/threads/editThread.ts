@@ -62,18 +62,6 @@ const editThread = async ({
   // for editing thread collaborators
   collaborators,
 }: EditThreadProps) => {
-  const {
-    action = null,
-    session = null,
-    hash = null,
-  } = await app.sessions.signThread(address, {
-    community: app.activeChainId(),
-    title: newTitle,
-    body: newBody,
-    link: url,
-    topic: topicId,
-  });
-
   const response = await axios.patch(`${app.serverUrl()}/threads/${threadId}`, {
     // common payload
     author_chain: chainId,
@@ -99,9 +87,6 @@ const editThread = async ({
     ...(topicId !== undefined && { topicId }),
     // for editing thread collaborators
     ...(collaborators !== undefined && { collaborators }),
-    canvas_action: action,
-    canvas_session: session,
-    canvas_hash: hash,
   });
 
   return new Thread(response.data.result);

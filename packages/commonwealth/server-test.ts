@@ -120,10 +120,16 @@ const resetServer = (debug = false): Promise<void> => {
           eth_chain_id: 3,
           balance_type: BalanceType.Ethereum,
         },
-        juno: {
+        osmosis: {
           url: 'https://rpc-osmosis.ecostake.com',
           name: 'Osmosis',
           balance_type: BalanceType.Cosmos,
+        },
+        csdkBeta: {
+          url: 'https://cosmos-devnet-beta.herokuapp.com/rpc',
+          name: 'Cosmos SDK v0.45.0 devnet',
+          balance_type: BalanceType.Cosmos,
+          alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
         },
         csdk: {
           url: 'https://cosmos-devnet.herokuapp.com/rpc',
@@ -133,7 +139,7 @@ const resetServer = (debug = false): Promise<void> => {
         },
       };
 
-      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkNode] =
+      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkBetaNode, csdkNode] =
         await models.ChainNode.bulkCreate(Object.values(nodes));
 
       // Initialize different chain + node URLs
@@ -185,6 +191,18 @@ const resetServer = (debug = false): Promise<void> => {
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
         chain_node_id: osmosisNode.id,
+      });
+      await models.Chain.create({
+        id: 'csdk-beta',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'STAKE',
+        name: 'Cosmos SDK v0.45.0 devnet',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: false,
+        chain_node_id: csdkBetaNode.id,
       });
       await models.Chain.create({
         id: 'csdk',

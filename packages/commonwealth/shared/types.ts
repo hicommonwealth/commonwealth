@@ -154,6 +154,11 @@ export interface IChainEventNotificationData {
   entity_id?: number;
 }
 
+export type NotificationDataTypes =
+  | IForumNotificationData
+  | IChainEventNotificationData
+  | ISnapshotNotificationData;
+
 export type NotifCategoryToNotifDataMapping = {
   [K in NotificationCategory]: K extends typeof NotificationCategories.NewComment
     ? INewCommentNotificationData

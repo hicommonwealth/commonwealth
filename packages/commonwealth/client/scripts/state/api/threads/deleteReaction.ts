@@ -23,7 +23,7 @@ const deleteReaction = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signDeleteThreadReaction(address, {
+  } = await app.sessions.signDeleteThreadReaction({
     thread_id: threadId,
   });
 

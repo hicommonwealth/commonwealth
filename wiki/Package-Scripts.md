@@ -43,7 +43,6 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [start-android](#start-android)
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
-  - [compress-images](#compress-images)
   - [datadog-db-setup](#datadog-db-setup)
   - [send-notification-digest-emails](#send-notification-digest-emails)
   - [start-prerender](#start-prerender)
@@ -338,14 +337,6 @@ Description: Uses the Capacitor tool to build and run the app's iOS project with
 Contributor: Dillon Chen
 
 # Other services
-
-## compress-images
-
-Definition: `npx ts-node -T ./scripts/compressImages.ts`
-
-Considerations: (per contributor) **Deprecated; recommend removal.**
-
-Contributor: Kurtis Assad
 
 ## datadog-db-setup
 
