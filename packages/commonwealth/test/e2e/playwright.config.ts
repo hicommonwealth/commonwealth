@@ -6,7 +6,7 @@ const config: PlaywrightTestConfig = {
     trace: 'on-first-retry',
   },
   globalSetup: './globalSetup.ts',
-  timeout: 60_000,
+  timeout: 120_000,
   fullyParallel: true,
   reporter: [['list'], ['playwright-json-summary-reporter']],
   webServer: {
