@@ -17,6 +17,9 @@ const MembersPage = lazy(() => import('views/pages/members'));
 const CreateMembersGroupPage = lazy(
   () => import('views/pages/Community/Groups/Create')
 );
+const UpdateMembersGroupPage = lazy(
+  () => import('views/pages/Community/Groups/Update')
+);
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
@@ -152,6 +155,12 @@ const CommonDomainRoutes = () => [
   <Route
     path="/:scope/members/groups/create"
     element={withLayout(CreateMembersGroupPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    path="/:scope/members/groups/:groupId/update"
+    element={withLayout(UpdateMembersGroupPage, {
       scoped: true,
     })}
   />,

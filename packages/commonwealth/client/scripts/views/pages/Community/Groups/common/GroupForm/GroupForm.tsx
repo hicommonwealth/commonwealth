@@ -35,7 +35,11 @@ const CWRequirementsRadioButton = () => {
   return <CWRadioButton label={Label} value="n-requirements" />;
 };
 
-const GroupForm = ({ formType, onSubmit, initialValues }: GroupFormProps) => {
+const GroupForm = ({
+  formType,
+  onSubmit,
+  initialValues = {},
+}: GroupFormProps) => {
   const [requirementSubForms, setRequirementSubForms] = useState<
     {
       defaultValues?: RequirementSubTypeWithLabel;
@@ -56,7 +60,7 @@ const GroupForm = ({ formType, onSubmit, initialValues }: GroupFormProps) => {
   ]);
 
   useEffect(() => {
-    if (initialValues?.requirements) {
+    if (initialValues.requirements) {
       setRequirementSubForms(
         initialValues.requirements.map((x) => ({
           defaultValues: x,
