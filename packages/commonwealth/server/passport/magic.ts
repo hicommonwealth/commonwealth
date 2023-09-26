@@ -1,4 +1,4 @@
-import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
+import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';

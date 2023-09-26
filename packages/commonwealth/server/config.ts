@@ -139,8 +139,6 @@ export const CHAIN_EVENT_SERVICE_SECRET =
   process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
 export const ETH_RPC = process.env.ETH_RPC || 'prod';
 
-export const ENFORCE_SESSION_KEYS = process.env.ENFORCE_SESSION_KEYS;
-
 export const COSMOS_GOV_V1 = process.env.COSMOS_GOV_V1;
 
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;

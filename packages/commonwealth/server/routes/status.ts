@@ -43,7 +43,7 @@ type StatusResp = {
     unseenPosts: { [chain: string]: number };
   };
   evmTestEnv?: string;
-  enforceSessionKeys?: string;
+  enforceSessionKeys?: boolean;
   chainCategoryMap: { [chain: string]: ChainCategoryType[] };
 };
 
@@ -301,7 +301,7 @@ export const status = async (
         notificationCategories,
         recentThreads: threadCountQueryData,
         evmTestEnv: ETH_RPC,
-        enforceSessionKeys: ENFORCE_SESSION_KEYS,
+        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,
       });
     } else {
@@ -324,7 +324,7 @@ export const status = async (
         loggedIn: true,
         user,
         evmTestEnv: ETH_RPC,
-        enforceSessionKeys: ENFORCE_SESSION_KEYS,
+        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,
       });
     }
