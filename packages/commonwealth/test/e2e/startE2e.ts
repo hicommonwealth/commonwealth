@@ -6,9 +6,11 @@ import { Sequelize } from 'sequelize';
 import { sequelizeMigrationUp } from '../util/sequlizeMigration';
 
 async function startE2e() {
-  const suiteToRun = process.argv[2] ? process.argv[2] : 'test-e2e-mature';
+  const args: string[] = process.argv[2]
+    ? process.argv.slice(2, process.argv.length)
+    : ['test-e2e-mature'];
 
-  console.log('Running test suite', suiteToRun);
+  console.log('Running test suite', args[0]);
 
   let pgContainer: StartedPostgreSqlContainer;
   try {
@@ -31,7 +33,7 @@ async function startE2e() {
 
   console.log('Database migration finished');
 
-  const returnValue = spawnSync('yarn', [suiteToRun], { stdio: 'inherit' });
+  const returnValue = spawnSync('yarn', args, { stdio: 'inherit' });
   if (returnValue.status) {
     process.exit(returnValue.status);
   }
