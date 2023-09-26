@@ -14,7 +14,7 @@ import app from 'state';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import { CWTable } from './CWTable/CWTable';
+import { CWTable } from './new_designs/CWTable/CWTable';
 import { makeData, createColumnInfo } from './showcase_helpers';
 import {
   ReactQuillEditor,

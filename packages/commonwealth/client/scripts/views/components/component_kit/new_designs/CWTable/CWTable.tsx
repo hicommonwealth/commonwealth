@@ -66,10 +66,10 @@ data structure).
 */
 
 import React, { useMemo, useState } from 'react';
-import { CWIcon } from '../cw_icons/cw_icon';
+import { CWIcon } from '../../cw_icons/cw_icon';
 import './CWTable.scss';
-import { Avatar } from '../../Avatar';
-import { ComponentType } from '../types';
+import { Avatar } from '../../../Avatar';
+import { ComponentType } from '../../types';
 import clsx from 'clsx';
 
 import {
