@@ -32,25 +32,57 @@ async function createTestProposal(rpcUrl: string, content: Any) {
   expect(isDeliverTxSuccess(resp), 'TX failed').to.be.true;
 }
 
-describe('Cosmos Governance Notification Generator with real proposals', () => {
+async function enableChains(chains: string[]) {
+  const possibleChains = [v1ChainId, v1Beta1ChainId];
+  await models.sequelize.query(`
+      DELETE FROM "NotificationsRead";
+    `);
+  await models.sequelize.query(`
+      DELETE FROM "Notifications";
+    `);
+
+  const [user] = await models.User.findOrCreate({
+    where: {
+      email: 'drewstone329@gmail.com',
+      emailVerified: true,
+      isAdmin: true,
+    },
+  });
+
+  for (const id of possibleChains) {
+    if (chains.includes(id)) {
+      await models.Subscription.findOrCreate({
+        where: {
+          subscriber_id: user.id,
+          chain_id: id,
+          category_id: 'chain-event',
+        },
+      });
+    } else {
+      await models.Subscription.destroy({
+        where: {
+          subscriber_id: user.id,
+          chain_id: id,
+        },
+      });
+    }
+  }
+}
+
+describe.only('Cosmos Governance Notification Generator with real proposals', () => {
+  beforeEach('Clear notifications', async () => {
+    await models.sequelize.query(`
+      DELETE FROM "NotificationsRead";
+    `);
+    await models.sequelize.query(`
+      DELETE FROM "Notifications";
+    `);
+  });
+
   describe('v1 proposals', () => {
     before('Setup DB objects and create proposal', async () => {
-      await models.Chain.update(
-        { has_chain_events_listener: false },
-        { where: { id: v1Beta1ChainId } }
-      );
-      await models.Chain.update(
-        { has_chain_events_listener: true },
-        { where: { id: v1ChainId } }
-      );
-
+      await enableChains([v1ChainId]);
       await createTestProposal(v1RpcUrl, v1Content);
-    });
-
-    beforeEach(async () => {
-      await models.Notification.destroy({
-        truncate: true,
-      });
     });
 
     it('should generate a single cosmos gov v1 notification when there are no existing notifications', async () => {
@@ -107,22 +139,8 @@ describe('Cosmos Governance Notification Generator with real proposals', () => {
 
   describe('v1beta1 proposals', () => {
     before('Setup DB objects and create proposal', async () => {
-      await models.Chain.update(
-        { has_chain_events_listener: false },
-        { where: { id: v1ChainId } }
-      );
-      await models.Chain.update(
-        { has_chain_events_listener: true },
-        { where: { id: v1Beta1ChainId } }
-      );
-
+      await enableChains([v1Beta1ChainId]);
       await createTestProposal(v1Beta1RpcUrl, v1Beta1Content);
-    });
-
-    beforeEach(async () => {
-      await models.Notification.destroy({
-        truncate: true,
-      });
     });
 
     it('should generate a single cosmos gov v1beta1 notification when there are no existing notifications', async () => {
@@ -179,16 +197,7 @@ describe('Cosmos Governance Notification Generator with real proposals', () => {
 
   describe('v1 and v1beta1 proposals', () => {
     before('Setup DB objects and create proposal', async () => {
-      await models.Chain.update(
-        { has_chain_events_listener: true },
-        { where: { id: [v1Beta1ChainId, v1ChainId] } }
-      );
-    });
-
-    beforeEach(async () => {
-      await models.Notification.destroy({
-        truncate: true,
-      });
+      await enableChains([v1ChainId, v1Beta1ChainId]);
     });
 
     it('should generate notifications for all v1 and v1beta1 proposals proposals since the last known notification', async () => {

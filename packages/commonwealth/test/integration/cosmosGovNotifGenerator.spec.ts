@@ -303,6 +303,9 @@ describe('Cosmos Governance Notification Generator', () => {
           delete CosmosClients[key];
         }
 
+        await models.sequelize.query(`
+          DELETE FROM "NotificationsRead";
+        `);
         await models.Notification.destroy({
           where: {
             category_id: 'chain-event',
@@ -336,6 +339,22 @@ describe('Cosmos Governance Notification Generator', () => {
 
     it('should not generate notifications if there are no new proposals', async () => {
       await createCosmosChains();
+      const user = await models.User.findOne();
+      await models.Subscription.findOrCreate({
+        where: {
+          subscriber_id: user.id,
+          chain_id: 'osmosis',
+          category_id: 'chain-event',
+        },
+      });
+      await models.Subscription.findOrCreate({
+        where: {
+          subscriber_id: user.id,
+          chain_id: 'kyve',
+          category_id: 'chain-event',
+        },
+      });
+
       createMockClients();
       await generateCosmosGovNotifications();
 

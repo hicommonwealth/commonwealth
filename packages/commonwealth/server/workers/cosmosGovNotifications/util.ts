@@ -11,10 +11,22 @@ import { AllCosmosProposals } from './proposalFetching/types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export async function fetchCosmosNotifChains(models: DB) {
-  return await models.Chain.findAll({
+  const chainIds = await models.Subscription.findAll({
+    attributes: [
+      [
+        models.sequelize.fn('DISTINCT', models.sequelize.col('chain_id')),
+        'chain_id',
+      ],
+    ],
     where: {
+      category_id: 'chain-event',
+    },
+  });
+
+  const result = await models.Chain.findAll({
+    where: {
+      id: chainIds.map((c) => c.chain_id),
       base: ChainBase.CosmosSDK,
-      has_chain_events_listener: true,
     },
     include: [
       {
@@ -23,6 +35,8 @@ export async function fetchCosmosNotifChains(models: DB) {
       },
     ],
   });
+
+  return result;
 }
 
 export async function fetchLatestNotifProposalIds(
