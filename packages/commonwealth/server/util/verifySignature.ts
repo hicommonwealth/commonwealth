@@ -239,7 +239,7 @@ const verifySignature = async (
       await Promise.all(
         cosmosChains.map(async (chain) => {
           const chainAddresses = await models.Address.findAll({
-            where: { chain: chain.id },
+            where: { chain: chain.id, wallet_id: 'keplr' },
           });
           const hexAddresses: HexAddress[] = chainAddresses.map((address) => {
             try {
@@ -260,68 +260,9 @@ const verifySignature = async (
               console.error(e);
             }
           });
-          allCosmosAddresses.push(...hexAddresses);
+          allCosmosAddresses.push(...hexAddresses); //30330
         })
       );
-
-      // const generatedAddresses: HexAddress[] = [];
-
-      // cosmosChains?.map((chain) => {
-      //   const prefix = chain?.bech32_prefix;
-      //   if (prefix) {
-      //     // verify cosmjs conversion works:
-      //     // How to get from one address to another:
-      //     // Get the hex, then convert to bech32 for the chain you want
-      //     const dataA = fromBech32(generatedAddress).data;
-      //     const achainHex = toHex(dataA);
-
-      //     const generatedAddressWithPrefix = toBech32(
-      //       prefix,
-      //       fromHex(achainHex)
-      //     );
-
-      //     const hexAddress: HexAddress = {
-      //       hex: achainHex,
-      //       bech32Address: {
-      //         address: generatedAddressWithPrefix,
-      //         userId: null,
-      //       },
-      //     };
-
-      //     if (
-      //       generatedAddresses.findIndex(
-      //         (address) => address.bech32Address === hexAddress.bech32Address
-      //       ) === -1
-      //     ) {
-      //       generatedAddresses.push(hexAddress);
-      //     }
-      //   }
-      // });
-
-      // check db for these addresses:
-      // const foundAddresses: HexAddress[] = [];
-      // await Promise.all(
-      //   generatedAddresses?.map(async (hexAddress) => {
-      //     // const foundAddress = await models.Address.findOne({
-      //     //   where: { address },
-      //     // });
-      //     const foundAddress = allCosmosAddresses.find(
-      //       (cosmosAddress) =>
-      //         cosmosAddress.address === hexAddress.bech32Address
-      //     );
-      //     if (foundAddress) {
-      //       const foundHexAddress: HexAddress = {
-      //         hex: hexAddress.hex,
-      //         bech32Address: {
-      //           address: foundAddress.address,
-      //           userId: foundAddress.user_id,
-      //         },
-      //       };
-
-      //       foundAddresses.push(foundHexAddress);
-      //     }
-      //   })
-      // );
 
       const signers = [];
       if (allCosmosAddresses?.length > 0) {
@@ -337,17 +278,32 @@ const verifySignature = async (
             // Find all of the bech32 addresses that are associated with the signer's hex address.
             const bech32Addresses = allCosmosAddresses
               .filter((dbAddress) => dbAddress?.hex === hexAddress.hex)
-              .map((dbAddress) => dbAddress.bech32Address);
+              .map((dbAddress) => dbAddress.bech32Address)
+              .filter((dbAddress) => !!dbAddress.userId); //filter out null userIds
 
             // Add the bech32 addresses to the signer object.
             signer.bech32Addresses = _.uniqBy(bech32Addresses, 'address');
 
-            signers.push(signer); //37444
+            signers.push(signer); // 30169
           }
         }
       }
 
-      const uniqueSigners = _.uniqBy(signers, 'hexAddress'); //33604
+      const uniqueSigners = _.uniqBy(signers, 'hexAddress'); //33604 26747
+      const signersWithMultipleAddresses = uniqueSigners.filter(
+        (signer) => signer.bech32Addresses.length > 1
+      ); // 1372
+      const signersWithMultipleUserIds = signersWithMultipleAddresses.filter(
+        (signer) => {
+          const userIds = _.uniqBy(signer.bech32Addresses, 'userId');
+          return userIds.length > 1;
+        }
+      );
+
+      console.log(
+        '# signersWithMultipleUserIds',
+        signersWithMultipleUserIds.length
+      ); // 1192
 
       if (
         generatedAddress === addressModel.address ||
