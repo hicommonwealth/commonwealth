@@ -223,7 +223,7 @@ const verifySignature = async (
       }
 
       interface Signer {
-        hexAddress: string;
+        hexAddress: string; //common identifier
         bech32Addresses: Bech32Address[];
       }
 
@@ -289,10 +289,12 @@ const verifySignature = async (
         }
       }
 
-      const uniqueSigners = _.uniqBy(signers, 'hexAddress'); //33604 26747
+      const uniqueSigners: Signer[] = _.uniqBy(signers, 'hexAddress'); // 26747
+
       const signersWithMultipleAddresses = uniqueSigners.filter(
         (signer) => signer.bech32Addresses.length > 1
       ); // 1372
+
       const signersWithMultipleUserIds = signersWithMultipleAddresses.filter(
         (signer) => {
           const userIds = _.uniqBy(signer.bech32Addresses, 'userId');
@@ -304,6 +306,52 @@ const verifySignature = async (
         '# signersWithMultipleUserIds',
         signersWithMultipleUserIds.length
       ); // 1192
+
+      // Number of Accounts that share addresses with one hex
+      const userIdGroupsThatShareSigners = signersWithMultipleUserIds.map(
+        (signer) => {
+          const addressUserIdGroups = _.uniqBy(
+            signer.bech32Addresses,
+            'userId'
+          );
+          return addressUserIdGroups;
+        }
+      );
+
+      console.log(
+        '# userIdGroupsThatShareSigners',
+        userIdGroupsThatShareSigners.length
+      ); // 1192
+
+      const userIdsThatShareSigners = _.flatten(userIdGroupsThatShareSigners);
+
+      console.log('# userIdsThatShareSigners', userIdsThatShareSigners.length); // 2699
+
+      // AddressGroups grouped by signer with at least two different userIds
+      const addressGroupsThatShareSigners = signersWithMultipleAddresses.map(
+        (signer) => {
+          const addresses = _.uniqBy(signer.bech32Addresses, 'address');
+          return addresses;
+        }
+      );
+
+      console.log(
+        '# addressGroupsThatShareSigners',
+        addressGroupsThatShareSigners.length
+      ); //1372
+
+      const addressesThatShareSigners = _.flatten(
+        addressGroupsThatShareSigners
+      );
+
+      // Number addresses with at least one separated sibling (different userId)
+      // AKA "Number of Accounts that share addresses with one public key"
+      console.log(
+        '# addressesThatShareSigners',
+        addressesThatShareSigners.length
+      ); // 3200
+
+      ////////////////////////
 
       if (
         generatedAddress === addressModel.address ||
