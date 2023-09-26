@@ -79,18 +79,18 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
-} from '@tanstack/react-table'
+} from '@tanstack/react-table';
 
 type ColumnDescriptor = {
   key: string;
   header: string;
   numeric: boolean;
   sortable: boolean;
-}
+};
 
 type RowData = {
   avatars?: object;
-}
+};
 
 type TableProps = {
   columnInfo: ColumnDescriptor[];
@@ -101,45 +101,39 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: columnInfo[0].key,
-      desc: false
-    }
-  ])
+      desc: false,
+    },
+  ]);
 
   const columns = useMemo<ColumnDef<unknown, any>[]>(
     () =>
       columnInfo.map((col) => {
-        return (
-          {
-            accessorKey: col.key,
-            header: col.header,
-            cell: (info) => {
-              const currentRow = info.row.original as RowData;
-              const avatarUrl = currentRow.avatars?.[col.key];
+        return {
+          accessorKey: col.key,
+          header: col.header,
+          cell: (info) => {
+            const currentRow = info.row.original as RowData;
+            const avatarUrl = currentRow.avatars?.[col.key];
 
-              if (col.numeric) {
-                return (
-                  <div className='numeric'>
-                    {info.getValue()}
-                  </div>
-                )
-              } else if(avatarUrl){
-                return (
-                  <div className='avatar-cell'>
-                    <Avatar url={avatarUrl} size={20} />
-                    <div className='text'>{info.getValue()}</div>
-                  </div>
-                )
-              } else {
-                return info.getValue()
-              }
-            },
-            footer: props => props.column.id,
-            enableSorting: col.sortable,
-          }
-        )
+            if (col.numeric) {
+              return <div className="numeric">{info.getValue()}</div>;
+            } else if (avatarUrl) {
+              return (
+                <div className="avatar-cell">
+                  <Avatar url={avatarUrl} size={20} />
+                  <div className="text">{info.getValue()}</div>
+                </div>
+              );
+            } else {
+              return info.getValue();
+            }
+          },
+          footer: (props) => props.column.id,
+          enableSorting: col.sortable,
+        };
       }),
     []
-  )
+  );
 
   const table = useReactTable({
     data: rowData,
@@ -151,47 +145,63 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     debugTable: true,
-  })
+  });
 
   const displaySortIcon = (sortDirection: string) => {
     const sortDirections = {
-      asc: <div className='icon-container'><CWIcon
-              iconName='arrowUpBlue500'
-              iconSize='small'
-              className='arrow-up-blue'
-            /></div>,
-      desc: <div className='icon-container'><CWIcon
-              iconName='arrowDownBlue500'
-              iconSize='small'
-              className='arrow-down-blue'
-              /></div>,
-      false: <div className='icon-container'><CWIcon
-                iconName='arrowUpNeutral400'
-                iconSize='small'
-                className='arrow-down-blue'
-              /></div>,
-    }
+      asc: (
+        <div className="icon-container">
+          <CWIcon
+            iconName="arrowUpBlue500"
+            iconSize="small"
+            className="arrow-up-blue"
+          />
+        </div>
+      ),
+      desc: (
+        <div className="icon-container">
+          <CWIcon
+            iconName="arrowDownBlue500"
+            iconSize="small"
+            className="arrow-down-blue"
+          />
+        </div>
+      ),
+      false: (
+        <div className="icon-container">
+          <CWIcon
+            iconName="arrowUpNeutral400"
+            iconSize="small"
+            className="arrow-down-blue"
+          />
+        </div>
+      ),
+    };
 
-    return sortDirections[sortDirection]
-  }
+    return sortDirections[sortDirection];
+  };
 
   return (
     <div className={ComponentType.Table}>
       <table>
         <thead>
-          {table.getHeaderGroups().map(headerGroup => (
+          {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map(header => {
+              {headerGroup.headers.map((header) => {
                 return (
                   <th key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder ? null : (
                       <div
                         {...{
-                          className: clsx('header-content', header.column.getCanSort() && 'cursor-pointer select-none'),
+                          className: clsx(
+                            'header-content',
+                            header.column.getCanSort() &&
+                              'cursor-pointer select-none'
+                          ),
                           onClick: header.column.getToggleSortingHandler(),
                         }}
                       >
-                        <span className='header-text'>
+                        <span className="header-text">
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
@@ -199,38 +209,37 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
                         </span>
 
                         {header.column.getCanSort()
-                          ? (displaySortIcon(header.column.getIsSorted() as string) ?? null)
+                          ? displaySortIcon(
+                              header.column.getIsSorted() as string
+                            ) ?? null
                           : null}
                       </div>
                     )}
                   </th>
-                )
+                );
               })}
             </tr>
           ))}
         </thead>
         <tbody>
-          {table
-            .getRowModel()
-            .rows
-            .map(row => {
-              return (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map(cell => {
-                    return (
-                      <td key={cell.id} className='data-container'>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </td>
-                    )
-                  })}
-                </tr>
-              )
-            })}
+          {table.getRowModel().rows.map((row) => {
+            return (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell) => {
+                  return (
+                    <td key={cell.id} className="data-container">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
