@@ -5,6 +5,7 @@ import { MessageRow } from './MessageRow';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 import { useTextInputWithValidation } from './useTextInputWithValidation';
+import { useFormContext } from 'react-hook-form';
 
 import './CWTextInput.scss';
 
@@ -49,10 +50,16 @@ type InputInternalStyleProps = {
   hasRightIcon?: boolean;
 };
 
+type InputFormValidationProps = {
+  name?: string;
+  hookToForm?: boolean;
+};
+
 type TextInputProps = BaseTextInputProps &
   InputStyleProps &
   InputInternalStyleProps &
-  React.HTMLAttributes<HTMLDivElement>;
+  React.HTMLAttributes<HTMLDivElement> &
+  InputFormValidationProps;
 
 const CWTextInput = (props: TextInputProps) => {
   const validationProps = useTextInputWithValidation();
@@ -84,7 +91,15 @@ const CWTextInput = (props: TextInputProps) => {
     displayOnly,
     manualStatusMessage = '',
     instructionalMessage,
+    hookToForm,
   } = props;
+
+  const formContext = useFormContext();
+  const formFieldContext = hookToForm
+    ? formContext.register(name)
+    : ({} as any);
+  const formFieldErrorMessage =
+    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
     <div
@@ -114,11 +129,14 @@ const CWTextInput = (props: TextInputProps) => {
           <div className="text-input-left-icon">{iconLeft}</div>
         ) : null}
         <input
+          {...formFieldContext}
           autoFocus={autoFocus}
           autoComplete={autoComplete}
           className={getClasses<InputStyleProps & InputInternalStyleProps>({
             size: isCompact ? 'small' : 'large',
-            validationStatus: validationProps.validationStatus,
+            validationStatus:
+              validationProps.validationStatus ||
+              (formFieldErrorMessage ? 'failure' : undefined),
             disabled,
             displayOnly,
             hasLeftIcon: !!iconLeft,
@@ -126,9 +144,9 @@ const CWTextInput = (props: TextInputProps) => {
             darkMode,
             inputClassName,
           })}
-          disabled={disabled || displayOnly}
+          disabled={disabled || displayOnly || formFieldContext?.disabled}
           tabIndex={tabIndex}
-          maxLength={maxLength}
+          maxLength={maxLength || formFieldContext?.maxLength}
           name={name}
           placeholder={placeholder}
           onInput={(e: any) => {
@@ -153,6 +171,8 @@ const CWTextInput = (props: TextInputProps) => {
             }
           }}
           onBlur={(e) => {
+            if (hookToForm) formFieldContext?.onBlur?.(e);
+
             if (inputValidationFn) {
               if (e.target.value?.length === 0) {
                 validationProps.setValidationStatus(undefined);
@@ -187,9 +207,16 @@ const CWTextInput = (props: TextInputProps) => {
       )}
       {label && (
         <MessageRow
-          hasFeedback={!!inputValidationFn}
-          statusMessage={manualStatusMessage || validationProps.statusMessage}
-          validationStatus={validationProps.validationStatus}
+          hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}
+          statusMessage={
+            manualStatusMessage ||
+            validationProps.statusMessage ||
+            formFieldErrorMessage
+          }
+          validationStatus={
+            validationProps.validationStatus ||
+            (formFieldErrorMessage ? 'failure' : undefined)
+          }
         />
       )}
     </div>
