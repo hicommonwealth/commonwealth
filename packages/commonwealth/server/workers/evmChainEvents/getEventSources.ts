@@ -78,7 +78,7 @@ export async function getEventSources(): Promise<EvmSources> {
   }
 
   for (const abi of abis) {
-    evmSources[abi.chain_node_id].rpc = abi.url || abi.private_url;
+    evmSources[abi.chain_node_id].rpc = abi.private_url || abi.url;
     evmSources[abi.chain_node_id].contracts[abi.contract_address].abi = abi.abi;
   }
 
