@@ -8,7 +8,6 @@ const useInitApp = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    console.log(app.platform());
     const isWebPlatform = app.platform() === 'web';
     const domainPromise = isWebPlatform
       ? axios
