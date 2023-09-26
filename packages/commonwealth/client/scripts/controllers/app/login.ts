@@ -512,7 +512,9 @@ export async function handleSocialLoginCallback({
         checksumAddress
       );
     }
-  } catch (err) {}
+  } catch (err) {
+    // if session auth fails, do nothing
+  }
 
   // Otherwise, skip Account.validate(), proceed directly to server login
   const response = await $.post({
