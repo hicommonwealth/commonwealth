@@ -1,8 +1,15 @@
 import React from 'react';
+import app from 'state';
+import Permissions from 'utils/Permissions';
+import { PageNotFound } from '../../../404';
 import { GroupForm } from '../common/GroupForm';
 import './index.scss';
 
 const UpdateCommunityGroupPage = () => {
+  if (!app.isLoggedIn() || !Permissions.isCommunityAdmin()) {
+    return <PageNotFound />;
+  }
+
   // TODO: we will get these values from existing group data
   const initialValues = {
     groupName: 'Ninja Turtles',
