@@ -41,7 +41,7 @@ export type GroupInitialValuesTypeWithLabel = {
 };
 
 export type GroupFormProps = {
-  formType: 'create-group' | 'edit-group';
+  formType: 'create' | 'edit';
   onSubmit: (values: GroupResponseValuesType) => any;
-  initialValues: Partial<GroupInitialValuesTypeWithLabel>;
+  initialValues?: Partial<GroupInitialValuesTypeWithLabel>;
 };

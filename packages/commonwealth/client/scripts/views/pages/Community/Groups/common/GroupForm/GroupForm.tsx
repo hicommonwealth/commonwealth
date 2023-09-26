@@ -56,7 +56,7 @@ const GroupForm = ({ formType, onSubmit, initialValues }: GroupFormProps) => {
   ]);
 
   useEffect(() => {
-    if (initialValues.requirements) {
+    if (initialValues?.requirements) {
       setRequirementSubForms(
         initialValues.requirements.map((x) => ({
           defaultValues: x,
@@ -193,10 +193,10 @@ const GroupForm = ({ formType, onSubmit, initialValues }: GroupFormProps) => {
       {/* Form header */}
       <div className="header-row">
         <CWText type="h2" fontWeight="semiBold" className="header-text">
-          {formType === 'create-group' ? 'Create a group' : 'Update your group'}
+          {formType === 'create' ? 'Create a group' : 'Update your group'}
         </CWText>
         <CWText type="b2">
-          {formType === 'create-group'
+          {formType === 'create'
             ? 'Create attributes-based groups for gating topics within your community'
             : 'Update group attributes'}
         </CWText>
@@ -315,7 +315,7 @@ const GroupForm = ({ formType, onSubmit, initialValues }: GroupFormProps) => {
         <CWButton
           type="submit"
           buttonWidth="wide"
-          label={formType === 'create-group' ? 'Create group' : 'Update group'}
+          label={formType === 'create' ? 'Create group' : 'Update group'}
         />
       </div>
     </CWForm>
