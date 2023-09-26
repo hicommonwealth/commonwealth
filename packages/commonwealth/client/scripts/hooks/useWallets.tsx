@@ -242,7 +242,7 @@ const useWallets = (walletProps: IuseWalletProps) => {
     const profile = account.profile;
     setAddress(account.address);
 
-    if (profile.name) {
+    if (profile.name && profile.initialized) {
       setUsername(profile.name);
     }
 
