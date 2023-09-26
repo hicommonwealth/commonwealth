@@ -26,7 +26,7 @@ export function getProvider(rpc: string) {
 export async function getLogs(
   evmSource: EvmSource,
   startingBlockNum?: number,
-  maxOldBlocks: number = 10
+  maxOldBlocks = 10
 ): Promise<{ logs: Log[]; lastBlockNum: number }> {
   const provider = getProvider(evmSource.rpc);
   const currentBlockNum = await provider.getBlockNumber();

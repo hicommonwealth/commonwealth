@@ -39,11 +39,7 @@ export async function processChainNode(
       ? startBlock.block_number + 1
       : null;
 
-    console.log('Fetching events from block ' + startBlockNum);
     const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
-    console.log(
-      `events: ${JSON.stringify(events)}, lastBlockNum: ${lastBlockNum}`
-    );
     const promises = await emitChainEventNotifs(chainNodeId, events);
 
     if (!startBlock) {

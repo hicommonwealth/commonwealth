@@ -19,8 +19,8 @@ import { hashAbi } from '../../../server/util/abiValidation';
 
 export const testChainId = 'aave-test';
 export const testChainIdV2 = 'dydx-test';
-export const testAbiNickname = 'Aave Test Governance V2';
-export const testAbiNicknameV2 = 'DyDx Test Governance V2';
+export const testAbiNickname = 'AaveGovernanceV2';
+export const testAbiNicknameV2 = 'DydxGovernor';
 
 export async function getTestChainNode(version?: 'v1' | 'v2') {
   let rpc: string, name: string;

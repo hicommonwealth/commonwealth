@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { resetDatabase } from '../../../util/resetDatabase';
 import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
 import sinon from 'sinon';
 import models from '../../../../server/database';
@@ -13,53 +12,74 @@ import {
 } from '../../../integration/evmChainEvents/util';
 import { sdk } from './util';
 import { NotificationCategories } from 'common-common/src/types';
+import { ContractInstance } from '../../../../server/models/contract';
+import { getEvmSecondsAndBlocks } from 'chain-events/test/util';
 
 async function verifyNumNotifications(num: number) {
   const notifications = await models.Notification.findAll();
   expect(notifications.length).to.equal(num);
 }
 
+async function verifyBlockNumber(
+  chainNodeId: number,
+  blockNumber: null | number
+) {
+  const lastBlock = await models.LastProcessedEvmBlock.findOne({
+    where: {
+      chain_node_id: chainNodeId,
+    },
+  });
+
+  let lastBlockNum: number;
+  if (!lastBlock && blockNumber === null) {
+    return;
+  } else if (!lastBlock && blockNumber !== null) {
+    throw new Error('Last processed block not found');
+  } else {
+    lastBlockNum = lastBlock.block_number;
+  }
+
+  if (blockNumber === null) {
+    expect(lastBlockNum).to.be.null;
+  } else {
+    expect(lastBlockNum).to.be.gte(blockNumber);
+  }
+}
+
 async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe.only('EVM Chain Events End to End Tests', () => {
+describe('EVM Chain Events End to End Tests', () => {
   const sandbox = sinon.createSandbox();
   let clock: sinon.SinonFakeTimers;
-  let proposalCreatedResult: { block: number; proposalId: string };
+  let propCreatedResult: { block: number; proposalId: string };
+  let contract: ContractInstance;
 
   before(async () => {
-    await resetDatabase();
+    const currentBlock = (await sdk.getBlock()).number;
+    // advance time to avoid test interaction issues
+    await sdk.safeAdvanceTime(currentBlock + 501);
+    await models.LastProcessedEvmBlock.destroy({
+      where: {},
+    });
   });
 
   beforeEach(async () => {
     clock = sandbox.useFakeTimers();
-    await models.sequelize.query(`DELETE FROM "NotificationsRead";`);
-    await models.sequelize.query(`DELETE FROM "Notifications";`);
+    // await models.sequelize.query(`DELETE FROM "NotificationsRead";`);
+    // await models.sequelize.query(`DELETE FROM "Notifications";`);
+    await models.NotificationsRead.destroy({
+      where: {},
+    });
+    await models.Notification.destroy({
+      where: {},
+    });
   });
 
   afterEach(() => {
     sandbox.restore();
   });
-
-  it.skip('sinon sucks', async () => {
-    setTimeout(async () => {
-      console.log('Checking');
-      await models.Notification.findAll();
-      console.log('Finished');
-    }, 5000);
-
-    setTimeout(async () => {
-      console.log('Checking 2');
-      await models.Notification.findAll();
-      console.log('Finished 2');
-    }, 10_000);
-
-    await clock.tickAsync(5_000);
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    await clock.tickAsync(10_000);
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }).timeout(80_000);
 
   it('should not emit any notifications if there are no event sources', async () => {
     const intervalId = await startEvmPolling(10_000);
@@ -75,49 +95,81 @@ describe.only('EVM Chain Events End to End Tests', () => {
     await getTestCommunityContract();
     await getTestSubscription();
     const abi = await getTestAbi();
-    const contract = await getTestContract();
+    contract = await getTestContract();
     await contract.update({ abi_id: abi.id });
     await getTestSignatures();
 
     // create proposal notification
     await sdk.getVotingPower(1, '400000', 'aave');
-    const propCreatedResult = await sdk.createProposal(1, 'aave');
+    propCreatedResult = await sdk.createProposal(1, 'aave');
     console.log(
       `Proposal created at block ${propCreatedResult.block} with id ${propCreatedResult.proposalId}`
     );
 
     await verifyNumNotifications(0);
+    // await verifyBlockNumber(contract.chain_node_id, null);
     const intervalId = await startEvmPolling(10_000);
+    clearInterval(intervalId);
     await clock.tickAsync(1);
-    // await clock.nextAsync();
+    clock.restore();
+
+    // tickAsync doesn't await callback execution thus sleep is necessary
+    await sleep(5000);
+    await verifyBlockNumber(contract.chain_node_id, propCreatedResult.block);
     const notifications = await models.Notification.findAll();
     expect(notifications.length).to.equal(1);
-    expect(notifications[0]).to.have.own.property('chain_id', testChainId);
-    expect(notifications[0]).to.have.own.property(
+    const notification = notifications[0].toJSON();
+    console.log(notification);
+    expect(notification).to.have.own.property('chain_id', testChainId);
+    expect(notification).to.have.own.property(
       'category_id',
       NotificationCategories.ChainEvent
     );
-    expect(notifications[0]).to.have.own.property(
+    expect(notification).to.have.own.property(
       'category_id',
       NotificationCategories.ChainEvent
     );
-    expect(notifications[0]).to.have.nested.property(
-      'notification_data.block_number',
+    expect(notification).to.have.own.property('notification_data');
+    expect(JSON.parse(notification.notification_data)).to.have.property(
+      'block_number',
       propCreatedResult.block
     );
-    expect(notifications[0]).to.have.nested.property(
-      'notification_data.event_data.id',
+    expect(JSON.parse(notification.notification_data)).to.have.nested.property(
+      'event_data.id',
       propCreatedResult.proposalId
     );
   }).timeout(80_000);
 
-  it('should stop emitting notifications if an event source is no longer subscribed to', async () => {});
-  it('should not throw for any reason', async () => {});
-  it('should loop forever', async () => {});
-});
+  it.skip(
+    'should stop emitting notifications if an event source is no longer subscribed to',
+    async () => {
+      const intervalId = await startEvmPolling(10_000);
+      await clock.tickAsync(1);
 
-describe('processChainNode', () => {
-  it('should update the block number of the last processed block', async () => {});
-  it('should fetch from the last block stored number onwards', async () => {});
-  it('should never throw an error', async () => {});
+      await models.Subscription.destroy({
+        where: {},
+      });
+
+      await verifyNumNotifications(0);
+      await verifyBlockNumber(contract.chain_node_id, propCreatedResult.block);
+
+      // generate proposal queued event
+      let res = getEvmSecondsAndBlocks(3);
+      await sdk.safeAdvanceTime(propCreatedResult.block + res.blocks);
+      await sdk.castVote(propCreatedResult.proposalId, 1, true, 'aave');
+      res = getEvmSecondsAndBlocks(3);
+      await sdk.advanceTime(String(res.secs), res.blocks);
+      const propQueuedResult = await sdk.queueProposal(
+        propCreatedResult.proposalId,
+        'aave'
+      );
+
+      await clock.tickAsync(10_000);
+      clock.restore();
+      clearInterval(intervalId);
+
+      await sleep(5000);
+      await verifyNumNotifications(0);
+    }
+  ).timeout(100_000);
 });
