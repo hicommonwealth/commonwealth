@@ -2,7 +2,7 @@ import React from 'react';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 
-type ErrorPageProps = { title?: any; message?: string | JSX.Element };
+type ErrorPageProps = { title?: any; message?: string };
 
 const ErrorPage = ({ message }: ErrorPageProps) => {
   const chunkLoadingErrRe = /Loading chunk/;

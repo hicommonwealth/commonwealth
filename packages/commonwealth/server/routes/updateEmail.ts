@@ -14,7 +14,7 @@ const log = factory.getLogger(formatFilename(__filename));
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const Errors = {
-  NotLoggedIn: 'Not signed in',
+  NotLoggedIn: 'Not logged in',
   NoEmail: 'Must provide email',
   NoUser: 'Could not find a user with this email',
   InvalidEmail: 'Invalid email',

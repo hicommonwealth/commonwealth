@@ -1,6 +1,6 @@
 import bs58 from 'bs58';
 import { KeyPairEd25519 } from 'near-api-js/lib/utils';
-import { verify as verifyCanvasSessionSignature } from 'canvas';
+import { verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 
 import type {
   Action,
@@ -9,42 +9,32 @@ import type {
   ActionArgument,
   SessionPayload,
 } from '@canvas-js/interfaces';
-import { ISessionController, InvalidSession } from '.';
+import { ISessionController } from '.';
 
 export class NEARSessionController implements ISessionController {
-  private signers: Record<string, Record<string, KeyPairEd25519>> = {};
+  private signers: Record<string, KeyPairEd25519> = {};
   private auths: Record<
     number,
-    Record<string, { payload: SessionPayload; signature: string }>
+    { payload: SessionPayload; signature: string }
   > = {};
 
-  getAddress(chainId: string, fromAddress: string): string {
-    return this.signers[chainId][fromAddress].getPublicKey().toString();
+  getAddress(chainId: string): string {
+    return this.signers[chainId].getPublicKey().toString();
   }
 
-  async hasAuthenticatedSession(
-    chainId: string,
-    fromAddress: string
-  ): Promise<boolean> {
-    await this.getOrCreateSigner(chainId, fromAddress);
+  async hasAuthenticatedSession(chainId: string): Promise<boolean> {
+    await this.getOrCreateSigner(chainId);
     return (
-      this.signers[chainId][fromAddress] !== undefined &&
-      this.auths[chainId][fromAddress] !== undefined
+      this.signers[chainId] !== undefined && this.auths[chainId] !== undefined
     );
   }
 
-  async getOrCreateAddress(
-    chainId: string,
-    fromAddress: string
-  ): Promise<string> {
-    return (await this.getOrCreateSigner(chainId, fromAddress))
-      .getPublicKey()
-      .toString();
+  async getOrCreateAddress(chainId: string): Promise<string> {
+    return (await this.getOrCreateSigner(chainId)).getPublicKey().toString();
   }
 
   async authSession(
     chainId: string,
-    fromAddress: string,
     payload: SessionPayload,
     signature: string
   ) {
@@ -52,45 +42,33 @@ export class NEARSessionController implements ISessionController {
       session: { type: 'session', payload, signature },
     });
     if (!valid) {
-      throw new Error('Invalid signature');
+      // throw new Error("Invalid signature");
     }
-    if (payload.sessionAddress !== this.getAddress(chainId, fromAddress)) {
+    if (payload.sessionAddress !== this.getAddress(chainId)) {
       throw new Error(
         `Invalid auth: ${payload.sessionAddress} vs. ${this.getAddress(
-          chainId,
-          fromAddress
+          chainId
         )}`
       );
     }
-    this.auths[chainId][fromAddress] = { payload, signature };
+    this.auths[chainId] = { payload, signature };
 
-    const authStorageKey = `CW_SESSIONS-near-${chainId}-${fromAddress}-auth`;
-    localStorage.setItem(
-      authStorageKey,
-      JSON.stringify(this.auths[chainId][fromAddress])
-    );
+    const authStorageKey = `CW_SESSIONS-near-${chainId}-auth`;
+    localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId]));
   }
 
-  private async getOrCreateSigner(
-    chainId: string,
-    fromAddress: string
-  ): Promise<KeyPairEd25519> {
-    this.auths[chainId] = this.auths[chainId] ?? {};
-    this.signers[chainId] = this.signers[chainId] ?? {};
-
-    if (this.signers[chainId][fromAddress] !== undefined) {
-      return this.signers[chainId][fromAddress];
+  private async getOrCreateSigner(chainId: string): Promise<KeyPairEd25519> {
+    if (this.signers[chainId] !== undefined) {
+      return this.signers[chainId];
     }
-    const storageKey = `CW_SESSIONS-near-${chainId}-${fromAddress}`;
-    const authStorageKey = `CW_SESSIONS-near-${chainId}-${fromAddress}-auth`;
+    const storageKey = `CW_SESSIONS-near-${chainId}`;
+    const authStorageKey = `CW_SESSIONS-near-${chainId}-auth`;
     // TODO: test session restoration on NEAR
     try {
       const nearApiUtils = await import('near-api-js/lib/utils');
       const storage = localStorage.getItem(storageKey);
       const { secretKey } = JSON.parse(storage);
-      this.signers[chainId][fromAddress] = new nearApiUtils.KeyPairEd25519(
-        secretKey
-      );
+      this.signers[chainId] = new nearApiUtils.KeyPairEd25519(secretKey);
 
       const auth = localStorage.getItem(authStorageKey);
       if (auth !== null) {
@@ -103,32 +81,29 @@ export class NEARSessionController implements ISessionController {
         });
         if (!valid) throw new Error();
 
-        if (payload.sessionAddress === this.getAddress(chainId, fromAddress)) {
+        if (payload.sessionAddress === this.getAddress(chainId)) {
           console.log(
             'Restored authenticated session:',
-            this.getAddress(chainId, fromAddress)
+            this.getAddress(chainId)
           );
-          this.auths[chainId][fromAddress] = { payload, signature };
+          this.auths[chainId] = { payload, signature };
         } else {
-          console.log(
-            'Restored signed-out session:',
-            this.getAddress(chainId, fromAddress)
-          );
+          console.log('Restored logged-out session:', this.getAddress(chainId));
         }
       }
     } catch (err) {
-      console.log('Could not restore previous session');
-      this.signers[chainId][fromAddress] = KeyPairEd25519.fromRandom();
-      delete this.auths[chainId][fromAddress];
-      const secretKey: string = this.signers[chainId][fromAddress].secretKey;
+      console.log('Could not restore previous session', err);
+      const nearApiUtils = await import('near-api-js/lib/utils');
+      this.signers[chainId] = KeyPairEd25519.fromRandom();
+      delete this.auths[chainId];
+      const secretKey: string = this.signers[chainId].secretKey;
       localStorage.setItem(storageKey, JSON.stringify({ secretKey }));
     }
-    return this.signers[chainId][fromAddress];
+    return this.signers[chainId];
   }
 
   async sign(
     chainId: string,
-    fromAddress: string,
     call: string,
     callArgs: Record<string, ActionArgument>
   ): Promise<{
@@ -136,21 +111,18 @@ export class NEARSessionController implements ISessionController {
     action: Action;
     hash: string;
   }> {
-    this.auths[chainId] = this.auths[chainId] ?? {};
-    this.signers[chainId] = this.signers[chainId] ?? {};
-
-    const signer = this.signers[chainId][fromAddress];
-    const sessionPayload = this.auths[chainId][fromAddress]?.payload;
-    const sessionSignature = this.auths[chainId][fromAddress]?.signature;
+    const signer = this.signers[chainId];
+    const sessionPayload = this.auths[chainId]?.payload;
+    const sessionSignature = this.auths[chainId]?.signature;
     // TODO: verify payload is not expired
-
-    if (!sessionPayload || !sessionSignature) throw new InvalidSession();
 
     const actionPayload: ActionPayload = {
       app: sessionPayload.app,
+      appName: 'Commonwealth',
       from: sessionPayload.from,
       timestamp: +Date.now(),
-      chain: `near:${chainId}`,
+      chain: 'near',
+      chainId,
       block: sessionPayload.block, // will be null
       call,
       callArgs,
@@ -175,7 +147,7 @@ export class NEARSessionController implements ISessionController {
     const action: Action = {
       type: 'action',
       payload: actionPayload,
-      session: sessionPayload.sessionAddress,
+      session: sessionPayload.from,
       signature,
     };
 
