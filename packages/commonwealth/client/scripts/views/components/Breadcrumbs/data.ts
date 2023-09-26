@@ -19,7 +19,7 @@ export const breadCrumbURLS = [
   },
   {
     url: 'createCommunity',
-    breadcrumb: 'Create Community',
+    breadcrumb: 'New Commonwealth Community',
     className: 'createCommunity',
     isParent: true,
   },

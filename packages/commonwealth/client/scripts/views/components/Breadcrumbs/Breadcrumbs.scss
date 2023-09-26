@@ -169,22 +169,24 @@
     align-items: center;
     justify-content: center;
     flex-direction: row;
+    padding-right: 23%;
 
     @include large {
-      padding-right: calc(18% + 4px);
-      align-items: center;
+      padding-right: calc(12% + 26px);
+      align-items: flex-start;
     }
 
-    @include mediumInclusive {
-      padding-right: 30%;
+    @include medium {
+      padding-right: calc(16% + 48px);
     }
 
     @include small {
-      padding-right: 36%;
+      padding-right: 24%;
     }
 
     @include extraSmall {
-      padding-right: 60%;
+      position: absolute;
+      left: 24px;
     }
   }
 
