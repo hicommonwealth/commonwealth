@@ -90,7 +90,7 @@ const UserDropdown = () => {
           />
         ),
         onClick: async () => {
-          if (app.config.enforceSessionKeys !== 'true' || signed) {
+          if (!app.config.enforceSessionKeys || signed) {
             return await setActiveAccount(account);
           }
 
