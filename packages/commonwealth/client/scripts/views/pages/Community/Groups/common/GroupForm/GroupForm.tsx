@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -11,7 +11,11 @@ import { ZodError } from 'zod';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
-import { GroupFormProps, RequirementSubType } from './index.types';
+import {
+  GroupFormProps,
+  RequirementSubType,
+  RequirementSubTypeWithLabel,
+} from './index.types';
 import {
   groupValidationSchema,
   requirementSubFormValidationSchema,
@@ -31,9 +35,10 @@ const CWRequirementsRadioButton = () => {
   return <CWRadioButton label={Label} value="n-requirements" />;
 };
 
-const GroupForm = ({ formType, onSubmit }: GroupFormProps) => {
+const GroupForm = ({ formType, onSubmit, initialValues }: GroupFormProps) => {
   const [requirementSubForms, setRequirementSubForms] = useState<
     {
+      defaultValues?: RequirementSubTypeWithLabel;
       values: RequirementSubType;
       errors?: RequirementSubType;
     }[]
@@ -49,6 +54,25 @@ const GroupForm = ({ formType, onSubmit }: GroupFormProps) => {
       errors: {},
     },
   ]);
+
+  useEffect(() => {
+    if (initialValues.requirements) {
+      setRequirementSubForms(
+        initialValues.requirements.map((x) => ({
+          defaultValues: x,
+          values: {
+            requirementAmount: x?.requirementAmount || '',
+            requirementChain: x?.requirementChain?.value || '',
+            requirementCondition: x?.requirementCondition?.value || '',
+            requirementContractAddress: x?.requirementContractAddress || '',
+            requirementType: x?.requirementType?.value || '',
+          },
+          errors: {},
+        }))
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const removeRequirementByIndex = (index: number) => {
     setRequirementSubForms(requirementSubForms.splice(index, 1));
@@ -155,6 +179,11 @@ const GroupForm = ({ formType, onSubmit }: GroupFormProps) => {
   return (
     <CWForm
       className="GroupForm"
+      initialValues={{
+        groupName: initialValues.groupName || '',
+        groupDescription: initialValues.groupDescription || '',
+        topics: initialValues.topics || '',
+      }}
       validationSchema={groupValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
@@ -228,6 +257,7 @@ const GroupForm = ({ formType, onSubmit }: GroupFormProps) => {
           {requirementSubForms.map((subForm, index) => (
             <RequirementSubForm
               key={index}
+              defaultValues={subForm.defaultValues}
               errors={subForm.errors}
               onChange={(val) => validateChangedValue(val, index)}
               onRemove={() => removeRequirementByIndex(index)}

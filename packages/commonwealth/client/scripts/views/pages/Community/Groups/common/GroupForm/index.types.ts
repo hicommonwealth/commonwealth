@@ -6,20 +6,42 @@ export type RequirementSubType = {
   requirementAmount?: string;
 };
 
+export type LabelType = {
+  label: string;
+  value: string;
+};
+
+export type RequirementSubTypeWithLabel = {
+  requirementType?: LabelType;
+  requirementContractAddress?: string;
+  requirementChain?: LabelType;
+  requirementCondition?: LabelType;
+  requirementAmount?: string;
+};
+
 export type RequirementSubFormType = {
   errors?: RequirementSubType;
+  defaultValues: RequirementSubTypeWithLabel;
   onRemove: () => any;
   onChange: (values: RequirementSubType) => any;
 };
 
-export type GroupType = {
+export type GroupResponseValuesType = {
   groupName: string;
   groupDescription?: string;
   requirements?: RequirementSubType[];
   topics: string[];
 };
 
+export type GroupInitialValuesTypeWithLabel = {
+  groupName: string;
+  groupDescription?: string;
+  requirements?: RequirementSubTypeWithLabel[];
+  topics: LabelType[];
+};
+
 export type GroupFormProps = {
   formType: 'create-group' | 'edit-group';
-  onSubmit: (values: GroupType) => any;
+  onSubmit: (values: GroupResponseValuesType) => any;
+  initialValues: Partial<GroupInitialValuesTypeWithLabel>;
 };

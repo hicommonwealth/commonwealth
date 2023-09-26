@@ -2,8 +2,8 @@ import React from 'react';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import './index.scss';
 import { RequirementSubFormType } from '../index.types';
+import './index.scss';
 
 // TODO: these types are not complete, get complete list
 const sampleRequirementTypes = [
@@ -17,6 +17,7 @@ const conditionTypes = ['Condition', 'More than', 'Equal to', 'Less than'];
 
 const RequirementSubForm = ({
   errors,
+  defaultValues = {},
   onRemove = () => null,
   onChange = () => null,
 }: RequirementSubFormType) => {
@@ -24,9 +25,13 @@ const RequirementSubForm = ({
     <div className="RequirementSubForm">
       <div className="row-1">
         <CWSelectList
+          key={defaultValues?.requirementType?.value}
           name="requirementType"
           label="Requirement type"
           placeholder="Requirement type"
+          {...(defaultValues.requirementType && {
+            defaultValue: [defaultValues.requirementType],
+          })}
           options={sampleRequirementTypes.map((requirement) => ({
             label: requirement,
             value: requirement,
@@ -43,9 +48,13 @@ const RequirementSubForm = ({
 
       <div className="row-2">
         <CWSelectList
+          key={defaultValues?.requirementChain?.value}
           name="requirementChain"
           label="Chain"
           placeholder="Chain"
+          {...(defaultValues.requirementChain && {
+            defaultValue: [defaultValues.requirementChain],
+          })}
           options={sampleChainTypes.map((chainType) => ({
             label: chainType,
             value: chainType,
@@ -58,12 +67,16 @@ const RequirementSubForm = ({
           customError={errors.requirementChain}
         />
         <CWTextInput
+          key={defaultValues.requirementContractAddress}
           name="requirementContractAddress"
           label="Contract Address"
           placeholder="Input contract address"
           containerClassName="w-full"
           fullWidth
           manualStatusMessage=""
+          {...(defaultValues.requirementContractAddress && {
+            defaultValue: defaultValues.requirementContractAddress,
+          })}
           onInput={(e) => {
             onChange({
               requirementContractAddress: (e.target as any).value,
@@ -72,11 +85,12 @@ const RequirementSubForm = ({
           customError={errors.requirementContractAddress}
         />
         <CWSelectList
+          key={defaultValues?.requirementCondition?.value}
           name="requirementCondition"
           label="Condition"
-          defaultValue={[
-            { label: conditionTypes[0], value: conditionTypes[0] },
-          ]}
+          {...(defaultValues.requirementCondition && {
+            defaultValue: [defaultValues.requirementCondition],
+          })}
           options={conditionTypes.map((conditionType) => ({
             label: conditionType,
             value: conditionType,
@@ -89,9 +103,13 @@ const RequirementSubForm = ({
           customError={errors.requirementCondition}
         />
         <CWTextInput
+          key={defaultValues.requirementAmount}
           name="requirementAmount"
           label="Amount"
           placeholder="Amount"
+          {...(defaultValues.requirementAmount && {
+            defaultValue: defaultValues.requirementAmount,
+          })}
           onInput={(e) => {
             onChange({
               requirementAmount: (e.target as any).value,

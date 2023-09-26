@@ -1,12 +1,12 @@
-import './CWSelectList.scss';
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 import type { GroupBase, Props } from 'react-select';
 import Select, { components } from 'react-select';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 import { MessageRow } from '../CWTextInput/MessageRow';
-import { useFormContext } from 'react-hook-form';
+import './CWSelectList.scss';
 
 type CustomCWSelectListProps = {
   label?: string;
@@ -28,22 +28,9 @@ export const CWSelectList = <
   const formFieldErrorMessage =
     props.hookToForm &&
     (formContext?.formState?.errors?.[props.name]?.message as string);
-
-  useEffect(() => {
-    props.hookToForm &&
-      formContext &&
-      props.name &&
-      props.defaultValue &&
-      formContext.setValue(props.name, props.defaultValue);
-  }, [props.hookToForm, props.name, props.defaultValue, formContext]);
-
-  useEffect(() => {
-    props.hookToForm &&
-      formContext &&
-      props.name &&
-      props.value &&
-      formContext.setValue(props.name, props.value);
-  }, [props.hookToForm, props.name, props.value, formContext]);
+  const defaultFormContextValue = props.hookToForm
+    ? formContext?.getValues?.(props?.name)
+    : null;
 
   return (
     <div>
@@ -51,6 +38,7 @@ export const CWSelectList = <
       <Select
         {...props}
         {...formFieldContext}
+        {...(defaultFormContextValue && { value: defaultFormContextValue })}
         isDisabled={props?.isDisabled || formFieldContext?.disabled}
         required={props?.required || formFieldContext?.required}
         onBlur={(e) => {
