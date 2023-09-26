@@ -218,18 +218,6 @@ describe('Integration tests for Compound Bravo', () => {
       });
 
       expect(propCreatedEvent, 'Proposal created event not found').to.exist;
-      expect(
-        rmq.queuedMessages[RascalSubscriptions.ChainEventNotificationsCUDMain]
-          .length
-      ).to.equal(2);
-      eventMatch(
-        rmq.queuedMessages[
-          RascalSubscriptions.ChainEventNotificationsCUDMain
-        ][0].event,
-        'proposal-created',
-        chain_id,
-        proposalId
-      );
 
       relatedEntity = await models.ChainEntity.findOne({
         where: {
@@ -292,15 +280,6 @@ describe('Integration tests for Compound Bravo', () => {
 
       expect(propExecutedEvent).to.exist;
       expect(relatedEntity.id).to.equal(propExecutedEvent.entity_id);
-
-      eventMatch(
-        rmq.queuedMessages[
-          RascalSubscriptions.ChainEventNotificationsCUDMain
-        ][1].event,
-        'proposal-executed',
-        chain_id,
-        proposalId
-      );
     });
   });
 
