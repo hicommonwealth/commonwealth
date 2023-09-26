@@ -2,7 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Response } from 'express';
 
 export const Errors = {
-  NotLoggedIn: 'Not signed in',
+  NotLoggedIn: 'Not logged in',
   MissingTopicIdOrThreshold: 'Missing topic ID or threshold',
   InvalidTopicId: 'Invalid topic ID',
   InvalidThreshold: 'Invalid threshold',

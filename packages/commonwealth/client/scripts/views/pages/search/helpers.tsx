@@ -257,6 +257,7 @@ export const renderSearchResults = (
   const components = results.map((res) => {
     switch (searchType) {
       case SearchScope.Threads:
+        // return null;
         return (
           <ThreadResultRow
             thread={res}

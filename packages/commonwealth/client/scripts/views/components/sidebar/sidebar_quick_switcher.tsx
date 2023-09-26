@@ -11,6 +11,7 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import useSidebarStore from 'state/ui/sidebar';
+import { featureFlags } from 'helpers/feature-flags';
 
 export const SidebarQuickSwitcher = () => {
   const navigate = useCommonNavigate();
@@ -36,7 +37,9 @@ export const SidebarQuickSwitcher = () => {
       <div className="community-nav-bar">
         {isLoggedIn && (
           <CWIconButton
-            iconName="plusCirclePhosphor"
+            iconName={
+              featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
+            }
             iconButtonTheme="black"
             onClick={() => {
               setMenu({ name: 'createContent' });
@@ -44,7 +47,7 @@ export const SidebarQuickSwitcher = () => {
           />
         )}
         <CWIconButton
-          iconName="compassPhosphor"
+          iconName={featureFlags.sessionKeys ? 'compassPhosphor' : 'compass'}
           iconButtonTheme="black"
           onClick={() => {
             setMenu({ name: 'exploreCommunities' });

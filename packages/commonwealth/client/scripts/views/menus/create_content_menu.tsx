@@ -11,13 +11,8 @@ import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { featureFlags } from 'helpers/feature-flags';
 import Permissions from '../../utils/Permissions';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import {
-  handleIconClick,
-  handleMouseEnter,
-  handleMouseLeave,
-} from 'views/menus/utils';
 
 const resetSidebarState = () => {
   sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -183,7 +178,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         {
           label: 'Connect Discord',
           iconLeft: 'discord',
-          onClick: async () => {
+          onClick: async (e) => {
             try {
               const verification_token = uuidv4();
               await app.discord.createConfig(verification_token);
@@ -309,31 +304,13 @@ export const CreateContentPopover = () => {
   return (
     <PopoverMenu
       menuItems={getCreateContentMenuItems(navigate)}
-      renderTrigger={(onClick, isMenuOpen) => (
-        <CWTooltip
-          content="Create content"
-          placement="bottom"
-          renderTrigger={(handleInteraction, isTooltipOpen) => (
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="plusCirclePhosphor"
-              onClick={(e) =>
-                handleIconClick({
-                  e,
-                  isMenuOpen,
-                  isTooltipOpen,
-                  handleInteraction,
-                  onClick,
-                })
-              }
-              onMouseEnter={(e) => {
-                handleMouseEnter({ e, isMenuOpen, handleInteraction });
-              }}
-              onMouseLeave={(e) => {
-                handleMouseLeave({ e, isTooltipOpen, handleInteraction });
-              }}
-            />
-          )}
+      renderTrigger={(onclick) => (
+        <CWIconButton
+          iconButtonTheme="black"
+          iconName={
+            featureFlags.sessionKeys ? 'plusCirclePhosphor' : 'plusCircle'
+          }
+          onClick={onclick}
         />
       )}
     />

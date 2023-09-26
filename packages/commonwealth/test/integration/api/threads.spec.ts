@@ -41,20 +41,14 @@ describe('Thread Tests', () => {
   let adminJWT;
   let adminAddress;
   let adminAddressId;
-  let adminSession;
-
   let userJWT;
   let userId;
   let userAddress;
   let userAddressId;
-  let userSession;
-
   let userJWT2;
   let userId2;
   let userAddress2;
   let userAddressId2;
-  let userSession2;
-
   let thread;
 
   before(async () => {
@@ -68,7 +62,6 @@ describe('Thread Tests', () => {
       chainOrCommObj: { chain_id: chain },
       role: 'admin',
     });
-    adminSession = { session: res.session, sign: res.sign };
     expect(adminAddress).to.not.be.null;
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;
@@ -78,7 +71,6 @@ describe('Thread Tests', () => {
     userId = res.user_id;
     userAddressId = res.address_id;
     userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
@@ -87,7 +79,6 @@ describe('Thread Tests', () => {
     userId2 = res.user_id;
     userAddressId2 = res.address_id;
     userJWT2 = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    userSession2 = { session: res.session, sign: res.sign };
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
@@ -105,8 +96,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
@@ -124,8 +113,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
@@ -146,8 +133,6 @@ describe('Thread Tests', () => {
           body,
           url: 'http://commonwealth.im',
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
@@ -168,8 +153,6 @@ describe('Thread Tests', () => {
           body,
           url: null,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
@@ -190,8 +173,6 @@ describe('Thread Tests', () => {
           body,
           readOnly,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         console.log({ tRes });
         expect(tRes).not.to.be.null;
@@ -203,8 +184,6 @@ describe('Thread Tests', () => {
           jwt: userJWT,
           text: markdownComment.text,
           thread_id: tRes.result.id,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(cRes).not.to.be.null;
         expect(cRes.error).not.to.be.null;
@@ -231,8 +210,6 @@ describe('Thread Tests', () => {
           title,
           body,
           jwt: adminJWT,
-          session: adminSession.session,
-          sign: adminSession.sign,
         });
         expect(tRes.status).to.equal('Success');
         expect(tRes.result).to.not.be.null;
@@ -249,8 +226,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(res.status).to.equal('Success');
         expect(res.result).to.not.be.null;
@@ -269,8 +244,6 @@ describe('Thread Tests', () => {
           title,
           body,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
@@ -287,8 +260,6 @@ describe('Thread Tests', () => {
           topicId,
           body: bodyWithMentions,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(res.status).to.equal('Success');
         expect(res.result).to.not.be.null;
@@ -309,8 +280,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: userJWT2,
-          session: userSession2.session,
-          sign: userSession2.sign,
         });
         expect(res2.status).not.to.be.equal('Success');
       });
@@ -373,8 +342,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(res2.status).to.be.equal('Success');
         expect(res2.result).to.not.be.null;
@@ -388,8 +355,6 @@ describe('Thread Tests', () => {
           jwt: userJWT,
           text: markdownComment.text,
           thread_id: thread.id,
-          session: userSession.session,
-          sign: userSession.sign,
         });
 
         expect(cRes.status).to.equal('Success');
@@ -407,8 +372,6 @@ describe('Thread Tests', () => {
           jwt: userJWT,
           text: bodyWithMentions,
           thread_id: thread.id,
-          session: userSession.session,
-          sign: userSession.sign,
         });
 
         expect(cRes.status).to.equal('Success');
@@ -426,8 +389,6 @@ describe('Thread Tests', () => {
           jwt: userJWT,
           text: markdownComment.text,
           thread_id: thread.id,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         const parentId = cRes.result.id;
         cRes = await modelUtils.createComment({
@@ -437,8 +398,6 @@ describe('Thread Tests', () => {
           text: markdownComment.text,
           thread_id: thread.id,
           parentCommentId: `${parentId}`,
-          session: userSession.session,
-          sign: userSession.sign,
         });
 
         expect(cRes.status).to.equal('Success');
@@ -457,8 +416,6 @@ describe('Thread Tests', () => {
           jwt: userJWT,
           text: markdownComment.text,
           thread_id: null,
-          session: userSession.session,
-          sign: userSession.sign,
         });
 
         expect(cRes.error).to.not.be.null;
@@ -472,8 +429,6 @@ describe('Thread Tests', () => {
           jwt: userJWT,
           text: null,
           thread_id: thread.id,
-          session: userSession.session,
-          sign: userSession.sign,
         });
 
         expect(cRes.error).to.not.be.null;
@@ -487,8 +442,6 @@ describe('Thread Tests', () => {
           jwt: userJWT,
           text: 'test',
           thread_id: -1,
-          session: userSession.session,
-          sign: userSession.sign,
         });
 
         expect(cRes.error).to.not.be.null;
@@ -508,8 +461,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: adminJWT,
-          session: adminSession.session,
-          sign: adminSession.sign,
         });
         expect(res2.status).to.be.equal('Success');
         expect(res2.result).to.not.be.null;
@@ -662,8 +613,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         expect(res1.result).to.not.be.null;
         tempThread = res1.result;
@@ -694,8 +643,6 @@ describe('Thread Tests', () => {
           jwt: newUserJWT,
           text: 'hello world',
           thread_id: tempThread.id,
-          session: res.session,
-          sign: res.sign,
         });
         expect(cRes.result).to.be.undefined;
         expect(cRes.error).to.be.equal(
@@ -731,8 +678,6 @@ describe('Thread Tests', () => {
           topicId,
           kind,
           stage,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         const cRes = await modelUtils.createComment({
           chain,
@@ -740,8 +685,6 @@ describe('Thread Tests', () => {
           jwt: userJWT,
           text: markdownComment.text,
           thread_id: tRes.result.id,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         const eRes = await modelUtils.editComment({
           text,
@@ -770,8 +713,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         const object_id = res.result.id;
         expect(object_id).to.not.be.null;
@@ -824,8 +765,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         const object_id = res.result.id;
 
@@ -900,8 +839,6 @@ describe('Thread Tests', () => {
           topicId,
           body,
           jwt: userJWT,
-          session: userSession.session,
-          sign: userSession.sign,
         });
         pinThread = res.result.id;
       });

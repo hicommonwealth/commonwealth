@@ -73,7 +73,7 @@ export const LoginSelector = () => {
           <CWButton
             buttonType="primary"
             buttonHeight="sm"
-            label="Sign in"
+            label="Login"
             buttonWidth="wide"
             onClick={() => setIsLoginModalOpen(true)}
           />
