@@ -19,7 +19,7 @@ export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
   private static _instance: WebWalletController;
 
-  public static get Instance(): WebWalletController {
+  public static get Instance(): WebWalletController{
     return this._instance || (this._instance = new this());
   }
 
@@ -66,7 +66,6 @@ export default class WebWalletController {
         address: account.address,
         author_chain: account.chain.id,
         wallet_id: wallet,
-        wallet_sso_source: null,
         jwt: app.user.jwt,
       });
     } catch (e) {

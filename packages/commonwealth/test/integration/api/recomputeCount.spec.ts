@@ -16,8 +16,6 @@ chai.use(chaiHttp);
 
 const notif_feed_categories = ['new-thread-creation', 'new-comment-creation'];
 
-let testVerifiedChainAddress;
-
 async function calcAllCountsFromSourceTables() {
   const retCommentCounts = (await models.Comment.count({
     where: {
@@ -288,12 +286,6 @@ async function verifyRecomputeCountAll() {
 }
 
 describe('recomputeCounts', () => {
-  before(async () => {
-    testVerifiedChainAddress = await modelUtils.createAndVerifyAddress({
-      chain: 'alex',
-    });
-  });
-
   describe('counts ', () => {
     it('recompute counts, check single thread-comment', async () => {
       await verifyRecomputeCountSingle();
@@ -383,15 +375,13 @@ describe('recomputeCounts', () => {
         jwt: testJwtToken,
         text: 'test comment',
         thread_id: testThreads[0].id,
-        session: testVerifiedChainAddress.session,
-        sign: testVerifiedChainAddress.sign,
       });
 
       expect(cRes).not.to.be.null;
       expect(cRes.error).not.to.be.null;
 
       const before = await getCounts(testThreads[0].id, testComments[0].id);
-      // expect(before.countsFromSourceTable.notification_id).to.be.greaterThan(0);
+      expect(before.countsFromSourceTable.notification_id).to.be.greaterThan(0);
       await verifyRecomputeCountAll();
     });
 
@@ -403,8 +393,6 @@ describe('recomputeCounts', () => {
         reaction: 'like',
         thread_id: testThreads[0].id,
         author_chain: testAddresses[0].chain,
-        session: testVerifiedChainAddress.session,
-        sign: testVerifiedChainAddress.sign,
       });
 
       expect(cRes).not.to.be.null;
@@ -423,8 +411,6 @@ describe('recomputeCounts', () => {
         reaction: 'like',
         comment_id: testComments[0].id,
         author_chain: testAddresses[0].chain,
-        session: testVerifiedChainAddress.session,
-        sign: testVerifiedChainAddress.sign,
       });
 
       expect(cRes).not.to.be.null;

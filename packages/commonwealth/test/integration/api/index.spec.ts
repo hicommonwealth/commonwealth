@@ -1,20 +1,18 @@
 /* eslint-disable no-unused-expressions */
-import { personalSign } from '@metamask/eth-sig-util';
+import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
-import * as siwe from 'siwe';
-import { createCanvasSessionPayload } from '../../../shared/canvas';
+import { constructCanvasMessage } from 'shared/adapters/shared';
 import app, { resetDatabase } from '../../../server-test';
 import {
-  createSiweMessage,
+  constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
 } from '../../../shared/adapters/chain/ethereum/keys';
 import * as modelUtils from '../../util/modelUtils';
-import { ChainBase } from '../../../../common-common/src/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -74,22 +72,21 @@ describe('API Tests', () => {
       const chain_id = '1'; // use ETH mainnet for testing
       const sessionWallet = ethers.Wallet.createRandom();
       const timestamp = 1665083987891;
-      const message = createCanvasSessionPayload(
-        'ethereum' as ChainBase,
+      const message = constructCanvasMessage(
+        'ethereum',
         chain_id,
         address,
         sessionWallet.address,
         timestamp,
         TEST_BLOCK_INFO_BLOCKHASH
       );
-      createSiweMessage;
-      // const data = getEIP712SignableSession(message);
-      const nonce = siwe.generateNonce();
-      const domain = 'https://commonwealth.test';
-      const siweMessage = createSiweMessage(message, domain, nonce);
+      const data = constructTypedCanvasMessage(message);
       const privateKey = keypair.getPrivateKey();
-      const signatureData = personalSign({ privateKey, data: siweMessage });
-      const signature = `${domain}/${nonce}/${signatureData}`;
+      const signature = signTypedData({
+        privateKey,
+        data,
+        version: SignTypedDataVersion.V4,
+      });
       res = await chai
         .request(app)
         .post('/api/verifyAddress')
@@ -108,7 +105,7 @@ describe('API Tests', () => {
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
       expect(res.body.result.user).to.be.not.null;
-      expect(res.body.result.message).to.be.equal('Signed in');
+      expect(res.body.result.message).to.be.equal('Logged in');
     });
   });
 });
