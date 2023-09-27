@@ -67,11 +67,7 @@ export default class CompoundAPI
     return this._tokenType === GovernorTokenType.MPondToken;
   }
 
-  constructor(
-    _factory: any,
-    contractAddress: string,
-    web3Provider: ExternalProvider
-  ) {
+  constructor(contractAddress: string, web3Provider: ExternalProvider) {
     this.contractAddress = contractAddress;
     this.web3Provider = web3Provider;
   }

@@ -86,7 +86,6 @@ export const EthDaoForm = (props: EthChainFormState) => {
             : new Web3.providers.WebsocketProvider(ethChainFormFields.nodeUrl);
 
         const compoundApi = new CompoundAPI(
-          null,
           ethChainFormFields.address,
           provider
         );
