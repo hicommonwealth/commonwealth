@@ -54,6 +54,8 @@ export const Errors = {
   ChainNameExists:
     'The name for this chain already exists, please choose another name',
   ChainNodeIdExists: 'The chain node with this id already exists',
+  CosmosChainNameRequired:
+    'cosmos_chain_id is a required field. It should be the chain name as registered in the Cosmos Chain Registry.',
   InvalidIconUrl: 'Icon url must begin with https://',
   InvalidWebsite: 'Website must begin with https://',
   InvalidDiscord: 'Discord must begin with https://',
@@ -168,7 +170,7 @@ const createChain = async (
   }
 
   // cosmos_chain_id is the canonical identifier for a cosmos chain.
-  if (req.body.base === ChainBase.CosmosSDK && req.body.cosmos_chain_id) {
+  if (req.body.base === ChainBase.CosmosSDK) {
     // Our convention is to follow the "chain_name" standard established by the
     // Cosmos Chain Registry:
     // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
@@ -177,6 +179,19 @@ const createChain = async (
     // It is a lowercase alphanumeric name, like 'osmosis'.
     // See: https://github.com/hicommonwealth/commonwealth/issues/4951
     cosmos_chain_id = req.body.cosmos_chain_id;
+
+    if (!cosmos_chain_id) {
+      return next(new AppError(Errors.CosmosChainNameRequired));
+    } else {
+      const oldChainNode = await models.ChainNode.findOne({
+        where: { cosmos_chain_id },
+      });
+      if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
+        return next(
+          new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`)
+        );
+      }
+    }
 
     const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
     const { data: chains } = await axios.get(
@@ -273,17 +288,6 @@ const createChain = async (
       await tmClient.block();
     } catch (err) {
       return next(new AppError(Errors.InvalidNode));
-    }
-
-    if (cosmos_chain_id) {
-      const oldChainNode = await models.ChainNode.findOne({
-        where: { cosmos_chain_id },
-      });
-      if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
-        return next(
-          new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`)
-        );
-      }
     }
 
     // TODO: test altWalletUrl if available
