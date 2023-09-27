@@ -1,17 +1,16 @@
-import React from 'react';
-import moment from 'moment';
 import _ from 'lodash';
+import moment from 'moment';
+import React from 'react';
 
 import 'pages/notifications/notification_row.scss';
 
 import type { IForumNotificationData } from 'types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 
-import app from 'state';
 import { pluralize } from 'helpers';
+import app from 'state';
+import { getCommunityUrl, getThreadUrl } from 'utils';
 import { User } from 'views/components/user/user';
-import { getThreadUrl, getCommunityUrl } from 'utils';
-import AddressInfo from '../../../models/AddressInfo';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 
 const jumpHighlightNotification = (
@@ -81,8 +80,9 @@ const getNotificationFields = (category, data: IForumNotificationData) => {
 
   const actorName = (
     <User
-      user={new AddressInfo(null, author_address, author_chain, null)}
-      hideAvatar
+      userAddress={author_address}
+      userChainId={author_chain}
+      shouldHideAvatar
     />
   );
 
@@ -191,8 +191,9 @@ export const getBatchNotificationFields = (
 
   const actorName = (
     <User
-      user={new AddressInfo(null, author_address, author_chain, null)}
-      hideAvatar
+      userAddress={author_address}
+      userChainId={author_chain}
+      shouldHideAvatar
     />
   );
 

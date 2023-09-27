@@ -22,7 +22,7 @@ import {
 import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCosmosTally,
+  useCosmosProposalTallyQuery,
   useCosmosProposalMetadataQuery,
 } from 'state/api/proposals';
 
@@ -40,7 +40,7 @@ export const ProposalCard = ({
     proposal.title || `Proposal ${proposal.identifier}`
   );
   const { data: metadata } = useCosmosProposalMetadataQuery(proposal);
-  const { isFetching: isFetchingTally } = useCosmosTally(proposal);
+  const { isFetching: isFetchingTally } = useCosmosProposalTallyQuery(proposal);
 
   const secondaryTagText = getSecondaryTagText(proposal);
 

@@ -10,14 +10,13 @@ import type {
   EmailNotificationInterval,
   UserInstance,
 } from 'server/models/user';
-import { JWT_SECRET } from '../config';
+import { JWT_SECRET, ETH_RPC } from '../config';
 import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-import { ETH_RPC } from '../config';
 import type { ChainCategoryType } from 'common-common/src/types';
 
 type ThreadCountQueryData = {
@@ -44,6 +43,7 @@ type StatusResp = {
     unseenPosts: { [chain: string]: number };
   };
   evmTestEnv?: string;
+  enforceSessionKeys?: boolean;
   chainCategoryMap: { [chain: string]: ChainCategoryType[] };
 };
 
@@ -301,6 +301,7 @@ export const status = async (
         notificationCategories,
         recentThreads: threadCountQueryData,
         evmTestEnv: ETH_RPC,
+        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,
       });
     } else {
@@ -323,6 +324,7 @@ export const status = async (
         loggedIn: true,
         user,
         evmTestEnv: ETH_RPC,
+        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,
       });
     }
@@ -340,7 +342,9 @@ function getChainActivity(
   return Promise.all(
     addresses.map(async (address) => {
       const { chain, last_active } = address;
-      return [chain, last_active.toISOString()];
+      // Check if last_active is not null before calling toISOString
+      const lastActiveISO = last_active ? last_active.toISOString() : 'N/A';
+      return [chain, lastActiveISO];
     })
   );
 }

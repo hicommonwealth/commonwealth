@@ -89,6 +89,8 @@ import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
 
+import { getCanvasData, postCanvasData } from '../routes/canvas';
+
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
@@ -161,6 +163,7 @@ import { ServerAnalyticsController } from '../controllers/server_analytics_contr
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
 import { ServerChainsController } from '../controllers/server_chains_controller';
 import { ServerProposalsController } from '../controllers/server_proposals_controller';
+import { ServerGroupsController } from '../controllers/server_groups_controller';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
@@ -178,8 +181,15 @@ import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { getChainsHandler } from '../routes/chains/get_chains_handler';
 import { getChainNodesHandler } from '../routes/chains/get_chain_nodes_handler';
+import exportMembersList from '../routes/exportMembersList';
 import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
+import viewChainActivity from '../routes/viewChainActivity';
+import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
+import { createGroupHandler } from '../routes/groups/create_group_handler';
+import { getGroupsHandler } from '../routes/groups/get_groups_handler';
+import { updateGroupHandler } from '../routes/groups/update_group_handler';
+import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -190,6 +200,7 @@ export type ServerControllers = {
   profiles: ServerProfilesController;
   chains: ServerChainsController;
   proposals: ServerProposalsController;
+  groups: ServerGroupsController;
 };
 
 function setupRouter(
@@ -214,6 +225,7 @@ function setupRouter(
     profiles: new ServerProfilesController(models),
     chains: new ServerChainsController(models, tokenBalanceCache, banCache),
     proposals: new ServerProposalsController(models, redisCache),
+    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
   };
 
   // ---
@@ -236,6 +248,13 @@ function setupRouter(
     '/updateSiteAdmin',
     passport.authenticate('jwt', { session: false }),
     updateSiteAdmin.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/exportMembersList',
+    passport.authenticate('jwt', { session: false }),
+    exportMembersList.bind(this, models)
   );
   registerRoute(router, 'get', '/domain', domain.bind(this, models));
   registerRoute(router, 'get', '/status', status.bind(this, models));
@@ -983,6 +1002,13 @@ function setupRouter(
   );
   registerRoute(
     router,
+    'get',
+    '/viewChainActivity',
+    viewChainActivity.bind(this, models)
+  );
+
+  registerRoute(
+    router,
     'post',
     '/markNotificationsRead',
     passport.authenticate('jwt', { session: false }),
@@ -1033,6 +1059,10 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateChainCategory.bind(this, models)
   );
+
+  // signed data
+  router.get('/oplog', getCanvasData.bind(this, models));
+  router.post('/oplog', postCanvasData.bind(this, models));
 
   // settings
   registerRoute(
@@ -1309,6 +1339,54 @@ function setupRouter(
     'get',
     '/proposalVotes',
     getProposalVotesHandler.bind(this, serverControllers)
+  );
+
+  // Group routes
+  registerRoute(
+    router,
+    'put',
+    '/refresh-membership',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    refreshMembershipHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/groups',
+    getGroupsHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/groups',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createGroupHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'put',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    updateGroupHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteGroupHandler.bind(this, serverControllers)
   );
 
   app.use(endpoint, router);

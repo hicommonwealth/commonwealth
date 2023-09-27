@@ -11,7 +11,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 
 type UserDashboardChainEventRowProps = {
-  blockNumber: number;
+  blockNumber?: number;
   chain: ChainInfo;
   label: IEventLabel;
   showSkeleton?: boolean;
@@ -85,9 +85,11 @@ export const UserDashboardChainEventRow = (
             </CWText>
           </Link>
           <div className="dot">.</div>
-          <CWText type="caption" fontWeight="medium" className="block">
-            Block {blockNumber}
-          </CWText>
+          {blockNumber ? (
+            <CWText type="caption" fontWeight="medium" className="block">
+              Block {blockNumber}
+            </CWText>
+          ) : null}
         </div>
         <CWText className="row-top-text" fontWeight="bold">
           {label.heading}
