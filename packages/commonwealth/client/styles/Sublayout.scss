@@ -50,6 +50,11 @@
           padding-left: calc(#{$sidebar-width} + 20px);
           margin-left: calc(-#{$sidebar-width} + 1px); // give it a negative margin equal to the parent's margin
         }
+
+        .MessageBanner {
+          padding-left: calc(#{$sidebar-width} + 20px);
+          margin-left: calc(-#{$sidebar-width} + 1px); // give it a negative margin equal to the parent's margin
+        }
       }
 
       .Body {
