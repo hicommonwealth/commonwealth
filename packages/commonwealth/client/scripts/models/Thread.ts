@@ -112,12 +112,20 @@ export enum LinkSource {
   Proposal = 'proposal',
   Thread = 'thread',
   Web = 'web',
+  Template = 'template',
+}
+
+export enum LinkDisplay {
+  inline = 'inline',
+  sidebar = 'sidebar',
+  both = 'both',
 }
 
 export type Link = {
   source: LinkSource;
   identifier: string;
   title?: string;
+  display?: LinkDisplay;
 };
 
 export class Thread implements IUniqueId {
@@ -199,7 +207,6 @@ export class Thread implements IUniqueId {
     canvasHash,
     links,
     discord_meta,
-    latest_activity,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -233,7 +240,6 @@ export class Thread implements IUniqueId {
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
     discord_meta?: any;
-    latest_activity?: string;
   }) {
     this.author = Address.address;
     this.title = getDecodedString(title);
@@ -276,7 +282,9 @@ export class Thread implements IUniqueId {
       reactionType,
       addressesReacted
     );
-    this.latestActivity = latest_activity ? moment(latest_activity) : null;
+    this.latestActivity = last_commented_on
+      ? moment(last_commented_on)
+      : moment(created_at);
   }
 }
 

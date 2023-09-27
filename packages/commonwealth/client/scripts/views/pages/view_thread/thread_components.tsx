@@ -1,12 +1,10 @@
-import React from 'react';
-
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_proposal/proposal_header_links.scss';
 import 'pages/view_thread/thread_components.scss';
-
+import React from 'react';
 import app from 'state';
 import { pluralize, threadStageToLabel } from '../../../helpers/index';
 import type Account from '../../../models/Account';
-import AddressInfo from '../../../models/AddressInfo';
 import type Thread from '../../../models/Thread';
 import { ThreadStage } from '../../../models/types';
 import {
@@ -16,7 +14,6 @@ import {
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { User } from '../../components/user/user';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type ThreadAuthorProps = {
   author: Thread['author'];
@@ -30,7 +27,13 @@ export const ThreadAuthor = ({ author, collaborators }: ThreadAuthorProps) => {
 
   return (
     <div className="ThreadAuthor">
-      <User avatarSize={24} user={user} popover linkify />
+      <User
+        avatarSize={24}
+        userAddress={user.address}
+        userChainId={user.chain?.id || user.profile?.chain}
+        shouldShowPopover
+        shouldLinkProfile
+      />
       {collaborators?.length > 0 && (
         <>
           <CWText type="caption">and</CWText>
@@ -47,9 +50,10 @@ export const ThreadAuthor = ({ author, collaborators }: ThreadAuthorProps) => {
                   {collaborators.map(({ address, chain }) => {
                     return (
                       <User
-                        linkify
                         key={address}
-                        user={new AddressInfo(null, address, chain, null)}
+                        shouldLinkProfile
+                        userChainId={chain}
+                        userAddress={address}
                       />
                     );
                   })}

@@ -160,18 +160,14 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
             <CWButton
               disabled={votingModalOpen}
               onClick={() => proposal.queueTx()}
-              label={
-                proposal.data.queued || proposal.data.executed
-                  ? 'Queued'
-                  : 'Queue'
-              }
+              label={proposal.queued || proposal.executed ? 'Queued' : 'Queue'}
             />
           )}
           {proposal.isExecutable && (
             <CWButton
               disabled={votingModalOpen}
               onClick={() => proposal.executeTx()}
-              label={proposal.data.executed ? 'Executed' : 'Execute'}
+              label={proposal.executed ? 'Executed' : 'Execute'}
             />
           )}
           <CompoundCancelButton

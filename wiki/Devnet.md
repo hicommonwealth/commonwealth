@@ -59,10 +59,13 @@ CI community (ephemeral spin-up for automated tests):
 
 # How to [deploy updates to a sandbox](https://dashboard.heroku.com/apps/cosmos-devnet/deploy/heroku-container) (v1 for example):
 1. In terminal go to packages/chain-events/cosmos-chain-testing/v1 directory
-2. `heroku git:remote -a evmos-devnet`
+2. `heroku git:remote -a cosmos-devnet`
 3. `heroku login`
-4. `heroku container:push web` to apply your changes to the heroku app
-5. `heroku container:release web` - A new build and deployment will be triggered.
+4. `heroku container:login`
+5. `heroku container:push web` to apply your changes to the heroku app
+6. `heroku container:release web` - A new build and deployment will be triggered.
+
+Note: If you get error "No images to push," make sure Dockerfile is capitalized
 
 # How to deploy updates to a CI deployment:
 1. Create a remote Docker Hub repo called (for ex) "csdk-v1"

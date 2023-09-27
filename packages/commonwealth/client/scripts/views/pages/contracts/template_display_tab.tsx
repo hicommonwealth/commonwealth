@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import app from 'state';
 import Contract from 'models/Contract';
 import Template from 'models/Template';
 import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
+import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
@@ -95,7 +95,11 @@ export const TemplateDisplayTab = ({
                   <CWText>{template.name}</CWText>
                 </div>
                 <div className="table-column">
-                  <User user={creator} showAddressWithDisplayName />
+                  <User
+                    userAddress={creator.address}
+                    userChainId={creator.chain?.id || creator?.profile?.chain}
+                    shouldShowAddressWithDisplayName
+                  />
                 </div>
                 <div className="table-column">
                   <div className="IconGroup">

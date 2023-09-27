@@ -49,13 +49,15 @@ export async function __deleteThread(
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
-  // check ban
-  const [canInteract, banError] = await this.banCache.checkBan({
-    chain: thread.chain,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`Ban error: ${banError}`);
+  if (address) {
+    // check ban
+    const [canInteract, banError] = await this.banCache.checkBan({
+      chain: thread.chain,
+      address: address.address,
+    });
+    if (!canInteract) {
+      throw new AppError(`Ban error: ${banError}`);
+    }
   }
 
   // check ownership (bypass if admin)

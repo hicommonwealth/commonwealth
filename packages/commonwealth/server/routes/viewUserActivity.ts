@@ -4,7 +4,7 @@ import { getActivityFeed } from '../util/activityQuery';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Must be logged in to view user dashboard',
+  NotLoggedIn: 'Must be signed in to view user dashboard',
 };
 
 export default async (

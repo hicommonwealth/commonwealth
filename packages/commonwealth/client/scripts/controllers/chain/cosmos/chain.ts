@@ -33,7 +33,7 @@ import {
   getTMClient,
 } from './chain.utils';
 import EthSigningClient from './eth_signing_client';
-import EVMKeplrWebWalletController from '../../app/webWallets/keplr_ethereum_web_wallet';
+import { ETHERMINT_CHAINS } from '../../app/webWallets/keplr_ethereum_web_wallet';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -182,12 +182,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const dbId = chain.meta.id;
     let client;
 
-    const ethermintWallet = WebWalletController.Instance.getByName(
-      WalletId.KeplrEthereum
-    ) as EVMKeplrWebWalletController;
-
     // TODO: To check if ethermint, we can get slip44 cointype from Cosmos Chain Directory instead of hardcoding
-    if (ethermintWallet.specificChains.some((c) => c === dbId)) {
+    if (ETHERMINT_CHAINS.some((c) => c === dbId)) {
       const chainId = wallet.getChainId();
 
       client = await EthSigningClient(

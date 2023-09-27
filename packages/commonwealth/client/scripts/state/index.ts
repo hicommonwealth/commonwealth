@@ -4,7 +4,6 @@ import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import SnapshotController from 'controllers/chain/snapshot';
 import ChainEntityController from 'controllers/server/chain_entities';
-import CommunitiesController from 'controllers/server/communities';
 import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
@@ -57,9 +56,6 @@ export interface IApp {
   search: SearchController;
   searchAddressCache: any;
 
-  // Community
-  communities: CommunitiesController;
-
   // Contracts
   contracts: ContractsController;
 
@@ -87,6 +83,7 @@ export interface IApp {
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     evmTestEnv?: string;
+    enforceSessionKeys?: boolean;
     chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
   };
 
@@ -140,9 +137,6 @@ const app: IApp = {
 
   // Proposals
   proposalEmitter: new EventEmitter(),
-
-  // Community
-  communities: new CommunitiesController(),
 
   // Contracts
   contracts: new ContractsController(),
@@ -228,6 +222,7 @@ export async function initAppState(
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
     app.config.evmTestEnv = statusRes.result.evmTestEnv;
+    app.config.enforceSessionKeys = statusRes.result.enforceSessionKeys;
 
     nodesRes.result
       .sort((a, b) => a.id - b.id)
