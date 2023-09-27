@@ -26,6 +26,8 @@ import {
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 import { CWContentPageCard } from '../component_kit/CWContentPage';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -37,7 +39,7 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector = topics.filter((t) => {
+  const topicsForSelector = topics?.filter((t) => {
     return (
       isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
     );
@@ -63,8 +65,17 @@ export const NewThreadForm = () => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const { mutateAsync: createThread } = useCreateThreadMutation({
+  const {
+    mutateAsync: createThread,
+    error: createThreadError,
+    reset: resetCreateThreadMutation,
+  } = useCreateThreadMutation({
     chainId: app.activeChainId(),
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetCreateThreadMutation,
+    error: createThreadError,
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -89,14 +100,6 @@ export const NewThreadForm = () => {
 
     setIsSaving(true);
 
-    await app.sessions.signThread({
-      community: app.activeChainId(),
-      title: threadTitle,
-      body: deltaString,
-      link: threadUrl,
-      topic: threadTopic,
-    });
-
     try {
       const thread = await createThread({
         address: app.user.activeAccount.address,
@@ -117,9 +120,11 @@ export const NewThreadForm = () => {
 
       navigate(`/discussion/${thread.id}`);
     } catch (err) {
-      const error =
-        err?.responseJSON?.error || err?.message || 'Failed to create thread';
-      throw new Error(error);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      console.error(err?.responseJSON?.error || err?.message);
+      notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
     }
@@ -215,6 +220,7 @@ export const NewThreadForm = () => {
         </div>
       </div>
       {JoinCommunityModals}
+      {RevalidationModal}
     </>
   );
 };

@@ -8,6 +8,13 @@
     // max-width: 768px;
     width: 100%;
 
+    .title {
+      font-family: $font-family-silka;
+      font-size: 24px;
+      line-height: 36px;
+      font-weight: 600;
+    }
+
     .header {
       display: flex;
       flex-direction: column;

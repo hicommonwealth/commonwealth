@@ -23,7 +23,7 @@ const deleteComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signDeleteComment({
+  } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
     comment_id: canvasHash,
   });
 
