@@ -137,6 +137,30 @@
     padding: 8px 0px 8px 36px;
   }
 
+  .search {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding-left: calc(22vw + 65px);
+    padding-top: 16px;
+
+    @include large {
+      padding-left: calc(46vw - 155px);
+    }
+
+    @include medium {
+      padding-left: calc(50vw - 225px);
+    }
+
+    @include small {
+      padding-left: 24%;
+    }
+
+    @include extraSmall {
+      padding-left: 24px;
+    }
+  }
+
   .createCommunity {
     display: flex;
     align-items: center;

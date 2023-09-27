@@ -164,6 +164,10 @@ export const Breadcrumbs = () => {
       return 'governance';
     }
 
+    if (location.pathname.includes('search')) {
+      return 'search';
+    }
+
     if (location.pathname.includes('new/discussion')) {
       return 'new-thread';
     }

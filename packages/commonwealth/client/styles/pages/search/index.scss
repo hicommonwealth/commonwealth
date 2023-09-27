@@ -38,6 +38,7 @@
     gap: 16px;
     margin: 0 auto;
     width: 796px;
+    padding-top: 16px;
 
     @include smallInclusive {
       width: 100%;
