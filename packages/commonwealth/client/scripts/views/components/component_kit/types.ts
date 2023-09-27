@@ -49,6 +49,7 @@ export enum ComponentType {
   ThreadVoteButton = 'ThreadVoteButton',
   Toggle = 'Toggle',
   Tooltip = 'Tooltip',
+  TypeaheadSelectList = 'TypeaheadSelectList',
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
   WalletOptionRow = 'WalletOptionRow',

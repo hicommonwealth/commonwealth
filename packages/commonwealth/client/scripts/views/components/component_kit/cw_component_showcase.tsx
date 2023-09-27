@@ -57,6 +57,8 @@ import { CWTag } from './new_designs/cw_tag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
+import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList/CWTypeaheadSelectList';
+import { optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -1568,6 +1570,14 @@ export const ComponentShowcase = () => {
             );
           })}
         </div>
+      </div>
+      <div className='typeahead-select-list'>
+        <CWText type='h3'> Typeahead Dropdown</CWText>
+        <CWTypeaheadSelectList
+          options={optionList}
+          defaultValue={optionList[0]}
+          placeholder='Select chain'
+        />
       </div>
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
