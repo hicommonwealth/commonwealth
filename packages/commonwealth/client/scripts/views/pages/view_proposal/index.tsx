@@ -1,23 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { ChainNetwork } from 'common-common/src/types';
-import _ from 'lodash';
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import useForceRerender from 'hooks/useForceRerender';
-import {
-  chainToProposalSlug,
-  getProposalUrlPath,
-  idToProposal,
-} from 'identifiers';
+import { getProposalUrlPath } from 'identifiers';
+import _ from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
-import app from 'state';
+import React, { useState } from 'react';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import type { AnyProposal } from '../../../models/types';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
@@ -25,154 +16,12 @@ import { VotingResults } from '../../components/proposals/VotingResults';
 import { Skeleton } from '../../components/Skeleton';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
+import { JSONDisplay } from './json_display';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
-import { JSONDisplay } from './json_display';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import {
-  useAaveProposalsQuery,
-  useCosmosProposalMetadataQuery,
-  useCosmosProposalQuery,
-  useCosmosProposalTallyQuery,
-  useCosmosProposalVotesQuery,
-  useCosmosProposalDepositsQuery,
-} from 'state/api/proposals';
-import { usePoolParamsQuery } from 'state/api/chainParams';
-
-export function useProposalData(proposalId, typeProp, ignoreInitChain = false) {
-  const forceRerender = useForceRerender();
-  useInitChainIfNeeded(app, ignoreInitChain);
-  const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
-  const [error, setError] = useState(null);
-  const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const { data: cosmosProposal } = useCosmosProposalQuery({
-    isApiReady: !!app.chain.apiInitialized,
-    proposalId,
-  });
-  const [title, setTitle] = useState<string>(proposal?.title);
-  const [description, setDescription] = useState<string>(proposal?.description);
-  const { data: metadata, isFetching: isFetchingMetadata } =
-    useCosmosProposalMetadataQuery(proposal);
-  const { data: poolData } = usePoolParamsQuery();
-  useCosmosProposalVotesQuery(proposal, +poolData);
-  useCosmosProposalTallyQuery(proposal);
-  useCosmosProposalDepositsQuery(proposal, +poolData);
-
-  useEffect(() => {
-    setProposal(cosmosProposal);
-    setTitle(cosmosProposal?.title);
-    setDescription(cosmosProposal?.description);
-  }, [cosmosProposal]);
-
-  useEffect(() => {
-    if (_.isEmpty(metadata)) return;
-    setTitle(metadata?.title);
-    setDescription(metadata?.description || metadata?.summary);
-  }, [metadata]);
-
-  useEffect(() => {
-    proposal?.isFetched.once('redraw', forceRerender);
-
-    return () => {
-      proposal?.isFetched.removeAllListeners();
-    };
-  }, [proposal, forceRerender]);
-
-  useManageDocumentTitle('View proposal', proposal?.title);
-
-  const getProposalFromStore = () => {
-    let resolvedType = typeProp;
-    if (!typeProp) {
-      resolvedType = chainToProposalSlug(app.chain.meta);
-    }
-    return idToProposal(resolvedType, proposalId);
-  };
-
-  const onAave = app.chain?.network === ChainNetwork.Aave;
-  const fetchAaveData = onAave && isAdapterLoaded;
-  const { data: cachedAaveProposals, isLoading: aaveProposalsLoading } =
-    useAaveProposalsQuery({
-      moduleReady: fetchAaveData,
-      chainId: app.chain?.id,
-    });
-
-  useEffect(() => {
-    if (!aaveProposalsLoading && fetchAaveData && !proposal) {
-      const foundProposal = cachedAaveProposals?.find(
-        (p) => p.identifier === proposalId
-      );
-
-      if (!foundProposal?.ipfsData) {
-        foundProposal?.ipfsDataReady.once('ready', () =>
-          setProposal(foundProposal)
-        );
-      } else {
-        setProposal(foundProposal);
-      }
-    }
-  }, [
-    aaveProposalsLoading,
-    cachedAaveProposals,
-    fetchAaveData,
-    proposal,
-    proposalId,
-  ]);
-
-  useNecessaryEffect(() => {
-    const afterAdapterLoaded = async () => {
-      if (onAave) return;
-      try {
-        const proposalFromStore = getProposalFromStore();
-        setProposal(proposalFromStore);
-        setError(null);
-      } catch (e) {
-        console.log(`#${proposalId} Not found in store. `, e);
-      }
-    };
-
-    if (!isAdapterLoaded) {
-      app.chainAdapterReady.on('ready', () => {
-        setIsAdapterLoaded(true);
-        afterAdapterLoaded();
-      });
-    } else {
-      afterAdapterLoaded();
-    }
-  }, [isAdapterLoaded, proposalId]);
-
-  useNecessaryEffect(() => {
-    const afterAdapterLoaded = async () => {
-      try {
-        const proposalFromStore = getProposalFromStore();
-        setProposal(proposalFromStore);
-        setError(null);
-      } catch (e) {
-        console.log(`#${proposalId} Not found in store. `, e);
-      }
-    };
-
-    if (!isAdapterLoaded) {
-      app.chainAdapterReady.on('ready', () => {
-        setIsAdapterLoaded(true);
-        afterAdapterLoaded();
-      });
-    } else {
-      afterAdapterLoaded();
-    }
-  }, [isAdapterLoaded, proposalId]);
-
-  return {
-    error,
-    metadata,
-    isAdapterLoaded,
-    proposal,
-    title,
-    description,
-    isFetchingMetadata,
-  };
-}
+import { useProposalData } from './useProposalData';
 
 type ViewProposalPageAttrs = {
   identifier: string;

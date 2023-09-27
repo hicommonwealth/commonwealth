@@ -52,10 +52,10 @@ import {
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import { useProposalData } from '../view_proposal/index';
-import { useSnapshotProposalData } from '../view_snapshot_proposal/index';
+import { useProposalData } from '../view_proposal/useProposalData';
 import { SnapshotInformationCard } from '../view_snapshot_proposal/snapshot_information_card';
 import { SnapshotPollCardContainer } from '../view_snapshot_proposal/snapshot_poll_card_container';
+import { useSnapshotProposalData } from '../view_snapshot_proposal/useSnapshotProposalData';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
@@ -94,7 +94,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isViewMarked, setIsViewMarked] = useState(false);
   const [snapshotProposalId, setSnapshotProposalId] = useState(null);
   const [snapshotId, setSnapshotId] = useState(null);
-  const [proposalId, setProposalId] = useState(null);
+  const [proposalId, setProposalId] = useState<string>(null);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const toggleVotingModal = (newModalState: boolean) => {
     setVotingModalOpen(newModalState);
@@ -106,7 +106,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const {
     snapshotProposal,
-    proposalAuthor,
     votes,
     symbol,
     threads,

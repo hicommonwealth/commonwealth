@@ -272,9 +272,6 @@ export const CWContentPageCard = (props: ContentPageCardProps) => {
               iconButtonTheme="black"
               iconName={isCollapsed ? 'chevronRight' : 'chevronDown'}
               iconSize="small"
-              onClick={() => {
-                setIsCollapsed(!isCollapsed);
-              }}
             />
           </div>
           {header}

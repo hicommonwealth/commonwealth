@@ -1,12 +1,24 @@
 import BN from 'bn.js';
 import React from 'react';
 import Web3 from 'web3-utils';
-import { formatNumberLong } from '../../../../../shared/adapters/currency';
-import { AaveProposalVote } from '../../../controllers/chain/ethereum/aave/proposal';
-import app from '../../../state/index';
-import { AaveVotingResult } from './voting_result_components';
+import { formatNumberLong } from '../../../../../../shared/adapters/currency';
+import AaveProposal, {
+  AaveProposalVote,
+} from '../../../../controllers/chain/ethereum/aave/proposal';
+import app from '../../../../state/index';
+import { AaveVotingResult } from './AaveVotingResult';
 
-export function AaveProposalResult({ proposal, votes, isInCard }) {
+interface AaveProposalResultProps {
+  proposal: AaveProposal;
+  votes: AaveProposalVote[];
+  isInCard: boolean;
+}
+
+export const AaveProposalResult = ({
+  proposal,
+  votes,
+  isInCard,
+}: AaveProposalResultProps) => {
   const yesVotes: AaveProposalVote[] = votes.filter((v) => !!v.choice);
 
   const yesBalance = yesVotes.reduce(
@@ -37,4 +49,4 @@ export function AaveProposalResult({ proposal, votes, isInCard }) {
       isInCard={isInCard}
     />
   );
-}
+};

@@ -5,18 +5,30 @@ import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
 import app from 'state';
-import { AaveProposalResult } from './AaveProposalResult';
-import { SimpleYesApprovalResult } from './SimpleYesApprovalResult';
+import { AaveProposalResult } from './VotingResults/AaveProposalResult';
+import { SimpleYesApprovalResult } from './VotingResults/SimpleYesApprovalResult';
 import useForceRerender from 'hooks/useForceRerender';
 import { CompoundYesNoAbstainResult } from './votingResults/CompoundYesNoAbstainResult';
 import { CompoundYesNoResult } from './votingResults/CompoundYesNoResult';
 import { DefaultVotingResult } from './votingResults/DefaultVotingResult';
 import { YesNoAbstainVetoResult } from './YesNoAbstainVetoResult';
-import { YesNoRejectResult } from './YesNoRejectResult';
+import { YesNoRejectResult } from './votingResults/YesNoRejectResult';
 import { useAaveProposalVotesQuery } from 'state/api/proposals';
 import { ChainNetwork } from 'common-common/src/types';
 
 type VotingResultsProps = { proposal: AnyProposal; isInCard: boolean };
+
+// Map voting type to component
+const votingTypeToComponent = {
+  [VotingType.SimpleYesNoVoting]: DefaultVotingResult,
+  [VotingType.ConvictionYesNoVoting]: DefaultVotingResult,
+  [VotingType.CompoundYesNo]: CompoundYesNoResult,
+  [VotingType.CompoundYesNoAbstain]: CompoundYesNoAbstainResult,
+  [VotingType.SimpleYesApprovalVoting]: SimpleYesApprovalResult,
+  [VotingType.YesNoAbstainVeto]: YesNoAbstainVetoResult,
+  [VotingType.YesNoReject]: YesNoRejectResult,
+  [VotingType.RankedChoiceVoting]: null, // not implemented yet
+};
 
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal, isInCard } = props;
@@ -60,18 +72,6 @@ export const VotingResults = (props: VotingResultsProps) => {
       />
     );
   }
-
-  // Map voting type to component
-  const votingTypeToComponent = {
-    [VotingType.SimpleYesNoVoting]: DefaultVotingResult,
-    [VotingType.ConvictionYesNoVoting]: DefaultVotingResult,
-    [VotingType.CompoundYesNo]: CompoundYesNoResult,
-    [VotingType.CompoundYesNoAbstain]: CompoundYesNoAbstainResult,
-    [VotingType.SimpleYesApprovalVoting]: SimpleYesApprovalResult,
-    [VotingType.YesNoAbstainVeto]: YesNoAbstainVetoResult,
-    [VotingType.YesNoReject]: YesNoRejectResult,
-    [VotingType.RankedChoiceVoting]: null, // not implemented yet
-  };
 
   const VotingComponent = votingTypeToComponent[proposal.votingType];
 

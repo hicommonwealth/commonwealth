@@ -3,7 +3,6 @@
   "scripts": {
     "start": "yarn --cwd packages/commonwealth start",
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
-    "build-commonwealth-docker": "DOCKER_BUILDKIT=1 docker build . -f ./packages/commonwealth/Dockerfile -t commonwealth && docker run commonwealth",
     "clean": "find . -name node_modules -exec rm -rf {} \\;; yarn --ignore-engines",
     "psql": "yarn --cwd packages/commonwealth psql",
     "test-api": "yarn --cwd packages/commonwealth test-api",

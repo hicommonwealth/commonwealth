@@ -1,7 +1,12 @@
 import React from 'react';
-import { VotingResult } from '../voting_result_components';
+import { BaseVotingResultCardProps } from './BaseVotingResultTypes';
+import { VotingResult } from './VotingResult';
 
-export function DefaultVotingResult({ votes, proposal, isInCard }) {
+export const DefaultVotingResult = ({
+  votes,
+  proposal,
+  isInCard,
+}: BaseVotingResultCardProps) => {
   return (
     <VotingResult
       yesVotes={votes.filter((v) => v.choice === true)}
@@ -10,4 +15,4 @@ export function DefaultVotingResult({ votes, proposal, isInCard }) {
       isInCard={isInCard}
     />
   );
-}
+};

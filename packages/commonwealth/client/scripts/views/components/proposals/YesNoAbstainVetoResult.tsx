@@ -3,16 +3,17 @@ import React, { useState } from 'react';
 import { Coin } from '../../../../../shared/adapters/currency';
 import { CosmosProposal } from '../../../controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import app from '../../../state/index';
-import { CWCard } from '../component_kit/cw_card';
-import { CWText } from '../component_kit/cw_text';
-import { VotingActions } from './voting_actions';
+import { CompletedProposalVotingResult } from './votingResults/CompletedProposalVotingResult';
 import {
-  CompletedProposalVotingResult,
   YesNoAbstainVetoVotingResult,
-} from './voting_result_components';
-import { VotingResults } from './VotingResults';
+  YesNoAbstainVetoVotingResultProps,
+} from './votingResults/YesNoAbstainVetoVotingResult';
 
-export function YesNoAbstainVetoResult({ votes, proposal, isInCard }) {
+export const YesNoAbstainVetoResult = ({
+  votes,
+  proposal,
+  isInCard,
+}: YesNoAbstainVetoVotingResultProps) => {
   // return different voting results on completed cosmos proposal, as voters are not available
   if (proposal.completed && (proposal as CosmosProposal).data?.state?.tally) {
     const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal).data
@@ -55,4 +56,4 @@ export function YesNoAbstainVetoResult({ votes, proposal, isInCard }) {
       />
     );
   }
-}
+};

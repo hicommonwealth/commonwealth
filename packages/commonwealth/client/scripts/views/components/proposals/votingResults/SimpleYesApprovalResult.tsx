@@ -1,8 +1,12 @@
 import React from 'react';
-import { CosmosProposal } from '../../../controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { SimpleYesApprovalVotingResult } from './voting_result_components';
+import { CosmosProposal } from '../../../../controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import { SimpleYesApprovalVotingResult } from './SimpleYesApprovalVotingResult';
+import { BaseVotingResultProps } from './BaseVotingResultTypes';
 
-export function SimpleYesApprovalResult({ votes, proposal }) {
+export const SimpleYesApprovalResult = ({
+  votes,
+  proposal,
+}: BaseVotingResultProps) => {
   if (proposal instanceof CosmosProposal) {
     return (
       <SimpleYesApprovalVotingResult
@@ -20,4 +24,4 @@ export function SimpleYesApprovalResult({ votes, proposal }) {
       />
     );
   }
-}
+};

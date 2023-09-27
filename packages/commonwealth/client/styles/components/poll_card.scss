@@ -57,6 +57,14 @@
   border-top: 1px solid $neutral-200;
 }
 
+.ResultSectionCard {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  width: 100%;
+  border-top: 1px solid $neutral-200;
+}
+
 .ResultsSection {
   display: flex;
   flex-direction: column;
