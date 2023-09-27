@@ -65,7 +65,7 @@ type ThreadCommentTree = {
 };
 
 function replaceCommonbotMention(text: string) {
-  const regex = /@commonessaybot/g; // 'g' flag ensures all instances are replaced
+  const regex = /@commonessaybot/g; // 'g' flag ensures all instances are captured
   const markdownLink = '[@commonessaybot](https://warpcast.com/commonessaybot)';
   return text.replace(regex, markdownLink);
 }
