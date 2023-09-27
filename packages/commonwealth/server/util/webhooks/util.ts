@@ -9,7 +9,11 @@ import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
 import { Label as chainEventLabel } from 'chain-events/src/util';
 import { capitalize } from 'lodash';
-import { renderQuillDeltaToText, slugify, smartTrim } from 'utils';
+import {
+  renderQuillDeltaToText,
+  slugify,
+  smartTrim,
+} from '../../../shared/utils';
 
 const log = factory.getLogger(formatFilename(__filename));
 
