@@ -1,6 +1,6 @@
 import { threadStageToLabel } from 'helpers';
 import moment from 'moment';
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Popover,
   usePopover,
@@ -17,6 +17,7 @@ import './AuthorAndPublishInfo.scss';
 import { PopperPlacementType } from '@mui/base/Popper';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { getRelativeTimestamp } from 'helpers/dates';
+import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
@@ -64,6 +65,8 @@ export const AuthorAndPublishInfo = ({
   popoverPlacement,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
+  const containerRef = useRef(null);
+  useAuthorMetadataCustomWrap(containerRef);
 
   const dotIndicator = showSplitDotIndicator && (
     <CWText className="dot-indicator">•</CWText>
@@ -72,7 +75,7 @@ export const AuthorAndPublishInfo = ({
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
 
   return (
-    <div className="AuthorAndPublishInfo">
+    <div className="AuthorAndPublishInfo" ref={containerRef}>
       <User
         avatarSize={24}
         userAddress={authorAddress}
