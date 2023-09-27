@@ -159,7 +159,7 @@ export class Thread implements IUniqueId {
   public numberOfComments: number;
   public associatedReactions: AssociatedReaction[];
   public links: Link[];
-  public readonly discord_meta: any;
+  public readonly bot_meta: any;
   public readonly latestActivity: Moment;
 
   public get uniqueIdentifier() {
@@ -198,7 +198,7 @@ export class Thread implements IUniqueId {
     canvasSession,
     canvasHash,
     links,
-    discord_meta,
+    bot_meta,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -213,6 +213,7 @@ export class Thread implements IUniqueId {
     canvasAction?: string;
     canvasSession?: string;
     canvasHash?: string;
+    bot_meta?: any;
     plaintext?: string;
     collaborators?: any[];
     last_edited: string;
@@ -231,7 +232,6 @@ export class Thread implements IUniqueId {
     reactionType: any[]; // TODO: fix type
     version_history: any[]; // TODO: fix type
     Address: any; // TODO: fix type
-    discord_meta?: any;
   }) {
     this.author = Address.address;
     this.title = getDecodedString(title);
@@ -265,7 +265,7 @@ export class Thread implements IUniqueId {
     this.canvasSession = canvasSession;
     this.canvasHash = canvasHash;
     this.links = links || [];
-    this.discord_meta = discord_meta;
+    this.bot_meta = bot_meta;
     this.versionHistory = processVersionHistory(version_history);
     this.chainEntities = processChainEntities(chain);
     this.associatedReactions = processAssociatedReactions(

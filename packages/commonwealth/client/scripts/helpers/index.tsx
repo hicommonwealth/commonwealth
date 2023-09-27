@@ -198,7 +198,7 @@ export function formatPercentShort(num: number) {
 }
 
 /* Choose Total Digits to Display*/
-export function formatPercent(num: number, digits: number) {
+export function formatPercent(num: number, digits = 2) {
   if (num === 0) return '0%';
   if (num === 1) return '100%';
   if (num > 1) return '100%+';
@@ -225,12 +225,12 @@ export function formatProposalHashShort(hash: string) {
 
 export function formatAddressShort(
   address: string,
-  numberOfVisibleCharacters = 5,
-  numberOfVisibleCharactersTail = 4
+  numberOfVisibleCharacters = 5
 ) {
   if (address.length < 10) return address;
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
-    -numberOfVisibleCharactersTail
+    -numberOfVisibleCharacters,
+    -1
   )}`;
 }
 

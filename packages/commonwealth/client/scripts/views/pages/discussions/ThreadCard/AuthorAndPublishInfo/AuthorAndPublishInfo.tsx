@@ -5,10 +5,11 @@ import {
   Popover,
   usePopover,
 } from 'views/components/component_kit/cw_popover/cw_popover';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWTag, TagType } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';
+import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { User } from 'views/components/user/user';
 import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
@@ -17,13 +18,14 @@ import './AuthorAndPublishInfo.scss';
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
+  bot_meta?: {
+    user: { id?: string; username: string };
+    channel_id?: string;
+    message_id?: string;
+    bot_type: string;
+  };
   authorAddress: string;
   authorChainId: string;
-  discord_meta?: {
-    user: { id: string; username: string };
-    channel_id: string;
-    message_id: string;
-  };
   collaboratorsInfo?: IThreadCollaborator[];
   isLocked?: boolean;
   lockedAt?: string;
@@ -48,7 +50,7 @@ export const AuthorAndPublishInfo = ({
   lastUpdated,
   viewsCount,
   publishDate,
-  discord_meta,
+  bot_meta,
   showSplitDotIndicator = true,
   showPublishLabelWithDate,
   showEditedLabelWithDate,
@@ -64,7 +66,8 @@ export const AuthorAndPublishInfo = ({
     <CWText className="dot-indicator">•</CWText>
   );
 
-  const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
+  const fromBot = bot_meta !== null && bot_meta !== undefined;
+  const botType = bot_meta?.bot_type;
 
   return (
     <div className="AuthorAndPublishInfo">
@@ -75,22 +78,30 @@ export const AuthorAndPublishInfo = ({
         shouldShowPopover
         shouldLinkProfile
         shouldShowAddressWithDisplayName={
-          fromDiscordBot ? false : showUserAddressWithInfo
+          fromBot ? false : showUserAddressWithInfo
         }
       />
 
-      {fromDiscordBot && (
+      {fromBot && (
         <>
           {dotIndicator}
           <CWText type="caption" className="discord-author">
-            <b>{discord_meta?.user?.username}</b>
+            <b>{bot_meta?.user?.username}</b>
           </CWText>
           {dotIndicator}
-          <CWTag label={'Discord'} type={'discord'} iconName="discord" />
-          {dotIndicator}
-          <CWText type="caption" className="discord-author">
-            Bridged from Discord
-          </CWText>
+          <CWTag
+            label={botType === 'discord' ? 'Discord' : 'Farcaster'}
+            type={botType as TagType}
+            iconName={botType as IconName}
+          />
+          {botType === 'discord' && (
+            <>
+              {dotIndicator}
+              <CWText type="caption" className="discord-author">
+                Bridged from Discord
+              </CWText>
+            </>
+          )}
         </>
       )}
 

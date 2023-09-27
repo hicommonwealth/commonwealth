@@ -12,6 +12,7 @@ import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
 import { CWCard } from '../cw_card';
+import { CWIconButton } from '../cw_icon_button';
 import { CWTab, CWTabBar } from '../cw_tabs';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
@@ -37,10 +38,11 @@ type ContentPageProps = {
   updatedAt?: moment.Moment;
   lastEdited?: moment.Moment | number;
   author?: Account | AddressInfo | MinimumProfile | undefined;
-  discord_meta?: {
-    user: { id: string; username: string };
-    channel_id: string;
-    message_id: string;
+  bot_meta?: {
+    user: { id?: string; username: string };
+    channel_id?: string;
+    message_id?: string;
+    bot_type: string;
   };
   collaborators?: IThreadCollaborator[];
   body?: (children: ReactNode) => ReactNode;
@@ -77,7 +79,7 @@ type ContentPageProps = {
 export const CWContentPage = ({
   thread,
   author,
-  discord_meta,
+  bot_meta,
   body,
   comments,
   contentBodyLabel,
@@ -143,7 +145,7 @@ export const CWContentPage = ({
     <div className="header-info-row">
       <AuthorAndPublishInfo
         showSplitDotIndicator={true}
-        discord_meta={discord_meta}
+        bot_meta={bot_meta}
         isLocked={thread?.readOnly}
         {...(thread?.lockedAt && {
           lockedAt: thread.lockedAt.toISOString(),
@@ -171,13 +173,7 @@ export const CWContentPage = ({
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
-        {typeof title === 'string' ? (
-          <CWText type="h3" fontWeight="semiBold">
-            {title}
-          </CWText>
-        ) : (
-          title
-        )}
+        {typeof title === 'string' ? <h1 className="title">{title}</h1> : title}
         {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}
@@ -246,15 +242,9 @@ export const CWContentPage = ({
             ))}
           </CWTabBar>
           {tabSelected === 0 && mainBody}
-          {sidebarComponents?.length >= 1 &&
-            tabSelected === 1 &&
-            sidebarComponents[0].item}
-          {sidebarComponents?.length >= 2 &&
-            tabSelected === 2 &&
-            sidebarComponents[1].item}
-          {sidebarComponents?.length === 3 &&
-            tabSelected === 3 &&
-            sidebarComponents[2].item}
+          {sidebarComponents.map((s, i) => {
+            return tabSelected === i + 1 && sidebarComponents[i].item;
+          })}
         </div>
       )}
     </div>

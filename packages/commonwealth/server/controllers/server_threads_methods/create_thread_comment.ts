@@ -45,7 +45,7 @@ export type CreateThreadCommentOptions = {
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
-  discordMeta?: any;
+  botMeta?: any;
 };
 
 export type CreateThreadCommentResult = [
@@ -66,7 +66,7 @@ export async function __createThreadComment(
     canvasAction,
     canvasSession,
     canvasHash,
-    discordMeta,
+    botMeta,
   }: CreateThreadCommentOptions
 ): Promise<CreateThreadCommentResult> {
   // check if banned
@@ -179,7 +179,7 @@ export async function __createThreadComment(
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
-    discord_meta: discordMeta,
+    bot_meta: botMeta,
   };
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
@@ -227,6 +227,7 @@ export async function __createThreadComment(
   // grab mentions to notify tagged users
   const bodyText = decodeURIComponent(text);
   let mentionedAddresses;
+
   try {
     const mentions = parseUserMentions(bodyText);
     if (mentions && mentions.length > 0) {

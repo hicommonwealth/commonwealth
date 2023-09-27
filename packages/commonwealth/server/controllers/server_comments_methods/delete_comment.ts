@@ -30,7 +30,7 @@ export async function __deleteComment(
     // Discord Bot Handling
     const existingComment = await this.models.Comment.findOne({
       where: {
-        discord_meta: { [Op.contains]: { message_id: messageId } },
+        bot_meta: { [Op.contains]: { message_id: messageId } },
       },
     });
 

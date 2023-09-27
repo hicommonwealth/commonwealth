@@ -13,6 +13,7 @@ type UpdateThreadRequestBody = {
   body?: string;
   stage?: string;
   url?: string;
+  bot_meta?: any;
   locked?: boolean;
   pinned?: boolean;
   archived?: boolean;
@@ -26,7 +27,6 @@ type UpdateThreadRequestBody = {
   canvasSession?: any;
   canvasAction?: any;
   canvasHash?: any;
-  discord_meta?: any; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;
 
@@ -52,7 +52,7 @@ export const updateThreadHandler = async (
     canvasSession,
     canvasAction,
     canvasHash,
-    discord_meta: discordMeta,
+    bot_meta,
   } = req.body;
 
   const threadId = parseInt(id, 10) || null;
@@ -69,6 +69,7 @@ export const updateThreadHandler = async (
       body,
       stage,
       url,
+      botMeta: bot_meta,
       locked,
       pinned,
       archived,
@@ -79,7 +80,6 @@ export const updateThreadHandler = async (
       canvasSession,
       canvasAction,
       canvasHash,
-      discordMeta,
     });
 
   for (const n of notificationOptions) {

@@ -111,6 +111,10 @@ export function getAllRascalConfigs(
       type: 'fanout',
       ...exchangeConfig,
     },
+    [RascalExchanges.FarcasterBot]: {
+      type: 'fanout',
+      ...exchangeConfig,
+    },
   };
 
   const allQueues: Record<keyof OmittedRascalQueue, QueueConfig> = {
@@ -142,6 +146,12 @@ export function getAllRascalConfigs(
       },
     },
     [RascalQueues.DiscordListener]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
+    [RascalQueues.FarcasterListener]: {
       ...queueConfig,
       options: {
         arguments: queueOptions,
@@ -180,6 +190,12 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.DiscordListener,
     },
+    [RascalBindings.FarcasterListener]: {
+      source: RascalExchanges.FarcasterBot,
+      destination: RascalQueues.FarcasterListener,
+      destinationType: 'queue',
+      bindingKey: RascalRoutingKeys.FarcasterListener,
+    },
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
@@ -208,6 +224,11 @@ export function getAllRascalConfigs(
       routingKey: RascalRoutingKeys.DiscordListener,
       ...publicationConfig,
     },
+    [RascalPublications.FarcasterListener]: {
+      exchange: RascalExchanges.FarcasterBot,
+      routingKey: RascalRoutingKeys.FarcasterListener,
+      ...publicationConfig,
+    },
   };
 
   const allSubscriptions: Record<RascalSubscriptions, SubscriptionConfig> = {
@@ -229,6 +250,10 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.DiscordListener]: {
       queue: RascalQueues.DiscordListener,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.FarcasterListener]: {
+      queue: RascalQueues.FarcasterListener,
       ...subscriptionConfig,
     },
   };

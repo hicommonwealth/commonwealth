@@ -1,0 +1,22 @@
+{
+  "name": "farcaster-bot",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc --project tsconfig.json && tsc-alias",
+    "start": "ts-node farcaster-listener/farcasterListener.ts",
+    "start-consumer": "ts-node farcaster-consumer/farcasterConsumer.ts",
+    "check-types": "tsc --noEmit",
+    "start-prod-consumer": "node build/farcaster-bot/farcaster-consumer/farcasterConsumer.js",
+    "start-prod-listener": "node build/farcaster-bot/farcaster-listener/farcasterListener.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "sequelize": "^6.32.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  }
+}

@@ -35,7 +35,8 @@
   display: flex;
   gap: 16px;
   margin-bottom: 8px;
-  overflow-x: auto;
+  overflow: auto;
+  flex-wrap: wrap;
 
   @include visibleScrollbar(light);
 }

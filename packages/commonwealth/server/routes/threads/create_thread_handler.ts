@@ -1,7 +1,6 @@
 import { ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { verifyThread } from '../../../shared/canvas/serverVerify';
 
 type CreateThreadRequestBody = {
   topic_id: string;
@@ -15,7 +14,7 @@ type CreateThreadRequestBody = {
   canvas_action?: any;
   canvas_session?: any;
   canvas_hash?: any;
-  discord_meta?: any;
+  bot_meta?: any;
 };
 type CreateThreadResponse = ThreadAttributes;
 
@@ -37,16 +36,8 @@ export const createThreadHandler = async (
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
-    discord_meta,
+    bot_meta,
   } = req.body;
-
-  await verifyThread(canvasAction, canvasSession, canvasHash, {
-    title,
-    body,
-    address: address.address,
-    community: chain.id,
-    topic: topicId ? parseInt(topicId, 10) : null,
-  });
 
   const [thread, notificationOptions, analyticsOptions] =
     await controllers.threads.createThread({
@@ -64,7 +55,7 @@ export const createThreadHandler = async (
       canvasAction,
       canvasSession,
       canvasHash,
-      discordMeta: discord_meta,
+      botMeta: bot_meta,
     });
 
   for (const n of notificationOptions) {

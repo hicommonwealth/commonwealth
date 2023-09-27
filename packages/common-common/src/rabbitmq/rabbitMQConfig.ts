@@ -13,6 +13,7 @@ export enum RascalConfigServices {
   ChainEventsService = 'chainEvents',
   SnapshotService = 'snapshot',
   DiscobotService = 'discobot',
+  FarcasterService = 'farcaster',
 }
 
 /**
@@ -142,6 +143,22 @@ export function getRabbitMQConfig(
     ]);
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
       RascalSubscriptions.DiscordListener,
+    ]);
+  } else if (service === RascalConfigServices.FarcasterService) {
+    copyConfigs(allExchanges, vhostConfig.exchanges, [
+      RascalExchanges.FarcasterBot,
+    ]);
+    copyConfigs(allQueues, vhostConfig.queues, [
+      RascalQueues.FarcasterListener,
+    ]);
+    copyConfigs(allBindings, vhostConfig.bindings, [
+      RascalBindings.FarcasterListener,
+    ]);
+    copyConfigs(allPublications, vhostConfig.publications, [
+      RascalPublications.FarcasterListener,
+    ]);
+    copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
+      RascalSubscriptions.FarcasterListener,
     ]);
   }
 

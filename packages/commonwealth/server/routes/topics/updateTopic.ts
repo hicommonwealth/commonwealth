@@ -56,7 +56,7 @@ const updateTopic = async (
       where: {
         topic_id: topicWithChannel.id,
         // discord meta is not null
-        discord_meta: {
+        bot_meta: {
           [Op.ne]: null,
         },
       },
@@ -85,7 +85,7 @@ const updateTopic = async (
       where: {
         chain: chain_id,
         // discord meta is not null
-        discord_meta: {
+        bot_meta: {
           [Op.contains]: { channel_id: channel_id },
         },
       },

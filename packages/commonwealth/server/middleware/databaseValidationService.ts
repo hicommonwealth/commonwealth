@@ -12,6 +12,10 @@ export const Errors = {
   InvalidCommunity: 'Invalid community or chain',
 };
 
+const BotUsers = {
+  discord: 'Discord Bot',
+  farcaster: 'Farcaster Bot',
+};
 export default class DatabaseValidationService {
   private models: DB;
 
@@ -49,14 +53,17 @@ export default class DatabaseValidationService {
     res: Response,
     next: NextFunction
   ) => {
+    const botName = BotUsers[req.body.bot_name];
+
     //1. Check for bot token
-    if (req.body.auth !== CW_BOT_KEY) {
+    if (!botName || req.body.auth !== CW_BOT_KEY) {
       return next(new AppError('Approved Bot Only Endpoint'));
     }
+
     //2. Get Bot User and inject
     const profile = await this.models.Profile.findOne({
       where: {
-        profile_name: 'Discord Bot',
+        profile_name: botName,
       },
     });
     req.user = await profile.getUser();

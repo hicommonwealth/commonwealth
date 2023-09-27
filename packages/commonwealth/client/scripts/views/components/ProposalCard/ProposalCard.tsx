@@ -57,15 +57,6 @@ export const ProposalCard = ({
     }
   }, [proposal]);
 
-  useEffect(() => {
-    if (proposal instanceof AaveProposal) {
-      proposal.ipfsDataReady.once('ready', () => {
-        // triggers render of shortDescription too
-        setTitle(proposal?.ipfsData.title);
-      });
-    }
-  }, [proposal]);
-
   return (
     <CWCard
       elevation="elevation-2"

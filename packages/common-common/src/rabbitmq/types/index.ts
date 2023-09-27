@@ -12,6 +12,7 @@ import { Sequelize } from 'sequelize';
 import { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
 import { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
 import { RmqDiscordMessage } from './discordMessage';
+import { RmqFarcasterMessage } from './farcasterMessage';
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -33,7 +34,8 @@ export type TRmqMessages =
   | RmqCENotification.RmqMsgType
   | RmqSnapshotEvent.RmqMsgType
   | RmqSnapshotNotification.RmqMsgType
-  | RmqDiscordMessage.RmqMsgType;
+  | RmqDiscordMessage.RmqMsgType
+  | RmqFarcasterMessage.RmqMsgType;
 
 export interface RmqMsgNamespace<MsgType> {
   getInvalidFormatError(...args): RmqMsgFormatError;
@@ -47,6 +49,7 @@ export enum RascalPublications {
   ChainEventNotifications = 'ChainEventNotificationsPublication',
   SnapshotListener = 'SnapshotListenerPublication',
   DiscordListener = 'DiscordMessageSubscription',
+  FarcasterListener = 'FarcasterMessagePublication',
 }
 
 export enum RascalSubscriptions {
@@ -55,6 +58,7 @@ export enum RascalSubscriptions {
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
   SnapshotListener = 'SnapshotListenerSubscription',
   DiscordListener = 'DiscordMessageSubscription',
+  FarcasterListener = 'FarcasterMessageSubscription',
 }
 
 export enum RascalExchanges {
@@ -64,6 +68,7 @@ export enum RascalExchanges {
   SnapshotListener = 'SnapshotListenerExchange',
   DeadLetter = 'DeadLetterExchange',
   Discobot = 'DiscobotExchange',
+  FarcasterBot = 'FarcasterBotExchange',
 }
 
 export enum RascalQueues {
@@ -71,8 +76,9 @@ export enum RascalQueues {
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueueV2',
   ChainEventNotifications = 'ChainEventNotificationsQueueV2',
   DeadLetter = 'DeadLetterQueue',
-  SnapshotListener = 'SnapshotListenerQueueV2',
-  DiscordListener = 'DiscordMessageQueueV2',
+  SnapshotListener = 'SnapshotListenerQueue',
+  DiscordListener = 'DiscordMessageQueue',
+  FarcasterListener = 'FarcasterMessageQueue',
 }
 
 export enum RascalBindings {
@@ -82,6 +88,7 @@ export enum RascalBindings {
   SnapshotListener = 'SnapshotListenerBinding',
   DeadLetter = 'DeadLetterBinding',
   DiscordListener = 'DiscordMessageBinding',
+  FarcasterListener = 'FarcasterMessageBinding',
 }
 
 export enum RascalRoutingKeys {
@@ -91,6 +98,7 @@ export enum RascalRoutingKeys {
   SnapshotListener = 'SnapshotListener',
   DeadLetter = 'DeadLetter',
   DiscordListener = 'DiscordListener',
+  FarcasterListener = 'FarcasterListener',
 }
 
 export type SafeRmqPublishSupported = ChainEventModelStatic;

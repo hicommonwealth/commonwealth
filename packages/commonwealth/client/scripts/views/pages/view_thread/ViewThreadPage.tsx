@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -13,6 +12,7 @@ import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -26,14 +26,21 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useForceRerender from '../../../hooks/useForceRerender';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { VotingActions } from '../../components/proposals/voting_actions';
+import { VotingResults } from '../../components/proposals/VotingResults';
 import { Select } from '../../components/Select';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
-import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import {
+  CWContentPage,
+  CWContentPageCard,
+} from '../../components/component_kit/CWContentPage';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -45,26 +52,19 @@ import {
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { useProposalData } from '../view_proposal/index';
+import { useSnapshotProposalData } from '../view_snapshot_proposal/index';
+import { SnapshotInformationCard } from '../view_snapshot_proposal/snapshot_information_card';
+import { SnapshotPollCardContainer } from '../view_snapshot_proposal/snapshot_poll_card_container';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
-import { useSearchParams } from 'react-router-dom';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 import 'pages/view_thread/index.scss';
-
-export type ThreadPrefetch = {
-  [identifier: string]: {
-    pollsStarted?: boolean;
-    profilesFinished: boolean;
-    profilesStarted: boolean;
-    viewCountStarted?: boolean;
-    threadReactionsStarted?: boolean;
-  };
-};
 
 type ViewThreadPageProps = {
   identifier: string;
@@ -92,6 +92,38 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false);
   const [isViewMarked, setIsViewMarked] = useState(false);
+  const [snapshotProposalId, setSnapshotProposalId] = useState(null);
+  const [snapshotId, setSnapshotId] = useState(null);
+  const [proposalId, setProposalId] = useState(null);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const toggleVotingModal = (newModalState: boolean) => {
+    setVotingModalOpen(newModalState);
+  };
+
+  const onModalClose = () => {
+    setVotingModalOpen(false);
+  };
+
+  const {
+    snapshotProposal,
+    proposalAuthor,
+    votes,
+    symbol,
+    threads,
+    activeUserAddress,
+    power,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    loadVotes,
+  } = useSnapshotProposalData(snapshotProposalId, snapshotId);
+
+  const { proposal } = useProposalData(proposalId, null, proposalId != null);
+
+  const forceRerender = useForceRerender();
+
+  const proposalVotes = proposal?.getVotes();
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -123,10 +155,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   useEffect(() => {
+    app.proposalEmitter.on('redraw', forceRerender);
+
+    return () => {
+      app.proposalEmitter.removeAllListeners();
+    };
+  }, [forceRerender]);
+
+  useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
   }, [fetchCommentsError]);
 
   const { isWindowLarge } = useBrowserWindow({
+    // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -241,7 +282,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  if (linkedSnapshots?.length > 0 && !snapshotId) {
+    setSnapshotId(linkedSnapshots[0].identifier.split('/')[0]);
+    setSnapshotProposalId(linkedSnapshots[0].identifier.split('/')[1]);
+  }
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+  if (linkedProposals?.length > 0 && !proposalId) {
+    setProposalId(linkedProposals[0].identifier);
+  }
+
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
 
   const showLinkedProposalOptions =
@@ -308,11 +357,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
-  const fromDiscordBot =
-    thread.discord_meta !== null && thread.discord_meta !== undefined;
+  const fromBot = thread.bot_meta !== null && thread.bot_meta !== undefined;
 
-  const showLocked =
-    (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
+  const showLocked = (thread.readOnly && !thread.markedAsSpamAt) || fromBot;
 
   const canUpdateThread =
     isLoggedIn &&
@@ -321,7 +368,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isCommunityModerator() ||
       Permissions.isThreadAuthor(thread) ||
       Permissions.isThreadCollaborator(thread) ||
-      (fromDiscordBot && isAdmin));
+      (fromBot && isAdmin));
 
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
@@ -350,7 +397,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         }
         isEditing={isEditingBody}
         author={app.chain.accounts.get(thread.author)}
-        discord_meta={thread.discord_meta}
+        bot_meta={thread.bot_meta}
         collaborators={thread.collaborators}
         createdAt={thread.createdAt}
         updatedAt={thread.updatedAt}
@@ -419,7 +466,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ) : (
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
-                {thread.readOnly || fromDiscordBot ? (
+                {thread.readOnly || fromBot ? (
                   <>
                     {threadOptionsComp}
                     {!thread.readOnly && thread.markedAsSpamAt && (
@@ -440,7 +487,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <LockMessage
                         lockedAt={thread.lockedAt}
                         updatedAt={thread.updatedAt}
-                        fromDiscordBot={fromDiscordBot}
+                        fromBot={fromBot}
+                        botType={thread.bot_meta?.bot_type}
                       />
                     )}
                   </>
@@ -507,7 +555,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               parentCommentId={parentCommentId}
               setParentCommentId={setParentCommentId}
               canComment={canComment}
-              fromDiscordBot={fromDiscordBot}
+              fromDiscordBot={fromBot}
             />
           </>
         }
@@ -532,6 +580,72 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           />
                         )}
                       </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(snapshotProposal
+              ? [
+                  {
+                    label: 'Info',
+                    item: (
+                      <SnapshotInformationCard
+                        proposal={snapshotProposal}
+                        threads={threads}
+                        header={'Snapshot Info'}
+                      />
+                    ),
+                  },
+                  {
+                    label: 'Poll',
+                    item: (
+                      <SnapshotPollCardContainer
+                        activeUserAddress={activeUserAddress}
+                        fetchedPower={!!power}
+                        identifier={identifier}
+                        proposal={snapshotProposal}
+                        space={space}
+                        symbol={symbol}
+                        totals={totals}
+                        totalScore={totalScore}
+                        validatedAgainstStrategies={validatedAgainstStrategies}
+                        votes={votes}
+                        loadVotes={async () =>
+                          loadVotes(snapshotId, identifier)
+                        }
+                      />
+                    ),
+                  },
+                ]
+              : []),
+            ...(proposal && proposalVotes?.length >= 0
+              ? [
+                  {
+                    label: 'ProposalPoll',
+                    item: (
+                      <CWContentPageCard
+                        header={'Proposal Vote'}
+                        content={
+                          <CWCard className="PollCard">
+                            <div className="poll-title-section">
+                              <CWText type="b2" className="poll-title-text">
+                                {proposal.title}
+                              </CWText>
+                            </div>
+                            <VotingActions
+                              onModalClose={onModalClose}
+                              proposal={proposal}
+                              toggleVotingModal={toggleVotingModal}
+                              votingModalOpen={votingModalOpen}
+                              isInCard={true}
+                            />
+                            <VotingResults
+                              proposal={proposal}
+                              isInCard={true}
+                            />
+                          </CWCard>
+                        }
+                      ></CWContentPageCard>
                     ),
                   },
                 ]
@@ -564,7 +678,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             polls?.map((poll) => [poll.id, poll])
                           ).values(),
                         ].map((poll: Poll) => {
-                          return (
+                          const threadPollCard = (
                             <ThreadPollCard
                               poll={poll}
                               key={poll.id}
@@ -574,6 +688,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 setInitializedPolls(false);
                               }}
                             />
+                          );
+                          return (
+                            <CWContentPageCard
+                              header="Thread Poll"
+                              content={threadPollCard}
+                            ></CWContentPageCard>
                           );
                         })}
                         {isAuthor &&
