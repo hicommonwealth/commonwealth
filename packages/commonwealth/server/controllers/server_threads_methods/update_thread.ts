@@ -92,7 +92,7 @@ export async function __updateThread(
 ): Promise<UpdateThreadResult> {
   // Discobot handling
   if (!threadId) {
-    if (!discordMeta) {
+    if (!botMeta) {
       throw new AppError(Errors.ThreadNotFound);
     }
     const existingThread = await this.models.Thread.findOne({
