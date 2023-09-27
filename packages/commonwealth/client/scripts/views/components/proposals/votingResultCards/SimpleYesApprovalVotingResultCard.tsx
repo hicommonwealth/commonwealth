@@ -9,7 +9,7 @@ export const SimpleYesApprovalVotingResultCard = (
   const { approvedCount } = props;
 
   return (
-    <div className={clsx('ResultsSection', 'TopBorder')}>
+    <div className="ResultSectionCard">
       <div className="results-header">
         <CWText type="b1" fontWeight="bold">
           Results

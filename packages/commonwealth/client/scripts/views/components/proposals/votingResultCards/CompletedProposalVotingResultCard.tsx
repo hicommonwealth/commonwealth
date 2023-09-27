@@ -9,7 +9,7 @@ export const CompletedProposalVotingResultCard = (
   const { abstainPct, noPct, noWithVetoPct, yesPct, yesResults } = props;
 
   return (
-    <div className={clsx('ResultsSection', 'TopBorder')}>
+    <div className="ResultSectionCard">
       <div className="results-header">
         <CWText type="b1" fontWeight="bold">
           Results
