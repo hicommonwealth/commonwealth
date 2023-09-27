@@ -60,8 +60,6 @@ export async function __refreshMembership(
       });
       membership.Group = group;
 
-      console.log(membership.toJSON(), created);
-
       if (!created) {
         const expiresAt = moment(membership.last_checked).add(
           MEMBERSHIP_TTL_SECONDS,
