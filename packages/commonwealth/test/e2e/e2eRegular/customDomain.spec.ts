@@ -6,8 +6,6 @@ if (process.env.IS_CI === 'true') {
   // ssl proxy takes a while, so increase test timeout
   test.setTimeout(200000);
 
-  test.use({ ignoreHTTPSErrors: true });
-
   test.beforeAll(async () => {
     await createTestEntities();
   });

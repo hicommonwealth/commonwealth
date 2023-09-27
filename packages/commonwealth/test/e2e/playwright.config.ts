@@ -4,9 +4,10 @@ const config: PlaywrightTestConfig = {
   use: {
     video: 'retain-on-failure',
     trace: 'on-first-retry',
+    ignoreHTTPSErrors: true,
   },
   globalSetup: './globalSetup.ts',
-  timeout: 120_000,
+  timeout: 60_000,
   fullyParallel: true,
   reporter: [['list'], ['playwright-json-summary-reporter']],
   webServer: {
@@ -14,6 +15,7 @@ const config: PlaywrightTestConfig = {
     url: 'http://localhost:8080',
     stdout: 'pipe',
     stderr: 'pipe',
+    timeout: 120_000,
   },
 };
 
