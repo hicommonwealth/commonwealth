@@ -28,6 +28,10 @@
       .tasl__indicator {
         padding: 0px;
         color: $neutral-500;
+
+        &.tasl__clear-indicator {
+          margin-right: 10px;
+        }
       }
       .tasl__indicator-separator {
         display: none;
