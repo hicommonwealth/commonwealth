@@ -52,8 +52,6 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
     }
   };
 
-  console.log(contractAddress);
-
   useEffect(() => {
     loadContractAbi().then(setAbiItems);
   }, [contractAddress, app.contracts]);
