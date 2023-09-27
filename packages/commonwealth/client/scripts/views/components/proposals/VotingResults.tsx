@@ -5,8 +5,8 @@ import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
 import app from 'state';
-import { AaveProposalResult } from './VotingResults/AaveProposalResult';
-import { SimpleYesApprovalResult } from './VotingResults/SimpleYesApprovalResult';
+import { AaveProposalResult } from './votingResults/AaveProposalResult';
+import { SimpleYesApprovalResult } from './votingResults/SimpleYesApprovalResult';
 import useForceRerender from 'hooks/useForceRerender';
 import { CompoundYesNoAbstainResult } from './votingResults/CompoundYesNoAbstainResult';
 import { CompoundYesNoResult } from './votingResults/CompoundYesNoResult';

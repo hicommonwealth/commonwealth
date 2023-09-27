@@ -1,12 +1,15 @@
 import React from 'react';
 import { BravoVote } from '../../../../controllers/chain/ethereum/compound/proposal';
-import { BaseVotingResultProps } from './BaseVotingResultTypes';
+import {
+  BaseCompoundVotingResultProps,
+  BaseVotingResultProps,
+} from './BaseVotingResultTypes';
 import { VotingResult } from './VotingResult';
 
 export const CompoundYesNoResult = ({
   votes,
   proposal,
-}: BaseVotingResultProps) => {
+}: BaseCompoundVotingResultProps) => {
   return (
     <VotingResult
       abstainVotes={votes.filter((v) => v.choice === BravoVote.ABSTAIN)}
