@@ -26,6 +26,9 @@ const NotificationsPage = () => {
 
   return (
     <div className="NotificationsPage">
+      <CWText type="h2" fontWeight="medium">
+        Notifications
+      </CWText>
       <div className="notifications-buttons-row">
         <CWButton
           label="Mark all as read"

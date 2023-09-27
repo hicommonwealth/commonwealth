@@ -19,6 +19,7 @@ import { TopicSelector } from 'views/components/topic_selector';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { ReactQuillEditor } from '../react_quill_editor';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   createDeltaFromText,
   getTextFromDelta,
@@ -137,6 +138,11 @@ export const NewThreadForm = () => {
   return (
     <>
       <div className="NewThreadForm">
+        <div className="header">
+          <CWText type="h2" fontWeight="medium">
+            Proposals
+          </CWText>
+        </div>
         <div className="new-thread-header">
           <CWTabBar>
             <CWTab
