@@ -40,3 +40,54 @@
     margin-bottom: 32px;
   }
 }
+
+.ViewTemplateForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
+
+  .header {
+    margin: 32px 0 8px;
+  }
+
+  .divider {
+    margin: 40px 0 20px;
+  }
+
+  .template {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .bottom-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .form {
+    textarea {
+      min-height: 400px;
+      resize: vertical;
+    }
+    gap: 32px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 32px;
+  }
+
+  .links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .no-threads-text.Text {
+    color: $neutral-500;
+  }
+}

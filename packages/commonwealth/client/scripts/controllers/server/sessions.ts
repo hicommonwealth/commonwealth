@@ -213,7 +213,7 @@ class SessionsController {
     );
 
     // Get a new session signature.
-    if (!hasAuthenticatedSession) {
+    if (app.config.enforceSessionKeys && !hasAuthenticatedSession) {
       const matchingAccount = app.user.addresses.find(
         (a) => a.address === address
       );
@@ -224,6 +224,10 @@ class SessionsController {
         address,
         ssoSource: matchingAccount.walletSsoSource,
       });
+    }
+
+    if (!hasAuthenticatedSession) {
+      return { session: '', action: '', hash: '' };
     }
 
     const { session, action, hash } = await controller.sign(

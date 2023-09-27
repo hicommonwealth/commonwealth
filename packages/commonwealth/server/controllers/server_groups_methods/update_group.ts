@@ -51,11 +51,13 @@ export async function __updateGroup(
       throw new AppError(`${Errors.InvalidMetadata}: ${metadataValidationErr}`);
     }
   }
-  if (
-    typeof requirements !== 'undefined' &&
-    !validateRequirements(requirements)
-  ) {
-    throw new AppError(Errors.InvalidRequirements);
+  if (typeof requirements !== 'undefined') {
+    const requirementsValidationErr = validateRequirements(requirements);
+    if (requirementsValidationErr) {
+      throw new AppError(
+        `${Errors.InvalidRequirements}: ${requirementsValidationErr}`
+      );
+    }
   }
 
   const group = await this.models.Group.findOne({

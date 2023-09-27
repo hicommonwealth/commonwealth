@@ -6,6 +6,28 @@ import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
 import { UserInstance } from 'server/models/user';
+import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+
+const VALID_REQUIREMENTS: Requirement[] = [
+  {
+    rule: 'threshold',
+    data: {
+      threshold: '1000',
+      source: {
+        source_type: 'erc20',
+        evm_chain_id: 1,
+        contract_address: '0x0000000000000000000000000000000000000000',
+      },
+    },
+  },
+  {
+    rule: 'allow',
+    data: {
+      allow: ['0x0000000000000000000000000000000000000000'],
+    },
+  },
+];
+const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 
 const createMockedGroupsController = () => {
   const groups: GroupAttributes[] = [
@@ -181,6 +203,24 @@ describe('ServerGroupsController', () => {
     expect(result).to.have.property('requirements');
   });
 
+  describe('#createGroup (invalid requirements)', async () => {
+    const controller = createMockedGroupsController();
+    const { user, chain, address } = createMockParams();
+    expect(
+      controller.createGroup({
+        user,
+        chain,
+        address,
+        metadata: {
+          name: 'blah',
+          description: 'blah',
+        },
+        requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
+        topics: [],
+      })
+    ).to.eventually.be.rejectedWith('Invalid requirements');
+  });
+
   describe('#updateGroup', async () => {
     const controller = createMockedGroupsController();
     const { user, chain, address } = createMockParams();
@@ -199,6 +239,24 @@ describe('ServerGroupsController', () => {
     expect(result).to.have.property('chain_id');
     expect(result).to.have.property('metadata');
     expect(result).to.have.property('requirements');
+  });
+
+  describe('#updateGroup (invalid requirements)', async () => {
+    const controller = createMockedGroupsController();
+    const { user, chain, address } = createMockParams();
+    expect(
+      controller.updateGroup({
+        user,
+        chain,
+        address,
+        groupId: 1,
+        metadata: {
+          name: 'blah',
+          description: 'blah',
+        },
+        requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
+      })
+    ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 
   describe('#deleteGroup', async () => {

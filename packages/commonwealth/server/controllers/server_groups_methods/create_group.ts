@@ -53,8 +53,11 @@ export async function __createGroup(
     throw new AppError(`${Errors.InvalidMetadata}: ${metadataValidationErr}`);
   }
 
-  if (!validateRequirements(requirements)) {
-    throw new AppError(Errors.InvalidRequirements);
+  const requirementsValidationErr = validateRequirements(requirements);
+  if (requirementsValidationErr) {
+    throw new AppError(
+      `${Errors.InvalidRequirements}: ${requirementsValidationErr}`
+    );
   }
 
   const numChainGroups = await this.models.Group.count({

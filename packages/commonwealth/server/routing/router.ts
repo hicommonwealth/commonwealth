@@ -39,7 +39,6 @@ import {
   fetchEtherscanContract,
   fetchEtherscanContractAbi,
 } from '../routes/etherscanAPI';
-import createContractAbi from '../routes/contractAbis/createContractAbi';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
 import adminAnalytics, {
   communitySpecificAnalytics,
@@ -515,14 +514,6 @@ function setupRouter(
     '/viewVotes',
     databaseValidationService.validateChain,
     viewVotes.bind(this, models)
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/contractAbi',
-    passport.authenticate('jwt', { session: false }),
-    createContractAbi.bind(this, models)
   );
 
   // Templates

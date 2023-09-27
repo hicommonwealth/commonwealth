@@ -1,4 +1,4 @@
-import { assert, expect } from 'chai';
+import { assert } from 'chai';
 import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
 import validateGroupMembership, {
   ValidateGroupMembershipResponse,

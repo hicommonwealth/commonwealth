@@ -40,13 +40,15 @@ export const createThreadHandler = async (
     discord_meta,
   } = req.body;
 
-  await verifyThread(canvasAction, canvasSession, canvasHash, {
-    title,
-    body,
-    address: address.address,
-    community: chain.id,
-    topic: topicId ? parseInt(topicId, 10) : null,
-  });
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    await verifyThread(canvasAction, canvasSession, canvasHash, {
+      title,
+      body,
+      address: address.address,
+      community: chain.id,
+      topic: topicId ? parseInt(topicId, 10) : null,
+    });
+  }
 
   const [thread, notificationOptions, analyticsOptions] =
     await controllers.threads.createThread({
