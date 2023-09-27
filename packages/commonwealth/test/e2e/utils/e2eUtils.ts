@@ -109,6 +109,8 @@ export async function removeUser() {
         FROM "Addresses"
         WHERE address = '${testAddress}'
     );
+    DELETE FROM "Addresses"
+    WHERE address = '${testAddress}';
     DELETE FROM "Users"
     WHERE id IN (
         SELECT user_id
@@ -121,8 +123,6 @@ export async function removeUser() {
       FROM "Addresses"
       WHERE address = '${testAddress}'
     );
-    DELETE FROM "Addresses"
-    WHERE address = '${testAddress}';
 `;
 
   await dbClient.query(removeQuery);
@@ -177,11 +177,7 @@ export async function createAddress(
   `);
 }
 
-export async function createInitialUser(passedDbClient = null) {
-  if (passedDbClient) {
-    dbClient = passedDbClient;
-  }
-
+export async function createInitialUser() {
   const userExists = await dbClient.query(
     `select 1 from "Addresses" where address = '${testAddress}' and chain = 'ethereum'`
   );

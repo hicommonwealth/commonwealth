@@ -16,6 +16,7 @@ const config: PlaywrightTestConfig = {
     stdout: 'pipe',
     stderr: 'pipe',
     timeout: 120_000,
+    reuseExistingServer: true,
   },
 };
 
