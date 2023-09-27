@@ -220,3 +220,5 @@ export type RoleObject = {
   allow: number;
   deny: number;
 };
+
+export type AbiType = Record<string, unknown>[];
