@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
-import { featureFlags } from 'helpers/feature-flags';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
@@ -165,7 +164,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
           {
             type: 'default',
             label: 'Explore communities',
-            iconLeft: featureFlags.sessionKeys ? 'compassPhosphor' : 'compass',
+            iconLeft: 'compassPhosphor',
             onClick: () => {
               setMenu({ name: 'default', isVisible: false });
               navigate('/communities', {}, null);
