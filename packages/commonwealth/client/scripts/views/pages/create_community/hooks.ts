@@ -14,13 +14,16 @@ import type {
 export const useChainFormIdFields = (): UseChainFormIdFieldsHookType => {
   const [id, setId] = useState('');
   const [name, setName] = useState('');
+  const [chainName, setChainName] = useState('');
   const [symbol, setSymbol] = useState('XYZ');
 
   return {
     id,
     name,
+    chainName,
     setId,
     setName,
+    setChainName,
     setSymbol,
     symbol,
   };

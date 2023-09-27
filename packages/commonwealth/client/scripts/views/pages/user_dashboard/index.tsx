@@ -80,7 +80,7 @@ const UserDashboard = (props: UserDashboardProps) => {
               onClick={() => {
                 if (!loggedIn) {
                   notifyInfo(
-                    'Log in or create an account for custom activity feed'
+                    'Sign in or create an account for custom activity feed'
                   );
                   return;
                 }

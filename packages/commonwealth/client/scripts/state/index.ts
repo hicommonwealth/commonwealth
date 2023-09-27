@@ -83,6 +83,7 @@ export interface IApp {
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     evmTestEnv?: string;
+    enforceSessionKeys?: boolean;
     chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
   };
 
@@ -221,6 +222,7 @@ export async function initAppState(
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
     app.config.evmTestEnv = statusRes.result.evmTestEnv;
+    app.config.enforceSessionKeys = statusRes.result.enforceSessionKeys;
 
     nodesRes.result
       .sort((a, b) => a.id - b.id)
