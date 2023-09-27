@@ -15,7 +15,7 @@ import ErrorPage from '../error';
 import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import {
   APIOrderBy,
-  APIOrderDirection,
+  APIOrderDirection
 } from '../../../../scripts/helpers/constants';
 
 const ManageCommunityPage = () => {
@@ -34,8 +34,8 @@ const ManageCommunityPage = () => {
       const res = await axios.get(`${app.serverUrl()}/roles`, {
         params: {
           chain_id: app.activeChainId(),
-          permissions: ['moderator', 'admin'],
-        },
+          permissions: ['moderator', 'admin']
+        }
       });
       const roles = res.data.result || [];
       roles.forEach((role) => {
@@ -59,7 +59,7 @@ const ManageCommunityPage = () => {
     limit: 20,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
-    includeRoles: true,
+    includeRoles: true
   });
 
   const roleData = useMemo(() => {
@@ -71,7 +71,7 @@ const ManageCommunityPage = () => {
         ...(profile.roles[0] || {}),
         Address: profile.addresses[0],
         id: profile.addresses[0].id,
-        displayName: profile.profile_name || 'Anonymous',
+        displayName: profile.profile_name || 'Anonymous'
       };
     });
   }, [searchResults]);

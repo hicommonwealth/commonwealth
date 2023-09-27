@@ -23,14 +23,14 @@ import { CWText } from '../../components/component_kit/cw_text';
 import {
   createDeltaFromText,
   getTextFromDelta,
-  serializeDelta,
+  serializeDelta
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    chainId: app.activeChainId()
   });
 
   const chainId = app.chain.id;
@@ -56,7 +56,7 @@ export const NewThreadForm = () => {
     setThreadContentDelta,
     setIsSaving,
     isDisabled,
-    clearDraft,
+    clearDraft
   } = useNewThreadForm(chainId, topicsForSelector);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -64,7 +64,7 @@ export const NewThreadForm = () => {
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
-    chainId: app.activeChainId(),
+    chainId: app.activeChainId()
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -94,7 +94,7 @@ export const NewThreadForm = () => {
       title: threadTitle,
       body: deltaString,
       link: threadUrl,
-      topic: threadTopic,
+      topic: threadTopic
     });
 
     try {
@@ -109,7 +109,7 @@ export const NewThreadForm = () => {
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
-        authorProfile: app.user.activeAccount.profile,
+        authorProfile: app.user.activeAccount.profile
       });
 
       setThreadContentDelta(createDeltaFromText(''));

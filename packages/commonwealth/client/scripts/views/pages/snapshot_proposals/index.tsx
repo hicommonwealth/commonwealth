@@ -33,7 +33,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
     () =>
       app.user.notifications.findNotificationSubscription({
         categoryId: NotificationCategories.SnapshotProposal,
-        options: { snapshotId },
+        options: { snapshotId }
       }),
     [snapshotId]
   );
@@ -52,7 +52,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
       if (app.snapshot.initialized) {
         const tempProposals = {
           active: [],
-          ended: [],
+          ended: []
         };
 
         // filter active and ended proposals
@@ -79,7 +79,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
       app.user.notifications
         .subscribe({
           categoryId: NotificationCategories.SnapshotProposal,
-          options: { snapshotId },
+          options: { snapshotId }
         })
         .then(() => {
           setHasSubscription(true);
