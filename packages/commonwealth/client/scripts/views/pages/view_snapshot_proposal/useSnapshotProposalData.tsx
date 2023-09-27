@@ -63,7 +63,11 @@ export const useSnapshotProposalData = (
     if (!snapshotProposal || !activeChainId) {
       return null;
     }
-    return new AddressInfo(null, snapshotProposal.author, activeChainId, null);
+    return new AddressInfo({
+      id: null,
+      address: snapshotProposal.author,
+      chainId: activeChainId,
+    });
   }, [activeChainId, snapshotProposal]);
 
   useManageDocumentTitle('View snapshot proposal', snapshotProposal?.title);

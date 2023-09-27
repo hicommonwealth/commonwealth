@@ -13,7 +13,10 @@ import { CompoundYesNoResult } from './votingResults/CompoundYesNoResult';
 import { DefaultVotingResult } from './votingResults/DefaultVotingResult';
 import { YesNoAbstainVetoResult } from './YesNoAbstainVetoResult';
 import { YesNoRejectResult } from './votingResults/YesNoRejectResult';
-import { useAaveProposalVotesQuery } from 'state/api/proposals';
+import {
+  useAaveProposalVotesQuery,
+  useCompoundProposalVotesQuery,
+} from 'state/api/proposals';
 import { ChainNetwork } from 'common-common/src/types';
 
 type VotingResultsProps = { proposal: AnyProposal; isInCard: boolean };
@@ -54,13 +57,20 @@ export const VotingResults = (props: VotingResultsProps) => {
     };
   }, [forceRerender]);
 
-  const { data } = useAaveProposalVotesQuery({
+  const { data: aaveVotes } = useAaveProposalVotesQuery({
     moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
     chainId: app.chain?.id,
     proposalId: proposal.identifier,
   });
 
-  const votes = data || proposal.getVotes();
+  const { data: compoundVotes } = useCompoundProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+    chainId: app.chain?.id,
+    proposalId: proposal.data.id,
+    proposalIdentifier: proposal.identifier,
+  });
+
+  const votes = aaveVotes || compoundVotes || proposal.getVotes();
 
   // handle aave separately
   if (proposal && proposal instanceof AaveProposal) {

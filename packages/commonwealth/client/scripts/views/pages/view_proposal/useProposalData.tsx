@@ -10,6 +10,7 @@ import { AnyProposal } from '../../../models/types';
 import { usePoolParamsQuery } from '../../../state/api/chainParams/index';
 import {
   useAaveProposalsQuery,
+  useCompoundProposalsQuery,
   useCosmosProposalDepositsQuery,
   useCosmosProposalMetadataQuery,
   useCosmosProposalQuery,
@@ -79,6 +80,14 @@ export const useProposalData = (
       chainId: app.chain?.id,
     });
 
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const fetchCompoundData = onCompound && isAdapterLoaded;
+  const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
+    useCompoundProposalsQuery({
+      moduleReady: fetchCompoundData,
+      chainId: app.chain?.id,
+    });
+
   useEffect(() => {
     if (!aaveProposalsLoading && fetchAaveData && !proposal) {
       const foundProposal = cachedAaveProposals?.find(
@@ -101,9 +110,18 @@ export const useProposalData = (
     proposalId,
   ]);
 
+  useEffect(() => {
+    if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
+      const foundProposal = cachedCompoundProposals?.find(
+        (p) => p.identifier === proposalId
+      );
+      setProposal(foundProposal);
+    }
+  }, [cachedCompoundProposals]);
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
-      if (onAave) return;
+      if (onAave || onCompound) return;
       try {
         const proposalFromStore = getProposalFromStore();
         setProposal(proposalFromStore);
