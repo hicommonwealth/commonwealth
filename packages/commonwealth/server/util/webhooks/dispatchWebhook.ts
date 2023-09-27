@@ -5,7 +5,8 @@ import {
 } from './webhookEndpointUtil/discord';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { fetchWebhooks, getWebhookData } from './util';
+import { fetchWebhooks } from './util';
+import { getWebhookData } from './getWebhookData';
 
 const log = factory.getLogger(formatFilename(__filename));
 

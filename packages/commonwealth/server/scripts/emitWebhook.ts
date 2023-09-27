@@ -25,7 +25,7 @@ async function main() {
 
   const chain = await models.Chain.findOne({
     where: {
-      id: 'aave',
+      id: 'ethereum',
     },
   });
 

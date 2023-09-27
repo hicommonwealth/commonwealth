@@ -6,14 +6,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
-import { ChainEventWebhookData, ForumWebhookData } from './types';
-import { Label as chainEventLabel } from 'chain-events/src/util';
-import { capitalize } from 'lodash';
-import {
-  renderQuillDeltaToText,
-  slugify,
-  smartTrim,
-} from '../../../shared/utils';
+import { slugify } from '../../../shared/utils';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -93,6 +86,7 @@ export async function getPreviewImageUrl(
     { categoryId: NotificationCategories.SnapshotProposal }
   >
 ): Promise<{ previewImageUrl: string; previewAltText: string }> {
+  // case 1: embedded imaged in thread body
   if (
     notification.categoryId !== NotificationCategories.ChainEvent &&
     notification.categoryId !== NotificationCategories.ThreadEdit &&
@@ -105,6 +99,7 @@ export async function getPreviewImageUrl(
     }
   }
 
+  // case 2: chain icon
   let chainId: string;
   if (notification.categoryId === NotificationCategories.ChainEvent) {
     chainId = notification.data.chain;
@@ -116,7 +111,6 @@ export async function getPreviewImageUrl(
       id: chainId,
     },
   });
-
   if (chain?.icon_url) {
     const previewImageUrl = chain.icon_url.match(`^(http|https)://`)
       ? chain.icon_url
@@ -125,101 +119,14 @@ export async function getPreviewImageUrl(
     return { previewImageUrl, previewAltText };
   }
 
+  // case 3: default commonwealth logo
   return {
     previewImageUrl: DEFAULT_COMMONWEALTH_LOGO,
     previewAltText: 'Commonwealth',
   };
 }
 
-export async function getWebhookData(
-  notification: Exclude<
-    NotificationDataAndCategory,
-    | { categoryId: NotificationCategories.SnapshotProposal }
-    | { categoryId: NotificationCategories.ThreadEdit }
-    | { categoryId: NotificationCategories.CommentEdit }
-  >
-): Promise<ForumWebhookData | ChainEventWebhookData> {
-  if (notification.categoryId === NotificationCategories.ChainEvent) {
-    const event = {
-      blockNumber: notification.data.block_number,
-      data: notification.data.event_data,
-      network: notification.data.network,
-      chain: notification.data.chain,
-    };
-    const eventLabel = chainEventLabel(notification.data.chain, event);
-
-    let description: string;
-    if (notification.data.block_number) {
-      description =
-        `${eventLabel.heading} on ${capitalize(notification.data.chain)}` +
-        `at block ${notification.data.block_number} \n${eventLabel.label}`;
-    } else {
-      description = `${eventLabel.heading} on ${capitalize(
-        notification.data.chain
-      )} \n${eventLabel.label}`;
-    }
-
-    return {
-      title: capitalize(notification.data.chain),
-      description,
-      url: eventLabel.linkUrl,
-      previewImageUrl: (await getPreviewImageUrl(notification)).previewImageUrl,
-    };
-  } else {
-    const profile = await getActorProfile(notification);
-
-    let titlePrefix: string;
-    switch (notification.categoryId) {
-      case NotificationCategories.NewComment:
-        titlePrefix = 'Comment on: ';
-        break;
-      case NotificationCategories.NewThread:
-        titlePrefix = 'New thread: ';
-        break;
-      case NotificationCategories.NewReaction:
-        titlePrefix = 'Reaction on: ';
-        break;
-      default:
-        titlePrefix = 'Activity on: ';
-    }
-
-    let title: string;
-    try {
-      title = decodeURIComponent(notification.data.root_title);
-    } catch (e) {
-      title = notification.data.root_title;
-    }
-
-    const bodytext = decodeURIComponent(notification.data.comment_text);
-
-    let objectSummary: string;
-    try {
-      // parse and use quill document
-      const doc = JSON.parse(bodytext);
-      if (!doc.ops) throw new Error();
-      const text = renderQuillDeltaToText(doc);
-      objectSummary = smartTrim(text);
-    } catch (err) {
-      // use markdown document directly
-      objectSummary = smartTrim(bodytext);
-    }
-
-    return {
-      communityId: notification.data.chain_id,
-      previewImageUrl: (await getPreviewImageUrl(notification)).previewImageUrl,
-
-      profileName: profile?.profile_name,
-      profileUrl: profile ? `${SERVER_URL}/profile/id/${profile.id}` : null,
-      profileAvatarUrl: profile?.avatar_url,
-
-      title: titlePrefix + title,
-      objectUrl: getThreadUrlFromNotification(notification),
-      objectSummary,
-    };
-  }
-}
-
-function getThreadUrlFromNotification(
+export function getThreadUrlFromNotification(
   notification: Exclude<
     NotificationDataAndCategory,
     | { categoryId: NotificationCategories.ChainEvent }
