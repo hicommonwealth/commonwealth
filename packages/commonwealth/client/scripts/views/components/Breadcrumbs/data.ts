@@ -43,11 +43,13 @@ export const breadCrumbURLS = [
     url: 'members',
     breadcrumb: 'Members',
     isGovernance: true,
+    className: 'governance',
   },
   {
     url: 'proposals',
     breadcrumb: 'Proposals',
     isGovernance: true,
+    className: 'governance',
   },
   {
     url: 'proposal/:id',
@@ -56,5 +58,26 @@ export const breadCrumbURLS = [
   {
     url: 'snapshot',
     breadcrumb: 'Snapshots',
+    className: 'governance',
+  },
+  {
+    url: 'discussions',
+    className: 'discussions',
+  },
+  {
+    url: 'new/discussion',
+    className: 'new-thread',
+  },
+  {
+    url: 'notification-settings',
+    className: 'notification-management',
+  },
+  {
+    url: 'notifications',
+    className: 'notifications',
+  },
+  {
+    url: 'search',
+    className: 'search',
   },
 ];

@@ -88,12 +88,16 @@ export const Breadcrumbs = () => {
         link = `id/${profileId}`;
       } else if (pathSegment === 'new') {
         // Remove 'new' segment and generate the link.
+        console.log('FIRED1');
         pathSegments.splice(index, 1);
+
+        console.log('PATH:', pathSegments);
         link = `new/discussion`;
       } else if (pathSegments[index] === 'discussion') {
         // Generate the link for 'discussion' segment.
         link = `discussions`;
       } else {
+        console.log('FIRED2');
         // Generate a default link for other segments.
         link = pathSegments.slice(0, index + 1).join('/');
       }
@@ -122,12 +126,12 @@ export const Breadcrumbs = () => {
             ? matchedBreadcrumb.breadcrumb
             : decodeURIComponent(pathSegments[index]),
         path: link ? `/${link}` : locationPath,
-        navigate: (val) => navigate(val),
+        navigate: (val: string) => navigate(val),
         isParent: pathSegments[0] === splitLinks[index],
       };
     });
 
-    return breadcrumbs;
+    return breadcrumbs.filter((val) => val !== undefined);
   }
 
   const pathnames = generateBreadcrumbs(location.pathname, breadCrumbURLS);
@@ -150,38 +154,9 @@ export const Breadcrumbs = () => {
     if (findStyle) {
       return findStyle.className;
     }
-    const governancePaths = ['members', 'snapshot', 'proposals'];
-
-    if (location.pathname.includes('discussions')) {
-      return 'discussions';
-    }
-
-    if (
-      governancePaths.some((governancePath) =>
-        location.pathname.includes(governancePath)
-      )
-    ) {
-      return 'governance';
-    }
-
-    if (location.pathname.includes('search')) {
-      return 'search';
-    }
-
-    if (location.pathname.includes('new/discussion')) {
-      return 'new-thread';
-    }
 
     if (location.pathname.includes(String(profileId))) {
       return 'viewProfile';
-    }
-
-    if (location.pathname.includes('notification-settings')) {
-      return 'notification-management';
-    }
-
-    if (location.pathname.includes('notifications')) {
-      return 'notifications';
     }
   };
 

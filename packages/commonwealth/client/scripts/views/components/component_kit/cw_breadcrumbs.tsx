@@ -19,9 +19,10 @@ type BreadcrumbsProps = {
   tooltipStr?: string;
 };
 
-export const CWBreadcrumbs = (props: BreadcrumbsProps) => {
-  const { breadcrumbs, tooltipStr } = props;
-
+export const CWBreadcrumbs = ({
+  breadcrumbs,
+  tooltipStr,
+}: BreadcrumbsProps) => {
   return (
     <div className={ComponentType.Breadcrumbs}>
       {breadcrumbs.map(({ label, path, navigate, isParent }, index) => {
@@ -44,7 +45,6 @@ export const CWBreadcrumbs = (props: BreadcrumbsProps) => {
                       'current-text': isCurrent,
                       'parent-text': !isCurrent,
                     })}
-                    onClick={isCurrent ? undefined : () => navigate(path)}
                   >
                     {label}
                   </CWText>

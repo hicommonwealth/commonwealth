@@ -7,36 +7,13 @@
   background-color: $white;
   min-height: 20px;
   padding: 5px 0;
-
   position: fixed;
   width: 100%;
   z-index: 3;
 
-  a {
-    color: $neutral-400;
-    text-decoration: none;
-    &:hover {
-      color: $neutral-400;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-    &::first-letter {
-      text-transform: uppercase;
-    }
-  }
-
   @include extraSmall {
     position: static;
     min-height: 40px;
-  }
-
-  .hidden {
-    display: none;
-  }
-
-  .active {
-    color: $neutral-500;
-    font-weight: 500;
   }
 
   .disable-active-cursor {
@@ -140,20 +117,20 @@
   .search {
     display: flex;
     align-items: center;
-    flex-direction: row;
     padding-left: calc(22vw + 65px);
     padding-top: 16px;
+    width: 100%;
 
     @include large {
-      padding-left: calc(46vw - 155px);
+      padding-left: calc(38vw - 138px);
     }
 
     @include medium {
-      padding-left: calc(50vw - 225px);
+      padding-left: calc(25vw - 38px);
     }
 
     @include small {
-      padding-left: 24%;
+      padding-left: 23%;
     }
 
     @include extraSmall {
