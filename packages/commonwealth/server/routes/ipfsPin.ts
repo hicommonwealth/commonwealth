@@ -9,7 +9,7 @@ import { success } from '../types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   InvalidAddress: 'Invalid address',
   NoBlobPresent: 'No JSON blob was input',
   InvalidJson: 'Input is not a valid JSON string',

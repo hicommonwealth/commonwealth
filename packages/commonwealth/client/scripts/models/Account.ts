@@ -1,4 +1,4 @@
-import type { WalletId } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import { ChainType } from 'common-common/src/types';
 import $ from 'jquery';
 import app from 'state';
@@ -22,6 +22,7 @@ class Account {
 
   private _addressId?: number;
   private _walletId?: WalletId;
+  private _walletSsoSource?: WalletSsoSource;
 
   private _profile?: MinimumProfile;
 
@@ -37,6 +38,7 @@ class Account {
     ghostAddress,
     addressId,
     walletId,
+    walletSsoSource,
     validationToken,
     sessionPublicAddress,
     validationBlockInfo,
@@ -50,6 +52,7 @@ class Account {
     // optional args
     addressId?: number;
     walletId?: WalletId;
+    walletSsoSource?: WalletSsoSource;
     validationToken?: string;
     sessionPublicAddress?: string;
     validationBlockInfo?: string;
@@ -65,6 +68,7 @@ class Account {
     this.address = address;
     this._addressId = addressId;
     this._walletId = walletId;
+    this._walletSsoSource = walletSsoSource;
     this._validationToken = validationToken;
     this._sessionPublicAddress = sessionPublicAddress;
     this._validationBlockInfo = validationBlockInfo;
@@ -117,6 +121,13 @@ class Account {
     this._walletId = walletId;
   }
 
+  get walletSsoSource() {
+    return this._walletSsoSource;
+  }
+
+  public setWalletSsoSource(walletSsoSource: WalletSsoSource) {
+    this._walletSsoSource = walletSsoSource;
+  }
   get validationToken() {
     return this._validationToken;
   }
@@ -155,9 +166,6 @@ class Account {
     chainId: string | number,
     shouldRedraw = true
   ) {
-    if (!this._validationToken && !this._validationBlockInfo) {
-      throw new Error('no validation token found');
-    }
     if (!signature) {
       throw new Error('signature required for validation');
     }
@@ -170,9 +178,11 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
+      wallet_sso_source: this.walletSsoSource,
       session_public_address: await app.sessions.getOrCreateAddress(
         this.chain.base,
-        chainId.toString()
+        chainId.toString(),
+        this.address
       ),
       session_timestamp: timestamp,
       session_block_data: this.validationBlockInfo,
