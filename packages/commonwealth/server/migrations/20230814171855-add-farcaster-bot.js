@@ -3,6 +3,50 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (transaction) => {
+      const chain = await queryInterface.sequelize.query(
+        `
+        INSERT INTO "Chains" (
+          id, 
+          type,  
+          name, 
+          active,
+          network, 
+          default_symbol, 
+          base, 
+          collapsed_on_homepage, 
+          has_chain_events_listener, 
+          custom_stages,
+          stages_enabled,
+          chain_node_id,
+          has_homepage,
+          default_page,
+          created_at, 
+          updated_at
+        ) 
+        VALUES (
+          'logline', 
+          'offchain', 
+          'logline',
+          TRUE,
+          'ethereum', 
+          'LOG', 
+          'ethereum', 
+          TRUE, 
+          FALSE,  
+          TRUE,
+          TRUE,
+          37,
+          TRUE,
+          'homepage',
+          NOW(), 
+          NOW()
+        ) 
+        ON CONFLICT (id) DO NOTHING 
+        RETURNING *;
+        `,
+        { transaction }
+      );
+
       const user = await queryInterface.bulkInsert(
         'Users',
         [
