@@ -1,6 +1,7 @@
 import './Breadcrumbs.scss';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
+import { useCommonNavigate } from 'navigation/helpers';
 import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import { breadCrumbURLS } from './data';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
@@ -8,6 +9,7 @@ import app from 'state';
 
 export const Breadcrumbs = () => {
   const location = useLocation();
+  const navigate = useCommonNavigate();
 
   function extractNumberFromUrl(url) {
     const match = url.match(/(\d+)/); // Match one or more digits
@@ -83,14 +85,14 @@ export const Breadcrumbs = () => {
 
       // Generate the link based on the current path segment.
       if (pathSegment === 'profile') {
-        link = `profile/id/${profileId}`;
+        link = `id/${profileId}`;
       } else if (pathSegment === 'new') {
         // Remove 'new' segment and generate the link.
         pathSegments.splice(index, 1);
-        link = `${pathSegments[index - 1]}/new/discussion`;
+        link = `new/discussion`;
       } else if (pathSegments[index] === 'discussion') {
         // Generate the link for 'discussion' segment.
-        link = `${pathSegments[index - 1]}/discussions`;
+        link = `discussions`;
       } else {
         // Generate a default link for other segments.
         link = pathSegments.slice(0, index + 1).join('/');
@@ -120,7 +122,8 @@ export const Breadcrumbs = () => {
             ? matchedBreadcrumb.breadcrumb
             : decodeURIComponent(pathSegments[index]),
         path: link ? `/${link}` : locationPath,
-        isParent: splitLinks.length === 1,
+        navigate: (val) => navigate(val),
+        isParent: pathSegments[0] === splitLinks[index],
       };
     });
 

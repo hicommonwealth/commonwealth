@@ -40,14 +40,6 @@ export const breadCrumbURLS = [
     breadcrumb: 'Overview',
   },
   {
-    url: 'dicussions/General',
-    breadcrumb: 'Discussions/General',
-  },
-  {
-    url: 'dicussions/Decentralise',
-    breadcrumb: 'Discussions/Decentralise',
-  },
-  {
     url: 'members',
     breadcrumb: 'Members',
     isGovernance: true,
