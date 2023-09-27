@@ -17,7 +17,6 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWToggle } from '../../components/component_kit/cw_toggle';
 import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -236,11 +235,12 @@ export const ChainMetadataRows = ({
 
   const handleSaveChanges = async () => {
     for (const space of snapshot) {
-      if (space !== '') {
-        if (space.slice(space.length - 4) !== '.eth') {
-          notifyError('Snapshot name must be in the form of *.eth');
-          return;
-        }
+      if (
+        space.slice(space.length - 4) !== '.eth' &&
+        space.slice(space.length - 4) !== '.xyz'
+      ) {
+        notifyError('Snapshot name must be in the form of *.eth or *.xyz');
+        return;
       }
     }
 
@@ -302,15 +302,22 @@ export const ChainMetadataRows = ({
       const verification_token = uuidv4();
       await app.discord.createConfig(verification_token);
 
+      const isCustomDomain = app.isCustomDomain();
+
       window.open(
         `https://discord.com/oauth2/authorize?client_id=${
           process.env.DISCORD_CLIENT_ID
         }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-          `${window.location.origin}`
+          `${
+            !isCustomDomain ? window.location.origin : 'https://commonwealth.im'
+          }`
         )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
+            redirect_domain: isCustomDomain
+              ? window.location.origin
+              : undefined,
           })
         )}`,
         '_parent'
@@ -347,15 +354,22 @@ export const ChainMetadataRows = ({
 
       await app.discord.createConfig(verification_token);
 
+      const isCustomDomain = app.isCustomDomain();
+
       window.open(
         `https://discord.com/oauth2/authorize?client_id=${
           process.env.DISCORD_CLIENT_ID
         }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-          `${window.location.origin}`
+          `${
+            !isCustomDomain ? window.location.origin : 'https://commonwealth.im'
+          }`
         )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
+            redirect_domain: isCustomDomain
+              ? window.location.origin
+              : undefined,
           })
         )}`,
         '_parent'
@@ -513,7 +527,7 @@ export const ChainMetadataRows = ({
         <InputRow
           title="Snapshot(s) -- use commas to add multiple spaces"
           value={snapshotString}
-          placeholder={chain.network}
+          placeholder="space-name.eth, space-2-name.xyz"
           onChangeHandler={(v) => {
             const snapshots = v
               .split(',')
@@ -656,8 +670,14 @@ export const ChainMetadataRows = ({
                             channel.id
                           );
                           await refetchTopics();
+                          notifySuccess(
+                            `#${channel.name} connected to ${
+                              topics.find((topic) => topic.id === topicId)?.name
+                            }!`
+                          );
                         } catch (e) {
                           console.log(e);
+                          notifyError('Error connecting channel to topic.');
                         }
                       },
                     };

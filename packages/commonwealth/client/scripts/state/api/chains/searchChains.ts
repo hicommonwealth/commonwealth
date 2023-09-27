@@ -68,7 +68,6 @@ const useSearchChainsQuery = ({
   limit,
   orderBy,
   orderDirection,
-
   enabled = true,
 }: SearchChainsProps) => {
   const key = [

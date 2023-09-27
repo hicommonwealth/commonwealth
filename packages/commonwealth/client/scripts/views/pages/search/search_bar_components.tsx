@@ -4,16 +4,14 @@ import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
 
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import AddressInfo from '../../../models/AddressInfo';
+import { useCommonNavigate } from 'navigation/helpers';
 import ChainInfo from '../../../models/ChainInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import { User } from '../../components/user/user';
-import { useCommonNavigate } from 'navigation/helpers';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { User } from '../../components/user/user';
 import {
   CommunityResult,
   MemberResult,
@@ -69,14 +67,8 @@ export const SearchBarThreadPreviewRow = (
     <div className="SearchBarThreadPreviewRow" onClick={handleClick}>
       <div className="header-row">
         <User
-          user={
-            new AddressInfo(
-              searchResult.address_id,
-              searchResult.address,
-              searchResult.address_chain,
-              null
-            )
-          }
+          userAddress={searchResult.address}
+          userChainId={searchResult.address_chain}
         />
         <CWText className="last-updated-text">•</CWText>
         <CWText type="caption" className="last-updated-text">
@@ -180,10 +172,7 @@ export const SearchBarMemberPreviewRow = (
 
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
-      <User
-        user={NewProfilesController.Instance.getProfile(chain, address)}
-        linkify
-      />
+      <User userAddress={address} userChainId={chain} shouldLinkProfile />
     </div>
   );
 };

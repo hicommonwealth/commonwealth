@@ -9,6 +9,7 @@ import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_URI } from '../utils/config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import v8 from 'v8';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const s3 = new AWS.S3();
 
@@ -19,7 +20,9 @@ const BOT_KEYWORD = '@commonessaybot';
 const app = express();
 const PORT = 3000;
 
-const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+const controller = new RabbitMQController(
+  getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.FarcasterService)
+);
 const initPromise = controller.init();
 
 const log = factory.getLogger(formatFilename(__filename));

@@ -151,9 +151,9 @@ test.describe('Community proposals page', () => {
       await allProposalCardsHaveTitles({ page });
     });
   });
-  test.describe('juno (gov v1beta1)', () => {
+  test.describe('osmosis (gov v1beta1)', () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`http://localhost:8080/juno/proposals`);
+      await page.goto(`http://localhost:8080/osmosis/proposals`);
     });
     test('Active header loads', headerTest);
     test('Inactive proposal cards load', ({ page }) =>

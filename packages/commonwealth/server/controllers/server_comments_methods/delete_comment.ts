@@ -47,7 +47,7 @@ export async function __deleteComment(
     address: address.address,
   });
   if (!canInteract) {
-    throw new AppError(`${Errors.BanError}; ${error}`);
+    throw new AppError(`${Errors.BanError}: ${error}`);
   }
 
   const userOwnedAddressIds = (await user.getAddresses())

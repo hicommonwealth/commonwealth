@@ -11,19 +11,17 @@ import moment from 'moment';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
-import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
-import AddressInfo from '../../../../models/AddressInfo';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
-import { isNewThread } from '../NewThreadTag';
 import { isHot } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
 import './ThreadCard.scss';
+import { CardSkeleton } from './ThreadCardSkeleton';
 import { ThreadOptions } from './ThreadOptions';
 import { AdminActionsProps } from './ThreadOptions/AdminActions';
 import { ReactionButton } from './ThreadOptions/ReactionButton';
@@ -34,36 +32,7 @@ type CardProps = AdminActionsProps & {
   threadHref?: string;
   showSkeleton?: boolean;
   canReact?: boolean;
-};
-
-const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
-  return (
-    <div className={'ThreadCard showSkeleton'}>
-      {!isWindowSmallInclusive && (
-        <ReactionButton
-          thread={thread}
-          size="big"
-          showSkeleton
-          disabled={disabled}
-        />
-      )}
-      <div className="content-wrapper">
-        <div>
-          <Skeleton count={1} className="content-header-skeleton" />
-          <div>
-            {' '}
-            <Skeleton className="content-header-icons-skeleton" />{' '}
-          </div>
-        </div>
-        <div className="content-body-wrapper">
-          <Skeleton count={3} />
-        </div>
-      </div>
-      <div className="content-footer">
-        <Skeleton />
-      </div>
-    </div>
-  );
+  onCommentBtnClick?: () => any;
 };
 
 export const ThreadCard = ({
@@ -72,7 +41,6 @@ export const ThreadCard = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -85,6 +53,7 @@ export const ThreadCard = ({
   threadHref,
   showSkeleton,
   canReact = true,
+  onCommentBtnClick = () => null,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -136,11 +105,9 @@ export const ThreadCard = ({
         <div className="content-wrapper">
           <div className="content-header">
             <AuthorAndPublishInfo
-              authorInfo={
-                new AddressInfo(null, thread.author, thread.authorChain, null)
-              }
+              authorAddress={thread.author}
+              authorChainId={thread.authorChain}
               publishDate={moment(thread.createdAt).format('l')}
-              isNew={isNewThread(thread.createdAt)}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {
@@ -234,7 +201,6 @@ export const ThreadCard = ({
               onSpamToggle={onSpamToggle}
               onLockToggle={onLockToggle}
               onPinToggle={onPinToggle}
-              onTopicChange={onTopicChange}
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onCollaboratorsEdit={onCollaboratorsEdit}
@@ -242,6 +208,7 @@ export const ThreadCard = ({
               onEditCancel={onEditCancel}
               onEditConfirm={onEditConfirm}
               hasPendingEdits={hasPendingEdits}
+              onCommentBtnClick={onCommentBtnClick}
             />
           </div>
         </div>

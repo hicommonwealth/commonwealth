@@ -7,6 +7,7 @@ const PING_INTERVAL = 1_000 * 20;
 
 export enum ServiceKey {
   Commonwealth = 'commonwealth',
+  CommonwealthConsumer = 'commonwealth-consumer',
   DiscordBotListener = 'discord-bot-listener',
   DiscordBotConsumer = 'discord-bot-consumer',
   FarcasterBotListener = 'farcaster-bot-listener',

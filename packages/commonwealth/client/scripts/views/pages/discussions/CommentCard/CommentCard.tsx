@@ -1,21 +1,20 @@
+import type Comment from 'models/Comment';
 import moment from 'moment';
 import type { DeltaStatic } from 'quill';
 import React, { useState } from 'react';
 import app from 'state';
-import type Comment from '../../../../models/Comment';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
-import { ReactQuillEditor } from '../../../components/react_quill_editor';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { SharePopover } from 'views/components/share_popover';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CommentCardProps = {
   // Edit
@@ -32,6 +31,9 @@ type CommentCardProps = {
   // Reply
   replyBtnVisible?: boolean;
   onReply?: () => any;
+  canReply?: boolean;
+  // Reaction
+  canReact?: boolean;
   // Spam
   isSpam?: boolean;
   onSpamToggle?: () => any;
@@ -55,6 +57,9 @@ export const CommentCard = ({
   // reply
   replyBtnVisible,
   onReply,
+  canReply,
+  // reaction
+  canReact,
   // spam
   isSpam,
   onSpamToggle,
@@ -64,7 +69,7 @@ export const CommentCard = ({
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const author = app.chain.accounts.get(comment.author);
 
   return (
     <div className="comment-body">
@@ -73,7 +78,8 @@ export const CommentCard = ({
           <span>[deleted]</span>
         ) : (
           <AuthorAndPublishInfo
-            authorInfo={app.chain.accounts.get(comment.author)}
+            authorAddress={author.address}
+            authorChainId={author.chain?.id || author?.profile?.chain}
             publishDate={moment(comment.createdAt).format('l')}
             bot_meta={comment.bot_meta}
           />
@@ -117,17 +123,14 @@ export const CommentCard = ({
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
-              <CommentReactionButton
-                comment={comment}
-                disabled={!hasJoinedCommunity}
-              />
+              <CommentReactionButton comment={comment} disabled={!canReact} />
 
               <SharePopover commentId={comment.id} />
 
               {replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
-                  disabled={!hasJoinedCommunity}
+                  disabled={!canReply}
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();

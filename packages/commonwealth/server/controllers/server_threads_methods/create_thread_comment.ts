@@ -105,6 +105,7 @@ export async function __createThreadComment(
         id: parentId,
         chain: chain.id,
       },
+      include: [this.models.Address],
     });
     if (!parentComment) {
       throw new AppError(Errors.InvalidParent);
@@ -199,7 +200,6 @@ export async function __createThreadComment(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewReaction,
-        object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
         comment_id: finalComment.id,
         is_active: true,
@@ -210,7 +210,6 @@ export async function __createThreadComment(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewComment,
-        object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
         comment_id: finalComment.id,
         is_active: true,
@@ -253,6 +252,11 @@ export async function __createThreadComment(
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(finalComment.Address.address);
 
+  const rootNotifExcludeAddresses = [...excludedAddrs];
+  if (parentComment && parentComment.Address) {
+    rootNotifExcludeAddresses.push(parentComment.Address.address);
+  }
+
   const cwUrl = getThreadUrl(thread, finalComment.id);
   const root_title = thread.title || '';
 
@@ -260,18 +264,19 @@ export async function __createThreadComment(
 
   // build notification for root thread
   allNotificationOptions.push({
-    categoryId: NotificationCategories.NewComment,
-    objectId: `discussion_${threadId}`,
-    notificationData: {
-      created_at: new Date(),
-      thread_id: threadId,
-      root_title,
-      root_type: ProposalType.Thread,
-      comment_id: +finalComment.id,
-      comment_text: finalComment.text,
-      chain_id: finalComment.chain,
-      author_address: finalComment.Address.address,
-      author_chain: finalComment.Address.chain,
+    notification: {
+      categoryId: NotificationCategories.NewComment,
+      data: {
+        created_at: new Date(),
+        thread_id: threadId,
+        root_title,
+        root_type: ProposalType.Thread,
+        comment_id: +finalComment.id,
+        comment_text: finalComment.text,
+        chain_id: finalComment.chain,
+        author_address: finalComment.Address.address,
+        author_chain: finalComment.Address.chain,
+      },
     },
     webhookData: {
       user: finalComment.Address.address,
@@ -281,26 +286,27 @@ export async function __createThreadComment(
       chain: finalComment.chain,
       body: finalComment.text,
     },
-    excludeAddresses: excludedAddrs,
+    excludeAddresses: rootNotifExcludeAddresses,
   });
 
   // if child comment, build notification for parent author
   if (parentId && parentComment) {
     allNotificationOptions.push({
-      categoryId: NotificationCategories.NewComment,
-      objectId: `comment-${parentId}`,
-      notificationData: {
-        created_at: new Date(),
-        thread_id: +threadId,
-        root_title,
-        root_type: ProposalType.Thread,
-        comment_id: +finalComment.id,
-        comment_text: finalComment.text,
-        parent_comment_id: +parentId,
-        parent_comment_text: parentComment.text,
-        chain_id: finalComment.chain,
-        author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+      notification: {
+        categoryId: NotificationCategories.NewComment,
+        data: {
+          created_at: new Date(),
+          thread_id: +threadId,
+          root_title,
+          root_type: ProposalType.Thread,
+          comment_id: +finalComment.id,
+          comment_text: finalComment.text,
+          parent_comment_id: +parentId,
+          parent_comment_text: parentComment.text,
+          chain_id: finalComment.chain,
+          author_address: finalComment.Address.address,
+          author_chain: finalComment.Address.chain,
+        },
       },
       webhookData: null,
       excludeAddresses: excludedAddrs,
@@ -315,18 +321,20 @@ export async function __createThreadComment(
         const shouldNotifyMentionedUser = true;
         if (shouldNotifyMentionedUser) {
           allNotificationOptions.push({
-            categoryId: NotificationCategories.NewMention,
-            objectId: `user-${mentionedAddress.User.id}`,
-            notificationData: {
-              created_at: new Date(),
-              thread_id: +threadId,
-              root_title,
-              root_type: ProposalType.Thread,
-              comment_id: +finalComment.id,
-              comment_text: finalComment.text,
-              chain_id: finalComment.chain,
-              author_address: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
+            notification: {
+              categoryId: NotificationCategories.NewMention,
+              data: {
+                mentioned_user_id: mentionedAddress.User.id,
+                created_at: new Date(),
+                thread_id: +threadId,
+                root_title,
+                root_type: ProposalType.Thread,
+                comment_id: +finalComment.id,
+                comment_text: finalComment.text,
+                chain_id: finalComment.chain,
+                author_address: finalComment.Address.address,
+                author_chain: finalComment.Address.chain,
+              },
             },
             webhookData: null,
             excludeAddresses: [finalComment.Address.address],

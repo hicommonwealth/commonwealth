@@ -9,12 +9,24 @@ export const Errors = {
 };
 
 type UpdateThreadRequestBody = {
-  body?: string;
   title?: string;
-  kind?: string;
+  body?: string;
   stage?: string;
   url?: string;
   bot_meta?: any;
+  locked?: boolean;
+  pinned?: boolean;
+  archived?: boolean;
+  spam?: boolean;
+  topicId?: number;
+  topicName?: string;
+  collaborators?: {
+    toAdd?: number[];
+    toRemove?: number[];
+  };
+  canvasSession?: any;
+  canvasAction?: any;
+  canvasHash?: any;
 };
 type UpdateThreadResponse = ThreadAttributes;
 
@@ -25,15 +37,29 @@ export const updateThreadHandler = async (
 ) => {
   const { user, address, chain } = req;
   const { id } = req.params;
-  const { body, title, stage, url, bot_meta } = req.body;
+  const {
+    title,
+    body,
+    stage,
+    url,
+    locked,
+    pinned,
+    archived,
+    spam,
+    topicId,
+    topicName,
+    collaborators,
+    canvasSession,
+    canvasAction,
+    canvasHash,
+    bot_meta,
+  } = req.body;
 
-  const threadId = parseInt(id, 10) || 0;
+  const threadId = parseInt(id, 10) || null;
 
-  if (!body || !body.trim()) {
-    throw new AppError(Errors.MissingText);
-  }
-
-  const [updatedThread, notificationOptions] =
+  // this is a patch update, so properties should be
+  // `undefined` if they are not intended to be updated
+  const [updatedThread, notificationOptions, analyticsOptions] =
     await controllers.threads.updateThread({
       user,
       address,
@@ -44,10 +70,24 @@ export const updateThreadHandler = async (
       stage,
       url,
       botMeta: bot_meta,
+      locked,
+      pinned,
+      archived,
+      spam,
+      topicId,
+      topicName,
+      collaborators,
+      canvasSession,
+      canvasAction,
+      canvasHash,
     });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
+  }
+
+  for (const a of analyticsOptions) {
+    controllers.analytics.track(a).catch(console.error);
   }
 
   return success(res, updatedThread);

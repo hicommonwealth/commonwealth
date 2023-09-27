@@ -47,7 +47,7 @@ export default class DatabaseCleaner {
     this._redisCache = redisCache;
     this._oneRunMax = oneRunMax;
 
-    if (!hourToRun) {
+    if (!hourToRun && hourToRun !== 0) {
       this.log.warn(`No hourToRun given. The cleaner will not run.`);
       this._rollbar?.warn(`No hourToRun given. The cleaner will not run.`);
       return;
@@ -217,19 +217,33 @@ export default class DatabaseCleaner {
 
     while (shouldContinueSubDelete()) {
       await this._models.sequelize.transaction(async (t) => {
+        // user has no addresses at all, and user was last updated before a year ago
+        const noAccountsAndIsOldUser = `
+          COUNT(A.user_id) = 0 AND MIN(U.updated_at) < NOW() - INTERVAL '12 months'
+        `;
+        // user has no addresses that were active within the last year
+        const noActiveAccountsQuery = `
+          SUM(
+            CASE
+              WHEN A.last_active >= NOW() - INTERVAL '12 months' THEN 1
+              ELSE 0
+            END
+          ) = 0
+        `;
         await this._models.sequelize.query(
           `
             CREATE TEMPORARY TABLE sub_ids_to_delete as (
-              WITH user_ids_to_delete as MATERIALIZED (
-                  SELECT U.id, U.updated_at
-                  FROM "Users" U
-                  WHERE U.updated_at < NOW() - interval '12 months'
-                  ORDER BY U.updated_at
+              WITH user_ids_to_delete AS MATERIALIZED (
+                SELECT U.id
+                FROM "Users" U
+                LEFT JOIN "Addresses" A ON U.id = A.user_id
+                GROUP BY U.id
+                HAVING (${noAccountsAndIsOldUser}) OR (${noActiveAccountsQuery})
               )
               SELECT S.id
               FROM "Subscriptions" S
-                       JOIN user_ids_to_delete UD ON UD.id = S.subscriber_id
-              ORDER BY UD.updated_at
+                JOIN user_ids_to_delete UD ON UD.id = S.subscriber_id
+              ORDER BY UD.id
               LIMIT ?
             );
         `,

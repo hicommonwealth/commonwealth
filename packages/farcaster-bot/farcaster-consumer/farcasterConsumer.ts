@@ -15,6 +15,7 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 let isServiceHealthy = false;
 
@@ -35,8 +36,9 @@ log.info(
   )} GB`
 );
 
-const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
-
+const controller = new RabbitMQController(
+  getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.FarcasterService)
+);
 type BotThread = {
   title: string;
   address: string;

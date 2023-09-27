@@ -21,8 +21,10 @@ import {
 } from './helpers';
 import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
-import { useProposalMetadata } from 'hooks/cosmos/useProposalMetadata';
-import useForceRerender from 'hooks/useForceRerender';
+import {
+  useCosmosProposalTallyQuery,
+  useCosmosProposalMetadataQuery,
+} from 'state/api/proposals';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;
@@ -34,15 +36,17 @@ export const ProposalCard = ({
   injectedContent,
 }: ProposalCardProps) => {
   const navigate = useCommonNavigate();
-  const [title, setTitle] = useState(proposal.title);
-  const { metadata } = useProposalMetadata({ app, proposal });
-  const forceRerender = useForceRerender();
+  const [title, setTitle] = useState(
+    proposal.title || `Proposal ${proposal.identifier}`
+  );
+  const { data: metadata } = useCosmosProposalMetadataQuery(proposal);
+  const { isFetching: isFetchingTally } = useCosmosProposalTallyQuery(proposal);
 
   const secondaryTagText = getSecondaryTagText(proposal);
 
   useEffect(() => {
     if (metadata?.title) setTitle(metadata?.title);
-  }, [metadata?.title]);
+  }, [metadata]);
 
   useEffect(() => {
     if (proposal instanceof AaveProposal) {
@@ -52,14 +56,6 @@ export const ProposalCard = ({
       });
     }
   }, [proposal]);
-
-  useEffect(() => {
-    proposal?.isFetched.once('redraw', forceRerender);
-
-    return () => {
-      proposal?.isFetched.removeAllListeners();
-    };
-  }, [proposal, forceRerender]);
 
   return (
     <CWCard
@@ -115,9 +111,12 @@ export const ProposalCard = ({
       ) : proposal.isPassing !== 'none' ? (
         <CWText
           fontWeight="medium"
-          className={`proposal-status-text ${getStatusClass(proposal)}`}
+          className={`proposal-status-text ${getStatusClass(
+            proposal,
+            isFetchingTally
+          )}`}
         >
-          {getStatusText(proposal)}
+          {getStatusText(proposal, isFetchingTally)}
         </CWText>
       ) : null}
     </CWCard>

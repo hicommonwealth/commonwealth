@@ -20,6 +20,7 @@ type OptionsProps = AdminActionsProps & {
   shareEndpoint?: string;
   canUpdateThread?: boolean;
   totalComments?: number;
+  onCommentBtnClick?: () => any;
 };
 
 export const ThreadOptions = ({
@@ -30,7 +31,6 @@ export const ThreadOptions = ({
   canUpdateThread,
   totalComments,
   onLockToggle,
-  onTopicChange,
   onCollaboratorsEdit,
   onDelete,
   onEditStart,
@@ -41,6 +41,7 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
+  onCommentBtnClick = () => null,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -89,6 +90,7 @@ export const ThreadOptions = ({
             label={`${pluralize(totalComments, 'Comment')}`}
             action="comment"
             disabled={!hasJoinedCommunity}
+            onClick={onCommentBtnClick}
           />
         )}
 
@@ -109,7 +111,6 @@ export const ThreadOptions = ({
           <AdminActions
             thread={thread}
             onLockToggle={onLockToggle}
-            onTopicChange={onTopicChange}
             onCollaboratorsEdit={onCollaboratorsEdit}
             onDelete={onDelete}
             onEditStart={onEditStart}

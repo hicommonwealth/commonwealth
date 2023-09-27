@@ -1,10 +1,6 @@
-import React from 'react';
 import { threadStageToLabel } from 'helpers';
-import type Account from '../../../../../models/Account';
-import AddressInfo from '../../../../../models/AddressInfo';
-import MinimumProfile from '../../../../../models/MinimumProfile';
-import { IThreadCollaborator } from '../../../../../models/Thread';
-import { ThreadStage } from '../../../../../models/types';
+import moment from 'moment';
+import React from 'react';
 import {
   Popover,
   usePopover,
@@ -12,22 +8,24 @@ import {
 import { CWTag, TagType } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
-import { User } from 'views/components/user/user';
-import './AuthorAndPublishInfo.scss';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';
-import moment from 'moment';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
+import { User } from 'views/components/user/user';
+import { IThreadCollaborator } from '../../../../../models/Thread';
+import { ThreadStage } from '../../../../../models/types';
+import { NewThreadTag } from '../../NewThreadTag';
+import './AuthorAndPublishInfo.scss';
 
 export type AuthorAndPublishInfoProps = {
-  isNew?: boolean;
   isHot?: boolean;
-  authorInfo: Account | AddressInfo | MinimumProfile | undefined;
   bot_meta?: {
     user: { id?: string; username: string };
     channel_id?: string;
     message_id?: string;
     bot_type: string;
   };
+  authorAddress: string;
+  authorChainId: string;
   collaboratorsInfo?: IThreadCollaborator[];
   isLocked?: boolean;
   lockedAt?: string;
@@ -44,9 +42,9 @@ export type AuthorAndPublishInfoProps = {
 };
 
 export const AuthorAndPublishInfo = ({
-  isNew,
   isHot,
-  authorInfo,
+  authorAddress,
+  authorChainId,
   isLocked,
   lockedAt,
   lastUpdated,
@@ -75,10 +73,13 @@ export const AuthorAndPublishInfo = ({
     <div className="AuthorAndPublishInfo">
       <User
         avatarSize={24}
-        user={authorInfo}
-        popover
-        linkify
-        showAddressWithDisplayName={fromBot ? false : showUserAddressWithInfo}
+        userAddress={authorAddress}
+        userChainId={authorChainId}
+        shouldShowPopover
+        shouldLinkProfile
+        shouldShowAddressWithDisplayName={
+          fromBot ? false : showUserAddressWithInfo
+        }
       />
 
       {fromBot && (
@@ -122,9 +123,10 @@ export const AuthorAndPublishInfo = ({
                   {collaboratorsInfo.map(({ address, chain }) => {
                     return (
                       <User
-                        linkify
+                        shouldLinkProfile
                         key={address}
-                        user={new AddressInfo(null, address, chain, null)}
+                        userAddress={address}
+                        userChainId={chain}
                       />
                     );
                   })}
@@ -175,7 +177,7 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      {isNew && <CWTag label={'New'} type={'new'} iconName={'newStar'} />}
+      <NewThreadTag threadCreatedAt={moment(publishDate)} />
 
       {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
 

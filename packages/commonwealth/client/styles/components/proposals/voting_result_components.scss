@@ -56,3 +56,40 @@
     }
   }
 }
+
+.VotingResultCard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 5px;
+  padding: 10px;
+
+  .results-column-yes {
+
+    border: 2px solid $green-300;
+
+    .results-header {
+      color: $green-500;
+    }
+  }
+
+  .results-column-no {
+
+    border: 2px solid $rorange-300;
+
+    .results-header {
+      color: $rorange-500;
+    }
+  }
+
+  .results-column {
+
+    .results-header {
+      font-size: 15px;
+    }
+
+    .results-info {
+      font-size: 10px;
+    }
+  }
+}

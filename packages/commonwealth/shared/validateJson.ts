@@ -12,6 +12,7 @@ const schema = {
           { $ref: '#/$defs/input' },
           { $ref: '#/$defs/dropdown' },
           { $ref: '#/$defs/function' },
+          { $ref: '#/$defs/struct' },
         ],
       },
     },
@@ -154,6 +155,36 @@ const schema = {
         },
       },
       required: ['function'],
+      additionalProperties: false,
+    },
+    struct: {
+      type: 'object',
+      properties: {
+        struct: {
+          type: 'object',
+          properties: {
+            field_name: { type: 'string' },
+            field_label: { type: 'string' },
+            field_ref: { type: 'string' },
+            form_fields: {
+              type: 'array',
+              items: {
+                oneOf: [
+                  { $ref: '#/$defs/divider' },
+                  { $ref: '#/$defs/text' },
+                  { $ref: '#/$defs/input' },
+                  { $ref: '#/$defs/dropdown' },
+                  { $ref: '#/$defs/function' },
+                  { $ref: '#/$defs/struct' },
+                ],
+              },
+            },
+          },
+          required: ['field_name', 'field_label', 'field_ref', 'form_fields'],
+          additionalProperties: false,
+        },
+      },
+      required: ['struct'],
       additionalProperties: false,
     },
     dropdown: {

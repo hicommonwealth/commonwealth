@@ -4,6 +4,7 @@ import { ServerThreadsController } from '../server_threads_controller';
 import { Op } from 'sequelize';
 import deleteThreadFromDb from '../../util/deleteThread';
 import { AppError } from '../../../../common-common/src/errors';
+import { AddressInstance } from 'server/models/address';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -12,6 +13,7 @@ export const Errors = {
 
 export type DeleteThreadOptions = {
   user: UserInstance;
+  address: AddressInstance;
   threadId?: number;
   messageId?: string;
 };
@@ -20,7 +22,7 @@ export type DeleteThreadResult = void;
 
 export async function __deleteThread(
   this: ServerThreadsController,
-  { user, threadId, messageId }: DeleteThreadOptions
+  { user, address, threadId, messageId }: DeleteThreadOptions
 ): Promise<DeleteThreadResult> {
   if (!threadId) {
     // Special handling for discobot threads
@@ -35,6 +37,7 @@ export async function __deleteThread(
       throw new AppError(Errors.ThreadNotFound);
     }
   }
+
   // find thread
   const thread = await this.models.Thread.findOne({
     where: {
@@ -46,13 +49,15 @@ export async function __deleteThread(
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
-  // check ban
-  const [canInteract, banError] = await this.banCache.checkBan({
-    chain: thread.chain,
-    address: thread.Address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`Ban error: ${banError}`);
+  if (address) {
+    // check ban
+    const [canInteract, banError] = await this.banCache.checkBan({
+      chain: thread.chain,
+      address: address.address,
+    });
+    if (!canInteract) {
+      throw new AppError(`Ban error: ${banError}`);
+    }
   }
 
   // check ownership (bypass if admin)

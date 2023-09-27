@@ -53,7 +53,7 @@ import disableSubscriptions from '../routes/subscription/disableSubscriptions';
 import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
 import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
 import viewNotifications, {
-  NotificationCategories,
+  RouteNotificationCategories,
 } from '../routes/viewNotifications';
 import viewUserActivity from '../routes/viewUserActivity';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
@@ -72,15 +72,8 @@ import getUploadSignature from '../routes/getUploadSignature';
 import createPoll from '../routes/createPoll';
 import getPolls from '../routes/getPolls';
 import deletePoll from '../routes/deletePoll';
-import updateThreadStage from '../routes/updateThreadStage';
-import updateThreadPrivacy from '../routes/updateThreadPrivacy';
-import updateThreadPinned from '../routes/updateThreadPinned';
 import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
-import fetchEntityTitle from '../routes/fetchEntityTitle';
-import updateChainEntityTitle from '../routes/updateChainEntityTitle';
-import addEditors, { addEditorValidation } from '../routes/addEditors';
-import deleteEditors from '../routes/deleteEditors';
 import deleteChain from '../routes/deleteChain';
 import updateChain from '../routes/updateChain';
 import updateProfileNew from '../routes/updateNewProfile';
@@ -88,7 +81,6 @@ import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
 import createTopic from '../routes/createTopic';
-import updateThreadTopic from '../routes/updateThreadTopic';
 import updateTopic from '../routes/topics/updateTopic';
 import orderTopics from '../routes/orderTopics';
 import editTopic from '../routes/editTopic';
@@ -108,7 +100,6 @@ import updateChainPriority from '../routes/updateChainPriority';
 
 import startSsoLogin from '../routes/startSsoLogin';
 import finishSsoLogin from '../routes/finishSsoLogin';
-import getEntityMeta from '../routes/getEntityMeta';
 import getTokenForum from '../routes/getTokenForum';
 import tokenBalance from '../routes/tokenBalance';
 import bulkBalances from '../routes/bulkBalances';
@@ -138,6 +129,7 @@ import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import createChainNode from '../routes/createChainNode';
+import { RedisCache } from 'common-common/src/redisCache';
 
 import {
   createCommunityContractTemplateAndMetadata,
@@ -158,9 +150,7 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
-import markThreadAsSpam from '../routes/spam/markThreadAsSpam';
 import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
-import unmarkThreadAsSpam from '../routes/spam/unmarkThreadAsSpam';
 import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
 
 import { ServerThreadsController } from '../controllers/server_threads_controller';
@@ -170,25 +160,34 @@ import { ServerNotificationsController } from '../controllers/server_notificatio
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
 import { ServerChainsController } from '../controllers/server_chains_controller';
+import { ServerProposalsController } from '../controllers/server_proposals_controller';
+import { ServerGroupsController } from '../controllers/server_groups_controller';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
-import { getCommentReactionsHandler } from '../routes/comments/get_comment_reactions_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createThreadCommentHandler } from '../routes/threads/create_thread_comment_handler';
 import { updateCommentHandler } from '../routes/comments/update_comment_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { archiveThreadHandler } from '../routes/threads/archive_thread_handler';
-import { unarchiveThreadHandler } from '../routes/threads/unarchive_thread_handler';
 import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { deleteBotThreadHandler } from '../routes/threads/delete_thread_bot_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
-import { searchChainsHandler } from '../routes/chains/search_chains_handler';
+import { getChainsHandler } from '../routes/chains/get_chains_handler';
+import { getChainNodesHandler } from '../routes/chains/get_chain_nodes_handler';
+import exportMembersList from '../routes/exportMembersList';
+import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
+import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
+import viewChainActivity from '../routes/viewChainActivity';
+import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
+import { createGroupHandler } from '../routes/groups/create_group_handler';
+import { getGroupsHandler } from '../routes/groups/get_groups_handler';
+import { updateGroupHandler } from '../routes/groups/update_group_handler';
+import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -198,6 +197,8 @@ export type ServerControllers = {
   analytics: ServerAnalyticsController;
   profiles: ServerProfilesController;
   chains: ServerChainsController;
+  proposals: ServerProposalsController;
+  groups: ServerGroupsController;
 };
 
 function setupRouter(
@@ -208,7 +209,8 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
-  databaseValidationService: DatabaseValidationService
+  databaseValidationService: DatabaseValidationService,
+  redisCache: RedisCache
 ) {
   // controllers
 
@@ -220,6 +222,8 @@ function setupRouter(
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     chains: new ServerChainsController(models, tokenBalanceCache, banCache),
+    proposals: new ServerProposalsController(models, redisCache),
+    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
   };
 
   // ---
@@ -242,6 +246,13 @@ function setupRouter(
     '/updateSiteAdmin',
     passport.authenticate('jwt', { session: false }),
     updateSiteAdmin.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/exportMembersList',
+    passport.authenticate('jwt', { session: false }),
+    exportMembersList.bind(this, models)
   );
   registerRoute(router, 'get', '/domain', domain.bind(this, models));
   registerRoute(router, 'get', '/status', status.bind(this, models));
@@ -330,7 +341,13 @@ function setupRouter(
     router,
     'get',
     '/chains',
-    searchChainsHandler.bind(this, serverControllers)
+    getChainsHandler.bind(this, serverControllers)
+  );
+  registerRoute(
+    router,
+    'get',
+    '/nodes',
+    getChainNodesHandler.bind(this, serverControllers)
   );
 
   registerRoute(
@@ -484,27 +501,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/updateThreadStage',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadStage.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/updateThreadPrivacy',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadPrivacy.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/updateThreadPinned',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadPinned.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
     '/updateVote',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -518,12 +514,7 @@ function setupRouter(
     databaseValidationService.validateChain,
     viewVotes.bind(this, models)
   );
-  registerRoute(
-    router,
-    'get',
-    '/fetchEntityTitle',
-    fetchEntityTitle.bind(this, models)
-  );
+
   registerRoute(
     router,
     'post',
@@ -608,36 +599,10 @@ function setupRouter(
 
   registerRoute(
     router,
-    'post',
-    '/updateChainEntityTitle',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    updateChainEntityTitle.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/addEditors',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    addEditorValidation,
-    addEditors.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/deleteEditors',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    deleteEditors.bind(this, models)
-  );
-  registerRoute(
-    router,
     'delete',
     '/threads/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     deleteThreadHandler.bind(this, serverControllers)
   );
@@ -748,14 +713,6 @@ function setupRouter(
     databaseValidationService.validateChain,
     createTopic.bind(this, models)
   );
-
-  registerRoute(
-    router,
-    'post',
-    '/updateThreadTopic',
-    passport.authenticate('jwt', { session: false }),
-    updateThreadTopic.bind(this, models)
-  );
   registerRoute(
     router,
     'post',
@@ -826,13 +783,8 @@ function setupRouter(
     'delete',
     '/reactions/:id',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     deleteReactionHandler.bind(this, serverControllers)
-  );
-  registerRoute(
-    router,
-    'get',
-    '/comments/:id/reactions',
-    getCommentReactionsHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
@@ -1013,14 +965,18 @@ function setupRouter(
     'post',
     '/viewDiscussionNotifications',
     passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(this, models, NotificationCategories.Discussion)
+    viewNotifications.bind(this, models, RouteNotificationCategories.Discussion)
   );
   registerRoute(
     router,
     'post',
     '/viewChainEventNotifications',
     passport.authenticate('jwt', { session: false }),
-    viewNotifications.bind(this, models, NotificationCategories.ChainEvents)
+    viewNotifications.bind(
+      this,
+      models,
+      RouteNotificationCategories.ChainEvents
+    )
   );
 
   registerRoute(
@@ -1042,6 +998,13 @@ function setupRouter(
     '/viewGlobalActivity',
     viewGlobalActivity.bind(this, models, globalActivityCache)
   );
+  registerRoute(
+    router,
+    'get',
+    '/viewChainActivity',
+    viewChainActivity.bind(this, models)
+  );
+
   registerRoute(
     router,
     'post',
@@ -1202,20 +1165,6 @@ function setupRouter(
   registerRoute(
     router,
     'put',
-    '/threads/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    markThreadAsSpam.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/threads/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    unmarkThreadAsSpam.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'put',
     '/comments/:id/spam',
     passport.authenticate('jwt', { session: false }),
     markCommentAsSpam.bind(this, models)
@@ -1226,22 +1175,6 @@ function setupRouter(
     '/comments/:id/spam',
     passport.authenticate('jwt', { session: false }),
     unmarkCommentAsSpam.bind(this, models)
-  );
-
-  // thread archive
-  registerRoute(
-    router,
-    'put',
-    '/threads/:id/archive',
-    passport.authenticate('jwt', { session: false }),
-    archiveThreadHandler.bind(this, serverControllers)
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/threads/:id/archive',
-    passport.authenticate('jwt', { session: false }),
-    unarchiveThreadHandler.bind(this, serverControllers)
   );
 
   // login
@@ -1335,13 +1268,6 @@ function setupRouter(
   // logout
   registerRoute(router, 'get', '/logout', logout.bind(this, models));
 
-  registerRoute(
-    router,
-    'get',
-    '/getEntityMeta',
-    getEntityMeta.bind(this, models)
-  );
-
   // snapshotAPI
   registerRoute(
     router,
@@ -1392,6 +1318,69 @@ function setupRouter(
     'post',
     '/getSubscribedChains',
     getSubscribedChains.bind(this, models)
+  );
+
+  // Proposal routes
+  registerRoute(
+    router,
+    'get',
+    '/proposals',
+    getProposalsHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/proposalVotes',
+    getProposalVotesHandler.bind(this, serverControllers)
+  );
+
+  // Group routes
+  registerRoute(
+    router,
+    'put',
+    '/refresh-membership',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    refreshMembershipHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/groups',
+    getGroupsHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/groups',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createGroupHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'put',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    updateGroupHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteGroupHandler.bind(this, serverControllers)
   );
 
   app.use(endpoint, router);

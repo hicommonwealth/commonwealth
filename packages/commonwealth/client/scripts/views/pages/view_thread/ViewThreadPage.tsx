@@ -1,4 +1,4 @@
-import { ProposalType } from 'common-common/src/types';
+import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -9,16 +9,16 @@ import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
-import $ from 'jquery';
-import ReactionCount from 'models/ReactionCount';
-import type { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
-import { fetchReactionCounts } from 'state/api/reactionCounts';
+import {
+  useAddThreadLinksMutation,
+  useGetThreadsByIdQuery,
+} from 'state/api/threads';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
 import ExternalLink from 'views/components/ExternalLink';
@@ -26,20 +26,22 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import NewProfilesController from '../../../controllers/server/newProfiles';
+import useForceRerender from '../../../hooks/useForceRerender';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource, Thread } from '../../../models/Thread';
-import Topic from '../../../models/Topic';
-import {
-  CommentsFeaturedFilterTypes,
-  ThreadStage,
-} from '../../../models/types';
+import { Link, LinkSource } from '../../../models/Thread';
+import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { VotingActions } from '../../components/proposals/voting_actions';
+import { VotingResults } from '../../components/proposals/VotingResults';
 import { Select } from '../../components/Select';
+import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
+import {
+  CWContentPage,
+  CWContentPageCard,
+} from '../../components/component_kit/CWContentPage';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
-import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -50,43 +52,37 @@ import {
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { useProposalData } from '../view_proposal/index';
+import { useSnapshotProposalData } from '../view_snapshot_proposal/index';
+import { SnapshotInformationCard } from '../view_snapshot_proposal/snapshot_information_card';
+import { SnapshotPollCardContainer } from '../view_snapshot_proposal/snapshot_poll_card_container';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
-export type ThreadPrefetch = {
-  [identifier: string]: {
-    pollsStarted?: boolean;
-    profilesFinished: boolean;
-    profilesStarted: boolean;
-    viewCountStarted?: boolean;
-    threadReactionsStarted?: boolean;
-  };
-};
+import 'pages/view_thread/index.scss';
 
 type ViewThreadPageProps = {
   identifier: string;
 };
 
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
-  const navigate = useCommonNavigate();
-  const { isLoggedIn } = useUserLoggedIn();
+  const threadId = identifier.split('-')[0];
 
+  const navigate = useCommonNavigate();
+
+  const { isLoggedIn } = useUserLoggedIn();
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [polls, setPolls] = useState<Array<Poll>>([]);
-  const [prefetch, setPrefetch] = useState<ThreadPrefetch>({});
-  const [recentlyEdited, setRecentlyEdited] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
-  const [thread, setThread] = useState<Thread>(null);
-  const [threadFetchFailed, setThreadFetchFailed] = useState(false);
-  const [title, setTitle] = useState('');
+  const [draftTitle, setDraftTitle] = useState('');
   const [viewCount, setViewCount] = useState<number>(null);
-  const [initializedComments, setInitializedComments] = useState(false);
   const [initializedPolls, setInitializedPolls] = useState(false);
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -94,11 +90,58 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>(null);
-  const [threadFetchCompleted, setThreadFetchCompleted] = useState(false);
+  const [arePollsFetched, setArePollsFetched] = useState(false);
+  const [isViewMarked, setIsViewMarked] = useState(false);
+  const [snapshotProposalId, setSnapshotProposalId] = useState(null);
+  const [snapshotId, setSnapshotId] = useState(null);
+  const [proposalId, setProposalId] = useState(null);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const toggleVotingModal = (newModalState: boolean) => {
+    setVotingModalOpen(newModalState);
+  };
 
-  const threadId = identifier.split('-')[0];
-  const threadDoesNotMatch =
-    +thread?.identifier !== +threadId || thread?.slug !== ProposalType.Thread;
+  const onModalClose = () => {
+    setVotingModalOpen(false);
+  };
+
+  const {
+    snapshotProposal,
+    proposalAuthor,
+    votes,
+    symbol,
+    threads,
+    activeUserAddress,
+    power,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    loadVotes,
+  } = useSnapshotProposalData(snapshotProposalId, snapshotId);
+
+  const { proposal } = useProposalData(proposalId, null, proposalId != null);
+
+  const forceRerender = useForceRerender();
+
+  const proposalVotes = proposal?.getVotes();
+
+  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const [searchParams] = useSearchParams();
+  const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
+
+  const {
+    data,
+    error: fetchThreadError,
+    isLoading,
+  } = useGetThreadsByIdQuery({
+    chainId: app.activeChainId(),
+    ids: [+threadId].filter(Boolean),
+    apiCallEnabled: !!threadId, // only call the api if we have thread id
+  });
+
+  const thread = data?.[0];
 
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
@@ -106,16 +149,25 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       threadId: parseInt(`${threadId}`),
     });
 
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: parseInt(threadId),
+  });
+
+  useEffect(() => {
+    app.proposalEmitter.on('redraw', forceRerender);
+
+    return () => {
+      app.proposalEmitter.removeAllListeners();
+    };
+  }, [forceRerender]);
+
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
   }, [fetchCommentsError]);
 
-  const cancelEditing = () => {
-    setIsGloballyEditing(false);
-    setIsEditingBody(false);
-  };
-
-  const { isWindowMedium } = useBrowserWindow({
+  const { isWindowLarge } = useBrowserWindow({
+    // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -141,71 +193,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
   });
 
-  const threadUpdatedCallback = (newTitle: string, body: string) => {
-    setThread(
-      new Thread({
-        ...thread,
-        title: newTitle,
-        body: body,
-      })
-    );
-    cancelEditing();
-  };
-
-  // we will want to prefetch comments, profiles, and viewCount on the page before rendering anything
-  if (!prefetch[threadId]) {
-    setPrefetch((prevState) => ({
-      ...prevState,
-      [threadId]: {
-        pollsStarted: false,
-        viewCountStarted: false,
-        profilesStarted: false,
-        profilesFinished: false,
-      },
-    }));
-  }
-
   useEffect(() => {
-    if (recentlyEdited) {
-      setRecentlyEdited(false);
+    if (!initializedPolls && thread?.id) {
+      setInitializedPolls(true);
+      setPolls(app.polls.getByThreadId(thread?.id));
     }
-  }, [recentlyEdited]);
+  }, [initializedPolls, thread?.id]);
 
-  useNecessaryEffect(() => {
-    app.threads
-      .fetchThreadsFromId([+threadId])
-      .then((res) => {
-        const t = res[0];
-        if (t) setThread(t);
-        setThreadFetchCompleted(true);
-      })
-      .catch(() => {
-        notifyError('Thread not found');
-        setThreadFetchFailed(true);
-        setThreadFetchCompleted(true);
-      });
-  }, [threadId]);
-
-  useNecessaryEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    // load proposal
-    if (!prefetch[threadId]['threadReactionsStarted']) {
-      app.threads.fetchReactionsCount([thread]).then(() => {
-        setThread(thread);
-      });
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          threadReactionsStarted: true,
-        },
-      }));
-    }
-  }, [prefetch, thread, threadId]);
-
+  // TODO: unnecessary code - must be in a redirect hook
   useNecessaryEffect(() => {
     if (!thread) {
       return;
@@ -220,198 +215,63 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       navigate(url, { replace: true });
     }
   }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
+  // ------------
 
   useNecessaryEffect(() => {
-    if (comments.length > 0 && thread && thread.id) {
-      fetchReactionCounts({
-        proposalIds: [`${thread.id}`],
-        commentIds: comments.map((c) => `${c.id}`),
-        address: app.user.activeAccount?.address,
-      }).then((reactionCounts) => {
-        for (const rc of reactionCounts) {
-          const id = app.threads.reactionCountsStore.getIdentifier({
-            threadId: rc.thread_id,
-            proposalId: rc.proposal_id,
-            commentId: rc.comment_id,
-          });
-
-          app.threads.reactionCountsStore.add(
-            new ReactionCount({ ...rc, id } as any)
-          );
-
-          app.threads.isReactionFetched.emit('redraw', rc.comment_id);
-        }
-      });
-    }
-  }, [thread, threadId, comments]);
-
-  useEffect(() => {
-    if (!initializedComments) {
-      setInitializedComments(true);
-    }
-  }, [initializedComments]);
-
-  useEffect(() => {
-    if (!initializedPolls) {
-      setInitializedPolls(true);
-      setPolls(app.polls.getByThreadId(thread?.id));
-    }
-  }, [initializedPolls, thread?.id]);
-
-  useNecessaryEffect(() => {
-    if (!thread) {
+    if (!thread || (thread && arePollsFetched)) {
       return;
     }
 
-    // load polls
-    if (!prefetch[threadId]['pollsStarted']) {
-      app.polls
-        .fetchPolls(app.activeChainId(), thread?.id)
-        .then(() => {
-          setPolls(app.polls.getByThreadId(thread.id));
-        })
-        .catch(() => {
-          notifyError('Failed to load polls');
-          setPolls([]);
-        });
-
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          pollsStarted: true,
-        },
-      }));
-    }
-  }, [prefetch, thread, thread?.id, threadId]);
+    app.polls
+      .fetchPolls(app.activeChainId(), thread?.id)
+      .then(() => {
+        setPolls(app.polls.getByThreadId(thread.id));
+        setArePollsFetched(true);
+      })
+      .catch(() => {
+        notifyError('Failed to load polls');
+        setPolls([]);
+      });
+  }, [thread, arePollsFetched]);
 
   useNecessaryEffect(() => {
-    if (!thread) {
+    if (!thread || (thread && isViewMarked)) {
       return;
     }
 
     // load view count
-    if (!prefetch[threadId]['viewCountStarted']) {
-      $.post(`${app.serverUrl()}/viewCount`, {
+    axios
+      .post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
         object_id: thread.id,
       })
-        .then((response) => {
-          if (response.status !== 'Success') {
-            setViewCount(0);
-            throw new Error(`got unsuccessful status: ${response.status}`);
-          } else {
-            setViewCount(response.result.view_count);
-          }
-        })
-        .catch(() => {
-          setViewCount(0);
-          throw new Error('could not load view count');
-        });
-
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          viewCountStarted: true,
-        },
-      }));
-    }
-  }, [prefetch, thread, thread?.id, threadId]);
-
-  useNecessaryEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    // load profiles
-    if (!prefetch[threadId]['profilesStarted']) {
-      NewProfilesController.Instance.getProfile(
-        thread.authorChain,
-        thread.author
-      );
-
-      comments.forEach((comment) => {
-        NewProfilesController.Instance.getProfile(
-          comment.authorChain,
-          comment.author
-        );
+      .then((response) => {
+        setViewCount(response?.data?.result?.view_count || 0);
+      })
+      .catch(() => {
+        setViewCount(0);
+      })
+      .finally(() => {
+        setIsViewMarked(true);
       });
+  }, [thread, isViewMarked]);
 
-      NewProfilesController.Instance.isFetched.on('redraw', () => {
-        if (!prefetch[threadId]?.['profilesFinished']) {
-          setPrefetch((prevState) => ({
-            ...prevState,
-            [threadId]: {
-              ...prevState[threadId],
-              profilesFinished: true,
-            },
-          }));
-        }
-      });
-
-      setPrefetch((prevState) => ({
-        ...prevState,
-        [threadId]: {
-          ...prevState[threadId],
-          profilesStarted: true,
-        },
-      }));
-    }
-  }, [
-    comments,
-    prefetch,
-    thread,
-    thread?.author,
-    thread?.authorChain,
-    threadId,
-  ]);
-
-  useEffect(() => {
-    if (threadDoesNotMatch) {
-      setThread(undefined);
-      setRecentlyEdited(false);
-    }
-  }, [threadDoesNotMatch]);
-
-  useEffect(() => {
-    if (thread?.id && comments?.length > 0) {
-      const mismatchedComments = comments.filter((c) => {
-        return c.threadId !== thread.id;
-      });
-
-      if (mismatchedComments.length) {
-        setPrefetch((prevState) => ({
-          ...prevState,
-          [threadId]: {
-            ...prevState[threadId],
-          },
-        }));
-      }
-    }
-  }, [comments, thread, threadId]);
-
-  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
-  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
-
-  if (typeof identifier !== 'string' || threadFetchFailed) {
-    return <PageNotFound />;
-  }
-
-  if (!app.chain?.meta || !app.threads.initialized || !thread) {
-    return <CWContentPage showSkeleton isWindowMedium={isWindowMedium} />;
-  }
+  useManageDocumentTitle('View thread', thread?.title);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
 
-  if (!thread && threadFetchCompleted) {
-    return <PageNotFound />;
+  if (!app.chain?.meta || isLoading) {
+    return (
+      <CWContentPage
+        showSkeleton
+        sidebarComponentsSkeletonCount={isWindowLarge ? 2 : 0}
+      />
+    );
   }
 
-  if (threadFetchFailed) {
+  if ((!isLoading && !thread) || fetchThreadError) {
     return <PageNotFound />;
   }
 
@@ -422,7 +282,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  if (linkedSnapshots?.length > 0 && !snapshotId) {
+    setSnapshotId(linkedSnapshots[0].identifier.split('/')[0]);
+    setSnapshotProposalId(linkedSnapshots[0].identifier.split('/')[1]);
+  }
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+  if (linkedProposals?.length > 0 && !proposalId) {
+    setProposalId(linkedProposals[0].identifier);
+  }
+
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
 
   const showLinkedProposalOptions =
@@ -444,28 +312,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     !!hasJoinedCommunity ||
     (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
 
-  const handleLinkedThreadChange = (links: Thread['links']) => {
-    const updatedThread = new Thread({
-      ...thread,
-      links,
-    });
-
-    setThread(updatedThread);
-  };
-
-  const handleLinkedProposalChange = (
-    stage: ThreadStage,
-    links: Link[] = []
-  ) => {
-    const newThread = {
-      ...thread,
-      stage,
-      links,
-    } as Thread;
-
-    setThread(newThread);
-  };
-
   const handleNewSnapshotChange = async ({
     id,
     snapshot_title,
@@ -481,18 +327,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const toAdd = [newLink]; // Add this line to create an array with the new link
 
     if (toAdd.length > 0) {
-      await app.threads.addLinks({
-        threadId: thread.id,
-        links: toAdd,
-      });
+      try {
+        await addThreadLinks({
+          chainId: app.activeChainId(),
+          threadId: thread.id,
+          links: toAdd,
+        });
+      } catch {
+        notifyError('Failed to update linked threads');
+        return;
+      }
     }
-
-    const newThread = {
-      ...thread,
-      links: [...thread.links, newLink],
-    } as Thread;
-
-    setThread(newThread);
   };
 
   const editsToSave = localStorage.getItem(
@@ -526,6 +371,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       (fromBot && isAdmin));
 
   return (
+    // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
       <CWContentPage
         showTabs={isCollapsedSize && tabsShouldBePresent}
@@ -541,7 +387,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           isEditingBody ? (
             <CWTextInput
               onInput={(e) => {
-                setTitle(e.target.value);
+                setDraftTitle(e.target.value);
               }}
               defaultValue={thread.title}
             />
@@ -558,7 +404,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         lastEdited={thread.lastEdited}
         viewCount={viewCount}
         canUpdateThread={canUpdateThread}
-        displayNewTag={true}
         stageLabel={!isStageDefault && thread.stage}
         subHeader={
           !!thread.url && (
@@ -571,27 +416,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         onLockToggle={(isLock) => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
-          setRecentlyEdited(true);
-          setThread((t) => ({
-            ...t,
-            readOnly: isLock,
-            uniqueIdentifier: t.uniqueIdentifier,
-          }));
-        }}
-        onPinToggle={(isPin) => {
-          setThread((t) => ({
-            ...t,
-            pinned: isPin,
-            uniqueIdentifier: t.uniqueIdentifier,
-          }));
-        }}
-        onTopicChange={(topic: Topic) => {
-          const newThread = new Thread({ ...thread, topic });
-          setThread(newThread);
-        }}
-        onCollaboratorsEdit={(collaborators: IThreadCollaborator[]) => {
-          const newThread = new Thread({ ...thread, collaborators });
-          setThread(newThread);
         }}
         onDelete={() => navigate('/discussions')}
         onEditCancel={() => {
@@ -616,19 +440,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         onSpamToggle={(updatedThread) => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
-          setRecentlyEdited(true);
-          setThread((t) => ({
-            ...t,
-            markedAsSpamAt: updatedThread.markedAsSpamAt,
-            uniqueIdentifier: t.uniqueIdentifier,
-          }));
-        }}
-        onProposalStageChange={(stage) => {
-          setThread((t) => ({
-            ...t,
-            stage: stage,
-            uniqueIdentifier: t.uniqueIdentifier,
-          }));
         }}
         hasPendingEdits={!!editsToSave}
         body={(threadOptionsComp) => (
@@ -637,12 +448,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 {/*// TODO editing thread */}
                 <EditBody
-                  title={title}
+                  title={draftTitle}
                   thread={thread}
                   savedEdits={savedEdits}
                   shouldRestoreEdits={shouldRestoreEdits}
-                  cancelEditing={cancelEditing}
-                  threadUpdatedCallback={threadUpdatedCallback}
+                  cancelEditing={() => {
+                    setIsGloballyEditing(false);
+                    setIsEditingBody(false);
+                  }}
+                  threadUpdatedCallback={() => {
+                    setIsGloballyEditing(false);
+                    setIsEditingBody(false);
+                  }}
                 />
                 {threadOptionsComp}
               </>
@@ -681,6 +498,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     <CreateComment
                       rootThread={thread}
                       canComment={canComment}
+                      shouldFocusEditor={shouldFocusCommentEditor}
                     />
                     {showBanner && (
                       <JoinCommunityBanner
@@ -751,7 +569,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <div className="cards-column">
                         {showLinkedProposalOptions && (
                           <LinkedProposalsCard
-                            onChangeHandler={handleLinkedProposalChange}
                             thread={thread}
                             showAddProposalButton={isAuthor || isAdminOrMod}
                           />
@@ -760,10 +577,75 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           <LinkedThreadsCard
                             thread={thread}
                             allowLinking={isAuthor || isAdminOrMod}
-                            onChangeHandler={handleLinkedThreadChange}
                           />
                         )}
                       </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(snapshotProposal
+              ? [
+                  {
+                    label: 'Info',
+                    item: (
+                      <SnapshotInformationCard
+                        proposal={snapshotProposal}
+                        threads={threads}
+                        header={'Snapshot Info'}
+                      />
+                    ),
+                  },
+                  {
+                    label: 'Poll',
+                    item: (
+                      <SnapshotPollCardContainer
+                        activeUserAddress={activeUserAddress}
+                        fetchedPower={!!power}
+                        identifier={identifier}
+                        proposal={snapshotProposal}
+                        space={space}
+                        symbol={symbol}
+                        totals={totals}
+                        totalScore={totalScore}
+                        validatedAgainstStrategies={validatedAgainstStrategies}
+                        votes={votes}
+                        loadVotes={async () =>
+                          loadVotes(snapshotId, identifier)
+                        }
+                      />
+                    ),
+                  },
+                ]
+              : []),
+            ...(proposal && proposalVotes?.length >= 0
+              ? [
+                  {
+                    label: 'ProposalPoll',
+                    item: (
+                      <CWContentPageCard
+                        header={'Proposal Vote'}
+                        content={
+                          <CWCard className="PollCard">
+                            <div className="poll-title-section">
+                              <CWText type="b2" className="poll-title-text">
+                                {proposal.title}
+                              </CWText>
+                            </div>
+                            <VotingActions
+                              onModalClose={onModalClose}
+                              proposal={proposal}
+                              toggleVotingModal={toggleVotingModal}
+                              votingModalOpen={votingModalOpen}
+                              isInCard={true}
+                            />
+                            <VotingResults
+                              proposal={proposal}
+                              isInCard={true}
+                            />
+                          </CWCard>
+                        }
+                      ></CWContentPageCard>
                     ),
                   },
                 ]
@@ -796,7 +678,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             polls?.map((poll) => [poll.id, poll])
                           ).values(),
                         ].map((poll: Poll) => {
-                          return (
+                          const threadPollCard = (
                             <ThreadPollCard
                               poll={poll}
                               key={poll.id}
@@ -806,6 +688,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 setInitializedPolls(false);
                               }}
                             />
+                          );
+                          return (
+                            <CWContentPageCard
+                              header="Thread Poll"
+                              content={threadPollCard}
+                            ></CWContentPageCard>
                           );
                         })}
                         {isAuthor &&

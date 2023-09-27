@@ -31,15 +31,7 @@ const writeUserSetting = async (
     return next(new AppError(Errors.NoKeyValue));
   }
 
-  if (key === 'lastVisited') {
-    const obj = JSON.parse(req.user.lastVisited);
-    const val = JSON.parse(value);
-    const { activeEntity, timestamp } = val;
-    obj[activeEntity] = timestamp;
-    const str = JSON.stringify(obj);
-    req.user.lastVisited = str;
-    await req.user.save();
-  } else if (key === 'disableRichText' && value === 'true') {
+  if (key === 'disableRichText' && value === 'true') {
     req.user.disableRichText = true;
     await req.user.save();
   } else if (key === 'disableRichText' && value === 'false') {
