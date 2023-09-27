@@ -81,16 +81,14 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.sequelize.transaction(async (t) => {
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.sequelize.query(`DELETE FROM "Memberships"`, { transaction })
+      await queryInterface.sequelize.query(`DELETE FROM "Groups"`, { transaction })
       await queryInterface.removeColumn(
         'Topics',
         'group_ids',
-        { transaction: t }
+        { transaction }
       )
-      const deleteGroupsQuery = `
-        DELETE FROM "Groups"
-      `
-      await await queryInterface.sequelize.query(deleteGroupsQuery)
     })
   }
 };
