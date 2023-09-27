@@ -51,7 +51,10 @@ const AddContractAndAbiForm = () => {
 
     if (isAddress(newAddress)) {
       const fetchedAbi = await app.contracts.getAbiFromEtherscan(newAddress);
-      setForm((prevState) => ({ ...prevState, abi: fetchedAbi }));
+      setForm((prevState) => ({
+        ...prevState,
+        abi: JSON.stringify(fetchedAbi),
+      }));
     }
   };
 
@@ -79,7 +82,10 @@ const AddContractAndAbiForm = () => {
           value={form.abi}
           placeholder="Enter contract's ABI file"
           onInput={(e) =>
-            setForm((prevState) => ({ ...prevState, abi: e.target.value }))
+            setForm((prevState) => ({
+              ...prevState,
+              abi: e.target.value,
+            }))
           }
         />
       </div>

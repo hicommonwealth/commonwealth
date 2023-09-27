@@ -1,0 +1,26 @@
+.SessionRevalidationModal {
+  width: 600px;
+  padding: 8px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+
+    .close-icon {
+      cursor: pointer;
+    }
+  }
+
+  .info {
+    display: block;
+    margin-bottom: 8px;
+  }
+}
+
+.AddressMismatch {
+  .Text {
+    display: inline-block;
+  }
+}

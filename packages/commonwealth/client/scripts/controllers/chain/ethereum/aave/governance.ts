@@ -7,11 +7,10 @@ import type AaveApi from './api';
 import type AaveChain from './chain';
 
 import AaveProposal from './proposal';
-import getFetch from 'helpers/getFetch';
-import { BigNumber } from 'ethers';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import axios from 'axios';
 import { ApiEndpoints } from 'state/api/config';
+import { deserializeBigNumbers } from 'controllers/chain/ethereum/util';
 
 export interface AaveProposalArgs {
   executor: string;
@@ -21,30 +20,6 @@ export interface AaveProposalArgs {
   calldatas: string[];
   withDelegateCalls: boolean[];
   ipfsHash: string;
-}
-
-function deserializeBigNumbers(obj: Record<string, any>) {
-  // Base case: if the object is not an object or is null, return it as-is
-  if (typeof obj !== 'object' || obj === null) {
-    return obj;
-  }
-
-  // If the object matches the serialized BigNumber pattern, return a deserialized BigNumber
-  if (obj.type === 'BigNumber' && obj.hex) {
-    return BigNumber.from(obj.hex);
-  }
-
-  // If it's an array, iterate over each element and deserialize if needed
-  if (Array.isArray(obj)) {
-    return obj.map(deserializeBigNumbers);
-  }
-
-  // For plain objects, iterate over each property
-  const result = {};
-  for (const key in obj) {
-    result[key] = deserializeBigNumbers(obj[key]);
-  }
-  return result;
 }
 
 export default class AaveGovernance extends ProposalModule<
@@ -141,7 +116,6 @@ export default class AaveGovernance extends ProposalModule<
     this._Accounts = accounts;
     this._api = chain.aaveApi;
 
-    // await AaveGovernance.getProposals(chain.app.chain as Aave)
     // set init to true without fetching proposals so chainAdapterReady emits true
     this._initialized = true;
   }
