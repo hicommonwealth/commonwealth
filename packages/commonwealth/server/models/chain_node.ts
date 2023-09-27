@@ -30,7 +30,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       url: { type: dataTypes.STRING, allowNull: false },
-      eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
+      eth_chain_id: { type: dataTypes.INTEGER, allowNull: true, unique: true },
       cosmos_chain_id: {
         type: dataTypes.STRING,
         allowNull: true,
