@@ -40,6 +40,142 @@ const sortedStringify = configureStableStringify({
   deterministic: true,
 });
 
+////////////////////////////////////////
+interface Bech32Address {
+  address: string;
+  userId?: number;
+}
+
+interface HexAddress {
+  hex: string;
+  bech32Address: Bech32Address;
+}
+
+interface Signer {
+  hexAddress: string; //common identifier
+  bech32Addresses: Bech32Address[];
+}
+
+const findTheLostSiblings = async (models: DB): Promise<void> => {
+  const { toHex, fromBech32 } = await import('@cosmjs/encoding');
+
+  const cosmosChains = await models.Chain.findAll({
+    where: { base: 'cosmos', type: 'chain' },
+  });
+
+  const allCosmosAddresses: HexAddress[] = [];
+  const erroredAddresses: string[] = [];
+  await Promise.all(
+    cosmosChains.map(async (chain) => {
+      const chainAddresses = await models.Address.findAll({
+        where: { chain: chain.id, wallet_id: 'keplr' },
+      });
+      const hexAddresses: HexAddress[] = chainAddresses.map((address) => {
+        try {
+          const { dataValues } = address;
+          if (!dataValues.address.startsWith('0x')) {
+            const dataA = fromBech32(dataValues.address).data;
+            const aHex = toHex(dataA);
+
+            return {
+              hex: aHex,
+              bech32Address: {
+                address: dataValues.address,
+                userId: dataValues.user_id,
+              },
+            };
+          }
+        } catch (e) {
+          console.error(e);
+          erroredAddresses.push(address.address);
+        }
+      });
+      allCosmosAddresses.push(...hexAddresses); //30330
+    })
+  );
+
+  const signers = [];
+  if (allCosmosAddresses?.length > 0) {
+    // sort them by hex into unique signers
+    for (const hexAddress of allCosmosAddresses) {
+      if (hexAddress?.hex) {
+        // Create a new signer object.
+        const signer: Signer = {
+          hexAddress: hexAddress?.hex,
+          bech32Addresses: [],
+        };
+
+        // Find all of the bech32 addresses that are associated with the signer's hex address.
+        const bech32Addresses = allCosmosAddresses
+          .filter((dbAddress) => dbAddress?.hex === hexAddress.hex)
+          .map((dbAddress) => dbAddress.bech32Address)
+          .filter((dbAddress) => !!dbAddress.userId); //filter out null userIds
+
+        // Add the bech32 addresses to the signer object.
+        signer.bech32Addresses = _.uniqBy(bech32Addresses, 'address');
+
+        signers.push(signer); // 30169
+      }
+    }
+  }
+
+  const uniqueSigners: Signer[] = _.uniqBy(signers, 'hexAddress'); // 26747
+
+  const signersWithMultipleAddresses = uniqueSigners.filter(
+    (signer) => signer.bech32Addresses.length > 1
+  ); // 1372
+
+  const signersWithMultipleUserIds = signersWithMultipleAddresses.filter(
+    (signer) => {
+      const userIds = _.uniqBy(signer.bech32Addresses, 'userId');
+      return userIds.length > 1;
+    }
+  );
+
+  console.log(
+    '# signersWithMultipleUserIds',
+    signersWithMultipleUserIds.length
+  ); // 1192
+
+  // Number of Accounts that share addresses with one hex
+  const userIdGroupsThatShareSigners = signersWithMultipleUserIds.map(
+    (signer) => {
+      const addressUserIdGroups = _.uniqBy(signer.bech32Addresses, 'userId');
+      return addressUserIdGroups;
+    }
+  );
+
+  console.log(
+    '# userIdGroupsThatShareSigners',
+    userIdGroupsThatShareSigners.length
+  ); // 1192
+
+  const userIdsThatShareSigners = _.flatten(userIdGroupsThatShareSigners);
+
+  console.log('# userIdsThatShareSigners', userIdsThatShareSigners.length); // 2699
+
+  // AddressGroups grouped by signer with at least two different userIds
+  const addressGroupsThatShareSigners = signersWithMultipleAddresses.map(
+    (signer) => {
+      const addresses = _.uniqBy(signer.bech32Addresses, 'address');
+      return addresses;
+    }
+  );
+
+  console.log(
+    '# addressGroupsThatShareSigners',
+    addressGroupsThatShareSigners.length
+  ); //1372
+
+  const addressesThatShareSigners = _.flatten(addressGroupsThatShareSigners);
+
+  // Number addresses with at least one separated sibling (different userId)
+  // AKA "Number of Accounts that share addresses with one public key"
+  console.log('# addressesThatShareSigners', addressesThatShareSigners.length); // 3200
+
+  console.log('# erroredAddresses', erroredAddresses.length); // 161 these failed because of checksum error - all regen, probably generated for past migration to CW. These should be considered real addresses for now.
+};
+
 const verifySignature = async (
   models: DB,
   chain: ChainInstance,
@@ -212,146 +348,7 @@ const verifySignature = async (
         'cosmos'
       );
 
-      interface Bech32Address {
-        address: string;
-        userId?: number;
-      }
-
-      interface HexAddress {
-        hex: string;
-        bech32Address: Bech32Address;
-      }
-
-      interface Signer {
-        hexAddress: string; //common identifier
-        bech32Addresses: Bech32Address[];
-      }
-
-      const { toHex, fromBech32, toBech32, fromHex } = await import(
-        '@cosmjs/encoding'
-      );
-
-      const cosmosChains = await models.Chain.findAll({
-        where: { base: 'cosmos', type: 'chain' },
-      });
-
-      const allCosmosAddresses: HexAddress[] = [];
-      await Promise.all(
-        cosmosChains.map(async (chain) => {
-          const chainAddresses = await models.Address.findAll({
-            where: { chain: chain.id, wallet_id: 'keplr' },
-          });
-          const hexAddresses: HexAddress[] = chainAddresses.map((address) => {
-            try {
-              const { dataValues } = address;
-              if (!dataValues.address.startsWith('0x')) {
-                const dataA = fromBech32(dataValues.address).data;
-                const aHex = toHex(dataA);
-
-                return {
-                  hex: aHex,
-                  bech32Address: {
-                    address: dataValues.address,
-                    userId: dataValues.user_id,
-                  },
-                };
-              }
-            } catch (e) {
-              console.error(e);
-            }
-          });
-          allCosmosAddresses.push(...hexAddresses); //30330
-        })
-      );
-
-      const signers = [];
-      if (allCosmosAddresses?.length > 0) {
-        // sort them by hex into unique signers
-        for (const hexAddress of allCosmosAddresses) {
-          if (hexAddress?.hex) {
-            // Create a new signer object.
-            const signer: Signer = {
-              hexAddress: hexAddress?.hex,
-              bech32Addresses: [],
-            };
-
-            // Find all of the bech32 addresses that are associated with the signer's hex address.
-            const bech32Addresses = allCosmosAddresses
-              .filter((dbAddress) => dbAddress?.hex === hexAddress.hex)
-              .map((dbAddress) => dbAddress.bech32Address)
-              .filter((dbAddress) => !!dbAddress.userId); //filter out null userIds
-
-            // Add the bech32 addresses to the signer object.
-            signer.bech32Addresses = _.uniqBy(bech32Addresses, 'address');
-
-            signers.push(signer); // 30169
-          }
-        }
-      }
-
-      const uniqueSigners: Signer[] = _.uniqBy(signers, 'hexAddress'); // 26747
-
-      const signersWithMultipleAddresses = uniqueSigners.filter(
-        (signer) => signer.bech32Addresses.length > 1
-      ); // 1372
-
-      const signersWithMultipleUserIds = signersWithMultipleAddresses.filter(
-        (signer) => {
-          const userIds = _.uniqBy(signer.bech32Addresses, 'userId');
-          return userIds.length > 1;
-        }
-      );
-
-      console.log(
-        '# signersWithMultipleUserIds',
-        signersWithMultipleUserIds.length
-      ); // 1192
-
-      // Number of Accounts that share addresses with one hex
-      const userIdGroupsThatShareSigners = signersWithMultipleUserIds.map(
-        (signer) => {
-          const addressUserIdGroups = _.uniqBy(
-            signer.bech32Addresses,
-            'userId'
-          );
-          return addressUserIdGroups;
-        }
-      );
-
-      console.log(
-        '# userIdGroupsThatShareSigners',
-        userIdGroupsThatShareSigners.length
-      ); // 1192
-
-      const userIdsThatShareSigners = _.flatten(userIdGroupsThatShareSigners);
-
-      console.log('# userIdsThatShareSigners', userIdsThatShareSigners.length); // 2699
-
-      // AddressGroups grouped by signer with at least two different userIds
-      const addressGroupsThatShareSigners = signersWithMultipleAddresses.map(
-        (signer) => {
-          const addresses = _.uniqBy(signer.bech32Addresses, 'address');
-          return addresses;
-        }
-      );
-
-      console.log(
-        '# addressGroupsThatShareSigners',
-        addressGroupsThatShareSigners.length
-      ); //1372
-
-      const addressesThatShareSigners = _.flatten(
-        addressGroupsThatShareSigners
-      );
-
-      // Number addresses with at least one separated sibling (different userId)
-      // AKA "Number of Accounts that share addresses with one public key"
-      console.log(
-        '# addressesThatShareSigners',
-        addressesThatShareSigners.length
-      ); // 3200
-
-      ////////////////////////
+      await findTheLostSiblings(models);
 
       if (
         generatedAddress === addressModel.address ||
