@@ -38,6 +38,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
 }
 
 .comments-filter-row {
@@ -65,4 +66,15 @@
       margin-left: 0 !important;
     }
   }
+}
+
+.ContentPageCard.Card {
+  width: 100% !important;
+}
+
+.FooterCards {
+  margin-top: 24px;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
 }

@@ -12,6 +12,7 @@ import './ThreadOptions.scss';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { pluralize } from 'helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { isMobile } from 'react-device-detect';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
@@ -87,7 +88,11 @@ export const ThreadOptions = ({
 
         {commentBtnVisible && totalComments >= 0 && (
           <CWThreadAction
-            label={`${pluralize(totalComments, 'Comment')}`}
+            label={
+              isMobile
+                ? `${totalComments}`
+                : `${pluralize(totalComments, 'Comment')}`
+            }
             action="comment"
             disabled={!hasJoinedCommunity}
             onClick={onCommentBtnClick}

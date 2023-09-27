@@ -45,6 +45,8 @@ import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { isMobile } from 'react-device-detect';
+
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
@@ -370,6 +372,160 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadCollaborator(thread) ||
       (fromBot && isAdmin));
 
+  const sidebarComponents = [
+    ...(showLinkedProposalOptions || showLinkedThreadOptions
+      ? [
+          {
+            label: 'Links',
+            item: (
+              <div className="cards-column">
+                <div className="cards-column">
+                  {showLinkedProposalOptions && (
+                    <LinkedProposalsCard
+                      thread={thread}
+                      showAddProposalButton={isAuthor || isAdminOrMod}
+                    />
+                  )}
+                </div>
+                <div className="cards-column">
+                  {showLinkedThreadOptions && (
+                    <LinkedThreadsCard
+                      thread={thread}
+                      allowLinking={isAuthor || isAdminOrMod}
+                    />
+                  )}
+                </div>
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(snapshotProposal
+      ? [
+          {
+            label: 'Info',
+            item: (
+              <div className="cards-column">
+                <SnapshotInformationCard
+                  proposal={snapshotProposal}
+                  threads={threads}
+                  header={'Snapshot Info'}
+                />
+              </div>
+            ),
+          },
+          {
+            label: 'Poll',
+            item: (
+              <div className="cards-column">
+                <SnapshotPollCardContainer
+                  activeUserAddress={activeUserAddress}
+                  fetchedPower={!!power}
+                  identifier={identifier}
+                  proposal={snapshotProposal}
+                  space={space}
+                  symbol={symbol}
+                  totals={totals}
+                  totalScore={totalScore}
+                  validatedAgainstStrategies={validatedAgainstStrategies}
+                  votes={votes}
+                  loadVotes={async () => loadVotes(snapshotId, identifier)}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(proposal && proposalVotes?.length >= 0
+      ? [
+          {
+            label: 'ProposalPoll',
+            item: (
+              <div className="cards-column">
+                <CWContentPageCard
+                  header={'Proposal Vote'}
+                  content={
+                    <CWCard className="PollCard">
+                      <div className="poll-title-section">
+                        <CWText type="b2" className="poll-title-text">
+                          {proposal.title}
+                        </CWText>
+                      </div>
+                      <VotingActions
+                        onModalClose={onModalClose}
+                        proposal={proposal}
+                        toggleVotingModal={toggleVotingModal}
+                        votingModalOpen={votingModalOpen}
+                        isInCard={true}
+                      />
+                      <VotingResults proposal={proposal} isInCard={true} />
+                    </CWCard>
+                  }
+                ></CWContentPageCard>
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(canCreateSnapshotProposal && !hasSnapshotProposal
+      ? [
+          {
+            label: 'Snapshot',
+            item: (
+              <div className="cards-column">
+                <SnapshotCreationCard
+                  thread={thread}
+                  allowSnapshotCreation={isAuthor || isAdminOrMod}
+                  onChangeHandler={handleNewSnapshotChange}
+                />
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(polls?.length > 0 ||
+    (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+      ? [
+          {
+            label: 'Polls',
+            item: (
+              <div className="cards-column">
+                {[
+                  ...new Map(polls?.map((poll) => [poll.id, poll])).values(),
+                ].map((poll: Poll) => {
+                  const threadPollCard = (
+                    <ThreadPollCard
+                      poll={poll}
+                      key={poll.id}
+                      onVote={() => setInitializedPolls(false)}
+                      showDeleteButton={isAuthor || isAdmin}
+                      onDelete={() => {
+                        setInitializedPolls(false);
+                      }}
+                    />
+                  );
+                  return (
+                    <CWContentPageCard
+                      header="Thread Poll"
+                      content={threadPollCard}
+                    ></CWContentPageCard>
+                  );
+                })}
+                {isAuthor &&
+                  (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                    <ThreadPollEditorCard
+                      thread={thread}
+                      threadAlreadyHasPolling={!polls?.length}
+                      onPollCreate={() => setInitializedPolls(false)}
+                    />
+                  )}
+              </div>
+            ),
+          },
+        ]
+      : []),
+  ] as SidebarComponents;
+
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
@@ -465,7 +621,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               </>
             ) : (
               <>
-                <QuillRenderer doc={thread.body} cutoffLines={50} />
+                <QuillRenderer
+                  doc={thread.body}
+                  cutoffLines={isMobile ? 10 : 50}
+                />
+                {isMobile && (
+                  <div className="FooterCards">
+                    {sidebarComponents.map((component) => {
+                      return <div key={component.label}>{component.item}</div>;
+                    })}
+                  </div>
+                )}
+
                 {thread.readOnly || fromBot ? (
                   <>
                     {threadOptionsComp}
@@ -559,158 +726,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             />
           </>
         }
-        sidebarComponents={
-          [
-            ...(showLinkedProposalOptions || showLinkedThreadOptions
-              ? [
-                  {
-                    label: 'Links',
-                    item: (
-                      <div className="cards-column">
-                        {showLinkedProposalOptions && (
-                          <LinkedProposalsCard
-                            thread={thread}
-                            showAddProposalButton={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                        {showLinkedThreadOptions && (
-                          <LinkedThreadsCard
-                            thread={thread}
-                            allowLinking={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                      </div>
-                    ),
-                  },
-                ]
-              : []),
-            ...(snapshotProposal
-              ? [
-                  {
-                    label: 'Info',
-                    item: (
-                      <SnapshotInformationCard
-                        proposal={snapshotProposal}
-                        threads={threads}
-                        header={'Snapshot Info'}
-                      />
-                    ),
-                  },
-                  {
-                    label: 'Poll',
-                    item: (
-                      <SnapshotPollCardContainer
-                        activeUserAddress={activeUserAddress}
-                        fetchedPower={!!power}
-                        identifier={identifier}
-                        proposal={snapshotProposal}
-                        space={space}
-                        symbol={symbol}
-                        totals={totals}
-                        totalScore={totalScore}
-                        validatedAgainstStrategies={validatedAgainstStrategies}
-                        votes={votes}
-                        loadVotes={async () =>
-                          loadVotes(snapshotId, identifier)
-                        }
-                      />
-                    ),
-                  },
-                ]
-              : []),
-            ...(proposal && proposalVotes?.length >= 0
-              ? [
-                  {
-                    label: 'ProposalPoll',
-                    item: (
-                      <CWContentPageCard
-                        header={'Proposal Vote'}
-                        content={
-                          <CWCard className="PollCard">
-                            <div className="poll-title-section">
-                              <CWText type="b2" className="poll-title-text">
-                                {proposal.title}
-                              </CWText>
-                            </div>
-                            <VotingActions
-                              onModalClose={onModalClose}
-                              proposal={proposal}
-                              toggleVotingModal={toggleVotingModal}
-                              votingModalOpen={votingModalOpen}
-                              isInCard={true}
-                            />
-                            <VotingResults
-                              proposal={proposal}
-                              isInCard={true}
-                            />
-                          </CWCard>
-                        }
-                      ></CWContentPageCard>
-                    ),
-                  },
-                ]
-              : []),
-            ...(canCreateSnapshotProposal && !hasSnapshotProposal
-              ? [
-                  {
-                    label: 'Snapshot',
-                    item: (
-                      <div className="cards-column">
-                        <SnapshotCreationCard
-                          thread={thread}
-                          allowSnapshotCreation={isAuthor || isAdminOrMod}
-                          onChangeHandler={handleNewSnapshotChange}
-                        />
-                      </div>
-                    ),
-                  },
-                ]
-              : []),
-            ...(polls?.length > 0 ||
-            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
-              ? [
-                  {
-                    label: 'Polls',
-                    item: (
-                      <div className="cards-column">
-                        {[
-                          ...new Map(
-                            polls?.map((poll) => [poll.id, poll])
-                          ).values(),
-                        ].map((poll: Poll) => {
-                          const threadPollCard = (
-                            <ThreadPollCard
-                              poll={poll}
-                              key={poll.id}
-                              onVote={() => setInitializedPolls(false)}
-                              showDeleteButton={isAuthor || isAdmin}
-                              onDelete={() => {
-                                setInitializedPolls(false);
-                              }}
-                            />
-                          );
-                          return (
-                            <CWContentPageCard
-                              header="Thread Poll"
-                              content={threadPollCard}
-                            ></CWContentPageCard>
-                          );
-                        })}
-                        {isAuthor &&
-                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                            <ThreadPollEditorCard
-                              thread={thread}
-                              threadAlreadyHasPolling={!polls?.length}
-                              onPollCreate={() => setInitializedPolls(false)}
-                            />
-                          )}
-                      </div>
-                    ),
-                  },
-                ]
-              : []),
-          ] as SidebarComponents
-        }
+        sidebarComponents={isMobile ? [] : sidebarComponents}
       />
       {JoinCommunityModals}
     </>
