@@ -12,6 +12,19 @@
   width: 100%;
   z-index: 3;
 
+  a {
+    color: $neutral-400;
+    text-decoration: none;
+    &:hover {
+      color: $neutral-400;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+
   @include extraSmall {
     position: static;
     min-height: 40px;
