@@ -93,37 +93,42 @@ export async function getPreviewImageUrl(
     { categoryId: NotificationCategories.SnapshotProposal }
   >
 ): Promise<{ previewImageUrl: string; previewAltText: string }> {
-  let previewImageUrl: string, previewAltText: string;
-  if (notification.categoryId === NotificationCategories.ChainEvent) {
-    const chain = await models.Chain.findOne({
-      where: {
-        id: notification.data.chain,
-      },
-    });
-    if (chain?.icon_url) {
-      previewImageUrl = chain.icon_url.match(`^(http|https)://`)
-        ? chain.icon_url
-        : `https://commonwealth.im${chain.icon_url}`;
-      previewAltText = `${chain.name}`;
-    }
-  } else if (
+  if (
+    notification.categoryId !== NotificationCategories.ChainEvent &&
     notification.categoryId !== NotificationCategories.ThreadEdit &&
     notification.categoryId !== NotificationCategories.CommentEdit
   ) {
     const bodytext = decodeURIComponent(notification.data.comment_text);
     const matches = bodytext.match(REGEX_IMAGE);
     if (matches) {
-      previewImageUrl = matches[0];
-      previewAltText = 'Embedded';
+      return { previewImageUrl: matches[0], previewAltText: 'Embedded' };
     }
   }
 
-  if (!previewImageUrl || !previewAltText) {
-    previewImageUrl = previewImageUrl || DEFAULT_COMMONWEALTH_LOGO;
-    previewAltText = previewAltText || 'Commonwealth';
+  let chainId: string;
+  if (notification.categoryId === NotificationCategories.ChainEvent) {
+    chainId = notification.data.chain;
+  } else {
+    chainId = notification.data.chain_id;
+  }
+  const chain = await models.Chain.findOne({
+    where: {
+      id: chainId,
+    },
+  });
+
+  if (chain?.icon_url) {
+    const previewImageUrl = chain.icon_url.match(`^(http|https)://`)
+      ? chain.icon_url
+      : `https://commonwealth.im${chain.icon_url}`;
+    const previewAltText = `${chain.name}`;
+    return { previewImageUrl, previewAltText };
   }
 
-  return { previewImageUrl, previewAltText };
+  return {
+    previewImageUrl: DEFAULT_COMMONWEALTH_LOGO,
+    previewAltText: 'Commonwealth',
+  };
 }
 
 export async function getWebhookData(
