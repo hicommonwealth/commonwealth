@@ -1,0 +1,2 @@
+listener: node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/farcaster-bot/build/farcaster-bot/farcaster-listener/FarcasterListener.js
+consumer: node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/farcaster-bot/build/farcaster-bot/farcaster-consumer/farcasterConsumer.js
