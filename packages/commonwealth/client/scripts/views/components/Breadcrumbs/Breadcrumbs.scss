@@ -10,8 +10,6 @@
 
   position: fixed;
   width: 100%;
-  //TODO -- Figure out if mobile is suppose to be sticky or if desktop.
-  //If it's suppose to be sticky on desktop, we have to solve for the zIndex being higher than the sidebar
   z-index: 3;
 
   @include extraSmall {
@@ -34,44 +32,6 @@
     }
   }
 
-  li {
-    display: flex;
-    align-items: center;
-
-    .Text {
-      white-space: nowrap;
-    }
-
-    @include small {
-      margin-bottom: 16px;
-    }
-
-    @include extraSmall {
-      margin-bottom: 16px;
-    }
-    &:not(:last-child) {
-      margin-right: 6px;
-      &::after {
-        content: '/';
-        margin-left: 6px;
-      }
-    }
-    a {
-      color: $neutral-400;
-      text-decoration: none;
-      &:hover {
-        color: $neutral-400;
-        text-decoration: underline;
-        cursor: pointer;
-      }
-      &::first-letter {
-        text-transform: uppercase;
-      }
-    }
-    a.standalone:first-child {
-      cursor: default;
-    }
-  }
   .commonPadding {
     display: flex;
     flex-direction: row;
@@ -167,26 +127,24 @@
   .createCommunity {
     display: flex;
     align-items: center;
-    justify-content: center;
     flex-direction: row;
-    padding-right: 23%;
+    padding-left: calc(22vw + 65px);
+    padding-top: 16px;
 
     @include large {
-      padding-right: calc(12% + 26px);
-      align-items: flex-start;
+      padding-left: calc(46vw - 120px);
     }
 
     @include medium {
-      padding-right: calc(16% + 48px);
+      padding-left: calc(50vw - 230px);
     }
 
     @include small {
-      padding-right: 24%;
+      padding-left: 24%;
     }
 
     @include extraSmall {
-      position: absolute;
-      left: 24px;
+      padding-left: 24px;
     }
   }
 

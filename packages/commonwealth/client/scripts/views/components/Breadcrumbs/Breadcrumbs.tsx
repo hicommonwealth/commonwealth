@@ -1,11 +1,9 @@
 import './Breadcrumbs.scss';
 import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { CWText } from '../component_kit/cw_text';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { useLocation } from 'react-router-dom';
+import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import { breadCrumbURLS } from './data';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
-import clsx from 'clsx';
 import app from 'state';
 
 export const Breadcrumbs = () => {
@@ -115,13 +113,13 @@ export const Breadcrumbs = () => {
 
       // Create the breadcrumb object.
       return {
-        text:
+        label:
           index === pathSegments.length - 1 && !!threadName
             ? threadName
             : matchedBreadcrumb
             ? matchedBreadcrumb.breadcrumb
             : decodeURIComponent(pathSegments[index]),
-        link: link ? link : locationPath,
+        path: link ? `/${link}` : locationPath,
         isParent: splitLinks.length === 1,
       };
     });
@@ -216,57 +214,14 @@ export const Breadcrumbs = () => {
     <nav className="Breadcrumbs">
       <div className={`${getStyle() ?? 'commonPadding'}`}>
         {standalone ? (
-          <li>
-            <CWText type="b2" fontWeight="regular">
-              <Link className="active standalone" to={null}>
-                {pathnames[0].text}
-              </Link>
-            </CWText>
-          </li>
+          <CWBreadcrumbs breadcrumbs={[pathnames[0]]} />
         ) : (
-          pathnames.map((path, index) => {
-            const pathText =
-              path.text === 'object' ? path.text.toString() : path.text;
-            return path.isParent ? (
-              <CWTooltip
-                content={
-                  getToolTipCopy() || 'This is an app, not a selectable page.'
-                }
-                placement="bottom"
-                renderTrigger={(handleIneraction) => (
-                  <li
-                    key={`${location.key} - ${index}`}
-                    onMouseEnter={handleIneraction}
-                    onMouseLeave={handleIneraction}
-                  >
-                    <CWText type="b2" fontWeight="regular">
-                      <Link
-                        className={clsx({
-                          'disable-active-cursor': index === 0,
-                        })}
-                        to={index !== 0 ? '/' + path.link : null}
-                      >
-                        {pathText}
-                      </Link>
-                    </CWText>
-                  </li>
-                )}
-              />
-            ) : (
-              <li key={`${location.key} - ${index}`}>
-                <CWText type="b2" fontWeight="regular">
-                  <Link
-                    className={clsx({
-                      active: pathnames.length - 1 === index,
-                    })}
-                    to={'/' + path.link}
-                  >
-                    {pathText}
-                  </Link>
-                </CWText>
-              </li>
-            );
-          })
+          <CWBreadcrumbs
+            breadcrumbs={pathnames}
+            tooltipStr={
+              getToolTipCopy() || 'This is an app, not a selectable page.'
+            }
+          />
         )}
       </div>
     </nav>
