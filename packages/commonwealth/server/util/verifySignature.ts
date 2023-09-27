@@ -86,7 +86,7 @@ const findTheLostSiblings = async (models: DB): Promise<void> => {
             };
           }
         } catch (e) {
-          console.error(e);
+          // console.error(e);
           erroredAddresses.push(address.address);
         }
       });
@@ -114,12 +114,12 @@ const findTheLostSiblings = async (models: DB): Promise<void> => {
         // Add the bech32 addresses to the signer object.
         signer.bech32Addresses = _.uniqBy(bech32Addresses, 'address');
 
-        signers.push(signer); // 30169
+        signers.push(signer); // 30411
       }
     }
   }
 
-  const uniqueSigners: Signer[] = _.uniqBy(signers, 'hexAddress'); // 26747
+  const uniqueSigners: Signer[] = _.uniqBy(signers, 'hexAddress'); // 26879
 
   const signersWithMultipleAddresses = uniqueSigners.filter(
     (signer) => signer.bech32Addresses.length > 1
@@ -135,7 +135,7 @@ const findTheLostSiblings = async (models: DB): Promise<void> => {
   console.log(
     '# signersWithMultipleUserIds',
     signersWithMultipleUserIds.length
-  ); // 1192
+  ); // 1221
 
   // Number of Accounts that share addresses with one hex
   const userIdGroupsThatShareSigners = signersWithMultipleUserIds.map(
@@ -148,11 +148,11 @@ const findTheLostSiblings = async (models: DB): Promise<void> => {
   console.log(
     '# userIdGroupsThatShareSigners',
     userIdGroupsThatShareSigners.length
-  ); // 1192
+  ); // 1221
 
   const userIdsThatShareSigners = _.flatten(userIdGroupsThatShareSigners);
 
-  console.log('# userIdsThatShareSigners', userIdsThatShareSigners.length); // 2699
+  console.log('# userIdsThatShareSigners', userIdsThatShareSigners.length); // 2767
 
   // AddressGroups grouped by signer with at least two different userIds
   const addressGroupsThatShareSigners = signersWithMultipleAddresses.map(
@@ -165,13 +165,13 @@ const findTheLostSiblings = async (models: DB): Promise<void> => {
   console.log(
     '# addressGroupsThatShareSigners',
     addressGroupsThatShareSigners.length
-  ); //1372
+  ); // 1404
 
   const addressesThatShareSigners = _.flatten(addressGroupsThatShareSigners);
 
   // Number addresses with at least one separated sibling (different userId)
   // AKA "Number of Accounts that share addresses with one public key"
-  console.log('# addressesThatShareSigners', addressesThatShareSigners.length); // 3200
+  console.log('# addressesThatShareSigners', addressesThatShareSigners.length); // 3282
 
   console.log('# erroredAddresses', erroredAddresses.length); // 161 these failed because of checksum error - all regen, probably generated for past migration to CW. These should be considered real addresses for now.
 };
