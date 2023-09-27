@@ -5,7 +5,6 @@ import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 import app, { initAppState } from '../state';
-import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import {
@@ -87,16 +86,6 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
-            app.activeChainId() && (
-              <CWCommunityAvatar
-                size="large"
-                community={app.chain.meta}
-                onClick={() => {
-                  navigate('/discussions');
-                }}
-              />
-            )}
           {onMobile && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
@@ -198,16 +187,6 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           }}
         />
         {isWindowSmallInclusive(window.innerWidth) && <CWDivider isVertical />}
-        {(!isWindowSmallInclusive(window.innerWidth) || !menuVisible) &&
-          app.activeChainId() && (
-            <CWCommunityAvatar
-              size="large"
-              community={app.chain.meta}
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
-          )}
         {onMobile && app.activeChainId() && (
           <CWIconButton
             iconButtonTheme="black"

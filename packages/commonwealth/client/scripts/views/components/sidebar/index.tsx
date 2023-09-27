@@ -6,6 +6,7 @@ import { CreateContentSidebar } from '../../menus/create_content_menu';
 import { CommunitySection } from './CommunitySection';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import { SidebarHeader } from '../component_kit/CWSidebarHeader';
 
 export type SidebarMenuName =
   | 'default'
@@ -17,6 +18,11 @@ export const Sidebar = ({ isInsideCommunity }) => {
 
   return (
     <div className="Sidebar">
+      {app.chain && (
+        <div className="sidebar-header-wrapper">
+          <SidebarHeader />
+        </div>
+      )}
       <div className="sidebar-default-menu">
         <SidebarQuickSwitcher />
         {isInsideCommunity && (

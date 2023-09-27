@@ -5,6 +5,10 @@
   flex-direction: column;
   width: min-content;
 
+  .sidebar-header-wrapper {
+    background-color: $neutral-50;
+  }
+
   .sidebar-default-menu {
     border-right: 1px solid $neutral-200;
     display: flex;
@@ -44,7 +48,9 @@
 
     background-color: $neutral-25;
     border-right: 1px solid $neutral-200;
-    height: calc(100vh - #{$global-header-height});
+    height: calc(
+      100vh - (#{$global-header-height} + #{$global-sidebar-header-height})
+    );
     overflow: auto;
     width: calc(calc(#{$sidebar-width} + #{$quick-switcher-width}) + 1px);
 
