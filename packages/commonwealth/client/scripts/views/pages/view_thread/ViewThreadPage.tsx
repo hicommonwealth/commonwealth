@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -26,7 +27,7 @@ import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource } from '../../../models/Thread';
+import { Link, LinkSource, LinkDisplay } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -52,6 +53,10 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 import { useSearchParams } from 'react-router-dom';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import { TemplateActionCard } from './TemplateActionCard';
+import { ViewTemplateFormCard } from './ViewTemplateFormCard';
+import ViewTemplate from '../view_template/view_template';
+import { featureFlags } from 'helpers/feature-flags';
 
 import 'pages/view_thread/index.scss';
 
@@ -126,7 +131,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [fetchCommentsError]);
 
   const { isWindowLarge } = useBrowserWindow({
-    // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -243,6 +247,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+  const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
@@ -256,6 +261,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
+
+  const showTemplateOptions =
+    featureFlags.proposalTemplates && (isAuthor || isAdminOrMod);
+  const showLinkedTemplateOptions =
+    featureFlags.proposalTemplates && linkedTemplates.length > 0;
 
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
@@ -419,6 +429,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ) : (
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
+                {showLinkedTemplateOptions &&
+                  linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
+                    <ViewTemplate
+                      contract_address={
+                        linkedTemplates[0]?.identifier.split('/')[1]
+                      }
+                      slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                      setTemplateNickname={null}
+                      isForm={true}
+                    />
+                  )}
                 {thread.readOnly || fromDiscordBot ? (
                   <>
                     {threadOptionsComp}
@@ -584,6 +605,34 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               onPollCreate={() => setInitializedPolls(false)}
                             />
                           )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showLinkedTemplateOptions &&
+            linkedTemplates[0]?.display !== LinkDisplay.inline
+              ? [
+                  {
+                    label: 'View Template',
+                    item: (
+                      <div className="cards-column">
+                        <ViewTemplateFormCard
+                          address={linkedTemplates[0]?.identifier.split('/')[1]}
+                          slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                        />
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showTemplateOptions
+              ? [
+                  {
+                    label: 'Template',
+                    item: (
+                      <div className="cards-column">
+                        <TemplateActionCard thread={thread} />
                       </div>
                     ),
                   },

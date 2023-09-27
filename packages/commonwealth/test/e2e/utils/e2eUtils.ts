@@ -46,7 +46,10 @@ export async function addAlchemyKey() {
 
   // If chainNode for eth doesn't exist, add it and add key.
   const ethChainNodeExists = await dbClient.query(
-    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1'
+    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1 OR id = 37'
+  );
+  const polygonChainNodeExists = await dbClient.query(
+    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 137 OR id = 56'
   );
   if (ethChainNodeExists[0].length === 0) {
     try {
@@ -56,7 +59,19 @@ export async function addAlchemyKey() {
          'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4', 'ethereum', 'Ethereum (Mainnet)');
     `);
     } catch (e) {
-      console.log(e);
+      console.log('ethChainNodeExists ERROR: ', e);
+    }
+
+    if (polygonChainNodeExists[0].length === 0) {
+      try {
+        await dbClient.query(`
+        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name)
+        VALUES (56, 'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 137,
+        'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 'ethereum', 'Polygon');
+    `);
+      } catch (e) {
+        console.log('polygonChainNodeExists ERROR: ', e);
+      }
     }
 
     return;
