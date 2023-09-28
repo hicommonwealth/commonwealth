@@ -17,8 +17,8 @@ export async function login(page) {
 
   // wait for login button and login modal to appear
   await expect(async () => {
-    await expect(page.locator('.LoginSelector button')).toBeVisible();
-    button = await page.locator('.LoginSelector button');
+    await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
+    button = await page.getByRole('button', { name: 'Login' });
     await button.click();
     await expect(page.locator('.LoginDesktop')).toBeVisible();
   }).toPass();
@@ -28,7 +28,7 @@ export async function login(page) {
   // Therefore we need to re-open the login screen a few times waiting for it to finish lazy loading.
   await expect(async () => {
     await page.mouse.click(0, 0);
-    button = await page.locator('.LoginSelector button');
+    button = await page.getByRole('button', { name: 'Login' });
     await button.click();
     await expect(page.locator("text='Metamask'")).toBeVisible({ timeout: 100 });
     await page.locator("text='Metamask'").click();
