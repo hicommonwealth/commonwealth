@@ -2,6 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
 import useragent from 'express-useragent';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 
@@ -201,6 +202,8 @@ export type ServerControllers = {
   proposals: ServerProposalsController;
   groups: ServerGroupsController;
 };
+
+const log = factory.getLogger(formatFilename(__filename));
 
 function setupRouter(
   endpoint: string,
@@ -1333,53 +1336,60 @@ function setupRouter(
   );
 
   // Group routes
-  registerRoute(
-    router,
-    'put',
-    '/refresh-membership',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    refreshMembershipHandler.bind(this, serverControllers)
-  );
 
-  registerRoute(
-    router,
-    'get',
-    '/groups',
-    databaseValidationService.validateChain,
-    getGroupsHandler.bind(this, serverControllers)
-  );
+  if (process.env.GATING_API_ENABLED) {
+    log.debug('GATING API ENABLED');
 
-  registerRoute(
-    router,
-    'post',
-    '/groups',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    createGroupHandler.bind(this, serverControllers)
-  );
+    registerRoute(
+      router,
+      'put',
+      '/refresh-membership',
+      passport.authenticate('jwt', { session: false }),
+      databaseValidationService.validateAuthor,
+      databaseValidationService.validateChain,
+      refreshMembershipHandler.bind(this, serverControllers)
+    );
 
-  registerRoute(
-    router,
-    'put',
-    '/groups/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    updateGroupHandler.bind(this, serverControllers)
-  );
+    registerRoute(
+      router,
+      'get',
+      '/groups',
+      databaseValidationService.validateChain,
+      getGroupsHandler.bind(this, serverControllers)
+    );
 
-  registerRoute(
-    router,
-    'delete',
-    '/groups/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateChain,
-    deleteGroupHandler.bind(this, serverControllers)
-  );
+    registerRoute(
+      router,
+      'post',
+      '/groups',
+      passport.authenticate('jwt', { session: false }),
+      databaseValidationService.validateAuthor,
+      databaseValidationService.validateChain,
+      createGroupHandler.bind(this, serverControllers)
+    );
+
+    registerRoute(
+      router,
+      'put',
+      '/groups/:id',
+      passport.authenticate('jwt', { session: false }),
+      databaseValidationService.validateAuthor,
+      databaseValidationService.validateChain,
+      updateGroupHandler.bind(this, serverControllers)
+    );
+
+    registerRoute(
+      router,
+      'delete',
+      '/groups/:id',
+      passport.authenticate('jwt', { session: false }),
+      databaseValidationService.validateAuthor,
+      databaseValidationService.validateChain,
+      deleteGroupHandler.bind(this, serverControllers)
+    );
+  } else {
+    log.warn('GATING API DISABLED');
+  }
 
   app.use(endpoint, router);
   app.use(methodNotAllowedMiddleware());
