@@ -40,6 +40,8 @@ const ADMIN_ONLY_TABS = [
   CommunityType.SputnikDao,
 ];
 
+export const ETHEREUM_MAINNET = 'Ethereum Mainnet';
+
 type CreateCommunityProps = {
   type?: string;
 };

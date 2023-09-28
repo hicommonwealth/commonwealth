@@ -1,7 +1,20 @@
 import { AppError } from 'common-common/src/errors';
 import type { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
-import { Errors } from '../routes/contractAbis/createContractAbi';
+import { hasher } from 'node-object-hash';
+import { AbiType } from '../../shared/types';
+
+export const Errors = {
+  NoContractId: 'Must provide contract id',
+  NoAbi: 'Must provide abi',
+  ContractAddressExists: 'The address already exists',
+  ChainIDExists:
+    'The id for this chain already exists, please choose another id',
+  ChainNameExists:
+    'The name for this chain already exists, please choose another name',
+  NotAdmin: 'Must be admin',
+  InvalidABI: 'Invalid ABI',
+};
 
 /**
  * Parses and validates an ABI string and returns it as an array of Record<string, unknown>
@@ -11,9 +24,7 @@ import { Errors } from '../routes/contractAbis/createContractAbi';
  * @returns Array<Record<string, unknown>>
  */
 
-export default function validateAbi(
-  abiString: string
-): Array<Record<string, unknown>> {
+export default function validateAbi(abiString: string): AbiType {
   // Parse ABI to validate it as a properly formatted ABI
   const abiAsRecord: Array<Record<string, unknown>> = JSON.parse(abiString);
   if (!abiAsRecord) {
@@ -24,4 +35,15 @@ export default function validateAbi(
     throw new AppError(Errors.InvalidABI);
   }
   return abiAsRecord;
+}
+
+export function hashAbi(abi: AbiType): string {
+  const hashInstance = hasher({
+    coerce: true,
+    sort: true,
+    trim: true,
+    alg: 'sha256',
+    enc: 'hex',
+  });
+  return hashInstance.hash(abi);
 }

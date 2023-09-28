@@ -124,22 +124,25 @@ const resetServer = (debug = false): Promise<void> => {
           url: 'https://rpc-osmosis.ecostake.com',
           name: 'Osmosis',
           balance_type: BalanceType.Cosmos,
+          cosmos_chain_id: 'osmosis'
         },
         csdkBeta: {
           url: 'https://cosmos-devnet-beta.herokuapp.com/rpc',
           name: 'Cosmos SDK v0.45.0 devnet',
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
+          cosmos_chain_id: 'csdkbetaci'
         },
-        csdk: {
+        csdkV1: {
           url: 'https://cosmos-devnet.herokuapp.com/rpc',
           name: 'Cosmos SDK v0.46.11 devnet',
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet.herokuapp.com/lcd/',
+          cosmos_chain_id: 'csdkv1'
         },
       };
 
-      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkBetaNode, csdkNode] =
+      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkBetaNode, csdkV1Node] =
         await models.ChainNode.bulkCreate(Object.values(nodes));
 
       // Initialize different chain + node URLs
@@ -214,7 +217,7 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: true,
-        chain_node_id: csdkNode.id,
+        chain_node_id: csdkV1Node.id,
       });
       const alexContract = await models.Contract.create({
         address: '0xFab46E002BbF0b4509813474841E0716E6730136',
