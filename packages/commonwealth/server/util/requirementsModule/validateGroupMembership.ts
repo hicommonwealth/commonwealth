@@ -1,6 +1,6 @@
 import { AllowlistData, Requirement, ThresholdData } from './requirementsTypes';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import { ChainNetwork } from '../../../../common-common/src/types';
+import { ChainNetwork } from 'common-common/src/types';
 import { toBN } from 'web3-utils';
 
 export type validateGroupMembershipResponse = {
