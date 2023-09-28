@@ -1,4 +1,4 @@
-import type { ChainId, SessionPayload } from '@canvas-js/interfaces';
+import type { SessionPayload } from '@canvas-js/interfaces';
 import type {
   ChainBase,
   ChainNetwork,
@@ -19,13 +19,13 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enable: () => Promise<void>;
   reset?: () => Promise<void>;
 
-  getChainId(): ChainId | null;
+  getChainId(): string | null;
 
   getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo>;
 
   signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload
   ): Promise<string>;
 
   chain: ChainBase;

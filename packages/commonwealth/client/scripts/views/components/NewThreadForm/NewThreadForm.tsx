@@ -19,25 +19,26 @@ import { TopicSelector } from 'views/components/topic_selector';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { ReactQuillEditor } from '../react_quill_editor';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   createDeltaFromText,
   getTextFromDelta,
-  serializeDelta
+  serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId()
+    chainId: app.activeChainId(),
   });
 
   const chainId = app.chain.id;
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector = topics.filter((t) => {
+  const topicsForSelector = topics?.filter((t) => {
     return (
       isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
     );
@@ -56,15 +57,24 @@ export const NewThreadForm = () => {
     setThreadContentDelta,
     setIsSaving,
     isDisabled,
-    clearDraft
+    clearDraft,
   } = useNewThreadForm(chainId, topicsForSelector);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const { mutateAsync: createThread } = useCreateThreadMutation({
-    chainId: app.activeChainId()
+  const {
+    mutateAsync: createThread,
+    error: createThreadError,
+    reset: resetCreateThreadMutation,
+  } = useCreateThreadMutation({
+    chainId: app.activeChainId(),
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetCreateThreadMutation,
+    error: createThreadError,
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -89,14 +99,6 @@ export const NewThreadForm = () => {
 
     setIsSaving(true);
 
-    await app.sessions.signThread({
-      community: app.activeChainId(),
-      title: threadTitle,
-      body: deltaString,
-      link: threadUrl,
-      topic: threadTopic
-    });
-
     try {
       const thread = await createThread({
         address: app.user.activeAccount.address,
@@ -109,7 +111,7 @@ export const NewThreadForm = () => {
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
-        authorProfile: app.user.activeAccount.profile
+        authorProfile: app.user.activeAccount.profile,
       });
 
       setThreadContentDelta(createDeltaFromText(''));
@@ -117,9 +119,11 @@ export const NewThreadForm = () => {
 
       navigate(`/discussion/${thread.id}`);
     } catch (err) {
-      const error =
-        err?.responseJSON?.error || err?.message || 'Failed to create thread';
-      throw new Error(error);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      console.error(err?.responseJSON?.error || err?.message);
+      notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
     }
@@ -138,11 +142,6 @@ export const NewThreadForm = () => {
   return (
     <>
       <div className="NewThreadForm">
-        <div className="header">
-          <CWText type="h2" fontWeight="medium">
-            New Thread
-          </CWText>
-        </div>
         <div className="new-thread-header">
           <CWTabBar>
             <CWTab
@@ -220,6 +219,7 @@ export const NewThreadForm = () => {
         </div>
       </div>
       {JoinCommunityModals}
+      {RevalidationModal}
     </>
   );
 };

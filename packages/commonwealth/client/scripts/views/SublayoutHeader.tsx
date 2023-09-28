@@ -4,29 +4,23 @@ import React, { useState } from 'react';
 import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
 import { HelpMenuPopover } from 'views/menus/help_menu';
-import app, { initAppState } from '../state';
+import app from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import {
   isWindowMediumSmallInclusive,
   isWindowSmallInclusive,
 } from './components/component_kit/helpers';
-import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
-import { featureFlags } from 'helpers/feature-flags';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { setDarkMode } from 'helpers/darkMode';
-import WebWalletController from 'controllers/app/web_wallets';
-import { WalletId } from 'common-common/src/types';
-import axios from 'axios';
 import clsx from 'clsx';
 import { CWButton } from './components/component_kit/new_designs/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
 import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -40,30 +34,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-  const resetWalletConnectSession = async () => {
-    /**
-     * Imp to reset wc session on logout as subsequent login attempts fail
-     */
-    const walletConnectWallet = WebWalletController.Instance.getByName(
-      WalletId.WalletConnect
-    );
-    await walletConnectWallet.reset();
-  };
-
-  const handleLogout = async () => {
-    try {
-      await axios.get(`${app.serverUrl()}/logout`);
-      await initAppState();
-      await resetWalletConnectSession();
-      notifySuccess('Logged out');
-      setDarkMode(false);
-    } catch (err) {
-      notifyError('Something went wrong during logging out.');
-      window.location.reload();
-    }
-  };
-
-  return featureFlags.sessionKeys ? (
+  return (
     <>
       <div className="SublayoutHeader">
         <div className="header-left">
@@ -109,44 +80,35 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             />
           </div>
           <div
-            className={clsx('DesktopMenuContainer', 'session-keys', {
+            className={clsx('DesktopMenuContainer', {
               isLoggedIn,
             })}
           >
             <CreateContentPopover />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="compassPhosphor"
-              onClick={() => navigate('/communities', {}, null)}
+            <CWTooltip
+              content="Explore communities"
+              placement="bottom"
+              renderTrigger={(handleInteraction) => (
+                <CWIconButton
+                  iconButtonTheme="black"
+                  iconName="compassPhosphor"
+                  onClick={() => navigate('/communities', {}, null)}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                />
+              )}
             />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="question"
-              onClick={() => setIsFeedbackModalOpen(true)}
-            />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="paperPlaneTilt"
-              onClick={() =>
-                window.open('https://docs.commonwealth.im/commonwealth/')
-              }
-            />
+
+            <HelpMenuPopover />
+
             {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
           </div>
           {isLoggedIn && <UserDropdown />}
-          {isLoggedIn && (
-            <CWIconButton
-              className="logout-button"
-              iconButtonTheme="black"
-              iconName="signOut"
-              onClick={handleLogout}
-            />
-          )}
           {!isLoggedIn && (
             <CWButton
               buttonType="primary"
               buttonHeight="sm"
-              label="Login"
+              label="Sign in"
               buttonWidth="wide"
               onClick={() => setIsLoginModalOpen(true)}
             />
