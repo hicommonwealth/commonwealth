@@ -4,7 +4,7 @@ import { discussionTests } from './discussionsTest';
 
 if (process.env.IS_CI === 'true') {
   // ssl proxy takes a while, so increase test timeout
-  test.setTimeout(200000);
+  test.setTimeout(300000);
 
   test.beforeAll(async () => {
     await createTestEntities();
