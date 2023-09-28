@@ -4,27 +4,33 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { RequirementSubFormType } from '../index.types';
 import './index.scss';
+import {
+  AMOUNT_CONDITIONS,
+  BLOCKCHAINS,
+  TOKENS,
+  SPECIFICATIONS,
+} from '../constants';
 
 const requirementTypes = [
-  { value: 'cosmos-tokens', label: 'Cosmos base tokens' },
-  { value: 'ERC-20', label: 'ERC-20' },
-  { value: 'ERC-721', label: 'ERC-721' },
-  { value: 'evm-tokens', label: 'EVM base tokens' },
+  { value: TOKENS.COSMOS_TOKEN, label: 'Cosmos base tokens' },
+  { value: SPECIFICATIONS.ERC_20, label: 'ERC-20' },
+  { value: SPECIFICATIONS.ERC_721, label: 'ERC-721' },
+  { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
 ];
 const chainTypes = [
-  { value: 'axie-infinity', label: 'Axie Infinity' },
-  { value: 'cosmos', label: 'Cosmos' },
-  { value: 'ethereum', label: 'Ethereum' },
-  { value: 'injective', label: 'Injective' },
-  { value: 'near', label: 'NEAR' },
-  { value: 'polkadot', label: 'Polkadot' },
-  { value: 'polygon', label: 'Polygon' },
-  { value: 'solana', label: 'Solana' },
+  { value: BLOCKCHAINS.AXIE_INFINITY, label: 'Axie Infinity' },
+  { value: BLOCKCHAINS.COSMOS, label: 'Cosmos' },
+  { value: BLOCKCHAINS.ETHEREUM, label: 'Ethereum' },
+  { value: BLOCKCHAINS.INJECTIVE, label: 'Injective' },
+  { value: BLOCKCHAINS.NEAR, label: 'NEAR' },
+  { value: BLOCKCHAINS.POLKADOT, label: 'Polkadot' },
+  { value: BLOCKCHAINS.POLYGON, label: 'Polygon' },
+  { value: BLOCKCHAINS.SOLANA, label: 'Solana' },
 ];
 const conditionTypes = [
-  { value: 'more', label: 'More than' },
-  { value: 'equal', label: 'Equal to' },
-  { value: 'less', label: 'Less than' },
+  { value: AMOUNT_CONDITIONS.MORE, label: 'More than' },
+  { value: AMOUNT_CONDITIONS.EQUAL, label: 'Equal to' },
+  { value: AMOUNT_CONDITIONS.LESS, label: 'Less than' },
 ];
 
 const RequirementSubForm = ({
