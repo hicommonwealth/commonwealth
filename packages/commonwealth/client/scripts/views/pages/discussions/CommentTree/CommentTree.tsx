@@ -456,8 +456,8 @@ export const CommentTree = ({
     ? recursivelyGatherComments(comments, comments[0], 0)
     : [];
 
-  const flattenComments = (comments) => {
-    let flattenedComments = [];
+  const flattenComments = (_comments) => {
+    const flattenedComments = [];
 
     const flatten = (comment) => {
       flattenedComments.push(comment);
@@ -467,7 +467,7 @@ export const CommentTree = ({
       }
     };
 
-    comments.forEach(flatten);
+    _comments.forEach(flatten);
 
     return flattenedComments;
   };
