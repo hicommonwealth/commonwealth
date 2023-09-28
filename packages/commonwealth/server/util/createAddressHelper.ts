@@ -1,5 +1,10 @@
 import crypto from 'crypto';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainNetwork,
+  WalletId,
+  WalletSsoSource,
+} from 'common-common/src/types';
 import { bech32 } from 'bech32';
 import type { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
@@ -17,6 +22,7 @@ type CreateAddressReq = {
   address: string;
   chain: string;
   wallet_id: WalletId;
+  wallet_sso_source: WalletSsoSource;
   community?: string;
   keytype?: string;
   block_info?: string;
@@ -136,6 +142,7 @@ export async function createAddressHelper(
 
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.wallet_id;
+    existingAddress.wallet_sso_source = req.wallet_sso_source;
 
     const updatedObj = await existingAddress.save();
 
@@ -182,6 +189,7 @@ export async function createAddressHelper(
         keytype: req.keytype,
         last_active,
         wallet_id: req.wallet_id,
+        wallet_sso_source: req.wallet_sso_source,
       });
 
       // if user.id is undefined, the address is being used to create a new user,

@@ -39,7 +39,6 @@ import {
   fetchEtherscanContract,
   fetchEtherscanContractAbi,
 } from '../routes/etherscanAPI';
-import createContractAbi from '../routes/contractAbis/createContractAbi';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
 import adminAnalytics, {
   communitySpecificAnalytics,
@@ -88,6 +87,8 @@ import deleteTopic from '../routes/deleteTopic';
 import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
+
+import { getCanvasData, postCanvasData } from '../routes/canvas';
 
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
@@ -513,14 +514,6 @@ function setupRouter(
     '/viewVotes',
     databaseValidationService.validateChain,
     viewVotes.bind(this, models)
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/contractAbi',
-    passport.authenticate('jwt', { session: false }),
-    createContractAbi.bind(this, models)
   );
 
   // Templates
@@ -1057,6 +1050,10 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateChainCategory.bind(this, models)
   );
+
+  // signed data
+  router.get('/oplog', getCanvasData.bind(this, models));
+  router.post('/oplog', postCanvasData.bind(this, models));
 
   // settings
   registerRoute(

@@ -30,8 +30,9 @@ export async function __updateGroup(
   { requirements }: UpdateGroupOptions
 ): Promise<UpdateGroupResult> {
   // TODO: require community admin
-  if (!validateRequirements(requirements)) {
-    throw new AppError(Errors.InvalidRequirements);
+  const validationError = validateRequirements(requirements);
+  if (validationError) {
+    throw new AppError(validationError.message);
   }
   // TODO: delete all existing memberships for group before update
   return [

@@ -144,7 +144,7 @@ export const CompoundProposalForm = () => {
           setProposer(app.user?.activeAccount?.address);
 
           if (!proposer) {
-            throw new Error('Invalid address / not logged in');
+            throw new Error('Invalid address / not signed in');
           }
 
           if (!description) {
