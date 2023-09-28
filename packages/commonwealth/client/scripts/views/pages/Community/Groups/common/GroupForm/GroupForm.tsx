@@ -35,6 +35,8 @@ const CWRequirementsRadioButton = () => {
   return <CWRadioButton label={Label} value="n-requirements" />;
 };
 
+const MAX_REQUIREMENTS = 10;
+
 const GroupForm = ({
   formType,
   onSubmit,
@@ -268,15 +270,17 @@ const GroupForm = ({
             />
           ))}
 
-          <CWButton
-            type="button"
-            label="Add requirement"
-            iconLeft="plus"
-            buttonWidth="full"
-            buttonType="secondary"
-            buttonHeight="med"
-            onClick={addRequirementSubForm}
-          />
+          {requirementSubForms.length < MAX_REQUIREMENTS && (
+            <CWButton
+              type="button"
+              label="Add requirement"
+              iconLeft="plus"
+              buttonWidth="full"
+              buttonType="secondary"
+              buttonHeight="med"
+              onClick={addRequirementSubForm}
+            />
+          )}
         </section>
 
         {/* Sub-section: Gated topics */}
