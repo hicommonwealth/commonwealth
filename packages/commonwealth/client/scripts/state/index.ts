@@ -17,6 +17,7 @@ import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
+import { Capacitor } from '@capacitor/core';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -92,9 +93,13 @@ export interface IApp {
   isLoggedIn(): boolean;
 
   isProduction(): boolean;
+
+  isDesktopApp(win): boolean;
   isNative(win): boolean;
 
   serverUrl(): string;
+
+  platform(): string;
 
   loadingError: string;
 
@@ -173,6 +178,18 @@ const app: IApp = {
   isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
+  },
+  isDesktopApp: (window) => {
+    return window.todesktop;
+  },
+  platform: () => {
+    // Using Desktop API to determine if the platform is desktop
+    if (app.isDesktopApp(window)) {
+      return 'desktop';
+    } else {
+      // If not desktop, get the platform from Capacitor
+      return Capacitor.getPlatform();
+    }
   },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,

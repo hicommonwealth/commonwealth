@@ -56,6 +56,11 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.FLAG_SIDEBAR_TOGGLE': JSON.stringify(
+        process.env.FLAG_SIDEBAR_TOGGLE
+      ),
+    }),
+    new webpack.DefinePlugin({
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
         process.env.FLAG_PROPOSAL_TEMPLATES
       ),
