@@ -38,7 +38,7 @@ export const groupValidationSchema = z.object({
   topics: z
     .array(
       z.object({
-        value: z.string().nonempty({ message: 'Invalid value' }),
+        value: z.number().default(-1),
         label: z.string().nonempty({ message: 'Invalid value' }),
       }),
       {
