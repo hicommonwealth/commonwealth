@@ -21,6 +21,8 @@ import {
 import { serializeDelta } from '../react_quill_editor/utils';
 import { CommentEditor } from './CommentEditor/CommentEditor';
 import { ArchiveMsg } from './ArchiveMsg/ArchiveMsg';
+import { SessionKeyError } from 'controllers/server/sessions';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -61,7 +63,6 @@ export const CreateComment = ({
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
-  console.log('author => ', author);
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
@@ -84,10 +85,19 @@ export const CreateComment = ({
     }
   }, [tokenPostingThreshold]);
 
-  const { mutateAsync: createComment } = useCreateCommentMutation({
+  const {
+    mutateAsync: createComment,
+    error: createCommentError,
+    reset: resetCreateCommentMutation,
+  } = useCreateCommentMutation({
     threadId: rootThread.id,
     chainId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetCreateCommentMutation,
+    error: createCommentError,
   });
 
   const handleSubmitComment = async () => {
@@ -100,7 +110,7 @@ export const CreateComment = ({
       const newComment: any = await createComment({
         threadId: rootThread.id,
         chainId: chainId,
-        address: author?.address,
+        address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -119,8 +129,13 @@ export const CreateComment = ({
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
     } catch (err) {
-      const errMsg = err?.responseJSON?.error || 'Failed to create comment';
-      notifyError(errMsg);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      const errMsg = err?.responseJSON?.error || err?.message;
+      console.error(errMsg);
+
+      notifyError('Failed to create comment');
       setErrorMsg(errMsg);
     } finally {
       setSendingComment(false);
@@ -156,23 +171,26 @@ export const CreateComment = ({
   return (
     <>
       { rootThread.archivedAt === null ? (
-        <CommentEditor
-          parentType={parentType}
-          canComment={canComment}
-          handleSubmitComment={handleSubmitComment}
-          errorMsg={errorMsg}
-          contentDelta={contentDelta}
-          setContentDelta={setContentDelta}
-          tokenPostingThreshold={tokenPostingThreshold}
-          activeTopic={activeTopic}
-          userBalance={userBalance}
-          disabled={disabled}
-          cancel={cancel}
-          isAdmin={isAdmin}
-          author={author}
-          editorValue={editorValue}
-          shouldFocus={shouldFocusEditor}
-        />
+        <>
+          <CommentEditor
+            parentType={parentType}
+            canComment={canComment}
+            handleSubmitComment={handleSubmitComment}
+            errorMsg={errorMsg}
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+            tokenPostingThreshold={tokenPostingThreshold}
+            activeTopic={activeTopic}
+            userBalance={userBalance}
+            disabled={disabled}
+            cancel={cancel}
+            isAdmin={isAdmin}
+            author={author}
+            editorValue={editorValue}
+            shouldFocus={shouldFocusEditor}
+          />
+          {RevalidationModal}
+        </>
       ): (
             <ArchiveMsg
               archivedAt={rootThread.archivedAt}
@@ -180,7 +198,6 @@ export const CreateComment = ({
           )
         }
     </>
-
   );
 };
 

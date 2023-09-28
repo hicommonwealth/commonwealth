@@ -14,12 +14,11 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import { User } from 'views/components/user/user';
 import { LoginModal } from 'views/modals/login_modal';
 import NewProfilesController from '../../../controllers/server/newProfiles';
-import { CWButton } from '../component_kit/cw_button';
+import { CWButton } from '../component_kit/new_designs/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { Modal } from '../component_kit/cw_modal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
-import { CWButton as CWButtonNew } from '../component_kit/new_designs/cw_button';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -72,9 +71,10 @@ export const LoginSelector = () => {
       <>
         <div className="LoginSelector">
           <CWButton
-            buttonType="tertiary-black"
-            iconLeft="person"
-            label="Log in"
+            buttonType="primary"
+            buttonHeight="sm"
+            label="Sign in"
+            buttonWidth="wide"
             onClick={() => setIsLoginModalOpen(true)}
           />
         </div>
@@ -102,7 +102,7 @@ export const LoginSelector = () => {
           profileLoadComplete &&
           !hasJoinedCommunity && (
             <div className="join-button-container">
-              <CWButtonNew
+              <CWButton
                 buttonType="primary"
                 onClick={handleJoinCommunity}
                 label={

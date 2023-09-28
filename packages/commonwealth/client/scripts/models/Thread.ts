@@ -111,12 +111,20 @@ export enum LinkSource {
   Proposal = 'proposal',
   Thread = 'thread',
   Web = 'web',
+  Template = 'template',
+}
+
+export enum LinkDisplay {
+  inline = 'inline',
+  sidebar = 'sidebar',
+  both = 'both',
 }
 
 export type Link = {
   source: LinkSource;
   identifier: string;
   title?: string;
+  display?: LinkDisplay;
 };
 
 export class Thread implements IUniqueId {

@@ -1,9 +1,5 @@
 @import '../shared';
 
-.unreads-icon svg {
-  cursor: pointer;
-}
-
 .notifications-container {
   display: flex;
 
@@ -34,14 +30,6 @@
   flex-direction: column;
   width: 296px;
 
-  @include smallInclusive {
-    border: none;
-    box-shadow: none;
-    flex: 1;
-    height: 100%;
-    width: 100%;
-  }
-
   .header {
     border-bottom: 1px solid $neutral-300;
     display: flex;
@@ -60,10 +48,6 @@
     flex-direction: column;
     height: 480px;
     justify-content: center;
-
-    @include smallInclusive {
-      height: calc(100% - 40px);
-    }
   }
 
   .footer {

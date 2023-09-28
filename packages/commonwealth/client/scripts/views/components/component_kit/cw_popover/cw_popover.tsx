@@ -25,7 +25,8 @@ type PopoverProps = {
 
 export type PopoverTriggerProps = {
   renderTrigger: (
-    handleInteraction: (e: React.MouseEvent<AnchorType>) => void
+    handleInteraction: (e: React.MouseEvent<AnchorType>) => void,
+    isOpen?: boolean
   ) => React.ReactNode;
 };
 
@@ -36,7 +37,7 @@ export const usePopover = (): UsePopoverProps => {
     setAnchorEl(anchorEl ? null : e.currentTarget);
   };
 
-  const open = Boolean(anchorEl);
+  const open = !!anchorEl;
   const id = open ? `popover-${uuidv4()}` : undefined;
 
   return {

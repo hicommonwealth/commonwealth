@@ -33,7 +33,8 @@ dasel put -t string -r json -f $GENESIS -v "aevmos" '.app_state.mint.params.mint
 
 # Update gov module
 dasel put -r json -t string -f $GENESIS -v "90s" '.app_state.gov.voting_params.voting_period'
-dasel put -r json -t string -f $GENESIS -v "200000" '.app_state.gov.deposit_params.min_deposit.index(0).amount'
+# 20 EVMOS deposit:
+dasel put -r json -t string -f $GENESIS -v "20000000000000000000" '.app_state.gov.deposit_params.min_deposit.index(0).amount'
 dasel put -r json -t string -f $GENESIS -v "aevmos" '.app_state.gov.deposit_params.min_deposit.index(0).denom'
 
 # Set gas limit in genesis
@@ -71,7 +72,7 @@ dasel put -r toml -t bool -f $CONFIG_FOLDER/app.toml -v "true" '.grpc-web.enable
 echo $COW_MNEMONIC | evmosd keys add cow --recover --keyring-backend test --home $EVMOS_HOME --algo $KEYALGO
 # make cow a validator:
 evmosd add-genesis-account "cow" 10000000000000000000000000aevmos --keyring-backend test --chain-id $EVMOS_CHAIN_ID --home "$EVMOS_HOME"
-evmosd gentx "cow" 200000000000000000000000aevmos --keyring-backend test --chain-id $EVMOS_CHAIN_ID --home "$EVMOS_HOME"
+evmosd gentx "cow" 2000000000000000000000000aevmos --keyring-backend test --chain-id $EVMOS_CHAIN_ID --home "$EVMOS_HOME"
 evmosd collect-gentxs --chain-id $EVMOS_CHAIN_ID --home "$EVMOS_HOME"
 evmosd keys list
 
