@@ -25,6 +25,8 @@ import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import './CommentTree.scss';
 import { jumpHighlightComment } from './helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { CommentsFeaturedFilterTypes } from 'models/types';
+import { commentsByDate } from 'helpers/dates';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -39,6 +41,7 @@ type CommentsTreeAttrs = {
   setParentCommentId: (id: number) => void;
   fromDiscordBot?: boolean;
   canComment: boolean;
+  commentSortType: CommentsFeaturedFilterTypes;
 };
 
 export const CommentTree = ({
@@ -52,6 +55,7 @@ export const CommentTree = ({
   parentCommentId,
   setParentCommentId,
   canComment,
+  commentSortType,
 }: CommentsTreeAttrs) => {
   const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
@@ -406,9 +410,11 @@ export const CommentTree = ({
     return comments_
       .filter((x) => (includeSpams ? true : !x.markedAsSpamAt))
       .map((comment: CommentType<any>) => {
-        const children = allComments.filter(
-          (c) => c.threadId === thread.id && c.parentComment === comment.id
-        );
+        const children = allComments
+          .filter(
+            (c) => c.threadId === thread.id && c.parentComment === comment.id
+          )
+          .sort((a, b) => commentsByDate(a, b, commentSortType));
 
         if (isLivingCommentTree(comment, children)) {
           const isCommentAuthor =

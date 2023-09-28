@@ -54,6 +54,7 @@ import { useSearchParams } from 'react-router-dom';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 import 'pages/view_thread/index.scss';
+import { commentsByDate } from 'helpers/dates';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -301,11 +302,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const sortedComments = [...comments]
     .filter((c) => !c.parentComment)
-    .sort((a, b) =>
-      commentSortType === CommentsFeaturedFilterTypes.Oldest
-        ? moment(a.createdAt).diff(moment(b.createdAt))
-        : moment(b.createdAt).diff(moment(a.createdAt))
-    );
+    .sort((a, b) => commentsByDate(a, b, commentSortType));
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
   const fromDiscordBot =
@@ -508,6 +505,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               setParentCommentId={setParentCommentId}
               canComment={canComment}
               fromDiscordBot={fromDiscordBot}
+              commentSortType={commentSortType}
             />
           </>
         }
