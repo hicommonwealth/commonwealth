@@ -1,7 +1,6 @@
 import { NotificationCategories } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../../../config';
 import request from 'superagent';
-import { WebhookInstance } from '../../../models/webhook';
 import {
   ChainEventWebhookData,
   ForumWebhookData,
@@ -68,7 +67,7 @@ function formatDiscordMessage<C extends NotificationCategories>(
             url: typedData.profileUrl,
             icon_url: typedData.profileAvatarUrl,
           },
-          title: typedData.title,
+          title: typedData.titlePrefix + typedData.objectTitle,
           url: typedData.objectUrl,
           description: typedData.objectSummary.replace(REGEX_EMOJI, ''),
           color: 15258703,
@@ -91,8 +90,4 @@ export function sendDiscordWebhook(
   const discordMessage = formatDiscordMessage(category, data);
 
   return request.post(webhookUrl).send(discordMessage);
-}
-
-export function isDiscordWebhookEndpoint(webhook: WebhookInstance) {
-  return webhook.url.includes('discord.com/api/webhooks');
 }

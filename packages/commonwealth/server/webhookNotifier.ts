@@ -391,19 +391,19 @@ const send = async (models, content: WebhookContent) => {
           return;
         }
         try {
-          // if (
-          //   process.env.NODE_ENV === 'production' ||
-          //   (SLACK_FEEDBACK_WEBHOOK && url === SLACK_FEEDBACK_WEBHOOK)
-          // ) {
-          //   await request.post(url).send(webhookData);
-          // } else {
-          //   console.log('Suppressed webhook notification to', url);
-          // }
-          await request
-            .post(
-              'https://discord.com/api/webhooks/1149345141417578608/R32PJzB2KX61_Et0aGtOUgrEZaCHDFZLngxN0g1O35yxH7g54VZGcfKx4vTQNCvJ6pFi'
-            )
-            .send(webhookData);
+          if (
+            url ===
+            'https://hooks.slack.com/services/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'
+          ) {
+            await request.post(url).send(webhookData);
+          } else {
+            console.log('Suppressed webhook notification to', url);
+          }
+          // await request
+          //   .post(
+          //     'https://discord.com/api/webhooks/1149345141417578608/R32PJzB2KX61_Et0aGtOUgrEZaCHDFZLngxN0g1O35yxH7g54VZGcfKx4vTQNCvJ6pFi'
+          //   )
+          //   .send(webhookData);
         } catch (err) {
           console.error(err);
         }

@@ -28,22 +28,14 @@ export async function getWebhookData(
     };
     const eventLabel = chainEventLabel(notification.data.chain, event);
 
-    let description: string;
-    if (notification.data.block_number) {
-      description =
-        `${eventLabel.heading} on ${capitalize(notification.data.chain)}` +
-        `at block ${notification.data.block_number} \n${eventLabel.label}`;
-    } else {
-      description = `${eventLabel.heading} on ${capitalize(
-        notification.data.chain
-      )} \n${eventLabel.label}`;
-    }
+    const previewImage = await getPreviewImageUrl(notification);
 
     return {
-      title: capitalize(notification.data.chain),
-      description,
+      title: `${eventLabel.heading} on ${capitalize(notification.data.chain)}`,
+      description: eventLabel.label,
       url: SERVER_URL + eventLabel.linkUrl,
-      previewImageUrl: (await getPreviewImageUrl(notification)).previewImageUrl,
+      previewImageUrl: previewImage.previewImageUrl,
+      previewImageAltText: previewImage.previewAltText,
     };
   } else {
     const profile = await getActorProfile(notification);
@@ -84,15 +76,19 @@ export async function getWebhookData(
       objectSummary = smartTrim(bodytext);
     }
 
+    const previewImage = await getPreviewImageUrl(notification);
+
     return {
       communityId: notification.data.chain_id,
-      previewImageUrl: (await getPreviewImageUrl(notification)).previewImageUrl,
+      titlePrefix,
+      previewImageUrl: previewImage.previewImageUrl,
+      previewImageAltText: previewImage.previewAltText,
 
       profileName: profile?.profile_name,
       profileUrl: profile ? `${SERVER_URL}/profile/id/${profile.id}` : null,
       profileAvatarUrl: profile?.avatar_url,
 
-      title: titlePrefix + title,
+      objectTitle: title,
       objectUrl: getThreadUrlFromNotification(notification),
       objectSummary,
     };

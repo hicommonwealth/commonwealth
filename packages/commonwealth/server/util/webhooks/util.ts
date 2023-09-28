@@ -7,6 +7,7 @@ import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import { slugify } from '../../../shared/utils';
+import { WebhookDestinations } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -144,4 +145,16 @@ export function getThreadUrlFromNotification(
   return `${SERVER_URL}/${data.chain_id}/discussion/${data.thread_id}-${slugify(
     data.root_title
   )}${commentId}`;
+}
+
+export function getWebhookDestination(webhookUrl: string): WebhookDestinations {
+  if (webhookUrl.includes('discord.com/api/webhooks')) {
+    return WebhookDestinations.Discord;
+  } else if (webhookUrl.includes('hooks.slack.com')) {
+    return WebhookDestinations.Slack;
+  } else if (webhookUrl.includes('api.telegram.org')) {
+    return WebhookDestinations.Telegram;
+  } else {
+    return WebhookDestinations.Unknown;
+  }
 }
