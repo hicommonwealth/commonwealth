@@ -4,14 +4,12 @@ import { PORT } from '../../../server/config';
 import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks';
 import { addAddressIfNone, dbClient, login } from '../utils/e2eUtils';
 
-test.beforeEach(async () => {
-  await createTestEntities();
-});
-
 test.describe('Discussion Page Tests', () => {
   let threadId;
 
   test.beforeEach(async ({ page }) => {
+    await createTestEntities();
+
     threadId = (
       await dbClient.query(`
         INSERT INTO "Threads" (address_id, title, body, chain, topic_id, kind, created_at, updated_at)

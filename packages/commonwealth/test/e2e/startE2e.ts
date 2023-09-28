@@ -16,6 +16,7 @@ async function startE2e() {
   try {
     pgContainer = await new PostgreSqlContainer().start();
   } catch (e) {
+    console.log(e);
     console.error(
       '[ERROR]: You need to install and have the docker daemon running to run e2e tests'
     );

@@ -225,7 +225,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --ignore-scripts
 
       - name: Assert yarn.lock is correct
         run: |
