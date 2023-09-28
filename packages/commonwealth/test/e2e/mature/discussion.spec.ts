@@ -15,7 +15,7 @@ test.describe('Discussion Page Tests', () => {
     threadId = (
       await dbClient.query(`
         INSERT INTO "Threads" (address_id, title, body, chain, topic_id, kind, created_at, updated_at)
-        VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        VALUES (1, 'Example Title', 'Example Body', 'cmntest', 1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         RETURNING id;
     `)
     )[0][0]['id'];
