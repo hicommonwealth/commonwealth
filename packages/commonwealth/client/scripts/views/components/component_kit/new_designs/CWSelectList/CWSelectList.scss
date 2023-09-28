@@ -93,9 +93,8 @@
           text-align: left;
           cursor: pointer;
           margin-bottom: 4px;
-          background-color: transparent;
   
-          &:hover {
+          &:hover, &:focus, &:focus-visible, &:focus-within {
             background-color: $neutral-100;
           }
   

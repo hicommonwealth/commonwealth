@@ -83,6 +83,11 @@ export const CWSelectList = <
               base.color = 'inherit';
             }
 
+            if (state.isFocused) {
+              base.backgroundColor = '#F0EFF0 !important';
+              base.color = 'inherit';
+            }
+
             return base;
           },
         }}
