@@ -42,7 +42,7 @@ export async function getWebhookData(
     return {
       title: capitalize(notification.data.chain),
       description,
-      url: eventLabel.linkUrl,
+      url: SERVER_URL + eventLabel.linkUrl,
       previewImageUrl: (await getPreviewImageUrl(notification)).previewImageUrl,
     };
   } else {
