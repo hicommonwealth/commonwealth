@@ -1,4 +1,5 @@
 import 'components/NewThreadForm.scss';
+import { CWText } from '../../components/component_kit/cw_text';
 import { notifyError } from 'controllers/app/notifications';
 import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
@@ -142,6 +143,11 @@ export const NewThreadForm = () => {
   return (
     <>
       <div className="NewThreadForm">
+        <div className="header">
+          <CWText type="h2" fontWeight="medium">
+            New Thread
+          </CWText>
+        </div>
         <div className="new-thread-header">
           <CWTabBar>
             <CWTab
