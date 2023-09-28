@@ -5,15 +5,27 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { RequirementSubFormType } from '../index.types';
 import './index.scss';
 
-// TODO: these types are not complete, get complete list
-const sampleRequirementTypes = [
-  'Requirement type',
-  'Cosmos base tokens',
-  'ERC-20',
-  'ERC-721',
+const requirementTypes = [
+  { value: 'cosmos-tokens', label: 'Cosmos base tokens' },
+  { value: 'ERC-20', label: 'ERC-20' },
+  { value: 'ERC-721', label: 'ERC-721' },
+  { value: 'evm-tokens', label: 'EVM base tokens' },
 ];
-const sampleChainTypes = ['Chain', 'Ethereum', 'Cosmos'];
-const conditionTypes = ['Condition', 'More than', 'Equal to', 'Less than'];
+const chainTypes = [
+  { value: 'axie-infinity', label: 'Axie Infinity' },
+  { value: 'cosmos', label: 'Cosmos' },
+  { value: 'ethereum', label: 'Ethereum' },
+  { value: 'injective', label: 'Injective' },
+  { value: 'near', label: 'NEAR' },
+  { value: 'polkadot', label: 'Polkadot' },
+  { value: 'polygon', label: 'Polygon' },
+  { value: 'solana', label: 'Solana' },
+];
+const conditionTypes = [
+  { value: 'more', label: 'More than' },
+  { value: 'equal', label: 'Equal to' },
+  { value: 'less', label: 'Less than' },
+];
 
 const RequirementSubForm = ({
   errors,
@@ -32,9 +44,9 @@ const RequirementSubForm = ({
           {...(defaultValues.requirementType && {
             defaultValue: [defaultValues.requirementType],
           })}
-          options={sampleRequirementTypes.map((requirement) => ({
-            label: requirement,
-            value: requirement,
+          options={requirementTypes.map((requirement) => ({
+            label: requirement.label,
+            value: requirement.value,
           }))}
           onChange={(newValue) => {
             onChange({
@@ -55,9 +67,9 @@ const RequirementSubForm = ({
           {...(defaultValues.requirementChain && {
             defaultValue: [defaultValues.requirementChain],
           })}
-          options={sampleChainTypes.map((chainType) => ({
-            label: chainType,
-            value: chainType,
+          options={chainTypes.map((chainType) => ({
+            label: chainType.label,
+            value: chainType.value,
           }))}
           onChange={(newValue) => {
             onChange({
@@ -88,12 +100,13 @@ const RequirementSubForm = ({
           key={defaultValues?.requirementCondition?.value}
           name="requirementCondition"
           label="Condition"
+          placeholder="Condition"
           {...(defaultValues.requirementCondition && {
             defaultValue: [defaultValues.requirementCondition],
           })}
           options={conditionTypes.map((conditionType) => ({
-            label: conditionType,
-            value: conditionType,
+            label: conditionType.label,
+            value: conditionType.value,
           }))}
           onChange={(newValue) => {
             onChange({
