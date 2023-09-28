@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import app from 'state';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -21,9 +23,6 @@ import {
   requirementSubFormValidationSchema,
 } from './validations';
 
-// TODO: these types are not complete, get complete list
-const sampleChainTopics = ['Call Updated', 'Change log', 'Communites'];
-
 const CWRequirementsRadioButton = () => {
   const Label = (
     <span className="requirements-radio-btn-label">
@@ -42,6 +41,11 @@ const GroupForm = ({
   onSubmit,
   initialValues = {},
 }: GroupFormProps) => {
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
+  const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
+
   const [requirementSubForms, setRequirementSubForms] = useState<
     {
       defaultValues?: RequirementSubTypeWithLabel;
@@ -302,9 +306,9 @@ const GroupForm = ({
             isClearable={false}
             label="Topics"
             placeholder="Type in topic name"
-            options={sampleChainTopics.map((chainTopic) => ({
-              label: chainTopic,
-              value: chainTopic,
+            options={sortedTopics.map((topic) => ({
+              label: topic.name,
+              value: topic.id,
             }))}
           />
         </section>
