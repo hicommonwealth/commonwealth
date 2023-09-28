@@ -20,6 +20,7 @@ import { PolygonForm } from './polygon_form';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ProtocolCommunityForm } from './ProtocolCommunityForm';
+import { featureFlags } from 'client/scripts/helpers/feature-flags';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -201,10 +202,14 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       <CWTabBar>
         {Object.values(CommunityType)
           .filter((t) => {
-            return (
-              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
-              t !== CommunityType.AbiFactory
-            );
+            if (t !== CommunityType.CommonProtocol) {
+              return (
+                (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
+                t !== CommunityType.AbiFactory
+              );
+            } else {
+              return featureFlags.protocolCommunity;
+            }
           })
           .map((t, i) => {
             return (
