@@ -19,6 +19,7 @@ import { SubstrateForm } from './substrate_form';
 import { PolygonForm } from './polygon_form';
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { ProtocolCommunityForm } from './ProtocolCommunityForm';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -31,6 +32,7 @@ export enum CommunityType {
   SplToken = 'Solana Token',
   Polygon = 'Polygon',
   AbiFactory = 'Abi Factory',
+  CommonProtocol = ' CommonProtocol',
 }
 
 const ADMIN_ONLY_TABS = [
@@ -91,6 +93,8 @@ const getTypeUrl = (type: CommunityType): string => {
       return 'polygon';
     case CommunityType.SplToken:
       return 'solana';
+    case CommunityType.CommonProtocol:
+      return 'protocol';
     default:
       return 'starter';
   }
@@ -182,6 +186,8 @@ const CreateCommunity = (props: CreateCommunityProps) => {
         );
       case 'solana':
         return <SplTokenForm />;
+      case 'protocol':
+        return <ProtocolCommunityForm />;
       default:
         return <StarterCommunityForm />;
     }

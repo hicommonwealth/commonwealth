@@ -9,6 +9,91 @@ import type IWebWallet from 'models/IWebWallet';
 import { ethers } from 'ethers';
 import WebWalletController from '../../app/web_wallets';
 
+//NOTE: This should be condensed into contract helpers once that becomes available
+const abi = [
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    name: 'getNamespace',
+    outputs: [
+      {
+        internalType: 'contract INamespace',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'contract IGate',
+        name: 'gate',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'name',
+        type: 'bytes32',
+      },
+      {
+        components: [
+          {
+            internalType: 'bytes32',
+            name: 'gateType',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'address',
+            name: 'customGate',
+            type: 'address',
+          },
+          {
+            internalType: 'bytes',
+            name: 'gateData',
+            type: 'bytes',
+          },
+        ],
+        internalType: 'struct CommonFactoryV1.GateInitialization',
+        name: 'gateConfig',
+        type: 'tuple',
+      },
+    ],
+    name: 'createNamespace',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+];
+
+const compGovAbi = {
+  constant: false,
+  inputs: [
+    { internalType: 'address[]', name: 'targets', type: 'address[]' },
+    { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+    { internalType: 'string[]', name: 'signatures', type: 'string[]' },
+    { internalType: 'bytes[]', name: 'calldatas', type: 'bytes[]' },
+    { internalType: 'string', name: 'description', type: 'string' },
+  ],
+  name: 'propose',
+  outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+  payable: false,
+  stateMutability: 'nonpayable',
+  type: 'function',
+};
+
 async function sendFunctionCall({
   fn,
   signingWallet,
@@ -116,4 +201,97 @@ export async function callContractFunction({
 export function encodeParameters(types, values) {
   const abi = new ethers.utils.AbiCoder();
   return abi.encode(types, values);
+}
+
+export async function setupCommunityContracts({
+  name,
+  gate,
+  gateMeta,
+  seedWalletMeta,
+}: {
+  name: string;
+  gate: string;
+  gateMeta: {
+    token: string;
+    amount: number;
+    type: string;
+  };
+  seedWalletMeta: {
+    type: string;
+    amount: number;
+    address: string;
+  };
+}) {
+  const signingWallet = WebWalletController.Instance.availableWallets(
+    ChainBase.Ethereum
+  )[0];
+  await signingWallet.enable('5');
+  if (!signingWallet.api) {
+    throw new Error('Web3 Api Not Initialized');
+  }
+  const web3: Web3 = signingWallet.api;
+  const factory = new web3.eth.Contract(
+    abi as AbiItem[],
+    '0xc4E27255c6D49af92DDF86d6A39ECbD9B46cB3e9'
+  );
+
+  //check that namespace doesnt exist
+  const namespace = await factory.methods
+    .getNamespace(web3.utils.asciiToHex(name))
+    .call();
+  if (
+    namespace['token'] &&
+    namespace['token'] !== '0x0000000000000000000000000000000000000000'
+  ) {
+    throw new Error('Name already used, try another name');
+  }
+
+  //1. config gate settings on gate contract
+
+  const gateConfig = {
+    gateType: web3.utils.padLeft(web3.utils.asciiToHex(gateMeta.type), 64),
+    customGate: gate ?? '0x0000000000000000000000000000000000000000',
+    gateData: web3.eth.abi.encodeParameters(
+      ['address[]', 'uint256[]'],
+      [[gateMeta.token], [gateMeta.amount]]
+    ),
+  };
+
+  //2. Deploy namespace
+  const txReceipt = await factory.methods
+    .createNamespace(web3.utils.asciiToHex(name), gateConfig)
+    .send({ from: signingWallet.accounts[0] });
+  if (!txReceipt) {
+    throw new Error('Transaction failed');
+  }
+
+  //Can/should be CREATE2 calc but this works for now
+  const walletAddress = (
+    await factory.methods.getNamespace(web3.utils.asciiToHex(name)).call()
+  )['communityWallet'];
+
+  //3. Set up wallet seed transactions
+  if (seedWalletMeta.type === 'wallet' && seedWalletMeta.amount > 0) {
+    const txReceipt = web3.eth.sendTransaction({
+      to: walletAddress,
+      from: signingWallet.accounts[0],
+      value: seedWalletMeta.amount,
+    });
+  } else if (seedWalletMeta.type === 'multi') {
+    //TODO: Create mulit-sig prop to seedAWalletMeta.address with amount to walletAddress
+  } else if (seedWalletMeta.type === 'proposal') {
+    const gov = new web3.eth.Contract(
+      compGovAbi as AbiItem,
+      seedWalletMeta.address
+    );
+    const txReceipt = await gov.methods
+      .propose(
+        [walletAddress],
+        [seedWalletMeta.amount],
+        [''],
+        [''],
+        'Fund Community Wallet'
+      )
+      .send({ from: signingWallet.accounts[0] });
+  }
 }
