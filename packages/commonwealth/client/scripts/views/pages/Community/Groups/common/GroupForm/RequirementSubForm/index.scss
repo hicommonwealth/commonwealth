@@ -19,6 +19,10 @@
 
   .row-1 {
     display: flex;
+
+    .w-350 {
+      min-width: 350px;
+    }
   }
 
   .row-2 {
