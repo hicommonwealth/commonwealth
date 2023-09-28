@@ -1,4 +1,5 @@
 import type moment from 'moment';
+import { AbiType } from 'shared/types';
 
 class Contract {
   public readonly id: number;
@@ -60,7 +61,7 @@ class Contract {
     symbol?: string;
     isFactory?: boolean;
     nickname?: string;
-    abi?: Array<Record<string, unknown>>;
+    abi?: AbiType;
     ccts?: Array<{
       id: number;
       communityContractId: number;
