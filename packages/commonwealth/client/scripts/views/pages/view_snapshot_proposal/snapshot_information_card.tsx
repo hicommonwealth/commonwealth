@@ -7,7 +7,6 @@ import moment from 'moment';
 import 'pages/snapshot/snapshot_information_card.scss';
 
 import app from 'state';
-import AddressInfo from '../../../models/AddressInfo';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -76,17 +75,11 @@ export const SnapshotInformationCard = ({
               value={
                 app.chain ? (
                   <User
-                    user={
-                      new AddressInfo(
-                        null,
-                        proposal.author,
-                        app.activeChainId(),
-                        null
-                      )
-                    }
-                    hideAvatar
-                    linkify
-                    popover
+                    userAddress={proposal.author}
+                    userChainId={app.activeChainId()}
+                    shouldHideAvatar
+                    shouldLinkProfile
+                    shouldShowPopover
                   />
                 ) : (
                   proposal.author

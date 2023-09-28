@@ -10,12 +10,14 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
 import 'modals/confirmation_modal.scss';
+import clsx from 'clsx';
 
 interface ConfirmationModalProps {
   title?: string;
   description: string | JSX.Element;
   buttons: ButtonProps[];
   removeModal: () => void;
+  className?: string;
 }
 
 const ConfirmationModal = ({
@@ -23,6 +25,7 @@ const ConfirmationModal = ({
   description,
   buttons,
   removeModal,
+  className,
 }: ConfirmationModalProps) => {
   const [open, setOpen] = useState(true);
 
@@ -45,7 +48,7 @@ const ConfirmationModal = ({
   return (
     <Modal
       content={
-        <div className="ConfirmationModal">
+        <div className={clsx('ConfirmationModal', className)}>
           <div className="header">
             {title && <CWText type="h4">{title}</CWText>}
             <CWIconButton
@@ -72,6 +75,7 @@ interface OpenConfirmationProps {
   title?: string;
   description: string | JSX.Element;
   buttons: ButtonProps[];
+  className?: string;
 }
 
 export const openConfirmation = (props: OpenConfirmationProps) => {

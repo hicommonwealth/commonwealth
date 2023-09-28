@@ -6,6 +6,7 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import { CWButton } from '../component_kit/cw_button';
 import { GovExplainer } from '../gov_explainer';
 import { useCommonNavigate } from 'navigation/helpers';
+import { BigNumber } from 'ethers';
 
 type SubstrateProposalStatsProps = { nextLaunchBlock: number };
 
@@ -55,18 +56,18 @@ export const CompoundProposalStats = (props: CompoundProposalStatsProps) => {
         {
           statHeading: 'Quorum:',
           stat: `${chain.governance?.quorumVotes
-            .div(new BN('1000000000000000000'))
+            .div(BigNumber.from('1000000000000000000'))
             .toString()} ${symbol}`, // TODO: We shouldn't be hardcoding these decimal amounts
         },
         {
           statHeading: 'Proposal Threshold:',
           stat: `${chain.governance?.proposalThreshold
-            .div(new BN('1000000000000000000'))
+            .div(BigNumber.from('1000000000000000000'))
             .toString()} ${symbol}`,
         },
         {
           statHeading: 'Voting Period Length:',
-          stat: `${chain.governance.votingPeriod.toString(10)}`,
+          stat: `${chain.governance.votingPeriod.toString()}`,
         },
       ]}
       statAction={

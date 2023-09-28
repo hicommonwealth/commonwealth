@@ -6,7 +6,7 @@ import {
 } from './server_proposal_methods/get_proposals';
 import { RedisCache } from 'common-common/src/redisCache';
 import { providers } from 'ethers';
-import { ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { ChainNetwork } from 'common-common/src/types';
 import {
   __getProposalVotes,
@@ -31,7 +31,13 @@ export class ServerProposalsController {
   ): Promise<GetProposalsResult> {
     const contractInfo = await this.getContractInfo(options.chainId);
     const provider = await this.createEvmProvider(options.chainId);
-    return __getProposals.call(this, options, provider, contractInfo);
+    return __getProposals.call(
+      this,
+      options,
+      provider,
+      contractInfo,
+      this.models
+    );
   }
 
   public async getProposalVotes(
@@ -66,12 +72,15 @@ export class ServerProposalsController {
       (contract.Contract.type !== ChainNetwork.Aave &&
         contract.Contract.type !== ChainNetwork.Compound)
     ) {
-      throw new ServerError(
+      throw new AppError(
         `Proposal fetching not supported for chain ${chainId}`
       );
     }
 
-    return { address: contract.Contract.address, type: contract.Contract.type };
+    return {
+      address: contract.Contract.address,
+      type: contract.Contract.type,
+    };
   }
 
   private async createEvmProvider(
@@ -103,27 +112,32 @@ export class ServerProposalsController {
       attributes: ['network', 'base'],
       include: [
         {
-          model: this.models.ChainNode,
+          model: this.models.ChainNode.scope('withPrivateData'),
           required: true,
-          attributes: ['private_url'],
         },
       ],
     });
 
-    if (!chain.ChainNode.private_url) {
+    if (!chain.ChainNode.private_url && !chain.ChainNode.url) {
       throw new ServerError(`No RPC URL found for chain ${chainId}`);
     }
 
+    // only Aave and Compound contracts on Ethereum are supported
+    // Celo and Fantom public nodes are extremely slow/rate limited
+    // so, it is not feasible to fetch proposals from them without
+    // a private node, indexing the chain, or using an existing
+    // indexer like TheGraph or SubQuery
     if (
-      chain.network !== ChainNetwork.Aave &&
-      chain.network !== ChainNetwork.Compound &&
-      chain.base !== 'ethereum'
+      chain.ChainNode.name !== 'Ethereum (Mainnet)' ||
+      (chain.network !== ChainNetwork.Aave &&
+        chain.network !== ChainNetwork.Compound &&
+        chain.base !== 'ethereum')
     ) {
-      throw new ServerError(
+      throw new AppError(
         `Proposal fetching not supported for chain ${chainId}`
       );
     }
 
-    return chain.ChainNode.private_url;
+    return chain.ChainNode.private_url || chain.ChainNode.url;
   }
 }

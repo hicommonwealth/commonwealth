@@ -9,9 +9,13 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
     + [Blockers](#blockers)
     + [Story Point Estimation](#story-point-estimation)
   * [Pull Requests](#pull-requests)
+    + [Linking Issues](#linking-issues)
     + [Draft PRs](#draft-prs)
     + [Github Quality Checks](#github-quality-checks)
-- [Standup](#standup)
+- [Sprint Cadence](#sprint-cadence)
+  * [Standup Meetings](#standup-meetings)
+  * [Deep Work Wednesdays](#deep-work-wednesdays)
+  * [Friday Meetings](#friday-meetings)
 - [Deployment and QA schedule](#deployment-and-qa-schedule)
 - [Change Log](#change-log)
 
@@ -68,15 +72,19 @@ Points _may_ always be increased mid-implementation, but a justification _must_ 
 
 ## Pull Requests
 
+If a PR is marked for review, it must be fully mergeable, without breaking any existing functionality. It should also pass CI and [GitHub Quality Checks](#github-quality-checks).
+
+As of 230906, test plans should be included with every code-changing PR, as part of our road to automated testing.
+
+Help close your own PRs: if it's ready for QA, tag a reviewer, complain in a Slack channel, or send a DM.
+
+### Linking Issues
+
 PRs must always link to their instigating ticket. GitHub uses [a set of keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) to automatically link a PR to referenced issues. Alternatively, PRs may be manually linked via their "Development" sidebar section. 
 
 Linked issues are automatically closed by their relevant PRs. In some exceptional cases—for instance, when referencing the outstanding Documentation Update Ticket (#4800)—GitHub closing keywords should be omitted so as to keep the instigating ticket open when the PR is closed.
 
-As of 230906, test plans should be included with every code-changing PR, as part of our road to automated testing.
-
-Engineers are welcome to open several pull requests to close an outstanding ticket. Such PRs can be either "dependent" (i.e., blocking) or "sequential" (i.e., logically independent), and should be flagged accordingly, so that depended-upon (i.e. blocking) PRs are prioritized for merging. 
-
-Close your own PR: if it's ready for QA, tag a reviewer, complain in a Slack channel, or send a DM.
+Engineers are welcome to open several pull requests to close an outstanding ticket. Such PRs can be either "dependent" (i.e., blocking) or "sequential" (i.e., logically independent), and should be flagged accordingly, so that depended-upon (i.e. blocking) PRs are prioritized for merging.
 
 ### Draft PRs
 
@@ -94,7 +102,13 @@ Any pull requests originating in the experimental branch, and being merged into 
 
 Occasionally, quality checks will erroneously flag code which is used throughout our codebase, such as `useEffect`. These can be ignored.
 
-# Standup
+# Sprint Cadence
+
+Sprints are grouped into 2 cycles of 6 one-week sprints per business quarter, plus an extra sprint that can either fall between the 2 cycles, or come at the end of the quarter. 
+
+Standup meetings are held Mondays, Tuesdays, and Thursdays. Wednesdays are intended for deep work, and should not be used to schedule lengthy or recurring meetings. Fridays are used to review the past week's work, and to plan for the following week's sprint.
+
+## Standup Meetings
 
 1. Standups are currently M, T, & Th at 12:00 EST for 15 minutes, followed by an optional 15 minute "parking lot" if there are further items that need discussing. 
 2. Please make sure all your stories are up-to-date before standup, and have the correct project state (Teed Up, In Progress, etc). 
@@ -104,6 +118,16 @@ Occasionally, quality checks will erroneously flag code which is used throughout
     - All complications can be handled in parking lot (or "p-lot"). We bracket them in the main standup session to keep the call short and sweet for engineers.
 4. The purpose of standup is to keep your fellow team members (both engineers and leads) informed. Standups should be given in this spirit, addressing the team broadly, and ensuring that enough contextual information is provided that your colleagues can follow along.
 5. Please keep your camera on whenever possible, and ensure you are in a relatively quiet space with clear audio quality.
+
+## Deep Work Wednesdays
+
+Wednesdays are intended to be deep focus days, so recurring or long meetings are not scheduled for Wednesday. This your chance to work uninterrupted on your sprint stories. 
+
+## Friday Meetings
+
+We try to keep all our regular 1:1's on Friday, the final day of the sprint. Our stated goal is to have sprint stories mostly completed by the Weekly Retro, which takes place every Friday at 12:00 (and where appropriate, demo things that were shipped at the the retro meeting for all to see).
+
+Later on Friday we have our Sprint Planning meeting where we tee up the stories we want to include in the next week's sprint. This is not a meeting the full team needs to attend; however, the goal is to have the following week's scope worked out by the end of the previous sprint. 
 
 # Deployment and QA schedule
 

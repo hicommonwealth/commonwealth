@@ -117,32 +117,57 @@ const resetServer = (debug = false): Promise<void> => {
           'https://rpc-osmosis.ecostake.com',
           'Osmosis',
           null,
+          'osmosis',
           BalanceType.Cosmos,
+        ],
+        [
+          'https://cosmos-devnet-beta.herokuapp.com/rpc',
+          'Cosmos SDK v0.45.0 devnet',
+          null,
+          'csdkv1',
+          BalanceType.Cosmos,
+          'https://cosmos-devnet-beta.herokuapp.com/lcd/',
         ],
         [
           'https://cosmos-devnet.herokuapp.com/rpc',
           'Cosmos SDK v0.46.11 devnet',
           null,
+          'csdkbetaci',
           BalanceType.Cosmos,
           'https://cosmos-devnet.herokuapp.com/lcd/',
         ],
       ];
 
-      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkNode] =
-        await Promise.all(
-          nodes.map(([url, name, eth_chain_id, balance_type, alt_wallet_url]) =>
+      const [
+        edgewareNode,
+        mainnetNode,
+        testnetNode,
+        osmosisNode,
+        csdkBetaNode,
+        csdkV1Node,
+      ] = await Promise.all(
+        nodes.map(
+          ([
+            url,
+            name,
+            eth_chain_id,
+            cosmos_chain_id,
+            balance_type,
+            alt_wallet_url,
+          ]) =>
             models.ChainNode.create({
               url,
               name,
               eth_chain_id: eth_chain_id ? +eth_chain_id : null,
+              cosmos_chain_id: cosmos_chain_id || null,
               balance_type:
                 balance_type || eth_chain_id
                   ? BalanceType.Ethereum
                   : BalanceType.Substrate,
               alt_wallet_url,
             })
-          )
-        );
+        )
+      );
 
       // Initialize different chain + node URLs
       await models.Chain.create({
@@ -195,6 +220,18 @@ const resetServer = (debug = false): Promise<void> => {
         chain_node_id: osmosisNode.id,
       });
       await models.Chain.create({
+        id: 'csdk-beta',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'STAKE',
+        name: 'Cosmos SDK v0.45.0 devnet',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: false,
+        chain_node_id: csdkBetaNode.id,
+      });
+      await models.Chain.create({
         id: 'csdk',
         network: ChainNetwork.Osmosis,
         default_symbol: 'STAKE',
@@ -204,7 +241,7 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
-        chain_node_id: csdkNode.id,
+        chain_node_id: csdkV1Node.id,
       });
       const alexContract = await models.Contract.create({
         address: '0xFab46E002BbF0b4509813474841E0716E6730136',

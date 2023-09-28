@@ -25,6 +25,7 @@ export type ButtonProps = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label: string | React.ReactNode;
+  type?: 'reset' | 'submit' | 'button';
 } & ButtonStyleProps &
   React.HTMLAttributes<HTMLButtonElement>;
 
