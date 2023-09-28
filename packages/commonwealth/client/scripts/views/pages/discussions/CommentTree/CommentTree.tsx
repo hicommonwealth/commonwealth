@@ -27,6 +27,7 @@ import { jumpHighlightComment } from './helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import { commentsByDate } from 'helpers/dates';
+import clsx from 'clsx';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -409,7 +410,7 @@ export const CommentTree = ({
 
     return comments_
       .filter((x) => (includeSpams ? true : !x.markedAsSpamAt))
-      .map((comment: CommentType<any>) => {
+      .reduce((acc, comment: CommentType<any>) => {
         const children = allComments
           .filter(
             (c) => c.threadId === thread.id && c.parentComment === comment.id
@@ -427,81 +428,128 @@ export const CommentTree = ({
             isLoggedIn
           );
 
-          return (
-            <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
-              <div className={`Comment comment-${comment.id}`}>
-                {threadLevel > 0 && (
-                  <div className="thread-connectors-container">
-                    {Array(threadLevel)
-                      .fill(undefined)
-                      .map((_, i) => (
-                        <div
-                          key={i}
-                          className={`thread-connector ${
-                            isReplying &&
-                            i === threadLevel - 1 &&
-                            parentCommentId === comment.id
-                              ? 'replying'
-                              : ''
-                          }`}
-                        />
-                      ))}
-                  </div>
-                )}
-                <CommentCard
-                  canReply={!!hasJoinedCommunity}
-                  maxReplyLimitReached={maxReplyLimitReached}
-                  canReact={
-                    !!hasJoinedCommunity ||
-                    isAdmin ||
-                    !app.chain.isGatedTopic(thread.topic.id)
-                  }
-                  canEdit={!isLocked && (isCommentAuthor || isAdminOrMod)}
-                  editDraft={edits?.[comment.id]?.editDraft || ''}
-                  onEditStart={async () => await handleEditStart(comment)}
-                  onEditCancel={async (hasContentChanged: boolean) =>
-                    await handleEditCancel(comment, hasContentChanged)
-                  }
-                  onEditConfirm={async (newDelta) =>
-                    await handleEditConfirm(comment, newDelta)
-                  }
-                  isSavingEdit={edits?.[comment.id]?.isSavingEdit || false}
-                  isEditing={edits?.[comment.id]?.isEditing || false}
-                  canDelete={!isLocked && (isCommentAuthor || isAdminOrMod)}
-                  replyBtnVisible={replyBtnVisible}
-                  onReply={() => {
-                    setParentCommentId(comment.id);
-                    setIsReplying(true);
-                  }}
-                  onDelete={async () => await handleDeleteComment(comment)}
-                  isSpam={!!comment.markedAsSpamAt}
-                  onSpamToggle={async () => await handleFlagMarkAsSpam(comment)}
-                  canToggleSpam={!isLocked && (isCommentAuthor || isAdminOrMod)}
-                  comment={comment}
-                />
-              </div>
-              {isReplying && parentCommentId === comment.id && (
-                <CreateComment
-                  handleIsReplying={handleIsReplying}
-                  parentCommentId={parentCommentId}
-                  rootThread={thread}
-                  canComment={canComment}
-                />
-              )}
-              {!!children.length &&
-                canContinueThreading &&
-                recursivelyGatherComments(children, comment, threadLevel + 1)}
-            </React.Fragment>
-          );
+          return [
+            ...acc,
+            {
+              ...comment,
+              children:
+                children?.length && canContinueThreading
+                  ? recursivelyGatherComments(
+                      children,
+                      comment,
+                      threadLevel + 1
+                    )
+                  : [],
+              threadLevel,
+              isCommentAuthor,
+              maxReplyLimitReached,
+              replyBtnVisible,
+            },
+          ];
         } else {
-          return null;
+          return [...acc];
         }
-      });
+      }, []);
   };
+
+  const commentsToRender = comments
+    ? recursivelyGatherComments(comments, comments[0], 0)
+    : [];
+
+  const flattenComments = (comments) => {
+    let flattenedComments = [];
+
+    const flatten = (comment) => {
+      flattenedComments.push(comment);
+
+      if (comment.children && comment.children.length > 0) {
+        comment.children.forEach(flatten);
+      }
+    };
+
+    comments.forEach(flatten);
+
+    return flattenedComments;
+  };
+
+  const flattenedComments = flattenComments(commentsToRender);
 
   return (
     <div className="CommentsTree">
-      {comments && recursivelyGatherComments(comments, comments[0], 0)}
+      {flattenedComments.map((comment, index) => {
+        const nextComment = flattenedComments[index + 1];
+        const nextCommentThreadLevel = nextComment?.threadLevel;
+
+        return (
+          <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
+            <div
+              className={`Comment comment-${comment.id} thread-level-${comment.threadLevel}`}
+            >
+              {comment.threadLevel > 0 && (
+                <div className="thread-connectors-container">
+                  {Array(comment.threadLevel)
+                    .fill(undefined)
+                    .map((_, i) => (
+                      <div
+                        key={i}
+                        className={clsx('thread-connector', {
+                          replying:
+                            isReplying &&
+                            i === comment.threadLevel - 1 &&
+                            parentCommentId === comment.id,
+                          smaller: i >= nextCommentThreadLevel || !nextComment,
+                        })}
+                      />
+                    ))}
+                </div>
+              )}
+              <CommentCard
+                canReply={!!hasJoinedCommunity}
+                maxReplyLimitReached={comment.maxReplyLimitReached}
+                canReact={
+                  !!hasJoinedCommunity ||
+                  isAdmin ||
+                  !app.chain.isGatedTopic(thread.topic.id)
+                }
+                canEdit={!isLocked && (comment.isCommentAuthor || isAdminOrMod)}
+                editDraft={edits?.[comment.id]?.editDraft || ''}
+                onEditStart={async () => await handleEditStart(comment)}
+                onEditCancel={async (hasContentChanged: boolean) =>
+                  await handleEditCancel(comment, hasContentChanged)
+                }
+                onEditConfirm={async (newDelta) =>
+                  await handleEditConfirm(comment, newDelta)
+                }
+                isSavingEdit={edits?.[comment.id]?.isSavingEdit || false}
+                isEditing={edits?.[comment.id]?.isEditing || false}
+                canDelete={
+                  !isLocked && (comment.isCommentAuthor || isAdminOrMod)
+                }
+                replyBtnVisible={comment.replyBtnVisible}
+                onReply={() => {
+                  setParentCommentId(comment.id);
+                  setIsReplying(true);
+                }}
+                onDelete={async () => await handleDeleteComment(comment)}
+                isSpam={!!comment.markedAsSpamAt}
+                onSpamToggle={async () => await handleFlagMarkAsSpam(comment)}
+                canToggleSpam={
+                  !isLocked && (comment.isCommentAuthor || isAdminOrMod)
+                }
+                comment={comment}
+              />
+            </div>
+            {isReplying && parentCommentId === comment.id && (
+              <CreateComment
+                handleIsReplying={handleIsReplying}
+                parentCommentId={parentCommentId}
+                rootThread={thread}
+                canComment={canComment}
+              />
+            )}
+          </React.Fragment>
+        );
+      })}
       {commentError && (
         <CWValidationText message={commentError} status="failure" />
       )}
