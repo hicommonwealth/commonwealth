@@ -31,6 +31,7 @@ const RequirementSubForm = ({
   errors,
   defaultValues = {},
   onRemove = () => null,
+  isRemoveable = true,
   onChange = () => null,
 }: RequirementSubFormType) => {
   return (
@@ -55,7 +56,13 @@ const RequirementSubForm = ({
           }}
           customError={errors.requirementType}
         />
-        <CWIconButton iconName="close" onClick={onRemove} className="ml-auto" />
+        {isRemoveable && (
+          <CWIconButton
+            iconName="close"
+            onClick={onRemove}
+            className="ml-auto cursor-pointer"
+          />
+        )}
       </div>
 
       <div className="row-2">

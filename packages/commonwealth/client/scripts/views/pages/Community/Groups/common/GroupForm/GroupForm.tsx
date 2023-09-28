@@ -270,6 +270,7 @@ const GroupForm = ({
               defaultValues={subForm.defaultValues}
               errors={subForm.errors}
               onChange={(val) => validateChangedValue(val, index)}
+              isRemoveable={index > 0}
               onRemove={() => removeRequirementByIndex(index)}
             />
           ))}

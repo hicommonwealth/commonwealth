@@ -23,6 +23,7 @@ export type RequirementSubFormType = {
   errors?: RequirementSubType;
   defaultValues: RequirementSubTypeWithLabel;
   onRemove: () => any;
+  isRemoveable?: boolean;
   onChange: (values: RequirementSubType) => any;
 };
 
