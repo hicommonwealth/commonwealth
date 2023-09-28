@@ -45,7 +45,7 @@ export const CWSelectList = <
   }, [props.hookToForm, props.name, props.value, formContext]);
 
   return (
-    <div>
+    <div className="CWSelectList">
       {props.label && <MessageRow label={props.label} />}
       <Select
         {...props}
