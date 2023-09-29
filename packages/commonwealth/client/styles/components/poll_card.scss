@@ -63,6 +63,19 @@
   padding: 16px;
   width: 100%;
   border-top: 1px solid $neutral-200;
+
+  .results-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    width: 100%;
+
+    .clickable {
+      cursor: pointer;
+      color: $primary-300;
+    }
+  }
 }
 
 .ResultsSection {
