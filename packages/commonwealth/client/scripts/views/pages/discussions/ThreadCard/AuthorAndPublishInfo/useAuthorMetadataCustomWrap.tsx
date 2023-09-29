@@ -47,9 +47,8 @@ const useAuthorMetadataCustomWrap = (
   containerRef: MutableRefObject<HTMLDivElement>
 ) => {
   useEffect(() => {
-    // Call the function after the component has rendered and the DOM is ready
     applyLeftMarginToItems(containerRef);
-  }, [containerRef]); // Run this effect only once after initial render
+  }, [containerRef]);
 
   useBrowserWindow({
     onResize: () => applyLeftMarginToItems(containerRef),

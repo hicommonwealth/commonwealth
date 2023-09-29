@@ -26,10 +26,8 @@ import './CommentTree.scss';
 import { jumpHighlightComment } from './helpers';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { CommentsFeaturedFilterTypes } from 'models/types';
-import { commentsByDate } from 'helpers/dates';
 import clsx from 'clsx';
-
-const MAX_THREAD_LEVEL = 8;
+import usePrepareCommentsList from './usePrepareCommentsList';
 
 type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;
@@ -116,6 +114,17 @@ export const CommentTree = ({
     }
   }, [comments?.length, highlightedComment]);
 
+  const commentsList = usePrepareCommentsList({
+    levelZeroComments: comments,
+    allComments,
+    threadId: thread.id,
+    includeSpams,
+    commentSortType,
+    isLocked,
+    fromDiscordBot,
+    isLoggedIn,
+  });
+
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
     if (isReplying) {
@@ -124,42 +133,6 @@ export const CommentTree = ({
     } else {
       setParentCommentId(undefined);
       setIsReplying(false);
-    }
-  };
-
-  const isLivingCommentTree = (comment, children) => {
-    if (!comment.deleted) {
-      return true;
-    } else if (!children.length) {
-      return false;
-    } else {
-      let survivingDescendents = false;
-
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-
-        if (!child.deleted) {
-          survivingDescendents = true;
-          break;
-        }
-
-        const grandchildren = allComments.filter(
-          (c) => c.threadId === thread.id && c.parentComment === comment.id
-        );
-
-        for (let j = 0; j < grandchildren.length; j++) {
-          const grandchild = grandchildren[j];
-
-          if (!grandchild.deleted) {
-            survivingDescendents = true;
-            break;
-          }
-        }
-
-        if (survivingDescendents) break;
-      }
-
-      return survivingDescendents;
     }
   };
 
@@ -401,90 +374,15 @@ export const CommentTree = ({
     });
   };
 
-  const recursivelyGatherComments = (
-    comments_: CommentType<any>[],
-    parentComment: CommentType<any>,
-    threadLevel: number
-  ) => {
-    const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
-
-    return comments_
-      .filter((x) => (includeSpams ? true : !x.markedAsSpamAt))
-      .reduce((acc, comment: CommentType<any>) => {
-        const children = allComments
-          .filter(
-            (c) => c.threadId === thread.id && c.parentComment === comment.id
-          )
-          .sort((a, b) => commentsByDate(a, b, commentSortType));
-
-        if (isLivingCommentTree(comment, children)) {
-          const isCommentAuthor =
-            comment.author === app.user.activeAccount?.address;
-
-          const maxReplyLimitReached = threadLevel >= 8;
-          const replyBtnVisible = !!(
-            !isLocked &&
-            !fromDiscordBot &&
-            isLoggedIn
-          );
-
-          return [
-            ...acc,
-            {
-              ...comment,
-              children:
-                children?.length && canContinueThreading
-                  ? recursivelyGatherComments(
-                      children,
-                      comment,
-                      threadLevel + 1
-                    )
-                  : [],
-              threadLevel,
-              isCommentAuthor,
-              maxReplyLimitReached,
-              replyBtnVisible,
-            },
-          ];
-        } else {
-          return [...acc];
-        }
-      }, []);
-  };
-
-  const commentsToRender = comments
-    ? recursivelyGatherComments(comments, comments[0], 0)
-    : [];
-
-  const flattenComments = (_comments) => {
-    const flattenedComments = [];
-
-    const flatten = (comment) => {
-      flattenedComments.push(comment);
-
-      if (comment.children && comment.children.length > 0) {
-        comment.children.forEach(flatten);
-      }
-    };
-
-    _comments.forEach(flatten);
-
-    return flattenedComments;
-  };
-
-  const flattenedComments = flattenComments(commentsToRender);
-
   return (
     <div className="CommentsTree">
-      {flattenedComments.map((comment, index) => {
-        const nextComment = flattenedComments[index + 1];
+      {commentsList.map((comment, index) => {
+        const nextComment = commentsList[index + 1];
         const nextCommentThreadLevel = nextComment?.threadLevel;
 
         return (
           <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
-            <div
-              className={`Comment comment-${comment.id} thread-level-${comment.threadLevel}`}
-            >
+            <div className={`Comment comment-${comment.id}`}>
               {comment.threadLevel > 0 && (
                 <div className="thread-connectors-container">
                   {Array(comment.threadLevel)
@@ -497,6 +395,7 @@ export const CommentTree = ({
                             isReplying &&
                             i === comment.threadLevel - 1 &&
                             parentCommentId === comment.id,
+                          // vertical line is shorter when the thread is finished
                           smaller: i >= nextCommentThreadLevel || !nextComment,
                         })}
                       />

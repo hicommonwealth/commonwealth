@@ -1,35 +1,6 @@
 @import '../../../../../styles/shared';
 @import '../../../../../styles/components/component_kit/cw_popover/cw_tooltip';
 
-//.thread-level-0 {
-//  background-color: white;
-//}
-//.thread-level-1 {
-//  background-color: darken($rorange-50, 10%) !important;
-//}
-//
-//.thread-level-2 {
-//  background-color: darken($rorange-50, 14%) !important;
-//}
-//.thread-level-3 {
-//  background-color: darken($rorange-50, 18%) !important;
-//}
-//.thread-level-4 {
-//  background-color: darken($rorange-50, 22%) !important;
-//}
-//.thread-level-5 {
-//  background-color: darken($rorange-50, 26%) !important;
-//}
-//.thread-level-6 {
-//  background-color: darken($rorange-50, 30%) !important;
-//}
-//.thread-level-7 {
-//  background-color: darken($rorange-50, 34%) !important;
-//}
-//.thread-level-8 {
-//  background-color: darken($rorange-50, 38%) !important;
-//}
-
 .thread-connectors-container {
   display: flex;
   gap: 24px;
@@ -73,7 +44,7 @@
     border-radius: $border-radius-corners;
 
     &.highlightAnimationComplete {
-      background-color: unset;
+      background-color: transparent;
       transition: background-color 1s ease-in-out;
     }
   }
