@@ -112,9 +112,11 @@ export const ChainEventNotificationRow = (
             />
           )}
         </div>
-        <div className="comment-body-bottom">
-          Block {notification.chainEvent.blockNumber}
-        </div>
+        {!notification.chainEvent.blockNumber ? null : (
+          <div className="comment-body-bottom">
+            Block {notification.chainEvent.blockNumber}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -177,7 +179,8 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
       ) : (
         <UserGallery
           users={authorInfo.map(
-            (auth) => new AddressInfo(null, auth[1], auth[0], null)
+            (auth) =>
+              new AddressInfo({ id: null, address: auth[1], chainId: auth[0] })
           )}
           avatarSize={26}
         />

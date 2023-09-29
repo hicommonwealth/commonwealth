@@ -17,6 +17,7 @@ import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
+import { Capacitor } from '@capacitor/core';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -83,6 +84,7 @@ export interface IApp {
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     evmTestEnv?: string;
+    enforceSessionKeys?: boolean;
     chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
   };
 
@@ -91,9 +93,13 @@ export interface IApp {
   isLoggedIn(): boolean;
 
   isProduction(): boolean;
+
+  isDesktopApp(win): boolean;
   isNative(win): boolean;
 
   serverUrl(): string;
+
+  platform(): string;
 
   loadingError: string;
 
@@ -173,6 +179,18 @@ const app: IApp = {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
   },
+  isDesktopApp: (window) => {
+    return window.todesktop;
+  },
+  platform: () => {
+    // Using Desktop API to determine if the platform is desktop
+    if (app.isDesktopApp(window)) {
+      return 'desktop';
+    } else {
+      // If not desktop, get the platform from Capacitor
+      return Capacitor.getPlatform();
+    }
+  },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
   serverUrl: () => {
@@ -221,6 +239,7 @@ export async function initAppState(
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
     app.config.evmTestEnv = statusRes.result.evmTestEnv;
+    app.config.enforceSessionKeys = statusRes.result.enforceSessionKeys;
 
     nodesRes.result
       .sort((a, b) => a.id - b.id)

@@ -44,7 +44,7 @@ test.describe('Commonwealth Create Community', () => {
     await fillOutERCForm(
       page,
       'ERC20',
-      '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+      '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI
       chainName
     );
 
@@ -57,7 +57,7 @@ test.describe('Commonwealth Create Community', () => {
     await fillOutERCForm(
       page,
       'ERC721',
-      '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+      '0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270', // Art Blocks
       chainName
     );
 
@@ -66,12 +66,13 @@ test.describe('Commonwealth Create Community', () => {
 
   test('Test create Polygon community', async ({ page }) => {
     const chainName = Date.now().toString() + getRandomInteger(1, 100000);
-    await page.locator('input#NameInput').fill(chainName);
-    const iconField = await page.locator('input[id*=Icon]');
-    await iconField.fill(
-      'https://assets.commonwealth.im/8c3f1d15-4c21-4fc0-9ea4-6f9bd234eb62.jpg'
+
+    await fillOutERCForm(
+      page,
+      'Polygon',
+      '0x45c32fA6DF82ead1e2EF74d17b76547EDdFaFF89', // FRAX
+      chainName
     );
-    await page.click('button.Button.primary-blue');
 
     await assertAdminCapablities(page, chainName);
   });
@@ -90,14 +91,12 @@ async function fillOutERCForm(page, formName, tokenContractAddress, chainName) {
     await page.locator('button.Button.primary-blue >> text=/Populate/')
   ).click();
 
-  await page.locator('input#NameInput').fill(chainName);
-  const iconField = await page.locator('input[id*=Icon]');
-  await iconField.fill(
-    'https://assets.commonwealth.im/8c3f1d15-4c21-4fc0-9ea4-6f9bd234eb62.jpg'
-  );
-  do {
-    await page.click('button.Button.primary-blue >> text=/Save/');
-  } while (!page.getByText('Success!'));
+  // wait for the token contract address to be populated
+  await page.waitForSelector('div.IDRow > div.id.false');
+
+  await page.locator('input[id*=NameInput]').fill(chainName);
+
+  await page.click('button.Button.primary-blue >> text=/Save/');
 }
 
 async function assertAdminCapablities(page, chainName) {
