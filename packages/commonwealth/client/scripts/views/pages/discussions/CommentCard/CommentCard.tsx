@@ -1,5 +1,3 @@
-import type Comment from 'models/Comment';
-import moment from 'moment';
 import type { DeltaStatic } from 'quill';
 import React, { useState, useEffect } from 'react';
 import app from 'state';

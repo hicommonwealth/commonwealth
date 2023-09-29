@@ -2,7 +2,6 @@ import { commentsByDate } from 'helpers/dates';
 import app from 'state';
 import type { Comment as CommentType } from '../../../../models/Comment';
 import { CommentsFeaturedFilterTypes } from 'models/types';
-import { and } from 'sequelize';
 
 const MAX_THREAD_LEVEL = 8;
 
@@ -102,7 +101,7 @@ const usePrepareCommentsList = ({
 
           // if user deletes some comments, the comments tree below might not be living anymore
           if (isLivingCommentTree(comment, children)) {
-            const maxReplyLimitReached = threadLevel >= 8;
+            const maxReplyLimitReached = threadLevel >= MAX_THREAD_LEVEL;
             const isCommentAuthor =
               comment.author === app.user.activeAccount?.address;
             const replyBtnVisible = !!(

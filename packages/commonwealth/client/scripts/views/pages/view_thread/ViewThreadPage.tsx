@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -373,7 +372,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           )
         }
         thread={thread}
-        onLockToggle={(isLock) => {
+        onLockToggle={() => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
         }}
@@ -397,7 +396,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           setIsGloballyEditing(true);
           setIsEditingBody(true);
         }}
-        onSpamToggle={(updatedThread) => {
+        onSpamToggle={() => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
         }}
