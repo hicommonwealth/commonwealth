@@ -140,7 +140,6 @@ export function sendSlackWebhook(
   category: NotificationCategories,
   data: ForumWebhookData | ChainEventWebhookData
 ) {
-  console.log('slack webhook data:', data);
   const slackMessage = formatSlackMessage(category, data);
   return request.post(webhookUrl).send(slackMessage);
 }

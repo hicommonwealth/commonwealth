@@ -1,16 +1,19 @@
 import { NotificationDataAndCategory } from 'types';
-import { sendDiscordWebhook } from './webhookEndpointUtil/discord';
+import { sendDiscordWebhook } from './webhookDestinations/discord';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { fetchWebhooks, getWebhookDestination } from './util';
 import { getWebhookData } from './getWebhookData';
 import { WebhookDestinations } from './types';
-import { sendSlackWebhook } from './webhookEndpointUtil/slack';
+import { sendSlackWebhook } from './webhookDestinations/slack';
+import { sendTelegramWebhook } from './webhookDestinations/telegram';
+import { WebhookInstance } from '../../models/webhook';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export async function dispatchWebhooks(
-  notifDataCategory: NotificationDataAndCategory
+  notifDataCategory: NotificationDataAndCategory,
+  webhooks?: WebhookInstance[]
 ) {
   if (
     notifDataCategory.categoryId === NotificationCategories.SnapshotProposal ||
@@ -23,7 +26,9 @@ export async function dispatchWebhooks(
     return;
   }
 
-  const webhooks = await fetchWebhooks(notifDataCategory);
+  if (!webhooks) {
+    webhooks = await fetchWebhooks(notifDataCategory);
+  }
   const webhookData = await getWebhookData(notifDataCategory);
 
   const webhookPromises = [];
@@ -48,11 +53,32 @@ export async function dispatchWebhooks(
         );
         break;
       case WebhookDestinations.Telegram:
+        webhookPromises.push(
+          sendTelegramWebhook(
+            webhook.url,
+            notifDataCategory.categoryId,
+            webhookData
+          )
+        );
         break;
       default:
         log.warn(`Unknown webhook destination: ${webhook.url}`);
     }
   }
 
-  return await Promise.allSettled(webhookPromises);
+  const results = await Promise.allSettled(webhookPromises);
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      const res = result.reason.response;
+      // console.log(res.error);
+      // console.log(result.reason.response);
+
+      console.error(
+        `Error sending webhook:\n` +
+          `\tStatus: ${res.statusCode}\n` +
+          `\tError Message: ${res.error}\n` +
+          `\tError Text: ${res.error.text}\n`
+      );
+    }
+  }
 }

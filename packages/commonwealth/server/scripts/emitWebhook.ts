@@ -5,23 +5,58 @@ import { NotificationDataAndCategory } from 'types';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
 import { SupportedNetwork } from 'chain-events/src';
 import models from '../database';
+import { WebhookDestinations } from '../util/webhooks/types';
 
 async function main() {
-  const argv = await yargs(hideBin(process.argv)).options({
-    notificationCategory: {
-      alias: 'c',
-      type: 'string',
-      description: 'The category of the webhook notification to emit.',
-      choices: Object.values(NotificationCategories),
-      demandOption: true,
-    },
-    url: {
-      alias: 'u',
-      type: 'string',
-      description: 'The webhook url to emit the notification to.',
-      demandOption: true,
-    },
-  }).argv;
+  const argv = await yargs(hideBin(process.argv))
+    .options({
+      notificationCategory: {
+        alias: 'c',
+        type: 'string',
+        description:
+          'The category of the webhook notification to emit i.e. NotificationCategories',
+        choices: Object.values(NotificationCategories),
+        demandOption: true,
+      },
+      url: {
+        alias: 'u',
+        type: 'string',
+        description:
+          'A custom webhook url to emit the notification to. Overrides the destination flag.',
+      },
+      destination: {
+        alias: 'd',
+        type: 'string',
+        choices: Object.values(WebhookDestinations),
+        description:
+          'The destination of the webhook notification. ' +
+          'This sends a notification to a hardcoded channel.' +
+          'See Webhooks.md in the Wiki for more information about existing testing channels.',
+      },
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+    })
+    .check((argv) => {
+      if (!argv.url && !argv.destination) {
+        throw new Error(
+          'Must provide either a webhook url or a destination flag.'
+        );
+      }
+
+      if (argv) return true;
+    })
+    .coerce('destination', (arg) => {
+      // TODO: map destination to an env var url
+      return arg;
+      // if (arg === WebhookDestinations.Discord) {
+      //   return process.env.DISCORD_WEBHOOK_URL;
+      // } else if (arg === WebhookDestinations.Slack) {
+      //   return process.env.SLACK_WEBHOOK_URL;
+      // } else if (arg === WebhookDestinations.Telegram) {
+      //   return process.env.TELEGRAM_BOT_TOKEN;
+      // } else {
+      //   throw new Error(`Invalid webhook destination: ${arg}`);
+      // }
+    }).argv;
 
   const chain = await models.Chain.findOne({
     where: {
@@ -83,7 +118,7 @@ async function main() {
     };
   }
 
-  await dispatchWebhooks(notification);
+  await dispatchWebhooks(notification, [webhook]);
 }
 
 if (require.main === module) {
