@@ -39,7 +39,6 @@ import {
   fetchEtherscanContract,
   fetchEtherscanContractAbi,
 } from '../routes/etherscanAPI';
-import createContractAbi from '../routes/contractAbis/createContractAbi';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
 import adminAnalytics, {
   communitySpecificAnalytics,
@@ -83,6 +82,8 @@ import deleteTopic from '../routes/deleteTopic';
 import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
+
+import { getCanvasData, postCanvasData } from '../routes/canvas';
 
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
@@ -159,6 +160,7 @@ import { ServerProfilesController } from '../controllers/server_profiles_control
 import { ServerChainsController } from '../controllers/server_chains_controller';
 import { ServerProposalsController } from '../controllers/server_proposals_controller';
 import { ServerPollsController } from '../controllers/server_polls_controller';
+import { ServerGroupsController } from '../controllers/server_groups_controller';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
@@ -183,6 +185,11 @@ import { getThreadPollsHandler } from '../routes/threads/get_thread_polls';
 import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
 import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
+import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
+import { createGroupHandler } from '../routes/groups/create_group_handler';
+import { getGroupsHandler } from '../routes/groups/get_groups_handler';
+import { updateGroupHandler } from '../routes/groups/update_group_handler';
+import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -194,6 +201,7 @@ export type ServerControllers = {
   chains: ServerChainsController;
   proposals: ServerProposalsController;
   polls: ServerPollsController;
+  groups: ServerGroupsController;
 };
 
 function setupRouter(
@@ -219,6 +227,7 @@ function setupRouter(
     chains: new ServerChainsController(models, tokenBalanceCache, banCache),
     polls: new ServerPollsController(models, tokenBalanceCache),
     proposals: new ServerProposalsController(models, redisCache),
+    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
   };
 
   // ---
@@ -512,14 +521,6 @@ function setupRouter(
     '/polls/:id/votes',
     databaseValidationService.validateChain,
     getPollVotesHandler.bind(this, serverControllers)
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/contractAbi',
-    passport.authenticate('jwt', { session: false }),
-    createContractAbi.bind(this, models)
   );
 
   // Templates
@@ -1057,6 +1058,10 @@ function setupRouter(
     updateChainCategory.bind(this, models)
   );
 
+  // signed data
+  router.get('/oplog', getCanvasData.bind(this, models));
+  router.post('/oplog', postCanvasData.bind(this, models));
+
   // settings
   registerRoute(
     router,
@@ -1332,6 +1337,54 @@ function setupRouter(
     'get',
     '/proposalVotes',
     getProposalVotesHandler.bind(this, serverControllers)
+  );
+
+  // Group routes
+  registerRoute(
+    router,
+    'put',
+    '/refresh-membership',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    refreshMembershipHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'get',
+    '/groups',
+    getGroupsHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/groups',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    createGroupHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'put',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    updateGroupHandler.bind(this, serverControllers)
+  );
+
+  registerRoute(
+    router,
+    'delete',
+    '/groups/:id',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
+    deleteGroupHandler.bind(this, serverControllers)
   );
 
   app.use(endpoint, router);

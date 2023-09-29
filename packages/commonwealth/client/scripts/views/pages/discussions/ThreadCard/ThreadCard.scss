@@ -1,14 +1,20 @@
 @import '../../../../../styles/shared';
+@import '../../../../../styles/components/component_kit/cw_popover/cw_tooltip';
 
 .ThreadCard {
   cursor: pointer;
   display: flex;
+  align-items: flex-start;
   width: 100%;
   border-radius: 6px;
   padding: 16px;
   gap: 16px;
   text-decoration: none;
   color: unset !important;
+
+  .OldTooltip {
+    @include newTempBlackTooltip;
+  }
 
   @include smallInclusive {
     padding: 12px;

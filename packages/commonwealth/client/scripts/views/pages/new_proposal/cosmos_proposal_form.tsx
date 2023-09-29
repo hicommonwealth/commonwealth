@@ -22,6 +22,10 @@ import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { useCommonNavigate } from 'navigation/helpers';
 import { Skeleton } from '../../components/Skeleton';
+import {
+  minimalToNaturalDenom,
+  naturalDenomToMinimal,
+} from '../../../../../shared/utils';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
@@ -37,10 +41,15 @@ export const CosmosProposalForm = () => {
 
   const author = app.user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
+  const meta = cosmos.meta;
 
-  useStakingParamsQuery();
-  const { data, isLoading } = useDepositParamsQuery();
-  const minDeposit = data?.minDeposit;
+  const { data: stakingDenom } = useStakingParamsQuery();
+  const { data: depositParams, isLoading: isLoadingDepositParams } =
+    useDepositParamsQuery(stakingDenom);
+
+  const minDeposit = parseFloat(
+    minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals)
+  );
 
   return (
     <>
@@ -71,13 +80,13 @@ export const CosmosProposalForm = () => {
           setDescription(e.target.value);
         }}
       />
-      {isLoading ? (
+      {isLoadingDepositParams ? (
         <Skeleton className="TextInput" style={{ height: 62 }} />
       ) : (
         <CWTextInput
-          label={`Deposit (${minDeposit?.denom})`}
-          placeholder={`Min: ${+minDeposit}`}
-          defaultValue={+minDeposit}
+          label={`Deposit (${meta?.default_symbol})`}
+          placeholder={`Min: ${minDeposit}`}
+          defaultValue={minDeposit}
           onInput={(e) => {
             setDeposit(+e.target.value);
           }}
@@ -93,9 +102,9 @@ export const CosmosProposalForm = () => {
           }}
         />
       )}
-      {cosmosProposalType !== 'textProposal' && (
+      {cosmosProposalType === 'communitySpend' && (
         <CWTextInput
-          label={`Amount (${minDeposit?.denom})`}
+          label={`Amount (${meta?.default_symbol})`}
           placeholder="12345"
           defaultValue=""
           onInput={(e) => {
@@ -111,18 +120,22 @@ export const CosmosProposalForm = () => {
           let prop: ProtobufAny;
 
           const _deposit = deposit
-            ? new CosmosToken(minDeposit?.denom, deposit, false)
-            : minDeposit;
+            ? new CosmosToken(depositParams?.minDeposit?.denom, deposit, false)
+            : depositParams?.minDeposit;
 
           if (cosmosProposalType === 'textProposal') {
             prop = encodeTextProposal(title, description);
           } else if (cosmosProposalType === 'communitySpend') {
+            const spendAmountInMinimalDenom = naturalDenomToMinimal(
+              payoutAmount,
+              meta?.decimals
+            );
             prop = encodeCommunitySpend(
               title,
               description,
               recipient,
-              payoutAmount.toString(),
-              minDeposit?.denom
+              spendAmountInMinimalDenom,
+              depositParams?.minDeposit?.denom
             );
           } else {
             throw new Error('Unknown Cosmos proposal type.');

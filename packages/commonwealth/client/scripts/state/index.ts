@@ -4,7 +4,6 @@ import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import SnapshotController from 'controllers/chain/snapshot';
 import ChainEntityController from 'controllers/server/chain_entities';
-import CommunitiesController from 'controllers/server/communities';
 import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
@@ -18,6 +17,7 @@ import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
+import { Capacitor } from '@capacitor/core';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -57,9 +57,6 @@ export interface IApp {
   search: SearchController;
   searchAddressCache: any;
 
-  // Community
-  communities: CommunitiesController;
-
   // Contracts
   contracts: ContractsController;
 
@@ -87,6 +84,7 @@ export interface IApp {
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
     evmTestEnv?: string;
+    enforceSessionKeys?: boolean;
     chainCategoryMap?: { [chain: string]: ChainCategoryType[] };
   };
 
@@ -95,9 +93,13 @@ export interface IApp {
   isLoggedIn(): boolean;
 
   isProduction(): boolean;
+
+  isDesktopApp(win): boolean;
   isNative(win): boolean;
 
   serverUrl(): string;
+
+  platform(): string;
 
   loadingError: string;
 
@@ -141,9 +143,6 @@ const app: IApp = {
   // Proposals
   proposalEmitter: new EventEmitter(),
 
-  // Community
-  communities: new CommunitiesController(),
-
   // Contracts
   contracts: new ContractsController(),
 
@@ -179,6 +178,18 @@ const app: IApp = {
   isNative: () => {
     const capacitor = window['Capacitor'];
     return !!(capacitor && capacitor.isNative);
+  },
+  isDesktopApp: (window) => {
+    return window.todesktop;
+  },
+  platform: () => {
+    // Using Desktop API to determine if the platform is desktop
+    if (app.isDesktopApp(window)) {
+      return 'desktop';
+    } else {
+      // If not desktop, get the platform from Capacitor
+      return Capacitor.getPlatform();
+    }
   },
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
@@ -228,6 +239,7 @@ export async function initAppState(
     app.user.notifications.clear();
     app.user.notifications.clearSubscriptions();
     app.config.evmTestEnv = statusRes.result.evmTestEnv;
+    app.config.enforceSessionKeys = statusRes.result.enforceSessionKeys;
 
     nodesRes.result
       .sort((a, b) => a.id - b.id)

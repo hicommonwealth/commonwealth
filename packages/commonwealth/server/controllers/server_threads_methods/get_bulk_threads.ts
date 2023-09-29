@@ -90,13 +90,12 @@ export async function __getBulkThreads(
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
-        collaborators,
-        threads.latest_activity AS latest_activity
+        collaborators
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
-          COALESCE(latest_comments.latest_comment_date, t.created_at) AS latest_activity,
+          t.max_notif_id AS latest_activity,
           t.marked_as_spam_at,
           t.archived_at,
           t.updated_at AS thread_updated,
@@ -116,20 +115,18 @@ export async function __getBulkThreads(
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
         LEFT JOIN (
-          SELECT thread_id, MAX(created_at) AS latest_comment_date
-          FROM "Comments"
-          WHERE deleted_at IS NULL
-          GROUP BY thread_id
-        ) latest_comments
-        ON t.id = latest_comments.thread_id
-        LEFT JOIN (
             SELECT thread_id,
             STRING_AGG(ad.address::text, ',') AS addresses_reacted,
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
             STRING_AGG(r.id::text, ',') AS reaction_ids
             FROM "Reactions" as r
+            JOIN "Threads" t2 
+            ON r.thread_id = t2.id and t2.chain = $chain ${
+              topicId ? ` AND t2.topic_id = $topic_id ` : ''
+            }
             LEFT JOIN "Addresses" ad
             ON r.address_id = ad.id
+            where r.chain = $chain
             GROUP BY thread_id
         ) reactions
         ON t.id = reactions.thread_id
@@ -140,9 +137,9 @@ export async function __getBulkThreads(
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
           AND (${includePinnedThreads ? 't.pinned = true OR' : ''}
           (COALESCE(t.last_commented_on, t.created_at) < $to_date AND t.pinned = false))
-          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), t.comment_count,
-          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, latest_comments.latest_comment_date)
-          ORDER BY t.pinned DESC, COALESCE(t.last_commented_on, t.created_at) DESC
+          GROUP BY (t.id, t.max_notif_id, t.comment_count,
+          reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted)
+          ORDER BY t.pinned DESC, t.max_notif_id DESC
         ) threads
       ON threads.address_id = addr.id
       LEFT JOIN "Topics" topics

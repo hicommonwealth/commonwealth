@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainNetwork } from 'common-common/src/types';
 import _ from 'lodash';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
@@ -30,15 +30,17 @@ import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
-import { useAaveProposalsQuery } from 'state/api/proposals';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
+  useAaveProposalsQuery,
+  useCompoundProposalsQuery,
   useCosmosProposalMetadataQuery,
-  useCosmosProposal,
-  useCosmosTally,
-  useCosmosVotes,
-  useCosmosDeposits,
+  useCosmosProposalQuery,
+  useCosmosProposalTallyQuery,
+  useCosmosProposalVotesQuery,
+  useCosmosProposalDepositsQuery,
 } from 'state/api/proposals';
+import { usePoolParamsQuery } from 'state/api/chainParams';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -60,15 +62,16 @@ const ViewProposalPage = ({
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
-  const { data: cosmosProposal } = useCosmosProposal({
+  const { data: cosmosProposal } = useCosmosProposalQuery({
     isApiReady: !!app.chain.apiInitialized,
     proposalId,
   });
   const { data: metadata, isFetching: isFetchingMetadata } =
     useCosmosProposalMetadataQuery(proposal);
-  useCosmosVotes(proposal);
-  useCosmosTally(proposal);
-  useCosmosDeposits(proposal);
+  const { data: poolData } = usePoolParamsQuery();
+  useCosmosProposalVotesQuery(proposal, +poolData);
+  useCosmosProposalTallyQuery(proposal);
+  useCosmosProposalDepositsQuery(proposal, +poolData);
 
   useEffect(() => {
     setProposal(cosmosProposal);
@@ -108,6 +111,14 @@ const ViewProposalPage = ({
       chainId: app.chain?.id,
     });
 
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const fetchCompoundData = onCompound && isAdapterLoaded;
+  const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
+    useCompoundProposalsQuery({
+      moduleReady: fetchCompoundData,
+      chainId: app.chain?.id,
+    });
+
   useEffect(() => {
     if (!aaveProposalsLoading && fetchAaveData && !proposal) {
       const foundProposal = cachedAaveProposals?.find(
@@ -124,9 +135,18 @@ const ViewProposalPage = ({
     }
   }, [cachedAaveProposals]);
 
+  useEffect(() => {
+    if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
+      const foundProposal = cachedCompoundProposals?.find(
+        (p) => p.identifier === proposalId
+      );
+      setProposal(foundProposal);
+    }
+  }, [cachedCompoundProposals]);
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
-      if (onAave) return;
+      if (onAave || onCompound) return;
       try {
         const proposalFromStore = getProposalFromStore();
         setProposal(proposalFromStore);

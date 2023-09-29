@@ -23,6 +23,39 @@
       display: flex;
       flex-direction: column;
       width: 100%;
+      transition: margin-left 0.2s ease-in-out;
+
+      &.resizing {
+        transition: none;
+      }
+
+      &.menu-visible {
+        margin-left: calc(calc(#{$sidebar-width} + #{$quick-switcher-width}) + 1px);
+        transition: margin-left 0.2s ease-in-out;
+
+        @include smallInclusive {
+          margin-left: 100vw;
+        }
+      }
+
+      &.menu-hidden {
+        margin-left: calc(#{$sidebar-width} + 1px);
+        transition: margin-left 0.2s ease-in-out;
+
+        @include smallInclusive {
+          margin-left: 0;
+        }
+
+        .Banner {
+          padding-left: calc(#{$sidebar-width} + 20px);
+          margin-left: calc(-#{$sidebar-width} + 1px); // give it a negative margin equal to the parent's margin
+        }
+
+        .MessageBanner {
+          padding-left: calc(#{$sidebar-width} + 20px);
+          margin-left: calc(-#{$sidebar-width} + 1px); // give it a negative margin equal to the parent's margin
+        }
+      }
 
       .Body {
         display: flex;

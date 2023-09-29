@@ -6,7 +6,8 @@ import ChainInfo from '../../../models/ChainInfo';
 import app from 'state';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import type { MenuItem } from '../component_kit/types';
-import useSidebarStore from 'state/ui/sidebar';
+import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
 
 export const ExploreCommunitiesSidebar = () => {
   const { setMenu } = useSidebarStore();
@@ -28,11 +29,11 @@ export const ExploreCommunitiesSidebar = () => {
   };
 
   const starredCommunities = allCommunities.filter((c) => {
-    return c instanceof ChainInfo && app.communities.isStarred(c.id);
+    return c instanceof ChainInfo && app.user.isCommunityStarred(c.id);
   });
 
   const joinedCommunities = allCommunities.filter(
-    (c) => isInCommunity(c) && !app.communities.isStarred(c.id)
+    (c) => isInCommunity(c) && !app.user.isCommunityStarred(c.id)
   );
 
   const communityList: MenuItem[] = [
@@ -64,12 +65,10 @@ export const ExploreCommunitiesSidebar = () => {
       menuHeader={{
         label: 'Explore',
         onClick: async () => {
-          const sidebar = document.getElementsByClassName(
-            'ExploreCommunitiesSidebar'
-          );
-          sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            setMenu({ name: 'default', isVisible: false });
+            const isSidebarOpen =
+              !!sidebarStore.getState().userToggledVisibility;
+            setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },
       }}
