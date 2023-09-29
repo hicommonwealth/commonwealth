@@ -4,6 +4,7 @@ export enum WebhookDestinations {
   Discord = 'discord',
   Slack = 'slack',
   Telegram = 'telegram',
+  Zapier = 'zapier',
   Unknown = 'unknown',
 }
 

@@ -154,6 +154,8 @@ export function getWebhookDestination(webhookUrl: string): WebhookDestinations {
     return WebhookDestinations.Slack;
   } else if (webhookUrl.includes('api.telegram.org')) {
     return WebhookDestinations.Telegram;
+  } else if (webhookUrl.includes('hooks.zapier.com/')) {
+    return WebhookDestinations.Zapier;
   } else {
     return WebhookDestinations.Unknown;
   }

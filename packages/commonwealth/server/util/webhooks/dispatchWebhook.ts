@@ -8,6 +8,7 @@ import { WebhookDestinations } from './types';
 import { sendSlackWebhook } from './webhookDestinations/slack';
 import { sendTelegramWebhook } from './webhookDestinations/telegram';
 import { WebhookInstance } from '../../models/webhook';
+import { sendZapierWebhook } from './webhookDestinations/zapier';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -61,6 +62,14 @@ export async function dispatchWebhooks(
           )
         );
         break;
+      case WebhookDestinations.Zapier:
+        webhookPromises.push(
+          sendZapierWebhook(
+            webhook.url,
+            notifDataCategory.categoryId,
+            webhookData
+          )
+        );
       default:
         log.warn(`Unknown webhook destination: ${webhook.url}`);
     }
