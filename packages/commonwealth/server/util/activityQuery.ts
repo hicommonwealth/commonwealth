@@ -15,7 +15,7 @@ export async function getActivityFeed(models: DB, id = 0) {
                                   t.max_notif_id
                                 FROM "Threads" t 
                                 ${filterByChainForUsers}
-                                WHERE t.max_notif_id IS NOT NULL
+                                WHERE t.max_notif_id IS NOT NULL AND deleted_at IS NULL
                                 ORDER BY t.max_notif_id DESC
                                 LIMIT 50
                                 )

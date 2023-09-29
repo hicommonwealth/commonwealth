@@ -6,7 +6,8 @@ import ChainInfo from '../../../models/ChainInfo';
 import app from 'state';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import type { MenuItem } from '../component_kit/types';
-import useSidebarStore from 'state/ui/sidebar';
+import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
 
 export const ExploreCommunitiesSidebar = () => {
   const { setMenu } = useSidebarStore();
@@ -64,12 +65,10 @@ export const ExploreCommunitiesSidebar = () => {
       menuHeader={{
         label: 'Explore',
         onClick: async () => {
-          const sidebar = document.getElementsByClassName(
-            'ExploreCommunitiesSidebar'
-          );
-          sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            setMenu({ name: 'default', isVisible: false });
+            const isSidebarOpen =
+              !!sidebarStore.getState().userToggledVisibility;
+            setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },
       }}

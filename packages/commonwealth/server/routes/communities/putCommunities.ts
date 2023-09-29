@@ -93,6 +93,7 @@ export async function putCommunities(
             chain: community.id,
             community: community.id,
             wallet_id: null,
+            wallet_sso_source: null,
           };
 
           const newAddress = await createAddressHelper(

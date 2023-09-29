@@ -21,7 +21,7 @@ const deleteReaction = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signDeleteCommentReaction({
+  } = await app.sessions.signDeleteCommentReaction(address, {
     comment_id: canvasHash,
   });
   return await axios

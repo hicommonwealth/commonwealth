@@ -12,7 +12,7 @@ export enum RouteNotificationCategories {
 }
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
 };
 
 export default async (

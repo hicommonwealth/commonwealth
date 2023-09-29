@@ -5,7 +5,7 @@ import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   TopicRequired: 'Topic name required',
   MustBeAdmin: 'Must be an admin',
   InvalidTokenThreshold: 'Invalid token threshold',

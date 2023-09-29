@@ -26,6 +26,8 @@ import {
   getTextFromDelta,
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
+import { SessionKeyError } from 'controllers/server/sessions';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -88,10 +90,19 @@ export const CreateComment = ({
     }
   }, [tokenPostingThreshold]);
 
-  const { mutateAsync: createComment } = useCreateCommentMutation({
+  const {
+    mutateAsync: createComment,
+    error: createCommentError,
+    reset: resetCreateCommentMutation,
+  } = useCreateCommentMutation({
     threadId: rootThread.id,
     chainId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetCreateCommentMutation,
+    error: createCommentError,
   });
 
   const handleSubmitComment = async () => {
@@ -104,7 +115,7 @@ export const CreateComment = ({
       const newComment: any = await createComment({
         threadId: rootThread.id,
         chainId: chainId,
-        address: author?.address,
+        address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
         existingNumberOfComments: rootThread.numberOfComments || 0,
@@ -123,8 +134,13 @@ export const CreateComment = ({
       // once we are receiving notifications from the websocket
       await app.user.notifications.refresh();
     } catch (err) {
-      const errMsg = err?.responseJSON?.error || 'Failed to create comment';
-      notifyError(errMsg);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      const errMsg = err?.responseJSON?.error || err?.message;
+      console.error(errMsg);
+
+      notifyError('Failed to create comment');
       setErrorMsg(errMsg);
     } finally {
       setSendingComment(false);
@@ -160,61 +176,64 @@ export const CreateComment = ({
   }, [handleIsReplying, saveDraft, contentDelta]);
 
   return (
-    <div className="CreateComment">
-      <div className="attribution-row">
-        <div className="attribution-left-content">
-          <CWText type="caption">
-            {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
+    <>
+      <div className="CreateComment">
+        <div className="attribution-row">
+          <div className="attribution-left-content">
+            <CWText type="caption">
+              {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
+            </CWText>
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className={clsx('user-link-text', { disabled: !canComment })}
+            >
+              <User
+                userAddress={author?.address}
+                userChainId={author?.chain.id}
+                shouldHideAvatar
+                shouldLinkProfile
+              />
+            </CWText>
+          </div>
+          {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
+        </div>
+        <ReactQuillEditor
+          className="editor"
+          contentDelta={contentDelta}
+          setContentDelta={setContentDelta}
+          isDisabled={!canComment}
+          tooltipLabel="Join community to comment"
+          shouldFocus={shouldFocusEditor}
+        />
+        {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
+          <CWText className="token-req-text">
+            Commenting in {activeTopic?.name} requires{' '}
+            {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
+            {app.chain.meta.default_symbol}.{' '}
+            {userBalance && (
+              <>
+                You have {weiToTokens(userBalance.toString(), decimals)}{' '}
+                {app.chain.meta.default_symbol}.
+              </>
+            )}
           </CWText>
-          <CWText
-            type="caption"
-            fontWeight="medium"
-            className={clsx('user-link-text', { disabled: !canComment })}
-          >
-            <User
-              userAddress={author?.address}
-              userChainId={author?.chain.id}
-              shouldHideAvatar
-              shouldLinkProfile
+        )}
+        <div className="form-bottom">
+          <div className="form-buttons">
+            {editorValue.length > 0 && (
+              <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
+            )}
+            <CWButton
+              buttonWidth="wide"
+              disabled={disabled && !isAdmin}
+              onClick={handleSubmitComment}
+              label="Submit"
             />
-          </CWText>
-        </div>
-        {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
-      </div>
-      <ReactQuillEditor
-        className="editor"
-        contentDelta={contentDelta}
-        setContentDelta={setContentDelta}
-        isDisabled={!canComment}
-        tooltipLabel="Join community to comment"
-        shouldFocus={shouldFocusEditor}
-      />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {activeTopic?.name} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
-      <div className="form-bottom">
-        <div className="form-buttons">
-          {editorValue.length > 0 && (
-            <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
-          )}
-          <CWButton
-            buttonWidth="wide"
-            disabled={disabled && !isAdmin}
-            onClick={handleSubmitComment}
-            label="Submit"
-          />
+          </div>
         </div>
       </div>
-    </div>
+      {RevalidationModal}
+    </>
   );
 };
