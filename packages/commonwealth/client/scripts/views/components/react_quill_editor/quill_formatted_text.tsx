@@ -44,7 +44,6 @@ export const QuillFormattedText = ({
     return doc;
   }, [cutoffLines, doc, isTruncated]);
 
-  // finalDoc is the rendered content which may include search term highlights
   const finalDoc = useMemo(() => {
     // if no search term, just render the doc normally
     if (!searchTerm) {
@@ -57,6 +56,53 @@ export const QuillFormattedText = ({
       );
     }
 
+    type TextWithHighlightsArray = Array<
+      React.ReactElement<TextWithHighlightsProps>
+    >;
+
+    type LinkProps = {
+      href: string;
+    };
+
+    type TextWithHighlightsProps = {
+      children: React.ReactNode;
+    };
+
+    const isTextWithHighlights = (
+      child: React.ReactElement
+    ): child is React.ReactElement<TextWithHighlightsProps> => {
+      return (
+        React.isValidElement(child) &&
+        typeof child.type !== 'string' &&
+        typeof (child.props as TextWithHighlightsProps).children !== 'string'
+      );
+    };
+
+    // Function to process individual elements
+    const processElements = (
+      elements: TextWithHighlightsArray | Array<React.ReactElement<LinkProps>>
+    ) =>
+      elements.map((el, i: number) => {
+        if (el.type === 'a') {
+          return (
+            <CWTooltip
+              key={i}
+              content={el.props.href}
+              placement="top"
+              renderTrigger={(handleInteraction) => (
+                <div
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  {el}
+                </div>
+              )}
+            />
+          );
+        }
+        return el;
+      });
+
     // get text from doc and replace new lines with spaces
     const docText = getTextFromDelta(truncatedDoc)
       .replace(/\n/g, ' ')
@@ -64,40 +110,31 @@ export const QuillFormattedText = ({
 
     const textWithHighlights = renderTruncatedHighlights(searchTerm, docText);
 
-    // wrap all elements in span to avoid container-based positioning
-    return <span>{textWithHighlights}</span>;
-  }, [hideFormatting, navigate, openLinksInNewTab, searchTerm, truncatedDoc]);
-
-  (finalDoc as any[])?.forEach((line: any) => {
-    const elements = line[0].props.children;
-    if (!elements) {
-      return;
-    }
-
-    if (typeof elements === 'string') {
-      return elements;
-    }
-
-    elements?.forEach((el: any, i: number) => {
-      if (el.type === 'a') {
-        elements[i] = (
-          <CWTooltip
-            content={el.props.href}
-            placement="top"
-            renderTrigger={(handleInteraction) => (
-              <div
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              >
-                {el}
-              </div>
-            )}
-          />
-        );
-        line[0] = <div className="line-with-link">{elements}</div>;
+    // Wrap all elements in a span to avoid container-based positioning
+    const wrappedElements = React.Children.map(textWithHighlights, (child) => {
+      if (isTextWithHighlights(child)) {
+        if (child.type === 'a') {
+          // Handle individual link element
+          return processElements([child]);
+        }
+        if (
+          Array.isArray(child.props.children) &&
+          child.props.children.every(
+            (el) => React.isValidElement(el) && typeof el.type !== 'string'
+          )
+        ) {
+          // Handle a group of elements (e.g., a line of text)
+          const processedChildren = processElements(
+            child.props.children as TextWithHighlightsArray
+          );
+          return React.cloneElement(child, null, processedChildren);
+        }
       }
+      return child;
     });
-  });
+
+    return <span>{wrappedElements}</span>;
+  }, [hideFormatting, navigate, openLinksInNewTab, searchTerm, truncatedDoc]);
 
   const toggleDisplay = () => setUserExpand(!userExpand);
 
