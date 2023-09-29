@@ -16,7 +16,7 @@ describe('validateGroupMembership', () => {
           threshold: '1000',
           source: {
             source_type: 'erc20',
-            chain_id: '1',
+            evm_chain_id: '1',
             contract_address: '0x12345',
           },
         },
@@ -50,7 +50,7 @@ describe('validateGroupMembership', () => {
           threshold: '1',
           source: {
             source_type: 'erc721',
-            chain_id: '1',
+            evm_chain_id: '1',
             contract_address: '0x12345',
           },
         },
@@ -84,7 +84,7 @@ describe('validateGroupMembership', () => {
           threshold: '1000',
           source: {
             source_type: 'eth_native',
-            chain_id: '1',
+            evm_chain_id: '1',
           },
         },
       },
@@ -117,7 +117,7 @@ describe('validateGroupMembership', () => {
           threshold: '2000',
           source: {
             source_type: 'erc20',
-            chain_id: '1',
+            evm_chain_id: '1',
             contract_address: '0x12345',
           },
         },
@@ -152,7 +152,7 @@ describe('validateGroupMembership', () => {
           threshold: '2000',
           source: {
             source_type: 'erc20',
-            chain_id: '1',
+            evm_chain_id: '1',
             contract_address: '0x12345',
           },
         },
@@ -218,7 +218,7 @@ describe('validateGroupMembership', () => {
           threshold: '2000',
           source: {
             source_type: 'erc20',
-            chain_id: '1',
+            evm_chain_id: '1',
             contract_address: '0x12345',
           },
         },
@@ -229,7 +229,7 @@ describe('validateGroupMembership', () => {
           threshold: '1',
           source: {
             source_type: 'erc721',
-            chain_id: '1',
+            evm_chain_id: '1',
             contract_address: '0x12345',
           },
         },
@@ -240,7 +240,7 @@ describe('validateGroupMembership', () => {
           threshold: '1000',
           source: {
             source_type: 'eth_native',
-            chain_id: '1',
+            evm_chain_id: '1',
           },
         },
       },
@@ -285,7 +285,7 @@ describe('validateGroupMembership', () => {
           threshold: '2000',
           source: {
             source_type: 'erc20',
-            chain_id: '1',
+            evm_chain_id: '1',
             contract_address: '0x12345',
           },
         },
@@ -296,7 +296,7 @@ describe('validateGroupMembership', () => {
           threshold: '5',
           source: {
             source_type: 'erc721',
-            chain_id: '1',
+            evm_chain_id: '1',
             contract_address: '0x12345',
           },
         },
@@ -307,7 +307,7 @@ describe('validateGroupMembership', () => {
           threshold: '1000',
           source: {
             source_type: 'eth_native',
-            chain_id: '1',
+            evm_chain_id: '1',
           },
         },
       },

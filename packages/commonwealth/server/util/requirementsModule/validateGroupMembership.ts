@@ -93,7 +93,9 @@ async function _thresholdCheck(
     const balance = await tbc.fetchUserBalanceWithChain(
       chainNetwork,
       userAddress,
-      thresholdData.source.chain_id,
+      thresholdData.source.evm_chain_id
+        ? thresholdData.source.evm_chain_id
+        : thresholdData.source.cosmos_chain_id,
       contractAddress
     );
 
