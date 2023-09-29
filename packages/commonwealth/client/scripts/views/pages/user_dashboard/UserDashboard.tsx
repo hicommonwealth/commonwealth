@@ -1,7 +1,7 @@
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
+import useBrowserWindow from '../../../hooks/useBrowserWindow';
 import 'pages/user_dashboard/index.scss';
 import React, { useEffect } from 'react';
 import app, { LoginState } from 'state';
@@ -10,7 +10,7 @@ import DashboardActivityNotification from '../../../models/DashboardActivityNoti
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { Feed } from '../../components/feed';
-import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
+import { DashboardCommunitiesPreview } from './DashboardCommunitiesPreview';
 import { fetchActivity } from './helpers';
 
 export enum DashboardViews {
@@ -25,11 +25,12 @@ type UserDashboardProps = {
 
 const UserDashboard = (props: UserDashboardProps) => {
   const { type } = props;
-  const { isLoggedIn } = useUserLoggedIn();
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global
   );
+
+  const { isWindowLarge } = useBrowserWindow({});
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -67,7 +68,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   }, [activePage, subpage]);
 
   return (
-    <div ref={setScrollElement} className="UserDashboard" key={`${isLoggedIn}`}>
+    <div ref={setScrollElement} className="UserDashboard">
       <div className="dashboard-column">
         <div className="dashboard-header">
           <CWText type="h2" fontWeight="medium">
@@ -80,7 +81,7 @@ const UserDashboard = (props: UserDashboardProps) => {
               onClick={() => {
                 if (!loggedIn) {
                   notifyInfo(
-                    'Sign in or create an account for custom activity feed'
+                    'Log in or create an account for custom activity feed'
                   );
                   return;
                 }
@@ -104,53 +105,6 @@ const UserDashboard = (props: UserDashboardProps) => {
           </CWTabBar>
         </div>
         <>
-          {/* TODO: add filter functionality */}
-          {/* <CWPopover
-              trigger={
-                <CWButton
-                  buttonType="mini-white"
-                  label="Filter"
-                  iconRight="chevronDown"
-                />
-              }
-              content={
-                <CWCard className="dashboard-filter-items">
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Threads"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Polls"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Proposals"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Crowdfunds"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                </CWCard>
-              }
-            />
-            <CWDivider /> */}
           {activePage === DashboardViews.ForYou && (
             <Feed
               fetchData={() => fetchActivity(activePage)}
@@ -173,14 +127,15 @@ const UserDashboard = (props: UserDashboardProps) => {
               noFeedMessage="Join some communities that have governance to see Chain Events!"
               onFetchedDataCallback={DashboardActivityNotification.fromJSON}
               customScrollParent={scrollElement}
-              isChainEventsRow={true}
             />
           )}
         </>
       </div>
-      <div>
-        <DashboardCommunitiesPreview />
-      </div>
+      {isWindowLarge && (
+        <div>
+          <DashboardCommunitiesPreview />
+        </div>
+      )}
     </div>
   );
 };

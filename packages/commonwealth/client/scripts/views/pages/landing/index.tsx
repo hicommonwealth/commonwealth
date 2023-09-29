@@ -10,7 +10,7 @@ import { CommunitySearch } from './community_search';
 import { CreatorsGallery } from './creators_gallery';
 import { TokenHolders } from './token_holders';
 import { CrowdfundingGallery } from './crowdfunding_gallery';
-import UserDashboard from '../user_dashboard';
+import UserDashboard from '../user_dashboard/UserDashboard';
 import { Footer } from '../../Footer';
 import useForceRerender from 'hooks/useForceRerender';
 import { CWText } from '../../components/component_kit/cw_text';

@@ -5,7 +5,7 @@ import $ from 'jquery';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 import app from 'state';
-import { DashboardViews } from '.';
+import { DashboardViews } from './UserDashboard';
 
 // Subscriptions
 export const subscribeToThread = async (

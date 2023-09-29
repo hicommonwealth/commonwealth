@@ -6,7 +6,9 @@ import { withLayout } from 'views/Layout';
 
 const LandingPage = lazy(() => import('views/pages/landing'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
-const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
+const DashboardPage = lazy(
+  () => import('views/pages/user_dashboard/UserDashboard')
+);
 const CommunitiesPage = lazy(() => import('views/pages/communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 const Web3LoginPage = lazy(() => import('views/pages/web3login'));
@@ -48,7 +50,7 @@ const ChainEntityLinkRedirectPage = lazy(
 const SnapshotProposalLinkRedirectPage = lazy(
   () => import('views/pages/snapshot_proposal_link_redirect')
 );
-const FeedPage = lazy(() => import('views/pages/feed'));
+const FeedPage = lazy(() => import('views/pages/feed/FeedPage'));
 
 const ContractsPage = lazy(() => import('views/pages/contracts'));
 const NewContractPage = lazy(() => import('views/pages/new_contract'));
@@ -282,17 +284,12 @@ const CommonDomainRoutes = () => [
       scoped: true,
     })}
   />,
-  ...(featureFlags.communityHomepage
-    ? [
-        <Route
-          path="/:scope/feed"
-          element={withLayout(FeedPage, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
-  // DISCUSSIONS END
+  <Route
+    path="/:scope/feed"
+    element={withLayout(FeedPage, {
+      scoped: true,
+    })}
+  />,
 
   // CONTRACTS
   ...(featureFlags.proposalTemplates

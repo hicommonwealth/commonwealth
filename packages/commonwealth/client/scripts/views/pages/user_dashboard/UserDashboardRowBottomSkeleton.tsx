@@ -1,4 +1,4 @@
-import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
+import 'pages/user_dashboard/UserDashboardRowBottom.scss';
 import React from 'react';
 import { Skeleton } from '../../components/Skeleton';
 

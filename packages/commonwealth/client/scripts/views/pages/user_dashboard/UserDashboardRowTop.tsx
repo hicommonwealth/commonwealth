@@ -1,28 +1,29 @@
 import { capitalize } from 'lodash';
 import moment from 'moment';
-import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/user_dashboard/user_dashboard_row_top.scss';
+
+import 'pages/user_dashboard/UserDashboardRowTop.scss';
+
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import app from 'state';
 import { User } from 'views/components/user/user';
+import AddressInfo from '../../../models/AddressInfo';
 import { CWText } from '../../components/component_kit/cw_text';
+import { useCommonNavigate } from 'navigation/helpers';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
-import { UserDashboardRowTopSkeleton } from './UserDashboardRowTopSkeleton';
+import EmbeddedThreadCard from './EmbeddedThreadCard';
 
 type UserDashboardRowTopProps = {
   activityData: any;
   category: string;
-  showSkeleton?: boolean;
+  threadText?: string;
+  threadAuthor?: string;
 };
 
 export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
-  const { activityData, category, showSkeleton } = props;
+  const { activityData, category, threadText, threadAuthor } = props;
   const navigate = useCommonNavigate();
-
-  if (showSkeleton) {
-    return <UserDashboardRowTopSkeleton />;
-  }
 
   const {
     created_at,
@@ -56,20 +57,18 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       : decodedTitle;
 
   const actorName = (
-    <span
+    <User
+      user={
+        new AddressInfo(null, author_address, author_chain ?? chain_id, null)
+      }
+      linkify
+      avatarSize={16}
       onClick={(e: any) => {
         e.preventDefault();
         e.stopPropagation();
         navigate(`/${author_chain}/account/${author_address}`);
       }}
-    >
-      <User
-        userAddress={author_address}
-        userChainId={author_chain}
-        shouldLinkProfile
-        avatarSize={16}
-      />
-    </span>
+    />
   );
 
   const isComment = category === 'new-comment-creation';
@@ -104,6 +103,14 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
       </div>
       <div className="comment-preview">
         {<QuillRenderer doc={comment_text} />}
+        {isComment && (
+          <EmbeddedThreadCard
+            threadId={thread_id}
+            threadText={threadText}
+            threadTitle={titleText}
+            threadAuthor={threadAuthor}
+          />
+        )}
       </div>
     </div>
   );

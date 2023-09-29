@@ -44,7 +44,7 @@ export const CommunitySection = ({ showSkeleton }) => {
           className={onHomeRoute ? 'home-button active' : 'home-button'}
           onClick={() => navigate('/feed')}
         >
-          <CWIcon iconName="home" iconSize="small" />
+          <CWIcon className="home-icon" iconName="home" iconSize="small" />
           <CWText>Home</CWText>
         </div>
       )}

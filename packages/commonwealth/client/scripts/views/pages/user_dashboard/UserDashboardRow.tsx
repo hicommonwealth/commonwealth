@@ -1,17 +1,20 @@
-import type { CWEvent, IEventLabel } from 'chain-events/src';
-import { getProposalUrlPath } from 'identifiers';
-import 'pages/user_dashboard/user_dashboard_row.scss';
 import React from 'react';
+
+import type { IEventLabel } from 'chain-events/src';
+import { getProposalUrlPath } from 'identifiers';
 import { Link } from 'react-router-dom';
-import app from 'state';
 import type DashboardActivityNotification from '../../../models/DashboardActivityNotification';
+
+import 'pages/user_dashboard/UserDashboardRow.scss';
+import app from 'state';
+import { useGetThreadsByIdQuery } from '../../../state/api/threads/index';
 import { getClasses } from '../../components/component_kit/helpers';
-import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
-import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
-import { UserDashboardRowTop } from './user_dashboard_row_top';
+import { UserDashboardChainEventRow } from './UserDashboardChainEventRow';
+import { UserDashboardRowBottom } from './UserDashboardRowBottom';
+import { UserDashboardRowTop } from './UserDashboardRowTop';
 
 type UserDashboardRowProps = {
-  notification?: DashboardActivityNotification;
+  notification: DashboardActivityNotification;
   showSkeleton?: boolean;
   isChainEventsRow?: boolean;
   label?: IEventLabel;
@@ -47,15 +50,8 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
     );
   }
 
-  const {
-    commentCount,
-    categoryId,
-    threadId,
-    blockNumber,
-    eventNetwork,
-    chain,
-    commenters,
-  } = notification;
+  const { commentCount, categoryId, threadId, blockNumber, chain, commenters } =
+    notification;
 
   if (categoryId === 'chain-event') {
     const chainInfo = app.config.chains.getById(chain);
@@ -75,6 +71,14 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
 
   const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
 
+  const { data: thread } = useGetThreadsByIdQuery({
+    chainId: chain_id,
+    ids: [thread_id],
+    apiCallEnabled:
+      categoryId === 'new-comment-creation' ||
+      categoryId === 'new-thread-creation',
+  });
+
   return (
     <Link
       className={getClasses<{ isLink?: boolean }>(
@@ -83,13 +87,19 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
       )}
       to={path}
     >
-      <UserDashboardRowTop activityData={notification} category={categoryId} />
+      <UserDashboardRowTop
+        activityData={notification}
+        category={categoryId}
+        threadText={thread?.plaintext}
+        threadAuthor={thread?.author}
+      />
       <UserDashboardRowBottom
         threadId={threadId}
         commentId={comment_id}
         chainId={chain_id}
         commentCount={commentCount}
         commenters={commenters}
+        thread={thread}
       />
     </Link>
   );

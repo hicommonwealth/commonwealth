@@ -1,7 +1,7 @@
 import { pluralize } from 'helpers';
 import ChainInfo from '../../../models/ChainInfo';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/user_dashboard/dashboard_communities_preview.scss';
+import 'pages/user_dashboard/DashboardCommunitiesPreview.scss';
 import React from 'react';
 
 import app from 'state';

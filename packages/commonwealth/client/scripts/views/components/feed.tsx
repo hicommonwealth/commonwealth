@@ -6,7 +6,7 @@ import 'components/feed.scss';
 import type DashboardActivityNotification from '../../models/DashboardActivityNotification';
 
 import { PageNotFound } from '../pages/404';
-import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
+import { UserDashboardRow } from '../pages/user_dashboard/UserDashboardRow';
 
 import { IEventLabel, Label as ChainEventLabel } from 'chain-events/src';
 
