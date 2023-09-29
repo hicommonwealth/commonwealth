@@ -1,5 +1,5 @@
 import { ChainInstance } from 'server/models/chain';
-import { ServerChainsController } from '../server_chains_controller';
+import { ServerCommunitiesController } from '../server_communities_controller';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
 
@@ -16,7 +16,7 @@ export type RefreshMembershipResult = {
 };
 
 export async function __refreshMembership(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   options: RefreshMembershipOptions
 ): Promise<RefreshMembershipResult> {
   /*

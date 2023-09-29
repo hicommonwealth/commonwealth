@@ -5,24 +5,24 @@ import {
 } from '../../util/queries';
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
-import { ServerChainsController } from '../server_chains_controller';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
-export type SearchChainsOptions = {
+export type SearchCommunitiesOptions = {
   search: string;
   limit?: number;
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
 };
-export type SearchChainsResult = TypedPaginatedResult<{
+export type SearchCommunitiesResult = TypedPaginatedResult<{
   id: number;
   iconUrl: string;
 }>;
 
-export async function __searchChains(
-  this: ServerChainsController,
-  { search, limit, page, orderBy, orderDirection }: SearchChainsOptions
-): Promise<SearchChainsResult> {
+export async function __searchCommunities(
+  this: ServerCommunitiesController,
+  { search, limit, page, orderBy, orderDirection }: SearchCommunitiesOptions
+): Promise<SearchCommunitiesResult> {
   let sortOptions: PaginationSqlOptions = {
     limit: Math.min(limit, 100) || 10,
     page: page || 1,

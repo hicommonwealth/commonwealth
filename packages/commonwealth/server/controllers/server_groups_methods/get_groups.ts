@@ -1,4 +1,4 @@
-import { ServerChainsController } from '../server_chains_controller';
+import { ServerCommunitiesController } from '../server_communities_controller';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 export type GetGroupsOptions = {
@@ -20,7 +20,7 @@ export type GetGroupsResult = {
 }[];
 
 export async function __getGroups(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   options: GetGroupsOptions
 ): Promise<GetGroupsResult> {
   /*

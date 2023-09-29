@@ -1,5 +1,5 @@
 import { ChainInstance } from 'server/models/chain';
-import { ServerChainsController } from '../server_chains_controller';
+import { ServerCommunitiesController } from '../server_communities_controller';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
 
@@ -13,7 +13,7 @@ export type DeleteGroupOptions = {
 export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   options: DeleteGroupOptions
 ): Promise<DeleteGroupResult> {
   // TODO: require community admin

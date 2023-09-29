@@ -1,5 +1,5 @@
 import { ChainInstance } from 'server/models/chain';
-import { ServerChainsController } from '../server_chains_controller';
+import { ServerCommunitiesController } from '../server_communities_controller';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { UserInstance } from '../../models/user';
@@ -26,7 +26,7 @@ export type UpdateGroupResult = {
 }[];
 
 export async function __updateGroup(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   { requirements }: UpdateGroupOptions
 ): Promise<UpdateGroupResult> {
   // TODO: require community admin

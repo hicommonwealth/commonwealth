@@ -29,7 +29,7 @@ import viewComments from '../routes/viewComments';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
-import createChain from '../routes/createChain';
+import createCommunity from '../routes/createChain';
 import createContract from '../routes/contracts/createContract';
 import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
@@ -160,7 +160,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerNotificationsController } from '../controllers/server_notifications_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
-import { ServerChainsController } from '../controllers/server_chains_controller';
+import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 import { ServerProposalsController } from '../controllers/server_proposals_controller';
 import { ServerGroupsController } from '../controllers/server_groups_controller';
 
@@ -197,7 +197,7 @@ export type ServerControllers = {
   notifications: ServerNotificationsController;
   analytics: ServerAnalyticsController;
   profiles: ServerProfilesController;
-  chains: ServerChainsController;
+  communities: ServerCommunitiesController;
   proposals: ServerProposalsController;
   groups: ServerGroupsController;
 };
@@ -222,7 +222,11 @@ function setupRouter(
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
-    chains: new ServerChainsController(models, tokenBalanceCache, banCache),
+    communities: new ServerCommunitiesController(
+      models,
+      tokenBalanceCache,
+      banCache
+    ),
     proposals: new ServerProposalsController(models, redisCache),
     groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
   };
@@ -326,22 +330,27 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/createChain',
+    '/communities' /* prev: POST /createChain */,
     passport.authenticate('jwt', { session: false }),
-    createChain.bind(this, models)
+    createCommunity.bind(this, models)
   );
-  registerRoute(router, 'post', '/deleteChain', deleteChain.bind(this, models));
   registerRoute(
     router,
-    'post',
-    '/updateChain',
+    'delete',
+    '/communities/:communityId' /* prev: POST /deleteChain */,
+    deleteChain.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'patch',
+    '/communities/:communityId' /* prev: POST /updateChain */,
     passport.authenticate('jwt', { session: false }),
     updateChain.bind(this, models)
   );
   registerRoute(
     router,
     'get',
-    '/chains',
+    '/communities' /* prev: GET /chains */,
     getChainsHandler.bind(this, serverControllers)
   );
   registerRoute(
