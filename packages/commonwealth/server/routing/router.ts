@@ -29,7 +29,6 @@ import viewComments from '../routes/viewComments';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
-import createCommunity from '../routes/createChain';
 import createContract from '../routes/contracts/createContract';
 import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
@@ -189,6 +188,7 @@ import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
+import { createCommunityHandler } from 'server/routes/communities/create_community_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -332,7 +332,7 @@ function setupRouter(
     'post',
     '/communities' /* prev: POST /createChain */,
     passport.authenticate('jwt', { session: false }),
-    createCommunity.bind(this, models)
+    createCommunityHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,

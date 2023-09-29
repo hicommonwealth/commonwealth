@@ -16,6 +16,16 @@ import {
   GetCommunityNodesResult,
   __getCommunityNodes,
 } from './server_communities_methods/get_community_nodes';
+import {
+  CreateCommunityOptions,
+  CreateCommunityResult,
+  __createCommunity,
+} from './server_communities_methods/create_community';
+import {
+  DeleteCommunityOptions,
+  DeleteCommunityResult,
+  __deleteCommunity,
+} from './server_communities_methods/delete_community';
 
 /**
  * Implements methods related to communities
@@ -43,5 +53,17 @@ export class ServerCommunitiesController {
     options: GetCommunityNodesOptions
   ): Promise<GetCommunityNodesResult> {
     return __getCommunityNodes.call(this, options);
+  }
+
+  async createCommunity(
+    options: CreateCommunityOptions
+  ): Promise<CreateCommunityResult> {
+    return __createCommunity.call(this, options);
+  }
+
+  async deleteCommunity(
+    options: DeleteCommunityOptions
+  ): Promise<DeleteCommunityResult> {
+    return __deleteCommunity.call(this, options);
   }
 }
