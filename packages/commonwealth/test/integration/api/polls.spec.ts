@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../../../server/config';
 import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
+import { ActionArgument } from '@canvas-js/interfaces';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -47,6 +48,30 @@ describe('Polls', () => {
       stage: 'discussion',
       topicName: 't1',
       topicId: undefined,
+      session: {
+        type: 'session',
+        signature: '',
+        payload: {
+          app: '',
+          chain: '',
+          from: '',
+          sessionAddress: '',
+          sessionDuration: 0,
+          sessionIssued: 0,
+          block: '',
+        },
+      },
+      sign: function (actionPayload: {
+        app: string;
+        chain: string;
+        from: string;
+        call: string;
+        callArgs: Record<string, ActionArgument>;
+        timestamp: number;
+        block: string;
+      }): string {
+        return '';
+      },
     });
 
     const data = {
