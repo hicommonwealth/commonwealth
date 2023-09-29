@@ -16,6 +16,18 @@ type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: DeltaStatic;
 };
 
+type TextWithHighlightsProps = {
+  children: React.ReactNode;
+};
+
+type TextWithHighlightsArray = Array<
+  React.ReactElement<TextWithHighlightsProps>
+>;
+
+type LinkProps = {
+  href: string;
+};
+
 // NOTE: Do NOT use this directly. Use QuillRenderer instead.
 export const QuillFormattedText = ({
   doc,
@@ -56,18 +68,12 @@ export const QuillFormattedText = ({
       );
     }
 
-    type TextWithHighlightsArray = Array<
-      React.ReactElement<TextWithHighlightsProps>
-    >;
-
-    type LinkProps = {
-      href: string;
-    };
-
-    type TextWithHighlightsProps = {
-      children: React.ReactNode;
-    };
-
+    /**
+     * Type guard function to check if a React element is a TextWithHighlights element.
+     *
+     * @param {React.ReactElement} child - The React element to check.
+     * @returns {child is React.ReactElement<TextWithHighlightsProps>} - True if the element is a TextWithHighlights element, false otherwise.
+     */
     const isTextWithHighlights = (
       child: React.ReactElement
     ): child is React.ReactElement<TextWithHighlightsProps> => {
