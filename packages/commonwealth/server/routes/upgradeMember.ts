@@ -8,7 +8,7 @@ import { isRole } from '../models/role';
 export const Errors = {
   InvalidAddress: 'Invalid address',
   InvalidRole: 'Invalid role',
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   MustBeAdmin: 'Must be an admin to upgrade member',
   NoMember: 'Cannot find member to upgrade',
   MustHaveAdmin: 'Communities must have at least one admin',

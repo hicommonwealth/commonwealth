@@ -13,6 +13,16 @@ import type {
 import { useCommonNavigate } from 'navigation/helpers';
 import { useLocation, matchRoutes } from 'react-router-dom';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { sidebarStore } from 'state/ui/sidebar';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
+
+const resetSidebarState = () => {
+  if (isWindowSmallInclusive(window.innerWidth)) {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  } else {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
+  }
+};
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -113,6 +123,7 @@ export const DiscussionSection = () => {
       isActive: !!matchesDiscussionsRoute,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -134,6 +145,7 @@ export const DiscussionSection = () => {
       isActive: !!matchesOverviewRoute,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -157,6 +169,7 @@ export const DiscussionSection = () => {
         (app.chain ? app.chain.serverLoaded : true),
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -187,6 +200,7 @@ export const DiscussionSection = () => {
         // eslint-disable-next-line no-loop-func
         onClick: (e, toggle: boolean) => {
           e.preventDefault();
+          resetSidebarState();
           handleRedirectClicks(
             navigate,
             e,

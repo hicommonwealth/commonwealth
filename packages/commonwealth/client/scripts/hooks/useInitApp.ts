@@ -7,16 +7,21 @@ const useInitApp = () => {
   const [customDomain, setCustomDomain] = React.useState('');
 
   useEffect(() => {
-    Promise.all([axios.get(`${app.serverUrl()}/domain`), initAppState()])
-      .then(([domainResp]) => {
-        const serverCustomDomain = domainResp.data.customDomain;
-        if (serverCustomDomain) {
-          app.setCustomDomain(serverCustomDomain);
-        }
-        setCustomDomain(serverCustomDomain);
-        return Promise.resolve(serverCustomDomain);
-      })
-      .catch((err) => console.log('Failed fetching custom domain', err))
+    setIsLoading(true);
+    const isWebPlatform = app.platform() === 'web';
+    const domainPromise = isWebPlatform
+      ? axios
+          .get(`${app.serverUrl()}/domain`)
+          .then((res) => {
+            const serverCustomDomain = res.data.customDomain || '';
+            setCustomDomain(serverCustomDomain);
+            return serverCustomDomain;
+          })
+          .catch((err) => console.log('Failed fetching custom domain', err))
+      : Promise.resolve();
+
+    Promise.all([domainPromise, initAppState(true)])
+      .then(([serverCustomDomain]) => serverCustomDomain)
       .finally(() => setIsLoading(false));
   }, []);
 
