@@ -56,13 +56,13 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
-        process.env.FLAG_PROPOSAL_TEMPLATES
+      'process.env.FLAG_SIDEBAR_TOGGLE': JSON.stringify(
+        process.env.FLAG_SIDEBAR_TOGGLE
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_SESSION_KEYS': JSON.stringify(
-        process.env.FLAG_SESSION_KEYS
+      'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
+        process.env.FLAG_PROPOSAL_TEMPLATES
       ),
     }),
     new webpack.DefinePlugin({
@@ -95,9 +95,13 @@ module.exports = {
           name: 'bitcoin',
           chunks: 'all',
         },
+        ethersAsync: {
+          test: /[\\/]node_modules[\\/](ethers)[\\/]/,
+          name: 'ethersAsync',
+          chunks: 'all',
+        },
         ethereumAsync: {
-          // this is made into an async chunk (lazy loaded)
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
+          test: /[\\/]node_modules[\\/](@audius|web3|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
           name: 'ethereumAsync',
           chunks: 'all',
         },

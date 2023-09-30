@@ -12,6 +12,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 enum SupportedNotificationChains {
   dydx = 'dydx',
+  kyve = 'kyve',
   osmosis = 'osmosis',
 }
 
@@ -38,6 +39,43 @@ function getMockNotification(
       },
       network: 'aave',
       chain: 'dydx',
+    },
+    [SupportedNotificationChains.kyve]: {
+      chain: 'kyve',
+      network: 'cosmos',
+      event_data: {
+        kind: 'msg-submit-proposal',
+        id: randomData ? String(randomInt()) : String(constantPropId),
+        content: {
+          typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+          value: '0a087631207469746c65120e7631206465736372697074696f6e',
+        },
+        submitTime: 1694015653,
+        depositEndTime: 1694188453,
+        votingStartTime: 1694015653,
+        votingEndTime: 1694015743,
+        finalTallyResult: { yes: '0', abstain: '0', no: '0', noWithVeto: '0' },
+        totalDeposit: { ustake: '2000000' },
+      },
+    },
+    [SupportedNotificationChains.osmosis]: {
+      chain: 'osmosis',
+      network: 'cosmos',
+      event_data: {
+        kind: 'msg-submit-proposal',
+        id: randomData ? String(randomInt()) : String(constantPropId),
+        content: {
+          typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+          value:
+            '0a0f626574612074657874207469746c651215626574612074657874206465736372697074696f6e',
+        },
+        submitTime: 1694015671,
+        depositEndTime: 1694188471,
+        votingStartTime: 1694015671,
+        votingEndTime: 1694015761,
+        finalTallyResult: { yes: '0', abstain: '0', no: '0', noWithVeto: '0' },
+        totalDeposit: { ustake: '2000000' },
+      },
     },
   };
 
@@ -291,7 +329,7 @@ async function main() {
       if (!address) {
         log.error(
           'Wallet address not found. ' +
-            'Make sure the given address is an address you have used to login before.'
+            'Make sure the given address is an address you have used to sign in before.'
         );
         process.exit(1);
       } else {
