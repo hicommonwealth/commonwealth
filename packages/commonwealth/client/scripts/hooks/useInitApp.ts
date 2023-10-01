@@ -14,7 +14,9 @@ const useInitApp = () => {
           .get(`${app.serverUrl()}/domain`)
           .then((res) => {
             const serverCustomDomain = res.data.customDomain || '';
-            setCustomDomain(serverCustomDomain);
+            if (res.data.customDomain) {
+              setCustomDomain(serverCustomDomain);
+            }
             return serverCustomDomain;
           })
           .catch((err) => console.log('Failed fetching custom domain', err))
