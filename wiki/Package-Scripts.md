@@ -47,6 +47,7 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [send-notification-digest-emails](#send-notification-digest-emails)
   - [start-prerender](#start-prerender)
 - [Playwright](#playwright)
+  - [e2e-start-server](#e2e-start-server)
   - [start-e2e](#start-e2e)
   - [gen-e2e](#gen-e2e)
   - [test-e2e](#test-e2e)
@@ -369,6 +370,14 @@ Definition: `ts-node --project tsconfig.json server/scripts/runPrerenderService.
 Considerations: Referenced prerender script no longer exists. **Deprecated; recommend removal.** 
 
 # Playwright
+
+## e2e-start-server
+
+Definition: `ETH_RPC=e2e-test yarn start`
+
+Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
+
+Contributor: Kurtis Assad
 
 ## start-e2e
 

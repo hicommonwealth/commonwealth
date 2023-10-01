@@ -50,11 +50,10 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium
 
-      - name: Install proxy
-        run: npm install -g local-ssl-proxy
-
-      - name: Add custom domain to /etc/hosts
-        run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
+      - name: Cache Docker images.
+        uses: ScribeMD/docker-cache@0.3.6
+        with:
+          key: docker-images
 
       - name: Run e2e tests (yarn test-e2e)
         env:
@@ -62,9 +61,7 @@ jobs:
           IS_CI: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
-        run: |
-          sudo local-ssl-proxy --source 443 --target 8080 &
-          yarn --cwd packages/commonwealth start-e2e test-e2e --forbid-only
+        run: yarn --cwd packages/commonwealth start-e2e test-e2e --forbid-only
 
       - name: Archive test status
         uses: actions/upload-artifact@v3
@@ -118,11 +115,10 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium
 
-      - name: Install proxy
-        run: npm install -g local-ssl-proxy
-
-      - name: Add custom domain to /etc/hosts
-        run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
+      - name: Cache Docker images.
+        uses: ScribeMD/docker-cache@0.3.6
+        with:
+          key: docker-images
 
       - name: Run e2e tests (yarn test-e2e)
         env:
@@ -130,9 +126,7 @@ jobs:
           IS_CI: true
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
           ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
-        run: |
-          sudo local-ssl-proxy --source 443 --target 8080 &
-          yarn --cwd packages/commonwealth start-e2e test-e2e-mature --forbid-only
+        run: yarn --cwd packages/commonwealth start-e2e test-e2e-mature --forbid-only
 
       - name: Archive test status
         uses: actions/upload-artifact@v3
@@ -155,6 +149,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: commonwealth
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -174,6 +189,9 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines --ignore-scripts
 
+      - name: Init Db
+        run: cd packages/commonwealth && npx sequelize db:migrate
+
       - name: Cache browsers
         id: playwright-cache
         uses: actions/cache@v3
@@ -186,7 +204,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run serial e2e tests (yarn test-e2e-serial)
-        run: yarn --cwd packages/commonwealth start-e2e test-e2e-serial --forbid-only
+        run: yarn --cwd packages/commonwealth e2e-start-server & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
         env:
           PORT: 8080
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}

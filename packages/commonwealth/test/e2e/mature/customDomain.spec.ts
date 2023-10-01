@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks';
-import { discussionTests } from './discussionsTest';
+import { discussionTests } from '../e2eRegular/discussionsTest';
 
 if (process.env.IS_CI === 'true') {
   // ssl proxy takes a while, so increase test timeout
