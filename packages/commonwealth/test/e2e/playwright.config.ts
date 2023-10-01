@@ -1,5 +1,7 @@
 import { PlaywrightTestConfig } from '@playwright/test';
 
+require('dotenv').config();
+
 const config: PlaywrightTestConfig = {
   use: {
     video: 'retain-on-failure',
@@ -18,5 +20,9 @@ const config: PlaywrightTestConfig = {
     timeout: 120_000,
   },
 };
+
+if (process.env.E2E_SERIAL) {
+  config.webServer = null;
+}
 
 export default config;

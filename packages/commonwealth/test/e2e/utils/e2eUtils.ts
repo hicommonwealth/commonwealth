@@ -9,7 +9,9 @@ export let dbClient = process.env.DATABASE_URL
   ? new Sequelize(process.env.DATABASE_URL, {
       logging: false,
     })
-  : null;
+  : new Sequelize('postgresql://commonwealth:edgeware@localhost/commonwealth', {
+      logging: false,
+    });
 
 // Logs in user for specific chain
 export async function login(page) {
