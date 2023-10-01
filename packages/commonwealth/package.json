@@ -64,7 +64,7 @@
     "test-devnet": "nyc ts-mocha --project tsconfig.json './test/devnet/**/*.spec.ts'",
     "test-e2e": "ETH_RPC=e2e-test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/e2eRegular/*",
     "start-e2e": "ts-node ./test/e2e/startE2e.ts",
-    "test-e2e-serial": "E2E_SERIAL=true ETH_RPC=e2e-test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/e2eSerial/*",
+    "test-e2e-serial": "ETH_RPC=e2e-test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 1 ./test/e2e/e2eSerial/*",
     "test-e2e-mature": "ETH_RPC=e2e-test TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/mature/*",
     "test-events": "nyc ts-mocha --project tsconfig.json ./test/integration/events/*.spec.ts",
     "test-integration-util": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts",

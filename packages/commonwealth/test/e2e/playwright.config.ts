@@ -21,8 +21,4 @@ const config: PlaywrightTestConfig = {
   },
 };
 
-if (process.env.E2E_SERIAL) {
-  config.webServer = null;
-}
-
 export default config;

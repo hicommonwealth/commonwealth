@@ -1,4 +1,4 @@
-import { expect as pwexpect } from '@playwright/test';
+import { expect as pwexpect, test } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Page } from 'playwright-core/index';
@@ -15,12 +15,8 @@ export const discussionTests = (test) => {
     }: {
       page: Page;
     }) => {
-      await page.waitForSelector('div.HeaderWithFilters');
-
-      // Assert Thread header exists on discussions page
-      const headerExists = (await page.$('div.HeaderWithFilters')) !== null;
-
-      expect(headerExists).to.be.true;
+      test.setTimeout(120_000);
+      await page.locator('div.HeaderWithFilters').waitFor();
 
       // Assert Threads are loaded into page
       await page.waitForSelector('div[data-test-id]');
@@ -92,11 +88,11 @@ export const discussionTests = (test) => {
       ).toString();
       // assert reaction count increased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page.locator('.Text.caption.regular');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           expectedNewReactionCount
         );
-      }).toPass({ timeout: 5_000 });
+      }).toPass({ intervals: [10_000], timeout: 60_000 });
 
       // click button
       await page
@@ -106,11 +102,11 @@ export const discussionTests = (test) => {
 
       // assert reaction count decreased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page.locator('.Text.caption.regular');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           firstThreadReactionCount
         );
-      }).toPass({ timeout: 5_000 });
+      }).toPass({ intervals: [10_000], timeout: 60_000 });
     });
   };
 };

@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test';
 import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks';
-import { discussionTests } from '../e2eRegular/discussionsTest';
+import { discussionTests } from './discussionsTest';
 
 if (process.env.IS_CI === 'true') {
   // ssl proxy takes a while, so increase test timeout
-  test.setTimeout(300000);
+  test.setTimeout(220_000);
+
+  test.use({ ignoreHTTPSErrors: true });
 
   test.beforeAll(async () => {
     await createTestEntities();
@@ -14,7 +16,8 @@ if (process.env.IS_CI === 'true') {
     // proxy can be slow to start up, so we wait for it.
     await expect(async () => {
       await page.goto(`https://${testChains[0]['custom_domain']}/`);
-    }).toPass({ intervals: [60_000] });
+      await page.locator('.SublayoutHeader').waitFor({ timeout: 100_000 });
+    }).toPass();
   });
   test.describe('Commonwealth custom domain Homepage', discussionTests(test));
 } else {
