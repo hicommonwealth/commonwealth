@@ -179,6 +179,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Add custom domain to /etc/hosts
+        run: sudo sh -c 'echo "127.0.0.1 customdomain.com" >> /etc/hosts'
+
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
@@ -204,7 +207,10 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run serial e2e tests (yarn test-e2e-serial)
-        run: yarn --cwd packages/commonwealth e2e-start-server & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-serial --forbid-only)
+        run: |
+          sudo npx --yes local-ssl-proxy --source 443 --target 8080 &
+          yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
+          yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e-serial --forbid-only
         env:
           PORT: 8080
           ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
