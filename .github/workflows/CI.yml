@@ -307,7 +307,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --ignore-scripts
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -388,7 +388,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --ignore-scripts
 
       ## EVM Section:
       - name: Start EVM Testnet
@@ -483,7 +483,7 @@ jobs:
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --ignore-scripts
 
       - name: Get changed chain-events files
         id: changed-files-chain-events
