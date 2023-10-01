@@ -1,6 +1,7 @@
 import { expect as pwexpect } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import { Page } from 'playwright-core/index';
 import { testThreads } from '../hooks/e2eDbEntityHooks';
 import { login } from '../utils/e2eUtils';
 
@@ -11,6 +12,8 @@ export const discussionTests = (test) => {
   return () => {
     test('Discussion page loads and can navigate to first thread', async ({
       page,
+    }: {
+      page: Page;
     }) => {
       await page.waitForSelector('div.HeaderWithFilters');
 
@@ -43,7 +46,11 @@ export const discussionTests = (test) => {
         .and.not.include('discussions');
     });
 
-    test('Check navigation to first profile', async ({ page }) => {
+    test('Check navigation to first profile', async ({
+      page,
+    }: {
+      page: Page;
+    }) => {
       let userProfileLinks = await page.locator('a.user-display-name.username');
 
       do {
@@ -56,7 +63,11 @@ export const discussionTests = (test) => {
       expect(page.url()).to.include('/profile/id/');
     });
 
-    test('Check User can Like/Dislike post', async ({ page }) => {
+    test('Check User can Like/Dislike post', async ({
+      page,
+    }: {
+      page: Page;
+    }) => {
       await login(page);
 
       let reactionsCountDivs = await page.locator('.Upvote');
