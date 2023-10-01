@@ -59,10 +59,10 @@ export const discussionTests = (test) => {
     test('Check User can Like/Dislike post', async ({ page }) => {
       await login(page);
 
-      let reactionsCountDivs = await page.locator('div.reactions-count');
+      let reactionsCountDivs = await page.locator('.Upvote');
 
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('div.reactions-count');
+        reactionsCountDivs = await page.locator('.Upvote');
         await pwexpect(reactionsCountDivs.first()).toBeVisible();
       }).toPass();
 
