@@ -27,9 +27,19 @@
         align-items: center;
         gap: 8px;
 
-        .input > .input-and-icon-container {
-          width: 35px !important;
+        .input {
+          .input-and-icon-container {
+            width: 45px !important;
+          }
+
+          &.failure {
+            .input-and-icon-container > input {
+              border-color: $rorange-600 !important;
+              background-color: $white !important;
+            }
+          }
         }
+
       }
     }
   }

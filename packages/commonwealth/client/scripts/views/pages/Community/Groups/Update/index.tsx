@@ -35,7 +35,7 @@ const UpdateCommunityGroupPage = () => {
         },
       },
     ],
-    numberOfRequirements: 'n-requirements',
+    requirementsToFulfill: 5 as any,
     topics: [
       {
         label: 'Change Log',

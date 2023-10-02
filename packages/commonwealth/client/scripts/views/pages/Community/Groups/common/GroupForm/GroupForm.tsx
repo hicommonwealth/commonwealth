@@ -20,23 +20,41 @@ import {
   RequirementSubTypeWithLabel,
 } from './index.types';
 import {
+  VALIDATION_MESSAGES,
   groupValidationSchema,
   requirementSubFormValidationSchema,
 } from './validations';
 
-const CWRequirementsRadioButton = () => {
+type CWRequirementsRadioButtonProps = {
+  inputError?: string;
+  inputValue: string;
+  onInputValueChange: (value: string) => any;
+};
+
+const CWRequirementsRadioButton = ({
+  inputError,
+  inputValue,
+  onInputValueChange,
+}: CWRequirementsRadioButtonProps) => {
   const Label = (
     <span className="requirements-radio-btn-label">
-      At least {<CWTextInput containerClassName="input" />} # of all
-      requirements
+      At least{' '}
+      {
+        <CWTextInput
+          containerClassName={`input ${inputError ? 'failure' : ''}`}
+          value={inputValue}
+          onInput={(e) => onInputValueChange(e.target?.value?.trim())}
+        />
+      }{' '}
+      # of all requirements
     </span>
   );
 
   return (
     <CWRadioButton
       label={Label}
-      value="n-requirements"
-      name="numberOfRequirements"
+      value="N"
+      name="requirementsToFulfill"
       hookToForm
     />
   );
@@ -53,7 +71,8 @@ const GroupForm = ({
     chainId: app.activeChainId(),
   });
   const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
-
+  const [cwRequiremnetsLabelInputField, setCWRequiremnetsLabelInputField] =
+    useState<{ value: string; error: string }>({ value: '1', error: '' });
   const [requirementSubForms, setRequirementSubForms] = useState<
     {
       defaultValues?: RequirementSubTypeWithLabel;
@@ -88,6 +107,13 @@ const GroupForm = ({
           errors: {},
         }))
       );
+    }
+
+    if (initialValues.requirementsToFulfill !== 'ALL') {
+      setCWRequiremnetsLabelInputField({
+        ...cwRequiremnetsLabelInputField,
+        value: `${initialValues.requirementsToFulfill}`,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -218,8 +244,43 @@ const GroupForm = ({
       return;
     }
 
+    // Custom validation for the radio with input label
+    let requirementsToFulfill = values.requirementsToFulfill;
+    setCWRequiremnetsLabelInputField({
+      ...cwRequiremnetsLabelInputField,
+      error: '',
+    });
+    if (values.requirementsToFulfill === 'N') {
+      // If radio label input has no value
+      if (!cwRequiremnetsLabelInputField.value) {
+        setCWRequiremnetsLabelInputField({
+          ...cwRequiremnetsLabelInputField,
+          error: VALIDATION_MESSAGES.NO_INPUT,
+        });
+        return;
+      }
+
+      // If radio label input has invalid value
+      requirementsToFulfill = parseInt(
+        cwRequiremnetsLabelInputField.value || ''
+      );
+      if (
+        !requirementsToFulfill ||
+        requirementsToFulfill < 1 ||
+        requirementsToFulfill > MAX_REQUIREMENTS ||
+        cwRequiremnetsLabelInputField.value.includes('.')
+      ) {
+        setCWRequiremnetsLabelInputField({
+          ...cwRequiremnetsLabelInputField,
+          error: VALIDATION_MESSAGES.INVALID_VALUE,
+        });
+        return;
+      }
+    }
+
     const formValues = {
       ...values,
+      requirementsToFulfill,
       requirements: requirementSubForms.map((x) => x.values),
     };
 
@@ -232,14 +293,18 @@ const GroupForm = ({
       initialValues={{
         groupName: initialValues.groupName || '',
         groupDescription: initialValues.groupDescription || '',
-        numberOfRequirements: initialValues.numberOfRequirements || '',
+        requirementsToFulfill: initialValues.requirementsToFulfill
+          ? initialValues.requirementsToFulfill === 'ALL'
+            ? 'ALL'
+            : 'N'
+          : '',
         topics: initialValues.topics || '',
       }}
       validationSchema={groupValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
     >
-      {(formContext) => (
+      {({ formState }) => (
         <>
           {/* TODO: add breadcrum here as a separate div when that ticket is done */}
 
@@ -327,20 +392,29 @@ const GroupForm = ({
               <div className="radio-buttons">
                 <CWRadioButton
                   label="All requirements must be satisfied"
-                  value="all-requirements"
-                  name="numberOfRequirements"
+                  value="ALL"
+                  name="requirementsToFulfill"
                   hookToForm
                 />
 
-                <CWRequirementsRadioButton />
+                <CWRequirementsRadioButton
+                  inputError={cwRequiremnetsLabelInputField.error}
+                  inputValue={cwRequiremnetsLabelInputField.value}
+                  onInputValueChange={(value) =>
+                    setCWRequiremnetsLabelInputField({
+                      ...cwRequiremnetsLabelInputField,
+                      value,
+                    })
+                  }
+                />
 
-                {formContext.formState?.errors?.numberOfRequirements
-                  ?.message && (
+                {(formState?.errors?.requirementsToFulfill?.message ||
+                  cwRequiremnetsLabelInputField.error) && (
                   <MessageRow
                     hasFeedback
                     statusMessage={
-                      formContext.formState?.errors?.numberOfRequirements
-                        ?.message
+                      formState?.errors?.requirementsToFulfill?.message ||
+                      cwRequiremnetsLabelInputField.error
                     }
                     validationStatus="failure"
                   />

@@ -30,6 +30,7 @@ export type RequirementSubFormType = {
 export type GroupResponseValuesType = {
   groupName: string;
   groupDescription?: string;
+  requirementsToFulfill: 'ALL' | number;
   requirements?: RequirementSubType[];
   topics: string[];
 };
@@ -38,7 +39,7 @@ export type GroupInitialValuesTypeWithLabel = {
   groupName: string;
   groupDescription?: string;
   requirements?: RequirementSubTypeWithLabel[];
-  numberOfRequirements?: string;
+  requirementsToFulfill?: 'ALL' | number;
   topics: LabelType[];
 };
 
