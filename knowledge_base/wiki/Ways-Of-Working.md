@@ -150,37 +150,48 @@ Our Beta/QA server can be found at `qa.commonwealth.im`. Custom domains are avai
 
 We use [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository). Releases are bundles of commits organized as tags. Git tags are similar to git branches, insofar as they are versions of the repository, containing a specific iteration in the repo’s history, which may be checked out locally.
 
-Our releases observe the following versioning syntax: `v<MajorVersion>.<CycleNumber>.<IndexNumber>`. As of 230912, our major version is 0, our cycle number is 6, and our index number is 9, thus: `v0.6.9`. For hot fixes to an existing release, an additional suffix should be appended after a hyphen, e.g. `v0.6.9-1`.
+Our releases observe the following versioning syntax: `v<MajorVersion>.<CycleNumber>.<IndexNumber>`. As of 230912, our major version is 0, our cycle number is 6, and our index number is 9, thus: `v0.6.9`. For hotfixes to an existing release, an additional suffix should be appended after a hyphen, e.g. `v0.6.9-1`.
 
 Releases must first be created, then QA’d, then deployed to Heroku. All engineers ought, by default, to possess the GitHub permissions required to draft a release. All engineers ought, by default, to possess the Heroku admin permissions required to deploy a release.
 
 Procedure for creating a new GitHub Release:
 
-- Navigate to the [repo’s Releases page](https://github.com/hicommonwealth/commonwealth/releases).
-- Draft a new release.
-- Create and select a new tag, following the versioning syntax described above.
-- Title the release after its tag number (e.g. `v0.6.9`).
-- Before hitting the "Generate release notes" button, manually set the "Previous tag" to the latest deployed version, e.g. `v0.6.8`.
-- Now hit “Generate release notes” to auto-populate the release description with a list of changes since the previous tag.
-- Check “Set as a pre-release,” at the bottom of the form.
-- Publish.
+1. Navigate to the [repo’s Releases page](https://github.com/hicommonwealth/commonwealth/releases).
+2. Draft a new release.
+3. Create and select a new tag, following the versioning syntax described above.
+4. Title the release after its tag number (e.g. `v0.6.9`).
+5. Before hitting the "Generate release notes" button, manually set the "Previous tag" to the latest deployed version, e.g. `v0.6.8`.
+6. Now hit “Generate release notes” to auto-populate the release description with a list of changes since the previous tag.
+7. Check “Set as a pre-release,” at the bottom of the form.
+8. Publish.
 
 Procedure for QAing a GitHub release:
 
-- Once a release is created, the QA team reviews our Beta (QA) server, which should already contain all versioned changes. 
-- QA must either approve or reject these changes. 
-- If QA finds significant issues with the branch, it will be rejected, and QA must open a GitHub issue enumerating the desired changes. 
+1. The tag is manually pushed to our Beta (QA) server, which is pegged to release versions.
+2. QA must either approve or reject these changes. 
+3. If QA finds significant issues with the branch, it will be rejected, and QA must open a GitHub issue enumerating the desired changes. 
     + A leads retro should be held to understand what went wrong in the product-and-engineering pipeline, to prevent similar problems in the future.
-- If QA finds minor issues with the branch, they may still approve it, but must similarly open a GitHub issue enumerating the desired changes.
+4. If QA finds minor issues with the branch, they may still approve it, but must similarly open a GitHub issue enumerating the desired changes.
     + These changes should be addressed before the next release.
 
 Procedure for deploying a GitHub release:
 
-- Once QA has approved the changes, the release can be deployed
-- `git push heroku <FullVersionTagname>:master`, e.g. `git push heroku v0.6.9:master`
-- If the tag is not found, run `git fetch origin`
-- If the git remote for Heroku doesn’t exist, run `heroku git:remote —app commonwealthapp`
-- Upon deploy, edit the original GitHub release, moving it from “pre-release” to “latest release”
+1. Once QA has approved the changes, the release can be deployed
+2. `git push heroku <FullVersionTagname>:master`, e.g. `git push heroku v0.6.9:master`
+3. If the tag is not found, run `git fetch origin`
+4. If the git remote for Heroku doesn’t exist, run `heroku git:remote —app commonwealthapp`
+5. Upon deploy, edit the original GitHub release, moving it from “pre-release” to “latest release”
+
+### Hotfix procedure
+
+Hotfixes should rolled out to production as follows: 
+
+1. A new branch is created from the latest tag. 
+2. The hotfix commit is pushed to this new branch. 
+3. This hotfixed branch is deployed to the Beta (QA) server. 
+4. QA approval is obtained. 
+5. The hotfix branch is deployed to production. 
+6. The hotfix branch is merged back into master before the next release is cut.
 
 # Change Log
 
