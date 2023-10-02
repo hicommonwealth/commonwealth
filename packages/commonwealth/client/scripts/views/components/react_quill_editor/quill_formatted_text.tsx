@@ -70,6 +70,14 @@ export const QuillFormattedText = ({
 
   (finalDoc as any[])?.forEach((line: any) => {
     const elements = line[0].props.children;
+    if (!elements) {
+      return;
+    }
+
+    if (typeof elements === 'string') {
+      return elements;
+    }
+
     elements?.forEach((el: any, i: number) => {
       if (el.type === 'a') {
         elements[i] = (

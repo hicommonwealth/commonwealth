@@ -155,7 +155,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
                 window.open('https://docs.commonwealth.im/commonwealth/')
               }
             />
-            {isLoggedIn && !onMobile && <NotificationsMenuPopover />}
+            {isLoggedIn && <NotificationsMenuPopover />}
           </div>
           {isLoggedIn && <UserDropdown />}
           {isLoggedIn && (
