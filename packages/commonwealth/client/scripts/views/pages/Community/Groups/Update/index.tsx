@@ -10,7 +10,7 @@ const UpdateCommunityGroupPage = () => {
   // const { mutateAsync: editGroup } = useEditGroupMutation();
 
   if (!app.isLoggedIn() || !Permissions.isCommunityAdmin()) {
-    // return <PageNotFound />;
+    return <PageNotFound />;
   }
 
   // TODO: we will get these values from existing group data
