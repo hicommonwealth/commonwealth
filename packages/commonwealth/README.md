@@ -112,8 +112,7 @@ You need to be able to call `python` in the terminal.
 
 ## Environment Variables
 
-You should create a `.env` file at the `package/commonwealth` level
-to store environment variables like session secrets.
+You should create a `.env` file at the `package/commonwealth` level to store environment variables like session secrets.
 
 Environment variables used for external services include:
 
@@ -137,13 +136,11 @@ Environment variables used for external services include:
 - DISCORD_CLIENT_SECRET: for Discord OAuth login
 - DISCORD_OAUTH_SCOPES: scopes (usually just 'identify')
 - PGPASSWORD: [OPTIONAL] avoids the password prompt for all local database commands
-- ETH_ALCHEMY_API_KEY: [OPTIONAL] if set, the load-db commands will replace production Alchemy urls with their locally
-  supported variants
+- ETH_ALCHEMY_API_KEY: [OPTIONAL] if set, the load-db commands will replace production Alchemy urls with their locally supported variants
 
 We also use certain environment variables to configure the application itself:
 
-- CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "
-  edgeware,edgeware-local")
+- CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "edgeware,edgeware-local")
 - NO_EVENTS: disable chain-event functionality entirely
 - NO_CLIENT: set to true to disable the front-end build
 
@@ -467,30 +464,20 @@ Polkadot/Kusama:
 
 **install-docker.sh**: This script installs Docker on a remote Vultr server.
 
-- Requires: the `cmn_docker_root_ssh.pub` key must be stored in `~/.ssh/authorized_keys` of the Vultr server with the IP
-  stored in the `VULTR_IP` env var defined in the `.env` file. Also requires the `VULTR_USER` env var to be set so that
-  the root user can give the `VULTR_USER` permission to use Docker CLI without using `sudo`. The user of this command
-  must have the `cmn_docker_root_ssh` private key in `~/.ssh/`.
+- Requires: the `cmn_docker_root_ssh.pub` key must be stored in `~/.ssh/authorized_keys` of the Vultr server with the IP stored in the `VULTR_IP` env var defined in the `.env` file. Also requires the `VULTR_USER` env var to be set so that the root user can give the `VULTR_USER` permission to use Docker CLI without using `sudo`. The user of this command must have the `cmn_docker_root_ssh` private key in `~/.ssh/`.
 
 **update-docker-images.sh**: This script updates the required docker images (currently RabbitMQ and Redis).
 
-- Requires: the `cmn_docker_admin_ssh.pub` key must be stored in `~/.ssh/authorized_keys` of the Vultr server with the
-  IP stored in the `VULTR_IP` env var defined in the `.env` file. The user of this command must have
-  the `cmn_docker_root_ssh` private key in `~/.ssh/`.
+- Requires: the `cmn_docker_admin_ssh.pub` key must be stored in `~/.ssh/authorized_keys` of the Vultr server with the IP stored in the `VULTR_IP` env var defined in the `.env` file. The user of this command must have the `cmn_docker_root_ssh` private key in `~/.ssh/`.
 
 ### Developer Commands
 
-Before running any of these commands, you will need `VULTR_IP`, `VULTR_USER`, and `VULTR_DOCKER_ADMIN_PASSWORD` in your
-.env file. You will also need the `cmn_docker_admin_ssh` file in your `.ssh` folder. This folder can be found at
-`~./ssh` on linux and `Users/<username>/.ssh/` on Mac.
+Before running any of these commands, you will need `VULTR_IP`, `VULTR_USER`, and `VULTR_DOCKER_ADMIN_PASSWORD` in your .env file. You will also need the `cmn_docker_admin_ssh` file in your `.ssh` folder. This folder can be found at `~./ssh` on linux and `Users/<username>/.ssh/` on Mac.
 
 If using the docker containers for the very first time use `start-docker-setup`.
 
-**start-docker-setup** This script should be run only when setting up the required environment variables for the
-first time.
+**start-docker-setup** This script should be run only when setting up the required environment variables for the first time.
 
-**start-containers** This scripts starts your existing docker containers. Should be used after `start-docker-setup` has
-been used.
+**start-containers** This scripts starts your existing docker containers. Should be used after `start-docker-setup` has been used.
 
-**stop-containers** This scripts stops/shutsdown your docker containers. Should be used to end your session after using
-`start-docker-setup` or `start-containers`.
+**stop-containers** This scripts stops/shutsdown your docker containers. Should be used to end your session after using `start-docker-setup` or `start-containers`.
