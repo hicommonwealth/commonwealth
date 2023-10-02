@@ -13,14 +13,14 @@ const Errors = {
   InvalidRequest: 'Invalid request',
 };
 
-type GetChainsRequestParams = {
-  snapshots?: boolean;
+type GetCommunitiesRequestQuery = {
+  snapshots?: string;
   search?: string;
 } & PaginationQueryParams;
 
-export const getChainsHandler = async (
+export const getCommunitiesHandler = async (
   controllers: ServerControllers,
-  req: TypedRequestQuery<GetChainsRequestParams>,
+  req: TypedRequestQuery<GetCommunitiesRequestQuery>,
   res: TypedResponse<
     GetCommunitiesWithSnapshotsResult | SearchCommunitiesResult
   >
@@ -28,7 +28,7 @@ export const getChainsHandler = async (
   const options = req.query;
 
   // get chains, with snapshots
-  if (options.snapshots) {
+  if (options.snapshots === 'true') {
     const results = await controllers.communities.getCommunitiesWithSnapshots(
       {}
     );

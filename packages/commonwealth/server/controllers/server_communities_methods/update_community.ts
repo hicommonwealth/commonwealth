@@ -1,17 +1,14 @@
 /* eslint-disable no-continue */
 import { AppError } from 'common-common/src/errors';
 import { ChainBase } from 'common-common/src/types';
-import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
-import type { DB } from '../../models';
 import type { ChainAttributes } from '../../models/chain';
-import type { TypedRequestBody, TypedResponse } from '../../types';
-import { success } from '../../types';
 import { findOneRole } from '../../util/roles';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { ServerCommunitiesController } from '../server_communities_controller';
+import { UserInstance } from 'server/models/user';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -33,43 +30,45 @@ export const Errors = {
   InvalidDefaultPage: 'Default page does not exist',
 };
 
-type UpdateChainReq = ChainAttributes & {
-  id: string;
-  'featured_topics[]'?: string[];
-  'snapshot[]'?: string[];
-};
-
-type UpdateChainResp = ChainAttributes & { snapshot: string[] };
-
-export type UpdateCommunityOptions = {
+export type UpdateCommunityOptions = ChainAttributes & {
   user: UserInstance;
-  id: string;
+  featuredTopics?: string[];
+  snapshot?: string[];
 };
-export type UpdateCommunityResult = void;
+export type UpdateCommunityResult = ChainAttributes & { snapshot: string[] };
 
 export async function __updateCommunity(
   this: ServerCommunitiesController,
-  { user, id }: UpdateCommunityOptions
+  { user, id, network, ...rest }: UpdateCommunityOptions
 ): Promise<UpdateCommunityResult> {
-  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-  if (!req.body.id) return next(new AppError(Errors.NoChainId));
-  if (req.body.id === ALL_CHAINS) return next(new AppError(Errors.ReservedId));
-  if (req.body.network) return next(new AppError(Errors.CantChangeNetwork));
+  if (!user) {
+    throw new AppError(Errors.NotLoggedIn);
+  }
+  if (!id) {
+    throw new AppError(Errors.NoChainId);
+  }
+  if (id === ALL_CHAINS) {
+    throw new AppError(Errors.ReservedId);
+  }
+  if (network) {
+    throw new AppError(Errors.CantChangeNetwork);
+  }
 
-  const chain = await models.Chain.findOne({ where: { id: req.body.id } });
-  if (!chain) return next(new AppError(Errors.NoChainFound));
-  else {
-    const userAddressIds = (await req.user.getAddresses())
+  const chain = await this.models.Chain.findOne({ where: { id: id } });
+  if (!chain) {
+    throw new AppError(Errors.NoChainFound);
+  } else {
+    const userAddressIds = (await user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
     const userMembership = await findOneRole(
-      models,
+      this.models,
       { where: { address_id: { [Op.in]: userAddressIds } } },
       chain.id,
       ['admin']
     );
-    if (!req.user.isAdmin && !userMembership) {
-      return next(new AppError(Errors.NotAdmin));
+    if (!user.isAdmin && !userMembership) {
+      throw new AppError(Errors.NotAdmin);
     }
   }
 
@@ -94,11 +93,10 @@ export async function __updateCommunity(
     has_homepage,
     terms,
     chain_node_id,
-  } = req.body;
-
-  let snapshot = req.body['snapshot[]'];
+  } = rest;
 
   // Handle single string case and undefined case
+  let { snapshot } = rest;
   if (snapshot !== undefined && typeof snapshot === 'string') {
     snapshot = [snapshot];
   } else if (snapshot === undefined) {
@@ -106,17 +104,17 @@ export async function __updateCommunity(
   }
 
   if (website && !urlHasValidHTTPPrefix(website)) {
-    return next(new AppError(Errors.InvalidWebsite));
+    throw new AppError(Errors.InvalidWebsite);
   } else if (discord && !urlHasValidHTTPPrefix(discord)) {
-    return next(new AppError(Errors.InvalidDiscord));
+    throw new AppError(Errors.InvalidDiscord);
   } else if (element && !urlHasValidHTTPPrefix(element)) {
-    return next(new AppError(Errors.InvalidElement));
+    throw new AppError(Errors.InvalidElement);
   } else if (telegram && !telegram.startsWith('https://t.me/')) {
-    return next(new AppError(Errors.InvalidTelegram));
+    throw new AppError(Errors.InvalidTelegram);
   } else if (github && !github.startsWith('https://github.com/')) {
-    return next(new AppError(Errors.InvalidGithub));
+    throw new AppError(Errors.InvalidGithub);
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
-    return next(new AppError(Errors.InvalidCustomDomain));
+    throw new AppError(Errors.InvalidCustomDomain);
   } else if (
     snapshot.some((snapshot_space) => {
       const lastFour = snapshot_space.slice(snapshot_space.length - 4);
@@ -125,18 +123,18 @@ export async function __updateCommunity(
       );
     })
   ) {
-    return next(new AppError(Errors.InvalidSnapshot));
+    throw new AppError(Errors.InvalidSnapshot);
   } else if (snapshot.length > 0 && chain.base !== ChainBase.Ethereum) {
-    return next(new AppError(Errors.SnapshotOnlyOnEthereum));
+    throw new AppError(Errors.SnapshotOnlyOnEthereum);
   } else if (terms && !urlHasValidHTTPPrefix(terms)) {
-    return next(new AppError(Errors.InvalidTerms));
+    throw new AppError(Errors.InvalidTerms);
   }
 
   const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
-    await models.CommunitySnapshotSpaces.findAll({
+    await this.models.CommunitySnapshotSpaces.findAll({
       where: { chain_id: chain.id },
       include: {
-        model: models.SnapshotSpace,
+        model: this.models.SnapshotSpace,
         as: 'snapshot_space',
       },
     });
@@ -155,12 +153,12 @@ export async function __updateCommunity(
   for (const spaceName of snapshot) {
     // check if its in the mapping
     if (!existingSpaceNames.includes(spaceName)) {
-      const spaceModelInstance = await models.SnapshotSpace.findOrCreate({
+      const spaceModelInstance = await this.models.SnapshotSpace.findOrCreate({
         where: { snapshot_space: spaceName },
       });
 
       // if it isnt, create it
-      await models.CommunitySnapshotSpaces.create({
+      await this.models.CommunitySnapshotSpaces.create({
         snapshot_space_id: spaceModelInstance[0].snapshot_space,
         chain_id: chain.id,
       });
@@ -169,7 +167,7 @@ export async function __updateCommunity(
 
   // delete unwanted associations
   for (const removedSpace of removedSpaces) {
-    await models.CommunitySnapshotSpaces.destroy({
+    await this.models.CommunitySnapshotSpaces.destroy({
       where: {
         snapshot_space_id: removedSpace.snapshot_space_id,
         chain_id: chain.id,
@@ -195,7 +193,7 @@ export async function __updateCommunity(
   if (has_homepage) chain.has_homepage = has_homepage;
   if (default_page) {
     if (!has_homepage) {
-      return next(new AppError(Errors.InvalidDefaultPage));
+      throw new AppError(Errors.InvalidDefaultPage);
     } else {
       chain.default_page = default_page;
     }
@@ -222,7 +220,5 @@ export async function __updateCommunity(
     return this.toString();
   };
 
-  return success(res, { ...chain.toJSON(), snapshot });
+  return { ...chain.toJSON(), snapshot };
 }
-
-export default updateChain;

@@ -26,6 +26,11 @@ import {
   DeleteCommunityResult,
   __deleteCommunity,
 } from './server_communities_methods/delete_community';
+import {
+  UpdateCommunityOptions,
+  UpdateCommunityResult,
+  __updateCommunity,
+} from './server_communities_methods/update_community';
 
 /**
  * Implements methods related to communities
@@ -59,6 +64,12 @@ export class ServerCommunitiesController {
     options: CreateCommunityOptions
   ): Promise<CreateCommunityResult> {
     return __createCommunity.call(this, options);
+  }
+
+  async updateCommunity(
+    options: UpdateCommunityOptions
+  ): Promise<UpdateCommunityResult> {
+    return __updateCommunity.call(this, options);
   }
 
   async deleteCommunity(

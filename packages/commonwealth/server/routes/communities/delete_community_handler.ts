@@ -15,7 +15,7 @@ export const deleteCommunityHandler = async (
 ) => {
   const community = await controllers.communities.deleteCommunity({
     user: req.user,
-    community: req.body,
+    id: req.params.id,
   });
   return success(res, community);
 };

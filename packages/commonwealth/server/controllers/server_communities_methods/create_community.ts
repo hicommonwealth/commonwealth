@@ -8,24 +8,17 @@ import {
   DefaultPage,
   NotificationCategories,
 } from 'common-common/src/types';
-import type { NextFunction } from 'express';
-import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
-import type { DB } from '../../models';
 
 import type { AddressInstance } from '../../models/address';
 import type { ChainAttributes } from '../../models/chain';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { RoleAttributes } from '../../models/role';
-import type { TypedRequestBody, TypedResponse } from '../../types';
-import { success } from '../../types';
 
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
-import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
-import { ServerAnalyticsController } from '../../controllers/server_analytics_controller';
 import axios from 'axios';
 import { UserInstance } from 'server/models/user';
 import { getFileSizeBytes } from 'server/util/getFilesSizeBytes';
@@ -539,14 +532,3 @@ export async function __createCommunity(
     admin_address: addressToBeAdmin?.address,
   };
 }
-
-// const serverAnalyticsController = new ServerAnalyticsController();
-// serverAnalyticsController.track(
-//   {
-//     chainBase: community.base,
-//     isCustomDomain: null,
-//     communityType: null,
-//     event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
-//   },
-//   req
-// );

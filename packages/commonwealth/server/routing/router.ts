@@ -177,8 +177,8 @@ import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_h
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
-import { getChainsHandler } from '../routes/chains/get_chains_handler';
-import { getChainNodesHandler } from '../routes/chains/get_chain_nodes_handler';
+import { getChainsHandler } from '../routes/communities/get_communities_handler';
+import { getChainNodesHandler } from '../routes/communities/get_community_nodes_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
