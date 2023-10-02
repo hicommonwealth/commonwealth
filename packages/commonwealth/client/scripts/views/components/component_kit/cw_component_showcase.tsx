@@ -14,7 +14,7 @@ import app from 'state';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import { CWRelatedCommunityCard } from './CWRelatedCommunityCard';
+import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import {
   ReactQuillEditor,
   createDeltaFromText,
