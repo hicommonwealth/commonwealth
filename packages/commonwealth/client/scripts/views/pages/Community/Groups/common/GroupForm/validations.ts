@@ -22,7 +22,7 @@ export const requirementSubFormValidationSchema = z.object({
     .nonempty({ message: NO_INPUT })
     .refine(
       (value) => {
-        return isNaN(Number(value));
+        return !isNaN(Number(value));
       },
       { message: INVALID_VALUE }
     ),
@@ -32,7 +32,7 @@ export const groupValidationSchema = z.object({
   groupName: z
     .string({ invalid_type_error: NO_INPUT })
     .nonempty({ message: NO_INPUT })
-    .max(3, { message: MAX_CHAR_LIMIT_REACHED }),
+    .max(40, { message: MAX_CHAR_LIMIT_REACHED }),
   groupDescription: z
     .string({ invalid_type_error: NO_INPUT })
     .max(250, { message: MAX_CHAR_LIMIT_REACHED }),

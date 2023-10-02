@@ -106,6 +106,18 @@ const GroupForm = ({
 
   const validateChangedValue = (val, index) => {
     const allRequirements = [...requirementSubForms];
+
+    // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
+    const isTokenRequirementTypeAdded =
+      !allRequirements[index].values.requirementType
+        ?.toLowerCase()
+        ?.includes('token') &&
+      val.requirementType &&
+      val.requirementType?.toLowerCase()?.includes('token');
+    if (isTokenRequirementTypeAdded) {
+      allRequirements[index].errors.requirementContractAddress = '';
+    }
+
     allRequirements[index] = {
       ...allRequirements[index],
       values: {
@@ -115,11 +127,17 @@ const GroupForm = ({
     };
     const key = Object.keys(val)[0];
     try {
-      requirementSubFormValidationSchema
-        .pick({
-          [key]: true,
-        })
-        .parse(val);
+      // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
+      const isTokenRequirement = allRequirements[index].values.requirementType
+        .toLowerCase()
+        .includes('token');
+      const schema = isTokenRequirement
+        ? requirementSubFormValidationSchema.omit({
+            requirementContractAddress: true,
+          })
+        : requirementSubFormValidationSchema;
+      schema.pick({ [key]: true }).parse(val);
+
       allRequirements[index] = {
         ...allRequirements[index],
         errors: {
@@ -148,7 +166,21 @@ const GroupForm = ({
 
     requirementSubForms.map((subForm, index) => {
       try {
-        requirementSubFormValidationSchema.parse(subForm.values);
+        // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
+        const isTokenRequirement = subForm.values.requirementType
+          .toLowerCase()
+          .includes('token');
+        let schema = isTokenRequirement
+          ? requirementSubFormValidationSchema.omit({
+              requirementContractAddress: true,
+            })
+          : requirementSubFormValidationSchema;
+        if (subForm.values.requirementType === '') {
+          schema.pick({ requirementType: true }).parse(subForm.values);
+        } else {
+          schema.parse(subForm.values);
+        }
+
         updatedSubForms[index] = {
           ...updatedSubForms[index],
           errors: {},
