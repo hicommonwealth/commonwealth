@@ -72,7 +72,7 @@ function formatTelegramMessage<C extends NotificationCategories>(
 /**
  * Note that webhookUrl is a Telegram API url containing a channel id and not an actual bot url.
  */
-export function sendTelegramWebhook(
+export async function sendTelegramWebhook(
   // TODO: Telegram urls are currently useless since we just parse them to get the channel id
   //  telegram webhooks should not have urls but channel ids instead
   webhookUrl: string,
@@ -88,7 +88,7 @@ export function sendTelegramWebhook(
       'objectUrl',
       'url',
     ]) {
-      if (key in data) {
+      if (data[key]) {
         data[key] = data[key].replace(
           'http://localhost:8080',
           'https://commonwealth.im'

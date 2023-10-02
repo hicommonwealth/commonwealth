@@ -80,7 +80,7 @@ function formatDiscordMessage<C extends NotificationCategories>(
   }
 }
 
-export function sendDiscordWebhook(
+export async function sendDiscordWebhook(
   webhookUrl: string,
   category: NotificationCategories,
   data: ForumWebhookData | ChainEventWebhookData

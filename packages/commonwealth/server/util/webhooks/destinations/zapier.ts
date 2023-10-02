@@ -1,9 +1,14 @@
 import { NotificationCategories } from 'common-common/src/types';
 import { ChainEventWebhookData, ForumWebhookData } from '../types';
 import request from 'superagent';
+import { factory, formatFilename } from 'common-common/src/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 type ZapierWebhookMessage = {
   event: NotificationCategories;
+  previewImageUrl: string;
+  previewImageAltText: string;
   author: {
     name: string;
     url: string;
@@ -20,6 +25,8 @@ function formatZapierMessage(
 ): ZapierWebhookMessage {
   return {
     event: category,
+    previewImageUrl: data.previewImageUrl,
+    previewImageAltText: data.previewImageAltText,
     author: {
       name: data.profileName,
       url: data.profileUrl,
@@ -31,15 +38,13 @@ function formatZapierMessage(
   };
 }
 
-export function sendZapierWebhook(
+export async function sendZapierWebhook(
   webhookUrl: string,
   category: NotificationCategories,
   data: ForumWebhookData | ChainEventWebhookData
 ) {
   if (category === NotificationCategories.ChainEvent) {
-    return Promise.reject(
-      new Error('Chain event webhooks not supported for Zapier')
-    );
+    throw new Error('Chain event webhooks not supported for Zapier');
   }
 
   const message = formatZapierMessage(category, data as ForumWebhookData);

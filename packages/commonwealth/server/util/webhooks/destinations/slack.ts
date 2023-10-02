@@ -135,7 +135,7 @@ function formatSlackMessage<C extends NotificationCategories>(
   };
 }
 
-export function sendSlackWebhook(
+export async function sendSlackWebhook(
   webhookUrl: string,
   category: NotificationCategories,
   data: ForumWebhookData | ChainEventWebhookData

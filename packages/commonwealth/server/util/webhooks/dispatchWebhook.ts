@@ -80,14 +80,15 @@ export async function dispatchWebhooks(
   const results = await Promise.allSettled(webhookPromises);
   for (const result of results) {
     if (result.status === 'rejected') {
-      log.error(
-        `Error sending webhook: ${result.reason}`,
-        result.reason?.response?.error
-      );
-      rollbar.error(
-        `Error sending webhook: ${result.reason}`,
-        result.reason?.response?.error
-      );
+      let error;
+      if (result.reason instanceof Error) {
+        error = result.reason;
+      } else if (result.reason?.response?.error) {
+        error = result.reason.response.error;
+      }
+
+      log.error(`Error sending webhook: ${result.reason}`, error);
+      rollbar.error(`Error sending webhook: ${result.reason}`, error);
     }
   }
 }

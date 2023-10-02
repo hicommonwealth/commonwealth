@@ -6,6 +6,7 @@ import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
 import { SupportedNetwork } from 'chain-events/src';
 import models from '../database';
 import { WebhookDestinations } from '../util/webhooks/types';
+import { WebhookInstance } from '../models/webhook';
 
 async function main() {
   const argv = await yargs(hideBin(process.argv))
@@ -32,7 +33,7 @@ async function main() {
       destination: {
         alias: 'd',
         type: 'string',
-        choices: Object.values(WebhookDestinations),
+        choices: [...Object.values(WebhookDestinations), 'all'],
         description:
           'The destination of the webhook notification. ' +
           'This sends a notification to a hardcoded channel. ' +
@@ -56,6 +57,11 @@ async function main() {
   });
 
   let url: string;
+  const webhooks: WebhookInstance[] = [];
+  const genericWebhookOptions = {
+    chain_id: chain.id,
+    categories: [argv.notificationCategory],
+  };
   if (argv.url) {
     url = argv.url;
   } else if (argv.destination === WebhookDestinations.Discord) {
@@ -64,15 +70,39 @@ async function main() {
     url = process.env.SLACK_WEBHOOK_URL_DEV;
   } else if (argv.destination === WebhookDestinations.Telegram) {
     url = 'api.telegram.org/@-1001509073772';
+  } else if (argv.destination === WebhookDestinations.Zapier) {
+    url = process.env.ZAPIER_WEBHOOK_URL_DEV;
+  } else if (argv.destination === 'all') {
+    webhooks.push(
+      models.Webhook.build({
+        url: process.env.DISCORD_WEBHOOK_URL_DEV,
+        ...genericWebhookOptions,
+      }),
+      models.Webhook.build({
+        url: process.env.SLACK_WEBHOOK_URL_DEV,
+        ...genericWebhookOptions,
+      }),
+      models.Webhook.build({
+        url: 'api.telegram.org/@-1001509073772',
+        ...genericWebhookOptions,
+      }),
+      models.Webhook.build({
+        url: process.env.ZAPIER_WEBHOOK_URL_DEV,
+        ...genericWebhookOptions,
+      })
+    );
   } else {
     throw new Error(`Invalid webhook destination: ${argv.destination}`);
   }
 
-  const webhook = models.Webhook.build({
-    url,
-    chain_id: chain.id,
-    categories: [argv.notificationCategory],
-  });
+  if (webhooks.length === 0) {
+    webhooks.push(
+      models.Webhook.build({
+        url,
+        ...genericWebhookOptions,
+      })
+    );
+  }
 
   let notification: NotificationDataAndCategory;
   if (argv.notificationCategory === NotificationCategories.ChainEvent) {
@@ -113,12 +143,13 @@ async function main() {
     };
   }
 
-  await dispatchWebhooks(notification, [webhook]);
+  await dispatchWebhooks(notification, webhooks);
 }
 
 if (require.main === module) {
   main()
     .then(() => {
+      // note this stops rollbar errors reports from completing in the `dispatchWebhooks` function
       process.exit(0);
     })
     .catch((err) => {

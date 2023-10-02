@@ -75,3 +75,13 @@ can be found here: https://api.slack.com/apps/A05UQUGRWGH/install-on-team.
 `SLACK_WEBHOOK_URL_DEV` environment variable required to use the `emit-webhook` script to send Slack webhooks.
 
 ### Zapier
+Zapier webhook payload format is found in `packages/commonwealth/server/util/webhooks/destinations/zapier.ts`.
+
+**Development**
+
+There is a Zapier Zap called Common Webhook Dev which is on the `ops@commonwealth.im` Zapier account. This Zap
+receives webhook payloads in step 1 and sends a formatted message to the `testing-webhooks` Slack channel in step 2. 
+The webhook url can be found by contacting Timothee or by viewing the Zap's 
+settings [here](https://zapier.com/editor/209598943/published/209598943/setup) (requires Zapier account access).
+
+`ZAPIER_WEBHOOK_URL_DEV` environment variable required to use the `emit-webhook` script to send Zapier webhooks.
