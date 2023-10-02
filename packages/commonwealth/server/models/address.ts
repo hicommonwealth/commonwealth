@@ -11,6 +11,7 @@ import type { UserAttributes, UserInstance } from './user';
 export type AddressAttributes = {
   address: string;
   chain: string;
+  hex?: string;
   verification_token: string;
   role: Role;
   is_user_default: boolean;
@@ -55,6 +56,7 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address: { type: dataTypes.STRING, allowNull: false },
       chain: { type: dataTypes.STRING, allowNull: false },
+      hex: { type: dataTypes.STRING, allowNull: true },
       role: {
         type: dataTypes.ENUM('member', 'moderator', 'admin'),
         defaultValue: 'member',

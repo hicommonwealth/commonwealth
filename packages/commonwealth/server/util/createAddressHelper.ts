@@ -17,6 +17,7 @@ import { addressSwapper } from '../../shared/utils';
 import { Errors } from '../routes/createAddress';
 import { Op } from 'sequelize';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+import { AddressInstance } from 'server/models/address';
 
 type CreateAddressReq = {
   address: string;
@@ -95,11 +96,28 @@ export async function createAddressHelper(
     return next(new AppError(Errors.InvalidAddress));
   }
 
-  const existingAddress = await models.Address.scope('withPrivateData').findOne(
-    {
-      where: { chain: req.chain, address: encodedAddress },
-    }
-  );
+  let addressHex: string;
+  let existingAddress: AddressInstance;
+  let existingHex: AddressInstance;
+  if (chain.base === ChainBase.CosmosSDK) {
+    const { toHex, fromBech32 } = await import('@cosmjs/encoding');
+    const encodedData = fromBech32(encodedAddress).data;
+    addressHex = toHex(encodedData);
+
+    // check all addresses for matching hex
+    existingHex = await models.Address.scope('withPrivateData').findOne({
+      where: { hex: addressHex },
+    });
+  }
+
+  existingAddress = await models.Address.scope('withPrivateData').findOne({
+    where: { chain: req.chain, address: encodedAddress },
+  });
+
+  if (existingHex && !existingAddress) {
+    // we want to consolidate that existingHex into this user
+    // existingAddress = existingHex;
+  }
 
   const existingAddressOnOtherChain = await models.Address.scope(
     'withPrivateData'
@@ -169,7 +187,11 @@ export async function createAddressHelper(
       );
       const last_active = new Date();
       let profile_id: number;
-      const user_id = user ? user.id : null;
+      let user_id = user ? user.id : null;
+
+      if (existingHex) {
+        user_id = existingHex.user_id; // too simple?
+      }
 
       if (user_id) {
         const profile = await models.Profile.findOne({
@@ -183,6 +205,7 @@ export async function createAddressHelper(
         profile_id,
         chain: req.chain,
         address: encodedAddress,
+        hex: addressHex,
         verification_token,
         verification_token_expires,
         block_info: req.block_info,
