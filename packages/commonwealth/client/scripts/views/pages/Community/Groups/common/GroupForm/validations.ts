@@ -1,49 +1,52 @@
 import z from 'zod';
 
+const NO_INPUT = 'No input';
+const MAX_CHAR_LIMIT_REACHED = 'Max character limit reached';
+const INVALID_VALUE = 'Invalid value';
+
 export const requirementSubFormValidationSchema = z.object({
   requirementType: z
-    .string({ invalid_type_error: 'Type is required!' })
-    .nonempty({ message: 'Type is required!' }),
+    .string({ invalid_type_error: NO_INPUT })
+    .nonempty({ message: NO_INPUT }),
   requirementChain: z
-    .string({ invalid_type_error: 'Chain is required!' })
-    .nonempty({ message: 'Chain is required!' }),
+    .string({ invalid_type_error: NO_INPUT })
+    .nonempty({ message: NO_INPUT }),
   requirementContractAddress: z
-    .string({ invalid_type_error: 'Address is required!' })
-    .nonempty({ message: 'Address is required!' })
-    .min(10, { message: 'Address must be min 10 characters!' }),
+    .string({ invalid_type_error: NO_INPUT })
+    .nonempty({ message: NO_INPUT }),
   requirementCondition: z
-    .string({ invalid_type_error: 'Condition is required!' })
-    .nonempty({ message: 'Condition is required!' }),
+    .string({ invalid_type_error: NO_INPUT })
+    .nonempty({ message: NO_INPUT }),
   requirementAmount: z
-    .string({ invalid_type_error: 'Amount is required!' })
-    .nonempty({ message: 'Amount is required!' })
+    .string({ invalid_type_error: NO_INPUT })
+    .nonempty({ message: NO_INPUT })
     .refine(
       (value) => {
-        return !isNaN(Number(value));
+        return isNaN(Number(value));
       },
-      { message: 'Amount must be a valid number!' }
+      { message: INVALID_VALUE }
     ),
 });
 
 export const groupValidationSchema = z.object({
   groupName: z
-    .string({ invalid_type_error: 'Group name is required!' })
-    .nonempty({ message: 'Group name is required!' })
-    .max(3, { message: 'Max character limit reached!' }),
+    .string({ invalid_type_error: NO_INPUT })
+    .nonempty({ message: NO_INPUT })
+    .max(3, { message: MAX_CHAR_LIMIT_REACHED }),
   groupDescription: z
-    .string({ invalid_type_error: 'Invalid value!' })
-    .max(250, { message: 'Max character limit reached!' }),
+    .string({ invalid_type_error: NO_INPUT })
+    .max(250, { message: MAX_CHAR_LIMIT_REACHED }),
   topics: z
     .array(
       z.object({
         value: z.number().default(-1),
-        label: z.string().nonempty({ message: 'Invalid value' }),
+        label: z.string().nonempty({ message: NO_INPUT }),
       }),
       {
-        invalid_type_error: 'Invalid value',
-        required_error: 'Topic(s) are required',
+        invalid_type_error: NO_INPUT,
+        required_error: NO_INPUT,
       }
     )
-    .min(1, { message: 'At least 1 topic is required' })
-    .nonempty({ message: 'Topic(s) are required' }),
+    .min(1, { message: NO_INPUT })
+    .nonempty({ message: NO_INPUT }),
 });
