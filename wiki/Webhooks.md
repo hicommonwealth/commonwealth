@@ -11,7 +11,6 @@ Example - emit a new thread notification to `webhook-testing` Discord channel:
 yarn emit-webhook -c new-thread-creation -d discord
 ```
 
-
 ## Destinations
 ### Telegram
 In order for users to receive Telegram webhooks, they must add the production bot to their channel
@@ -36,6 +35,8 @@ channel you must be invited. Contact Dillon or Timothee for the invite link. The
 `@CommonWebhooksDevBot` is an admin of this channel and therefore can be used to
 test Telegram webhooks.
 
+`TELEGRAM_CW_BOT_TOKEN_DEV` environment variable required to use the `emit-webhook` script to send Telegram webhooks.
+
 ### Discord
 
 **Development**
@@ -45,6 +46,8 @@ invitation link to the server: https://discord.gg/commonwealth. To access the `w
 channel, message one of the server moderators. The webhook for the channel can be found
 in the channel's 'integration' settings.
 
+`DISCORD_WEBHOOK_URL_DEV` environment variable required to use the `emit-webhook` script to send Discord webhooks.
+
 ### Slack
 
 **Development**
@@ -53,5 +56,7 @@ There is a webhook testing channel named `testing-webhooks` on the Common Slack 
 for an invitation to the channel. The `testing-webhooks` channel has a Slack app called `Common Webhooks Dev`
 installed in it. This app contains the webhook url used to send messages to the channel. This webhook url
 can be found here: https://api.slack.com/apps/A05UQUGRWGH/install-on-team.
+
+`SLACK_WEBHOOK_URL_DEV` environment variable required to use the `emit-webhook` script to send Slack webhooks.
 
 ### Zapier
