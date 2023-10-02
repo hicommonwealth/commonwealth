@@ -36,7 +36,8 @@ const CWForm = ({
     await formMethods.handleSubmit(onSubmit)(event);
 
     // trigger error callback if there are any errors
-    Object.keys(formMethods.formState.errors).length && await onErrors(formMethods.formState.errors)
+    Object.keys(formMethods.formState.errors).length &&
+      (await onErrors(formMethods.formState.errors));
   };
 
   return (
