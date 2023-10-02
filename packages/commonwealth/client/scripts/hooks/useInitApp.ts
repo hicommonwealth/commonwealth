@@ -14,8 +14,9 @@ const useInitApp = () => {
           .get(`${app.serverUrl()}/domain`)
           .then((res) => {
             const serverCustomDomain = res.data.customDomain || '';
+            setCustomDomain(serverCustomDomain);
             if (res.data.customDomain) {
-              setCustomDomain(serverCustomDomain);
+              app.setCustomDomain(serverCustomDomain);
             }
             return serverCustomDomain;
           })
