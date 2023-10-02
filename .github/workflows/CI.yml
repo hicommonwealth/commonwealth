@@ -50,15 +50,18 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --verbose | tail -n 200
+
+      - name: Upload yarn error log on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: yarn-error-log
+          path: packages/commonwealth/yarn-error.log
+
+      - name: Fail intentionally
+        run: exit 1
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -145,15 +148,18 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --verbose | tail -n 200
+
+      - name: Upload yarn error log on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: yarn-error-log
+          path: packages/commonwealth/yarn-error.log
+
+      - name: Fail intentionally
+        run: exit 1
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -238,15 +244,18 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --verbose | tail -n 200
+
+      - name: Upload yarn error log on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: yarn-error-log
+          path: packages/commonwealth/yarn-error.log
+
+      - name: Fail intentionally
+        run: exit 1
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -295,15 +304,18 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --verbose | tail -n 200
+
+      - name: Upload yarn error log on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: yarn-error-log
+          path: packages/commonwealth/yarn-error.log
+
+      - name: Fail intentionally
+        run: exit 1
 
       - name: Assert yarn.lock is correct
         run: |
@@ -359,15 +371,18 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --verbose | tail -n 200
+
+      - name: Upload yarn error log on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: yarn-error-log
+          path: packages/commonwealth/yarn-error.log
+
+      - name: Fail intentionally
+        run: exit 1
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -440,15 +455,18 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --verbose | tail -n 200
+
+      - name: Upload yarn error log on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: yarn-error-log
+          path: packages/commonwealth/yarn-error.log
+
+      - name: Fail intentionally
+        run: exit 1
 
       ## EVM Section:
       - name: Start EVM Testnet
@@ -535,15 +553,19 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
       - name: Install dependencies
-        run: yarn --ignore-engines
+        run: yarn --ignore-engines --verbose | tail -n 200
+
+      - name: Upload yarn error log on failure
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: yarn-error-log
+          path: packages/commonwealth/yarn-error.log
+
+      - name: Fail intentionally
+        run: exit 1
+
 
       - name: Get changed chain-events files
         id: changed-files-chain-events
