@@ -1,7 +1,5 @@
 import { StatsDController } from 'common-common/src/statsd';
-import {
-  NotificationCategories,
-} from 'common-common/src/types';
+import { NotificationCategories } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
@@ -15,10 +13,9 @@ import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
 } from '../scripts/emails';
-import type { WebhookContent } from '../webhookNotifier';
-import send from '../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
+import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,7 +24,6 @@ const { Op } = Sequelize;
 export default async function emitNotifications(
   models: DB,
   notification_data_and_category: NotificationDataAndCategory,
-  webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
   includeAddresses?: string[]
 ): Promise<NotificationInstance> {
@@ -198,12 +194,7 @@ export default async function emitNotifications(
   }
 
   // send data to relevant webhooks
-  if (webhook_data) {
-    await send(models, {
-      notificationCategory: category_id,
-      ...(webhook_data as Required<WebhookContent>),
-    });
-  }
+  await dispatchWebhooks(notification_data_and_category);
 
   return notification;
 }
