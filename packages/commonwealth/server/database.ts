@@ -19,6 +19,8 @@ import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
 import NotificationsReadFactory from './models/notifications_read';
 import PollFactory from './models/poll';
+import GroupFactory from './models/group';
+import MembershipFactory from './models/membership';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
 import SnapshotProposalFactory from './models/snapshot_proposal';
@@ -92,6 +94,8 @@ const models: Models = {
   NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   Comment: CommentFactory(sequelize, DataTypes),
   Poll: PollFactory(sequelize, DataTypes),
+  Group: GroupFactory(sequelize, DataTypes),
+  Membership: MembershipFactory(sequelize, DataTypes),
   Reaction: ReactionFactory(sequelize, DataTypes),
   Thread: ThreadFactory(sequelize, DataTypes),
   Topic: TopicFactory(sequelize, DataTypes),
