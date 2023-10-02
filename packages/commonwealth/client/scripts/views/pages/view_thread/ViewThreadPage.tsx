@@ -530,7 +530,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
       <CWContentPage
-        showTabs={isCollapsedSize && tabsShouldBePresent}
+        showTabs={isCollapsedSize && tabsShouldBePresent && !isMobile}
         contentBodyLabel="Thread"
         showSidebar={
           showLinkedProposalOptions ||

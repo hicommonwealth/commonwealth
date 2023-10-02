@@ -17,7 +17,7 @@ import { CWTab, CWTabBar } from '../cw_tabs';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';
-import { CWIconButton } from '../cw_icon_button';
+import { isMobile } from 'react-device-detect';
 
 export type ContentPageSidebarItem = {
   label: string;
@@ -258,7 +258,7 @@ type ContentPageCardProps = {
 
 export const CWContentPageCard = (props: ContentPageCardProps) => {
   const { content, header } = props;
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(isMobile ? true : false);
 
   return (
     <CWCard className="ContentPageCard">
