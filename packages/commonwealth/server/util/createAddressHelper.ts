@@ -200,6 +200,11 @@ export async function createAddressHelper(
         });
         profile_id = profile?.id;
       }
+
+      if (existingHex && !profile_id) {
+        profile_id = existingHex.profile_id;
+      }
+
       const newObj = await models.Address.create({
         user_id,
         profile_id,
@@ -233,7 +238,7 @@ export async function createAddressHelper(
 
       return {
         ...newObj.toJSON(),
-        newly_created: !existingAddressOnOtherChain,
+        newly_created: !existingAddressOnOtherChain && !existingHex,
       };
     } catch (e) {
       return next(e);
