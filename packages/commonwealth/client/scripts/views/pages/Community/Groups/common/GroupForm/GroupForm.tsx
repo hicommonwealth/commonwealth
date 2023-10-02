@@ -247,24 +247,6 @@ const GroupForm = ({
 
         {/* Sub-section: Necessary requirements */}
         <section className="form-section">
-          <CWText
-            type="h4"
-            fontWeight="semiBold"
-            className="header-row header-text"
-          >
-            Necessary requirements
-          </CWText>
-
-          <div className="radio-buttons">
-            <CWRadioButton
-              groupName="numberOfRequirements"
-              label="All requirements must be satisfied"
-              value="all-requirements"
-            />
-
-            <CWRequirementsRadioButton />
-          </div>
-
           {/* Added Requirements */}
           {requirementSubForms.map((subForm, index) => (
             <RequirementSubForm
@@ -288,6 +270,24 @@ const GroupForm = ({
               onClick={addRequirementSubForm}
             />
           )}
+
+          <CWText
+            type="h4"
+            fontWeight="semiBold"
+            className="header-row header-text"
+          >
+            Necessary requirements
+          </CWText>
+
+          <div className="radio-buttons">
+            <CWRadioButton
+              groupName="numberOfRequirements"
+              label="All requirements must be satisfied"
+              value="all-requirements"
+            />
+
+            <CWRequirementsRadioButton />
+          </div>
         </section>
 
         {/* Sub-section: Gated topics */}
