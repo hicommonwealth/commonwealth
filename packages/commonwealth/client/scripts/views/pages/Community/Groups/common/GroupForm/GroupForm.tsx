@@ -109,7 +109,10 @@ const GroupForm = ({
       );
     }
 
-    if (initialValues.requirementsToFulfill !== 'ALL') {
+    if (
+      initialValues.requirementsToFulfill &&
+      initialValues.requirementsToFulfill !== 'ALL'
+    ) {
       setCWRequiremnetsLabelInputField({
         ...cwRequiremnetsLabelInputField,
         value: `${initialValues.requirementsToFulfill}`,
