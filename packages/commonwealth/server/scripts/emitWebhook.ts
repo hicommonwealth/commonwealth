@@ -38,16 +38,15 @@ async function main() {
           'This sends a notification to a hardcoded channel. ' +
           'See Webhooks.md in the Wiki for more information about existing testing channels.',
       },
-      // eslint-disable-next-line @typescript-eslint/no-shadow
     })
-    .check((argv) => {
-      if (!argv.url && !argv.destination) {
+    .check((args) => {
+      if (!args.url && !args.destination) {
         throw new Error(
           'Must provide either a webhook url or a destination flag.'
         );
       }
 
-      if (argv) return true;
+      if (args) return true;
     }).argv;
 
   const chain = await models.Chain.findOne({

@@ -70,6 +70,7 @@ export async function dispatchWebhooks(
             webhookData
           )
         );
+        break;
       default:
         log.warn(`Unknown webhook destination: ${webhook.url}`);
     }
