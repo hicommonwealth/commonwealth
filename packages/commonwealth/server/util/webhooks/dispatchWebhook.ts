@@ -1,14 +1,14 @@
 import { NotificationDataAndCategory } from 'types';
-import { sendDiscordWebhook } from './webhookDestinations/discord';
+import { sendDiscordWebhook } from './destinations/discord';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { fetchWebhooks, getWebhookDestination } from './util';
 import { getWebhookData } from './getWebhookData';
 import { WebhookDestinations } from './types';
-import { sendSlackWebhook } from './webhookDestinations/slack';
-import { sendTelegramWebhook } from './webhookDestinations/telegram';
+import { sendSlackWebhook } from './destinations/slack';
+import { sendTelegramWebhook } from './destinations/telegram';
 import { WebhookInstance } from '../../models/webhook';
-import { sendZapierWebhook } from './webhookDestinations/zapier';
+import { sendZapierWebhook } from './destinations/zapier';
 import { rollbar } from '../rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));

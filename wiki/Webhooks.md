@@ -1,6 +1,7 @@
 # Webhooks
 ## Overview
 ### Development
+**Testing Script**
 To facilitate testing of specific webhooks there is a script (`packages/commonwealth/server/scripts/emitWebhook.ts`)
 which can be invoked to emit a webhook with real data to any desired destination via the `yarn emit-webhook` command.
 
@@ -10,6 +11,20 @@ Example - emit a new thread notification to `webhook-testing` Discord channel:
 ```
 yarn emit-webhook -c new-thread-creation -d discord
 ```
+
+**Pattern**
+The logic for each webhook destination should be contained in a single file in 
+`packages/commonwealth/server/util/destinations/` where the name of the file is the name of the destination.
+Within the file, there should be 3 things:
+1. A type definition for the destination's webhook payload
+2. A function that takes generic webhook data and returns a formatted message specific to the destination
+3. A function that takes generic webhook data and sends the formatted message to the destination.
+
+The `getWebhookData.ts` file contains a function which transforms a NotificationDataAndCategory object into
+the generic WebhookData object needed for the destination functions.
+
+Finally, the `dispatchWebhook.ts` file contains a function which given a NotificationDataAndCategory will emit
+all necessary webhooks. This is the root function for all webhook emission.
 
 ## Destinations
 ### Telegram
@@ -35,7 +50,7 @@ channel you must be invited. Contact Dillon or Timothee for the invite link. The
 `@CommonWebhooksDevBot` is an admin of this channel and therefore can be used to
 test Telegram webhooks.
 
-`TELEGRAM_CW_BOT_TOKEN_DEV` environment variable required to use the `emit-webhook` script to send Telegram webhooks.
+`TELEGRAM_BOT_TOKEN_DEV` environment variable required to use the `emit-webhook` script to send Telegram webhooks.
 
 ### Discord
 
