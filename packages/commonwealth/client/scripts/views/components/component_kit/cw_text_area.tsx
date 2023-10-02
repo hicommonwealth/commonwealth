@@ -13,6 +13,7 @@ import { useFormContext } from 'react-hook-form';
 type TextAreaStyleProps = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
+  instructionalMessage?: string;
 };
 
 type TextAreaFormValidationProps = {
@@ -40,6 +41,7 @@ export const CWTextArea = (props: TextAreaProps) => {
     placeholder,
     tabIndex,
     hookToForm,
+    instructionalMessage,
   } = props;
 
   const formContext = useFormContext();
@@ -116,6 +118,13 @@ export const CWTextArea = (props: TextAreaProps) => {
         }}
         value={value}
       />
+      {label && (
+        <NewMessageRow
+          instructionalMessage={instructionalMessage}
+          statusMessage={validationProps.statusMessage}
+          validationStatus={validationProps.validationStatus}
+        />
+      )}
       {label && (
         <NewMessageRow
           hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}

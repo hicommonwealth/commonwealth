@@ -29,12 +29,10 @@ export const groupValidationSchema = z.object({
   groupName: z
     .string({ invalid_type_error: 'Group name is required!' })
     .nonempty({ message: 'Group name is required!' })
-    .min(3, { message: 'Group name must have minimun 3 characters!' }),
+    .max(3, { message: 'Max character limit reached!' }),
   groupDescription: z
     .string({ invalid_type_error: 'Invalid value!' })
-    .max(500, {
-      message: 'Group description must not be more than 500 characters!',
-    }),
+    .max(250, { message: 'Max character limit reached!' }),
   topics: z
     .array(
       z.object({
