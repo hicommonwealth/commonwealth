@@ -134,3 +134,8 @@ export const SEND_WEBHOOKS_EMAILS =
 
 export const FEATURE_FLAG_GROUP_CHECK_ENABLED =
   process.env.FEATURE_FLAG_GROUP_CHECK_ENABLED === 'true' || false;
+
+export const UNLEASH_SERVER_URL = process.env.UNLEASH_SERVER_URL;
+export const UNLEASH_SERVER_API_TOKEN =
+  process.env.UNLEASH_SERVER_API_TOKEN ||
+  'default:development.unleash-insecure-api-token';

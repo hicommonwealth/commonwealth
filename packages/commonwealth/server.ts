@@ -39,6 +39,7 @@ import setupAppRoutes from './server/scripts/setupAppRoutes';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
+import { UnleashClient } from './server/scripts/setupUnleash';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
@@ -78,6 +79,8 @@ log.info(
 );
 
 async function main() {
+  UnleashClient.getInstance(); // start unleash client async
+
   const DEV = process.env.NODE_ENV !== 'production';
 
   // CLI parameters for which task to run
