@@ -45,25 +45,15 @@ export const CWRadioButton = (props: RadioButtonProps) => {
   const commonProps = {
     name: groupName,
     onClick: handleClick,
-    size: 20,
   };
 
   return (
     <div className="container">
-      {isChecked ? (
-        <RadioButton
-          className={`radio-button checked ${disabled ? 'disabled' : ''}`}
-          {...commonProps}
-          weight="fill"
-        />
-      ) : (
-        <Circle
-          className={`radio-button ${disabled ? 'disabled' : ''}`}
-          {...commonProps}
-          weight="regular"
-        />
-      )}
-      <div className={disabled ? 'background' : ''} />
+      <input
+        type="radio"
+        className={`radio-button2 ${disabled ? 'disabled' : ''}`}
+        {...commonProps}
+      />
       <CWText className="label" type="b2" fontWeight="regular">
         {label || value}
       </CWText>
