@@ -10,7 +10,7 @@ export type SubUniqueData =
     }
   | {
       categoryId: NotificationCategories.SnapshotProposal;
-      options: { snapshotId: string };
+      options: { snapshotId: string; chainId: string };
     }
   | {
       categoryId:
