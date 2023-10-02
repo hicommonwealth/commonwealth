@@ -3,7 +3,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
-import { HelpMenuPopover } from 'views/menus/help_menu';
 import app, { initAppState } from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
@@ -11,10 +10,8 @@ import {
   isWindowMediumSmallInclusive,
   isWindowSmallInclusive
 } from './components/component_kit/helpers';
-import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
-import { featureFlags } from 'helpers/feature-flags';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
