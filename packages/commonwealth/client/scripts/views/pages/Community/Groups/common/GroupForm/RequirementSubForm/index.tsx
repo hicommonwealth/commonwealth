@@ -41,6 +41,7 @@ const RequirementSubForm = ({
   onChange = () => null,
 }: RequirementSubFormType) => {
   const [requirementType, setRequirementType] = useState('');
+  const isTokenRequirement = requirementType.toLowerCase().includes('token');
 
   return (
     <div className="RequirementSubForm">
@@ -77,7 +78,7 @@ const RequirementSubForm = ({
       </div>
 
       {requirementType && (
-        <div className="row-2">
+        <div className={`row-2 ${isTokenRequirement ? 'cols-3' : 'cols-4'}`}>
           <CWSelectList
             key={defaultValues?.requirementChain?.value}
             name="requirementChain"
@@ -97,24 +98,26 @@ const RequirementSubForm = ({
             }}
             customError={errors.requirementChain}
           />
-          <CWTextInput
-            key={defaultValues.requirementContractAddress}
-            name="requirementContractAddress"
-            label="Contract Address"
-            placeholder="Input contract address"
-            containerClassName="w-full"
-            fullWidth
-            manualStatusMessage=""
-            {...(defaultValues.requirementContractAddress && {
-              defaultValue: defaultValues.requirementContractAddress,
-            })}
-            onInput={(e) => {
-              onChange({
-                requirementContractAddress: (e.target as any).value,
-              });
-            }}
-            customError={errors.requirementContractAddress}
-          />
+          {!isTokenRequirement && (
+            <CWTextInput
+              key={defaultValues.requirementContractAddress}
+              name="requirementContractAddress"
+              label="Contract Address"
+              placeholder="Input contract address"
+              containerClassName="w-full"
+              fullWidth
+              manualStatusMessage=""
+              {...(defaultValues.requirementContractAddress && {
+                defaultValue: defaultValues.requirementContractAddress,
+              })}
+              onInput={(e) => {
+                onChange({
+                  requirementContractAddress: (e.target as any).value,
+                });
+              }}
+              customError={errors.requirementContractAddress}
+            />
+          )}
           <CWSelectList
             key={defaultValues?.requirementCondition?.value}
             name="requirementCondition"
