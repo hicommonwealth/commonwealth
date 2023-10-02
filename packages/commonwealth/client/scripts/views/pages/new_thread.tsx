@@ -156,7 +156,7 @@ const NewThreadPage = () => {
 
     setIsSaving(true);
 
-    await app.sessions.signThread({
+    await app.sessions.signThread(app.user.activeAccount.address, {
       community: app.activeChainId(),
       title: threadTitle,
       body: deltaString,
@@ -203,6 +203,9 @@ const NewThreadPage = () => {
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
 
+  const communityHasSnapshot =
+    app.chain.meta?.snapshot && app.chain.meta?.snapshot?.length > 0;
+
   if (!app.chain) return <PageLoading />;
 
   const sidebarComponents = [
@@ -221,7 +224,7 @@ const NewThreadPage = () => {
                 buttonType="mini-black"
                 label="Add Action"
                 onClick={(e) => {
-                  setShowSidebar(true);
+                  setShowSidebar(!showSidebar);
                 }}
               />
             </div>
@@ -229,7 +232,7 @@ const NewThreadPage = () => {
         />
       ),
     },
-    ...(linkedSnapshotProposal
+    ...(linkedSnapshotProposal && communityHasSnapshot
       ? [
           {
             label: 'Linked Snapshot',
@@ -363,146 +366,154 @@ const NewThreadPage = () => {
       )}
       sidebarComponents={sidebarComponents}
       rightSidebarContent={[
-        {
-          label: 'Create Snapshot',
-          item: (
-            <div className="SelectableCard">
-              <Modal
-                className="LinkedProposalsCardModal"
-                content={
-                  <NewSnapshotProposalModal
-                    onSave={(snapshotInfo: {
-                      id: string;
-                      snapshot_title: string;
-                    }) => {
-                      const newLink: Link = {
-                        source: LinkSource.Snapshot,
-                        identifier: snapshotInfo.id,
-                        title: snapshotInfo.snapshot_title,
-                      };
+        ...(communityHasSnapshot
+          ? [
+              {
+                label: 'Create Snapshot',
+                item: (
+                  <div className="SelectableCard">
+                    <Modal
+                      className="LinkedProposalsCardModal"
+                      content={
+                        <NewSnapshotProposalModal
+                          onSave={(snapshotInfo: {
+                            id: string;
+                            snapshot_title: string;
+                          }) => {
+                            const newLink: Link = {
+                              source: LinkSource.Snapshot,
+                              identifier: snapshotInfo.id,
+                              title: snapshotInfo.snapshot_title,
+                            };
 
-                      setLinkedSnapshotProposal(newLink);
-                      setLinks((prev) => [...prev, newLink]);
-                    }}
-                    onModalClose={() => {
-                      setCreateSnapshotModalOpen(false);
-                    }}
-                    thread={{
-                      id: null,
-                      title: threadTitle,
-                      body: null,
-                      plaintext: threadContentDelta
-                        ? renderQuillDeltaToText(threadContentDelta)
-                        : '',
-                    }}
-                    fromExistingThread={false}
-                  />
-                }
-                onClose={() => setCreateSnapshotModalOpen(false)}
-                open={createSnapshotModalOpen}
-              />
-              <CWContentPageCard
-                header="Create Snapshot"
-                onClick={() => {
-                  if (app.chain.meta.snapshot?.length > 0) {
-                    setCreateSnapshotModalOpen(true);
-                  } else {
-                    notifyError(
-                      "This community doesn't have snapshot spaces connected"
-                    );
-                  }
-                }}
-                content={
-                  <div className="ActionCard">
-                    <CWText type="b2">
-                      Creates snapshot from existing text.
-                    </CWText>
+                            setLinkedSnapshotProposal(newLink);
+                            setLinks((prev) => [...prev, newLink]);
+                          }}
+                          onModalClose={() => {
+                            setCreateSnapshotModalOpen(false);
+                          }}
+                          thread={{
+                            id: null,
+                            title: threadTitle,
+                            body: null,
+                            plaintext: threadContentDelta
+                              ? renderQuillDeltaToText(threadContentDelta)
+                              : '',
+                          }}
+                          fromExistingThread={false}
+                        />
+                      }
+                      onClose={() => setCreateSnapshotModalOpen(false)}
+                      open={createSnapshotModalOpen}
+                    />
+                    <CWContentPageCard
+                      header="Create Snapshot"
+                      onClick={() => {
+                        if (app.chain.meta.snapshot?.length > 0) {
+                          setCreateSnapshotModalOpen(true);
+                        } else {
+                          notifyError(
+                            "This community doesn't have snapshot spaces connected"
+                          );
+                        }
+                      }}
+                      content={
+                        <div className="ActionCard">
+                          <CWText type="b2">
+                            Creates snapshot from existing text.
+                          </CWText>
+                        </div>
+                      }
+                    />
                   </div>
-                }
-              />
-            </div>
-          ),
-        },
-        {
-          label: 'Link Snapshot',
-          item: (
-            <div className="SelectableCard">
-              <Modal
-                className="LinkedProposalsCardModal"
-                content={
-                  <LinkSnapshotInitialThreadModal
-                    onModalClose={() => {
-                      setLinkSnapshotModalOpen(false);
-                    }}
-                    onSave={async (snapshot) => {
-                      let enrichedSnapshot;
-                      if (app.chain.meta.snapshot?.length === 1) {
-                        enrichedSnapshot = {
-                          id: `${app.chain.meta.snapshot[0]}/${snapshot.id}`,
-                          title: snapshot.title,
-                        };
-                      } else {
-                        await loadMultipleSpacesData(
-                          app.chain.meta.snapshot
-                        ).then((data) => {
-                          for (const { space: _space, proposals } of data) {
-                            const matchingSnapshot = proposals.find(
-                              (sn) => sn.id === snapshot.id
-                            );
-                            if (matchingSnapshot) {
+                ),
+              },
+              {
+                label: 'Link Snapshot',
+                item: (
+                  <div className="SelectableCard">
+                    <Modal
+                      className="LinkedProposalsCardModal"
+                      content={
+                        <LinkSnapshotInitialThreadModal
+                          onModalClose={() => {
+                            setLinkSnapshotModalOpen(false);
+                          }}
+                          onSave={async (snapshot) => {
+                            let enrichedSnapshot;
+                            if (app.chain.meta.snapshot?.length === 1) {
                               enrichedSnapshot = {
-                                id: `${_space.id}/${snapshot.id}`,
+                                id: `${app.chain.meta.snapshot[0]}/${snapshot.id}`,
                                 title: snapshot.title,
                               };
-                              break;
+                            } else {
+                              await loadMultipleSpacesData(
+                                app.chain.meta.snapshot
+                              ).then((data) => {
+                                for (const {
+                                  space: _space,
+                                  proposals,
+                                } of data) {
+                                  const matchingSnapshot = proposals.find(
+                                    (sn) => sn.id === snapshot.id
+                                  );
+                                  if (matchingSnapshot) {
+                                    enrichedSnapshot = {
+                                      id: `${_space.id}/${snapshot.id}`,
+                                      title: snapshot.title,
+                                    };
+                                    break;
+                                  }
+                                }
+                              });
                             }
-                          }
-                        });
-                      }
 
-                      setLinkedSnapshotProposal({
-                        source: LinkSource.Snapshot,
-                        identifier: String(enrichedSnapshot.id),
-                        title: enrichedSnapshot.title,
-                      });
-                      setLinks((prev) => [
-                        ...prev,
-                        {
-                          source: LinkSource.Snapshot,
-                          identifier: String(enrichedSnapshot.id),
-                          title: enrichedSnapshot.title,
-                        },
-                      ]);
-                      setLinkSnapshotModalOpen(false);
-                    }}
-                  />
-                }
-                onClose={() => setLinkSnapshotModalOpen(false)}
-                open={linkSnapshotModalOpen}
-              />
-              <CWContentPageCard
-                header="Link Snapshot"
-                onClick={() => {
-                  if (app.chain.meta.snapshot?.length > 0) {
-                    setLinkSnapshotModalOpen(true);
-                  } else {
-                    notifyError(
-                      "This community doesn't have snapshot spaces connected"
-                    );
-                  }
-                }}
-                content={
-                  <div className="ActionCard">
-                    <CWText type="b2">
-                      Search through snapshots show the poll directly on the
-                      thread page
-                    </CWText>
+                            setLinkedSnapshotProposal({
+                              source: LinkSource.Snapshot,
+                              identifier: String(enrichedSnapshot.id),
+                              title: enrichedSnapshot.title,
+                            });
+                            setLinks((prev) => [
+                              ...prev,
+                              {
+                                source: LinkSource.Snapshot,
+                                identifier: String(enrichedSnapshot.id),
+                                title: enrichedSnapshot.title,
+                              },
+                            ]);
+                            setLinkSnapshotModalOpen(false);
+                          }}
+                        />
+                      }
+                      onClose={() => setLinkSnapshotModalOpen(false)}
+                      open={linkSnapshotModalOpen}
+                    />
+                    <CWContentPageCard
+                      header="Link Snapshot"
+                      onClick={() => {
+                        if (app.chain.meta.snapshot?.length > 0) {
+                          setLinkSnapshotModalOpen(true);
+                        } else {
+                          notifyError(
+                            "This community doesn't have snapshot spaces connected"
+                          );
+                        }
+                      }}
+                      content={
+                        <div className="ActionCard">
+                          <CWText type="b2">
+                            Search through snapshots show the poll directly on
+                            the thread page
+                          </CWText>
+                        </div>
+                      }
+                    />
                   </div>
-                }
-              />
-            </div>
-          ),
-        },
+                ),
+              },
+            ]
+          : []),
+
         {
           label: 'Create new template',
           item: (

@@ -275,27 +275,25 @@ export const CWContentPage = ({
           </div>
         )}
       </div>
-      {showRightSidebar && (
-        <div className="RightSidebar">
-          <div className="CloseButtonContainer">
-            <CWIconButton
-              iconName="close"
-              iconSize="small"
-              className="close-button"
-              onClick={() => {
-                if (onCloseRightSidebar) {
-                  onCloseRightSidebar();
-                }
-              }}
-            />
-          </div>
-          <div className="RightSidebarContent">
-            {rightSidebarContent?.map((c) => (
-              <React.Fragment key={c.label}>{c.item}</React.Fragment>
-            ))}
-          </div>
+      <div className={`RightSidebar ${showRightSidebar ? 'show' : ''}`}>
+        <div className="CloseButtonContainer">
+          <CWIconButton
+            iconName="close"
+            iconSize="small"
+            className="close-button"
+            onClick={() => {
+              if (onCloseRightSidebar) {
+                onCloseRightSidebar();
+              }
+            }}
+          />
         </div>
-      )}
+        <div className="RightSidebarContent">
+          {rightSidebarContent?.map((c) => (
+            <React.Fragment key={c.label}>{c.item}</React.Fragment>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

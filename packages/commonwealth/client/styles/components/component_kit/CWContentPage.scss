@@ -119,9 +119,17 @@
   overflow-y: auto;
   width: $sidebar-width;
   padding: 8px;
+  visibility: hidden;
   // right: 0;
   // position: absolute;
   border-left: 1px solid $neutral-200;
+  transform: translateX(100%);
+  transition: transform 0.1s ease-out;
+
+  &.show {
+    transform: translateX(0);
+    visibility: visible;
+  }
 
   .CloseButtonContainer {
     width: 100%;
