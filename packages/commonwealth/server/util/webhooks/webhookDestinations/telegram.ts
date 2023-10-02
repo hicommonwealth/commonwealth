@@ -6,7 +6,7 @@ import {
 } from '../types';
 import { REGEX_EMOJI } from '../util';
 import request from 'superagent';
-import { SERVER_URL } from '../../../config';
+import { SERVER_URL, TELEGRAM_BOT_TOKEN } from '../../../config';
 
 type TelegramWebhookMessage = {
   chat_id: string;
@@ -102,7 +102,7 @@ export function sendTelegramWebhook(
     throw new Error('Invalid Telegram webhook URL');
   }
 
-  const url = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`;
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
   const message = formatTelegramMessage(category, data, channelId);
   return request.post(url).send(message);

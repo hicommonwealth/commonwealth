@@ -144,3 +144,8 @@ export const COSMOS_GOV_V1 = process.env.COSMOS_GOV_V1;
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
 // Don't set default value so if env var is not set the database cleaner will not run
 export const DATABASE_CLEAN_HOUR = process.env.DATABASE_CLEAN_HOUR;
+
+export const TELEGRAM_BOT_TOKEN =
+  process.env.NODE_ENV === 'production'
+    ? process.env.TELEGRAM_BOT_TOKEN
+    : process.env.TELEGRAM_BOT_TOKEN_DEV;

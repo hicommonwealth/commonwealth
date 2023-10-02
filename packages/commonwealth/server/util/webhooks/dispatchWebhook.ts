@@ -79,15 +79,7 @@ export async function dispatchWebhooks(
   for (const result of results) {
     if (result.status === 'rejected') {
       const res = result.reason.response;
-      // console.log(res.error);
-      // console.log(result.reason.response);
-
-      console.error(
-        `Error sending webhook:\n` +
-          `\tStatus: ${res.statusCode}\n` +
-          `\tError Message: ${res.error}\n` +
-          `\tError Text: ${res.error.text}\n`
-      );
+      console.log(res.error);
     }
   }
 }

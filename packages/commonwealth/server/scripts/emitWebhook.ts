@@ -30,7 +30,7 @@ async function main() {
         choices: Object.values(WebhookDestinations),
         description:
           'The destination of the webhook notification. ' +
-          'This sends a notification to a hardcoded channel.' +
+          'This sends a notification to a hardcoded channel. ' +
           'See Webhooks.md in the Wiki for more information about existing testing channels.',
       },
       // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -43,19 +43,6 @@ async function main() {
       }
 
       if (argv) return true;
-    })
-    .coerce('destination', (arg) => {
-      // TODO: map destination to an env var url
-      return arg;
-      // if (arg === WebhookDestinations.Discord) {
-      //   return process.env.DISCORD_WEBHOOK_URL;
-      // } else if (arg === WebhookDestinations.Slack) {
-      //   return process.env.SLACK_WEBHOOK_URL;
-      // } else if (arg === WebhookDestinations.Telegram) {
-      //   return process.env.TELEGRAM_BOT_TOKEN;
-      // } else {
-      //   throw new Error(`Invalid webhook destination: ${arg}`);
-      // }
     }).argv;
 
   const chain = await models.Chain.findOne({
@@ -64,20 +51,24 @@ async function main() {
     },
   });
 
-  const [webhook, created] = await models.Webhook.findOrCreate({
-    where: {
-      url: argv.url,
-      chain_id: chain.id,
-    },
-    defaults: {
-      categories: [argv.notificationCategory],
-    },
-  });
-
-  if (!created) {
-    webhook.categories = [argv.notificationCategory];
-    await webhook.save();
+  let url: string;
+  if (argv.url) {
+    url = argv.url;
+  } else if (argv.destination === WebhookDestinations.Discord) {
+    url = process.env.DISCORD_WEBHOOK_URL_DEV;
+  } else if (argv.destination === WebhookDestinations.Slack) {
+    url = process.env.SLACK_WEBHOOK_URL_DEV;
+  } else if (argv.destination === WebhookDestinations.Telegram) {
+    url = 'api.telegram.org/@-1001509073772';
+  } else {
+    throw new Error(`Invalid webhook destination: ${argv.destination}`);
   }
+
+  const webhook = models.Webhook.build({
+    url,
+    chain_id: chain.id,
+    categories: [argv.notificationCategory],
+  });
 
   let notification: NotificationDataAndCategory;
   if (argv.notificationCategory === NotificationCategories.ChainEvent) {
