@@ -1,7 +1,7 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import { NotificationDataAndCategory } from 'types';
+import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
 import { SupportedNetwork } from 'chain-events/src';
 import models from '../database';
@@ -15,7 +15,12 @@ async function main() {
         type: 'string',
         description:
           'The category of the webhook notification to emit i.e. NotificationCategories',
-        choices: Object.values(NotificationCategories),
+        choices: [
+          NotificationCategories.ChainEvent,
+          NotificationCategories.NewThread,
+          NotificationCategories.NewComment,
+          NotificationCategories.NewReaction,
+        ] as WebhookCategory[],
         demandOption: true,
       },
       url: {
