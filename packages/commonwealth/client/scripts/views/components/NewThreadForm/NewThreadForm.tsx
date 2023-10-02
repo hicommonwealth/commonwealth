@@ -38,11 +38,21 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector = topics?.filter((t) => {
-    return (
-      isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
-    );
-  });
+  const { enabledTopics, disabledTopics } = topics?.reduce(
+    (acc, t) => {
+      if (
+        isAdmin ||
+        t.tokenThreshold.isZero() ||
+        !app.chain.isGatedTopic(t.id)
+      ) {
+        acc.enabledTopics.push(t);
+      } else {
+        acc.disabledTopics.push(t);
+      }
+      return acc;
+    },
+    { enabledTopics: [], disabledTopics: [] }
+  );
 
   const {
     threadTitle,
@@ -58,7 +68,7 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-  } = useNewThreadForm(chainId, topicsForSelector);
+  } = useNewThreadForm(chainId, enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -132,7 +142,7 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      topicsForSelector.find((t) => t.name.includes('General')) || null
+      enabledTopics.find((t) => t.name.includes('General')) || null
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
@@ -161,7 +171,8 @@ export const NewThreadForm = () => {
             <div className="topics-and-title-row">
               {hasTopics && (
                 <TopicSelector
-                  topics={topicsForSelector}
+                  enabledTopics={enabledTopics}
+                  disabledTopics={disabledTopics}
                   value={threadTopic}
                   onChange={setThreadTopic}
                 />

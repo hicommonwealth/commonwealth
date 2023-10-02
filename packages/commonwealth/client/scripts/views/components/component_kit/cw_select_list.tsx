@@ -14,6 +14,7 @@ export const SelectList = <
   return (
     <Select
       {...props}
+      isOptionDisabled={(option) => option.disabled}
       styles={{
         control: (baseStyles) => ({
           ...baseStyles,
