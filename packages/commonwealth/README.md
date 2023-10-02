@@ -118,7 +118,7 @@ Environment variables used for external services include:
 
 - AWS_ACCESS_KEY_ID: for uploading images to Amazon S3
 - AWS_SECRET_ACCESS_KEY: for uploading images to Amazon S3
-- AWS_REGION: for uploading images to Amazon S3 (conventionally 'us-east-2')
+- AWS_REGION: for uploading images to Amazon S3 (conventionally 'us-east-1')
 - GITHUB_CLIENT_ID: for Github OAuth login
 - GITHUB_CLIENT_SECRET: for Github OAuth login
 - MIXPANEL_TOKEN: for analytics
