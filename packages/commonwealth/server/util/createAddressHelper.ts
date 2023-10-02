@@ -114,16 +114,11 @@ export async function createAddressHelper(
     where: { chain: req.chain, address: encodedAddress },
   });
 
-  if (existingHex && !existingAddress) {
-    // we want to consolidate that existingHex into this user
-    // existingAddress = existingHex;
-  }
-
-  const existingAddressOnOtherChain = await models.Address.scope(
-    'withPrivateData'
-  ).findOne({
-    where: { chain: { [Op.ne]: req.chain }, address: encodedAddress },
-  });
+  const existingAddressOnOtherChain =
+    existingHex ||
+    (await models.Address.scope('withPrivateData').findOne({
+      where: { chain: { [Op.ne]: req.chain }, address: encodedAddress },
+    }));
 
   if (existingAddress) {
     // address already exists on another user, only take ownership if
@@ -238,7 +233,7 @@ export async function createAddressHelper(
 
       return {
         ...newObj.toJSON(),
-        newly_created: !existingAddressOnOtherChain && !existingHex,
+        newly_created: !existingAddressOnOtherChain,
       };
     } catch (e) {
       return next(e);
