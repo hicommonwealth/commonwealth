@@ -1,5 +1,5 @@
-import React, { useEffect, useState, ReactNode } from 'react';
-import { Circle, RadioButton } from '@phosphor-icons/react';
+import React, { ReactNode } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import 'components/component_kit/new_designs/cw_radio_button.scss';
 import { CWText } from '../cw_text';
@@ -15,14 +15,22 @@ type RadioButtonStyleProps = {
   checked?: boolean;
 };
 
+type RadioButtoFormValidationProps = {
+  name?: string;
+  hookToForm?: boolean;
+};
+
 type RadioButtonProps = {
   groupName?: string;
   onChange?: (e?: any) => void;
 } & Omit<RadioButtonType, 'disabled'> &
-  RadioButtonStyleProps;
+  RadioButtonStyleProps &
+  RadioButtoFormValidationProps;
 
 export const CWRadioButton = (props: RadioButtonProps) => {
   const {
+    name,
+    hookToForm,
     disabled = false,
     groupName,
     label,
@@ -30,29 +38,29 @@ export const CWRadioButton = (props: RadioButtonProps) => {
     checked,
     value,
   } = props;
-  const [isChecked, setIsChecked] = useState<boolean>(checked);
 
-  const handleClick = () => {
-    if (!disabled) {
-      setIsChecked(!isChecked);
-    }
-    onChange?.();
-  };
+  const formContext = useFormContext();
+  const formFieldContext = hookToForm
+    ? formContext.register(name)
+    : ({} as any);
 
-  // For Storybook checked control
-  useEffect(() => setIsChecked(checked), [checked]);
-
-  const commonProps = {
-    name: groupName,
-    onClick: handleClick,
-  };
+  // TODO: this message is not needed now, but when its needed it should be coming from the radio group
+  // const formFieldErrorMessage =
+  //   hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
     <div className="container">
       <input
         type="radio"
         className={`radio-button2 ${disabled ? 'disabled' : ''}`}
-        {...commonProps}
+        checked={checked}
+        name={groupName}
+        value={value}
+        {...formFieldContext}
+        onChange={async (e) => {
+          hookToForm && (await formFieldContext?.onChange(e));
+          await onChange?.(e);
+        }}
       />
       <CWText className="label" type="b2" fontWeight="regular">
         {label || value}
