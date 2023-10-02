@@ -9,6 +9,7 @@ import { sendSlackWebhook } from './webhookDestinations/slack';
 import { sendTelegramWebhook } from './webhookDestinations/telegram';
 import { WebhookInstance } from '../../models/webhook';
 import { sendZapierWebhook } from './webhookDestinations/zapier';
+import { rollbar } from '../rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -79,8 +80,14 @@ export async function dispatchWebhooks(
   const results = await Promise.allSettled(webhookPromises);
   for (const result of results) {
     if (result.status === 'rejected') {
-      const res = result.reason.response;
-      console.log(res.error);
+      log.error(
+        `Error sending webhook: ${result.reason}`,
+        result.reason?.response?.error
+      );
+      rollbar.error(
+        `Error sending webhook: ${result.reason}`,
+        result.reason?.response?.error
+      );
     }
   }
 }

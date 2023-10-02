@@ -16,6 +16,7 @@ import {
 import { factory, formatFilename } from 'common-common/src/logging';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 import { dispatchWebhooks } from './webhooks/dispatchWebhook';
+import { rollbar } from './rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -193,8 +194,12 @@ export default async function emitNotifications(
     }
   }
 
-  // send data to relevant webhooks
-  await dispatchWebhooks(notification_data_and_category);
+  try {
+    await dispatchWebhooks(notification_data_and_category);
+  } catch (e) {
+    log.error('Failed to dispatch webhooks', e);
+    rollbar.error('Failed to dispatch webhooks', e);
+  }
 
   return notification;
 }
