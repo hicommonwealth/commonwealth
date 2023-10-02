@@ -36,10 +36,13 @@ export const groupValidationSchema = z.object({
   groupDescription: z
     .string({ invalid_type_error: NO_INPUT })
     .max(250, { message: MAX_CHAR_LIMIT_REACHED }),
+  numberOfRequirements: z
+    .string({ invalid_type_error: NO_INPUT })
+    .nonempty({ message: NO_INPUT }),
   topics: z
     .array(
       z.object({
-        value: z.number().default(-1),
+        value: z.any().default(-1),
         label: z.string().nonempty({ message: NO_INPUT }),
       }),
       {

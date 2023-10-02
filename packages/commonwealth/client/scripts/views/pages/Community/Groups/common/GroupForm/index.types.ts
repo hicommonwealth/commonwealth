@@ -38,6 +38,7 @@ export type GroupInitialValuesTypeWithLabel = {
   groupName: string;
   groupDescription?: string;
   requirements?: RequirementSubTypeWithLabel[];
+  numberOfRequirements?: string;
   topics: LabelType[];
 };
 

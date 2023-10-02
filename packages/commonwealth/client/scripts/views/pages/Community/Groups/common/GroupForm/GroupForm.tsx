@@ -7,6 +7,7 @@ import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError } from 'zod';
@@ -31,7 +32,14 @@ const CWRequirementsRadioButton = () => {
     </span>
   );
 
-  return <CWRadioButton label={Label} value="n-requirements" />;
+  return (
+    <CWRadioButton
+      label={Label}
+      value="n-requirements"
+      name="numberOfRequirements"
+      hookToForm
+    />
+  );
 };
 
 const MAX_REQUIREMENTS = 10;
@@ -224,147 +232,167 @@ const GroupForm = ({
       initialValues={{
         groupName: initialValues.groupName || '',
         groupDescription: initialValues.groupDescription || '',
+        numberOfRequirements: initialValues.numberOfRequirements || '',
         topics: initialValues.topics || '',
       }}
       validationSchema={groupValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
     >
-      {/* TODO: add breadcrum here as a separate div when that ticket is done */}
+      {(formContext) => (
+        <>
+          {/* TODO: add breadcrum here as a separate div when that ticket is done */}
 
-      {/* Form header */}
-      <div className="header-row">
-        <CWText type="h2" fontWeight="semiBold" className="header-text">
-          {formType === 'create' ? 'Create a group' : 'Update your group'}
-        </CWText>
-        <CWText type="b2">
-          {formType === 'create'
-            ? 'Create attributes-based groups for gating topics within your community'
-            : 'Update group attributes'}
-        </CWText>
-      </div>
-
-      {/* Basic information section */}
-      <section className="form-section">
-        <CWText type="h3" fontWeight="semiBold" className="header-text">
-          Basic information
-        </CWText>
-        <CWTextInput
-          name="groupName"
-          hookToForm
-          label="Group name"
-          placeholder="Group name"
-          fullWidth
-          instructionalMessage="Can be up to 40 characters long."
-        />
-        <CWTextArea
-          name="groupDescription"
-          hookToForm
-          label="Description"
-          placeholder="Add a description for your group"
-          instructionalMessage="Can be up to 250 characters long."
-        />
-      </section>
-
-      <CWDivider />
-
-      {/* Requirements section */}
-      <section className="form-section">
-        <div className="header-row">
-          <CWText type="h3" fontWeight="semiBold" className="header-text">
-            Requirements
-          </CWText>
-          <CWText type="b2">Add requirements for access to gated topics</CWText>
-        </div>
-
-        {/* Sub-section: Necessary requirements */}
-        <section className="form-section">
-          {/* Added Requirements */}
-          {requirementSubForms.map((subForm, index) => (
-            <RequirementSubForm
-              key={index}
-              defaultValues={subForm.defaultValues}
-              errors={subForm.errors}
-              onChange={(val) => validateChangedValue(val, index)}
-              isRemoveable={index > 0}
-              onRemove={() => removeRequirementByIndex(index)}
-            />
-          ))}
-
-          {requirementSubForms.length < MAX_REQUIREMENTS && (
-            <CWButton
-              type="button"
-              label="Add requirement"
-              iconLeft="plus"
-              buttonWidth="full"
-              buttonType="secondary"
-              buttonHeight="med"
-              onClick={addRequirementSubForm}
-            />
-          )}
-
-          <CWText
-            type="h4"
-            fontWeight="semiBold"
-            className="header-row header-text"
-          >
-            Necessary requirements
-          </CWText>
-
-          <div className="radio-buttons">
-            <CWRadioButton
-              groupName="numberOfRequirements"
-              label="All requirements must be satisfied"
-              value="all-requirements"
-            />
-
-            <CWRequirementsRadioButton />
-          </div>
-        </section>
-
-        {/* Sub-section: Gated topics */}
-        <section className="form-section">
+          {/* Form header */}
           <div className="header-row">
-            <CWText type="h4" fontWeight="semiBold" className="header-text">
-              Gated topic(s)
+            <CWText type="h2" fontWeight="semiBold" className="header-text">
+              {formType === 'create' ? 'Create a group' : 'Update your group'}
             </CWText>
             <CWText type="b2">
-              Add topics to gate to auto-lock it for group members who satisfy
-              the requirements above
+              {formType === 'create'
+                ? 'Create attributes-based groups for gating topics within your community'
+                : 'Update group attributes'}
             </CWText>
           </div>
 
-          <CWSelectList
-            name="topics"
-            hookToForm
-            isMulti
-            isClearable={false}
-            label="Topics"
-            placeholder="Type in topic name"
-            options={sortedTopics.map((topic) => ({
-              label: topic.name,
-              value: topic.id,
-            }))}
-          />
-        </section>
-      </section>
+          {/* Basic information section */}
+          <section className="form-section">
+            <CWText type="h3" fontWeight="semiBold" className="header-text">
+              Basic information
+            </CWText>
+            <CWTextInput
+              name="groupName"
+              hookToForm
+              label="Group name"
+              placeholder="Group name"
+              fullWidth
+              instructionalMessage="Can be up to 40 characters long."
+            />
+            <CWTextArea
+              name="groupDescription"
+              hookToForm
+              label="Description"
+              placeholder="Add a description for your group"
+              instructionalMessage="Can be up to 250 characters long."
+            />
+          </section>
 
-      <TopicGatingHelpMessage />
+          <CWDivider />
 
-      {/* Form action buttons */}
-      <div className="action-buttons">
-        <CWButton
-          label="Back"
-          buttonWidth="wide"
-          buttonType="secondary"
-          type="button"
-        />
-        <CWButton
-          type="submit"
-          buttonWidth="wide"
-          label={formType === 'create' ? 'Create group' : 'Update group'}
-        />
-      </div>
+          {/* Requirements section */}
+          <section className="form-section">
+            <div className="header-row">
+              <CWText type="h3" fontWeight="semiBold" className="header-text">
+                Requirements
+              </CWText>
+              <CWText type="b2">
+                Add requirements for access to gated topics
+              </CWText>
+            </div>
+
+            {/* Sub-section: Necessary requirements */}
+            <section className="form-section">
+              {/* Added Requirements */}
+              {requirementSubForms.map((subForm, index) => (
+                <RequirementSubForm
+                  key={index}
+                  defaultValues={subForm.defaultValues}
+                  errors={subForm.errors}
+                  onChange={(val) => validateChangedValue(val, index)}
+                  isRemoveable={index > 0}
+                  onRemove={() => removeRequirementByIndex(index)}
+                />
+              ))}
+
+              {requirementSubForms.length < MAX_REQUIREMENTS && (
+                <CWButton
+                  type="button"
+                  label="Add requirement"
+                  iconLeft="plus"
+                  buttonWidth="full"
+                  buttonType="secondary"
+                  buttonHeight="med"
+                  onClick={addRequirementSubForm}
+                />
+              )}
+
+              <CWText
+                type="h4"
+                fontWeight="semiBold"
+                className="header-row header-text"
+              >
+                Necessary requirements
+              </CWText>
+
+              <div className="radio-buttons">
+                <CWRadioButton
+                  label="All requirements must be satisfied"
+                  value="all-requirements"
+                  name="numberOfRequirements"
+                  hookToForm
+                />
+
+                <CWRequirementsRadioButton />
+
+                {formContext.formState?.errors?.numberOfRequirements
+                  ?.message && (
+                  <MessageRow
+                    hasFeedback
+                    statusMessage={
+                      formContext.formState?.errors?.numberOfRequirements
+                        ?.message
+                    }
+                    validationStatus="failure"
+                  />
+                )}
+              </div>
+            </section>
+
+            {/* Sub-section: Gated topics */}
+            <section className="form-section">
+              <div className="header-row">
+                <CWText type="h4" fontWeight="semiBold" className="header-text">
+                  Gated topic(s)
+                </CWText>
+                <CWText type="b2">
+                  Add topics to gate to auto-lock it for group members who
+                  satisfy the requirements above
+                </CWText>
+              </div>
+
+              <CWSelectList
+                name="topics"
+                hookToForm
+                isMulti
+                isClearable={false}
+                label="Topics"
+                placeholder="Type in topic name"
+                options={sortedTopics.map((topic) => ({
+                  label: topic.name,
+                  value: topic.id,
+                }))}
+              />
+            </section>
+          </section>
+
+          <TopicGatingHelpMessage />
+
+          {/* Form action buttons */}
+          <div className="action-buttons">
+            <CWButton
+              label="Back"
+              buttonWidth="wide"
+              buttonType="secondary"
+              type="button"
+            />
+            <CWButton
+              type="submit"
+              buttonWidth="wide"
+              label={formType === 'create' ? 'Create group' : 'Update group'}
+            />
+          </div>
+        </>
+      )}
     </CWForm>
   );
 };
