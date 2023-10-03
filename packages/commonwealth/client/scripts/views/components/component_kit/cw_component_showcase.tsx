@@ -1762,13 +1762,13 @@ export const ComponentShowcase = () => {
           )}
         </CWForm>
       </div>
-      <div className='community-card'>
-            <CWText type='h3'> Community Card </CWText>
-            <CWRelatedCommunityCard
-              chain={app.config.chains.getById("basindao")}
-              memberCount={2623}
-              threadCount={437}
-            />
+      <div className="community-card">
+        <CWText type="h3"> Community Card </CWText>
+        <CWRelatedCommunityCard
+          chain={app.config.chains.getById('basindao')}
+          memberCount={2623}
+          threadCount={437}
+        />
       </div>
     </div>
   );
