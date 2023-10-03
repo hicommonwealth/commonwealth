@@ -79,6 +79,7 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
+  Header,
 } from '@tanstack/react-table';
 
 type ColumnDescriptor = {
@@ -147,7 +148,10 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
     debugTable: true,
   });
 
-  const displaySortIcon = (sortDirection: string) => {
+  const displaySortIcon = (
+    sortDirection: string,
+    sortHandler: (event: unknown) => void
+  ) => {
     const sortDirections = {
       asc: (
         <div className="icon-container">
@@ -155,6 +159,7 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
             iconName="arrowUpBlue500"
             iconSize="small"
             className="arrow-up-blue"
+            onClick={sortHandler}
           />
         </div>
       ),
@@ -164,6 +169,7 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
             iconName="arrowDownBlue500"
             iconSize="small"
             className="arrow-down-blue"
+            onClick={sortHandler}
           />
         </div>
       ),
@@ -173,6 +179,7 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
             iconName="arrowUpNeutral400"
             iconSize="small"
             className="arrow-down-blue"
+            onClick={sortHandler}
           />
         </div>
       ),
@@ -198,7 +205,6 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
                             header.column.getCanSort() &&
                               'cursor-pointer select-none'
                           ),
-                          onClick: header.column.getToggleSortingHandler(),
                         }}
                       >
                         <span className="header-text">
@@ -210,7 +216,8 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
 
                         {header.column.getCanSort()
                           ? displaySortIcon(
-                              header.column.getIsSorted() as string
+                              header.column.getIsSorted() as string,
+                              header.column.getToggleSortingHandler()
                             ) ?? null
                           : null}
                       </div>
