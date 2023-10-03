@@ -128,8 +128,9 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
             renderTrigger={renderTrigger}
             menuItems={[
               {
-                iconLeft: 'copy',
-                label: 'Copy URL',
+                iconLeft: 'linkPhosphor',
+                iconLeftSize: 'regular',
+                label: 'Copy link',
                 onClick: async () => {
                   if (isThread) {
                     await navigator.clipboard.writeText(
@@ -143,7 +144,8 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 },
               },
               {
-                iconLeft: 'twitter',
+                iconLeft: 'twitterOutline',
+                iconLeftSize: 'regular',
                 label: 'Share on Twitter',
                 onClick: async () => {
                   if (isThread) {
