@@ -49,6 +49,7 @@ import 'components/TemplateSelectorItem.scss';
 import 'pages/view_thread/linked_proposals_card.scss';
 
 import ContractsPage from './contracts';
+import { PollEditorModal } from '../modals/poll_editor_modal';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
@@ -63,6 +64,7 @@ const NewThreadPage = () => {
   const [contracts, setContracts] = useState<Array<any>>([]);
   const [links, setLinks] = useState<Link[]>([]);
   const [tempTemplates, setTempTemplates] = useState<any[]>([]);
+  const [initializedPolls, setInitializedPolls] = useState(false);
 
   const fetchContracts = async () => {
     const contractsInStore = app.contracts.getCommunityContracts();
@@ -613,6 +615,38 @@ const NewThreadPage = () => {
                   <div className="ActionCard">
                     <CWText type="b2">
                       Add an existing template to the thread.
+                    </CWText>
+                  </div>
+                }
+              />
+            </div>
+          ),
+        },
+        {
+          label: 'Add Poll',
+          item: (
+            <div className="SelectableCard">
+              {/* <Modal
+                className="PollEditorCardModal"
+                content={
+                  <PollEditorModal
+                    thread={thread}
+                    onModalClose={() => setIsModalOpen(false)}
+                    onPollCreate={onPollCreate}
+                  />
+                }
+                onClose={() => setIsModalOpen(false)}
+                open={isModalOpen}
+              /> */}
+              <CWContentPageCard
+                header="Create Poll"
+                onClick={() => {
+                  setCreateTemplateModalOpen(true);
+                }}
+                content={
+                  <div className="ActionCard">
+                    <CWText type="b2">
+                      Create a new poll attached to this thread.
                     </CWText>
                   </div>
                 }
