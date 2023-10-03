@@ -8,4 +8,4 @@ export const optionList = [
   { value: 'stargate-finance', label: 'Stargate Finance' },
   { value: 'stargaze', label: 'Stargaze' },
   { value: 'terra-classic', label: 'Terra Classic' },
-]
+];

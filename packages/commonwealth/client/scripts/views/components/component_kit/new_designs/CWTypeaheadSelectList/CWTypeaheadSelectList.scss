@@ -6,35 +6,38 @@
   .SelectList {
     font-family: $font-family-neue-haas-unica;
     border: 1px solid $neutral-200;
-    padding: 10px 16px;
     border-radius: $border-radius-corners-wider;
 
     &:hover {
       border: 1px solid $primary-600;
     }
 
-    .tasl__value-container {
-      padding: 0;
+    .tasl__control {
+      padding: 10px 16px;
 
-      .tasl__single-value {
-        margin: 0;
-      }
-      .tasl__input-container {
-        margin: 0;
+      .tasl__value-container {
         padding: 0;
-      }
-    }
-    .tasl__indicators {
-      .tasl__indicator {
-        padding: 0px;
-        color: $neutral-500;
 
-        &.tasl__clear-indicator {
-          margin-right: 10px;
+        .tasl__single-value {
+          margin: 0;
+        }
+        .tasl__input-container {
+          margin: 0;
+          padding: 0;
         }
       }
-      .tasl__indicator-separator {
-        display: none;
+      .tasl__indicators {
+        .tasl__indicator {
+          padding: 0px;
+          color: $neutral-500;
+
+          &.tasl__clear-indicator {
+            margin-right: 10px;
+          }
+        }
+        .tasl__indicator-separator {
+          display: none;
+        }
       }
     }
   }

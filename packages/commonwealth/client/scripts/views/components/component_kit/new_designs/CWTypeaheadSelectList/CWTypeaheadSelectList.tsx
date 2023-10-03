@@ -14,8 +14,7 @@ type TypeaheadSelectListProps = {
   placeholder?: string;
 };
 
-export const CWTypeaheadSelectList = (props: TypeaheadSelectListProps) => {
-  const { options, defaultValue, placeholder } = props;
+export const CWTypeaheadSelectList = ({ options, defaultValue, placeholder }: TypeaheadSelectListProps) => {
 
   return (
     <div className={ComponentType.TypeaheadSelectList}>
