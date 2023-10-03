@@ -12,6 +12,7 @@ import { CWSpinner } from '../component_kit/cw_spinner';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivity from './ProfileActivity';
 import ProfileHeader from './ProfileHeader';
+import { CWText } from '../../components/component_kit/cw_text';
 
 enum ProfileError {
   None,
@@ -43,9 +44,7 @@ const Profile = ({ profileId }: ProfileProps) => {
 
       setProfile(new NewProfile(result.profile));
       setThreads(result.threads.map((t) => new Thread(t)));
-      const responseComments = result.comments.map((c) =>
-        new Comment(c)
-      );
+      const responseComments = result.comments.map((c) => new Comment(c));
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = result.commentThreads.find(
           (t) => t.id === parseInt(c.threadId, 10)
@@ -117,24 +116,30 @@ const Profile = ({ profileId }: ProfileProps) => {
         style={
           profile.backgroundImage
             ? {
-              backgroundImage: `url(${backgroundUrl})`,
-              backgroundRepeat: `${backgroundImageBehavior === ImageBehavior.Fill
-                  ? 'no-repeat'
-                  : 'repeat'
+                backgroundImage: `url(${backgroundUrl})`,
+                backgroundRepeat: `${
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'no-repeat'
+                    : 'repeat'
                 }`,
-              backgroundSize:
-                backgroundImageBehavior === ImageBehavior.Fill
-                  ? 'cover'
-                  : '100px',
-              backgroundPosition:
-                backgroundImageBehavior === ImageBehavior.Fill
-                  ? 'center'
-                  : '56px 56px',
-              backgroundAttachment: 'fixed',
-            }
+                backgroundSize:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'cover'
+                    : '100px',
+                backgroundPosition:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'center'
+                    : '56px 56px',
+                backgroundAttachment: 'fixed',
+              }
             : {}
         }
       >
+        <div className="header">
+          <CWText type="h2" fontWeight="medium">
+            {profile.name}'s Profile
+          </CWText>
+        </div>
         <div
           className={
             profile.backgroundImage
