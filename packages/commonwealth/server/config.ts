@@ -144,4 +144,8 @@ export const TELEGRAM_BOT_TOKEN =
     ? process.env.TELEGRAM_BOT_TOKEN
     : process.env.TELEGRAM_BOT_TOKEN_DEV;
 
-export const SEND_WEBHOOKS = process.env.SEND_WEBHOOKS === 'true';
+// Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
+// Risks sending webhooks/emails to real users if incorrectly set to true
+export const SEND_WEBHOOKS_EMAILS =
+  process.env.NODE_ENV === 'production' &&
+  process.env.SEND_WEBHOOKS_EMAILS === 'true';

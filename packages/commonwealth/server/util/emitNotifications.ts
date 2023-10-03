@@ -6,7 +6,7 @@ import type {
   IForumNotificationData,
   NotificationDataAndCategory,
 } from '../../shared/types';
-import { SEND_WEBHOOKS, SERVER_URL } from '../config';
+import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
 import type { DB } from '../models';
 import type { NotificationInstance } from '../models/notification';
 import {
@@ -183,18 +183,19 @@ export default async function emitNotifications(
     });
   }
 
-  // send emails
-  for (const subscription of subscriptions) {
-    if (msg && isChainEventData && chainEvent.chain) {
-      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+  if (SEND_WEBHOOKS_EMAILS) {
+    // emails
+    for (const subscription of subscriptions) {
+      if (msg && isChainEventData && chainEvent.chain) {
+        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+      }
+      if (msg && subscription?.immediate_email && subscription?.User) {
+        // kick off async call and immediately return
+        sendImmediateNotificationEmail(subscription.User, msg);
+      }
     }
-    if (msg && subscription?.immediate_email && subscription?.User) {
-      // kick off async call and immediately return
-      sendImmediateNotificationEmail(subscription.User, msg);
-    }
-  }
 
-  if (process.env.NODE_ENV === 'production' && SEND_WEBHOOKS) {
+    // webhooks
     try {
       await dispatchWebhooks(notification_data_and_category);
     } catch (e) {
