@@ -79,6 +79,8 @@ export const CosmosProposalForm = () => {
         onInput={(e) => {
           setDescription(e.target.value);
         }}
+        value={description}
+        resizeWithText
       />
       {isLoadingDepositParams ? (
         <Skeleton className="TextInput" style={{ height: 62 }} />

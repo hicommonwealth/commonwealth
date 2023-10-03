@@ -49,7 +49,6 @@ export const Feed = ({
     const getData = async () => {
       try {
         const response = await fetchData();
-
         const notifications = onFetchedDataCallback
           ? response.result.map((activity) => onFetchedDataCallback(activity))
           : response.result;

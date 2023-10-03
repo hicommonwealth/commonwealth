@@ -238,7 +238,7 @@ class ContractsController {
     community: string;
   }) {
     try {
-      await $.post(`${app.serverUrl()}/contract/template`, {
+      const response = await $.post(`${app.serverUrl()}/contract/template`, {
         jwt: app.user.jwt,
         chain_id: app.activeChainId(),
         name,
@@ -252,6 +252,7 @@ class ContractsController {
       const contract = this._store.getById(contract_id);
       this._store.remove(this._store.getById(contract_id));
       this._store.add(new Contract({ ...contract, hasGlobalTemplate: true }));
+      return response.result.template_id;
     } catch (err) {
       console.log(err);
       throw new Error('Failed to create template');

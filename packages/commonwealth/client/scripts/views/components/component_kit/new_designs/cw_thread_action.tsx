@@ -69,6 +69,7 @@ type CWThreadActionProps = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   label?: string;
   selected?: boolean;
+  tooltipText?: string;
 };
 
 interface TooltipWrapperProps {
@@ -78,7 +79,11 @@ interface TooltipWrapperProps {
 }
 
 // Tooltip should only wrap the ThreadAction when the button is disabled
-const TooltipWrapper = ({ children, disabled, text }: TooltipWrapperProps) => {
+export const TooltipWrapper = ({
+  children,
+  disabled,
+  text,
+}: TooltipWrapperProps) => {
   if (!disabled) {
     return <>{children}</>;
   }
@@ -89,7 +94,15 @@ const TooltipWrapper = ({ children, disabled, text }: TooltipWrapperProps) => {
       content={text}
       placement="top"
       renderTrigger={(handleInteraction) => (
-        <div onMouseEnter={handleInteraction} onMouseLeave={handleInteraction}>
+        <div
+          style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
+          onClick={(e) => {
+            e.preventDefault();
+            if (disabled) return;
+          }}
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+        >
           {children}
         </div>
       )}
@@ -120,6 +133,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   onClick,
   label,
   selected,
+  tooltipText,
 }) => {
   const handleClick = (e) => {
     if (disabled) {
@@ -132,7 +146,10 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   const upvoteSelected = action === 'upvote' && selected;
 
   return (
-    <TooltipWrapper disabled={disabled} text={getTooltipCopy(action)}>
+    <TooltipWrapper
+      disabled={disabled}
+      text={tooltipText || getTooltipCopy(action)}
+    >
       <button
         onClick={handleClick}
         className={getClasses(

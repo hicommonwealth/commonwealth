@@ -37,6 +37,8 @@ import type { WebhookModelStatic } from './models/webhook';
 import type { CommunityContractTemplateStatic } from './models/community_contract_template';
 import type { CommunityContractTemplateMetadataStatic } from './models/community_contract_metadata';
 import type { TemplateModelStatic } from './models/template';
+import type { GroupModelStatic } from './models/group';
+import type { MembershipModelStatic } from './models/membership';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -61,6 +63,8 @@ export type Models = {
   NotificationsRead: NotificationsReadModelStatic;
   Comment: CommentModelStatic;
   Poll: PollModelStatic;
+  Group: GroupModelStatic;
+  Membership: MembershipModelStatic;
   Reaction: ReactionModelStatic;
   Thread: ThreadModelStatic;
   Topic: TopicModelStatic;

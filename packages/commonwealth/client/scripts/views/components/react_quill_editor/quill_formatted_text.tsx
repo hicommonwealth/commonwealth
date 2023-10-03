@@ -10,9 +10,22 @@ import { DeltaStatic } from 'quill';
 import { renderTruncatedHighlights } from './highlighter';
 import { QuillRendererProps } from './quill_renderer';
 import { countLinesQuill, getTextFromDelta } from './utils';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 
 type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: DeltaStatic;
+};
+
+type TextWithHighlightsProps = {
+  children: React.ReactNode;
+};
+
+type TextWithHighlightsArray = Array<
+  React.ReactElement<TextWithHighlightsProps>
+>;
+
+type LinkProps = {
+  href: string;
 };
 
 // NOTE: Do NOT use this directly. Use QuillRenderer instead.
@@ -43,7 +56,6 @@ export const QuillFormattedText = ({
     return doc;
   }, [cutoffLines, doc, isTruncated]);
 
-  // finalDoc is the rendered content which may include search term highlights
   const finalDoc = useMemo(() => {
     // if no search term, just render the doc normally
     if (!searchTerm) {
@@ -56,6 +68,47 @@ export const QuillFormattedText = ({
       );
     }
 
+    /**
+     * Type guard function to check if a React element is a TextWithHighlights element.
+     *
+     * @param {React.ReactElement} child - The React element to check.
+     * @returns {child is React.ReactElement<TextWithHighlightsProps>} - True if the element is a TextWithHighlights element, false otherwise.
+     */
+    const isTextWithHighlights = (
+      child: React.ReactElement
+    ): child is React.ReactElement<TextWithHighlightsProps> => {
+      return (
+        React.isValidElement(child) &&
+        typeof child.type !== 'string' &&
+        typeof (child.props as TextWithHighlightsProps).children !== 'string'
+      );
+    };
+
+    // Function to process individual elements
+    const processElements = (
+      elements: TextWithHighlightsArray | Array<React.ReactElement<LinkProps>>
+    ) =>
+      elements.map((el, i: number) => {
+        if (el.type === 'a') {
+          return (
+            <CWTooltip
+              key={i}
+              content={el.props.href}
+              placement="top"
+              renderTrigger={(handleInteraction) => (
+                <div
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                >
+                  {el}
+                </div>
+              )}
+            />
+          );
+        }
+        return el;
+      });
+
     // get text from doc and replace new lines with spaces
     const docText = getTextFromDelta(truncatedDoc)
       .replace(/\n/g, ' ')
@@ -63,8 +116,30 @@ export const QuillFormattedText = ({
 
     const textWithHighlights = renderTruncatedHighlights(searchTerm, docText);
 
-    // wrap all elements in span to avoid container-based positioning
-    return <span>{textWithHighlights}</span>;
+    // Wrap all elements in a span to avoid container-based positioning
+    const wrappedElements = React.Children.map(textWithHighlights, (child) => {
+      if (isTextWithHighlights(child)) {
+        if (child.type === 'a') {
+          // Handle individual link element
+          return processElements([child]);
+        }
+        if (
+          Array.isArray(child.props.children) &&
+          child.props.children.every(
+            (el) => React.isValidElement(el) && typeof el.type !== 'string'
+          )
+        ) {
+          // Handle a group of elements (e.g., a line of text)
+          const processedChildren = processElements(
+            child.props.children as TextWithHighlightsArray
+          );
+          return React.cloneElement(child, null, processedChildren);
+        }
+      }
+      return child;
+    });
+
+    return <span>{wrappedElements}</span>;
   }, [hideFormatting, navigate, openLinksInNewTab, searchTerm, truncatedDoc]);
 
   const toggleDisplay = () => setUserExpand(!userExpand);

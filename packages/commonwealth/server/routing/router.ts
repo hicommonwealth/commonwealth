@@ -88,6 +88,8 @@ import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
 
+import { getCanvasData, postCanvasData } from '../routes/canvas';
+
 import createWebhook from '../routes/webhooks/createWebhook';
 import updateWebhook from '../routes/webhooks/updateWebhook';
 import deleteWebhook from '../routes/webhooks/deleteWebhook';
@@ -1048,6 +1050,10 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     updateChainCategory.bind(this, models)
   );
+
+  // signed data
+  router.get('/oplog', getCanvasData.bind(this, models));
+  router.post('/oplog', postCanvasData.bind(this, models));
 
   // settings
   registerRoute(
