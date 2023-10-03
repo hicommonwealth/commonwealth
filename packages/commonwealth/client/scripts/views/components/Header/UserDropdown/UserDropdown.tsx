@@ -84,13 +84,13 @@ const UserDropdown = () => {
         type: 'default',
         label: (
           <UserDropdownItem
-            isSignedIn={signed}
+            isSignedIn={true /*signed*/}
             hasJoinedCommunity={isActive}
             address={account.address}
           />
         ),
         onClick: async () => {
-          if (signed) {
+          if (!app.config.enforceSessionKeys || signed) {
             return await setActiveAccount(account);
           }
 

@@ -44,12 +44,14 @@ export const createThreadReactionHandler = async (
     throw new AppError(Errors.InvalidThreadId);
   }
 
-  await verifyReaction(canvasAction, canvasSession, canvasHash, {
-    thread_id: threadId,
-    address: address.address,
-    chain: chain.id,
-    value: reaction,
-  });
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    await verifyReaction(canvasAction, canvasSession, canvasHash, {
+      thread_id: threadId,
+      address: address.address,
+      chain: chain.id,
+      value: reaction,
+    });
+  }
 
   // create thread reaction
   const [newReaction, notificationOptions, analyticsOptions] =

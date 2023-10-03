@@ -20,8 +20,8 @@ function assertMatches(a, b, obj: string, field: string) {
 // to the new Canvas packages soon anyway.
 const verifyUnpack = async (canvas_action, canvas_session, address) => {
   // const { actionType, sessionType } = await import('@canvas-js/core/codecs');
-  const action = JSON.parse(canvas_action);
-  const session = JSON.parse(canvas_session);
+  const action = canvas_action && JSON.parse(canvas_action);
+  const session = canvas_session && JSON.parse(canvas_session);
   // assert(actionType.is(action), 'Invalid signed action (typecheck)');
   // assert(sessionType.is(session), 'Invalid signed session (typecheck)');
   const [verifiedAction, verifiedSession] = await Promise.all([

@@ -11,6 +11,14 @@ import {
 import { caip2ToChainBase } from './chainMappings';
 import { ChainBase } from '../../../common-common/src/types';
 
+import { configure } from 'safe-stable-stringify';
+export const stringify = configure({
+  bigint: false,
+  circularValue: Error,
+  strict: true,
+  deterministic: true,
+});
+
 // TODO: verify payload is not expired
 export const verify = async ({
   action,
@@ -79,10 +87,9 @@ export const verify = async ({
       !action &&
       bech32.bech32.decode(sessionPayload.from).prefix === 'terra'
     ) {
-      const canvas = await import('@canvas-js/interfaces');
       const prefix = cosmEncoding.fromBech32(sessionPayload.from).prefix;
       const signDocDigest = new cosmCrypto.Sha256(
-        Buffer.from(canvas.serializeSessionPayload(sessionPayload))
+        Buffer.from(stringify(sessionPayload))
       ).digest();
       // decode "{ pub_key, signature }" to an object with { pubkey, signature }
       const { pubkey, signature: decodedSignature } = cosmAmino.decodeSignature(
@@ -108,9 +115,8 @@ export const verify = async ({
     // verify cosmos-ethereum sessions (actions are verified like other cosmos chains)
     if (!action && signature.startsWith('0x')) {
       const ethUtil = await import('ethereumjs-util');
-      const canvas = await import('@canvas-js/interfaces');
       const msgHash = ethUtil.hashPersonalMessage(
-        Buffer.from(canvas.serializeSessionPayload(sessionPayload))
+        Buffer.from(stringify(sessionPayload))
       );
       const ethSignatureParams = ethUtil.fromRpcSig(signature.trim());
       // recover the eth signature, then convert to cosmos address
@@ -166,14 +172,13 @@ export const verify = async ({
       // - launchpad sessions (legacy) have signature of format { pubkey, signature, chain_id }
       //   and chain_id needs to be stripped and attached to signDoc instead
       // - stargate sessions (ADR-036) have signature of format { pubkey, signature }
-      const canvas = await import('@canvas-js/interfaces');
       const {
         pub_key,
         signature: predecodedSignature,
         chain_id,
       } = JSON.parse(signature);
       const signDoc = await getADR036SignableSession(
-        Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
+        Buffer.from(stringify(sessionPayload)),
         payload.from,
         chain_id // if undefined, signDoc produces an ADR-036 signature
       );
@@ -206,11 +211,10 @@ export const verify = async ({
   } else if (chainBase === ChainBase.Solana) {
     const nacl = await import('tweetnacl');
     const bs58 = await import('bs58');
-    const canvas = await import('@canvas-js/interfaces');
     // verify solana signature (action, session)
     const stringPayload = action
-      ? canvas.serializeActionPayload(actionPayload)
-      : canvas.serializeSessionPayload(sessionPayload);
+      ? stringify(actionPayload)
+      : stringify(sessionPayload);
     const message = new TextEncoder().encode(stringPayload);
     const signatureBytes = bs58.decode(signature);
     const signerPublicKeyBytes = bs58.decode(
@@ -228,8 +232,7 @@ export const verify = async ({
     const bs58 = await import('bs58');
     // verify near signature (action, session)
     if (action) {
-      const canvas = await import('@canvas-js/interfaces');
-      const stringPayload = canvas.serializeActionPayload(actionPayload);
+      const stringPayload = stringify(actionPayload);
       const message = new TextEncoder().encode(stringPayload);
       const publicKey = nearlib.PublicKey.fromString(actionSignerAddress);
       const signatureBytes = bs58.decode(signature); // encoded in sessionSigners/near.ts
@@ -244,8 +247,7 @@ export const verify = async ({
       // NEAR doesn't provide a way for .near address to be mapped to public keys, so
       // we should either store more data on NEAR logins, or push session creation to
       // the NEAR wallet altogether.
-      const canvas = await import('@canvas-js/interfaces');
-      const stringPayload = canvas.serializeSessionPayload(sessionPayload);
+      const stringPayload = stringify(sessionPayload);
       const message = new TextEncoder().encode(stringPayload);
       const { signature: signatureEncoded, publicKey: publicKeyEncoded } =
         JSON.parse(signature);
@@ -264,10 +266,9 @@ export const verify = async ({
   } else if (chainBase === ChainBase.Substrate) {
     // verify substrate signature (action, session)
     const polkadotUtil = await import('@polkadot/util-crypto');
-    const canvas = await import('@canvas-js/interfaces');
     const stringPayload = action
-      ? canvas.serializeActionPayload(actionPayload)
-      : canvas.serializeSessionPayload(sessionPayload);
+      ? stringify(actionPayload)
+      : stringify(sessionPayload);
     const message = new TextEncoder().encode(stringPayload);
     const signatureBytes = new Buffer(
       action ? signature : signature.slice(2),

@@ -42,6 +42,7 @@ import {
 } from '../common-common/src/cacheKeyUtils';
 
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainNodeAttributes } from './server/models/chain_node';
 import { RedisCache } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -101,48 +102,48 @@ const resetServer = (debug = false): Promise<void> => {
         isAdmin: true,
       });
 
-      const nodes = [
-        ['mainnet1.edgewa.re', 'Edgeware Mainnet', null, BalanceType.Substrate],
-        [
-          'https://eth-mainnet.alchemyapi.io/v2/dummy_key',
-          'Ethereum Mainnet',
-          '1',
-        ],
-        [
-          'https://eth-ropsten.alchemyapi.io/v2/dummy_key',
-          'Ropsten Testnet',
-          '3',
-        ],
-        [
-          'https://rpc-osmosis.ecostake.com',
-          'Osmosis',
-          null,
-          BalanceType.Cosmos,
-        ],
-        [
-          'https://cosmos-devnet.herokuapp.com/rpc',
-          'Cosmos SDK v0.46.11 devnet',
-          null,
-          BalanceType.Cosmos,
-          'https://cosmos-devnet.herokuapp.com/lcd/',
-        ],
-      ];
+      const nodes: Record<string, ChainNodeAttributes> = {
+        edgeware: {
+          url: 'mainnet1.edgewa.re',
+          name: 'Edgeware Mainnet',
+          balance_type: BalanceType.Substrate,
+        },
+        ethereum: {
+          url: 'https://eth-mainnet.alchemyapi.io/v2/dummy_key',
+          name: 'Ethereum Mainnet',
+          eth_chain_id: 1,
+          balance_type: BalanceType.Ethereum,
+        },
+        ropsten: {
+          url: 'https://eth-ropsten.alchemyapi.io/v2/dummy_key',
+          name: 'Ropsten Testnet',
+          eth_chain_id: 3,
+          balance_type: BalanceType.Ethereum,
+        },
+        osmosis: {
+          url: 'https://rpc-osmosis.ecostake.com',
+          name: 'Osmosis',
+          balance_type: BalanceType.Cosmos,
+          cosmos_chain_id: 'osmosis'
+        },
+        csdkBeta: {
+          url: 'https://cosmos-devnet-beta.herokuapp.com/rpc',
+          name: 'Cosmos SDK v0.45.0 devnet',
+          balance_type: BalanceType.Cosmos,
+          alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
+          cosmos_chain_id: 'csdkbetaci'
+        },
+        csdkV1: {
+          url: 'https://cosmos-devnet.herokuapp.com/rpc',
+          name: 'Cosmos SDK v0.46.11 devnet',
+          balance_type: BalanceType.Cosmos,
+          alt_wallet_url: 'https://cosmos-devnet.herokuapp.com/lcd/',
+          cosmos_chain_id: 'csdkv1'
+        },
+      };
 
-      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkNode] =
-        await Promise.all(
-          nodes.map(([url, name, eth_chain_id, balance_type, alt_wallet_url]) =>
-            models.ChainNode.create({
-              url,
-              name,
-              eth_chain_id: eth_chain_id ? +eth_chain_id : null,
-              balance_type:
-                balance_type || eth_chain_id
-                  ? BalanceType.Ethereum
-                  : BalanceType.Substrate,
-              alt_wallet_url,
-            })
-          )
-        );
+      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkBetaNode, csdkV1Node] =
+        await models.ChainNode.bulkCreate(Object.values(nodes));
 
       // Initialize different chain + node URLs
       await models.Chain.create({
@@ -195,6 +196,18 @@ const resetServer = (debug = false): Promise<void> => {
         chain_node_id: osmosisNode.id,
       });
       await models.Chain.create({
+        id: 'csdk-beta',
+        network: ChainNetwork.Osmosis,
+        default_symbol: 'STAKE',
+        name: 'Cosmos SDK v0.45.0 devnet',
+        icon_url: '/static/img/protocols/cosmos.png',
+        active: true,
+        type: ChainType.Chain,
+        base: ChainBase.CosmosSDK,
+        has_chain_events_listener: false,
+        chain_node_id: csdkBetaNode.id,
+      });
+      await models.Chain.create({
         id: 'csdk',
         network: ChainNetwork.Osmosis,
         default_symbol: 'STAKE',
@@ -203,8 +216,8 @@ const resetServer = (debug = false): Promise<void> => {
         active: true,
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
-        has_chain_events_listener: false,
-        chain_node_id: csdkNode.id,
+        has_chain_events_listener: true,
+        chain_node_id: csdkV1Node.id,
       });
       const alexContract = await models.Contract.create({
         address: '0xFab46E002BbF0b4509813474841E0716E6730136',
@@ -265,8 +278,8 @@ const resetServer = (debug = false): Promise<void> => {
       });
 
       // Admin roles for specific communities
-      await Promise.all([
-        models.Address.create({
+      await models.Address.bulkCreate([
+        {
           user_id: 1,
           address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
           chain: 'ethereum',
@@ -274,70 +287,71 @@ const resetServer = (debug = false): Promise<void> => {
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
-        }),
-        models.Address.create({
+        },
+        {
           address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
           keytype: 'sr25519',
-        }),
-        models.Address.create({
+        },
+        {
           address: 'ik52qFh92pboSctWPSFKtQwGEpypzz2m6D5ZRP8AYxqjHpM',
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
           keytype: 'sr25519',
-        }),
-        models.Address.create({
+        },
+        {
           address: 'js4NB7G3bqEsSYq4ruj9Lq24QHcoKaqauw6YDPD7hMr1Roj',
           chain: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
           keytype: 'sr25519',
-        }),
+        },
       ]);
 
-      // Notification Categories
-      await models.NotificationCategory.create({
-        name: NotificationCategories.NewThread,
-        description: 'someone makes a new thread',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.NewComment,
-        description: 'someone makes a new comment',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.NewMention,
-        description: 'someone @ mentions a user',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.NewCollaboration,
-        description: 'someone collaborates with a user',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.ChainEvent,
-        description: 'a chain event occurs',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.NewReaction,
-        description: 'someone reacts to a post',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.ThreadEdit,
-        description: 'someone edited a thread',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.CommentEdit,
-        description: 'someoned edited a comment',
-      });
-      await models.NotificationCategory.create({
-        name: NotificationCategories.SnapshotProposal,
-        description: 'Snapshot proposal notifications',
-      });
+      await models.NotificationCategory.bulkCreate([
+        {
+          name: NotificationCategories.NewThread,
+          description: 'someone makes a new thread',
+        },
+        {
+          name: NotificationCategories.NewComment,
+          description: 'someone makes a new comment',
+        },
+        {
+          name: NotificationCategories.NewMention,
+          description: 'someone @ mentions a user',
+        },
+        {
+          name: NotificationCategories.NewCollaboration,
+          description: 'someone collaborates with a user',
+        },
+        {
+          name: NotificationCategories.ChainEvent,
+          description: 'a chain event occurs',
+        },
+        {
+          name: NotificationCategories.NewReaction,
+          description: 'someone reacts to a post',
+        },
+        {
+          name: NotificationCategories.ThreadEdit,
+          description: 'someone edited a thread',
+        },
+        {
+          name: NotificationCategories.CommentEdit,
+          description: 'someone edited a comment',
+        },
+        {
+          name: NotificationCategories.SnapshotProposal,
+          description: 'Snapshot proposal notifications',
+        },
+      ]);
 
       // Admins need to be subscribed to mentions and collaborations
       await models.Subscription.create({
@@ -517,3 +531,7 @@ export const getBanCache = () => banCache;
 export const getMockBalanceProvider = () => mockTokenBalanceProvider;
 
 export default app;
+
+if (require.main === module) {
+  resetServer().then((r) => process.exit(0));
+}

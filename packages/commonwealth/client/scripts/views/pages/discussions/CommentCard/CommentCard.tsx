@@ -84,6 +84,8 @@ export const CommentCard = ({
 
   useEffect(() => {
     try {
+      // suppress "unexpected error while verifying" error message on non-synced comments
+      if (!comment.canvasSession || !comment.canvasAction) return;
       const session: Session = JSON.parse(comment.canvasSession);
       const action: Action = JSON.parse(comment.canvasAction);
       const actionSignerAddress = session?.payload?.sessionAddress;
