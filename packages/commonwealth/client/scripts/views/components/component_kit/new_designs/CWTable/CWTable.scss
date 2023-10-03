@@ -2,7 +2,11 @@
 
 .Table {
   table {
+    @include b2;
+    letter-spacing: 0.14px;
+    font-weight: 400;
     border-collapse: collapse;
+    color: $neutral-800;
 
     thead {
       border-top: 1px solid $neutral-200;
@@ -16,14 +20,11 @@
             gap: 4px;
             display: flex;
 
-            span.header-text {
+            .header-text {
               font-family: $font-family-neue-haas-unica;
-              font-weight: 500;
+              font-weight: 700;
               display: flex;
               align-items: center;
-              font-size: 14px;
-              line-height: 20px;
-              letter-spacing: 0.14px;
             }
 
             .icon-container {
@@ -51,14 +52,21 @@
     tbody {
       tr {
         border-bottom: 1px solid $neutral-200;
+
+        &:hover {
+          background-color: $neutral-50;
+        }
+
         td {
           padding: 14px 16px;
+          vertical-align: top;
 
           .numeric {
             text-align: end;
           }
 
           .avatar-cell {
+            font-weight: 500;
             display: flex;
             gap: 8px;
 

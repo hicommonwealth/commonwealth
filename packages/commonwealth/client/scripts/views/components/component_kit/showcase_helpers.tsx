@@ -1,7 +1,7 @@
 import React from 'react';
 import faker from 'faker';
-import { CWTag } from './cw_tag';
-import { CWButton } from './cw_button';
+import { CWTag } from './new_designs/cw_tag';
+import { CWButton } from './new_designs/cw_button';
 
 const range = (len: number) => {
   const arr = [];
@@ -18,23 +18,10 @@ const tagTypes = [
   'poll',
   'proposal',
   'referendum',
-  'stage',
-  'new',
-  'trending',
   'disabled',
-  'discord',
 ];
 
-const buttonTypes = [
-  'primary-red',
-  'primary-blue',
-  'tertiary-black',
-  'lg-secondary-blue',
-  'primary-blue-dark',
-  'secondary-blue-dark',
-  'mini-white',
-  'mini-red',
-];
+const buttonTypes = ['primary', 'secondary', 'tertiary', 'destructive'];
 
 const iconNames = ['cloud', 'mail', 'sun', 'cow'];
 

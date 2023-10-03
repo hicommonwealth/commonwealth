@@ -79,7 +79,6 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
-  Header,
 } from '@tanstack/react-table';
 
 type ColumnDescriptor = {
