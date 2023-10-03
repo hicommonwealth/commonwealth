@@ -7,6 +7,7 @@ import { SupportedNetwork } from 'chain-events/src';
 import models from '../database';
 import { WebhookDestinations } from '../util/webhooks/types';
 import { WebhookInstance } from '../models/webhook';
+import { TELEGRAM_BOT_TOKEN } from '../config';
 
 async function main() {
   const argv = await yargs(hideBin(process.argv))
@@ -46,9 +47,20 @@ async function main() {
           'Must provide either a webhook url or a destination flag.'
         );
       }
-
-      if (args) return true;
+      return true;
     }).argv;
+
+  if (
+    !process.env.DISCORD_WEBHOOK_URL_DEV ||
+    !process.env.SLACK_WEBHOOK_URL_DEV ||
+    !process.env.ZAPIER_WEBHOOK_URL_DEV ||
+    !process.env.TELEGRAM_BOT_TOKEN_DEV
+  ) {
+    throw new Error(
+      'Must have DISCORD_WEBHOOK_URL_DEV, SLACK_WEBHOOK_URL_DEV, ' +
+        'ZAPIER_WEBHOOK_URL_DEV, and TELEGRAM_BOT_TOKEN_DEV set in .env'
+    );
+  }
 
   const chain = await models.Chain.findOne({
     where: {
