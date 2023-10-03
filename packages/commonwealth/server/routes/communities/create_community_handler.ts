@@ -3,8 +3,8 @@ import { ServerControllers } from '../../routing/router';
 import {
   CreateCommunityOptions,
   CreateCommunityResult,
-} from 'server/controllers/server_communities_methods/create_community';
-import { MixpanelCommunityCreationEvent } from 'shared/analytics/types';
+} from '../../controllers/server_communities_methods/create_community';
+import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
 
 type CreateCommunityRequestBody = CreateCommunityOptions['community'];
 type CreateCommunityResponse = CreateCommunityResult;

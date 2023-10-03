@@ -5,7 +5,7 @@ import {
   success,
 } from '../../types';
 import { ServerControllers } from '../../routing/router';
-import { GetCommunitiesWithSnapshotsResult } from 'server/controllers/server_communities_methods/get_communities_with_snapshots';
+import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
 import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
 import { AppError } from '../../../../common-common/src/errors';
 
@@ -21,17 +21,13 @@ type GetCommunitiesRequestQuery = {
 export const getCommunitiesHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<GetCommunitiesRequestQuery>,
-  res: TypedResponse<
-    GetCommunitiesWithSnapshotsResult | SearchCommunitiesResult
-  >
+  res: TypedResponse<GetCommunitiesResult | SearchCommunitiesResult>
 ) => {
   const options = req.query;
 
   // get chains, with snapshots
   if (options.snapshots === 'true') {
-    const results = await controllers.communities.getCommunitiesWithSnapshots(
-      {}
-    );
+    const results = await controllers.communities.getCommunities({});
     return success(res, results);
   }
 

@@ -8,12 +8,12 @@ export const Errors = {
   NotAdmin: 'Must be a site admin',
 };
 
-type GetCommunityStatsOptions = {
+export type GetCommunityStatsOptions = {
   user: UserInstance;
   chain: ChainInstance;
 };
 
-type GetCommunityStatsResult = {
+export type GetCommunityStatsResult = {
   numCommentsLastMonth: number;
   numThreadsLastMonth: number;
   numPollsLastMonth: number;
@@ -22,7 +22,7 @@ type GetCommunityStatsResult = {
   numMembersLastMonth: number;
 };
 
-export async function __getCommunityNodes(
+export async function __getCommunityStats(
   this: ServerCommunitiesController,
   { user, chain }: GetCommunityStatsOptions
 ): Promise<GetCommunityStatsResult> {

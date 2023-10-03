@@ -20,8 +20,8 @@ import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import axios from 'axios';
-import { UserInstance } from 'server/models/user';
-import { getFileSizeBytes } from 'server/util/getFilesSizeBytes';
+import { UserInstance } from '../../models/user';
+import { getFileSizeBytes } from '../../util/getFilesSizeBytes';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 const MAX_IMAGE_SIZE_KB = 500;

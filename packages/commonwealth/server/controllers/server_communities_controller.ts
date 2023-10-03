@@ -7,10 +7,10 @@ import {
   __searchCommunities,
 } from './server_communities_methods/search_communities';
 import {
-  GetCommunitiesWithSnapshotsOptions,
-  GetCommunitiesWithSnapshotsResult,
-  __getCommunitiesWithSnapshots,
-} from './server_communities_methods/get_communities_with_snapshots';
+  GetCommunitiesOptions,
+  GetCommunitiesResult,
+  __getCommunities,
+} from './server_communities_methods/get_communities';
 import {
   GetCommunityNodesOptions,
   GetCommunityNodesResult,
@@ -31,6 +31,16 @@ import {
   UpdateCommunityResult,
   __updateCommunity,
 } from './server_communities_methods/update_community';
+import {
+  GetCommunityStatsOptions,
+  GetCommunityStatsResult,
+  __getCommunityStats,
+} from './server_communities_methods/get_community_stats';
+import {
+  CreateCommunityNodeOptions,
+  CreateCommunityNodeResult,
+  __createCommunityNode,
+} from './server_communities_methods/create_community_node';
 
 /**
  * Implements methods related to communities
@@ -48,16 +58,22 @@ export class ServerCommunitiesController {
     return __searchCommunities.call(this, options);
   }
 
-  async getCommunitiesWithSnapshots(
-    options: GetCommunitiesWithSnapshotsOptions
-  ): Promise<GetCommunitiesWithSnapshotsResult> {
-    return __getCommunitiesWithSnapshots.call(this, options);
+  async getCommunities(
+    options: GetCommunitiesOptions
+  ): Promise<GetCommunitiesResult> {
+    return __getCommunities.call(this, options);
   }
 
   async getCommunityNodes(
     options: GetCommunityNodesOptions
   ): Promise<GetCommunityNodesResult> {
     return __getCommunityNodes.call(this, options);
+  }
+
+  async createCommunityNode(
+    options: CreateCommunityNodeOptions
+  ): Promise<CreateCommunityNodeResult> {
+    return __createCommunityNode.call(this, options);
   }
 
   async createCommunity(
@@ -76,5 +92,11 @@ export class ServerCommunitiesController {
     options: DeleteCommunityOptions
   ): Promise<DeleteCommunityResult> {
     return __deleteCommunity.call(this, options);
+  }
+
+  async getCommunityStats(
+    options: GetCommunityStatsOptions
+  ): Promise<GetCommunityStatsResult> {
+    return __getCommunityStats.call(this, options);
   }
 }

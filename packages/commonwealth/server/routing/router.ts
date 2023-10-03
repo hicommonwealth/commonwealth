@@ -177,8 +177,8 @@ import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_h
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
-import { getChainsHandler } from '../routes/communities/get_communities_handler';
-import { getChainNodesHandler } from '../routes/communities/get_community_nodes_handler';
+import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
+import { getCommunityNodesHandler } from '../routes/communities/get_community_nodes_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
@@ -188,7 +188,9 @@ import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
-import { createCommunityHandler } from 'server/routes/communities/create_community_handler';
+import { createCommunityHandler } from '../routes/communities/create_community_handler';
+import { updateCommunityHandler } from '../routes/communities/update_community_handler';
+import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -326,7 +328,7 @@ function setupRouter(
     selectChain.bind(this, models)
   );
 
-  // chains
+  // communities
   registerRoute(
     router,
     'post',
@@ -338,26 +340,33 @@ function setupRouter(
     router,
     'delete',
     '/communities/:communityId' /* prev: POST /deleteChain */,
-    deleteChain.bind(this, models)
+    deleteCommunityHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
     'patch',
     '/communities/:communityId' /* prev: POST /updateChain */,
     passport.authenticate('jwt', { session: false }),
-    updateChain.bind(this, models)
+    updateCommunityHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
     'get',
     '/communities' /* prev: GET /chains */,
-    getChainsHandler.bind(this, serverControllers)
+    getCommunitiesHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
     'get',
     '/nodes',
-    getChainNodesHandler.bind(this, serverControllers)
+    getCommunityNodesHandler.bind(this, serverControllers)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/nodes' /* prev: POST /createChain */,
+    passport.authenticate('jwt', { session: false }),
+    createChainNode.bind(this, models)
   );
 
   registerRoute(
@@ -413,14 +422,6 @@ function setupRouter(
     'get',
     '/getSupportedEthChains',
     getSupportedEthChains.bind(this, models)
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/createChainNode',
-    passport.authenticate('jwt', { session: false }),
-    createChainNode.bind(this, models)
   );
 
   registerRoute(
