@@ -191,6 +191,7 @@ import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { createCommunityHandler } from '../routes/communities/create_community_handler';
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
+import { createCommunityNodeHandler } from 'server/routes/communities/create_community_node_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -364,9 +365,16 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/nodes' /* prev: POST /createChain */,
+    '/nodes' /* prev: POST /createChainNode */,
     passport.authenticate('jwt', { session: false }),
-    createChainNode.bind(this, models)
+    createCommunityNodeHandler.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'post',
+    '/communitySpecificAnalytics' /* prev: POST /communitySpecificAnalytics */,
+    databaseValidationService.validateChain,
+    communitySpecificAnalytics.bind(this, models)
   );
 
   registerRoute(
@@ -429,13 +437,6 @@ function setupRouter(
     'get',
     '/adminAnalytics',
     adminAnalytics.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/communitySpecificAnalytics',
-    databaseValidationService.validateChain,
-    communitySpecificAnalytics.bind(this, models)
   );
 
   // threads

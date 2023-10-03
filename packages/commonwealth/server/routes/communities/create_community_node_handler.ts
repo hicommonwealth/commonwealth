@@ -1,9 +1,4 @@
-import {
-  TypedRequestBody,
-  TypedRequestQuery,
-  TypedResponse,
-  success,
-} from '../../types';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { CreateCommunityNodeResult } from 'server/controllers/server_communities_methods/create_community_node';
 
@@ -15,7 +10,7 @@ type CreateCommunityNodeRequestBody = {
 };
 type CreateCommunityNodeResponse = CreateCommunityNodeResult;
 
-export const getCommunityNodesHandler = async (
+export const createCommunityNodeHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateCommunityNodeRequestBody>,
   res: TypedResponse<CreateCommunityNodeResponse>
