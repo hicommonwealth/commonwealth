@@ -4,12 +4,13 @@ import { ApiEndpoints } from 'state/api/config';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { useQuery } from '@tanstack/react-query';
 import { ChainNetwork } from 'common-common/src/types';
+import {ICompoundProposalResponse} from "adapters/chain/compound/types";
 
 const RAW_PROPOSAL_STALE_TIME = 30000; // 30 seconds
 
-const fetchRawAaveProposals = async (
+const fetchRawEvmProposals = async (
   chainId: string
-): Promise<IAaveProposalResponse[]> => {
+): Promise<IAaveProposalResponse[] | ICompoundProposalResponse[]> => {
   const res = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_PROPOSALS}`,
     {
@@ -22,7 +23,7 @@ const fetchRawAaveProposals = async (
   return res.data.result.proposals;
 };
 
-const useRawAaveProposalsQuery = ({
+const useRawEvmProposalsQuery = ({
   chainId,
   chainNetwork,
 }: {
@@ -32,10 +33,10 @@ const useRawAaveProposalsQuery = ({
   const key = [ApiEndpoints.FETCH_PROPOSALS, chainId] as any;
   return useQuery({
     queryKey: key,
-    queryFn: () => fetchRawAaveProposals(chainId),
-    enabled: chainNetwork === ChainNetwork.Aave,
+    queryFn: () => fetchRawEvmProposals(chainId),
+    enabled: chainNetwork === ChainNetwork.Aave || chainNetwork === ChainNetwork.Compound,
     staleTime: RAW_PROPOSAL_STALE_TIME,
   });
 };
 
-export default useRawAaveProposalsQuery;
+export default useRawEvmProposalsQuery;

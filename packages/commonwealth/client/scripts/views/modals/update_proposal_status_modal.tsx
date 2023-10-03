@@ -23,7 +23,7 @@ import {
   useDeleteThreadLinksMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
-import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
+import { ProposalSelector } from '../components/ProposalSelector';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -281,16 +281,16 @@ export const UpdateProposalStatusModal = ({
     setVotingStage();
   };
 
-  const handleSelectChainEntity = (ce: { identifier: string }) => {
+  const handleSelectEvmProposal = (ce: { identifier: string }) => {
     const isSelected = tempProposals.find(
       ({ identifier }) => ce.identifier === identifier
     );
 
-    const updatedChainEntities = isSelected
+    const updatedProposals = isSelected
       ? tempProposals.filter(({ identifier }) => ce.identifier !== identifier)
       : [...tempProposals, ce];
 
-    setTempProposals(updatedChainEntities);
+    setTempProposals(updatedProposals);
     setVotingStage();
   };
 
@@ -339,8 +339,8 @@ export const UpdateProposalStatusModal = ({
           />
         )}
         {showChainEvents && (
-          <ChainEntitiesSelector
-            onSelect={handleSelectChainEntity}
+          <ProposalSelector
+            onSelect={handleSelectEvmProposal}
             proposalsToSet={tempProposals}
           />
         )}

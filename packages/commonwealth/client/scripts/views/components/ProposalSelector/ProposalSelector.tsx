@@ -1,16 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-
 import 'components/ChainEntitiesSelector.scss';
-import type ChainEntity from '../../../models/ChainEntity';
-
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
-import { ChainEntitiesSelectorItem } from 'views/components/ChainEntitiesSelector';
-import { filterChainEntities } from 'views/components/ChainEntitiesSelector/utils';
-import { useRawAaveProposalsQuery } from 'state/api/proposals';
+import { ProposalSelectorItem } from 'views/components/ProposalSelector';
+import { useRawEvmProposalsQuery } from 'state/api/proposals';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import { parseProposals } from 'views/components/ProposalSelector/utils';
 
 type ChainEntitiesSelectorProps = {
   proposalsToSet: Array<
@@ -19,14 +16,16 @@ type ChainEntitiesSelectorProps = {
   onSelect: ({ identifier }: { identifier: string }) => void;
 };
 
-export const ChainEntitiesSelector = ({
+export const ProposalSelector = ({
   onSelect,
   proposalsToSet,
 }: ChainEntitiesSelectorProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [proposals, setProposals] = useState<IAaveProposalResponse[]>([]);
+  const [proposals, setProposals] = useState<
+    IAaveProposalResponse[] | ICompoundProposalResponse[]
+  >([]);
 
-  const { data: aaveProposals, isLoading } = useRawAaveProposalsQuery({
+  const { data, isLoading } = useRawEvmProposalsQuery({
     chainId: app.chain.id,
     chainNetwork: app.chain.network,
   });
@@ -40,26 +39,24 @@ export const ChainEntitiesSelector = ({
   };
 
   useMemo(() => {
-    if (aaveProposals) {
-      setProposals(
-        aaveProposals
-          .sort((a, b) => b.id - a.id)
-          .filter((prop) =>
-            prop.identifier.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-      );
+    if (data) {
+      const parsedProposals = parseProposals(data, searchTerm);
+      setProposals(parsedProposals);
     }
-  }, [aaveProposals, searchTerm]);
+  }, [data, searchTerm]);
 
   const renderItem = useCallback(
-    (i: number, chainEntity: IAaveProposalResponse) => {
+    (
+      i: number,
+      proposal: IAaveProposalResponse | ICompoundProposalResponse
+    ) => {
       const isSelected = !!proposalsToSet.find(
-        (el) => String(el.identifier) === chainEntity.identifier
+        (el) => String(el.identifier) === proposal.identifier
       );
 
       return (
-        <ChainEntitiesSelectorItem
-          chainEntity={chainEntity}
+        <ProposalSelectorItem
+          proposal={proposal}
           isSelected={isSelected}
           onClick={(ce) => onSelect({ identifier: ce.identifier })}
         />
@@ -82,7 +79,7 @@ export const ChainEntitiesSelector = ({
         onInput={handleInputChange}
       />
 
-      <QueryList
+      <QueryList<IAaveProposalResponse | ICompoundProposalResponse>
         loading={isLoading}
         options={proposals}
         renderItem={renderItem}

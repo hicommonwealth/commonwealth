@@ -1,38 +1,37 @@
 import React from 'react';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { chainEntityTypeToProposalName } from 'identifiers';
-import type ChainEntity from '../../../models/ChainEntity';
 import { CWText } from '../component_kit/cw_text';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { IChainEntityKind } from 'chain-events/src';
 
-interface ChainEntitiesSelectorItemProps {
-  chainEntity: IAaveProposalResponse | ICompoundProposalResponse;
+interface ProposalSelectorItemProps {
+  proposal: IAaveProposalResponse | ICompoundProposalResponse;
   isSelected: boolean;
   onClick: (
-    chainEntity: IAaveProposalResponse | ICompoundProposalResponse
+    proposal: IAaveProposalResponse | ICompoundProposalResponse
   ) => void;
 }
 
-const ChainEntitiesSelectorItem = ({
+const ProposalSelectorItem = ({
   onClick,
-  chainEntity,
+  proposal,
   isSelected,
-}: ChainEntitiesSelectorItemProps) => {
+}: ProposalSelectorItemProps) => {
   return (
-    <div className="chain-entity" onClick={() => onClick(chainEntity)}>
+    <div className="chain-entity" onClick={() => onClick(proposal)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
         <CWText fontWeight="medium" truncate noWrap>
           {chainEntityTypeToProposalName('proposal' as IChainEntityKind) +
-            (chainEntity.identifier.startsWith('0x')
-              ? ` ${chainEntity.identifier.slice(0, 6)}...`
-              : ` #${chainEntity.identifier}`)}
+            (proposal.identifier.startsWith('0x')
+              ? ` ${proposal.identifier.slice(0, 6)}...`
+              : ` #${proposal.identifier}`)}
         </CWText>
       </div>
     </div>
   );
 };
 
-export { ChainEntitiesSelectorItem };
+export { ProposalSelectorItem };
