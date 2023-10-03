@@ -5,11 +5,12 @@
   font-size: 0.875rem;
   color: $neutral-400;
   background-color: $white;
-  min-height: 20px;
-  padding: 5px 0;
+  min-height: 8px;
+  padding: 5px 0px;
   position: fixed;
   width: 100%;
-  z-index: 3;
+  z-index: 1000;
+  overflow: auto;
 
   @include extraSmall {
     position: static;
@@ -42,6 +43,12 @@
     @include extraSmall {
       padding-left: 24px;
     }
+  }
+
+  .explore-communities {
+    display: flex;
+    flex-direction: row;
+    padding-left: 50px;
   }
 
   .new-thread {
@@ -80,13 +87,14 @@
   .discussions {
     display: flex;
     flex-direction: row;
+    padding-left: 36px;
 
     @include large {
       padding-left: 40px;
     }
 
-    @include mediumInclusive {
-      padding-left: 32px;
+    @include medium {
+      padding-left: 40px;
     }
 
     @include small {
@@ -138,28 +146,12 @@
     }
   }
 
-  .createCommunity {
+  .create-community {
     display: flex;
     align-items: center;
     flex-direction: row;
-    padding-left: calc(22vw + 65px);
+    padding-left: 24px;
     padding-top: 16px;
-
-    @include large {
-      padding-left: calc(46vw - 155px);
-    }
-
-    @include medium {
-      padding-left: calc(50vw - 225px);
-    }
-
-    @include small {
-      padding-left: 24%;
-    }
-
-    @include extraSmall {
-      padding-left: 24px;
-    }
   }
 
   .viewProfile {

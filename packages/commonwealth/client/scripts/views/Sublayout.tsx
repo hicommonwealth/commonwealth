@@ -24,7 +24,6 @@ const Sublayout = ({
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName } = useSidebarStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const [isVisible, setIsVisible] = React.useState(true);
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -41,29 +40,6 @@ const Sublayout = ({
     ) {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
-  }, []);
-
-  useEffect(() => {
-    console.log('wind', window.scrollY);
-    // Add a scroll event listener
-    const handleScroll = () => {
-      // Define the scroll point where you want to hide the div
-      const scrollPoint = 200; // Adjust this value as needed
-
-      // Check the current scroll position
-      if (window.scrollY >= scrollPoint) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      // Remove the scroll event listener
-      window.removeEventListener('scroll', handleScroll);
-    };
   }, []);
 
   const chain = app.chain ? app.chain.meta : null;

@@ -93,7 +93,11 @@ export const Breadcrumbs = () => {
 
         console.log('PATH:', pathSegments);
         link = `new/discussion`;
-      } else if (pathSegments[index] === 'discussion') {
+      } else if (
+        pathSegments[index] === 'discussion' ||
+        pathSegments[index] === 'discussions'
+      ) {
+        console.log('FIRED3');
         // Generate the link for 'discussion' segment.
         link = `discussions`;
       } else {
@@ -148,6 +152,7 @@ export const Breadcrumbs = () => {
       if (location.pathname.split('/').length > 2) {
         return location.pathname.includes(page.url);
       }
+      console.log('page', location.pathname);
       return location.pathname === page.url;
     });
 

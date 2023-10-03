@@ -20,6 +20,7 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import { Breadcrumbs } from '../../components/Breadcrumbs';
 
 import 'pages/discussions/index.scss';
 
@@ -123,15 +124,18 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             ),
           Header: () => {
             return (
-              <HeaderWithFilters
-                topic={topicName}
-                stage={stageName}
-                featuredFilter={featuredFilter}
-                dateRange={dateRange}
-                totalThreadCount={threads ? totalThreadsInCommunity : 0}
-                isIncludingSpamThreads={includeSpamThreads}
-                onIncludeSpamThreads={setIncludeSpamThreads}
-              />
+              <>
+                <Breadcrumbs />
+                <HeaderWithFilters
+                  topic={topicName}
+                  stage={stageName}
+                  featuredFilter={featuredFilter}
+                  dateRange={dateRange}
+                  totalThreadCount={threads ? totalThreadsInCommunity : 0}
+                  isIncludingSpamThreads={includeSpamThreads}
+                  onIncludeSpamThreads={setIncludeSpamThreads}
+                />
+              </>
             );
           },
         }}
