@@ -1,7 +1,12 @@
 # Webhooks
 ## Overview
+### Production
+Set the `SEND_WEBHOOKS_EMAILS` env var to true to enable sending Webhooks and emails. This env var should be false
+or undefined everywhere except for the production app (i.e. undefined on Frick/Frack/QA).
+
 ### Development
 **Testing Script**
+
 To facilitate testing of specific webhooks there is a script (`packages/commonwealth/server/scripts/emitWebhook.ts`)
 which can be invoked to emit a webhook with real data to any desired destination via the `yarn emit-webhook` command.
 
@@ -13,6 +18,7 @@ yarn emit-webhook -c new-thread-creation -d discord
 ```
 
 **Pattern**
+
 The logic for each webhook destination should be contained in a single file in 
 `packages/commonwealth/server/util/destinations/` where the name of the file is the name of the destination.
 Within the file, there should be 3 things:
