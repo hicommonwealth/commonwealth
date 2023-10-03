@@ -35,6 +35,7 @@ export enum ComponentType {
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  RelatedCommunityCard = 'RelatedCommunityCard',
   Searchbar = 'Searchbar',
   SidebarMenu = 'SidebarMenu',
   Socials = 'Socials',
