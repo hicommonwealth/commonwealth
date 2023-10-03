@@ -28,6 +28,7 @@ import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
+import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -37,7 +38,7 @@ const getInitialSnapshots = (thread: Thread) =>
 
 const getInitialProposals = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Proposal).map((l) => ({
-    typeId: l.identifier,
+    identifier: l.identifier,
     title: l.title,
   }));
 
@@ -76,7 +77,7 @@ export const UpdateProposalStatusModal = ({
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
   >(getInitialSnapshots(thread));
   const [tempProposals, setTempProposals] = useState<
-    Array<Pick<ChainEntity, 'typeId'>>
+    Array<Pick<IAaveProposalResponse, 'identifier'>>
   >(getInitialProposals(thread));
   const [tempCosmosProposals, setTempCosmosProposals] = useState<
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>
@@ -188,16 +189,16 @@ export const UpdateProposalStatusModal = ({
       const { toAdd, toDelete } = getAddedAndDeleted(
         tempProposals,
         getInitialProposals(thread),
-        'typeId'
+        'identifier'
       );
 
       if (toAdd.length > 0) {
         const updatedThread = await addThreadLinks({
           chainId: app.activeChainId(),
           threadId: thread.id,
-          links: toAdd.map(({ typeId }) => ({
+          links: toAdd.map(({ identifier }) => ({
             source: LinkSource.Proposal,
-            identifier: String(typeId),
+            identifier,
           })),
         });
 
@@ -208,9 +209,9 @@ export const UpdateProposalStatusModal = ({
         const updatedThread = await deleteThreadLinks({
           chainId: app.activeChainId(),
           threadId: thread.id,
-          links: toDelete.map(({ typeId }) => ({
+          links: toDelete.map(({ identifier }) => ({
             source: LinkSource.Proposal,
-            identifier: String(typeId),
+            identifier,
           })),
         });
 
@@ -280,13 +281,13 @@ export const UpdateProposalStatusModal = ({
     setVotingStage();
   };
 
-  const handleSelectChainEntity = (ce: { typeId: string }) => {
+  const handleSelectChainEntity = (ce: { identifier: string }) => {
     const isSelected = tempProposals.find(
-      ({ typeId }) => ce.typeId === String(typeId)
+      ({ identifier }) => ce.identifier === identifier
     );
 
     const updatedChainEntities = isSelected
-      ? tempProposals.filter(({ typeId }) => ce.typeId !== String(typeId))
+      ? tempProposals.filter(({ identifier }) => ce.identifier !== identifier)
       : [...tempProposals, ce];
 
     setTempProposals(updatedChainEntities);

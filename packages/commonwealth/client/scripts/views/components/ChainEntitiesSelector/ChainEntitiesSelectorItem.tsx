@@ -3,11 +3,16 @@ import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
 import { chainEntityTypeToProposalName } from 'identifiers';
 import type ChainEntity from '../../../models/ChainEntity';
 import { CWText } from '../component_kit/cw_text';
+import { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import { IChainEntityKind } from 'chain-events/src';
 
 interface ChainEntitiesSelectorItemProps {
-  chainEntity: ChainEntity;
+  chainEntity: IAaveProposalResponse | ICompoundProposalResponse;
   isSelected: boolean;
-  onClick: (chainEntity: ChainEntity) => void;
+  onClick: (
+    chainEntity: IAaveProposalResponse | ICompoundProposalResponse
+  ) => void;
 }
 
 const ChainEntitiesSelectorItem = ({
@@ -20,10 +25,10 @@ const ChainEntitiesSelectorItem = ({
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
         <CWText fontWeight="medium" truncate noWrap>
-          {chainEntityTypeToProposalName(chainEntity.type) +
-            (chainEntity.typeId.startsWith('0x')
-              ? ` ${chainEntity.typeId.slice(0, 6)}...`
-              : ` #${chainEntity.typeId}`)}
+          {chainEntityTypeToProposalName('proposal' as IChainEntityKind) +
+            (chainEntity.identifier.startsWith('0x')
+              ? ` ${chainEntity.identifier.slice(0, 6)}...`
+              : ` #${chainEntity.identifier}`)}
         </CWText>
       </div>
     </div>
