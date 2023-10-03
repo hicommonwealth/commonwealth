@@ -43,7 +43,7 @@ const customDurationOptions = [
 
 type PollEditorModalProps = {
   onModalClose: () => void;
-  thread: Thread;
+  thread: Thread | null;
   onPollCreate: () => void;
 };
 

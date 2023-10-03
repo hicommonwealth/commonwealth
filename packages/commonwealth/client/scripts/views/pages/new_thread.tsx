@@ -57,6 +57,7 @@ const NewThreadPage = () => {
   const [linkSnapshotModalOpen, setLinkSnapshotModalOpen] = useState(false);
   const [createSnapshotModalOpen, setCreateSnapshotModalOpen] = useState(false);
   const [createTemplateModalOpen, setCreateTemplateModalOpen] = useState(false);
+  const [createPollModalOpen, setCreatePollModalOpen] = useState(false);
   const [linkedSnapshotProposal, setLinkedSnapshotProposal] =
     useState<Link>(null);
   const [linkedTemplateModalOpen, setLinkedTemplateModalOpen] = useState(false);
@@ -622,38 +623,42 @@ const NewThreadPage = () => {
             </div>
           ),
         },
-        {
-          label: 'Add Poll',
-          item: (
-            <div className="SelectableCard">
-              {/* <Modal
-                className="PollEditorCardModal"
-                content={
-                  <PollEditorModal
-                    thread={thread}
-                    onModalClose={() => setIsModalOpen(false)}
-                    onPollCreate={onPollCreate}
-                  />
-                }
-                onClose={() => setIsModalOpen(false)}
-                open={isModalOpen}
-              /> */}
-              <CWContentPageCard
-                header="Create Poll"
-                onClick={() => {
-                  setCreateTemplateModalOpen(true);
-                }}
-                content={
-                  <div className="ActionCard">
-                    <CWText type="b2">
-                      Create a new poll attached to this thread.
-                    </CWText>
-                  </div>
-                }
-              />
-            </div>
-          ),
-        },
+        // Implementing polls requires significant updates to the models and poll architecture.
+        // Needs to be discussed further.
+        // {
+        //   label: 'Add Poll',
+        //   item: (
+        //     <div className="SelectableCard">
+        //       <Modal
+        //         className="PollEditorCardModal"
+        //         content={
+        //           <PollEditorModal
+        //             thread={null}
+        //             onModalClose={() => setCreatePollModalOpen(false)}
+        //             onPollCreate={() => {
+        //               //
+        //             }}
+        //           />
+        //         }
+        //         onClose={() => setCreatePollModalOpen(false)}
+        //         open={createPollModalOpen}
+        //       />
+        //       <CWContentPageCard
+        //         header="Create Poll"
+        //         onClick={() => {
+        //           setCreatePollModalOpen(true);
+        //         }}
+        //         content={
+        //           <div className="ActionCard">
+        //             <CWText type="b2">
+        //               Create a new poll attached to this thread.
+        //             </CWText>
+        //           </div>
+        //         }
+        //       />
+        //     </div>
+        //   ),
+        // },
       ]}
       showSidebar
       showRightSidebar={showSidebar}
