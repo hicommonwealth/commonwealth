@@ -73,18 +73,18 @@ async function _thresholdCheck(
       case 'erc20': {
         chainNetwork = ChainNetwork.ERC20;
         contractAddress = thresholdData.source.contract_address;
-        chainId = thresholdData.source.evm_chain_id;
+        chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'erc721': {
         chainNetwork = ChainNetwork.ERC721;
         contractAddress = thresholdData.source.contract_address;
-        chainId = thresholdData.source.evm_chain_id;
+        chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'eth_native': {
         chainNetwork = ChainNetwork.Ethereum;
-        chainId = thresholdData.source.evm_chain_id;
+        chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'cosmos_native': {
