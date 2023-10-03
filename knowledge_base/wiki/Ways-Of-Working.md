@@ -1,4 +1,4 @@
-<!-- TODO Graham 230831: Establish a glossary of engineering terms for our wiki. -->
+<!-- TODO Graham 230831: Establish a glossary of engineering terms for our knowledge base. -->
 _Throughout this page, "ticket" and "story" are used interchangeably to refer to GitHub issues._
 
 **Contents**
