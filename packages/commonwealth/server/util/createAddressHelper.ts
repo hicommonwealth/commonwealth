@@ -99,15 +99,24 @@ export async function createAddressHelper(
   let addressHex: string;
   let existingAddress: AddressInstance;
   let existingHex: AddressInstance;
+
   if (chain.base === ChainBase.CosmosSDK) {
     const { toHex, fromBech32 } = await import('@cosmjs/encoding');
     const encodedData = fromBech32(encodedAddress).data;
     addressHex = toHex(encodedData);
 
     // check all addresses for matching hex
-    existingHex = await models.Address.scope('withPrivateData').findOne({
-      where: { hex: addressHex },
+    const existingHexes = await models.Address.scope('withPrivateData').findAll(
+      {
+        where: { hex: addressHex, verified: { [Op.ne]: null } },
+      }
+    );
+    const existingHexesSorted = existingHexes.sort((a, b) => {
+      // sort by latest last_active
+      return +b.dataValues.last_active - +a.dataValues.last_active;
     });
+
+    existingHex = existingHexesSorted[0];
   }
 
   existingAddress = await models.Address.scope('withPrivateData').findOne({
@@ -152,6 +161,8 @@ export async function createAddressHelper(
     existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
     existingAddress.block_info = req.block_info;
+
+    existingAddress.hex = addressHex; // TODO: maybe not needed after migration
 
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.wallet_id;
