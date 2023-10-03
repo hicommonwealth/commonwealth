@@ -83,7 +83,12 @@ export async function dispatchWebhooks(
       }
 
       // TODO: Issue #5230
-      console.error(`Error sending webhook: ${result.reason}`, error);
+      console.error(
+        `[${formatFilename(__filename)}]: Error sending webhook: ${
+          result.reason
+        }`,
+        error
+      );
       // log.error(`Error sending webhook: ${result.reason}`, error);
       rollbar.error(`Error sending webhook: ${result.reason}`, error);
     } else {
