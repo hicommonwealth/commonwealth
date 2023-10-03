@@ -36,14 +36,6 @@ export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
 
 export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
 
-export const SLACK_WEBHOOKS = {
-  cosmos: process.env.COSMOS_SLACK_WEBHOOK,
-  edgeware: process.env.EDGEWARE_SLACK_WEBHOOK,
-  ethereum: process.env.ETHEREUM_SLACK_WEBHOOK,
-  kusama: process.env.KUSAMA_SLACK_WEBHOOK,
-  near: process.env.NEAR_SLACK_WEBHOOK,
-};
-
 export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
 export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
@@ -151,3 +143,5 @@ export const TELEGRAM_BOT_TOKEN =
   process.env.NODE_ENV === 'production'
     ? process.env.TELEGRAM_BOT_TOKEN
     : process.env.TELEGRAM_BOT_TOKEN_DEV;
+
+export const SEND_WEBHOOKS = process.env.SEND_WEBHOOKS === 'true';

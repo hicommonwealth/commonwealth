@@ -6,7 +6,7 @@ import type {
   IForumNotificationData,
   NotificationDataAndCategory,
 } from '../../shared/types';
-import { SERVER_URL } from '../config';
+import { SEND_WEBHOOKS, SERVER_URL } from '../config';
 import type { DB } from '../models';
 import type { NotificationInstance } from '../models/notification';
 import {
@@ -194,11 +194,13 @@ export default async function emitNotifications(
     }
   }
 
-  try {
-    await dispatchWebhooks(notification_data_and_category);
-  } catch (e) {
-    log.error('Failed to dispatch webhooks', e);
-    rollbar.error('Failed to dispatch webhooks', e);
+  if (process.env.NODE_ENV === 'production' && SEND_WEBHOOKS) {
+    try {
+      await dispatchWebhooks(notification_data_and_category);
+    } catch (e) {
+      log.error('Failed to dispatch webhooks', e);
+      rollbar.error('Failed to dispatch webhooks', e);
+    }
   }
 
   return notification;
