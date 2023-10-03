@@ -1,6 +1,5 @@
 import moment from 'moment';
 import ChainEvent from './ChainEvent';
-import { NotificationDataTypes } from 'types';
 import { NotificationCategory } from 'common-common/src/types';
 
 export class Notification {

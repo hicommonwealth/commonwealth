@@ -23,7 +23,7 @@
   border-radius: 6px;
   color: $neutral-800;
 
-  @include smallInclusive {
+  @include mediumSmallMid {
     width: 100%;
   }
 
