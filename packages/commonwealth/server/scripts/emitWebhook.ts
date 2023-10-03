@@ -51,10 +51,11 @@ async function main() {
     }).argv;
 
   if (
-    !process.env.DISCORD_WEBHOOK_URL_DEV ||
-    !process.env.SLACK_WEBHOOK_URL_DEV ||
-    !process.env.ZAPIER_WEBHOOK_URL_DEV ||
-    !process.env.TELEGRAM_BOT_TOKEN_DEV
+    !argv.url &&
+    (!process.env.DISCORD_WEBHOOK_URL_DEV ||
+      !process.env.SLACK_WEBHOOK_URL_DEV ||
+      !process.env.ZAPIER_WEBHOOK_URL_DEV ||
+      !process.env.TELEGRAM_BOT_TOKEN_DEV)
   ) {
     throw new Error(
       'Must have DISCORD_WEBHOOK_URL_DEV, SLACK_WEBHOOK_URL_DEV, ' +
