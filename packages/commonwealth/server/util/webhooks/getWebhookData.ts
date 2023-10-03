@@ -62,18 +62,21 @@ export async function getWebhookData(
       title = notification.data.root_title;
     }
 
-    const bodytext = decodeURIComponent(notification.data.comment_text);
-
     let objectSummary: string;
-    try {
-      // parse and use quill document
-      const doc = JSON.parse(bodytext);
-      if (!doc.ops) throw new Error();
-      const text = renderQuillDeltaToText(doc);
-      objectSummary = smartTrim(text);
-    } catch (err) {
-      // use markdown document directly
-      objectSummary = smartTrim(bodytext);
+    if (notification.categoryId !== NotificationCategories.NewReaction) {
+      const bodytext = decodeURIComponent(notification.data.comment_text);
+      try {
+        // parse and use quill document
+        const doc = JSON.parse(bodytext);
+        if (!doc.ops) throw new Error();
+        const text = renderQuillDeltaToText(doc);
+        objectSummary = smartTrim(text);
+      } catch (err) {
+        // use markdown document directly
+        objectSummary = smartTrim(bodytext);
+      }
+    } else {
+      objectSummary = 'New Like';
     }
 
     const previewImage = await getPreviewImageUrl(notification);

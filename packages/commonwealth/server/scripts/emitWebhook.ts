@@ -117,7 +117,7 @@ async function main() {
         chain: chain.id,
       },
     };
-  } else if (argv.notificationCategory === NotificationCategories.NewThread) {
+  } else {
     const thread = await models.Thread.findOne({
       where: {
         chain: chain.id,
@@ -128,19 +128,71 @@ async function main() {
         as: 'Address',
       },
     });
-    notification = {
-      categoryId: NotificationCategories.NewThread,
-      data: {
-        created_at: thread.created_at,
-        thread_id: thread.id,
-        root_title: thread.title,
-        root_type: ProposalType.Thread,
-        chain_id: thread.chain,
-        author_address: thread.Address.address,
-        author_chain: thread.Address.chain,
-        comment_text: thread.body,
-      },
+
+    const baseNotifData = {
+      created_at: thread.created_at,
+      thread_id: thread.id,
+      root_title: thread.title,
+      root_type: ProposalType.Thread,
+      chain_id: thread.chain,
+      author_address: thread.Address.address,
+      author_chain: thread.Address.chain,
     };
+
+    if (argv.notificationCategory === NotificationCategories.NewThread) {
+      notification = {
+        categoryId: NotificationCategories.NewThread,
+        data: {
+          ...baseNotifData,
+          comment_text: thread.body,
+        },
+      };
+    } else if (
+      argv.notificationCategory === NotificationCategories.NewComment
+    ) {
+      const [comment, created] = await models.Comment.findOrCreate({
+        where: {
+          chain: chain.id,
+          thread_id: thread.id,
+        },
+        defaults: {
+          address_id: thread.address_id,
+          text: 'This is a comment',
+        },
+      });
+
+      notification = {
+        categoryId: NotificationCategories.NewComment,
+        data: {
+          ...baseNotifData,
+          comment_text: comment.text,
+          comment_id: comment.id,
+        },
+      };
+    } else if (
+      argv.notificationCategory === NotificationCategories.NewReaction
+    ) {
+      const anotherAddress = await models.Address.findOne({
+        where: {
+          chain: chain.id,
+        },
+      });
+      await models.Reaction.findOrCreate({
+        where: {
+          chain: chain.id,
+          thread_id: thread.id,
+          address_id: anotherAddress.id,
+          reaction: 'like',
+        },
+      });
+
+      notification = {
+        categoryId: NotificationCategories.NewReaction,
+        data: {
+          ...baseNotifData,
+        },
+      };
+    }
   }
 
   await dispatchWebhooks(notification, webhooks);

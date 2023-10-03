@@ -13,6 +13,7 @@ import { rollbar } from '../rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+// TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(
   notifDataCategory: NotificationDataAndCategory,
   webhooks?: WebhookInstance[]
@@ -38,38 +39,30 @@ export async function dispatchWebhooks(
     switch (getWebhookDestination(webhook.url)) {
       case WebhookDestinations.Discord:
         webhookPromises.push(
-          sendDiscordWebhook(
-            webhook.url,
-            notifDataCategory.categoryId,
-            webhookData
-          )
+          sendDiscordWebhook(webhook.url, notifDataCategory.categoryId, {
+            ...webhookData,
+          })
         );
         break;
       case WebhookDestinations.Slack:
         webhookPromises.push(
-          sendSlackWebhook(
-            webhook.url,
-            notifDataCategory.categoryId,
-            webhookData
-          )
+          sendSlackWebhook(webhook.url, notifDataCategory.categoryId, {
+            ...webhookData,
+          })
         );
         break;
       case WebhookDestinations.Telegram:
         webhookPromises.push(
-          sendTelegramWebhook(
-            webhook.url,
-            notifDataCategory.categoryId,
-            webhookData
-          )
+          sendTelegramWebhook(webhook.url, notifDataCategory.categoryId, {
+            ...webhookData,
+          })
         );
         break;
       case WebhookDestinations.Zapier:
         webhookPromises.push(
-          sendZapierWebhook(
-            webhook.url,
-            notifDataCategory.categoryId,
-            webhookData
-          )
+          sendZapierWebhook(webhook.url, notifDataCategory.categoryId, {
+            ...webhookData,
+          })
         );
         break;
       default:
