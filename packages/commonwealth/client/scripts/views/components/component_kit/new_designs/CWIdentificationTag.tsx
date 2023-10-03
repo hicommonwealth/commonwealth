@@ -7,7 +7,7 @@ import React from 'react';
 import 'components/component_kit/new_designs/CWIdentificationTag.scss';
 
 interface CWIdentificationTagProps {
-  iconLeft: CustomIconName;
+  iconLeft?: CustomIconName;
   iconRight?: boolean;
   address?: string;
   username?: string;

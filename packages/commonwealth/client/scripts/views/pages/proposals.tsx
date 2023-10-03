@@ -19,8 +19,10 @@ import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
   useAaveProposalsQuery,
+  useCompoundProposalsQuery,
 } from 'state/api/proposals';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 import {
   useDepositParamsQuery,
@@ -39,10 +41,17 @@ const ProposalsPage = () => {
   const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
 
-  const { data: cachedAaveProposals, isError } = useAaveProposalsQuery({
-    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
-    chainId: app.chain?.id,
-  });
+  const { data: cachedAaveProposals, isError: isAaveError } =
+    useAaveProposalsQuery({
+      moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
+      chainId: app.chain?.id,
+    });
+
+  const { data: cachedCompoundProposals, isError: isCompoundError } =
+    useCompoundProposalsQuery({
+      moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+      chainId: app.chain?.id,
+    });
 
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
@@ -93,7 +102,7 @@ const ProposalsPage = () => {
     return <PageLoading message="Connecting to chain" />;
   }
 
-  if (isError) {
+  if (isAaveError || isCompoundError) {
     return <ErrorPage message="Could not connect to chain" />;
   }
 
@@ -102,11 +111,16 @@ const ProposalsPage = () => {
     aaveProposals =
       cachedAaveProposals || (app.chain as Aave).governance.store.getAll();
 
+  let compoundProposals: CompoundProposal[];
+  if (onCompound)
+    compoundProposals =
+      cachedCompoundProposals ||
+      (app.chain as Compound).governance.store.getAll();
+
   // active proposals
   const activeCompoundProposals =
     onCompound &&
-    (app.chain as Compound).governance.store
-      .getAll()
+    compoundProposals
       .filter((p) => !p.completed)
       .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 
@@ -170,8 +184,7 @@ const ProposalsPage = () => {
 
   const inactiveCompoundProposals =
     onCompound &&
-    (app.chain as Compound).governance.store
-      .getAll()
+    compoundProposals
       .filter((p) => p.completed)
       .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 

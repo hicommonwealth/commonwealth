@@ -29,6 +29,7 @@ import { JSONDisplay } from './json_display';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   useAaveProposalsQuery,
+  useCompoundProposalsQuery,
   useCosmosProposalMetadataQuery,
   useCosmosProposalQuery,
   useCosmosProposalTallyQuery,
@@ -106,6 +107,14 @@ const ViewProposalPage = ({
       chainId: app.chain?.id,
     });
 
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const fetchCompoundData = onCompound && isAdapterLoaded;
+  const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
+    useCompoundProposalsQuery({
+      moduleReady: fetchCompoundData,
+      chainId: app.chain?.id,
+    });
+
   useEffect(() => {
     if (!aaveProposalsLoading && fetchAaveData && !proposal) {
       const foundProposal = cachedAaveProposals?.find(
@@ -122,9 +131,18 @@ const ViewProposalPage = ({
     }
   }, [cachedAaveProposals]);
 
+  useEffect(() => {
+    if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
+      const foundProposal = cachedCompoundProposals?.find(
+        (p) => p.identifier === proposalId
+      );
+      setProposal(foundProposal);
+    }
+  }, [cachedCompoundProposals]);
+
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
-      if (onAave) return;
+      if (onAave || onCompound) return;
       try {
         const proposalFromStore = getProposalFromStore();
         setProposal(proposalFromStore);

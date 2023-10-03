@@ -21,6 +21,8 @@ import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -66,10 +68,19 @@ export const AdminActions = ({
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
 
-  const { mutateAsync: deleteThread } = useDeleteThreadMutation({
+  const {
+    mutateAsync: deleteThread,
+    reset: resetDeleteThreadMutation,
+    error: deleteThreadError,
+  } = useDeleteThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+      handleClose: resetDeleteThreadMutation,
+      error: deleteThreadError,
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
@@ -93,15 +104,14 @@ export const AdminActions = ({
                 threadId: thread.id,
                 chainId: app.activeChainId(),
                 address: app.user.activeAccount.address,
-              })
-                .then(() => {
-                  onDelete && onDelete();
-                })
-                .catch(() => {
-                  notifyError('Could not delete thread');
-                });
+              });
+              onDelete?.();
             } catch (err) {
-              console.log(err);
+              if (err instanceof SessionKeyError) {
+                return;
+              }
+              console.error(err?.responseJSON?.error || err?.message);
+              notifyError('Failed to delete thread');
             }
           },
         },
@@ -397,6 +407,8 @@ export const AdminActions = ({
         onClose={() => setIsEditCollaboratorsModalOpen(false)}
         open={isEditCollaboratorsModalOpen}
       />
+
+      {RevalidationModal}
     </>
   );
 };

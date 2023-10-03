@@ -17,7 +17,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import {
   defaultChainRows,
-  ethChainRows,
+  EthChainRows,
   updateAdminOnCreateCommunity,
 } from './chain_input_rows';
 import type { EthChainFormState } from './types';
@@ -28,6 +28,7 @@ import {
   useChainFormState,
   useEthChainFormFields,
 } from './hooks';
+import { ETHEREUM_MAINNET } from './index';
 
 export const ERC20Form = (props: EthChainFormState) => {
   const { ethChainNames, ethChains } = props;
@@ -46,9 +47,10 @@ export const ERC20Form = (props: EthChainFormState) => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    ethChainFormFields.setChainString('Ethereum Mainnet');
-    ethChainFormFields.setNodeUrl(ethChains[1].url);
-  }, []);
+    if (!ethChainFormFields.chainString) {
+      ethChainFormFields.setChainString(ETHEREUM_MAINNET);
+    }
+  }, [ethChainFormFields]);
 
   const validAddress = isAddress(ethChainFormFields.address);
   const disableField = !validAddress || !chainFormState.loaded;
@@ -162,7 +164,7 @@ export const ERC20Form = (props: EthChainFormState) => {
 
   return (
     <div className="CreateCommunityForm">
-      {ethChainRows(
+      {EthChainRows(
         { ethChainNames, ethChains },
         { ...ethChainFormFields, ...chainFormState }
       )}

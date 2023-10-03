@@ -71,7 +71,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   }, [app.loginState]);
 
   if (!isLoggedIn) {
-    return <CannotVote label="Log in to vote" />;
+    return <CannotVote label="Sign in to vote" />;
   } else if (!app.user.activeAccount) {
     return <CannotVote label="Connect an address to vote" />;
   } else if (!proposal.canVoteFrom(app.user.activeAccount)) {

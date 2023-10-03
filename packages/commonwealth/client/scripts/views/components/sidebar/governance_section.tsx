@@ -15,6 +15,16 @@ import type {
 } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
+import { sidebarStore } from 'state/ui/sidebar';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
+
+const resetSidebarState = () => {
+  if (isWindowSmallInclusive(window.innerWidth)) {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  } else {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
+  }
+};
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
@@ -148,6 +158,7 @@ export const GovernanceSection = () => {
     isActive:
       !!matchesMembersRoute && (app.chain ? app.chain.serverLoaded : true),
     onClick: (e, toggle: boolean) => {
+      resetSidebarState();
       handleRedirectClicks(navigate, e, '/members', app.activeChainId(), () => {
         setGovernanceToggleTree('children.Members.toggledState', toggle);
       });
@@ -168,6 +179,7 @@ export const GovernanceSection = () => {
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
       setGovernanceToggleTree('children.Snapshots.toggledState', toggle);
+      resetSidebarState();
       // Check if we have multiple snapshots for conditional redirect
       const snapshotSpaces = app.chain.meta.snapshot;
       if (snapshotSpaces.length > 1) {
@@ -212,6 +224,7 @@ export const GovernanceSection = () => {
       : false,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
+      resetSidebarState();
       handleRedirectClicks(
         navigate,
         e,
