@@ -2,6 +2,7 @@ import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
 import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
+import { verifyReaction } from '../../../shared/canvas/serverVerify';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
@@ -41,6 +42,15 @@ export const createCommentReactionHandler = async (
   const commentId = parseInt(req.params.id, 10);
   if (!commentId) {
     throw new AppError(Errors.InvalidCommentId);
+  }
+
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    await verifyReaction(canvasAction, canvasSession, canvasHash, {
+      comment_id: commentId,
+      address: address.address,
+      chain: chain.id,
+      value: reaction,
+    });
   }
 
   // create comment reaction

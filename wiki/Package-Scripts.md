@@ -43,7 +43,6 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [start-android](#start-android)
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
-  - [compress-images](#compress-images)
   - [datadog-db-setup](#datadog-db-setup)
   - [send-notification-digest-emails](#send-notification-digest-emails)
   - [start-prerender](#start-prerender)
@@ -339,14 +338,6 @@ Contributor: Dillon Chen
 
 # Other services
 
-## compress-images
-
-Definition: `npx ts-node -T ./scripts/compressImages.ts`
-
-Considerations: (per contributor) **Deprecated; recommend removal.**
-
-Contributor: Kurtis Assad
-
 ## datadog-db-setup
 
 Definition: `chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh`
@@ -362,6 +353,14 @@ Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 Description: Schedules a daily task for sending notification email digests.
 
 Considerations: Script name might be worth shortening.
+
+## send-cosmos-notifs
+
+Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
+
+Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
+
+Contributor: Timothee Legros
 
 ## start-prerender
 
