@@ -8,6 +8,7 @@ import type Contract from 'models/Contract';
 import type IWebWallet from 'models/IWebWallet';
 import { ethers } from 'ethers';
 import WebWalletController from '../../app/web_wallets';
+import MetamaskWebWalletController from '../../app/webWallets/metamask_web_wallet';
 
 //NOTE: This should be condensed into contract helpers once that becomes available
 const abi = [
@@ -199,8 +200,8 @@ export async function callContractFunction({
 }
 
 export function encodeParameters(types, values) {
-  const abi = new ethers.utils.AbiCoder();
-  return abi.encode(types, values);
+  const abiCoder = new ethers.utils.AbiCoder();
+  return abiCoder.encode(types, values);
 }
 
 export async function setupCommunityContracts({
@@ -224,7 +225,7 @@ export async function setupCommunityContracts({
 }) {
   const signingWallet = WebWalletController.Instance.availableWallets(
     ChainBase.Ethereum
-  )[0];
+  )[0] as MetamaskWebWalletController;
   await signingWallet.enable('5');
   if (!signingWallet.api) {
     throw new Error('Web3 Api Not Initialized');
@@ -272,7 +273,7 @@ export async function setupCommunityContracts({
 
   //3. Set up wallet seed transactions
   if (seedWalletMeta.type === 'wallet' && seedWalletMeta.amount > 0) {
-    const txReceipt = web3.eth.sendTransaction({
+    web3.eth.sendTransaction({
       to: walletAddress,
       from: signingWallet.accounts[0],
       value: seedWalletMeta.amount,
@@ -284,7 +285,7 @@ export async function setupCommunityContracts({
       compGovAbi as AbiItem,
       seedWalletMeta.address
     );
-    const txReceipt = await gov.methods
+    await gov.methods
       .propose(
         [walletAddress],
         [seedWalletMeta.amount],
