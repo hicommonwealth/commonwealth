@@ -29,6 +29,8 @@ import {
   Link,
   TwitterLogo,
   NotePencil,
+  Users,
+  Notepad,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -81,6 +83,7 @@ export const iconLookup = {
   democraticProposal: Icons.CWDemocraticProposal,
   discord: Icons.CWDiscord,
   discordLogin: Icons.CWDiscordLogin,
+  dot: Icons.CWDot,
   dots: Icons.CWDots,
   dotsVertical: Icons.CWDotsVertical,
   downvote: withPhosphorIcon(ArrowFatDown),
@@ -120,6 +123,7 @@ export const iconLookup = {
   near: Icons.CWNear,
   newStar: Icons.CWNewStar,
   notePencil: withPhosphorIcon(NotePencil),
+  notepad: withPhosphorIcon(Notepad),
   paperPlaneTilt: withPhosphorIcon(PaperPlaneTilt),
   people: Icons.CWPeople,
   person: Icons.CWPerson,
@@ -153,6 +157,7 @@ export const iconLookup = {
   twitterOutline: withPhosphorIcon(TwitterLogo),
   unsubscribe: Icons.CWUnsubscribe,
   upvote: withPhosphorIcon(ArrowFatUp),
+  users: withPhosphorIcon(Users),
   vote: Icons.CWVote,
   views: Icons.CWViews,
   wallet: Icons.CWWallet,

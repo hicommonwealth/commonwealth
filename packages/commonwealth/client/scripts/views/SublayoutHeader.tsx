@@ -1,18 +1,16 @@
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
-import { HelpMenuPopover } from 'views/menus/help_menu';
 import app, { initAppState } from '../state';
-import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import {
   isWindowMediumSmallInclusive,
   isWindowSmallInclusive,
 } from './components/component_kit/helpers';
-import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { featureFlags } from 'helpers/feature-flags';
@@ -47,6 +45,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
   } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     setRecentlyUpdatedVisibility(menuVisible);
@@ -172,6 +171,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               buttonHeight="sm"
               label="Login"
               buttonWidth="wide"
+              disabled={location.pathname.includes('/finishsociallogin')}
               onClick={() => setIsLoginModalOpen(true)}
             />
           )}
