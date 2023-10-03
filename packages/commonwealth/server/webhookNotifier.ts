@@ -188,9 +188,13 @@ const send = async (models, content: WebhookContent) => {
     }
   }
 
-  const chain = await models.Chain.findOne({
-    where: { id: content?.chain },
-  });
+  let chain;
+
+  if (content?.chain) {
+    chain = await models.Chain.findOne({
+      where: { id: content?.chain },
+    });
+  }
 
   // Second case
   if (!previewImageUrl) {

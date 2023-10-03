@@ -388,18 +388,22 @@ describe('emitNotifications tests', () => {
           ...snapshotNotificationData,
         },
       };
+      console.log('what');
 
       await emitNotifications(models, notififcation_data, {
         notificationCategory: eventType,
         body: snapshotNotificationData.body,
         title: snapshotNotificationData.title,
       });
+      console.log('the');
 
       const notif = await models.Notification.findOne({
         where: {
           category_id: NotificationCategories.SnapshotProposal,
         },
       });
+      console.log('fuck');
+
       expect(notif).to.exist;
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -409,6 +413,8 @@ describe('emitNotifications tests', () => {
           user_id: userId,
         },
       });
+      console.log('dude');
+
       expect(notifRead).to.exist;
     });
   });
