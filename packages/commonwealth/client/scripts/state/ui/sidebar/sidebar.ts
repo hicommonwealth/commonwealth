@@ -34,7 +34,7 @@ export const sidebarStore = createStore<SidebarStore>()(
         menuName: 'default',
         menuVisible: true,
         userToggledVisibility:
-          featureFlags.sidebarToggle === false ? 'closed' : null,
+          featureFlags.sidebarToggle !== true ? 'closed' : null,
         setUserToggledVisibility: (toggled) => {
           set(() => ({ userToggledVisibility: toggled }));
           set((state) => ({
