@@ -1768,6 +1768,14 @@ export const ComponentShowcase = () => {
           chain={app.config.chains.getById('basindao')}
           memberCount={2623}
           threadCount={437}
+          actions={
+            <CWButton
+              buttonType="primary"
+              disabled={false}
+              className="action-btn"
+              label="Action"
+            />
+          }
         />
       </div>
     </div>

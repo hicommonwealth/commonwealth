@@ -6,17 +6,17 @@ import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { ComponentType } from '../../types';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { pluralizeWithoutNumberPrefix } from '../../../../../helpers';
-import { CWButton } from '../../cw_button';
 import { addPeriodToText } from './utils';
 
 type CWRelatedCommunityCardProps = {
   chain: ChainInfo;
   memberCount: number;
   threadCount: number;
+  actions: JSX.Element;
 };
 
 export const CWRelatedCommunityCard = (props: CWRelatedCommunityCardProps) => {
-  const { chain, memberCount, threadCount } = props;
+  const { chain, memberCount, threadCount, actions } = props;
 
   return (
     <div className={ComponentType.RelatedCommunityCard}>
@@ -54,14 +54,8 @@ export const CWRelatedCommunityCard = (props: CWRelatedCommunityCardProps) => {
             </span>
           </div>
         </div>
-        <div className="actions">
-          <CWButton
-            buttonType="primary-black"
-            disabled={false}
-            className="action-btn"
-            label="Button"
-          />
-        </div>
+
+        {actions && <div className="actions">{actions}</div>}
       </div>
     </div>
   );
