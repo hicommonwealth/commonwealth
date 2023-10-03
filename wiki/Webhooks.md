@@ -47,9 +47,9 @@ by Dillon by interacting with [@BotFather](https://t.me/botfather) on Telegram.
 **Development**
 
 We have a Telegram bot that goes by the name `@CommonWebhooksDevBot`. The owner of this
-bot is also Dillon Chen. The token can be found in `frick` or `frack` Heroku app
-environment variables as `TELEGRAM_BOT_TOKEN`. The token can also be retrieved
-by Dillon by interacting with [@BotFather](https://t.me/botfather) on Telegram.
+bot is also Dillon Chen. The token can be retrieved by Dillon by interacting with 
+[@BotFather](https://t.me/botfather) on Telegram. The token may also be found on Heroku apps as the
+`TELEGRAM_BOT_TOKEN_DEV` environment variable.
 
 There is also a development Telegram channel named `Common Webhook Dev`. To join this
 channel you must be invited. Contact Dillon or Timothee for the invite link. The
