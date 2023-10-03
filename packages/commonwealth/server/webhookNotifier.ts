@@ -395,7 +395,10 @@ const send = async (models, content: WebhookContent) => {
             process.env.NODE_ENV === 'production' ||
             (SLACK_FEEDBACK_WEBHOOK && url === SLACK_FEEDBACK_WEBHOOK)
           ) {
-            await request.post(url).send(webhookData);
+            console.error(
+              `\n\n\nSENDING WEBHOOKS TO PRODUCTION URLS: ${url}\n\n\n`
+            );
+            // await request.post(url).send(webhookData);
           } else {
             console.log('Suppressed webhook notification to', url);
           }
