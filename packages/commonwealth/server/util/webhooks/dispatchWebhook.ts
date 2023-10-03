@@ -10,6 +10,7 @@ import { sendTelegramWebhook } from './destinations/telegram';
 import { WebhookInstance } from '../../models/webhook';
 import { sendZapierWebhook } from './destinations/zapier';
 import { rollbar } from '../rollbar';
+import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -73,6 +74,7 @@ export async function dispatchWebhooks(
   const results = await Promise.allSettled(webhookPromises);
   for (const result of results) {
     if (result.status === 'rejected') {
+      StatsDController.get().increment('webhook.error');
       let error;
       if (result.reason instanceof Error) {
         error = result.reason;
@@ -82,6 +84,8 @@ export async function dispatchWebhooks(
 
       log.error(`Error sending webhook: ${result.reason}`, error);
       rollbar.error(`Error sending webhook: ${result.reason}`, error);
+    } else {
+      StatsDController.get().increment('webhook.success');
     }
   }
 }
