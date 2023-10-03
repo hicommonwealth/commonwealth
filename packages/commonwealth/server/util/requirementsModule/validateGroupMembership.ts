@@ -68,23 +68,28 @@ async function _thresholdCheck(
   try {
     let chainNetwork: ChainNetwork;
     let contractAddress: string;
+    let chainId: string;
     switch (thresholdData.source.source_type) {
       case 'erc20': {
         chainNetwork = ChainNetwork.ERC20;
         contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.evm_chain_id;
         break;
       }
       case 'erc721': {
         chainNetwork = ChainNetwork.ERC721;
         contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.evm_chain_id;
         break;
       }
       case 'eth_native': {
         chainNetwork = ChainNetwork.Ethereum;
+        chainId = thresholdData.source.evm_chain_id;
         break;
       }
       case 'cosmos_native': {
         chainNetwork = ChainNetwork.Osmosis;
+        chainId = thresholdData.source.cosmos_chain_id;
         break;
       }
       default:
@@ -93,9 +98,7 @@ async function _thresholdCheck(
     const balance = await tbc.fetchUserBalanceWithChain(
       chainNetwork,
       userAddress,
-      thresholdData.source.evm_chain_id
-        ? thresholdData.source.evm_chain_id
-        : thresholdData.source.cosmos_chain_id,
+      chainId,
       contractAddress
     );
 
