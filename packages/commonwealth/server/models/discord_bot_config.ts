@@ -58,7 +58,7 @@ export default (
     models.DiscordBotConfig.belongsTo(models.Chain, {
       foreignKey: 'chain_id',
       targetKey: 'id',
-      onDelete: 'CASCADE', // add this line
+      onDelete: 'CASCADE',
     });
   };
 
