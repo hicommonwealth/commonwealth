@@ -4,11 +4,6 @@ export const breadCrumbURLS = [
     breadcrumb: 'Dashboard',
   },
   {
-    url: 'notification-settings',
-    breadcrumb: 'Notification Management',
-    className: 'notification-settings',
-  },
-  {
     url: 'profile/id',
     breadcrumb: 'Profile',
   },
@@ -82,10 +77,12 @@ export const breadCrumbURLS = [
   {
     url: 'notification-settings',
     className: 'notification-management',
+    breadcrumb: 'Notification Management',
   },
   {
-    url: 'notifications',
+    url: '/notifications',
     className: 'notifications',
+    breadcrumb: 'Notifications',
   },
   {
     url: 'search',

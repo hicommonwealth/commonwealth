@@ -63,12 +63,6 @@
     padding-left: 24px;
   }
 
-  .notifications {
-    display: flex;
-    padding-left: 24px;
-    flex-direction: row;
-  }
-
   .notification-management {
     display: flex;
     flex-direction: row;
@@ -158,6 +152,12 @@
     flex-direction: row;
     padding-left: 24px;
     padding-top: 16px;
+  }
+
+  .notifications {
+    display: flex;
+    flex-direction: row;
+    padding-left: 24px;
   }
 
   .viewProfile {

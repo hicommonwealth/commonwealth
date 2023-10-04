@@ -72,7 +72,6 @@ export const Breadcrumbs = () => {
       .filter((segment) => segment.length > 0);
 
     const breadcrumbs = pathSegments.map((pathSegment, index) => {
-      console.log('path', pathSegment, index, pathSegments);
       // Find the matching breadcrumb data for the current path segment.
       const matchedBreadcrumb = breadcrumbData.find((breadcrumbItem) => {
         // Check if breadcrumbItem.url is falsy or if index is out of bounds
@@ -86,6 +85,8 @@ export const Breadcrumbs = () => {
 
       // Generate the link based on the current path segment.
       if (pathSegment === 'profile') {
+        // Remove 'profile' segment and generate the link.
+        pathSegments.splice(index + 1, 2);
         link = `id/${profileId}`;
       } else if (pathSegment === 'snapshot') {
         pathSegments.splice(index + 1, 1);
@@ -149,10 +150,9 @@ export const Breadcrumbs = () => {
   const getStyle = () => {
     const findStyle = breadCrumbURLS.find((page) => {
       if (!page.className) return;
-      if (location.pathname.split('/').length > 2) {
+      if (location.pathname.split('/').length > 1) {
         return location.pathname.includes(page.url);
       }
-      console.log('page', location.pathname);
       return location.pathname === page.url;
     });
 
