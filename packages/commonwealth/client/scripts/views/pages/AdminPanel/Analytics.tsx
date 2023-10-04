@@ -103,6 +103,7 @@ const Analytics = () => {
         <>
           <div className="AnalyticsSection">
             <CWText type="h4">Site Statistics</CWText>
+
             <CWText type="caption">
               All stats pulled from the last 30 days of global site activity.
             </CWText>
