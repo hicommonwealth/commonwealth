@@ -54,6 +54,7 @@ export enum ComponentType {
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
   WalletOptionRow = 'WalletOptionRow',
+  SelectList = 'SelectList',
 }
 
 export type BaseStyleProps = {
