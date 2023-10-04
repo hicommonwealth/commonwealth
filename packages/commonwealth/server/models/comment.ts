@@ -2,7 +2,7 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 
 import type { AddressAttributes } from './address';
-import type { CommunityAttributes } from './communities';
+import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 import { StatsDController } from 'common-common/src/statsd';
 
@@ -49,7 +49,11 @@ export default (
     'Comment',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
+      chain: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        field: 'community_id',
+      },
       thread_id: {
         type: dataTypes.INTEGER,
         allowNull: false,

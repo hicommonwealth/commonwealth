@@ -13,7 +13,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
-import type { CommunityInstance } from '../models/communities';
+import type { CommunityInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';

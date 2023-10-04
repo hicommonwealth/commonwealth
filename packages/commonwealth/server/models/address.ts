@@ -1,7 +1,7 @@
 import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { CommunityAttributes, CommunityInstance } from './communities';
+import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
@@ -54,7 +54,11 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address: { type: dataTypes.STRING, allowNull: false },
-      chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
+      chain: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        field: 'community_id',
+      },
       role: {
         type: dataTypes.ENUM('member', 'moderator', 'admin'),
         defaultValue: 'member',

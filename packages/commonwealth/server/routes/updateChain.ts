@@ -6,7 +6,7 @@ import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-import type { CommunityAttributes } from '../models/communities';
+import type { CommunityAttributes } from '../models/community';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { findOneRole } from '../util/roles';

@@ -7,7 +7,7 @@ import type {
 } from '../../shared/types';
 import type { DB } from '../models';
 import type { WebhookContent } from '../webhookNotifier';
-import type { CommunityAttributes } from './communities';
+import type { CommunityAttributes } from './community';
 import type { CommentAttributes } from './comment';
 import type { NotificationInstance } from './notification';
 import type { NotificationCategoryAttributes } from './notification_category';
@@ -87,7 +87,11 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      chain_id: { type: dataTypes.STRING, allowNull: true, field: 'community_id' },
+      chain_id: {
+        type: dataTypes.STRING,
+        allowNull: true,
+        field: 'community_id',
+      },
       thread_id: { type: dataTypes.INTEGER, allowNull: true },
       comment_id: { type: dataTypes.INTEGER, allowNull: true },
       snapshot_id: {

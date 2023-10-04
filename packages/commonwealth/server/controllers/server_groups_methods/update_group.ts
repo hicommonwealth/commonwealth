@@ -1,4 +1,4 @@
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/community';
 import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
@@ -12,7 +12,7 @@ const Errors = {
 
 export type UpdateGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   address: AddressInstance;
   metadata: any;
   requirements: Requirement[];

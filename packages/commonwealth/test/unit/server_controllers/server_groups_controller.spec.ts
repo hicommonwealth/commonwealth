@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
 import { AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/community';
 import { UserInstance } from 'server/models/user';
 import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
 
@@ -24,7 +24,7 @@ const VALID_REQUIREMENTS: Requirement[] = [
     },
   },
 ];
-const INVALID_REQUIREMENTS_NOT_ARRAY = ('no an array' as unknown) as [];
+const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 
 const createMockedGroupsController = () => {
   const db: any = {};
@@ -43,7 +43,7 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const result = await controller.refreshMembership({
       user: {} as UserInstance,
-      chain: {} as ChainInstance,
+      chain: {} as CommunityInstance,
       address: {} as AddressInstance,
       topicId: 1,
     });
@@ -74,7 +74,7 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const result = await controller.createGroup({
       user: {} as UserInstance,
-      chain: {} as ChainInstance,
+      chain: {} as CommunityInstance,
       address: {} as AddressInstance,
       metadata: {},
       requirements: VALID_REQUIREMENTS,
@@ -92,7 +92,7 @@ describe('ServerGroupsController', () => {
     expect(
       controller.createGroup({
         user: {} as UserInstance,
-        chain: {} as ChainInstance,
+        chain: {} as CommunityInstance,
         address: {} as AddressInstance,
         metadata: {},
         requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
@@ -105,7 +105,7 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const result = await controller.updateGroup({
       user: {} as UserInstance,
-      chain: {} as ChainInstance,
+      chain: {} as CommunityInstance,
       address: {} as AddressInstance,
       metadata: {},
       requirements: VALID_REQUIREMENTS,
@@ -122,7 +122,7 @@ describe('ServerGroupsController', () => {
     expect(
       controller.updateGroup({
         user: {} as UserInstance,
-        chain: {} as ChainInstance,
+        chain: {} as CommunityInstance,
         address: {} as AddressInstance,
         metadata: {},
         requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
@@ -134,7 +134,7 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const result = await controller.deleteGroup({
       user: {} as UserInstance,
-      chain: {} as ChainInstance,
+      chain: {} as CommunityInstance,
       address: {} as AddressInstance,
       groupId: 1,
     });

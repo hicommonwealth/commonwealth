@@ -2,7 +2,7 @@ import { ServerError } from 'common-common/src/errors';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
-import type { CommunityInstance } from 'server/models/communities';
+import type { CommunityInstance } from '../models/community';
 import type { NotificationCategoryInstance } from 'server/models/notification_category';
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
@@ -145,15 +145,15 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       continue;
     }
 
-      // adds a union between SELECT queries if the number of SELECT queries is greater than 1
-      if (i != 0) query += ' UNION ';
-      // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
-      replacements.push(name, time.getTime());
-      // append the SELECT query
-      query += `SELECT id, community_id FROM "Threads" WHERE
+    // adds a union between SELECT queries if the number of SELECT queries is greater than 1
+    if (i != 0) query += ' UNION ';
+    // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
+    replacements.push(name, time.getTime());
+    // append the SELECT query
+    query += `SELECT id, community_id FROM "Threads" WHERE
  (kind IN ('discussion', 'link') OR community_id = ?) AND created_at > TO_TIMESTAMP(?)`;
-      if (i === commsAndChains.length - 1) query += ';';
-    }
+    if (i === commsAndChains.length - 1) query += ';';
+  }
 
   // populate the query replacements and execute the query
   const threadNumPromise: Promise<{ id: string; chain: string }[]> = <any>(
@@ -200,14 +200,14 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       continue;
     }
 
-      // adds a union between SELECT queries if the number of SELECT queries is greater than 1
-      if (i !== 0) query += ' UNION ';
-      // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
-      replacements.push(name, time.getTime());
-      // append the SELECT query
-      query += `SELECT thread_id, community_id FROM "Comments" WHERE community_id = ? AND created_at > TO_TIMESTAMP(?)`;
-      if (i === commsAndChains.length - 1) query += ';';
-    }
+    // adds a union between SELECT queries if the number of SELECT queries is greater than 1
+    if (i !== 0) query += ' UNION ';
+    // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
+    replacements.push(name, time.getTime());
+    // append the SELECT query
+    query += `SELECT thread_id, community_id FROM "Comments" WHERE community_id = ? AND created_at > TO_TIMESTAMP(?)`;
+    if (i === commsAndChains.length - 1) query += ';';
+  }
 
   // populate query and execute
   const commentNum: { thread_id: string; chain: string }[] = <any>(

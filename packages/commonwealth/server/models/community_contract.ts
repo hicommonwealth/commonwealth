@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
-import type { CommunityAttributes, CommunityInstance } from './communities';
+import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ContractAttributes, ContractInstance } from './contract';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -31,7 +31,11 @@ export default (
     'CommunityContract',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-      chain_id: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
+      chain_id: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        field: 'community_id',
+      },
       contract_id: { type: dataTypes.INTEGER, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },

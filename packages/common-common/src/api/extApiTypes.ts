@@ -3,7 +3,7 @@
 import type { ThreadAttributes } from 'commonwealth/server/models/thread';
 import type { CommentAttributes } from 'commonwealth/server/models/comment';
 import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
-import type { CommunityAttributes } from 'commonwealth/server/models/communities';
+import type { CommunityAttributes } from '../../../commonwealth/server/models/community';
 import type { ProfileAttributes } from 'commonwealth/server/models/profile';
 import type {
   BalanceProviderResp,

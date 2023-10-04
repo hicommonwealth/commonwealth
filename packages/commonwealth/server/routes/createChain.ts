@@ -13,7 +13,7 @@ import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-import type { CommunityAttributes } from '../models/communities';
+import type { CommunityAttributes } from '../models/community';
 import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';

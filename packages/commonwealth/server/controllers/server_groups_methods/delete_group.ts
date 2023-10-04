@@ -1,11 +1,11 @@
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/community';
 import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
 
 export type DeleteGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   address: AddressInstance;
   groupId: number;
 };

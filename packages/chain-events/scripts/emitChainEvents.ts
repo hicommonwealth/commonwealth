@@ -4,7 +4,7 @@ import type { CWEvent, IEventHandler } from 'chain-events/src';
 import ceModels, { sequelize } from '../services/database/database';
 import cwModels from '../../commonwealth/server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
-import type { CommunityInstance } from 'commonwealth/server/models/communities';
+import type { CommunityInstance } from '../../commonwealth/server/models/community';
 import type { StorageFilterConfig } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   EntityArchivalHandler,

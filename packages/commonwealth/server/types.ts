@@ -1,7 +1,7 @@
 import type { Response } from 'express';
 import type { ValidationError } from 'express-validator';
 import type { AddressInstance } from './models/address';
-import type { CommunityInstance } from './models/communities';
+import type { CommunityInstance } from './models/community';
 import type { UserInstance } from './models/user';
 
 export type PaginationQueryParams = {
@@ -42,7 +42,7 @@ export type TypedRequestParams<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
-  chain?: ChainInstance;
+  chain?: CommunityInstance;
   params: P;
 };
 

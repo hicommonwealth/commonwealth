@@ -2,7 +2,6 @@ import moment from 'moment';
 import { UserInstance } from '../../models/user';
 import { ServerThreadsController } from '../server_threads_controller';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -18,6 +17,7 @@ import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { uniq } from 'lodash';
+import { CommunityInstance } from '../../models/community';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -38,7 +38,7 @@ export const Errors = {
 export type UpdateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   threadId?: number;
   title?: string;
   body?: string;
@@ -548,7 +548,7 @@ async function setThreadSpam(
 async function setThreadStage(
   permissions: UpdateThreadPermissions,
   stage: string | undefined,
-  chain: ChainInstance,
+  chain: CommunityInstance,
   allAnalyticsOptions: TrackOptions[],
   toUpdate: Partial<ThreadAttributes>
 ) {

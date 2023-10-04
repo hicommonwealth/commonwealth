@@ -3,7 +3,7 @@ import * as process from 'process';
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
-import type { CommunityInstance } from 'server/models/communities';
+import type { CommunityInstance } from '../../../../server/models/community';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { CollaborationAttributes } from 'server/models/collaboration';
 import type { CommentInstance } from 'server/models/comment';

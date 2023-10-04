@@ -1,4 +1,4 @@
-import { ChainInstance } from '../../../models/chain';
+import { CommunityInstance } from '../../../models/community';
 import { factory, formatFilename } from 'common-common/src/logging';
 import Rollbar from 'rollbar';
 
@@ -24,7 +24,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * v1beta1 gov modules.
  */
 export async function fetchUpToLatestCosmosProposals(
-  chains: ChainInstance[],
+  chains: CommunityInstance[],
   latestProposalIds: Record<string, number>,
   rollbar?: Rollbar
 ): Promise<AllCosmosProposals> {
@@ -71,7 +71,7 @@ export async function fetchUpToLatestCosmosProposals(
  * Fetches the last/latest proposal for each chain. Works for both v1 and v1beta1 gov modules.
  */
 export async function fetchLatestProposals(
-  chains: ChainInstance[],
+  chains: CommunityInstance[],
   rollbar?: Rollbar
 ): Promise<AllCosmosProposals> {
   if (chains.length === 0) return { v1: {}, v1Beta1: {} };

@@ -1,7 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { CommunityAttributes } from './communities';
+import type { CommunityAttributes } from './community';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import { NotificationAttributes } from './notification';
@@ -101,7 +101,11 @@ export default (
         defaultValue: false,
         allowNull: false,
       },
-      chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
+      chain: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        field: 'community_id',
+      },
       view_count: {
         type: dataTypes.INTEGER,
         allowNull: false,

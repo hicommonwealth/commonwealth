@@ -2,7 +2,7 @@
 // If a community is found, also check that the user is allowed to see it.
 
 import type { DB } from '../models';
-import type { CommunityInstance } from '../models/communities';
+import type { CommunityInstance } from '../models/community';
 
 export const ChainCommunityErrors = {
   ChainDNE: 'Chain does not exist',
@@ -13,7 +13,11 @@ export type ValidateChainParams = {
   chain_id?: string;
 };
 
-const getChainQuery = (chain_id: string, models: DB, includeTopics: boolean) => ({
+const getChainQuery = (
+  chain_id: string,
+  models: DB,
+  includeTopics: boolean
+) => ({
   where: {
     id: chain_id,
   },

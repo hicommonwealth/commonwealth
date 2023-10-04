@@ -4,7 +4,7 @@ import { DATABASE_URI } from './config';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';
-import ChainFactory from './models/communities';
+import ChainFactory from './models/community';
 import ChainNodeFactory from './models/chain_node';
 import CollaborationFactory from './models/collaboration';
 import CommentFactory from './models/comment';

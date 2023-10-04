@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { CommunityAttributes } from './communities';
+import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -33,7 +33,11 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
-      chain_id: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
+      chain_id: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        field: 'community_id',
+      },
 
       prompt: { type: dataTypes.TEXT, allowNull: false },
       options: { type: dataTypes.STRING, allowNull: true },

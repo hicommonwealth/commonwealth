@@ -124,26 +124,32 @@ const resetServer = (debug = false): Promise<void> => {
           url: 'https://rpc-osmosis.ecostake.com',
           name: 'Osmosis',
           balance_type: BalanceType.Cosmos,
-          cosmos_chain_id: 'osmosis'
+          cosmos_chain_id: 'osmosis',
         },
         csdkBeta: {
           url: 'https://cosmos-devnet-beta.herokuapp.com/rpc',
           name: 'Cosmos SDK v0.45.0 devnet',
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
-          cosmos_chain_id: 'csdkbetaci'
+          cosmos_chain_id: 'csdkbetaci',
         },
         csdkV1: {
           url: 'https://cosmos-devnet.herokuapp.com/rpc',
           name: 'Cosmos SDK v0.46.11 devnet',
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet.herokuapp.com/lcd/',
-          cosmos_chain_id: 'csdkv1'
+          cosmos_chain_id: 'csdkv1',
         },
       };
 
-      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkBetaNode, csdkV1Node] =
-        await models.ChainNode.bulkCreate(Object.values(nodes));
+      const [
+        edgewareNode,
+        mainnetNode,
+        testnetNode,
+        osmosisNode,
+        csdkBetaNode,
+        csdkV1Node,
+      ] = await models.ChainNode.bulkCreate(Object.values(nodes));
 
       // Initialize different chain + node URLs
       await models.Community.create({
@@ -195,7 +201,7 @@ const resetServer = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: osmosisNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'csdk-beta',
         network: ChainNetwork.Osmosis,
         default_symbol: 'STAKE',

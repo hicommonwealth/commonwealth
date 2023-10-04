@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { CommunityAttributes } from './communities';
+import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type WebhookAttributes = {
@@ -26,7 +26,11 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       url: { type: dataTypes.STRING, allowNull: false },
-      chain_id: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
+      chain_id: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        field: 'community_id',
+      },
       categories: {
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: false,

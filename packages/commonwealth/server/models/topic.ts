@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { CommunityAttributes } from './communities';
+import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -42,7 +42,11 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
       telegram: { type: dataTypes.STRING, allowNull: true },
-      chain_id: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
+      chain_id: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        field: 'community_id',
+      },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
