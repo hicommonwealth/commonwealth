@@ -1,3 +1,4 @@
+import { getClasses } from 'views/components/component_kit/helpers';
 import React, { useState } from 'react';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
@@ -78,7 +79,18 @@ const RequirementSubForm = ({
       </div>
 
       {requirementType && (
-        <div className={`row-2 ${isTokenRequirement ? 'cols-3' : 'cols-4'}`}>
+        <div
+          className={getClasses<{
+            'cols-3'?: boolean;
+            'cols-4'?: boolean;
+          }>(
+            {
+              'cols-3': isTokenRequirement,
+              'cols-4': !isTokenRequirement,
+            },
+            `row-2`
+          )}
+        >
           <CWSelectList
             key={defaultValues?.requirementChain?.value}
             name="requirementChain"
