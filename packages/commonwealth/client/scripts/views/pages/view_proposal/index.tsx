@@ -77,7 +77,7 @@ const ViewProposalPage = ({
     setProposal(cosmosProposal);
     setTitle(cosmosProposal?.title);
     setDescription(cosmosProposal?.description);
-  }, [cosmosProposal]);
+  }, [cosmosProposal, app.chain.apiInitialized]);
 
   useEffect(() => {
     if (_.isEmpty(metadata)) return;
