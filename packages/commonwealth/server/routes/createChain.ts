@@ -11,11 +11,8 @@ import {
 import type { NextFunction } from 'express';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
-// import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-
-import type { AddressInstance } from '../models/address';
 import type { ChainAttributes } from '../models/chain';
 import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
@@ -37,6 +34,8 @@ export const Errors = {
   NoName: 'Must provide name',
   InvalidNameLength: 'Name should not exceed 255',
   NoSymbol: 'Must provide symbol',
+  NoValidAddressWithBase:
+    'Must hold an address with the correct chain base type',
   InvalidSymbolLength: 'Symbol should not exceed 9',
   NoType: 'Must provide chain type',
   NoBase: 'Must provide chain base',
@@ -44,7 +43,6 @@ export const Errors = {
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
   InvalidNode: 'RPC url returned invalid response. Check your node url',
   MustBeWs: 'Node must support websockets on ethereum',
-  InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
   InvalidChainIdOrUrl:
     'Could not determine a valid endpoint for provided chain',
@@ -145,12 +143,25 @@ const createChain = async (
     throw new AppError(Errors.ImageTooLarge);
   }
 
-  const existingBaseChain = await models.Chain.findOne({
-    where: { base: req.body.base },
+  const validAdminAddresses = await models.Address.scope(
+    'withPrivateData'
+  ).findAll({
+    where: { user_id: req.user.id, verified: { [Op.ne]: null } },
+    include: [
+      {
+        model: models.Chain,
+        where: { base: req.body.base },
+        attributes: ['id'],
+      },
+    ],
   });
-  if (!existingBaseChain) {
-    return next(new AppError(Errors.InvalidBase));
+
+  if (validAdminAddresses.length === 0) {
+    return next(new AppError(Errors.NoValidAddressWithBase));
   }
+
+  // Get any valid address to be admin address
+  const addressToBeAdmin = validAdminAddresses[0];
 
   // TODO: refactor this to use existing nodes rather than always creating one
 
@@ -443,79 +454,23 @@ const createChain = async (
     featured_in_sidebar: true,
   });
 
-  // try to make admin one of the user's addresses
-  // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
-  let role: RoleInstanceWithPermission | undefined;
-  let addressToBeAdmin: AddressInstance | undefined;
+  const newAddress = await models.Address.create({
+    user_id: req.user.id,
+    profile_id: addressToBeAdmin.profile_id,
+    address: addressToBeAdmin.address,
+    chain: chain.id,
+    verification_token: addressToBeAdmin.verification_token,
+    verification_token_expires: addressToBeAdmin.verification_token_expires,
+    verified: addressToBeAdmin.verified,
+    keytype: addressToBeAdmin.keytype,
+    wallet_id: addressToBeAdmin.wallet_id,
+    is_user_default: true,
+    role: 'admin',
+    last_active: new Date(),
+  });
 
-  if (chain.base === ChainBase.Ethereum) {
-    addressToBeAdmin = await models.Address.scope('withPrivateData').findOne({
-      where: {
-        user_id: req.user.id,
-        address: {
-          [Op.startsWith]: '0x',
-        },
-      },
-      include: [
-        {
-          model: models.Chain,
-          where: { base: chain.base },
-          required: true,
-        },
-      ],
-    });
-  } else if (chain.base === ChainBase.NEAR) {
-    addressToBeAdmin = await models.Address.scope('withPrivateData').findOne({
-      where: {
-        user_id: req.user.id,
-        address: {
-          [Op.endsWith]: '.near',
-        },
-      },
-      include: [
-        {
-          model: models.Chain,
-          where: { base: chain.base },
-          required: true,
-        },
-      ],
-    });
-  } else if (chain.base === ChainBase.Solana) {
-    addressToBeAdmin = await models.Address.scope('withPrivateData').findOne({
-      where: {
-        user_id: req.user.id,
-        address: {
-          // This is the regex formatting for solana addresses per their website
-          [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}',
-        },
-      },
-      include: [
-        {
-          model: models.Chain,
-          where: { base: chain.base },
-          required: true,
-        },
-      ],
-    });
-  }
-
-  if (addressToBeAdmin) {
-    const newAddress = await models.Address.create({
-      user_id: req.user.id,
-      profile_id: addressToBeAdmin.profile_id,
-      address: addressToBeAdmin.address,
-      chain: chain.id,
-      verification_token: addressToBeAdmin.verification_token,
-      verification_token_expires: addressToBeAdmin.verification_token_expires,
-      verified: addressToBeAdmin.verified,
-      keytype: addressToBeAdmin.keytype,
-      wallet_id: addressToBeAdmin.wallet_id,
-      is_user_default: true,
-      role: 'admin',
-      last_active: new Date(),
-    });
-
-    role = new RoleInstanceWithPermission(
+  const role: RoleInstanceWithPermission | undefined =
+    new RoleInstanceWithPermission(
       { community_role_id: 0, address_id: newAddress.id },
       chain.id,
       'admin',
@@ -523,15 +478,14 @@ const createChain = async (
       0
     );
 
-    await models.Subscription.findOrCreate({
-      where: {
-        subscriber_id: req.user.id,
-        category_id: NotificationCategories.NewThread,
-        chain_id: chain.id,
-        is_active: true,
-      },
-    });
-  }
+  await models.Subscription.findOrCreate({
+    where: {
+      subscriber_id: req.user.id,
+      category_id: NotificationCategories.NewThread,
+      chain_id: chain.id,
+      is_active: true,
+    },
+  });
 
   const serverAnalyticsController = new ServerAnalyticsController();
   serverAnalyticsController.track(
@@ -548,7 +502,7 @@ const createChain = async (
     chain: chain.toJSON(),
     node: nodeJSON,
     role: role?.toJSON(),
-    admin_address: addressToBeAdmin?.address,
+    admin_address: addressToBeAdmin.address,
   });
 };
 

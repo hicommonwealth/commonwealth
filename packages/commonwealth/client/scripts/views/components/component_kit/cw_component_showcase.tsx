@@ -16,6 +16,7 @@ import CWBanner, {
 } from 'views/components/component_kit/new_designs/CWBanner';
 import { CWTable } from './new_designs/CWTable/CWTable';
 import { makeData, createColumnInfo } from './showcase_helpers';
+import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -1774,6 +1775,22 @@ export const ComponentShowcase = () => {
       <div className="table">
         <CWText type="h3">Table</CWText>
         <CWTable columnInfo={columnInfo} rowData={rowData} />
+      </div>
+      <div className="community-card">
+        <CWText type="h3"> Community Card </CWText>
+        <CWRelatedCommunityCard
+          chain={app.config.chains.getById('basindao')}
+          memberCount={2623}
+          threadCount={437}
+          actions={
+            <CWButton
+              buttonType="primary"
+              disabled={false}
+              className="action-btn"
+              label="Action"
+            />
+          }
+        />
       </div>
     </div>
   );

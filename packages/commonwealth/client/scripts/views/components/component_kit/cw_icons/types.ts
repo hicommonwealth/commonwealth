@@ -9,6 +9,7 @@ export type IconSize =
   | 'xxs'
   | 'xs'
   | 'small'
+  | 'regular'
   | 'medium'
   | 'large'
   | 'xl'
