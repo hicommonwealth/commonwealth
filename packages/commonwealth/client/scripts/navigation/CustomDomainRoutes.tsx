@@ -8,7 +8,9 @@ const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
-const MembersPage = lazy(() => import('views/pages/members'));
+const MembersPage = lazy(
+  () => import('views/pages/Community/Members/CommunityMembersPage')
+);
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));

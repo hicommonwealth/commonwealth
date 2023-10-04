@@ -1,4 +1,4 @@
-import 'pages/members.scss';
+import './CommunityMembersPage.scss';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import app from 'state';
@@ -7,12 +7,12 @@ import { User } from 'views/components/user/user';
 import {
   APIOrderBy,
   APIOrderDirection,
-} from '../../../scripts/helpers/constants';
-import { useSearchProfilesQuery } from '../../../scripts/state/api/profiles';
-import { SearchProfilesResponse } from '../../../scripts/state/api/profiles/searchProfiles';
-import MinimumProfile from '../../models/MinimumProfile';
-import { CWText } from '../components/component_kit/cw_text';
-import { MembersSearchBar } from '../components/members_search_bar';
+} from '../../../../helpers/constants';
+import { useSearchProfilesQuery } from '../../../../state/api/profiles';
+import { SearchProfilesResponse } from '../../../../state/api/profiles/searchProfiles';
+import MinimumProfile from '../../../../models/MinimumProfile';
+import { CWText } from '../../../components/component_kit/cw_text';
+import { MembersSearchBar } from '../../../components/members_search_bar';
 
 const MembersPage = () => {
   const containerRef = useRef<VirtuosoHandle>();
