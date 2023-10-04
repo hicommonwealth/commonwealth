@@ -78,7 +78,7 @@ export async function __getBulkThreads(
     responseThreads = await this.models.sequelize.query(
       `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
-        addr.chain AS addr_chain, threads.thread_id, thread_title,
+        addr.community_id AS addr_chain, threads.thread_id, thread_title,
         threads.marked_as_spam_at,
         threads.archived_at,
         thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
@@ -88,7 +88,7 @@ export async function __getBulkThreads(
         threads.reaction_ids, threads.reaction_type, threads.addresses_reacted, COALESCE(threads.total_likes, 0) as threads_total_likes,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
-        topics.chain_id AS topic_chain,
+        topics.community_id AS topic_chain,
         topics.telegram AS topic_telegram,
         collaborators
       FROM "Addresses" AS addr
@@ -100,13 +100,13 @@ export async function __getBulkThreads(
           t.archived_at,
           t.updated_at AS thread_updated,
           t.locked_at AS thread_locked,
-          t.chain AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
+          t.community_id AS thread_chain, t.read_only, t.body, t.discord_meta, t.comment_count AS number_of_comments,
           reactions.reaction_ids, reactions.reaction_type, reactions.addresses_reacted, t.reaction_count AS total_likes,
           t.has_poll,
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
             CONCAT(
-              '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
+              '{ "address": "', editors.address, '", "chain": "', editors.community_id, '" }'
               )
             ) AS collaborators
         FROM "Threads" t
@@ -121,17 +121,17 @@ export async function __getBulkThreads(
             STRING_AGG(r.id::text, ',') AS reaction_ids
             FROM "Reactions" as r
             JOIN "Threads" t2 
-            ON r.thread_id = t2.id and t2.chain = $chain ${
+            ON r.thread_id = t2.id and t2.community_id = $chain ${
               topicId ? ` AND t2.topic_id = $topic_id ` : ''
             }
             LEFT JOIN "Addresses" ad
             ON r.address_id = ad.id
-            where r.chain = $chain
+            where r.community_id = $chain
             GROUP BY thread_id
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          ${chain ? ` AND t.chain = $chain` : ''}
+          ${chain ? ` AND t.community_id = $chain` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
@@ -228,7 +228,7 @@ export async function __getBulkThreads(
   const countsQuery = `
      SELECT id, title, stage FROM "Threads"
      WHERE ${
-       chain ? 'chain = $chain AND' : ''
+       chain ? 'community_id = $chain AND' : ''
      } (stage = 'proposal_in_review' OR stage = 'voting')`;
 
   const threadsInVoting: ThreadInstance[] = await this.models.sequelize.query(

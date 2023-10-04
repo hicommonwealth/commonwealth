@@ -55,13 +55,13 @@ const exportMembersList = async (
       LEFT JOIN 
           "Profiles" "p" ON "a"."profile_id" = "p"."id"
       LEFT JOIN 
-          "Threads" "t" ON "a"."id" = "t"."address_id" AND "t"."chain" = :chainId
+          "Threads" "t" ON "a"."id" = "t"."address_id" AND "t"."community_id" = :chainId
       LEFT JOIN 
-          "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."chain" = :chainId
+          "Comments" "c" ON "a"."id" = "c"."address_id" AND "c"."community_id" = :chainId
       LEFT JOIN 
-          "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."chain" = :chainId
+          "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."community_id" = :chainId
       WHERE 
-          "a"."chain" = :chainId
+          "a"."community_id" = :chainId
       GROUP BY 
           "a"."address", "p"."profile_name"
     `,

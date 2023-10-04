@@ -72,13 +72,13 @@ SELECT seq.date, COUNT(DISTINCT objs.address_id) AS new_items
 FROM ( SELECT CURRENT_DATE - seq.date AS date FROM generate_series(0, ${numberOfPrevDays}) AS seq(date) ) seq
 LEFT JOIN (
   SELECT address_id, created_at FROM "Threads" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
-    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
+    AND ${chain ? 'community_id' : 'community'} = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Comments" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
-    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
+    AND ${chain ? 'community_id' : 'community'} = :chainOrCommunity
   UNION
   SELECT address_id, created_at FROM "Reactions" WHERE created_at > CURRENT_DATE - ${numberOfPrevDays}
-    AND ${chain ? 'chain' : 'community'} = :chainOrCommunity
+    AND ${chain ? 'community_id' : 'community'} = :chainOrCommunity
 ) objs
 ON objs.created_at::date = seq.date
 GROUP BY seq.date

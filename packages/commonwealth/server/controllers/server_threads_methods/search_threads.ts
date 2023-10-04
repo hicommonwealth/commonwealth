@@ -72,7 +72,7 @@ export async function __searchThreads(
     bind.chain = chain.id;
   }
 
-  const chainWhere = bind.chain ? '"Threads".chain = $chain AND' : '';
+  const chainWhere = bind.chain ? '"Threads".community_id = $chain AND' : '';
 
   let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
   if (!threadTitleOnly) {
@@ -88,9 +88,9 @@ export async function __searchThreads(
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".chain as address_chain,
+      "Addresses".community_id as address_chain,
       "Threads".created_at,
-      "Threads".chain,
+      "Threads".community_id as chain,
       ts_rank_cd("Threads"._search, query) as rank
     FROM "Threads"
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,

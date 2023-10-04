@@ -3,6 +3,7 @@ import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { AppError } from 'common-common/src/errors';
 import { success } from '../types';
+import { CommunityAttributes } from '../models/community';
 
 export const Errors = {
   NotAdmin: 'Must be a site admin',
@@ -33,8 +34,10 @@ const adminAnalytics = async (
 
   try {
     // New Communities
-    const newCommunites: Array<{ id: string }> = await models.sequelize.query(
-      `SELECT id FROM "Chains" WHERE created_at >= NOW() - INTERVAL '30 days'`,
+    const newCommunites = await models.sequelize.query<
+      Pick<CommunityAttributes, 'id'>
+    >(
+      `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
       { type: QueryTypes.SELECT }
     );
 

@@ -7,7 +7,7 @@ export async function getActivityFeed(models: DB, id = 0) {
    */
 
   const filterByChainForUsers = id
-    ? 'JOIN "Addresses" a on a.chain=t.chain and a.user_id = ?'
+    ? 'JOIN "Addresses" a on a.community_id=t.community_id and a.user_id = ?'
     : '';
 
   const query = `

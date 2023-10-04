@@ -84,7 +84,7 @@ export async function __searchProfiles(
     bind.chain = chain.id;
   }
 
-  const chainWhere = bind.chain ? `"Addresses".chain = $chain AND` : '';
+  const chainWhere = bind.chain ? `"Addresses".community_id = $chain AND` : '';
 
   const sqlWithoutPagination = `
     SELECT
@@ -94,7 +94,7 @@ export async function __searchProfiles(
       "Profiles".avatar_url,
       "Profiles".created_at,
       array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".chain) as chains,
+      array_agg("Addresses".community_id) as chains,
       array_agg("Addresses".address) as addresses,
       MAX("Addresses".last_active) as last_active
     FROM

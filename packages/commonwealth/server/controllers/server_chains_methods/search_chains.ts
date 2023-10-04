@@ -34,13 +34,13 @@ export async function __searchChains(
     case 'created_at':
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Chains".${orderBy}`,
+        orderBy: `"Communities".${orderBy}`,
       };
       break;
     default:
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Chains".created_at`,
+        orderBy: `"Communities".created_at`,
         orderDirection: 'ASC',
       };
   }
@@ -55,19 +55,19 @@ export async function __searchChains(
 
   const sqlWithoutPagination = `
     SELECT
-      "Chains".id,
-      "Chains".name,
-      "Chains".default_symbol,
-      "Chains".type,
-      "Chains".icon_url,
-      "Chains".created_at
-    FROM "Chains"
+      "Communities".id,
+      "Communities".name,
+      "Communities".default_symbol,
+      "Communities".type,
+      "Communities".icon_url,
+      "Communities".created_at
+    FROM "Communities" C
     WHERE
-      "Chains".active = TRUE AND
+      C.active = TRUE AND
       (
-        "Chains".name ILIKE '%' || $searchTerm || '%'
+        C.name ILIKE '%' || $searchTerm || '%'
         OR
-        "Chains".default_symbol ILIKE '%' || $searchTerm || '%'
+        C.default_symbol ILIKE '%' || $searchTerm || '%'
       )
   `;
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([

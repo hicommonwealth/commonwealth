@@ -12,9 +12,9 @@ const bulkTopics = async (models: DB, req: Request, res: Response) => {
         *,
         (
           SELECT COUNT(*)::int FROM "Threads"
-          WHERE chain = :chain_id AND topic_id = t.id AND deleted_at IS NULL
+          WHERE community_id = :chain_id AND topic_id = t.id AND deleted_at IS NULL
         ) as total_threads
-      FROM "Topics" t WHERE chain_id = :chain_id AND deleted_at IS NULL`,
+      FROM "Topics" t WHERE community_id = :chain_id AND deleted_at IS NULL`,
     {
       replacements: { chain_id: chain.id },
       type: QueryTypes.SELECT,

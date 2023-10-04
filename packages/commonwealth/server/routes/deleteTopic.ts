@@ -33,7 +33,7 @@ const deleteTopic = async (
   const topic = await models.Topic.findOne({ where: { id } });
   if (!topic) return next(new AppError(Errors.TopicNotFound));
 
-  const chainOrCommunity = 'chain = $chain';
+  const chainOrCommunity = 'community_id = $chain';
   const bind = { chain: chain.id };
   bind['id'] = id;
   const query = `UPDATE "Threads" SET topic_id=null WHERE topic_id = $id AND ${chainOrCommunity};`;

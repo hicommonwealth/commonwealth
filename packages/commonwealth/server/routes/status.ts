@@ -18,9 +18,10 @@ import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 import type { ChainCategoryType } from 'common-common/src/types';
+import { ThreadAttributes } from '../models/thread';
 
 type ThreadCountQueryData = {
-  concat: string;
+  chain: ThreadAttributes['chain'];
   count: number;
 };
 
@@ -69,7 +70,7 @@ const getChainStatus = async (models: DB) => {
   const threadCountQueryData: ThreadCountQueryData[] =
     await models.sequelize.query(
       `
-      SELECT "Threads".community_id, COUNT("Threads".id)
+      SELECT "Threads".community_id as chain, COUNT("Threads".id)
       FROM "Threads"
       WHERE "Threads".created_at > :thirtyDaysAgo
       AND "Threads".deleted_at IS NULL
@@ -150,25 +151,28 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, time.getTime());
     // append the SELECT query
-    query += `SELECT id, community_id FROM "Threads" WHERE
+    query += `SELECT id, community_id as chain FROM "Threads" WHERE
  (kind IN ('discussion', 'link') OR community_id = ?) AND created_at > TO_TIMESTAMP(?)`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 
   // populate the query replacements and execute the query
-  const threadNumPromise: Promise<{ id: string; chain: string }[]> = <any>(
-    sequelize.query(query, {
-      raw: true,
-      type: QueryTypes.SELECT,
-      replacements,
-    })
-  );
+  const threadNumPromise = sequelize.query<
+    Pick<ThreadAttributes, 'id' | 'chain'>
+  >(query, {
+    raw: true,
+    type: QueryTypes.SELECT,
+    replacements,
+    logging: console.log,
+  });
 
   // wait for all the promises to resolve
   const [starredCommunities, threadNum] = await Promise.all([
     starredCommunitiesPromise,
     threadNumPromise,
   ]);
+
+  console.log('>>>>>>>>>>>>>>>>>>>>>>> threadNum', threadNum);
 
   // this section iterates through the retrieved threads
   // counting the number of threads and keeping a set of activePosts
@@ -178,7 +182,11 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {};
     unseenPosts[thread.chain].activePosts
       ? unseenPosts[thread.chain].activePosts.add(thread.id)
-      : (unseenPosts[thread.chain].activePosts = new Set(thread.id));
+      : (unseenPosts[thread.chain].activePosts = new Set([thread.id]));
+    console.log(
+      '????????????????????????',
+      unseenPosts[thread.chain].activePosts
+    );
     unseenPosts[thread.chain].threads
       ? unseenPosts[thread.chain].threads++
       : (unseenPosts[thread.chain].threads = 1);
@@ -205,7 +213,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, time.getTime());
     // append the SELECT query
-    query += `SELECT thread_id, community_id FROM "Comments" WHERE community_id = ? AND created_at > TO_TIMESTAMP(?)`;
+    query += `SELECT thread_id, community_id as chain FROM "Comments" WHERE community_id = ? AND created_at > TO_TIMESTAMP(?)`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 

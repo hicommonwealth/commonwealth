@@ -48,10 +48,10 @@ export async function fetchLatestNotifProposalIds(
   const result = (await models.sequelize.query(
     `
     SELECT
-    chain_id, MAX(notification_data::jsonb -> 'event_data' ->> 'id') as proposal_id
+    community_id as chain_id, MAX(notification_data::jsonb -> 'event_data' ->> 'id') as proposal_id
     FROM "Notifications"
-    WHERE category_id = 'chain-event' AND chain_id IN (?)
-    GROUP BY chain_id;
+    WHERE category_id = 'chain-event' AND community_id IN (?)
+    GROUP BY community_id;
   `,
     { raw: true, type: 'SELECT', replacements: [chainIds] }
   )) as { chain_id: string; proposal_id: string }[];
