@@ -1,6 +1,6 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import 'Sublayout.scss';
@@ -10,6 +10,7 @@ import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { Breadcrumbs } from './components/Breadcrumbs';
+import { isMobile } from 'react-device-detect';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -24,6 +25,10 @@ const Sublayout = ({
   const forceRerender = useForceRerender();
   const { menuVisible, mobileMenuName } = useSidebarStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [toggleMobileView, setToggleMobileView] = useState(
+    (location.pathname.includes('discussions') && isMobile) ||
+      window.innerWidth <= 425
+  );
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -47,6 +52,22 @@ const Sublayout = ({
   const banner = app.chain ? chain.communityBanner : null;
   const showSidebar = menuVisible || !isWindowSmallInclusive;
 
+  useEffect(() => {
+    if (!location.pathname.includes('discussions')) return;
+    const handleResize = () => {
+      setToggleMobileView(
+        (location.pathname.includes('discussions') && isMobile) ||
+          window.innerWidth <= 425
+      );
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   return (
     <div className="Sublayout">
       <div className="header-and-body-container">
@@ -60,7 +81,7 @@ const Sublayout = ({
               <AppMobileMenus />
             ) : (
               <div className="Body">
-                <Breadcrumbs />
+                {!toggleMobileView && <Breadcrumbs />}
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>

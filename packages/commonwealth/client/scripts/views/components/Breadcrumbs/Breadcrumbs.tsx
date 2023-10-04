@@ -160,7 +160,10 @@ export const Breadcrumbs = () => {
       return findStyle.className;
     }
 
-    if (location.pathname.includes(String(profileId))) {
+    if (
+      location.pathname.includes(String(profileId)) ||
+      location.pathname.includes('/profile/id')
+    ) {
       return 'viewProfile';
     }
   };

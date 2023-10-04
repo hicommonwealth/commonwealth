@@ -6,11 +6,11 @@
   color: $neutral-400;
   background-color: $white;
   min-height: 8px;
-  padding: 5px 0px;
+  padding: 2px 0px;
   position: fixed;
   width: 100%;
-  z-index: 1000;
   overflow: auto;
+  z-index: 3;
 
   @include extraSmall {
     position: static;
@@ -157,19 +157,18 @@
   .viewProfile {
     display: flex;
     flex-direction: row;
-    margin-left: 80px;
+    margin-bottom: 24px;
 
     @include mediumInclusive {
-      margin-left: 72px;
+      padding-left: 72px;
     }
 
     @include mediumSmallInclusive {
-      margin-left: 48px;
+      padding-left: 48px;
     }
 
     @include smallInclusive {
-      flex-direction: column;
-      margin-left: 32px;
+      padding-left: 32px;
     }
   }
 

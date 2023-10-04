@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -21,6 +21,7 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
+import { isMobile } from 'react-device-detect';
 
 import 'pages/discussions/index.scss';
 
@@ -64,8 +65,31 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
+  //
+  //Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
+  //Checks both for mobile device and inner window size for desktop responsiveness
 
   useManageDocumentTitle('Discussions');
+
+  const [toggleMobileView, setToggleMobileView] = useState(
+    (location.pathname.includes('discussions') && isMobile) ||
+      window.innerWidth <= 425
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setToggleMobileView(
+        (location.pathname.includes('discussions') && isMobile) ||
+          window.innerWidth <= 425
+      );
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
     <div className="DiscussionsPage">
@@ -125,7 +149,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           Header: () => {
             return (
               <>
-                <Breadcrumbs />
+                {toggleMobileView && (
+                  <div className="mobileBreadcrumbs">
+                    <Breadcrumbs />
+                  </div>
+                )}
                 <HeaderWithFilters
                   topic={topicName}
                   stage={stageName}
