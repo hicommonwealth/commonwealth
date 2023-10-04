@@ -16,7 +16,7 @@ import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
-  CWRequiremnetsLabelInputFieldState,
+  CWRequirementsLabelInputFieldState,
   GroupFormProps,
   RequirementSubFormsState,
 } from './index.types';
@@ -75,8 +75,8 @@ const GroupForm = ({
     chainId: app.activeChainId(),
   });
   const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
-  const [cwRequiremnetsLabelInputField, setCWRequiremnetsLabelInputField] =
-    useState<CWRequiremnetsLabelInputFieldState>({ value: '1', error: '' });
+  const [cwRequiremenetsLabelInputField, setCwRequiremenetsLabelInputField] =
+    useState<CWRequirementsLabelInputFieldState>({ value: '1', error: '' });
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
   >([
@@ -113,8 +113,8 @@ const GroupForm = ({
       initialValues.requirementsToFulfill &&
       initialValues.requirementsToFulfill !== 'ALL'
     ) {
-      setCWRequiremnetsLabelInputField({
-        ...cwRequiremnetsLabelInputField,
+      setCwRequiremenetsLabelInputField({
+        ...cwRequiremenetsLabelInputField,
         value: `${initialValues.requirementsToFulfill}`,
       });
     }
@@ -249,15 +249,15 @@ const GroupForm = ({
 
     // Custom validation for the radio with input label
     let requirementsToFulfill = values.requirementsToFulfill;
-    setCWRequiremnetsLabelInputField({
-      ...cwRequiremnetsLabelInputField,
+    setCwRequiremenetsLabelInputField({
+      ...cwRequiremenetsLabelInputField,
       error: '',
     });
     if (values.requirementsToFulfill === 'N') {
       // If radio label input has no value
-      if (!cwRequiremnetsLabelInputField.value) {
-        setCWRequiremnetsLabelInputField({
-          ...cwRequiremnetsLabelInputField,
+      if (!cwRequiremenetsLabelInputField.value) {
+        setCwRequiremenetsLabelInputField({
+          ...cwRequiremenetsLabelInputField,
           error: VALIDATION_MESSAGES.NO_INPUT,
         });
         return;
@@ -265,16 +265,16 @@ const GroupForm = ({
 
       // If radio label input has invalid value
       requirementsToFulfill = parseInt(
-        cwRequiremnetsLabelInputField.value || ''
+        cwRequiremenetsLabelInputField.value || ''
       );
       if (
         !requirementsToFulfill ||
         requirementsToFulfill < 1 ||
         requirementsToFulfill > MAX_REQUIREMENTS ||
-        cwRequiremnetsLabelInputField.value.includes('.')
+        cwRequiremenetsLabelInputField.value.includes('.')
       ) {
-        setCWRequiremnetsLabelInputField({
-          ...cwRequiremnetsLabelInputField,
+        setCwRequiremenetsLabelInputField({
+          ...cwRequiremenetsLabelInputField,
           error: VALIDATION_MESSAGES.INVALID_VALUE,
         });
         return;
@@ -401,23 +401,23 @@ const GroupForm = ({
                 />
 
                 <CWRequirementsRadioButton
-                  inputError={cwRequiremnetsLabelInputField.error}
-                  inputValue={cwRequiremnetsLabelInputField.value}
+                  inputError={cwRequiremenetsLabelInputField.error}
+                  inputValue={cwRequiremenetsLabelInputField.value}
                   onInputValueChange={(value) =>
-                    setCWRequiremnetsLabelInputField({
-                      ...cwRequiremnetsLabelInputField,
+                    setCwRequiremenetsLabelInputField({
+                      ...cwRequiremenetsLabelInputField,
                       value,
                     })
                   }
                 />
 
                 {(formState?.errors?.requirementsToFulfill?.message ||
-                  cwRequiremnetsLabelInputField.error) && (
+                  cwRequiremenetsLabelInputField.error) && (
                   <MessageRow
                     hasFeedback
                     statusMessage={
                       formState?.errors?.requirementsToFulfill?.message ||
-                      cwRequiremnetsLabelInputField.error
+                      cwRequiremenetsLabelInputField.error
                     }
                     validationStatus="failure"
                   />
