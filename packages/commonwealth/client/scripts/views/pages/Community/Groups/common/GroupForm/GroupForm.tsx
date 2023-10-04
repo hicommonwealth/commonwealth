@@ -20,6 +20,7 @@ import {
   FormSubmitValues,
   GroupFormProps,
   RequirementSubFormsState,
+  RequirementSubType,
 } from './index.types';
 import {
   VALIDATION_MESSAGES,
@@ -142,7 +143,10 @@ const GroupForm = ({
     ]);
   };
 
-  const validateChangedValue = (val, index) => {
+  const validateChangedValue = (
+    val: Partial<RequirementSubType>,
+    index: number
+  ) => {
     const allRequirements = [...requirementSubForms];
 
     // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
