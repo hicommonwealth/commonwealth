@@ -17,6 +17,7 @@ import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
   CWRequirementsLabelInputFieldState,
+  FormSubmitValues,
   GroupFormProps,
   RequirementSubFormsState,
 } from './index.types';
@@ -241,14 +242,14 @@ const GroupForm = ({
     return !!updatedSubForms.find((x) => Object.keys(x.errors).length > 0);
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: FormSubmitValues) => {
     const hasSubFormErrors = validateSubForms();
     if (hasSubFormErrors) {
       return;
     }
 
     // Custom validation for the radio with input label
-    let requirementsToFulfill = values.requirementsToFulfill;
+    let requirementsToFulfill: any = values.requirementsToFulfill;
     setCwRequiremenetsLabelInputField({
       ...cwRequiremenetsLabelInputField,
       error: '',

@@ -43,7 +43,7 @@ export type GroupResponseValuesType = {
   groupDescription?: string;
   requirementsToFulfill: 'ALL' | number;
   requirements?: RequirementSubType[];
-  topics: string[];
+  topics: LabelType[];
 };
 
 export type GroupInitialValuesTypeWithLabel = {
@@ -51,6 +51,13 @@ export type GroupInitialValuesTypeWithLabel = {
   groupDescription?: string;
   requirements?: RequirementSubTypeWithLabel[];
   requirementsToFulfill?: 'ALL' | number;
+  topics: LabelType[];
+};
+
+export type FormSubmitValues = {
+  groupName: string;
+  groupDescription?: string;
+  requirementsToFulfill: 'ALL' | 'N';
   topics: LabelType[];
 };
 
