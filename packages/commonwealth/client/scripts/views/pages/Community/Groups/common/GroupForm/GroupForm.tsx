@@ -11,7 +11,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import { ZodError } from 'zod';
+import { ZodError, ZodObject } from 'zod';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
@@ -67,6 +67,18 @@ const CWRequirementsRadioButton = ({
 };
 
 const MAX_REQUIREMENTS = 10;
+
+const getRequirementSubFormSchema = (
+  requirementType: string
+): ZodObject<any> => {
+  const isTokenRequirement = requirementType.toLowerCase().includes('token');
+  const schema = isTokenRequirement
+    ? requirementSubFormValidationSchema.omit({
+        requirementContractAddress: true,
+      })
+    : requirementSubFormValidationSchema;
+  return schema;
+};
 
 const GroupForm = ({
   formType,
@@ -170,14 +182,9 @@ const GroupForm = ({
     const key = Object.keys(val)[0];
     try {
       // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
-      const isTokenRequirement = allRequirements[index].values.requirementType
-        .toLowerCase()
-        .includes('token');
-      const schema = isTokenRequirement
-        ? requirementSubFormValidationSchema.omit({
-            requirementContractAddress: true,
-          })
-        : requirementSubFormValidationSchema;
+      const schema = getRequirementSubFormSchema(
+        allRequirements[index].values.requirementType
+      );
       schema.pick({ [key]: true }).parse(val);
 
       allRequirements[index] = {
@@ -209,14 +216,9 @@ const GroupForm = ({
     requirementSubForms.map((subForm, index) => {
       try {
         // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
-        const isTokenRequirement = subForm.values.requirementType
-          .toLowerCase()
-          .includes('token');
-        const schema = isTokenRequirement
-          ? requirementSubFormValidationSchema.omit({
-              requirementContractAddress: true,
-            })
-          : requirementSubFormValidationSchema;
+        const schema = getRequirementSubFormSchema(
+          subForm.values.requirementType
+        );
         if (subForm.values.requirementType === '') {
           schema.pick({ requirementType: true }).parse(subForm.values);
         } else {
