@@ -6,7 +6,6 @@ import type Contract from 'models/Contract';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
@@ -428,13 +427,6 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
 
   return (
     <div className={formData.isForm ? 'ViewTemplateForm' : 'ViewTemplatePage'}>
-      <CWBreadcrumbs
-        breadcrumbs={[
-          { label: 'Contracts', path: `/contracts`, navigate },
-          { label: templateNickname },
-        ]}
-      />
-
       {!formData.isForm && (
         <CWText type="h3" className="header">
           {templateNickname}

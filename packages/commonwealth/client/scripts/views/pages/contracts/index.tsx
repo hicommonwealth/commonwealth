@@ -6,7 +6,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/contracts/contracts_page.scss';
 import React, { useState } from 'react';
 import app from 'state';
-import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
@@ -117,9 +116,6 @@ const ContractsPage = () => {
 
   return (
     <div className="ContractsPage">
-      <CWBreadcrumbs
-        breadcrumbs={[{ label: 'Contract action templates', path: '' }]}
-      />
       <div className="header-container">
         <CWText type="h3">Contract action templates</CWText>
         <CWButton

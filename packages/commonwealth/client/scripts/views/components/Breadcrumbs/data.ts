@@ -13,6 +13,11 @@ export const breadCrumbURLS = [
     breadcrumb: 'Profile',
   },
   {
+    url: 'new/proposal',
+    breadcrumb: 'New Proposal',
+    className: 'new-proposal',
+  },
+  {
     url: 'profile/edit',
     breadcrumb: 'Edit',
     className: 'editProfile',

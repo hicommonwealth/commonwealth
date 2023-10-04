@@ -72,6 +72,7 @@ export const Breadcrumbs = () => {
       .filter((segment) => segment.length > 0);
 
     const breadcrumbs = pathSegments.map((pathSegment, index) => {
+      console.log('path', pathSegment, index, pathSegments);
       // Find the matching breadcrumb data for the current path segment.
       const matchedBreadcrumb = breadcrumbData.find((breadcrumbItem) => {
         // Check if breadcrumbItem.url is falsy or if index is out of bounds
@@ -86,22 +87,21 @@ export const Breadcrumbs = () => {
       // Generate the link based on the current path segment.
       if (pathSegment === 'profile') {
         link = `id/${profileId}`;
+      } else if (pathSegment === 'snapshot') {
+        pathSegments.splice(index + 1, 1);
+        pathSegments[index] = 'snapshots';
       } else if (pathSegment === 'new') {
         // Remove 'new' segment and generate the link.
-        console.log('FIRED1');
         pathSegments.splice(index, 1);
 
-        console.log('PATH:', pathSegments);
         link = `new/discussion`;
       } else if (
         pathSegments[index] === 'discussion' ||
         pathSegments[index] === 'discussions'
       ) {
-        console.log('FIRED3');
         // Generate the link for 'discussion' segment.
         link = `discussions`;
       } else {
-        console.log('FIRED2');
         // Generate a default link for other segments.
         link = pathSegments.slice(0, index + 1).join('/');
       }
