@@ -15,7 +15,11 @@ import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { defaultChainRows, ethChainRows } from './chain_input_rows';
+import {
+  defaultChainRows,
+  EthChainRows,
+  updateAdminOnCreateCommunity,
+} from './chain_input_rows';
 import type { EthChainFormState } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
@@ -24,6 +28,7 @@ import {
   useChainFormState,
   useEthChainFormFields,
 } from './hooks';
+import { ETHEREUM_MAINNET } from './index';
 
 export const ERC20Form = (props: EthChainFormState) => {
   const { ethChainNames, ethChains } = props;
@@ -42,9 +47,10 @@ export const ERC20Form = (props: EthChainFormState) => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    ethChainFormFields.setChainString('Ethereum Mainnet');
-    ethChainFormFields.setNodeUrl(ethChains[1].url);
-  }, []);
+    if (!ethChainFormFields.chainString) {
+      ethChainFormFields.setChainString(ETHEREUM_MAINNET);
+    }
+  }, [ethChainFormFields]);
 
   const validAddress = isAddress(ethChainFormFields.address);
   const disableField = !validAddress || !chainFormState.loaded;
@@ -61,9 +67,7 @@ export const ERC20Form = (props: EthChainFormState) => {
     const args = {
       address: ethChainFormFields.address,
       chain_id: ethChainFormFields.ethChainId,
-      chain_network: ChainNetwork.ERC20,
       url: ethChainFormFields.nodeUrl,
-      allowUncached: true,
     };
 
     try {
@@ -98,8 +102,10 @@ export const ERC20Form = (props: EthChainFormState) => {
           console.log('Querying chain for ERC info');
 
           const Web3 = (await import('web3')).default;
-
-          const provider = new Web3.providers.WebsocketProvider(args.url);
+          const provider =
+            args.url.slice(0, 4) == 'http'
+              ? new Web3.providers.HttpProvider(args.url)
+              : new Web3.providers.WebsocketProvider(args.url);
 
           try {
             const ethersProvider = new providers.Web3Provider(provider);
@@ -136,8 +142,8 @@ export const ERC20Form = (props: EthChainFormState) => {
           chainFormDefaultFields.setElement('');
           chainFormDefaultFields.setTelegram('');
           chainFormDefaultFields.setGithub('');
-
-          provider.disconnect(1000, 'finished');
+          if (provider instanceof Web3.providers.WebsocketProvider)
+            provider.disconnect(1000, 'finished');
         }
 
         chainFormState.setLoaded(true);
@@ -158,7 +164,7 @@ export const ERC20Form = (props: EthChainFormState) => {
 
   return (
     <div className="CreateCommunityForm">
-      {ethChainRows(
+      {EthChainRows(
         { ethChainNames, ethChains },
         { ...ethChainFormFields, ...chainFormState }
       )}
@@ -235,6 +241,7 @@ export const ERC20Form = (props: EthChainFormState) => {
             }
 
             await initAppState(false);
+            await updateAdminOnCreateCommunity(id);
 
             navigate(`/${res.result.chain?.id}`);
           } catch (err) {

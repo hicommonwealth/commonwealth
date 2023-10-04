@@ -1,19 +1,16 @@
-import React, { useEffect } from 'react';
-
 import { notifyInfo } from 'controllers/app/notifications';
-
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useEffect } from 'react';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
-import Sublayout from 'views/Sublayout';
 import { NewThreadForm } from '../components/NewThreadForm';
-import { useCommonNavigate } from 'navigation/helpers';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
     if (!app.isLoggedIn()) {
-      notifyInfo('You need to log in first');
+      notifyInfo('You need to sign in first');
       navigate('/login', {}, null);
       return;
     }
@@ -21,11 +18,7 @@ const NewThreadPage = () => {
 
   if (!app.chain) return <PageLoading />;
 
-  return (
-    <Sublayout>
-      <NewThreadForm />
-    </Sublayout>
-  );
+  return <NewThreadForm />;
 };
 
 export default NewThreadPage;

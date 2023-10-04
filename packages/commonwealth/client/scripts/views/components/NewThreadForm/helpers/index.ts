@@ -1,10 +1,4 @@
-import { checkNewThreadErrors, updateTopicList } from './helpers';
-import useAuthorName from './useAuthorName';
+import { checkNewThreadErrors } from './helpers';
 import useNewThreadForm from './useNewThreadForm';
 
-export {
-  checkNewThreadErrors,
-  updateTopicList,
-  useAuthorName,
-  useNewThreadForm,
-};
+export { checkNewThreadErrors, useNewThreadForm };

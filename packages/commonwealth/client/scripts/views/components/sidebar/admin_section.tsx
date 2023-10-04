@@ -16,6 +16,16 @@ import { Modal } from '../component_kit/cw_modal';
 import { useCommonNavigate } from 'navigation/helpers';
 import { featureFlags } from 'helpers/feature-flags';
 import { matchRoutes, useLocation } from 'react-router-dom';
+import { sidebarStore } from 'state/ui/sidebar';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
+
+const resetSidebarState = () => {
+  if (isWindowSmallInclusive(window.innerWidth)) {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  } else {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
+  }
+};
 
 const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(
@@ -75,6 +85,7 @@ const AdminSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -96,6 +107,7 @@ const AdminSectionComponent = () => {
       isUpdated: false,
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
+        resetSidebarState();
         handleRedirectClicks(
           navigate,
           e,
@@ -119,7 +131,7 @@ const AdminSectionComponent = () => {
             isUpdated: false,
             onClick: (e, toggle: boolean) => {
               e.preventDefault();
-
+              resetSidebarState();
               handleRedirectClicks(
                 navigate,
                 e,
@@ -143,6 +155,7 @@ const AdminSectionComponent = () => {
       hasDefaultToggle: false,
       onClick: (e) => {
         e.preventDefault();
+        resetSidebarState();
         setIsNewTopicModalOpen(true);
       },
     },
@@ -156,6 +169,7 @@ const AdminSectionComponent = () => {
       hasDefaultToggle: false,
       onClick: (e) => {
         e.preventDefault();
+        resetSidebarState();
         setIsOrderTopicsModalOpen(true);
       },
     },
@@ -169,6 +183,7 @@ const AdminSectionComponent = () => {
       hasDefaultToggle: false,
       onClick: (e) => {
         e.preventDefault();
+        resetSidebarState();
         setIsEditTopicThresholdsModalOpen(true);
       },
     },

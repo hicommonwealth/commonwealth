@@ -15,7 +15,8 @@ import { CWValidationText } from 'views/components/component_kit/cw_validation_t
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import {
   defaultChainRows,
-  ethChainRows,
+  EthChainRows,
+  updateAdminOnCreateCommunity,
 } from 'views/pages/create_community/chain_input_rows';
 import type { EthChainFormState } from 'views/pages/create_community/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
@@ -33,6 +34,7 @@ import {
   useChainFormState,
   useEthChainFormFields,
 } from './hooks';
+import { ETHEREUM_MAINNET } from './index';
 
 export const EthDaoForm = (props: EthChainFormState) => {
   const { ethChainNames, ethChains } = props;
@@ -54,8 +56,10 @@ export const EthDaoForm = (props: EthChainFormState) => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    ethChainFormFields.setNodeUrl(ethChains[1].url);
-  }, []);
+    if (!ethChainFormFields.chainString) {
+      ethChainFormFields.setChainString(ETHEREUM_MAINNET);
+    }
+  }, [ethChainFormFields]);
 
   const validAddress = isAddress(ethChainFormFields.address);
   const disableField = !validAddress || !chainFormState.loaded;
@@ -76,13 +80,12 @@ export const EthDaoForm = (props: EthChainFormState) => {
     try {
       if (network === ChainNetwork.Compound) {
         const Web3 = (await import('web3')).default;
-
-        const provider = new Web3.providers.WebsocketProvider(
-          ethChainFormFields.nodeUrl
-        );
+        const provider =
+          ethChainFormFields.nodeUrl.slice(0, 4) == 'http'
+            ? new Web3.providers.HttpProvider(ethChainFormFields.nodeUrl)
+            : new Web3.providers.WebsocketProvider(ethChainFormFields.nodeUrl);
 
         const compoundApi = new CompoundAPI(
-          null,
           ethChainFormFields.address,
           provider
         );
@@ -104,10 +107,10 @@ export const EthDaoForm = (props: EthChainFormState) => {
         );
       } else if (network === ChainNetwork.Aave) {
         const Web3 = (await import('web3')).default;
-
-        const provider = new Web3.providers.WebsocketProvider(
-          ethChainFormFields.nodeUrl
-        );
+        const provider =
+          ethChainFormFields.nodeUrl.slice(0, 4) == 'http'
+            ? new Web3.providers.HttpProvider(ethChainFormFields.nodeUrl)
+            : new Web3.providers.WebsocketProvider(ethChainFormFields.nodeUrl);
 
         const aaveApi = new AaveApi(
           IAaveGovernanceV2__factory.connect,
@@ -134,7 +137,7 @@ export const EthDaoForm = (props: EthChainFormState) => {
 
   return (
     <div className="CreateCommunityForm">
-      {ethChainRows(
+      {EthChainRows(
         { ethChainNames, ethChains },
         { ...ethChainFormFields, ...chainFormState }
       )}
@@ -231,6 +234,8 @@ export const EthDaoForm = (props: EthChainFormState) => {
             }
 
             await initAppState(false);
+            await updateAdminOnCreateCommunity(id);
+
             navigate(`/${res.result.chain?.id}`);
           } catch (err) {
             notifyError(

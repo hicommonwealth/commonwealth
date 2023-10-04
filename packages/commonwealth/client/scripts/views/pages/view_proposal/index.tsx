@@ -1,34 +1,46 @@
 import React, { useState, useEffect } from 'react';
-
-import app from 'state';
-import Sublayout from 'views/Sublayout';
-import { ChainBase } from 'common-common/src/types';
+import { ChainNetwork } from 'common-common/src/types';
+import _ from 'lodash';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
+import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import useForceRerender from 'hooks/useForceRerender';
 import {
   chainToProposalSlug,
   getProposalUrlPath,
   idToProposal,
 } from 'identifiers';
-import type { AnyProposal } from '../../../models/types';
-
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
 import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import type { AnyProposal } from '../../../models/types';
+import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
+import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
-import { User } from '../../components/user/user';
+import { Skeleton } from '../../components/Skeleton';
 import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
 import type { LinkedSubstrateProposal } from './linked_proposals_embed';
 import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
-import { CollapsibleProposalBody } from '../../components/collapsible_body_text';
-import useForceRerender from 'hooks/useForceRerender';
-import { useCommonNavigate } from 'navigation/helpers';
-import Cosmos from 'controllers/chain/cosmos/adapter';
+import { JSONDisplay } from './json_display';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import {
+  useAaveProposalsQuery,
+  useCompoundProposalsQuery,
+  useCosmosProposalMetadataQuery,
+  useCosmosProposalQuery,
+  useCosmosProposalTallyQuery,
+  useCosmosProposalVotesQuery,
+  useCosmosProposalDepositsQuery,
+} from 'state/api/proposals';
+import { usePoolParamsQuery } from 'state/api/chainParams';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -40,40 +52,107 @@ const ViewProposalPage = ({
   type: typeProp,
 }: ViewProposalPageAttrs) => {
   const proposalId = identifier.split('-')[0];
-  const forceRender = useForceRerender();
   const navigate = useCommonNavigate();
+  const forceRerender = useForceRerender();
+  useInitChainIfNeeded(app);
 
   const [proposal, setProposal] = useState<AnyProposal>(undefined);
-  const [type, setType] = useState(typeProp);
+  const [title, setTitle] = useState<string>(proposal?.title);
+  const [description, setDescription] = useState<string>(proposal?.description);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(!!app.chain?.loaded);
   const [error, setError] = useState(null);
+  const { data: cosmosProposal } = useCosmosProposalQuery({
+    isApiReady: !!app.chain.apiInitialized,
+    proposalId,
+  });
+  const { data: metadata, isFetching: isFetchingMetadata } =
+    useCosmosProposalMetadataQuery(proposal);
+  const { data: poolData } = usePoolParamsQuery();
+  useCosmosProposalVotesQuery(proposal, +poolData);
+  useCosmosProposalTallyQuery(proposal);
+  useCosmosProposalDepositsQuery(proposal, +poolData);
 
   useEffect(() => {
-    const afterAdapterLoaded = async () => {
-      if (!type) {
-        setType(chainToProposalSlug(app.chain.meta));
-      }
+    setProposal(cosmosProposal);
+    setTitle(cosmosProposal?.title);
+    setDescription(cosmosProposal?.description);
+  }, [cosmosProposal]);
 
+  useEffect(() => {
+    if (_.isEmpty(metadata)) return;
+    setTitle(metadata?.title);
+    setDescription(metadata?.description || metadata?.summary);
+  }, [metadata]);
+
+  useEffect(() => {
+    proposal?.isFetched.once('redraw', forceRerender);
+
+    return () => {
+      proposal?.isFetched.removeAllListeners();
+    };
+  }, [proposal, forceRerender]);
+
+  useManageDocumentTitle('View proposal', proposal?.title);
+
+  const getProposalFromStore = () => {
+    let resolvedType = typeProp;
+    if (!typeProp) {
+      resolvedType = chainToProposalSlug(app.chain.meta);
+    }
+    return idToProposal(resolvedType, proposalId);
+  };
+
+  const onAave = app.chain?.network === ChainNetwork.Aave;
+  const fetchAaveData = onAave && isAdapterLoaded;
+  const { data: cachedAaveProposals, isLoading: aaveProposalsLoading } =
+    useAaveProposalsQuery({
+      moduleReady: fetchAaveData,
+      chainId: app.chain?.id,
+    });
+
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const fetchCompoundData = onCompound && isAdapterLoaded;
+  const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
+    useCompoundProposalsQuery({
+      moduleReady: fetchCompoundData,
+      chainId: app.chain?.id,
+    });
+
+  useEffect(() => {
+    if (!aaveProposalsLoading && fetchAaveData && !proposal) {
+      const foundProposal = cachedAaveProposals?.find(
+        (p) => p.identifier === proposalId
+      );
+
+      if (!foundProposal?.ipfsData) {
+        foundProposal.ipfsDataReady.once('ready', () =>
+          setProposal(foundProposal)
+        );
+      } else {
+        setProposal(foundProposal);
+      }
+    }
+  }, [cachedAaveProposals]);
+
+  useEffect(() => {
+    if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
+      const foundProposal = cachedCompoundProposals?.find(
+        (p) => p.identifier === proposalId
+      );
+      setProposal(foundProposal);
+    }
+  }, [cachedCompoundProposals]);
+
+  useNecessaryEffect(() => {
+    const afterAdapterLoaded = async () => {
+      if (onAave || onCompound) return;
       try {
-        const proposalFromStore = idToProposal(type, proposalId);
+        const proposalFromStore = getProposalFromStore();
         setProposal(proposalFromStore);
         setError(null);
       } catch (e) {
-        // special case handling for completed cosmos proposals
-        if (app.chain.base === ChainBase.CosmosSDK) {
-          try {
-            const cosmosProposal = await (
-              app.chain as Cosmos
-            ).governance.getProposal(+proposalId);
-            setProposal(cosmosProposal);
-            setError(null);
-          } catch (err) {
-            setError('Proposal not found');
-          }
-        } else {
-          setError('Proposal not found');
-        }
+        console.log(`#${proposalId} Not found in store. `, e);
       }
     };
 
@@ -85,9 +164,9 @@ const ViewProposalPage = ({
     } else {
       afterAdapterLoaded();
     }
-  }, [type, isAdapterLoaded, proposalId]);
+  }, [isAdapterLoaded, proposalId]);
 
-  if (!isAdapterLoaded || !proposal) {
+  if (!isAdapterLoaded) {
     return <PageLoading message="Loading..." />;
   }
 
@@ -95,14 +174,20 @@ const ViewProposalPage = ({
     return <PageNotFound message={error} />;
   }
 
+  const proposalTitle = title || proposal?.title;
+  const proposalDescription = description || proposal?.description;
+
   // replace path with correct slug
-  if (identifier !== `${proposalId}-${slugify(proposal.title)}`) {
-    const newPath = getProposalUrlPath(
-      proposal.slug,
-      `${proposalId}-${slugify(proposal.title)}`,
-      true
-    );
-    navigate(newPath, { replace: true });
+  if (proposal?.slug) {
+    const slugTitle = slugify(proposalTitle);
+    if (identifier !== `${proposalId}-${slugTitle}`) {
+      const newPath = getProposalUrlPath(
+        proposal.slug,
+        `${proposalId}-${slugTitle}`,
+        true
+      );
+      navigate(newPath, { replace: true });
+    }
   }
 
   // special case loading for tips
@@ -117,49 +202,64 @@ const ViewProposalPage = ({
   const onModalClose = () => {
     setVotingModalOpen(false);
   };
+
   return (
-    <Sublayout
-    //  title={headerTitle}
-    >
-      <CWContentPage
-        title={proposal.title}
-        author={
-          !!proposal.author && (
-            <User avatarSize={24} user={proposal.author} popover linkify />
-          )
-        }
-        createdAt={proposal.createdAt}
-        subHeader={
-          <ProposalSubheader
-            proposal={proposal as SubheaderProposalType}
+    <CWContentPage
+      showSkeleton={!proposal}
+      title={proposalTitle}
+      author={proposal?.author}
+      createdAt={proposal?.createdAt}
+      updatedAt={null}
+      subHeader={
+        <ProposalSubheader
+          proposal={proposal as SubheaderProposalType}
+          toggleVotingModal={toggleVotingModal}
+          votingModalOpen={votingModalOpen}
+        />
+      }
+      body={() =>
+        proposalDescription && (
+          <CollapsibleProposalBody doc={proposalDescription} />
+        )
+      }
+      subBody={
+        <>
+          <LinkedProposalsEmbed
+            proposal={proposal as LinkedSubstrateProposal}
+          />
+          {proposal instanceof AaveProposal && (
+            <AaveViewProposalDetail proposal={proposal} />
+          )}
+          {isFetchingMetadata ? (
+            <Skeleton height={94.4} />
+          ) : (
+            !_.isEmpty(metadata) && (
+              <JSONDisplay data={metadata} title="Metadata" />
+            )
+          )}
+          {!_.isEmpty(proposal?.data?.messages) && (
+            <JSONDisplay data={proposal.data.messages} title="Messages" />
+          )}
+          {proposal instanceof CosmosProposal &&
+            proposal?.data?.type === 'communitySpend' && (
+              <JSONDisplay
+                data={{
+                  recipient: proposal.data?.spendRecipient,
+                  amount: proposal.data?.spendAmount,
+                }}
+                title="Community Spend Proposal"
+              />
+            )}
+          <VotingResults proposal={proposal} />
+          <VotingActions
+            onModalClose={onModalClose}
+            proposal={proposal}
             toggleVotingModal={toggleVotingModal}
             votingModalOpen={votingModalOpen}
           />
-        }
-        body={
-          !!proposal.description && (
-            <CollapsibleProposalBody proposal={proposal} />
-          )
-        }
-        subBody={
-          <>
-            <LinkedProposalsEmbed
-              proposal={proposal as LinkedSubstrateProposal}
-            />
-            {proposal instanceof AaveProposal && (
-              <AaveViewProposalDetail proposal={proposal} />
-            )}
-            <VotingResults proposal={proposal} />
-            <VotingActions
-              onModalClose={onModalClose}
-              proposal={proposal}
-              toggleVotingModal={toggleVotingModal}
-              votingModalOpen={votingModalOpen}
-            />
-          </>
-        }
-      />
-    </Sublayout>
+        </>
+      }
+    />
   );
 };
 

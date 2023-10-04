@@ -6,6 +6,7 @@ class Topic {
   public readonly description: string;
   public readonly telegram?: string;
   public readonly chainId: string;
+  public readonly channelId?: string;
   public readonly featuredInSidebar?: boolean;
   public readonly featuredInNewPost?: boolean;
   public order?: number;
@@ -33,6 +34,7 @@ class Topic {
     default_offchain_template,
     token_threshold,
     total_threads,
+    channel_id,
   }: {
     name: string;
     id: number;
@@ -45,6 +47,7 @@ class Topic {
     default_offchain_template?: string;
     token_threshold?: BN | string | number;
     total_threads: number;
+    channel_id?: string;
   }) {
     this.name = name;
     this.id = id;
@@ -59,6 +62,7 @@ class Topic {
       this._tokenThreshold = new BN(token_threshold);
     }
     this.totalThreads = total_threads || 0;
+    this.channelId = channel_id;
   }
 }
 

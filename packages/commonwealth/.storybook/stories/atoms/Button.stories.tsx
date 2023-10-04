@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWButton } from '../../../client/scripts/views/components/component_kit/cw_button';
+import { CWButton } from '../../../client/scripts/views/components/component_kit/new_designs/cw_button';
 import { notifySuccess } from '../../../client/scripts/controllers/app/notifications';
 import { iconLookup } from '../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
@@ -15,8 +15,12 @@ const button = {
 export default button;
 type Story = StoryObj<typeof CWButton>;
 
-const argTypesObj = (options: string[]) => {
+const argTypesObj = () => {
   return {
+    buttonType: {
+      control: { type: "inline-radio" },
+      options: ["primary", "secondary", "tertiary", "destructive"]
+    },
     iconLeft: {
       control: { type: "select" },
       options: iconOptions,
@@ -28,9 +32,13 @@ const argTypesObj = (options: string[]) => {
     label: {
       control: { type: "text" },
     },
-    buttonType: {
-      control: { type: "radio" },
-      options: [ ...options ],
+    buttonHeight: {
+      control: { type: "inline-radio" },
+      options: ['lg', 'med', 'sm']
+    },
+    buttonWidth: {
+      control: { type: "inline-radio" },
+      options: ["narrow", "wide"]
     },
     disabled: {
       options: [ true, false ],
@@ -50,11 +58,12 @@ export const Primary: Story = {
     label: "Primary",
     iconLeft: "person",
     iconRight: undefined,
-    buttonType: "primary-red",
+    buttonType: "primary",
+    buttonWidth: "narrow",
+    buttonHeight: "med",
     disabled: false,
   },
-  argTypes: argTypesObj([ "primary-red", "primary-blue", "primary-blue-dark", "primary-black" ]),
-  ...commonParameters,
+  argTypes: argTypesObj(),
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!')} />
   ),
@@ -65,11 +74,13 @@ export const Secondary: Story = {
   args: {
     label: "Secondary",
     iconLeft: "person",
-    buttonType: "secondary-red",
+    iconRight: undefined,
+    buttonType: "secondary",
+    buttonWidth: "narrow",
+    buttonHeight: "med",
     disabled: false,
   },
-  argTypes: argTypesObj([ "secondary-red", "secondary-blue", "secondary-blue-dark", "secondary-black" ]),
-  ...commonParameters,
+  argTypes: argTypesObj(),
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
   ),
@@ -80,71 +91,30 @@ export const Tertiary: Story = {
   args: {
     label: "Tertiary",
     iconLeft: "person",
-    buttonType: "tertiary-blue",
+    iconRight: undefined,
+    buttonType: "tertiary",
+    buttonWidth: "narrow",
+    buttonHeight: "med",
     disabled: false,
   },
-  argTypes: argTypesObj([ "tertiary-blue", "tertiary-black" ]),
-  ...commonParameters,
+  argTypes: argTypesObj(),
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
   ),
 };
 
-/** Large primary buttons */
-export const LargePrimary: Story = {
+/** Destructive buttons */
+export const Destructive: Story = {
   args: {
-    label: "Large primary",
+    label: "Destructive",
     iconLeft: "person",
-    buttonType: "lg-primary-red",
+    iconRight: undefined,
+    buttonType: "destructive",
+    buttonWidth: "narrow",
+    buttonHeight: "med",
     disabled: false,
   },
-  argTypes: argTypesObj([ "lg-primary-red", "lg-primary-blue" ]),
-  ...commonParameters,
-  render: ({...args}) => (
-    <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
-  ),
-};
-
-/** Large secondary buttons */
-export const LargeSecondary: Story = {
-  args: {
-    label: "Large secondary",
-    iconLeft: "person",
-    buttonType: "lg-secondary-red",
-    disabled: false,
-  },
-  argTypes: argTypesObj([ "lg-secondary-red", "lg-secondary-blue" ]),
-  ...commonParameters,
-  render: ({...args}) => (
-    <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
-  ),
-};
-
-/** Large tertiary buttons */
-export const LargeTertiary: Story = {
-  args: {
-    label: "Large tertiary",
-    iconLeft: "person",
-    buttonType: "lg-tertiary-red",
-    disabled: false,
-  },
-  argTypes: argTypesObj([ "lg-tertiary-red", "lg-tertiary-blue" ]),
-  ...commonParameters,
-  render: ({...args}) => (
-    <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
-  ),
-};
-
-/** Mini buttons */
-export const Mini: Story = {
-  args: {
-    label: "Mini",
-    iconLeft: "person",
-    buttonType: "mini-black",
-    disabled: false,
-  },
-  argTypes: argTypesObj([ "mini-black", "mini-red", "mini-white" ]),
-  ...commonParameters,
+  argTypes: argTypesObj(),
   render: ({...args}) => (
     <CWButton {...args} onClick={() => notifySuccess('Button clicked!') } />
   ),

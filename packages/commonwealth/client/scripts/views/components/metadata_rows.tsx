@@ -8,6 +8,7 @@ import { CWTextInput } from './component_kit/cw_text_input';
 import { CWToggle } from './component_kit/cw_toggle';
 import { CWRadioGroup } from './component_kit/cw_radio_group';
 import type { RadioButtonType } from './component_kit/cw_radio_button';
+import { ValidationStatus } from './component_kit/cw_validation_text';
 
 type InputRowProps = {
   disabled?: boolean;
@@ -17,6 +18,7 @@ type InputRowProps = {
   textarea?: boolean;
   title: string;
   value: string | number;
+  inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
 };
 
 export const InputRow = (props: InputRowProps) => {
@@ -28,6 +30,7 @@ export const InputRow = (props: InputRowProps) => {
     textarea,
     title,
     value,
+    inputValidationFn,
   } = props;
 
   return (
@@ -53,6 +56,7 @@ export const InputRow = (props: InputRowProps) => {
           onInput={(e) => {
             onChangeHandler((e.target as any).value);
           }}
+          inputValidationFn={inputValidationFn}
         />
       )}
     </div>

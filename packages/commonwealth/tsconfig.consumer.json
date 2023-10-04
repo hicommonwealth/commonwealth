@@ -1,4 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["server/CommonwealthConsumer/CommonwealthConsumer.ts"]
+  "include": [
+    "server/workers/commonwealthConsumer/commonwealthConsumer.ts"
+  ]
 }

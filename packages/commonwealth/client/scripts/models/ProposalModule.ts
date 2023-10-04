@@ -112,11 +112,9 @@ export abstract class ProposalModule<
   public deinit() {
     this._initialized = false;
     this._error = undefined;
-    this.store.getAll().map((p) => p.deinit());
+    this.store.getAll()?.map((p) => p?.initialized && p?.deinit());
     this.store.clear();
   }
-
-  public abstract createTx(...args): ITXModalData | Promise<ITXModalData>;
 }
 
 export default ProposalModule;

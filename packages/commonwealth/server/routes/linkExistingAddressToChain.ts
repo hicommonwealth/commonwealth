@@ -18,7 +18,7 @@ export const Errors = {
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
   NeedOriginChain: 'Must provide original chain',
-  NeedLoggedIn: 'Must be logged in',
+  NeedLoggedIn: 'Must be signed in',
   NotVerifiedAddressOrUser: 'Not verified address or user',
   InvalidChain: 'Invalid chain',
 };
@@ -133,7 +133,6 @@ const linkExistingAddressToChain = async (
       existingAddress.verification_token = verificationToken;
       existingAddress.verification_token_expires = verificationTokenExpires;
       existingAddress.last_active = new Date();
-      existingAddress.name = originalAddress.name;
       existingAddress.verified = originalAddress.verified;
       const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
@@ -147,8 +146,8 @@ const linkExistingAddressToChain = async (
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,
         keytype: originalAddress.keytype,
-        name: originalAddress.name,
         wallet_id: originalAddress.wallet_id,
+        wallet_sso_source: originalAddress.wallet_sso_source,
         last_active: new Date(),
       });
 

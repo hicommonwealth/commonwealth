@@ -1,7 +1,5 @@
-import BN from 'bn.js';
 import type { ICosmosProposal } from 'controllers/chain/cosmos/types';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { Any } from 'common-common/src/cosmos-ts/src/codegen/google/protobuf/any';
 
 import type { ITXModalData } from 'models/interfaces';
@@ -13,7 +11,7 @@ import type { CosmosApiType } from '../../chain';
 import { CosmosProposalV1 } from './proposal-v1';
 import { numberToLong } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { encodeMsgSubmitProposal } from '../v1beta1/utils-v1beta1';
-import { getActiveProposalsV1, propToIProposal } from './utils-v1';
+import { propToIProposal } from './utils-v1';
 
 /** This file is a copy of controllers/chain/cosmos/governance.ts, modified for
  * gov module version v1. This is considered a patch to make sure v1-enabled chains
@@ -27,18 +25,14 @@ class CosmosGovernanceV1 extends ProposalModule<
   ICosmosProposal,
   CosmosProposalV1
 > {
-  private _votingPeriodS: number;
-  private _yesThreshold: number;
-  private _vetoThreshold: number;
-  private _maxDepositPeriodS: number;
   private _minDeposit: CosmosToken;
-
-  public get vetoThreshold() {
-    return this._vetoThreshold;
-  }
 
   public get minDeposit() {
     return this._minDeposit;
+  }
+
+  public setMinDeposit(minDeposit: CosmosToken) {
+    this._minDeposit = minDeposit;
   }
 
   private _Chain: CosmosChain;
@@ -50,48 +44,6 @@ class CosmosGovernanceV1 extends ProposalModule<
   ): Promise<void> {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
-    try {
-      // query chain-wide params
-      const { deposit_params } = await this._Chain.lcd.cosmos.gov.v1.params({
-        paramsType: 'deposit',
-      });
-      const { tally_params } = await this._Chain.lcd.cosmos.gov.v1.params({
-        paramsType: 'tallying',
-      });
-      const { voting_params } = await this._Chain.lcd.cosmos.gov.v1.params({
-        paramsType: 'voting',
-      });
-      this._votingPeriodS = +voting_params.voting_period.replace('s', '');
-      this._yesThreshold = +tally_params?.threshold;
-      this._vetoThreshold = +tally_params?.veto_threshold;
-      this._maxDepositPeriodS = +deposit_params?.max_deposit_period.replace(
-        's',
-        ''
-      );
-
-      // TODO: support off-denom deposits
-      const depositCoins = deposit_params?.min_deposit.find(
-        ({ denom }) => denom === this._Chain.denom
-      );
-      if (depositCoins) {
-        this._minDeposit = new CosmosToken(
-          depositCoins.denom,
-          new BN(depositCoins.amount)
-        );
-      } else {
-        console.error(
-          'Gov minDeposit in wrong denom:',
-          deposit_params?.min_deposit
-        );
-        this._minDeposit = new CosmosToken(this._Chain.denom, 0);
-      }
-      console.log(this._minDeposit);
-    } catch (e) {
-      console.error(e);
-    }
-
-    // query existing proposals
-    await this._initProposals();
     this._initialized = true;
   }
 
@@ -100,44 +52,25 @@ class CosmosGovernanceV1 extends ProposalModule<
     if (existingProposal) {
       return existingProposal;
     }
-    const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
-      proposalId: numberToLong(proposalId),
-    });
-    const cosmosProp = new CosmosProposalV1(
-      this._Chain,
-      this._Accounts,
-      this,
-      propToIProposal(proposal)
-    );
-    await cosmosProp.init();
-    return cosmosProp;
+    return this._initProposal(proposalId);
   }
 
-  private async _initProposals(proposalId?: number): Promise<void> {
-    let cosmosProposals: CosmosProposalV1[] = [];
+  private async _initProposal(proposalId: number): Promise<CosmosProposalV1> {
     try {
-      if (!proposalId) {
-        const activeProposals = await getActiveProposalsV1(this._Chain.lcd);
-
-        cosmosProposals = activeProposals?.map(
-          (p) => new CosmosProposalV1(this._Chain, this._Accounts, this, p)
-        );
-      } else {
-        const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
-          proposalId: numberToLong(proposalId),
-        });
-        cosmosProposals = [
-          new CosmosProposalV1(
-            this._Chain,
-            this._Accounts,
-            this,
-            propToIProposal(proposal)
-          ),
-        ];
-      }
-      Promise.all(cosmosProposals?.map((p) => p.init()));
+      if (!proposalId) return;
+      const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
+        proposalId: numberToLong(proposalId),
+      });
+      const cosmosProposal = new CosmosProposalV1(
+        this._Chain,
+        this._Accounts,
+        this,
+        propToIProposal(proposal)
+      );
+      await cosmosProposal.init();
+      return cosmosProposal;
     } catch (error) {
-      console.error('Error fetching proposals: ', error);
+      console.error('Error fetching proposal: ', error);
     }
   }
 
@@ -150,28 +83,6 @@ class CosmosGovernanceV1 extends ProposalModule<
     memo = ''
   ): ITXModalData {
     throw new Error('unsupported');
-  }
-
-  // TODO: support multiple amount types
-  public encodeCommunitySpend(
-    title: string,
-    description: string,
-    recipient: string,
-    amount: string
-  ): Any {
-    const denom = this._minDeposit.denom;
-    const coinAmount = [{ amount, denom }];
-    const spend = CommunityPoolSpendProposal.fromPartial({
-      title,
-      description,
-      recipient,
-      amount: coinAmount,
-    });
-    const prop = CommunityPoolSpendProposal.encode(spend).finish();
-    return Any.fromPartial({
-      typeUrl: '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-      value: prop,
-    });
   }
 
   // TODO: support multiple deposit types
@@ -195,7 +106,7 @@ class CosmosGovernanceV1 extends ProposalModule<
       ({ key }) => key && cosm.fromAscii(key) === 'proposal_id'
     );
     const id = +cosm.fromAscii(idAttribute.value);
-    await this._initProposals(id);
+    await this._initProposal(id);
     return id;
   }
 }

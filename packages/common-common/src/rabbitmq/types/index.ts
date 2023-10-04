@@ -1,7 +1,5 @@
-import type { RmqEntityCUD } from './chainEntityCUD';
 import type { RmqCENotificationCUD } from './chainEventNotificationsCUD';
 
-export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD';
 
 export * from './chainEvents';
@@ -13,6 +11,7 @@ import type { RmqSnapshotNotification } from './snapshotNotification';
 import { Sequelize } from 'sequelize';
 import { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
 import { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
+import { RmqDiscordMessage } from './discordMessage';
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -29,12 +28,12 @@ export class RmqMsgFormatError extends Error {
  * anywhere, it MUST be one of these types
  */
 export type TRmqMessages =
-  | RmqEntityCUD.RmqMsgType
   | RmqCENotificationCUD.RmqMsgType
   | RmqCWEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
   | RmqSnapshotEvent.RmqMsgType
-  | RmqSnapshotNotification.RmqMsgType;
+  | RmqSnapshotNotification.RmqMsgType
+  | RmqDiscordMessage.RmqMsgType;
 
 export interface RmqMsgNamespace<MsgType> {
   getInvalidFormatError(...args): RmqMsgFormatError;
@@ -44,20 +43,18 @@ export interface RmqMsgNamespace<MsgType> {
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',
-  ChainEntityCUDMain = 'ChainEntityCUDMainPublication',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
-  SnapshotProposalNotifications = 'SnapshotProposalNotificationsPublication',
   SnapshotListener = 'SnapshotListenerPublication',
+  DiscordListener = 'DiscordMessageSubscription',
 }
 
 export enum RascalSubscriptions {
   ChainEvents = 'ChainEventsSubscription',
-  ChainEntityCUDMain = 'ChainEntityCUDMainSubscription',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDSubscription',
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
-  SnapshotProposalNotifications = 'SnapshotProposalNotificationsSubscription',
   SnapshotListener = 'SnapshotListenerSubscription',
+  DiscordListener = 'DiscordMessageSubscription',
 }
 
 export enum RascalExchanges {
@@ -66,41 +63,37 @@ export enum RascalExchanges {
   Notifications = 'NotificationsExchange',
   SnapshotListener = 'SnapshotListenerExchange',
   DeadLetter = 'DeadLetterExchange',
+  Discobot = 'DiscobotExchange',
 }
 
 export enum RascalQueues {
-  ChainEvents = 'ChainEventsQueue',
-  ChainEntityCUDMain = 'ChainEntityCUDMainQueue',
-  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueue',
-  ChainEventNotifications = 'ChainEventNotificationsQueue',
+  ChainEvents = 'ChainEventsQueueV2',
+  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueueV2',
+  ChainEventNotifications = 'ChainEventNotificationsQueueV2',
   DeadLetter = 'DeadLetterQueue',
-  SnapshotProposalNotifications = 'SnapshotProposalNotificationsQueue',
-  SnapshotListener = 'SnapshotListenerQueue',
+  SnapshotListener = 'SnapshotListenerQueueV2',
+  DiscordListener = 'DiscordMessageQueueV2',
 }
 
 export enum RascalBindings {
   ChainEvents = 'ChainEventsBinding',
-  ChainEntityCUDMain = 'ChainEntityCUDMainBinding',
   ChainEventNotificationsCUD = 'ChainEventNotificationsCUDBinding',
   ChainEventNotifications = 'ChainEventNotificationsBinding',
-  SnapshotProposalNotifications = 'SnapshotProposalNotificationsBinding',
   SnapshotListener = 'SnapshotListenerBinding',
   DeadLetter = 'DeadLetterBinding',
+  DiscordListener = 'DiscordMessageBinding',
 }
 
 export enum RascalRoutingKeys {
   ChainEvents = 'ChainEvents',
-  ChainEntityCUD = 'ChainEntityCUD',
   ChainEventNotificationsCUD = 'ChainEventNotificationsCUD',
   ChainEventNotifications = 'ChainEventNotifications',
-  SnapshotProposalNotifications = 'SnapshotProposalNotifications',
   SnapshotListener = 'SnapshotListener',
   DeadLetter = 'DeadLetter',
+  DiscordListener = 'DiscordListener',
 }
 
-export type SafeRmqPublishSupported =
-  | ChainEntityModelStatic
-  | ChainEventModelStatic;
+export type SafeRmqPublishSupported = ChainEventModelStatic;
 
 export abstract class AbstractRabbitMQController {
   protected _initialized = false;

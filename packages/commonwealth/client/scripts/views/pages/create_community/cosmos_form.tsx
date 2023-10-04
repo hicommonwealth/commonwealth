@@ -9,9 +9,15 @@ import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import {
+  CWValidationText,
+  ValidationStatus,
+} from '../../components/component_kit/cw_validation_text';
 import { IdRow, InputRow } from '../../components/metadata_rows';
-import { defaultChainRows } from './chain_input_rows';
+import {
+  defaultChainRows,
+  updateAdminOnCreateCommunity,
+} from './chain_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
   useChainFormIdFields,
@@ -22,10 +28,18 @@ import {
 
 export const CosmosForm = () => {
   const [bech32Prefix, setBech32Prefix] = useState('');
-  const [decimals, setDecimals] = useState(6);
+  const [decimals, setDecimals] = useState(6); // can be 6 or 18
 
-  const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+  const {
+    id,
+    setId,
+    name,
+    setName,
+    chainName,
+    setChainName,
+    symbol,
+    setSymbol,
+  } = useChainFormIdFields();
 
   const chainFormDefaultFields = useChainFormDefaultFields();
 
@@ -35,6 +49,21 @@ export const CosmosForm = () => {
     useEthChainFormFields();
 
   const navigate = useCommonNavigate();
+
+  const chainNameValidationFn = (
+    value: string
+  ): [ValidationStatus, string] | [] => {
+    const validChainNameRegex = /^[a-z0-9]+$/;
+
+    if (!validChainNameRegex.test(value)) {
+      return [
+        'failure',
+        'Must be lowercase, alphanumeric, and equal to Cosmos Chain Registry entry',
+      ];
+    } else {
+      return [];
+    }
+  };
 
   return (
     <div className="CreateCommunityForm">
@@ -56,6 +85,15 @@ export const CosmosForm = () => {
       />
       <IdRow id={id} />
       <InputRow
+        title="Registered Cosmos Chain Name"
+        value={chainName}
+        placeholder={name.toLowerCase()}
+        onChangeHandler={(v) => {
+          setChainName(v);
+        }}
+        inputValidationFn={chainNameValidationFn}
+      />
+      <InputRow
         title="Symbol"
         value={symbol}
         placeholder="XYZ"
@@ -74,7 +112,6 @@ export const CosmosForm = () => {
       <InputRow
         title="Decimals"
         value={`${decimals}`}
-        disabled={true}
         onChangeHandler={(v) => {
           setDecimals(+v);
         }}
@@ -91,6 +128,7 @@ export const CosmosForm = () => {
               alt_wallet_url: altWalletUrl,
               id: id,
               name: name,
+              cosmos_chain_id: chainName,
               base: ChainBase.CosmosSDK,
               bech32_prefix: bech32Prefix,
               chain_string: chainString,
@@ -113,6 +151,7 @@ export const CosmosForm = () => {
             }
 
             await initAppState(false);
+            await updateAdminOnCreateCommunity(id);
 
             navigate(`/${res.result.chain?.id}`);
           } catch (err) {

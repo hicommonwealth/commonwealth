@@ -56,9 +56,17 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
+      'process.env.FLAG_SIDEBAR_TOGGLE': JSON.stringify(
+        process.env.FLAG_SIDEBAR_TOGGLE
+      ),
+    }),
+    new webpack.DefinePlugin({
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
         process.env.FLAG_PROPOSAL_TEMPLATES
       ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
@@ -87,15 +95,13 @@ module.exports = {
           name: 'bitcoin',
           chunks: 'all',
         },
-        ethereum: {
-          // this is made into an inital chunk
-          test: /[\\/]node_modules[\\/](@ethersproject)[\\/]/,
-          name: 'ethereum',
+        ethersAsync: {
+          test: /[\\/]node_modules[\\/](ethers)[\\/]/,
+          name: 'ethersAsync',
           chunks: 'all',
         },
         ethereumAsync: {
-          // this is made into an async chunk (lazy loaded)
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
+          test: /[\\/]node_modules[\\/](@audius|web3|web3-eth-accounts|@walletconnect|ethereumjs-abi)[\\/]/,
           name: 'ethereumAsync',
           chunks: 'all',
         },
@@ -119,6 +125,11 @@ module.exports = {
           name: 'snapshot',
           chunks: 'all',
         },
+        // ethereum: {
+        //   test: /[\\/]node_modules[\\/](@ethersproject)[\\/]/,
+        //   name: 'ethereum',
+        //   chunks: 'all',
+        // },
         // near: {
         //   test: /[\\/]node_modules[\\/](near-api-js)[\\/]/,
         //   name: 'near',

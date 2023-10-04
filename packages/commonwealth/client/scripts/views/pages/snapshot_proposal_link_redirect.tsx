@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
-import { PageLoading } from './loading';
-import { useCommonNavigate } from 'navigation/helpers';
 import { getProposal } from 'helpers/snapshot_utils';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
+import { PageLoading } from './loading';
 
 type SnapshotProposalLinkRedirectProps = {
   identifier: string;
@@ -13,7 +14,7 @@ export default function SnapshotProposalLinkRedirect({
 }: SnapshotProposalLinkRedirectProps) {
   const navigate = useCommonNavigate();
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     const fetchSnapshotData = async () => {
       try {
         // 1. make query to snapshot to get the specific proposal data

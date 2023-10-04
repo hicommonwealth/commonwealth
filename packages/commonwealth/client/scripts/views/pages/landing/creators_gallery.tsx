@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
-
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import 'pages/landing/creators_gallery.scss';
-
+import React, { useState } from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
-import { isWindowSmallInclusive } from '../../components/component_kit/helpers';
 
 const creatorsGalleryText = [
   {
@@ -67,21 +65,7 @@ export const GalleryCard = ({
 
 export const CreatorsGallery = () => {
   const [selectedCard, setSelectedCard] = useState(1);
-  const [windowIsSmallInclusive, setWindowIsSmallInclusive] = useState(
-    isWindowSmallInclusive(window.innerWidth)
-  );
-
-  useEffect(() => {
-    const onResize = () => {
-      setWindowIsSmallInclusive(isWindowSmallInclusive(window.innerWidth));
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
-  }, []);
+  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   return (
     <div className="CreatorsGallery">
@@ -95,7 +79,7 @@ export const CreatorsGallery = () => {
         </CWText>
       </div>
       <div className="inner-container">
-        {windowIsSmallInclusive ? (
+        {isWindowSmallInclusive ? (
           <>
             <div className="mobile-card">
               <CWText

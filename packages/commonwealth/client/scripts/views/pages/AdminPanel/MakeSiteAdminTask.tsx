@@ -68,7 +68,6 @@ const MakeSiteAdminTask = () => {
       </CWText>
       <div className="TaskRow">
         <CWTextInput
-          label="Address"
           value={address}
           onInput={onInput}
           inputValidationFn={validationFn}

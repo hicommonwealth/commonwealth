@@ -1,12 +1,8 @@
-import React from 'react';
 /* eslint-disable max-len */
-
 import { renderMultilineText } from 'helpers';
-
 import 'pages/privacy_and_terms.scss';
-
+import React from 'react';
 import { CWText } from '../components/component_kit/cw_text';
-import Sublayout from '../Sublayout';
 
 const PrivacyPolicy = `
 Last updated: January 14, 2019
@@ -117,14 +113,12 @@ If you have any questions about this Privacy Statement, please contact us at: he
 
 const PrivacyPage = () => {
   return (
-    <Sublayout>
-      <div className="PrivacyPage">
-        <div className="forum-container">
-          <CWText type="h3">Privacy Policy</CWText>
-          {renderMultilineText(PrivacyPolicy)}
-        </div>
+    <div className="PrivacyPage">
+      <div className="forum-container">
+        <CWText type="h3">Privacy Policy</CWText>
+        {renderMultilineText(PrivacyPolicy)}
       </div>
-    </Sublayout>
+    </div>
   );
 };
 

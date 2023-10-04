@@ -1,0 +1,210 @@
+import { threadStageToLabel } from 'helpers';
+import moment from 'moment';
+import React, { useRef } from 'react';
+import {
+  Popover,
+  usePopover,
+} from 'views/components/component_kit/cw_popover/cw_popover';
+import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { getClasses } from 'views/components/component_kit/helpers';
+import { LockWithTooltip } from 'views/components/lock_with_tooltip';
+import { User } from 'views/components/user/user';
+import { IThreadCollaborator } from '../../../../../models/Thread';
+import { ThreadStage } from '../../../../../models/types';
+import { NewThreadTag } from '../../NewThreadTag';
+import './AuthorAndPublishInfo.scss';
+import { PopperPlacementType } from '@mui/base/Popper';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { getRelativeTimestamp } from 'helpers/dates';
+import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
+
+export type AuthorAndPublishInfoProps = {
+  isHot?: boolean;
+  authorAddress: string;
+  authorChainId: string;
+  discord_meta?: {
+    user: { id: string; username: string };
+    channel_id: string;
+    message_id: string;
+  };
+  collaboratorsInfo?: IThreadCollaborator[];
+  isLocked?: boolean;
+  lockedAt?: string;
+  lastUpdated?: string;
+  publishDate?: moment.Moment;
+  viewsCount?: number;
+  showSplitDotIndicator?: boolean;
+  showPublishLabelWithDate?: boolean;
+  showEditedLabelWithDate?: boolean;
+  showUserAddressWithInfo?: boolean;
+  isSpamThread?: boolean;
+  threadStage?: ThreadStage;
+  onThreadStageLabelClick?: (threadStage: ThreadStage) => Promise<any>;
+  popoverPlacement?: PopperPlacementType;
+};
+
+export const AuthorAndPublishInfo = ({
+  isHot,
+  authorAddress,
+  authorChainId,
+  isLocked,
+  lockedAt,
+  lastUpdated,
+  viewsCount,
+  publishDate,
+  discord_meta,
+  showSplitDotIndicator = true,
+  showPublishLabelWithDate,
+  showEditedLabelWithDate,
+  isSpamThread,
+  showUserAddressWithInfo = true,
+  threadStage,
+  onThreadStageLabelClick,
+  collaboratorsInfo,
+  popoverPlacement,
+}: AuthorAndPublishInfoProps) => {
+  const popoverProps = usePopover();
+  const containerRef = useRef(null);
+  useAuthorMetadataCustomWrap(containerRef);
+
+  const dotIndicator = showSplitDotIndicator && (
+    <CWText className="dot-indicator">•</CWText>
+  );
+
+  const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
+
+  return (
+    <div className="AuthorAndPublishInfo" ref={containerRef}>
+      <User
+        avatarSize={24}
+        userAddress={authorAddress}
+        userChainId={authorChainId}
+        shouldShowPopover
+        shouldLinkProfile
+        shouldShowAddressWithDisplayName={
+          fromDiscordBot ? false : showUserAddressWithInfo
+        }
+        popoverPlacement={popoverPlacement}
+      />
+
+      {fromDiscordBot && (
+        <>
+          {dotIndicator}
+          <CWText type="caption" className="discord-author">
+            <b>{discord_meta?.user?.username}</b>
+          </CWText>
+          {dotIndicator}
+          <CWTag label={'Discord'} type={'discord'} iconName="discord" />
+          {dotIndicator}
+          <CWText type="caption" className="discord-author">
+            Bridged from Discord
+          </CWText>
+        </>
+      )}
+
+      {collaboratorsInfo?.length > 0 && (
+        <>
+          <CWText type="caption">and</CWText>
+          <CWText
+            type="caption"
+            className="section-text cursor-pointer"
+            onMouseEnter={popoverProps.handleInteraction}
+            onMouseLeave={popoverProps.handleInteraction}
+          >
+            {`${collaboratorsInfo.length} other${
+              collaboratorsInfo.length > 1 ? 's' : ''
+            }`}
+            <Popover
+              content={
+                <div className="collaborators">
+                  {collaboratorsInfo.map(({ address, chain }) => {
+                    return (
+                      <User
+                        shouldLinkProfile
+                        key={address}
+                        userAddress={address}
+                        userChainId={chain}
+                      />
+                    );
+                  })}
+                </div>
+              }
+              {...popoverProps}
+            />
+          </CWText>
+        </>
+      )}
+
+      {publishDate && (
+        <>
+          {dotIndicator}
+
+          <CWTooltip
+            placement="top"
+            content={
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {publishDate.format('MMMM Do YYYY')} {dotIndicator}{' '}
+                {publishDate.format('h:mm A')}
+              </div>
+            }
+            renderTrigger={(handleInteraction) => (
+              <CWText
+                type="caption"
+                fontWeight="regular"
+                className="section-text publish-date"
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+              >
+                {showPublishLabelWithDate ? 'Published ' : ''}
+                {showEditedLabelWithDate ? 'Edited ' : ''}
+                {getRelativeTimestamp(publishDate?.toISOString())}
+              </CWText>
+            )}
+          />
+        </>
+      )}
+
+      {viewsCount !== null && viewsCount >= 0 && (
+        <>
+          {dotIndicator}
+          <CWText type="caption" className="section-text">
+            {`${viewsCount} view${viewsCount > 1 ? 's' : ''}`}
+          </CWText>
+        </>
+      )}
+
+      {threadStage && (
+        <>
+          {dotIndicator}
+          <CWText
+            type="caption"
+            className={getClasses<{ stage: 'negative' | 'positive' }>(
+              {
+                stage:
+                  threadStage === ThreadStage.Failed ? 'negative' : 'positive',
+              },
+              'proposal-stage-text'
+            )}
+            onClick={async () => await onThreadStageLabelClick(threadStage)}
+          >
+            {threadStageToLabel(threadStage)}
+          </CWText>
+        </>
+      )}
+
+      <NewThreadTag threadCreatedAt={moment(publishDate)} />
+
+      {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
+
+      {isSpamThread && <CWTag label={'SPAM'} type={'disabled'} />}
+
+      {isLocked && lockedAt && lastUpdated && (
+        <LockWithTooltip
+          lockedAt={moment(lockedAt)}
+          updatedAt={moment(lastUpdated)}
+        />
+      )}
+    </div>
+  );
+};

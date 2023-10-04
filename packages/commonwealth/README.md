@@ -78,11 +78,11 @@ following the Production Database instructions afterwards.
 ## Trouble Shooting for M1 Mac Users
 
 Newer Macs use Apple Silicon (M1, M2, etc), instead of the common Intel chips.
-Several critical CLI tools like `nvm` and `brew` do not yet have native versions 
-built for the new M1 architecture. Follow these steps to enable Rosetta 2 
+Several critical CLI tools like `nvm` and `brew` do not yet have native versions
+built for the new M1 architecture. Follow these steps to enable Rosetta 2
 ([source](https://www.courier.com/blog/tips-and-tricks-to-setup-your-apple-m1-for-development/)):
 
-For M1+ development, you should follow the same steps as in the **nvm** section, 
+For M1+ development, you should follow the same steps as in the **nvm** section,
 except you must make sure you are using the Rosetta2 Terminal.
 - Download a terminal alternative like [iTerm2](https://iterm2.com/) to your Applications (optionally, rename it, ie: "Rosetta Terminal")
 - In the Applications menu, right-click the new terminal app and click "Get Info"
@@ -91,7 +91,7 @@ except you must make sure you are using the Rosetta2 Terminal.
 - You may now use this terminal to install `nvm` and other applications. They will run fine in your usual terminal.
 
 _FOR ALL CLI INSTALLS_ you must prefix `arch -arm64` in front of the command.
-For example for python: `arch -arm64 brew install python@3.9`. This will allow you 
+For example for python: `arch -arm64 brew install python@3.9`. This will allow you
 to install using the M1 homebrew with Rosetta. This is crucial.
 
 If errors occur try these steps:
@@ -152,7 +152,7 @@ We also use certain environment variables to configure the application itself:
 To download and restore the production database, and run migrations:
 
 ```
-pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"DiscussionDrafts\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --exclude-table-data="public.\"ChainEvents\"" --no-privileges --no-owner -f latest.dump
+pg_dump $(heroku config:get DATABASE_URL --app commonwealthapp) --verbose --exclude-table-data="public.\"Sessions\"" --exclude-table-data="public.\"LoginTokens\"" --exclude-table-data="public.\"Notifications\"" --exclude-table-data="public.\"SocialAccounts\"" --exclude-table-data="public.\"Webhooks\"" --exclude-table-data="public.\"ChainEvents\"" --no-privileges --no-owner -f latest.dump
 
 npx sequelize db:drop
 npx sequelize db:create
@@ -296,26 +296,13 @@ npm install -g local-ssl-proxy
 local-ssl-proxy --source 443 --target 8080
 ```
 
-## Chat Server
-
-In order to use chat functionality, you will also need to check out and
-build the `commonwealth-chat` server and run it in the background.
-
-https://github.com/hicommonwealth/commonwealth-chat
-
-The chat server talks to the same database as the main server. It only
-makes a couple of simple queries, to read/write to message history and
-check that Users are sending messages from valid Addresses.
-
-By default it runs on port 3001.
-
 ## Datadog Monitoring on Heroku
 
 `Warning:` Following steps below may lead your app to restart several times, please choose appropriate maintainance window.
 
 
-**Helpful guides:**  
-[Generic Datadog Heroku Agent Guide](https://docs.datadoghq.com/agent/basic_agent_usage/heroku/)  
+**Helpful guides:**
+[Generic Datadog Heroku Agent Guide](https://docs.datadoghq.com/agent/basic_agent_usage/heroku/)
 [Datadtog Postgres Guide](
 https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle)
 
@@ -332,20 +319,20 @@ https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle)
   DD_HEROKU_CONF_FOLDER=packages/commonwealth/datadog
 ```
 
-**Install Datadog Buildpack**   
+**Install Datadog Buildpack**
 This can be done by copying below URL on Heroku App settings page using `Add Buildpack` button
 https://github.com/DataDog/heroku-buildpack-datadog.git
 
-**Postgres Monitoring**   
-- Login to heroku on your local, and use helper script `datadog-db-setup` with target app name as first argument  
-- This executes script `setup-datadog-postgres.sh` & run `datadog-postgres.sql` in app database  
+**Postgres Monitoring**
+- Login to heroku on your local, and use helper script `datadog-db-setup` with target app name as first argument
+- This executes script `setup-datadog-postgres.sh` & run `datadog-postgres.sql` in app database
 - Script creates new datadog database user, schema & other database object required by Datadog.
 
 ```bash
 cd packages/commonwealth
 yarn datadog-db-setup <app-name> <dd-conf-folder>
 #example
-yarn datadog-db-setup commonwealth-staging packages/commonwealth/datadog
+yarn datadog-db-setup commonwealth-frick packages/commonwealth/datadog
 ```
 
 **Datadog Postgres Config**
@@ -367,7 +354,7 @@ instances:
 ```
 
 ### Verify on Datadog
-Visit `https://us5.datadoghq.com/dashboard/lists` for all available dashboards. 
+Visit `https://us5.datadoghq.com/dashboard/lists` for all available dashboards.
 
 Available Postgres Dashboards:
 - `Postgres - Metrics`
@@ -375,7 +362,7 @@ Available Postgres Dashboards:
 
 If datadog agent picked up postgres config & setting properly, you will see your app database name in top dropdown on postgres dashabords
 
-### Datadog - Dashboard 
+### Datadog - Dashboard
 
 **Copy Widget(s)**
 - click on any dashboard `Cmd+c` or using `share` icon and select `Copy` option

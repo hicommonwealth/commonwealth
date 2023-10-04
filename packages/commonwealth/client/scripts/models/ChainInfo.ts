@@ -5,8 +5,7 @@ import RoleInfo from './RoleInfo';
 import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
-
-import type CommunityRole from './CommunityRole';
+import { ETHERMINT_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
 
 class ChainInfo {
   public readonly id: string;
@@ -37,8 +36,6 @@ class ChainInfo {
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
-  public defaultAllowPermissions: bigint;
-  public defaultDenyPermissions: bigint;
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
   public decimals: number;
@@ -46,7 +43,6 @@ class ChainInfo {
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
   public discordConfigId?: string;
-  public communityRoles: CommunityRole[];
   public cosmosGovernanceVersion?: string;
 
   public get node() {
@@ -80,15 +76,12 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    defaultAllowPermissions,
-    defaultDenyPermissions,
     decimals,
     substrateSpec,
     ChainNode,
     tokenName,
     adminOnlyPolling,
     discord_config_id,
-    communityRoles,
     cosmosGovernanceVersion,
   }) {
     this.id = id;
@@ -115,8 +108,6 @@ class ChainInfo {
     this.hasHomepage = hasHomepage;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
-    this.defaultAllowPermissions = defaultAllowPermissions;
-    this.defaultDenyPermissions = defaultDenyPermissions;
     this.ss58Prefix = ss58_prefix;
     this.bech32Prefix = bech32_prefix;
     this.decimals = decimals;
@@ -126,7 +117,6 @@ class ChainInfo {
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
-    this.communityRoles = communityRoles;
     this.cosmosGovernanceVersion = cosmosGovernanceVersion;
   }
 
@@ -157,15 +147,12 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    default_allow_permissions,
-    default_deny_permissions,
     substrate_spec,
     token_name,
     Contracts,
     ChainNode,
     admin_only_polling,
     discord_config_id,
-    community_roles,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -174,11 +161,15 @@ class ChainInfo {
       // ignore invalid JSON blobs
       block_explorer_ids = {};
     }
-    const decimals = Contracts
+    let decimals = Contracts
       ? Contracts[0]?.decimals
       : base === ChainBase.CosmosSDK
       ? 6
       : 18;
+
+    if (ETHERMINT_CHAINS.some((c) => c === id)) {
+      decimals = 18;
+    }
 
     // TODO: this is temporary until we have a better way to handle governance versions
     // see: https://github.com/hicommonwealth/commonwealth/issues/3292
@@ -212,15 +203,12 @@ class ChainInfo {
       ss58_prefix,
       bech32_prefix,
       type,
-      defaultAllowPermissions: default_allow_permissions,
-      defaultDenyPermissions: default_deny_permissions,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       tokenName: token_name,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
-      communityRoles: community_roles,
       cosmosGovernanceVersion: cosmos_governance_version,
     });
   }
@@ -285,8 +273,6 @@ class ChainInfo {
     defaultOverview,
     defaultPage,
     hasHomepage,
-    default_allow_permissions,
-    default_deny_permissions,
     chain_node_id,
   }: {
     name?: string;
@@ -305,8 +291,6 @@ class ChainInfo {
     defaultOverview?: boolean;
     defaultPage?: DefaultPage;
     hasHomepage?: boolean;
-    default_allow_permissions?: bigint;
-    default_deny_permissions?: bigint;
     chain_node_id?: string;
   }) {
     // TODO: Change to PUT /chain
@@ -322,8 +306,6 @@ class ChainInfo {
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
-      default_allow_permissions,
-      default_deny_permissions,
       snapshot,
       terms,
       icon_url: iconUrl,
@@ -350,8 +332,6 @@ class ChainInfo {
     this.defaultOverview = updatedChain.default_summary_view;
     this.defaultPage = updatedChain.default_page;
     this.hasHomepage = updatedChain.has_homepage;
-    this.defaultAllowPermissions = updatedChain.default_allow_permissions;
-    this.defaultDenyPermissions = updatedChain.default_deny_permissions;
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
   }
 }

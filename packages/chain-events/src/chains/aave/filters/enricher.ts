@@ -20,7 +20,7 @@ export async function Enrich(
   api: Api,
   blockNumber: number,
   kind: EventKind,
-  rawData: RawEvent
+  rawData: RawEvent | Omit<RawEvent, 'name'> // omit name for backwards compatibility with StorageFetcher
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     case EventKind.ProposalCanceled: {

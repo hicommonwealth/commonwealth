@@ -36,7 +36,7 @@ const staticFileToBucketMigrator = async () => {
 
     const s3 = new AWS.S3();
     const params = {
-      Bucket: 'commonwealth-uploads',
+      Bucket: 'assets.commonwealth.im',
       Key: `${fileName}`,
       Expires: 3600,
       ContentType: 'image/png',

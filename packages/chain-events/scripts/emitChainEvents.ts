@@ -1,11 +1,10 @@
 import * as fs from 'fs';
-import type { IEventHandler, CWEvent } from 'chain-events/src';
+import type { CWEvent, IEventHandler } from 'chain-events/src';
 
 import ceModels, { sequelize } from '../services/database/database';
 import cwModels from '../../commonwealth/server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { CommunityInstance } from 'commonwealth/server/models/communities';
-import { SubstrateTypes } from '../src/types';
 import type { StorageFilterConfig } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   EntityArchivalHandler,
@@ -14,13 +13,16 @@ import {
 } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import type { BrokerConfig } from 'rascal';
 import {
-  MockRabbitMQController,
   getRabbitMQConfig,
+  MockRabbitMQController,
 } from 'common-common/src/rabbitmq';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 
 const log = factory.getLogger(formatFilename(__filename));
 const rmqController = new MockRabbitMQController(
-  <BrokerConfig>getRabbitMQConfig('localhost')
+  <BrokerConfig>(
+    getRabbitMQConfig('localhost', RascalConfigServices.ChainEventsService)
+  )
 );
 
 const handleEventFn = async (
@@ -53,12 +55,7 @@ export const generateHandlers = (
 
   // emits notifications by writing into the db's Notifications table, and also optionally
   // sending a notification to the client via websocket
-  const excludedNotificationEvents = [SubstrateTypes.EventKind.DemocracyTabled];
-  const notificationHandler = new NotificationHandler(
-    ceModels,
-    rmqController,
-    excludedNotificationEvents
-  );
+  const notificationHandler = new NotificationHandler(ceModels, rmqController);
 
   // creates and updates ChainEntity rows corresponding with entity-related events
   const entityArchivalHandler = new EntityArchivalHandler(

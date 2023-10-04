@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
 import moment from 'moment';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
@@ -7,8 +7,6 @@ import type { DB } from '../models';
 import type { VoteAttributes, VoteInstance } from '../models/vote';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import checkRule from '../util/rules/checkRule';
-import type RuleCache from '../util/rules/ruleCache';
 
 import validateTopicThreshold from '../util/validateTopicThreshold';
 
@@ -19,7 +17,7 @@ export const Errors = {
   InvalidOption: 'Invalid response option',
   PollingClosed: 'Polling already finished',
   BalanceCheckFailed: 'Could not verify user token balance',
-  RuleCheckFailed: 'Rule check failed',
+  InsufficientTokenBalance: 'Insufficient token balance',
 };
 
 type UpdateVoteReq = {
@@ -35,7 +33,6 @@ type UpdateVoteResp = VoteAttributes;
 const updateVote = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  ruleCache: RuleCache,
   req: TypedRequestBody<UpdateVoteReq>,
   res: TypedResponse<UpdateVoteResp>,
   next: NextFunction
@@ -69,31 +66,19 @@ const updateVote = async (
   });
   if (!thread) return next(new AppError(Errors.NoThread));
 
-  // check token balance threshold if needed
-  const canVote = await validateTopicThreshold(
-    tokenBalanceCache,
-    models,
-    thread.topic_id,
-    address
-  );
-  if (!canVote) {
-    return next(new AppError(Errors.BalanceCheckFailed));
-  }
-
-  const topic = await models.Topic.findOne({
-    where: { id: thread.topic_id },
-    attributes: ['rule_id'],
-  });
-  if (topic?.rule_id) {
-    const passesRules = await checkRule(
-      ruleCache,
+  try {
+    // check token balance threshold if needed
+    const canVote = await validateTopicThreshold(
+      tokenBalanceCache,
       models,
-      topic.rule_id,
-      author.address
+      thread.topic_id,
+      address
     );
-    if (!passesRules) {
-      return next(new AppError(Errors.RuleCheckFailed));
+    if (!canVote) {
+      return next(new AppError(Errors.InsufficientTokenBalance));
     }
+  } catch (e) {
+    return next(new ServerError(Errors.BalanceCheckFailed, e));
   }
 
   let vote: VoteInstance;

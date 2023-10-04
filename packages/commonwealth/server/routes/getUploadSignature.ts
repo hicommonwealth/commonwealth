@@ -10,7 +10,7 @@ AWS.config.update({
 });
 
 export const Errors = {
-  NotLoggedIn: 'Must be logged in',
+  NotLoggedIn: 'Must be signed in',
   MissingParams: 'Must specify name and mimetype',
   ImageType: 'Can only upload JPG, PNG, GIF, and WEBP images',
 };
@@ -40,7 +40,7 @@ const getUploadSignature = async (
 
   const s3 = new AWS.S3();
   const params = {
-    Bucket: 'commonwealth-uploads',
+    Bucket: 'assets.commonwealth.im',
     Key: `${filename}`,
     Expires: 3600,
     ContentType: contentType,

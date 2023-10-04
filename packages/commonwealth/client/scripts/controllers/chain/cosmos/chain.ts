@@ -24,7 +24,7 @@ import {
   ITXModalData,
 } from '../../../models/interfaces';
 import WebWalletController from '../../app/web_wallets';
-import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
+import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import type CosmosAccount from './account';
 import {
   getLCDClient,
@@ -32,6 +32,8 @@ import {
   getSigningClient,
   getTMClient,
 } from './chain.utils';
+import EthSigningClient from './eth_signing_client';
+import { ETHERMINT_CHAINS } from '../../app/webWallets/keplr_ethereum_web_wallet';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -88,44 +90,71 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   public async init(chain: ChainInfo, reset = false) {
     const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
-    console.log(`Starting Tendermint RPC API at ${url}...`);
+
     // TODO: configure broadcast mode
-
-    this._tmClient = await getTMClient(url);
-    this._api = await getRPCClient(this._tmClient);
-
-    if (chain?.cosmosGovernanceVersion === 'v1') {
-      const lcdUrl = `${window.location.origin}/cosmosLCD/${chain.id}`;
-      const lcd = await getLCDClient(lcdUrl);
-      this._lcd = lcd;
+    try {
+      console.log(`Starting Tendermint client...`);
+      this._tmClient = await getTMClient(url);
+    } catch (e) {
+      console.error('Error starting tendermint client: ', e);
     }
-
-    const {
-      pool: { bondedTokens },
-    } = await this._api.staking.pool();
-    this._staked = this.coins(new BN(bondedTokens));
-
-    const {
-      params: { bondDenom },
-    } = await this._api.staking.params();
-    this._denom = bondDenom;
 
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
     }
 
-    // Poll for new block immediately
-    const { block } = await this._tmClient.block();
-    const height = +block.header.height;
-    const { block: prevBlock } = await this._tmClient.block(height - 1);
-    const time = moment.unix(block.header.time.valueOf() / 1000);
-    // TODO: check if this is correctly seconds or milliseconds
-    this.app.chain.block.duration =
-      block.header.time.valueOf() - prevBlock.header.time.valueOf();
-    this.app.chain.block.lastTime = time;
-    this.app.chain.block.height = height;
+    try {
+      console.log(`Starting RPC API at ${url}...`);
+      this._api = await getRPCClient(this._tmClient);
+    } catch (e) {
+      console.error('Error starting RPC client: ', e);
+    }
 
-    this.app.chain.networkStatus = ApiStatus.Connected;
+    if (chain?.cosmosGovernanceVersion === 'v1') {
+      try {
+        const lcdUrl = `${window.location.origin}/cosmosLCD/${chain.id}`;
+        console.log(`Starting LCD API at ${lcdUrl}...`);
+        const lcd = await getLCDClient(lcdUrl);
+        this._lcd = lcd;
+      } catch (e) {
+        console.error('Error starting LCD client: ', e);
+      }
+    }
+
+    await this.fetchBlock(); // Poll for new block immediately
+  }
+
+  private async fetchBlock(): Promise<void> {
+    try {
+      const { block } = await this._tmClient.block();
+      const height = +block.header.height;
+      const { block: prevBlock } = await this._tmClient.block(height - 1);
+      // TODO: check if this is correctly seconds or milliseconds
+      const time = moment.unix(block.header.time.valueOf() / 1000);
+      this.app.chain.block.duration =
+        block.header.time.valueOf() - prevBlock.header.time.valueOf();
+      this.app.chain.block.lastTime = time;
+      this.app.chain.block.height = height;
+      this.app.chain.networkStatus = ApiStatus.Connected;
+    } catch (e) {
+      console.error('Error fetching block: ', e);
+    }
+  }
+
+  public async fetchPoolParams(): Promise<CosmosToken> {
+    const {
+      pool: { bondedTokens },
+    } = await this._api.staking.pool();
+    this._staked = this.coins(new BN(bondedTokens));
+    return this._staked;
+  }
+
+  public async fetchStakingParams(): Promise<string> {
+    const {
+      params: { bondDenom },
+    } = await this._api.staking.params();
+    this._denom = bondDenom;
+    return this._denom;
   }
 
   public async deinit(): Promise<void> {
@@ -136,9 +165,10 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     account: CosmosAccount,
     tx: EncodeObject
   ): Promise<readonly Event[]> {
+    const chain = this._app.chain;
     // TODO: error handling
     // TODO: support multiple wallets
-    if (this._app.chain.network === ChainNetwork.Terra) {
+    if (chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
     const wallet = WebWalletController.Instance.getByName(
@@ -149,10 +179,27 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       await wallet.enable();
     }
     const cosm = await import('@cosmjs/stargate');
-    const client = await getSigningClient(
-      this._app.chain.meta.node.url,
-      wallet.offlineSigner
-    );
+    const dbId = chain.meta.id;
+    let client;
+
+    // TODO: To check if ethermint, we can get slip44 cointype from Cosmos Chain Directory instead of hardcoding
+    if (ETHERMINT_CHAINS.some((c) => c === dbId)) {
+      const chainId = wallet.getChainId();
+
+      client = await EthSigningClient(
+        {
+          restUrl: `${window.location.origin}/cosmosLCD/${dbId}`,
+          chainId,
+          path: dbId,
+        },
+        wallet.offlineSigner
+      );
+    } else {
+      client = await getSigningClient(
+        chain.meta.node.url,
+        wallet.offlineSigner
+      );
+    }
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
@@ -171,9 +218,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         DEFAULT_MEMO
       );
       console.log(result);
-      if (cosm.isBroadcastTxFailure(result)) {
+      if (cosm.isDeliverTxFailure(result)) {
         throw new Error('TX execution failed.');
-      } else if (cosm.isBroadcastTxSuccess(result)) {
+      } else if (cosm.isDeliverTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({
           hash: Buffer.from(txHash, 'hex'),

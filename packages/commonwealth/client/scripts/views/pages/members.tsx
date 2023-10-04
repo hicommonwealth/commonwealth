@@ -1,137 +1,113 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
-
 import 'pages/members.scss';
-
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import app from 'state';
-import MinimumProfile from '../../models/MinimumProfile';
-import { User } from 'views/components/user/user';
-import Sublayout from 'views/Sublayout';
-import { CWText } from '../components/component_kit/cw_text';
 import { useDebounce } from 'usehooks-ts';
+import { User } from 'views/components/user/user';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from '../../../scripts/helpers/constants';
+import { useSearchProfilesQuery } from '../../../scripts/state/api/profiles';
+import { SearchProfilesResponse } from '../../../scripts/state/api/profiles/searchProfiles';
+import MinimumProfile from '../../models/MinimumProfile';
+import { CWText } from '../components/component_kit/cw_text';
 import { MembersSearchBar } from '../components/members_search_bar';
-
-type MemberInfo = {
-  profile: MinimumProfile;
-  role: any;
-};
 
 const MembersPage = () => {
   const containerRef = useRef<VirtuosoHandle>();
 
-  const [membersList, setMembersList] = React.useState<Array<MemberInfo>>([]);
-  const [totalCount, setTotalCount] = useState<number>(1);
-  const [page, setPage] = useState<number>(1);
-
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
-  const handleLoadNextPage = async (searchQuery: string, reset: boolean) => {
-    const newPage = reset ? 1 : page + 1;
-    setPage(newPage);
+  const { data, fetchNextPage } = useSearchProfilesQuery({
+    chainId: app.activeChainId(),
+    searchTerm: debouncedSearchTerm,
+    limit: 10,
+    orderBy: APIOrderBy.LastActive,
+    orderDirection: APIOrderDirection.Desc,
+    includeRoles: true,
+  });
 
-    const response = await app.search.searchMentionableProfiles(
-      searchQuery || '',
-      app.activeChainId(),
-      50,
-      newPage,
-      true
-    );
-
-    if (response.totalCount) {
-      setTotalCount(response.totalCount);
+  const members = useMemo(() => {
+    if (!data?.pages?.length) {
+      return [];
     }
+    return data.pages
+      .reduce((acc, page) => {
+        return [...acc, ...page.results];
+      }, [] as SearchProfilesResponse['results'])
+      .map((p) => ({
+        id: p.id,
+        address_id: p.addresses?.[0]?.id,
+        address: p.addresses?.[0]?.address,
+        address_chain: p.addresses?.[0]?.chain,
+        chain: p.addresses?.[0]?.chain,
+        profile_name: p.profile_name,
+        avatar_url: p.avatar_url,
+        roles: p.roles,
+      }))
+      .map((p) => {
+        const minProfile = new MinimumProfile(p.address, p.chain);
+        minProfile.initialize(
+          p.profile_name,
+          p.address,
+          p.avatar_url,
+          p.id,
+          p.chain,
+          null
+        );
+        return {
+          profile: minProfile,
+          role: p.roles.find(
+            (role) =>
+              role.chain_id === app.activeChainId() &&
+              ['admin', 'moderator'].includes(role.permission)
+          ),
+        };
+      });
+  }, [data]);
 
-    const members = response.profiles.map((p) => ({
-      id: p.id,
-      address_id: p.addresses?.[0]?.id,
-      address: p.addresses?.[0]?.address,
-      address_chain: p.addresses?.[0]?.chain,
-      chain_id: p.addresses?.[0]?.chain,
-      profile_name: p.profile_name,
-      avatar_url: p.avatar_url,
-      roles: p.roles,
-    }));
+  const totalResults = data?.pages?.[0]?.totalResults || 0;
 
-    const profiles: Array<MemberInfo> = members.map((p) => {
-      const minProfile = new MinimumProfile(p.address, p.chain);
-      minProfile.initialize(
-        p.profile_name,
-        p.address,
-        p.avatar_url,
-        p.id,
-        p.chain,
-        null
-      );
-      return {
-        profile: minProfile,
-        role: p.roles.find(
-          (role) =>
-            role.chain_id === app.activeChainId() &&
-            ['admin', 'moderator'].includes(role.permission)
-        ),
-      };
-    });
-
-    if (reset) {
-      setMembersList(profiles);
-      if (containerRef) {
-        containerRef.current.scrollToIndex(0);
-      }
-    } else {
-      setMembersList([...membersList, ...profiles]);
-    }
-  };
-
-  // on debounced search term change, refresh search results
+  // fixes bug that prevents scrolling on initial page load
   useEffect(() => {
-    if (debouncedSearchTerm === '') {
-      handleLoadNextPage('', true);
+    const shouldFetchMore = members.length < 50 && totalResults > 50;
+    if (!shouldFetchMore) {
       return;
     }
-    if (debouncedSearchTerm.length >= 3) {
-      handleLoadNextPage(debouncedSearchTerm, true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearchTerm]);
-
-  // on init, load first page
-  useEffect(() => {
-    handleLoadNextPage('', true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchNextPage();
+  }, [members, totalResults, fetchNextPage]);
 
   return (
-    <Sublayout>
-      <div className="MembersPage">
-        <CWText type="h3" fontWeight="medium">
-          Members ({totalCount})
-        </CWText>
-        <MembersSearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          chainName={app.activeChainId()}
-        />
-        <Virtuoso
-          ref={containerRef}
-          data={membersList}
-          endReached={() => handleLoadNextPage(searchTerm, false)}
-          itemContent={(index, profileInfo) => {
-            return (
-              <div className="member-row" key={index}>
-                <User
-                  user={profileInfo.profile}
-                  role={profileInfo.role}
-                  showRole
-                  hideAvatar={false}
-                  linkify
-                />
-              </div>
-            );
-          }}
-        />
-      </div>
-    </Sublayout>
+    <div className="MembersPage">
+      <CWText type="h3" fontWeight="medium">
+        Members ({totalResults})
+      </CWText>
+      <MembersSearchBar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        chainName={app.activeChainId()}
+      />
+      <Virtuoso
+        ref={containerRef}
+        data={members}
+        endReached={() => fetchNextPage()}
+        itemContent={(index, profileInfo) => {
+          return (
+            <div className="member-row" key={index}>
+              <User
+                userAddress={profileInfo.profile.address}
+                userChainId={profileInfo.profile.chain}
+                role={profileInfo.role}
+                shouldShowRole
+                shouldLinkProfile
+              />
+            </div>
+          );
+        }}
+      />
+    </div>
   );
 };
 

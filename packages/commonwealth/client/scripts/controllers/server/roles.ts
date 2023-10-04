@@ -1,15 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 
-import { aggregatePermissions } from 'utils';
-import type { Action } from 'permissions';
-import {
-  AccessLevel,
-  PermissionManager,
-  ToCheck,
-  everyonePermissions,
-} from 'permissions';
-import type { RoleObject } from 'types';
+import { AccessLevel } from 'permissions';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import ChainInfo from '../../models/ChainInfo';
@@ -24,9 +16,7 @@ const getPermissionLevel = (permission: AccessLevel | undefined) => {
 };
 
 export class RolesController {
-  private permissionManager = new PermissionManager();
-
-  constructor(public readonly User: UserController) {}
+  constructor(public readonly User: UserController) { }
 
   private _roles: RoleInfo[] = [];
   public get roles(): RoleInfo[] {
@@ -58,43 +48,28 @@ export class RolesController {
     address: AddressInfo | Omit<AddressInfo, 'chain'>;
     chain?: string;
     community?: string;
-  }): JQueryPromise<void> {
-    // TODO: Change to POST /role
-    return $.post('/api/createRole', {
-      jwt: this.User.jwt,
+  }): any {
+    this.addRole({
+      address: options.address.address,
+      address_chain: options.chain,
       address_id: options.address.id,
-      chain:
-        options.chain ||
-        options.community ||
-        (options.address as AddressInfo).chain?.id,
-    }).then((result) => {
-      // handle state updates
-      this.addRole(result.result.role);
-    });
+      allow: 0,
+      chain_id: options.chain,
+      community_role_id: options.address.id,
+      deny: 0,
+      is_user_default: true,
+      permission: AccessLevel.Member,
+    } as any)
   }
 
   public deleteRole(options: {
     address: AddressInfo;
-    chain?: string;
-    community?: string;
-  }): JQueryPromise<void> {
-    // TODO: Change to DELETE /role
-    return $.post('/api/deleteRole', {
-      jwt: this.User.jwt,
-      address_id: options.address.id,
-      chain: options.chain || options.community || options.address.chain?.id,
-    }).then((result) => {
-      if (result.status !== 'Success') {
-        throw new Error(`Got unsuccessful status: ${result.status}`);
-      }
-      // handle state updates
-      if (options.chain) {
-        this.removeRole((r) => {
-          return (
-            r.chain_id === options.chain && r.address_id === options.address.id
-          );
-        });
-      }
+    chain: string;
+  }): any {
+    this.removeRole((r) => {
+      return (
+        r.chain_id === options.chain && r.address_id === options.address.id
+      );
     });
   }
 
@@ -254,10 +229,10 @@ export class RolesController {
     const addressinfo: AddressInfo | undefined =
       options.account instanceof Account
         ? this.User.addresses.find(
-            (a) =>
-              options.account.address === a.address &&
-              (options.account.chain as ChainInfo).id === a.chain.id
-          )
+          (a) =>
+            options.account.address === a.address &&
+            (options.account.chain as ChainInfo).id === a.chain.id
+        )
         : options.account;
     const roles = this.roles.filter((role) =>
       addressinfo ? role.address_id === addressinfo.id : true
@@ -280,57 +255,5 @@ export class RolesController {
 
     if (!role) return;
     return this.User.addresses.find((a) => a.id === role.address_id);
-  }
-}
-
-// Client-side helpers
-export function isActiveAddressPermitted(
-  active_address_roles: RoleInfo[],
-  chain_info: ChainInfo,
-  action: Action
-): boolean {
-  const chainRoles = active_address_roles.filter(
-    (r) => r.chain_id === chain_info.id
-  );
-
-  // populate permission assignment array with role allow and deny permissions
-  const roles: Array<RoleObject> = chainRoles.map((r) => {
-    const communityRole = chain_info.communityRoles.find(
-      (cr) => cr.name === r.permission
-    );
-    return {
-      permission: r.permission,
-      allow: communityRole.allow,
-      deny: communityRole.deny,
-    };
-  });
-
-  const permissionsManager = new PermissionManager();
-  if (chainRoles.length > 0) {
-    const permission = aggregatePermissions(roles, {
-      allow: chain_info.defaultAllowPermissions,
-      deny: chain_info.defaultDenyPermissions,
-    });
-    if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
-      return false;
-    }
-    return true;
-  }
-  // If no roles are given for the chain, compute permissions with chain default permissions
-  else {
-    // compute permissions with chain default permissions
-    const permission = permissionsManager.computePermissions(
-      everyonePermissions,
-      [
-        {
-          allow: chain_info.defaultAllowPermissions,
-          deny: chain_info.defaultDenyPermissions,
-        },
-      ]
-    );
-    if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
-      return false;
-    }
-    return true;
   }
 }

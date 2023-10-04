@@ -154,7 +154,10 @@ export const renderQuillDelta = (
                             // don't open a new window if the link is on Commonwealth
                             e.preventDefault();
                             e.stopPropagation();
-                            navigate(child.attributes.link);
+                            const navigateTo = child.attributes.link.split(
+                              `${document.location.origin}`
+                            )[1];
+                            navigate(navigateTo, {}, null);
                           }
                         }}
                       >
@@ -181,6 +184,7 @@ export const renderQuillDelta = (
           if (child.insert?.image) {
             return <img key={ii} src={child.insert?.image} alt="image" />;
           }
+
           // handle video
           if (child.insert?.video) {
             return (
@@ -195,6 +199,7 @@ export const renderQuillDelta = (
               </div>
             );
           }
+
           // handle tweets
           if (child.insert?.twitter) {
             const id = child.insert.twitter.id;
@@ -218,6 +223,7 @@ export const renderQuillDelta = (
               </blockquote>
             );
           }
+
           // handle text nodes
           let result;
           if (child.insert?.mention) {
@@ -244,7 +250,10 @@ export const renderQuillDelta = (
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
-                    navigate(child.attributes.link);
+                    const navigateTo = child.attributes.link.split(
+                      `${document.location.origin}`
+                    )[1];
+                    navigate(navigateTo, {}, null);
                   }
                 }}
               >
@@ -254,14 +263,15 @@ export const renderQuillDelta = (
           } else {
             result = <span key={ii}>{child.insert}</span>;
           }
+
           Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if (k !== 'color' && k !== 'background' && v !== true) return;
             switch (k) {
               case 'bold':
-                result = <strong key={ii}>{result}</strong>;
+                result = <b key={ii}>{result}</b>;
                 return;
               case 'italic':
-                result = <em key={ii}>{result}</em>;
+                result = <i key={ii}>{result}</i>;
                 return;
               case 'strike':
                 result = <s key={ii}>{result}</s>;
@@ -290,8 +300,10 @@ export const renderQuillDelta = (
                 result = <span key={ii}>{result}</span>;
             }
           });
+
           return result;
         };
+
         const renderParent = (parent, ii) => {
           // render empty parent nodes as .between-paragraphs
           if (
@@ -301,6 +313,7 @@ export const renderQuillDelta = (
           ) {
             return <div className="between-paragraphs" key={ii} />;
           }
+
           // render normal parent nodes with content
           const Tag = parent.attributes?.blockquote
             ? 'blockquote'
@@ -335,12 +348,27 @@ export const renderQuillDelta = (
               ? 'unchecked'
               : '';
 
-          return (
-            <Tag key={ii} className={className}>
-              {parent.children.map(renderChild)}
-            </Tag>
-          );
+          if (parent.attributes?.header === 1) {
+            return (
+              <h1 key={ii} className={className}>
+                {parent.children[0].insert}
+              </h1>
+            );
+          } else if (parent.attributes?.header === 2) {
+            return (
+              <h2 key={ii} className={className}>
+                {parent.children[0].insert}
+              </h2>
+            );
+          } else {
+            return (
+              <Tag key={ii} className={className}>
+                {parent.children.map(renderChild)}
+              </Tag>
+            );
+          }
         };
+
         // special handler for lists, which need to be un-flattened and turned into a tree
         const renderListGroup = (_group, ii) => {
           const [GroupTag, groupTagClass] = getGroupTag(_group, collapse);

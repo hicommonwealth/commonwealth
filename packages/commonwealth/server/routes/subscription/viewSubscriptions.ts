@@ -1,9 +1,8 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
-import { Op } from 'sequelize';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
 };
 
 export default async (
@@ -40,11 +39,9 @@ export default async (
     },
   ];
 
-  const searchParams: any[] = [{ subscriber_id: req.user.id }];
-
   const subscriptions = await models.Subscription.findAll({
     where: {
-      [Op.and]: searchParams,
+      subscriber_id: req.user.id,
     },
     include: [...associationParams],
   });

@@ -2,7 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import validateRoles from '../util/validateRoles';
+import { validateOwner } from '../util/validateOwner';
 
 enum CreateDiscordBotConfigErrors {
   NoChain = 'Must supply a chain ID',
@@ -26,10 +26,18 @@ const createDiscordBotConfig = async (
 ) => {
   const { chain_id, verification_token } = req.body;
 
-  if (!chain_id || !verification_token)
+  if (!chain_id || !verification_token) {
     throw new AppError(CreateDiscordBotConfigErrors.NoChain);
+  }
 
-  if (!req.user || !validateRoles(models, req.user, 'admin', chain_id)) {
+  const isAdmin = await validateOwner({
+    models: models,
+    user: req.user,
+    chainId: chain_id,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isAdmin) {
     throw new AppError(CreateDiscordBotConfigErrors.NotAdmin);
   }
 

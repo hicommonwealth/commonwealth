@@ -1,5 +1,6 @@
 import type ChainInfo from '../../../models/ChainInfo';
 import type { IconName } from './cw_icons/cw_icon_lookup';
+import { IconSize } from 'views/components/component_kit/cw_icons/types';
 
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
@@ -28,11 +29,15 @@ export enum ComponentType {
   MessageBanner = 'MessageBanner',
   MobileMenu = 'MobileMenu',
   Modal = 'Modal',
+  OldTextInput = 'OldTextInput',
+  OldTooltip = 'OldTooltip',
   Popover = 'Popover',
   PopoverMenu = 'PopoverMenu',
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  RelatedCommunityCard = 'RelatedCommunityCard',
+  Searchbar = 'Searchbar',
   SidebarMenu = 'SidebarMenu',
   Socials = 'Socials',
   Spinner = 'Spinner',
@@ -42,11 +47,14 @@ export enum ComponentType {
   Text = 'Text',
   TextArea = 'TextArea',
   TextInput = 'TextInput',
+  ThreadAction = 'ThreadAction',
   ThreadVoteButton = 'ThreadVoteButton',
   Toggle = 'Toggle',
   Tooltip = 'Tooltip',
+  Upvote = 'Upvote',
   ValidationText = 'ValidationText',
   WalletOptionRow = 'WalletOptionRow',
+  SelectList = 'SelectList',
 }
 
 export type BaseStyleProps = {
@@ -54,32 +62,41 @@ export type BaseStyleProps = {
   className?: string;
 };
 
-export type DividerMenuItem = { type: 'divider' };
+export type DividerMenuItem = { type: 'divider'; className?: string };
 
-export type HeaderMenuItem = { type: 'header'; label?: string };
+export type HeaderMenuItem = {
+  type: 'header';
+  label?: string | JSX.Element;
+  className?: string;
+};
 
 export type DefaultMenuItem = {
   disabled?: boolean;
   iconLeft?: IconName;
+  iconLeftWeight?: 'fill' | 'bold';
+  iconLeftSize?: IconSize;
   iconRight?: IconName;
+  iconRightWeight?: 'fill' | 'bold';
   isSecondary?: boolean;
-  label?: string;
+  label?: string | JSX.Element;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'default';
+  className?: string;
+  preventClosing?: boolean;
 };
 
 type NotificationMenuItem = {
   hasUnreads?: boolean;
   iconLeft?: IconName;
   iconRight?: IconName;
-  label?: string;
+  label?: string | JSX.Element;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
   type?: 'notification';
 };
 
 export type CommunityMenuItem = {
   community?: ChainInfo;
-  label?: string;
+  label?: string | JSX.Element;
   type?: 'community';
 };
 

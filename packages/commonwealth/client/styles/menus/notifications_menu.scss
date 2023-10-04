@@ -1,7 +1,24 @@
 @import '../shared';
 
-.unreads-icon svg {
-  cursor: pointer;
+.notifications-container {
+  display: flex;
+
+  &.unread-notifications {
+    position: relative;
+    cursor: pointer;
+
+    &:before {
+      content: '';
+      display: flex;
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      right: 3px;
+      top: 3px;
+      background-color: $pink-500;
+      border-radius: 50%;
+    }
+  }
 }
 
 .NotificationsMenu {
@@ -12,14 +29,6 @@
   display: flex;
   flex-direction: column;
   width: 296px;
-
-  @include smallInclusive {
-    border: none;
-    box-shadow: none;
-    flex: 1;
-    height: 100%;
-    width: 100%;
-  }
 
   .header {
     border-bottom: 1px solid $neutral-300;
@@ -39,10 +48,6 @@
     flex-direction: column;
     height: 480px;
     justify-content: center;
-
-    @include smallInclusive {
-      height: calc(100% - 40px);
-    }
   }
 
   .footer {

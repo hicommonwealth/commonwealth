@@ -43,31 +43,6 @@ const editComment = async (
     return next(new AppError(banError));
   }
 
-  const attachFiles = async () => {
-    if (
-      req.body['attachments[]'] &&
-      typeof req.body['attachments[]'] === 'string'
-    ) {
-      await models.Attachment.create({
-        attachable: 'comment',
-        attachment_id: req.body.id,
-        url: req.body['attachments[]'],
-        description: 'image',
-      });
-    } else if (req.body['attachments[]']) {
-      await Promise.all(
-        req.body['attachments[]'].map((u) =>
-          models.Attachment.create({
-            attachable: 'comment',
-            attachment_id: req.body.id,
-            url: u,
-            description: 'image',
-          })
-        )
-      );
-    }
-  };
-
   try {
     const userOwnedAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
@@ -105,10 +80,9 @@ const editComment = async (
       }
     })();
     await comment.save();
-    await attachFiles();
     const finalComment = await models.Comment.findOne({
       where: { id: comment.id },
-      include: [models.Address, models.Attachment],
+      include: [models.Address],
     });
 
     // get thread for crafting commonwealth url
@@ -125,18 +99,19 @@ const editComment = async (
     // dispatch notifications to subscribers of the comment/thread
     emitNotifications(
       models,
-      NotificationCategories.CommentEdit,
-      '',
       {
-        created_at: new Date(),
-        thread_id: comment.thread_id,
-        root_title,
-        root_type: ProposalType.Thread,
-        comment_id: +finalComment.id,
-        comment_text: finalComment.text,
-        chain_id: finalComment.chain,
-        author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+        categoryId: NotificationCategories.CommentEdit,
+        data: {
+          created_at: new Date(),
+          thread_id: comment.thread_id,
+          root_title,
+          root_type: ProposalType.Thread,
+          comment_id: +finalComment.id,
+          comment_text: finalComment.text,
+          chain_id: finalComment.chain,
+          author_address: finalComment.Address.address,
+          author_chain: finalComment.Address.chain,
+        },
       },
       // don't send webhook notifications for edits
       {
@@ -181,7 +156,7 @@ const editComment = async (
                 chain: mention[0],
                 address: mention[1],
               },
-              include: [models.User, models.RoleAssignment],
+              include: [models.User],
             });
             return user;
           } catch (err) {
@@ -199,18 +174,20 @@ const editComment = async (
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
         emitNotifications(
           models,
-          NotificationCategories.NewMention,
-          `user-${mentionedAddress.User.id}`,
           {
-            created_at: new Date(),
-            thread_id: +comment.thread_id,
-            root_title,
-            root_type: ProposalType.Thread,
-            comment_id: +finalComment.id,
-            comment_text: finalComment.text,
-            chain_id: finalComment.chain,
-            author_address: finalComment.Address.address,
-            author_chain: finalComment.Address.chain,
+            categoryId: NotificationCategories.NewMention,
+            data: {
+              mentioned_user_id: mentionedAddress.User.id,
+              created_at: new Date(),
+              thread_id: +comment.thread_id,
+              root_title,
+              root_type: ProposalType.Thread,
+              comment_id: +finalComment.id,
+              comment_text: finalComment.text,
+              chain_id: finalComment.chain,
+              author_address: finalComment.Address.address,
+              author_chain: finalComment.Address.chain,
+            },
           },
           null,
           [finalComment.Address.address]

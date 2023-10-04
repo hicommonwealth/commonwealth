@@ -3,11 +3,7 @@
  */
 
 import { addPrefix, factory } from 'common-common/src/logging';
-import type { RmqEntityCUD } from 'common-common/src/rabbitmq/types';
-import {
-  AbstractRabbitMQController,
-  RascalPublications,
-} from 'common-common/src/rabbitmq/types';
+import { AbstractRabbitMQController } from 'common-common/src/rabbitmq/types';
 
 import type { DB } from '../../database/database';
 
@@ -23,7 +19,6 @@ import {
   getUniqueEntityKey,
   IEventHandler,
 } from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';
@@ -76,13 +71,6 @@ export default class extends IEventHandler {
       author?: string,
       completed = false
     ) => {
-      if (type === SubstrateTypes.EntityKind.DemocracyPreimage) {
-        // we always mark preimages as "completed" -- we have no link between democracy proposals
-        // and preimages in the database, so we want to always fetch them for archival purposes,
-        // which requires marking them completed.
-        completed = true;
-      }
-
       const dbEntity = await this._models.ChainEntity.create({
         type: type.toString(),
         type_id,
@@ -90,24 +78,6 @@ export default class extends IEventHandler {
         author,
         completed,
       });
-
-      const publishData: RmqEntityCUD.RmqMsgType = {
-        ce_id: dbEntity.id,
-        chain_id: dbEntity.chain,
-        author,
-        entity_type_id: type_id,
-        cud: 'create',
-      };
-
-      await this._rmqController.safePublish(
-        publishData,
-        dbEntity.id,
-        RascalPublications.ChainEntityCUDMain,
-        {
-          sequelize: this._models.sequelize,
-          model: this._models.ChainEntity,
-        }
-      );
 
       if (dbEvent.entity_id !== dbEntity.id) {
         dbEvent.entity_id = dbEntity.id;

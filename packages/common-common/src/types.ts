@@ -1,23 +1,17 @@
-// This is a const and not an enum because of a weird webpack error.
-// It has the same syntax, though, so it should be OK, as long as we don't
-// modify any of the values.
-// eslint-disable-next-line
-export const NotificationCategories = {
-  NewComment: 'new-comment-creation',
-  NewThread: 'new-thread-creation',
-  NewCommunity: 'new-community-creation',
-  NewRoleCreation: 'new-role-creation',
-  NewMention: 'new-mention',
-  NewReaction: 'new-reaction',
-  NewCollaboration: 'new-collaboration',
-  ThreadEdit: 'thread-edit',
-  CommentEdit: 'comment-edit',
-  ChainEvent: 'chain-event',
-  EntityEvent: 'entity-event',
-  NewChatMention: 'new-chat-mention',
-  NewSnapshot: 'new-snapshot',
-  SnapshotProposal: 'snapshot-proposal',
-};
+export enum NotificationCategories {
+  NewComment = 'new-comment-creation',
+  NewThread = 'new-thread-creation',
+  NewMention = 'new-mention',
+  NewReaction = 'new-reaction',
+  NewCollaboration = 'new-collaboration',
+  ThreadEdit = 'thread-edit',
+  CommentEdit = 'comment-edit',
+  ChainEvent = 'chain-event',
+  SnapshotProposal = 'snapshot-proposal',
+}
+
+export type NotificationCategory =
+  typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
   SubstrateDemocracyReferendum = 'referendum',
@@ -74,6 +68,16 @@ export enum WalletId {
   Ronin = 'ronin',
 }
 
+// 'google', 'github', 'discord', and 'twitter' are passed to magic login directly
+export enum WalletSsoSource {
+  Google = 'google',
+  Github = 'github',
+  Discord = 'discord',
+  Twitter = 'twitter',
+  Email = 'email',
+  Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
+}
+
 export enum ChainCategoryType {
   DeFi = 'DeFi',
   DAO = 'DAO',
@@ -120,6 +124,7 @@ export enum ChainNetwork {
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
   Kava = 'kava',
+  Kyve = 'kyve',
 }
 
 export enum BalanceType {
@@ -133,11 +138,12 @@ export enum BalanceType {
 }
 
 export enum RedisNamespaces {
-  Chat_Socket = 'chat_socket',
   Route_Response = 'route_response',
   Function_Response = 'function_response',
   Global_Response = 'global_response',
   Test_Redis = 'test_redis',
+  Database_Cleaner = 'database_cleaner',
+  Compound_Gov_Version = 'compound_gov_version',
 }
 
 export interface ISnapshotNotification {
@@ -156,3 +162,33 @@ export enum DefaultPage {
   Overview = 'default_summary_view',
   Homepage = 'homepage',
 }
+
+export type DiscordAction =
+  | 'create'
+  | 'update'
+  | 'thread-delete'
+  | 'comment-delete';
+
+export interface IDiscordMessage {
+  user?: {
+    id: string;
+    username: string;
+  };
+  title?: string;
+  content: string;
+  message_id: string;
+  channel_id?: string;
+  parent_channel_id?: string;
+  guild_id?: string;
+  imageUrls?: string[];
+  action: DiscordAction;
+}
+
+export type HttpMethod =
+  | 'get'
+  | 'post'
+  | 'put'
+  | 'delete'
+  | 'patch'
+  | 'options'
+  | 'head';

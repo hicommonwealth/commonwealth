@@ -3,6 +3,10 @@ import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './communities';
 import type { ModelInstance, ModelStatic } from './types';
+import { StatsDController } from 'common-common/src/statsd';
+
+import { factory, formatFilename } from 'common-common/src/logging';
+const log = factory.getLogger(formatFilename(__filename));
 
 export type ReactionAttributes = {
   address_id: number;
@@ -48,6 +52,84 @@ export default (
       canvas_hash: { type: dataTypes.STRING, allowNull: true },
     },
     {
+      hooks: {
+        afterCreate: async (reaction: ReactionInstance) => {
+          let thread_id = reaction.thread_id;
+          const comment_id = reaction.comment_id;
+          const { Thread, Comment } = sequelize.models;
+          try {
+            if (thread_id) {
+              const thread = await Thread.findOne({
+                where: { id: thread_id },
+              });
+              if (thread) {
+                thread.increment('reaction_count');
+                StatsDController.get().increment('cw.hook.reaction-count', {
+                  thread_id: String(thread_id),
+                });
+              }
+            }
+
+            if (comment_id) {
+              const comment = await Comment.findOne({
+                where: { id: comment_id },
+              });
+              if (comment) {
+                comment.increment('reaction_count');
+                thread_id = Number(comment.get('thread_id'));
+                StatsDController.get().increment('cw.hook.reaction-count', {
+                  thread_id: String(thread_id),
+                });
+              }
+            }
+          } catch (error) {
+            log.error(
+              `incrementing thread reaction count afterCreate: thread_id ${thread_id} comment_id ${comment_id} ${error}`
+            );
+            StatsDController.get().increment('cw.reaction-count-error', {
+              thread_id: String(thread_id),
+            });
+          }
+        },
+        afterDestroy: async (reaction: ReactionInstance) => {
+          let thread_id = reaction.thread_id;
+          const comment_id = reaction.comment_id;
+          const { Thread, Comment } = sequelize.models;
+          try {
+            if (thread_id) {
+              const thread = await Thread.findOne({
+                where: { id: thread_id },
+              });
+              if (thread) {
+                thread.decrement('reaction_count');
+                StatsDController.get().decrement('cw.hook.reaction-count', {
+                  thread_id: String(thread_id),
+                });
+              }
+            }
+
+            if (comment_id) {
+              const comment = await Comment.findOne({
+                where: { id: comment_id },
+              });
+              if (comment) {
+                thread_id = Number(comment.get('thread_id'));
+                comment.decrement('reaction_count');
+                StatsDController.get().decrement('cw.hook.reaction-count', {
+                  thread_id: String(thread_id),
+                });
+              }
+            }
+          } catch (error) {
+            log.error(
+              `incrementing thread reaction count afterDestroy: thread_id ${thread_id} comment_id ${comment_id} ${error}`
+            );
+            StatsDController.get().increment('cw.hook.reaction-count-error', {
+              thread_id: String(thread_id),
+            });
+          }
+        },
+      },
       tableName: 'Reactions',
       underscored: true,
       createdAt: 'created_at',

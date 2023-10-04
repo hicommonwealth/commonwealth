@@ -1,130 +1,142 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Virtuoso } from 'react-virtuoso';
+
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { getProposalUrlPath } from 'identifiers';
+import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
+import { useFetchThreadsQuery } from 'state/api/threads';
+import { useDateCursor } from 'state/api/threads/fetchThreads';
+import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
+import { slugify } from 'utils';
+import { CWText } from 'views/components/component_kit/cw_text';
+import {
+  ThreadFeaturedFilterTypes,
+  ThreadTimelineFilterTypes,
+} from '../../../models/types';
+import app from '../../../state';
+import { useFetchTopicsQuery } from '../../../state/api/topics';
+import { HeaderWithFilters } from './HeaderWithFilters';
+import { ThreadCard } from './ThreadCard';
+import { sortByFeaturedFilter, sortPinned } from './helpers';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 import 'pages/discussions/index.scss';
-
-import app from '../../../state';
-import Sublayout from '../../Sublayout';
-import { PageLoading } from '../loading';
-import { RecentThreadsHeader } from './recent_threads_header';
-import { ThreadPreview } from './thread_preview';
-import { ThreadActionType } from '../../../../../shared/types';
-import { CWText } from 'views/components/component_kit/cw_text';
 
 type DiscussionsPageProps = {
   topicName?: string;
 };
 
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const [threads, setThreads] = useState([]);
-  const [totalThreads, setTotalThreads] = useState(0);
-  const [initializing, setInitializing] = useState(true);
+  const navigate = useCommonNavigate();
+  const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
+  const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
+  const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
+    'featured'
+  ) as ThreadFeaturedFilterTypes;
+  const dateRange: ThreadTimelineFilterTypes = searchParams.get(
+    'dateRange'
+  ) as ThreadTimelineFilterTypes;
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const handleThreadUpdate = (data: {
-    threadId: number;
-    action: ThreadActionType;
-  }) => {
-    const { threadId, action } = data;
+  const { dateCursor } = useDateCursor({
+    dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
+  });
 
-    if (
-      action === ThreadActionType.TopicChange ||
-      action === ThreadActionType.Deletion
-    ) {
-      const updatedThreadList = threads.filter((t) => t.id !== threadId);
+  const { fetchNextPage, data, isInitialLoading, hasNextPage } =
+    useFetchThreadsQuery({
+      chainId: app.activeChainId(),
+      queryType: 'bulk',
+      page: 1,
+      limit: 20,
+      topicId: (topics || []).find(({ name }) => name === topicName)?.id,
+      stage: stageName,
+      includePinnedThreads: true,
+      orderBy: featuredFilter,
+      toDate: dateCursor.toDate,
+      fromDate: dateCursor.fromDate,
+    });
 
-      setThreads(updatedThreadList);
-    } else {
-      const pinnedThreads = app.threads.listingStore.getThreads({
-        topicName,
-        stageName,
-        pinned: true,
-      });
+  const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
-      const unpinnedThreads = app.threads.listingStore.getThreads({
-        topicName,
-        stageName,
-        pinned: false,
-      });
+  useManageDocumentTitle('Discussions');
 
-      setThreads([...pinnedThreads, ...unpinnedThreads]);
-    }
-  };
-
-  // Event binding for actions that trigger a thread update (e.g. topic or stage change)
-  useEffect(() => {
-    app.threadUpdateEmitter.on('threadUpdated', (data) =>
-      handleThreadUpdate(data)
-    );
-
-    return () => {
-      app.threadUpdateEmitter.off('threadUpdated', handleThreadUpdate);
-    };
-  }, [threads]);
-
-  useEffect(() => {
-    setTotalThreads(app.threads.numTotalThreads);
-  }, [app.threads.numTotalThreads]);
-
-  // setup initial threads
-  useEffect(() => {
-    app.threads.resetPagination();
-    app.threads
-      .loadNextPage({ topicName, stageName, includePinnedThreads: true })
-      .then((t) => {
-        // Fetch first 20 + unpinned threads
-        setThreads(t);
-        // !totalThreads && setTotalThreads(totalResults);
-        setInitializing(false);
-      });
-  }, [stageName, topicName]);
-
-  const loadMore = useCallback(async () => {
-    const newThreads = await app.threads.loadNextPage({ topicName, stageName });
-    // If no new threads (we reached the end)
-    if (!newThreads) {
-      return;
-    }
-
-    // !totalThreads && setTotalThreads(response.totalResults);
-    return setThreads((oldThreads) => [...oldThreads, ...newThreads]);
-  }, [stageName, topicName, totalThreads]);
-
-  if (initializing) {
-    return <PageLoading />;
-  }
   return (
-    <Sublayout hideFooter={true}>
-      <div className="DiscussionsPage">
-        <Virtuoso
-          style={{ height: '100%', width: '100%' }}
-          data={threads}
-          itemContent={(i, thread) => {
-            return <ThreadPreview thread={thread} key={thread.id} />;
-          }}
-          endReached={loadMore}
-          overscan={200}
-          components={{
-            EmptyPlaceholder: () => (
+    <div className="DiscussionsPage">
+      <Virtuoso
+        className="thread-list"
+        style={{ height: '100%', width: '100%' }}
+        data={isInitialLoading ? [] : threads}
+        itemContent={(i, thread) => {
+          const discussionLink = getProposalUrlPath(
+            thread.slug,
+            `${thread.identifier}-${slugify(thread.title)}`
+          );
+
+          if (!includeSpamThreads && thread.markedAsSpamAt) return null;
+
+          const canReact =
+            hasJoinedCommunity && !thread.lockedAt && !thread.archivedAt;
+          return (
+            <ThreadCard
+              key={thread.id + '-' + thread.readOnly}
+              thread={thread}
+              canReact={canReact}
+              onEditStart={() => navigate(`${discussionLink}`)}
+              onStageTagClick={() => {
+                navigate(`/discussions?stage=${thread.stage}`);
+              }}
+              threadHref={`${getScopePrefix()}${discussionLink}`}
+              onBodyClick={() => {
+                const scrollEle = document.getElementsByClassName('Body')[0];
+
+                localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+                  scrollEle.scrollTop;
+              }}
+              onCommentBtnClick={() =>
+                navigate(`${discussionLink}?focusEditor=true`)
+              }
+            />
+          );
+        }}
+        endReached={() => hasNextPage && fetchNextPage()}
+        overscan={200}
+        components={{
+          EmptyPlaceholder: () =>
+            isInitialLoading ? (
+              <div className="threads-wrapper">
+                {Array(3)
+                  .fill({})
+                  .map((x, i) => (
+                    <ThreadCard key={i} showSkeleton thread={{} as any} />
+                  ))}
+              </div>
+            ) : (
               <CWText type="b1" className="no-threads-text">
                 There are no threads matching your filter.
               </CWText>
             ),
-            Header: () => {
-              return (
-                <RecentThreadsHeader
-                  topic={topicName}
-                  stage={stageName}
-                  totalThreadCount={threads ? totalThreads : 0}
-                />
-              );
-            },
-          }}
-        />
-      </div>
-    </Sublayout>
+          Header: () => {
+            return (
+              <HeaderWithFilters
+                topic={topicName}
+                stage={stageName}
+                featuredFilter={featuredFilter}
+                dateRange={dateRange}
+                totalThreadCount={threads ? totalThreadsInCommunity : 0}
+                isIncludingSpamThreads={includeSpamThreads}
+                onIncludeSpamThreads={setIncludeSpamThreads}
+              />
+            );
+          },
+        }}
+      />
+    </div>
   );
 };
 

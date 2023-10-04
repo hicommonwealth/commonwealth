@@ -1,13 +1,12 @@
 import { StatsDController } from 'common-common/src/statsd';
-import { ChainBase, ChainType } from 'common-common/src/types';
+import {
+  NotificationCategories,
+} from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
-  IChatNotification,
-  ICommunityNotificationData,
-  IPostNotificationData,
-  SnapshotEventType,
-  SnapshotNotification,
+  IForumNotificationData,
+  NotificationDataAndCategory,
 } from '../../shared/types';
 import { SERVER_URL } from '../config';
 import type { DB } from '../models';
@@ -19,7 +18,7 @@ import {
 import type { WebhookContent } from '../webhookNotifier';
 import send from '../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { SupportedNetwork } from 'chain-events/src';
+import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,42 +26,30 @@ const { Op } = Sequelize;
 
 export default async function emitNotifications(
   models: DB,
-  category_id: string,
-  object_id: string,
-  notification_data:
-    | IPostNotificationData
-    | ICommunityNotificationData
-    | IChainEventNotificationData
-    | IChatNotification
-    | (SnapshotNotification & { eventType: SnapshotEventType }),
+  notification_data_and_category: NotificationDataAndCategory,
   webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
   includeAddresses?: string[]
 ): Promise<NotificationInstance> {
+  const notification_data = notification_data_and_category.data;
+  const category_id = notification_data_and_category.categoryId;
   // get subscribers to send notifications to
   StatsDController.get().increment('cw.notifications.created', {
     category_id,
-    object_id,
     chain:
       (notification_data as any).chain || (notification_data as any).chain_id,
   });
+
+  const uniqueOptions = mapNotificationsDataToSubscriptions(
+    notification_data_and_category
+  );
   const findOptions: any = {
-    [Op.and]: [{ category_id }, { object_id }, { is_active: true }],
+    [Op.and]: [{ category_id }, { ...uniqueOptions }, { is_active: true }],
   };
 
   // typeguard function to differentiate between chain event notifications as needed
   let chainEvent: IChainEventNotificationData;
-  const isChainEventData = !!(
-    typeof (<any>notification_data).id === 'number' &&
-    typeof (<any>notification_data).block_number === 'number' &&
-    (<any>notification_data).event_data &&
-    Object.values(SupportedNetwork).includes(
-      (<any>notification_data).network
-    ) &&
-    (<any>notification_data).chain &&
-    typeof (<any>notification_data).chain === 'string' &&
-    typeof (<any>notification_data).entity_id === 'number'
-  );
+  const isChainEventData = category_id === NotificationCategories.ChainEvent;
 
   if (isChainEventData) {
     chainEvent = <IChainEventNotificationData>notification_data;
@@ -83,8 +70,10 @@ export default async function emitNotifications(
     if (addressModels && addressModels.length > 0) {
       const userIds = addressModels.map((a) => a.user_id);
 
-      // remove duplicates
-      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
+      // remove duplicates and null user_ids
+      const userIdsDedup = userIds.filter(
+        (a, b) => userIds.indexOf(a) === b && a !== null
+      );
       return userIdsDedup;
     } else {
       return [];
@@ -112,19 +101,19 @@ export default async function emitNotifications(
 
   // get notification if it already exists
   let notification: NotificationInstance;
-  notification = await models.Notification.findOne(
-    isChainEventData
-      ? {
-          where: {
-            chain_event_id: chainEvent.id,
-          },
-        }
-      : {
-          where: {
-            notification_data: JSON.stringify(notification_data),
-          },
-        }
-  );
+  if (isChainEventData && chainEvent.id) {
+    notification = await models.Notification.findOne({
+      where: {
+        chain_event_id: chainEvent.id,
+      },
+    });
+  } else {
+    notification = await models.Notification.findOne({
+      where: {
+        notification_data: JSON.stringify(notification_data),
+      },
+    });
+  }
 
   // if the notification does not yet exist create it here
   if (!notification) {
@@ -140,12 +129,9 @@ export default async function emitNotifications(
       notification = await models.Notification.create({
         notification_data: JSON.stringify(notification_data),
         category_id,
-        chain_id:
-          (<IPostNotificationData>notification_data).chain_id ||
-          (<ICommunityNotificationData>notification_data).chain ||
-          (<IChatNotification>notification_data).chain_id,
+        chain_id: (<IForumNotificationData>notification_data).chain_id,
         thread_id:
-          Number((<IPostNotificationData>notification_data).thread_id) ||
+          Number((<IForumNotificationData>notification_data).thread_id) ||
           undefined,
       });
     }
@@ -165,24 +151,22 @@ export default async function emitNotifications(
     console.trace(e);
   }
 
-  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id, id) VALUES `;
+  let query = `INSERT INTO "NotificationsRead" (notification_id, subscription_id, is_read, user_id) VALUES `;
   const replacements = [];
   for (const subscription of subscriptions) {
     if (subscription.subscriber_id) {
       StatsDController.get().increment('cw.notifications.emitted', {
         category_id,
-        object_id,
         chain:
           (notification_data as any).chain ||
           (notification_data as any).chain_id,
         subscriber: `${subscription.subscriber_id}`,
       });
-      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `;
+      query += `(?, ?, ?, ?), `;
       replacements.push(
         notification.id,
         subscription.id,
         false,
-        subscription.subscriber_id,
         subscription.subscriber_id
       );
     } else {
@@ -213,22 +197,8 @@ export default async function emitNotifications(
     }
   }
 
-  const erc20Tokens = (
-    await models.Community.findAll({
-      where: {
-        base: ChainBase.Ethereum,
-        type: ChainType.Token,
-      },
-    })
-  ).map((o) => o.id);
-
   // send data to relevant webhooks
-  if (
-    webhook_data &&
-    // TODO: this OR clause seems redundant?
-    (webhook_data.chainEventType?.chain ||
-      !erc20Tokens.includes(webhook_data.chainEventType?.chain))
-  ) {
+  if (webhook_data) {
     await send(models, {
       notificationCategory: category_id,
       ...(webhook_data as Required<WebhookContent>),

@@ -1,25 +1,51 @@
-import React from 'react';
-
-import type { CWEvent } from 'chain-events/src';
-import { Label as ChainEventLabel } from 'chain-events/src';
+import type { CWEvent, IEventLabel } from 'chain-events/src';
 import { getProposalUrlPath } from 'identifiers';
-import type DashboardActivityNotification from '../../../models/DashboardActivityNotification';
-
 import 'pages/user_dashboard/user_dashboard_row.scss';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import app from 'state';
+import type DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { getClasses } from '../../components/component_kit/helpers';
 import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
 import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
 import { UserDashboardRowTop } from './user_dashboard_row_top';
-import { useCommonNavigate } from 'navigation/helpers';
 
 type UserDashboardRowProps = {
-  notification: DashboardActivityNotification;
+  notification?: DashboardActivityNotification;
+  showSkeleton?: boolean;
+  isChainEventsRow?: boolean;
+  label?: IEventLabel;
 };
 
 export const UserDashboardRow = (props: UserDashboardRowProps) => {
-  const { notification } = props;
-  const navigate = useCommonNavigate();
+  const { notification, showSkeleton, isChainEventsRow, label } = props;
+
+  if (showSkeleton) {
+    if (isChainEventsRow) {
+      return (
+        <UserDashboardChainEventRow
+          blockNumber={0}
+          chain={{} as any}
+          label={{} as any}
+          showSkeleton
+        />
+      );
+    }
+
+    return (
+      <div className="UserDashboardRow">
+        <UserDashboardRowTop activityData="" category="" showSkeleton />
+        <UserDashboardRowBottom
+          threadId=""
+          commentId=""
+          chainId=""
+          commentCount={0}
+          commenters={[]}
+          showSkeleton
+        />
+      </div>
+    );
+  }
 
   const {
     commentCount,
@@ -32,14 +58,6 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
   } = notification;
 
   if (categoryId === 'chain-event') {
-    const chainEvent: CWEvent = {
-      blockNumber,
-      network: eventNetwork,
-      data: notification.eventData,
-    };
-
-    const label = ChainEventLabel(chain, chainEvent);
-
     const chainInfo = app.config.chains.getById(chain);
 
     return (
@@ -58,14 +76,12 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
   const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
 
   return (
-    <div
+    <Link
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!path },
         'UserDashboardRow'
       )}
-      onClick={() => {
-        navigate(path);
-      }}
+      to={path}
     >
       <UserDashboardRowTop activityData={notification} category={categoryId} />
       <UserDashboardRowBottom
@@ -75,6 +91,6 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
         commentCount={commentCount}
         commenters={commenters}
       />
-    </div>
+    </Link>
   );
 };

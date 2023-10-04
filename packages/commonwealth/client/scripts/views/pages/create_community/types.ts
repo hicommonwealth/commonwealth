@@ -6,12 +6,14 @@ import type {
 export type ChainFormIdFields = {
   id: string;
   name: string;
+  chainName: string; // canonical identifer for chain that agrees with cosmos.directory
   symbol: string;
 };
 
 export type ChainFormIdFieldSetters = {
   setId: React.Dispatch<React.SetStateAction<string>>;
   setName: React.Dispatch<React.SetStateAction<string>>;
+  setChainName: React.Dispatch<React.SetStateAction<string>>;
   setSymbol: React.Dispatch<React.SetStateAction<string>>;
 };
 
@@ -70,6 +72,7 @@ export type EthChainNamesType = { [id: number]: string };
 export type EthChainFormState = {
   ethChains: EthChainsType;
   ethChainNames: EthChainNamesType;
+  disabled?: boolean;
 };
 
 export type EthChainFormStateSetters = {

@@ -1,34 +1,33 @@
-import React, { useState, useEffect } from 'react';
-
-import 'Sublayout.scss';
-
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useForceRerender from 'hooks/useForceRerender';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
+import useSidebarStore from 'state/ui/sidebar';
+import 'Sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
 import { AppMobileMenus } from './AppMobileMenus';
-import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
-import useForceRerender from 'hooks/useForceRerender';
-import useSidebarStore from 'state/ui/sidebar';
+import clsx from 'clsx';
 
 type SublayoutProps = {
   hideFooter?: boolean;
-  hideSearch?: boolean;
-  onScroll?: () => void; // lazy loading for page content
+  hasCommunitySidebar?: boolean;
 } & React.PropsWithChildren;
 
 const Sublayout = ({
   children,
   hideFooter = true,
-  hideSearch,
-  onScroll,
+  hasCommunitySidebar,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible, mobileMenuName } = useSidebarStore();
-  const [isWindowSmall, setIsWindowSmall] = useState(
-    isWindowSmallInclusive(window.innerWidth)
-  );
+  const { menuVisible, mobileMenuName, setMenu } = useSidebarStore();
+  const [resizing, setResizing] = useState(false);
+  const { isWindowSmallInclusive } = useBrowserWindow({
+    onResize: () => setResizing(true),
+    resizeListenerUpdateDeps: [resizing],
+  });
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -39,6 +38,18 @@ const Sublayout = ({
   }, [forceRerender]);
 
   useEffect(() => {
+    let timer;
+    if (resizing) {
+      timer = setTimeout(() => {
+        setResizing(false);
+      }, 200); // adjust delay as needed
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [resizing]);
+
+  useEffect(() => {
     if (
       localStorage.getItem('dark-mode-state') === 'on' &&
       localStorage.getItem('user-dark-mode-state') === 'on'
@@ -47,7 +58,9 @@ const Sublayout = ({
     }
 
     const onResize = () => {
-      setIsWindowSmall(isWindowSmallInclusive(window.innerWidth));
+      if (!isWindowSmallInclusive) {
+        setMenu({ name: 'default', isVisible: true });
+      }
     };
 
     window.addEventListener('resize', onResize);
@@ -60,21 +73,26 @@ const Sublayout = ({
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const showSidebar = menuVisible || !isWindowSmall;
 
   return (
     <div className="Sublayout">
       <div className="header-and-body-container">
-        <SublayoutHeader hideSearch={hideSearch} onMobile={isWindowSmall} />
+        <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">
-          {showSidebar && <Sidebar />}
-          <div className="body-and-sticky-headers-container">
+          <Sidebar isInsideCommunity={hasCommunitySidebar} />
+          <div
+            className={clsx('body-and-sticky-headers-container', {
+              'menu-visible': menuVisible,
+              'menu-hidden': !menuVisible,
+              resizing,
+            })}
+          >
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
             {isWindowSmallInclusive && mobileMenuName ? (
               <AppMobileMenus />
             ) : (
-              <div className="Body" onScroll={onScroll}>
+              <div className="Body">
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>

@@ -15,7 +15,12 @@ import type {
 
 import moment from 'moment';
 import { ITXModalData, IVote } from '../../../../../models/interfaces';
-import { ProposalEndTime, ProposalStatus, VotingType, VotingUnit } from '../../../../../models/types';
+import {
+  ProposalEndTime,
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from '../../../../../models/types';
 import { DepositVote } from '../../../../../models/votes';
 import Proposal from '../../../../../models/Proposal';
 import CosmosAccount from '../../account';
@@ -142,58 +147,7 @@ export class CosmosProposal extends Proposal<
     throw new Error('unimplemented');
   }
 
-  public async init() {
-    const api = this._Chain.api;
-    // only fetch voter data if active
-    if (!this.data.state.completed) {
-      try {
-        const [depositResp, voteResp, tallyResp]: [
-          QueryDepositsResponse,
-          QueryVotesResponse,
-          QueryTallyResultResponse
-        ] = await Promise.all([
-          this.status === 'DepositPeriod'
-            ? api.gov.deposits(this.data.identifier)
-            : Promise.resolve(null),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : api.gov.votes(this.data.identifier),
-          this.status === 'DepositPeriod'
-            ? Promise.resolve(null)
-            : api.gov.tally(this.data.identifier),
-        ]);
-        if (depositResp?.deposits) {
-          for (const deposit of depositResp.deposits) {
-            if (deposit.amount && deposit.amount[0]) {
-              this.data.state.depositors.push([
-                deposit.depositor,
-                new BN(deposit.amount[0].amount),
-              ]);
-            }
-          }
-        }
-        if (voteResp) {
-          for (const voter of voteResp.votes) {
-            const vote = voteToEnum(voter.option);
-            if (vote) {
-              this.data.state.voters.push([voter.voter, vote]);
-              this.addOrUpdateVote(
-                new CosmosVote(this._Accounts.fromAddress(voter.voter), vote)
-              );
-            } else {
-              console.error(
-                `voter: ${voter.voter} has invalid vote option: ${voter.option}`
-              );
-            }
-          }
-        }
-        if (tallyResp?.tally) {
-          this.data.state.tally = marshalTally(tallyResp?.tally);
-        }
-      } catch (err) {
-        console.error(`Cosmos query failed: ${err.message}`);
-      }
-    }
+  public init() {
     if (!this.initialized) {
       this._initialized = true;
     }
@@ -202,8 +156,64 @@ export class CosmosProposal extends Proposal<
     }
   }
 
+  public async fetchDeposits(): Promise<QueryDepositsResponse> {
+    const deposits = await this._Chain.api.gov.deposits(this._data.identifier);
+    this.setDeposits(deposits);
+    return deposits;
+  }
+
+  public async fetchTally(): Promise<QueryTallyResultResponse> {
+    const tally = await this._Chain.api.gov.tally(this._data.identifier);
+    this.setTally(tally);
+    return tally;
+  }
+
+  public async fetchVotes(): Promise<QueryVotesResponse> {
+    const votes = await this._Chain.api.gov.votes(this._data.identifier);
+    this.setVotes(votes);
+    return votes;
+  }
+
+  public setDeposits(depositResp: QueryDepositsResponse) {
+    if (depositResp?.deposits) {
+      for (const deposit of depositResp.deposits) {
+        if (deposit.amount && deposit.amount[0]) {
+          this.data.state.depositors.push([
+            deposit.depositor,
+            new BN(deposit.amount[0].amount),
+          ]);
+        }
+      }
+    }
+  }
+
+  public setTally(tallyResp: QueryTallyResultResponse) {
+    if (tallyResp?.tally) {
+      this.data.state.tally = marshalTally(tallyResp?.tally);
+    }
+  }
+
+  public setVotes(votesResp: QueryVotesResponse) {
+    if (votesResp) {
+      for (const vote of votesResp.votes) {
+        const voteChoice = voteToEnum(vote.options[0].option);
+        if (voteChoice) {
+          this.data.state.voters.push([vote.voter, voteChoice]);
+          this.addOrUpdateVote(
+            new CosmosVote(this._Accounts.fromAddress(vote.voter), voteChoice)
+          );
+        } else {
+          console.error(
+            `voter: ${vote.voter} has invalid vote option: ${vote.options[0].option}`
+          );
+        }
+      }
+    }
+  }
+
   // TODO: add getters for various vote features: tally, quorum, threshold, veto
   // see: https://blog.chorus.one/an-overview-of-cosmos-hub-governance/
+  // TODO
   get support() {
     if (this.status === 'DepositPeriod') {
       return this._Chain.coins(this.data.state.totalDeposit);
@@ -221,7 +231,7 @@ export class CosmosProposal extends Proposal<
 
   get turnout() {
     if (this.status === 'DepositPeriod') {
-      if (this.data.state.totalDeposit.eqn(0)) {
+      if (this.data.state.totalDeposit.eqn(0) || !this._Chain.staked) {
         return 0;
       } else {
         const ratioInPpm = +this.data.state.totalDeposit
@@ -274,13 +284,17 @@ export class CosmosProposal extends Proposal<
       case 'Rejected':
         return ProposalStatus.Failed;
       case 'VotingPeriod':
-        return this.support > 0.5 && this.veto <= 1 / 3
+        return typeof this.support === 'number' &&
+          +this.support > 0.5 &&
+          this.veto <= 1 / 3
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':
-        return this.data.state.totalDeposit.gte(this._Governance.minDeposit)
-          ? ProposalStatus.Passing
-          : ProposalStatus.Failing;
+        return this._Governance.minDeposit
+          ? this.data.state.totalDeposit.gte(this._Governance.minDeposit)
+            ? ProposalStatus.Passing
+            : ProposalStatus.Failing
+          : ProposalStatus.None;
       default:
         return ProposalStatus.None;
     }
@@ -291,7 +305,7 @@ export class CosmosProposal extends Proposal<
     if (this.status !== 'DepositPeriod') {
       throw new Error('proposal not in deposit period');
     }
-    const cosm = await import('@cosmjs/stargate/build/queries/utils');
+    const cosm = await import('@cosmjs/stargate/build/queryclient');
     const msg: MsgDepositEncodeObject = {
       typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
       value: {

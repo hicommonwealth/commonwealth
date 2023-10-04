@@ -1,24 +1,31 @@
+import axios from 'axios';
 import React, { useEffect } from 'react';
-import { initAppState } from 'state';
+import app, { initAppState } from 'state';
 
 const useInitApp = () => {
-  const [loading, setLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [customDomain, setCustomDomain] = React.useState('');
 
   useEffect(() => {
-    setLoading(true);
-    fetch('/api/domain')
-      .then((res) => res.json())
-      .then(({ customDomain: serverCustomDomain }) => {
-        setCustomDomain(serverCustomDomain);
-        return Promise.resolve(serverCustomDomain);
-      })
-      .then((serverCustomDomain) => initAppState(true, serverCustomDomain))
-      .catch((err) => console.log('Failed fetching custom domain', err))
-      .finally(() => setLoading(false));
+    setIsLoading(true);
+    const isWebPlatform = app.platform() === 'web';
+    const domainPromise = isWebPlatform
+      ? axios
+          .get(`${app.serverUrl()}/domain`)
+          .then((res) => {
+            const serverCustomDomain = res.data.customDomain || '';
+            setCustomDomain(serverCustomDomain);
+            return serverCustomDomain;
+          })
+          .catch((err) => console.log('Failed fetching custom domain', err))
+      : Promise.resolve();
+
+    Promise.all([domainPromise, initAppState(true)])
+      .then(([serverCustomDomain]) => serverCustomDomain)
+      .finally(() => setIsLoading(false));
   }, []);
 
-  return { loading, customDomain };
+  return { isLoading, customDomain };
 };
 
 export default useInitApp;

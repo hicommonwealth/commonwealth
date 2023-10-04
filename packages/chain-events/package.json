@@ -18,15 +18,12 @@
     "test-query": "ts-node ./scripts/testSequelizeQuery.ts",
     "unit-test": "ts-mocha --config ./.mocharc.json --project test/tsconfig.json ./test/unit/events/*.spec.ts",
     "test": "ts-mocha --bail --project test/tsconfig.json test/integration/service-tests/EVM/aave.spec.ts --timeout 80000",
-    "test-services": "ts-mocha --bail --project test/tsconfig.json test/integration/service-tests/**/*.spec.ts --timeout 240000",
+    "test-services": "ts-mocha --bail --project test/tsconfig.json 'test/integration/service-tests/**/*.spec.ts' --timeout 240000",
     "test-app": "ts-mocha --project test/tsconfig.json test/integration/service-tests/chainEventsApp.test.ts",
     "lint-all": "eslint './**/*.ts'",
     "listen": "ts-node -T ./scripts/listener.ts",
-    "listenV2": "ts-node -T ./scripts/listenerV2.ts",
     "listen-archival": "ts-node -T ./scripts/listener.ts -n edgeware-local -a true",
-    "scrape": "ts-node -T ./scripts/scraper.ts",
     "ganache": "ganache-cli -m \"Alice\" -p 9545 -l 800000000 --allowUnlimitedContractSize",
-    "batch-poll": "ts-node -T ./scripts/batchPoller.ts",
     "preyalcpublish": "yarn build",
     "emit-events": "ts-node --project tsconfig.json ./scripts/emitChainEvents.ts",
     "start-app": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.services.json services/app/Server.ts",
@@ -42,9 +39,9 @@
     "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a chain-events) --verbose --no-privileges --no-owner -f latest.dump",
     "dump-db-empty": "pg_dump $(heroku config:get DATABASE_URL -a chain-events) --exclude-table-data=\"public.\\\"ChainEntities\\\"\" --exclude-table-data=\"public.\\\"ChainEventTypes\\\"\" --exclude-table-data=\"public.\\\"ChainEvents\\\"\" --verbose --no-privileges --no-owner -f latest.dump",
     "migrate-events": "NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) ts-node --project tsconfig.json scripts/migrateChainEntities.ts",
-    "cosmos:build": "chmod u+x cosmos-chain-testing/v1/start.sh && ./cosmos-chain-testing/v1/start.sh --build && chmod u+x cosmos-chain-testing/v1beta1/start.sh && ./cosmos-chain-testing/v1beta1/start.sh --build",
-    "cosmos:start": "chmod u+x cosmos-chain-testing/v1/start.sh && ./cosmos-chain-testing/v1/start.sh && chmod u+x cosmos-chain-testing/v1beta1/start.sh && ./cosmos-chain-testing/v1beta1/start.sh",
-    "cosmos:stop": "chmod u+x cosmos-chain-testing/v1/stop.sh && ./cosmos-chain-testing/v1/stop.sh && chmod u+x cosmos-chain-testing/v1beta1/stop.sh && ./cosmos-chain-testing/v1beta1/stop.sh"
+    "cosmos:build": "chmod u+x cosmos-chain-testing/v1/start.sh && ./cosmos-chain-testing/v1/start.sh --build && chmod u+x cosmos-chain-testing/v1beta1/start.sh && ./cosmos-chain-testing/v1beta1/start.sh --build && chmod u+x cosmos-chain-testing/ethermint/start.sh && ./cosmos-chain-testing/ethermint/start.sh --build",
+    "cosmos:start": "chmod u+x cosmos-chain-testing/v1/start.sh && ./cosmos-chain-testing/v1/start.sh && chmod u+x cosmos-chain-testing/v1beta1/start.sh && ./cosmos-chain-testing/v1beta1/start.sh && chmod u+x cosmos-chain-testing/ethermint/start.sh && ./cosmos-chain-testing/ethermint/start.sh",
+    "cosmos:stop": "chmod u+x cosmos-chain-testing/v1/stop.sh && ./cosmos-chain-testing/v1/stop.sh && chmod u+x cosmos-chain-testing/v1beta1/stop.sh && ./cosmos-chain-testing/v1beta1/stop.sh && chmod u+x cosmos-chain-testing/ethermint/stop.sh && ./cosmos-chain-testing/ethermint/stop.sh"
   },
   "engines": {
     "node": "18.x"

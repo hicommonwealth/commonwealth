@@ -1,46 +1,47 @@
-import React, { useMemo } from 'react';
-import { capitalize } from 'lodash';
-
 import 'components/NewThreadForm.scss';
-
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { notifyError } from 'controllers/app/notifications';
-import { ThreadKind, ThreadStage } from '../../../models/types';
-import app from 'state';
 import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
+import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { capitalize } from 'lodash';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useMemo } from 'react';
+import app from 'state';
+import { useCreateThreadMutation } from 'state/api/threads';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import useJoinCommunity from 'views/components/Header/useJoinCommunity';
+import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
-import { useCommonNavigate } from 'navigation/helpers';
-
-import {
-  useNewThreadForm,
-  useAuthorName,
-  checkNewThreadErrors,
-  updateTopicList,
-} from './helpers';
+import { ThreadKind, ThreadStage } from '../../../models/types';
+import Permissions from '../../../utils/Permissions';
 import { ReactQuillEditor } from '../react_quill_editor';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   createDeltaFromText,
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
+import { checkNewThreadErrors, useNewThreadForm } from './helpers';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
 
   const chainId = app.chain.id;
-  const hasTopics = !!app.topics.getByCommunity(chainId).length;
-  const { authorName } = useAuthorName();
-  const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
+  const hasTopics = topics?.length;
+  const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector = app.topics?.getByCommunity(chainId)?.filter((t) => {
+  const topicsForSelector = topics?.filter((t) => {
     return (
-      isAdmin ||
-      t.tokenThreshold.isZero() ||
-      !TopicGateCheck.isGatedTopic(t.name)
+      isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
     );
   });
 
@@ -58,7 +59,24 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-  } = useNewThreadForm(chainId, authorName, topicsForSelector);
+  } = useNewThreadForm(chainId, topicsForSelector);
+
+  const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const {
+    mutateAsync: createThread,
+    error: createThreadError,
+    reset: resetCreateThreadMutation,
+  } = useCreateThreadMutation({
+    chainId: app.activeChainId(),
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetCreateThreadMutation,
+    error: createThreadError,
+  });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
 
@@ -76,40 +94,37 @@ export const NewThreadForm = () => {
 
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
-      deltaString
+      deltaString,
+      !!hasTopics
     );
 
     setIsSaving(true);
 
-    await app.sessions.signThread({
-      community: app.activeChainId(),
-      title: threadTitle,
-      body: deltaString,
-      link: threadUrl,
-      topic: threadTopic,
-    });
-
     try {
-      const result = await app.threads.create(
-        app.user.activeAccount.address,
-        threadKind,
-        app.chain.meta.customStages
+      const thread = await createThread({
+        address: app.user.activeAccount.address,
+        kind: threadKind,
+        stage: app.chain.meta.customStages
           ? parseCustomStages(app.chain.meta.customStages)[0]
           : ThreadStage.Discussion,
-        app.activeChainId(),
-        threadTitle,
-        threadTopic,
-        serializeDelta(threadContentDelta),
-        threadUrl
-      );
+        chainId: app.activeChainId(),
+        title: threadTitle,
+        topic: threadTopic,
+        body: serializeDelta(threadContentDelta),
+        url: threadUrl,
+        authorProfile: app.user.activeAccount.profile,
+      });
 
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
-      navigate(`/discussion/${result.id}`);
-      updateTopicList(result.topic, app.chain);
+      navigate(`/discussion/${thread.id}`);
     } catch (err) {
-      console.error(err);
+      if (err instanceof SessionKeyError) {
+        return;
+      }
+      console.error(err?.responseJSON?.error || err?.message);
+      notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
     }
@@ -123,9 +138,16 @@ export const NewThreadForm = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
+  const showBanner = !hasJoinedCommunity && isBannerVisible;
+
   return (
     <>
       <div className="NewThreadForm">
+        <div className="header">
+          <CWText type="h2" fontWeight="medium">
+            Proposals
+          </CWText>
+        </div>
         <div className="new-thread-header">
           <CWTabBar>
             <CWTab
@@ -171,31 +193,39 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
+              isDisabled={!hasJoinedCommunity}
+              tooltipLabel="Join community to submit"
             />
 
             <div className="buttons-row">
-              {isPopulated && (
+              {isPopulated && hasJoinedCommunity && (
                 <CWButton
-                  label={'Cancel'}
+                  buttonType="tertiary"
                   onClick={handleCancel}
                   tabIndex={3}
-                  buttonType="secondary-blue"
+                  label="Cancel"
                 />
               )}
               <CWButton
-                label={
-                  app.user.activeAccount
-                    ? 'Create thread'
-                    : 'Join community to create'
-                }
-                disabled={isDisabled}
+                label="Submit"
+                disabled={isDisabled || !hasJoinedCommunity}
                 onClick={handleNewThreadCreation}
                 tabIndex={4}
+                buttonWidth="wide"
               />
             </div>
+
+            {showBanner && (
+              <JoinCommunityBanner
+                onClose={handleCloseBanner}
+                onJoin={handleJoinCommunity}
+              />
+            )}
           </div>
         </div>
       </div>
+      {JoinCommunityModals}
+      {RevalidationModal}
     </>
   );
 };

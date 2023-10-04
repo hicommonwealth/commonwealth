@@ -93,6 +93,7 @@ export async function putCommunities(
             chain: community.id,
             community: community.id,
             wallet_id: null,
+            wallet_sso_source: null,
           };
 
           const newAddress = await createAddressHelper(
@@ -101,9 +102,9 @@ export async function putCommunities(
             req.user,
             next
           );
-          await models.Role.update(
-            { permission: 'admin' },
-            { where: { address_id: (newAddress as any).id } }
+          await models.Address.update(
+            { role: 'admin' },
+            { where: { id: (newAddress as any).id } }
           );
         })
       );

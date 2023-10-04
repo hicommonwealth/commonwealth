@@ -4,7 +4,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
   AddressNotFound: 'Address not found',
@@ -41,7 +41,6 @@ const deleteAddress = async (
     addressObj.profile_id = null;
     addressObj.user_id = null;
     addressObj.verified = null;
-    addressObj.name = null;
     await addressObj.save();
     return res.json({ status: 'Success', response: 'Deleted address' });
   } catch (err) {

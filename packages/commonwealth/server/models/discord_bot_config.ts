@@ -59,6 +59,7 @@ export default (
     models.DiscordBotConfig.belongsTo(models.Community, {
       foreignKey: 'community_id',
       targetKey: 'id',
+      onDelete: 'CASCADE',
     });
   };
 

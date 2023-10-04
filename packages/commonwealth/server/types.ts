@@ -4,6 +4,21 @@ import type { AddressInstance } from './models/address';
 import type { CommunityInstance } from './models/communities';
 import type { UserInstance } from './models/user';
 
+export type PaginationQueryParams = {
+  limit?: string;
+  page?: string;
+  order_by?: string;
+  order_direction?: string;
+};
+
+export type TypedPaginatedResult<T> = {
+  results: T[];
+  limit: number;
+  page: number;
+  totalPages: number;
+  totalResults: number;
+};
+
 export type TypedRequestQuery<
   Q extends Record<string, unknown> = Record<string, unknown>
 > = Express.Request & {
@@ -22,15 +37,26 @@ export type TypedRequestBody<
   body: B;
 };
 
+export type TypedRequestParams<
+  P extends Record<string, unknown> = Record<string, unknown>
+> = Express.Request & {
+  user?: Express.User & UserInstance;
+  address?: AddressInstance;
+  chain?: ChainInstance;
+  params: P;
+};
+
 export type TypedRequest<
   B extends Record<string, unknown> = Record<string, unknown>,
-  Q extends Record<string, unknown> = Record<string, unknown>
+  Q extends Record<string, unknown> = Record<string, unknown>,
+  P extends Record<string, unknown> = Record<string, unknown>
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
   chain?: CommunityInstance;
   body?: B;
   query?: Q;
+  params?: P;
 };
 
 export type TypedResponse<T> = Response<

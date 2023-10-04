@@ -35,7 +35,7 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
 
   // Fire on action
   const trackAnalytics = useCallback(
-    (actionPayload: AnalyticsPayload) => {
+    (actionPayload: T) => {
       if (onAction) {
         try {
           clientAnalyticsTrack({

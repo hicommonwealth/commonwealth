@@ -21,6 +21,7 @@ coverage/
 *.csv
 cache/
 stats.json
+serviceAccountKey.json
 
 # Database downloads
 latest.dump
@@ -42,3 +43,7 @@ stats.json
 
 # Test account artefacts
 test_accounts.txt
+
+/test-results
+
+summary.json

@@ -1,29 +1,35 @@
-import React from 'react';
-
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 import app from 'state';
+import { uuidv4 } from 'lib/util';
+import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import { useCommonNavigate } from 'navigation/helpers';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import Permissions from '../../utils/Permissions';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import {
+  handleIconClick,
+  handleMouseEnter,
+  handleMouseLeave,
+} from 'views/menus/utils';
+
+const resetSidebarState = () => {
+  if (sidebarStore.getState().userToggledVisibility !== 'open') {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  } else {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
+  }
+};
 
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
-
-  const topics = app.topics
-    .getByCommunity(app.activeChainId())
-    .reduce(
-      (acc, current) => (current.featuredInNewPost ? [...acc, current] : acc),
-      []
-    )
-    .sort((a, b) => a.name.localeCompare(b.name));
 
   const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
 
@@ -55,8 +61,10 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             items.push({
               label: `New ${cct.cctmd.nickname}`,
               iconLeft: 'star',
-              onClick: () =>
-                navigate(`/${contract.address}/${slugWithSlashRemoved}`),
+              onClick: () => {
+                resetSidebarState();
+                navigate(`/${contract.address}/${slugWithSlashRemoved}`);
+              },
             });
           }
         }
@@ -66,33 +74,15 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     return items;
   };
 
-  const getTopicTemplateItems = (): PopoverMenuItem[] =>
-    topics.map((t) => ({
-      label: `New ${t.name} Thread`,
-      iconLeft: 'write',
-      onClick: () => {
-        // TODO Graham 7-19-22: Let's find a non-localStorage solution
-        localStorage.setItem(`${app.activeChainId()}-active-topic`, t.name);
-        if (t.defaultOffchainTemplate) {
-          localStorage.setItem(
-            `${app.activeChainId()}-active-topic-default-template`,
-            t.defaultOffchainTemplate
-          );
-        } else {
-          localStorage.removeItem(
-            `${app.activeChainId()}-active-topic-default-template`
-          );
-        }
-        navigate('/new/discussion');
-      },
-    }));
-
   const getOnChainProposalItem = (): PopoverMenuItem[] =>
     showOnChainProposalItem
       ? [
           {
             label: 'New On-Chain Proposal',
-            onClick: () => navigate('/new/proposal'),
+            onClick: () => {
+              resetSidebarState();
+              navigate('/new/proposal');
+            },
             iconLeft: 'star',
           },
         ]
@@ -103,7 +93,10 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'New Sputnik proposal',
-            onClick: () => navigate('/new/proposal'),
+            onClick: () => {
+              resetSidebarState();
+              navigate('/new/proposal');
+            },
             iconLeft: 'democraticProposal',
           },
         ]
@@ -114,26 +107,32 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       ? [
           {
             label: 'New treasury proposal',
-            onClick: () =>
+            onClick: () => {
+              resetSidebarState();
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryProposal,
-              }),
+              });
+            },
             iconLeft: 'treasuryProposal',
           },
           {
             label: 'New democracy proposal',
-            onClick: () =>
+            onClick: () => {
+              resetSidebarState();
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateDemocracyProposal,
-              }),
+              });
+            },
             iconLeft: 'democraticProposal',
           },
           {
             label: 'New tip',
-            onClick: () =>
+            onClick: () => {
+              resetSidebarState();
               navigate('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
-              }),
+              });
+            },
             iconLeft: 'jar',
           },
         ]
@@ -146,6 +145,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
             label: 'New Snapshot Proposal',
             iconLeft: 'democraticProposal',
             onClick: () => {
+              resetSidebarState();
               const snapshotSpaces = app.chain.meta.snapshot;
               if (snapshotSpaces.length > 1) {
                 navigate('/multiple-snapshots', {
@@ -172,27 +172,58 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       iconLeft: 'people',
       onClick: (e) => {
         e?.preventDefault();
-        sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
-        navigate('/createCommunity', {}, null);
-      },
-    },
-    {
-      label: 'Gate your Discord',
-      iconLeft: 'discord',
-      onClick: (e) => {
-        e?.preventDefault();
-        sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
-
-        window.open(
-          `https://discord.com/oauth2/authorize?client_id=${
-            process.env.DISCORD_CLIENT_ID
-          }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
-            process.env.DISCORD_UI_URL
-          )}/callback&response_type=code&scope=bot`
-        );
+        resetSidebarState();
+        navigate('/createCommunity/starter', {}, null);
       },
     },
   ];
+
+  const getDiscordBotConnectionItems = (): PopoverMenuItem[] => {
+    const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+    const botNotConnected = app.chain.meta.discordConfigId === null;
+
+    if (isAdmin && botNotConnected) {
+      return [
+        {
+          label: 'Connect Discord',
+          iconLeft: 'discord',
+          onClick: async () => {
+            try {
+              const verification_token = uuidv4();
+              await app.discord.createConfig(verification_token);
+
+              const isCustomDomain = app.isCustomDomain();
+
+              window.open(
+                `https://discord.com/oauth2/authorize?client_id=${
+                  process.env.DISCORD_CLIENT_ID
+                }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+                  `${
+                    !isCustomDomain
+                      ? window.location.origin
+                      : 'https://commonwealth.im'
+                  }`
+                )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
+                  JSON.stringify({
+                    cw_chain_id: app.activeChainId(),
+                    verification_token,
+                    redirect_domain: isCustomDomain
+                      ? window.location.origin
+                      : undefined,
+                  })
+                )}`,
+                '_parent'
+              );
+            } catch (err) {
+              console.log(err);
+            }
+          },
+        },
+      ];
+    } else {
+      return [];
+    }
+  };
 
   return [
     ...(app.activeChainId()
@@ -204,19 +235,17 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           {
             label: 'New Thread',
             onClick: () => {
-              sidebarStore
-                .getState()
-                .setMenu({ name: 'default', isVisible: false });
+              resetSidebarState();
               navigate('/new/discussion');
             },
             iconLeft: 'write',
           } as PopoverMenuItem,
-          ...getTopicTemplateItems(),
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),
           ...getSubstrateProposalItems(),
           ...getSnapshotProposalItem(),
           ...getTemplateItems(),
+          ...getDiscordBotConnectionItems(),
         ]
       : []),
     {
@@ -242,7 +271,9 @@ export const CreateContentSidebar = () => {
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {
-            setMenu({ name: 'default', isVisible: false });
+            const isSidebarOpen =
+              !!sidebarStore.getState().userToggledVisibility;
+            setMenu({ name: 'default', isVisible: isSidebarOpen });
           }, 200);
         },
       }}
@@ -270,12 +301,13 @@ export const CreateContentMenu = () => {
 export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const { isLoggedIn } = useUserLoggedIn();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   if (
     !isLoggedIn ||
     !app.chain ||
     !app.activeChainId() ||
-    !app.user.activeAccount
+    !hasJoinedCommunity
   ) {
     return;
   }
@@ -283,11 +315,31 @@ export const CreateContentPopover = () => {
   return (
     <PopoverMenu
       menuItems={getCreateContentMenuItems(navigate)}
-      renderTrigger={(onclick) => (
-        <CWIconButton
-          iconButtonTheme="black"
-          iconName="plusCircle"
-          onClick={onclick}
+      renderTrigger={(onClick, isMenuOpen) => (
+        <CWTooltip
+          content="Create content"
+          placement="bottom"
+          renderTrigger={(handleInteraction, isTooltipOpen) => (
+            <CWIconButton
+              iconButtonTheme="black"
+              iconName="plusCirclePhosphor"
+              onClick={(e) =>
+                handleIconClick({
+                  e,
+                  isMenuOpen,
+                  isTooltipOpen,
+                  handleInteraction,
+                  onClick,
+                })
+              }
+              onMouseEnter={(e) => {
+                handleMouseEnter({ e, isMenuOpen, handleInteraction });
+              }}
+              onMouseLeave={(e) => {
+                handleMouseLeave({ e, isTooltipOpen, handleInteraction });
+              }}
+            />
+          )}
         />
       )}
     />

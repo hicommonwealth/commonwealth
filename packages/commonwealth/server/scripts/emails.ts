@@ -5,18 +5,22 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
 import { Op } from 'sequelize';
-import { getForumNotificationCopy } from '../../shared/notificationFormatter';
 import type {
-  IPostNotificationData,
+  IForumNotificationData,
   IChainEventNotificationData,
-  IChatNotification,
-  ICommunityNotificationData,
-  SnapshotEventType,
-  SnapshotNotification,
+  ISnapshotNotificationData,
 } from '../../shared/types';
+import {
+  formatAddressShort,
+  getThreadUrl,
+  renderQuillDeltaToText,
+  smartTrim,
+} from '../../shared/utils';
+
 import { DynamicTemplate } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
 import type { UserAttributes } from '../models/user';
+import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -24,20 +28,124 @@ const log = factory.getLogger(formatFilename(__filename));
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
+const getForumNotificationCopy = async (
+  models: DB,
+  notification_data: IForumNotificationData,
+  category_id
+) => {
+  // unpack notification_data
+  const {
+    thread_id,
+    root_title,
+    comment_id,
+    comment_text,
+    chain_id,
+    author_address,
+    author_chain,
+  } = notification_data;
+
+  // title
+  const decodedTitle = decodeURIComponent(root_title).trim();
+
+  // email subject line
+  const emailSubjectLine =
+    category_id === NotificationCategories.NewComment
+      ? `Comment on: ${decodedTitle}`
+      : category_id === NotificationCategories.NewMention
+      ? `You were mentioned in: ${decodedTitle}`
+      : category_id === NotificationCategories.NewCollaboration
+      ? `You were added as a collaborator on: ${decodedTitle}`
+      : category_id === NotificationCategories.NewThread
+      ? `New thread: ${decodedTitle}`
+      : 'New activity on Commonwealth';
+
+  // author
+  const authorProfile = await models.Profile.findOne({
+    include: [
+      {
+        model: models.Address,
+        where: { address: author_address, chain: author_chain || null },
+        required: true,
+      },
+    ],
+  });
+  let authorName;
+  const author_addr_short = formatAddressShort(
+    author_address,
+    author_chain,
+    true
+  );
+  try {
+    authorName = authorProfile.profile_name || author_addr_short;
+  } catch (e) {
+    authorName = author_addr_short;
+  }
+  // author profile link
+  const authorPath = `https://commonwealth.im/${author_chain}/account/${author_address}?base=${author_chain}`;
+
+  // action and community
+  const actionCopy = [
+    NotificationCategories.NewComment,
+    NotificationCategories.CommentEdit,
+  ].includes(category_id)
+    ? 'commented on'
+    : category_id === NotificationCategories.NewMention
+    ? 'mentioned you in the thread'
+    : category_id === NotificationCategories.NewCollaboration
+    ? 'invited you to collaborate on'
+    : [
+        NotificationCategories.ThreadEdit,
+        NotificationCategories.NewThread,
+      ].includes(category_id)
+    ? 'created a new thread'
+    : null;
+  const objectCopy = decodeURIComponent(root_title).trim();
+  const communityObject = await models.Chain.findOne({
+    where: { id: chain_id },
+  });
+  const communityCopy = communityObject ? `in ${communityObject.name}` : '';
+  const excerpt = (() => {
+    const text = decodeURIComponent(comment_text);
+    try {
+      // return rendered quill doc
+      const doc = JSON.parse(text);
+      if (!doc.ops) throw new Error();
+      const finalText = renderQuillDeltaToText(doc);
+      return smartTrim(finalText);
+    } catch (e) {
+      // return markdown
+      return smartTrim(text);
+    }
+  })();
+
+  // link to proposal
+  const pseudoProposal = {
+    id: thread_id,
+    title: root_title,
+    chain: chain_id,
+  };
+  const proposalPath = getThreadUrl(pseudoProposal, comment_id);
+  return [
+    emailSubjectLine,
+    authorName,
+    actionCopy,
+    objectCopy,
+    communityCopy,
+    excerpt,
+    proposalPath,
+    authorPath,
+  ];
+};
+
 export const createImmediateNotificationEmailObject = async (
   notification_data:
-    | IPostNotificationData
-    | ICommunityNotificationData
+    | IForumNotificationData
     | IChainEventNotificationData
-    | IChatNotification
-    | (SnapshotNotification & { eventType: SnapshotEventType }),
+    | ISnapshotNotificationData,
   category_id,
   models
 ) => {
-  if (
-    (<IChainEventNotificationData>notification_data).block_number &&
-    (<IChainEventNotificationData>notification_data).event_data
-  ) {
+  if (category_id === NotificationCategories.ChainEvent) {
     const ceInstance = <IChainEventNotificationData>notification_data;
     // construct compatible CW event from DB by inserting network from type
     const evt: CWEvent = {
@@ -88,7 +196,7 @@ export const createImmediateNotificationEmailObject = async (
       authorPath,
     ] = await getForumNotificationCopy(
       models,
-      notification_data as IPostNotificationData,
+      notification_data as IForumNotificationData,
       category_id
     );
     return {

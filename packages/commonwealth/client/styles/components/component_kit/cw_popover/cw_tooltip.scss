@@ -1,6 +1,26 @@
 @import '../../../shared';
 
-.Tooltip {
+// This is temporary solution, just updated styles of the current Tooltip
+// It should be removed when Tooltip from new designs will be introduced
+@mixin newTempBlackTooltip {
+  font-size: 12px;
+  letter-spacing: 0.24px;
+  border-radius: 4px;
+  background-color: $neutral-900;
+  padding: 4px 8px;
+  color: $white;
+  text-align: center;
+  border: none;
+
+  .Text {
+    height: 16px;
+    display: flex;
+    align-items: center;
+    color: $white;
+  }
+}
+
+.OldTooltip {
   align-items: center;
   background-color: $white;
   border: 2px solid $neutral-400;
@@ -18,11 +38,11 @@
   }
 
   &.hasBackground {
-    background-color: $primary-100;
-    border-color: $primary-100;
+    background-color: #332e36;
+    border: none;
 
     .Text {
-      color: $neutral-800;
+      color: #f1f1f1;
     }
   }
 }

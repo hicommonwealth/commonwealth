@@ -1,28 +1,25 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
-import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { IChainEntityKind } from 'chain-events/src';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
+import { filterLinks } from 'helpers/threads';
 import {
   chainEntityTypeToProposalName,
   chainEntityTypeToProposalSlug,
   getProposalUrlPath,
 } from 'identifiers';
+import { Link, LinkSource } from 'models/Thread';
+import 'pages/view_thread/linked_proposals_card.scss';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link as ReactRouterLink } from 'react-router-dom';
+import app from 'state';
 import type ChainEntity from '../../../models/ChainEntity';
 import type Thread from '../../../models/Thread';
 import type { ThreadStage } from '../../../models/types';
-
-import 'pages/view_thread/linked_proposals_card.scss';
-
-import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
+import { Modal } from '../../components/component_kit/cw_modal';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
-import { Modal } from '../../components/component_kit/cw_modal';
-import { Link, LinkSource } from 'models/Thread';
-import { IChainEntityKind } from 'chain-events/src';
-import { filterLinks } from 'helpers/threads';
 
 type LinkedProposalProps = {
   thread: Thread;
@@ -51,29 +48,26 @@ const LinkedProposal = ({
         )}`;
 
   return (
-    <a href={threadLink}>
+    <ReactRouterLink to={threadLink}>
       {`${
         title ?? chainEntityTypeToProposalName(ceType) ?? 'Proposal'
       } #${ceTypeId} ${ceCompleted ? ' (Completed)' : ''}`}
-    </a>
+    </ReactRouterLink>
   );
 };
 
 type LinkedProposalsCardProps = {
-  onChangeHandler: (stage: ThreadStage, links?: Link[]) => void;
   showAddProposalButton: boolean;
   thread: Thread;
 };
 
 export const LinkedProposalsCard = ({
-  onChangeHandler,
   thread,
   showAddProposalButton,
 }: LinkedProposalsCardProps) => {
-  const [snapshot, setSnapshot] = useState<SnapshotProposal>(null);
   const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
   const [snapshotUrl, setSnapshotUrl] = useState('');
-  const [space, setSpace] = useState<SnapshotSpace>(null);
+  const [snapshotTitle, setSnapshotTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const initialSnapshotLinks = useMemo(
@@ -102,8 +96,7 @@ export const LinkedProposalsCard = ({
               (sn) => sn.id === proposal.identifier
             );
             if (matchingSnapshot) {
-              setSnapshot(matchingSnapshot);
-              setSpace(_space);
+              setSnapshotTitle(matchingSnapshot.title);
               setSnapshotUrl(
                 `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
                   _space.id
@@ -119,7 +112,7 @@ export const LinkedProposalsCard = ({
   }, [initialSnapshotLinks]);
 
   const showSnapshot =
-    snapshot && initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
+    initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
 
   return (
     <>
@@ -150,10 +143,9 @@ export const LinkedProposalsCard = ({
                     </div>
                   )}
                   {showSnapshot && (
-                    <a href={snapshotUrl}>
-                      Snapshot:{' '}
-                      {initialSnapshotLinks[0].title ?? snapshot.title}
-                    </a>
+                    <ReactRouterLink to={snapshotUrl}>
+                      Snapshot: {initialSnapshotLinks[0].title ?? snapshotTitle}
+                    </ReactRouterLink>
                   )}
                 </div>
               ) : (
@@ -179,7 +171,6 @@ export const LinkedProposalsCard = ({
         className="LinkedProposalsCardModal"
         content={
           <UpdateProposalStatusModal
-            onChangeHandler={onChangeHandler}
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
           />

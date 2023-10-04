@@ -13,7 +13,7 @@ const communityStats = async (
   const chain = req.chain;
 
   if (!req.user) {
-    return next(new AppError('Not logged in'));
+    return next(new AppError('Not signed in'));
   }
 
   // TODO: factor this pattern into a util
@@ -47,7 +47,7 @@ ORDER BY seq.date DESC;`,
       }
     );
   };
-  const roles = await newObjectsQuery('"Roles"', 'community_id');
+  const roles = await newObjectsQuery('""Addresses"', 'community_id');
   const threads = await newObjectsQuery('"Threads"', 'community_id');
   const comments = await newObjectsQuery('"Comments"', 'community_id');
 
@@ -61,7 +61,7 @@ ORDER BY seq.date DESC;`,
       }
     );
   };
-  const totalRoles = await totalObjectsQuery('"Roles"', 'community_id');
+  const totalRoles = await totalObjectsQuery('"Addresses"', 'community_id');
   const totalThreads = await totalObjectsQuery('"Threads"', 'community_id');
   const totalComments = await totalObjectsQuery('"Comments"', 'community_id');
 

@@ -138,14 +138,12 @@ const RPCEndpointTask = () => {
       <div className="MultiRow">
         <div className="TaskRow">
           <CWTextInput
-            label="Community Id"
             value={rpcEndpointChainValue}
             onInput={setCommunityIdInput}
             inputValidationFn={idValidationFn}
             placeholder="Enter a community id"
           />
           <CWTextInput
-            label="RPC Endpoint"
             value={rpcEndpoint}
             onInput={(e) => {
               setRpcEndpoint(e.target.value);

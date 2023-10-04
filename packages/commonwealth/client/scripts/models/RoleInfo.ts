@@ -9,8 +9,8 @@ class RoleInfo {
   public readonly address_chain: string;
   public readonly chain_id: string;
   public permission: AccessLevel;
-  public allow: bigint;
-  public deny: bigint;
+  public allow: number;
+  public deny: number;
   public is_user_default: boolean;
 
   constructor(
@@ -20,8 +20,8 @@ class RoleInfo {
     address_chain: string,
     chain_id: string,
     permission: AccessLevel,
-    allow: bigint,
-    deny: bigint,
+    allow: number,
+    deny: number,
     is_user_default: boolean
   ) {
     this.id = id;

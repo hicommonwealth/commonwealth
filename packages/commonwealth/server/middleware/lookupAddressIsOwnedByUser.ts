@@ -60,7 +60,7 @@ const lookupAddressIsOwnedByUser = async (
   req: AddressChainReq
 ): Promise<[AddressInstance | null, string | null]> => {
   if (!req.user?.id) {
-    return [null, 'Not logged in'];
+    return [null, 'Not signed in'];
   }
 
   if (!req.body?.author_chain) {
@@ -71,12 +71,21 @@ const lookupAddressIsOwnedByUser = async (
     return [null, 'Must provide an address'];
   }
 
+  const query: {
+    chain: string;
+    address: string;
+    user_id?: number;
+  } = {
+    chain: req.body.author_chain,
+    address: req.body.address,
+  };
+
+  if (!req.user.isAdmin) {
+    query.user_id = req.user.id;
+  }
+
   const author = await models.Address.findOne({
-    where: {
-      chain: req.body.author_chain,
-      address: req.body.address,
-      user_id: req.user.id,
-    },
+    where: query,
   });
 
   if (!author) {

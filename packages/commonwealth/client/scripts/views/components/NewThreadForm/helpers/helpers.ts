@@ -1,7 +1,3 @@
-import topics from 'controllers/server/topics';
-import app from 'state';
-import type IChainAdapter from '../../../../models/IChainAdapter';
-import type Topic from '../../../../models/Topic';
 import { ThreadKind } from '../../../../models/types';
 import type { NewThreadFormType } from '../types';
 import { NewThreadErrors } from '../types';
@@ -9,13 +5,14 @@ import { notifyError } from 'controllers/app/notifications';
 
 export const checkNewThreadErrors = (
   { threadTitle, threadKind, threadTopic, threadUrl }: NewThreadFormType,
-  bodyText?: string
+  bodyText?: string,
+  hasTopics?: boolean
 ) => {
   if (!threadTitle) {
     return notifyError(NewThreadErrors.NoTitle);
   }
 
-  if (!threadTopic && topics.length > 0) {
+  if (!threadTopic && hasTopics) {
     return notifyError(NewThreadErrors.NoTopic);
   }
 
@@ -23,19 +20,5 @@ export const checkNewThreadErrors = (
     return notifyError(NewThreadErrors.NoBody);
   } else if (threadKind === ThreadKind.Link && !threadUrl) {
     return notifyError(NewThreadErrors.NoUrl);
-  }
-};
-
-export const updateTopicList = (
-  topic: Topic,
-  chain: IChainAdapter<any, any>
-) => {
-  try {
-    const topicNames = app.topics.getByCommunity(chain.id).map((t) => t.name);
-    if (!topicNames.includes(topic.name)) {
-      app.topics.store.add(topic);
-    }
-  } catch (e) {
-    console.log(`Error adding new topic to ${chain.name}.`);
   }
 };

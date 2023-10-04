@@ -7,6 +7,10 @@
   padding: 24px;
   width: 100%;
 
+  .header {
+    padding: 32px 0px 32px 0px;
+  }
+
   &.isModal {
     padding: 16px;
   }
@@ -80,6 +84,7 @@
       .buttons-row {
         display: flex;
         gap: 8px;
+        justify-content: end;
       }
     }
   }
@@ -125,5 +130,9 @@
         }
       }
     }
+  }
+
+  .JoinCommunityBanner {
+    margin-top: 8px;
   }
 }

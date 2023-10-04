@@ -25,6 +25,6 @@
     "web3": "^1.8.2"
   },
   "optionalDependencies": {
-    "ganache": "^7.7.6"
+    "ganache": "^7.9.0"
   }
 }

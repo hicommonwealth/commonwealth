@@ -9,13 +9,14 @@ import type Web3 from 'web3';
 
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
+import * as siwe from 'siwe';
 
 import type { SessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
+import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -23,7 +24,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   private _enabling = false;
   private _accounts: string[];
   private _provider: provider;
-  private _web3: Web3;
+  private _web3: Web3 | any;
 
   public readonly name = WalletId.Metamask;
   public readonly label = 'Metamask';
@@ -78,14 +79,18 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     account: Account,
     sessionPayload: SessionPayload
   ): Promise<string> {
-    const typedCanvasMessage = await constructTypedCanvasMessage(
-      sessionPayload
-    );
+    const nonce = siwe.generateNonce();
+    // this must be open-ended, because of custom domains
+    const domain = document.location.origin;
+    const message = createSiweMessage(sessionPayload, domain, nonce);
+
     const signature = await this._web3.givenProvider.request({
-      method: 'eth_signTypedData_v4',
-      params: [account.address, JSON.stringify(typedCanvasMessage)],
+      method: 'personal_sign',
+      params: [account.address, message],
     });
-    return signature;
+
+    // signature format: https://docs.canvas.xyz/docs/formats#ethereum
+    return `${domain}/${nonce}/${signature}`;
   }
 
   // ACTIONS
@@ -101,7 +106,20 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       // ensure we're on the correct chain
 
       const Web3 = (await import('web3')).default;
-      this._web3 = new Web3((window as any).ethereum);
+      this._web3 =
+        process.env.ETH_RPC !== 'e2e-test'
+          ? new Web3((window as any).ethereum)
+          : {
+              givenProvider: window.ethereum,
+              eth: {
+                getAccounts: async () => {
+                  return await this._web3.givenProvider.request({
+                    method: 'eth_requestAccounts',
+                  });
+                },
+              },
+            };
+
       // TODO: does this come after?
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',

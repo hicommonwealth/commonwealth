@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoChain: 'Must provide chain',
   ChainNF: 'Chain not found',
 };

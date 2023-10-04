@@ -1,61 +1,45 @@
-import React, { useState, useEffect } from 'react';
-
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import useForceRerender from 'hooks/useForceRerender';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/overview/index.scss';
+import React, { useEffect } from 'react';
+import app from 'state';
+import { useFetchThreadsQuery } from 'state/api/threads';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
-
-import 'pages/overview/index.scss';
-
-import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWText } from '../../components/component_kit/cw_text';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
-import Sublayout from '../../Sublayout';
 import { PageLoading } from '../loading';
-import { TopicSummaryRow } from './topic_summary_row';
-import { useCommonNavigate } from 'navigation/helpers';
-import useForceRerender from 'hooks/useForceRerender';
+import { CWText } from '../../components/component_kit/cw_text';
+import { TopicSummaryRow } from './TopicSummaryRow';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
+  const { isWindowExtraSmall } = useBrowserWindow({});
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const [windowIsExtraSmall, setWindowIsExtraSmall] = useState(
-    isWindowExtraSmall(window.innerWidth)
-  );
-
-  useEffect(() => {
-    const onResize = () => {
-      setWindowIsExtraSmall(isWindowExtraSmall(window.innerWidth));
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
-  }, []);
+  const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
+    queryType: 'active',
+    chainId: app.activeChainId(),
+    topicsPerThread: 3,
+    // TODO: ask for a pinned thread prop here to show pinned threads
+  });
 
   useEffect(() => {
-    app.threads.isFetched.on('redraw', forceRerender);
     app.loginStateEmitter.on('redraw', forceRerender);
-    app.user.isFetched.on('redraw', forceRerender);
 
     return () => {
-      app.threads.isFetched.off('redraw', forceRerender);
       app.loginStateEmitter.off('redraw', forceRerender);
-      app.user.isFetched.off('redraw', forceRerender);
     };
   }, [forceRerender]);
 
-  const allMonthlyThreads = app.threads.overviewStore.getAll();
-  const allPinnedThreads = app.threads.listingStore.getThreads({
-    pinned: true,
+  const { data: topics = [] } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
   });
-  const allThreads = app.threads.store.getAll();
-
-  const topics = app.topics.getByCommunity(app.activeChainId());
 
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
 
@@ -72,85 +56,80 @@ const OverviewPage = () => {
     pinnedThreads: Array<Thread>;
     topic: Topic;
   }> = topicsSorted.map((topic) => {
-    const monthlyThreads = allMonthlyThreads.filter(
-      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
-    );
-    const pinnedThreads = allPinnedThreads.filter(
+    const monthlyThreads = (recentlyActiveThreads || []).filter(
       (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
     );
 
     return {
       monthlyThreads,
-      pinnedThreads,
+      pinnedThreads: [], // TODO: ask for a pinned thread prop in /threads?active=true api to show pinned threads
       topic,
     };
   });
 
-  return !topicSummaryRows.length && !app.threads.initialized ? (
+  return !topicSummaryRows.length ? (
     <PageLoading />
   ) : (
-    <Sublayout>
-      <div className="OverviewPage">
-        <div className="header-row">
-          <div className="header-row-left">
-            <CWText type="h3" fontWeight="semiBold">
-              Overview
-            </CWText>
-            <CWButton
-              className="latest-button"
-              buttonType="mini-black"
-              label="Latest Threads"
-              iconLeft="home"
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
-          </div>
-          {windowIsExtraSmall ? (
-            <CWIconButton
-              iconName="plusCircle"
-              iconButtonTheme="black"
-              onClick={() => {
-                navigate('/new/discussion');
-              }}
-              disabled={!app.user.activeAccount}
-            />
-          ) : (
-            <CWButton
-              buttonType="mini-black"
-              label="Create Thread"
-              iconLeft="plus"
-              onClick={() => {
-                navigate('/new/discussion');
-              }}
-              disabled={!app.user.activeAccount}
-            />
-          )}
+    <div className="OverviewPage">
+      <div className="header-row">
+        <div className="header-row-left">
+          <CWText type="h3" fontWeight="semiBold">
+            Overview
+          </CWText>
+          <CWButton
+            className="latest-button"
+            buttonType="mini-black"
+            label="Latest Threads"
+            iconLeft="home"
+            onClick={() => {
+              navigate('/discussions');
+            }}
+          />
         </div>
-        <div className="column-headers-row">
+        {isWindowExtraSmall ? (
+          <CWIconButton
+            iconName="plusCircle"
+            iconButtonTheme="black"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!hasJoinedCommunity}
+          />
+        ) : (
+          <CWButton
+            buttonType="mini-black"
+            label="Create Thread"
+            iconLeft="plus"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!hasJoinedCommunity}
+          />
+        )}
+      </div>
+      <div className="column-headers-row">
+        <CWText
+          type="h5"
+          fontWeight="semiBold"
+          className="threads-header-row-text"
+        >
+          Topic
+        </CWText>
+        <div className="threads-header-container">
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="threads-header-row-text"
           >
-            Topic
+            Recent threads
           </CWText>
-          <div className="threads-header-container">
-            <CWText
-              type="h5"
-              fontWeight="semiBold"
-              className="threads-header-row-text"
-            >
-              Recent threads
-            </CWText>
-          </div>
         </div>
-        <CWDivider />
-        {topicSummaryRows.map((row, i) => (
-          <TopicSummaryRow {...row} key={i} />
-        ))}
       </div>
-    </Sublayout>
+      <CWDivider />
+      {topicSummaryRows.map((row, i) => (
+        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
+      ))}
+    </div>
   );
 };
 

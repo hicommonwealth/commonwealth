@@ -4,17 +4,16 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { ProposalType } from 'common-common/src/types';
-import {
-  AccessLevel,
-  everyonePermissions,
-  PermissionManager,
-} from './permissions';
+import { AccessLevel } from './permissions';
 import type { RoleObject } from './types';
 
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
   // space, and then replace any sequence of spaces with dashes.
+  if (!str) return '';
+
   return str
     .toLowerCase()
     .trim()
@@ -49,12 +48,15 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
 };
 
 /* eslint-disable */
-export const getThreadUrl = (thread: {
-  chain: string;
-  type_id?: string | number;
-  id?: string | number;
-  title?: string;
-}, comment?: string | number): string => {
+export const getThreadUrl = (
+  thread: {
+    chain: string;
+    type_id?: string | number;
+    id?: string | number;
+    title?: string;
+  },
+  comment?: string | number
+): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
@@ -196,20 +198,19 @@ export function formatAddressShort(
   address: string,
   chain?: string,
   includeEllipsis?: boolean,
-  maxCharLength?: number
+  maxCharLength?: number,
+  prefix?: string
 ) {
   if (!address) return;
   if (chain === 'near') {
     return `@${address}`;
-  } else if (
-    chain === 'straightedge' ||
-    chain === 'cosmoshub' ||
-    chain === 'osmosis' ||
-    chain === 'injective' ||
-    chain === 'injective-testnet' ||
-    chain === 'osmosis-local'
-  ) {
-    return `${address.slice(0, 9)}${includeEllipsis ? '…' : ''}`;
+  } else if (prefix && !maxCharLength) {
+    if (!includeEllipsis) return address;
+    const totalLength = address.length;
+    return `${address.slice(0, prefix.length + 3)}...${address.slice(
+      totalLength - 4,
+      totalLength
+    )}`;
   } else {
     return `${address.slice(0, maxCharLength || 5)}${
       includeEllipsis ? '…' : ''
@@ -257,10 +258,8 @@ export const addressSwapper = (options: {
 
 export function aggregatePermissions(
   roles: RoleObject[],
-  chain_permissions: { allow: bigint; deny: bigint }
+  chain_permissions: { allow: number; deny: number }
 ) {
-  const permissionsManager = new PermissionManager();
-
   const ORDER: AccessLevel[] = [
     AccessLevel.Member,
     AccessLevel.Moderator,
@@ -274,17 +273,50 @@ export function aggregatePermissions(
   roles = roles.sort(compare);
 
   const permissionsAllowDeny: Array<{
-    allow: bigint;
-    deny: bigint;
+    allow: number;
+    deny: number;
   }> = roles.map(({ allow, deny }) => ({ allow, deny }));
 
   // add chain default permissions to beginning of permissions array
   permissionsAllowDeny.unshift(chain_permissions);
 
   // compute permissions
-  const permission: bigint = permissionsManager.computePermissions(
-    everyonePermissions,
-    permissionsAllowDeny
-  );
-  return permission;
+  return BigInt(0); //bandaid fix. always allow permissions due to removing functionality.
+}
+
+/**
+ * Convert Cosmos-style minimal denom amount to readable full-denom amount
+ * Example 7000000 uosmo -> 7 OSMO
+ * Example 8000000000000000000 aevmos -> 8 EVMOS
+ */
+export function minimalToNaturalDenom(
+  amount?: string | number,
+  decimals?: number
+): string {
+  if (!amount || !decimals) return '0';
+  const intPretty = new IntPretty(
+    new Dec(amount.toString())
+  ).moveDecimalPointLeft(decimals);
+
+  // return full decimal precision and let the UI handle rounding
+  return intPretty.toDec().toString(decimals);
+}
+
+/**
+ * Convert readable full-denom amount to minimal denom amount (BigInt)
+ * Example 8 OSMO -> 8000000 uosmo
+ * Example 8 EVMOS -> 8000000000000000000 aevmos
+ * Intended for Cosmos use (decimals usually 6 or 18)
+ */
+export function naturalDenomToMinimal(
+  naturalAmount?: string | number,
+  decimals?: number
+): string {
+  if (!naturalAmount || !decimals) return '0';
+  const intPretty = new IntPretty(
+    new Dec(naturalAmount.toString())
+  ).moveDecimalPointRight(decimals);
+
+  // 0 decimal places because this is max precision for the chain
+  return intPretty.toDec().toString(0);
 }

@@ -2,15 +2,22 @@ import type { Coin } from 'adapters/currency';
 import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 
+import BN from 'bn.js';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
+import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
-import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 import ProposalModule from './ProposalModule';
+import type {
+  IAccountsModule,
+  IBlockInfo,
+  IChainModule,
+  IGatedTopic,
+} from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -35,8 +42,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public abstract accounts: IAccountsModule<C, A>;
   public readonly communityBanner?: string;
 
-  public deferred: boolean;
-
   protected _serverLoaded: boolean;
   public get serverLoaded() {
     return this._serverLoaded;
@@ -46,7 +51,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
     const [response] = await Promise.all([
-      // this.app.chainEntities.refresh(this.meta.id),
       $.get(`${this.app.serverUrl()}/bulkOffchain`, {
         chain: this.id,
         community: null,
@@ -62,39 +66,26 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
 
     const {
-      pinnedThreads,
-      topics,
       admins,
-      activeUsers,
+      // activeUsers,
+      // pinned and active threads must not be returned from api
       numVotingThreads,
       numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
-      communityRoles,
+      gateStrategies,
     } = response.result;
-    this.app.topics.initialize(topics, true);
-    this.app.threads.initialize(
-      pinnedThreads,
-      numVotingThreads,
-      numTotalThreads,
-      true
-    );
+    // Update community level thread counters variables (Store in state instead of react query here is an
+    // exception case, view the threadCountersStore code for more details)
+    EXCEPTION_CASE_threadCountersStore.setState({
+      totalThreadsInCommunity: numTotalThreads,
+      totalThreadsInCommunityForVoting: numVotingThreads,
+    });
     this.meta.setAdmins(admins);
-    this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
-
-    // add community roles to the chain's roles
-    this.meta.communityRoles = communityRoles;
-
-    await this.app.recentActivity.getRecentTopicActivity(this.id);
-
-    if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
-      this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
-        threads: this.app.threads.listingStore.getPinnedThreads(),
-        chain: this.meta.id,
-        pinned: true,
-      });
+    if (gateStrategies.length > 0) {
+      this.gatedTopics = gateStrategies;
     }
 
     this._serverLoaded = true;
@@ -103,14 +94,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public deinitServer() {
     this._serverLoaded = false;
-    this.app.threads.deinit();
-    this.app.comments.deinit();
-    this.app.reactions.deinit();
+    EXCEPTION_CASE_threadCountersStore.setState({
+      totalThreadsInCommunity: 0,
+      totalThreadsInCommunityForVoting: 0,
+    });
     if (this.app.chainEntities) {
       this.app.chainEntities.deinit();
     }
-    this.app.reactionCounts.deinit();
-    this.app.threadUniqueAddressesCount.deinit();
     console.log(`${this.meta.name} stopped`);
   }
 
@@ -158,6 +148,30 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
   }
 
+  public getTopicThreshold(topicId: number): BN {
+    if (this.gatedTopics?.length > 0 && topicId) {
+      const topicGate = this.gatedTopics.find((i) => i.id === topicId);
+
+      if (!topicGate) return new BN('0', 10);
+
+      return new BN(topicGate.data.threshold);
+    }
+    return new BN('0', 10);
+  }
+
+  public isGatedTopic(topicId: number): boolean {
+    const tokenPostingThreshold = this.getTopicThreshold(topicId);
+    if (
+      !tokenPostingThreshold.isZero() &&
+      !this.app.user.activeAccount?.tokenBalance
+    )
+      return true;
+    return (
+      !tokenPostingThreshold.isZero() &&
+      tokenPostingThreshold.gt(this.app.user.activeAccount.tokenBalance)
+    );
+  }
+
   public abstract base: ChainBase;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
@@ -170,6 +184,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public version: string;
   public name: string;
   public runtimeName: string;
+  public gatedTopics: IGatedTopic[];
 
   constructor(meta: ChainInfo, app: IApp) {
     this.meta = meta;

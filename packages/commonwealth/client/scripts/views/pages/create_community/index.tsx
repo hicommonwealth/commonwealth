@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import $ from 'jquery';
-
 import 'pages/create_community.scss';
-
+import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
-import Sublayout from '../../Sublayout';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
 import { EthDaoForm } from './eth_dao_form';
+import { useEthChainFormState } from './hooks';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
-import { useEthChainFormState } from './hooks';
-import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import { PolygonForm } from './polygon_form';
+import { useCommonNavigate } from 'navigation/helpers';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -28,6 +29,7 @@ export enum CommunityType {
   Cosmos = 'Cosmos',
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
+  Polygon = 'Polygon',
   AbiFactory = 'Abi Factory',
 }
 
@@ -38,9 +40,76 @@ const ADMIN_ONLY_TABS = [
   CommunityType.SputnikDao,
 ];
 
-const CreateCommunity = () => {
+export const ETHEREUM_MAINNET = 'Ethereum Mainnet';
+
+type CreateCommunityProps = {
+  type?: string;
+};
+
+const getFormType = (type: string) => {
+  switch (type) {
+    case 'starter':
+      return CommunityType.StarterCommunity;
+    case 'erc20':
+      return CommunityType.Erc20Community;
+    case 'erc721':
+      return CommunityType.Erc721Community;
+    case 'sputnik':
+      return CommunityType.SputnikDao;
+    case 'substrate':
+      return CommunityType.SubstrateCommunity;
+    case 'cosmos':
+      return CommunityType.Cosmos;
+    case 'ethdao':
+      return CommunityType.EthDao;
+    case 'polygon':
+      return CommunityType.Polygon;
+    case 'solana':
+      return CommunityType.SplToken;
+    default:
+      return CommunityType.StarterCommunity;
+  }
+};
+
+const getTypeUrl = (type: CommunityType): string => {
+  switch (type) {
+    case CommunityType.StarterCommunity:
+      return 'starter';
+    case CommunityType.Erc20Community:
+      return 'erc20';
+    case CommunityType.Erc721Community:
+      return 'erc721';
+    case CommunityType.SputnikDao:
+      return 'sputnik';
+    case CommunityType.SubstrateCommunity:
+      return 'substrate';
+    case CommunityType.Cosmos:
+      return 'cosmos';
+    case CommunityType.EthDao:
+      return 'ethdao';
+    case CommunityType.Polygon:
+      return 'polygon';
+    case CommunityType.SplToken:
+      return 'solana';
+    default:
+      return 'starter';
+  }
+};
+
+const CreateCommunity = (props: CreateCommunityProps) => {
+  const { type } = props;
+  const navigate = useCommonNavigate();
+
+  useEffect(() => {
+    if (!type) {
+      navigate('/createCommunity/starter');
+    } else {
+      setCurrentForm(getFormType(type));
+    }
+  }, [type]);
+
   const [currentForm, setCurrentForm] = useState<CommunityType>(
-    CommunityType.StarterCommunity
+    getFormType(type)
   );
   const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
     useEthChainFormState();
@@ -65,7 +134,7 @@ const CreateCommunity = () => {
     fetchEthChains();
   }, []);
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     const fetchEthChainNames = async () => {
       const chains = await $.getJSON('https://chainid.network/chains.json');
 
@@ -86,64 +155,73 @@ const CreateCommunity = () => {
   }, [ethChains]);
 
   const getCurrentForm = () => {
-    switch (currentForm) {
-      case CommunityType.StarterCommunity:
+    switch (type) {
+      case 'starter':
         return <StarterCommunityForm />;
-      case CommunityType.Erc20Community:
+      case 'erc20':
         return (
           <ERC20Form ethChains={ethChains} ethChainNames={ethChainNames} />
         );
-      case CommunityType.Erc721Community:
+      case 'erc721':
         return (
           <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
         );
-      case CommunityType.SputnikDao:
+      case 'sputnik':
         return <SputnikForm />;
-      case CommunityType.SubstrateCommunity:
+      case 'substrate':
         return <SubstrateForm />;
-      case CommunityType.Cosmos:
+      case 'cosmos':
         return <CosmosForm />;
-      case CommunityType.EthDao:
+      case 'ethdao':
         return (
           <EthDaoForm ethChains={ethChains} ethChainNames={ethChainNames} />
         );
-      case CommunityType.SplToken:
+      case 'polygon':
+        return (
+          <PolygonForm ethChains={ethChains} ethChainNames={ethChainNames} />
+        );
+      case 'solana':
         return <SplTokenForm />;
       default:
-        throw new Error(`Invalid community type: ${currentForm}`);
+        return <StarterCommunityForm />;
     }
   };
 
   return (
-    <Sublayout>
-      <div className="CreateCommunityIndex">
-        <CWText type="h3" fontWeight="semiBold">
-          New Commonwealth Community
-        </CWText>
-        <CWTabBar>
-          {Object.values(CommunityType)
-            .filter((t) => {
-              return (
-                (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
-                t !== CommunityType.AbiFactory
-              );
-            })
-            .map((t, i) => {
-              return (
-                <CWTab
-                  key={i}
-                  label={t.toString()}
-                  isSelected={currentForm === t}
-                  onClick={() => {
-                    setCurrentForm(t);
-                  }}
-                />
-              );
-            })}
-        </CWTabBar>
-        {getCurrentForm()}
-      </div>
-    </Sublayout>
+    <div className="CreateCommunityIndex">
+      <CWText type="h3" fontWeight="semiBold">
+        New Commonwealth Community
+      </CWText>
+      <CWTabBar>
+        {Object.values(CommunityType)
+          .filter((t) => {
+            return (
+              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
+              t !== CommunityType.AbiFactory
+            );
+          })
+          .map((t, i) => {
+            return (
+              <CWTab
+                key={i}
+                label={t.toString()}
+                isSelected={currentForm === t}
+                onClick={() => {
+                  setCurrentForm(t);
+                  navigate(`/createCommunity/${getTypeUrl(t)}`);
+                }}
+              />
+            );
+          })}
+      </CWTabBar>
+      {Object.keys(ethChainNames).length !== 0 ? (
+        getCurrentForm()
+      ) : (
+        <div className="SpinnerContainer">
+          <CWSpinner />
+        </div>
+      )}
+    </div>
   );
 };
 

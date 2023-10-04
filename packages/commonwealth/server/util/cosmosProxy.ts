@@ -1,5 +1,6 @@
 import axios from 'axios';
 import bodyParser from 'body-parser';
+import _ from 'lodash';
 
 import { AppError } from 'common-common/src/errors';
 import type { Express } from 'express';
@@ -82,8 +83,9 @@ function setupCosmosProxy(app: Express, models: DB) {
         }
         log.trace(`Found cosmos endpoint: ${targetUrl}`);
         const rewrite = req.originalUrl.replace(req.baseUrl, targetUrl);
+        const body = _.isEmpty(req.body) ? null : req.body;
 
-        const response = await axios.get(rewrite, {
+        const response = await axios.post(rewrite, body, {
           headers: {
             origin: 'https://commonwealth.im',
           },

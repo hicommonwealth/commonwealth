@@ -5,26 +5,33 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import type { MenuItem } from '../components/component_kit/types';
 import useSidebarStore from 'state/ui/sidebar';
 import { MobileMenuName } from 'views/AppMobileMenus';
+import { useCommonNavigate } from 'navigation/helpers';
+import { NavigateOptions, To } from 'react-router';
 
 export const getMainMenuItems = (
-  setMobileMenuName: (name: MobileMenuName) => void
+  setMobileMenuName: (name: MobileMenuName) => void,
+  navigate: (url: To, options?: NavigateOptions, prefix?: null | string) => void
 ): Array<MenuItem> => {
   return [
     ...((app.activeChainId()
       ? [
           {
             label: 'Create',
-            iconLeft: 'plusCircle',
+            iconLeft: 'plusCirclePhosphor',
             iconRight: 'chevronRight',
             onClick: () => setMobileMenuName('CreateContentMenu'),
           },
         ]
       : []) as Array<MenuItem>),
     {
+      label: 'Explore communities',
+      iconLeft: 'compassPhosphor',
+      onClick: () => navigate('/communities', {}, null),
+    },
+    {
       label: 'Help',
-      iconLeft: 'help',
-      iconRight: 'chevronRight',
-      onClick: () => setMobileMenuName('HelpMenu'),
+      iconLeft: 'question',
+      onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
     },
     ...((app.isLoggedIn()
       ? [
@@ -43,11 +50,12 @@ export const getMainMenuItems = (
 
 export const MainMenu = () => {
   const { setMobileMenuName } = useSidebarStore();
+  const navigate = useCommonNavigate();
 
   return (
     <CWMobileMenu
       className="MainMenu"
-      menuItems={getMainMenuItems(setMobileMenuName)}
+      menuItems={getMainMenuItems(setMobileMenuName, navigate)}
     />
   );
 };

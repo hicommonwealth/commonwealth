@@ -1,10 +1,7 @@
 import app, { ApiStatus } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { updateActiveAddresses } from 'controllers/app/login';
-import $ from 'jquery';
-import type { NavigateFunction } from 'react-router-dom';
 import ChainInfo from '../models/ChainInfo';
-import NodeInfo from '../models/NodeInfo';
 
 export const deinitChainOrCommunity = async () => {
   app.isAdapterReady = false;
@@ -26,10 +23,7 @@ export const deinitChainOrCommunity = async () => {
 // called by the user, when clicking on the chain/node switcher menu
 // returns a boolean reflecting whether initialization of chain via the
 // initChain fn ought to proceed or abort
-export const selectChain = async (
-  chain?: ChainInfo,
-  deferred = false
-): Promise<boolean> => {
+export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
   // Select the default node, if one wasn't provided
   if (!chain) {
     if (app.user.selectedChain) {
@@ -48,8 +42,11 @@ export const selectChain = async (
     return;
   }
 
-  // Shut down old chain if applicable
-  await deinitChainOrCommunity();
+  // This is a bandaid fix used to stop chain deinit on navigation from createCommunities page. Should be removed.
+  if (!app.skipDeinitChain) {
+    await deinitChainOrCommunity();
+    app.skipDeinitChain = false;
+  }
   app.chainPreloading = true;
   document.title = `Commonwealth – ${chain.name}`;
 
@@ -202,7 +199,6 @@ export const selectChain = async (
   }
 
   app.chainPreloading = false;
-  app.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses({ chain });
@@ -228,9 +224,11 @@ export const initChain = async (): Promise<void> => {
     await app.chain.initApi();
   }
 
-  app.chain.deferred = false;
+  if (!app.chain.loaded) {
+    await app.chain.initData();
+  }
+
   const chain = app.chain.meta;
-  await app.chain.initData();
 
   // Emit chain as updated
   app.chainAdapterReady.emit('ready');
@@ -239,32 +237,4 @@ export const initChain = async (): Promise<void> => {
 
   // Instantiate (again) to create chain-specific Account<> objects
   await updateActiveAddresses({ chain });
-};
-
-export const initNewTokenChain = async (
-  address: string,
-  navigate: NavigateFunction
-) => {
-  const chain_network = app.chain.network;
-  const response = await $.getJSON('/api/getTokenForum', {
-    address,
-    chain_network,
-    autocreate: true,
-  });
-
-  if (response.status !== 'Success') {
-    // TODO: better custom 404
-    navigate('/404');
-  }
-
-  // TODO: check if this is valid
-  const { chain, node } = response.result;
-  const chainInfo = ChainInfo.fromJSON(chain);
-  const nodeInfo = new NodeInfo(node);
-
-  if (!app.config.chains.getById(chainInfo.id)) {
-    app.config.chains.add(chainInfo);
-    app.config.nodes.add(nodeInfo);
-  }
-  await selectChain(chainInfo);
 };

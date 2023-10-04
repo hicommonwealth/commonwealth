@@ -23,8 +23,8 @@ class EthereumAccounts
 
   private _Chain: EthereumChain;
 
-  public get(address: string) {
-    return this.fromAddress(address);
+  public get(address: string, keytype?: string, ignoreProfiles = true) {
+    return this.fromAddress(address, ignoreProfiles);
   }
 
   private _app: IApp;
@@ -36,7 +36,7 @@ class EthereumAccounts
     this._app = app;
   }
 
-  public fromAddress(address: string): EthereumAccount {
+  public fromAddress(address: string, ignoreProfiles = true): EthereumAccount {
     if (address.indexOf('0x') !== -1) {
       if (address.length !== 42) {
         console.error(`Invalid address length! ${address}`);
@@ -50,7 +50,13 @@ class EthereumAccounts
     try {
       return this._store.getByAddress(address);
     } catch (e) {
-      return new EthereumAccount(this.app, this._Chain, this, address);
+      return new EthereumAccount(
+        this.app,
+        this._Chain,
+        this,
+        address,
+        ignoreProfiles
+      );
     }
   }
 

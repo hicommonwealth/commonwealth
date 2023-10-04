@@ -17,7 +17,7 @@ import { success } from '../types';
 import { createRole } from '../util/roles';
 
 import { redirectWithLoginError } from './finishEmailLogin';
-import { serverAnalyticsTrack } from '../../shared/analytics/server-track';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -57,7 +57,7 @@ const Errors = {
   TokenBadIssuer: 'Invalid token issuer',
   TokenExpired: 'Token expired',
   TokenBadAddress: 'Invalid token address',
-  AlreadyLoggedIn: 'User is already logged in',
+  AlreadyLoggedIn: 'User is already signed in',
   ReplayAttack: 'Invalid token. Try again',
   AccountCreationFailed: 'Failed to create account',
 };
@@ -70,6 +70,8 @@ const finishSsoLogin = async (
   req: TypedRequestBody<FinishSsoLoginReq>,
   res: TypedResponse<FinishSsoLoginRes>
 ) => {
+  const serverAnalyticsController = new ServerAnalyticsController();
+
   // verify issuer (TODO: support other SSO endpoints)
   if (req.body.issuer !== Issuers.AxieInfinity) {
     throw new AppError(Errors.InvalidIssuer);
@@ -251,12 +253,15 @@ const finishSsoLogin = async (
           if (err)
             return redirectWithLoginError(
               res,
-              `Could not log in with ronin wallet`
+              `Could not sign in with ronin wallet`
             );
-          serverAnalyticsTrack({
-            event: MixpanelLoginEvent.LOGIN,
-            isCustomDomain: null,
-          });
+          serverAnalyticsController.track(
+            {
+              event: MixpanelLoginEvent.LOGIN_COMPLETED,
+              isCustomDomain: null,
+            },
+            req
+          );
         });
         return success(res, { user: existingUser });
       } else {
@@ -267,15 +272,27 @@ const finishSsoLogin = async (
         existingAddress.user_id = newUser.id;
         await existingAddress.save();
         req.login(newUser, (err) => {
-          if (err)
+          if (err) {
+            serverAnalyticsController.track(
+              {
+                event: MixpanelLoginEvent.LOGIN_FAILED,
+                isCustomDomain: null,
+              },
+              req
+            );
             return redirectWithLoginError(
               res,
-              `Could not log in with ronin wallet`
+              `Could not sign in with ronin wallet`
             );
-          serverAnalyticsTrack({
-            event: MixpanelLoginEvent.LOGIN,
-            isCustomDomain: null,
-          });
+          }
+
+          serverAnalyticsController.track(
+            {
+              event: MixpanelLoginEvent.LOGIN_COMPLETED,
+              isCustomDomain: null,
+            },
+            req
+          );
         });
         return success(res, { user: newUser });
       }
@@ -316,6 +333,7 @@ const finishSsoLogin = async (
           user_id: user.id,
           profile_id: profile.id,
           wallet_id: WalletId.Ronin,
+          // wallet_sso_source: null,
         },
         { transaction: t }
       );
@@ -334,7 +352,6 @@ const finishSsoLogin = async (
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewMention,
-          object_id: `user-${user.id}`,
           is_active: true,
         },
         { transaction: t }
@@ -345,18 +362,6 @@ const finishSsoLogin = async (
         {
           subscriber_id: user.id,
           category_id: NotificationCategories.NewCollaboration,
-          object_id: `user-${user.id}`,
-          is_active: true,
-        },
-        { transaction: t }
-      );
-
-      // Automatically create subscription to chat mentions
-      await models.Subscription.create(
-        {
-          subscriber_id: user.id,
-          category_id: NotificationCategories.NewChatMention,
-          object_id: `user-${user.id}`,
           is_active: true,
         },
         { transaction: t }
@@ -376,10 +381,13 @@ const finishSsoLogin = async (
       const newAddress = await models.Address.findOne({
         where: { address: checksumAddress },
       });
-      serverAnalyticsTrack({
-        event: MixpanelLoginEvent.LOGIN,
-        isCustomDomain: null,
-      });
+      serverAnalyticsController.track(
+        {
+          event: MixpanelLoginEvent.LOGIN_COMPLETED,
+          isCustomDomain: null,
+        },
+        req
+      );
       return success(res, { address: newAddress });
     } else {
       // re-fetch user to include address object, if freshly created
@@ -394,12 +402,15 @@ const finishSsoLogin = async (
         if (err)
           return redirectWithLoginError(
             res,
-            `Could not log in with ronin wallet`
+            `Could not sign in with ronin wallet`
           );
-        serverAnalyticsTrack({
-          event: MixpanelLoginEvent.LOGIN,
-          isCustomDomain: null,
-        });
+        serverAnalyticsController.track(
+          {
+            event: MixpanelLoginEvent.LOGIN_COMPLETED,
+            isCustomDomain: null,
+          },
+          req
+        );
       });
       return success(res, { user: newUser });
     }

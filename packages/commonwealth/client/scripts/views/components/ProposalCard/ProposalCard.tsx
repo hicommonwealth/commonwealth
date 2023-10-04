@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import { ProposalType } from 'common-common/src/types';
-
 import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
@@ -23,6 +21,10 @@ import {
 } from './helpers';
 import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
+import {
+  useCosmosProposalTallyQuery,
+  useCosmosProposalMetadataQuery,
+} from 'state/api/proposals';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;
@@ -34,9 +36,26 @@ export const ProposalCard = ({
   injectedContent,
 }: ProposalCardProps) => {
   const navigate = useCommonNavigate();
-  const [title, setTitle] = useState(proposal.title);
+  const [title, setTitle] = useState(
+    proposal.title || `Proposal ${proposal.identifier}`
+  );
+  const { data: metadata } = useCosmosProposalMetadataQuery(proposal);
+  const { isFetching: isFetchingTally } = useCosmosProposalTallyQuery(proposal);
 
   const secondaryTagText = getSecondaryTagText(proposal);
+
+  useEffect(() => {
+    if (metadata?.title) setTitle(metadata?.title);
+  }, [metadata]);
+
+  useEffect(() => {
+    if (proposal instanceof AaveProposal) {
+      proposal.ipfsDataReady.once('ready', () => {
+        // triggers render of shortDescription too
+        setTitle(proposal?.ipfsData.title);
+      });
+    }
+  }, [proposal]);
 
   useEffect(() => {
     if (proposal instanceof AaveProposal) {
@@ -101,38 +120,14 @@ export const ProposalCard = ({
       ) : proposal.isPassing !== 'none' ? (
         <CWText
           fontWeight="medium"
-          className={`proposal-status-text ${getStatusClass(proposal)}`}
+          className={`proposal-status-text ${getStatusClass(
+            proposal,
+            isFetchingTally
+          )}`}
         >
-          {getStatusText(proposal)}
+          {getStatusText(proposal, isFetchingTally)}
         </CWText>
       ) : null}
-      {proposal.threadId && (
-        <CWText type="caption" className="proposal-thread-link-text">
-          <a
-            href={getProposalUrlPath(
-              ProposalType.Thread,
-              `${proposal.threadId}`
-            )}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-
-              localStorage[`${app.activeChainId()}-proposals-scrollY`] =
-                window.scrollY;
-
-              navigate(
-                getProposalUrlPath(
-                  ProposalType.Thread,
-                  `${proposal.threadId}`,
-                  true
-                )
-              );
-            }}
-          >
-            {proposal.threadTitle ? proposal.threadTitle : 'Go to thread'}
-          </a>
-        </CWText>
-      )}
     </CWCard>
   );
 };

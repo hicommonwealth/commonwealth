@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import type { NavigateOptions, To } from 'react-router';
-import $ from 'jquery';
-
-import app from 'state';
-import { initAppState } from 'state';
 import { updateActiveAddresses } from 'controllers/app/login';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useState } from 'react';
+import type { NavigateOptions, To } from 'react-router';
+import { useSearchParams } from 'react-router-dom';
+import app, { initAppState } from 'state';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from './error';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useSearchParams } from 'react-router-dom';
 
 // creates address, initializes account, and redirects to main page
 const validate = async (
@@ -27,7 +26,7 @@ const validate = async (
     });
   } catch (e) {
     console.error(`Post request error: ${e.responseText}`);
-    return `Login Error: ${e.responseText}`;
+    return `Sign in Error: ${e.responseText}`;
   }
   if (result.status === 'Success') {
     await initAppState();
@@ -36,8 +35,8 @@ const validate = async (
     console.log('Navigating to axie infinite community');
     setRoute('/axie-infinity');
   } else {
-    console.error(`Got login error: ${JSON.stringify(result)}`);
-    return `Login error: ${JSON.stringify(result)}`;
+    console.error(`Got sign in error: ${JSON.stringify(result)}`);
+    return `Sign in error: ${JSON.stringify(result)}`;
   }
 };
 
@@ -49,7 +48,7 @@ const FinishAxieLogin = () => {
   const token = searchParams.get('token');
   const stateId = searchParams.get('stateId');
 
-  useEffect(() => {
+  useNecessaryEffect(() => {
     validate(token, stateId, 'axie-infinity', navigate).then((res) => {
       if (typeof res === 'string') {
         setError(res);
@@ -57,10 +56,26 @@ const FinishAxieLogin = () => {
     });
   }, [navigate, stateId, token]);
 
-  console.log('finish axie login');
+  console.log('finish axie sign in');
 
   if (error) {
-    return <ErrorPage title="Login Error" message={error} />;
+    return (
+      <ErrorPage
+        title="Sign in Error"
+        message={
+          <div>
+            {error}
+            <br />
+            <br />
+            <div>
+              If this is your first time encountering this error, log out of{' '}
+              <a href="https://app.axieinfinity.com">Ronin Wallet</a> and{' '}
+              <a href="/axie-infinity">try logging in again</a>.
+            </div>
+          </div>
+        }
+      />
+    );
   } else {
     return <PageLoading />;
   }

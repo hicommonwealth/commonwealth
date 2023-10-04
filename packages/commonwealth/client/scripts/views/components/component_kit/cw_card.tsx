@@ -5,7 +5,12 @@ import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
 
-export type CardElevation = 'elevation-1' | 'elevation-2' | 'elevation-3';
+export type CardElevation =
+  | 'elevation-1'
+  | 'elevation-2'
+  | 'elevation-3'
+  | 'elevation-4'
+  | 'elevation-5';
 
 type CardStyleProps = {
   className?: string;

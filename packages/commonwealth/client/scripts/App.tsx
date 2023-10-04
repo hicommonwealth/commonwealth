@@ -1,27 +1,36 @@
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import useInitApp from 'hooks/useInitApp';
+import router from 'navigation/Router';
 import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { queryClient } from 'state/api/config';
+import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
 
-import useInitApp from 'hooks/useInitApp';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
-
-import router from 'navigation/Router';
+const Splash = () => {
+  return (
+    <div className="Splash">
+      {/* This can be a moving bobber, atm it is still */}
+      <CWIcon iconName="cow" iconSize="xxl" />
+    </div>
+  );
+};
 
 const App = () => {
-  const { customDomain, loading } = useInitApp();
-
-  if (loading) {
-    return (
-      <div className="app-loading">
-        <CWSpinner />
-      </div>
-    );
-  }
+  const { customDomain, isLoading } = useInitApp();
 
   return (
     <StrictMode>
-      <RouterProvider router={router(customDomain)} />
-      <ToastContainer />
+      <QueryClientProvider client={queryClient}>
+        {isLoading ? (
+          <Splash />
+        ) : (
+          <RouterProvider router={router(customDomain)} />
+        )}
+        <ToastContainer />
+        <ReactQueryDevtools />
+      </QueryClientProvider>
     </StrictMode>
   );
 };

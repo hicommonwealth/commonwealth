@@ -349,7 +349,7 @@ export class CacheDecorator {
         res.send = originalSend;
         res.send(body);
         try {
-          if (res.statusCode == 200) {
+          if (res.statusCode == 200 || res.statusCode == 304) {
             const ret = await this.cacheResponse(
               cacheKey,
               body,
@@ -365,7 +365,7 @@ export class CacheDecorator {
             }
           } else {
             log.warn(
-              `NOSET: Response status code is not 200 ${cacheKey}, skip writing cache`
+              `NOSET: ${cacheKey} Response status code is not 200 but ${res.statusCode}, skip writing cache`
             );
           }
         } catch (error) {

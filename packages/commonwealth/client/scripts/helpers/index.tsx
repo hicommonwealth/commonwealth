@@ -223,9 +223,15 @@ export function formatProposalHashShort(hash: string) {
   return `${hash.slice(0, 8)}…`;
 }
 
-export function formatAddressShort(address: string) {
+export function formatAddressShort(
+  address: string,
+  numberOfVisibleCharacters = 5,
+  numberOfVisibleCharactersTail = 4
+) {
   if (address.length < 10) return address;
-  return `${address.slice(0, 5)}…${address.slice(-5, -1)}`;
+  return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
+    -numberOfVisibleCharactersTail
+  )}`;
 }
 
 export function renderMultilineText(text: string) {

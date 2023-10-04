@@ -1,11 +1,3 @@
-import type { RegisteredTypes } from '@polkadot/types/types';
-
-import { HydraDXSpec } from './specs/hydraDX';
-import { KulupuSpec } from './specs/kulupu';
-import { StafiSpec } from './specs/stafi';
-import { CloverSpec } from './specs/clover';
-import { EdgewareSpec } from './specs/edgeware';
-
 export const networkUrls = {
   clover: 'wss://api.clover.finance',
   hydradx: 'wss://rpc-01.snakenet.hydradx.io',
@@ -17,35 +9,23 @@ export const networkUrls = {
   kulupu: 'ws://rpc.kulupu.corepaper.org/ws',
   stafi: 'wss://scan-rpc.stafi.io/ws',
 
-  marlin: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+  marlin: 'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   'marlin-local': 'ws://127.0.0.1:9545',
   uniswap:
-    'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
-  tribe: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+    'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+  tribe: 'http://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
 
-  aave: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+  aave: 'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   'aave-local': 'ws://127.0.0.1:9545',
   'dydx-ropsten':
-    'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
-  dydx: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+    'https://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
+  dydx: 'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   frax: 'ws://localhost:8545',
 
-  erc20: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+  erc20: 'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
   'eth-local': 'ws://127.0.0.1:8545',
   osmosis: 'https://rpc-osmosis.blockapsis.com',
 } as const;
-
-export const networkSpecs: { [chain: string]: RegisteredTypes } = {
-  clover: CloverSpec,
-  hydradx: HydraDXSpec,
-  kulupu: KulupuSpec,
-  edgeware: EdgewareSpec,
-  'edgeware-local': EdgewareSpec,
-  'edgeware-testnet': EdgewareSpec,
-  stafi: StafiSpec,
-  kusama: {},
-  polkadot: {},
-};
 
 export const contracts = {
   marlin: '0x777992c2E4EDF704e49680468a9299C6679e37F6',

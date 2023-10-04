@@ -19,7 +19,7 @@ export async function Enrich(
   api: Api,
   blockNumber: number,
   kind: EventKind,
-  rawData: RawEvent
+  rawData: RawEvent | Omit<RawEvent, 'name'>
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     case EventKind.ProposalCanceled: {

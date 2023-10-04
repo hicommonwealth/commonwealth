@@ -26,7 +26,9 @@ export const SidebarQuickSwitcher = () => {
 
   const starredCommunities = allCommunities.filter((item) => {
     // filter out non-starred communities
-    return !(item instanceof ChainInfo && !app.communities.isStarred(item.id));
+    return !(
+      item instanceof ChainInfo && !app.user.isCommunityStarred(item.id)
+    );
   });
 
   return (
@@ -34,7 +36,7 @@ export const SidebarQuickSwitcher = () => {
       <div className="community-nav-bar">
         {isLoggedIn && (
           <CWIconButton
-            iconName="plusCircle"
+            iconName="plusCirclePhosphor"
             iconButtonTheme="black"
             onClick={() => {
               setMenu({ name: 'createContent' });
@@ -42,7 +44,7 @@ export const SidebarQuickSwitcher = () => {
           />
         )}
         <CWIconButton
-          iconName="compass"
+          iconName="compassPhosphor"
           iconButtonTheme="black"
           onClick={() => {
             setMenu({ name: 'exploreCommunities' });

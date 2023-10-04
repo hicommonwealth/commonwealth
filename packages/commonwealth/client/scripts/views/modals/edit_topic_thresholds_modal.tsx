@@ -1,26 +1,31 @@
-import React from 'react';
-
-import { getDecimals } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-
+import { getDecimals } from 'helpers';
 import 'modals/edit_topic_thresholds_modal.scss';
-import type Topic from '../../models/Topic';
-
+import React from 'react';
 import app from 'state';
+import {
+  useFetchTopicsQuery,
+  useSetTopicThresholdMutation,
+} from 'state/api/topics';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';
+import type Topic from '../../models/Topic';
+import Permissions from '../../utils/Permissions';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWText } from '../components/component_kit/cw_text';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
+  onClose: () => void;
 };
 
-const EditTopicThresholdsRow = (props: EditTopicThresholdsRowProps) => {
+const EditTopicThresholdsRow = ({
+  topic,
+  onClose,
+}: EditTopicThresholdsRowProps) => {
   const [newTokenThresholdInWei, setNewTokenThresholdInWei] =
     React.useState<string>();
-
-  const { topic } = props;
+  const { mutateAsync: setTopicThreshold } = useSetTopicThresholdMutation();
 
   if (typeof newTokenThresholdInWei !== 'string') {
     setNewTokenThresholdInWei(topic.tokenThreshold?.toString() || '0');
@@ -46,18 +51,18 @@ const EditTopicThresholdsRow = (props: EditTopicThresholdsRowProps) => {
             e.preventDefault();
 
             try {
-              const status = await app.topics.setTopicThreshold(
+              await setTopicThreshold({
                 topic,
-                newTokenThresholdInWei
-              );
-
-              if (status === 'Success') {
-                notifySuccess('Successfully updated threshold value');
-              } else {
-                notifyError('Could not update threshold value');
-              }
+                topicThreshold: newTokenThresholdInWei,
+              });
+              onClose();
+              notifySuccess('Successfully updated threshold value');
             } catch (err) {
-              notifyError(`Invalid threshold value: ${err.message}`);
+              notifyError(
+                err?.response?.data?.error ||
+                  err?.message ||
+                  'Invalid threshold value'
+              );
             }
           }}
         />
@@ -70,23 +75,22 @@ type EditTopicThresholdsModalProps = {
   onModalClose: () => void;
 };
 
-export const EditTopicThresholdsModal = (
-  props: EditTopicThresholdsModalProps
-) => {
-  if (
-    !app.user.isSiteAdmin &&
-    !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
-  ) {
+export const EditTopicThresholdsModal = ({
+  onModalClose,
+}: EditTopicThresholdsModalProps) => {
+  const { data: topics } = useFetchTopicsQuery({
+    chainId: app.activeChainId(),
+  });
+
+  if (!(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())) {
     return null;
   }
-
-  const topics = app.topics.getByCommunity(app.activeChainId());
 
   return (
     <div className="EditTopicThresholdsModal">
       <div className="compact-modal-title">
         <h3>Edit topic thresholds</h3>
-        <CWIconButton iconName="close" onClick={() => props.onModalClose()} />
+        <CWIconButton iconName="close" onClick={onModalClose} />
       </div>
       <div className="compact-modal-body">
         {topics.length > 0 ? (
@@ -101,7 +105,13 @@ export const EditTopicThresholdsModal = (
               return 0;
             })
             .map((topic) => {
-              return <EditTopicThresholdsRow topic={topic} key={topic.id} />;
+              return (
+                <EditTopicThresholdsRow
+                  topic={topic}
+                  key={topic.id}
+                  onClose={onModalClose}
+                />
+              );
             })
         ) : (
           <CWText>There are no topics in this community yet</CWText>

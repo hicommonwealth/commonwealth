@@ -54,18 +54,6 @@ const updateAddress = async (
           { where: { address_id: ghostAddressId }, transaction }
         );
 
-        // update address in roles
-        await models.RoleAssignment.update(
-          { address_id: newAddressId },
-          { where: { address_id: ghostAddressId }, transaction }
-        );
-
-        // delete role assignment by address
-        await models.RoleAssignment.destroy({
-          where: { address_id: ghostAddressId },
-          transaction,
-        });
-
         // delete ghost address from Address
         await models.Address.destroy({
           where: { id: ghostAddressId },

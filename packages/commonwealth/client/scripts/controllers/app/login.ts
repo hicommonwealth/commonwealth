@@ -2,22 +2,21 @@
  * @file Manages logged-in user accounts and local storage.
  */
 import { initAppState } from 'state';
-import { WalletId } from 'common-common/src/types';
+import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { signSessionWithMagic } from 'controllers/server/sessions';
+import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
 
-import moment from 'moment';
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
-import ITokenAdapter from '../../models/ITokenAdapter';
 import SocialAccount from '../../models/SocialAccount';
-import { CosmosExtension } from '@magic-ext/cosmos';
-import { clientAnalyticsTrack } from '../../../../shared/analytics/client-track';
-import { MixpanelLoginEvent } from '../../../../shared/analytics/types';
+
+import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -39,11 +38,7 @@ export async function setActiveAccount(
   const chain = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
 
-  if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-    await app.chain.activeAddressHasToken(account.address);
-  }
-
-  if (!role || role.is_user_default) {
+  if (!role) {
     app.user.ephemerallySetActiveAccount(account);
     if (
       app.user.activeAccounts.filter((a) => isSameAccount(a, account))
@@ -54,6 +49,17 @@ export async function setActiveAccount(
         shouldRedraw
       );
     }
+
+    // HOT FIX: https://github.com/hicommonwealth/commonwealth/issues/4177
+    // Emit a force re-render on cosmos chains to make sure
+    // that app.user.activeAccount is set - this is required for many actions
+    // There is a race condition b/w the app accessing app.user.activeAccount
+    // and updating it. A proper solution would be to fix this race condition
+    // for cosmos chains - since the issue happens only on that chain
+    if (app.chain.base === 'cosmos') {
+      app.loginStateEmitter.emit('redraw');
+    }
+
     return;
   }
 
@@ -65,6 +71,12 @@ export async function setActiveAccount(
       jwt: app.user.jwt,
       auth: true,
     });
+
+    app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
+      r.is_user_default = false;
+    });
+    role.is_user_default = true;
+
     if (response.status !== 'Success') {
       throw Error(`Unsuccessful status: ${response.status}`);
     }
@@ -73,11 +85,6 @@ export async function setActiveAccount(
     notifyError('Could not set active account');
   }
 
-  // update is_user_default
-  app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
-    r.is_user_default = false;
-  });
-  role.is_user_default = true;
   app.user.ephemerallySetActiveAccount(account);
   if (
     app.user.activeAccounts.filter((a) => isSameAccount(a, account)).length ===
@@ -97,12 +104,13 @@ export async function completeClientLogin(account: Account) {
     );
 
     if (!addressInfo && account.addressId) {
-      addressInfo = new AddressInfo(
-        account.addressId,
-        account.address,
-        account.chain.id,
-        account.walletId
-      );
+      addressInfo = new AddressInfo({
+        id: account.addressId,
+        address: account.address,
+        chainId: account.chain.id,
+        walletId: account.walletId,
+        walletSsoSource: account.walletSsoSource,
+      });
       app.user.addresses.push(addressInfo);
     }
 
@@ -139,28 +147,6 @@ export async function completeClientLogin(account: Account) {
   }
 }
 
-export async function updateLastVisited(
-  activeEntity: ChainInfo,
-  updateFrontend?: boolean
-) {
-  if (!app.isLoggedIn()) return;
-  try {
-    const timestamp = moment();
-    const obj = { activeEntity: activeEntity.id, timestamp };
-    const value = JSON.stringify(obj);
-    if (updateFrontend) {
-      app.user.lastVisited[activeEntity.id] = new Date().toISOString();
-    }
-    await $.post(`${app.serverUrl()}/writeUserSetting`, {
-      jwt: app.user.jwt,
-      key: 'lastVisited',
-      value,
-    });
-  } catch (e) {
-    console.log('Could not update lastVisited:', e);
-  }
-}
-
 export async function updateActiveAddresses({
   chain,
   shouldRedraw = true,
@@ -173,10 +159,12 @@ export async function updateActiveAddresses({
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
       .filter((addr) => addr),
     shouldRedraw
   );
+
+  getTokenBalance();
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
@@ -219,7 +207,6 @@ export function updateActiveUser(data) {
 
     app.user.setSiteAdmin(false);
     app.user.setDisableRichText(false);
-    app.user.setLastVisited({});
     app.user.setUnseenPosts({});
 
     app.user.setActiveAccounts([]);
@@ -233,14 +220,15 @@ export function updateActiveUser(data) {
     app.user.setAddresses(
       data.addresses.map(
         (a) =>
-          new AddressInfo(
-            a.id,
-            a.address,
-            a.chain,
-            a.keytype,
-            a.wallet_id,
-            a.ghost_address
-          )
+          new AddressInfo({
+            id: a.id,
+            address: a.address,
+            chainId: a.chain,
+            keytype: a.keytype,
+            walletId: a.wallet_id,
+            walletSsoSource: a.wallet_sso_source,
+            ghostAddress: a.ghost_address,
+          })
       )
     );
     app.user.setSocialAccounts(
@@ -251,7 +239,6 @@ export function updateActiveUser(data) {
 
     app.user.setSiteAdmin(data.isAdmin);
     app.user.setDisableRichText(data.disableRichText);
-    app.user.setLastVisited(data.lastVisited);
     app.user.setUnseenPosts(data.unseenPosts);
   }
 }
@@ -259,6 +246,7 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
+  walletSsoSource: WalletSsoSource,
   chain: string,
   sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo
@@ -268,6 +256,7 @@ export async function createUserWithAddress(
     chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
+    wallet_sso_source: walletSsoSource,
     block_info: validationBlockInfo
       ? JSON.stringify(validationBlockInfo)
       : null,
@@ -282,6 +271,7 @@ export async function createUserWithAddress(
     walletId,
     sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
+    ignoreProfile: false,
   });
   return { account, newlyCreated: response.result.newly_created };
 }
@@ -294,6 +284,11 @@ export async function unlinkLogin(account: AddressInfo) {
     chain: account.chain.id,
     auth: true,
     jwt: app.user.jwt,
+  });
+  // remove deleted role from app.roles
+  app.roles.deleteRole({
+    address: account,
+    chain: account.chain.id,
   });
   // Remove from all address stores in the frontend state.
   // This might be more gracefully handled by calling initAppState again.
@@ -312,45 +307,82 @@ export async function unlinkLogin(account: AddressInfo) {
   }
 }
 
-async function constructMagic() {
+async function constructMagic(isCosmos: boolean, chain?: string) {
   const { Magic } = await import('magic-sdk');
   const { OAuthExtension } = await import('@magic-ext/oauth');
+  const { CosmosExtension } = await import('@magic-ext/cosmos');
+
+  if (isCosmos && !chain) {
+    throw new Error('Must be in a community to sign in with Cosmos magic link');
+  }
+
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions: [
-      new OAuthExtension(),
-      new CosmosExtension({
-        // default to Osmosis URL
-        rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
-      }),
-    ]
+    extensions: !isCosmos
+      ? [new OAuthExtension()]
+      : [
+          new OAuthExtension(),
+          new CosmosExtension({
+            // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
+            // so we can't use app.chain.meta?.node?.url
+            rpcUrl: `${document.location.origin}/magicCosmosAPI/${chain}`,
+            // rpcUrl: app.chain?.meta?.node?.url || app.config.chains.getById('osmosis').node.url,
+          }),
+        ],
   });
 }
 
-export async function loginWithMagicLink({
-  email, provider
-}: { email?: string, provider?: string }) {
-  if (!email && !provider) throw new Error('Must provider email or provider');
-  const magic = await constructMagic();
+export async function startLoginWithMagicLink({
+  email,
+  provider,
+  redirectTo,
+  chain,
+  isCosmos,
+}: {
+  email?: string;
+  provider?: WalletSsoSource;
+  redirectTo?: string;
+  chain?: string;
+  isCosmos: boolean;
+}) {
+  if (!email && !provider)
+    throw new Error('Must provide email or SSO provider');
+  const magic = await constructMagic(isCosmos, chain);
 
   if (email) {
+    // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    await handleSocialLoginCallback(bearer);
+    const address = await handleSocialLoginCallback({ bearer });
+    return { bearer, address };
   } else {
-    // provider-based login
+    const params = `?redirectTo=${
+      redirectTo ? encodeURIComponent(redirectTo) : ''
+    }&chain=${chain || ''}&sso=${provider}`;
     await magic.oauth.loginWithRedirect({
       provider: provider as any,
-      redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+      redirectURI: new URL(
+        '/finishsociallogin' + params,
+        window.location.origin
+      ).href,
     });
+
+    // magic should redirect away from this page, but we return after 5 sec if it hasn't
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
+    const info = await magic.user.getInfo();
+    return { address: info.publicAddress };
   }
 }
 
 // Cannot get proper type due to code splitting
-function getProfileMetadata({ provider, userInfo }): { username?: string, avatarUrl?: string } {
+function getProfileMetadata({ provider, userInfo }): {
+  username?: string;
+  avatarUrl?: string;
+} {
   // provider: result.oauth.provider (twitter, discord, github)
   if (provider === 'discord') {
     // for discord: result.oauth.userInfo.sources.https://discord.com/api/users/@me.username = name
     //   avatar: https://cdn.discordapp.com/avatars/<user id>/<avatar id>.png
-    const { avatar, id, username } = userInfo.sources['https://discord.com/api/users/@me'];
+    const { avatar, id, username } =
+      userInfo.sources['https://discord.com/api/users/@me'];
     if (avatar) {
       const avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
       return { username, avatarUrl };
@@ -369,16 +401,122 @@ function getProfileMetadata({ provider, userInfo }): { username?: string, avatar
   return {};
 }
 
-export async function handleSocialLoginCallback(bearer?: string) {
-  let profileMetadata: { username?: string, avatarUrl?: string } = {};
+// Given a magic bearer token, generate a session key for the user, and (optionally) also log them in
+export async function handleSocialLoginCallback({
+  bearer,
+  chain,
+  walletSsoSource,
+}: {
+  bearer?: string;
+  chain?: string;
+  walletSsoSource?: string;
+}): Promise<string> {
+  // desiredChain may be empty if social login was initialized from
+  // a page without a chain, in which case we default to an eth login
+  const desiredChain = app.chain?.meta || app.config.chains.getById(chain);
+  const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
+  const magic = await constructMagic(isCosmos, desiredChain?.id);
+
+  // Code up to this line might run multiple times because of extra calls to useEffect().
+  // Those runs will be rejected because getRedirectResult purges the browser search param.
+
+  const result = await magic.oauth.getRedirectResult();
   if (!bearer) {
-    const magic = await constructMagic();
-    const result = await magic.oauth.getRedirectResult();
-    profileMetadata = getProfileMetadata(result.oauth);
     bearer = result.magic.idToken;
-    // console.log('Magic redirect result:', result);
+    console.log('Magic redirect result:', result);
   }
 
+  // Get magic metadata
+  const profileMetadata = getProfileMetadata(result.oauth);
+  let magicAddress, authedSessionPayload, authedSignature;
+  if (isCosmos) {
+    magicAddress = result.magic.userMetadata.publicAddress;
+  } else {
+    const { utils } = await import('ethers');
+    magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
+  }
+
+  try {
+    // Sign a session
+    if (isCosmos && desiredChain) {
+      // Not every chain prefix will succeed, so Magic defaults to osmo... as the Cosmos prefix
+      const bech32Prefix = desiredChain.bech32Prefix;
+      try {
+        magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
+      } catch (err) {
+        console.error(
+          `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+        );
+      }
+
+      // Request the cosmos chain ID, since this is used by Magic to generate
+      // the signed message. The API is already used by the Magic iframe,
+      // but they don't expose the results.
+      const nodeInfo = await $.get(
+        `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`
+      );
+      const chainId = nodeInfo.node_info.network;
+
+      const timestamp = +new Date();
+
+      const signer = { signMessage: magic.cosmos.sign };
+      const { signature, sessionPayload } = await signSessionWithMagic(
+        ChainBase.CosmosSDK,
+        signer,
+        magicAddress,
+        timestamp
+      );
+      // TODO: provide blockhash as last argument to signSessionWithMagic
+      signature.signatures[0].chain_id = chainId;
+      await app.sessions.authSession(
+        ChainBase.CosmosSDK, // could be desiredChain.base in the future?
+        chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
+        magicAddress,
+        sessionPayload,
+        JSON.stringify(signature.signatures[0])
+      );
+      authedSessionPayload = JSON.stringify(sessionPayload);
+      authedSignature = JSON.stringify(signature.signatures[0]);
+      console.log(
+        'Reauthenticated Cosmos session from magic address:',
+        magicAddress
+      );
+    } else {
+      const { Web3Provider } = await import('@ethersproject/providers');
+      const { utils } = await import('ethers');
+
+      const provider = new Web3Provider(magic.rpcProvider);
+      const signer = provider.getSigner();
+      const checksumAddress = utils.getAddress(magicAddress); // get checksum-capitalized eth address
+
+      const timestamp = +new Date();
+      const { signature, sessionPayload } = await signSessionWithMagic(
+        ChainBase.Ethereum,
+        signer,
+        checksumAddress,
+        timestamp
+      );
+      // TODO: provide blockhash as last argument to signSessionWithMagic
+
+      await app.sessions.authSession(
+        ChainBase.Ethereum, // could be desiredChain.base in the future?
+        chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
+        checksumAddress,
+        sessionPayload,
+        signature
+      );
+      authedSessionPayload = JSON.stringify(sessionPayload);
+      authedSignature = signature;
+      console.log(
+        'Reauthenticated Ethereum session from magic address:',
+        checksumAddress
+      );
+    }
+  } catch (err) {
+    // if session auth fails, do nothing
+  }
+
+  // Otherwise, skip Account.validate(), proceed directly to server login
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,
     headers: {
@@ -388,22 +526,28 @@ export async function handleSocialLoginCallback(bearer?: string) {
       withCredentials: true,
     },
     data: {
-      chain: app.activeChainId(),
+      chain: desiredChain?.id,
       jwt: app.user.jwt,
       username: profileMetadata?.username,
       avatarUrl: profileMetadata?.avatarUrl,
+      magicAddress,
+      sessionPayload: authedSessionPayload,
+      signature: authedSignature,
+      walletSsoSource,
     },
   });
 
   if (response.status === 'Success') {
     await initAppState(false);
+    // This is code from before desiredChain was implemented, and
+    // may not be necessary anymore:
     if (app.chain) {
       const c = app.user.selectedChain
         ? app.user.selectedChain
         : app.config.chains.getById(app.activeChainId());
       await updateActiveAddresses({ chain: c });
     }
-    clientAnalyticsTrack({ event: MixpanelLoginEvent.MAGIC_LOGIN });
+    return magicAddress;
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
   }

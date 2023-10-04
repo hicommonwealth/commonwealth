@@ -1,28 +1,24 @@
-import React from 'react';
-import 'view_template/view_template.scss';
+import { parseFunctionFromABI } from 'abi_utils';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
+import validateType from 'helpers/validateTypes';
+import type Contract from 'models/Contract';
+import { useCommonNavigate } from 'navigation/helpers';
+import React, { useCallback, useEffect, useState } from 'react';
 import app from 'state';
-
-import Sublayout from '../../Sublayout';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
-import isValidJson from '../../../../../shared/validateJson';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWText } from 'views/components/component_kit/cw_text';
 import {
   CWTextInput,
   MessageRow,
 } from 'views/components/component_kit/cw_text_input';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWButton } from '../../components/component_kit/cw_button';
-import type Contract from 'models/Contract';
-import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
-import { parseFunctionFromABI } from 'abi_utils';
-import validateType from 'helpers/validateTypes';
-import Web3 from 'web3';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useCallback, useEffect, useState } from 'react';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useParams } from 'react-router-dom';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import 'view_template/view_template.scss';
+import Web3 from 'web3';
+import isValidJson from '../../../../../shared/validateJson';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 export enum TemplateComponents {
   DIVIDER = 'divider',
@@ -30,6 +26,7 @@ export enum TemplateComponents {
   INPUT = 'input',
   DROPDOWN = 'dropdown',
   FUNCTIONFORM = 'function',
+  STRUCTFORM = 'struct',
 }
 
 type Json = {
@@ -50,9 +47,16 @@ type Json = {
   };
 };
 
-const ViewTemplatePage = () => {
+type ViewTemplateFormProps = {
+  contract_address?: string;
+  slug?: string;
+  isForm?: boolean;
+  setTemplateNickname(name: string): any;
+};
+
+const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
   const navigate = useCommonNavigate();
-  const params = useParams();
+  const params = formData;
   const [formState, setFormState] = useState({});
   const [json, setJson] = useState<Json>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -73,11 +77,18 @@ const ViewTemplatePage = () => {
     });
 
     if (!contractInStore || !templateMetadata) {
+      if (formData.isForm) return <div>No Contract Available</div>;
       navigate('/404', {}, null);
     }
 
     setCurrentContract(contractInStore);
     setTemplateNickname(templateMetadata.cctmd.nickname);
+    if (
+      params.setTemplateNickname &&
+      typeof params.setTemplateNickname === 'function'
+    ) {
+      params.setTemplateNickname(templateMetadata.cctmd.nickname);
+    }
 
     app.contracts
       .getTemplatesForContract(contractInStore.id)
@@ -139,6 +150,18 @@ const ViewTemplatePage = () => {
               });
 
               break;
+            case TemplateComponents.STRUCTFORM:
+              setFormState((prevState) => {
+                const newState = { ...prevState };
+                const form = {};
+                field.struct.form_fields.forEach((nestField) => {
+                  form[nestField.input.field_ref] = null;
+                });
+                newState[field.struct.field_ref] = form;
+                return newState;
+              });
+              break;
+
             default:
               break;
           }
@@ -257,7 +280,13 @@ const ViewTemplatePage = () => {
           return <CWDivider />;
         case TemplateComponents.TEXT:
           return (
-            <CWText fontStyle={field[component].field_type}>
+            <CWText
+              fontStyle={
+                formData.isForm && field[component].field_type == 'h1'
+                  ? 'h2'
+                  : field[component].field_type
+              }
+            >
               {field[component].field_value}
             </CWText>
           );
@@ -272,9 +301,14 @@ const ViewTemplatePage = () => {
                   const newState = { ...prevState };
 
                   if (nested_field_ref) {
-                    newState[nested_field_ref][nested_index][
-                      field[component].field_ref
-                    ] = e.target.value;
+                    if (nested_index) {
+                      newState[nested_field_ref][nested_index][
+                        field[component].field_ref
+                      ] = e.target.value;
+                    } else {
+                      newState[nested_field_ref][field[component].field_ref] =
+                        e.target.value;
+                    }
                   } else {
                     newState[field[component].field_ref] = e.target.value;
                   }
@@ -300,6 +334,21 @@ const ViewTemplatePage = () => {
             })
           );
 
+          functionComponents.push(<CWDivider />);
+          return functionComponents;
+        }
+        case TemplateComponents.STRUCTFORM: {
+          const functionComponents = [
+            <CWDivider />,
+            <CWText type="h3">{field[component].field_label}</CWText>,
+          ];
+
+          functionComponents.push(
+            ...renderTemplate(
+              field[component].form_fields,
+              field[component].field_ref
+            )
+          );
           functionComponents.push(<CWDivider />);
           return functionComponents;
         }
@@ -373,48 +422,50 @@ const ViewTemplatePage = () => {
   };
 
   if (!json) {
+    if (formData.isForm) return <div>No Contract Available</div>;
     return;
   }
 
   return (
-    <Sublayout>
-      <div className="ViewTemplatePage">
-        <CWBreadcrumbs
-          breadcrumbs={[
-            { label: 'Contracts', path: `/contracts`, navigate },
-            { label: templateNickname },
-          ]}
-        />
+    <div className={formData.isForm ? 'ViewTemplateForm' : 'ViewTemplatePage'}>
+      <CWBreadcrumbs
+        breadcrumbs={[
+          { label: 'Contracts', path: `/contracts`, navigate },
+          { label: templateNickname },
+        ]}
+      />
+
+      {!formData.isForm && (
         <CWText type="h3" className="header">
           {templateNickname}
         </CWText>
+      )}
 
-        <div className="form">
-          <CWDivider className="divider" />
+      <div className="form">
+        {!formData.isForm && <CWDivider className="divider" />}
 
-          {!templateError ? (
-            <div className="template">{renderTemplate(json.form_fields)}</div>
-          ) : (
-            <MessageRow
-              label="error"
-              hasFeedback
-              validationStatus="failure"
-              statusMessage="invalid template format"
-            />
-          )}
-          <CWDivider />
-          <div className="bottom-row">
-            <CWButton label="Cancel" buttonType="secondary-black" />
-            <CWButton
-              label="Create"
-              buttonType="primary-black"
-              disabled={!txReady}
-              onClick={handleCreate}
-            />
-          </div>
+        {!templateError ? (
+          <div className="template">{renderTemplate(json.form_fields)}</div>
+        ) : (
+          <MessageRow
+            label="error"
+            hasFeedback
+            validationStatus="failure"
+            statusMessage="invalid template format"
+          />
+        )}
+        <CWDivider />
+        <div className="bottom-row">
+          <CWButton label="Cancel" buttonType="secondary-black" />
+          <CWButton
+            label="Create"
+            buttonType="primary-black"
+            disabled={!txReady}
+            onClick={handleCreate}
+          />
         </div>
       </div>
-    </Sublayout>
+    </div>
   );
 };
 

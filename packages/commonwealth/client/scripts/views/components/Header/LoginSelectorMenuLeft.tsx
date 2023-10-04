@@ -1,42 +1,45 @@
-import { useCommonNavigate } from 'navigation/helpers';
+import { setActiveAccount } from 'controllers/app/login';
+import { isSameAccount } from 'helpers';
 import useForceRerender from 'hooks/useForceRerender';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { setActiveAccount } from 'controllers/app/login';
-import { UserBlock } from 'views/components/user/user_block';
-import { isSameAccount, pluralize } from 'helpers';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { Modal } from 'views/components/component_kit/cw_modal';
-import { SelectAddressModal } from 'views/modals/select_address_modal';
-import { LoginModal } from 'views/modals/login_modal';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { UserBlock } from 'views/components/user/user_block';
+import { LoginModal } from 'views/modals/login_modal';
 
 import 'components/Header/LoginSelectorMenu.scss';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 
-type LoginSelectorMenuLeftAttrs = {
-  nAccountsWithoutRole: number;
-};
-
-export const LoginSelectorMenuLeft = ({
-  nAccountsWithoutRole,
-}: LoginSelectorMenuLeftAttrs) => {
+export const LoginSelectorMenuLeft = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isSelectAddressModalOpen, setIsSelectAddressModalOpen] =
-    useState(false);
-  const [profileId, setProfileId] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
+  const chain =
+    typeof activeAccount.chain === 'string'
+      ? activeAccount.chain
+      : activeAccount.chain?.id;
+  const { data: users } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [chain],
+    profileAddresses: [activeAccount.address],
+    currentChainId: app.activeChainId(),
+  });
+  const profileId = users?.[0]?.id;
 
   const changeSelectedAddress = () => {
-    const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
     setSelectedAddress(activeAccount.address);
     forceRerender();
   };
 
   useEffect(() => {
+    setSelectedAddress(activeAccount.address);
+
     // force rerender when new address is connected
     app.user.isFetched.on('redraw', () => {
       changeSelectedAddress();
@@ -49,26 +52,17 @@ export const LoginSelectorMenuLeft = ({
     };
   }, []);
 
-  useEffect(() => {
-    const activeAccount = app.user.activeAccount ?? app.user.addresses[0];
-    const chain =
-      typeof activeAccount.chain === 'string'
-        ? activeAccount.chain
-        : activeAccount.chain?.id;
-    const profile = app.newProfiles.getProfile(chain, activeAccount.address);
-    setProfileId(profile.id);
-    setSelectedAddress(activeAccount.address);
-  }, []);
-
   const { activeAccounts } = app.user;
 
   return (
     <div className="LoginSelectorMenu left">
       {app.activeChainId() && (
         <>
-          <CWText type="caption" className="title">
-            Select address to use
-          </CWText>
+          {activeAccounts?.length > 0 && (
+            <CWText type="caption" className="title">
+              Select address to use
+            </CWText>
+          )}
           {activeAccounts.map((account, i) => {
             return (
               <div
@@ -85,6 +79,7 @@ export const LoginSelectorMenuLeft = ({
                   user={account}
                   selected={isSameAccount(account, app.user.activeAccount)}
                   showRole={false}
+                  showLoginMethod={true}
                   compact
                   hideAvatar
                 />
@@ -112,29 +107,10 @@ export const LoginSelectorMenuLeft = ({
       </div>
       <div
         className="login-menu-item"
-        onClick={() => {
-          if (nAccountsWithoutRole > 0) {
-            setIsSelectAddressModalOpen(true);
-          } else {
-            setIsLoginModalOpen(true);
-          }
-        }}
+        onClick={() => setIsLoginModalOpen(true)}
       >
-        <CWText type="caption">
-          {nAccountsWithoutRole > 0
-            ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-            : 'Connect a new address'}
-        </CWText>
+        <CWText type="caption">Connect a new address</CWText>
       </div>
-      <Modal
-        content={
-          <SelectAddressModal
-            onModalClose={() => setIsSelectAddressModalOpen(false)}
-          />
-        }
-        onClose={() => setIsSelectAddressModalOpen(false)}
-        open={isSelectAddressModalOpen}
-      />
       <Modal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}

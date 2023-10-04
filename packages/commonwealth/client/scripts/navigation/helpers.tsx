@@ -103,6 +103,9 @@ export const navigateToCommunity = ({
 }: NavigateToCommunityProps) => {
   const isExternalLink = chain !== app.customDomainId();
 
+  // When we navigate to another chain, remove all listeners initialized from old chain.
+  app.chainModuleReady.removeAllListeners();
+
   if (!app.isCustomDomain()) {
     navigate(path, {}, chain);
   } else {

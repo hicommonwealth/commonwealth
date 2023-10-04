@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import axios from 'axios';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import app from 'state';
 import { AvatarUpload } from 'views/components/Avatar';
@@ -6,6 +7,7 @@ import { InputRow } from 'views/components/metadata_rows';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import { Skeleton } from '../../components/Skeleton';
 import type {
   ChainFormDefaultFields,
   EthChainFormState,
@@ -13,6 +15,22 @@ import type {
   UseChainFormStateHookType,
   UseEthChainFormFieldsHookType,
 } from './types';
+
+export async function updateAdminOnCreateCommunity(chainId: string) {
+  app.user.ephemerallySetActiveAccount(
+    app.user.addresses.filter((a) => a.chain.id === chainId)[0]
+  );
+
+  const roles = await axios.get(`${app.serverUrl()}/roles`, {
+    params: {
+      chain_id: chainId,
+      permissions: ['admin'],
+    },
+  });
+
+  app.roles.addRole(roles.data.result[0]);
+  app.skipDeinitChain = true;
+}
 
 export const initChainForm = (): ChainFormDefaultFields => {
   return {
@@ -120,34 +138,77 @@ export const defaultChainRows = <T extends UseChainFormDefaultFieldsHookType>(
 
 type EthChainState = UseEthChainFormFieldsHookType & UseChainFormStateHookType;
 
-export const ethChainRows = (
+export const EthChainRows = (
   props: EthChainFormState,
   state: EthChainState
 ) => {
-  const options = [
-    ...Object.keys(props.ethChains).map(
-      (c) =>
-        ({
-          label: props.ethChainNames[c],
-          value: props.ethChainNames[c],
-        } || { label: c, value: c })
-    ),
-    app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
-  ] as Array<DropdownItemType>;
+  const [defaultChainNode, setDefaultChainNode] = useState<DropdownItemType>();
+  const options = useMemo(
+    () =>
+      [
+        ...Object.keys(props.ethChains).map(
+          (c) =>
+            ({
+              label: props.ethChainNames[c],
+              value: props.ethChainNames[c],
+            } || { label: c, value: c })
+        ),
+        app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
+      ] as Array<DropdownItemType>,
+    [props.ethChains, props.ethChainNames]
+  );
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const onSelectHandler = useCallback(
+    (o) => {
+      if (!o?.value) return;
+      state.setChainString(o.value);
+
+      if (o.value !== 'Custom') {
+        const [id] =
+          Object.entries(props.ethChainNames).find(
+            ([, name]) => name === o.value
+          ) || Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
+
+        state.setEthChainId(id);
+        state.setNodeUrl(props.ethChains[id].url);
+        state.setAltWalletUrl(props.ethChains[id].alt_wallet_url);
+      } else {
+        state.setEthChainId('');
+        state.setNodeUrl('');
+        state.setAltWalletUrl('');
+      }
+    },
+    [state, props.ethChains, props.ethChainNames]
+  );
+
+  // chainString is the key we use to set all the other fields:
   useEffect(() => {
-    onSelectHandler(options[0]);
-  }, [onSelectHandler, options]);
+    if (state?.chainString && options?.length > 0) {
+      const foundChainNode = options.find((o) => o.label === state.chainString);
+      setDefaultChainNode(foundChainNode || options[0]);
+    }
+  }, [state?.chainString, options]);
+
+  // when we know the defaultChainNode, we can set the other fields:
+  useEffect(() => {
+    if (defaultChainNode && !state.nodeUrl) {
+      onSelectHandler(defaultChainNode);
+    }
+  }, [defaultChainNode, state?.nodeUrl, onSelectHandler]);
 
   return (
     <>
-      <CWDropdown
-        label="Chain"
-        options={options}
-        initialValue={options[0]}
-        onSelect={(o) => onSelectHandler(o)}
-      />
+      {defaultChainNode ? (
+        <CWDropdown
+          label="Chain"
+          options={options}
+          initialValue={defaultChainNode}
+          onSelect={(o) => onSelectHandler(o)}
+          disabled={!!props.disabled}
+        />
+      ) : (
+        <Skeleton height="62px" />
+      )}
       {state.chainString === 'Custom' && (
         <InputRow
           title="Chain ID"
@@ -182,7 +243,7 @@ export const ethChainRows = (
         />
       )}
       <InputRow
-        title="Address"
+        title="Token Contract Address"
         value={state.address}
         placeholder="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
         onChangeHandler={(v) => {
@@ -192,23 +253,4 @@ export const ethChainRows = (
       />
     </>
   );
-
-  function onSelectHandler(o) {
-    state.setChainString(o.value);
-
-    if (o.value !== 'Custom') {
-      const [id] =
-        Object.entries(props.ethChainNames).find(
-          ([, name]) => name === o.value
-        ) || Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
-
-      state.setEthChainId(id);
-      state.setNodeUrl(props.ethChains[id].url);
-      state.setAltWalletUrl(props.ethChains[id].alt_wallet_url);
-    } else {
-      state.setEthChainId('');
-      state.setNodeUrl('');
-      state.setAltWalletUrl('');
-    }
-  }
 };

@@ -1,83 +1,39 @@
-import type { RegisteredTypes } from '@polkadot/types/types';
-
 import type {
   IDisconnectedRange,
   IEventProcessor,
   IEventSubscriber,
   IStorageFetcher,
   CWEvent,
-  IEventTitle,
   IEventLabel,
-  IChainEventKind,
 } from './interfaces';
 import { SupportedNetwork } from './interfaces';
-import { Listener as SubstrateListener } from './chains/substrate/Listener';
-import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
 import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
 import {
   Listener as CompoundListener,
-  Title as CompoundTitle,
   Label as CompoundLabel,
 } from './chains/compound';
-import {
-  Listener as Erc20Listener,
-  Title as Erc20Title,
-  Label as Erc20Label,
-} from './chains/erc20';
-import {
-  Listener as Erc721Listener,
-  Title as Erc721Title,
-  Label as Erc721Label,
-} from './chains/erc721';
-import {
-  Listener as AaveListener,
-  Title as AaveTitle,
-  Label as AaveLabel,
-} from './chains/aave';
+import { Listener as AaveListener, Label as AaveLabel } from './chains/aave';
 import {
   Listener as CosmosListener,
-  Title as CosmosTitle,
   Label as CosmosLabel,
 } from './chains/cosmos';
 import type { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
+import { ethers } from 'ethers';
 
-export function Title(
-  network: SupportedNetwork,
-  kind: IChainEventKind
-): IEventTitle {
-  switch (network) {
-    case SupportedNetwork.Substrate:
-      return SubstrateTitle(kind);
-    case SupportedNetwork.Aave:
-      return AaveTitle(kind);
-    case SupportedNetwork.Compound:
-      return CompoundTitle(kind);
-    case SupportedNetwork.ERC20:
-      return Erc20Title(kind);
-    case SupportedNetwork.ERC721:
-      return Erc721Title(kind);
-    case SupportedNetwork.Cosmos:
-      return CosmosTitle(kind);
-    default:
-      throw new Error(`Invalid network: ${network}`);
-  }
-}
-
-export function Label(chain: string, event: CWEvent): IEventLabel {
+export function Label(
+  chain: string,
+  event: Omit<CWEvent, 'blockNumber'>
+): IEventLabel {
   switch (event.network) {
     case SupportedNetwork.Substrate:
-      return SubstrateLabel(event.blockNumber, chain, event.data);
+      return SubstrateLabel(chain, event.data);
     case SupportedNetwork.Aave:
-      return AaveLabel(event.blockNumber, chain, event.data);
+      return AaveLabel(chain, event.data);
     case SupportedNetwork.Compound:
-      return CompoundLabel(event.blockNumber, chain, event.data);
-    case SupportedNetwork.ERC20:
-      return Erc20Label(event.blockNumber, chain, event.data);
-    case SupportedNetwork.ERC721:
-      return Erc721Label(event.blockNumber, chain, event.data);
+      return CompoundLabel(chain, event.data);
     case SupportedNetwork.Cosmos:
-      return CosmosLabel(event.blockNumber, chain, event.data);
+      return CosmosLabel(chain, event.data);
     default:
       throw new Error(`Invalid network: ${event.network}`);
   }
@@ -100,7 +56,6 @@ export async function createListener(
     skipCatchup?: boolean;
     startBlock?: number;
     archival?: boolean;
-    spec?: RegisteredTypes;
     url?: string;
     enricherConfig?: any;
     pollTime?: number;
@@ -124,20 +79,7 @@ export async function createListener(
   >;
   const log = factory.getLogger(addPrefix(__filename, [network, chain]));
 
-  if (network === SupportedNetwork.Substrate) {
-    // start a substrate listener
-    listener = new SubstrateListener(
-      chain,
-      options.url,
-      options.spec,
-      !!options.archival,
-      options.startBlock || 0,
-      !!options.skipCatchup,
-      options.enricherConfig,
-      !!options.verbose,
-      options.discoverReconnectRange
-    );
-  } else if (network === SupportedNetwork.Compound) {
+  if (network === SupportedNetwork.Compound) {
     listener = new CompoundListener(
       chain,
       options.address,
@@ -145,23 +87,6 @@ export async function createListener(
       !!options.skipCatchup,
       !!options.verbose,
       options.discoverReconnectRange
-    );
-  } else if (network === SupportedNetwork.ERC20) {
-    listener = new Erc20Listener(
-      chain,
-      options.tokenAddresses || [options.address],
-      options.url,
-      Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
-      options.enricherConfig,
-      !!options.verbose
-    );
-  } else if (network === SupportedNetwork.ERC721) {
-    listener = new Erc721Listener(
-      chain,
-      options.tokenAddresses || [options.address],
-      options.url,
-      Array.isArray(options.tokenNames) ? options.tokenNames : undefined,
-      !!options.verbose
     );
   } else if (network === SupportedNetwork.Aave) {
     listener = new AaveListener(
@@ -219,4 +144,19 @@ export function populateRange(
     );
   }
   return range;
+}
+
+/**
+ * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
+ * https://ethereum.org/en/developers/docs/apis/json-rpc/#quantities-encoding
+ * @param decimal
+ */
+export function decimalToHex(decimal: number | string) {
+  if (decimal == '0') {
+    return '0x0';
+  } else {
+    return ethers.utils.hexStripZeros(
+      ethers.BigNumber.from(decimal).toHexString()
+    );
+  }
 }

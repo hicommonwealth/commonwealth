@@ -1,12 +1,9 @@
-import type { WalletId } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes, CommunityInstance } from './communities';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import type {
-  RoleAssignmentAttributes,
-  RoleAssignmentInstance,
-} from './role_assignment';
+import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes, UserInstance } from './user';
@@ -15,12 +12,13 @@ export type AddressAttributes = {
   address: string;
   chain: string;
   verification_token: string;
+  role: Role;
+  is_user_default: boolean;
   id?: number;
   verification_token_expires?: Date;
   verified?: Date;
   keytype?: string;
   block_info?: string;
-  name?: string;
   last_active?: Date;
   created_at?: Date;
   updated_at?: Date;
@@ -30,11 +28,11 @@ export type AddressAttributes = {
   ghost_address?: boolean;
   profile_id?: number;
   wallet_id?: WalletId;
+  wallet_sso_source?: WalletSsoSource;
   // associations
   Chain?: CommunityAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
-  RoleAssignments?: RoleAssignmentAttributes[];
   SsoToken?: SsoTokenAttributes;
 };
 
@@ -42,7 +40,6 @@ export type AddressInstance = ModelInstance<AddressAttributes> & {
   getChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
-  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 };
 
@@ -58,11 +55,20 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address: { type: dataTypes.STRING, allowNull: false },
       chain: { type: dataTypes.STRING, allowNull: false, field: 'community_id' },
+      role: {
+        type: dataTypes.ENUM('member', 'moderator', 'admin'),
+        defaultValue: 'member',
+        allowNull: false,
+      },
+      is_user_default: {
+        type: dataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
       verification_token: { type: dataTypes.STRING, allowNull: false },
       verification_token_expires: { type: dataTypes.DATE, allowNull: true },
       verified: { type: dataTypes.DATE, allowNull: true },
       keytype: { type: dataTypes.STRING, allowNull: true },
-      name: { type: dataTypes.STRING, allowNull: true },
       last_active: { type: dataTypes.DATE, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
@@ -84,6 +90,7 @@ export default (
       },
       profile_id: { type: dataTypes.INTEGER, allowNull: true },
       wallet_id: { type: dataTypes.STRING, allowNull: true },
+      wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
       block_info: { type: dataTypes.STRING, allowNull: true },
     },
     {
@@ -95,7 +102,6 @@ export default (
       indexes: [
         { fields: ['address', 'community_id'], unique: true },
         { fields: ['user_id'] },
-        { fields: ['name'] },
       ],
       defaultScope: {
         attributes: {
@@ -128,7 +134,6 @@ export default (
       targetKey: 'id',
     });
     models.Address.hasOne(models.SsoToken);
-    models.Address.hasMany(models.RoleAssignment, { foreignKey: 'address_id' });
     models.Address.hasMany(models.Comment, { foreignKey: 'address_id' });
     models.Address.hasMany(models.Thread, {
       foreignKey: 'address_id',

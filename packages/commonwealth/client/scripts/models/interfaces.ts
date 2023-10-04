@@ -63,7 +63,7 @@ export interface IAccountsModule<C extends Coin, A extends Account>
   extends StorageModule {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
-  get(address: string, keytype?: string): A;
+  get(address: string, keytype?: string, ignoreProfile?: boolean): A;
 }
 
 // Offchain stores and management for discussion features.
@@ -122,4 +122,12 @@ export interface IUnavailableEndTime {
 
 export interface IQueuedEndTime {
   kind: 'queued';
+}
+
+export interface IGatedTopic {
+  id: number;
+  type: string;
+  data: {
+    threshold: number;
+  };
 }
