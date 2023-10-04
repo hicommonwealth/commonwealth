@@ -4,7 +4,7 @@ import { ApiEndpoints } from 'state/api/config';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { useQuery } from '@tanstack/react-query';
 import { ChainNetwork } from 'common-common/src/types';
-import {ICompoundProposalResponse} from "adapters/chain/compound/types";
+import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 
 const RAW_PROPOSAL_STALE_TIME = 30000; // 30 seconds
 
@@ -30,11 +30,12 @@ const useRawEvmProposalsQuery = ({
   chainId: string;
   chainNetwork: ChainNetwork;
 }) => {
-  const key = [ApiEndpoints.FETCH_PROPOSALS, chainId] as any;
   return useQuery({
-    queryKey: key,
+    queryKey: [ApiEndpoints.FETCH_PROPOSALS, chainId, 'raw'],
     queryFn: () => fetchRawEvmProposals(chainId),
-    enabled: chainNetwork === ChainNetwork.Aave || chainNetwork === ChainNetwork.Compound,
+    enabled:
+      chainNetwork === ChainNetwork.Aave ||
+      chainNetwork === ChainNetwork.Compound,
     staleTime: RAW_PROPOSAL_STALE_TIME,
   });
 };
