@@ -214,7 +214,7 @@ export const PolygonForm = (props: EthChainFormState) => {
           chainFormState.setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               alt_wallet_url: ethChainFormFields.altWalletUrl,
               base: ChainBase.Ethereum,
               id: id,

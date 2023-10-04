@@ -6,11 +6,12 @@ import { Op } from 'sequelize';
 
 export const Errors = {
   NotAdmin: 'Must be a site admin',
+  ChainNotFound: 'Chain not found',
 };
 
 export type GetCommunityStatsOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chainId: string;
 };
 
 export type GetCommunityStatsResult = {
@@ -24,13 +25,16 @@ export type GetCommunityStatsResult = {
 
 export async function __getCommunityStats(
   this: ServerCommunitiesController,
-  { user, chain }: GetCommunityStatsOptions
+  { user, chainId }: GetCommunityStatsOptions
 ): Promise<GetCommunityStatsResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
-  const chainId = chain.id;
+  const chain = await this.models.Chain.findByPk(chainId);
+  if (!chain) {
+    throw new AppError(Errors.ChainNotFound);
+  }
 
   // Community Stats
   const oneMonthAgo = new Date();

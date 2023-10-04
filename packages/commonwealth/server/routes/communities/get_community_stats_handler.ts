@@ -5,7 +5,9 @@ import {
   GetCommunityStatsResult,
 } from 'server/controllers/server_communities_methods/get_community_stats';
 
-type GetCommunityStatsRequestParams = GetCommunityStatsOptions;
+type GetCommunityStatsRequestParams = {
+  communityId: string;
+};
 type GetCommunityStatsResponse = GetCommunityStatsResult;
 
 export const getCommunityStatsHandler = async (
@@ -13,6 +15,9 @@ export const getCommunityStatsHandler = async (
   req: TypedRequestParams<GetCommunityStatsRequestParams>,
   res: TypedResponse<GetCommunityStatsResponse>
 ) => {
-  const community = await controllers.communities.getCommunityStats({});
+  const community = await controllers.communities.getCommunityStats({
+    user: req.user,
+    chainId: req.params.communityId,
+  });
   return success(res, community);
 };

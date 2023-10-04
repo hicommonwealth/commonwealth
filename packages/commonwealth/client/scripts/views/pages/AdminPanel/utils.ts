@@ -1,6 +1,7 @@
 import axios from 'axios';
 import app from 'state';
 import { BalanceType } from '../../../../../../common-common/src/types';
+import { ThreadAttributes } from 'server/models/thread';
 
 export const createChainNode = async ({
   url,
@@ -13,7 +14,7 @@ export const createChainNode = async ({
   bech32: string;
   balance_type: BalanceType;
 }) => {
-  return await axios.post(`${app.serverUrl()}/createChainNode`, {
+  return await axios.post(`${app.serverUrl()}/nodes`, {
     url,
     name,
     bech32,
@@ -23,8 +24,7 @@ export const createChainNode = async ({
 };
 
 export const deleteChain = async ({ id }: { id: string }) => {
-  await axios.post(`${app.serverUrl()}/deleteChain`, {
-    id,
+  await axios.delete(`${app.serverUrl()}/communities/${id}`, {
     jwt: app.user.jwt,
   });
 };

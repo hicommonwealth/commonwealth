@@ -119,7 +119,7 @@ export const SputnikForm = () => {
 
             // POST object
             const res = await $.post(
-              `${app.serverUrl()}/createChain`,
+              `${app.serverUrl()}/communities`,
               createChainArgs
             );
 

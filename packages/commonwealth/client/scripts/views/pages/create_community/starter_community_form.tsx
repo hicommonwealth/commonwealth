@@ -120,7 +120,7 @@ export const StarterCommunityForm = () => {
           }
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               jwt: app.user.jwt,
               address: '',
               type: ChainType.Offchain,

@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 
-import { Errors as ChainError } from '../../../server/routes/updateChain';
+import { Errors as ChainError } from '../../../server/controllers/server_communities_methods/update_community';
 import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);

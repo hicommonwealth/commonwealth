@@ -1,6 +1,6 @@
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
-import { CreateCommunityNodeResult } from 'server/controllers/server_communities_methods/create_community_node';
+import { CreateCommunityNodeResult } from '../../controllers/server_communities_methods/create_community_node';
 
 type CreateCommunityNodeRequestBody = {
   url: string;

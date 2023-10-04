@@ -1,5 +1,6 @@
 import chai from 'chai';
-import { Errors, getFileSizeBytes } from '../../server/routes/createChain';
+import { Errors } from '../../server/routes/createChain';
+import { getFileSizeBytes } from '../../server/util/getFilesSizeBytes';
 
 describe('ChainIconSizeLimit tests', () => {
   it("should fail if the url provided doesn't exist", async () => {

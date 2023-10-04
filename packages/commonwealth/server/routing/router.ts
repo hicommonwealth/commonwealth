@@ -39,9 +39,7 @@ import {
   fetchEtherscanContractAbi,
 } from '../routes/etherscanAPI';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
-import adminAnalytics, {
-  communitySpecificAnalytics,
-} from '../routes/adminAnalytics';
+import adminAnalytics from '../routes/adminAnalytics';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -72,8 +70,6 @@ import getPolls from '../routes/getPolls';
 import deletePoll from '../routes/deletePoll';
 import updateVote from '../routes/updateVote';
 import viewVotes from '../routes/viewVotes';
-import deleteChain from '../routes/deleteChain';
-import updateChain from '../routes/updateChain';
 import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
@@ -128,7 +124,6 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
-import createChainNode from '../routes/createChainNode';
 import { RedisCache } from 'common-common/src/redisCache';
 
 import {
@@ -191,7 +186,8 @@ import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { createCommunityHandler } from '../routes/communities/create_community_handler';
 import { updateCommunityHandler } from '../routes/communities/update_community_handler';
 import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
-import { createCommunityNodeHandler } from 'server/routes/communities/create_community_node_handler';
+import { createCommunityNodeHandler } from '../routes/communities/create_community_node_handler';
+import { getCommunityStatsHandler } from '../routes/communities/get_community_stats_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -341,6 +337,7 @@ function setupRouter(
     router,
     'delete',
     '/communities/:communityId' /* prev: POST /deleteChain */,
+    passport.authenticate('jwt', { session: false }),
     deleteCommunityHandler.bind(this, serverControllers)
   );
   registerRoute(
@@ -367,16 +364,17 @@ function setupRouter(
     'post',
     '/nodes' /* prev: POST /createChainNode */,
     passport.authenticate('jwt', { session: false }),
-    createCommunityNodeHandler.bind(this, models)
+    createCommunityNodeHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
-    'post',
-    '/communitySpecificAnalytics' /* prev: POST /communitySpecificAnalytics */,
-    databaseValidationService.validateChain,
-    communitySpecificAnalytics.bind(this, models)
+    'get',
+    '/communities/:communityId/stats' /* prev: POST /communitySpecificAnalytics */,
+    passport.authenticate('jwt', { session: false }),
+    getCommunityStatsHandler.bind(this, serverControllers)
   );
 
+  // ----
   registerRoute(
     router,
     'post',
