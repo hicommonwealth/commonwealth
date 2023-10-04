@@ -5,6 +5,7 @@ import { createBoundedUseStore } from 'state/ui/utils';
 import { SidebarMenuName } from 'views/components/sidebar';
 import { MobileMenuName } from 'views/AppMobileMenus';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
+import { featureFlags } from '../../../helpers/feature-flags';
 
 interface SidebarStore {
   mobileMenuName: MobileMenuName;
@@ -32,7 +33,8 @@ export const sidebarStore = createStore<SidebarStore>()(
         setMobileMenuName: (name) => set(() => ({ mobileMenuName: name })),
         menuName: 'default',
         menuVisible: true,
-        userToggledVisibility: null,
+        userToggledVisibility:
+          featureFlags.sidebarToggle !== true ? 'closed' : null,
         setUserToggledVisibility: (toggled) => {
           set(() => ({ userToggledVisibility: toggled }));
           set((state) => ({

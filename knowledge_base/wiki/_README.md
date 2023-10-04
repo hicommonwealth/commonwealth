@@ -18,7 +18,7 @@
 
 # Navigating the docs
 
-For a complete list of wiki entries, see our [Table of Contents](_TOC.md)
+For a complete list of knowledge base entries, see our [Table of Contents](_TOC.md)
 
 # Updating The Docs: How & When
 
@@ -31,19 +31,19 @@ Similarly, whenever a PR introduces new codebase functionality where either...
 
 ...then that PR should include documentation as part of its purview.
 
-Significant updates to wiki entries should be manually listed in a given entry's change log; see the [Change Log](#change-log) sub-entry for guidelines and context. All entries should follow the [Documentation Language](#documentation-language) guidelines.
+Significant updates to knowledge base entries should be manually listed in a given entry's change log; see the [Change Log](#change-log) sub-entry for guidelines and context. All entries should follow the [Documentation Language](#documentation-language) guidelines.
 
-At least for the duration of 2023, as we implement this new system, any PR that updates or contributes to our documentation wiki should tag @gdjohnson (the documentarian) on GitHub.
+At least for the duration of 2023, as we implement this new system, any PR that updates or contributes to our knowledge base should tag @gdjohnson (the documentarian) on GitHub.
 
 ## Documentation Language
 
 ### Indexicality & Timestamps
 
-Language is "indexical" insofar as it relies on inferred context to be understood. For instance, in our wiki, words like "I," "you," "now," and "soon" are indexical insofar as they rely on a context, known to the contributor at time of writing, that will likely be lost to future readers.
+Language is "indexical" insofar as it relies on inferred context to be understood. For instance, in our knowledge base, words like "I," "you," "now," and "soon" are indexical insofar as they rely on a context, known to the contributor at time of writing, that will likely be lost to future readers.
 
 In place of pronouns, documentation should be written with proper names and nouns. Moreover, it is preferable to name _teams_ rather than individuals, since individuals may be replaced or change over time.
 
-References to places and times (e.g. "now," "soon," "recently," "historically") should be explicitly contextualized with dates whenever possible (e.g. "As of 230831..."). Dates across our wiki and codebase should be structured YYMMDD, e.g. 230831 for August 31st, 2023.  
+References to places and times (e.g. "now," "soon," "recently," "historically") should be explicitly contextualized with dates whenever possible (e.g. "As of 230831..."). Dates across our knowledge base and codebase should be structured YYMMDD, e.g. 230831 for August 31st, 2023.  
 
 ### Must, Should, & May
 
@@ -74,7 +74,7 @@ In order to track the history and status of documentation (e.g. to determine whe
 
 Change log entries should center around one of the default change log keyphrases, [listed below](#change-log-keyphrases). They should include additional useful context, including any relevant PRs, and must name the individual responsible for the action as well as the date the action occurred. 
 
-The change log should often be the first section of a wiki entry checked. Is the entry out of date? Has it been flagged for an overhaul? One goal of change logs is to prevent engineers from wasting time implementing obsolete documentation. A second goal is to ensure engineers, when assigned work in novel areas of the codebase, can be guaranteed adequate documentation for onboarding into that area.
+The change log should often be the first section of a knowledge base entry checked. Is the entry out of date? Has it been flagged for an overhaul? One goal of change logs is to prevent engineers from wasting time implementing obsolete documentation. A second goal is to ensure engineers, when assigned work in novel areas of the codebase, can be guaranteed adequate documentation for onboarding into that area.
 
 ### Example Change Log
 
@@ -91,7 +91,7 @@ The change log should often be the first section of a wiki entry checked. Is the
 
 #### Authored By
 
-The author responsible for creating the entry. Since new wiki pages should only be created ~fully formed (i.e. no stubs or placeholders), the author will in most cases also be the individual with most knowledge of the area affected, or who is taking on some level of responsibility for the page's content. 
+The author responsible for creating the entry. Since new knowledge base entries should only be created ~fully formed (i.e. no stubs or placeholders), the author will in most cases also be the individual with most knowledge of the area affected, or who is taking on some level of responsibility for the page's content. 
 
 Ideally, all newly authored documentation should also be [certified fresh](#certified-fresh), and authorship on a given date should be assumed to be synonymous with certification on that date. However, as of 230901, we should specifically include the "certified fresh" keyphrase alongside the "authored by" entry, to guarantee this standard of quality.
 
@@ -99,7 +99,7 @@ Ideally, all newly authored documentation should also be [certified fresh](#cert
 
 When a contributor certifies an entry as fresh, he is attesting that he has successfully tested, or else followed (implemented, executed), the entry on a given date. For non-codebase process documentation (e.g. [Ways of Working](./Ways-Of-Working.md)), an entry is certified fresh when an authorized individual (typically a lead) has reviewed and signed off on an entry's guidelines.
 
-All newly added pages or sections in the wiki should be explicitly certified to the date of their addition, as it is assumed that all new documentation meets the above criteria.
+All newly added pages or sections in the knowledge base should be explicitly certified to the date of their addition, as it is assumed that all new documentation meets the above criteria.
 
 A contributor may certify either a full entry, or a section of that entry, as fresh. But it is important not to certify a wider scope than has been actually verified as accurate. Certification is meant to be a strong signal to engineers, in using documentation, that the documentation can be relied upon as up-to-date and accurate. Dilution of the certification system is more harmful than a lack of certification. 
 
@@ -111,7 +111,7 @@ If an engineer is using or auditing the docs, and notices an incomplete, out-of-
 
 Any concerns about future reliability of the entry (e.g. an engineer knows that in a few months, a new technical solution will replace the currently documented solution) should be noted here whenever possible. 
 
-The goal of the "Flagged by" keyphrase is to raise awareness of areas of the wiki need attention, and to prevent future engineers from implementing misleading or out-of-date instructions.
+The goal of the "Flagged by" keyphrase is to raise awareness of areas of the knowledge base need attention, and to prevent future engineers from implementing misleading or out-of-date instructions.
 
 #### Merged By
 
