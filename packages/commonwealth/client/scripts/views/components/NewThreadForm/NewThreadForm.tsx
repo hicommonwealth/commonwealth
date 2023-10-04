@@ -38,7 +38,7 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const { enabledTopics, disabledTopics } = topics?.reduce(
+  const topicsForSelector = topics?.reduce(
     (acc, t) => {
       if (
         isAdmin ||
@@ -68,7 +68,7 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-  } = useNewThreadForm(chainId, enabledTopics);
+  } = useNewThreadForm(chainId, topicsForSelector.enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -142,7 +142,8 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      enabledTopics.find((t) => t.name.includes('General')) || null
+      topicsForSelector.enabledTopics.find((t) => t.name.includes('General')) ||
+        null
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
@@ -171,8 +172,8 @@ export const NewThreadForm = () => {
             <div className="topics-and-title-row">
               {hasTopics && (
                 <TopicSelector
-                  enabledTopics={enabledTopics}
-                  disabledTopics={disabledTopics}
+                  enabledTopics={topicsForSelector.enabledTopics}
+                  disabledTopics={topicsForSelector.disabledTopics}
                   value={threadTopic}
                   onChange={setThreadTopic}
                 />

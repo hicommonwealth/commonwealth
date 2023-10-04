@@ -25,7 +25,7 @@ export const ChangeThreadTopicModal = ({
   });
 
   const isAdmin = Permissions.isCommunityAdmin();
-  const { enabledTopics, disabledTopics } = topics?.reduce(
+  const topicsForSelector = topics?.reduce(
     (acc, t) => {
       if (
         isAdmin ||
@@ -73,8 +73,8 @@ export const ChangeThreadTopicModal = ({
       </div>
       <div className="compact-modal-body">
         <TopicSelector
-          enabledTopics={enabledTopics}
-          disabledTopics={disabledTopics}
+          enabledTopics={topicsForSelector.enabledTopics}
+          disabledTopics={topicsForSelector.disabledTopics}
           value={activeTopic}
           onChange={setActiveTopic}
         />
