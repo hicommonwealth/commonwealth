@@ -4,6 +4,7 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { getClasses } from 'views/components/component_kit/helpers';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -41,7 +42,10 @@ const CWRequirementsRadioButton = ({
       At least{' '}
       {
         <CWTextInput
-          containerClassName={`input ${inputError ? 'failure' : ''}`}
+          containerClassName={getClasses<{ failure?: boolean }>(
+            { failure: !!inputError },
+            'input'
+          )}
           value={inputValue}
           onInput={(e) => onInputValueChange(e.target?.value?.trim())}
         />
