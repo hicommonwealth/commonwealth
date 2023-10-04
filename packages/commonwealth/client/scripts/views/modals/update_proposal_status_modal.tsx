@@ -2,17 +2,16 @@ import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import {
-  SnapshotProposal,
   loadMultipleSpacesData,
+  SnapshotProposal,
 } from 'helpers/snapshot_utils';
 
 import 'modals/update_proposal_status_modal.scss';
-import type ChainEntity from '../../models/ChainEntity';
 import type Thread from '../../models/Thread';
 import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
@@ -86,7 +85,10 @@ export const UpdateProposalStatusModal = ({
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
   const showChainEvents =
-    !isCosmos && app.chainEntities.store.get(thread.chain)?.length > 0;
+    !isCosmos &&
+    app.chain.base === ChainBase.Ethereum &&
+    (app.chain.network === ChainNetwork.Aave ||
+      app.chain.network === ChainNetwork.Compound);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     chainId: app.activeChainId(),
