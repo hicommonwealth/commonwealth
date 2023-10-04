@@ -207,7 +207,7 @@ const GroupForm = ({
         const isTokenRequirement = subForm.values.requirementType
           .toLowerCase()
           .includes('token');
-        let schema = isTokenRequirement
+        const schema = isTokenRequirement
           ? requirementSubFormValidationSchema.omit({
               requirementContractAddress: true,
             })
