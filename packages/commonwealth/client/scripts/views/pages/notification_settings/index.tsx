@@ -88,8 +88,6 @@ const NotificationSettingsPage = () => {
     app?.user.notifications.discussionSubscriptions
   );
 
-  console.log('ACTIVE:', app.activeChainId());
-
   // bundled snapshot subscriptions
   const bundledSnapshotSubs = extractSnapshotProposals(
     app.user.notifications.discussionSubscriptions
@@ -523,7 +521,13 @@ const NotificationSettingsPage = () => {
           >
             Community
           </CWText>
-          <div />
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="column-header-text"
+          >
+            Email
+          </CWText>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
             fontWeight="medium"
@@ -536,7 +540,23 @@ const NotificationSettingsPage = () => {
       {Object.entries(bundledSnapshotSubs)
         .sort((x, y) => x[0].localeCompare(y[0]))
         .map(([chainName, subs]) => {
-          const chainInfo = app?.config.chains.getById('dydx');
+          const getChainName = () => {
+            const getCurrentChain = subs.find((chain) => {
+              if (Number(chain.id) === Number(chainName)) {
+                return chain.snapshotId;
+              }
+            });
+
+            const chainNameUrl = getCurrentChain.snapshotId.replace('.eth', '');
+
+            if (chainNameUrl === 'dydxgov') {
+              return 'dydx';
+            }
+
+            return chainNameUrl;
+          };
+
+          const chainInfo = app?.config.chains.getById(getChainName());
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
@@ -555,7 +575,13 @@ const NotificationSettingsPage = () => {
                     </CWText>
                   </div>
                 </div>
-                <div />
+                <CWCheckbox
+                  label="Receive Emails"
+                  checked={hasSomeEmailSubs}
+                  onChange={() => {
+                    handleEmailSubscriptions(hasSomeEmailSubs, subs);
+                  }}
+                />
                 <CWToggle
                   checked={hasSomeInAppSubs}
                   onChange={() => handleSubscriptions(hasSomeInAppSubs, subs)}
