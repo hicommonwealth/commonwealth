@@ -23,7 +23,7 @@ import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
   getTextFromDelta,
-  serializeDelta,
+  serializeDelta
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
@@ -32,7 +32,7 @@ import { SessionKeyError } from 'controllers/server/sessions';
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    chainId: app.activeChainId()
   });
 
   const chainId = app.chain.id;
@@ -58,7 +58,7 @@ export const NewThreadForm = () => {
     setThreadContentDelta,
     setIsSaving,
     isDisabled,
-    clearDraft,
+    clearDraft
   } = useNewThreadForm(chainId, topicsForSelector);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -68,14 +68,14 @@ export const NewThreadForm = () => {
   const {
     mutateAsync: createThread,
     error: createThreadError,
-    reset: resetCreateThreadMutation,
+    reset: resetCreateThreadMutation
   } = useCreateThreadMutation({
-    chainId: app.activeChainId(),
+    chainId: app.activeChainId()
   });
 
   const { RevalidationModal } = useSessionRevalidationModal({
     handleClose: resetCreateThreadMutation,
-    error: createThreadError,
+    error: createThreadError
   });
 
   const isDiscussion = threadKind === ThreadKind.Discussion;
@@ -112,7 +112,7 @@ export const NewThreadForm = () => {
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
-        authorProfile: app.user.activeAccount.profile,
+        authorProfile: app.user.activeAccount.profile
       });
 
       setThreadContentDelta(createDeltaFromText(''));

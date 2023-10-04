@@ -11,6 +11,7 @@ import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import { isMobile } from 'react-device-detect';
+import clsx from 'clsx';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -20,15 +21,19 @@ type SublayoutProps = {
 const Sublayout = ({
   children,
   hideFooter = true,
-  hasCommunitySidebar,
+  hasCommunitySidebar
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const { menuVisible, mobileMenuName } = useSidebarStore();
-  const { isWindowSmallInclusive } = useBrowserWindow({});
   const [toggleMobileView, setToggleMobileView] = useState(
     (location.pathname.includes('discussions') && isMobile) ||
       window.innerWidth <= 425
   );
+  const { menuVisible, mobileMenuName, setMenu } = useSidebarStore();
+  const [resizing, setResizing] = useState(false);
+  const { isWindowSmallInclusive } = useBrowserWindow({
+    onResize: () => setResizing(true),
+    resizeListenerUpdateDeps: [resizing]
+  });
 
   useEffect(() => {
     app.sidebarRedraw.on('redraw', forceRerender);
@@ -39,18 +44,41 @@ const Sublayout = ({
   }, [forceRerender]);
 
   useEffect(() => {
+    let timer;
+    if (resizing) {
+      timer = setTimeout(() => {
+        setResizing(false);
+      }, 200); // adjust delay as needed
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [resizing]);
+
+  useEffect(() => {
     if (
       localStorage.getItem('dark-mode-state') === 'on' &&
       localStorage.getItem('user-dark-mode-state') === 'on'
     ) {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
+
+    const onResize = () => {
+      if (!isWindowSmallInclusive) {
+        setMenu({ name: 'default', isVisible: true });
+      }
+    };
+
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
 
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
-  const showSidebar = menuVisible || !isWindowSmallInclusive;
 
   useEffect(() => {
     if (!location.pathname.includes('discussions')) return;
@@ -73,8 +101,14 @@ const Sublayout = ({
       <div className="header-and-body-container">
         <SublayoutHeader onMobile={isWindowSmallInclusive} />
         <div className="sidebar-and-body-container">
-          {showSidebar && <Sidebar isInsideCommunity={hasCommunitySidebar} />}
-          <div className="body-and-sticky-headers-container">
+          <Sidebar isInsideCommunity={hasCommunitySidebar} />
+          <div
+            className={clsx('body-and-sticky-headers-container', {
+              'menu-visible': menuVisible,
+              'menu-hidden': !menuVisible,
+              resizing
+            })}
+          >
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
 
             {isWindowSmallInclusive && mobileMenuName ? (
