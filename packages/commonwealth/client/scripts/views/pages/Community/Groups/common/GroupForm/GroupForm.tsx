@@ -28,6 +28,11 @@ import {
   requirementSubFormValidationSchema,
 } from './validations';
 
+const REQUIREMENTS_TO_FULFILL = {
+  ALL_REQUIREMENTS: 'ALL',
+  N_REQUIREMENTS: 'N',
+};
+
 type CWRequirementsRadioButtonProps = {
   inputError?: string;
   inputValue: string;
@@ -59,7 +64,7 @@ const CWRequirementsRadioButton = ({
   return (
     <CWRadioButton
       label={Label}
-      value="N"
+      value={REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS}
       name="requirementsToFulfill"
       hookToForm
     />
@@ -125,7 +130,8 @@ const GroupForm = ({
 
     if (
       initialValues.requirementsToFulfill &&
-      initialValues.requirementsToFulfill !== 'ALL'
+      initialValues.requirementsToFulfill !==
+        REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
     ) {
       setCwRequiremenetsLabelInputField({
         ...cwRequiremenetsLabelInputField,
@@ -260,7 +266,9 @@ const GroupForm = ({
       ...cwRequiremenetsLabelInputField,
       error: '',
     });
-    if (values.requirementsToFulfill === 'N') {
+    if (
+      values.requirementsToFulfill === REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
+    ) {
       // If radio label input has no value
       if (!cwRequiremenetsLabelInputField.value) {
         setCwRequiremenetsLabelInputField({
@@ -304,9 +312,10 @@ const GroupForm = ({
         groupName: initialValues.groupName || '',
         groupDescription: initialValues.groupDescription || '',
         requirementsToFulfill: initialValues.requirementsToFulfill
-          ? initialValues.requirementsToFulfill === 'ALL'
-            ? 'ALL'
-            : 'N'
+          ? initialValues.requirementsToFulfill ===
+            REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
+            ? REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
+            : REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
           : '',
         topics: initialValues.topics || '',
       }}
@@ -402,7 +411,7 @@ const GroupForm = ({
               <div className="radio-buttons">
                 <CWRadioButton
                   label="All requirements must be satisfied"
-                  value="ALL"
+                  value={REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS}
                   name="requirementsToFulfill"
                   hookToForm
                 />
