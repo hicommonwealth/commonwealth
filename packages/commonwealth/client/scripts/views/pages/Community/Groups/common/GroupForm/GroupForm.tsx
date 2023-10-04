@@ -16,9 +16,9 @@ import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
 import {
+  CWRequiremnetsLabelInputFieldState,
   GroupFormProps,
-  RequirementSubType,
-  RequirementSubTypeWithLabel,
+  RequirementSubFormsState,
 } from './index.types';
 import {
   VALIDATION_MESSAGES,
@@ -76,13 +76,9 @@ const GroupForm = ({
   });
   const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
   const [cwRequiremnetsLabelInputField, setCWRequiremnetsLabelInputField] =
-    useState<{ value: string; error: string }>({ value: '1', error: '' });
+    useState<CWRequiremnetsLabelInputFieldState>({ value: '1', error: '' });
   const [requirementSubForms, setRequirementSubForms] = useState<
-    {
-      defaultValues?: RequirementSubTypeWithLabel;
-      values: RequirementSubType;
-      errors?: RequirementSubType;
-    }[]
+    RequirementSubFormsState[]
   >([
     {
       values: {

@@ -1,3 +1,14 @@
+export type RequirementSubFormsState = {
+  defaultValues?: RequirementSubTypeWithLabel;
+  values: RequirementSubType;
+  errors?: RequirementSubType;
+};
+
+export type CWRequiremnetsLabelInputFieldState = {
+  value: string;
+  error: string;
+};
+
 export type RequirementSubType = {
   requirementType?: string;
   requirementContractAddress?: string;
