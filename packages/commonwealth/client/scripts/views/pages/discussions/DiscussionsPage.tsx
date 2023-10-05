@@ -27,7 +27,8 @@ type DiscussionsPageProps = {
   topicName?: string;
 };
 
-const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
+function DiscussionsPage(props: DiscussionsPageProps) {
+  const { topicName } = props;
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
@@ -138,6 +139,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       />
     </div>
   );
-};
+}
 
 export default DiscussionsPage;
