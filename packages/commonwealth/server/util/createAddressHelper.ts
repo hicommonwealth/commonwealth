@@ -102,8 +102,12 @@ export async function createAddressHelper(
 
   if (chain.base === ChainBase.CosmosSDK) {
     const { toHex, fromBech32 } = await import('@cosmjs/encoding');
-    const encodedData = fromBech32(encodedAddress).data;
-    addressHex = toHex(encodedData);
+    try {
+      const encodedData = fromBech32(encodedAddress).data;
+      addressHex = toHex(encodedData);
+    } catch (e) {
+      console.log(`Error converting bech32 to hex: ${e}. Hex was not added.`);
+    }
 
     // check all addresses for matching hex
     const existingHexes = await models.Address.scope('withPrivateData').findAll(
