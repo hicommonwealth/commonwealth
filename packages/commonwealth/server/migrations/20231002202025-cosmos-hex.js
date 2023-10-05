@@ -13,6 +13,8 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Addresses" ADD COLUMN "hex" VARCHAR(64) NULL;
+        ALTER TABLE "Addresses" ADD COLUMN "master_user_id" INTEGER NULL;
+        ALTER TABLE "Addresses" ADD COLUMN "master_profile_id" INTEGER NULL;
         `,
         { raw: true, transaction: t }
       );
@@ -50,49 +52,16 @@ module.exports = {
         }
       }
     });
-
     // time to complete: 13s
-
-    // await queryInterface.sequelize.transaction(async (t) => {
-    //   // then consolidate similar hexes into user_id with latest last_active
-    //   const [hexes] = await queryInterface.sequelize.query(
-    //     `
-    //     SELECT hex, last_active
-    //     FROM "Addresses"
-    //     WHERE hex IS NOT NULL AND last_active IS NOT NULL
-    //     GROUP BY hex, last_active;
-    //     `,
-    //     { transaction: t }
-    //   );
-
-    //   for (const hex of hexes) {
-    //     const [address] = await queryInterface.sequelize.query(
-    //       `
-    //       SELECT id, user_id, profile_id
-    //       FROM "Addresses"
-    //       WHERE hex = '${hex.hex}'
-    //       ORDER BY last_active DESC
-    //       LIMIT 1;
-    //       `,
-    //       { transaction: t }
-    //     );
-
-    //     await queryInterface.sequelize.query(
-    //       `
-    //       UPDATE "Addresses"
-    //       SET user_id = ${address[0].user_id}, profile_id = ${address[0].profile_id}
-    //       WHERE hex = '${hex.hex}';
-    //       `,
-    //       { transaction: t }
-    //     );
-    //   }
-    // });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
-        `ALTER TABLE "Addresses" DROP COLUMN "hex";`,
+        `ALTER TABLE "Addresses" DROP COLUMN "hex";
+          ALTER TABLE "Addresses" DROP COLUMN "master_user_id";
+          ALTER TABLE "Addresses" DROP COLUMN "master_profile_id";
+        `,
         { raw: true, transaction: t }
       );
     });
