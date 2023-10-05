@@ -11,7 +11,7 @@ import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
@@ -214,7 +214,7 @@ export const CommentCard = ({
               )}
 
               {isCanvasVerifyModalVisible && (
-                <Modal
+                <CWModal
                   content={<CanvasVerifyDataModal obj={comment} />}
                   onClose={() => setIsCanvasVerifyDataModalVisible(false)}
                   open={isCanvasVerifyModalVisible}

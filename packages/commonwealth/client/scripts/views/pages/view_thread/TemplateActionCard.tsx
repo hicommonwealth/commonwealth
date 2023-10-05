@@ -5,7 +5,7 @@ import { TemplateActionModal } from '../../modals/TemplateActionModal'; // Impor
 
 import 'pages/view_thread/TemplateActionCard.scss';
 import Thread, { Link, LinkDisplay, LinkSource } from 'models/Thread';
-import { Modal } from '../../components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import {
   CWDropdown,
   DropdownItemType,
@@ -104,7 +104,7 @@ export const TemplateActionCard = ({ thread }: TemplateActionCardProps) => {
           </div>
         }
       />
-      <Modal
+      <CWModal
         content={
           <TemplateActionModal
             isOpen={isModalOpen}

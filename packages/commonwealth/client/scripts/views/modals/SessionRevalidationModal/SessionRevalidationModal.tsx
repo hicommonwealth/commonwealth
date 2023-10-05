@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import './SessionRevalidationModal.scss';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { formatAddress } from 'views/components/user/user_block';
 import { WalletSsoSource } from 'common-common/src/types';
@@ -86,7 +86,7 @@ const SessionRevalidationModal = ({
   );
 
   return (
-    <Modal
+    <CWModal
       onClose={onModalClose}
       open={true}
       content={

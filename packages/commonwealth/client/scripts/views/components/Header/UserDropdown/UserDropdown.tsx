@@ -187,7 +187,7 @@ const UserDropdown = () => {
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
       />
-      <Modal
+      <CWModal
         isFullScreen={false}
         content={
           <SessionRevalidationModal
