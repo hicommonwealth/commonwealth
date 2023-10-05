@@ -27,6 +27,7 @@ export type SelectProps = {
     v: string | { id: string | number; value: any; label: string }
   ) => any;
   dropdownPosition?: Placement;
+  containerClassname?: string;
 };
 
 export const Select = ({
@@ -40,6 +41,7 @@ export const Select = ({
   canEditOption,
   dropdownPosition,
   placeholder = 'Select an option',
+  containerClassname,
 }: SelectProps) => {
   const popoverProps = usePopover();
 
@@ -55,7 +57,7 @@ export const Select = ({
       }}
     >
       {/* needs to be div instead of fragment so listener can work */}
-      <div>
+      <div className={containerClassname}>
         <CWButton
           className={`Select ${
             popoverProps.anchorEl ? 'active' : ''
