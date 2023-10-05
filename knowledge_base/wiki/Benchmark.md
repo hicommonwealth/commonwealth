@@ -101,7 +101,7 @@ As seen, notable performance improvements have been achieved in `viewUserActivit
 
 Similarly, a tenfold performance enhancement has been achieved in the `status` call due to these PRs: [#3916](https://github.com/hicommonwealth/commonwealth/pull/3916) & [#4060](https://github.com/hicommonwealth/commonwealth/pull/4060). 
 
-These improvements are discussed in detail [here](https://github.com/hicommonwealth/commonwealth/wiki/request-handler-optimization).
+These improvements are discussed in detail [here](./Request-Handler-Optimization.md).
 
 #### Geographic Performance Assessment - Forthcoming
 
