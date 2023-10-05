@@ -14,7 +14,7 @@ export async function fetchCosmosNotifChains(models: DB) {
   const chainIds = await models.Subscription.findAll({
     attributes: [
       [
-        models.sequelize.fn('DISTINCT', models.sequelize.col('chain_id')),
+        models.sequelize.fn('DISTINCT', models.sequelize.col('community_id')),
         'chain_id',
       ],
     ],
