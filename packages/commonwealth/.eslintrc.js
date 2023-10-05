@@ -8,7 +8,7 @@ module.exports = {
       },
     },
   },
-  plugins: ['@tanstack/query'],
+  plugins: ['@tanstack/query', 'unused-imports'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/camelcase': 'off',
