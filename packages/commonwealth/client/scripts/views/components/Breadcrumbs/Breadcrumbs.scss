@@ -165,6 +165,10 @@
     flex-direction: row;
     margin-bottom: 24px;
 
+    @include large {
+      padding-left: 80px;
+    }
+
     @include mediumInclusive {
       padding-left: 72px;
     }

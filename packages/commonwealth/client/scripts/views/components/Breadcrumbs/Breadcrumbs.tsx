@@ -75,10 +75,12 @@ export const Breadcrumbs = () => {
       // Find the matching breadcrumb data for the current path segment.
       const matchedBreadcrumb = breadcrumbData.find((breadcrumbItem) => {
         // Check if breadcrumbItem.url is falsy or if index is out of bounds
+
         return (
           !breadcrumbItem.url ||
           index >= pathSegments.length ||
-          breadcrumbItem.url === pathSegments.slice(0, index + 1).join('/')
+          breadcrumbItem.url ===
+            pathSegments.slice(index, breadcrumbData.length - 1).join('/')
         );
       });
 
@@ -96,8 +98,14 @@ export const Breadcrumbs = () => {
           break;
         case 'new':
           // Remove 'new' segment and generate the link.
-          pathSegments.splice(index, 1);
-          link = `new/discussion`;
+          if (pathSegments[index + 1] === 'discussion') {
+            link = `new/discussion`;
+            pathSegments.splice(index, 1);
+          } else {
+            link = `new/snapshot`;
+            pathSegments.splice(-2);
+            pathSegments[index] = 'New Snapshot Proposal';
+          }
           break;
         default:
           if (

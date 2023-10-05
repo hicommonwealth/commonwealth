@@ -13,6 +13,11 @@ export const breadCrumbURLS = [
     className: 'new-proposal',
   },
   {
+    url: 'new/discussion',
+    breadcrumb: 'New Thread',
+    className: 'new-thread',
+  },
+  {
     url: 'profile/edit',
     breadcrumb: 'Edit',
     className: 'editProfile',
@@ -69,10 +74,7 @@ export const breadCrumbURLS = [
   {
     url: 'discussions',
     className: 'discussions',
-  },
-  {
-    url: 'new/discussion',
-    className: 'new-thread',
+    breadcrumb: 'Discussions',
   },
   {
     url: 'notification-settings',
