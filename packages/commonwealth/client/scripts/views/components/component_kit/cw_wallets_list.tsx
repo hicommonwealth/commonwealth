@@ -89,7 +89,10 @@ export const AccountSelector = (props: AccountSelectorProps) => {
 
   return (
     <div className="AccountSelector">
-      <CWModalHeader onModalClose={onModalClose} />
+      <CWModalHeader
+        label="Select account to join"
+        onModalClose={onModalClose}
+      />
       <CWModalBody>
         {accounts.map((account, idx) => {
           return (
@@ -168,6 +171,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 }}
               />
               <CWModal
+                size="small"
                 content={
                   <AccountSelector
                     accounts={wallet.accounts}

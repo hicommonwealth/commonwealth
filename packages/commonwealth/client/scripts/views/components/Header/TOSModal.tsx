@@ -27,7 +27,7 @@ export const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
         onModalClose={onModalClose}
       />
       <CWModalBody>
-        <CWText>
+        <CWText className="body">
           By clicking accept you agree to the community's
           <a href={terms} target="_blank">
             Terms of Service

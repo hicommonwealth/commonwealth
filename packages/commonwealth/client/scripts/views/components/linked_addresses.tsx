@@ -75,6 +75,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
         );
       })}
       <CWModal
+        size="small"
         content={
           <DeleteAddressModal
             profile={profile}

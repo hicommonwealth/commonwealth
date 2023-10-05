@@ -388,6 +388,7 @@ export const PollCard = ({
           {proposalTitle}
         </CWText>
         <CWModal
+          size="small"
           content={
             <DeletePollModal
               onClickDelete={async () => {

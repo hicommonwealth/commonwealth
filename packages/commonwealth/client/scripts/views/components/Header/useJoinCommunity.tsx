@@ -193,6 +193,7 @@ const useJoinCommunity = () => {
 
   const AccountSelectorModal = (
     <CWModal
+      size="small"
       content={
         <AccountSelector
           accounts={sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
@@ -214,6 +215,7 @@ const useJoinCommunity = () => {
 
   const TermsOfServiceModal = (
     <CWModal
+      size="medium"
       content={
         <TOSModal
           onAccept={async () => {
