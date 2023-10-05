@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
-import { ChainAttributes } from './chain';
+import { ChainAttributes } from './community';
 import { ModelInstance, ModelStatic } from './types';
 import { Requirement } from '../util/requirementsModule/requirementsTypes';
 
@@ -53,7 +53,7 @@ export default (
   );
 
   Group.associate = (models) => {
-    models.Group.belongsTo(models.Chain, {
+    models.Group.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

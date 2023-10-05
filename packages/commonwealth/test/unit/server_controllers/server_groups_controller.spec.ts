@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
 import { AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
+import { ChainInstance } from '../../../server/models/community';
 import { UserInstance } from 'server/models/user';
 import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
 
@@ -24,7 +24,7 @@ const VALID_REQUIREMENTS: Requirement[] = [
     },
   },
 ];
-const INVALID_REQUIREMENTS_NOT_ARRAY = ('no an array' as unknown) as [];
+const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 
 const createMockedGroupsController = () => {
   const db: any = {};

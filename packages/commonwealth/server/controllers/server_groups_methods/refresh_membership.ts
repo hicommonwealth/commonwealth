@@ -1,4 +1,4 @@
-import { ChainInstance } from 'server/models/chain';
+import { ChainInstance } from '../../models/community';
 import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';

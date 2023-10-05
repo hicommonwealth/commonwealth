@@ -5,7 +5,7 @@ import {
   UpdateThreadPermissions,
   validatePermissions,
 } from 'server/controllers/server_threads_methods/update_thread';
-import { ChainInstance } from 'server/models/chain';
+import { ChainInstance } from '../../../server/models/community';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {

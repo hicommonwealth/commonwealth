@@ -2,7 +2,7 @@ import { ServerError } from 'common-common/src/errors';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
+import type { ChainInstance } from '../models/community';
 import type { NotificationCategoryInstance } from 'server/models/notification_category';
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
@@ -49,7 +49,7 @@ type StatusResp = {
 
 const getChainStatus = async (models: DB) => {
   const [chains, notificationCategories] = await Promise.all([
-    models.Chain.findAll({
+    models.Community.findAll({
       where: { active: true },
     }),
     models.NotificationCategory.findAll(),
@@ -87,7 +87,7 @@ const getChainStatus = async (models: DB) => {
 };
 
 export const getUserStatus = async (models: DB, user: UserInstance) => {
-  const chains = await models.Chain.findAll({
+  const chains = await models.Community.findAll({
     where: { active: true },
     attributes: ['id'],
   });

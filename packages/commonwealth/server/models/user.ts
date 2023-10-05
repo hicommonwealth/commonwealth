@@ -2,7 +2,7 @@ import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { AddressAttributes, AddressInstance } from './address';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { ChainAttributes, ChainInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import type {
   SocialAccountAttributes,
@@ -137,7 +137,7 @@ export default (
   };
 
   User.associate = (models) => {
-    models.User.belongsTo(models.Chain, {
+    models.User.belongsTo(models.Community, {
       as: 'selectedChain',
       foreignKey: 'selected_chain_id',
       constraints: false,

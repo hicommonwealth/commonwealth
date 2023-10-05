@@ -1,4 +1,4 @@
-import { ChainInstance } from '../../../models/chain';
+import { ChainInstance } from '../../../models/community';
 import { factory, formatFilename } from 'common-common/src/logging';
 import Rollbar from 'rollbar';
 

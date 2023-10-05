@@ -171,7 +171,7 @@ export const emailDigestBuilder = async (
   confirmationEmail: string
 ) => {
   // Go through each community on CW
-  const communities = await models.Chain.findAll();
+  const communities = await models.Community.findAll();
 
   const communityDigestInfo: CommunityDigestInfo = {};
 

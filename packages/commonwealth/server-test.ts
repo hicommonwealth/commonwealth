@@ -124,29 +124,35 @@ const resetServer = (debug = false): Promise<void> => {
           url: 'https://rpc-osmosis.ecostake.com',
           name: 'Osmosis',
           balance_type: BalanceType.Cosmos,
-          cosmos_chain_id: 'osmosis'
+          cosmos_chain_id: 'osmosis',
         },
         csdkBeta: {
           url: 'https://cosmos-devnet-beta.herokuapp.com/rpc',
           name: 'Cosmos SDK v0.45.0 devnet',
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet-beta.herokuapp.com/lcd/',
-          cosmos_chain_id: 'csdkbetaci'
+          cosmos_chain_id: 'csdkbetaci',
         },
         csdkV1: {
           url: 'https://cosmos-devnet.herokuapp.com/rpc',
           name: 'Cosmos SDK v0.46.11 devnet',
           balance_type: BalanceType.Cosmos,
           alt_wallet_url: 'https://cosmos-devnet.herokuapp.com/lcd/',
-          cosmos_chain_id: 'csdkv1'
+          cosmos_chain_id: 'csdkv1',
         },
       };
 
-      const [edgewareNode, mainnetNode, testnetNode, osmosisNode, csdkBetaNode, csdkV1Node] =
-        await models.ChainNode.bulkCreate(Object.values(nodes));
+      const [
+        edgewareNode,
+        mainnetNode,
+        testnetNode,
+        osmosisNode,
+        csdkBetaNode,
+        csdkV1Node,
+      ] = await models.ChainNode.bulkCreate(Object.values(nodes));
 
       // Initialize different chain + node URLs
-      await models.Chain.create({
+      await models.Community.create({
         id: 'edgeware',
         network: ChainNetwork.Edgeware,
         default_symbol: 'EDG',
@@ -159,7 +165,7 @@ const resetServer = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: edgewareNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
@@ -171,7 +177,7 @@ const resetServer = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
       });
-      const alex = await models.Chain.create({
+      const alex = await models.Community.create({
         id: 'alex',
         network: ChainNetwork.ERC20,
         default_symbol: 'ALEX',
@@ -183,7 +189,7 @@ const resetServer = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: testnetNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'osmosis',
         network: ChainNetwork.Osmosis,
         default_symbol: 'OSMO',
@@ -195,7 +201,7 @@ const resetServer = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: osmosisNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'csdk-beta',
         network: ChainNetwork.Osmosis,
         default_symbol: 'STAKE',
@@ -207,7 +213,7 @@ const resetServer = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: csdkBetaNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'csdk',
         network: ChainNetwork.Osmosis,
         default_symbol: 'STAKE',
@@ -230,7 +236,7 @@ const resetServer = (debug = false): Promise<void> => {
         chain_id: alex.id,
         contract_id: alexContract.id,
       });
-      const yearn = await models.Chain.create({
+      const yearn = await models.Community.create({
         id: 'yearn',
         network: ChainNetwork.ERC20,
         default_symbol: 'YFI',
@@ -253,7 +259,7 @@ const resetServer = (debug = false): Promise<void> => {
         chain_id: yearn.id,
         contract_id: yearnContract.id,
       });
-      const sushi = await models.Chain.create({
+      const sushi = await models.Community.create({
         id: 'sushi',
         network: ChainNetwork.ERC20,
         default_symbol: 'SUSHI',

@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { ChainAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type WebhookAttributes = {
@@ -43,7 +43,7 @@ export default (
   );
 
   Webhook.associate = (models) => {
-    models.Webhook.belongsTo(models.Chain, {
+    models.Webhook.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

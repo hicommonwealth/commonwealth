@@ -3,7 +3,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
-import type { ChainInstance } from '../models/chain';
+import type { ChainInstance } from '../models/community';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -121,7 +121,7 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
       where: scope ? { id: threadId, chain: scope } : { id: threadId },
       include: [
         {
-          model: models.Chain,
+          model: models.Community,
           where: scope ? null : { custom_domain: req.hostname },
           attributes: ['custom_domain', 'icon_url'],
         },
@@ -236,8 +236,10 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
 
   async function getChain(req, scope: string) {
     return scope
-      ? await models.Chain.findOne({ where: { id: scope } })
-      : await models.Chain.findOne({ where: { custom_domain: req.hostname } });
+      ? await models.Community.findOne({ where: { id: scope } })
+      : await models.Community.findOne({
+          where: { custom_domain: req.hostname },
+        });
   }
 
   app.get('/:scope?', renderGeneralPage);

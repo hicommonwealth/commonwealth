@@ -1,7 +1,7 @@
 import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { ChainAttributes, ChainInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
@@ -121,7 +121,7 @@ export default (
   );
 
   Address.associate = (models) => {
-    models.Address.belongsTo(models.Chain, {
+    models.Address.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });

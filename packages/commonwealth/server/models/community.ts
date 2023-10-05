@@ -93,7 +93,7 @@ export default (
   dataTypes: typeof DataTypes
 ): ChainModelStatic => {
   const Chain = <ChainModelStatic>sequelize.define(
-    'Chain',
+    'Community',
     {
       id: { type: dataTypes.STRING, primaryKey: true },
       chain_node_id: { type: dataTypes.INTEGER, allowNull: true }, // only null if starter community
@@ -153,17 +153,17 @@ export default (
   );
 
   Chain.associate = (models) => {
-    models.Chain.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id' });
-    models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
-    models.Chain.hasMany(models.Topic, {
+    models.Community.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id' });
+    models.Community.hasMany(models.Address, { foreignKey: 'chain' });
+    models.Community.hasMany(models.Notification, { foreignKey: 'chain_id' });
+    models.Community.hasMany(models.Topic, {
       as: 'topics',
       foreignKey: 'chain_id',
     });
-    models.Chain.hasMany(models.Thread, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
-    models.Chain.belongsToMany(models.Contract, {
+    models.Community.hasMany(models.Thread, { foreignKey: 'chain' });
+    models.Community.hasMany(models.Comment, { foreignKey: 'chain' });
+    models.Community.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
+    models.Community.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });
   };

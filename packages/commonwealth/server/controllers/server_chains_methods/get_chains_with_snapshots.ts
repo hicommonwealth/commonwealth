@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import { ServerChainsController } from '../server_chains_controller';
-import { ChainInstance } from 'server/models/chain';
+import { ChainInstance } from '../../models/community';
 import { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 
 export type GetChainsWithSnapshotsOptions = {};
@@ -14,7 +14,7 @@ export async function __getChainsWithSnapshots(
   options: GetChainsWithSnapshotsOptions
 ): Promise<GetChainsWithSnapshotsResult> {
   const [chains] = await Promise.all([
-    this.models.Chain.findAll({
+    this.models.Community.findAll({
       where: { active: true },
     }),
   ]);

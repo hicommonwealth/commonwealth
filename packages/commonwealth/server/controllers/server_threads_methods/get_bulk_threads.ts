@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { ChainInstance } from '../../models/chain';
+import { ChainInstance } from '../../models/community';
 import { Link, ThreadAttributes, ThreadInstance } from '../../models/thread';
 import { ServerThreadsController } from '../server_threads_controller';
 import { QueryTypes } from 'sequelize';

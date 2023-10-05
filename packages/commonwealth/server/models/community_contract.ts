@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { ChainAttributes, ChainInstance } from './community';
 import type { ContractAttributes, ContractInstance } from './contract';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -51,7 +51,7 @@ export default (
       foreignKey: 'contract_id',
       targetKey: 'id',
     });
-    models.CommunityContract.belongsTo(models.Chain, {
+    models.CommunityContract.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

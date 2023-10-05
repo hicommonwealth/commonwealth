@@ -12,7 +12,7 @@ describe('Thread queries', () => {
     await resetDatabase();
   });
   it('query_thread_through_collabo', async () => {
-    const chain = await models.Chain.findOne();
+    const chain = await models.Community.findOne();
     expect(chain.id).to.not.be.null;
     const address = (
       await models.Address.findOrCreate({

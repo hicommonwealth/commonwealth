@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import moment from 'moment';
 
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { ChainInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import {

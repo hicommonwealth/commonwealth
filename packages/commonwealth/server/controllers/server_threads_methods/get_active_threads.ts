@@ -1,5 +1,5 @@
 import { ServerThreadsController } from '../server_threads_controller';
-import { ChainInstance } from '../../models/chain';
+import { ChainInstance } from '../../models/community';
 import { ThreadAttributes } from '../../models/thread';
 
 const MIN_THREADS_PER_TOPIC = 0;

@@ -12,7 +12,7 @@ import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { UserInstance } from '../../models/user';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { ChainInstance } from '../../models/community';
 import { ServerCommentsController } from '../server_comments_controller';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { EmitOptions } from '../server_notifications_methods/emit';

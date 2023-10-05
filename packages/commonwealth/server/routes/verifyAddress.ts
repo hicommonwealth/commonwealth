@@ -13,7 +13,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
-import type { ChainInstance } from '../models/chain';
+import type { ChainInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
@@ -193,7 +193,7 @@ const verifyAddress = async (
   if (!req.body.chain || !req.body.chain_id) {
     throw new AppError(Errors.NoChain);
   }
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain },
   });
   const chain_id = req.body.chain_id;

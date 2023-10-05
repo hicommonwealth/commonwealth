@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { ChainAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
@@ -45,7 +45,7 @@ export default (
 
   StarredCommunity.associate = (models) => {
     models.StarredCommunity.belongsTo(models.User);
-    models.StarredCommunity.belongsTo(models.Chain, {
+    models.StarredCommunity.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });

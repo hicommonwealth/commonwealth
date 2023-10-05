@@ -4,7 +4,7 @@ import { DATABASE_URI } from './config';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';
-import ChainFactory from './models/chain';
+import CommunityFactory from './models/community';
 import ChainNodeFactory from './models/chain_node';
 import CollaborationFactory from './models/collaboration';
 import CommentFactory from './models/comment';
@@ -70,7 +70,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),
-  Chain: ChainFactory(sequelize, DataTypes),
+  Community: CommunityFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),

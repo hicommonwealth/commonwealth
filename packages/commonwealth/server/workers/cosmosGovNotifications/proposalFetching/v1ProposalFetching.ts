@@ -1,4 +1,4 @@
-import { ChainInstance } from '../../../models/chain';
+import { ChainInstance } from '../../../models/community';
 import {
   ProposalSDKType,
   ProposalStatus,

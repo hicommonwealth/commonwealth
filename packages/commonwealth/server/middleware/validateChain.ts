@@ -2,7 +2,7 @@
 // If a community is found, also check that the user is allowed to see it.
 
 import type { DB } from '../models';
-import type { ChainInstance } from '../models/chain';
+import type { ChainInstance } from '../models/community';
 
 export const ChainCommunityErrors = {
   ChainDNE: 'Chain does not exist',
@@ -13,7 +13,11 @@ export type ValidateChainParams = {
   chain_id?: string;
 };
 
-const getChainQuery = (chain_id: string, models: DB, includeTopics: boolean) => ({
+const getChainQuery = (
+  chain_id: string,
+  models: DB,
+  includeTopics: boolean
+) => ({
   where: {
     id: chain_id,
   },
@@ -42,7 +46,7 @@ export const validateChain = async (
 ): Promise<[ChainInstance, string]> => {
   const chain_id = params.chain || params.chain_id;
   if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
-  const chain = await models.Chain.findOne(
+  const chain = await models.Community.findOne(
     getChainQuery(chain_id, models, includeTopics)
   );
   // searching for chain that doesn't exist

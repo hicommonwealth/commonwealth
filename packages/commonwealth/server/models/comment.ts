@@ -2,7 +2,7 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
+import type { ChainAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 import { StatsDController } from 'common-common/src/statsd';
 
@@ -150,7 +150,7 @@ export default (
   );
 
   Comment.associate = (models) => {
-    models.Comment.belongsTo(models.Chain, {
+    models.Comment.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });

@@ -7,7 +7,7 @@ import type {
 } from '../../shared/types';
 import type { DB } from '../models';
 import type { WebhookContent } from '../webhookNotifier';
-import type { ChainAttributes } from './chain';
+import type { ChainAttributes } from './community';
 import type { CommentAttributes } from './comment';
 import type { NotificationInstance } from './notification';
 import type { NotificationCategoryAttributes } from './notification_category';
@@ -154,7 +154,7 @@ export default (
       foreignKey: 'subscription_id',
       onDelete: 'cascade',
     });
-    models.Subscription.belongsTo(models.Chain, {
+    models.Subscription.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

@@ -2,7 +2,7 @@ import moment from 'moment';
 import { UserInstance } from '../../models/user';
 import { ServerThreadsController } from '../server_threads_controller';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { ChainInstance } from '../../models/community';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { EmitOptions } from '../server_notifications_methods/emit';

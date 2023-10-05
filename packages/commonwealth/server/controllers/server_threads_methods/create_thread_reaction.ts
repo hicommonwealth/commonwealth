@@ -1,5 +1,5 @@
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { ChainInstance } from '../../models/community';
 import { ReactionAttributes } from '../../models/reaction';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';

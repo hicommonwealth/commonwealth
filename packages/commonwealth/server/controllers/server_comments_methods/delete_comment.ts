@@ -1,5 +1,5 @@
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { ChainInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { ServerCommentsController } from '../server_comments_controller';
 import { Op } from 'sequelize';
@@ -69,7 +69,7 @@ export async function __deleteComment(
       where: {
         id: commentId,
       },
-      include: [this.models.Chain],
+      include: [this.models.Community],
     });
     if (!comment) {
       throw new AppError(Errors.CommentNotFound);

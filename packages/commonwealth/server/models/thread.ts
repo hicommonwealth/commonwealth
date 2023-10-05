@@ -1,7 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
+import type { ChainAttributes } from './community';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import { NotificationAttributes } from './notification';
@@ -178,7 +178,7 @@ export default (
   );
 
   Thread.associate = (models) => {
-    models.Thread.belongsTo(models.Chain, {
+    models.Thread.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });
