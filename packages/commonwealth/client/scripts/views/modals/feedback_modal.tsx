@@ -39,6 +39,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
         />
       </CWModalBody>
       <CWModalFooter>
+        {message && <CWValidationText message={message} status={status} />}
         <CWButton
           buttonType="primary"
           buttonHeight="sm"
@@ -68,7 +69,6 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
             );
           }}
         />
-        {message && <CWValidationText message={message} status={status} />}
       </CWModalFooter>
     </div>
   );
