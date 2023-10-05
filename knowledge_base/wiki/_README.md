@@ -4,6 +4,7 @@
     * [Documentation Language](#documentation-language)
         + [Indexicality & Timestamps](#indexicality--timestamps)
         + [Must, Should, & May](#must-should--may)
+- [Mermaid Visualizations](#mermaid-visualizations)
 - [Tracking Documentation Status](#tracking-documentation-status)
     * [Change Logs](#change-logs)
         + [Example Change Log](#example-change-log)
@@ -18,7 +19,12 @@
 
 # Navigating the docs
 
-For a complete list of knowledge base entries, see our [Table of Contents](_TOC.md)
+For a complete list of knowledge base entries, see our [Table of Contents](_TOC.md).
+
+Many text-only docs can be fluently read in pre-rendered Markdown. However, VSCode also has built-in Markdown rendering features, which can be enabled by the keyboard shortcut Cmd-Shift-V. To render [Mermaid diagrams](#mermaid-visualizations), we recommend the Markdown Preview Mermaid Support extension for VSCode.
+
+Alternatively, the knowledge base can be browsed and shared, in rendered form, through the GitHub repo.
+- 
 
 # Updating The Docs: How & When
 
@@ -54,6 +60,12 @@ Per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119), the following prescripti
 3. **SHOULD**: This word, or the adjective "RECOMMENDED", conveys that there may exist valid reasons in particular circumstances to ignore a particular item, but the full implications must be understood and carefully weighed before choosing a different course.
 4. **SHOULD NOT**: This phrase, or the phrase "NOT RECOMMENDED" conveys that there may exist valid reasons in particular circumstances when the particular behavior is acceptable or even useful, but the full implications should be understood and the case carefully weighed before implementing any behavior described with this label.
 5. **MAY**: This word, or the adjective "OPTIONAL", mean that an item is truly optional. 
+
+# Mermaid Visualizations
+
+As of 231005, we are moving toward using Mermaid syntax for Markdown-compatible visual representations, diagrams, and flow charts. To render Mermaid visualizations, we recommend the Markdown Preview Mermaid Support extension for VSCode.
+
+An overview of Mermaid syntax can be found on their [online docs](https://mermaid.js.org/intro/syntax-reference.html). 
 
 # Tracking Documentation Status
 
