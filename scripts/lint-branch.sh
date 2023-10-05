@@ -17,5 +17,5 @@ then
     echo "There is nothing to lint"
 else
     echo $LINES
-    NODE_OPTIONS="--max-old-space-size=8192" eslint $LINES
+    NODE_OPTIONS="--max-old-space-size=8192" eslint $LINES --max-warnings=0
 fi
