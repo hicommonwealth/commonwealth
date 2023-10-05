@@ -11,9 +11,15 @@
     display: grid;
     height: fit-content;
     align-items: center;
-    grid-template-columns: 7fr 1fr 2fr 2fr;
     gap: 16px;
     width: 100%;
+
+    &.cols-3 {
+      grid-template-columns: 9fr 1fr 2fr;
+    }
+    &.cols-4 {
+      grid-template-columns: 7fr 1fr 2fr 2fr;
+    }
 
     .search-icon {
       color: $neutral-400;

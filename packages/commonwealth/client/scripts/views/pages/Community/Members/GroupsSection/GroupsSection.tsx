@@ -1,6 +1,8 @@
+import { getClasses } from 'views/components/component_kit/helpers';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import app from 'state';
+import Permissions from 'utils/Permissions';
 import { Select } from 'views/components/Select';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -84,7 +86,18 @@ const GroupsSection = () => {
   return (
     <section className="GroupsSection">
       {/* Filter section */}
-      <section className="filters">
+      <section
+        className={getClasses<{
+          'cols-3': boolean;
+          'cols-4': boolean;
+        }>(
+          {
+            'cols-3': !Permissions.isCommunityAdmin(),
+            'cols-4': Permissions.isCommunityAdmin(),
+          },
+          'filters'
+        )}
+      >
         <CWTextInput
           size="large"
           fullWidth
@@ -109,12 +122,14 @@ const GroupsSection = () => {
             setGroupFilters((g) => ({ ...g, category: item.value }));
           }}
         />
-        <CWButton
-          buttonWidth="full"
-          label="Create group"
-          iconLeft={'plus'}
-          onClick={navigateToCreateGroupPage}
-        />
+        {Permissions.isCommunityAdmin() && (
+          <CWButton
+            buttonWidth="full"
+            label="Create group"
+            iconLeft={'plus'}
+            onClick={navigateToCreateGroupPage}
+          />
+        )}
       </section>
 
       {/* Groups list section */}
