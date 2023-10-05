@@ -49,12 +49,14 @@ const getInitialCosmosProposals = (thread: Thread) =>
 
 type UpdateProposalStatusModalProps = {
   onChangeHandler?: (stage: ThreadStage, links?: Link[]) => void;
+  onProposalSelect: (proposalId: string) => void;
   onModalClose: () => void;
   thread: Thread;
 };
 
 export const UpdateProposalStatusModal = ({
   onChangeHandler,
+  onProposalSelect,
   onModalClose,
   thread,
 }: UpdateProposalStatusModalProps) => {
@@ -130,6 +132,7 @@ export const UpdateProposalStatusModal = ({
       );
 
       if (toAdd.length > 0) {
+        onProposalSelect(toAdd[0].id);
         let enrichedSnapshot;
         if (app.chain.meta.snapshot?.length === 1) {
           enrichedSnapshot = {

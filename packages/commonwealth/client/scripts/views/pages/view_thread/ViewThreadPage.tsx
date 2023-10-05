@@ -26,7 +26,6 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import useForceRerender from '../../../hooks/useForceRerender';
 import Poll from '../../../models/Poll';
 import { Link, LinkSource, LinkDisplay } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
@@ -125,8 +124,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { proposal } = useProposalData(proposalId, null, proposalId != null);
 
-  const forceRerender = useForceRerender();
-
   const proposalVotes = proposal?.getVotes();
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -135,6 +132,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [searchParams] = useSearchParams();
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
+  console.log(snapshotProposalId, '====');
   const {
     data,
     error: fetchThreadError,
@@ -282,8 +280,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     setSnapshotProposalId(linkedSnapshots[0].identifier.split('/')[1]);
   }
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
-  if (linkedProposals?.length > 0 && !proposalId) {
-    setProposalId(linkedProposals[0].identifier);
+  if (linkedProposals?.length === 0 && proposalId) {
+    setProposalId(null);
   }
 
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
@@ -581,6 +579,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           <LinkedProposalsCard
                             thread={thread}
                             showAddProposalButton={isAuthor || isAdminOrMod}
+                            onProposalSelect={setSnapshotProposalId}
                           />
                         )}
                         {showLinkedThreadOptions && (

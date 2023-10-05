@@ -59,11 +59,13 @@ const LinkedProposal = ({
 type LinkedProposalsCardProps = {
   showAddProposalButton: boolean;
   thread: Thread;
+  onProposalSelect: (proposalId: string) => void;
 };
 
 export const LinkedProposalsCard = ({
   thread,
   showAddProposalButton,
+  onProposalSelect,
 }: LinkedProposalsCardProps) => {
   const [snapshotProposalsLoaded, setSnapshotProposalsLoaded] = useState(false);
   const [snapshotUrl, setSnapshotUrl] = useState('');
@@ -173,6 +175,7 @@ export const LinkedProposalsCard = ({
           <UpdateProposalStatusModal
             thread={thread}
             onModalClose={() => setIsModalOpen(false)}
+            onProposalSelect={onProposalSelect}
           />
         }
         onClose={() => setIsModalOpen(false)}
