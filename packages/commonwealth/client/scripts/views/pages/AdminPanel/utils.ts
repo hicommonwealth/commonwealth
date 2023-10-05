@@ -1,7 +1,6 @@
 import axios from 'axios';
 import app from 'state';
 import { BalanceType } from '../../../../../../common-common/src/types';
-import { ThreadAttributes } from 'server/models/thread';
 
 export const createChainNode = async ({
   url,
@@ -25,7 +24,9 @@ export const createChainNode = async ({
 
 export const deleteChain = async ({ id }: { id: string }) => {
   await axios.delete(`${app.serverUrl()}/communities/${id}`, {
-    jwt: app.user.jwt,
+    data: {
+      jwt: app.user.jwt,
+    },
   });
 };
 
