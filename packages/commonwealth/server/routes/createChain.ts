@@ -1,6 +1,6 @@
 import type { Cluster } from '@solana/web3.js';
 import BN from 'bn.js';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
 import {
   BalanceType,
   ChainBase,
@@ -11,11 +11,8 @@ import {
 import type { NextFunction } from 'express';
 import fetch from 'node-fetch';
 import { Op } from 'sequelize';
-// import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-
-import type { AddressInstance } from '../models/address';
 import type { ChainAttributes } from '../models/chain';
 import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
@@ -27,6 +24,7 @@ import testSubstrateSpec from '../util/testSubstrateSpec';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+import axios from 'axios';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
@@ -36,6 +34,8 @@ export const Errors = {
   NoName: 'Must provide name',
   InvalidNameLength: 'Name should not exceed 255',
   NoSymbol: 'Must provide symbol',
+  NoValidAddressWithBase:
+    'Must hold an address with the correct chain base type',
   InvalidSymbolLength: 'Symbol should not exceed 9',
   NoType: 'Must provide chain type',
   NoBase: 'Must provide chain base',
@@ -43,7 +43,6 @@ export const Errors = {
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
   InvalidNode: 'RPC url returned invalid response. Check your node url',
   MustBeWs: 'Node must support websockets on ethereum',
-  InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
   InvalidChainIdOrUrl:
     'Could not determine a valid endpoint for provided chain',
@@ -52,6 +51,9 @@ export const Errors = {
     'The id for this chain already exists, please choose another id',
   ChainNameExists:
     'The name for this chain already exists, please choose another name',
+  ChainNodeIdExists: 'The chain node with this id already exists',
+  CosmosChainNameRequired:
+    'cosmos_chain_id is a required field. It should be the chain name as registered in the Cosmos Chain Registry.',
   InvalidIconUrl: 'Icon url must begin with https://',
   InvalidWebsite: 'Website must begin with https://',
   InvalidDiscord: 'Discord must begin with https://',
@@ -62,6 +64,7 @@ export const Errors = {
   NotAdmin: 'Must be admin',
   ImageDoesntExist: `Image url provided doesn't exist`,
   ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
+  UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
 export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
@@ -97,7 +100,7 @@ const createChain = async (
   next: NextFunction
 ) => {
   if (!req.user) {
-    return next(new AppError('Not logged in'));
+    return next(new AppError('Not signed in'));
   }
   // require Admin privilege for creating Chain/DAO
   if (
@@ -140,16 +143,30 @@ const createChain = async (
     throw new AppError(Errors.ImageTooLarge);
   }
 
-  const existingBaseChain = await models.Chain.findOne({
-    where: { base: req.body.base },
+  const validAdminAddresses = await models.Address.scope(
+    'withPrivateData'
+  ).findAll({
+    where: { user_id: req.user.id, verified: { [Op.ne]: null } },
+    include: [
+      {
+        model: models.Chain,
+        where: { base: req.body.base },
+        attributes: ['id'],
+      },
+    ],
   });
-  if (!existingBaseChain) {
-    return next(new AppError(Errors.InvalidBase));
+
+  if (validAdminAddresses.length === 0) {
+    return next(new AppError(Errors.NoValidAddressWithBase));
   }
+
+  // Get any valid address to be admin address
+  const addressToBeAdmin = validAdminAddresses[0];
 
   // TODO: refactor this to use existing nodes rather than always creating one
 
   let eth_chain_id: number = null;
+  let cosmos_chain_id: string | null = null;
   let url = req.body.node_url;
   let altWalletUrl = req.body.alt_wallet_url;
   let privateUrl: string | undefined;
@@ -161,6 +178,44 @@ const createChain = async (
       return next(new AppError(Errors.InvalidChainId));
     }
     eth_chain_id = +req.body.eth_chain_id;
+  }
+
+  // cosmos_chain_id is the canonical identifier for a cosmos chain.
+  if (req.body.base === ChainBase.CosmosSDK) {
+    // Our convention is to follow the "chain_name" standard established by the
+    // Cosmos Chain Registry:
+    // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
+    // This community-led registry seeks to track chain info for all Cosmos chains.
+    // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
+    // It is a lowercase alphanumeric name, like 'osmosis'.
+    // See: https://github.com/hicommonwealth/commonwealth/issues/4951
+    cosmos_chain_id = req.body.cosmos_chain_id;
+
+    if (!cosmos_chain_id) {
+      return next(new AppError(Errors.CosmosChainNameRequired));
+    } else {
+      const oldChainNode = await models.ChainNode.findOne({
+        where: { cosmos_chain_id },
+      });
+      if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
+        return next(
+          new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`)
+        );
+      }
+    }
+
+    const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
+    const { data: chains } = await axios.get(
+      `${REGISTRY_API_URL}/api/v1/mainnet`
+    );
+    const foundRegisteredChain = chains?.find(
+      (chain) => chain === cosmos_chain_id
+    );
+    if (!foundRegisteredChain) {
+      return next(
+        new AppError(`${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`)
+      );
+    }
   }
 
   // if not offchain, also validate the address
@@ -310,9 +365,11 @@ const createChain = async (
   }
 
   const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
-    where: { url },
+    where: { [Op.or]: [{ url }, { eth_chain_id }] },
     defaults: {
+      url,
       eth_chain_id,
+      cosmos_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
       balance_type:
@@ -397,79 +454,23 @@ const createChain = async (
     featured_in_sidebar: true,
   });
 
-  // try to make admin one of the user's addresses
-  // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
-  let role: RoleInstanceWithPermission | undefined;
-  let addressToBeAdmin: AddressInstance | undefined;
+  const newAddress = await models.Address.create({
+    user_id: req.user.id,
+    profile_id: addressToBeAdmin.profile_id,
+    address: addressToBeAdmin.address,
+    chain: chain.id,
+    verification_token: addressToBeAdmin.verification_token,
+    verification_token_expires: addressToBeAdmin.verification_token_expires,
+    verified: addressToBeAdmin.verified,
+    keytype: addressToBeAdmin.keytype,
+    wallet_id: addressToBeAdmin.wallet_id,
+    is_user_default: true,
+    role: 'admin',
+    last_active: new Date(),
+  });
 
-  if (chain.base === ChainBase.Ethereum) {
-    addressToBeAdmin = await models.Address.scope('withPrivateData').findOne({
-      where: {
-        user_id: req.user.id,
-        address: {
-          [Op.startsWith]: '0x',
-        },
-      },
-      include: [
-        {
-          model: models.Chain,
-          where: { base: chain.base },
-          required: true,
-        },
-      ],
-    });
-  } else if (chain.base === ChainBase.NEAR) {
-    addressToBeAdmin = await models.Address.scope('withPrivateData').findOne({
-      where: {
-        user_id: req.user.id,
-        address: {
-          [Op.endsWith]: '.near',
-        },
-      },
-      include: [
-        {
-          model: models.Chain,
-          where: { base: chain.base },
-          required: true,
-        },
-      ],
-    });
-  } else if (chain.base === ChainBase.Solana) {
-    addressToBeAdmin = await models.Address.scope('withPrivateData').findOne({
-      where: {
-        user_id: req.user.id,
-        address: {
-          // This is the regex formatting for solana addresses per their website
-          [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}',
-        },
-      },
-      include: [
-        {
-          model: models.Chain,
-          where: { base: chain.base },
-          required: true,
-        },
-      ],
-    });
-  }
-
-  if (addressToBeAdmin) {
-    const newAddress = await models.Address.create({
-      user_id: req.user.id,
-      profile_id: addressToBeAdmin.profile_id,
-      address: addressToBeAdmin.address,
-      chain: chain.id,
-      verification_token: addressToBeAdmin.verification_token,
-      verification_token_expires: addressToBeAdmin.verification_token_expires,
-      verified: addressToBeAdmin.verified,
-      keytype: addressToBeAdmin.keytype,
-      wallet_id: addressToBeAdmin.wallet_id,
-      is_user_default: true,
-      role: 'admin',
-      last_active: new Date(),
-    });
-
-    role = new RoleInstanceWithPermission(
+  const role: RoleInstanceWithPermission | undefined =
+    new RoleInstanceWithPermission(
       { community_role_id: 0, address_id: newAddress.id },
       chain.id,
       'admin',
@@ -477,15 +478,14 @@ const createChain = async (
       0
     );
 
-    await models.Subscription.findOrCreate({
-      where: {
-        subscriber_id: req.user.id,
-        category_id: NotificationCategories.NewThread,
-        chain_id: chain.id,
-        is_active: true,
-      },
-    });
-  }
+  await models.Subscription.findOrCreate({
+    where: {
+      subscriber_id: req.user.id,
+      category_id: NotificationCategories.NewThread,
+      chain_id: chain.id,
+      is_active: true,
+    },
+  });
 
   const serverAnalyticsController = new ServerAnalyticsController();
   serverAnalyticsController.track(
@@ -502,7 +502,7 @@ const createChain = async (
     chain: chain.toJSON(),
     node: nodeJSON,
     role: role?.toJSON(),
-    admin_address: addressToBeAdmin?.address,
+    admin_address: addressToBeAdmin.address,
   });
 };
 

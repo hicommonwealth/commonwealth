@@ -91,7 +91,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload
   ): Promise<string> {
     // timeout?
     const canvas = await import('@canvas-js/interfaces');
@@ -102,7 +102,9 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(canvas.serializeSessionPayload(canvasMessage)),
+          bytes: Buffer.from(
+            canvas.serializeSessionPayload(canvasSessionPayload)
+          ),
         });
       } catch (error) {
         console.error(error);

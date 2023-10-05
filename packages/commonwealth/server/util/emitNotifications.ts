@@ -1,7 +1,5 @@
 import { StatsDController } from 'common-common/src/statsd';
 import {
-  ChainBase,
-  ChainType,
   NotificationCategories,
 } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
@@ -9,7 +7,6 @@ import type {
   IChainEventNotificationData,
   IForumNotificationData,
   NotificationDataAndCategory,
-  NotificationDataTypes,
 } from '../../shared/types';
 import { SERVER_URL } from '../config';
 import type { DB } from '../models';
@@ -21,7 +18,6 @@ import {
 import type { WebhookContent } from '../webhookNotifier';
 import send from '../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { SupportedNetwork } from 'chain-events/src';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -74,8 +70,10 @@ export default async function emitNotifications(
     if (addressModels && addressModels.length > 0) {
       const userIds = addressModels.map((a) => a.user_id);
 
-      // remove duplicates
-      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
+      // remove duplicates and null user_ids
+      const userIdsDedup = userIds.filter(
+        (a, b) => userIds.indexOf(a) === b && a !== null
+      );
       return userIdsDedup;
     } else {
       return [];

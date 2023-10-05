@@ -1,5 +1,5 @@
-import React from 'react';
-import { useFormContext } from 'react-hook-form';
+import './CWSelectList.scss';
+import React, { useEffect } from 'react';
 import type { GroupBase, Props } from 'react-select';
 import Select, { components } from 'react-select';
 import { CWIcon } from '../../cw_icons/cw_icon';
@@ -7,6 +7,7 @@ import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 import { MessageRow } from '../CWTextInput/MessageRow';
 import './CWSelectList.scss';
+import { useFormContext } from 'react-hook-form';
 
 type CustomCWSelectListProps = {
   label?: string;
@@ -32,8 +33,24 @@ export const CWSelectList = <
     ? formContext?.getValues?.(props?.name)
     : null;
 
+  useEffect(() => {
+    props.hookToForm &&
+      formContext &&
+      props.name &&
+      props.defaultValue &&
+      formContext.setValue(props.name, props.defaultValue);
+  }, [props.hookToForm, props.name, props.defaultValue, formContext]);
+
+  useEffect(() => {
+    props.hookToForm &&
+      formContext &&
+      props.name &&
+      props.value &&
+      formContext.setValue(props.name, props.value);
+    }, [props.hookToForm, props.name, props.value, formContext]);
+
   return (
-    <div>
+    <div className="CWSelectList">
       {props.label && <MessageRow label={props.label} />}
       <Select
         {...props}
@@ -68,6 +85,11 @@ export const CWSelectList = <
             const base = { ...baseStyles };
 
             if (state.isSelected) {
+              base.backgroundColor = '#F0EFF0 !important';
+              base.color = 'inherit';
+            }
+
+            if (state.isFocused) {
               base.backgroundColor = '#F0EFF0 !important';
               base.color = 'inherit';
             }

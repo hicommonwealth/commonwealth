@@ -15,6 +15,7 @@ import { CWSelectList } from './new_designs/CWSelectList';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
+import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -1810,6 +1811,22 @@ export const ComponentShowcase = () => {
             { value: 'substrate', label: 'Substrate' },
             { value: 'binance', label: 'Binance' },
           ]}
+        />
+      </div>
+      <div className="community-card">
+        <CWText type="h3"> Community Card </CWText>
+        <CWRelatedCommunityCard
+          chain={app.config.chains.getById('basindao')}
+          memberCount={2623}
+          threadCount={437}
+          actions={
+            <CWButton
+              buttonType="primary"
+              disabled={false}
+              className="action-btn"
+              label="Action"
+            />
+          }
         />
       </div>
     </div>
