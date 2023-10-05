@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
+import clsx from 'clsx';
 
 import { uuidv4 } from '../../lib/util';
 import type { ButtonProps } from '../components/component_kit/new_designs/cw_button';
@@ -20,6 +21,7 @@ interface ConfirmationModalProps {
   description: string | JSX.Element;
   buttons: ButtonProps[];
   removeModal: () => void;
+  className?: string;
 }
 
 const ConfirmationModal = ({
@@ -27,6 +29,7 @@ const ConfirmationModal = ({
   description,
   buttons,
   removeModal,
+  className,
 }: ConfirmationModalProps) => {
   const [open, setOpen] = useState(true);
 
@@ -49,7 +52,7 @@ const ConfirmationModal = ({
   return (
     <CWModal
       content={
-        <div className="ConfirmationModal">
+        <div className={clsx('ConfirmationModal', className)}>
           <CWModalHeader label={title} icon="warning" onModalClose={onClose} />
           <CWModalBody>
             {description && (
@@ -71,6 +74,7 @@ interface OpenConfirmationProps {
   title?: string;
   description: string | JSX.Element;
   buttons: ButtonProps[];
+  className?: string;
 }
 
 export const openConfirmation = (props: OpenConfirmationProps) => {

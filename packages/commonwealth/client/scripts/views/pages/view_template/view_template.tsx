@@ -5,7 +5,6 @@ import validateType from 'helpers/validateTypes';
 import type Contract from 'models/Contract';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import app from 'state';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -48,9 +47,16 @@ type Json = {
   };
 };
 
-const ViewTemplatePage = () => {
+type ViewTemplateFormProps = {
+  contract_address?: string;
+  slug?: string;
+  isForm?: boolean;
+  setTemplateNickname(name: string): any;
+};
+
+const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
   const navigate = useCommonNavigate();
-  const params = useParams();
+  const params = formData;
   const [formState, setFormState] = useState({});
   const [json, setJson] = useState<Json>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -71,11 +77,18 @@ const ViewTemplatePage = () => {
     });
 
     if (!contractInStore || !templateMetadata) {
+      if (formData.isForm) return <div>No Contract Available</div>;
       navigate('/404', {}, null);
     }
 
     setCurrentContract(contractInStore);
     setTemplateNickname(templateMetadata.cctmd.nickname);
+    if (
+      params.setTemplateNickname &&
+      typeof params.setTemplateNickname === 'function'
+    ) {
+      params.setTemplateNickname(templateMetadata.cctmd.nickname);
+    }
 
     app.contracts
       .getTemplatesForContract(contractInStore.id)
@@ -267,7 +280,13 @@ const ViewTemplatePage = () => {
           return <CWDivider />;
         case TemplateComponents.TEXT:
           return (
-            <CWText fontStyle={field[component].field_type}>
+            <CWText
+              fontStyle={
+                formData.isForm && field[component].field_type == 'h1'
+                  ? 'h2'
+                  : field[component].field_type
+              }
+            >
               {field[component].field_value}
             </CWText>
           );
@@ -403,23 +422,27 @@ const ViewTemplatePage = () => {
   };
 
   if (!json) {
+    if (formData.isForm) return <div>No Contract Available</div>;
     return;
   }
 
   return (
-    <div className="ViewTemplatePage">
+    <div className={formData.isForm ? 'ViewTemplateForm' : 'ViewTemplatePage'}>
       <CWBreadcrumbs
         breadcrumbs={[
           { label: 'Contracts', path: `/contracts`, navigate },
           { label: templateNickname },
         ]}
       />
-      <CWText type="h3" className="header">
-        {templateNickname}
-      </CWText>
+
+      {!formData.isForm && (
+        <CWText type="h3" className="header">
+          {templateNickname}
+        </CWText>
+      )}
 
       <div className="form">
-        <CWDivider className="divider" />
+        {!formData.isForm && <CWDivider className="divider" />}
 
         {!templateError ? (
           <div className="template">{renderTemplate(json.form_fields)}</div>

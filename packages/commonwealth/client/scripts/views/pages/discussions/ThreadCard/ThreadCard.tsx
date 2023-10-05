@@ -7,7 +7,6 @@ import {
   getProposalUrlPath,
 } from 'identifiers';
 import { LinkSource } from 'models/Thread';
-import moment from 'moment';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
@@ -107,7 +106,7 @@ export const ThreadCard = ({
             <AuthorAndPublishInfo
               authorAddress={thread.author}
               authorChainId={thread.authorChain}
-              publishDate={moment(thread.createdAt).format('l')}
+              publishDate={thread.createdAt}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {

@@ -1,6 +1,5 @@
 import React from 'react';
-
-import type { ChainNetwork } from 'common-common/src/types';
+import type { ChainNetwork, WalletSsoSource } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import app from 'state';
@@ -114,10 +113,13 @@ type WalletsListProps = {
   canResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
+  useSessionKeyRevalidationFlow?: boolean;
+  hideSocialLogins?: boolean;
   onResetWalletConnect: () => void;
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onSocialLogin: (
-    type: 'google' | 'twitter' | 'discord' | 'github'
+    type: WalletSsoSource,
+    useSessionKeyRevalidationFlow: boolean
   ) => Promise<void>;
   onWalletAddressSelect: (
     wallet: IWebWallet<any>,
@@ -132,10 +134,12 @@ export const CWWalletsList = (props: WalletsListProps) => {
     canResetWalletConnect,
     hasNoWalletsLink = true,
     wallets,
+    useSessionKeyRevalidationFlow,
     onResetWalletConnect,
     onWalletSelect,
     onWalletAddressSelect,
     onSocialLogin,
+    hideSocialLogins,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -191,27 +195,39 @@ export const CWWalletsList = (props: WalletsListProps) => {
               />
             </React.Fragment>
           ))}
+          {wallets.length === 0 && (
+            <CWNoAuthMethodsAvailable darkMode={darkMode} />
+          )}
 
-          <CWDivider className="wallets-divider" />
+          {!hideSocialLogins && (
+            <>
+              <CWDivider className="wallets-divider" />
 
-          <CWAuthButton
-            type="google"
-            label="Sign in with Google"
-            darkMode={darkMode}
-            onClick={async () => onSocialLogin('google')}
-          />
+              <CWAuthButton
+                type="google"
+                label="Sign in with Google"
+                darkMode={darkMode}
+                onClick={async () =>
+                  onSocialLogin(
+                    WalletSsoSource.Google,
+                    useSessionKeyRevalidationFlow
+                  )
+                }
+              />
 
-          <CWText
-            type="b2"
-            className={getClasses<{ darkMode?: boolean }>(
-              { darkMode },
-              'connect-another-way-link'
-            )}
-          >
-            <a onClick={onConnectAnotherWay}>
-              Sign in with another email address
-            </a>
-          </CWText>
+              <CWText
+                type="b2"
+                className={getClasses<{ darkMode?: boolean }>(
+                  { darkMode },
+                  'connect-another-way-link'
+                )}
+              >
+                <a onClick={onConnectAnotherWay}>
+                  Sign in with another email address
+                </a>
+              </CWText>
+            </>
+          )}
 
           <CWDivider className="wallets-divider" />
           {/* <CWAuthButton
@@ -225,25 +241,36 @@ export const CWWalletsList = (props: WalletsListProps) => {
             type="discord"
             label="Discord"
             darkMode={darkMode}
-            onClick={async () => onSocialLogin('discord')}
+            onClick={async () =>
+              onSocialLogin(
+                WalletSsoSource.Discord,
+                useSessionKeyRevalidationFlow
+              )
+            }
             className="DiscordAuthButton"
           />
           <CWAuthButton
             type="github"
             label="Github"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('github')}
+            onClick={() =>
+              onSocialLogin(
+                WalletSsoSource.Github,
+                useSessionKeyRevalidationFlow
+              )
+            }
           />
           <CWAuthButton
             type="twitter"
             label="Twitter"
             darkMode={darkMode}
-            onClick={() => onSocialLogin('twitter')}
+            onClick={() =>
+              onSocialLogin(
+                WalletSsoSource.Twitter,
+                useSessionKeyRevalidationFlow
+              )
+            }
           />
-
-          {wallets.length === 0 && (
-            <CWNoAuthMethodsAvailable darkMode={darkMode} />
-          )}
         </div>
         <div className="wallet-list-links">
           {canResetWalletConnect && (

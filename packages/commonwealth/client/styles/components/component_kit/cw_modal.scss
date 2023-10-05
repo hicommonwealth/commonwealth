@@ -29,6 +29,7 @@ $modal-padding: 16px;
   border-radius: $border-radius-corners;
   box-shadow: $elevation-3;
   overflow: auto;
+  outline: none;
 
   &.isFullScreen {
     border-radius: 0;
@@ -76,4 +77,10 @@ $modal-padding: 16px;
 
 .compact-modal-actions {
   padding: $modal-padding;
+}
+
+.ban-modal-content {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
 }

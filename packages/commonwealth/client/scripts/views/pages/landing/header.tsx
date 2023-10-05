@@ -37,7 +37,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
               Why Commonwealth?
             </CWText>
             <CWButton
-              label="Login"
+              label="Sign in"
               buttonType="primary-black"
               onClick={() => setIsModalOpen(true)}
             />

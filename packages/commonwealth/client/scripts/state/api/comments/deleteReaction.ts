@@ -21,7 +21,7 @@ const deleteReaction = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signDeleteCommentReaction({
+  } = await app.sessions.signDeleteCommentReaction(address, {
     comment_id: canvasHash,
   });
   return await axios
@@ -74,11 +74,15 @@ const useDeleteCommentReactionMutation = ({
       queryClient.cancelQueries({ queryKey: key });
       queryClient.setQueryData(key, () => {
         const tempComments = [...comments];
-        const commentToUpdate = tempComments.find((x) => x.id === commentId);
-        commentToUpdate.reactions = [...commentToUpdate.reactions].filter(
-          (x) => x.id !== reactionId
-        );
-        return tempComments;
+        return tempComments.map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              reactions: comment.reactions.filter((r) => r.id !== reactionId),
+            };
+          }
+          return comment;
+        });
       });
     },
   });

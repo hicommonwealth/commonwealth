@@ -1,8 +1,13 @@
 import type { Action, Session } from '@canvas-js/interfaces';
 
-import { getCosmosSignatureData } from 'controllers/server/sessionSigners/cosmos';
-import { constructTypedCanvasMessage } from '../../../shared/adapters/chain/ethereum/keys';
-import { validationTokenToSignDoc } from '../../../shared/adapters/chain/cosmos/keys';
+import {
+  createSiweMessage,
+  getEIP712SignableAction,
+} from '../../../shared/adapters/chain/ethereum/keys';
+import {
+  getADR036SignableAction,
+  getADR036SignableSession,
+} from '../../../shared/adapters/chain/cosmos/keys';
 
 // TODO: verify payload is not expired
 export const verify = async ({
@@ -29,26 +34,37 @@ export const verify = async ({
     // verify ethereum signature
     if (action) {
       const ethersUtils = (await import('ethers')).utils;
-      const canvasEthereum = await import('@canvas-js/chain-ethereum');
-      const [domain, types, value] =
-        canvasEthereum.getActionSignatureData(actionPayload);
+      const { domain, types, message } = getEIP712SignableAction(actionPayload);
+      // vs.
+      // const canvasEthereum = await import('@canvas-js/chain-ethereum');
+      // const [domain, types, value] = canvasEthereum.getAction(actionPayload);
       const recoveredAddr = ethersUtils.verifyTypedData(
-        domain,
+        domain as any,
         types,
-        value,
+        message,
         signature
       );
       return recoveredAddr.toLowerCase() === actionSignerAddress.toLowerCase();
     } else {
-      const ethSigUtil = await import('@metamask/eth-sig-util');
-      const { types, domain, message } =
-        constructTypedCanvasMessage(sessionPayload);
-      const recoveredAddr = ethSigUtil.recoverTypedSignature({
-        data: { types, domain, message, primaryType: 'Message' as const },
-        signature,
-        version: ethSigUtil.SignTypedDataVersion.V4,
-      });
-      return recoveredAddr.toLowerCase() === session.payload.from.toLowerCase();
+      const ethersUtils = (await import('ethers')).utils;
+
+      const signaturePattern = /^(.+)\/([A-Za-z0-9]+)\/(0x[A-Fa-f0-9]+)$/;
+      const signaturePatternMatch = signaturePattern.exec(signature);
+      if (signaturePatternMatch === null) {
+        throw new Error(
+          `Invalid signature: signature did not match ${signaturePattern}`
+        );
+      }
+      const [_, domain, nonce, signatureData] = signaturePatternMatch;
+      const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
+
+      const recoveredAddress = ethersUtils.verifyMessage(
+        siweMessage,
+        signatureData
+      );
+      return (
+        recoveredAddress.toLowerCase() === session.payload.from.toLowerCase()
+      );
     }
   } else if (payload.chain === 'cosmos') {
     // verify terra sessions (actions are verified like other cosmos chains)
@@ -119,7 +135,7 @@ export const verify = async ({
     }
     // verify cosmos signature (base64)
     if (action) {
-      const signDocPayload = await getCosmosSignatureData(
+      const signDocPayload = await getADR036SignableAction(
         actionPayload,
         actionSignerAddress
       );
@@ -146,7 +162,7 @@ export const verify = async ({
       );
     } else {
       const canvas = await import('@canvas-js/interfaces');
-      const signDocPayload = await validationTokenToSignDoc(
+      const signDocPayload = await getADR036SignableSession(
         Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
         payload.from
       );

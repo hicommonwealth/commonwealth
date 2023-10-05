@@ -1,5 +1,5 @@
-import type { Chain } from '@canvas-js/interfaces';
-import { constructCanvasMessage } from 'adapters/shared';
+import { createCanvasSessionPayload } from 'canvas';
+
 import BN from 'bn.js';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
@@ -86,20 +86,22 @@ const FinishNearLogin = () => {
       const chainId = 'mainnet';
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
-        chainId
+        chainId,
+        acct.address
       );
 
       // We do not add blockInfo for NEAR
       const newAcct = await createUserWithAddress(
         acct.address,
         WalletId.NearWallet,
+        null, // no wallet sso source
         chain.id,
         sessionPublicAddress,
         null
       );
 
-      const canvasMessage = constructCanvasMessage(
-        'near' as Chain,
+      const canvasSessionPayload = createCanvasSessionPayload(
+        'near' as ChainBase,
         chainId,
         acct.address,
         sessionPublicAddress,
@@ -117,14 +119,18 @@ const FinishNearLogin = () => {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
-        canvas.serializeSessionPayload(canvasMessage)
+        canvas.serializeSessionPayload(canvasSessionPayload)
       );
 
-      await acct.validate(signature, canvasMessage.sessionIssued, chainId);
+      await acct.validate(
+        signature,
+        canvasSessionPayload.sessionIssued,
+        chainId
+      );
 
       app.sessions
         .getSessionController(ChainBase.NEAR)
-        .authSession(chainId, canvasMessage, signature);
+        .authSession(chainId, acct.address, canvasSessionPayload, signature);
 
       if (!app.isLoggedIn()) {
         await initAppState();
@@ -145,13 +151,13 @@ const FinishNearLogin = () => {
     const failedTx = searchParams.get('tx_failure');
 
     if (failedTx) {
-      console.log(`Login failed: deleting storage key ${failedTx}`);
+      console.log(`Sign in failed: deleting storage key ${failedTx}`);
 
       if (localStorage[failedTx]) {
         delete localStorage[failedTx];
       }
 
-      setValidationError('Login failed.');
+      setValidationError('Sign in failed.');
       return;
     }
 
@@ -221,7 +227,7 @@ const FinishNearLogin = () => {
   if (validationError) {
     return (
       <>
-        <CWText>NEAR account log in error: {validationError}</CWText>
+        <CWText>NEAR account sign in error: {validationError}</CWText>
         <CWButton
           onClick={(e) => {
             e.preventDefault();

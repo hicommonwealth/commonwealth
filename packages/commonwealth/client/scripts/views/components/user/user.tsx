@@ -27,7 +27,8 @@ export const User = ({
   shouldShowAddressWithDisplayName,
   avatarSize = 16,
   role,
-  showSkeleton
+  showSkeleton,
+  popoverPlacement,
 }: UserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
   const { data: users } = useFetchProfilesByAddressesQuery({
@@ -114,7 +115,11 @@ export const User = ({
 
   const userFinal = shouldShowAvatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
-      <Avatar url={profile?.avatarUrl} size={16} address={profile?.id} />
+      <Avatar
+        url={profile?.avatarUrl}
+        size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
+        address={profile?.id}
+      />
     </div>
   ) : (
     <div
@@ -123,7 +128,11 @@ export const User = ({
     >
       {showAvatar && (
         <Link
-          to={profile ? `/profile/id/${profile?.id}` : undefined}
+          to={
+            profile && shouldLinkProfile
+              ? `/profile/id/${profile?.id}`
+              : undefined
+          }
           className="user-avatar"
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
@@ -166,7 +175,11 @@ export const User = ({
       {profile && (
         <div className="UserPopover" onClick={(e) => e.stopPropagation()}>
           <div className="user-avatar">
-            <Avatar url={profile?.avatarUrl} size={32} address={profile?.id} />
+            <Avatar
+              url={profile?.avatarUrl}
+              size={profile?.avatarUrl ? 36 : 32}
+              address={profile?.id}
+            />
           </div>
           <div className="user-name">
             {app.chain && app.chain.base === ChainBase.Substrate && (
@@ -232,7 +245,13 @@ export const User = ({
       onMouseLeave={popoverProps.handleInteraction}
     >
       {userFinal}
-      {profile && <Popover content={userPopover} {...popoverProps} />}
+      {profile && (
+        <Popover
+          content={userPopover}
+          {...popoverProps}
+          placement={popoverPlacement}
+        />
+      )}
     </div>
   ) : (
     userFinal
