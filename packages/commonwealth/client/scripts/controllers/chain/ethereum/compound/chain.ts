@@ -34,7 +34,6 @@ export default class CompoundChain extends EthereumChain {
     }
     const compoundContract = compoundContracts[0];
     this.compoundApi = new CompoundAPI(
-      null,
       compoundContract.address,
       this.api.currentProvider as any
     );
