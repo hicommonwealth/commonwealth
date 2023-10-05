@@ -5,7 +5,6 @@ export const bundleSubs = (
 ): { [k: string]: Array<NotificationSubscription> } => {
   const result = {};
   for (const sub of subs) {
-    console.log('sub1', sub);
     if (sub.Chain) {
       if (result[sub.Chain.id]) {
         result[sub.Chain.id].push(sub);
@@ -20,10 +19,8 @@ export const bundleSubs = (
 export const extractSnapshotProposals = (subs) => {
   const snapshotProposals = {};
 
-  console.log('SUBS', subs);
   for (const sub of subs) {
     if (sub.category === 'snapshot-proposal') {
-      console.log('sub2', sub);
       if (snapshotProposals[sub.id]) {
         snapshotProposals[sub.id].push(sub);
       } else {

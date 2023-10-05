@@ -93,7 +93,6 @@ const NotificationSettingsPage = () => {
     app.user.notifications.discussionSubscriptions
   );
 
-  console.log('discussion', app.user.notifications.discussionSubscriptions);
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
     app?.user.notifications.chainEventSubscriptions
