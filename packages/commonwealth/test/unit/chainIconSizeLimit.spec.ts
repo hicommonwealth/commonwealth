@@ -1,5 +1,4 @@
 import chai from 'chai';
-import { Errors } from '../../server/routes/createChain';
 import { getFileSizeBytes } from '../../server/util/getFilesSizeBytes';
 
 describe('ChainIconSizeLimit tests', () => {
@@ -9,7 +8,7 @@ describe('ChainIconSizeLimit tests', () => {
       await getFileSizeBytes('badUrl');
     } catch (e) {
       errorCaught = true;
-      chai.assert.equal(e.message, Errors.ImageDoesntExist);
+      chai.assert.equal(e.message, 'Only absolute URLs are supported');
     }
 
     chai.assert.isTrue(errorCaught);
