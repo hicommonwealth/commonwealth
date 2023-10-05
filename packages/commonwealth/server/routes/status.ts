@@ -13,6 +13,7 @@ import { ETH_RPC, JWT_SECRET } from '../config';
 import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { CommunityInstance } from '../models/community';
+import { ThreadAttributes } from '../models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
@@ -126,7 +127,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   const commsAndChains = await getChainActivity(addresses);
   const unseenPosts = {};
   let query = ``;
-  let replacements = [];
+  let replacements: string[] = [];
 
   // this loops through the communities/chains for which we want to see if there are any new updates
   // for each community a UNION SELECT query is appended to the query so that that communities updated threads are
@@ -134,11 +135,9 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   // than a new query for each community
   for (let i = 0; i < commsAndChains.length; i++) {
     const name = commsAndChains[i][0];
-    let time: any = commsAndChains[i][1];
-    time = new Date(time as string);
+    const date = commsAndChains[i][1];
 
-    // if time is invalid reset + skip this chain
-    if (Number.isNaN(time.getDate())) {
+    if (!date) {
       unseenPosts[name] = {};
       continue;
     }
@@ -146,21 +145,21 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // adds a union between SELECT queries if the number of SELECT queries is greater than 1
     if (i != 0) query += ' UNION ';
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
-    replacements.push(name, time.getTime());
+    replacements.push(name, date);
     // append the SELECT query
     query += `SELECT id, chain FROM "Threads" WHERE
-(kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
+    chain = ? AND created_at > ? AND deleted_at IS NULL`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 
   // populate the query replacements and execute the query
-  const threadNumPromise: Promise<{ id: string; chain: string }[]> = <any>(
-    sequelize.query(query, {
-      raw: true,
-      type: QueryTypes.SELECT,
-      replacements,
-    })
-  );
+  const threadNumPromise = sequelize.query<
+    Pick<ThreadAttributes, 'id' | 'chain'>
+  >(query, {
+    raw: true,
+    type: QueryTypes.SELECT,
+    replacements,
+  });
 
   // wait for all the promises to resolve
   const [starredCommunities, threadNum] = await Promise.all([
@@ -176,7 +175,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     if (!unseenPosts[thread.chain]) unseenPosts[thread.chain] = {};
     unseenPosts[thread.chain].activePosts
       ? unseenPosts[thread.chain].activePosts.add(thread.id)
-      : (unseenPosts[thread.chain].activePosts = new Set(thread.id));
+      : (unseenPosts[thread.chain].activePosts = new Set([thread.id]));
     unseenPosts[thread.chain].threads
       ? unseenPosts[thread.chain].threads++
       : (unseenPosts[thread.chain].threads = 1);
@@ -189,11 +188,9 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
   // same principal as the loop above but for comments instead of threads
   for (let i = 0; i < commsAndChains.length; i++) {
     const name = commsAndChains[i][0];
-    let time: any = commsAndChains[i][1];
-    time = new Date(time as string);
+    const date = commsAndChains[i][1];
 
-    // if time is invalid reset + skip this chain
-    if (Number.isNaN(time.getDate())) {
+    if (!date) {
       unseenPosts[name] = {};
       continue;
     }
@@ -201,9 +198,9 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // adds a union between SELECT queries if the number of SELECT queries is greater than 1
     if (i !== 0) query += ' UNION ';
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
-    replacements.push(name, time.getTime());
+    replacements.push(name, date);
     // append the SELECT query
-    query += `SELECT thread_id, chain FROM "Comments" WHERE chain = ? AND created_at > TO_TIMESTAMP(?)`;
+    query += `SELECT thread_id, chain FROM "Comments" WHERE chain = ? AND created_at > ?`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 
@@ -230,9 +227,8 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
 
   // set the activePosts to num in set
   for (const chain of commsAndChains) {
-    // again checks for invalid time values
-    const [name, time] = chain;
-    if (Number.isNaN(new Date(time as string).getDate())) {
+    const [name, date] = chain;
+    if (!date) {
       unseenPosts[name] = {};
       continue;
     }
@@ -331,7 +327,7 @@ export const status = async (
   }
 };
 
-type ChainActivity = [chain: string, timestamp: string][];
+type ChainActivity = [chain: string, timestamp: string | null][];
 
 function getChainActivity(
   addresses: AddressInstance[],
@@ -339,9 +335,7 @@ function getChainActivity(
   return Promise.all(
     addresses.map(async (address) => {
       const { community_id, last_active } = address;
-      // Check if last_active is not null before calling toISOString
-      const lastActiveISO = last_active ? last_active.toISOString() : 'N/A';
-      return [community_id, lastActiveISO];
+      return [community_id, last_active?.toISOString()];
     }),
   );
 }
