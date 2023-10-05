@@ -1,5 +1,6 @@
 import React from 'react';
-import type { ChainNetwork, WalletSsoSource } from 'common-common/src/types';
+import type { ChainNetwork } from 'common-common/src/types';
+import { WalletSsoSource } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import app from 'state';

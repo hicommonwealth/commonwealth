@@ -89,6 +89,7 @@ export const LoginSelectorMenuRight = ({
         </div>
       </div>
       <CWModal
+        size="small"
         content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}

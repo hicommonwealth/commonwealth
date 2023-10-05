@@ -33,7 +33,7 @@ const Backdrop = React.forwardRef<
 const CWModal: FC<CWModalProps> = ({
   content,
   isFullScreen,
-  size = 'small',
+  size,
   onClose,
   open,
   className,

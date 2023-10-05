@@ -38,6 +38,7 @@ export const HelpMenu = () => {
         ]}
       />
       <CWModal
+        size="small"
         content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
@@ -96,6 +97,7 @@ export const HelpMenuPopover = () => {
         )}
       />
       <CWModal
+        size="small"
         content={<FeedbackModal onModalClose={() => setIsModalOpen(false)} />}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}

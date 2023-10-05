@@ -9,7 +9,7 @@ import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import {
   isWindowMediumSmallInclusive,
-  isWindowSmallInclusive
+  isWindowSmallInclusive,
 } from './components/component_kit/helpers';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
@@ -40,7 +40,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     setMobileMenuName,
     mobileMenuName,
     setUserToggledVisibility,
-    setRecentlyUpdatedVisibility
+    setRecentlyUpdatedVisibility,
   } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -131,7 +131,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           </div>
           <div
             className={clsx('DesktopMenuContainer', 'session-keys', {
-              isLoggedIn
+              isLoggedIn,
             })}
           >
             <CreateContentPopover />
@@ -176,6 +176,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
         </div>
       </div>
       <CWModal
+        size="small"
         content={
           <FeedbackModal onModalClose={() => setIsFeedbackModalOpen(false)} />
         }
