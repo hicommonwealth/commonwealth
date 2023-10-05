@@ -163,7 +163,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     raw: true,
     type: QueryTypes.SELECT,
     replacements,
-    logging: console.log,
   });
 
   // wait for all the promises to resolve
@@ -171,8 +170,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     starredCommunitiesPromise,
     threadNumPromise,
   ]);
-
-  console.log('>>>>>>>>>>>>>>>>>>>>>>> threadNum', threadNum);
 
   // this section iterates through the retrieved threads
   // counting the number of threads and keeping a set of activePosts
@@ -183,10 +180,6 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     unseenPosts[thread.chain].activePosts
       ? unseenPosts[thread.chain].activePosts.add(thread.id)
       : (unseenPosts[thread.chain].activePosts = new Set([thread.id]));
-    console.log(
-      '????????????????????????',
-      unseenPosts[thread.chain].activePosts
-    );
     unseenPosts[thread.chain].threads
       ? unseenPosts[thread.chain].threads++
       : (unseenPosts[thread.chain].threads = 1);
