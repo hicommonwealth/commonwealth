@@ -234,6 +234,7 @@ const ReactQuillEditor = ({
         {showTooltip && <QuillTooltip label={tooltipLabel} />}
         {isUploading && <LoadingIndicator />}
         <CWModal
+          size="medium"
           content={
             <PreviewModal
               doc={
