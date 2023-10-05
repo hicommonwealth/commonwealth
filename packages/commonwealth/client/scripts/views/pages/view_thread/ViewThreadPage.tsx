@@ -97,8 +97,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false);
   const [isViewMarked, setIsViewMarked] = useState(false);
-  const [snapshotProposalId, setSnapshotProposalId] = useState(null);
-  const [snapshotId, setSnapshotId] = useState(null);
+  const [snapshotProposalId, setSnapshotProposalId] = useState<string>(null);
+  const [snapshotId, setSnapshotId] = useState<string>(null);
   const [proposalId, setProposalId] = useState<string>(null);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const toggleVotingModal = (newModalState: boolean) => {
@@ -157,14 +157,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     chainId: app.activeChainId(),
     threadId: parseInt(threadId),
   });
-
-  useEffect(() => {
-    app.proposalEmitter.on('redraw', forceRerender);
-
-    return () => {
-      app.proposalEmitter.removeAllListeners();
-    };
-  }, [forceRerender]);
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');

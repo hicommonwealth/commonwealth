@@ -24,20 +24,20 @@ export const VotingResult = (props: VotingResultProps) => {
     <div className="VotingResult">
       <div className="results-column-yes">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Yes (${yesVotes.length})`}
+          Yes ({yesVotes.length})
         </CWText>
         <VoteListing proposal={proposal} votes={yesVotes} />
       </div>
       <div className="results-column-no">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`No (${noVotes.length})`}
+          No ({noVotes.length})
         </CWText>
         <VoteListing proposal={proposal} votes={noVotes} />
       </div>
       {abstainVotes && (
         <div className="results-column-no">
           <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Abstain (${abstainVotes.length})`}
+            Abstain ({abstainVotes.length})
           </CWText>
           <VoteListing proposal={proposal} votes={abstainVotes} />
         </div>

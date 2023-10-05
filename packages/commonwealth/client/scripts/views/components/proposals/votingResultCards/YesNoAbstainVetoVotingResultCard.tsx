@@ -1,15 +1,12 @@
-import clsx from 'clsx';
 import React from 'react';
 import { formatPercent } from '../../../../helpers/index';
 import { CWText } from '../../component_kit/cw_text';
 import { YesNoAbstainVetoVotingResultProps } from '../votingResults/YesNoAbstainVetoVotingResult';
 import { safeDivision } from './AaveVotingResultCard';
 
-export const YesNoAbstainVetoVotingResultCard = (
-  props: YesNoAbstainVetoVotingResultProps
-) => {
-  const { votes } = props;
-
+export const YesNoAbstainVetoVotingResultCard = ({
+  votes,
+}: YesNoAbstainVetoVotingResultProps) => {
   const yesVotes = votes.filter((v) => v.choice === 'Yes').length;
   const noVotes = votes.filter((v) => v.choice === 'No').length;
   const abstainVotes = votes.filter((v) => v.choice === 'Abstain').length;

@@ -39,25 +39,25 @@ export const CompletedProposalVotingResult = (
         <CWText type="h4" fontWeight="medium" className="results-header">
           {`${yesPct}% voted Yes`}
         </CWText>
-        <CWText>{`(${yesResults})`}</CWText>
+        <CWText>({yesResults})</CWText>
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
           {`${noPct}% voted No`}
         </CWText>
-        <CWText>{`(${noResults})`}</CWText>
+        <CWText>({noResults})</CWText>
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
           {`${abstainPct}% voted Abstain`}
         </CWText>
-        <CWText>{`(${abstainResults})`}</CWText>
+        <CWText>({abstainResults})</CWText>
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
           {`${noWithVetoPct}% voted Veto`}
         </CWText>
-        <CWText>{`(${noWithVetoResults})`}</CWText>
+        <CWText>({noWithVetoResults})</CWText>
       </div>
     </div>
   );

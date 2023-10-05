@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import React from 'react';
 import { NearSputnikVoteString } from '../../../../controllers/chain/near/sputnik/types';
 import { formatPercent } from '../../../../helpers/index';
@@ -6,11 +5,9 @@ import { CWText } from '../../component_kit/cw_text';
 import { YesNoRejectVotingResultProps } from '../votingResults/YesNoRejectVotingResult';
 import { safeDivision } from './AaveVotingResultCard';
 
-export const YesNoRejectVotingResultCard = (
-  props: YesNoRejectVotingResultProps
-) => {
-  const { votes } = props;
-
+export const YesNoRejectVotingResultCard = ({
+  votes,
+}: YesNoRejectVotingResultProps) => {
   const approveVotes = votes.filter(
     (v) => v.choice === NearSputnikVoteString.Approve
   ).length;

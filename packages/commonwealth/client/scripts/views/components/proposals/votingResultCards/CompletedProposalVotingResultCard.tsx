@@ -1,13 +1,14 @@
-import clsx from 'clsx';
 import React from 'react';
 import { CWText } from '../../component_kit/cw_text';
 import { CompletedProposalVotingResultProps } from '../votingResults/CompletedProposalVotingResult';
 
-export const CompletedProposalVotingResultCard = (
-  props: CompletedProposalVotingResultProps
-) => {
-  const { abstainPct, noPct, noWithVetoPct, yesPct, yesResults } = props;
-
+export const CompletedProposalVotingResultCard = ({
+  abstainPct,
+  noPct,
+  noWithVetoPct,
+  yesPct,
+  yesResults,
+}: CompletedProposalVotingResultProps) => {
   return (
     <div className="ResultSectionCard">
       <div className="results-header">

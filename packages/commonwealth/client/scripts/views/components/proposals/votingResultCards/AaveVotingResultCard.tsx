@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import React from 'react';
 import { formatPercent } from '../../../../helpers/index';
 import { CWText } from '../../component_kit/cw_text';
@@ -12,9 +11,11 @@ export function safeDivision(num, den) {
   return num / den;
 }
 
-export const AaveVotingResultCard = (props: AaveVotingResultProps) => {
-  const { noVotesCount, proposal, yesVotesCount } = props;
-
+export const AaveVotingResultCard = ({
+  noVotesCount,
+  proposal,
+  yesVotesCount,
+}: AaveVotingResultProps) => {
   const totalVotesCount = yesVotesCount + noVotesCount;
 
   return (

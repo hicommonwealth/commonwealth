@@ -27,10 +27,12 @@ export const YesNoRejectVotingResult = (
     <div className="VotingResult">
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted approve (${
+          Voted approve (
+          {
             votes.filter((v) => v.choice === NearSputnikVoteString.Approve)
               .length
-          })`}
+          }
+          )
         </CWText>
         <VoteListing
           proposal={proposal}
@@ -41,10 +43,12 @@ export const YesNoRejectVotingResult = (
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted reject (${
+          Voted reject (
+          {
             votes.filter((v) => v.choice === NearSputnikVoteString.Reject)
               .length
-          })`}
+          }
+          )
         </CWText>
         <VoteListing
           proposal={proposal}
@@ -53,10 +57,12 @@ export const YesNoRejectVotingResult = (
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted remove (${
+          Voted remove (
+          {
             votes.filter((v) => v.choice === NearSputnikVoteString.Remove)
               .length
-          })`}
+          }
+          )
         </CWText>
         <VoteListing
           proposal={proposal}

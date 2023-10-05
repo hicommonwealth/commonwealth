@@ -27,7 +27,7 @@ export const YesNoAbstainVetoVotingResult = (
     <div className={clsx('VotingResult', { card: isInCard })}>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`}
+          Voted yes ({votes.filter((v) => v.choice === 'Yes').length})
         </CWText>
         <VoteListing
           proposal={proposal}
@@ -36,7 +36,7 @@ export const YesNoAbstainVetoVotingResult = (
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted no (${votes.filter((v) => v.choice === 'No').length})`}
+          Voted no ({votes.filter((v) => v.choice === 'No').length})
         </CWText>
         <VoteListing
           proposal={proposal}
@@ -45,9 +45,7 @@ export const YesNoAbstainVetoVotingResult = (
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted abstain (${
-            votes.filter((v) => v.choice === 'Abstain').length
-          })`}
+          Voted abstain ({votes.filter((v) => v.choice === 'Abstain').length})
         </CWText>
         <VoteListing
           proposal={proposal}
@@ -56,9 +54,7 @@ export const YesNoAbstainVetoVotingResult = (
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted veto (${
-            votes.filter((v) => v.choice === 'NoWithVeto').length
-          })`}
+          Voted veto ({votes.filter((v) => v.choice === 'NoWithVeto').length})
         </CWText>
         <VoteListing
           proposal={proposal}

@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import React, { useState } from 'react';
+import React from 'react';
 import { Coin } from '../../../../../shared/adapters/currency';
 import { CosmosProposal } from '../../../controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import app from '../../../state/index';

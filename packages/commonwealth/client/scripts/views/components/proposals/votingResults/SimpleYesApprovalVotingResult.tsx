@@ -22,7 +22,7 @@ export const SimpleYesApprovalVotingResult = (
     <div className="VotingResult">
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Approved ${approvedCount}`}
+          Approved {approvedCount}
         </CWText>
         <VoteListing proposal={proposal} votes={votes} />
       </div>
