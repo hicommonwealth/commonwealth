@@ -6,12 +6,12 @@ import {
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
-import { ChainInstance } from '../../models/community';
+import { CommunityInstance } from '../../models/community';
 import { ThreadAttributes } from '../../models/thread';
 import { TypedPaginatedResult } from 'server/types';
 
 export type SearchThreadsOptions = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   searchTerm: string;
   threadTitleOnly: boolean;
   limit?: number;

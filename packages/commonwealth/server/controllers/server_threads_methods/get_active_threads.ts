@@ -1,12 +1,12 @@
 import { ServerThreadsController } from '../server_threads_controller';
-import { ChainInstance } from '../../models/community';
+import { CommunityInstance } from '../../models/community';
 import { ThreadAttributes } from '../../models/thread';
 
 const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
 
 export type GetActiveThreadsOptions = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   threadsPerTopic: number;
 };
 

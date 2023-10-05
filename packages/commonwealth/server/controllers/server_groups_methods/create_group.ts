@@ -1,4 +1,4 @@
-import { ChainInstance } from '../../models/community';
+import { CommunityInstance } from '../../models/community';
 import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
@@ -12,7 +12,7 @@ const Errors = {
 
 export type CreateGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   address: AddressInstance;
   metadata: any;
   requirements: Requirement[];

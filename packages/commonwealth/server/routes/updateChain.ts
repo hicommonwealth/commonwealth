@@ -6,7 +6,7 @@ import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-import type { ChainAttributes } from '../models/community';
+import type { CommunityAttributes } from '../models/community';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { findOneRole } from '../util/roles';
@@ -32,13 +32,13 @@ export const Errors = {
   InvalidDefaultPage: 'Default page does not exist',
 };
 
-type UpdateChainReq = ChainAttributes & {
+type UpdateChainReq = CommunityAttributes & {
   id: string;
   'featured_topics[]'?: string[];
   'snapshot[]'?: string[];
 };
 
-type UpdateChainResp = ChainAttributes & { snapshot: string[] };
+type UpdateChainResp = CommunityAttributes & { snapshot: string[] };
 
 const updateChain = async (
   models: DB,

@@ -13,7 +13,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
-import type { ChainInstance } from '../models/community';
+import type { CommunityInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
@@ -41,7 +41,7 @@ export const Errors = {
 
 const processAddress = async (
   models: DB,
-  chain: ChainInstance,
+  chain: CommunityInstance,
   chain_id: string | number,
   address: string,
   wallet_id: WalletId,

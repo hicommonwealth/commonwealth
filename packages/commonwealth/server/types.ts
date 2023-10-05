@@ -1,7 +1,7 @@
 import type { Response } from 'express';
 import type { ValidationError } from 'express-validator';
 import type { AddressInstance } from './models/address';
-import type { ChainInstance } from './models/community';
+import type { CommunityInstance } from './models/community';
 import type { UserInstance } from './models/user';
 
 export type PaginationQueryParams = {
@@ -24,7 +24,7 @@ export type TypedRequestQuery<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
-  chain?: ChainInstance;
+  chain?: CommunityInstance;
   query: Q;
 };
 
@@ -33,7 +33,7 @@ export type TypedRequestBody<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
-  chain?: ChainInstance;
+  chain?: CommunityInstance;
   body: B;
 };
 
@@ -42,7 +42,7 @@ export type TypedRequestParams<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
-  chain?: ChainInstance;
+  chain?: CommunityInstance;
   params: P;
 };
 
@@ -53,7 +53,7 @@ export type TypedRequest<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
-  chain?: ChainInstance;
+  chain?: CommunityInstance;
   body?: B;
   query?: Q;
   params?: P;
@@ -88,7 +88,7 @@ declare global {
     interface Request {
       user?: User;
       address?: AddressInstance;
-      chain?: ChainInstance;
+      chain?: CommunityInstance;
       // TODO: session is used in logout.ts -> remove?
       session: any;
       sessionID: any;

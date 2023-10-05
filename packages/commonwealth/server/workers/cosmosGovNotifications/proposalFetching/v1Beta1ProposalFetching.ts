@@ -1,4 +1,4 @@
-import { ChainInstance } from '../../../models/community';
+import { CommunityInstance } from '../../../models/community';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { ProposalStatus } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { GovV1Beta1ClientType } from './types';
@@ -13,7 +13,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param chain
  */
 export async function fetchLatestCosmosProposalV1Beta1(
-  chain: ChainInstance
+  chain: CommunityInstance
 ): Promise<Proposal[]> {
   const client = await getCosmosClient<GovV1Beta1ClientType>(chain);
   let nextKey: Uint8Array, finalProposalsPage: Proposal[];
@@ -58,7 +58,7 @@ export async function fetchLatestCosmosProposalV1Beta1(
  */
 export async function fetchUpToLatestCosmosProposalV1Beta1(
   proposalId: number,
-  chain: ChainInstance
+  chain: CommunityInstance
 ): Promise<Proposal[]> {
   log.info(
     `Fetching proposals from '${chain.id}' starting at proposal id ${proposalId}`

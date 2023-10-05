@@ -1,5 +1,5 @@
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/community';
+import { CommunityInstance } from '../../models/community';
 import { CommentAttributes, CommentInstance } from '../../models/comment';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -38,7 +38,7 @@ const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 export type CreateThreadCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   parentId: number;
   threadId: number;
   text: string;

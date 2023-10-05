@@ -9,12 +9,12 @@ import {
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
 import { uniq } from 'lodash';
 import { ServerProfilesController } from '../server_profiles_controller';
-import { ChainInstance } from '../../models/community';
+import { CommunityInstance } from '../../models/community';
 
 export const Errors = {};
 
 export type SearchProfilesOptions = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   search: string;
   includeRoles?: boolean;
   limit?: number;

@@ -22,7 +22,7 @@ import {
 } from '../../shared/canvas';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
-import type { ChainInstance } from '../models/community';
+import type { CommunityInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -37,7 +37,7 @@ const sortedStringify = configureStableStringify({
 
 const verifySessionSignature = async (
   models: DB,
-  chain: Readonly<ChainInstance>,
+  chain: Readonly<CommunityInstance>,
   chain_id: string | number,
   addressModel: AddressInstance,
   user_id: number,

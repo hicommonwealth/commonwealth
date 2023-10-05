@@ -13,7 +13,7 @@ import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-import type { ChainAttributes } from '../models/community';
+import type { CommunityAttributes } from '../models/community';
 import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -67,7 +67,7 @@ export const Errors = {
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
-export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
+export type CreateChainReq = Omit<CommunityAttributes, 'substrate_spec'> &
   Omit<ChainNodeAttributes, 'id'> & {
     id: string;
     node_url: string;
@@ -77,7 +77,7 @@ export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
   };
 
 type CreateChainResp = {
-  chain: ChainAttributes;
+  chain: CommunityAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
   admin_address: string;

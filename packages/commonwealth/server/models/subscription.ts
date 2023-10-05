@@ -7,7 +7,7 @@ import type {
 } from '../../shared/types';
 import type { DB } from '../models';
 import type { WebhookContent } from '../webhookNotifier';
-import type { ChainAttributes } from './community';
+import type { CommunityAttributes } from './community';
 import type { CommentAttributes } from './comment';
 import type { NotificationInstance } from './notification';
 import type { NotificationCategoryAttributes } from './notification_category';
@@ -44,7 +44,7 @@ export type SubscriptionAttributes = {
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   NotificationsRead?: NotificationsReadAttributes[];
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
 };

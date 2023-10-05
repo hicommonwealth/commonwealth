@@ -1,7 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './community';
+import type { CommunityAttributes } from './community';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import { NotificationAttributes } from './notification';
@@ -55,7 +55,7 @@ export type ThreadAttributes = {
   discord_meta?: any;
 
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Address?: AddressAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;

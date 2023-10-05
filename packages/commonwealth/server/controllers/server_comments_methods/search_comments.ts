@@ -1,4 +1,4 @@
-import { ChainInstance } from '../../models/community';
+import { CommunityInstance } from '../../models/community';
 import { ServerCommentsController } from '../server_comments_controller';
 import {
   PaginationSqlOptions,
@@ -9,7 +9,7 @@ import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
 export type SearchCommentsOptions = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   search: string;
   limit?: number;
   page?: number;

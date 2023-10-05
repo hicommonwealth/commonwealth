@@ -1,5 +1,5 @@
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/community';
+import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { ServerCommentsController } from '../server_comments_controller';
 import { Op } from 'sequelize';
@@ -15,7 +15,7 @@ const Errors = {
 export type DeleteCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   commentId?: number;
   messageId?: string;
 };

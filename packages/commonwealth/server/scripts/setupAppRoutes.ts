@@ -3,7 +3,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
-import type { ChainInstance } from '../models/community';
+import type { CommunityInstance } from '../models/community';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -157,7 +157,7 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     scope: string,
     req,
     res,
-    chain?: ChainInstance
+    chain?: CommunityInstance
   ) => {
     // Retrieve title, description, and author from the database
     chain = chain || (await getChain(req, scope));
