@@ -34,7 +34,7 @@ To link a new or existing chain-events service to a new commonwealth service fol
 1. Put the chain-events service in maintenance mode and turn off all dynos.
 2. Set the environment variables as described in [Environment Variables][2].
 3. Ensure the `ENTITIES_URL` env var does not exist in the commonwealth service that is being disconnected (if any).
-4. Update the `CLOUDAMQP_APIKEY` and `CLOUDAMQP_URL` environment variables in both the chain-events service and the disconnected commonwealth service.
+4. Update the `CLOUDAMQP_URL` environment variable in both the chain-events service and the disconnected commonwealth service.
 5. Clear the old RabbitMQ instance of all queues and exchanges.
 6. If this process took more than 30 minutes run the migrateEvents script as described [here][3].
 7. Run the enforceDataConsistency script as described [here][4].

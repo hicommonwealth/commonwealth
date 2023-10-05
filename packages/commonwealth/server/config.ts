@@ -6,10 +6,9 @@ dotenv.config();
 export const PORT = process.env.PORT || '8080';
 
 export const NODE_URL =
-  process.env.NODE_URL ||
-  (process.env.NODE_ENV === 'production'
+  process.env.NODE_ENV === 'production'
     ? 'ws://testnet2.edgewa.re:9944'
-    : 'ws://localhost:9944');
+    : 'ws://localhost:9944';
 
 export const SERVER_URL =
   process.env.SERVER_URL ||
@@ -35,14 +34,6 @@ export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
 export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
 
 export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
-
-export const SLACK_WEBHOOKS = {
-  cosmos: process.env.COSMOS_SLACK_WEBHOOK,
-  edgeware: process.env.EDGEWARE_SLACK_WEBHOOK,
-  ethereum: process.env.ETHEREUM_SLACK_WEBHOOK,
-  kusama: process.env.KUSAMA_SLACK_WEBHOOK,
-  near: process.env.NEAR_SLACK_WEBHOOK,
-};
 
 export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
@@ -114,8 +105,6 @@ export const REDIS_URL = (() => {
 export const LOGIN_RATE_LIMIT_TRIES = 15;
 export const LOGIN_RATE_LIMIT_MINS = 5;
 
-export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
-
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
   ','
@@ -127,9 +116,6 @@ export const DEFAULT_COMMONWEALTH_LOGO =
   'https://commonwealth.im/static/brand_assets/logo_stacked.png';
 
 export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
-
-export const WEBSOCKET_ADMIN_USERNAME = process.env.WEBSOCKET_ADMIN_USERNAME;
-export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
 
 export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';

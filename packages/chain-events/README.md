@@ -244,15 +244,8 @@ events DB nodes poll the database for the information that is specific to them.
 
 ####Environment Variables
 
-- `NUM_WORKERS`: The total number of chain-events DB nodes in the cluster. This is used to ensure even separation of
+- `NUM_CHAIN_SUBSCRIBERS`: The total number of chain-events DB nodes in the cluster. This is used to ensure even separation of
   listeners among the different chain-events DB nodes.
-- `WORKER_NUMBER`: The unique number id that this chain-events DB node should have. Must be between 0 and NUM_WORKERS-1
-- `HANDLE_IDENTITY`: ("handle" || "publish" || null)
-
-  - handle: The node will directly update the database with identity data
-  - publish: The node will publish identity events to an identity queue
-  - null: The node will not query the identity cache
-
 - `NODE_ENV`: ("production" || "development") - optional
 - `DATABASE_URL`: The url of the database to connect to. If `NODE_ENV` = production this url is the default.
 - `PGPASSWORD`: [OPTIONAL] avoids the password prompt for all local database commands

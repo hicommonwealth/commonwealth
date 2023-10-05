@@ -68,10 +68,6 @@ nvm install
 Now, you should set up environment variables, following the instructions in
 the section below.
 
-If you are not using backend storage of chain events, we recommend
-running with NO_EVENTS=true to reduce load on your dev computer, and reduce
-the number of possible errors you might run into.
-
 You should also download a copy of the production database if possible.
 following the Production Database instructions afterwards.
 
@@ -122,10 +118,8 @@ Environment variables used for external services include:
 - AWS_REGION: for uploading images to Amazon S3 (conventionally 'us-east-2')
 - GITHUB_CLIENT_ID: for Github OAuth login
 - GITHUB_CLIENT_SECRET: for Github OAuth login
-- MIXPANEL_TOKEN: for analytics
 - ROLLBAR_SERVER_TOKEN: for error reporting
 - SENDGRID_API_KEY: for sending emails, email login, etc.
-- NODE_URL: for server-side proposal archiving (usually ws://testnet2.edgewa.re:9944, may be deprecated soon)
 - DATABASE_URL (set by Heroku)
 - JWT_SECRET
 - SESSION_SECRET
@@ -142,9 +136,6 @@ Environment variables used for external services include:
 
 We also use certain environment variables to configure the application itself:
 
-- CHAIN_EVENTS: select chains for event listening. Must be "all", "none", or a comma-separated list of chains (e.g. "
-  edgeware,edgeware-local")
-- NO_EVENTS: disable chain-event functionality entirely
 - NO_CLIENT: set to true to disable the front-end build
 
 ## Production Database
