@@ -34,13 +34,13 @@ export async function __searchChains(
     case 'created_at':
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Communities".${orderBy}`,
+        orderBy: `C.${orderBy}`,
       };
       break;
     default:
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Communities".created_at`,
+        orderBy: `C.created_at`,
         orderDirection: 'ASC',
       };
   }
@@ -55,12 +55,12 @@ export async function __searchChains(
 
   const sqlWithoutPagination = `
     SELECT
-      "Communities".id,
-      "Communities".name,
-      "Communities".default_symbol,
-      "Communities".type,
-      "Communities".icon_url,
-      "Communities".created_at
+      C.id,
+      C.name,
+      C.default_symbol,
+      C.type,
+      C.icon_url,
+      C.created_at
     FROM "Communities" C
     WHERE
       C.active = TRUE AND
