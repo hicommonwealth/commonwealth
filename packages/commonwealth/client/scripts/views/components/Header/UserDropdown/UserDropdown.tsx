@@ -188,7 +188,7 @@ const UserDropdown = () => {
         open={isLoginModalOpen}
       />
       <CWModal
-        isFullScreen={false}
+        size="medium"
         content={
           <SessionRevalidationModal
             onModalClose={() => setRevalidationModalData(null)}

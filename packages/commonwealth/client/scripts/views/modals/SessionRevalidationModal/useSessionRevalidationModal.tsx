@@ -8,7 +8,7 @@ const useSessionRevalidationModal = ({ handleClose, error }) => {
 
   const RevalidationModal = (
     <CWModal
-      isFullScreen={false}
+      size="medium"
       content={
         <SessionRevalidationModal
           onModalClose={handleClose}
