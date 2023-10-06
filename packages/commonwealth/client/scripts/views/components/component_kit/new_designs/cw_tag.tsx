@@ -14,7 +14,7 @@ import 'components/component_kit/new_designs/cw_tag.scss';
 type TagType =
   | 'passed'
   | 'failed'
-  | 'active'
+  | 'active' // i.e. snapshot
   | 'poll'
   | 'proposal'
   | 'referendum'
@@ -23,22 +23,17 @@ type TagType =
   | 'spam'
   | 'trending'
   | 'disabled'
-  // below to be replaced with appropriate stages
-  | 'new-stage'
-  | 'input'
   | 'login'
+  | 'input'
   | 'address';
 
 export type TagProps = {
   iconName?: IconName;
   label: string;
-  type?: TagType;
+  type: TagType;
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   trimAt?: number;
-  // for styling purposes only. remove when
-  // stage names provided
   classNames?: string;
-  loginIcon?: IconName;
   community?: ChainInfo;
 };
 
@@ -49,7 +44,6 @@ export const CWTag = ({
   onClick,
   trimAt,
   classNames,
-  loginIcon,
   community,
 }: TagProps) => {
   const displayLabel = () => {
@@ -74,16 +68,13 @@ export const CWTag = ({
       )} ${classNames || ''}`}
       onClick={onClick}
     >
-      {(type === 'login' || type === 'address') && (
-        <CWIcon iconName={loginIcon} iconSize="small" className="tag-icon" />
-      )}
       {type === 'input' && (
         <CWCommunityAvatar size="small" community={community} />
       )}
       {!!iconName && (
-        <CWIcon iconName={iconName} iconSize="small" className="tag-icon" />
+        <CWIcon iconName={iconName} iconSize="small" className={iconName} />
       )}
-      <CWText type="caption" fontWeight="medium" className="tag-text" noWrap>
+      <CWText type="caption" fontWeight="medium" noWrap>
         {displayLabel()}
       </CWText>
       {type === 'input' && (

@@ -10,7 +10,7 @@ import withRouter, {
   useCommonNavigate,
 } from 'navigation/helpers';
 import { CWText } from '../component_kit/cw_text';
-import { CWTag } from '../component_kit/cw_tag';
+import { CWTag } from '../component_kit/new_designs/cw_tag';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
@@ -74,7 +74,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
           </a>
         </CWText>
         <div className="dot">.</div>
-        <CWTag label={author.slice(0, 5)} />
+        <CWTag label={author.slice(0, 5)} type='disabled' />
         <div className="dot">.</div>
         <div className="date">
           <CWText type="caption" fontWeight="medium">

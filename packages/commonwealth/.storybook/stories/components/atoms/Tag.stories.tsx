@@ -2,10 +2,6 @@ import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { CWTag } from '../../../../client/scripts/views/components/component_kit/new_designs/cw_tag';
-// import { notifySuccess } from '../../../../client/scripts/controllers/app/notifications';
-import { iconLookup } from '../../../../client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
-
-const iconOptions = [ undefined, ...Object.keys(iconLookup) ];
 
 const tag = {
   title: 'Components/Tag',
@@ -19,7 +15,7 @@ const argTypesObj = () => {
   return {
     type: {
       control: { type: "inline-radio" },
-      options: ["poll", "proposal", "new", "trending", "stage", "spam", "new-stage", "input", "login", "address"]
+      options: ["poll", "proposal", "new", "trending", "stage", "spam", "input", "login", "address"]
     },
     label: {
       control: { type: "text" },
@@ -34,7 +30,7 @@ const argTypesObj = () => {
     },
     classNames: {
       control: { type: "inline-radio" },
-      options: [ "rorange-600", "rorange-400", "yellow-500", "green-600", "green-500", "primary-600", "primary-400", "purple-600", "purple-400" ]
+      options: [ "phase-1", "phase-2", "phase-3", "phase-4", "phase-5", "phase-6", "phase-7", "phase-8", "phase-9" ]
     }
   }
 }
@@ -109,8 +105,8 @@ export const Snapshot: Story = {
 export const Stages: Story = {
   args: {
     label: "Stage 1",
-    type: "new-stage",
-    classNames: 'rorange-600'
+    type: "stage",
+    classNames: 'phase-1'
   },
   argTypes: argTypesObj(),
   render: ({...args}) => (
@@ -135,7 +131,7 @@ export const Login: Story = {
   args: {
     label: "mnh7a",
     type: "login",
-    loginIcon: "cosmos"
+    iconName: "cosmos"
   },
   argTypes: argTypesObj(),
   render: ({...args}) => (
@@ -148,7 +144,7 @@ export const Address: Story = {
   args: {
     label: "0xd83e1...a39bD",
     type: "address",
-    loginIcon: "cosmos"
+    iconName: "cosmos"
   },
   argTypes: argTypesObj(),
   render: ({...args}) => (
