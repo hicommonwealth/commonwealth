@@ -46,6 +46,7 @@ class GqlLazyLoader {
       symbol
       private
       network
+      avatar
       validation {
         params
       }
@@ -188,6 +189,7 @@ export interface SnapshotSpace {
   symbol: string;
   private: boolean;
   network: string;
+  avatar: string;
   validation: {
     params: {
       minScore: number;
@@ -251,16 +253,19 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
       space,
     },
   });
+
   return spaceObj.data.space;
 }
 
-export async function getProposal(id: string): Promise<{ title: string, space: string }> {
+export async function getProposal(
+  id: string
+): Promise<{ title: string; space: string }> {
   await getApolloClient();
   const proposalObj = await apolloClient.query({
     query: await GqlLazyLoader.PROPOSAL_QUERY(),
     variables: {
       id: +id,
-    }
+    },
   });
   return proposalObj.data?.proposals[0];
 }

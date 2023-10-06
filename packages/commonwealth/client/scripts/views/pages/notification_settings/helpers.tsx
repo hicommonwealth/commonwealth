@@ -22,10 +22,10 @@ export const extractSnapshotProposals = (subs) => {
 
   for (const sub of subs) {
     if (sub.category === NotificationCategories.SnapshotProposal) {
-      if (snapshotProposals[sub.id]) {
-        snapshotProposals[sub.id].push(sub);
+      if (snapshotProposals[sub.snapshotId]) {
+        snapshotProposals[sub.snapshotId].push(sub);
       } else {
-        snapshotProposals[sub.id] = [sub];
+        snapshotProposals[sub.snapshotId] = [sub];
       }
     }
   }

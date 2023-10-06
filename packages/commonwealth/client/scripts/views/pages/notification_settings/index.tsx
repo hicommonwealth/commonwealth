@@ -23,6 +23,7 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
+import { getSpace } from 'helpers/snapshot_utils';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -38,6 +39,7 @@ const NotificationSettingsPage = () => {
   const [email, setEmail] = useState('');
   const [emailValidated, setEmailValidated] = useState(false);
   const [sentEmail, setSentEmail] = useState(false);
+  const [snapshotsInfo, setSnapshotsInfo] = useState(null);
 
   const [currentFrequency, setCurrentFrequency] = useState(
     app.user.emailInterval
@@ -93,6 +95,8 @@ const NotificationSettingsPage = () => {
     app.user.notifications.discussionSubscriptions
   );
 
+  console.log('bundledSnapshotSubs', bundledSnapshotSubs);
+
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
     app?.user.notifications.chainEventSubscriptions
@@ -105,6 +109,26 @@ const NotificationSettingsPage = () => {
   const relevantSubscribedChains = app?.user.addresses
     .map((x) => x.chain)
     .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
+
+  const snapshotIds = Object.keys(bundledSnapshotSubs);
+
+  useEffect(() => {
+    const spaceArray = [];
+    const getTheSpace = async () => {
+      for (const snapshotId of snapshotIds) {
+        try {
+          const space = await getSpace(snapshotId);
+          spaceArray.push(space);
+        } catch (error) {
+          console.error('Error getting space', error);
+        }
+      }
+
+      setSnapshotsInfo(spaceArray);
+    };
+
+    getTheSpace();
+  }, []);
 
   return (
     <div className="NotificationSettingsPage">
@@ -524,67 +548,40 @@ const NotificationSettingsPage = () => {
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
             fontWeight="medium"
             className="column-header-text"
-          >
-            Email
-          </CWText>
+          ></CWText>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
             fontWeight="medium"
             className="last-column-header-text"
-          >
-            In-App
-          </CWText>
+          ></CWText>
         </div>
       </div>
-      {Object.entries(bundledSnapshotSubs)
-        .sort((x, y) => x[0].localeCompare(y[0]))
-        .map(([chainName, subs]) => {
-          const getChainName = () => {
-            const getCurrentChain = subs.find((chain) => {
-              if (Number(chain.id) === Number(chainName)) {
-                return chain.snapshotId;
-              }
-            });
-
-            const chainNameUrl = getCurrentChain.snapshotId.replace('.eth', '');
-
-            if (chainNameUrl === 'dydxgov') {
-              return 'dydx';
-            }
-
-            return chainNameUrl;
-          };
-
-          const chainInfo = app?.config.chains.getById(getChainName());
-          const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
-          const hasSomeInAppSubs = subs.some((s) => s.isActive);
-
-          if (!chainInfo?.id) return null; // handles incomplete loading case
+      {snapshotsInfo &&
+        snapshotsInfo.map((snapshot, idx) => {
+          if (!snapshot?.id) return null; // handles incomplete loading case
+          console.log(`${app.serverUrl()}/ipfsProxy?hash=${snapshot.avatar}`);
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
-              key={chainInfo.id}
+              key={snapshot.id}
             >
               <div className="notification-row-header">
                 <div className="left-content-container">
                   <div className="avatar-and-name">
-                    <CWCommunityAvatar size="medium" community={chainInfo} />
+                    <CWCommunityAvatar
+                      size="medium"
+                      // community={snapshot.symbol}
+                      community={`${app.serverUrl()}/ipfsProxy?hash=${
+                        snapshot.avatar
+                      }}`}
+                    />
                     <CWText type="h5" fontWeight="medium">
-                      {chainInfo.name}
+                      {snapshot.name}
                     </CWText>
                   </div>
                 </div>
-                <CWCheckbox
-                  label="Receive Emails"
-                  checked={hasSomeEmailSubs}
-                  onChange={() => {
-                    handleEmailSubscriptions(hasSomeEmailSubs, subs);
-                  }}
-                />
-                <CWToggle
-                  checked={hasSomeInAppSubs}
-                  onChange={() => handleSubscriptions(hasSomeInAppSubs, subs)}
-                />
+                <div />
+                <div />
               </div>
             </div>
           );
