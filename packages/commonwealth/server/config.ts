@@ -146,3 +146,8 @@ export const COSMOS_GOV_V1_CHAIN_IDS = process.env.COSMOS_GOV_V1
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
 // Don't set default value so if env var is not set the database cleaner will not run
 export const DATABASE_CLEAN_HOUR = process.env.DATABASE_CLEAN_HOUR;
+
+export const UNLEASH_SERVER_URL = process.env.UNLEASH_SERVER_URL;
+export const UNLEASH_SERVER_API_TOKEN =
+  process.env.UNLEASH_SERVER_API_TOKEN ||
+  'default:development.unleash-insecure-api-token';

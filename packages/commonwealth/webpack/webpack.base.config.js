@@ -68,6 +68,14 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
     }),
+    new webpack.DefinePlugin({
+      'process.env.UNLEASH_URL':
+        JSON.stringify(process.env.UNLEASH_URL) ||
+        'http://localhost:4242/api/frontend/',
+      'process.env.UNLEASH_CLIENT_KEY':
+        JSON.stringify(process.env.UNLEASH_CLIENT_KEY) ||
+        'default:development.unleash-insecure-frontend-api-token',
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {
