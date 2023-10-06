@@ -12,6 +12,7 @@ import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import {
@@ -30,9 +31,15 @@ import { Link, LinkSource, LinkDisplay } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { VotingActions } from '../../components/proposals/voting_actions';
+import { VotingResults } from '../../components/proposals/VotingResults';
 import { Select } from '../../components/Select';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
-import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import {
+  CWContentPage,
+  CWContentPageCard,
+} from '../../components/component_kit/CWContentPage';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -44,13 +51,16 @@ import {
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import { useProposalData } from '../view_proposal/useProposalData';
+import { SnapshotInformationCard } from '../view_snapshot_proposal/snapshot_information_card';
+import { SnapshotPollCardContainer } from '../view_snapshot_proposal/snapshot_poll_card_container';
+import { useSnapshotProposalData } from '../view_snapshot_proposal/useSnapshotProposalData';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
-import { useSearchParams } from 'react-router-dom';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import { TemplateActionCard } from './TemplateActionCard';
 import { ViewTemplateFormCard } from './ViewTemplateFormCard';
@@ -60,21 +70,11 @@ import { featureFlags } from 'helpers/feature-flags';
 import 'pages/view_thread/index.scss';
 import { commentsByDate } from 'helpers/dates';
 
-export type ThreadPrefetch = {
-  [identifier: string]: {
-    pollsStarted?: boolean;
-    profilesFinished: boolean;
-    profilesStarted: boolean;
-    viewCountStarted?: boolean;
-    threadReactionsStarted?: boolean;
-  };
-};
-
-type ViewThreadPageProps = {
+type NewViewThreadPageProps = {
   identifier: string;
 };
 
-const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
+const NewViewThreadPage = ({ identifier }: NewViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
 
   const navigate = useCommonNavigate();
@@ -96,6 +96,35 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [parentCommentId, setParentCommentId] = useState<number>(null);
   const [arePollsFetched, setArePollsFetched] = useState(false);
   const [isViewMarked, setIsViewMarked] = useState(false);
+  const [snapshotProposalId, setSnapshotProposalId] = useState<string>(null);
+  const [snapshotId, setSnapshotId] = useState<string>(null);
+  const [proposalId, setProposalId] = useState<string>(null);
+  const [votingModalOpen, setVotingModalOpen] = useState(false);
+  const toggleVotingModal = (newModalState: boolean) => {
+    setVotingModalOpen(newModalState);
+  };
+
+  const onModalClose = () => {
+    setVotingModalOpen(false);
+  };
+
+  const {
+    snapshotProposal,
+    votes,
+    symbol,
+    threads,
+    activeUserAddress,
+    power,
+    space,
+    totals,
+    totalScore,
+    validatedAgainstStrategies,
+    loadVotes,
+  } = useSnapshotProposalData(snapshotProposalId, snapshotId);
+
+  const { proposal } = useProposalData(proposalId, null, proposalId != null);
+
+  const proposalVotes = proposal?.getVotes();
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -245,7 +274,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
+  if (linkedSnapshots?.length > 0 && !snapshotId) {
+    setSnapshotId(linkedSnapshots[0].identifier.split('/')[0]);
+    setSnapshotProposalId(linkedSnapshots[0].identifier.split('/')[1]);
+  }
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
+  if (linkedProposals?.length === 0 && proposalId) {
+    setProposalId(null);
+  }
+
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
   const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
@@ -541,6 +578,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           <LinkedProposalsCard
                             thread={thread}
                             showAddProposalButton={isAuthor || isAdminOrMod}
+                            onProposalSelect={setSnapshotProposalId}
                           />
                         )}
                         {showLinkedThreadOptions && (
@@ -550,6 +588,72 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           />
                         )}
                       </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(snapshotProposal
+              ? [
+                  {
+                    label: 'Info',
+                    item: (
+                      <SnapshotInformationCard
+                        proposal={snapshotProposal}
+                        threads={threads}
+                        header={'Snapshot Info'}
+                      />
+                    ),
+                  },
+                  {
+                    label: 'Poll',
+                    item: (
+                      <SnapshotPollCardContainer
+                        activeUserAddress={activeUserAddress}
+                        fetchedPower={!!power}
+                        identifier={identifier}
+                        proposal={snapshotProposal}
+                        space={space}
+                        symbol={symbol}
+                        totals={totals}
+                        totalScore={totalScore}
+                        validatedAgainstStrategies={validatedAgainstStrategies}
+                        votes={votes}
+                        loadVotes={async () =>
+                          loadVotes(snapshotId, identifier)
+                        }
+                      />
+                    ),
+                  },
+                ]
+              : []),
+            ...(proposal && proposalVotes?.length >= 0
+              ? [
+                  {
+                    label: 'ProposalPoll',
+                    item: (
+                      <CWContentPageCard
+                        header={'Proposal Vote'}
+                        content={
+                          <CWCard className="PollCard">
+                            <div className="poll-title-section">
+                              <CWText type="b2" className="poll-title-text">
+                                {proposal.title}
+                              </CWText>
+                            </div>
+                            <VotingActions
+                              onModalClose={onModalClose}
+                              proposal={proposal}
+                              toggleVotingModal={toggleVotingModal}
+                              votingModalOpen={votingModalOpen}
+                              isInCard={true}
+                            />
+                            <VotingResults
+                              proposal={proposal}
+                              isInCard={true}
+                            />
+                          </CWCard>
+                        }
+                      ></CWContentPageCard>
                     ),
                   },
                 ]
@@ -582,7 +686,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             polls?.map((poll) => [poll.id, poll])
                           ).values(),
                         ].map((poll: Poll) => {
-                          return (
+                          const threadPollCard = (
                             <ThreadPollCard
                               poll={poll}
                               key={poll.id}
@@ -592,6 +696,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 setInitializedPolls(false);
                               }}
                             />
+                          );
+                          return (
+                            <CWContentPageCard
+                              header="Thread Poll"
+                              content={threadPollCard}
+                            ></CWContentPageCard>
                           );
                         })}
                         {isAuthor &&
@@ -643,4 +753,4 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 };
 
-export default ViewThreadPage;
+export default NewViewThreadPage;

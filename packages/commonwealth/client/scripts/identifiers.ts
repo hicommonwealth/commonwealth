@@ -119,6 +119,10 @@ export const proposalSlugToFriendlyName = new Map<ProposalType, string>([
 ]);
 
 export const idToProposal = (slug: string, id: string | number) => {
+  if (!id) {
+    return;
+  }
+
   const store = proposalSlugToStore(slug);
   const proposal = store.getByIdentifier(id);
   if (!proposal) {
