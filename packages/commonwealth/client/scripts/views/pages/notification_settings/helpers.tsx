@@ -1,3 +1,4 @@
+import { NotificationCategories } from '../../../../../../common-common/src/types';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 export const bundleSubs = (
@@ -20,7 +21,7 @@ export const extractSnapshotProposals = (subs) => {
   const snapshotProposals = {};
 
   for (const sub of subs) {
-    if (sub.category === 'snapshot-proposal') {
+    if (sub.category === NotificationCategories.SnapshotProposal) {
       if (snapshotProposals[sub.id]) {
         snapshotProposals[sub.id].push(sub);
       } else {

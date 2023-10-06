@@ -127,18 +127,12 @@ class NotificationsController {
           ...requestData,
         },
         (result: SubscriptionInstance) => {
-          console.log({
-            category: data.categoryId,
-            is_active: true,
-            ...requestData,
-          });
           const newSubscription = modelFromServer(result);
           if (newSubscription.category === 'chain-event')
             app.socket.chainEventsNs.addChainEventSubscriptions([
               newSubscription.chainId,
             ]);
           this._subscriptions.push(newSubscription);
-          console.log('RES', result, newSubscription);
         }
       );
     }

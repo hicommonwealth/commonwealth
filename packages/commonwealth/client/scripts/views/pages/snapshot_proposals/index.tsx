@@ -76,11 +76,10 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
         setHasSubscription(false);
       });
     } else {
-      console.log('FIRED');
       app.user.notifications
         .subscribe({
           categoryId: NotificationCategories.SnapshotProposal,
-          options: { snapshotId, chainId: app.activeChainId() },
+          options: { snapshotId },
         })
         .then(() => {
           setHasSubscription(true);
