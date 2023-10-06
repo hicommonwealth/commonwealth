@@ -718,12 +718,6 @@ export const ChainMetadataRows = ({
                 Allow webhook notifications for Bridged Forum posts.
               </CWText>
             </div>
-            {/* <CWButton
-              label="Save Commonbot Settings"
-              className="save-snapshot"
-              buttonType="primary-black"
-              onClick={handleSaveCommonbotSettings}
-            /> */}
           </>
         ) : discordBotConnecting ? (
           <>
