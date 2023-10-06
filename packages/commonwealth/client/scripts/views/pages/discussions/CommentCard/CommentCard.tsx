@@ -1,4 +1,3 @@
-import moment from 'moment';
 import type { DeltaStatic } from 'quill';
 import React, { useState, useEffect } from 'react';
 import app from 'state';
@@ -38,6 +37,7 @@ type CommentCardProps = {
   replyBtnVisible?: boolean;
   onReply?: () => any;
   canReply?: boolean;
+  maxReplyLimitReached: boolean;
   // Reaction
   canReact?: boolean;
   // Spam
@@ -64,6 +64,7 @@ export const CommentCard = ({
   replyBtnVisible,
   onReply,
   canReply,
+  maxReplyLimitReached,
   // reaction
   canReact,
   // spam
@@ -116,8 +117,10 @@ export const CommentCard = ({
           <AuthorAndPublishInfo
             authorAddress={author.address}
             authorChainId={author.chain?.id || author?.profile?.chain}
-            publishDate={moment(comment.createdAt).format('l')}
+            publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
+            popoverPlacement="top"
+            showUserAddressWithInfo={false}
           />
         )}
       </div>
@@ -166,7 +169,12 @@ export const CommentCard = ({
               {replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
-                  disabled={!canReply}
+                  disabled={maxReplyLimitReached || !canReply}
+                  tooltipText={
+                    canReply && maxReplyLimitReached
+                      ? 'Nested reply limit reached'
+                      : ''
+                  }
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -184,7 +192,7 @@ export const CommentCard = ({
                   menuItems={[
                     canEdit && {
                       label: 'Edit',
-                      iconLeft: 'write' as const,
+                      iconLeft: 'notePencil' as const,
                       onClick: onEditStart,
                       iconLeftWeight: 'bold' as const,
                     },

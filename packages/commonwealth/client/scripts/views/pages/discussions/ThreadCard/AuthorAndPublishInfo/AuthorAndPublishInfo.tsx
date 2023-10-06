@@ -1,6 +1,6 @@
 import { threadStageToLabel } from 'helpers';
 import moment from 'moment';
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Popover,
   usePopover,
@@ -14,6 +14,10 @@ import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';
+import { PopperPlacementType } from '@mui/base/Popper';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { getRelativeTimestamp } from 'helpers/dates';
+import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
 
 export type AuthorAndPublishInfoProps = {
   isHot?: boolean;
@@ -28,7 +32,7 @@ export type AuthorAndPublishInfoProps = {
   isLocked?: boolean;
   lockedAt?: string;
   lastUpdated?: string;
-  publishDate?: string;
+  publishDate?: moment.Moment;
   viewsCount?: number;
   showSplitDotIndicator?: boolean;
   showPublishLabelWithDate?: boolean;
@@ -37,6 +41,7 @@ export type AuthorAndPublishInfoProps = {
   isSpamThread?: boolean;
   threadStage?: ThreadStage;
   onThreadStageLabelClick?: (threadStage: ThreadStage) => Promise<any>;
+  popoverPlacement?: PopperPlacementType;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -57,8 +62,11 @@ export const AuthorAndPublishInfo = ({
   threadStage,
   onThreadStageLabelClick,
   collaboratorsInfo,
+  popoverPlacement,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
+  const containerRef = useRef(null);
+  useAuthorMetadataCustomWrap(containerRef);
 
   const dotIndicator = showSplitDotIndicator && (
     <CWText className="dot-indicator">•</CWText>
@@ -67,7 +75,7 @@ export const AuthorAndPublishInfo = ({
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
 
   return (
-    <div className="AuthorAndPublishInfo">
+    <div className="AuthorAndPublishInfo" ref={containerRef}>
       <User
         avatarSize={24}
         userAddress={authorAddress}
@@ -77,6 +85,7 @@ export const AuthorAndPublishInfo = ({
         shouldShowAddressWithDisplayName={
           fromDiscordBot ? false : showUserAddressWithInfo
         }
+        popoverPlacement={popoverPlacement}
       />
 
       {fromDiscordBot && (
@@ -130,15 +139,33 @@ export const AuthorAndPublishInfo = ({
       {publishDate && (
         <>
           {dotIndicator}
-          <CWText type="caption" fontWeight="medium" className="section-text">
-            {showPublishLabelWithDate ? 'Published on ' : ''}
-            {showEditedLabelWithDate ? 'Edited on ' : ''}
-            {publishDate}
-          </CWText>
+
+          <CWTooltip
+            placement="top"
+            content={
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {publishDate.format('MMMM Do YYYY')} {dotIndicator}{' '}
+                {publishDate.format('h:mm A')}
+              </div>
+            }
+            renderTrigger={(handleInteraction) => (
+              <CWText
+                type="caption"
+                fontWeight="regular"
+                className="section-text publish-date"
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+              >
+                {showPublishLabelWithDate ? 'Published ' : ''}
+                {showEditedLabelWithDate ? 'Edited ' : ''}
+                {getRelativeTimestamp(publishDate?.toISOString())}
+              </CWText>
+            )}
+          />
         </>
       )}
 
-      {viewsCount >= 0 && (
+      {viewsCount !== null && viewsCount >= 0 && (
         <>
           {dotIndicator}
           <CWText type="caption" className="section-text">
