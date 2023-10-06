@@ -214,7 +214,7 @@ export const ChainMetadataRows = ({
   } | null>(null);
   const [selectedChannelLoaded, setSelectedChannelLoaded] = useState(false);
   const [discordWebhooksEnabled, setDiscordWebhooksEnabled] = useState(
-    chain.discordWebhooksEnabled
+    chain.discordBotWebhooksEnabled
   );
 
   useEffect(() => {
@@ -355,7 +355,7 @@ export const ChainMetadataRows = ({
   const updateDiscordWebhookEnabled = async () => {
     try {
       await chain.updateChainData({
-        discord_webhooks_enabled: !discordWebhooksEnabled,
+        discord_bot_webhooks_enabled: !discordWebhooksEnabled,
       });
       setDiscordWebhooksEnabled(!discordWebhooksEnabled);
 
