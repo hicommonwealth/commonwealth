@@ -51,6 +51,7 @@ const ConfirmationModal = ({
 
   return (
     <CWModal
+      size="small"
       content={
         <div className={clsx('ConfirmationModal', className)}>
           <CWModalHeader label={title} icon="warning" onModalClose={onClose} />
@@ -61,7 +62,7 @@ const ConfirmationModal = ({
               </CWText>
             )}
           </CWModalBody>
-          <CWModalFooter>{actions}</CWModalFooter>
+          {actions?.length ? <CWModalFooter>{actions}</CWModalFooter> : null}
         </div>
       }
       onClose={onClose}

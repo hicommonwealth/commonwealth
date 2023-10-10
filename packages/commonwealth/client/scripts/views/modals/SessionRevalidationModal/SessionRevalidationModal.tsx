@@ -56,13 +56,14 @@ const SessionRevalidationModal = ({
         openConfirmation({
           title: 'Address mismatch',
           description: (
-            <CWText>
+            <>
               Expected the address <b>{formatAddress(walletAddress)}</b>, but
               the wallet you signed in with has address{' '}
               <b>{formatAddress(signedAddress)}</b>.
               <br />
               Please try sign again with expected address.
-            </CWText>
+              <br />
+            </>
           ),
           buttons: [],
           className: 'AddressMismatch',
