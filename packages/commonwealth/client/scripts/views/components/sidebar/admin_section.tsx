@@ -227,6 +227,7 @@ const AdminSectionComponent = () => {
     <React.Fragment>
       <SidebarSectionGroup {...sidebarSectionData} />
       <CWModal
+        size="small"
         content={
           <NewTopicModal onModalClose={() => setIsNewTopicModalOpen(false)} />
         }
@@ -234,6 +235,7 @@ const AdminSectionComponent = () => {
         open={isNewTopicModalOpen}
       />
       <CWModal
+        size="small"
         content={
           <OrderTopicsModal
             onModalClose={() => setIsOrderTopicsModalOpen(false)}
@@ -243,6 +245,7 @@ const AdminSectionComponent = () => {
         open={isOrderTopicsModalOpen}
       />
       <CWModal
+        size="small"
         content={
           <EditTopicThresholdsModal
             onModalClose={() => setIsEditTopicThresholdsModalOpen(false)}

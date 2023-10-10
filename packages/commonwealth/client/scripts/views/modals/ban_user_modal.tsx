@@ -14,8 +14,6 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { useBanProfileByAddressMutation } from 'state/api/profiles';
 
-import '../../../styles/modals/ban_user_modal.scss';
-
 type BanUserModalAttrs = {
   onModalClose: () => void;
   address: string;

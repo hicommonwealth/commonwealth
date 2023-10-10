@@ -1,13 +1,15 @@
-.CWModalBody {
-  margin-bottom: 24px;
+.SessionRevalidationModal {
+  .CWModalBody {
+    margin-bottom: 24px;
 
-  .info {
-    display: block;
+    .info {
+      display: block;
+    }
   }
-}
 
-.AddressMismatch {
-  .Text {
-    display: inline-block;
+  .AddressMismatch {
+    .Text {
+      display: inline-block;
+    }
   }
 }

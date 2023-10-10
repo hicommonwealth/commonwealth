@@ -88,7 +88,7 @@ const SessionRevalidationModal = ({
   );
 
   return (
-    <>
+    <div className="SessionRevalidationModal">
       <CWModalHeader label="Session expired" onModalClose={onModalClose} />
       <CWModalBody>
         <CWText className="info">
@@ -168,7 +168,7 @@ const SessionRevalidationModal = ({
           )}
         </div>
       </CWModalBody>
-    </>
+    </div>
   );
 };
 

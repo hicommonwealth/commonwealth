@@ -226,6 +226,7 @@ export const User = ({
         </div>
       )}
       <CWModal
+        size="small"
         content={
           <BanUserModal
             address={userAddress}

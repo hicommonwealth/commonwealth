@@ -1,14 +1,12 @@
 @import '../shared';
 
 .EditTopicThresholdsModal {
-  width: 100%;
-
   .EditTopicThresholdsBody {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    height: 340px;
     overflow-y: auto;
+    margin-bottom: 24px;
 
     .EditTopicThresholdsRow {
       display: flex;
