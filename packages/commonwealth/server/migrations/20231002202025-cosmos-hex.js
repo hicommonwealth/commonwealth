@@ -44,9 +44,9 @@ module.exports = {
             { transaction: t }
           );
         } catch (e) {
-          console.log(
-            `Error getting hex for ${address.address}. Not updating.`
-          );
+          // console.log(
+          //   `Error getting hex for ${address.address}. Not updating.`
+          // );
         }
       }
     });

@@ -16,31 +16,38 @@ module.exports = {
       try {
         await queryInterface.sequelize.query(
           `
+          WITH MasterProfiles AS (
+            SELECT
+              A.hex,
+              P.id AS master_profile_id,
+              P.user_id AS master_user_id
+            FROM "Addresses" A
+            LEFT JOIN (
+              SELECT
+                A2.hex,
+                P2.id,
+                P2.user_id,
+                RANK() OVER (PARTITION BY A2.hex ORDER BY
+                  COUNT(CASE WHEN P2.profile_name IS NOT NULL THEN 1 ELSE NULL END) +
+                  COUNT(CASE WHEN P2.email IS NOT NULL THEN 1 ELSE NULL END) +
+                  COUNT(CASE WHEN P2.bio IS NOT NULL THEN 1 ELSE NULL END) DESC
+                ) AS rank
+              FROM "Addresses" A2
+              LEFT JOIN "Profiles" P2 ON A2.profile_id = P2.id
+              WHERE A2.hex IS NOT NULL
+              AND P2.id IS NOT NULL
+              GROUP BY A2.hex, P2.id, P2.user_id
+            ) AS P ON A.hex = P.hex
+            WHERE P.rank = 1
+          )
           UPDATE "Addresses" A
           SET
             legacy_user_id = A.user_id,
             legacy_profile_id = A.profile_id,
-            user_id = (
-              SELECT P.id
-              FROM "Profiles" P
-              WHERE P.id = A.profile_id
-              ORDER BY
-                CASE WHEN P.profile_name IS NOT NULL THEN 1 ELSE 0 END +
-                CASE WHEN P.email IS NOT NULL THEN 1 ELSE 0 END +
-                CASE WHEN P.bio IS NOT NULL THEN 1 ELSE 0 END DESC
-              LIMIT 1
-            ),
-            profile_id = (
-              SELECT P.id
-              FROM "Profiles" P
-              WHERE P.id = A.profile_id
-              ORDER BY
-                CASE WHEN P.profile_name IS NOT NULL THEN 1 ELSE 0 END +
-                CASE WHEN P.email IS NOT NULL THEN 1 ELSE 0 END +
-                CASE WHEN P.bio IS NOT NULL THEN 1 ELSE 0 END DESC
-              LIMIT 1
-            )
-          WHERE A.hex IS NOT NULL;          
+            user_id = MP.master_user_id,
+            profile_id = MP.master_profile_id
+          FROM MasterProfiles MP
+          WHERE A.hex = MP.hex;                  
           `,
           { transaction: t }
         );
