@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import 'components/ChainEntitiesSelector.scss';
+import React, { useCallback, useMemo, useState } from 'react';
+import 'components/ProposalSelector.scss';
 import app from 'state';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
@@ -9,7 +9,7 @@ import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { parseProposals } from 'views/components/ProposalSelector/utils';
 
-type ChainEntitiesSelectorProps = {
+type ProposalSelectorProps = {
   proposalsToSet: Array<
     Pick<IAaveProposalResponse | ICompoundProposalResponse, 'identifier'>
   >;
@@ -19,7 +19,7 @@ type ChainEntitiesSelectorProps = {
 export const ProposalSelector = ({
   onSelect,
   proposalsToSet,
-}: ChainEntitiesSelectorProps) => {
+}: ProposalSelectorProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [proposals, setProposals] = useState<
     IAaveProposalResponse[] | ICompoundProposalResponse[]
@@ -70,7 +70,7 @@ export const ProposalSelector = ({
   }
 
   return (
-    <div className="ChainEntitiesSelector">
+    <div className="ProposalSelector">
       <CWTextInput
         placeholder="Search for an existing proposal..."
         iconRightonClick={handleClearButtonClick}

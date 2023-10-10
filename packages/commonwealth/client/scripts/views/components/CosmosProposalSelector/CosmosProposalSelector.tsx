@@ -81,7 +81,7 @@ export const CosmosProposalSelector = ({
   }
 
   return (
-    <div className="ChainEntitiesSelector">
+    <div className="ProposalSelector">
       <CWTextInput
         placeholder="Search for an existing proposal..."
         iconRightonClick={handleClearButtonClick}
