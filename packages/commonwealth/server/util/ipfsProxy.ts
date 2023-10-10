@@ -30,7 +30,6 @@ function setupIpfsProxy(app: Express) {
         }
         return res.send(response.data);
       } catch (err) {
-        console.log('err!', err);
         res.status(500).json({ message: err.message });
       }
     }
