@@ -5,7 +5,7 @@ import { QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoTopicId: 'Must provide topic ID',
   NotAdmin: 'Only admins can delete topics',
   TopicNotFound: 'Topic not found',

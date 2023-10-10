@@ -155,9 +155,7 @@ export const CWContentPage = ({
           typeof author?.chain === 'string' ? author?.chain : author?.chain?.id
         }
         collaboratorsInfo={collaborators}
-        publishDate={
-          createdOrEditedDate ? moment(createdOrEditedDate).format('l') : null
-        }
+        publishDate={moment(createdOrEditedDate)}
         viewsCount={viewCount}
         showPublishLabelWithDate={!lastEdited}
         showEditedLabelWithDate={!!lastEdited}
@@ -170,13 +168,7 @@ export const CWContentPage = ({
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
-        {typeof title === 'string' ? (
-          <CWText type="h3" fontWeight="semiBold">
-            {title}
-          </CWText>
-        ) : (
-          title
-        )}
+        {typeof title === 'string' ? <h1 className="title">{title}</h1> : title}
         {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}

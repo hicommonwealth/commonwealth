@@ -8,6 +8,7 @@ import app, { LoginState } from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
 import { Feed } from '../../components/feed';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
@@ -69,6 +70,9 @@ const UserDashboard = (props: UserDashboardProps) => {
     <div ref={setScrollElement} className="UserDashboard" key={`${isLoggedIn}`}>
       <div className="dashboard-column">
         <div className="dashboard-header">
+          <CWText type="h2" fontWeight="medium">
+            Home
+          </CWText>
           <CWTabBar>
             <CWTab
               label={DashboardViews.ForYou}
@@ -76,7 +80,7 @@ const UserDashboard = (props: UserDashboardProps) => {
               onClick={() => {
                 if (!loggedIn) {
                   notifyInfo(
-                    'Log in or create an account for custom activity feed'
+                    'Sign in or create an account for custom activity feed'
                   );
                   return;
                 }
