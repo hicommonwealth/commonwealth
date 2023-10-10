@@ -9,6 +9,7 @@ For a list of React-specific guidelines, see [React Best Practices](./React-Best
 - [Inline Documentation](#inline-documentation)
   + [TSDoc](#tsdoc)
   + [Inline Comments](#inline-comments)
+- [Change Log](#change-log)
 
 # Imports
 
@@ -25,11 +26,11 @@ Never import `server/` on the client.
 
 Inline documentation should be reserved for code that is complex or non-obvious. 
 
-Descriptive const names are our first line of defense.
+Descriptive const names should be the first line of defense in producing human-readable code.
 
 ## TSDoc
 
-TSDoc syntax is preferred over inline comments when documenting a newly declared function, class, or interface. 
+TSDoc syntax is preferred over inline comments when documenting newly declared functions, including class functions. 
 
 TSDoc syntax is especially preferred for code that is either exported or frequently re-invoked, so as to populate built-in IDE preview features.
 
@@ -64,10 +65,10 @@ public async getProposalDetails(proposalId: string, govType = 'compound') {
 }
 ```
 
-A complete list of TSDoc tags can be found at [TSDoc.org](https://tsdoc.org/pages/tags/alpha/). Most functions, however, only require:
+A complete list of TSDoc tags can be found at [TSDoc.org](https://tsdoc.org/pages/tags/alpha/). Most functions, however, will only require the following two tags:
 
 - @param: Used to document a function parameter.
-- @returns:Used to document a function’s return value.
+- @returns: Used to document a function’s return value.
 
 Additionally, we are moving towards use of the @deprecated to mark deprecated code.
 
@@ -82,5 +83,5 @@ In cases where TSDoc is inappropriate for inline documentation, the following st
 
 # Change Log
 
-- 231010: Updated with TSDoc guidelines by Graham Johnson.
-- 231010: Renamed from `Code-Requirements.md` to `Code-Style.md`.
+- 231010: Updated with TSDoc guidelines by Graham Johnson (#5254).
+- 231010: Renamed from `Code-Requirements.md` to `Code-Style.md` (#5254).
