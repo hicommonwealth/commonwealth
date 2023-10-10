@@ -6,6 +6,11 @@
   flex-direction: column;
   width: 100%;
 
+  .header {
+    margin: 0px 80px;
+    padding: 16px 0 0px 0px;
+  }
+
   &.loading {
     height: 100%;
     align-items: center;

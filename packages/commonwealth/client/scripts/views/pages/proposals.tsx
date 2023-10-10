@@ -18,6 +18,7 @@ import { CardsCollection } from '../components/cards_collection';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { getStatusText } from '../components/ProposalCard/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
+import { CWText } from '../components/component_kit/cw_text';
 import {
   CompoundProposalStats,
   SubstrateProposalStats,
@@ -314,6 +315,11 @@ const ProposalsPage = () => {
 
   return (
     <div className="ProposalsPage">
+      <div className="header">
+        <CWText type="h2" fontWeight="medium">
+          Proposals
+        </CWText>
+      </div>
       {onSubstrate && (
         <SubstrateProposalStats
           nextLaunchBlock={
