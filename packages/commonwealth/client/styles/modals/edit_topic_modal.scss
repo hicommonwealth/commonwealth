@@ -1,8 +1,6 @@
 @import '../shared';
 
 .EditTopicModal {
-  width: 100%;
-
   @include extraSmall {
     width: 100%;
   }

@@ -215,7 +215,13 @@ export const CommentCard = ({
 
               {isCanvasVerifyModalVisible && (
                 <CWModal
-                  content={<CanvasVerifyDataModal obj={comment} />}
+                  size="medium"
+                  content={
+                    <CanvasVerifyDataModal
+                      obj={comment}
+                      onClose={() => setIsCanvasVerifyDataModalVisible(false)}
+                    />
+                  }
                   onClose={() => setIsCanvasVerifyDataModalVisible(false)}
                   open={isCanvasVerifyModalVisible}
                 />

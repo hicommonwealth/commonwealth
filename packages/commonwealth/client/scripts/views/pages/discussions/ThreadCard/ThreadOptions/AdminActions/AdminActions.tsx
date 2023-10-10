@@ -79,8 +79,8 @@ export const AdminActions = ({
   });
 
   const { RevalidationModal } = useSessionRevalidationModal({
-      handleClose: resetDeleteThreadMutation,
-      error: deleteThreadError,
+    handleClose: resetDeleteThreadMutation,
+    error: deleteThreadError,
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
@@ -378,6 +378,8 @@ export const AdminActions = ({
       </span>
 
       <CWModal
+        size="small"
+        visibleOverflow
         content={
           <ChangeThreadTopicModal
             thread={thread}
@@ -404,6 +406,7 @@ export const AdminActions = ({
       />
 
       <CWModal
+        size="medium"
         content={
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}

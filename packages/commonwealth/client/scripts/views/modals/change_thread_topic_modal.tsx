@@ -13,8 +13,6 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
-import '../../../styles/modals/change_thread_topic_modal.scss';
-
 type ChangeThreadTopicModalProps = {
   onModalClose: () => void;
   thread: Thread;

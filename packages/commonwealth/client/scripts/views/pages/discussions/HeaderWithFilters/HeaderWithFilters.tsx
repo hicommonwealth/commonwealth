@@ -336,6 +336,7 @@ export const HeaderWithFilters = ({
       />
 
       <CWModal
+        size="medium"
         content={
           <EditTopicModal
             topic={topicSelectedToEdit}

@@ -34,6 +34,7 @@ export const TemplateDisplayTab = ({
   return (
     <div className="template-display-section">
       <CWModal
+        size="medium"
         content={
           <ViewTemplateModal
             template={mountedTemplate}

@@ -1,9 +1,0 @@
-@import '../shared';
-
-.Modal:has(.ChangeThreadTopicModal) {
-  overflow: unset;
-
-  .ChangeThreadTopicModal {
-    width: 320px;
-  }
-}

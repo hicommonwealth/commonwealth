@@ -166,6 +166,7 @@ export const ContractCard = ({
           )}
         </div>
         <CWModal
+          size="medium"
           content={
             <ManageContractTemplateModal
               contractId={manageContractTemplateModalData?.contractId}
