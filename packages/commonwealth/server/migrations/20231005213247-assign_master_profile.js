@@ -16,24 +16,31 @@ module.exports = {
       try {
         await queryInterface.sequelize.query(
           `
-          WITH MasterProfiles AS (
-            SELECT
-              A.hex,
-              P.id AS master_profile_id,
-              P.user_id AS master_user_id
-            FROM "Addresses" A
-            LEFT JOIN "Profiles" P ON A.profile_id = P.id
-            WHERE A.hex IS NOT NULL
-            AND P.id IS NOT NULL
-          )
           UPDATE "Addresses" A
           SET
             legacy_user_id = A.user_id,
             legacy_profile_id = A.profile_id,
-            user_id = MP.master_user_id,
-            profile_id = MP.master_profile_id
-          FROM MasterProfiles MP
-          WHERE A.hex = MP.hex;
+            user_id = (
+              SELECT P.id
+              FROM "Profiles" P
+              WHERE P.id = A.profile_id
+              ORDER BY
+                CASE WHEN P.profile_name IS NOT NULL THEN 1 ELSE 0 END +
+                CASE WHEN P.email IS NOT NULL THEN 1 ELSE 0 END +
+                CASE WHEN P.bio IS NOT NULL THEN 1 ELSE 0 END DESC
+              LIMIT 1
+            ),
+            profile_id = (
+              SELECT P.id
+              FROM "Profiles" P
+              WHERE P.id = A.profile_id
+              ORDER BY
+                CASE WHEN P.profile_name IS NOT NULL THEN 1 ELSE 0 END +
+                CASE WHEN P.email IS NOT NULL THEN 1 ELSE 0 END +
+                CASE WHEN P.bio IS NOT NULL THEN 1 ELSE 0 END DESC
+              LIMIT 1
+            )
+          WHERE A.hex IS NOT NULL;          
           `,
           { transaction: t }
         );
