@@ -9,7 +9,7 @@ const footercontents = [
   { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
   {
     text: 'Jobs',
-    externalLink: 'https://angel.co/company/commonwealth-labs/jobs',
+    externalLink: 'https://boards.greenhouse.io/commonwealth',
   },
   { text: 'Terms', redirectTo: '/terms' },
   { text: 'Privacy', redirectTo: '/privacy' },
