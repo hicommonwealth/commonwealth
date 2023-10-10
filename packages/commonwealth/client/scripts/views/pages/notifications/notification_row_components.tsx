@@ -112,9 +112,11 @@ export const ChainEventNotificationRow = (
             />
           )}
         </div>
-        <div className="comment-body-bottom">
-          Block {notification.chainEvent.blockNumber}
-        </div>
+        {!notification.chainEvent.blockNumber ? null : (
+          <div className="comment-body-bottom">
+            Block {notification.chainEvent.blockNumber}
+          </div>
+        )}
       </div>
     </div>
   );

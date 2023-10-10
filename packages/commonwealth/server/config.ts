@@ -139,7 +139,9 @@ export const CHAIN_EVENT_SERVICE_SECRET =
   process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
 export const ETH_RPC = process.env.ETH_RPC || 'prod';
 
-export const COSMOS_GOV_V1 = process.env.COSMOS_GOV_V1;
+export const COSMOS_GOV_V1_CHAIN_IDS = process.env.COSMOS_GOV_V1
+  ? process.env.COSMOS_GOV_V1.split(',')
+  : [];
 
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
 // Don't set default value so if env var is not set the database cleaner will not run

@@ -55,6 +55,7 @@ export const CompoundProposalForm = () => {
         onInput={(e) => {
           setDescription(e.target.value);
         }}
+        resizeWithText
       />
       <div className="tab-selector">
         <CWTabBar>

@@ -124,6 +124,7 @@ export enum ChainNetwork {
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
   Kava = 'kava',
+  Kyve = 'kyve',
 }
 
 export enum BalanceType {
