@@ -139,5 +139,6 @@ Used for all significant updates or changes of note. This helps flag, for engine
 
 # Change Log
 
+- 231010: Updated with MermaidJS documentation by Graham Johnson (#5253)
 - 230831: Updated and certified fresh by Graham Johnson (#4941).
 - 230808: Authored by Graham Johnson.
