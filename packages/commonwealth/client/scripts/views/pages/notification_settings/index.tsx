@@ -34,15 +34,13 @@ const emailIntervalFrequencyMap = {
 };
 
 type SnapshotInfo = {
-  snapshotId: string;
-  space: {
-    avatar: string;
-    name: string;
-  };
-  subs: NotificationSubscription[];
+  avatar: string;
+  id: string;
+  name: string;
 };
 
 const NotificationSettingsPage = () => {
+  console.log(process.env);
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   const [email, setEmail] = useState('');
@@ -57,41 +55,6 @@ const NotificationSettingsPage = () => {
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [app?.user.notifications, app.user.emailInterval]);
-
-  useEffect(() => {
-    const getTheSpace = async () => {
-      try {
-        // Fetch spaces for all snapshotIds concurrently
-        const spacePromises = snapshotIds.map(async (snapshotId) => {
-          try {
-            return await getSpace(snapshotId);
-          } catch (error) {
-            console.error(
-              `Error getting space for snapshotId ${snapshotId}:`,
-              error
-            );
-            return null; // You can handle the error as needed
-          }
-        });
-
-        // Wait for all space fetch requests to complete
-        const spaceArray = await Promise.all(spacePromises);
-
-        // Combine bundledSnapshotSubs with spaceArray
-        const snapshotsInfoArr = snapshotIds.map((snapshotId, index) => ({
-          snapshotId,
-          space: spaceArray[index],
-          subs: bundledSnapshotSubs[snapshotId],
-        }));
-
-        setSnapshotsInfo(snapshotsInfoArr);
-      } catch (error) {
-        console.error('Error fetching spaces:', error);
-      }
-    };
-
-    getTheSpace();
-  }, []);
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
@@ -139,6 +102,8 @@ const NotificationSettingsPage = () => {
     app.user.notifications.discussionSubscriptions
   );
 
+  console.log('bundledSnapshotSubs', bundledSnapshotSubs);
+
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
     app?.user.notifications.chainEventSubscriptions
@@ -153,6 +118,24 @@ const NotificationSettingsPage = () => {
     .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
 
   const snapshotIds = Object.keys(bundledSnapshotSubs);
+
+  useEffect(() => {
+    const spaceArray = [];
+    const getTheSpace = async () => {
+      for (const snapshotId of snapshotIds) {
+        try {
+          const space = await getSpace(snapshotId);
+          spaceArray.push(space);
+        } catch (error) {
+          console.error('Error getting space', error);
+        }
+      }
+
+      setSnapshotsInfo(spaceArray);
+    };
+
+    getTheSpace();
+  }, []);
 
   return (
     <div className="NotificationSettingsPage">
@@ -572,60 +555,49 @@ const NotificationSettingsPage = () => {
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
             fontWeight="medium"
             className="column-header-text"
-          >
-            Email
-          </CWText>
+          ></CWText>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
             fontWeight="medium"
             className="last-column-header-text"
-          >
-            In-App
-          </CWText>
+          ></CWText>
         </div>
       </div>
       {snapshotsInfo &&
         snapshotsInfo.map((snapshot: SnapshotInfo) => {
-          //destructure map to maintain readability
-          const { space, subs } = snapshot;
-          if (!snapshot?.snapshotId) return null; // handles incomplete loading case
+          console.log('snap', snapshot);
+          if (!snapshot?.id) return null; // handles incomplete loading case
 
           //remove ipfs:// from avatar
-          const avatar = space.avatar.replace('ipfs://', '');
+          const avatar = snapshot.avatar.replace('ipfs://', '');
 
-          const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
-          const hasSomeInAppSubs = subs.some((s) => s.isActive);
+          // const hasSomeEmailSubs = !!snapshot;
+          // const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
-              key={snapshot.snapshotId}
+              key={snapshot.id}
             >
               <div className="notification-row-header">
                 <div className="left-content-container">
                   <div className="avatar-and-name">
-                    <img
-                      style={{ width: 24, height: 24, borderRadius: 12 }}
-                      src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`}
-                    />
-                    <CWText type="h5" fontWeight="medium">
-                      {space.name}
-                    </CWText>
+                    {/* <CWCommunityAvatar */}
+                    {/*   size="medium" */}
+                    {/*   // community={snapshot.symbol} */}
+                    {/*   // community={`${app.serverUrl()}/ipfsProxy?hash=${ */}
+                    {/*   //   snapshot.avatar */}
+                    {/*   // }}`} */}
+                    {/* community={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`} */}
+                    {/* /> */}
+                    {/* <CWText type="h5" fontWeight="medium"> */}
+                    {/*   {snapshot.name} */}
+                    {/* </im> */}
+                    <img src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`} />
                   </div>
                 </div>
-                <CWCheckbox
-                  label="Receive Emails"
-                  checked={hasSomeEmailSubs}
-                  onChange={() => {
-                    handleEmailSubscriptions(hasSomeEmailSubs, subs);
-                  }}
-                />
-                <CWToggle
-                  checked={hasSomeInAppSubs}
-                  onChange={() => {
-                    handleSubscriptions(hasSomeInAppSubs, subs);
-                  }}
-                />
+                <div />
+                <div />
               </div>
             </div>
           );
