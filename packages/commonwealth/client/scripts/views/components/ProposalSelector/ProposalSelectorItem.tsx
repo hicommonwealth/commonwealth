@@ -20,7 +20,7 @@ const ProposalSelectorItem = ({
   isSelected,
 }: ProposalSelectorItemProps) => {
   return (
-    <div className="chain-entity" onClick={() => onClick(proposal)}>
+    <div className="proposal" onClick={() => onClick(proposal)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
         <CWText fontWeight="medium" truncate noWrap>

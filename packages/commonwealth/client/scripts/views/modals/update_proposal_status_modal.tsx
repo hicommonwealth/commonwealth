@@ -84,7 +84,7 @@ export const UpdateProposalStatusModal = ({
 
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
-  const showChainEvents =
+  const showEvmProposals =
     !isCosmos &&
     app.chain.base === ChainBase.Ethereum &&
     (app.chain.network === ChainNetwork.Aave ||
@@ -340,7 +340,7 @@ export const UpdateProposalStatusModal = ({
             snapshotProposalsToSet={tempSnapshotProposals}
           />
         )}
-        {showChainEvents && (
+        {showEvmProposals && (
           <ProposalSelector
             onSelect={handleSelectEvmProposal}
             proposalsToSet={tempProposals}
