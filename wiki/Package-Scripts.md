@@ -12,7 +12,9 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [create-migration](#create-migration)
   - [db-all](#db-all)
   - [dump-db](#dump-db)
+  - [dump-db-limit](#dump-db-limit)
   - [load-db](#load-db)
+  - [load-db-limit](#load-db-limit)
   - [migrate-db](#migrate-db)
   - [migrate-db-down](#migrate-db-down)
   - [psql](#psql)
@@ -117,11 +119,23 @@ Definition: `pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verb
 
 Description: Creates a database dump file, `latest.dump`, from Heroku's commonwealth-beta db, excluding several tables such as DiscussionDrafts, Subscriptions, Notifications, and SocialAccounts.
 
+## dump-db-limit
+
+Definition: `yarn run dump-db && psql $(heroku config:get CW_READ_DB -a commonwealth-beta) -a -f limited_dump.sql`
+
+Description: In addition to running the [dump-db](#dump-db) script, this copies a limited set of Notification and Subscription data from the commonwealth-beta Heroku database. Used in conjunction with the [load-db-limit](#load-db-limit) script.
+
 ## load-db 
 
 Definition: `chmod u+x scripts/load-db.sh && ./scripts/load-db.sh`
 
 Description: Loads database following the `load-db.sh` script. Looks for dump file `latest.dump` by default; if script is called with an argument, the value of DUMP_NAME will be updated to that argument's value.
+
+## load-db-limit 
+
+Definition: `yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql`
+
+Description: Used in conjunction with [dump-db-limit](#dump-db-limit), this loads a dumped copy of the commonwealth-beta Heroku database alongside a limited, copied set of Notification and Subscription rows.
 
 ## migrate-db
 
