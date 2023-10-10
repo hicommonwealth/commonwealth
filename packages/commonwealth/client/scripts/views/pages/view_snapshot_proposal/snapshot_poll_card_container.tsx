@@ -1,21 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
 import type {
   SnapshotProposal,
   SnapshotProposalVote,
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
 import moment from 'moment';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Modal } from '../../components/component_kit/cw_modal';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPage/index';
 
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
-import { Modal } from '../../components/component_kit/cw_modal';
 
 type SnapshotProposalCardsProps = {
   activeUserAddress: string;
   identifier: string;
   proposal: SnapshotProposal;
-  scores: number[];
   space: SnapshotSpace;
   symbol: string;
   totals: any;
@@ -50,7 +49,6 @@ export const SnapshotPollCardContainer = (
     activeUserAddress,
     identifier,
     proposal,
-    scores,
     space,
     totals,
     votes,
@@ -113,48 +111,52 @@ export const SnapshotPollCardContainer = (
   }, [choice]);
 
   return (
-    <>
-      <SnapshotPollCard
-        pollEnded={!isActive}
-        hasVoted={hasVoted}
-        votedFor={hasVoted ? userVote : ''}
-        disableVoteButton={!fetchedPower || voteErrorText !== null}
-        proposalTitle={proposal.title}
-        timeRemaining={timeRemaining}
-        tokenSymbol={space.symbol}
-        totalVoteCount={totals.sumOfResultsBalance}
-        voteInformation={voteInformation}
-        onSnapshotVoteCast={async (_choice) => {
-          setChoice(_choice);
-        }}
-        onVoteCast={async () => {
-          setIsModalOpen(false);
-        }}
-        incrementalVoteCast={totalScore}
-        tooltipErrorMessage={voteErrorText}
-        isPreview={false}
-      />
-      <Modal
-        content={
-          <ConfirmSnapshotVoteModal
-            space={space}
-            proposal={proposal}
-            id={identifier}
-            selectedChoice={proposal?.choices.indexOf(choice).toString()}
-            totalScore={totalScore}
-            scores={scores}
-            snapshot={proposal.snapshot}
-            successCallback={async () => {
-              await loadVotes();
-              setHasVoted(true);
-              setUserVote(choice);
+    <CWContentPageCard
+      header={'Snapshot Vote'}
+      content={
+        <>
+          <SnapshotPollCard
+            pollEnded={!isActive}
+            hasVoted={hasVoted}
+            votedFor={hasVoted ? userVote : ''}
+            disableVoteButton={!fetchedPower || voteErrorText !== null}
+            proposalTitle={proposal.title}
+            timeRemaining={timeRemaining}
+            tokenSymbol={space.symbol}
+            totalVoteCount={totals.sumOfResultsBalance}
+            voteInformation={voteInformation}
+            onSnapshotVoteCast={async (_choice) => {
+              setChoice(_choice);
             }}
-            onModalClose={() => setIsModalOpen(false)}
+            onVoteCast={async () => {
+              setIsModalOpen(false);
+            }}
+            incrementalVoteCast={totalScore}
+            tooltipErrorMessage={voteErrorText}
+            isPreview={false}
           />
-        }
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
-      />
-    </>
+          <Modal
+            content={
+              <ConfirmSnapshotVoteModal
+                space={space}
+                proposal={proposal}
+                id={identifier}
+                selectedChoice={proposal?.choices.indexOf(choice).toString()}
+                totalScore={totalScore}
+                snapshot={proposal.snapshot}
+                successCallback={async () => {
+                  await loadVotes();
+                  setHasVoted(true);
+                  setUserVote(choice);
+                }}
+                onModalClose={() => setIsModalOpen(false)}
+              />
+            }
+            onClose={() => setIsModalOpen(false)}
+            open={isModalOpen}
+          />
+        </>
+      }
+    />
   );
 };

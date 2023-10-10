@@ -10,10 +10,11 @@ import { initChain } from 'helpers/chain';
  * Helper function initChain requires app.chain to be selected, otherwise this will do nothing.
  * So this will run after the chain is selected, but not if the chain is loaded already.
  */
-export const useInitChainIfNeeded = (app: IApp) => {
+export const useInitChainIfNeeded = (app: IApp, ignore = false) => {
   const hasFetchedRef = useRef(false); // prevent multiple calls to initChain
 
   useEffect(() => {
+    if (ignore) return;
     const chainInit = async () => {
       if (!hasFetchedRef.current && !app.isAdapterReady) {
         hasFetchedRef.current = true;
@@ -22,5 +23,5 @@ export const useInitChainIfNeeded = (app: IApp) => {
     };
 
     chainInit();
-  }, [app?.isAdapterReady]);
+  }, [app.isAdapterReady, ignore]);
 };

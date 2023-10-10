@@ -1,7 +1,7 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import 'components/component_kit/CWContentPage.scss';
 import moment from 'moment';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import type Account from '../../../../models/Account';
@@ -12,6 +12,7 @@ import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
 import { CWCard } from '../cw_card';
+import { CWIconButton } from '../cw_icon_button';
 import { CWTab, CWTabBar } from '../cw_tabs';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
@@ -237,15 +238,9 @@ export const CWContentPage = ({
             ))}
           </CWTabBar>
           {tabSelected === 0 && mainBody}
-          {sidebarComponents?.length >= 1 &&
-            tabSelected === 1 &&
-            sidebarComponents[0].item}
-          {sidebarComponents?.length >= 2 &&
-            tabSelected === 2 &&
-            sidebarComponents[1].item}
-          {sidebarComponents?.length === 3 &&
-            tabSelected === 3 &&
-            sidebarComponents[2].item}
+          {sidebarComponents.map((s, i) => {
+            return tabSelected === i + 1 && sidebarComponents[i].item;
+          })}
         </div>
       )}
     </div>
@@ -259,15 +254,28 @@ type ContentPageCardProps = {
 
 export const CWContentPageCard = (props: ContentPageCardProps) => {
   const { content, header } = props;
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <CWCard className="ContentPageCard">
-      <div className="header-container">
+      <div
+        className="header-container"
+        onClick={() => {
+          setIsCollapsed(!isCollapsed);
+        }}
+      >
         <CWText type="h5" fontWeight="semiBold">
+          <div className="collapsableButton">
+            <CWIconButton
+              iconButtonTheme="black"
+              iconName={isCollapsed ? 'chevronRight' : 'chevronDown'}
+              iconSize="small"
+            />
+          </div>
           {header}
         </CWText>
       </div>
-      {content}
+      {!isCollapsed ? content : null}
     </CWCard>
   );
 };

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 
 import 'components/proposals/voting_actions.scss';
@@ -53,15 +54,22 @@ type VotingActionsProps = {
   proposal: AnyProposal;
   toggleVotingModal: (newModalState: boolean) => void;
   votingModalOpen: boolean;
+  isInCard?: boolean;
 };
 
 export const VotingActions = (props: VotingActionsProps) => {
-  const { onModalClose, proposal, toggleVotingModal, votingModalOpen } = props;
+  const {
+    onModalClose,
+    proposal,
+    toggleVotingModal,
+    votingModalOpen,
+    isInCard,
+  } = props;
 
   const [amount, setAmount] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
   const [conviction, setConviction] = useState<number>();
-  // conviction isn't used anywhere?
+  const buttonClass = isInCard ? 'button-row-card' : 'button-row';
 
   useEffect(() => {
     app.loginStateEmitter.once('redraw', () => {
@@ -325,7 +333,7 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   if (proposal instanceof AaveProposal) {
     votingActionObj = (
-      <div className="button-row">
+      <div className={buttonClass}>
         {yesButton}
         {noButton}
       </div>
@@ -333,7 +341,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
     votingActionObj = (
       <>
-        <div className="button-row">
+        <div className={buttonClass}>
           {yesButton}
           {noButton}
         </div>
@@ -343,7 +351,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
     votingActionObj = (
       <>
-        <div className="button-row">
+        <div className={buttonClass}>
           {yesButton}
           {noButton}
         </div>
@@ -361,7 +369,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
     votingActionObj = (
       <>
-        <div className="button-row">{multiDepositApproveButton}</div>
+        <div className={buttonClass}>{multiDepositApproveButton}</div>
         <ProposalExtensions
           proposal={proposal}
           setCosmosDepositAmount={(c) => {
@@ -373,7 +381,7 @@ export const VotingActions = (props: VotingActionsProps) => {
   } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
     votingActionObj = (
       <>
-        <div className="button-row">
+        <div className={buttonClass}>
           {yesButton}
           {noButton}
           {abstainButton}
@@ -384,7 +392,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     );
   } else if (proposal.votingType === VotingType.CompoundYesNo) {
     votingActionObj = (
-      <div className="button-row">
+      <div className={buttonClass}>
         {yesButton}
         <CompoundCancelButton
           onModalClose={onModalClose}
@@ -395,7 +403,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     );
   } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
     votingActionObj = (
-      <div className="button-row">
+      <div className={buttonClass}>
         {yesButton}
         {noButton}
         {abstainButton}
@@ -408,7 +416,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     );
   } else if (proposal.votingType === VotingType.YesNoReject) {
     votingActionObj = (
-      <div className="button-row">
+      <div className={buttonClass}>
         {yesButton}
         {noButton}
         {removeButton}
@@ -423,7 +431,12 @@ export const VotingActions = (props: VotingActionsProps) => {
   }
 
   return (
-    <div className="VotingActions">
+    <div
+      className={clsx(
+        { VotingActions: !isInCard },
+        { VotingActionsCard: isInCard }
+      )}
+    >
       <CWText type="h4" className="voting-actions-header">
         Cast Your Vote
       </CWText>

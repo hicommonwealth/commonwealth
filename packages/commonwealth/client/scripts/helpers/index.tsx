@@ -198,7 +198,7 @@ export function formatPercentShort(num: number) {
 }
 
 /* Choose Total Digits to Display*/
-export function formatPercent(num: number, digits: number) {
+export function formatPercent(num: number, digits = 2) {
   if (num === 0) return '0%';
   if (num === 1) return '100%';
   if (num > 1) return '100%+';

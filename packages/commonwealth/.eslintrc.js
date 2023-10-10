@@ -8,7 +8,7 @@ module.exports = {
       },
     },
   },
-  plugins: ['@tanstack/query'],
+  plugins: ['@tanstack/query', 'unused-imports'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/camelcase': 'off',
@@ -84,6 +84,7 @@ module.exports = {
     ],
     '@tanstack/query/exhaustive-deps': 'error',
     '@tanstack/query/prefer-query-object-syntax': 'error',
+    'unused-imports/no-unused-imports-ts': 'warn',
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: ['plugin:@tanstack/eslint-plugin-query/recommended'],
