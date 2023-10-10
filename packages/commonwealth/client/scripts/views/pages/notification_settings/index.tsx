@@ -40,6 +40,7 @@ type SnapshotInfo = {
 };
 
 const NotificationSettingsPage = () => {
+  console.log(process.env);
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   const [email, setEmail] = useState('');
@@ -581,17 +582,18 @@ const NotificationSettingsPage = () => {
               <div className="notification-row-header">
                 <div className="left-content-container">
                   <div className="avatar-and-name">
-                    <CWCommunityAvatar
-                      size="medium"
-                      // community={snapshot.symbol}
-                      // community={`${app.serverUrl()}/ipfsProxy?hash=${
-                      //   snapshot.avatar
-                      // }}`}
-                      community={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`}
-                    />
-                    <CWText type="h5" fontWeight="medium">
-                      {snapshot.name}
-                    </CWText>
+                    {/* <CWCommunityAvatar */}
+                    {/*   size="medium" */}
+                    {/*   // community={snapshot.symbol} */}
+                    {/*   // community={`${app.serverUrl()}/ipfsProxy?hash=${ */}
+                    {/*   //   snapshot.avatar */}
+                    {/*   // }}`} */}
+                    {/* community={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`} */}
+                    {/* /> */}
+                    {/* <CWText type="h5" fontWeight="medium"> */}
+                    {/*   {snapshot.name} */}
+                    {/* </im> */}
+                    <img src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`} />
                   </div>
                 </div>
                 <div />
