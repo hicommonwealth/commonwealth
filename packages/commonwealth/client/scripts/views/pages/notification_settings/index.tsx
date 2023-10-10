@@ -33,6 +33,12 @@ const emailIntervalFrequencyMap = {
   monthly: 'Once a month',
 };
 
+type SnapshotInfo = {
+  avatar: string;
+  id: string;
+  name: string;
+};
+
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
@@ -557,9 +563,16 @@ const NotificationSettingsPage = () => {
         </div>
       </div>
       {snapshotsInfo &&
-        snapshotsInfo.map((snapshot, idx) => {
+        snapshotsInfo.map((snapshot: SnapshotInfo) => {
+          console.log('snap', snapshot);
           if (!snapshot?.id) return null; // handles incomplete loading case
-          console.log(`${app.serverUrl()}/ipfsProxy?hash=${snapshot.avatar}`);
+
+          //remove ipfs:// from avatar
+          const avatar = snapshot.avatar.replace('ipfs://', '');
+
+          // const hasSomeEmailSubs = !!snapshot;
+          // const hasSomeInAppSubs = subs.some((s) => s.isActive);
+
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
@@ -571,9 +584,10 @@ const NotificationSettingsPage = () => {
                     <CWCommunityAvatar
                       size="medium"
                       // community={snapshot.symbol}
-                      community={`${app.serverUrl()}/ipfsProxy?hash=${
-                        snapshot.avatar
-                      }}`}
+                      // community={`${app.serverUrl()}/ipfsProxy?hash=${
+                      //   snapshot.avatar
+                      // }}`}
+                      community={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`}
                     />
                     <CWText type="h5" fontWeight="medium">
                       {snapshot.name}
