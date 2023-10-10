@@ -13,8 +13,6 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Addresses" ADD COLUMN "hex" VARCHAR(64) NULL;
-        ALTER TABLE "Addresses" ADD COLUMN "master_user_id" INTEGER NULL;
-        ALTER TABLE "Addresses" ADD COLUMN "master_profile_id" INTEGER NULL;
         `,
         { raw: true, transaction: t }
       );
@@ -58,9 +56,8 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
-        `ALTER TABLE "Addresses" DROP COLUMN "hex";
-          ALTER TABLE "Addresses" DROP COLUMN "master_user_id";
-          ALTER TABLE "Addresses" DROP COLUMN "master_profile_id";
+        `
+          ALTER TABLE "Addresses" DROP COLUMN "hex";
         `,
         { raw: true, transaction: t }
       );
