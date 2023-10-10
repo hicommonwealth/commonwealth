@@ -1,0 +1,6 @@
+[classic_mirrored_queue_version,classic_queue_type_delivery_support,
+ direct_exchange_routing_v2,drop_unroutable_metric,empty_basic_get_metric,
+ feature_flags_v2,implicit_default_bindings,listener_records_in_ets,
+ maintenance_mode_status,quorum_queue,stream_queue,
+ stream_sac_coordinator_unblock_group,stream_single_active_consumer,
+ tracking_records_in_ets,user_limits,virtual_host_metadata].
