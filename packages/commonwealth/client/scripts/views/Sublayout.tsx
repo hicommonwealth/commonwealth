@@ -38,29 +38,26 @@ const Sublayout = ({
   }, [forceRerender]);
 
   useEffect(() => {
-    let timer;
+    setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
+  }, [isWindowSmallInclusive]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
     if (resizing) {
       timer = setTimeout(() => {
         setResizing(false);
-      }, 200); // adjust delay as needed
+      }, 200); // Adjust delay as needed
     }
+
     return () => {
       clearTimeout(timer);
     };
   }, [resizing]);
 
   useEffect(() => {
-    if (
-      localStorage.getItem('dark-mode-state') === 'on' &&
-      localStorage.getItem('user-dark-mode-state') === 'on'
-    ) {
-      document.getElementsByTagName('html')[0].classList.add('invert');
-    }
-
     const onResize = () => {
-      if (!isWindowSmallInclusive) {
-        setMenu({ name: 'default', isVisible: true });
-      }
+      setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
     };
 
     window.addEventListener('resize', onResize);
@@ -68,7 +65,7 @@ const Sublayout = ({
     return () => {
       window.removeEventListener('resize', onResize);
     };
-  }, []);
+  }, [isWindowSmallInclusive, menuVisible, mobileMenuName, setMenu]);
 
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
