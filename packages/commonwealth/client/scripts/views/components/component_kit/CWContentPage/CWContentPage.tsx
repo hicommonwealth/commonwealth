@@ -155,9 +155,7 @@ export const CWContentPage = ({
           typeof author?.chain === 'string' ? author?.chain : author?.chain?.id
         }
         collaboratorsInfo={collaborators}
-        publishDate={
-          createdOrEditedDate ? moment(createdOrEditedDate).format('l') : null
-        }
+        publishDate={moment(createdOrEditedDate)}
         viewsCount={viewCount}
         showPublishLabelWithDate={!lastEdited}
         showEditedLabelWithDate={!!lastEdited}
