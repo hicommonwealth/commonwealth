@@ -1,9 +1,0 @@
-@import '../shared';
-
-.LinkedThreadModal {
-  width: 100%;
-
-  @include smallInclusive {
-    width: 100%;
-  }
-}

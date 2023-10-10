@@ -135,6 +135,7 @@ export const SnapshotPollCardContainer = (
         isPreview={false}
       />
       <CWModal
+        size="small"
         content={
           <ConfirmSnapshotVoteModal
             space={space}

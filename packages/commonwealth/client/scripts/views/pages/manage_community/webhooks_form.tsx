@@ -147,6 +147,7 @@ export const WebhooksForm = () => {
                   onClick={() => deleteWebhook(webhook)}
                 />
                 <CWModal
+                  size="small"
                   content={
                     <WebhookSettingsModal
                       onModalClose={() => setIsModalOpen(false)}

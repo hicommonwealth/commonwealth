@@ -84,6 +84,7 @@ export const LinkedThreadsCard = ({
         }
       />
       <CWModal
+        size="small"
         content={
           <LinkedThreadModal
             thread={thread}

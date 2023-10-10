@@ -168,6 +168,7 @@ export const LinkedProposalsCard = ({
       />
       <CWModal
         className="LinkedProposalsCardModal"
+        size="medium"
         content={
           <UpdateProposalStatusModal
             thread={thread}

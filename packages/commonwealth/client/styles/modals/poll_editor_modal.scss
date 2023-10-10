@@ -1,12 +1,6 @@
 @import '../shared';
 
 .PollEditorModal {
-  width: 100%;
-
-  @include extraSmall {
-    width: 100%;
-  }
-
   .options-and-label-container {
     display: flex;
     flex-direction: column;
@@ -36,7 +30,6 @@
     width: 100%;
 
     .poll-duration-text.Text {
-      min-height: 48px;
       margin-bottom: 8px;
 
       @include extraSmall {

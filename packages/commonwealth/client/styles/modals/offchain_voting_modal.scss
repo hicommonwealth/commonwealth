@@ -3,16 +3,9 @@
 .OffchainVotingModal {
   display: flex;
   flex-direction: column;
-  height: 400px;
-  width: 100%;
 
   .OffchainVotingModalBody {
     overflow-y: auto;
-    width: 100%;
-
-    @include extraSmall {
-      width: initial;
-    }
 
     .download-link {
       cursor: pointer;
@@ -21,10 +14,7 @@
 
     .offchain-poll-voter {
       display: flex;
-
-      .User {
-        display: inline;
-      }
+      align-items: center;
 
       .offchain-poll-voter-user {
         flex: 1;

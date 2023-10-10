@@ -30,8 +30,6 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
-import '../../../styles/modals/update_proposal_status_modal.scss';
-
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
     id: l.identifier,

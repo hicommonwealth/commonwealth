@@ -17,8 +17,6 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
-import '../../../styles/modals/linked_thread_modal.scss';
-
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];
   thread: Thread;

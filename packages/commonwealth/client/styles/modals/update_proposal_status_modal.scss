@@ -1,9 +1,0 @@
-@import '../shared';
-
-.UpdateProposalStatusModal {
-  width: 100%;
-
-  @include smallInclusive {
-    width: 100%;
-  }
-}

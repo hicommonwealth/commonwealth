@@ -105,6 +105,7 @@ export const TemplateActionCard = ({ thread }: TemplateActionCardProps) => {
         }
       />
       <CWModal
+        size="small"
         content={
           <TemplateActionModal
             isOpen={isModalOpen}

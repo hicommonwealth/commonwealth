@@ -50,6 +50,7 @@ export const ThreadPollEditorCard = ({
         }
       />
       <CWModal
+        size="medium"
         className="PollEditorCardModal"
         content={
           <PollEditorModal
@@ -144,6 +145,7 @@ export const ThreadPollCard = ({
         }}
       />
       <CWModal
+        size="small"
         content={
           <OffchainVotingModal
             votes={poll.votes}

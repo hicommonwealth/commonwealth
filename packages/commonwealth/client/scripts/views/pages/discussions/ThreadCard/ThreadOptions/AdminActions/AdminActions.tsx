@@ -391,6 +391,7 @@ export const AdminActions = ({
       />
 
       <CWModal
+        size="medium"
         content={
           <UpdateProposalStatusModal
             onChangeHandler={(s) =>
@@ -406,7 +407,7 @@ export const AdminActions = ({
       />
 
       <CWModal
-        size="medium"
+        size="small"
         content={
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}

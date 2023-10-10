@@ -46,6 +46,7 @@ export const SnapshotCreationCard = ({
         }
       />
       <CWModal
+        size="large"
         content={
           <NewSnapshotProposalModal
             thread={thread}

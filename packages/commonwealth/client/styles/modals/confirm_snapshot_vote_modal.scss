@@ -1,12 +1,6 @@
 @import '../shared';
 
 .ConfirmSnapshotVoteModal {
-  width: 100%;
-
-  @include extraSmall {
-    width: 100%;
-  }
-
   .vote-info {
     border: 2px solid $primary-300;
     border-radius: $border-radius-corners;
