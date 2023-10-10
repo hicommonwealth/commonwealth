@@ -34,7 +34,9 @@ TSDoc syntax is preferred over inline comments when documenting newly declared f
 
 TSDoc syntax is especially preferred for code that is either exported or frequently re-invoked, so as to populate built-in IDE preview features.
 
-The TSDoc annotation format is as follows:
+As with all inline documentation, TSDoc annotations should be used sparingly, for complex or non-obvious code. By extension, TSDoc annotations do not need to be "complete," in the sense of fully documenting a given function. If only a single param needs explaining, then only that param needs annotation.
+
+The full TSDoc annotation format is as follows:
 ```
 /**
  * A description of the function
