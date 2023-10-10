@@ -1,6 +1,6 @@
 **Engineering Praxis**
   - [Agile Development](Agile-Development.md)
-  - [Code Requirements](Code-Requirements.md)
+  - [Code Style](Code-Style.md)
   - [Ways of Working](Ways-Of-Working.md)
   - [Sprint Cadence](Sprint-Cadence.md)
   - [Analytics](Analytics.md)
