@@ -62,6 +62,7 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
+          UPDATE "Addresses" set profile_id = "Addresses".legacy_profile_id, user_id = "Addresses".legacy_user_id where legacy_profile_id IS NOT NULL;
           ALTER TABLE "Addresses" DROP COLUMN "legacy_user_id";
           ALTER TABLE "Addresses" DROP COLUMN "legacy_profile_id";
         `,
