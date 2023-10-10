@@ -5,12 +5,14 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
-        ALTER TABLE "Addresses" ADD COLUMN "master_user_id" INTEGER NULL;
-        ALTER TABLE "Addresses" ADD COLUMN "master_profile_id" INTEGER NULL;
+        ALTER TABLE "Addresses" ADD COLUMN "legacy_user_id" INTEGER NULL;
+        ALTER TABLE "Addresses" ADD COLUMN "legacy_profile_id" INTEGER NULL;
         `,
         { raw: true, transaction: t }
       );
+    });
 
+    await queryInterface.sequelize.transaction(async (t) => {
       try {
         // Update the query that selects the addresses to consolidate
         // to include the profile_id column.
@@ -18,7 +20,7 @@ module.exports = {
           `
           SELECT hex, profile_id, id
           FROM "Addresses"
-          WHERE hex IS NOT NULL and id > 153200
+          WHERE hex IS NOT NULL
           GROUP BY hex, profile_id, id;
           `,
           { transaction: t }
@@ -28,7 +30,7 @@ module.exports = {
           // get each address that shares the hex
           const [addresses] = await queryInterface.sequelize.query(
             `
-            SELECT id, profile_id
+            SELECT id, user_id, profile_id
             FROM "Addresses"
             WHERE hex = '${hex.hex}';
             `,
@@ -55,6 +57,7 @@ module.exports = {
           // The following reduce() function calculates the most populated profile in the profiles array.
           const masterProfile = profiles.reduce(
             (accumulator, currentValue) => {
+              if (!currentValue) return accumulator;
               // Count the number of populated fields in the current profile.
               const numPopulatedFields = Object.keys(currentValue).filter(
                 (key) => !!currentValue[key]
@@ -72,10 +75,18 @@ module.exports = {
             { numPopulatedFields: 0 }
           );
 
+          if (!masterProfile.id || !masterProfile.user_id) {
+            return;
+          }
+
           await queryInterface.sequelize.query(
             `
             UPDATE "Addresses"
-            SET master_user_id = ${masterProfile.user_id}, master_profile_id = ${masterProfile.id}
+            SET
+              legacy_user_id = "Addresses".user_id,
+              legacy_profile_id = "Addresses".profile_id,
+              user_id = ${masterProfile.user_id},
+              profile_id = ${masterProfile.id}
             WHERE hex = '${hex.hex}';
             `,
             { transaction: t }
@@ -92,8 +103,8 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
-          ALTER TABLE "Addresses" DROP COLUMN "master_user_id";
-          ALTER TABLE "Addresses" DROP COLUMN "master_profile_id";
+          ALTER TABLE "Addresses" DROP COLUMN "legacy_user_id";
+          ALTER TABLE "Addresses" DROP COLUMN "legacy_profile_id";
         `,
         { raw: true, transaction: t }
       );
