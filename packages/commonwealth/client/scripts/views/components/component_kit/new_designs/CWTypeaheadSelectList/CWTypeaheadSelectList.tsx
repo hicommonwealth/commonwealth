@@ -18,7 +18,7 @@ type TypeaheadSelectListProps = {
 };
 
 const DropdownIndicator = (props) => {
-  let isMenuOpen = props.selectProps.menuIsOpen;
+  const isMenuOpen = props.selectProps.menuIsOpen;
 
   return (
     <components.DropdownIndicator {...props}>
