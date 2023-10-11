@@ -73,7 +73,7 @@ const ViewProposalPage = ({
     setProposal(cosmosProposal);
     setTitle(cosmosProposal?.title);
     setDescription(cosmosProposal?.description);
-  }, [cosmosProposal]);
+  }, [cosmosProposal, app.chain.apiInitialized]);
 
   useEffect(() => {
     if (_.isEmpty(metadata)) return;
@@ -128,17 +128,13 @@ const ViewProposalPage = ({
       } else {
         setProposal(foundProposal);
       }
-    }
-  }, [cachedAaveProposals]);
-
-  useEffect(() => {
-    if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
+    } else if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
       const foundProposal = cachedCompoundProposals?.find(
         (p) => p.identifier === proposalId
       );
       setProposal(foundProposal);
     }
-  }, [cachedCompoundProposals]);
+  }, [cachedAaveProposals, cachedCompoundProposals, isAdapterLoaded]);
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
