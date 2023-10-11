@@ -1,5 +1,4 @@
-import './MembersSection.scss';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
@@ -8,17 +7,23 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../../helpers/constants';
+import MinimumProfile from '../../../../../models/MinimumProfile';
 import { useSearchProfilesQuery } from '../../../../../state/api/profiles';
 import { SearchProfilesResponse } from '../../../../../state/api/profiles/searchProfiles';
-import MinimumProfile from '../../../../../models/MinimumProfile';
-import { CWText } from '../../../../components/component_kit/cw_text';
-import { MembersSearchBar } from '../../../../components/members_search_bar';
+import { SearchFilters } from '../index.types';
+import './MembersSection.scss';
 
-const MembersSection = () => {
+type MembersSectionProps = {
+  searchFilters: SearchFilters;
+};
+
+const MembersSection = ({ searchFilters }: MembersSectionProps) => {
   const containerRef = useRef<VirtuosoHandle>();
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce<string>(
+    searchFilters.searchText,
+    500
+  );
 
   const { data, fetchNextPage } = useSearchProfilesQuery({
     chainId: app.activeChainId(),
@@ -81,14 +86,6 @@ const MembersSection = () => {
 
   return (
     <div className="MembersSection">
-      <CWText type="h3" fontWeight="medium">
-        Members ({totalResults})
-      </CWText>
-      <MembersSearchBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        chainName={app.activeChainId()}
-      />
       <Virtuoso
         ref={containerRef}
         data={members}
