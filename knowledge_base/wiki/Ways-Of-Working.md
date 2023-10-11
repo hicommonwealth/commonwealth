@@ -1,4 +1,4 @@
-<!-- TODO Graham 230831: Establish a glossary of engineering terms for our wiki. -->
+<!-- TODO Graham 230831: Establish a glossary of engineering terms for our knowledge base. -->
 _Throughout this page, "ticket" and "story" are used interchangeably to refer to GitHub issues._
 
 **Contents**
@@ -143,6 +143,7 @@ Our Beta/QA server can be found at `qa.commonwealth.im`. Custom domains are avai
 
 # Change Log
 
+- 231010: Flagged by Timothee Legros; Deployment and QA schedule section needs to be updated. Merging does not automatically push to Beta.
 - 230906: Updated with new requirements for tickets and PRs (#4972).
 - 230831: Merged with Agile-Development.md by Graham Johnson (#4936) and certified fresh.
 - 230823: Migrated from GitHub wiki by Graham Johnson (#4350).

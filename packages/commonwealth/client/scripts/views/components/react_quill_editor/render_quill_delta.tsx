@@ -348,25 +348,11 @@ export const renderQuillDelta = (
               ? 'unchecked'
               : '';
 
-          if (parent.attributes?.header === 1) {
-            return (
-              <h1 key={ii} className={className}>
-                {parent.children[0].insert}
-              </h1>
-            );
-          } else if (parent.attributes?.header === 2) {
-            return (
-              <h2 key={ii} className={className}>
-                {parent.children[0].insert}
-              </h2>
-            );
-          } else {
-            return (
-              <Tag key={ii} className={className}>
-                {parent.children.map(renderChild)}
-              </Tag>
-            );
-          }
+          return (
+            <Tag key={ii} className={className}>
+              {parent.children.map(renderChild)}
+            </Tag>
+          );
         };
 
         // special handler for lists, which need to be un-flattened and turned into a tree

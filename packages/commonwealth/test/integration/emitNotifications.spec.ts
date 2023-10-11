@@ -389,11 +389,7 @@ describe('emitNotifications tests', () => {
         },
       };
 
-      await emitNotifications(models, notififcation_data, {
-        notificationCategory: eventType,
-        body: snapshotNotificationData.body,
-        title: snapshotNotificationData.title,
-      });
+      await emitNotifications(models, notififcation_data);
 
       const notif = await models.Notification.findOne({
         where: {
