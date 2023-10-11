@@ -59,6 +59,12 @@ const NotificationSettingsPage = () => {
   }, [app?.user.notifications, app.user.emailInterval]);
 
   useEffect(() => {
+    // bundled snapshot subscriptions
+    const bundledSnapshotSubs = extractSnapshotProposals(
+      app.user.notifications.discussionSubscriptions
+    );
+    const snapshotIds = Object.keys(bundledSnapshotSubs);
+
     const getTheSpace = async () => {
       try {
         // Fetch spaces for all snapshotIds concurrently
@@ -134,11 +140,6 @@ const NotificationSettingsPage = () => {
     app?.user.notifications.discussionSubscriptions
   );
 
-  // bundled snapshot subscriptions
-  const bundledSnapshotSubs = extractSnapshotProposals(
-    app.user.notifications.discussionSubscriptions
-  );
-
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
     app?.user.notifications.chainEventSubscriptions
@@ -151,8 +152,6 @@ const NotificationSettingsPage = () => {
   const relevantSubscribedChains = app?.user.addresses
     .map((x) => x.chain)
     .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
-
-  const snapshotIds = Object.keys(bundledSnapshotSubs);
 
   return (
     <div className="NotificationSettingsPage">

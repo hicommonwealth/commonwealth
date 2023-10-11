@@ -17,7 +17,9 @@ export const bundleSubs = (
   return result;
 };
 
-export const extractSnapshotProposals = (subs) => {
+export const extractSnapshotProposals = (
+  subs: Array<NotificationSubscription>
+) => {
   const snapshotProposals = {};
 
   for (const sub of subs) {
