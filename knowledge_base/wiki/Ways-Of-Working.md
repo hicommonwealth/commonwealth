@@ -28,7 +28,7 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
 
 All work must be associated with a ticket, and the ticket must be opened before its respective pull request (as we use automated software which relies on this precedence).
 
-You must change the title or description of someone else's Github story or PR without permission. 
+You must not change the title or description of someone else's Github story or PR without permission. 
 
 ## Tickets
 
