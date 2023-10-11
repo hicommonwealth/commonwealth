@@ -39,7 +39,7 @@ const Sublayout = ({
 
   useEffect(() => {
     setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
-  }, [isWindowSmallInclusive]);
+  }, [isWindowSmallInclusive, setMenu]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -80,11 +80,14 @@ const Sublayout = ({
           <div
             className={clsx(
               'body-and-sticky-headers-container',
-              menuVisible ? 'menu-visible' : 'menu-hidden',
-              (menuName === 'exploreCommunities' ||
-                menuName === 'createContent' ||
-                hasCommunitySidebar) &&
-                'quick-switcher-visible',
+              {
+                'menu-visible': menuVisible,
+                'menu-hidden': !menuVisible,
+                'quick-switcher-visible':
+                  menuName === 'exploreCommunities' ||
+                  menuName === 'createContent' ||
+                  hasCommunitySidebar,
+              },
               resizing
             )}
           >
