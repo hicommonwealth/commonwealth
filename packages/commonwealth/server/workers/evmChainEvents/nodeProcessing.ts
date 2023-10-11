@@ -4,7 +4,7 @@ import models from '../../database';
 import { getEvents } from './logProcessing';
 import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
-import { rollbar } from './startEvmPolling';
+import { rollbar } from '../../util/rollbar';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationInstance } from '../../models/notification';
 
