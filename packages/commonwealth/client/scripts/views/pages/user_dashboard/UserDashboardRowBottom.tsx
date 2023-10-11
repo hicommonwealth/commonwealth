@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-
 import { NotificationCategories } from 'common-common/src/types';
+import useForceRerender from 'hooks/useForceRerender';
+import Thread from 'models/Thread';
 
 import 'pages/user_dashboard/UserDashboardRowBottom.scss';
+import React, { useState } from 'react';
 
 import app from 'state';
 import NotificationSubscription from '../../../models/NotificationSubscription';
 import { CreateComment } from '../../components/Comments/CreateComment';
-import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
 import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
+import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
-import useForceRerender from 'hooks/useForceRerender';
-import Thread from 'models/Thread';
 import { ReactionButton } from '../discussions/ThreadCard/ThreadOptions/ReactionButton/index';
 import { subscribeToThread } from './helpers';
 import { UserDashboardRowBottomSkeleton } from './UserDashboardRowBottomSkeleton';
@@ -130,8 +130,32 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           <PopoverMenu
             menuItems={[
               {
-                iconLeft: 'copy',
-                label: 'Copy URL',
+                onClick: () => {
+                  setSubscription(
+                    threadId,
+                    bothActive,
+                    commentSubscription,
+                    reactionSubscription
+                  );
+                },
+                label: bothActive ? 'Unsubscribe' : 'Subscribe',
+                iconLeft: bothActive ? 'unsubscribe' : 'bell',
+              },
+            ]}
+            renderTrigger={(onClick) => (
+              <CWIconButton
+                iconName={bothActive ? 'unsubscribe' : 'bell'}
+                iconSize="small"
+                onClick={onClick}
+              />
+            )}
+          />
+          <PopoverMenu
+            menuItems={[
+              {
+                iconLeft: 'linkPhosphor',
+                iconLeftSize: 'regular',
+                label: 'Copy link',
                 onClick: async () => {
                   if (commentId) {
                     await navigator.clipboard.writeText(
@@ -145,13 +169,14 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
                 },
               },
               {
-                iconLeft: 'twitter',
+                iconLeft: 'twitterOutline',
+                iconLeftSize: 'regular',
                 label: 'Share on Twitter',
                 onClick: async () => {
                   if (commentId) {
                     await window.open(
                       `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}
-                        ?comment=${commentId}`
+                      ?comment=${commentId}`
                     );
                     return;
                   }
@@ -163,22 +188,11 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
               },
             ]}
             renderTrigger={(onClick) => (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  onClick(e);
-                }}
-                className="thread-option-btn"
-              >
-                <CWIcon
-                  color="black"
-                  iconName="share"
-                  iconSize="small"
-                  weight="fill"
-                />
-                <CWText type="caption">Share</CWText>
-              </button>
+              <CWIconButton
+                iconName="share"
+                iconSize="small"
+                onClick={onClick}
+              />
             )}
           />
           <button
