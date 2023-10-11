@@ -113,13 +113,6 @@ const editComment = async (
           author_chain: finalComment.Address.chain,
         },
       },
-      // don't send webhook notifications for edits
-      {
-        user: finalComment.Address.address,
-        url: cwUrl,
-        title: proposal.title || '',
-        chain: finalComment.chain,
-      },
       [finalComment.Address.address]
     );
 

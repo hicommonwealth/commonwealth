@@ -1,4 +1,4 @@
-_This page allows us to track and prioritize new wiki entries._
+_This page allows us to track and prioritize new knowledge base entries._
 
 _Engineers are encouraged to reach out to Graham Johnson with suggestions for new entries._
 

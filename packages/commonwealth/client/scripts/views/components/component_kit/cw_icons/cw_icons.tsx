@@ -1173,6 +1173,38 @@ export const CWDiscordLogin = (props: IconProps) => {
   );
 };
 
+export const CWDot = (props: IconProps) => {
+  const {
+    className,
+    componentType,
+    disabled,
+    iconButtonTheme,
+    iconSize,
+    selected,
+    ...otherProps
+  } = props;
+  return (
+    <svg
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="4"
+      height="4"
+      fill="none"
+      viewBox="0 0 4 4"
+      {...otherProps}
+    >
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M2.004 3.108C1.628 3.108 1.304 2.972 1.032 2.7C0.768 2.428 0.636 2.104 0.636 1.728C0.636 1.344 0.768 1.02 1.032 0.756C1.304 0.484 1.628 0.348 2.004 0.348C2.388 0.348 2.712 0.484 2.976 0.756C3.248 1.02 3.384 1.344 3.384 1.728C3.384 2.104 3.248 2.428 2.976 2.7C2.712 2.972 2.388 3.108 2.004 3.108Z"
+        fill="#656167"
+      />
+    </svg>
+  );
+};
+
 export const CWDots = (props: IconProps) => {
   const {
     className,
