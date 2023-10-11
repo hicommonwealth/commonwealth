@@ -1,4 +1,4 @@
-import type { WalletId, WalletSsoSource } from 'common-common/src/types';
+import { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes, ChainInstance } from './chain';
@@ -56,7 +56,26 @@ export default (
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address: { type: dataTypes.STRING, allowNull: false },
       chain: { type: dataTypes.STRING, allowNull: false },
-      hex: { type: dataTypes.STRING, allowNull: true },
+      hex: {
+        type: dataTypes.STRING,
+        allowNull: true,
+        validate: {
+          isRequiredForCosmos(value) {
+            if (
+              [
+                WalletId.Keplr,
+                WalletId.KeplrEthereum,
+                WalletId.TerraStation,
+                WalletId.CosmosEvmMetamask,
+              ].includes(value.wallet_id)
+            ) {
+              if (!value.hex) {
+                throw new Error('hex is required for cosmos addresses');
+              }
+            }
+          },
+        },
+      },
       role: {
         type: dataTypes.ENUM('member', 'moderator', 'admin'),
         defaultValue: 'member',
@@ -75,6 +94,7 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       user_id: { type: dataTypes.INTEGER, allowNull: true },
+      legacy_user_id: { type: dataTypes.INTEGER, allowNull: true }, // TODO: remove in clean-up
       is_councillor: {
         type: dataTypes.BOOLEAN,
         allowNull: false,
@@ -91,6 +111,7 @@ export default (
         defaultValue: false,
       },
       profile_id: { type: dataTypes.INTEGER, allowNull: true },
+      legacy_profile_id: { type: dataTypes.INTEGER, allowNull: true }, // TODO: remove in clean-up
       wallet_id: { type: dataTypes.STRING, allowNull: true },
       wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
       block_info: { type: dataTypes.STRING, allowNull: true },
