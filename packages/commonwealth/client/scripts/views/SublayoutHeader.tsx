@@ -9,7 +9,7 @@ import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import {
   isWindowMediumSmallInclusive,
-  isWindowSmallInclusive
+  isWindowSmallInclusive,
 } from './components/component_kit/helpers';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
@@ -25,6 +25,7 @@ import clsx from 'clsx';
 import { CWButton } from './components/component_kit/new_designs/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
 import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
+import { featureFlags } from '../helpers/feature-flags';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -40,7 +41,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     setMobileMenuName,
     mobileMenuName,
     setUserToggledVisibility,
-    setRecentlyUpdatedVisibility
+    setRecentlyUpdatedVisibility,
   } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -109,7 +110,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {onMobile && app.activeChainId() && (
+          {(featureFlags.sidebarToggle || onMobile) && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
               iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
@@ -131,7 +132,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           </div>
           <div
             className={clsx('DesktopMenuContainer', 'session-keys', {
-              isLoggedIn
+              isLoggedIn,
             })}
           >
             <CreateContentPopover />
