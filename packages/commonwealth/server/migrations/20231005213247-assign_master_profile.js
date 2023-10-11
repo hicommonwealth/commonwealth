@@ -33,8 +33,7 @@ module.exports = {
                   COUNT(CASE WHEN P2.bio IS NOT NULL THEN 1 ELSE NULL END) +
                   COUNT(CASE WHEN P2.avatar_url IS NOT NULL THEN 1 ELSE NULL END) +
                   COUNT(CASE WHEN P2.socials IS NOT NULL THEN 1 ELSE NULL END) +
-                  COUNT(CASE WHEN P2.background_image IS NOT NULL THEN 1 ELSE NULL END) +
-                  COUNT(CASE WHEN P2.slug IS NOT NULL THEN 1 ELSE NULL END) DESC
+                  COUNT(CASE WHEN P2.background_image IS NOT NULL THEN 1 ELSE NULL END) DESC
                 ) AS rank
               FROM "Addresses" A2
               LEFT JOIN "Profiles" P2 ON A2.profile_id = P2.id
