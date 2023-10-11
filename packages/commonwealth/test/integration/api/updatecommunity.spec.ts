@@ -56,7 +56,7 @@ describe('Update Community/Chain Tests', () => {
       const name = 'commonwealtheum';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, name });
       expect(res.body.status).to.be.equal('Success');
@@ -67,7 +67,7 @@ describe('Update Community/Chain Tests', () => {
       const description = 'hello this the new chain';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, description });
       expect(res.body.status).to.be.equal('Success');
@@ -78,7 +78,7 @@ describe('Update Community/Chain Tests', () => {
       const website = 'http://edgewa.re';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, website });
       expect(res.body.status).to.be.equal('Success');
@@ -89,7 +89,7 @@ describe('Update Community/Chain Tests', () => {
       const discord = 'http://discord.gg';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, discord });
       expect(res.body.status).to.be.equal('Success');
@@ -100,7 +100,7 @@ describe('Update Community/Chain Tests', () => {
       const github = 'github.com';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, github });
       expect(res.body.error).to.be.equal(ChainError.InvalidGithub);
@@ -110,7 +110,7 @@ describe('Update Community/Chain Tests', () => {
       const telegram = 't.me';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, telegram });
       expect(res.body.error).to.be.equal(ChainError.InvalidTelegram);
@@ -120,7 +120,7 @@ describe('Update Community/Chain Tests', () => {
       const telegram = 'https://t.me/';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, telegram });
       expect(res.body.status).to.be.equal('Success');
@@ -131,7 +131,7 @@ describe('Update Community/Chain Tests', () => {
       const github = 'https://github.com/';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, github });
       expect(res.body.status).to.be.equal('Success');
@@ -142,7 +142,7 @@ describe('Update Community/Chain Tests', () => {
       const default_symbol = 'CWL';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, default_symbol });
       expect(res.body.status).to.be.equal('Success');
@@ -153,7 +153,7 @@ describe('Update Community/Chain Tests', () => {
       const icon_url = '/static/img/protocols/cwl.png';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, icon_url });
       expect(res.body.status).to.be.equal('Success');
@@ -164,7 +164,7 @@ describe('Update Community/Chain Tests', () => {
       const active = false;
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, active });
       expect(res.body.status).to.be.equal('Success');
@@ -175,7 +175,7 @@ describe('Update Community/Chain Tests', () => {
       const type = 'parachain';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, type });
       expect(res.body.status).to.be.equal('Success');
@@ -186,7 +186,7 @@ describe('Update Community/Chain Tests', () => {
       const network = 'ethereum-testnet';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, network });
       expect(res.body.error).to.not.be.null;
@@ -197,7 +197,7 @@ describe('Update Community/Chain Tests', () => {
       const name = 'ethereum-testnet';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, name });
       expect(res.body.error).to.not.be.null;
@@ -208,7 +208,7 @@ describe('Update Community/Chain Tests', () => {
       const id = 'ethereum-testnet';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id });
       expect(res.body.error).to.not.be.null;
@@ -224,7 +224,7 @@ describe('Update Community/Chain Tests', () => {
       );
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(`/api/communities/${chain}`)
         .set('Accept', 'application/json')
         .send({ jwt: newJwt, id });
       expect(res.body.error).to.not.be.null;
@@ -237,9 +237,9 @@ describe('Update Community/Chain Tests', () => {
       const name = 'commonwealth tester community';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(``)
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, name });
+        .send({ jwt: jwtToken, id: chain, name });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.name).to.be.equal(name);
     });
@@ -248,9 +248,9 @@ describe('Update Community/Chain Tests', () => {
       const description = 'for me! and the tester community';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(``)
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, description });
+        .send({ jwt: jwtToken, id: chain, description });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.description).to.be.equal(description);
     });
@@ -259,9 +259,9 @@ describe('Update Community/Chain Tests', () => {
       const website = 'http://edgewa.re';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(``)
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, website });
+        .send({ jwt: jwtToken, id: chain, website });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.website).to.be.equal(website);
     });
@@ -270,9 +270,9 @@ describe('Update Community/Chain Tests', () => {
       const discord = 'http://discord.gg';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(``)
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, discord });
+        .send({ jwt: jwtToken, id: chain, discord });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.discord).to.be.equal(discord);
     });
@@ -281,9 +281,9 @@ describe('Update Community/Chain Tests', () => {
       const telegram = 'https://t.me/';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(``)
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, telegram });
+        .send({ jwt: jwtToken, id: chain, telegram });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.telegram).to.be.equal(telegram);
     });
@@ -292,9 +292,9 @@ describe('Update Community/Chain Tests', () => {
       const github = 'https://github.com/';
       const res = await chai
         .request(app)
-        .patch(`/communities/${offchainCommunity.id}`)
+        .patch(``)
         .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: offchainCommunity.id, github });
+        .send({ jwt: jwtToken, id: chain, github });
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result.github).to.be.equal(github);
     });
