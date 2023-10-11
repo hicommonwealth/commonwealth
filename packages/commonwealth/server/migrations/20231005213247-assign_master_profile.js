@@ -5,8 +5,8 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
-        ALTER TABLE "Addresses" ADD COLUMN "legacy_user_id" INTEGER NULL;
-        ALTER TABLE "Addresses" ADD COLUMN "legacy_profile_id" INTEGER NULL;
+        ALTER TABLE "Addresses" ADD COLUMN IF NOT EXISTS "legacy_user_id" INTEGER NULL;
+        ALTER TABLE "Addresses" ADD COLUMN IF NOT EXISTS "legacy_profile_id" INTEGER NULL;
         `,
         { raw: true, transaction: t }
       );
@@ -30,7 +30,11 @@ module.exports = {
                 RANK() OVER (PARTITION BY A2.hex ORDER BY
                   COUNT(CASE WHEN P2.profile_name IS NOT NULL THEN 1 ELSE NULL END) +
                   COUNT(CASE WHEN P2.email IS NOT NULL THEN 1 ELSE NULL END) +
-                  COUNT(CASE WHEN P2.bio IS NOT NULL THEN 1 ELSE NULL END) DESC
+                  COUNT(CASE WHEN P2.bio IS NOT NULL THEN 1 ELSE NULL END) +
+                  COUNT(CASE WHEN P2.avatar_url IS NOT NULL THEN 1 ELSE NULL END) +
+                  COUNT(CASE WHEN P2.socials IS NOT NULL THEN 1 ELSE NULL END) +
+                  COUNT(CASE WHEN P2.background_image IS NOT NULL THEN 1 ELSE NULL END) +
+                  COUNT(CASE WHEN P2.slug IS NOT NULL THEN 1 ELSE NULL END) DESC
                 ) AS rank
               FROM "Addresses" A2
               LEFT JOIN "Profiles" P2 ON A2.profile_id = P2.id
@@ -47,7 +51,7 @@ module.exports = {
             user_id = MP.master_user_id,
             profile_id = MP.master_profile_id
           FROM MasterProfiles MP
-          WHERE A.hex = MP.hex;                  
+          WHERE A.hex = MP.hex;
           `,
           { transaction: t }
         );
