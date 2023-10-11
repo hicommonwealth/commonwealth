@@ -1,5 +1,3 @@
-_Authored by Nakul Manchanda 230627._
-
 # PSQL Schema Inspection
 
 ## How to Connect
@@ -152,3 +150,7 @@ SELECT datname, count(*) FROM pg_stat_activity GROUP BY datname;
 -- Lock mode and count
 SELECT mode, COUNT(mode) FROM pg_locks GROUP BY mode ORDER BY mode;
 ```
+
+# Change Log
+
+- 230627: Authored by Nakul Manchanda.

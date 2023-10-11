@@ -1,5 +1,3 @@
-_Authored by Timothee Legros, 230803._
-
 # Prerequisites
 ## Subscriptions
 - Be logged in on a new account with MetaMask that has no pre-existing joined communities.
@@ -183,3 +181,7 @@ Cannot QA chain-event notifications until [#4667][10] is completed.
 [9]: https://github.com/hicommonwealth/commonwealth/issues/4657
 [10]: https://github.com/hicommonwealth/commonwealth/issues/4667
 [11]: https://github.com/hicommonwealth/commonwealth/issues/4690
+
+# Change Log
+
+- 230803: Authored by Timothee Legros.

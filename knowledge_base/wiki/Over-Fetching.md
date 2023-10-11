@@ -1,5 +1,3 @@
-_Authored by Nakul Manchanda, 230629._
-
 # Data Over-Fetching
 This pertains to situations where we retrieve more data than required. This is commonly observed when Sequelize queries behind endpoints extract excessive information.
 
@@ -215,3 +213,7 @@ include: [
 A new query for `viewUserActivity` and `viewGlobalActivity` has been proposed in [this pull request](https://github.com/hicommonwealth/commonwealth/pull/4200). This optimized query operates under 200ms, improving the speed and efficiency of the system.
 
 Additionally, this update also addresses code duplication between `viewUserActivity` and `viewGlobalActivity`. The redundant code has been consolidated into a single 'activity' query. When this query is passed a user_id, it returns user-specific activity; otherwise, it delivers global activity. This change enhances the code's maintainability and readability while still retaining its functionality.
+
+# Change Log
+
+- 230629: Authored by Nakul Manchanda.

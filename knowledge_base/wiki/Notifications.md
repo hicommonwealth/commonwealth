@@ -1,5 +1,3 @@
-_Authored by Nakul Manchanda 230628._
-
 ## Current Setup
 
 ### Supported User Scenarios
@@ -175,3 +173,7 @@ payload: JSONB
 event_id: INTEGER or BIGINT (Foreign Key, references Event.event_id)  
 user_id: INTEGER or BIGINT  
 read_ind: BOOLEAN
+
+# Change Log
+
+- 230628: Authored by Nakul Manchanda 230628.

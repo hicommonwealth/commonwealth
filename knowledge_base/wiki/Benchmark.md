@@ -1,5 +1,3 @@
-_Authored by Nakul Manchanda, 230724._
-
 # Performance Benchmarking 
 
 ## Core Web Performance Metrics
@@ -107,3 +105,7 @@ These improvements are discussed in detail [here](./Request-Handler-Optimization
 
 - We aim to extend the location TAG using `req.headers['cf-ipcountry']` - added by Cloudflare to each request. It can be included in the list of tags for the `express.response_time` metric reported to Datadog by the backend app available [here](https://github.com/hicommonwealth/commonwealth/blob/7e5c72252078ee2cfc237f99c43a1ad67e97dcf7/packages/commonwealth/server/scripts/setupExpressStats.ts#L29).
 - We plan to filter the entire dashboard using a Dashboard variable to view performance from just one geographic location.
+
+# Change Log
+
+- 230724: Authored by Nakul Manchanda.
