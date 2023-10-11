@@ -21,6 +21,7 @@
     "dump-db-local": "pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "e2e-start-server": "ETH_RPC=e2e-test yarn start",
     "emit-notification": "ts-node --project tsconfig.json server/scripts/emitTestNotification.ts",
+    "emit-webhook": "ts-node --project tsconfig.json server/scripts/emitWebhook.ts",
     "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
     "gen-e2e": "npx playwright codegen",
     "heroku-postbuild": "NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer",

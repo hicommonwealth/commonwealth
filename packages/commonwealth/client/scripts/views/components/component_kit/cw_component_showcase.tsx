@@ -11,6 +11,7 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
+import { CWSelectList } from './new_designs/CWSelectList';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
@@ -198,6 +199,18 @@ const validationSchema = z.object({
     .nonempty({ message: 'Bio is required' })
     .min(100, { message: 'Bio must be 100 chars long' })
     .max(200, { message: 'Bio must not be more than 200 chars' }),
+});
+
+const chainValidationSchema = z.object({
+  chain: z
+    .array(
+      z.object({
+        value: z.string().nonempty({ message: 'Invalid value' }),
+        label: z.string().nonempty({ message: 'Invalid value' }),
+      })
+    )
+    .min(1, { message: 'At least 1 chain is required' })
+    .nonempty({ message: 'Chains are required' }),
 });
 
 export const ComponentShowcase = () => {
@@ -1771,6 +1784,44 @@ export const ComponentShowcase = () => {
             </>
           )}
         </CWForm>
+        {/* With tag input */}
+        <CWForm
+          className="w-full"
+          validationSchema={chainValidationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          <CWSelectList
+            label="Chain"
+            name="chain"
+            placeholder="Add or select a chain"
+            isMulti
+            isClearable={false}
+            defaultValue={[{ value: 'solana', label: 'Solana' }]}
+            options={[
+              { value: 'solana', label: 'Solana' },
+              { value: 'polkadot', label: 'Polkadot' },
+              { value: 'ethereum', label: 'Ethereum' },
+              { value: 'substrate', label: 'Substrate' },
+              { value: 'binance', label: 'Binance' },
+            ]}
+            hookToForm
+          />
+          <CWButton label="Submit" type="submit" />
+        </CWForm>
+        <CWText type="h3">Multi select list</CWText>
+        <CWSelectList
+          placeholder="Add or select a chain"
+          isMulti
+          isClearable={false}
+          defaultValue={[{ value: 'solana', label: 'Solana' }]}
+          options={[
+            { value: 'solana', label: 'Solana' },
+            { value: 'polkadot', label: 'Polkadot' },
+            { value: 'ethereum', label: 'Ethereum' },
+            { value: 'substrate', label: 'Substrate' },
+            { value: 'binance', label: 'Binance' },
+          ]}
+        />
       </div>
       <div className="table">
         <CWText type="h3">Table</CWText>
