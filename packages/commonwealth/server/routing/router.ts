@@ -163,6 +163,7 @@ import { ServerProfilesController } from '../controllers/server_profiles_control
 import { ServerChainsController } from '../controllers/server_chains_controller';
 import { ServerProposalsController } from '../controllers/server_proposals_controller';
 import { ServerGroupsController } from '../controllers/server_groups_controller';
+import { ServerTopicsController } from '../controllers/server_topics_controller';
 
 import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { createThreadReactionHandler } from '../routes/threads/create_thread_reaction_handler';
@@ -189,6 +190,8 @@ import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
+import { getTopicsHandler } from '../routes/topics/get_topics_handler';
+import { createTopicHandler } from 'server/routes/topics/create_topic_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -200,6 +203,7 @@ export type ServerControllers = {
   chains: ServerChainsController;
   proposals: ServerProposalsController;
   groups: ServerGroupsController;
+  topics: ServerTopicsController;
 };
 
 function setupRouter(
@@ -225,6 +229,7 @@ function setupRouter(
     chains: new ServerChainsController(models, tokenBalanceCache, banCache),
     proposals: new ServerProposalsController(models, redisCache),
     groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
+    topics: new ServerTopicsController(models, tokenBalanceCache, banCache),
   };
 
   // ---
@@ -701,38 +706,38 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/createTopic',
+    '/topics' /* OLD: /createTopic */,
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
-    createTopic.bind(this, models)
+    createTopicHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
-    'post',
-    '/updateTopic',
+    'patch',
+    '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
     passport.authenticate('jwt', { session: false }),
     updateTopic.bind(this, models)
   );
   registerRoute(
     router,
-    'post',
-    '/orderTopics',
+    'put',
+    '/topics-order' /* OLD: /orderTopics */,
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     orderTopics.bind(this, models)
   );
   registerRoute(
     router,
-    'post',
-    '/editTopic',
+    'patch',
+    '/topics/:topicId' /* OLD: /editTopic */,
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     editTopic.bind(this, models)
   );
   registerRoute(
     router,
-    'post',
-    '/deleteTopic',
+    'delete',
+    '/topics/:topicId' /* OLD: /deleteTopic */,
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
     deleteTopic.bind(this, models)
@@ -740,9 +745,9 @@ function setupRouter(
   registerRoute(
     router,
     'get',
-    '/bulkTopics',
+    '/topics' /* OLD: /bulkTopics */,
     databaseValidationService.validateChain,
-    bulkTopics.bind(this, models)
+    getTopicsHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
