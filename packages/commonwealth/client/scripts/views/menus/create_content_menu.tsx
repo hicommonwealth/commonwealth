@@ -18,6 +18,7 @@ import {
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
+import { isMobile } from 'react-device-detect';
 
 const resetSidebarState = () => {
   if (sidebarStore.getState().userToggledVisibility !== 'open') {
@@ -27,6 +28,7 @@ const resetSidebarState = () => {
   }
 };
 
+console.log('is', isMobile);
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
@@ -235,7 +237,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           {
             label: 'New Thread',
             onClick: () => {
-              resetSidebarState();
+              isMobile && resetSidebarState();
               navigate('/new/discussion');
             },
             iconLeft: 'write',
