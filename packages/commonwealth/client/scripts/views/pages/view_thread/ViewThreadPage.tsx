@@ -58,6 +58,7 @@ import ViewTemplate from '../view_template/view_template';
 import { featureFlags } from 'helpers/feature-flags';
 
 import 'pages/view_thread/index.scss';
+import { LinkedUrlCard } from './LinkedUrlCard';
 import { commentsByDate } from 'helpers/dates';
 
 export type ThreadPrefetch = {
@@ -558,6 +559,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   },
                 ]
               : []),
+            ...[
+              {
+                label: 'Links',
+                item: (
+                  <div className="cards-column">
+                    <LinkedUrlCard
+                      thread={thread}
+                      allowLinking={isAuthor || isAdminOrMod}
+                    />
+                  </div>
+                ),
+              },
+            ],
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
               ? [
                   {
