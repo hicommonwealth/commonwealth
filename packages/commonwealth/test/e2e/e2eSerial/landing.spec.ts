@@ -22,13 +22,13 @@ test.describe('Test landing login', () => {
 export async function login(page) {
   await removeUser();
 
-  await page.getByText('Login').click();
+  await page.getByText('Sign in').click();
   await page.waitForSelector('.LoginDesktop');
 
   let metaMaskIcon = await page.$$("text='Metamask'");
   do {
     await page.mouse.click(0, 0);
-    await page.getByText('Login').click();
+    await page.getByText('Sign in').click();
     metaMaskIcon = await page.$$("text='Metamask'");
   } while (metaMaskIcon.length === 0);
 

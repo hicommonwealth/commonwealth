@@ -1,13 +1,6 @@
 /* eslint-disable dot-notation */
 import bodyParser from 'body-parser';
 import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
-import {
-  BalanceType,
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-} from 'common-common/src/types';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import cookieParser from 'cookie-parser';
 import type { Express } from 'express';

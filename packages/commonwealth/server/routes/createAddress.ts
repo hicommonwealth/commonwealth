@@ -1,5 +1,5 @@
 import type { NextFunction } from 'express';
-import type { WalletId } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -18,6 +18,7 @@ export type CreateAddressReq = {
   address: string;
   chain: string;
   wallet_id: WalletId;
+  wallet_sso_source: WalletSsoSource;
   community?: string;
   keytype?: string;
   block_info?: string;
