@@ -216,4 +216,10 @@ $width: 360px;
   .searchbar-gallery {
     @include gallery-grid(8px, column);
   }
+
+  .typeahead-gallery {
+    .typeahead-row {
+      margin-bottom: 20px;
+    }
+  }
 }

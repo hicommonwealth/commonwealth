@@ -4,12 +4,23 @@
   width: 400px;
 
   .SelectList {
+    @include inputStyles;
     font-family: $font-family-neue-haas-unica;
-    border: 1px solid $neutral-200;
     border-radius: $border-radius-corners-wider;
 
-    &:hover {
-      border: 1px solid $primary-600;
+    &.disabled {
+      background-color: $neutral-50;
+      color: $neutral-400;
+
+      .tasl__control {
+        .tasl__indicators {
+          .tasl__indicator {
+            svg {
+              color: $neutral-400;
+            }
+          }
+        }
+      }
     }
 
     .tasl__control {
@@ -29,14 +40,40 @@
       .tasl__indicators {
         .tasl__indicator {
           padding: 0px;
-          color: $neutral-500;
-
-          &.tasl__clear-indicator {
-            margin-right: 10px;
-          }
+          color: $neutral-800;
         }
         .tasl__indicator-separator {
           display: none;
+        }
+      }
+    }
+
+    .tasl__menu {
+      .tasl__menu-list {
+        @include scrollbarStyles;
+
+        .tasl__option {
+          padding: 0 8px;
+          background-color: #fff;
+
+          .text-container {
+            padding: 10px 12px;
+            border-radius: $border-radius-corners-wider;
+          }
+
+          &:hover {
+            .text-container {
+              background-color: $neutral-100;
+              color: $neutral-800;
+            }
+          }
+        }
+
+        .tasl__option--is-selected {
+          .text-container {
+            background-color: $neutral-50;
+            color: $neutral-800;
+          }
         }
       }
     }

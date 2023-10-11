@@ -1571,13 +1571,24 @@ export const ComponentShowcase = () => {
           })}
         </div>
       </div>
-      <div className="typeahead-select-list">
+      <div className="typeahead-gallery">
         <CWText type="h3"> Typeahead Dropdown</CWText>
-        <CWTypeaheadSelectList
-          options={optionList}
-          defaultValue={optionList[0]}
-          placeholder="Select chain"
-        />
+        <div className="typeahead-row">
+          <CWTypeaheadSelectList
+            options={optionList}
+            defaultValue={optionList[0]}
+            placeholder="Select chain"
+            isDisabled={false}
+          />
+        </div>
+        <div className="typeahead-row">
+          <CWTypeaheadSelectList
+            options={optionList}
+            defaultValue={optionList[0]}
+            placeholder="Select chain"
+            isDisabled={true}
+          />
+        </div>
       </div>
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
