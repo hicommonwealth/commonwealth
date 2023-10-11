@@ -1,4 +1,4 @@
-import { NotificationDataAndCategory } from 'types';
+import { NotificationDataAndCategory } from '../../../shared/types';
 import { NotificationCategories } from 'common-common/src/types';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
 import { Label as chainEventLabel } from 'chain-events/src';
