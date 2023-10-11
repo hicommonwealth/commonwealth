@@ -473,7 +473,7 @@ export const CommentTree = ({
                   canReact={
                     !!hasJoinedCommunity ||
                     isAdmin ||
-                    !app.chain.isGatedTopic(thread.topic.id)
+                    !app.chain.isGatedTopic(thread.topic?.id)
                   }
                   canEdit={!isLocked && (isCommentAuthor || isAdminOrMod)}
                   editDraft={edits?.[comment.id]?.editDraft || ''}
