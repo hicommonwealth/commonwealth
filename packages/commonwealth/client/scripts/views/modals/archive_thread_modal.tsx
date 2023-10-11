@@ -34,13 +34,17 @@ export const ArchiveThreadModal = ({
       archived: !thread.archivedAt,
       address: app.user?.activeAccount?.address,
     })
-    .then(() => {
-      notifySuccess(`Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`);
-      onModalClose();
-    })
-    .catch(() => {
-      notifyError(`Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`);
-    });
+      .then(() => {
+        notifySuccess(
+          `Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`
+        );
+        onModalClose();
+      })
+      .catch(() => {
+        notifyError(
+          `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`
+        );
+      });
   };
 
   return (
@@ -52,17 +56,17 @@ export const ArchiveThreadModal = ({
       </div>
       <div className="body">
         <div className="warning-text">
-          <CWText className='top'>
+          <CWText className="top">
             Are you sure you want to archive this thread post?
           </CWText>
 
-          <CWText className='middle'>
-            Archived posts are hidden from the main feed and can no longer be interacted with. Archiving will move the post to a new topic section titled "Archived," which is still viewable by all community members.
+          <CWText className="middle">
+            Archived posts are hidden from the main feed and can no longer be
+            interacted with. Archiving will move the post to a new topic section
+            titled "Archived," which is still viewable by all community members.
           </CWText>
 
-          <CWText>
-            Note that you can always unarchive a post.
-          </CWText>
+          <CWText>Note that you can always unarchive a post.</CWText>
         </div>
 
         <div className="actions">

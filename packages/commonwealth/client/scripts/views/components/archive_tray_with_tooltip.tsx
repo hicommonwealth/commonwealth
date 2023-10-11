@@ -3,11 +3,13 @@ import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import moment from 'moment';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
 
-type ArchiveTrayWithTooltip = {
+type ArchiveTrayWithTooltipProps = {
   archivedAt: moment.Moment;
 };
 
-export const ArchiveTrayWithTooltip = ({ archivedAt }: ArchiveTrayWithTooltip) => {
+export const ArchiveTrayWithTooltip = ({
+  archivedAt,
+}: ArchiveTrayWithTooltipProps) => {
   return (
     <CWTooltip
       hasBackground={true}
