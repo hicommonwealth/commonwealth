@@ -31,10 +31,6 @@ module.exports = {
         try {
           const hex = await getHex(address.address);
 
-          //TODO: can we replicate the function in SQL?
-          // get the migration declarative (instead of looping), down to 2 minutes in PROD
-          // maybe batching
-
           await queryInterface.sequelize.query(
             `
             UPDATE "Addresses"

@@ -55,7 +55,7 @@ module.exports = {
           { transaction: t }
         );
       } catch (e) {
-        console.log('error', e);
+        // console.log('error', e);
         throw new Error(e);
       }
     });
