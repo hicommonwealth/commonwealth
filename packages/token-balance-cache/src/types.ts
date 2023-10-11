@@ -17,6 +17,7 @@ export type IChainNode = {
   id: number;
   url: string;
   eth_chain_id?: number;
+  cosmos_chain_id?: string;
   alt_wallet_url?: string;
   private_url?: string;
   balance_type: BalanceType;

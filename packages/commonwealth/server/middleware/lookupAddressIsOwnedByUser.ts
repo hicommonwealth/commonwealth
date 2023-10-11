@@ -60,7 +60,7 @@ const lookupAddressIsOwnedByUser = async (
   req: AddressChainReq
 ): Promise<[AddressInstance | null, string | null]> => {
   if (!req.user?.id) {
-    return [null, 'Not logged in'];
+    return [null, 'Not signed in'];
   }
 
   if (!req.body?.author_chain) {

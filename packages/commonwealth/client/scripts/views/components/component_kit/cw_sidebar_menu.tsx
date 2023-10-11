@@ -2,22 +2,32 @@ import React, { useState } from 'react';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
-import { featureFlags } from 'helpers/feature-flags';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
-import useSidebarStore from 'state/ui/sidebar';
+import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import { CommunityLabel } from '../community_label';
 import { User } from '../user/user';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
-import { getClasses } from './helpers';
+import { getClasses, isWindowSmallInclusive } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
 
 type CWSidebarMenuItemProps = {
   isStarred?: boolean;
 } & MenuItem;
+
+const resetSidebarState = () => {
+  if (
+    sidebarStore.getState().userToggledVisibility !== 'open' ||
+    isWindowSmallInclusive(window.innerWidth)
+  ) {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
+  } else {
+    sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
+  }
+};
 
 export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const navigate = useCommonNavigate();
@@ -65,6 +75,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
           e.preventDefault();
           e.stopPropagation();
           setMenu({ name: 'default', isVisible: false });
+          resetSidebarState();
           navigateToCommunity({
             navigate,
             path: '/',
@@ -153,7 +164,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
           {
             type: 'default',
             label: 'Explore communities',
-            iconLeft: featureFlags.sessionKeys ? 'compassPhosphor' : 'compass',
+            iconLeft: 'compassPhosphor',
             onClick: () => {
               setMenu({ name: 'default', isVisible: false });
               navigate('/communities', {}, null);

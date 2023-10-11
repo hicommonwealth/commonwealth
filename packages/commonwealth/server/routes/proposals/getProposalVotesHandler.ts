@@ -19,7 +19,7 @@ export const getProposalVotesHandler = async (
 
   const votes = await controllers.proposals.getProposalVotes({
     chainId,
-    proposalId: +proposalId,
+    proposalId,
   });
 
   return success(res, {

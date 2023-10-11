@@ -49,7 +49,7 @@ export const CWTooltip: FC<TooltipProps> = ({
 
   return (
     <>
-      {renderTrigger(popoverProps.handleInteraction)}
+      {renderTrigger(popoverProps.handleInteraction, popoverProps.open)}
       <Popover
         placement={placement}
         content={

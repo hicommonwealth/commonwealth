@@ -31,8 +31,9 @@ export async function __createGroup(
   { requirements }: CreateGroupOptions
 ): Promise<CreateGroupResult> {
   // TODO: require community admin
-  if (!validateRequirements(requirements)) {
-    throw new AppError(Errors.InvalidRequirements);
+  const validationError = validateRequirements(requirements);
+  if (validationError) {
+    throw new AppError(validationError.message);
   }
   /*
     TODO:
