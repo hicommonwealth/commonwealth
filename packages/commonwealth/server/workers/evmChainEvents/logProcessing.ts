@@ -9,7 +9,7 @@ import {
 import { decimalToHex } from 'chain-events/src';
 import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { rollbar } from './startEvmPolling';
+import { rollbar } from '../../util/rollbar';
 
 const logger = factory.getLogger(formatFilename(__filename));
 
