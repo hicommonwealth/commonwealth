@@ -49,7 +49,6 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [test-devnet](#test-devnet)
   - [test-emit-notif](#test-emit-notif)
   - [test-integration-util](#test-integration-util)
-  - [test-query](#test-query)
   - [test-select](#test-select)
   - [test-suite](#test-suite)
   - [unit-test](#unit-test)
@@ -374,14 +373,6 @@ Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integrati
 Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing). 
 
 Considerations: The script name might misleadingly suggest that this script would pick out specifically the /util subfolder in the /integration directory. Might we be better off moving the three top-level scripts (e.g. databaseCleaner.spec.ts) into a dedicated subfolder, and targeting that?
-
-Contributor: Timothee Legros
-
-## test-query
-
-Definition: `ts-node server/scripts/testQuery.ts`
-
-Description: Executes testQuery.ts, which runs a select query on chains, for unclear-to-this-documentarian reasons.
 
 Contributor: Timothee Legros
 

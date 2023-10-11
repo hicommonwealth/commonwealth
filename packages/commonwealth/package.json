@@ -50,7 +50,6 @@
     "test-e2e-mature": "TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/mature/*",
     "test-e2e-serial": "TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*",
     "test-integration-util": "NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts",
-    "test-query": "ts-node server/scripts/testQuery.ts",
     "test-select": "NODE_ENV=test nyc ts-mocha --project tsconfig.json",
     "test-suite": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
     "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'",
