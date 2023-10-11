@@ -551,7 +551,7 @@ const NotificationSettingsPage = () => {
             </div>
           );
         })}
-      <div style={{ marginTop: 26 }}>
+      <div>
         <CWText
           type="h4"
           fontWeight="semiBold"
