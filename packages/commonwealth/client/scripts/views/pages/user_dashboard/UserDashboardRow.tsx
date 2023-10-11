@@ -71,13 +71,25 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
 
   const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
 
-  const { data: thread } = useGetThreadsByIdQuery({
+  const { data: threads } = useGetThreadsByIdQuery({
     chainId: chain_id,
     ids: [thread_id],
     apiCallEnabled:
       categoryId === 'new-comment-creation' ||
       categoryId === 'new-thread-creation',
   });
+
+  // If waiting on API call, show skeleton
+  if (!threads) {
+    return (
+      <UserDashboardChainEventRow
+        blockNumber={0}
+        chain={{} as any}
+        label={{} as any}
+        showSkeleton
+      />
+    );
+  }
 
   return (
     <Link
@@ -90,8 +102,8 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
       <UserDashboardRowTop
         activityData={notification}
         category={categoryId}
-        threadText={thread?.plaintext}
-        threadAuthor={thread?.author}
+        threadText={threads[0]?.plaintext}
+        threadAuthor={threads[0]?.author}
       />
       <UserDashboardRowBottom
         threadId={threadId}
@@ -99,7 +111,7 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
         chainId={chain_id}
         commentCount={commentCount}
         commenters={commenters}
-        thread={thread}
+        thread={threads[0]}
       />
     </Link>
   );

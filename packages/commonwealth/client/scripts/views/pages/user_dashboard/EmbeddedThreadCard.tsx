@@ -3,12 +3,7 @@ import 'pages/user_dashboard/EmbeddedThreadCard.scss';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWCard } from 'views/components/component_kit/cw_card';
 
-const EmbeddedThreadCard = ({
-  threadId,
-  threadText,
-  threadTitle,
-  threadAuthor,
-}) => {
+const EmbeddedThreadCard = ({ threadText, threadTitle, threadAuthor }) => {
   // Render the embedded thread card UI
   return (
     <CWCard className="EmbeddedThreadCard">

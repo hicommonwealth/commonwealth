@@ -23,6 +23,7 @@ type ReactionButtonProps = {
   size: 'small' | 'big';
   showSkeleton?: boolean;
   disabled: boolean;
+  chain?: string; // If this reaction button is not in a community, pass this in
 };
 
 export const ReactionButton = ({
@@ -30,9 +31,18 @@ export const ReactionButton = ({
   size,
   disabled,
   showSkeleton,
+  chain,
 }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const chainId = chain ?? app.activeChainId();
   const reactors = thread?.associatedReactions?.map((t) => t.address);
+  // If this reaction button is not in a community, use one of the users addresses to react.
+  if (!app.user.activeAccounts) {
+    app.user.setActiveAccounts(
+      app.user.addresses.filter((a) => a.chain.id === chain),
+      false
+    );
+  }
   const activeAddress = app.user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress
@@ -47,7 +57,7 @@ export const ReactionButton = ({
     error: createThreadReactionError,
     reset: resetCreateThreadReactionMutation,
   } = useCreateThreadReactionMutation({
-    chainId: app.activeChainId(),
+    chainId,
     threadId: thread.id,
   });
   const {
@@ -56,8 +66,8 @@ export const ReactionButton = ({
     error: deleteThreadReactionError,
     reset: resetDeleteThreadReactionMutation,
   } = useDeleteThreadReactionMutation({
-    chainId: app.activeChainId(),
-    address: app.user.activeAccount?.address,
+    chainId,
+    address: activeAddress,
     threadId: thread.id,
   });
 
@@ -75,21 +85,21 @@ export const ReactionButton = ({
 
   // token balance check if needed
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isUserForbidden = !isAdmin && app.chain.isGatedTopic(thread.topic?.id);
+  const isUserForbidden = !isAdmin && app.chain?.isGatedTopic(thread.topic?.id);
 
   const handleVoteClick = async (event) => {
     event.stopPropagation();
     event.preventDefault();
     if (isLoading || disabled) return;
 
-    if (!app.isLoggedIn() || !app.user.activeAccount) {
+    if (!app.isLoggedIn() || !activeAddress) {
       setIsModalOpen(true);
       return;
     }
     if (hasReacted) {
       deleteThreadReaction({
-        chainId: app.activeChainId(),
-        address: app.user.activeAccount?.address,
+        chainId,
+        address: activeAddress,
         threadId: thread.id,
         reactionId: reactedId as number,
       }).catch((e) => {
@@ -100,7 +110,7 @@ export const ReactionButton = ({
       });
     } else {
       createThreadReaction({
-        chainId: app.activeChainId(),
+        chainId,
         address: activeAddress,
         threadId: thread.id,
         reactionType: 'like',

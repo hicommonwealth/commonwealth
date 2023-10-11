@@ -26,7 +26,6 @@ type UserDashboardRowBottomProps = {
   commenters: ProfileWithAddress[];
   showSkeleton?: boolean;
   thread?: Thread;
-  comment?: Comment;
 };
 
 export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
@@ -38,7 +37,6 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     commenters,
     showSkeleton,
     thread,
-    comment,
   } = props;
   const forceRerender = useForceRerender();
   const [isReplying, setIsReplying] = useState(false);
@@ -86,13 +84,23 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   return (
     <div className="UserDashboardRowBottom">
       <div className="top-row">
-        <div className="activity">
+        <div
+          className="activity"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
           {
             thread && (
-              <ReactionButton thread={thread} size="small" />
+              <ReactionButton
+                thread={thread}
+                size="small"
+                disabled={false}
+                showSkeleton={showSkeleton}
+                chain={chainId}
+              />
             ) /* Show on more than threads? */
           }
-          {/* {comment && <CommentReactionButton comment={comment} />} */}
           <button
             className="thread-option-btn"
             onClick={(e) => {

@@ -1,4 +1,4 @@
-import 'pages/user_dashboard/user_dashboard_row_top.scss';
+import 'pages/user_dashboard/UserDashboardRowTop.scss';
 import React from 'react';
 import { Skeleton } from '../../components/Skeleton';
 import { CWText } from '../../components/component_kit/cw_text';
