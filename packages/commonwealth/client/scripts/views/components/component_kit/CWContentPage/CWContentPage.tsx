@@ -161,7 +161,7 @@ export const CWContentPage = ({
         showEditedLabelWithDate={!!lastEdited}
         isSpamThread={isSpamThread}
         threadStage={stageLabel}
-        archivedAt={thread.archivedAt}
+        archivedAt={thread?.archivedAt}
       />
     </div>
   );
