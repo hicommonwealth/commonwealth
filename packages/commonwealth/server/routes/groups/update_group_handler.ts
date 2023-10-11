@@ -1,9 +1,4 @@
-import {
-  TypedRequest,
-  TypedRequestBody,
-  TypedResponse,
-  success,
-} from '../../types';
+import { TypedRequest, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';

@@ -4,7 +4,7 @@ import { CreateGroupResult } from '../../controllers/server_groups_methods/creat
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { AppError } from '../../../../common-common/src/errors';
 import z from 'zod';
-import { GroupMetadata } from 'server/models/group';
+import { GroupMetadata } from '../../models/group';
 
 const Errors = {};
 

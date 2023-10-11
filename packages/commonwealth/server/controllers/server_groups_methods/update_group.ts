@@ -80,13 +80,15 @@ export async function __updateGroup(
   }
 
   await sequelize.transaction(async (transaction) => {
-    // delete all existing memberships for group
-    await this.models.Membership.destroy({
-      where: {
-        group_id: group.id,
-      },
-      transaction,
-    });
+    if (toUpdate.requirements?.length) {
+      // delete all existing memberships for group
+      await this.models.Membership.destroy({
+        where: {
+          group_id: group.id,
+        },
+        transaction,
+      });
+    }
     // update group
     await group.update(toUpdate, { transaction });
   });
