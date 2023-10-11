@@ -28,7 +28,6 @@ const resetSidebarState = () => {
   }
 };
 
-console.log('is', isMobile);
 const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   const showSnapshotOptions =
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
