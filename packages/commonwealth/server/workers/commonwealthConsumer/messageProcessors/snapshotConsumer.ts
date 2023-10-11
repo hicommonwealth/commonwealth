@@ -124,21 +124,13 @@ export async function processSnapshotMessage(
 
   if (associatedCommunities.length > 0) {
     // Notifications
-    emitNotifications(
-      this.models,
-      {
-        categoryId: NotificationCategories.SnapshotProposal,
-        data: {
-          eventType,
-          ...snapshotNotificationData,
-        },
+    emitNotifications(this.models, {
+      categoryId: NotificationCategories.SnapshotProposal,
+      data: {
+        eventType,
+        ...snapshotNotificationData,
       },
-      {
-        notificationCategory: eventType,
-        body: snapshotNotificationData.body,
-        title: snapshotNotificationData.title, // TODO: Decide on what we want for the webhook we emit
-      }
-    );
+    });
   }
 
   for (const community of associatedCommunities) {
