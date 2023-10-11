@@ -3,8 +3,6 @@ import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
 import type { ChainInstance } from 'server/models/chain';
-import type { ChainNodeInstance } from 'server/models/chain_node';
-import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import type { NotificationCategoryInstance } from 'server/models/notification_category';
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
@@ -12,14 +10,13 @@ import type {
   EmailNotificationInterval,
   UserInstance,
 } from 'server/models/user';
-import { JWT_SECRET } from '../config';
+import { JWT_SECRET, ETH_RPC } from '../config';
 import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-import { ETH_RPC } from '../config';
 import type { ChainCategoryType } from 'common-common/src/types';
 
 type ThreadCountQueryData = {
@@ -28,11 +25,6 @@ type ThreadCountQueryData = {
 };
 
 type StatusResp = {
-  chainsWithSnapshots: {
-    chain: ChainInstance;
-    snapshot: string[];
-  }[];
-  nodes: ChainNodeInstance[];
   notificationCategories: NotificationCategoryInstance[];
   recentThreads: ThreadCountQueryData[];
   roles?: RoleInstanceWithPermission[];
@@ -51,15 +43,15 @@ type StatusResp = {
     unseenPosts: { [chain: string]: number };
   };
   evmTestEnv?: string;
+  enforceSessionKeys?: boolean;
   chainCategoryMap: { [chain: string]: ChainCategoryType[] };
 };
 
 const getChainStatus = async (models: DB) => {
-  const [chains, nodes, notificationCategories] = await Promise.all([
+  const [chains, notificationCategories] = await Promise.all([
     models.Chain.findAll({
       where: { active: true },
     }),
-    models.ChainNode.findAll(),
     models.NotificationCategory.findAll(),
   ]);
 
@@ -69,33 +61,6 @@ const getChainStatus = async (models: DB) => {
       chainCategories[chain.id] = chain.category as ChainCategoryType[];
     }
   }
-
-  const chainsIds = chains.map((chain) => chain.id);
-  const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
-    await models.CommunitySnapshotSpaces.findAll({
-      where: {
-        chain_id: {
-          [Op.in]: chainsIds,
-        },
-      },
-      include: {
-        model: models.SnapshotSpace,
-        as: 'snapshot_space',
-      },
-    });
-
-  const chainsWithSnapshots = chains.map((chain) => {
-    const chainSnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.chain_id === chain.id
-    );
-    const snapshotSpaceNames = chainSnapshotSpaces.map(
-      (space) => space.snapshot_space?.snapshot_space
-    );
-    return {
-      chain,
-      snapshot: snapshotSpaceNames.length > 0 ? snapshotSpaceNames : [],
-    };
-  });
 
   const thirtyDaysAgo = new Date(
     (new Date() as any) - 1000 * 24 * 60 * 60 * 30
@@ -115,10 +80,8 @@ const getChainStatus = async (models: DB) => {
     );
 
   return {
-    nodes,
     notificationCategories,
     chainCategories,
-    chainsWithSnapshots,
     threadCountQueryData,
   };
 };
@@ -331,20 +294,14 @@ export const status = async (
     const chainStatusPromise = getChainStatus(models);
     const { user: reqUser } = req;
     if (!reqUser) {
-      const {
-        nodes,
-        notificationCategories,
-        chainCategories,
-        chainsWithSnapshots,
-        threadCountQueryData,
-      } = await chainStatusPromise;
+      const { notificationCategories, chainCategories, threadCountQueryData } =
+        await chainStatusPromise;
 
       return success(res, {
-        chainsWithSnapshots,
-        nodes,
         notificationCategories,
         recentThreads: threadCountQueryData,
         evmTestEnv: ETH_RPC,
+        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,
       });
     } else {
@@ -354,26 +311,20 @@ export const status = async (
         chainStatusPromise,
         userStatusPromise,
       ]);
-      const {
-        nodes,
-        notificationCategories,
-        chainCategories,
-        chainsWithSnapshots,
-        threadCountQueryData,
-      } = chainStatus;
+      const { notificationCategories, chainCategories, threadCountQueryData } =
+        chainStatus;
       const { roles, user, id, email } = userStatus;
       const jwtToken = jwt.sign({ id, email }, JWT_SECRET);
       user.jwt = jwtToken as string;
 
       return success(res, {
-        chainsWithSnapshots,
-        nodes,
         notificationCategories,
         recentThreads: threadCountQueryData,
         roles,
         loggedIn: true,
         user,
         evmTestEnv: ETH_RPC,
+        enforceSessionKeys: process.env.ENFORCE_SESSION_KEYS == 'true',
         chainCategoryMap: chainCategories,
       });
     }
@@ -391,7 +342,9 @@ function getChainActivity(
   return Promise.all(
     addresses.map(async (address) => {
       const { chain, last_active } = address;
-      return [chain, last_active.toISOString()];
+      // Check if last_active is not null before calling toISOString
+      const lastActiveISO = last_active ? last_active.toISOString() : 'N/A';
+      return [chain, lastActiveISO];
     })
   );
 }

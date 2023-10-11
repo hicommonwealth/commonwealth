@@ -34,7 +34,13 @@ export const CompoundProposalForm = () => {
     <div className="CompoundProposalForm">
       <div className="row-with-label">
         <CWLabel label="Proposer (you)" />
-        <User user={author} linkify popover showAddressWithDisplayName />
+        <User
+          userAddress={author.address}
+          userChainId={author.chain?.id || author.profile?.chain}
+          shouldLinkProfile
+          shouldShowPopover
+          shouldShowAddressWithDisplayName
+        />
       </div>
       <CWTextInput
         label="Proposal Title (leave blank for no title)"
@@ -49,6 +55,7 @@ export const CompoundProposalForm = () => {
         onInput={(e) => {
           setDescription(e.target.value);
         }}
+        resizeWithText
       />
       <div className="tab-selector">
         <CWTabBar>
@@ -138,7 +145,7 @@ export const CompoundProposalForm = () => {
           setProposer(app.user?.activeAccount?.address);
 
           if (!proposer) {
-            throw new Error('Invalid address / not logged in');
+            throw new Error('Invalid address / not signed in');
           }
 
           if (!description) {

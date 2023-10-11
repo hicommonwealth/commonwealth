@@ -105,6 +105,7 @@ export async function __createThreadComment(
         id: parentId,
         chain: chain.id,
       },
+      include: [this.models.Address],
     });
     if (!parentComment) {
       throw new AppError(Errors.InvalidParent);
@@ -250,6 +251,11 @@ export async function __createThreadComment(
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(finalComment.Address.address);
 
+  const rootNotifExcludeAddresses = [...excludedAddrs];
+  if (parentComment && parentComment.Address) {
+    rootNotifExcludeAddresses.push(parentComment.Address.address);
+  }
+
   const cwUrl = getThreadUrl(thread, finalComment.id);
   const root_title = thread.title || '';
 
@@ -271,15 +277,7 @@ export async function __createThreadComment(
         author_chain: finalComment.Address.chain,
       },
     },
-    webhookData: {
-      user: finalComment.Address.address,
-      author_chain: finalComment.Address.chain,
-      url: cwUrl,
-      title: root_title,
-      chain: finalComment.chain,
-      body: finalComment.text,
-    },
-    excludeAddresses: excludedAddrs,
+    excludeAddresses: rootNotifExcludeAddresses,
   });
 
   // if child comment, build notification for parent author
@@ -301,7 +299,6 @@ export async function __createThreadComment(
           author_chain: finalComment.Address.chain,
         },
       },
-      webhookData: null,
       excludeAddresses: excludedAddrs,
     });
 
@@ -329,7 +326,6 @@ export async function __createThreadComment(
                 author_chain: finalComment.Address.chain,
               },
             },
-            webhookData: null,
             excludeAddresses: [finalComment.Address.address],
           });
         }

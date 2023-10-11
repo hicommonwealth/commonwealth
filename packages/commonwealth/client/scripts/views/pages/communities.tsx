@@ -134,9 +134,14 @@ const CommunitiesPage = () => {
   return (
     <div className="CommunitiesPage">
       <div className="header-section">
-        <CWText type="h3" fontWeight="semiBold" className="communities-count">
-          {buildCommunityString(sortedChains.length)}
-        </CWText>
+        <div>
+          <CWText type="h3" fontWeight="semiBold" className="communities-count">
+            Explore Communities
+          </CWText>
+          <CWText type="h3" fontWeight="semiBold" className="communities-count">
+            {buildCommunityString(sortedChains.length)}
+          </CWText>
+        </div>
         <div className="filter-buttons">
           {chainCategories.map((cat, i) => {
             return (

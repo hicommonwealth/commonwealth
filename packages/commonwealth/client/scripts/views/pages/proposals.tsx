@@ -18,6 +18,7 @@ import { CardsCollection } from '../components/cards_collection';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { getStatusText } from '../components/ProposalCard/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
+import { CWText } from '../components/component_kit/cw_text';
 import {
   CompoundProposalStats,
   SubstrateProposalStats,
@@ -25,8 +26,17 @@ import {
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
+  useAaveProposalsQuery,
+  useCompoundProposalsQuery,
 } from 'state/api/proposals';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
+import {
+  useDepositParamsQuery,
+  usePoolParamsQuery,
+  useStakingParamsQuery,
+} from 'state/api/chainParams';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -57,6 +67,18 @@ const ProposalsPage = () => {
   const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
   const onCosmos = app.chain?.base === ChainBase.CosmosSDK;
 
+  const { data: cachedAaveProposals, isError: isAaveError } =
+    useAaveProposalsQuery({
+      moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
+      chainId: app.chain?.id,
+    });
+
+  const { data: cachedCompoundProposals, isError: isCompoundError } =
+    useCompoundProposalsQuery({
+      moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+      chainId: app.chain?.id,
+    });
+
   useEffect(() => {
     app.chainAdapterReady.on('ready', () => setLoading(false));
 
@@ -80,6 +102,11 @@ const ProposalsPage = () => {
   }, [setSubstrateLoading]);
 
   useManageDocumentTitle('Proposals');
+
+  // lazy load Cosmos chain params
+  const { data: stakingDenom } = useStakingParamsQuery();
+  useDepositParamsQuery(stakingDenom);
+  usePoolParamsQuery();
 
   const {
     data: activeCosmosProposals,
@@ -119,9 +146,24 @@ const ProposalsPage = () => {
     return <PageLoading message="Connecting to chain" />;
   }
 
+  if (isAaveError || isCompoundError) {
+    return <ErrorPage message="Could not connect to chain" />;
+  }
+
   const modLoading = loadSubstrateModules('Proposals', getModules);
 
   if (isSubstrateLoading) return modLoading;
+
+  let aaveProposals: AaveProposal[];
+  if (onAave)
+    aaveProposals =
+      cachedAaveProposals || (app.chain as Aave).governance.store.getAll();
+
+  let compoundProposals: CompoundProposal[];
+  if (onCompound)
+    compoundProposals =
+      cachedCompoundProposals ||
+      (app.chain as Compound).governance.store.getAll();
 
   // active proposals
   const activeDemocracyProposals =
@@ -132,15 +174,13 @@ const ProposalsPage = () => {
 
   const activeCompoundProposals =
     onCompound &&
-    (app.chain as Compound).governance.store
-      .getAll()
+    compoundProposals
       .filter((p) => !p.completed)
       .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 
   const activeAaveProposals =
     onAave &&
-    (app.chain as Aave).governance.store
-      .getAll()
+    aaveProposals
       .filter((p) => !p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
@@ -208,15 +248,13 @@ const ProposalsPage = () => {
 
   const inactiveCompoundProposals =
     onCompound &&
-    (app.chain as Compound).governance.store
-      .getAll()
+    compoundProposals
       .filter((p) => p.completed)
       .sort((p1, p2) => +p2.startingPeriod - +p1.startingPeriod);
 
   const inactiveAaveProposals =
     onAave &&
-    (app.chain as Aave).governance.store
-      .getAll()
+    aaveProposals
       .filter((p) => p.completed)
       .sort((p1, p2) => +p2.startBlock - +p1.startBlock);
 
@@ -277,6 +315,11 @@ const ProposalsPage = () => {
 
   return (
     <div className="ProposalsPage">
+      <div className="header">
+        <CWText type="h2" fontWeight="medium">
+          Proposals
+        </CWText>
+      </div>
       {onSubstrate && (
         <SubstrateProposalStats
           nextLaunchBlock={

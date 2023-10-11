@@ -7,7 +7,6 @@ import {
   getProposalUrlPath,
 } from 'identifiers';
 import { LinkSource } from 'models/Thread';
-import moment from 'moment';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
@@ -16,7 +15,6 @@ import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
-import AddressInfo from '../../../../models/AddressInfo';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
 import { isHot } from '../helpers';
@@ -106,10 +104,9 @@ export const ThreadCard = ({
         <div className="content-wrapper">
           <div className="content-header">
             <AuthorAndPublishInfo
-              authorInfo={
-                new AddressInfo(null, thread.author, thread.authorChain, null)
-              }
-              publishDate={moment(thread.createdAt).format('l')}
+              authorAddress={thread.author}
+              authorChainId={thread.authorChain}
+              publishDate={thread.createdAt}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {

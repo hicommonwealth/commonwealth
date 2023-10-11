@@ -49,7 +49,7 @@ export const PopoverMenu = ({
     <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
       {/* needs to be div instead of fragment so listener can work */}
       <div>
-        {renderTrigger(handleInteraction)}
+        {renderTrigger(handleInteraction, open)}
         <Popover
           modifiers={modifiers}
           placement={placement}
@@ -79,6 +79,7 @@ export const PopoverMenu = ({
                     isSecondary,
                     iconLeft,
                     iconLeftWeight,
+                    iconLeftSize,
                     label,
                     onClick,
                   } = item;
@@ -108,7 +109,7 @@ export const PopoverMenu = ({
                         <CWIcon
                           className="menu-item-icon"
                           iconName={iconLeft}
-                          iconSize="small"
+                          iconSize={iconLeftSize || 'small'}
                           weight={iconLeftWeight}
                         />
                       )}

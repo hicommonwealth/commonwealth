@@ -1,33 +1,52 @@
 /* eslint-disable no-unused-expressions */
-import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
+import {
+  personalSign,
+  signTypedData,
+  SignTypedDataVersion,
+} from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
 import type BN from 'bn.js';
 import chai from 'chai';
 import 'chai/register-should';
-import { BalanceType, ChainNetwork } from 'common-common/src/types';
+import { BalanceType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
+import * as siwe from 'siwe';
+import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createRole, findOneRole } from 'server/util/roles';
+import type {
+  Action,
+  Session,
+  ActionPayload,
+  SessionPayload,
+} from '@canvas-js/interfaces';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
-import { constructCanvasMessage } from 'shared/adapters/shared';
+
+import { createCanvasSessionPayload } from '../../shared/canvas';
+
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3-utils';
 import app from '../../server-test';
 import models from '../../server/database';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { Role } from '../../server/models/role';
 
 import {
-  constructTypedCanvasMessage,
+  getEIP712SignableAction,
   TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
+  createSiweMessage,
 } from '../../shared/adapters/chain/ethereum/keys';
 import { Link, LinkSource } from 'server/models/thread';
 
-const log = factory.getLogger(formatFilename(__filename));
+const sortedStringify = configureStableStringify({
+  bigint: false,
+  circularValue: Error,
+  strict: true,
+  deterministic: true,
+});
 
 export const generateEthAddress = () => {
   const keypair = wallet.generate();
@@ -50,21 +69,27 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
-    const message = constructCanvasMessage(
-      'ethereum',
+    const sessionPayload = createCanvasSessionPayload(
+      'ethereum' as ChainBase,
       chain_id,
       address,
       sessionWallet.address,
       timestamp,
       TEST_BLOCK_INFO_BLOCKHASH
     );
-    const data = constructTypedCanvasMessage(message);
-    const privateKey = keypair.getPrivateKey();
-    const signature = signTypedData({
-      privateKey,
-      data,
-      version: SignTypedDataVersion.V4,
+    const nonce = siwe.generateNonce();
+    const domain = 'https://commonwealth.test';
+    const siweMessage = createSiweMessage(sessionPayload, domain, nonce);
+    const signatureData = personalSign({
+      privateKey: keypair.getPrivateKey(),
+      data: siweMessage,
     });
+    const signature = `${domain}/${nonce}/${signatureData}`;
+    const session: Session = {
+      type: 'session',
+      payload: sessionPayload,
+      signature: signature,
+    };
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')
@@ -81,7 +106,23 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
-    return { address_id, address, user_id, email };
+    return {
+      address_id,
+      address,
+      user_id,
+      email,
+      session,
+      sign: (actionPayload: ActionPayload) => {
+        const { types, primaryType, domain, message } =
+          getEIP712SignableAction(actionPayload);
+        const signature = signTypedData({
+          privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
+          data: getEIP712SignableAction(actionPayload),
+          version: SignTypedDataVersion.V4,
+        });
+        return signature;
+      },
+    };
   }
   if (chain === 'edgeware') {
     const wallet_id = 'polkadot';
@@ -105,16 +146,22 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     );
     const chain_id = ChainNetwork.Edgeware;
     const timestamp = 1665083987891;
-    const message = constructCanvasMessage(
-      'ethereum',
+    const sessionPayload: SessionPayload = createCanvasSessionPayload(
+      'substrate' as ChainBase,
       chain_id,
       address,
       sessionWallet.address,
       timestamp,
       TEST_BLOCK_INFO_BLOCKHASH
     );
-
-    const signature = keyPair.sign(stringToU8a(JSON.stringify(message)));
+    const signature = keyPair.sign(
+      stringToU8a(sortedStringify(sessionPayload))
+    );
+    const session: Session = {
+      type: 'session',
+      payload: sessionPayload,
+      signature: new Buffer(signature).toString('hex'),
+    };
 
     const address_id = res.body.result.id;
     res = await chai.request
@@ -124,7 +171,21 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({ address, chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
-    return { address_id, address, user_id, email };
+    return {
+      address_id,
+      address,
+      user_id,
+      email,
+      session,
+      sessionSigner: keyPair,
+      sign: (actionPayload: ActionPayload) => {
+        const signatureBytes = sessionWallet.sign(
+          stringToU8a(sortedStringify(actionPayload))
+        );
+        const signature = new Buffer(signatureBytes).toString('hex');
+        return signature;
+      },
+    };
   }
   throw new Error('invalid chain');
 };
@@ -156,6 +217,8 @@ export interface ThreadArgs {
   body?: string;
   url?: string;
   readOnly?: boolean;
+  session: Session;
+  sign: (actionPayload: ActionPayload) => string;
 }
 
 export const createThread = async (args: ThreadArgs) => {
@@ -170,7 +233,35 @@ export const createThread = async (args: ThreadArgs) => {
     readOnly,
     kind,
     url,
+    session,
+    sign,
   } = args;
+
+  const actionPayload: ActionPayload = {
+    app: session.payload.app,
+    block: session.payload.block,
+    call: 'thread',
+    callArgs: {
+      community: chainId || '',
+      title: encodeURIComponent(title),
+      body: encodeURIComponent(body),
+      link: url || '',
+      topic: topicId || '',
+    },
+    chain: 'eip155:1',
+    from: session.payload.from,
+    timestamp: Date.now(),
+  };
+  const action: Action = {
+    type: 'action',
+    payload: actionPayload,
+    session: session.payload.sessionAddress,
+    signature: sign(actionPayload),
+  };
+  const canvas_session = sortedStringify(session);
+  const canvas_action = sortedStringify(action);
+  const canvas_hash = ''; // getActionHash(action)
+
   const res = await chai.request
     .agent(app)
     .post('/api/threads')
@@ -187,6 +278,9 @@ export const createThread = async (args: ThreadArgs) => {
       url,
       readOnly: readOnly || false,
       jwt,
+      canvas_action,
+      canvas_session,
+      canvas_hash,
     });
   return res.body;
 };
@@ -237,10 +331,46 @@ export interface CommentArgs {
   text: any;
   parentCommentId?: any;
   thread_id?: any;
+  session: Session;
+  sign: (actionPayload: ActionPayload) => string;
 }
 
 export const createComment = async (args: CommentArgs) => {
-  const { chain, address, jwt, text, parentCommentId, thread_id } = args;
+  const {
+    chain,
+    address,
+    jwt,
+    text,
+    parentCommentId,
+    thread_id,
+    session,
+    sign,
+  } = args;
+
+  const actionPayload: ActionPayload = {
+    app: session.payload.app,
+    block: session.payload.block,
+    call: 'comment',
+    callArgs: {
+      body: text,
+      thread_id,
+      parent_comment_id: parentCommentId,
+    },
+    chain: 'eip155:1',
+    from: session.payload.from,
+    timestamp: Date.now(),
+  };
+  const action: Action = {
+    type: 'action',
+    payload: actionPayload,
+    session: session.payload.sessionAddress,
+    signature: sign(actionPayload),
+  };
+  const canvas_session = sortedStringify(session);
+  const canvas_action = sortedStringify(action);
+  const canvas_hash = ''; // getActionHash(action)
+  // TODO
+
   const res = await chai.request
     .agent(app)
     .post(`/api/threads/${thread_id}/comments`)
@@ -252,6 +382,9 @@ export const createComment = async (args: CommentArgs) => {
       parent_id: parentCommentId,
       text,
       jwt,
+      canvas_action,
+      canvas_session,
+      canvas_hash,
     });
   return res.body;
 };
@@ -288,11 +421,45 @@ export interface CreateReactionArgs {
   address: string;
   reaction: string;
   jwt: string;
-  comment_id: number;
+  comment_id?: number;
+  thread_id?: number;
+  session: Session;
+  sign: (actionPayload: ActionPayload) => string;
 }
 
 export const createReaction = async (args: CreateReactionArgs) => {
-  const { chain, address, jwt, author_chain, reaction, comment_id } = args;
+  const {
+    chain,
+    address,
+    jwt,
+    author_chain,
+    reaction,
+    comment_id,
+    thread_id,
+    session,
+    sign,
+  } = args;
+
+  const actionPayload: ActionPayload = {
+    app: session.payload.app,
+    block: session.payload.block,
+    call: 'reactComment',
+    callArgs: { comment_id, value: reaction },
+    chain: 'eip155:1',
+    from: session.payload.from,
+    timestamp: Date.now(),
+  };
+  const action: Action = {
+    type: 'action',
+    payload: actionPayload,
+    session: session.payload.sessionAddress,
+    signature: sign(actionPayload),
+  };
+  const canvas_session = sortedStringify(session);
+  const canvas_action = sortedStringify(action);
+  const canvas_hash = ''; // getActionHash(action)
+  // TODO
+
   const res = await chai.request
     .agent(app)
     .post(`/api/comments/${comment_id}/reactions`)
@@ -304,6 +471,71 @@ export const createReaction = async (args: CreateReactionArgs) => {
       comment_id,
       author_chain,
       jwt,
+      thread_id,
+      canvas_session,
+      canvas_action,
+      canvas_hash,
+    });
+  return res.body;
+};
+
+export interface CreateThreadReactionArgs {
+  author_chain: string;
+  chain: string;
+  address: string;
+  reaction: string;
+  jwt: string;
+  thread_id?: number;
+  session: Session;
+  sign: (actionPayload: ActionPayload) => string;
+}
+
+export const createThreadReaction = async (args: CreateThreadReactionArgs) => {
+  const {
+    chain,
+    address,
+    jwt,
+    author_chain,
+    reaction,
+    thread_id,
+    session,
+    sign,
+  } = args;
+
+  const actionPayload: ActionPayload = {
+    app: session.payload.app,
+    block: session.payload.block,
+    call: 'reactThread',
+    callArgs: { thread_id, value: reaction },
+    chain: 'eip155:1',
+    from: session.payload.from,
+    timestamp: Date.now(),
+  };
+  const action: Action = {
+    type: 'action',
+    payload: actionPayload,
+    session: session.payload.sessionAddress,
+    signature: sign(actionPayload),
+  };
+  const canvas_session = sortedStringify(session);
+  const canvas_action = sortedStringify(action);
+  const canvas_hash = ''; // getActionHash(action)
+  // TODO
+
+  const res = await chai.request
+    .agent(app)
+    .post(`/api/threads/${thread_id}/reactions`)
+    .set('Accept', 'application/json')
+    .send({
+      chain,
+      address,
+      reaction,
+      author_chain,
+      jwt,
+      thread_id,
+      canvas_session,
+      canvas_action,
+      canvas_hash,
     });
   return res.body;
 };

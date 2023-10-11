@@ -11,6 +11,7 @@ export enum LinkSource {
   Proposal = 'proposal',
   Thread = 'thread',
   Web = 'web',
+  Template = 'template',
 }
 
 export type Link = {
@@ -59,6 +60,13 @@ export type ThreadAttributes = {
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
+
+  //counts
+  reaction_count: number;
+  comment_count: number;
+
+  //notifications
+  max_notif_id: number;
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
@@ -128,6 +136,25 @@ export default (
       locked_at: {
         type: dataTypes.DATE,
         allowNull: true,
+      },
+
+      //counts
+      reaction_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      comment_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+
+      //notifications
+      max_notif_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
     },
     {

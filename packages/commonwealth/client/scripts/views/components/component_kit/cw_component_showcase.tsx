@@ -1,57 +1,64 @@
+import { ArrowCircleRight, MagnifyingGlass } from '@phosphor-icons/react';
 import React, { useState } from 'react';
 
 import 'components/component_kit/cw_component_showcase.scss';
 import 'components/component_kit/new_designs/cw_button.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { CWAuthButton } from './cw_auth_button';
 import { CWAccountCreationButton } from './cw_account_creation_button';
+import { CWAuthButton } from './cw_auth_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
-import { CWButton } from './new_designs/cw_button';
-import { CWUpvote } from './new_designs/cw_upvote';
-import { CWThreadAction } from './new_designs/cw_thread_action';
-import { CWTooltip } from './new_designs/CWTooltip';
-import { CWCard } from './cw_card';
-import type { CheckboxType } from './cw_checkbox';
-import { CWCheckbox } from './cw_checkbox';
-import { CWIconButton } from './cw_icon_button';
-import type { IconName } from './cw_icons/cw_icon_lookup';
-import { iconLookup } from './cw_icons/cw_icon_lookup';
-import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
-import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
-import { CWProgressBar } from './cw_progress_bar';
-import { CWRadioGroup } from './cw_radio_group';
-import { CWTab, CWTabBar } from './cw_tabs';
-import { CWTextArea } from './cw_text_area';
-import { CWTextInput } from './cw_text_input';
-import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
-import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { CWCollapsible } from './cw_collapsible';
-import { CWTag } from './new_designs/cw_tag';
-import { CWSpinner } from './cw_spinner';
-import { CWDropdown } from './cw_dropdown';
-import { CWRadioButton } from './cw_radio_button';
-import type { RadioButtonType } from './cw_radio_button';
-import { CWContentPageCard } from './CWContentPage';
-import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWFilterMenu } from './cw_popover/cw_filter_menu';
-import { CWCoverImageUploader } from './cw_cover_image_uploader';
-import { Modal } from './cw_modal';
-import type { ValidationStatus } from './cw_validation_text';
-import { AvatarUpload } from '../Avatar';
-import { openConfirmation } from 'views/modals/confirmation_modal';
 import { DeltaStatic } from 'quill';
-import {
-  createDeltaFromText,
-  ReactQuillEditor,
-} from 'views/components/react_quill_editor';
+import app from 'state';
+import { CWSelectList } from './new_designs/CWSelectList';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
+import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
+import {
+  ReactQuillEditor,
+  createDeltaFromText,
+} from 'views/components/react_quill_editor';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import { z } from 'zod';
+import { AvatarUpload } from '../Avatar';
+import { CWContentPageCard } from './CWContentPage';
+import { CWCard } from './cw_card';
+import type { CheckboxType } from './cw_checkbox';
+import { CWCheckbox } from './cw_checkbox';
+import { CWCollapsible } from './cw_collapsible';
+import { CWCoverImageUploader } from './cw_cover_image_uploader';
+import { CWDropdown } from './cw_dropdown';
+import { CWIconButton } from './cw_icon_button';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { IconName } from './cw_icons/cw_icon_lookup';
+import { iconLookup } from './cw_icons/cw_icon_lookup';
+import { Modal } from './cw_modal';
+import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
+import { CWFilterMenu } from './cw_popover/cw_filter_menu';
+import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
+import { PopoverMenu } from './cw_popover/cw_popover_menu';
+import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
+import { CWProgressBar } from './cw_progress_bar';
+import type { RadioButtonType } from './cw_radio_button';
+import { CWRadioButton } from './cw_radio_button';
+import { CWRadioGroup } from './cw_radio_group';
+import { CWSpinner } from './cw_spinner';
+import { CWTab, CWTabBar } from './cw_tabs';
+import { CWText } from './cw_text';
+import { CWTextArea } from './cw_text_area';
+import { CWThreadVoteButton } from './cw_thread_vote_button';
+import type { ValidationStatus } from './cw_validation_text';
+import { CWSearchBar } from './new_designs/CWSearchBar';
+import { CWTextInput } from './new_designs/CWTextInput';
+import { CWTooltip } from './new_designs/CWTooltip';
+import { CWButton } from './new_designs/cw_button';
+import { CWForm } from './new_designs/CWForm';
+import { CWTag } from './new_designs/cw_tag';
+import { CWThreadAction } from './new_designs/cw_thread_action';
+import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
+import { CWUpvote } from './new_designs/cw_upvote';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -155,6 +162,52 @@ const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   {} as { [K in BannerType]: boolean }
 );
 
+const validationSchema = z.object({
+  email: z
+    .string()
+    .nonempty({ message: 'Email is required' })
+    .email({ message: 'Email must be valid' }),
+  username: z
+    .string()
+    .nonempty({ message: 'Username is required' })
+    .min(3, { message: 'Usrename must have 3 characters' })
+    .regex(/^[a-zA-Z0-9]+$/, {
+      message: 'Username must only contain letters and numbers',
+    }),
+  password: z
+    .string()
+    .nonempty({ message: 'Password is required' })
+    .min(8, { message: 'Password must be 8 characters long' })
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)/, {
+      message:
+        'Password must contain lowercase, uppercase, numbers and special chars',
+    }),
+  USPhoneNumber: z
+    .string()
+    .nonempty({ message: 'Phone number is required' })
+    .regex(/^\+1\d{10}$/, {
+      message:
+        'Phone number must be valid, must match a US phone number pattern',
+    }),
+  bio: z
+    .string()
+    .nonempty({ message: 'Bio is required' })
+    .min(100, { message: 'Bio must be 100 chars long' })
+    .max(200, { message: 'Bio must not be more than 200 chars' }),
+});
+
+const chainValidationSchema = z.object({
+  chain: z
+    .array(
+      z.object({
+        value: z.string().nonempty({ message: 'Invalid value' }),
+        label: z.string().nonempty({ message: 'Invalid value' }),
+      })
+    )
+    .min(1, { message: 'At least 1 chain is required' })
+    .nonempty({ message: 'Chains are required' }),
+});
+
 export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
     number | undefined
@@ -185,6 +238,8 @@ export const ComponentShowcase = () => {
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
+  const allChains = app.config.chains.getAll();
+  const [chainId, setChainId] = useState(allChains[1]);
 
   return (
     <div className="ComponentShowcase">
@@ -521,7 +576,14 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Input Tag</CWText>
-          <CWTag label="Display name" type="input" />
+          {chainId && (
+            <CWTag
+              label={allChains[1].name}
+              type="input"
+              community={allChains[1]}
+              onClick={() => setChainId(null)}
+            />
+          )}
         </div>
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
@@ -1017,12 +1079,179 @@ export const ComponentShowcase = () => {
       </div>
       <div className="form-gallery">
         <CWText type="h3">Form fields</CWText>
-        <CWTextInput name="Text field" label="Large" placeholder="Type here" />
+        <CWText type="h5">isCompact = Yes</CWText>
         <CWTextInput
           name="Text field"
-          label="Small"
+          label="Text Input with default width of 240 px"
+          placeholder="Placeholder"
+          isCompact
+        />
+        <div className="custom-width-1">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 250 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-2">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 275 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-3">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 300 px"
+            placeholder="Placeholder"
+            isCompact
+            fullWidth
+          />
+        </div>
+        <CWTextInput
+          name="Text field"
+          label="Full width"
+          placeholder="Placeholder"
+          isCompact
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Text Input with instructional message"
+          placeholder="Placeholder"
+          isCompact
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
           placeholder="Type here"
-          size="small"
+          isCompact
+        />
+        <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+          isCompact
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+        />
+        <CWTextInput
+          label="Text field with icons fullWidth"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          isCompact
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Disabled"
+          disabled
+          value="Some disabled text"
+          isCompact
+        />
+        <CWTextInput
+          name="Text field dark mode"
+          label="Dark mode"
+          darkMode
+          placeholder="Type here"
+          isCompact
+        />
+        <CWText type="h5">isCompact = No</CWText>
+        <CWTextInput
+          name="Text field"
+          label="Text Input with default width of 240 px"
+          placeholder="Placeholder"
+        />
+        <div className="custom-width-1">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 250 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-2">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 275 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <div className="custom-width-3">
+          <CWTextInput
+            name="Text field"
+            label="Custom width of 300 px"
+            placeholder="Placeholder"
+            fullWidth
+          />
+        </div>
+        <CWTextInput
+          name="Text field"
+          label="Full width"
+          placeholder="Placeholder"
+          fullWidth
+        />
+        <CWTextInput
+          name="Text field"
+          label="Text Input with instructional message"
+          placeholder="Placeholder"
+          instructionalMessage="Instructional message"
         />
         <CWTextInput
           name="Form field"
@@ -1037,10 +1266,56 @@ export const ComponentShowcase = () => {
           placeholder="Type here"
         />
         <CWTextInput
+          name="Form field"
+          inputValidationFn={(val: string): [ValidationStatus, string] => {
+            if (val.match(/[^A-Za-z]/)) {
+              return ['failure', 'Must enter characters A-Z'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+          label="This input only accepts A-Z"
+          placeholder="Type here"
+          instructionalMessage="Instructional message"
+        />
+        <CWTextInput
           label="Text field with icons"
           name="Text field with icons"
           placeholder="Type here"
-          iconRight="write"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+        />
+        <CWTextInput
+          label="Text field with icons"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+        />
+        <CWTextInput
+          label="Text field with icons fullWidth"
+          name="Text field with icons"
+          placeholder="Type here"
+          iconLeft={
+            <MagnifyingGlass size={20} weight="regular" color="#A09DA1" />
+          }
+          iconRight={
+            <ArrowCircleRight size={20} weight="regular" color="#338FFF" />
+          }
+          fullWidth
         />
         <CWTextInput
           name="Text field"
@@ -1054,7 +1329,17 @@ export const ComponentShowcase = () => {
           darkMode
           placeholder="Type here"
         />
-        <CWTextArea name="Textarea" label="Text area" placeholder="Type here" />
+        <CWTextArea
+          name="Textarea"
+          label="Text area"
+          placeholder="Placeholder"
+        />
+        <CWTextArea
+          name="Textarea"
+          label="Text area"
+          placeholder="Placeholder"
+          disabled
+        />
         <CWCoverImageUploader
           uploadCompleteCallback={(url: string) => {
             notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
@@ -1213,6 +1498,10 @@ export const ComponentShowcase = () => {
           <CWUpvote voteCount={99999} disabled />
         </div>
       </div>
+      <div className="searchbar-gallery">
+        <CWText type="h3">SearchBar</CWText>
+        <CWSearchBar />
+      </div>
       <div className="Quill">
         <CWText type="h3">Quill Editor</CWText>
         <div className="editor-toggle">
@@ -1362,6 +1651,182 @@ export const ComponentShowcase = () => {
               onMouseLeave={handleInteraction}
             />
           )}
+        />
+        <CWText>Validated Forms</CWText>
+        <CWForm
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          <CWTextInput
+            name="username"
+            placeholder="Username"
+            label="Username"
+            hookToForm
+          />
+          <CWTextInput
+            name="email"
+            placeholder="Email"
+            label="Email"
+            hookToForm
+          />
+          <CWTextInput
+            name="USPhoneNumber"
+            placeholder="US Phone Number"
+            label="US Phone Number"
+            hookToForm
+          />
+          <CWTextInput
+            name="password"
+            placeholder="Password"
+            label="Password"
+            hookToForm
+          />
+          <CWTextArea name="bio" placeholder="Bio" label="Bio" hookToForm />
+          <CWButton label="Submit" />
+        </CWForm>
+        {/* With initial values */}
+        <CWForm
+          initialValues={{
+            username: 'user1',
+            email: 'test@example.com',
+            USPhoneNumber: '+11234567890',
+            password: 'Abc1#$%^&(cahv',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          <CWTextInput
+            name="username"
+            placeholder="Username"
+            label="Username"
+            hookToForm
+          />
+          <CWTextInput
+            name="email"
+            placeholder="Email"
+            label="Email"
+            hookToForm
+          />
+          <CWTextInput
+            name="USPhoneNumber"
+            placeholder="US Phone Number"
+            label="US Phone Number"
+            hookToForm
+          />
+          <CWTextInput
+            name="password"
+            placeholder="Password"
+            label="Password"
+            hookToForm
+          />
+          <CWButton label="Submit" />
+        </CWForm>
+        {/* With initial values and a reset switch */}
+        <CWForm
+          initialValues={{
+            username: 'user1',
+            email: 'test@example.com',
+            USPhoneNumber: '+11234567890',
+            password: 'Abc1#$%^&(cahv',
+          }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          {(formMethods) => (
+            <>
+              <CWTextInput
+                name="username"
+                placeholder="Username"
+                label="Username"
+                hookToForm
+              />
+              <CWTextInput
+                name="email"
+                placeholder="Email"
+                label="Email"
+                hookToForm
+              />
+              <CWTextInput
+                name="USPhoneNumber"
+                placeholder="US Phone Number"
+                label="US Phone Number"
+                hookToForm
+              />
+              <CWTextInput
+                name="password"
+                placeholder="Password"
+                label="Password"
+                hookToForm
+              />
+              <CWButton
+                label="Reset Form"
+                type="reset"
+                onClick={() =>
+                  formMethods.reset({
+                    username: '',
+                    password: '',
+                    email: '',
+                    USPhoneNumber: '',
+                  })
+                }
+              />
+              <CWButton label="Submit Form" />
+            </>
+          )}
+        </CWForm>
+        {/* With tag input */}
+        <CWForm
+          className="w-full"
+          validationSchema={chainValidationSchema}
+          onSubmit={(values) => console.log('values => ', values)}
+        >
+          <CWSelectList
+            label="Chain"
+            name="chain"
+            placeholder="Add or select a chain"
+            isMulti
+            isClearable={false}
+            defaultValue={[{ value: 'solana', label: 'Solana' }]}
+            options={[
+              { value: 'solana', label: 'Solana' },
+              { value: 'polkadot', label: 'Polkadot' },
+              { value: 'ethereum', label: 'Ethereum' },
+              { value: 'substrate', label: 'Substrate' },
+              { value: 'binance', label: 'Binance' },
+            ]}
+            hookToForm
+          />
+          <CWButton label="Submit" type="submit" />
+        </CWForm>
+        <CWText type="h3">Multi select list</CWText>
+        <CWSelectList
+          placeholder="Add or select a chain"
+          isMulti
+          isClearable={false}
+          defaultValue={[{ value: 'solana', label: 'Solana' }]}
+          options={[
+            { value: 'solana', label: 'Solana' },
+            { value: 'polkadot', label: 'Polkadot' },
+            { value: 'ethereum', label: 'Ethereum' },
+            { value: 'substrate', label: 'Substrate' },
+            { value: 'binance', label: 'Binance' },
+          ]}
+        />
+      </div>
+      <div className="community-card">
+        <CWText type="h3"> Community Card </CWText>
+        <CWRelatedCommunityCard
+          chain={app.config.chains.getById('basindao')}
+          memberCount={2623}
+          threadCount={437}
+          actions={
+            <CWButton
+              buttonType="primary"
+              disabled={false}
+              className="action-btn"
+              label="Action"
+            />
+          }
         />
       </div>
     </div>

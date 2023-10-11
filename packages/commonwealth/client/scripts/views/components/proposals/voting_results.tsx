@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Coin, formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
@@ -21,14 +21,29 @@ import {
   YesNoRejectVotingResult,
 } from './voting_result_components';
 import useForceRerender from 'hooks/useForceRerender';
+import {
+  useAaveProposalVotesQuery,
+  useCompoundProposalVotesQuery,
+} from 'state/api/proposals';
+import { ChainNetwork } from 'common-common/src/types';
 
 type VotingResultsProps = { proposal: AnyProposal };
 
 export const VotingResults = (props: VotingResultsProps) => {
   const { proposal } = props;
   const forceRerender = useForceRerender();
+  const [isLoading, setLoading] = useState(
+    !app.chain || !app.chain.loaded || !app.chain.apiInitialized
+  );
 
-  const votes = proposal.getVotes();
+  useEffect(() => {
+    const listener = () => setLoading(false);
+    app.chainAdapterReady.on('ready', listener);
+
+    return () => {
+      app.chainAdapterReady.off('ready', listener);
+    };
+  }, []);
 
   useEffect(() => {
     app.proposalEmitter.on('redraw', forceRerender);
@@ -37,6 +52,21 @@ export const VotingResults = (props: VotingResultsProps) => {
       app.proposalEmitter.removeAllListeners();
     };
   }, [forceRerender]);
+
+  const { data: aaveVotes } = useAaveProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
+    chainId: app.chain?.id,
+    proposalId: proposal.identifier,
+  });
+
+  const { data: compoundVotes } = useCompoundProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+    chainId: app.chain?.id,
+    proposalId: proposal.data.id,
+    proposalIdentifier: proposal.identifier,
+  });
+
+  const votes = aaveVotes || compoundVotes || proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
   if (

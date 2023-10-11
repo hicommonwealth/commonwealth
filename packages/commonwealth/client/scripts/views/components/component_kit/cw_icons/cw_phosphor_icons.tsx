@@ -25,6 +25,8 @@ export const withPhosphorIcon = (Icon: PhosphorIcon) => (props: IconProps) => {
         componentType
       )}
       onClick={otherProps.onClick}
+      onMouseEnter={otherProps.onMouseEnter}
+      onMouseLeave={otherProps.onMouseLeave}
       weight={weight}
     />
   );

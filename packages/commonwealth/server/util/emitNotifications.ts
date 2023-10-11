@@ -1,28 +1,22 @@
 import { StatsDController } from 'common-common/src/statsd';
-import {
-  ChainBase,
-  ChainType,
-  NotificationCategories,
-} from 'common-common/src/types';
+import { NotificationCategories } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   NotificationDataAndCategory,
-  NotificationDataTypes,
 } from '../../shared/types';
-import { SERVER_URL } from '../config';
+import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
 import type { DB } from '../models';
 import type { NotificationInstance } from '../models/notification';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
 } from '../scripts/emails';
-import type { WebhookContent } from '../webhookNotifier';
-import send from '../webhookNotifier';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { SupportedNetwork } from 'chain-events/src';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
+import { dispatchWebhooks } from './webhooks/dispatchWebhook';
+import { rollbar } from './rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -31,7 +25,6 @@ const { Op } = Sequelize;
 export default async function emitNotifications(
   models: DB,
   notification_data_and_category: NotificationDataAndCategory,
-  webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
   includeAddresses?: string[]
 ): Promise<NotificationInstance> {
@@ -74,8 +67,10 @@ export default async function emitNotifications(
     if (addressModels && addressModels.length > 0) {
       const userIds = addressModels.map((a) => a.user_id);
 
-      // remove duplicates
-      const userIdsDedup = userIds.filter((a, b) => userIds.indexOf(a) === b);
+      // remove duplicates and null user_ids
+      const userIdsDedup = userIds.filter(
+        (a, b) => userIds.indexOf(a) === b && a !== null
+      );
       return userIdsDedup;
     } else {
       return [];
@@ -103,19 +98,19 @@ export default async function emitNotifications(
 
   // get notification if it already exists
   let notification: NotificationInstance;
-  notification = await models.Notification.findOne(
-    isChainEventData
-      ? {
-          where: {
-            chain_event_id: chainEvent.id,
-          },
-        }
-      : {
-          where: {
-            notification_data: JSON.stringify(notification_data),
-          },
-        }
-  );
+  if (isChainEventData && chainEvent.id) {
+    notification = await models.Notification.findOne({
+      where: {
+        chain_event_id: chainEvent.id,
+      },
+    });
+  } else {
+    notification = await models.Notification.findOne({
+      where: {
+        notification_data: JSON.stringify(notification_data),
+      },
+    });
+  }
 
   // if the notification does not yet exist create it here
   if (!notification) {
@@ -188,23 +183,25 @@ export default async function emitNotifications(
     });
   }
 
-  // send emails
-  for (const subscription of subscriptions) {
-    if (msg && isChainEventData && chainEvent.chain) {
-      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+  if (SEND_WEBHOOKS_EMAILS) {
+    // emails
+    for (const subscription of subscriptions) {
+      if (msg && isChainEventData && chainEvent.chain) {
+        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+      }
+      if (msg && subscription?.immediate_email && subscription?.User) {
+        // kick off async call and immediately return
+        sendImmediateNotificationEmail(subscription.User, msg);
+      }
     }
-    if (msg && subscription?.immediate_email && subscription?.User) {
-      // kick off async call and immediately return
-      sendImmediateNotificationEmail(subscription.User, msg);
-    }
-  }
 
-  // send data to relevant webhooks
-  if (webhook_data) {
-    await send(models, {
-      notificationCategory: category_id,
-      ...(webhook_data as Required<WebhookContent>),
-    });
+    // webhooks
+    try {
+      await dispatchWebhooks(notification_data_and_category);
+    } catch (e) {
+      log.error('Failed to dispatch webhooks', e);
+      rollbar.error('Failed to dispatch webhooks', e);
+    }
   }
 
   return notification;

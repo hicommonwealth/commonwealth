@@ -16,7 +16,8 @@ import {
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
 
-const v1beta1ChainId = 'juno';
+const v1beta1ChainId = 'csdk-beta';
+const v1ChainId = 'csdk';
 
 function verifyNoCacheResponse(res) {
   expect(res.body).to.not.be.null;
@@ -256,7 +257,7 @@ describe('Cosmos Cache', () => {
       proposalStatus: string,
       expectedDuration: number
     ) => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals?proposal_status=${proposalStatus}&voter=&depositor=`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals?proposal_status=${proposalStatus}&voter=&depositor=`;
       lcdTestDuration(expectedDuration, url, {
         proposal_status: proposalStatus,
       });
@@ -267,7 +268,7 @@ describe('Cosmos Cache', () => {
       param: string,
       expectedDuration: number
     ) => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/params/${param}`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/params/${param}`;
       lcdTestDuration(expectedDuration, url);
       await lcdTestIsCached(url);
     };
@@ -295,19 +296,19 @@ describe('Cosmos Cache', () => {
     }
 
     it('should have 7-day duration for an an individual proposal', async () => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1`;
       lcdTestDuration(60 * 60 * 24 * 7, url);
     });
     it("should have 6-second duration for an an individual proposal's live votes", async () => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1/votes`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1/votes`;
       lcdTestDuration(6, url);
     });
     it("should have 6-second duration for an individual proposal's live tally", async () => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1/tally`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1/tally`;
       lcdTestDuration(6, url);
     });
     it("should have 6-second duration for an individual proposal's live deposits", async () => {
-      const url = `/cosmosLCD/csdk/cosmos/gov/v1/proposals/1/deposits`;
+      const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals/1/deposits`;
       lcdTestDuration(6, url);
     });
     it('should cache deposit period proposals', async () => {

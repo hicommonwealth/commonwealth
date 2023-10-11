@@ -6,6 +6,7 @@ import type EthereumAccounts from './accounts';
 import EthereumChain from './chain';
 
 export default class EthereumAccount extends Account {
+  // TODO: @Timothee this function is not used so this entire object is useless
   public get balance(): Promise<EthereumCoin> {
     if (!this._Chain) return; // TODO
     return this._Chain.api.eth

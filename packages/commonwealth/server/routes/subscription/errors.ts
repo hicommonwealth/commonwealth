@@ -1,6 +1,6 @@
 const Errors = {
   NotAdmin: 'Not an admin of chain or community',
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoCategory: 'Must provide a category',
   InvalidNotificationCategory: 'invalid notification category',
   InvalidSubscriptionCategory:

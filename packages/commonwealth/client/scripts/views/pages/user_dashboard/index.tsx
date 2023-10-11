@@ -1,5 +1,6 @@
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/index.scss';
 import React, { useEffect } from 'react';
@@ -7,10 +8,10 @@ import app, { LoginState } from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
 import { Feed } from '../../components/feed';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
-import useUserLoggedIn from 'hooks/useUserLoggedIn';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -69,6 +70,9 @@ const UserDashboard = (props: UserDashboardProps) => {
     <div ref={setScrollElement} className="UserDashboard" key={`${isLoggedIn}`}>
       <div className="dashboard-column">
         <div className="dashboard-header">
+          <CWText type="h2" fontWeight="medium">
+            Home
+          </CWText>
           <CWTabBar>
             <CWTab
               label={DashboardViews.ForYou}
@@ -76,7 +80,7 @@ const UserDashboard = (props: UserDashboardProps) => {
               onClick={() => {
                 if (!loggedIn) {
                   notifyInfo(
-                    'Log in or create an account for custom activity feed'
+                    'Sign in or create an account for custom activity feed'
                   );
                   return;
                 }
@@ -169,6 +173,7 @@ const UserDashboard = (props: UserDashboardProps) => {
               noFeedMessage="Join some communities that have governance to see Chain Events!"
               onFetchedDataCallback={DashboardActivityNotification.fromJSON}
               customScrollParent={scrollElement}
+              isChainEventsRow={true}
             />
           )}
         </>

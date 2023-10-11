@@ -36,14 +36,6 @@ export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
 
 export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
 
-export const SLACK_WEBHOOKS = {
-  cosmos: process.env.COSMOS_SLACK_WEBHOOK,
-  edgeware: process.env.EDGEWARE_SLACK_WEBHOOK,
-  ethereum: process.env.ETHEREUM_SLACK_WEBHOOK,
-  kusama: process.env.KUSAMA_SLACK_WEBHOOK,
-  near: process.env.NEAR_SLACK_WEBHOOK,
-};
-
 export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
 export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
@@ -139,8 +131,21 @@ export const CHAIN_EVENT_SERVICE_SECRET =
   process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
 export const ETH_RPC = process.env.ETH_RPC || 'prod';
 
-export const COSMOS_GOV_V1 = process.env.COSMOS_GOV_V1;
+export const COSMOS_GOV_V1_CHAIN_IDS = process.env.COSMOS_GOV_V1
+  ? process.env.COSMOS_GOV_V1.split(',')
+  : [];
 
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
 // Don't set default value so if env var is not set the database cleaner will not run
 export const DATABASE_CLEAN_HOUR = process.env.DATABASE_CLEAN_HOUR;
+
+export const TELEGRAM_BOT_TOKEN =
+  process.env.NODE_ENV === 'production'
+    ? process.env.TELEGRAM_BOT_TOKEN
+    : process.env.TELEGRAM_BOT_TOKEN_DEV;
+
+// Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
+// Risks sending webhooks/emails to real users if incorrectly set to true
+export const SEND_WEBHOOKS_EMAILS =
+  process.env.NODE_ENV === 'production' &&
+  process.env.SEND_WEBHOOKS_EMAILS === 'true';
