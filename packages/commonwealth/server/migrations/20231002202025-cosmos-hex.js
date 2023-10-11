@@ -12,7 +12,7 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
-        ALTER TABLE "Addresses" ADD COLUMN "hex" VARCHAR(64) NULL;
+        ALTER TABLE "Addresses" ADD COLUMN IF NOT EXISTS "hex" VARCHAR(64) NULL;
         `,
         { raw: true, transaction: t }
       );
@@ -20,9 +20,9 @@ module.exports = {
       // get all cosmos addresses and assign a hex
       const [addresses] = await queryInterface.sequelize.query(
         `
-          SELECT id, address
-          FROM "Addresses"
-          WHERE "wallet_id" = 'keplr';
+        SELECT id, address
+        FROM "Addresses"
+        WHERE "wallet_id" IN ('keplr', 'cosm-metamask', 'terrastation', 'keplr-ethereum');     
           `,
         { transaction: t }
       );
@@ -44,20 +44,33 @@ module.exports = {
             { transaction: t }
           );
         } catch (e) {
-          // console.log(
-          //   `Error getting hex for ${address.address}. Not updating.`
-          // );
+          console.log(
+            `Error getting hex for ${address.address}. Not updating.`
+          );
         }
       }
     });
-    // time to complete: 13s
+
+    // TODO: this fails because there are some Cosmos addresses that couldn't be converted to hex
+    // await queryInterface.sequelize.transaction(async (t) => {
+    //   await queryInterface.sequelize.query(
+    //     `
+    //     ALTER TABLE "Addresses"
+    //       ADD CONSTRAINT cosmos_requires_hex
+    //       CHECK ((wallet_id NOT IN ('keplr', 'cosm-metamask', 'terrastation', 'keplr-ethereum')) OR (wallet_id IN ('keplr', 'cosm-metamask', 'terrastation', 'keplr-ethereum') AND hex IS NOT NULL));
+    //     `,
+    //     { raw: true, transaction: t }
+    //   );
+    // });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
-          ALTER TABLE "Addresses" DROP COLUMN "hex";
+          ALTER TABLE "Addresses"
+          DROP CONSTRAINT IF EXISTS "cosmos_requires_hex",
+          DROP COLUMN "hex";
         `,
         { raw: true, transaction: t }
       );
