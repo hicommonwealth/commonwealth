@@ -10,7 +10,6 @@ import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { Breadcrumbs } from './components/Breadcrumbs';
-import { isMobile } from 'react-device-detect';
 import clsx from 'clsx';
 
 type SublayoutProps = {
@@ -21,18 +20,18 @@ type SublayoutProps = {
 const Sublayout = ({
   children,
   hideFooter = true,
-  hasCommunitySidebar
+  hasCommunitySidebar,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const [toggleMobileView, setToggleMobileView] = useState(
-    (location.pathname.includes('discussions') && isMobile) ||
-      window.innerWidth <= 425
+    location.pathname.includes('discussions') || window.innerWidth <= 425
   );
+
   const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const { isWindowSmallInclusive } = useBrowserWindow({
     onResize: () => setResizing(true),
-    resizeListenerUpdateDeps: [resizing]
+    resizeListenerUpdateDeps: [resizing],
   });
 
   useEffect(() => {
@@ -45,6 +44,9 @@ const Sublayout = ({
 
   useEffect(() => {
     setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
+    setToggleMobileView(
+      location.pathname.includes('discussions') && isWindowSmallInclusive
+    );
   }, [isWindowSmallInclusive, setMenu]);
 
   useEffect(() => {
@@ -77,22 +79,6 @@ const Sublayout = ({
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
 
-  useEffect(() => {
-    if (!location.pathname.includes('discussions')) return;
-    const handleResize = () => {
-      setToggleMobileView(
-        (location.pathname.includes('discussions') && isMobile) ||
-          window.innerWidth <= 425
-      );
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
   return (
     <div className="Sublayout">
       <div className="header-and-body-container">
@@ -108,7 +94,7 @@ const Sublayout = ({
                 'quick-switcher-visible':
                   menuName === 'exploreCommunities' ||
                   menuName === 'createContent' ||
-                  hasCommunitySidebar
+                  hasCommunitySidebar,
               },
               resizing
             )}

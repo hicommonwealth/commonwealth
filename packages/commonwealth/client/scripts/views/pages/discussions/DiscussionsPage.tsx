@@ -21,7 +21,6 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
-import { isMobile } from 'react-device-detect';
 
 import 'pages/discussions/index.scss';
 
@@ -72,15 +71,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   const [toggleMobileView, setToggleMobileView] = useState(
-    (location.pathname.includes('discussions') && isMobile) ||
-      window.innerWidth <= 425
+    location.pathname.includes('discussions') && window.innerWidth <= 425
   );
 
   useEffect(() => {
     const handleResize = () => {
       setToggleMobileView(
-        (location.pathname.includes('discussions') && isMobile) ||
-          window.innerWidth <= 425
+        location.pathname.includes('discussions') && window.innerWidth <= 425
       );
     };
 

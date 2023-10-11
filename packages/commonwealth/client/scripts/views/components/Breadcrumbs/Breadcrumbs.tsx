@@ -11,10 +11,10 @@ export const Breadcrumbs = () => {
   const location = useLocation();
   const navigate = useCommonNavigate();
 
-  function extractNumberFromUrl(url) {
+  function extractNumberFromUrl(url: string) {
     const match = url.match(/(\d+)/); // Match one or more digits
     if (match) {
-      return [match[0]];
+      return [Number(match[0])];
     }
   }
 
@@ -39,13 +39,7 @@ export const Breadcrumbs = () => {
     'createCommunity',
   ];
 
-  /**
-   * Checks if the current page is a standalone page or if it contains the profileId.
-   *
-   * @param {string} pathname - The pathname of the current location.
-   * @param {string} profileId - The profile ID to check for.
-   * @returns {boolean} True if the page is standalone or contains the profileId, otherwise false.
-   */
+  //Checks if the current page is a standalone page or if it contains the profileId.
   if (
     standalonePaths.includes(location.pathname.split('/')[1]) ||
     location.pathname.includes(String(profileId))
@@ -53,14 +47,7 @@ export const Breadcrumbs = () => {
     standalone = true;
   }
 
-  /**
-   * Generates breadcrumbs based on the given location path and breadcrumb data.
-   *
-   * @param {string} locationPath - The current location path.
-   * @param {any[]} breadcrumbData - An array of breadcrumb data objects.
-   * @returns {Array<{ text: string, link: string, isParent: boolean }>} An array of breadcrumb objects.
-   */
-
+  //Generates breadcrumbs based on the given location path and breadcrumb data.
   function generateBreadcrumbs(
     locationPath: string,
     breadcrumbData: typeof breadCrumbURLS
@@ -155,12 +142,7 @@ export const Breadcrumbs = () => {
 
   const pathnames = generateBreadcrumbs(location.pathname, breadCrumbURLS);
 
-  /**
-   * Determines the style based on the current page.
-   *
-   * @param page - An array of objects representing the page links.
-   * @returns The style associated with the current page.
-   */
+  //Determines the style based on the current page.
   const getStyle = () => {
     const findStyle = breadCrumbURLS.find((page) => {
       if (!page.className) return;
@@ -182,12 +164,7 @@ export const Breadcrumbs = () => {
     }
   };
 
-  /**
-   * Gets the tooltip copy based on the current page.
-   *
-   * @returns The tooltip copy for the current page, or `undefined` if it's not found which is handled in the return.
-   */
-
+  //Gets the tooltip copy based on the current page.
   const getToolTipCopy = () => {
     const pathSegments = location.pathname.split('/');
     const lastPathSegment = pathSegments[pathSegments.length - 1];
