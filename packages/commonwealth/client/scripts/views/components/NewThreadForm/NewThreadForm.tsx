@@ -39,11 +39,21 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector = topics?.filter((t) => {
-    return (
-      isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
-    );
-  });
+  const topicsForSelector = topics?.reduce(
+    (acc, t) => {
+      if (
+        isAdmin ||
+        t.tokenThreshold.isZero() ||
+        !app.chain.isGatedTopic(t.id)
+      ) {
+        acc.enabledTopics.push(t);
+      } else {
+        acc.disabledTopics.push(t);
+      }
+      return acc;
+    },
+    { enabledTopics: [], disabledTopics: [] }
+  );
 
   const {
     threadTitle,
@@ -59,7 +69,7 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-  } = useNewThreadForm(chainId, topicsForSelector);
+  } = useNewThreadForm(chainId, topicsForSelector.enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -133,7 +143,8 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      topicsForSelector.find((t) => t.name.includes('General')) || null
+      topicsForSelector.enabledTopics.find((t) => t.name.includes('General')) ||
+        null
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
@@ -155,11 +166,6 @@ export const NewThreadForm = () => {
               isSelected={threadKind === ThreadKind.Discussion}
               onClick={() => setThreadKind(ThreadKind.Discussion)}
             />
-            <CWTab
-              label={capitalize(ThreadKind.Link)}
-              isSelected={threadKind === ThreadKind.Link}
-              onClick={() => setThreadKind(ThreadKind.Link)}
-            />
           </CWTabBar>
         </div>
         <div className="new-thread-body">
@@ -167,7 +173,8 @@ export const NewThreadForm = () => {
             <div className="topics-and-title-row">
               {hasTopics && (
                 <TopicSelector
-                  topics={topicsForSelector}
+                  enabledTopics={topicsForSelector.enabledTopics}
+                  disabledTopics={topicsForSelector.disabledTopics}
                   value={threadTopic}
                   onChange={setThreadTopic}
                 />

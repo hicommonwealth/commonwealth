@@ -351,7 +351,7 @@ export async function startLoginWithMagicLink({
   if (email) {
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const address = await handleSocialLoginCallback({ bearer });
+    const address = await handleSocialLoginCallback({ bearer, isEmail: true });
     return { bearer, address };
   } else {
     const params = `?redirectTo=${
@@ -406,10 +406,12 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
+  isEmail,
 }: {
   bearer?: string;
   chain?: string;
   walletSsoSource?: string;
+  isEmail?: boolean;
 }): Promise<string> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
@@ -419,23 +421,35 @@ export async function handleSocialLoginCallback({
 
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
+  let profileMetadata, magicAddress;
+  if (isEmail) {
+    const metadata = await magic.user.getMetadata();
+    profileMetadata = { username: metadata.email };
 
-  const result = await magic.oauth.getRedirectResult();
-  if (!bearer) {
-    bearer = result.magic.idToken;
-    console.log('Magic redirect result:', result);
-  }
-
-  // Get magic metadata
-  const profileMetadata = getProfileMetadata(result.oauth);
-  let magicAddress, authedSessionPayload, authedSignature;
-  if (isCosmos) {
-    magicAddress = result.magic.userMetadata.publicAddress;
+    if (isCosmos) {
+      magicAddress = metadata.publicAddress;
+    } else {
+      const { utils } = await import('ethers');
+      magicAddress = utils.getAddress(metadata.publicAddress);
+    }
   } else {
-    const { utils } = await import('ethers');
-    magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
+    const result = await magic.oauth.getRedirectResult();
+
+    if (!bearer) {
+      bearer = result.magic.idToken;
+      console.log('Magic redirect result:', result);
+    }
+    // Get magic metadata
+    profileMetadata = getProfileMetadata(result.oauth);
+    if (isCosmos) {
+      magicAddress = result.magic.userMetadata.publicAddress;
+    } else {
+      const { utils } = await import('ethers');
+      magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
+    }
   }
 
+  let authedSessionPayload, authedSignature;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {

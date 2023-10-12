@@ -153,14 +153,6 @@ export async function __createCommentReaction(
         author_chain: finalReaction.Address.chain,
       },
     },
-    webhookData: {
-      user: finalReaction.Address.address,
-      author_chain: finalReaction.Address.chain,
-      url: getThreadUrl(thread),
-      title: thread.title,
-      chain: finalReaction.chain,
-      body: comment.text,
-    },
     excludeAddresses: [finalReaction.Address.address],
   });
 

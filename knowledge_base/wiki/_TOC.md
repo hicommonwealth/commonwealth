@@ -1,29 +1,27 @@
 **Engineering Praxis**
-  - [Agile Development](Agile-Development.md)
-  - [Code Requirements](Code-Requirements.md)
-  - [Ways of Working](Ways-Of-Working.md)
-  - [Sprint Cadence](Sprint-Cadence.md)
-  - [Analytics](Analytics.md)
-  - [Migration Best Practices](Database-Migrations.md)
+- [Code Requirements](Code-Requirements.md)
+- [Ways of Working](Ways-Of-Working.md)
+- [Analytics](Analytics.md)
+- [Migration Best Practices](Database-Migrations.md)
 
 **API Gateway**
-  - [Kong](Kong.md)
-  - [Swagger](Swagger.md)
-  - [Express to OpenAPI](Express-OpenAPI-Generator.md)
+- [Kong](Kong.md)
+- [Express to OpenAPI](Express-OpenAPI-Generator.md)
 
 **Services & Tooling**
-  - [Sequelize](Sequelize.md)
-  - [Discobot](Discobot.md)
-  - [React Notes](React-Notes.md)
-  - [Package.json Scripts](Package-Scripts.md)
-  - [Custom Domains](Custom-Domains.md)
-  - [Testing Environments](Testing-Environments.md)
-  - [Database](Database.md)
+- [Sequelize](Sequelize.md)
+- [Discobot](Discobot.md)
+- [React Notes](React-Notes.md)
+- [Package.json Scripts](Package-Scripts.md)
+- [Custom Domains](Custom-Domains.md)
+- [Testing Environments](Testing-Environments.md)
+- [Database](Database.md)
   - [Database Monitoring](Database-Monitoring.md)
-  - [Wallet Support](Wallet-Support.md)
-  - [Devnet](Devnet.md)
-  - [Initialization Flow](Initialization-Flow.md)
-  - [Notifications](Notifications.md)
+  - [Database Optimization](Database-Optimization.md)
+- [Wallet Support](Wallet-Support.md)
+- [Devnet](Devnet.md)
+- [App Initialization Flow](App-Initialization-Flow.md)
+- [Notifications](Notifications.md)
 
 **Current Roadmap**
 - [All Milestones](Milestones.md)
@@ -61,14 +59,14 @@
 - [EVM Overview and Docs](Chain-Testing-Overview.md)
 
 **RabbitMQ**
-  - [Overview](RabbitMQ-Overview.md)
-  - [RabbitMQ](RabbitMQ.md)
-  - [Management Panel](RabbitMQ-Management-Panel.md)
-  - [Preventing Data Loss](RabbitMQ-Preventing-Data-Loss.md)
-  - [FAQ](RabbitMQ-FAQ.md)
+- [Overview](RabbitMQ-Overview.md)
+- [RabbitMQ](RabbitMQ.md)
+- [Management Panel](RabbitMQ-Management-Panel.md)
+- [Preventing Data Loss](RabbitMQ-Preventing-Data-Loss.md)
+- [FAQ](RabbitMQ-FAQ.md)
 
 **Notifications**
-  - [QA](Notifications-QA.md)
+- [QA](Notifications-QA.md)
 
 **Pattern Library &etc**
 - [Bouncing in Pure React](Bouncing-In-Pure-React.md)

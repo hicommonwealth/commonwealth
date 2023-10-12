@@ -98,17 +98,6 @@ describe('ServerThreadsController', () => {
         author_chain: 'ethereum',
       });
 
-      expect(notificationOptions).to.have.property('webhookData');
-      const { webhookData } = notificationOptions;
-      expect(webhookData).to.include({
-        user: '0x123',
-        author_chain: 'ethereum',
-        url: 'http://localhost:8080/ethereum/discussion/4-big-thread',
-        title: 'Big Thread!',
-        chain: 'ethereum',
-        body: '',
-      });
-
       expect(notificationOptions).to.have.property('excludeAddresses');
       const { excludeAddresses } = notificationOptions;
       expect(excludeAddresses[0]).to.equal('0x123');
@@ -1359,15 +1348,6 @@ describe('ServerThreadsController', () => {
       expect(notificationOptions[0]).to.have.property('notification');
       expect(notificationOptions[0].notification).to.include({
         categoryId: 'new-thread-creation',
-      });
-      expect(notificationOptions[0].webhookData).to.include({
-        user: '0x123',
-        author_chain: 'ethereum',
-        url: 'http://localhost:8080/ethereum/discussion/1-mythread',
-        title: 'mythread',
-        bodyUrl: 'http://blah',
-        chain: 'ethereum',
-        body: 'hello',
       });
       expect(notificationOptions[0].notification.data).to.include({
         thread_id: 1,

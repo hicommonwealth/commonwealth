@@ -115,17 +115,6 @@ describe('ServerCommentsController', () => {
         author_chain: 'ethereum',
       });
 
-      expect(allNotificationOptions[0]).to.have.property('webhookData');
-      const { webhookData } = allNotificationOptions[0];
-      expect(webhookData).to.include({
-        user: '0x123',
-        author_chain: 'ethereum',
-        url: 'http://localhost:8080/ethereum/discussion/4-big-thread',
-        title: 'Big Thread!',
-        chain: 'ethereum',
-        body: 'my comment body',
-      });
-
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');
       const { excludeAddresses } = allNotificationOptions[0];
       expect(excludeAddresses[0]).to.equal('0x123');
@@ -588,15 +577,6 @@ describe('ServerCommentsController', () => {
         chain_id: 'ethereum',
         author_address: '0x123',
         author_chain: 'ethereum',
-      });
-
-      expect(allNotificationOptions[0]).to.have.property('webhookData');
-      const { webhookData } = allNotificationOptions[0];
-      expect(webhookData).to.include({
-        user: '0x123',
-        url: 'http://localhost:8080/ethereum/discussion/1-big-thread?comment=123',
-        title: 'Big Thread!',
-        chain: 'ethereum',
       });
 
       expect(allNotificationOptions[0]).to.have.property('excludeAddresses');

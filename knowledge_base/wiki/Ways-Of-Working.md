@@ -1,4 +1,3 @@
-<!-- TODO Graham 230831: Establish a glossary of engineering terms for our knowledge base. -->
 _Throughout this page, "ticket" and "story" are used interchangeably to refer to GitHub issues._
 
 **Contents**
@@ -27,19 +26,21 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
 
 # Project Management Flow
 
-All work _must_ be associated with a ticket, and the ticket _must_ be opened before its respective pull request (as we use automated software which relies on this precedence).
+All work must be associated with a ticket, and the ticket must be opened before its respective pull request (as we use automated software which relies on this precedence).
 
-You _must not_ change the title or description of someone else's Github story or PR without permission. 
+You must not change the title or description of someone else's Github story or PR without permission. 
 
 ## Tickets
 
-Engineers are welcome to open up new tickets. These _should_ be set to "No Status," for the current work cycle (e.g. "Cycle 6"). This can be done either in the ticket's "projects" metadata (found in the right-hand side bar when opening a new GitHub issue), or from within the relevant [sprint board](https://github.com/orgs/hicommonwealth/projects/). 
+Engineers are welcome to open up new tickets. These should be set to "No Status," for the current work cycle (e.g. "Cycle 6"). This can be done either in the ticket's "projects" metadata (found in the right-hand side bar when opening a new GitHub issue), or from within the relevant [sprint board](https://github.com/orgs/hicommonwealth/projects/). 
 
 Next, a ticket is "Teed Up" (moved to the "Teed Up" stage) by a lead or project manager. An engineer who wishes for a ticket to be Teed Up should DM the relevant lead/PM. Only leads Tee Up tickets.
 
-Work _should not_ begin on a ticket until (1) an engineer has been assigned to the ticket by a lead (2) the engineer has given the ticket a [story-point value](#story-point-estimation) (3) the engineer has moved the ticket to "In Progress."
+Work should not begin on a ticket until (1) an engineer has been assigned to the ticket by a lead (2) the engineer has given the ticket a [story-point value](#story-point-estimation) (3) the engineer has moved the ticket to "In Progress."
 
-Typically, engineers _should_ only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be moved to "In Progress"). 
+Typically, engineers should only be working on one "In Progress" ticket at a time. If blocked, apply the "blocked" project label and move on to next Teed-Up item (which should now be moved to "In Progress"). 
+
+A "high priority" label may also be added by leads to teed-up tickets; these tickets should jump the queue and be worked on next.
 
 ### Questions
 
@@ -53,10 +54,10 @@ The "blocked" label is the official source of truth as to whether a story is con
 
 ### Story Point Estimation
 
-1. You *must* add point estimations to your stories before moving them to "In Progress." (Even better if you can have stories estimated while "Teed Up.")
+1. You must add point estimations to your stories before moving them to "In Progress." (Even better if you can have stories estimated while "Teed Up.")
 2. We use Fibonacci points, i.e. 1, 2, 3, 5, 8, 13. (See below for full breakdown of point values.)
-3. Stories of any point value *may* be broken out into subtasks.
-4. Stories of more than 3 points *must* be broken out into subtasks.
+3. Stories of any point value may be broken out into subtasks.
+4. Stories of more than 3 points must be broken out into subtasks.
 5. Stories may be broken into _independent_ and _dependent_ sub-tasks, and should be flagged accordingly, to prevent blocked work.
 6. When you complete the work, if the original estimation was off, do not mutate it in place. Instead, add the correct estimation as a comment to the issue with a short explanation. 
 
@@ -68,13 +69,13 @@ NB. Points != Time! Points are an estimate of complexity, not time. Having said 
 - 8 points ~= 1 sprint / 1-week task
 - 13 points ~= more than a single sprint
 
-Points _may_ always be increased mid-implementation, but a justification _must_ be provided.
+Points may always be increased mid-implementation, but a justification must be provided.
 
 ## Pull Requests
 
 If a PR is marked for review, it must be fully mergeable, without breaking any existing functionality. It should also pass CI and [GitHub Quality Checks](#github-quality-checks).
 
-As of 230906, test plans should be included with every code-changing PR, as part of our road to automated testing.
+PR descriptions should concretely describe how the introduced code changes resolve the instigating ticket. Orienting information should be provided so that a developer lacking extensive contextual knowledge of the codebase area is nonetheless able to review the code. As of 230906, test plans should be included with every code-changing PR, as part of our road to automated testing. PR descriptions should be sufficient for a developer without extensive contextual knowledge of this area to review the code.
 
 Help close your own PRs: if it's ready for QA, tag a reviewer, complain in a Slack channel, or send a DM.
 
@@ -96,9 +97,9 @@ In the case of a Design Review (not to be confused with a Codeowner Review), any
 
 ### Github Quality Checks
 
-Pull requests to Master _should_ pass Github's code quality checks. (Nb: Not the test suite run by our CI, but those quality checks identified in the PR's `files/diff`.) PR authors _should_ resolve these checks themselves.
+Pull requests to Master should pass Github's code quality checks. (Nb: Not the test suite run by our CI, but those quality checks identified in the PR's `files/diff`.) PR authors should resolve these checks themselves.
 
-Any pull requests originating in the experimental branch, and being merged into Master, _must_ pass all code quality checks. PR authors _must_ resolve these checks themselves.
+Any pull requests originating in the experimental branch, and being merged into Master, must pass all code quality checks. PR authors must resolve these checks themselves.
 
 Occasionally, quality checks will erroneously flag code which is used throughout our codebase, such as `useEffect`. These can be ignored.
 
@@ -143,6 +144,7 @@ Our Beta/QA server can be found at `qa.commonwealth.im`. Custom domains are avai
 
 # Change Log
 
+- 231010: Flagged by Timothee Legros; Deployment and QA schedule section needs to be updated. Merging does not automatically push to Beta.
 - 230906: Updated with new requirements for tickets and PRs (#4972).
 - 230831: Merged with Agile-Development.md by Graham Johnson (#4936) and certified fresh.
 - 230823: Migrated from GitHub wiki by Graham Johnson (#4350).

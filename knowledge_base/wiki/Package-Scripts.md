@@ -1,4 +1,6 @@
-This entry documents [the Commonwealth package.json file](../packages/commonwealth/package.json). `Package.json` scripts should always be organized alphabetically. If you add a script, you *must* add documentation in this file describing (1) what it does (2) when engineers might use it.
+This entry documents [the Commonwealth package.json file](../packages/commonwealth/package.json). `Package.json` scripts should always be organized alphabetically. 
+
+If you add a script to the package.json, you must add documentation here, describing (1) what the script does (2) when engineers might want or need to use it. As with [all documentation](./_README.md#updating-the-docs-how--when), this should be included in the PR alongside the script addition.
 
 # Contents
 
@@ -79,6 +81,7 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [start](#start)
   - [start-all](#start-all)
   - [start-consumer](#start-consumer)
+  - [start-evm-ce](#start-evm-ce)
 
 # Build Scripts
 
@@ -600,3 +603,9 @@ Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app ser
 Definition: `ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
+
+## start-evm-ce
+
+Definition: `ts-node ./server/workers/evmChainEvents/startEvmPolling.ts`
+
+Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.

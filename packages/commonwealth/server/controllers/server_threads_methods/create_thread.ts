@@ -281,15 +281,6 @@ export async function __createThread(
         author_chain: finalThread.Address.chain,
       },
     },
-    webhookData: {
-      user: finalThread.Address.address,
-      author_chain: finalThread.Address.chain,
-      url: getThreadUrl(finalThread),
-      title: title,
-      bodyUrl: url,
-      chain: finalThread.chain,
-      body: finalThread.body,
-    },
     excludeAddresses: excludedAddrs,
   });
 
@@ -314,7 +305,6 @@ export async function __createThread(
             author_chain: finalThread.Address.chain,
           },
         },
-        webhookData: null,
         excludeAddresses: [finalThread.Address.address],
       });
     });

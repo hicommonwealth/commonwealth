@@ -277,14 +277,6 @@ export async function __createThreadComment(
         author_chain: finalComment.Address.chain,
       },
     },
-    webhookData: {
-      user: finalComment.Address.address,
-      author_chain: finalComment.Address.chain,
-      url: cwUrl,
-      title: root_title,
-      chain: finalComment.chain,
-      body: finalComment.text,
-    },
     excludeAddresses: rootNotifExcludeAddresses,
   });
 
@@ -307,7 +299,6 @@ export async function __createThreadComment(
           author_chain: finalComment.Address.chain,
         },
       },
-      webhookData: null,
       excludeAddresses: excludedAddrs,
     });
 
@@ -335,7 +326,6 @@ export async function __createThreadComment(
                 author_chain: finalComment.Address.chain,
               },
             },
-            webhookData: null,
             excludeAddresses: [finalComment.Address.address],
           });
         }
