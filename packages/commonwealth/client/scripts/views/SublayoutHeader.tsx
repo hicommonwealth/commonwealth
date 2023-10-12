@@ -100,6 +100,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
                 navigate('/', {}, null);
               } else {
                 if (isLoggedIn) {
+                  setMobileMenuName(null);
                   navigate('/dashboard/for-you', {}, null);
                 } else {
                   navigate('/dashboard/global', {}, null);
