@@ -24,7 +24,7 @@ export type DeletePollResult = void;
 
 export async function __deletePoll(
   this: ServerThreadsController,
-  { user, address, chain, pollId }: DeletePollOptions
+  { user, chain, pollId }: DeletePollOptions
 ): Promise<DeletePollResult> {
   const poll = await this.models.Poll.findByPk(pollId);
   if (!poll) {

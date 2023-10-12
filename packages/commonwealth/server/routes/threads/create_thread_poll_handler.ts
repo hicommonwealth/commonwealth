@@ -26,8 +26,6 @@ export const createThreadPollHandler = async (
   const { id: threadId } = req.params;
   const { prompt, options, custom_duration } = req.body;
 
-  console.log('options: ', options);
-
   // validate options
   if (!Array.isArray(options)) {
     throw new AppError(Errors.InvalidOptions);
