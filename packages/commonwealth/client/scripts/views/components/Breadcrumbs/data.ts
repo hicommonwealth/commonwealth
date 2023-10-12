@@ -19,7 +19,7 @@ export const breadCrumbURLS = [
   },
   {
     url: 'profile/edit',
-    breadcrumb: 'Edit',
+    breadcrumb: 'Edit Profile',
     className: 'editProfile',
   },
   {
@@ -89,5 +89,6 @@ export const breadCrumbURLS = [
   {
     url: 'search',
     className: 'search',
+    breadcrumb: 'Search',
   },
 ];

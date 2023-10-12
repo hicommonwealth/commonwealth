@@ -8,7 +8,7 @@ import {
 } from 'models/SearchQuery';
 import 'pages/search/index.scss';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
@@ -26,6 +26,7 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
+import { Breadcrumbs } from '../../components/Breadcrumbs/Breadcrumbs';
 
 const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
   (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope)
@@ -53,6 +54,24 @@ const SearchPage = () => {
   const location = useLocation();
   const [urlQueryParams] = useSearchParams();
   const [bottomRef, bottomInView] = useInView();
+
+  const [toggleMobileView, setToggleMobileView] = useState(
+    location.pathname.includes('search') && window.innerWidth <= 425
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setToggleMobileView(
+        location.pathname.includes('search') && window.innerWidth <= 425
+      );
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [location.pathname]);
 
   const queryParams = useMemo(() => {
     return Object.fromEntries(urlQueryParams.entries()) as SearchQueryParams;
@@ -255,6 +274,7 @@ const SearchPage = () => {
       {
         <>
           <div className="search-results">
+            {toggleMobileView && <Breadcrumbs />}
             <CWTabBar>
               {VISIBLE_TABS.map((s, i) => (
                 <CWTab

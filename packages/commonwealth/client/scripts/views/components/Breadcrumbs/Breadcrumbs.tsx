@@ -62,6 +62,7 @@ export const Breadcrumbs = () => {
       // Find the matching breadcrumb data for the current path segment.
       const matchedBreadcrumb = breadcrumbData.find((breadcrumbItem) => {
         // Check if breadcrumbItem.url is falsy or if index is out of bounds
+        //
 
         return (
           !breadcrumbItem.url ||

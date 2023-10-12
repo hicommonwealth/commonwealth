@@ -125,24 +125,12 @@
   .search {
     display: flex;
     align-items: center;
-    padding-left: calc(22vw + 65px);
+    padding-left: 32px;
     padding-top: 16px;
-    width: 100%;
-
-    @include large {
-      padding-left: calc(38vw - 138px);
-    }
-
-    @include medium {
-      padding-left: calc(25vw - 38px);
-    }
-
-    @include small {
-      padding-left: 23%;
-    }
 
     @include extraSmall {
-      padding-left: 24px;
+      padding-left: 8px;
+      margin-top: -8%;
     }
   }
 

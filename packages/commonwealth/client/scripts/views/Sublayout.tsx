@@ -24,7 +24,9 @@ const Sublayout = ({
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
   const [toggleMobileView, setToggleMobileView] = useState(
-    location.pathname.includes('discussions') || window.innerWidth <= 425
+    (location.pathname.includes('discussions') ||
+      location.pathname.includes('search')) &&
+      window.innerWidth <= 425
   );
 
   const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
@@ -45,7 +47,9 @@ const Sublayout = ({
   useEffect(() => {
     setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
     setToggleMobileView(
-      location.pathname.includes('discussions') && isWindowSmallInclusive
+      (location.pathname.includes('discussions') ||
+        location.pathname.includes('search')) &&
+        window.innerWidth <= 425
     );
   }, [isWindowSmallInclusive, setMenu]);
 
@@ -66,6 +70,11 @@ const Sublayout = ({
   useEffect(() => {
     const onResize = () => {
       setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
+      setToggleMobileView(
+        (location.pathname.includes('discussions') ||
+          location.pathname.includes('search')) &&
+          window.innerWidth <= 425
+      );
     };
 
     window.addEventListener('resize', onResize);
