@@ -84,3 +84,5 @@ These environment variables may be set locally but they will have unknown side-e
 [2]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Overview#vultr-scripts
 
 # Change Log
+
+- 231012: Flagged by Graham Johnson to update links from footnote-style to inline.

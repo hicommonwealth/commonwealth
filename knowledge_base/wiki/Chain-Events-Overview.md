@@ -88,5 +88,6 @@ This script pulls entities from the given chain-events database and populates th
 
 # Change Log
 
+- 231012: Flagged by Graham Johnson to update links from footnote-style to inline.
 - 230305: Updated with diagram by Timothee Legros.
 - 230122: Authored by Timothee Legros.

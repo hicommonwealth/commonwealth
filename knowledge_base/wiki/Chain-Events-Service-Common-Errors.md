@@ -90,4 +90,5 @@ This occurs because your chain-events database is behind (in terms of entities f
 
 # Change Log
 
+- 231012: Flagged by Graham Johnson to update links from footnote-style to inline.
 - 230122: Authored by Timothee Legros

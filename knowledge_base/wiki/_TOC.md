@@ -8,8 +8,6 @@
 
 **API Gateway**
   - [Kong](Kong.md)
-  - [Swagger](Swagger.md)
-  - [Express to OpenAPI](Express-OpenAPI-Generator.md)
 
 **Services & Tooling**
   - [Sequelize](Sequelize.md)
@@ -26,8 +24,6 @@
   - [Notifications](Notifications.md)
 
 **Current Roadmap**
-- [All Milestones](Milestones.md)
-- [Front End Kaizen](Front-End.md)
 - [React Conversion](React-Milestone.md)
 - [Rules Engine](Rules-Module.md)
 - [Environment Variables](Environment-Variables.md)
@@ -72,7 +68,6 @@
   - [QA](Notifications-QA.md)
 
 **Pattern Library &etc**
-- [Bouncing in Pure React](Bouncing-In-Pure-React.md)
 - [Debouncing in Pure React](Debouncing-in-Pure-React.md)
 - [Quill React Component](Quill-Component.md)
 - [Shadow DOM](Shadow-DOM.md)

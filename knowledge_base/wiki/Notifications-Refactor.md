@@ -1,3 +1,8 @@
+**Contents**
+- [Notifications Refactor](#notifications-refactor)
+  * [Refactor Proposals](#refactor-proposals)
+- [Change Log](#change-log)
+
 # Notifications Refactor
 
 - The refactor aims to keep Notifications functional.
