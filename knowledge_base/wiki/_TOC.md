@@ -41,7 +41,6 @@
 - [Treasury Spend example](./examples/Treasury-Spend-Example.md)
 - [Parameter Change example](./examples/Param-Change-Example.md)
 - [Template Parser](Template-Parser.md)
-- [Proposal Form Handler](Proposal-Form-Handler.md)
 - [Contract Components Kit](Contract-Components-Kit.md)
 
 **Chain Events**
@@ -66,10 +65,9 @@
 **Notifications**
 - [QA](Notifications-QA.md)
 
-**Pattern Library &etc**
+**Pattern Library**
 - [Debouncing in Pure React](./examples/Debouncing-in-Pure-React.md)
-- [Quill React Component](Quill-Component.md)
-- [Shadow DOM](Shadow-DOM.md)
+- [Shadow DOM](./examples/Shadow-DOM.md)
 
 **Storybook**
 - [Introduction](Storybook-Introduction.md)

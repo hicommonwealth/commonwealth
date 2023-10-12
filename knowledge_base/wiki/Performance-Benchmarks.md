@@ -12,7 +12,6 @@
     + [Geographic Performance Assessment - Forthcoming](#geographic-performance-assessment---forthcoming)
 - [Change Log](#change-log)
 
-
 # Core Web Performance Metrics
 
 The performance of a website is key to its effective functionality and ensuring an exceptional user experience. Three critical performance metrics that have a substantial impact include:
