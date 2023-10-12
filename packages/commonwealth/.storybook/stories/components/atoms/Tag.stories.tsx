@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { CWTag } from '../../../../client/scripts/views/components/component_kit/new_designs/cw_tag';
+import { CWTag } from '../../../../client/scripts/views/components/component_kit/new_designs/CWTag';
 
 const tag = {
   title: 'Components/Tag',

@@ -6,7 +6,7 @@ import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import app from 'state';
 import { slugify } from 'utils';
-import { CWTag } from '../../components/component_kit/new_designs/cw_tag';
+import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';

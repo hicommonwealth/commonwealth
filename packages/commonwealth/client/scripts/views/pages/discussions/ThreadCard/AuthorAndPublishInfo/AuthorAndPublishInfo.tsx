@@ -5,7 +5,7 @@ import {
   Popover,
   usePopover,
 } from 'views/components/component_kit/cw_popover/cw_popover';
-import { CWTag } from 'views/components/component_kit/new_designs/cw_tag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';

@@ -9,7 +9,7 @@ import { ComponentType } from '../types';
 import ChainInfo from '../../../../models/ChainInfo';
 import { CWCommunityAvatar } from '../cw_community_avatar';
 
-import 'components/component_kit/new_designs/cw_tag.scss';
+import 'components/component_kit/new_designs/CWTag.scss';
 
 type TagType =
   | 'passed'
