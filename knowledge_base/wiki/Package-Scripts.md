@@ -6,11 +6,8 @@ If you add a script to the package.json, you must add documentation here, descri
 
 - [Build Scripts](#build-scripts)
   - [build-all](#build-all)
-  - [build-app](#build-app)
-  - [build:css](#buildcss)
   - [heroku-postbuild](#heroku-postbuild)
 - [CI Scripts](#ci-scripts)
-  - [start-ci](#start-ci)
   - [wait-server](#wait-server)
 - [Database Scripts](#database-scripts)
   - [clean-db](#clean-db)
@@ -18,19 +15,13 @@ If you add a script to the package.json, you must add documentation here, descri
   - [db-all](#db-all)
   - [dump-db](#dump-db)
   - [dump-db-limit](#dump-db-limit)
-  - [dump-db-local](#dump-db-local)
   - [load-db](#load-db)
   - [load-db-limit](#load-db-limit)
-  - [load-db-local](#load-db-local)
   - [migrate-db](#migrate-db)
   - [migrate-db-down](#migrate-db-down)
-  - [migrate-server](#migrate-server)
   - [psql](#psql)
   - [reset-db](#reset-db)
   - [reset-frack-db](#reset-frack-db)
-- [Docker](#docker)
-  -[start-containers](#start-containers)
-  -[start-docker-setup](#start-docker-setup)
 - [Linting & Formatting](#linting--formatting)
   - [format](#format)
   - [lint](#lint)
@@ -46,27 +37,20 @@ If you add a script to the package.json, you must add documentation here, descri
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
   - [datadog-db-setup](#datadog-db-setup)
+  - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
-  - [start-prerender](#start-prerender)
+  - [storybook](#storybook)
 - [Playwright](#playwright)
   - [e2e-start-server](#e2e-start-server)
-  - [gen-e2e](#gen-e2e)
   - [test-e2e](#test-e2e)
   - [test-e2e-serial](#test-e2e-serial)
-- [Storybook](#storybook)
-  - [build-storybook](#build-storybook)
-  - [storybook](#storybook-1)
 - [Testing](#testing)
   - [integration-test](#integration-test)
   - [test](#test)
   - [test-api](#test-api)
-  - [test-client](#test-client)
-  - [test-consumer](#test-consumer)
   - [test-devnet](#test-devnet)
   - [test-emit-notif](#test-emit-notif)
-  - [test-events](#test-events)
   - [test-integration-util](#test-integration-util)
-  - [test-query](#test-query)
   - [test-select](#test-select)
   - [test-suite](#test-suite)
   - [unit-test](#unit-test)
@@ -77,7 +61,6 @@ If you add a script to the package.json, you must add documentation here, descri
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
   - [listen](#listen)
-  - [profile](#profile)
   - [start](#start)
   - [start-all](#start-all)
   - [start-consumer](#start-consumer)
@@ -87,23 +70,9 @@ If you add a script to the package.json, you must add documentation here, descri
 
 ## build-all
 
-Definition: `yarn build-app && yarn build-consumer`
+Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
 
-Description: Builds app based on webpack.prod.config.js file, as well as the build-consumer script
-
-Considerations: Merely an aggregate script of `build-app` and `build-consumer`; may not be necessary. **Flagged for possible removal.**
-
-## build-app
-    
-Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.prod.config.js --progress`
-
-Description: Builds project, allocating max 4096MB memory to Node; runs webpack based on webpack.prod.config.js file.
-
-## build:css
-
-Definition: `NODE_ENV=production build client/styles/shared.scss` 
-
-Considerations: Why do we have a separate CSS build? Who uses it? And does it even work? We don't appear to have a `build` command that it could modify. **Deprecated; recommend removal.**
+Description: Runs webpack on our front-end code with 4096MB memory allocated to Node. If successful, fires the build-consumer script.
 
 ## heroku-postbuild
 
@@ -113,14 +82,6 @@ Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dyna
 
 # CI Scripts
 
-## start-ci
-
-Definition: `FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts`
-
-Description: Used by our CI tool to start the server.
-
-Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file? **Flagged for possible removal.**
-
 ## wait-server
 
 Definition: `chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh`
@@ -128,8 +89,6 @@ Definition: `chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh`
 Description: Used for CI. Waits for the server to be ready (start serving on port 8080).
 
 Contributor: Kurtis Assad
-
-Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file? **Flagged for possible removal.**
 
 # Database Scripts
 
@@ -169,12 +128,6 @@ Definition: `yarn run dump-db && psql $(heroku config:get CW_READ_DB -a commonwe
 
 Description: In addition to running the [dump-db](#dump-db) script, this copies a limited set of Notification and Subscription data from the commonwealth-beta Heroku database. Used in conjunction with the [load-db-limit](#load-db-limit) script.
 
-## dump-db-local
-
-Definition: `pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump`
-
-Description: Exports the local Postgres database to a dump file, `local_save.dump`.
-
 ## load-db 
 
 Definition: `chmod u+x scripts/load-db.sh && ./scripts/load-db.sh`
@@ -187,12 +140,6 @@ Definition: `yarn run reset-db && yarn run load-db && psql -d commonwealth -U co
 
 Description: Used in conjunction with [dump-db-limit](#dump-db-limit), this loads a dumped copy of the commonwealth-beta Heroku database alongside a limited, copied set of Notification and Subscription rows.
 
-## load-db-local
-
-Definition: `psql -d commonwealth -U commonwealth -W -f local_save.dump`
-
-Description: Loads local database from a dump file, `local_save.dump`.
-
 ## migrate-db
 
 Definition: `npx sequelize db:migrate`
@@ -204,14 +151,6 @@ Description: Migrates database, using migration files in `./server/migration` di
 Definition: `npx sequelize db:migrate:undo`
 
 Description: Undoes the last-run Sequelize migration.
-
-## migrate-server
-
-Definition: `heroku run npx sequelize db:migrate --debug`
-
-Description: Runs a database migration on the Heroku dyno in debug mode.
-
-Considerations: The current script name does not sufficiently indicate its relationship to Heroku.
 
 ## psql
 
@@ -230,20 +169,6 @@ Description: Resets the local database.
 Definition: `heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack`
 
 Description: Synchronizes `beta-db` (used for QA) against the `frack-db` (used for CDN cache testing). Good for undoing migration script run in previous commit to Frack. See [Testing Environments](./Testing-Environments.md) entry for more info.
-
-# Docker
-
-## start-containers
-
-Definition: `chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh`
-
-Description: Starts remote Docker containers; see [start-docker-containers.sh](../packages/commonwealth/scripts/start-docker-containers.sh) for further documentation.
-
-## start-docker-setup
-
-Definition: `chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh`
-
-Description: To be run in a new project or repo when first setting up remote docker containers. See [start-docker-setup-help.sh](../packages/commonwealth/scripts/start-docker-setup-help.sh) for further documentation.
 
 # Linting & Formatting
 
@@ -288,8 +213,6 @@ Description: Lints SCSS files.
 Considerations: Why lint styles separately? Why not just include `.scss` file extension in [lint](#lint) and [lint-all](#lint-all) scripts (which currently only target `.ts` files)? **Flagged for possible removal.**
 
 # Mobile
-
-Open considerations: Are these still in use?
 
 ## build-android 
 
@@ -349,14 +272,6 @@ Description: Helper script to complete DataDog Postgres account setup, scripts, 
 
 Contributor: Nakul Manchanda
 
-## send-notification-digest-emails
-
-Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
-
-Description: Schedules a daily task for sending notification email digests.
-
-Considerations: Script name might be worth shortening.
-
 ## send-cosmos-notifs
 
 Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
@@ -365,11 +280,19 @@ Description: Generates Cosmos v1 and v1beta1 governance notifications by polling
 
 Contributor: Timothee Legros
 
-## start-prerender
+## send-notification-digest-emails
 
-Definition: `ts-node --project tsconfig.json server/scripts/runPrerenderService.ts`
+Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 
-Considerations: Referenced prerender script no longer exists. **Deprecated; recommend removal.** 
+Description: Schedules a daily task for sending notification email digests.
+
+## storybook
+
+Definition: `storybook dev -p 6006`
+
+Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
+
+Contributor: Daniel Martins
 
 # Playwright
 
@@ -389,14 +312,6 @@ Description: Emits a chain-event or snapshot notification. Run `yarn emit-notifi
 
 Contributor: Timothee Legros
 
-## gen-e2e
-
-Definition: `npx playwright codegen`
-
-Description: Starts Playwright's test generation feature. This will open up a browser window and allow developers to click around on-screen and autogenerate Playwright code according to actions performed. [Loom example](https://www.loom.com/share/b1b36c7d7fae4b079b380ec2a61da25c)
-
-Contributor: Kurtis Assad
-
 ## test-e2e
 
 Definition: `TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/e2eRegular/*`
@@ -412,26 +327,6 @@ Definition: `TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eS
 Description: Runs e2e tests one at a time, to avoid problems of parallel execution.
 
 Contributor: Kurtis Assad
-
-# Storybook
-
-## build-storybook
-
-Definition `storybook build`
-
-Description:  Compiles Storybook instance for deployment.
-
-Contributor: Daniel Martins
-
-Considerations: Not used by Storybook / Design System team. **Deprecated; recommend removal.**
-
-## storybook
-
-Definition: `storybook dev -p 6006`
-
-Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
-
-Contributor: Daniel Martins
 
 # Testing
 
@@ -462,20 +357,6 @@ Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integrati
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
-## test-client
-
-Definition: `webpack-dev-server --config webpack/webpack.config.test.js`
-
-Description: Ostensibly used to test only client-side code.
-
-Considerations: The `webpack.config.test.js` file referenced does not exist. **Deprecated; recommend removal.**
-
-## test-consumer
-
-Definition: `ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000`
-
-Considerations: The `consumer.test.ts` file referenced does not exist. **Deprecated; recommend removal.**
-
 ## test-devnet
 
 Definition: `nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts`
@@ -488,14 +369,6 @@ Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integratio
 
 Description: Runs only the `emitNotifications.spec.ts` test, of the three `/integration`` folder "utils."
 
-## test-events
-
-Definition: `nyc ts-mocha --project tsconfig.json ./test/integration/events/*.spec.ts`
-
-Description: Ostensibly used to test all events in our integration folder.
-
-Considerations: Misleading name (should be integration-scoped). More importantly, we do not have an /events folder inside our /integration directory. **Deprecated; recommend removal.**
-
 ## test-integration-util
 
 Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts`
@@ -503,16 +376,6 @@ Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integrati
 Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing). 
 
 Considerations: The script name might misleadingly suggest that this script would pick out specifically the /util subfolder in the /integration directory. Might we be better off moving the three top-level scripts (e.g. databaseCleaner.spec.ts) into a dedicated subfolder, and targeting that?
-
-Contributor: Timothee Legros
-
-## test-query
-
-Definition: `ts-node server/scripts/testQuery.ts`
-
-Description: Executes testQuery.ts, which runs a select query on chains, for unclear-to-this-documentarian reasons.
-
-Considerations: Why do we have this? Is a "test-" prefix name misleading, given that it is not, strictly speaking, a test (in the same sense as our ts-mocha scripts).
 
 Contributor: Timothee Legros
 
@@ -577,14 +440,6 @@ Description:  Runs webpack-bundle-analyzer library to display breakdown of bundl
 Definition: `RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts`
 
 Description: Runs ts-node, a TypeScript execution engine for NodeJS, in listening mode for changes, following tsconfig.json and using [server.ts](../packages/commonwealth/server.ts) as the entry file.
-
-## profile 
-
-Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.dev.config.js --json --profile > webpack-stats.json`
-
-Description: Runs build webpack analyzer. 
-
-Considerations: **Deprecated; recommend removal.** Appears to be redundant with `bundle-report`. As of 22-08-03 #all-eng conversation, appears to be unused. See also [stats.sh](../packages/commonwealth/stats.sh) for possible removal.
 
 ## start
 
