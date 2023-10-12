@@ -39,9 +39,9 @@ module.exports = {
             updated_at: new Date(),
           };
 
-          if (hexAddress.id === 155335) {
-            console.log('155335', hexAddress);
-          }
+          // if (hexAddress.id === 155335) {
+          //   console.log('155335', hexAddress);
+          // }
           bulkUpdateData.push(hexAddress);
         } catch (e) {
           console.log(
@@ -50,16 +50,12 @@ module.exports = {
         }
       }
 
-      try {
-        // bulk update addresses with hex:
-        await queryInterface.bulkInsert('Addresses', bulkUpdateData, {
-          updateOnDuplicate: ['hex'],
-          upsertKeys: ['id', 'address'],
-          transaction: t,
-        });
-      } catch (e) {
-        console.log('Error bulk updating addresses with hex.');
-      }
+      // bulk update addresses with hex:
+      await queryInterface.bulkInsert('Addresses', bulkUpdateData, {
+        updateOnDuplicate: ['hex'],
+        upsertKeys: ['id'],
+        transaction: t,
+      });
 
       await queryInterface.sequelize.query(
         `
