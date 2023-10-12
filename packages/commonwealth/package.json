@@ -13,6 +13,7 @@
     "create-migration": "npx sequelize migration:generate --name",
     "datadog-db-setup": "chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh",
     "db-all": "yarn reset-db && yarn load-db && yarn migrate-db",
+    "db-doc": "chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/wiki/Database-ERD.md",
     "dump-db": "pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
     "e2e-start-server": "ETH_RPC=e2e-test yarn start",
     "emit-notification": "ts-node --project tsconfig.json server/scripts/emitTestNotification.ts",
