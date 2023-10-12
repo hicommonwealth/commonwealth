@@ -1,4 +1,4 @@
-import { EvmSource } from './types';
+import { EvmSource, EvmSources } from './types';
 import { StatsDController } from 'common-common/src/statsd';
 import models from '../../database';
 import { getEvents } from './logProcessing';
@@ -6,6 +6,7 @@ import { emitChainEventNotifs } from './emitChainEventNotifs';
 import { getEventSources } from './getEventSources';
 import { rollbar } from '../../util/rollbar';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { NotificationInstance } from '../../models/notification';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -17,7 +18,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export async function processChainNode(
   chainNodeId: number,
   evmSource: EvmSource
-): Promise<void> {
+): Promise<Promise<void | NotificationInstance>[] | void> {
   try {
     log.info(
       'Processing:\n' +
@@ -27,18 +28,19 @@ export async function processChainNode(
     StatsDController.get().increment('ce.evm.chain_node_id', {
       chainNodeId: String(chainNodeId),
     });
+
     const startBlock = await models.LastProcessedEvmBlock.findOne({
       where: {
         chain_node_id: chainNodeId,
       },
     });
 
-    const { events, lastBlockNum } = await getEvents(
-      evmSource,
-      startBlock?.block_number
-    );
+    const startBlockNum = startBlock?.block_number
+      ? startBlock.block_number + 1
+      : null;
 
-    await emitChainEventNotifs(chainNodeId, events);
+    const { events, lastBlockNum } = await getEvents(evmSource, startBlockNum);
+    const promises = await emitChainEventNotifs(chainNodeId, events);
 
     if (!startBlock) {
       await models.LastProcessedEvmBlock.create({
@@ -53,6 +55,8 @@ export async function processChainNode(
     log.info(
       `Processed ${events.length} events for chainNodeId ${chainNodeId}`
     );
+
+    return promises;
   } catch (e) {
     const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
     log.error(msg, e);
@@ -70,7 +74,10 @@ export async function processChainNode(
  */
 export async function scheduleNodeProcessing(
   interval: number,
-  processFn: (chainNodeId: number, sources: EvmSource) => Promise<void>
+  processFn: (
+    chainNodeId: number,
+    sources: EvmSource
+  ) => Promise<Promise<void | NotificationInstance>[] | void>
 ) {
   const evmSources = await getEventSources();
 
@@ -85,8 +92,11 @@ export async function scheduleNodeProcessing(
   chainNodeIds.forEach((chainNodeId, index) => {
     const delay = index * betweenInterval;
 
-    setTimeout(() => {
-      processFn(+chainNodeId, evmSources[chainNodeId]);
+    setTimeout(async () => {
+      const promises = await processFn(+chainNodeId, evmSources[chainNodeId]);
+      if (promises) {
+        await Promise.allSettled(promises);
+      }
     }, delay);
   });
 }

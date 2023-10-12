@@ -1,4 +1,3 @@
-import { EvmEventSourceInstance } from '../../models/evmEventSource';
 import { ethers } from 'ethers';
 import { AbiType } from '../../../shared/types';
 
