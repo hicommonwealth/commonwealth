@@ -114,4 +114,5 @@ a shared address for this purpose.
 
 # Change Log
 
-- 230727: Authored by Mark Hagelberg.
+- 230727: Updated with Cosmos SDK info by Mark Hagelberg.
+- 230418: Authored by Mark Hagelberg.

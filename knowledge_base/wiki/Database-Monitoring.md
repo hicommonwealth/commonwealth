@@ -153,4 +153,5 @@ SELECT mode, COUNT(mode) FROM pg_locks GROUP BY mode ORDER BY mode;
 
 # Change Log
 
-- 230627: Authored by Nakul Manchanda.
+- 230627: Updated and certified fresh by Nakul Manchanda.
+- 230413: Authored by Nakul Manchanda.
