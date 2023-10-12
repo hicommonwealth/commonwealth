@@ -50,6 +50,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Install node-gyp
+        run: npm install -g node-gyp
+
       - name: Install dependencies
         run: yarn --ignore-engines --verbose | tail -n 200
 
@@ -148,6 +151,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Install node-gyp
+        run: npm install -g node-gyp
+
       - name: Install dependencies
         run: yarn --ignore-engines --verbose | tail -n 200
 
@@ -244,6 +250,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Install node-gyp
+        run: npm install -g node-gyp
+
       - name: Install dependencies
         run: yarn --ignore-engines --verbose | tail -n 200
 
@@ -303,6 +312,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+
+      - name: Install node-gyp
+        run: npm install -g node-gyp
 
       - name: Install dependencies
         run: yarn --ignore-engines --verbose | tail -n 200
@@ -370,6 +382,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+
+      - name: Install node-gyp
+        run: npm install -g node-gyp
 
       - name: Install dependencies
         run: yarn --ignore-engines --verbose | tail -n 200
@@ -454,6 +469,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+
+      - name: Install node-gyp
+        run: npm install -g node-gyp
 
       - name: Install dependencies
         run: yarn --ignore-engines --verbose | tail -n 200
@@ -552,6 +570,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+
+      - name: Install node-gyp
+        run: npm install -g node-gyp
 
       - name: Install dependencies
         run: yarn --ignore-engines --verbose | tail -n 200
