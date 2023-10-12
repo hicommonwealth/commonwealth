@@ -188,7 +188,7 @@ import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { createTopicHandler } from '../routes/topics/create_topic_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { deleteTopicHandler } from '../routes/topics/delete_topic_handler';
-import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel';
+import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 
 export type ServerControllers = {
