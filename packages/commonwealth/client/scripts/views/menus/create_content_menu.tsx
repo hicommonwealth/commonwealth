@@ -21,6 +21,8 @@ import {
 import { isMobile } from 'react-device-detect';
 
 const resetSidebarState = () => {
+  //Bouncer pattern -- I have found isMobile does not always detect screen
+  //size when responsively resizing so added a redundancy with window.innerWidth
   if (!isMobile || window.innerWidth > 425) return;
 
   if (sidebarStore.getState().userToggledVisibility !== 'open') {
