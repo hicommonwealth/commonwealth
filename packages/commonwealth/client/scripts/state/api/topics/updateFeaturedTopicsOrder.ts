@@ -15,7 +15,7 @@ const updateFeaturedTopicsOrder = async ({
     .sort((a, b) => a.order - b.order)
     .map((t) => t.id);
 
-  await axios.post(`${app.serverUrl()}/orderTopics`, {
+  await axios.put(`${app.serverUrl()}/topics-order`, {
     chain: app.activeChainId(),
     orderedIds,
     jwt: app.user.jwt,
