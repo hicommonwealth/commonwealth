@@ -23,8 +23,6 @@ cache/
 stats.json
 serviceAccountKey.json
 
-../../.rabbitmq/
-
 # Database downloads
 latest.dump
 latest.dump.*
