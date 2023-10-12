@@ -1,15 +1,17 @@
 'use strict';
 
-const getHex = async (address) => {
-  const { toHex, fromBech32 } = await import('@cosmjs/encoding');
-  const encodedData = fromBech32(address).data;
-  const addressHex = toHex(encodedData);
-  return addressHex;
-};
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    const { toHex, fromBech32 } = await import('@cosmjs/encoding');
+    const getHex = async (address) => {
+      const encodedData = fromBech32(address).data;
+      const addressHex = toHex(encodedData);
+      return addressHex;
+    };
+
     await queryInterface.sequelize.transaction(async (t) => {
+      let bulkUpdateData = [];
+
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Addresses" ADD COLUMN IF NOT EXISTS "hex" VARCHAR(64) NULL;
@@ -20,7 +22,7 @@ module.exports = {
       // get all cosmos addresses and assign a hex
       const [addresses] = await queryInterface.sequelize.query(
         `
-        SELECT id, address
+        SELECT *
         FROM "Addresses"
         WHERE "wallet_id" IN ('keplr', 'cosm-metamask', 'terrastation', 'keplr-ethereum');     
           `,
@@ -31,23 +33,34 @@ module.exports = {
         try {
           const hex = await getHex(address.address);
 
-          await queryInterface.sequelize.query(
-            `
-            UPDATE "Addresses"
-            SET hex = '${hex}'
-            WHERE id = ${address.id};
-            `,
-            { transaction: t }
-          );
+          const hexAddress = {
+            ...address,
+            hex,
+            updated_at: new Date(),
+          };
+
+          if (hexAddress.id === 155335) {
+            console.log('155335', hexAddress);
+          }
+          bulkUpdateData.push(hexAddress);
         } catch (e) {
           console.log(
-            `Error getting hex for ${address.address}. Not updating.`
+            `Error getting hex for ${address.address}. Hex not generated.`
           );
         }
       }
-    });
 
-    await queryInterface.sequelize.transaction(async (t) => {
+      try {
+        // bulk update addresses with hex:
+        await queryInterface.bulkInsert('Addresses', bulkUpdateData, {
+          updateOnDuplicate: ['hex'],
+          upsertKeys: ['id', 'address'],
+          transaction: t,
+        });
+      } catch (e) {
+        console.log('Error bulk updating addresses with hex.');
+      }
+
       await queryInterface.sequelize.query(
         `
         ALTER TABLE "Addresses"
