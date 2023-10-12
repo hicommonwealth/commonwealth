@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 
-import type ChainEntity from '../../models/ChainEntity';
 import type Thread from '../../models/Thread';
-import { ChainBase } from 'common-common/src/types';
-import app from '../../state';
 import { parseCustomStages, threadStageToLabel } from '../../helpers';
 import {
   loadMultipleSpacesData,
   SnapshotProposal,
 } from 'helpers/snapshot_utils';
 
-import 'modals/update_proposal_status_modal.scss';
-import type Thread from '../../models/Thread';
 import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
@@ -27,12 +22,6 @@ import {
   useEditThreadMutation,
 } from 'state/api/threads';
 import { ProposalSelector } from '../components/ProposalSelector';
-import { notifyError } from '../../controllers/app/notifications';
-import { CosmosProposal } from '../../controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { filterLinks, getAddedAndDeleted } from '../../helpers/threads';
-import { Link, LinkSource } from '../../models/Thread';
-import { SelectList } from '../components/component_kit/cw_select_list';
-import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';

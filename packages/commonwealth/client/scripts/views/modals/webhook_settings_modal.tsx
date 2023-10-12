@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { NotificationCategories } from 'common-common/src/types';
 import type Webhook from '../../models/Webhook';
 import {
   ChainBase,
   ChainNetwork,
   NotificationCategories,
 } from 'common-common/src/types';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
