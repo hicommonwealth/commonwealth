@@ -21,6 +21,8 @@ import {
 import { isMobile } from 'react-device-detect';
 
 const resetSidebarState = () => {
+  if (!isMobile || window.innerWidth > 425) return;
+
   if (sidebarStore.getState().userToggledVisibility !== 'open') {
     sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
   } else {
@@ -236,7 +238,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           {
             label: 'New Thread',
             onClick: () => {
-              isMobile && resetSidebarState();
+              resetSidebarState();
               navigate('/new/discussion');
             },
             iconLeft: 'write',
