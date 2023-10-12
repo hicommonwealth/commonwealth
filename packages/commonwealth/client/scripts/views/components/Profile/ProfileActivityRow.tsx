@@ -74,7 +74,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
           </a>
         </CWText>
         <div className="dot">.</div>
-        <CWTag label={author.slice(0, 5)} type='disabled' />
+        <CWTag label={author.slice(0, 5)} type="disabled" />
         <div className="dot">.</div>
         <div className="date">
           <CWText type="caption" fontWeight="medium">
