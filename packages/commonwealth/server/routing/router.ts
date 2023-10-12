@@ -186,10 +186,10 @@ import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { createTopicHandler } from '../routes/topics/create_topic_handler';
-import { updateTopicHandler } from 'server/routes/topics/update_topic_handler';
-import { deleteTopicHandler } from 'server/routes/topics/delete_topic_handler';
-import { updateTopicChannelHandler } from 'server/routes/topics/update_channel_connection_handler';
-import { updateTopicsOrderHandler } from 'server/routes/topics/update_topics_order_handler';
+import { updateTopicHandler } from '../routes/topics/update_topic_handler';
+import { deleteTopicHandler } from '../routes/topics/delete_topic_handler';
+import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel';
+import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;

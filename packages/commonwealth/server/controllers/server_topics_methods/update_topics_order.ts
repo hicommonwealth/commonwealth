@@ -1,10 +1,9 @@
-import { Op } from 'sequelize';
 import { TopicAttributes, TopicInstance } from '../../models/topic';
 import { ChainInstance } from '../../models/chain';
 import { ServerTopicsController } from '../server_topics_controller';
 import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../../util/validateOwner';
 
 const Errors = {
   NoUser: 'Not signed in',

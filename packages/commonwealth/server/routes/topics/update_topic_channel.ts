@@ -1,11 +1,5 @@
-import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
-import {
-  TypedRequest,
-  TypedRequestParams,
-  TypedResponse,
-  success,
-} from '../../types';
+import { TypedRequestParams, TypedResponse, success } from '../../types';
 
 type UpdateTopicChannelRequestParams = {
   topicId: string;
