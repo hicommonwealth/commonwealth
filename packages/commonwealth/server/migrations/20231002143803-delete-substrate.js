@@ -92,26 +92,17 @@ module.exports = {
                 FOR r IN (SELECT * FROM merged_entity_link)
                     LOOP
                         UPDATE "Threads"
-                        SET links = CASE
-                                        WHEN r.type = 'treasury-proposal' THEN jsonb_set(
-                                                jsonb_set(links, ARRAY [r.link_index::text, 'source'], '"web"'),
-                                                ARRAY [r.link_index::text, 'identifier'],
-                                                ('"https://' || r.chain || '.subscan.io/treasury/' || r.type_id || '"')::jsonb)
-                                        WHEN r.type = 'democracy-referendum' THEN jsonb_set(
-                                                jsonb_set(links, ARRAY [r.link_index::text, 'source'], '"web"'),
-                                                ARRAY [r.link_index::text, 'identifier'],
-                                                ('"https://' || r.chain || '.subscan.io/referenda/' || r.type_id || '"')::jsonb)
-                                        WHEN r.type = 'democracy-proposal' THEN jsonb_set(
-                                                jsonb_set(links, ARRAY [r.link_index::text, 'source'], '"web"'),
-                                                ARRAY [r.link_index::text, 'identifier'],
-                                                ('"https://' || r.chain || '.subscan.io/democracy_proposal/' || r.type_id ||
-                                                 '"')::jsonb)
-                                        WHEN r.type = 'tip-proposal' THEN jsonb_set(
-                                                jsonb_set(links, ARRAY [r.link_index::text, 'source'], '"web"'),
-                                                ARRAY [r.link_index::text, 'identifier'],
-                                                ('"https://' || r.chain || '.subscan.io/treasury_tip/' || r.type_id || '"')::jsonb)
-                                        ELSE links
-                            END
+                        SET links = jsonb_set(
+                                links,
+                                ARRAY [r.link_index::text],
+                                links->r.link_index::integer ||
+                                jsonb_build_object('source', 'web', 'identifier',
+                                                   CASE
+                                                       WHEN r.chain = 'hydradx' THEN 'https://cloudflare-ipfs.com/ipns/dotapps.io/?rpc=wss%3A%2F%2Frpc.hydradx.cloud#/democracy'
+                                                       ELSE 'https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fmainnet2.edgewa.re#/democracy'
+                                                       END,
+                                                  'title', INITCAP(REPLACE(r.type, '-', ' ')) || ' ' || r.type_id)
+                                    )
                         WHERE id = r.thread_id;
                     END LOOP;
             END
