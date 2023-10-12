@@ -38,8 +38,8 @@
 - [Template API Routes](Template-API-Routes.md)
 - [Templating JSON Schema - HEAD](Template-Schema.md)
 - [Templating JSON Schema (legacy/v.0.1)](Template-Schema-v0.1.md)
-- [Treasury Spend example](Treasury-Spend-Example.md)
-- [Parameter Change example](Param-Change-Example.md)
+- [Treasury Spend example](./examples/Treasury-Spend-Example.md)
+- [Parameter Change example](./examples/Param-Change-Example.md)
 - [Template Parser](Template-Parser.md)
 - [Proposal Form Handler](Proposal-Form-Handler.md)
 - [Contract Components Kit](Contract-Components-Kit.md)
@@ -67,7 +67,7 @@
 - [QA](Notifications-QA.md)
 
 **Pattern Library &etc**
-- [Debouncing in Pure React](Debouncing-in-Pure-React.md)
+- [Debouncing in Pure React](./examples/Debouncing-in-Pure-React.md)
 - [Quill React Component](Quill-Component.md)
 - [Shadow DOM](Shadow-DOM.md)
 
