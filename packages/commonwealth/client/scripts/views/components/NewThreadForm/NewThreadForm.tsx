@@ -19,6 +19,7 @@ import { TopicSelector } from 'views/components/topic_selector';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { ReactQuillEditor } from '../react_quill_editor';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   createDeltaFromText,
   getTextFromDelta,
@@ -38,11 +39,21 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
-  const topicsForSelector = topics?.filter((t) => {
-    return (
-      isAdmin || t.tokenThreshold.isZero() || !app.chain.isGatedTopic(t.id)
-    );
-  });
+  const topicsForSelector = topics?.reduce(
+    (acc, t) => {
+      if (
+        isAdmin ||
+        t.tokenThreshold.isZero() ||
+        !app.chain.isGatedTopic(t.id)
+      ) {
+        acc.enabledTopics.push(t);
+      } else {
+        acc.disabledTopics.push(t);
+      }
+      return acc;
+    },
+    { enabledTopics: [], disabledTopics: [] }
+  );
 
   const {
     threadTitle,
@@ -58,7 +69,7 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-  } = useNewThreadForm(chainId, topicsForSelector);
+  } = useNewThreadForm(chainId, topicsForSelector.enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -132,7 +143,8 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      topicsForSelector.find((t) => t.name.includes('General')) || null
+      topicsForSelector.enabledTopics.find((t) => t.name.includes('General')) ||
+        null
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
@@ -142,17 +154,17 @@ export const NewThreadForm = () => {
   return (
     <>
       <div className="NewThreadForm">
+        <div className="header">
+          <CWText type="h2" fontWeight="medium">
+            Proposals
+          </CWText>
+        </div>
         <div className="new-thread-header">
           <CWTabBar>
             <CWTab
               label={capitalize(ThreadKind.Discussion)}
               isSelected={threadKind === ThreadKind.Discussion}
               onClick={() => setThreadKind(ThreadKind.Discussion)}
-            />
-            <CWTab
-              label={capitalize(ThreadKind.Link)}
-              isSelected={threadKind === ThreadKind.Link}
-              onClick={() => setThreadKind(ThreadKind.Link)}
             />
           </CWTabBar>
         </div>
@@ -161,7 +173,8 @@ export const NewThreadForm = () => {
             <div className="topics-and-title-row">
               {hasTopics && (
                 <TopicSelector
-                  topics={topicsForSelector}
+                  enabledTopics={topicsForSelector.enabledTopics}
+                  disabledTopics={topicsForSelector.disabledTopics}
                   value={threadTopic}
                   onChange={setThreadTopic}
                 />

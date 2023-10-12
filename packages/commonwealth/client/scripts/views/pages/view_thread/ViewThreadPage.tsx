@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { ProposalType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { filterLinks } from 'helpers/threads';
@@ -59,6 +58,8 @@ import ViewTemplate from '../view_template/view_template';
 import { featureFlags } from 'helpers/feature-flags';
 
 import 'pages/view_thread/index.scss';
+import { LinkedUrlCard } from './LinkedUrlCard';
+import { commentsByDate } from 'helpers/dates';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -234,7 +235,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
   }
 
-  if ((!isLoading && !thread) || fetchThreadError) {
+  if (
+    (!isLoading && !thread) ||
+    fetchThreadError ||
+    thread.chain !== app.activeChainId()
+  ) {
     return <PageNotFound />;
   }
 
@@ -311,11 +316,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const sortedComments = [...comments]
     .filter((c) => !c.parentComment)
-    .sort((a, b) =>
-      commentSortType === CommentsFeaturedFilterTypes.Oldest
-        ? moment(a.createdAt).diff(moment(b.createdAt))
-        : moment(b.createdAt).diff(moment(a.createdAt))
-    );
+    .sort((a, b) => commentsByDate(a, b, commentSortType));
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
   const fromDiscordBot =
@@ -376,7 +377,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           )
         }
         thread={thread}
-        onLockToggle={(isLock) => {
+        onLockToggle={() => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
         }}
@@ -400,7 +401,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           setIsGloballyEditing(true);
           setIsEditingBody(true);
         }}
-        onSpamToggle={(updatedThread) => {
+        onSpamToggle={() => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
         }}
@@ -529,6 +530,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               setParentCommentId={setParentCommentId}
               canComment={canComment}
               fromDiscordBot={fromDiscordBot}
+              commentSortType={commentSortType}
             />
           </>
         }
@@ -557,6 +559,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   },
                 ]
               : []),
+            ...[
+              {
+                label: 'Links',
+                item: (
+                  <div className="cards-column">
+                    <LinkedUrlCard
+                      thread={thread}
+                      allowLinking={isAuthor || isAdminOrMod}
+                    />
+                  </div>
+                ),
+              },
+            ],
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
               ? [
                   {

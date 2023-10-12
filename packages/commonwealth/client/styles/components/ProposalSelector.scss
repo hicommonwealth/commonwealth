@@ -1,6 +1,6 @@
 @import '../shared';
 
-.ChainEntitiesSelector {
+.ProposalSelector {
   border-radius: $border-radius-corners;
   border: 1px solid $neutral-100;
   height: 208px;
@@ -11,7 +11,7 @@
     flex: 1;
   }
 
-  .chain-entity {
+  .proposal {
     padding-block: 6px;
     display: flex;
     font-size: 14px;
