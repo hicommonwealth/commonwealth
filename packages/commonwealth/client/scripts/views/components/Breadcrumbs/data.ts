@@ -29,7 +29,7 @@ export const breadCrumbURLS = [
     isParent: true,
   },
   {
-    url: '/communities',
+    url: 'communities',
     breadcrumb: 'Explore Communities',
     className: 'explore-communities',
     isParent: true,
