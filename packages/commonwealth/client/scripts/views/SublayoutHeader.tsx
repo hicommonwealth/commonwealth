@@ -49,7 +49,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
 
   useEffect(() => {
     setRecentlyUpdatedVisibility(menuVisible);
-  }, [menuVisible]);
+  }, [menuVisible, setRecentlyUpdatedVisibility]);
 
   function handleToggle() {
     const isVisible = !menuVisible;
