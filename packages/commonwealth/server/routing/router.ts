@@ -79,12 +79,6 @@ import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
-import createTopic from '../routes/createTopic';
-import updateTopic from '../routes/topics/updateTopic';
-import orderTopics from '../routes/orderTopics';
-import editTopic from '../routes/editTopic';
-import deleteTopic from '../routes/deleteTopic';
-import bulkTopics from '../routes/bulkTopics';
 import bulkOffchain from '../routes/bulkOffchain';
 import setTopicThreshold from '../routes/setTopicThreshold';
 
@@ -191,7 +185,11 @@ import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { getTopicsHandler } from '../routes/topics/get_topics_handler';
-import { createTopicHandler } from 'server/routes/topics/create_topic_handler';
+import { createTopicHandler } from '../routes/topics/create_topic_handler';
+import { updateTopicHandler } from 'server/routes/topics/update_topic_handler';
+import { deleteTopicHandler } from 'server/routes/topics/delete_topic_handler';
+import { updateTopicChannelHandler } from 'server/routes/topics/update_channel_connection_handler';
+import { updateTopicsOrderHandler } from 'server/routes/topics/update_topics_order_handler';
 
 export type ServerControllers = {
   threads: ServerThreadsController;
@@ -716,7 +714,7 @@ function setupRouter(
     'patch',
     '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
     passport.authenticate('jwt', { session: false }),
-    updateTopic.bind(this, models)
+    updateTopicChannelHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
@@ -724,7 +722,7 @@ function setupRouter(
     '/topics-order' /* OLD: /orderTopics */,
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
-    orderTopics.bind(this, models)
+    updateTopicsOrderHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
@@ -732,7 +730,7 @@ function setupRouter(
     '/topics/:topicId' /* OLD: /editTopic */,
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
-    editTopic.bind(this, models)
+    updateTopicHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
@@ -740,7 +738,7 @@ function setupRouter(
     '/topics/:topicId' /* OLD: /deleteTopic */,
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateChain,
-    deleteTopic.bind(this, models)
+    deleteTopicHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,

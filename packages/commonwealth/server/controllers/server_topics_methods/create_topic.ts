@@ -1,10 +1,10 @@
-import { Op, QueryTypes } from 'sequelize';
-import { TopicAttributes } from 'server/models/topic';
-import { ChainInstance } from 'server/models/chain';
+import { Op } from 'sequelize';
+import { TopicAttributes } from '../../models/topic';
+import { ChainInstance } from '../../models/chain';
 import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from 'server/models/user';
+import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
-import { findAllRoles } from 'server/util/roles';
+import { findAllRoles } from '../../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',

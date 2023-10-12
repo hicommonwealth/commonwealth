@@ -1,11 +1,10 @@
-import { TopicAttributes } from 'server/models/topic';
-import { ChainInstance } from 'server/models/chain';
+import { ChainInstance } from '../../models/chain';
 import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from 'server/models/user';
+import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from 'server/util/validateOwner';
+import { validateOwner } from '../../util/validateOwner';
 import { QueryTypes } from 'sequelize';
-import { sequelize } from 'server/database';
+import { sequelize } from '../../database';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -19,7 +18,6 @@ export type DeleteTopicOptions = {
   user: UserInstance;
   chain: ChainInstance;
   topicId: number;
-  featuredOrder;
 };
 
 export type DeleteTopicResult = void;
@@ -64,6 +62,6 @@ export async function __deleteTopic(
         transaction,
       }
     );
-    topic.destroy({ transaction });
+    await topic.destroy({ transaction });
   });
 }

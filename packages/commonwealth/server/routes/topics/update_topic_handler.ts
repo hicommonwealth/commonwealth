@@ -1,14 +1,14 @@
 import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
-import { TypedResponse, success } from '../../types';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 
-type CreateTopicRequestBody = Partial<TopicAttributes>;
+type UpdateTopicRequestBody = Partial<TopicAttributes>;
 
 type UpdateTopicResponse = TopicAttributes;
 
 export const updateTopicHandler = async (
   controllers: ServerControllers,
-  req: TypedRequestBody<CreateTopicRequestBody>,
+  req: TypedRequestBody<UpdateTopicRequestBody>,
   res: TypedResponse<UpdateTopicResponse>
 ) => {
   const { user, chain, body } = req;
