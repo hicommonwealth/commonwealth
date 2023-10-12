@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { VirtuosoHandle } from 'react-virtuoso';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
-import { User } from 'views/components/user/user';
+import Permissions from 'utils/Permissions';
+import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import {
   APIOrderBy,
   APIOrderDirection,
@@ -18,8 +21,6 @@ type MembersSectionProps = {
 };
 
 const MembersSection = ({ searchFilters }: MembersSectionProps) => {
-  const containerRef = useRef<VirtuosoHandle>();
-
   const debouncedSearchTerm = useDebounce<string>(
     searchFilters.searchText,
     500
@@ -67,7 +68,9 @@ const MembersSection = ({ searchFilters }: MembersSectionProps) => {
           role: p.roles.find(
             (role) =>
               role.chain_id === app.activeChainId() &&
-              ['admin', 'moderator'].includes(role.permission)
+              [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
+                role.permission
+              )
           ),
         };
       });
@@ -86,23 +89,41 @@ const MembersSection = ({ searchFilters }: MembersSectionProps) => {
 
   return (
     <div className="MembersSection">
-      <Virtuoso
-        ref={containerRef}
-        data={members}
-        endReached={() => fetchNextPage()}
-        itemContent={(index, profileInfo) => {
-          return (
-            <div className="member-row" key={index}>
-              <User
-                userAddress={profileInfo.profile.address}
-                userChainId={profileInfo.profile.chain}
-                role={profileInfo.role}
-                shouldShowRole
-                shouldLinkProfile
-              />
+      <CWTable
+        columnInfo={[
+          {
+            key: 'name',
+            header: 'Label',
+            numeric: false,
+            sortable: true,
+          },
+          {
+            key: 'groups',
+            header: 'Groups',
+            numeric: false,
+            sortable: true,
+          },
+        ]}
+        rowData={members.map((member) => ({
+          name: (
+            <div className="table-cell">
+              <CWText type="b2">{member.profile.name}</CWText>
+              {member?.role?.permission === Permissions.ROLES.ADMIN && (
+                <CWTag label="Admin" type="referendum" />
+              )}
+              {member?.role?.permission === Permissions.ROLES.MODERATOR && (
+                <CWTag label="Moderator" type="referendum" />
+              )}
             </div>
-          );
-        }}
+          ),
+          groups: (
+            <div className="table-cell">
+              {/* TODO: add groups here when the api is done */}
+              <CWTag label="Clubhouse" type="referendum" />
+              <CWTag label="Planet painters" type="referendum" />
+            </div>
+          ),
+        }))}
       />
     </div>
   );

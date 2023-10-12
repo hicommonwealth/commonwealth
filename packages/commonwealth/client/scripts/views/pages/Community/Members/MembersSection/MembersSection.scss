@@ -7,26 +7,13 @@
   gap: 24px;
   padding-right: 0px;
 
-  .member-row {
-    padding: 0px;
-    margin: 0px;
-    align-items: center;
-    display: flex;
-    height: 32px;
+  table {
+    width: 100%;
 
-    a {
-      color: $neutral-800;
-      text-decoration: none;
-
-      .User {
-        align-items: center;
-        display: flex;
-
-        .username {
-          align-items: center;
-          display: flex;
-        }
-      }
+    .table-cell {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
   }
 }
