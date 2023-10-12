@@ -25,6 +25,7 @@ import clsx from 'clsx';
 import { CWButton } from './components/component_kit/new_designs/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
 import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
+import { featureFlags } from '../helpers/feature-flags';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -109,7 +110,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {onMobile && app.activeChainId() && (
+          {(featureFlags.sidebarToggle || onMobile) && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
               iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}

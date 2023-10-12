@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-
 import { NotificationCategories } from 'common-common/src/types';
 import type Webhook from '../../models/Webhook';
 import {
-  DydxChainNotificationTypes,
-  EdgewareChainNotificationTypes,
-  KulupuChainNotificationTypes,
-  KusamaChainNotificationTypes,
-  PolkadotChainNotificationTypes,
-} from '../../helpers/chain_notification_types';
+  ChainBase,
+  ChainNetwork,
+  NotificationCategories,
+} from 'common-common/src/types';
+import { CWButton } from '../components/component_kit/cw_button';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
@@ -19,6 +17,8 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 
 import '../../../styles/modals/webhook_settings_modal.scss';
+import app from 'state';
+import { WebhookCategory } from 'types';
 
 type WebhookSettingsModalProps = {
   onModalClose: () => void;
@@ -31,27 +31,23 @@ export const WebhookSettingsModal = ({
   updateWebhook,
   webhook,
 }: WebhookSettingsModalProps) => {
-  const [selectedCategories, setSelectedCategories] = useState<Array<string>>(
-    webhook.categories
-  );
+  const [selectedCategories, setSelectedCategories] = useState<
+    Array<WebhookCategory>
+  >(webhook.categories);
 
-  const isChain = !!webhook.chain_id;
+  let supportsChainEvents = false;
+  if (app.chain.base === ChainBase.CosmosSDK) {
+    supportsChainEvents = true;
+  } else if (
+    // TODO: @Timothee update once event labeling is implemented
+    app.chain.base === ChainBase.Ethereum &&
+    (app.chain.network === ChainNetwork.Compound ||
+      app.chain.network === ChainNetwork.Aave)
+  ) {
+    supportsChainEvents = true;
+  }
 
-  // TODO: @ZAK make this generic or based on chain-event listening status on backend
-  const chainNotifications =
-    webhook.chain_id === 'edgeware'
-      ? EdgewareChainNotificationTypes
-      : webhook.chain_id === 'kusama'
-      ? KusamaChainNotificationTypes
-      : webhook.chain_id === 'kulupu'
-      ? KulupuChainNotificationTypes
-      : webhook.chain_id === 'polkadot'
-      ? PolkadotChainNotificationTypes
-      : webhook.chain_id === 'dydx'
-      ? DydxChainNotificationTypes
-      : {};
-
-  const row = (label: string, values: string[]) => {
+  const row = (label: string, values: WebhookCategory[]) => {
     const allValuesPresent = values.every((v) =>
       selectedCategories.includes(v)
     );
@@ -97,15 +93,12 @@ export const WebhookSettingsModal = ({
           {row('New comment', [NotificationCategories.NewComment])}
           {row('New reaction', [NotificationCategories.NewReaction])}
         </div>
-        {isChain && Object.keys(chainNotifications).length > 0 && (
+        {supportsChainEvents && (
           <div className="checkbox-section">
             <CWText type="h5" fontWeight="semiBold">
               On-chain events
             </CWText>
-            {/* iterate over chain events */}
-            {Object.keys(chainNotifications).map((k) =>
-              row(`${k} event`, chainNotifications[k])
-            )}
+            {row('Proposal Events', [NotificationCategories.ChainEvent])}
           </div>
         )}
       </CWModalBody>

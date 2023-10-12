@@ -12,6 +12,7 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import Permissions from 'utils/Permissions';
 
 type ChangeThreadTopicModalProps = {
   onModalClose: () => void;
@@ -26,6 +27,23 @@ export const ChangeThreadTopicModal = ({
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
+
+  const isAdmin = Permissions.isCommunityAdmin();
+  const topicsForSelector = topics?.reduce(
+    (acc, t) => {
+      if (
+        isAdmin ||
+        t.tokenThreshold.isZero() ||
+        !app.chain.isGatedTopic(t.id)
+      ) {
+        acc.enabledTopics.push(t);
+      } else {
+        acc.disabledTopics.push(t);
+      }
+      return acc;
+    },
+    { enabledTopics: [], disabledTopics: [] }
+  );
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     chainId: app.activeChainId(),
@@ -56,7 +74,8 @@ export const ChangeThreadTopicModal = ({
       <CWModalHeader label="Change topic" onModalClose={onModalClose} />
       <CWModalBody>
         <TopicSelector
-          topics={topics}
+          enabledTopics={topicsForSelector.enabledTopics}
+          disabledTopics={topicsForSelector.disabledTopics}
           value={activeTopic}
           onChange={setActiveTopic}
         />
