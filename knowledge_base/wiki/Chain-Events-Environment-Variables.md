@@ -1,3 +1,10 @@
+**Contents**
+- [Local](#local)
+    + [Vultr Env](#vultr-env)
+- [Heroku](#heroku)
+- [Both](#both)
+- [Change Log](#change-log)
+
 # Local
 The environment variables listed here (including the VULTR Env var) should be set in `packages/chain-events/.env`
 
@@ -75,3 +82,5 @@ These environment variables may be set locally but they will have unknown side-e
 
 [1]: https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/server/routes/getChainEventServiceData.ts#L71
 [2]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Overview#vultr-scripts
+
+# Change Log
