@@ -75,6 +75,12 @@ export const OrderTopicsModal = ({ onModalClose }: OrderTopicsModalProps) => {
       </CWModalBody>
       <CWModalFooter>
         <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
           buttonType="primary"
           buttonHeight="sm"
           onClick={handleSave}

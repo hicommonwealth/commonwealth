@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
 
 import app from '../../state';
 import {
@@ -13,6 +12,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 import { useBanProfileByAddressMutation } from 'state/api/profiles';
+import { CWText } from 'views/components/component_kit/cw_text';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
@@ -52,13 +52,20 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
         onModalClose={onModalClose}
       />
       <CWModalBody>
-        <div>
-          Banning an address prevents it from interacting with the forum.
-        </div>
+        <CWText>
+          Banning an address prevents it from interacting with the forum. This
+          may take a few moments. Please click once and wait.
+        </CWText>
       </CWModalBody>
       <CWModalFooter>
         <CWButton
-          label="Ban Address (just click once and wait)"
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          label="Ban Address"
           buttonType="destructive"
           buttonHeight="sm"
           onClick={onBanConfirmation}

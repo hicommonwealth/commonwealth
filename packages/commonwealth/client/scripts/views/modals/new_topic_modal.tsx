@@ -168,6 +168,12 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
       <CWModalFooter className="NewTopicModalFooter">
         <div className="action-buttons">
           <CWButton
+            label="Cancel"
+            buttonType="secondary"
+            buttonHeight="sm"
+            onClick={onModalClose}
+          />
+          <CWButton
             label="Create topic"
             buttonType="primary"
             buttonHeight="sm"

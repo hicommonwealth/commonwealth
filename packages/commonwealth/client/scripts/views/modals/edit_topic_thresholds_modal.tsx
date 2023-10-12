@@ -13,7 +13,6 @@ import {
 } from '../../state/api/topics';
 import Permissions from '../../utils/Permissions';
 import { TokenDecimalInput } from '../components/token_decimal_input';
-import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import {
   CWModalBody,
@@ -21,6 +20,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 
 import '../../../styles/modals/edit_topic_thresholds_modal.scss';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
@@ -54,6 +54,7 @@ const EditTopicThresholdsRow = ({
         />
         <CWButton
           label="Update"
+          buttonHeight="sm"
           disabled={!newTokenThresholdInWei}
           onClick={async (e) => {
             e.preventDefault();

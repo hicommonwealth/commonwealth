@@ -218,7 +218,7 @@ export const User = ({
                 onClick={() => {
                   setIsModalOpen(true);
                 }}
-                label="Ban User"
+                label="Ban address"
                 buttonType="primary-red"
               />
             </div>

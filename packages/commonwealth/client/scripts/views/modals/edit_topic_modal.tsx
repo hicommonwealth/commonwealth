@@ -194,18 +194,26 @@ export const EditTopicModal = ({
       </CWModalBody>
       <CWModalFooter className="EditTopicModalFooter">
         <div className="action-buttons">
+          <div className="delete-topic">
+            <CWButton
+              buttonType="destructive"
+              buttonHeight="sm"
+              disabled={isSaving}
+              onClick={handleDeleteTopic}
+              label="Delete topic"
+            />
+          </div>
+          <CWButton
+            label="Cancel"
+            buttonType="secondary"
+            buttonHeight="sm"
+            onClick={onModalClose}
+          />
           <CWButton
             buttonType="primary"
             buttonHeight="sm"
             onClick={handleSaveChanges}
             label="Save changes"
-          />
-          <CWButton
-            buttonType="destructive"
-            buttonHeight="sm"
-            disabled={isSaving}
-            onClick={handleDeleteTopic}
-            label="Delete topic"
           />
         </div>
         {errorMsg && (

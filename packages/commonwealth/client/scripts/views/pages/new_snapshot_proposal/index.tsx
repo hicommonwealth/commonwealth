@@ -13,7 +13,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import app from 'state';
 import { MixpanelSnapshotEvents } from '../../../../../shared/analytics/types';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -23,6 +22,7 @@ import {
 } from '../../components/react_quill_editor';
 import { createNewProposal } from './helpers';
 import type { ThreadForm } from './types';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 type NewSnapshotProposalPageProps = {
   snapshotId: string;
@@ -32,12 +32,14 @@ type NewSnapshotProposalFormProps = {
   snapshotId: string;
   thread?: Thread;
   onSave?: (snapshotInfo: { id: string; snapshot_title: string }) => void;
+  onModalClose?: () => void;
 };
 
 export const NewSnapshotProposalForm = ({
   snapshotId,
   thread,
   onSave,
+  onModalClose,
 }: NewSnapshotProposalFormProps) => {
   const navigate = useCommonNavigate();
 
@@ -277,31 +279,46 @@ export const NewSnapshotProposalForm = ({
           />
         );
       })}
-      <CWButton
-        iconLeft="plus"
-        label="Add voting choice"
-        onClick={() => {
-          setForm({
-            ...form,
-            choices: form.choices.concat(`Option ${form.choices.length + 1}`),
-          });
-        }}
-      />
+      <div className="add-voting-btn">
+        <CWButton
+          iconLeft="plus"
+          buttonType="primary"
+          buttonHeight="sm"
+          label="Add voting choice"
+          onClick={() => {
+            setForm({
+              ...form,
+              choices: form.choices.concat(`Option ${form.choices.length + 1}`),
+            });
+          }}
+        />
+      </div>
       <ReactQuillEditor
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
         placeholder={'What is your proposal?'}
       />
-      <CWButton
-        label="Publish"
-        disabled={!author || isSaving || !isValid}
-        onClick={handlePublish}
-      />
+      <div className="footer">
+        {onModalClose && (
+          <CWButton
+            buttonHeight="sm"
+            buttonType="secondary"
+            label="Cancel"
+            onClick={onModalClose}
+          />
+        )}
+        <CWButton
+          buttonHeight="sm"
+          label="Publish"
+          disabled={!author || isSaving || !isValid}
+          onClick={handlePublish}
+        />
+      </div>
     </div>
   );
 };
 
-const NewSnapshotProposalPageComponent = ({
+const NewSnapshotProposalPage = ({
   snapshotId,
 }: NewSnapshotProposalPageProps) => {
   return (
@@ -313,7 +330,5 @@ const NewSnapshotProposalPageComponent = ({
     </div>
   );
 };
-
-const NewSnapshotProposalPage = NewSnapshotProposalPageComponent;
 
 export default NewSnapshotProposalPage;
