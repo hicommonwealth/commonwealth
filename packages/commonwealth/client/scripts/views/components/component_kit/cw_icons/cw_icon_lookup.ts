@@ -136,7 +136,6 @@ export const iconLookup = {
   polygon: Icons.CWPolygon,
   question: withPhosphorIcon(Question),
   search: Icons.CWSearch,
-  searchDark: Icons.CWSearchDark,
   send: Icons.CWSend,
   // share: Icons.CWShare,
   share: withPhosphorIcon(ArrowBendUpRight),
