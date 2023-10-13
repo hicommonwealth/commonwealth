@@ -45,7 +45,7 @@ import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWSpinner } from './cw_spinner';
-import { CWTab, CWTabBar } from './cw_tabs';
+import { CWTab as CWTabOld, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
@@ -59,6 +59,7 @@ import { CWTag } from './new_designs/cw_tag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
+import { CWTabsRow, CWTab } from './new_designs/CWTabs';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -208,6 +209,15 @@ const chainValidationSchema = z.object({
     .nonempty({ message: 'Chains are required' }),
 });
 
+const tagsList = [
+  { label: 'First', id: 0 },
+  { label: 'Second is very long so it gets truncated at some point', id: 1 },
+  { label: 'Third is with New Tag', id: 2, showTag: true },
+  { label: 'Fourth - disabled', id: 3, disabled: true },
+  { label: 'Fifth - disabled with Tag', id: 4, disabled: true, showTag: true },
+  { label: 'Sixth', id: 5 },
+];
+
 export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
     number | undefined
@@ -240,6 +250,7 @@ export const ComponentShowcase = () => {
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
   const allChains = app.config.chains.getAll();
   const [chainId, setChainId] = useState(allChains[1]);
+  const [currentTab, setCurrentTab] = useState(tagsList[0].id);
 
   return (
     <div className="ComponentShowcase">
@@ -1003,23 +1014,23 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div className="basic-gallery">
-        <CWText type="h3">Tabs</CWText>
+        <CWText type="h3">Old Tabs</CWText>
         <CWTabBar>
-          <CWTab
+          <CWTabOld
             label="A tab"
             onClick={() => {
               setSelectedTab(1);
             }}
             isSelected={selectedTab === 1}
           />
-          <CWTab
+          <CWTabOld
             label="Another tab"
             onClick={() => {
               setSelectedTab(2);
             }}
             isSelected={selectedTab === 2}
           />
-          <CWTab
+          <CWTabOld
             label="Yet another tab"
             onClick={() => {
               setSelectedTab(3);
@@ -1028,6 +1039,23 @@ export const ComponentShowcase = () => {
           />
         </CWTabBar>
       </div>
+
+      <div>
+        <CWText type="h3">New Tabs</CWText>
+        <CWTabsRow>
+          {tagsList.map((tab) => (
+            <CWTab
+              key={tab.id}
+              label={tab.label}
+              isDisabled={tab.disabled}
+              showTag={tab.showTag}
+              isSelected={currentTab === tab.id}
+              onClick={() => setCurrentTab(tab.id)}
+            />
+          ))}
+        </CWTabsRow>
+      </div>
+
       <div className="progress-gallery">
         <CWText type="h3">Progress Bars</CWText>
         <CWProgressBar
