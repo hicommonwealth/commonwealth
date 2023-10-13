@@ -446,9 +446,9 @@ Contributor: Ryan Bennett
 
 ## build-consumer
 
-Definition: `tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsconfig.consumer.json`
+Definition: `tsc --project tsconfig.worker.json && tsc-alias --project tsconfig.worker.json`
 
-Description: Runs a compilation based on tsconfig.consumer.json; does not emit files; replaces alias with relative paths post-compilation.
+Description: Runs a compilation based on tsconfig.worker.json; does not emit files; replaces alias with relative paths post-compilation.
 
 ## check-types
 
@@ -484,7 +484,7 @@ Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app ser
 
 ## start-consumer
 
-Definition: `ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script`
+Definition: `ts-node --project tsconfig.worker.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 
