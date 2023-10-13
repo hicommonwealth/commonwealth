@@ -7,6 +7,7 @@
     font-weight: 400;
     border-collapse: collapse;
     color: $neutral-800;
+    width: 100%;
 
     thead {
       border-top: 1px solid $neutral-200;
@@ -34,6 +35,7 @@
               padding: 4px;
 
               .Icon {
+
                 &.arrow-up-blue,
                 &.arrow-down-blue {
                   fill: none;

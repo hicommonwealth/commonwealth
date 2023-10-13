@@ -132,7 +132,7 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
           enableSorting: col.sortable,
         };
       }),
-    []
+    [columnInfo]
   );
 
   const table = useReactTable({

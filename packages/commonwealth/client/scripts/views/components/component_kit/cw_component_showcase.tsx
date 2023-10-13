@@ -15,7 +15,7 @@ import { CWSelectList } from './new_designs/CWSelectList';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import { CWTable } from './new_designs/CWTable/CWTable';
+import { CWTable } from './new_designs/CWTable';
 import { makeData, createColumnInfo } from './showcase_helpers';
 import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import {
@@ -164,7 +164,7 @@ const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   {} as { [K in BannerType]: boolean }
 );
 
-const rowData = makeData(25)
+const rowData = makeData(25);
 const columnInfo = createColumnInfo();
 
 const validationSchema = z.object({
