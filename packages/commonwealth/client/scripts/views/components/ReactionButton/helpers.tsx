@@ -7,10 +7,12 @@ const MAX_VISIBLE_REACTING_ACCOUNTS = 10;
 
 type ReactorProps = {
   reactors: string[];
+  chainId: string;
 };
 
 export const getDisplayedReactorsForPopup = ({
   reactors = [],
+  chainId,
 }: ReactorProps) => {
   const slicedReactors = reactors
     .slice(0, MAX_VISIBLE_REACTING_ACCOUNTS)
@@ -23,7 +25,7 @@ export const getDisplayedReactorsForPopup = ({
           <CWText noWrap>
             <User
               userAddress={reactorAddress}
-              userChainId={app.chain.id}
+              userChainId={chainId}
               shouldLinkProfile
             />
           </CWText>

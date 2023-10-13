@@ -130,29 +130,6 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           <PopoverMenu
             menuItems={[
               {
-                onClick: () => {
-                  setSubscription(
-                    threadId,
-                    bothActive,
-                    commentSubscription,
-                    reactionSubscription
-                  );
-                },
-                label: bothActive ? 'Unsubscribe' : 'Subscribe',
-                iconLeft: bothActive ? 'unsubscribe' : 'bell',
-              },
-            ]}
-            renderTrigger={(onClick) => (
-              <CWIconButton
-                iconName={bothActive ? 'unsubscribe' : 'bell'}
-                iconSize="small"
-                onClick={onClick}
-              />
-            )}
-          />
-          <PopoverMenu
-            menuItems={[
-              {
                 iconLeft: 'linkPhosphor',
                 iconLeftSize: 'regular',
                 label: 'Copy link',

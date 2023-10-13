@@ -95,12 +95,6 @@ const FeedPage = () => {
     fetchActiveProposals();
   }, []);
 
-  // if (!app.chain.meta.hasHomepage) {
-  //   return (
-  //     <ErrorPage message="The Homepage feature has not been enabled for this community." />
-  //   );
-  // }
-
   if (error) {
     return <ErrorPage message={error.message} />;
   }

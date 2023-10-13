@@ -5,12 +5,12 @@ import { updateThreadInAllCaches } from './helpers/cache';
 
 interface UseDeleteThreadReactionMutationProps {
   chainId: string;
-  address: string;
   threadId: number;
 }
 
 interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
   reactionId: number;
+  address: string;
 }
 
 const deleteReaction = async ({

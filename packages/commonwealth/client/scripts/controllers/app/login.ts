@@ -148,19 +148,16 @@ export async function completeClientLogin(account: Account) {
 }
 
 export async function updateActiveAddresses({
-  chain,
+  chainId,
   shouldRedraw = true,
 }: {
-  chain?: ChainInfo;
+  chainId?: string;
   shouldRedraw?: boolean;
 }) {
   // update addresses for a chain (if provided) or for communities (if null)
   // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
-    app.user.addresses
-      .filter((a) => a.chain.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
-      .filter((addr) => addr),
+    app.user.addresses.filter((a) => a.chain.id === chainId),
     shouldRedraw
   );
 
@@ -168,7 +165,7 @@ export async function updateActiveAddresses({
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.roles.isMember({ chain: chain.id, account });
+    return app.roles.isMember({ chain: chainId, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -178,7 +175,7 @@ export async function updateActiveAddresses({
     // no addresses - preview the community
   } else {
     const existingAddress = app.roles.getDefaultAddressInCommunity({
-      chain: chain.id,
+      chain: chainId,
     });
 
     if (existingAddress) {
@@ -559,7 +556,7 @@ export async function handleSocialLoginCallback({
       const c = app.user.selectedChain
         ? app.user.selectedChain
         : app.config.chains.getById(app.activeChainId());
-      await updateActiveAddresses({ chain: c });
+      await updateActiveAddresses({ chainId: c.id });
     }
     return magicAddress;
   } else {

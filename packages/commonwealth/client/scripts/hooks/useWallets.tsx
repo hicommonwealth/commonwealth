@@ -274,7 +274,10 @@ const useWallets = (walletProps: IuseWalletProps) => {
         const chain =
           app.user.selectedChain ||
           app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses({ chain, shouldRedraw: shouldRedrawApp });
+        await updateActiveAddresses({
+          chainId: chain.id,
+          shouldRedraw: shouldRedrawApp,
+        });
       }
     }
 

@@ -1,32 +1,33 @@
-import BN from 'bn.js';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import clsx from 'clsx';
+import BN from 'bn.js';
 
 import 'components/Comments/CreateComment.scss';
 import { notifyError } from 'controllers/app/notifications';
-import { SessionKeyError } from 'controllers/server/sessions';
 import { getDecimals, weiToTokens } from 'helpers';
+import type { DeltaStatic } from 'quill';
+import Thread from '../../../models/Thread';
+
+import clsx from 'clsx';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 import { useDraft } from 'hooks/useDraft';
-import type { DeltaStatic } from 'quill';
-import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import Thread from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { CWButton } from '../component_kit/new_designs/cw_button';
 import {
+  ReactQuillEditor,
   createDeltaFromText,
   getTextFromDelta,
-  ReactQuillEditor,
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
+import { SessionKeyError } from 'controllers/server/sessions';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;

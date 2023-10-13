@@ -1,3 +1,4 @@
+import { SessionKeyError } from 'controllers/server/sessions';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -6,17 +7,18 @@ import {
   useDeleteThreadReactionMutation,
 } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
-import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { updateActiveAddresses } from '../../../../../../controllers/app/login';
+import { selectChain } from '../../../../../../helpers/chain';
 import { LoginModal } from '../../../../../modals/login_modal';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
-import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
-import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 
 type ReactionButtonProps = {
   thread: Thread;
@@ -36,16 +38,11 @@ export const ReactionButton = ({
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const chainId = chain ?? app.activeChainId();
   const reactors = thread?.associatedReactions?.map((t) => t.address);
-  // If this reaction button is not in a community, use one of the users addresses to react.
-  if (!app.user.activeAccounts) {
-    app.user.setActiveAccounts(
-      app.user.addresses.filter((a) => a.chain.id === chain),
-      false
-    );
-  }
-  const activeAddress = app.user.activeAccount?.address;
+  const userAddressForChain = app.user.addresses.find(
+    (a) => a.chain.id === chainId
+  ).address;
   const thisUserReaction = thread?.associatedReactions?.filter(
-    (r) => r.address === activeAddress
+    (r) => r.address === userAddressForChain
   );
   const hasReacted = thisUserReaction?.length !== 0;
   const reactedId =
@@ -67,7 +64,6 @@ export const ReactionButton = ({
     reset: resetDeleteThreadReactionMutation,
   } = useDeleteThreadReactionMutation({
     chainId,
-    address: activeAddress,
     threadId: thread.id,
   });
 
@@ -90,6 +86,16 @@ export const ReactionButton = ({
   const handleVoteClick = async (event) => {
     event.stopPropagation();
     event.preventDefault();
+
+    // If this button was clicked, and we are not in a community, update the activeAddress
+    let activeAddress = app.user.activeAccount?.address;
+
+    if (!activeAddress) {
+      await selectChain(app.config.chains.getById(chainId));
+      await updateActiveAddresses({ chainId, shouldRedraw: false });
+      activeAddress = app.user.activeAccount?.address;
+    }
+
     if (isLoading || disabled) return;
 
     if (!app.isLoggedIn() || !activeAddress) {
@@ -134,6 +140,7 @@ export const ReactionButton = ({
           onClick={handleVoteClick}
           tooltipContent={getDisplayedReactorsForPopup({
             reactors: reactors,
+            chainId,
           })}
         />
       ) : disabled ? (
@@ -151,6 +158,7 @@ export const ReactionButton = ({
             reactors.length > 0
               ? getDisplayedReactorsForPopup({
                   reactors,
+                  chainId,
                 })
               : null
           }

@@ -201,7 +201,7 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
   app.chainPreloading = false;
 
   // Instantiate active addresses before chain fully loads
-  await updateActiveAddresses({ chain });
+  await updateActiveAddresses({ chainId: chain.id });
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
@@ -236,5 +236,5 @@ export const initChain = async (): Promise<void> => {
   console.log(`${chain.network.toUpperCase()} started.`);
 
   // Instantiate (again) to create chain-specific Account<> objects
-  await updateActiveAddresses({ chain });
+  await updateActiveAddresses({ chainId: chain.id });
 };

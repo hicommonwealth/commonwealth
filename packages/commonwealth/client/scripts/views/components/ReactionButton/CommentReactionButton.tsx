@@ -119,6 +119,7 @@ export const CommentReactionButton = ({
         onClick={handleVoteClick}
         tooltipContent={getDisplayedReactorsForPopup({
           reactors: (comment.reactions || []).map((r) => r.author),
+          chainId: app.activeChainId(),
         })}
       />
     </>
