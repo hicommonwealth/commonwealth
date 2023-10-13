@@ -1,4 +1,4 @@
-import React, { FC, ChangeEvent, useState } from 'react';
+import React, { FC, ChangeEvent, useState, useEffect } from 'react';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import type { NavigateOptions, To } from 'react-router';
 
@@ -111,10 +111,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
         )}
       >
         <MagnifyingGlass
-          className={getClasses(
-            { magnifyingGlass: true },
-            ComponentType.Searchbar
-          )}
+          className="magnifyingGlass"
           weight="regular"
           size={24}
           onClick={handleGoToSearchPage}
