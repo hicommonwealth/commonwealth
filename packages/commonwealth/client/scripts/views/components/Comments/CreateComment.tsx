@@ -1,33 +1,34 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
 import BN from 'bn.js';
+
+import clsx from 'clsx';
 
 import 'components/Comments/CreateComment.scss';
 import { notifyError } from 'controllers/app/notifications';
+import { SessionKeyError } from 'controllers/server/sessions';
 import { getDecimals, weiToTokens } from 'helpers';
-import type { DeltaStatic } from 'quill';
-import Thread from '../../../models/Thread';
-
-import clsx from 'clsx';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 import { useDraft } from 'hooks/useDraft';
+import type { DeltaStatic } from 'quill';
+import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { updateActiveAddresses } from '../../../controllers/app/login';
+import { selectChain } from '../../../helpers/chain';
+import Thread from '../../../models/Thread';
 import Permissions from '../../../utils/Permissions';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { CWButton } from '../component_kit/new_designs/cw_button';
 import {
-  ReactQuillEditor,
   createDeltaFromText,
   getTextFromDelta,
+  ReactQuillEditor,
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
-import { SessionKeyError } from 'controllers/server/sessions';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -35,6 +36,7 @@ type CreateCommentProps = {
   rootThread: Thread;
   canComment: boolean;
   shouldFocusEditor?: boolean;
+  chainId?: string;
 };
 
 export const CreateComment = ({
@@ -43,6 +45,7 @@ export const CreateComment = ({
   rootThread,
   canComment,
   shouldFocusEditor = false,
+  chainId,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -65,6 +68,7 @@ export const CreateComment = ({
   );
   const [userBalance, setUserBalance] = useState(new BN('0'));
   const [balanceLoading, setBalanceLoading] = useState(false);
+  const [chain, setChain] = useState(app.chain);
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
@@ -72,10 +76,28 @@ export const CreateComment = ({
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
 
+  // on content updated, save draft
   useEffect(() => {
-    activeTopic?.id &&
+    saveDraft(contentDelta);
+  }, [handleIsReplying, saveDraft, contentDelta]);
+
+  useEffect(() => {
+    let activeAddress = app.user.activeAccount?.address;
+
+    if (!activeAddress) {
+      selectChain(app.config.chains.getById(chainId)).then(() => {
+        updateActiveAddresses({ chainId, shouldRedraw: false }).then(() => {
+          setChain(app.chain);
+        });
+      });
+    }
+  });
+
+  useEffect(() => {
+    chain &&
+      activeTopic?.id &&
       setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic?.id));
-  }, [activeTopic]);
+  }, [activeTopic, chain]);
 
   useEffect(() => {
     if (!tokenPostingThreshold.isZero() && !balanceLoading) {
@@ -105,8 +127,13 @@ export const CreateComment = ({
     error: createCommentError,
   });
 
+  if (chainId && !chain) {
+    return <></>; // we need to init chain, so just wait
+  }
+
   const handleSubmitComment = async (e) => {
     e.stopPropagation();
+    e.preventDefault();
     setErrorMsg(null);
     setSendingComment(true);
 
@@ -172,14 +199,15 @@ export const CreateComment = ({
     clearDraft();
   };
 
-  // on content updated, save draft
-  useEffect(() => {
-    saveDraft(contentDelta);
-  }, [handleIsReplying, saveDraft, contentDelta]);
-
   return (
     <>
-      <div className="CreateComment">
+      <div
+        className="CreateComment"
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
         <div className="attribution-row">
           <div className="attribution-left-content">
             <CWText type="caption">
@@ -200,7 +228,7 @@ export const CreateComment = ({
           </div>
           {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
         </div>
-        <div onClick={(e) => e.stopPropagation()}>
+        <div>
           <ReactQuillEditor
             className="editor"
             contentDelta={contentDelta}

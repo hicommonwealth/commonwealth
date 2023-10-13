@@ -40,7 +40,7 @@ export const ReactionButton = ({
   const reactors = thread?.associatedReactions?.map((t) => t.address);
   const userAddressForChain = app.user.addresses.find(
     (a) => a.chain.id === chainId
-  ).address;
+  )?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === userAddressForChain
   );
@@ -87,14 +87,13 @@ export const ReactionButton = ({
     event.stopPropagation();
     event.preventDefault();
 
-    // If this button was clicked, and we are not in a community, update the activeAddress
-    let activeAddress = app.user.activeAccount?.address;
-
-    if (!activeAddress) {
+    // If active account is a different chain, or doesn't exist
+    if (app.user.activeAccount?.chain.id !== chainId) {
       await selectChain(app.config.chains.getById(chainId));
       await updateActiveAddresses({ chainId, shouldRedraw: false });
-      activeAddress = app.user.activeAccount?.address;
     }
+
+    const activeAddress = app.user.activeAccount.address;
 
     if (isLoading || disabled) return;
 
@@ -116,10 +115,10 @@ export const ReactionButton = ({
       });
     } else {
       createThreadReaction({
-        chainId,
         address: activeAddress,
         threadId: thread.id,
         reactionType: 'like',
+        chainId,
       }).catch((e) => {
         if (e instanceof SessionKeyError) {
           return;

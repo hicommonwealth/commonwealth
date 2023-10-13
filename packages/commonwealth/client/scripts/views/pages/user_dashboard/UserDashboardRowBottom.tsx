@@ -119,79 +119,79 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
               <CWAvatarGroup profiles={commenters} chainId={chainId} />
             </div>
           )}
-        </div>
-        <div
-          className="actions"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-        >
-          <PopoverMenu
-            menuItems={[
-              {
-                iconLeft: 'linkPhosphor',
-                iconLeftSize: 'regular',
-                label: 'Copy link',
-                onClick: async () => {
-                  if (commentId) {
-                    await navigator.clipboard.writeText(
-                      `${domain}/${chainId}/discussion/${threadId}?comment=${commentId}`
-                    );
-                    return;
-                  }
-                  await navigator.clipboard.writeText(
-                    `${domain}/${chainId}/discussion/${threadId}`
-                  );
-                },
-              },
-              {
-                iconLeft: 'twitterOutline',
-                iconLeftSize: 'regular',
-                label: 'Share on Twitter',
-                onClick: async () => {
-                  if (commentId) {
-                    await window.open(
-                      `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}
-                      ?comment=${commentId}`
-                    );
-                    return;
-                  }
-                  await window.open(
-                    `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}`,
-                    '_blank'
-                  );
-                },
-              },
-            ]}
-            renderTrigger={(onClick) => (
-              <CWIconButton
-                iconName="share"
-                iconSize="small"
-                onClick={onClick}
-              />
-            )}
-          />
-          <button
-            onClick={async (e) => {
-              e.preventDefault();
+          <div
+            className="actions"
+            onClick={(e) => {
               e.stopPropagation();
-              threadId &&
-                (await setSubscription(
-                  threadId,
-                  bothActive,
-                  commentSubscription,
-                  reactionSubscription
-                ));
+              e.preventDefault();
             }}
-            className="thread-option-btn"
           >
-            <CWIcon
-              color="black"
-              iconName={bothActive ? 'bellMuted' : 'bell'}
-              iconSize="small"
+            <PopoverMenu
+              menuItems={[
+                {
+                  iconLeft: 'linkPhosphor',
+                  iconLeftSize: 'regular',
+                  label: 'Copy link',
+                  onClick: async () => {
+                    if (commentId) {
+                      await navigator.clipboard.writeText(
+                        `${domain}/${chainId}/discussion/${threadId}?comment=${commentId}`
+                      );
+                      return;
+                    }
+                    await navigator.clipboard.writeText(
+                      `${domain}/${chainId}/discussion/${threadId}`
+                    );
+                  },
+                },
+                {
+                  iconLeft: 'twitterOutline',
+                  iconLeftSize: 'regular',
+                  label: 'Share on Twitter',
+                  onClick: async () => {
+                    if (commentId) {
+                      await window.open(
+                        `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}
+                      ?comment=${commentId}`
+                      );
+                      return;
+                    }
+                    await window.open(
+                      `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}`,
+                      '_blank'
+                    );
+                  },
+                },
+              ]}
+              renderTrigger={(onClick) => (
+                <CWIconButton
+                  iconName="share"
+                  iconSize="small"
+                  onClick={onClick}
+                />
+              )}
             />
-          </button>
+            <button
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                threadId &&
+                  (await setSubscription(
+                    threadId,
+                    bothActive,
+                    commentSubscription,
+                    reactionSubscription
+                  ));
+              }}
+              className="thread-option-btn"
+            >
+              <CWIcon
+                color="black"
+                iconName={bothActive ? 'bellMuted' : 'bell'}
+                iconSize="small"
+              />
+            </button>
+          </div>
         </div>
       </div>
       {isReplying && (
@@ -201,6 +201,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           rootThread={thread}
           updatedCommentsCallback={forceRerender}
           canComment={true}
+          chainId={chainId}
         /> // user can comment because this thread is on his dashboard
       )}
     </div>
