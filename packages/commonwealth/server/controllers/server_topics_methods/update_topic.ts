@@ -51,6 +51,7 @@ export async function __updateTopic(
     models: this.models,
     user: user,
     chainId: chain.id,
+    allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
   });

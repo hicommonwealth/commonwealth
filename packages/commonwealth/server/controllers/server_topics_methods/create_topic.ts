@@ -1,10 +1,9 @@
-import { Op } from 'sequelize';
 import { TopicAttributes } from '../../models/topic';
 import { ChainInstance } from '../../models/chain';
 import { ServerTopicsController } from '../server_topics_controller';
 import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
-import { findAllRoles } from '../../util/roles';
+import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -46,16 +45,16 @@ export async function __createTopic(
     throw new AppError(Errors.DefaultTemplateRequired);
   }
 
-  const userAddressIds = (await user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-  const adminRoles = await findAllRoles(
-    this.models,
-    { where: { address_id: { [Op.in]: userAddressIds } } },
-    chain.id,
-    ['admin', 'moderator']
-  );
-  if (!user.isAdmin && adminRoles.length === 0) {
+  const isAdmin = validateOwner({
+    models: this.models,
+    user,
+    chainId: chain.id,
+    allowMod: true,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+
+  if (!isAdmin) {
     throw new AppError(Errors.MustBeAdmin);
   }
 
@@ -64,7 +63,7 @@ export async function __createTopic(
     throw new AppError(Errors.InvalidTokenThreshold);
   }
 
-  const options = {
+  const options: Partial<TopicAttributes> = {
     name,
     description: body.description || '',
     token_threshold: body.token_threshold,

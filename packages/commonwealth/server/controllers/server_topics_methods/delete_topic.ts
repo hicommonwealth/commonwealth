@@ -26,12 +26,6 @@ export async function __deleteTopic(
   this: ServerTopicsController,
   { user, chain, topicId }: DeleteTopicOptions
 ): Promise<DeleteTopicResult> {
-  if (!user) {
-    throw new AppError(Errors.NotLoggedIn);
-  }
-  if (!topicId) {
-    throw new AppError(Errors.NoTopicId);
-  }
   const isAdmin = validateOwner({
     models: this.models,
     user,

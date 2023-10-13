@@ -3,7 +3,7 @@ import { ChainInstance } from '../../models/chain';
 import { ServerTopicsController } from '../server_topics_controller';
 import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
-import { findAllRoles } from '../../util/roles';
+import { validateOwner } from '../../util/validateOwner';
 
 const Errors = {
   MissingTopic: 'Invalid topic ID',
@@ -24,23 +24,16 @@ export async function __updateTopicChannel(
   this: ServerTopicsController,
   { user, chain, topicId, channelId }: UpdateTopicChannelOptions
 ): Promise<UpdateTopicChannelResult> {
-  const userOwnedAddressIds = (await user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-  const isAdmin = await findAllRoles(
-    this.models,
-    {
-      where: {
-        address: {
-          [Op.in]: userOwnedAddressIds,
-        },
-      },
-    },
-    chain.id,
-    ['admin']
-  );
+  const isAdmin = await validateOwner({
+    models: this.models,
+    user: user,
+    chainId: chain.id,
+    allowMod: true,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
 
-  if (!isAdmin || !isAdmin.length) {
+  if (!isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
