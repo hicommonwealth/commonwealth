@@ -181,29 +181,6 @@ export const User = ({
               address={profile?.id}
             />
           </div>
-          <div className="user-name">
-            {app.chain && app.chain.base === ChainBase.Substrate && (
-              <Link
-                className="user-display-name substrate@"
-                to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
-              >
-                {!profile || !profile?.id ? (
-                  !profile?.id ? (
-                    `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
-                  ) : (
-                    redactedAddress
-                  )
-                ) : !shouldShowAddressWithDisplayName ? (
-                  profile?.name
-                ) : (
-                  <>
-                    {profile?.name}
-                    <div className="id-short">{redactedAddress}</div>
-                  </>
-                )}
-              </Link>
-            )}
-          </div>
           {profile?.address && (
             <div className="user-address">{redactedAddress}</div>
           )}
