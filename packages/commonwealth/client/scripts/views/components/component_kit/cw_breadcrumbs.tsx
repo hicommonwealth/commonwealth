@@ -28,6 +28,22 @@ export const CWBreadcrumbs = ({
       {breadcrumbs.map(({ label, path, navigate, isParent }, index) => {
         const isCurrent = index === breadcrumbs.length - 1;
 
+        const truncate = (str: string) => {
+          // Get the available width of the container or the window
+          const availableWidth = window.innerWidth;
+
+          // Define the maximum allowed width
+          const maxWidth = 0.4 * availableWidth;
+
+          if (str.length > 50 || availableWidth < maxWidth) {
+            const ellipsisWidth = '...'.length * 4;
+            const truncatedLength = Math.floor((maxWidth - ellipsisWidth) / 8);
+            return str.substring(0, truncatedLength) + '...';
+          }
+
+          return str;
+        };
+
         return (
           <React.Fragment key={index}>
             {isParent && breadcrumbs.length !== 1 ? (
@@ -46,7 +62,7 @@ export const CWBreadcrumbs = ({
                       'parent-text': !isCurrent,
                     })}
                   >
-                    {label}
+                    {truncate(label)}
                   </CWText>
                 )}
               />
@@ -57,7 +73,7 @@ export const CWBreadcrumbs = ({
                 className={isCurrent ? 'current-text' : 'parent-text'}
                 onClick={isCurrent ? undefined : () => navigate(path)}
               >
-                {label}
+                {truncate(label)}
               </CWText>
             )}
             {!isCurrent && (
