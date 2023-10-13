@@ -128,6 +128,22 @@ export const CWContentPage = ({
     });
   };
 
+  const truncate = (str: string) => {
+    // Get the available width of the container or the window
+    const availableWidth = window.innerWidth;
+
+    // Define the maximum allowed width
+    const maxWidth = 0.5 * availableWidth;
+
+    if (str.length > 140 || availableWidth < maxWidth) {
+      const ellipsisWidth = '...'.length * 4;
+      const truncatedLength = Math.floor((maxWidth - ellipsisWidth) / 8);
+      return str.substring(0, truncatedLength) + '...';
+    }
+
+    return str;
+  };
+
   if (showSkeleton) {
     return (
       <CWContentPageSkeleton
@@ -168,7 +184,11 @@ export const CWContentPage = ({
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
-        {typeof title === 'string' ? <h1 className="title">{title}</h1> : title}
+        {typeof title === 'string' ? (
+          <h1 className="title">{truncate(title)}</h1>
+        ) : (
+          title
+        )}
         {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}
