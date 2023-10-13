@@ -1040,7 +1040,7 @@ export const ComponentShowcase = () => {
         </CWTabBar>
       </div>
 
-      <div>
+      <div className="new-tabs">
         <CWText type="h3">New Tabs</CWText>
         <CWTabsRow>
           {tagsList.map((tab) => (
