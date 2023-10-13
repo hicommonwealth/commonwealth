@@ -18,7 +18,7 @@ export type UpdateTopicsOrderOptions = {
   user: UserInstance;
   chain: ChainInstance;
   body: {
-    orderIds: string[];
+    orderedIds: string[];
   };
 };
 
@@ -26,7 +26,7 @@ export type UpdateTopicsOrderResult = TopicAttributes[];
 
 export async function __updateTopicsOrder(
   this: ServerTopicsController,
-  { user, chain, body: { orderIds: newTopicOrder } }: UpdateTopicsOrderOptions
+  { user, chain, body: { orderedIds: newTopicOrder } }: UpdateTopicsOrderOptions
 ): Promise<UpdateTopicsOrderResult> {
   if (!user) {
     throw new AppError(Errors.NoUser);
