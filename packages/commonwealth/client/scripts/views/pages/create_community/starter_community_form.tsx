@@ -63,6 +63,7 @@ export const StarterCommunityForm = () => {
           { label: 'ethereum', value: 'ethereum' },
           { label: 'near', value: 'near' },
         ]}
+        initialValue={{ label: 'ethereum', value: 'ethereum' }}
         onSelect={(o) => {
           setBase(o.value as ChainBase);
         }}

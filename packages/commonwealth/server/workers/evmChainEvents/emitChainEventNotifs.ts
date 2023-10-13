@@ -7,7 +7,7 @@ import { NotificationDataAndCategory } from 'types';
 import { NotificationCategories } from 'common-common/src/types';
 import { SupportedNetwork } from 'chain-events/src';
 import emitNotifications from '../../util/emitNotifications';
-import { rollbar } from './startEvmPolling';
+import { rollbar } from '../../util/rollbar';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationInstance } from '../../models/notification';
 

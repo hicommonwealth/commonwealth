@@ -176,7 +176,13 @@ class ChainEntityController {
       const [entityKind] = eventEntity;
 
       // create event
-      const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data);
+      const event = new ChainEvent(
+        cwEvent.data,
+        null,
+        cwEvent.chain,
+        network,
+        cwEvent.blockNumber
+      );
 
       // create entity
       const fieldName = getUniqueEntityKey(network, entityKind);

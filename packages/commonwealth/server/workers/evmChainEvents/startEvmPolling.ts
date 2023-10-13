@@ -1,18 +1,8 @@
-import Rollbar from 'rollbar';
-import { ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
-import { getEventSources } from './getEventSources';
+import { rollbar } from '../../util/rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
-
-// TODO: @Timothee @Jake can we make this a util singleton for easy across the server?
-export const rollbar = new Rollbar({
-  accessToken: ROLLBAR_SERVER_TOKEN,
-  environment: ROLLBAR_ENV,
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
 
 /**
  * Starts an infinite loop that periodically fetches and parses blocks from

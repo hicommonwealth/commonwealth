@@ -190,9 +190,9 @@ export async function createTestEntities() {
         await models.ChainNode.findOrCreate({
           where: {
             id: -1,
-            eth_chain_id: 1,
+            eth_chain_id: -1,
             url: 'test1',
-            balance_type: 'cmntest',
+            balance_type: 'ethereum',
             name: 'TestName1',
           },
         })
@@ -201,9 +201,9 @@ export async function createTestEntities() {
         await models.ChainNode.findOrCreate({
           where: {
             id: -2,
-            eth_chain_id: 1,
+            eth_chain_id: -2,
             url: 'test2',
-            balance_type: 'cmntest',
+            balance_type: 'ethereum',
             name: 'TestName2',
           },
         })

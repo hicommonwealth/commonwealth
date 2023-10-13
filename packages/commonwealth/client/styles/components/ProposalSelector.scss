@@ -1,0 +1,43 @@
+@import '../shared';
+
+.ProposalSelector {
+  border-radius: $border-radius-corners;
+  border: 1px solid $neutral-100;
+  height: 208px;
+  display: flex;
+  flex-direction: column;
+
+  .QueryList {
+    flex: 1;
+  }
+
+  .proposal {
+    padding-block: 6px;
+    display: flex;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $neutral-100;
+    }
+
+    .selected {
+      min-width: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      svg {
+        fill: $black;
+        width: 18px;
+      }
+    }
+
+    .text {
+      width: calc(100% - 50px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  }
+}

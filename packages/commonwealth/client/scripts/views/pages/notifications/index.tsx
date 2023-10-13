@@ -12,7 +12,7 @@ const NotificationsPage = () => {
   const [allRead, setAllRead] = useState<boolean>(false);
 
   if (!app.isLoggedIn()) {
-    return <PageError message="This page requires you to be logged in." />;
+    return <PageError message="This page requires you to be signed in." />;
   }
 
   const discussionNotifications =
@@ -26,6 +26,9 @@ const NotificationsPage = () => {
 
   return (
     <div className="NotificationsPage">
+      <CWText type="h2" fontWeight="medium">
+        Notifications
+      </CWText>
       <div className="notifications-buttons-row">
         <CWButton
           label="Mark all as read"

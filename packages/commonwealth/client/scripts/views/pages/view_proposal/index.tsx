@@ -33,6 +33,7 @@ import { JSONDisplay } from './json_display';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   useAaveProposalsQuery,
+  useCompoundProposalsQuery,
   useCosmosProposalMetadataQuery,
   useCosmosProposalQuery,
   useCosmosProposalTallyQuery,
@@ -76,7 +77,7 @@ const ViewProposalPage = ({
     setProposal(cosmosProposal);
     setTitle(cosmosProposal?.title);
     setDescription(cosmosProposal?.description);
-  }, [cosmosProposal]);
+  }, [cosmosProposal, app.chain.apiInitialized]);
 
   useEffect(() => {
     if (_.isEmpty(metadata)) return;
@@ -110,6 +111,14 @@ const ViewProposalPage = ({
       chainId: app.chain?.id,
     });
 
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const fetchCompoundData = onCompound && isAdapterLoaded;
+  const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
+    useCompoundProposalsQuery({
+      moduleReady: fetchCompoundData,
+      chainId: app.chain?.id,
+    });
+
   useEffect(() => {
     if (!aaveProposalsLoading && fetchAaveData && !proposal) {
       const foundProposal = cachedAaveProposals?.find(
@@ -123,12 +132,17 @@ const ViewProposalPage = ({
       } else {
         setProposal(foundProposal);
       }
+    } else if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
+      const foundProposal = cachedCompoundProposals?.find(
+        (p) => p.identifier === proposalId
+      );
+      setProposal(foundProposal);
     }
-  }, [cachedAaveProposals]);
+  }, [cachedAaveProposals, cachedCompoundProposals, isAdapterLoaded]);
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
-      if (onAave) return;
+      if (onAave || onCompound) return;
       try {
         const proposalFromStore = getProposalFromStore();
         setProposal(proposalFromStore);

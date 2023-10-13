@@ -1,5 +1,6 @@
 import type { CompoundTypes } from 'chain-events/src/types';
 import type { ICompletable } from '../../shared';
+import { BigNumber } from 'ethers';
 
 export type ICompoundProposalResponse = Omit<
   CompoundTypes.IProposalCreated,
@@ -7,8 +8,10 @@ export type ICompoundProposalResponse = Omit<
 > &
   ICompletable & {
     eta?: number;
-    queued: boolean;
-    executed: boolean;
-    cancelled: boolean;
-    expired: boolean;
+    forVotes: BigNumber;
+    againstVotes: BigNumber;
+    abstainVotes?: BigNumber;
+    state: number;
   };
+
+export type ICompoundVoteResponse = Omit<CompoundTypes.IVoteCast, 'kind'>;
