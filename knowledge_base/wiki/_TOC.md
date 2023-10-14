@@ -35,12 +35,12 @@
 
 **Templating Engine**
 - [Proposal Templates](Proposal-Templates.md)
-- [Template API Routes](Template-API-Routes.md)
-- [Templating JSON Schema - HEAD](Template-Schema.md)
-- [Templating JSON Schema (legacy/v.0.1)](Template-Schema-v0.1.md)
+- [Template OAS](Template-OAS.md)
+- [Templating JSON Schema - HEAD](examples/Template-Schema.md)
+- [Templating JSON Schema (legacy/v.0.1)](examples/Template-Schema-v0.1.md)
 - [Treasury Spend example](./examples/Treasury-Spend-Example.md)
 - [Parameter Change example](./examples/Param-Change-Example.md)
-- [Template Parser](Template-Parser.md)
+- [Template Parser](examples/Template-Parser.md)
 - [Contract Components Kit](Contract-Components-Kit.md)
 
 **Chain Events**

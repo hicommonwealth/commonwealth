@@ -62,6 +62,7 @@ export const CheckboxStory = {
 }
 ```
 
----
+# Change Log
 
-Next page: [Controls](https://github.com/hicommonwealth/commonwealth/wiki/Controls)
+- 230113: Flagged by Graham Johnson for consolidation or relocation.
+- 230530: Authored by Daniel Martins.

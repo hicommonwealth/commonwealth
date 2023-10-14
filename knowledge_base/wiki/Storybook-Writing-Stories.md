@@ -1,13 +1,13 @@
-## Table of contents
+**Contents**
+- [Basics](#basics)
+- [Args and argTypes](#args-and-argtypes)
+- [Two or more stories for the same component](#two-or-more-stories-for-the-same-component)
+- [Controls](#controls)
+- [Custom component function](#custom-component-function)
+- [References:](#references-)
+- [Change Log](#change-log)
 
-1. [Basics](#basics)
-2. [Args and argTypes](#args-and-argTypes)
-3. [Two or more stories for the same component](#two-or-more-stories-for-the-same-component)
-4. [Controls](#controls)
-5. [Custom component function](custom-component-function)
-6. [References](#references)
-
-## Basics
+# Basics
 
 When writing stories to a component we essentially need to
 * Import components we want to show
@@ -33,7 +33,7 @@ type Story = StoryObj<typeof spinner>;
 export const Spinner: Story = { render: () => <CWSpinner /> }
 ```
 
-## Args and argTypes
+# Args and argTypes
 
 Additionally we can set the default [args](https://github.com/hicommonwealth/commonwealth/wiki/Args) for a story control and [more information](https://github.com/hicommonwealth/commonwealth/wiki/ArgTypes) about them:
 
@@ -66,17 +66,17 @@ export const Spinner: Story = {
 
 ```
 
-## Two or more stories for the same component
+# Two or more stories for the same component
 
 Some components have variations that can be displayed in different stories.
 
 The [stories for the Button component](https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/.storybook/stories/atoms/Button.stories.tsx) were separated by button type (e.g. primary, secondary, tertiary, etc.)
 
-## Controls
+# Controls
 
 [Storybook control](https://github.com/hicommonwealth/commonwealth/wiki/Controls) allows us to interact with the components and change their appearance. [This example](https://github.com/hicommonwealth/commonwealth/wiki/Storybook-Introduction#page-example) shows the interaction with controls for the Tag component.
 
-## Custom component function
+# Custom component function
 
 Sometimes we need to write a [custom function](https://github.com/hicommonwealth/commonwealth/wiki/Custom-components) that will render the component we want to display on the story. This custom function may handle state change or work with args passed by user on controls.
 
@@ -136,9 +136,9 @@ export const VoteButtonStory = {
 
 ```
 
-## References:
+# References:
 1. https://storybook.js.org/docs/react/writing-stories/introduction
 
----
+# Change Log
 
-Next page: [Args](https://github.com/hicommonwealth/commonwealth/wiki/Args)
+- 230530: Authored by Daniel Martins.

@@ -1,3 +1,14 @@
+**Contents**
+- [Overview](#overview)
+- [Introduction](#introduction)
+- [Why two different state management tools?](#why-two-different-state-management-tools-)
+- [Zustand](#zustand)
+  * [Directory structure](#directory-structure)
+  * [Store file composition](#store-file-composition)
+  * [Middlewares](#middlewares)
+  * [Testing](#testing)
+  * [Usage](#usage)
+
 # Overview
 
 This document is intended to provide the fundamental principles for creating the next parts of the store using best practices.

@@ -1,3 +1,11 @@
+- [Learning from Recent Refactoring](#learning-from-recent-refactoring)
+  * [Law of Compounding](#law-of-compounding)
+  * [Motivation](#motivation)
+  * [Best Practices (Refactoring Opportunities)](#best-practices--refactoring-opportunities-)
+  * [SELECT - In For Loop](#select---in-for-loop)
+  * [Parallelization - Using Promise.all](#parallelization---using-promiseall)
+  * [Remove Unwanted Data - Eliminating Joins](#remove-unwanted-data---eliminating-joins)
+
 # Learning from Recent Refactoring
 
 ## Law of Compounding
@@ -67,3 +75,7 @@ models.Chain.findAll({
   where: { active: true },
 })
 ```
+
+# Change Log
+
+- 230602: Authored by Nakul Manchanda.

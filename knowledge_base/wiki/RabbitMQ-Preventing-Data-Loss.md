@@ -16,3 +16,8 @@ While we could replicate RabbitMQ memory the method is complex, expensive, and u
 ## Preventing data inconsistencies across deployments and migrations
 
 Direct write/update access should be restricted for any tables that share data with another service. No connection except the app itself (sequelize) should have write access to the database. As part of the deployment process, at the end of each migration execution, the script described above is executed to ensure that any changes made within migrations are copied over to the databases of the other services ([https://devcenter.heroku.com/articles/release-phase#specifying-release-phase-tasks](https://devcenter.heroku.com/articles/release-phase#specifying-release-phase-tasks)).
+
+# Change Log 
+
+- 231013: Flagged by Graham Johnson for consolidation with other RabbitMQ files. 
+- 230123: Authored by Timothee Legros.
