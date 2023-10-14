@@ -1,3 +1,4 @@
+**Contents**
 - [Learning from Recent Refactoring](#learning-from-recent-refactoring)
   * [Law of Compounding](#law-of-compounding)
   * [Motivation](#motivation)
