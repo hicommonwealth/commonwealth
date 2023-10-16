@@ -1,6 +1,6 @@
 import React from 'react';
 import faker from 'faker';
-import { CWTag } from '../../components/component_kit/new_designs/CWTag';
+import { CWTag } from './new_designs/CWTag';
 import { CWButton } from './new_designs/cw_button';
 
 const range = (len: number) => {
