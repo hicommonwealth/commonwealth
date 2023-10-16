@@ -1,6 +1,5 @@
 import React from 'react';
-import { SelectList } from '../../cw_select_list';
-import { components } from 'react-select';
+import Select, { components } from 'react-select';
 import { ComponentType } from '../../types';
 import './CWTypeaheadSelectList.scss';
 import { CWIcon } from '../../cw_icons/cw_icon';
@@ -47,7 +46,20 @@ export const CWTypeaheadSelectList = ({
 }: TypeaheadSelectListProps) => {
   return (
     <div className={ComponentType.TypeaheadSelectList}>
-      <SelectList
+      <Select
+        styles={{
+          control: (baseStyles) => ({
+            ...baseStyles,
+            // removes unnecessary styles
+            border: 0,
+            boxShadow: 'none',
+            minHeight: 'unset',
+          }),
+          menu: (baseStyles) => ({
+            ...baseStyles,
+            maxHeight: '300px',
+          }),
+        }}
         components={{ DropdownIndicator, Option }}
         defaultValue={defaultValue}
         options={options}
@@ -57,7 +69,7 @@ export const CWTypeaheadSelectList = ({
         placeholder={placeholder}
         noOptionsMessage={() => 'No matches found.'}
         isDisabled={isDisabled}
-        className={isDisabled ? 'disabled' : ''}
+        className={`SelectList ${isDisabled ? 'disabled' : ''}`}
       />
     </div>
   );
