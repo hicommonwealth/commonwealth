@@ -12,6 +12,7 @@ import { Placement } from '@popperjs/core/lib';
 type TooltipProps = {
   content: string | React.ReactNode;
   placement?: Placement;
+  disablePortal?: boolean;
 } & PopoverTriggerProps;
 
 type ContainerProps = {
@@ -44,6 +45,7 @@ export const CWTooltip: FC<TooltipProps> = ({
   content,
   renderTrigger,
   placement,
+  disablePortal,
 }) => {
   const popoverProps = usePopover();
 
@@ -51,6 +53,7 @@ export const CWTooltip: FC<TooltipProps> = ({
     <>
       {renderTrigger(popoverProps.handleInteraction, popoverProps.open)}
       <Popover
+        disablePortal={disablePortal}
         placement={placement}
         content={
           <Container placement={placement}>
