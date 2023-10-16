@@ -7,6 +7,7 @@ import { useCosmosProposalVotesQuery } from './cosmos/fetchCosmosVotes';
 import { useCosmosProposalDepositsQuery } from './cosmos/fetchCosmosDeposits';
 import useAaveProposalsQuery from 'state/api/proposals/aave/fetchAaveProposals';
 import useAaveProposalVotesQuery from 'state/api/proposals/aave/fetchAaveProposalVotes';
+import useRawEvmProposalsQuery from 'state/api/proposals/fetchRawEvmProposals';
 import useCompoundProposalsQuery from 'state/api/proposals/compound/fetchCompoundProposals';
 import useCompoundProposalVotesQuery from 'state/api/proposals/compound/fetchCompoundProposalVotes';
 
@@ -20,6 +21,7 @@ export {
   useCosmosProposalDepositsQuery,
   useAaveProposalVotesQuery,
   useAaveProposalsQuery,
+  useRawEvmProposalsQuery,
   useCompoundProposalsQuery,
   useCompoundProposalVotesQuery,
 };
