@@ -151,7 +151,9 @@ Our Beta/QA server can be found at `qa.commonwealth.im`. Custom domains are avai
 
 We use [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository). Releases are bundles of commits organized as tags. Git tags are similar to git branches, insofar as they are versions of the repository, containing a specific iteration in the repo’s history, which may be checked out locally. As of 231016, tags are created from dedicated release branches. 
 
-Tags observe the following versioning syntax: `v<MajorVersion>.<CycleNumber>.<IndexNumber>`. As of 230912, our major version is 0, our cycle number is 6, and our index number is 9, thus: `v0.6.9`. For hotfixes to an existing release, an additional suffix should be appended after a hyphen, e.g. `v0.6.9-1`. Release branches also follow this syntax, but prepend `release/` (e.g. `release/v0.6.9`).
+Tags observe the following versioning syntax: `v<MajorVersion>.<CycleNumber>.<IndexNumber>`. As of 230912, our major version is 0, our cycle number is 6, and our index number is 9, thus: `v0.6.9`. For hotfixes to an existing release, an additional suffix should be appended after a hyphen, e.g. `v0.6.9-1`. 
+
+Release branches also follow this syntax, but prepend `release/` and append `-x`, e.g. `release/v0.6.9-x`. The `-x` suffix denotes that the branch contains any hot fix releases for that version.
 
 Releases must first be created, then QA’d, then deployed to Heroku. All engineers ought, by default, to possess the GitHub permissions required to draft a release. All engineers ought, by default, to possess the Heroku admin permissions required to deploy a release.
 
@@ -188,16 +190,17 @@ Procedure for deploying a GitHub release:
 
 Hotfixes should rolled out to production as follows: 
 
-1. A new branch is created from the latest tag. 
-2. The hotfix commit is pushed to this new branch. 
-3. This hotfixed branch is deployed to the Beta (QA) server. 
-4. QA approval is obtained. 
-5. The hotfix branch is deployed to production. 
-6. The hotfix branch is merged back into master before the next release is cut.
+1. The hotfix is pushed directly to the release branch.
+2. The release branch is manually pushed to the Beta (QA) server.
+3. QA approval is obtained. 
+4. The hotfix branch is deployed to production. 
+5. The hotfix branch is merged back into master before the next release is cut.
+
+Alternatively, engineers are welcome to create a new hotfix branch, and cherrypick it into the release branch, replacing steps 1 & 2 above.
 
 # Change Log
 
-- 230912: Added "Github Release & Heroku Deployment Procedure" section (#5062)
+- 231016: Added "Release & Deploy Procedure" section (#5062).
 - 230906: Updated with new requirements for tickets and PRs (#4972).
 - 230831: Merged with Agile-Development.md by Graham Johnson (#4936) and certified fresh.
 - 230823: Migrated from GitHub wiki by Graham Johnson (#4350).
