@@ -1,18 +1,16 @@
 import { assert } from 'chai';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+import { Requirement } from '../../../server/util/requirementsModule/requirementsTypes';
 import validateGroupMembership, {
-  ValidateGroupMembershipResponse,
-} from 'server/util/requirementsModule/validateGroupMembership';
+  validateGroupMembershipResponse,
+} from '../../../server/util/requirementsModule/validateGroupMembership';
 
 describe('validateGroupMembership', () => {
-  it('should return a valid response', () => {
+  it('should return a valid response', async () => {
     const userAddress: string = 'mockUserAddress';
     const requirements: Requirement[] = [];
 
-    const result: ValidateGroupMembershipResponse = validateGroupMembership(
-      userAddress,
-      requirements
-    );
+    const result: validateGroupMembershipResponse =
+      await validateGroupMembership(userAddress, requirements);
 
     assert.equal(result.isValid, true);
   });

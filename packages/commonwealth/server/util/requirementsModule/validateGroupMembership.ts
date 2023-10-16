@@ -1,7 +1,7 @@
 import { Requirement } from './requirementsTypes';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 
-export type ValidateGroupMembershipResponse = {
+export type validateGroupMembershipResponse = {
   isValid: boolean;
   messages?: {
     requirement: Requirement;
@@ -16,11 +16,11 @@ export type ValidateGroupMembershipResponse = {
  * @param tbc initialized Token Balance Cache instance
  * @returns validateGroupMembershipResponse validity and messages on requirements that failed
  */
-export default function validateGroupMembership(
+export default async function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
   tbc?: TokenBalanceCache
-): ValidateGroupMembershipResponse {
+): Promise<validateGroupMembershipResponse> {
   return {
     isValid: true,
   };
