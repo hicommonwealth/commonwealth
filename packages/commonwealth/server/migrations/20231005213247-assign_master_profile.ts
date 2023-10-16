@@ -60,14 +60,13 @@ module.exports = {
         { transaction: t }
       );
 
-      console.log('hexAddresses', hexAddresses.length);
+      console.log('# hexAddresses with a profile_id', hexAddresses.length);
 
       const profileIds = hexAddresses
-        // .filter((address) => !!address.profile_id)
         .map((address) => address.profile_id)
         .join(',');
 
-      console.log('profileIds', profileIds.split(',').length);
+      console.log('# profileIds', profileIds.split(',').length);
 
       const [profiles] = await queryInterface.sequelize.query(
         `
@@ -93,18 +92,17 @@ module.exports = {
         }
       });
 
-      console.log('signers', signers.length);
+      console.log('# signers', signers.length);
 
       const signersWithMultipleProfiles = signers.filter(
         (signer) => signer.profiles.length > 1
       );
 
       console.log(
-        'signersWithMultipleProfiles',
+        '# signersWithMultipleProfiles',
         signersWithMultipleProfiles.length
       );
 
-      // wait for all updates to conclude:
       for (let i = 0; i < signersWithMultipleProfiles.length; i++) {
         const masterProfile = signersWithMultipleProfiles[i].profiles.reduce(
           (master, profile) => {
@@ -140,7 +138,6 @@ module.exports = {
             }
             if (profile.socials) {
               if (addressLastActive > master.socials_last_active) {
-                console.log('profile.socials', profile.socials);
                 master.socials = profile.socials;
                 master.socials_last_active = addressLastActive;
               }

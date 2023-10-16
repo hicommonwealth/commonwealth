@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     const { toHex, fromBech32 } = await import('@cosmjs/encoding');
     const getHex = async (address) => {
       const encodedData = fromBech32(address).data;
@@ -39,14 +39,9 @@ module.exports = {
             updated_at: new Date(),
           };
 
-          // if (hexAddress.id === 155335) {
-          //   console.log('155335', hexAddress);
-          // }
           bulkUpdateData.push(hexAddress);
         } catch (e) {
-          // console.log(
-          //   `Error getting hex for ${address.address}. Hex not generated.`
-          // );
+          // some addresses are invalid, so we just skip them
         }
       }
 
@@ -68,7 +63,7 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
