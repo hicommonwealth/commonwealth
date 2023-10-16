@@ -3,7 +3,7 @@ import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type UpdateTopicsOrderRequestBody = {
-  orderIds: string[];
+  orderedIds: string[];
 };
 
 type UpdateTopicsOrderResponse = TopicAttributes[];
