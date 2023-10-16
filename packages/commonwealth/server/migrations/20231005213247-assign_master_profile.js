@@ -1,5 +1,7 @@
 'use strict';
 
+// reference interfaces used to temporarily type the data:
+
 // interface Address {
 //   hex: string;
 //   id: number;
@@ -37,7 +39,7 @@
 // }
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
@@ -214,7 +216,7 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(
         `
