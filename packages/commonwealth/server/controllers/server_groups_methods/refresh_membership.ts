@@ -107,7 +107,7 @@ async function recomputeMembership(
     throw new ServerError('membership Group is not populated');
   }
   const { requirements } = membership.Group;
-  const { isValid, messages } = validateGroupMembership(
+  const { isValid, messages } = await validateGroupMembership(
     address.address,
     requirements,
     tokenBalanceCache
