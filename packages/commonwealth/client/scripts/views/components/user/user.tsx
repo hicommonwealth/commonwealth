@@ -28,6 +28,7 @@ export const User = ({
   avatarSize = 16,
   role,
   showSkeleton,
+  popoverPlacement,
 }: UserAttrsWithSkeletonProp) => {
   const popoverProps = usePopover();
   const { data: users } = useFetchProfilesByAddressesQuery({
@@ -187,7 +188,7 @@ export const User = ({
                 to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
               >
                 {!profile || !profile?.id ? (
-                  !profile?.id ? (
+                  !profile?.id && userAddress ? (
                     `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
                   ) : (
                     redactedAddress
@@ -244,7 +245,13 @@ export const User = ({
       onMouseLeave={popoverProps.handleInteraction}
     >
       {userFinal}
-      {profile && <Popover content={userPopover} {...popoverProps} />}
+      {profile && (
+        <Popover
+          content={userPopover}
+          {...popoverProps}
+          placement={popoverPlacement}
+        />
+      )}
     </div>
   ) : (
     userFinal

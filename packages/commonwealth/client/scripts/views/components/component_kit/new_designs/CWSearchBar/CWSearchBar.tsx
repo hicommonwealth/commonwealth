@@ -9,7 +9,7 @@ import SearchQuery from '../../../../../models/SearchQuery';
 import { notifyError } from '../../../../../controllers/app/notifications';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import useSearchResults from '../../../../../hooks/useSearchResults';
-import { CWTag } from '../cw_tag';
+import { CWTag } from '../CWTag';
 import { SearchBarDropdown } from './SearchBarDropdown';
 
 import './CWSearchBar.scss';

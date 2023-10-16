@@ -1,12 +1,15 @@
 import { assert } from 'chai';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+import { Requirement } from '../../../server/util/requirementsModule/requirementsTypes';
 import validateGroupMembership, {
   validateGroupMembershipResponse,
-} from 'server/util/requirementsModule/validateGroupMembership';
+} from '../../../server/util/requirementsModule/validateGroupMembership';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import { ChainNetwork } from '../../../../common-common/src/types';
 
 describe('validateGroupMembership', () => {
+  it('should return a valid response', async () => {
+    const userAddress: string = 'mockUserAddress';
+    const requirements: Requirement[] = [];
   it('should pass basic erc20 check', async () => {
     const userAddress: string = '0x123456';
     const requirements: Requirement[] = [
@@ -344,4 +347,5 @@ describe('validateGroupMembership', () => {
     assert.equal(result.isValid, false);
     assert.equal(result.messages.length, 2);
   });
-});
+})
+})

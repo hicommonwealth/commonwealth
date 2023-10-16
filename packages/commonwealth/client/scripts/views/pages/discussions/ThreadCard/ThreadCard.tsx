@@ -7,12 +7,11 @@ import {
   getProposalUrlPath,
 } from 'identifiers';
 import { LinkSource } from 'models/Thread';
-import moment from 'moment';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
@@ -87,6 +86,7 @@ export const ThreadCard = ({
   const isStageDefault = isDefaultStage(thread.stage);
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals.length > 0;
+  const stageLabel = threadStageToLabel(thread.stage);
 
   return (
     <>
@@ -107,7 +107,7 @@ export const ThreadCard = ({
             <AuthorAndPublishInfo
               authorAddress={thread.author}
               authorChainId={thread.authorChain}
-              publishDate={moment(thread.createdAt).format('l')}
+              publishDate={thread.createdAt}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {
@@ -152,7 +152,8 @@ export const ThreadCard = ({
             <div className="content-tags">
               {thread.stage && !isStageDefault && (
                 <CWTag
-                  label={threadStageToLabel(thread.stage)}
+                  label={stageLabel}
+                  classNames={stageLabel}
                   trimAt={20}
                   type="stage"
                   onClick={async (e) => {

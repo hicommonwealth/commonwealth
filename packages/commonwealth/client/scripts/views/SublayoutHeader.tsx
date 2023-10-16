@@ -1,33 +1,28 @@
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
-import { HelpMenuPopover } from 'views/menus/help_menu';
-import app, { initAppState } from '../state';
-import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
+import app from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import {
   isWindowMediumSmallInclusive,
   isWindowSmallInclusive,
 } from './components/component_kit/helpers';
-import { LoginSelector } from './components/Header/LoginSelector';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
-import { featureFlags } from 'helpers/feature-flags';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
 import { Modal } from 'views/components/component_kit/cw_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { setDarkMode } from 'helpers/darkMode';
-import WebWalletController from 'controllers/app/web_wallets';
-import { WalletId } from 'common-common/src/types';
-import axios from 'axios';
 import clsx from 'clsx';
 import { CWButton } from './components/component_kit/new_designs/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
 import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
+import { featureFlags } from '../helpers/feature-flags';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { HelpMenuPopover } from 'views/menus/help_menu';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -47,10 +42,11 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
   } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     setRecentlyUpdatedVisibility(menuVisible);
-  }, [menuVisible]);
+  }, [menuVisible, setRecentlyUpdatedVisibility]);
 
   function handleToggle() {
     const isVisible = !menuVisible;
@@ -59,29 +55,6 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   }
-
-  const resetWalletConnectSession = async () => {
-    /**
-     * Imp to reset wc session on logout as subsequent login attempts fail
-     */
-    const walletConnectWallet = WebWalletController.Instance.getByName(
-      WalletId.WalletConnect
-    );
-    await walletConnectWallet.reset();
-  };
-
-  const handleLogout = async () => {
-    try {
-      await axios.get(`${app.serverUrl()}/logout`);
-      await initAppState();
-      await resetWalletConnectSession();
-      notifySuccess('Logged out');
-      setDarkMode(false);
-    } catch (err) {
-      notifyError('Something went wrong during logging out.');
-      window.location.reload();
-    }
-  };
 
   return (
     <>
@@ -101,6 +74,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
                 navigate('/', {}, null);
               } else {
                 if (isLoggedIn) {
+                  setMobileMenuName(null);
                   navigate('/dashboard/for-you', {}, null);
                 } else {
                   navigate('/dashboard/global', {}, null);
@@ -111,8 +85,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {(featureFlags.sidebarToggle ||
-            isWindowSmallInclusive(window.innerWidth)) && (
+          {(featureFlags.sidebarToggle || onMobile) && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
               iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
@@ -138,40 +111,32 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             })}
           >
             <CreateContentPopover />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="compassPhosphor"
-              onClick={() => navigate('/communities', {}, null)}
+            <CWTooltip
+              content="Explore communities"
+              placement="bottom"
+              renderTrigger={(handleInteraction) => (
+                <CWIconButton
+                  iconButtonTheme="black"
+                  iconName="compassPhosphor"
+                  onClick={() => navigate('/communities', {}, null)}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                />
+              )}
             />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="question"
-              onClick={() => setIsFeedbackModalOpen(true)}
-            />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="paperPlaneTilt"
-              onClick={() =>
-                window.open('https://docs.commonwealth.im/commonwealth/')
-              }
-            />
+
+            <HelpMenuPopover />
+
             {isLoggedIn && <NotificationsMenuPopover />}
           </div>
           {isLoggedIn && <UserDropdown />}
-          {isLoggedIn && (
-            <CWIconButton
-              className="logout-button"
-              iconButtonTheme="black"
-              iconName="signOut"
-              onClick={handleLogout}
-            />
-          )}
           {!isLoggedIn && (
             <CWButton
               buttonType="primary"
               buttonHeight="sm"
               label="Login"
               buttonWidth="wide"
+              disabled={location.pathname.includes('/finishsociallogin')}
               onClick={() => setIsLoginModalOpen(true)}
             />
           )}

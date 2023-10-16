@@ -1,4 +1,3 @@
-import moment from 'moment';
 import type { DeltaStatic } from 'quill';
 import React, { useState, useEffect } from 'react';
 import app from 'state';
@@ -8,7 +7,7 @@ import type { Action, Session } from '@canvas-js/interfaces';
 import type Comment from 'models/Comment';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -38,6 +37,7 @@ type CommentCardProps = {
   replyBtnVisible?: boolean;
   onReply?: () => any;
   canReply?: boolean;
+  maxReplyLimitReached: boolean;
   // Reaction
   canReact?: boolean;
   // Spam
@@ -64,6 +64,7 @@ export const CommentCard = ({
   replyBtnVisible,
   onReply,
   canReply,
+  maxReplyLimitReached,
   // reaction
   canReact,
   // spam
@@ -116,8 +117,10 @@ export const CommentCard = ({
           <AuthorAndPublishInfo
             authorAddress={author.address}
             authorChainId={author.chain?.id || author?.profile?.chain}
-            publishDate={moment(comment.createdAt).format('l')}
+            publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
+            popoverPlacement="top"
+            showUserAddressWithInfo={false}
           />
         )}
       </div>
@@ -153,7 +156,7 @@ export const CommentCard = ({
         </div>
       ) : (
         <div className="comment-content">
-          {isSpam && <CWTag label="SPAM" type="disabled" />}
+          {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
             <QuillRenderer doc={comment.text} />
           </CWText>
@@ -166,7 +169,12 @@ export const CommentCard = ({
               {replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
-                  disabled={!canReply}
+                  disabled={maxReplyLimitReached || !canReply}
+                  tooltipText={
+                    canReply && maxReplyLimitReached
+                      ? 'Nested reply limit reached'
+                      : ''
+                  }
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -184,7 +192,7 @@ export const CommentCard = ({
                   menuItems={[
                     canEdit && {
                       label: 'Edit',
-                      iconLeft: 'write' as const,
+                      iconLeft: 'notePencil' as const,
                       onClick: onEditStart,
                       iconLeftWeight: 'bold' as const,
                     },

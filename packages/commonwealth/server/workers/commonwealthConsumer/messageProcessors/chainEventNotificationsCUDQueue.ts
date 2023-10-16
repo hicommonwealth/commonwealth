@@ -34,10 +34,6 @@ export async function processChainEventNotificationsCUD(
           ...chainEvent,
         },
       },
-      {
-        chainEvent,
-        chain: chainEvent.chain,
-      },
       data.event.excludeAddresses,
       data.event.includeAddresses
     );
