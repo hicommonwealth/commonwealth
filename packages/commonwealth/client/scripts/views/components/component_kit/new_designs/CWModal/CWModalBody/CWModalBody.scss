@@ -5,7 +5,7 @@
   padding-inline: 24px;
 
   // For content that may overflow the parent container (e.g. Dropdowns)
-  &.unset {
+  &.allowOverflow {
     overflow: unset;
   }
 }

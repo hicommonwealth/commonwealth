@@ -5,12 +5,12 @@ import { CWText } from '../../../cw_text';
 
 import './CWModalHeader.scss';
 
-type WarningIcon = 'warning' | 'danger';
+type HeaderIconType = 'warning' | 'danger';
 
 type CWModalHeaderProps = {
   label?: string;
   subheader?: string;
-  icon?: WarningIcon;
+  icon?: HeaderIconType;
   onModalClose: () => void;
 };
 

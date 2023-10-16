@@ -6,12 +6,12 @@ import { ComponentType } from '../../types';
 
 import './CWModal.scss';
 
-export type Size = 'small' | 'medium' | 'large';
+export type ModalSize = 'small' | 'medium' | 'large';
 
 interface CWModalProps {
   content: React.ReactNode;
   isFullScreen?: boolean;
-  size?: Size;
+  size?: ModalSize;
   onClose: () => void;
   open: boolean;
   className?: string;

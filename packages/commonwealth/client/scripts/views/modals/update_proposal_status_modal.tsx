@@ -321,7 +321,7 @@ export const UpdateProposalStatusModal = ({
         label="Update proposal status"
         onModalClose={onModalClose}
       />
-      <CWModalBody unset>
+      <CWModalBody allowOverflow>
         <SelectList
           defaultValue={
             tempStage

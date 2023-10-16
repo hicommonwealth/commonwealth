@@ -40,8 +40,8 @@ export type PollOptionProps = {
 };
 
 type DeletePollModalProps = {
-  onClickDelete: any;
-  onClickClose: () => void;
+  onDelete: any;
+  onClose: () => void;
 };
 
 export const PollOptions = ({
@@ -296,23 +296,21 @@ export const ResultsSection = ({
 };
 
 export const DeletePollModal: FC<DeletePollModalProps> = ({
-  onClickDelete,
-  onClickClose,
+  onDelete,
+  onClose,
 }) => {
   const handleDeleteClick = async (e) => {
     e.preventDefault();
-    await onClickDelete();
+    await onDelete();
     // Assuming you are using a library like 'react-modal', you can trigger the modal exit using that library's methods.
   };
-
-  const handleCloseModal = () => onClickClose();
 
   return (
     <div className="DeleteThreadModal">
       <CWModalHeader
         label="Delete this poll?"
         icon="danger"
-        onModalClose={handleCloseModal}
+        onModalClose={onClose}
       />
       <CWModalBody>
         <CWText>This action cannot be reversed.</CWText>
@@ -322,7 +320,7 @@ export const DeletePollModal: FC<DeletePollModalProps> = ({
           label="Cancel"
           buttonType="secondary"
           buttonHeight="sm"
-          onClick={handleCloseModal}
+          onClick={onClose}
         />
         <CWButton
           buttonType="destructive"
@@ -391,11 +389,11 @@ export const PollCard = ({
           size="small"
           content={
             <DeletePollModal
-              onClickDelete={async () => {
+              onDelete={async () => {
                 if (onDeleteClick) onDeleteClick();
                 setDeleteModalOpen(false);
               }}
-              onClickClose={() => setDeleteModalOpen(false)}
+              onClose={() => setDeleteModalOpen(false)}
             />
           }
           onClose={() => setDeleteModalOpen(false)}

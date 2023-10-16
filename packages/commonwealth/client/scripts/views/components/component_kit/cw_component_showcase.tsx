@@ -59,7 +59,7 @@ import { CWTag } from './new_designs/cw_tag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
-import { Size } from './new_designs/CWModal/CWModal';
+import { ModalSize } from './new_designs/CWModal/CWModal';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -227,9 +227,8 @@ export const ComponentShowcase = () => {
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [modalSize, setModalSize] = useState<Size>('small');
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
-    useState<boolean>(false);
+  const [modalSize, setModalSize] = useState<ModalSize>('small');
+  useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
@@ -243,7 +242,7 @@ export const ComponentShowcase = () => {
   const allChains = app.config.chains.getAll();
   const [chainId, setChainId] = useState(allChains[1]);
 
-  const renderModal = (size?: Size) => {
+  const renderModal = (size?: ModalSize) => {
     return (
       <CWModal
         content={
@@ -265,7 +264,7 @@ export const ComponentShowcase = () => {
     );
   };
 
-  const setModal = (size?: Size) => {
+  const setModal = (size?: ModalSize) => {
     setModalSize(size);
     setIsModalOpen(true);
   };
@@ -314,10 +313,6 @@ export const ComponentShowcase = () => {
         }
       />
       <CWButton label="Toast" onClick={() => notifySuccess('message')} />
-      <CWButton
-        label="Full Screen Modal"
-        onClick={() => setIsFullScreenModalOpen(true)}
-      />
       <CWButton
         label="Confirmation Modal"
         onClick={() =>

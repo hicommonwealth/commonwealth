@@ -7,12 +7,16 @@ import './CWModalBody.scss';
 interface CWModalBodyProps {
   children: React.ReactNode;
   className?: string;
-  unset?: boolean;
+  allowOverflow?: boolean;
 }
 
-const CWModalBody: FC<CWModalBodyProps> = ({ children, className, unset }) => {
+const CWModalBody: FC<CWModalBodyProps> = ({
+  children,
+  className,
+  allowOverflow,
+}) => {
   return (
-    <div className={getClasses({ className, unset }, 'CWModalBody')}>
+    <div className={getClasses({ className, allowOverflow }, 'CWModalBody')}>
       {children}
     </div>
   );
