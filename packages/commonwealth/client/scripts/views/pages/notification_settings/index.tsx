@@ -23,11 +23,7 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
-import {
-  getSpace,
-  getMultipleSpacesById,
-  SnapshotSpace,
-} from 'helpers/snapshot_utils';
+import { getMultipleSpacesById } from 'helpers/snapshot_utils';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -73,7 +69,7 @@ const NotificationSettingsPage = () => {
       try {
         const getSpaceById = await getMultipleSpacesById(snapshotIds);
 
-        const snapshotsInfoArr = snapshotIds.map((snapshotId, index) => ({
+        const snapshotsInfoArr = snapshotIds.map((snapshotId) => ({
           snapshotId,
           space: getSpaceById.find((x: { id: string }) => x.id === snapshotId),
           subs: bundledSnapshotSubs[snapshotId],

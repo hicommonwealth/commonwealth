@@ -302,7 +302,7 @@ export async function getMultipleSpaces(space: string): Promise<SnapshotSpace> {
 
 export async function getMultipleSpacesById(
   id_in: Array<string>
-): Promise<SnapshotSpace> {
+): Promise<Array<SnapshotSpace>> {
   await getApolloClient();
   const spaceObj = await apolloClient.query({
     query: await GqlLazyLoader.MULTIPLE_SPACE_QUERY(),
