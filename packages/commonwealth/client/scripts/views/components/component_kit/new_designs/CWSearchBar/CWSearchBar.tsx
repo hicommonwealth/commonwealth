@@ -1,4 +1,4 @@
-import React, { FC, ChangeEvent, useState, useEffect } from 'react';
+import React, { FC, ChangeEvent, useState } from 'react';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import type { NavigateOptions, To } from 'react-router';
 
