@@ -90,7 +90,12 @@ module.exports = {
     'react/destructuring-assignment': [1, 'always'],
     'react/function-component-definition': [1, { "namedComponents": "arrow-function" }],
     'react/no-multi-comp': [1, { "ignoreStateless": false }],
+    'react/jsx-curly-brace-presence': [1, { props: "never", children: "never" }]
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
-  extends: ['plugin:@tanstack/eslint-plugin-query/recommended', "plugin:react-hooks/recommended", "plugin:react/recommended"],
+  extends: [
+    'plugin:@tanstack/eslint-plugin-query/recommended',
+    "plugin:react-hooks/recommended",
+    "plugin:react/recommended"
+  ],
 }
