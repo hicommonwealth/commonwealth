@@ -210,7 +210,7 @@ module.exports = {
           }
         });
       }
-      console.log('updateCount', updateCount);
+      console.log('updateCount', updateCount); // 2777 ... 20231005213247-assign_master_profile: migrated (77.703s)
     });
   },
 
