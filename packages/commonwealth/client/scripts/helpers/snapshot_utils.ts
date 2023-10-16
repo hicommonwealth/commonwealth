@@ -69,6 +69,37 @@ class GqlLazyLoader {
 `;
   }
 
+  public static async MULTIPLE_SPACE_QUERY() {
+    await this.init();
+    return this.gql`
+ query Spaces($id_in: [String!]) {
+    spaces(
+      where: {
+        id_in: $id_in
+      }
+    ) {
+      id
+      name
+      about
+      network
+      symbol
+      strategies {
+        name
+        params
+      }
+      avatar
+      admins
+      members
+      filters {
+        minScore
+        onlyMembers
+      }
+      plugins
+    }
+  }
+`;
+  }
+
   public static async PROPOSAL_QUERY() {
     await this.init();
     return this.gql`
@@ -255,6 +286,32 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
   });
 
   return spaceObj.data.space;
+}
+
+export async function getMultipleSpaces(space: string): Promise<SnapshotSpace> {
+  await getApolloClient();
+  const spaceObj = await apolloClient.query({
+    query: await GqlLazyLoader.SPACE_QUERY(),
+    variables: {
+      space,
+    },
+  });
+
+  return spaceObj.data.space;
+}
+
+export async function getMultipleSpacesById(
+  id_in: Array<string>
+): Promise<SnapshotSpace> {
+  await getApolloClient();
+  const spaceObj = await apolloClient.query({
+    query: await GqlLazyLoader.MULTIPLE_SPACE_QUERY(),
+    variables: {
+      id_in,
+    },
+  });
+
+  return spaceObj.data.spaces;
 }
 
 export async function getProposal(

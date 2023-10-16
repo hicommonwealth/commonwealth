@@ -23,7 +23,11 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
-import { getSpace } from 'helpers/snapshot_utils';
+import {
+  getSpace,
+  getMultipleSpacesById,
+  SnapshotSpace,
+} from 'helpers/snapshot_utils';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -65,38 +69,24 @@ const NotificationSettingsPage = () => {
     );
     const snapshotIds = Object.keys(bundledSnapshotSubs);
 
-    const getTheSpace = async () => {
+    const getSpaces = async () => {
       try {
-        // Fetch spaces for all snapshotIds concurrently
-        const spacePromises = snapshotIds.map(async (snapshotId) => {
-          try {
-            return await getSpace(snapshotId);
-          } catch (error) {
-            console.error(
-              `Error getting space for snapshotId ${snapshotId}:`,
-              error
-            );
-            return null; // You can handle the error as needed
-          }
-        });
+        const getSpaceById = await getMultipleSpacesById(snapshotIds);
 
-        // Wait for all space fetch requests to complete
-        const spaceArray = await Promise.all(spacePromises);
-
-        // Combine bundledSnapshotSubs with spaceArray
         const snapshotsInfoArr = snapshotIds.map((snapshotId, index) => ({
           snapshotId,
-          space: spaceArray[index],
+          space: getSpaceById.find((x: { id: string }) => x.id === snapshotId),
           subs: bundledSnapshotSubs[snapshotId],
         }));
 
         setSnapshotsInfo(snapshotsInfoArr);
-      } catch (error) {
-        console.error('Error fetching spaces:', error);
+      } catch (err) {
+        console.error(err);
+        return null;
       }
     };
 
-    getTheSpace();
+    getSpaces();
   }, []);
 
   const handleSubscriptions = async (
