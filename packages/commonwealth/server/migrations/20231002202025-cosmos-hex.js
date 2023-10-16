@@ -44,9 +44,9 @@ module.exports = {
           // }
           bulkUpdateData.push(hexAddress);
         } catch (e) {
-          console.log(
-            `Error getting hex for ${address.address}. Hex not generated.`
-          );
+          // console.log(
+          //   `Error getting hex for ${address.address}. Hex not generated.`
+          // );
         }
       }
 

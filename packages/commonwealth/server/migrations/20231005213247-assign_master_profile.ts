@@ -48,6 +48,7 @@ module.exports = {
       );
     });
 
+    let updateCount = 0;
     await queryInterface.sequelize.transaction(async (t) => {
       // get all addresses with hex and their profiles by profile_id:
       const [hexAddresses] = await queryInterface.sequelize.query(
@@ -103,146 +104,115 @@ module.exports = {
         signersWithMultipleProfiles.length
       );
 
-      // let masterProfiles: MasterProfile[] = [];
-      let updateCount = 0;
-
-      signersWithMultipleProfiles.forEach(async (signer) => {
-        const masterProfile = signer.profiles.reduce((master, profile) => {
-          if (!master) {
-            return profile;
-          }
-          const addressLastActive = signer.addresses.find(
-            (a) => a.profile_id === profile.id
-          ).last_active;
-          if (profile.profile_name) {
-            if (addressLastActive > master.profile_name_last_active) {
-              master.profile_name = profile.profile_name;
-              master.profile_name_last_active = addressLastActive;
+      // wait for all updates to conclude:
+      for (let i = 0; i < signersWithMultipleProfiles.length; i++) {
+        const masterProfile = signersWithMultipleProfiles[i].profiles.reduce(
+          (master, profile) => {
+            if (!master) {
+              return profile;
             }
-          }
-          if (profile.email) {
-            if (addressLastActive > master.email_last_active) {
-              master.email = profile.email;
-              master.email_last_active = addressLastActive;
+            const addressLastActive = signersWithMultipleProfiles[
+              i
+            ].addresses.find((a) => a.profile_id === profile.id).last_active;
+            if (profile.profile_name) {
+              if (addressLastActive > master.profile_name_last_active) {
+                master.profile_name = profile.profile_name;
+                master.profile_name_last_active = addressLastActive;
+              }
             }
-          }
-          if (profile.bio) {
-            if (addressLastActive > master.bio_last_active) {
-              master.bio = profile.bio;
-              master.bio_last_active = addressLastActive;
+            if (profile.email) {
+              if (addressLastActive > master.email_last_active) {
+                master.email = profile.email;
+                master.email_last_active = addressLastActive;
+              }
             }
-          }
-          if (profile.avatar_url) {
-            if (addressLastActive > master.avatar_url_last_active) {
-              master.avatar_url = profile.avatar_url;
-              master.avatar_url_last_active = addressLastActive;
+            if (profile.bio) {
+              if (addressLastActive > master.bio_last_active) {
+                master.bio = profile.bio;
+                master.bio_last_active = addressLastActive;
+              }
             }
-          }
-          if (profile.socials) {
-            if (addressLastActive > master.socials_last_active) {
-              console.log('profile.socials', profile.socials);
-              master.socials = profile.socials;
-              master.socials_last_active = addressLastActive;
+            if (profile.avatar_url) {
+              if (addressLastActive > master.avatar_url_last_active) {
+                master.avatar_url = profile.avatar_url;
+                master.avatar_url_last_active = addressLastActive;
+              }
             }
-          }
-          if (profile.background_image) {
-            if (addressLastActive > master.background_image_last_active) {
-              master.background_image = profile.background_image;
-              master.background_image_last_active = addressLastActive;
+            if (profile.socials) {
+              if (addressLastActive > master.socials_last_active) {
+                console.log('profile.socials', profile.socials);
+                master.socials = profile.socials;
+                master.socials_last_active = addressLastActive;
+              }
             }
-          }
-          // assign user_id:
-          if (profile.user_id) {
-            if (addressLastActive > master.user_id_last_active) {
-              master.user_id = profile.user_id;
-              master.user_id_last_active = addressLastActive;
+            if (profile.background_image) {
+              if (addressLastActive > master.background_image_last_active) {
+                master.background_image = profile.background_image;
+                master.background_image_last_active = addressLastActive;
+              }
             }
-          }
-          return master;
-        }, null);
-        signer.master_profile = masterProfile;
-
-        if (masterProfile) {
-          await queryInterface.sequelize.transaction(async (t) => {
-            // Insert the new profile and update the addresses
-            try {
-              //     const insertQuery = `
-              //   INSERT INTO "Profiles" (profile_name, email, bio, avatar_url, socials, background_image, user_id)
-              //   VALUES (${
-              //     masterProfile.profile_name
-              //       ? `'${masterProfile.profile_name}'`
-              //       : null
-              //   }, ${masterProfile.email ? `'${masterProfile.email}'` : null}, ${
-              //       masterProfile.bio ? `'${masterProfile.bio}'` : null
-              //     }, ${
-              //       masterProfile.avatar_url
-              //         ? `'${masterProfile.avatar_url}'`
-              //         : null
-              //     }, ${
-              //       masterProfile.socials ? `'{${masterProfile.socials}}'` : null
-              //     }, ${
-              //       masterProfile.background_image
-              //         ? `'${JSON.stringify(masterProfile.background_image)}'`
-              //         : null
-              //     }, ${masterProfile.user_id})
-              //     RETURNING id;
-              // `;
-
-              console.log('masterProfile', masterProfile);
-
-              const { profile_name, email, bio, avatar_url, user_id } =
-                masterProfile;
-
-              const [insertedProfile] = await queryInterface.bulkInsert(
-                'Profiles',
-                [
-                  {
-                    profile_name,
-                    email,
-                    bio,
-                    avatar_url,
-                    socials: masterProfile.socials?.length
-                      ? masterProfile.socials
-                      : null,
-                    background_image: masterProfile.background_image
-                      ? JSON.stringify(masterProfile.background_image)
-                      : null,
-                    user_id,
-                  },
-                ],
-                { transaction: t, returning: true }
-              );
-
-              // console.log('insertedProfile', insertedProfile);
-
-              // const [insertedProfile] = await queryInterface.sequelize.query(
-              //   insertQuery,
-              //   { transaction: t, type: Sequelize.QueryTypes.INSERT }
-              // );
-              const new_profile_id = insertedProfile.id;
-
-              const updateQuery = `
-            UPDATE "Addresses" A
-            SET
-              legacy_user_id = A.user_id,
-              legacy_profile_id = A.profile_id,
-              profile_id = ${new_profile_id},
-              user_id = ${masterProfile.user_id}
-            WHERE A.hex = '${signer.hex}';
-          `;
-
-              await queryInterface.sequelize.query(updateQuery, {
-                transaction: t,
-                raw: true,
-              });
-            } catch (e) {
-              console.log('error', e, e.errors);
-              throw new Error(e);
+            // assign user_id:
+            if (profile.user_id) {
+              if (addressLastActive > master.user_id_last_active) {
+                master.user_id = profile.user_id;
+                master.user_id_last_active = addressLastActive;
+              }
             }
+            return master;
+          },
+          null
+        );
+        signersWithMultipleProfiles[i].master_profile = masterProfile;
+
+        await queryInterface.sequelize.transaction(async (t) => {
+          // Insert the new profile and update the addresses
+          try {
+            const { profile_name, email, bio, avatar_url, user_id } =
+              masterProfile;
+
+            const [insertedProfile] = await queryInterface.bulkInsert(
+              'Profiles',
+              [
+                {
+                  profile_name,
+                  email,
+                  bio,
+                  avatar_url,
+                  socials: masterProfile.socials?.length
+                    ? masterProfile.socials
+                    : null,
+                  background_image: masterProfile.background_image
+                    ? JSON.stringify(masterProfile.background_image)
+                    : null,
+                  user_id,
+                },
+              ],
+              { transaction: t, returning: true }
+            );
+
+            const new_profile_id = insertedProfile.id;
+
+            const updateQuery = `
+                UPDATE "Addresses" A
+                SET
+                  legacy_user_id = A.user_id,
+                  legacy_profile_id = A.profile_id,
+                  profile_id = ${new_profile_id},
+                  user_id = ${masterProfile.user_id}
+                WHERE A.hex = '${signersWithMultipleProfiles[i].hex}';
+              `;
+
+            await queryInterface.sequelize.query(updateQuery, {
+              transaction: t,
+              raw: true,
+            });
             updateCount++;
-          });
-        }
-      });
+          } catch (e) {
+            console.log('error', e);
+            throw new Error(e);
+          }
+        });
+      }
       console.log('updateCount', updateCount);
     });
   },
