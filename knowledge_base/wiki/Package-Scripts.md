@@ -7,6 +7,7 @@ If you add a script to the package.json, you must add documentation here, descri
 - [Build Scripts](#build-scripts)
   - [build-all](#build-all)
   - [heroku-postbuild](#heroku-postbuild)
+  - [heroku-prebuild](#heroku-prebuild)
 - [CI Scripts](#ci-scripts)
   - [wait-server](#wait-server)
 - [Database Scripts](#database-scripts)
@@ -79,6 +80,12 @@ Description: Runs webpack on our front-end code with 4096MB memory allocated to 
 Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) webpack --config webpack/webpack.prod.config.js --progress && yarn build-consumer`
 
 Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dynamically allocate memory, then running webpack and the [build-consumer](#build-consumer) script
+
+## heroku-prebuild
+
+Definition: `yarn global add node-gyp`
+
+Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs. 
 
 # CI Scripts
 
