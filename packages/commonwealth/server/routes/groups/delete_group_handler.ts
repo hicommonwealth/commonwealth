@@ -13,6 +13,7 @@ export const deleteGroupHandler = async (
   res: TypedResponse<DeleteGroupResponse>
 ) => {
   const { user, address, chain } = req;
+
   const { id } = req.params;
   const result = await controllers.groups.deleteGroup({
     user,

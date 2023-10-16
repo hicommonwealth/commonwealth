@@ -46,7 +46,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
 
   useEffect(() => {
     setRecentlyUpdatedVisibility(menuVisible);
-  }, [menuVisible]);
+  }, [menuVisible, setRecentlyUpdatedVisibility]);
 
   function handleToggle() {
     const isVisible = !menuVisible;
@@ -74,6 +74,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
                 navigate('/', {}, null);
               } else {
                 if (isLoggedIn) {
+                  setMobileMenuName(null);
                   navigate('/dashboard/for-you', {}, null);
                 } else {
                   navigate('/dashboard/global', {}, null);

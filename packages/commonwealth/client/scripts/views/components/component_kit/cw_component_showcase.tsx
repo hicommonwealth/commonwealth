@@ -15,6 +15,8 @@ import { CWSelectList } from './new_designs/CWSelectList';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
+import { CWTable } from './new_designs/CWTable';
+import { makeData, createColumnInfo } from './showcase_helpers';
 import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import {
   ReactQuillEditor,
@@ -55,7 +57,7 @@ import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWButton } from './new_designs/cw_button';
 import { CWForm } from './new_designs/CWForm';
-import { CWTag } from './new_designs/cw_tag';
+import { CWTag } from './new_designs/CWTag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
@@ -163,6 +165,9 @@ const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   (acc, el) => ({ ...acc, [el]: true }),
   {} as { [K in BannerType]: boolean }
 );
+
+const rowData = makeData(25);
+const columnInfo = createColumnInfo();
 
 const validationSchema = z.object({
   email: z
@@ -562,15 +567,15 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Stage Tags</CWText>
-          <CWTag label="Stage 1" type="new-stage" classNames="rorange-600" />
-          <CWTag label="Stage 2" type="new-stage" classNames="rorange-400" />
-          <CWTag label="Stage 3" type="new-stage" classNames="yellow-500" />
-          <CWTag label="Stage 4" type="new-stage" classNames="green-600" />
-          <CWTag label="Stage 5" type="new-stage" classNames="green-500" />
-          <CWTag label="Stage 6" type="new-stage" classNames="primary-600" />
-          <CWTag label="Stage 7" type="new-stage" classNames="primary-400" />
-          <CWTag label="Stage 8" type="new-stage" classNames="purple-600" />
-          <CWTag label="Stage 9" type="new-stage" classNames="purple-400" />
+          <CWTag label="Stage 1" type="stage" classNames="phase-1" />
+          <CWTag label="Stage 2" type="stage" classNames="phase-2" />
+          <CWTag label="Stage 3" type="stage" classNames="phase-3" />
+          <CWTag label="Stage 4" type="stage" classNames="phase-4" />
+          <CWTag label="Stage 5" type="stage" classNames="phase-5" />
+          <CWTag label="Stage 6" type="stage" classNames="phase-6" />
+          <CWTag label="Stage 7" type="stage" classNames="phase-7" />
+          <CWTag label="Stage 8" type="stage" classNames="phase-8" />
+          <CWTag label="Stage 9" type="stage" classNames="phase-9" />
         </div>
         <div className="tag-row">
           <CWText type="h4">Proposal Tag</CWText>
@@ -589,35 +594,32 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Login User Tag</CWText>
-          <CWTag label="mnh7a" type="login" loginIcon="cosmos" />
-          <CWTag label="mnh7a" type="login" loginIcon="discordLogin" />
-          <CWTag label="mnh7a" type="login" loginIcon="envelope" />
-          <CWTag label="mnh7a" type="login" loginIcon="ethereum" />
-          <CWTag label="mnh7a" type="login" loginIcon="octocat" />
-          <CWTag label="mnh7a" type="login" loginIcon="near" />
-          <CWTag label="mnh7a" type="login" loginIcon="polkadot" />
-          <CWTag label="mnh7a" type="login" loginIcon="polygon" />
-          <CWTag label="mnh7a" type="login" loginIcon="twitterNew" />
+          <CWTag label="mnh7a" type="login" iconName="cosmos" />
+          <CWTag label="mnh7a" type="login" iconName="discordLogin" />
+          <CWTag label="mnh7a" type="login" iconName="discord" />
+          <CWTag label="mnh7a" type="login" iconName="envelope" />
+          <CWTag label="mnh7a" type="login" iconName="ethereum" />
+          <CWTag label="mnh7a" type="login" iconName="octocat" />
+          <CWTag label="mnh7a" type="login" iconName="near" />
+          <CWTag label="mnh7a" type="login" iconName="polkadot" />
+          <CWTag label="mnh7a" type="login" iconName="polygon" />
+          <CWTag label="mnh7a" type="login" iconName="twitterNew" />
         </div>
         <div className="tag-row">
           <CWText type="h4">Address Tags</CWText>
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="cosmos" />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="cosmos" />
           <CWTag
             label="0xd83e1...a39bD"
             type="address"
-            loginIcon="discordLogin"
+            iconName="discordLogin"
           />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="envelope" />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="ethereum" />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="octocat" />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="near" />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="polkadot" />
-          <CWTag label="0xd83e1...a39bD" type="address" loginIcon="polygon" />
-          <CWTag
-            label="0xd83e1...a39bD"
-            type="address"
-            loginIcon="twitterNew"
-          />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="envelope" />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="ethereum" />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="octocat" />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="near" />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="polkadot" />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="polygon" />
+          <CWTag label="0xd83e1...a39bD" type="address" iconName="twitterNew" />
         </div>
       </div>
       <div className="button-gallery">
@@ -895,17 +897,6 @@ export const ComponentShowcase = () => {
             { label: 'Current' },
           ]}
         />
-      </div>
-      <div className="basic-gallery">
-        <CWText type="h3">Tag</CWText>
-        <CWTag label="Ref #90" />
-        <CWTag label="Passed" type="passed" />
-        <CWTag label="Failed" type="failed" />
-        <CWTag label="Active" type="active" />
-        <CWTag label="Poll" type="poll" />
-        <CWTag label="Prop #52" type="proposal" />
-        <CWTag label="Ref #90" type="referendum" />
-        <CWTag label="12 days" iconName="clock" />
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Collapsible</CWText>
@@ -1607,7 +1598,8 @@ export const ComponentShowcase = () => {
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
         <CWTooltip
-          content="Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund projects together. Never miss an on-chain event, proposal, or important discussion again."
+          content="Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund
+            projects together. Never miss an on-chain event, proposal, or important discussion again."
           placement="top"
           renderTrigger={(handleInteraction) => (
             <CWText
@@ -1641,7 +1633,11 @@ export const ComponentShowcase = () => {
           )}
         />
         <CWTooltip
-          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam semper justo eget facilisis auctor. Mauris consequat arcu non est semper vestibulum. Nulla nec porta nisi. Nullam eu erat vel arcu finibus imperdiet nec eget mi. Pellentesque enim nibh, consequat eu urna id, rhoncus porta metus. Vestibulum hendrerit felis urna, in tempor purus lobortis sit amet. Etiam pulvinar nisl eu enim laoreet tristique. Nam semper venenatis massa vel finibus."
+          content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam semper justo eget facilisis auctor.
+            Mauris consequat arcu non est semper vestibulum. Nulla nec porta nisi. Nullam eu erat vel arcu finibus
+            imperdiet nec eget mi. Pellentesque enim nibh, consequat eu urna id, rhoncus porta metus. Vestibulum
+            hendrerit felis urna, in tempor purus lobortis sit amet. Etiam pulvinar nisl eu enim laoreet tristique.
+            Nam semper venenatis massa vel finibus."
           placement="right"
           renderTrigger={(handleInteraction) => (
             <CWButton
@@ -1833,6 +1829,10 @@ export const ComponentShowcase = () => {
             { value: 'binance', label: 'Binance' },
           ]}
         />
+      </div>
+      <div className="table">
+        <CWText type="h3">Table</CWText>
+        <CWTable columnInfo={columnInfo} rowData={rowData} />
       </div>
       <div className="community-card">
         <CWText type="h3"> Community Card </CWText>
