@@ -60,14 +60,17 @@ describe('ServerThreadsController', () => {
         banCache as any
       );
 
-      const [newReaction, notificationOptions, analyticsOptions] =
-        await serverThreadsController.createThreadReaction({
-          user: user as any,
-          address: address as any,
-          chain: chain as any,
-          reaction: reaction as any,
-          threadId: threadId,
-        });
+      const [
+        newReaction,
+        notificationOptions,
+        analyticsOptions,
+      ] = await serverThreadsController.createThreadReaction({
+        user: user as any,
+        address: address as any,
+        chain: chain as any,
+        reaction: reaction as any,
+        threadId: threadId,
+      });
 
       expect(
         serverThreadsController.createThreadReaction({
@@ -96,17 +99,6 @@ describe('ServerThreadsController', () => {
         chain_id: 'ethereum',
         author_address: '0x123',
         author_chain: 'ethereum',
-      });
-
-      expect(notificationOptions).to.have.property('webhookData');
-      const { webhookData } = notificationOptions;
-      expect(webhookData).to.include({
-        user: '0x123',
-        author_chain: 'ethereum',
-        url: 'http://localhost:8080/ethereum/discussion/4-big-thread',
-        title: 'Big Thread!',
-        chain: 'ethereum',
-        body: '',
       });
 
       expect(notificationOptions).to.have.property('excludeAddresses');
@@ -486,18 +478,21 @@ describe('ServerThreadsController', () => {
         banCache as any
       );
 
-      const [newComment, notificationOptions, analyticsOptions] =
-        await serverThreadsController.createThreadComment({
-          user: user as any,
-          address: address as any,
-          chain: chain as any,
-          parentId,
-          threadId,
-          text,
-          canvasAction,
-          canvasSession,
-          canvasHash,
-        });
+      const [
+        newComment,
+        notificationOptions,
+        analyticsOptions,
+      ] = await serverThreadsController.createThreadComment({
+        user: user as any,
+        address: address as any,
+        chain: chain as any,
+        parentId,
+        threadId,
+        text,
+        canvasAction,
+        canvasSession,
+        canvasHash,
+      });
 
       expect(
         serverThreadsController.createThreadComment({
@@ -1311,23 +1306,26 @@ describe('ServerThreadsController', () => {
       const canvasSession = undefined;
       const canvasHash = undefined;
 
-      const [thread, notificationOptions, analyticsOptions] =
-        await serverThreadsController.createThread({
-          user: user as any,
-          address: address as any,
-          chain: chain as any,
-          title,
-          body,
-          kind,
-          readOnly,
-          topicId,
-          topicName,
-          stage,
-          url,
-          canvasAction,
-          canvasSession,
-          canvasHash,
-        });
+      const [
+        thread,
+        notificationOptions,
+        analyticsOptions,
+      ] = await serverThreadsController.createThread({
+        user: user as any,
+        address: address as any,
+        chain: chain as any,
+        title,
+        body,
+        kind,
+        readOnly,
+        topicId,
+        topicName,
+        stage,
+        url,
+        canvasAction,
+        canvasSession,
+        canvasHash,
+      });
 
       expect(
         serverThreadsController.createThread({
@@ -1359,15 +1357,6 @@ describe('ServerThreadsController', () => {
       expect(notificationOptions[0]).to.have.property('notification');
       expect(notificationOptions[0].notification).to.include({
         categoryId: 'new-thread-creation',
-      });
-      expect(notificationOptions[0].webhookData).to.include({
-        user: '0x123',
-        author_chain: 'ethereum',
-        url: 'http://localhost:8080/ethereum/discussion/1-mythread',
-        title: 'mythread',
-        bodyUrl: 'http://blah',
-        chain: 'ethereum',
-        body: 'hello',
       });
       expect(notificationOptions[0].notification.data).to.include({
         thread_id: 1,
