@@ -51,7 +51,6 @@ export const ThreadPollEditorCard = ({
       />
       <CWModal
         size="medium"
-        className="PollEditorCardModal"
         content={
           <PollEditorModal
             thread={thread}

@@ -88,7 +88,10 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
             }}
           />
         }
-        onClose={() => setCurrentAddress(null)}
+        onClose={() => {
+          setIsRemoveModalOpen(false);
+          setCurrentAddress(null);
+        }}
         open={isRemoveModalOpen}
       />
     </div>

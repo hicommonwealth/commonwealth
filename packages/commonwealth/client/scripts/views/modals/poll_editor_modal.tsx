@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import _ from 'underscore';
 import moment from 'moment';
 
@@ -62,6 +62,7 @@ export const PollEditorModal = ({
   const [customDurationEnabled, setCustomDurationEnabled] = useState(false);
   const [options, setOptions] = useState(TWO_EMPTY_OPTIONS);
   const [prompt, setPrompt] = useState('');
+  const modalContainerRef = useRef(null);
 
   const handleInputChange = (value: string, index: number) => {
     setOptions((prevState) => {
@@ -119,7 +120,7 @@ export const PollEditorModal = ({
   };
 
   return (
-    <div className="PollEditorModal">
+    <div className="PollEditorModal" ref={modalContainerRef}>
       <CWModalHeader label="Create Poll" onModalClose={onModalClose} />
       <CWModalBody allowOverflow>
         <CWTextInput
@@ -172,6 +173,7 @@ export const PollEditorModal = ({
             />
             {customDurationEnabled && (
               <SelectList
+                menuPortalTarget={modalContainerRef?.current}
                 isSearchable={false}
                 options={customDurationOptions}
                 defaultValue={customDurationOptions[0]}
