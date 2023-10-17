@@ -7,10 +7,11 @@ _Throughout this page, "ticket" and "story" are used interchangeably to refer to
     + [Questions](#questions)
     + [Blockers](#blockers)
     + [Story Point Estimation](#story-point-estimation)
-  * [Pull Requests](#pull-requests)
+  * [Writing Pull Requests](#writing-pull-requests)
     + [Linking Issues](#linking-issues)
     + [Draft PRs](#draft-prs)
     + [Github Quality Checks](#github-quality-checks)
+  * [Reviewing Pull Requests](#reviewing-pull-requests)
 - [Sprint Cadence](#sprint-cadence)
   * [Standup Meetings](#standup-meetings)
   * [Deep Work Wednesdays](#deep-work-wednesdays)
@@ -71,7 +72,7 @@ NB. Points != Time! Points are an estimate of complexity, not time. Having said 
 
 Points may always be increased mid-implementation, but a justification must be provided.
 
-## Pull Requests
+## Writing Pull Requests
 
 If a PR is marked for review, it must be fully mergeable, without breaking any existing functionality. It should also pass CI and [GitHub Quality Checks](#github-quality-checks).
 
@@ -102,6 +103,12 @@ Pull requests to Master should pass Github's code quality checks. (Nb: Not the t
 Any pull requests originating in the experimental branch, and being merged into Master, must pass all code quality checks. PR authors must resolve these checks themselves.
 
 Occasionally, quality checks will erroneously flag code which is used throughout our codebase, such as `useEffect`. These can be ignored.
+
+## Reviewing Pull Requests
+
+Any engineer on the team may (and is encouraged to!) review a PR. Two approvals are required to merge to master. 
+
+Occasionally reviewers may be assigned by a lead or PR author, using the `assignee` field, but we are hopeful that a volunteer culture will be sufficient.
 
 # Sprint Cadence
 

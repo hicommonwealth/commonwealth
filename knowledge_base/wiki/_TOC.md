@@ -5,8 +5,7 @@
 - [Migration Best Practices](Database-Migrations.md)
 
 **API Gateway**
-- [Kong](Kong.md)
-- [Express to OpenAPI](Express-OpenAPI-Generator.md)
+  - [Kong](Kong.md)
 
 **Services & Tooling**
 - [Sequelize](Sequelize.md)
@@ -24,19 +23,7 @@
 - [Notifications](Notifications.md)
 
 **Current Roadmap**
-- [All Milestones](Milestones.md)
-- [Front End Kaizen](Front-End.md)
 - [React Conversion](React-Milestone.md)
-- [Templating Engine](Template-Module.md)
-  - [Proposal Templates](Proposal-Templates.md)
-  - [Template API Routes](Template-API-Routes.md)
-  - [Templating JSON Schema - HEAD](Template-Schema.md)
-  - [Templating JSON Schema (legacy/v.0.1)](Template-Schema-v0.1.md)
-  - [Treasury Spend example](Treasury-Spend-Example.md)
-  - [Parameter Change example](Param-Change-Example.md)
-  - [Template Parser](Template-Parser.md)
-  - [Proposal Form Handler](Proposal-Form-Handler.md)
-  - [Contract Components Kit](Contract-Components-Kit.md)
 - [Rules Engine](Rules-Module.md)
 - [Environment Variables](Environment-Variables.md)
 - [Performance](Performance.md)
@@ -45,6 +32,16 @@
   - [Pagination](Pagination.md)
   - [Request Handler Optimization](Request-Handler-Optimization.md)
 - [Observability](Observability.md)
+
+**Templating Engine**
+- [Proposal Templates](Proposal-Templates.md)
+- [Template OAS](Template-OAS.md)
+- [Templating JSON Schema - HEAD](examples/Template-Schema.md)
+- [Templating JSON Schema (legacy/v.0.1)](examples/Template-Schema-v0.1.md)
+- [Treasury Spend example](./examples/Treasury-Spend-Example.md)
+- [Parameter Change example](./examples/Param-Change-Example.md)
+- [Template Parser](examples/Template-Parser.md)
+- [Contract Components Kit](Contract-Components-Kit.md)
 
 **Chain Events**
 - [Overview](Chain-Events-Overview.md)
@@ -68,17 +65,15 @@
 **Notifications**
 - [QA](Notifications-QA.md)
 
-**Pattern Library &etc**
-- [Bouncing in Pure React](Bouncing-In-Pure-React.md)
-- [Debouncing in Pure React](Debouncing-in-Pure-React.md)
-- [Quill React Component](Quill-Component.md)
-- [Shadow DOM](Shadow-DOM.md)
+**Pattern Library**
+- [Debouncing in Pure React](./examples/Debouncing-in-Pure-React.md)
+- [Shadow DOM](./examples/Shadow-DOM.md)
 
 **Storybook**
 - [Introduction](Storybook-Introduction.md)
 - [Stories](Storybook-Stories.md)
 - [Component Story Format](Storybook-Component-Story-Format.md)
-- [Writing stories](Storybook-Writing-stories.md)
+- [Writing stories](Storybook-Writing-Stories.md)
 - [Args](Storybook-Args.md)
 - [ArgTypes](Storybook-ArgTypes.md)
 - [Parameters](Storybook-Parameters.md)

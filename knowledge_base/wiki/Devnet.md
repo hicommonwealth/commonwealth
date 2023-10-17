@@ -1,5 +1,3 @@
-_Authored by Mark Hagelberg 230727._
-
 To develop and test new features for different chains, we use containerized testnet deployments (AKA devnets).
 
 ## Cosmos SDK
@@ -113,3 +111,8 @@ a shared address for this purpose.
 
 - Go to http://localhost:8080/evmos-dev and join community. You should be able to create proposals and vote.
 - Note: Set gas to zero. There is an issue with displaying tokens correctly, but this address should have tokens. See https://github.com/hicommonwealth/commonwealth/issues/4909s
+
+# Change Log
+
+- 230727: Updated with Cosmos SDK info by Mark Hagelberg.
+- 230418: Authored by Mark Hagelberg.

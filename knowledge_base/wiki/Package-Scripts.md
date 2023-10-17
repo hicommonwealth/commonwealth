@@ -1,4 +1,4 @@
-This entry documents [the Commonwealth package.json file](../packages/commonwealth/package.json). `Package.json` scripts should always be organized alphabetically. 
+This entry documents [the Commonwealth package.json file](../packages/commonwealth/package.json). `Package.json` scripts should always be organized alphabetically.
 
 If you add a script to the package.json, you must add documentation here, describing (1) what the script does (2) when engineers might want or need to use it. As with [all documentation](./_README.md#updating-the-docs-how--when), this should be included in the PR alongside the script addition.
 
@@ -7,6 +7,7 @@ If you add a script to the package.json, you must add documentation here, descri
 - [Build Scripts](#build-scripts)
   - [build-all](#build-all)
   - [heroku-postbuild](#heroku-postbuild)
+  - [heroku-prebuild](#heroku-prebuild)
 - [CI Scripts](#ci-scripts)
   - [wait-server](#wait-server)
 - [Database Scripts](#database-scripts)
@@ -80,6 +81,12 @@ Definition: `NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space
 
 Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dynamically allocate memory, then running webpack and the [build-consumer](#build-consumer) script
 
+## heroku-prebuild
+
+Definition: `yarn global add node-gyp`
+
+Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs. 
+
 # CI Scripts
 
 ## wait-server
@@ -96,7 +103,7 @@ Contributor: Kurtis Assad
 
 Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
 
-Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily. 
+Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily.
 
 Considerations: Engineers will almost never need to use this locally (unless they have purposefully create a large number of test notifications). This script was authored at the request of Jake Naviasky; we should confer with him as to the long-term value of this script. **Flagged for possible removal.**
 
@@ -128,13 +135,13 @@ Definition: `yarn run dump-db && psql $(heroku config:get CW_READ_DB -a commonwe
 
 Description: In addition to running the [dump-db](#dump-db) script, this copies a limited set of Notification and Subscription data from the commonwealth-beta Heroku database. Used in conjunction with the [load-db-limit](#load-db-limit) script.
 
-## load-db 
+## load-db
 
 Definition: `chmod u+x scripts/load-db.sh && ./scripts/load-db.sh`
 
 Description: Loads database following the `load-db.sh` script. Looks for dump file `latest.dump` by default; if script is called with an argument, the value of DUMP_NAME will be updated to that argument's value.
 
-## load-db-limit 
+## load-db-limit
 
 Definition: `yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql`
 
@@ -164,15 +171,43 @@ Definition: `chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh`
 
 Description: Resets the local database.
 
-## reset-frack-db 
+## reset-frack-db
 
 Definition: `heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack`
 
 Description: Synchronizes `beta-db` (used for QA) against the `frack-db` (used for CDN cache testing). Good for undoing migration script run in previous commit to Frack. See [Testing Environments](./Testing-Environments.md) entry for more info.
 
+## db-doc
+
+Definition: `chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/wiki/Database-ERD.md`
+
+Description: This pulls the schema from a local Postgres instance and generates a Mermaid ERD, updating `/knowledge_base/wiki/Database-ERD.md`
+
+Considerations:
+
+- Using a local PG instance with the default configuration. Developers must ensure it has the latest schema
+- Recommended after major database migrations (adding/removing tables/fields/relationships)
+- Not integrated (CI) yet, need to review how we incorporate file changes from GH actions back to the repo
+
+Contributor: Roger Torres
+
+# Docker
+
+## start-containers
+
+Definition: `chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh`
+
+Description: Starts remote Docker containers; see [start-docker-containers.sh](../packages/commonwealth/scripts/start-docker-containers.sh) for further documentation.
+
+## start-docker-setup
+
+Definition: `chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh`
+
+Description: To be run in a new project or repo when first setting up remote docker containers. See [start-docker-setup-help.sh](../packages/commonwealth/scripts/start-docker-setup-help.sh) for further documentation.
+
 # Linting & Formatting
 
-Open considerations: Given our Prettier pre-commit hook, this amount of linting and formatting commands may be unnecessary. 
+Open considerations: Given our Prettier pre-commit hook, this amount of linting and formatting commands may be unnecessary.
 
 ## format
 
@@ -184,7 +219,7 @@ Description: Autoformats files using config `prettierrc.json` config.
 
 Definition: `./scripts/lint-new-work.sh`
 
-Description: Lints new work, according to script file `lint-new-work.sh`. 
+Description: Lints new work, according to script file `lint-new-work.sh`.
 
 Considerations: Problematically, only checks .ts files. Name is misleading. Redundancy with [lint-branch](#lint-branch) script. **Flagged for possible removal.**
 
@@ -192,7 +227,7 @@ Considerations: Problematically, only checks .ts files. Name is misleading. Redu
 
 Definition: `eslint client/\\**/*.{ts,tsx} server/\\**/*.ts`
 
-Description: Only lints changed files on current branch. 
+Description: Only lints changed files on current branch.
 
 Considerations: May be more clearly renamed "lint-changes".
 
@@ -214,7 +249,7 @@ Considerations: Why lint styles separately? Why not just include `.scss` file ex
 
 # Mobile
 
-## build-android 
+## build-android
 
 Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android`
 
@@ -331,6 +366,7 @@ Contributor: Kurtis Assad
 # Testing
 
 Open considerations:
+
 - When and why do we invoke `nyc` and `NODE_ENV=test` in our scripts? No clear rhyme or reason to our use.
   - `nyc` runs IstanbulJS, which tracks and reports how much of our source code is covered by tests. `NODE_ENV=test` sets a global variable that changes how select parts of our wallet and chain infrastructure runs.
 - Do we need so many different scripts for specifying which part of the codebase we want to test? Would a generic test script, taking a directory as argument, suffice?
@@ -363,7 +399,7 @@ Definition: `nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts`
 
 Description: Runs all tests in our `/devnet`` folder.
 
-## test-emit-notif 
+## test-emit-notif
 
 Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/emitNotifications.spec.ts`
 
@@ -373,7 +409,7 @@ Description: Runs only the `emitNotifications.spec.ts` test, of the three `/inte
 
 Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts`
 
-Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing). 
+Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing).
 
 Considerations: The script name might misleadingly suggest that this script would pick out specifically the /util subfolder in the /integration directory. Might we be better off moving the three top-level scripts (e.g. databaseCleaner.spec.ts) into a dedicated subfolder, and targeting that?
 
@@ -429,10 +465,10 @@ Description: Runs a compilation of TypeScript files based on tsconfig.json; does
 
 # Webpack && TSNode
 
-## bundle-report    
+## bundle-report
 
 Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
-    
+
 Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.js](../packages/commonwealth/webpack/webpack.prod.config.js), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
 
 ## listen
@@ -445,7 +481,7 @@ Description: Runs ts-node, a TypeScript execution engine for NodeJS, in listenin
 
 Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
 
-Description: Windows-compatible start script. Used to start the Commonwealth app in development. 
+Description: Windows-compatible start script. Used to start the Commonwealth app in development.
 
 ## start-all
 

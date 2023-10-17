@@ -6,17 +6,16 @@ import {
   chainEntityTypeToProposalSlug,
   getProposalUrlPath,
 } from 'identifiers';
-import { Link, LinkSource } from 'models/Thread';
+import { LinkSource } from 'models/Thread';
 import 'pages/view_thread/linked_proposals_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
 import type ChainEntity from '../../../models/ChainEntity';
 import type Thread from '../../../models/Thread';
-import type { ThreadStage } from '../../../models/types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
-import { Modal } from '../../components/component_kit/cw_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
@@ -167,8 +166,9 @@ export const LinkedProposalsCard = ({
           )
         }
       />
-      <Modal
+      <CWModal
         className="LinkedProposalsCardModal"
+        size="medium"
         content={
           <UpdateProposalStatusModal
             thread={thread}
@@ -177,6 +177,7 @@ export const LinkedProposalsCard = ({
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
+        visibleOverflow
       />
     </>
   );

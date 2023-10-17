@@ -12,7 +12,9 @@ const log = factory.getLogger(formatFilename(__filename));
  * 1 second or more (block fetching is limited to 500 blocks per interval). The recommended interval
  * is 120_000 ms (120 seconds) to avoid issues with public EVM nodes rate limiting requests.
  */
-export async function startEvmPolling(interval: number) {
+export async function startEvmPolling(
+  interval: number
+): Promise<NodeJS.Timeout> {
   log.info(`Starting EVM poller`);
   if (interval > 500_000) {
     throw new Error(
@@ -23,8 +25,13 @@ export async function startEvmPolling(interval: number) {
   log.info(
     `All chains will be polled for events every ${interval / 1000} seconds`
   );
-  scheduleNodeProcessing(interval, processChainNode);
-  setInterval(scheduleNodeProcessing, interval, interval, processChainNode);
+  await scheduleNodeProcessing(interval, processChainNode);
+  return setInterval(
+    scheduleNodeProcessing,
+    interval,
+    interval,
+    processChainNode
+  );
 }
 
 if (require.main === module) {

@@ -117,12 +117,14 @@ const RPCEndpointTask = () => {
       buttons: [
         {
           label: 'Update',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
           onClick: update,
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });

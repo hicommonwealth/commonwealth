@@ -107,7 +107,8 @@ export const ManageRoles = ({
       buttons: [
         {
           label: 'Remove',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             await removeRole(role);
             if (isLosingAdminPermissions) {
@@ -117,7 +118,8 @@ export const ManageRoles = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });

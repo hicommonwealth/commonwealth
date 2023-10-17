@@ -14,7 +14,7 @@ import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { PollEditorModal } from '../../modals/poll_editor_modal';
 import { getPollTimestamp, handlePollVote } from './helpers';
-import { Modal } from '../../components/component_kit/cw_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 
 type ThreadPollEditorCardProps = {
   thread: Thread;
@@ -50,8 +50,8 @@ export const ThreadPollEditorCard = ({
           </div>
         }
       />
-      <Modal
-        className="PollEditorCardModal"
+      <CWModal
+        size="medium"
         content={
           <PollEditorModal
             thread={thread}
@@ -146,7 +146,8 @@ export const ThreadPollCard = ({
           }
         }}
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <OffchainVotingModal
             votes={poll.votes}
