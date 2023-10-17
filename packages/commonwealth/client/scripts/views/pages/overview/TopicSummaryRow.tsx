@@ -82,7 +82,7 @@ export const TopicSummaryRow = ({
 
           const isStageDefault = isDefaultStage(thread.stage);
           const isTagsRowVisible = thread.stage && !isStageDefault;
-          const stageLabel = threadStageToLabel(thread.stage)
+          const stageLabel = threadStageToLabel(thread.stage);
 
           return (
             <div key={idx}>
@@ -113,7 +113,9 @@ export const TopicSummaryRow = ({
                     >
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
-                    { isNewThread(thread.createdAt) && <CWTag label={'New'} type={'new'} iconName={'newStar'}/> }
+                    {isNewThread(thread.createdAt) && (
+                      <CWTag label={'New'} type={'new'} iconName={'newStar'} />
+                    )}
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
                     )}
