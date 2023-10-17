@@ -1,4 +1,4 @@
-import { ChainTesting } from 'chain-events/chain-testing/sdk/chainTesting';
+import { ChainTesting } from 'chain-events/evm-chain-testing/sdk/chainTesting';
 import models from '../../../../server/database';
 
 export const localRpc = 'http://localhost:8545';
