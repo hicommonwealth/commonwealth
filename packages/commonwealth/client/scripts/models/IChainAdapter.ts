@@ -98,9 +98,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       totalThreadsInCommunity: 0,
       totalThreadsInCommunityForVoting: 0,
     });
-    if (this.app.chainEntities) {
-      this.app.chainEntities.deinit();
-    }
     console.log(`${this.meta.name} stopped`);
   }
 

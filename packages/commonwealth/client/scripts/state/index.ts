@@ -3,7 +3,6 @@ import { ChainCategoryType } from 'common-common/src/types';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
 import SnapshotController from 'controllers/chain/snapshot';
-import ChainEntityController from 'controllers/server/chain_entities';
 import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
@@ -35,7 +34,6 @@ export const enum LoginState {
 export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
-  chainEntities: ChainEntityController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -123,7 +121,6 @@ const roles = new RolesController(user);
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
-  chainEntities: new ChainEntityController(),
   activeChainId: () => app.chain?.id,
 
   chainPreloading: false,
