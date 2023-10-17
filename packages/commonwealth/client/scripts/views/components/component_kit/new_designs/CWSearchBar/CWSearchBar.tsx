@@ -111,10 +111,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
         )}
       >
         <MagnifyingGlass
-          className={getClasses(
-            { magnifyingGlass: true },
-            ComponentType.Searchbar
-          )}
+          className="magnifyingGlass"
           weight="regular"
           size={24}
           onClick={handleGoToSearchPage}

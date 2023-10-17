@@ -1,7 +1,23 @@
+**Contents**
+  * [Cache Opportunities](#cache-opportunities)
+  * [Caching Consideration](#caching-consideration)
+    + [Route Level](#route-level)
+    + [Blockchain Queries](#blockchain-queries)
+    + [Database Queries](#database-queries)
+  * [Cache Strategies](#cache-strategies)
+  * [Cache Invalidation Techniques](#cache-invalidation-techniques)
+- [USAGE](#usage)
+  * [Config](#config)
+  * [Route Level Caching Example Usage](#route-level-caching-example-usage)
+  * [Wrap Functions for caching](#wrap-functions-for-caching)
+  * [Background Task Runner - Pre-fetching/ Refreshing result periodically](#background-task-runner---pre-fetching--refreshing-result-periodically)
+  * [Activity - Decorator Helper class](#activity---decorator-helper-class)
+- [Change Log](#change-log)
 
-<img width="658" alt="image" src="https://user-images.githubusercontent.com/4791635/235123601-d3cc3342-64b8-48fb-b42c-36c6049490ae.png">
+![Caching Flow](./assets/Caching-Flow.png)
 
 ## Cache Opportunities
+
 - **App Route Level responses** eg. query responses to user queries /api/viewGlobalActivity
 - **Blockchain Query Responses** - Snapshots/Linked Proposals etc
 - **Database Query Responses**
@@ -320,5 +336,6 @@ export const getChainActivity = new Activity(
   getChainActivity.startTask(models);
 ```
 
+# Change Log
 
-
+- 230428: Authored by Nakul Manchanda

@@ -7,7 +7,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { Modal } from '../../components/component_kit/cw_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { User } from '../../components/user/user';
@@ -33,7 +33,8 @@ export const TemplateDisplayTab = ({
 
   return (
     <div className="template-display-section">
-      <Modal
+      <CWModal
+        size="medium"
         content={
           <ViewTemplateModal
             template={mountedTemplate}

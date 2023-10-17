@@ -14,7 +14,7 @@ import {
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 import { useCommonNavigate } from 'navigation/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from '../../component_kit/new_designs/CWModal';
 import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { UserDropdownItem } from './UserDropdownItem';
@@ -181,14 +181,14 @@ const UserDropdown = () => {
           </button>
         )}
       />
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}
         open={isLoginModalOpen}
       />
-      <Modal
-        isFullScreen={false}
+      <CWModal
+        size="medium"
         content={
           <SessionRevalidationModal
             onModalClose={() => setRevalidationModalData(null)}

@@ -12,7 +12,7 @@ import { Select } from 'views/components/Select';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import type Topic from '../../../../models/Topic';
@@ -335,7 +335,8 @@ export const HeaderWithFilters = ({
         }}
       />
 
-      <Modal
+      <CWModal
+        size="medium"
         content={
           <EditTopicModal
             topic={topicSelectedToEdit}

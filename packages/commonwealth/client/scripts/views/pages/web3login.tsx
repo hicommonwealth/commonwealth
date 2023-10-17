@@ -5,7 +5,7 @@ import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
-import { Modal } from '../components/component_kit/cw_modal';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
@@ -62,7 +62,7 @@ const Web3LoginPage = () => {
 
   return (
     <>
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}

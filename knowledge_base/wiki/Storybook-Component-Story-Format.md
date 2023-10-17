@@ -1,12 +1,12 @@
 Component Story Format (CSF) is the recommended way to [write stories](https://storybook.js.org/docs/react/writing-stories/introduction). It's an [open standard](https://github.com/ComponentDriven/csf) based on ES6 modules that is portable beyond Storybook.
 
-## Default export
+# Default export
 
 The default export defines metadata about your component, including the component itself, its title and more.
 
 The most used properties are _component_ and _title_. The _component_ field is required and used by addons for automatic prop table generation and display of other component metadata. The _title_ field is optional and should be unique (i.e., not re-used across files).
 
-## Example
+# Example
 
 ```typescript
 import React from 'react';
@@ -29,7 +29,7 @@ On the story above the component is shown inside the "Molecules" folder as follo
 
 ![image](https://github.com/hicommonwealth/commonwealth/assets/30223098/c69ab6a9-23de-42da-8585-afa042e8c7cb)
 
-## Named story exports
+# Named story exports
 
 With CSF, every named export in the file represents a story object by default.
 
@@ -60,11 +60,12 @@ The stories result of the named exports:
 
 ![image](https://github.com/hicommonwealth/commonwealth/assets/30223098/d6d52fb6-3490-4909-a1fe-c18b9a0ec05e)
 
-## References
+# References
 
 1. [Component Story Format](https://storybook.js.org/docs/react/api/csf)
 
 ---
 
-Next page: [Writing stories](https://github.com/hicommonwealth/commonwealth/wiki/Writing-stories)
+# Change Log
 
+- 230530: Authored by Daniel Martins.

@@ -1,3 +1,11 @@
+**Contents**
+- [API Pagination Standard](#api-pagination-standard)
+  * [Request Query Params](#request-query-params)
+  * [Limit/Offset vs Cursor Pagination](#limit-offset-vs-cursor-pagination)
+  * [Code Implementation](#code-implementation)
+  * [Response Body](#response-body)
+- [Change Log](#change-log)
+
 # API Pagination Standard
 
 ⭐️ The goal of this document is to provide a standard pattern for pagination to be implemented across all routes of the Commonwealth API.
@@ -86,3 +94,7 @@ Example:
     totalResults: 247,
 }
 ```
+
+# Change Log
+
+- 230714: Authored by Ryan Bennett.
