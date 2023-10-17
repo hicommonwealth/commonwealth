@@ -24,3 +24,8 @@ If you click on a specific queue there are several things you can do:
   - You can publish messages to the queue.
 
 [1]: https://github.com/hicommonwealth/commonwealth/wiki/RabbitMQ-FAQ#how-do-i-access-the-correct-rabbitmq-management-dashboard
+
+# Change Log 
+
+- 231013: Flagged by Graham Johnson for consolidation with other RabbitMQ files. 
+- 230122: Authored by Timothee Legros.

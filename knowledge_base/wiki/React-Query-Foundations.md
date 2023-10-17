@@ -1,5 +1,15 @@
 The purpose of this doc is to present react-query as a tool that will help us handling application state - to be more specific - not a UI state, but the data coming from the backend server.
 
+**Contents**
+- [What is React-Query](#what-is-react-query)
+- [How **React-Query works in a nutshell**](#how---react-query-works-in-a-nutshell--)
+- [Why do we even consider React-Query?](#why-do-we-even-consider-react-query-)
+- [Advantages and drawbacks](#advantages-and-drawbacks)
+  * [Pros](#pros)
+  * [Cons](#cons)
+- [Gameplan](#gameplan)
+- [React-Query styleguide](#react-query-styleguide)
+
 ## What is React-Query
 
 React-Query is a popular open-source library that offers a data-fetching and caching solution for React applications. It simplifies the process of making asynchronous API calls and managing the data received from these calls. React-Query provides an elegant way to manage complex data-fetching requirements that typically involve network requests, caching, and refetching.
@@ -65,3 +75,7 @@ At first glance, React-Query does not seem to be too complicated to use. On the 
 [See comment](https://github.com/hicommonwealth/commonwealth/pull/3741/files#r1186842517)
 - we should use default `staleTime` and `cacheTime` at the beginning as they work pretty nice out of the box. Later on we can play around with these values to adjust it to our needs.
 [See comment](https://github.com/hicommonwealth/commonwealth/pull/3741/files#r1186839947)
+
+# Change Log
+
+- 230509: Authored by Marcin Maslanka.

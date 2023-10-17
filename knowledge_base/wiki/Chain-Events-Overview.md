@@ -1,7 +1,6 @@
 Please direct unanswered questions about the Chain-Event Services to Timothee or Jake.
 
-# Architecture Diagram
-![chain-events-architecture drawio (2)](https://user-images.githubusercontent.com/62490329/222942650-2915985d-15a3-4f4a-bdb1-2d09daefd87a.png)
+![Chain Events Architecture](./assets/Chain-Events-Architecture.png)
 
 # Servers
 
@@ -9,6 +8,7 @@ The chain-events service is split into 3 different servers as follows.
 [Diagram coming Soon]
 
 ## [ChainSubscriber][12]
+
 - Source of all blockchain data
 - Where chain-event listeners (see [Listeners.ts][1]) actually execute
 - Can be executed with `yarn start-subscriber`
@@ -85,3 +85,9 @@ This script pulls entities from the given chain-events database and populates th
 [14]: https://github.com/hicommonwealth/commonwealth/tree/master/packages/chain-events/services/app
 [15]: https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/server/scripts/enforceDataConsistency.ts
 [16]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events%20Environment%20Variables#both
+
+# Change Log
+
+- 231012: Flagged by Graham Johnson to update links from footnote-style to inline.
+- 230305: Updated with diagram by Timothee Legros.
+- 230122: Authored by Timothee Legros.

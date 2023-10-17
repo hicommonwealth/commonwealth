@@ -1,5 +1,3 @@
-_Certified fresh 230810 by Graham Johnson._
-
 The goal of this document is to describe the current state of the app initialization flow in as much detail as possible, so that we are better informed when engineering improvements.
 
 1. On `yarn start`, bundling begins with the `webpack.base.config.js`-defined entry point, currently set to the `client/scripts` file `index.tsx`.
@@ -66,3 +64,7 @@ The goal of this document is to describe the current state of the app initializa
         4. Emit `ready` from the `chainAdapterReady` event emitter, and print `CHAIN started.` from the console.
     8. If the user is logged in, his addresses for the initialized community are set as his current active addresses, and the `/selectChain` endpoint is hit, to update his last visited community.
 10. Nested within the `Layout` component, the `Sublayout` component renders the header, sidebar, banners, and similar sub-components, as well as wrapping any child content pages. 
+
+# Change Log
+
+- 230810: Authored by Graham Johnson (#4763).

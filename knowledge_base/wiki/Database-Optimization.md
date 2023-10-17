@@ -1,5 +1,3 @@
-_Authored by Nakul Manchanda 230627._
-
 # Query Optimization
 
 ## Limit Columns and Data Pulled by Sequelize
@@ -16,3 +14,7 @@ If you're encountering slow reads when querying JSONB attributes, it's recommend
 
 ## Slow Inserts
 If you're experiencing slow inserts due to calculating the maximum value every time a new entry is made, consider optimizing the insertion process. Calculating the maximum value can be an expensive operation, especially as the number of entries grows. Instead, you can store the maximum value separately and update it only when necessary. This can help improve the insert performance. Refer to the [GitHub issue](https://github.com/hicommonwealth/commonwealth/issues/3438) for more information on optimizing inserts involving maximum value calculation.
+
+# Change Log
+
+- 230627: Authored by Nakul Manchanda.
