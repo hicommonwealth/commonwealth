@@ -4,8 +4,7 @@ import type { RmqCWEvent } from './chainEvents';
 import type { RmqCENotification } from './chainEventNotification';
 import type { RmqSnapshotEvent } from './snapshotListener';
 import type { RmqSnapshotNotification } from './snapshotNotification';
-import { Sequelize } from 'sequelize';
-import { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
+import { ModelStatic, Sequelize } from 'sequelize';
 import { RmqDiscordMessage } from './discordMessage';
 
 /**
@@ -81,7 +80,7 @@ export enum RascalRoutingKeys {
   DiscordListener = 'DiscordListener',
 }
 
-export type SafeRmqPublishSupported = ChainEventModelStatic;
+export type SafeRmqPublishSupported = ModelStatic<any>;
 
 export abstract class AbstractRabbitMQController {
   protected _initialized = false;

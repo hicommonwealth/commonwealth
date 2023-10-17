@@ -1,7 +1,6 @@
 /**
  * Defines general interfaces for chain event fetching and processing.
  */
-import type { ChainEventInstance } from '../services/database/models/chain_event';
 
 import * as CompoundTypes from './chains/compound/types';
 import * as AaveTypes from './chains/aave/types';
@@ -70,9 +69,7 @@ export interface CWEvent<IEventData = IChainEventData> {
 }
 
 // handles individual events by sending them off to storage/notifying
-export abstract class IEventHandler<
-  DBEventType = IChainEventData | ChainEventInstance
-> {
+export abstract class IEventHandler<DBEventType = IChainEventData> {
   name?: any;
 
   // throws on error, returns a db event, or void
