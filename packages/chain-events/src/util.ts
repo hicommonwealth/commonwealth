@@ -1,4 +1,4 @@
-import type { IDisconnectedRange, CWEvent, IEventLabel } from './interfaces';
+import type { CWEvent, IEventLabel } from './interfaces';
 import { SupportedNetwork } from './interfaces';
 import { Label as CompoundLabel } from './chains/compound';
 import { Label as AaveLabel } from './chains/aave';
