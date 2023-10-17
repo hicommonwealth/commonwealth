@@ -155,7 +155,7 @@ Tags observe the following versioning syntax: `v<MajorVersion>.<CycleNumber>.<In
 
 Release branches also follow this syntax, but prepend `release/` and append `-x`, e.g. `release/v0.6.9-x`. The `-x` suffix denotes that the branch contains any hot fix releases for that version.
 
-Releases must first be created, then QA’d, then deployed to Heroku. All engineers ought, by default, to possess the GitHub permissions required to draft a release. All engineers ought, by default, to possess the Heroku admin permissions required to deploy a release.
+Releases must first be created, then QA’d, then deployed to Heroku. All engineers ought, by default, to possess the GitHub permissions required to draft a release. All engineers ought, by default, to possess the Heroku admin permissions required to deploy a release. If this is not the case, and permissions are required for the task at hand, reach out to a lead.
 
 Procedure for creating a new GitHub Release from a pre-existing release branch, e.g. `release/v0.6.9`:
 
