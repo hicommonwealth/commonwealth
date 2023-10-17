@@ -10,6 +10,7 @@ export const getChainNodesHandler = async (
   req: TypedRequestQuery<GetChainNodesRequestParams>,
   res: TypedResponse<GetChainNodesResponse>
 ) => {
+  console.log("testing new eslint CI")
   const results = await controllers.chains.getChainNodes({});
   return success(res, results);
 };
