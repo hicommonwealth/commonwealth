@@ -13,7 +13,7 @@ import { User } from 'views/components/user/user';
 import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { NewThreadTag } from '../../NewThreadTag';
-import { ArchiveTrayWithTooltip } from 'views/components/archive_tray_with_tooltip';
+import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import './AuthorAndPublishInfo.scss';
 import { PopperPlacementType } from '@mui/base/Popper';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
