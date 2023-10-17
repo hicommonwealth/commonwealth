@@ -84,7 +84,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
           if (!includeSpamThreads && thread.markedAsSpamAt) return null;
 
-          if (!onArchivePage && !includeArchivedThreads && thread.archivedAt !== null) return null;
+          if (
+            !onArchivePage &&
+            !includeArchivedThreads &&
+            thread.archivedAt !== null
+          )
+            return null;
 
           if (onArchivePage && thread.archivedAt === null) return null;
 
