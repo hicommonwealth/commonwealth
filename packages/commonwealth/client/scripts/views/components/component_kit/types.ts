@@ -43,6 +43,7 @@ export enum ComponentType {
   Spinner = 'Spinner',
   Tab = 'Tab',
   TabBar = 'TabBar',
+  Table = 'Table',
   Tag = 'Tag',
   Text = 'Text',
   TextArea = 'TextArea',

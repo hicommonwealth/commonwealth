@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React from 'react';
-import { CWTag } from '../../components/component_kit/cw_tag';
+import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 
 export function isNewThread(threadCreatedAt: moment.Moment) {
   const diffInMs = moment().diff(threadCreatedAt);
