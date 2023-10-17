@@ -5,7 +5,7 @@ import {
   useDeleteThreadMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
@@ -100,7 +100,8 @@ export const AdminActions = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await deleteThread({
@@ -120,7 +121,8 @@ export const AdminActions = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -161,11 +163,13 @@ export const AdminActions = ({
       buttons: [
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
         {
           label: !thread.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             const isSpam = !thread.markedAsSpamAt;
             try {
@@ -233,12 +237,14 @@ export const AdminActions = ({
         buttons: [
           {
             label: 'Restore',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: onEditConfirm,
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
             onClick: onEditCancel,
           },
         ],
@@ -416,7 +422,9 @@ export const AdminActions = ({
         />
       </span>
 
-      <Modal
+      <CWModal
+        size="small"
+        visibleOverflow
         content={
           <ChangeThreadTopicModal
             thread={thread}
@@ -427,7 +435,8 @@ export const AdminActions = ({
         open={isChangeTopicModalOpen}
       />
 
-      <Modal
+      <CWModal
+        size="medium"
         content={
           <UpdateProposalStatusModal
             onChangeHandler={(s) =>
@@ -439,9 +448,11 @@ export const AdminActions = ({
         }
         onClose={() => setIsUpdateProposalStatusModalOpen(false)}
         open={isUpdateProposalStatusModalOpen}
+        visibleOverflow
       />
 
-      <Modal
+      <CWModal
+        size="small"
         content={
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
@@ -453,7 +464,7 @@ export const AdminActions = ({
         open={isEditCollaboratorsModalOpen}
       />
 
-      <Modal
+      <CWModal
         content={
           <ArchiveThreadModal
             thread={thread}

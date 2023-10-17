@@ -28,7 +28,8 @@ export const handlePollVote = async (
     buttons: [
       {
         label: 'Submit',
-        buttonType: 'mini-black',
+        buttonType: 'primary',
+        buttonHeight: 'sm',
         onClick: () => {
           poll
             .submitVote(...userInfo, option)
@@ -44,7 +45,8 @@ export const handlePollVote = async (
       },
       {
         label: 'Cancel',
-        buttonType: 'mini-white',
+        buttonType: 'secondary',
+        buttonHeight: 'sm',
       },
     ],
   });

@@ -1,19 +1,20 @@
-import { ChainNetwork, WalletSsoSource } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
-import 'components/component_kit/cw_wallets_list.scss';
-import type Substrate from 'controllers/chain/substrate/adapter';
 import React from 'react';
+import type { ChainNetwork } from 'common-common/src/types';
+import { WalletSsoSource } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import type Substrate from 'controllers/chain/substrate/adapter';
 import app from 'state';
 import { addressSwapper } from 'utils';
 import IWebWallet from '../../../models/IWebWallet';
 import { User } from '../user/user';
 import { CWAuthButton, CWNoAuthMethodsAvailable } from './cw_auth_button';
 import { CWDivider } from './cw_divider';
-import { CWIconButton } from './cw_icon_button';
-import { Modal } from './cw_modal';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
+import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
+
+import 'components/component_kit/cw_wallets_list.scss';
 
 const LinkAccountItem = (props: {
   account: { address: string; meta?: { name: string } };
@@ -88,28 +89,24 @@ export const AccountSelector = (props: AccountSelectorProps) => {
 
   return (
     <div className="AccountSelector">
-      <div className="close-button-wrapper">
-        <CWIconButton
-          iconButtonTheme="primary"
-          iconName="close"
-          iconSize="small"
-          className="close-icon"
-          onClick={() => onModalClose()}
-        />
-      </div>
-
-      {accounts.map((account, idx) => {
-        return (
-          <LinkAccountItem
-            key={`${account.address}-${idx}`}
-            account={account}
-            walletChain={walletChain}
-            walletNetwork={walletNetwork}
-            onSelect={onSelect}
-            idx={idx}
-          />
-        );
-      })}
+      <CWModalHeader
+        label="Select account to join"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody>
+        {accounts.map((account, idx) => {
+          return (
+            <LinkAccountItem
+              key={`${account.address}-${idx}`}
+              account={account}
+              walletChain={walletChain}
+              walletNetwork={walletNetwork}
+              onSelect={onSelect}
+              idx={idx}
+            />
+          );
+        })}
+      </CWModalBody>
     </div>
   );
 };
@@ -173,7 +170,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
                   }
                 }}
               />
-              <Modal
+              <CWModal
+                size="small"
                 content={
                   <AccountSelector
                     accounts={wallet.accounts}

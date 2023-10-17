@@ -38,7 +38,8 @@ const DownloadMembersListTask = () => {
       buttons: [
         {
           label: 'Download',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               setIsDownloading(true);
@@ -80,7 +81,8 @@ const DownloadMembersListTask = () => {
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });
