@@ -96,7 +96,7 @@ export const ChainEventNotificationRow = (
       className={
         !notification.isRead ? 'NotificationRow unread' : 'NotificationRow'
       }
-      onClick={() => navigate(path)}
+      onClick={() => navigate(path, {}, null)}
     >
       <div className="comment-body">
         <div className="comment-body-top chain-event-notification-top">
