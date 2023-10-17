@@ -1,7 +1,7 @@
 import { WebhookInstance } from '../../models/webhook';
 import { ProfileAttributes } from '../../models/profile';
 import models from '../../database';
-import { NotificationDataAndCategory } from 'types';
+import { NotificationDataAndCategory } from '../../../shared/types';
 import { NotificationCategories } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';

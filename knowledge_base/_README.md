@@ -125,6 +125,8 @@ Any concerns about future reliability of the entry (e.g. an engineer knows that 
 
 The goal of the "Flagged by" keyphrase is to raise awareness of areas of the knowledge base need attention, and to prevent future engineers from implementing misleading or out-of-date instructions.
 
+If fixes are minor or urgent (i.e. can or should be addressed quickly), ping Graham Johnson on Slack or GitHub.
+
 #### Merged By
 
 If pages are merged together, this should be noted in the change log of the merged-into page, and a compressive summary of the merged page should be provided below.

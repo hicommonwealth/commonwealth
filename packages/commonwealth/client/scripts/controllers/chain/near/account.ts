@@ -66,7 +66,7 @@ export class NearAccount extends Account {
   }
 }
 
-export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
+export class NearAccounts implements IAccountsModule<NearAccount> {
   private _Chain: NearChain;
   private _store: AccountsStore<NearAccount> = new AccountsStore();
   public get store() {

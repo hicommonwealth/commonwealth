@@ -19,7 +19,6 @@ export type ProfileAttributes = {
   email?: string;
   website?: string;
   bio?: string;
-  is_default?: boolean;
   avatar_url?: string;
   slug?: string;
   socials?: string[];
@@ -57,11 +56,6 @@ export default (
       email: { type: dataTypes.STRING, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       bio: { type: dataTypes.TEXT, allowNull: true },
-      is_default: {
-        type: dataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
       avatar_url: { type: dataTypes.STRING, allowNull: true },
       slug: { type: dataTypes.STRING, allowNull: true },
       socials: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: true },

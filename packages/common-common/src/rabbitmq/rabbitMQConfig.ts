@@ -65,31 +65,26 @@ export function getRabbitMQConfig(
   const vhostConfig = config.vhosts[vhost];
   if (service === RascalConfigServices.CommonwealthService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
-      RascalExchanges.CUD,
       RascalExchanges.Notifications,
       RascalExchanges.SnapshotListener,
       RascalExchanges.Discobot,
     ]);
     copyConfigs(allQueues, vhostConfig.queues, [
-      RascalQueues.ChainEventNotificationsCUDMain,
       RascalQueues.ChainEventNotifications,
       RascalQueues.SnapshotListener,
       RascalQueues.DiscordListener,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
-      RascalBindings.ChainEventNotificationsCUD,
       RascalBindings.ChainEventNotifications,
       RascalBindings.SnapshotListener,
       RascalBindings.DiscordListener,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
-      RascalPublications.ChainEventNotificationsCUDMain,
       RascalPublications.ChainEventNotifications,
       RascalPublications.SnapshotListener,
       RascalPublications.DiscordListener,
     ]);
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
-      RascalSubscriptions.ChainEventNotificationsCUDMain,
       RascalSubscriptions.ChainEventNotifications,
       RascalSubscriptions.SnapshotListener,
       RascalSubscriptions.DiscordListener,
@@ -97,23 +92,16 @@ export function getRabbitMQConfig(
   } else if (service === RascalConfigServices.ChainEventsService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
       RascalExchanges.ChainEvents,
-      RascalExchanges.CUD,
     ]);
-    copyConfigs(allQueues, vhostConfig.queues, [
-      RascalQueues.ChainEvents,
-      RascalQueues.ChainEventNotificationsCUDMain,
-    ]);
+    copyConfigs(allQueues, vhostConfig.queues, [RascalQueues.ChainEvents]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvents,
-      RascalBindings.ChainEventNotificationsCUD,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.ChainEvents,
-      RascalPublications.ChainEventNotificationsCUDMain,
     ]);
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
       RascalSubscriptions.ChainEvents,
-      RascalSubscriptions.ChainEventNotificationsCUDMain,
     ]);
   } else if (service === RascalConfigServices.SnapshotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [
