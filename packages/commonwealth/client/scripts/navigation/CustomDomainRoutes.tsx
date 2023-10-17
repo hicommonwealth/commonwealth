@@ -35,9 +35,6 @@ const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect')
 );
-const ChainEntityLinkRedirectPage = lazy(
-  () => import('views/pages/chain_entity_link_redirect')
-);
 const SnapshotProposalLinkRedirectPage = lazy(
   () => import('views/pages/snapshot_proposal_link_redirect')
 );
@@ -507,12 +504,6 @@ const CustomDomainRoutes = () => {
     // (a) load external data as needed (from snapshot, chain events, etc) to
     // (b) produce a correct link to the entity (whether /snapshot/space/id or /proposal/id), and
     // (c) update the link objects associated with the identifer to point at the correct page.
-    <Route
-      path="/link/chain-entity/:identifier"
-      element={withLayout(ChainEntityLinkRedirectPage, {
-        scoped: true,
-      })}
-    />,
     <Route
       path="/link/snapshot-proposal/:identifier"
       element={withLayout(SnapshotProposalLinkRedirectPage, {
