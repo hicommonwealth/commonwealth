@@ -147,11 +147,11 @@ export const HeaderWithFilters = ({
     <div className="HeaderWithFilters">
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
-          {
-            isUndefined(topic)
-              ? ( onArchivePage ? 'Archived' : 'All Discussions')
-              : topic
-          }
+          {isUndefined(topic)
+            ? onArchivePage
+              ? 'Archived'
+              : 'All Discussions'
+            : topic}
         </CWText>
         <div className="count-and-button">
           <CWText
@@ -190,11 +190,11 @@ export const HeaderWithFilters = ({
         <CWText className="subheader-text">{selectedTopic.description}</CWText>
       )}
 
-      { onArchivePage && (
+      {onArchivePage && (
         <CWText className="subheader-text">
-          This section is for all archived posts. Archived posts will
-          always be visible here and can be linked to new thread posts,
-          but they can’t be upvoted or receive new comments.
+          This section is for all archived posts. Archived posts will always be
+          visible here and can be linked to new thread posts, but they can’t be
+          upvoted or receive new comments.
         </CWText>
       )}
 
@@ -353,15 +353,15 @@ export const HeaderWithFilters = ({
           }}
         />
 
-        {!onArchivePage &&
-            <CWCheckbox
-              checked={isIncludingArchivedThreads}
-              label="Include archived posts"
-              onChange={(e) => {
-                onIncludeArchivedThreads(e.target.checked);
-              }}
-            />
-        }
+        {!onArchivePage && (
+          <CWCheckbox
+            checked={isIncludingArchivedThreads}
+            label="Include archived posts"
+            onChange={(e) => {
+              onIncludeArchivedThreads(e.target.checked);
+            }}
+          />
+        )}
       </div>
 
       <Modal
