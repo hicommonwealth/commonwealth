@@ -45,7 +45,7 @@ import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { isMobile } from 'react-device-detect';
+import { isMobile, MobileView } from 'react-device-detect';
 
 import {
   breakpointFnValidator,
@@ -530,7 +530,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
       <CWContentPage
-        showTabs={isCollapsedSize && tabsShouldBePresent && !isMobile}
+        showTabs={isCollapsedSize && tabsShouldBePresent && !MobileView}
         contentBodyLabel="Thread"
         showSidebar={
           showLinkedProposalOptions ||
@@ -623,9 +623,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <>
                 <QuillRenderer
                   doc={thread.body}
-                  cutoffLines={isMobile ? 10 : 50}
+                  cutoffLines={MobileView ? 10 : 50}
                 />
-                {isMobile && (
+                {MobileView && (
                   <div className="FooterCards">
                     {sidebarComponents.map((component) => {
                       return <div key={component.label}>{component.item}</div>;
@@ -726,7 +726,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             />
           </>
         }
-        sidebarComponents={isMobile ? [] : sidebarComponents}
+        sidebarComponents={MobileView ? [] : sidebarComponents}
       />
       {JoinCommunityModals}
     </>
