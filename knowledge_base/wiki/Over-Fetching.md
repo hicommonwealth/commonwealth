@@ -1,4 +1,11 @@
-_Authored by Nakul Manchanda, 230629._
+**Contents**
+- [Data Over-Fetching](#data-over-fetching)
+  * [Changes Made](#changes-made)
+  * [Examples](#examples)
+    + [Scenario 1: Accidentally pulling all attributes using Sequelize](#scenario-1--accidentally-pulling-all-attributes-using-sequelize)
+    + [Scenario 2: Response format doesn't allow pagination](#scenario-2--response-format-doesn-t-allow-pagination)
+    + [Scenario 3: Grabbing unused data](#scenario-3--grabbing-unused-data)
+- [Change Log](#change-log)
 
 # Data Over-Fetching
 This pertains to situations where we retrieve more data than required. This is commonly observed when Sequelize queries behind endpoints extract excessive information.
@@ -18,12 +25,13 @@ Check out the changes in this [pull request](https://github.com/hicommonwealth/c
 
 ## Examples
 
-### Scenario 1 - accidentally pulling all attributes using Sequelize
+### Scenario 1: Accidentally pulling all attributes using Sequelize
+
 - In some instances, we are **over-fetching data by over 99%**, resulting in unnecessary strain on the Database and Network. An example of this can be seen with `/viewSubscriptions`.
 
 Here is [viewSubscription query](https://github.com/hicommonwealth/commonwealth/blob/0fca7428d17cb860a676eaf9c28825ad7d4416ed/packages/commonwealth/server/routes/subscription/viewSubscriptions.ts#L45)
 
-<img width="1416" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/4791635/047b6235-d835-4706-a0d6-342bbf12ccf7">
+![viewSubscription query](./assets/viewSubscription-Query.png)
 
 SQL Query: **120 attributes fetched**
 
@@ -168,7 +176,8 @@ WHERE
 By excluding certain attributes, we managed to reduce data size by 15 times, shrinking from 15MB to 1MB as per the changes implemented in the pull request [3966](https://github.com/hicommonwealth/commonwealth/pull/3966).
 <img width="1416" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/4791635/dd5dc68a-7cb0-474b-a4f1-5f8a602c7b14">
 
-### Scenario 2 - Response format doesn't allow pagination
+### Scenario 2: Response format doesn't allow pagination
+
 - In extreme instances, over-fetching can lead to **out of memory errors**. This problem can be observed in the `getThreads` endpoint when it includes comments:
 
 Even when fetching paginated threads, the comments array for each thread is fetched without pagination. This approach can result in substantial memory usage for threads with many comments. The code snippet responsible for this behavior can be found in the [getThreads with include_comments](https://github.com/hicommonwealth/commonwealth/blob/0fca7428d17cb860a676eaf9c28825ad7d4416ed/packages/commonwealth/server/routes/threads/getThreads.ts#L77) function.
@@ -189,7 +198,8 @@ Response structure:
 ```
 This issue is addressed in the changes of pull request [3966](https://github.com/hicommonwealth/commonwealth/pull/3966).
 
-### Scenario 3 - we think we need it but not used in UI/App
+### Scenario 3: Grabbing unused data
+
 - **Unnecessary joining and fetching of attributes** in a fairly frequently used query that are not utilized in the frontend is a prevalent issue. This is seen in `viewUserActivity` and `viewGlobalActivity`. For instance, reactions and profile information are fetched even though they are not required.
 
 Code Snippet is from [here](https://github.com/hicommonwealth/commonwealth/blob/0fca7428d17cb860a676eaf9c28825ad7d4416ed/packages/commonwealth/server/routes/viewUserActivity.ts#L50)
@@ -215,3 +225,7 @@ include: [
 A new query for `viewUserActivity` and `viewGlobalActivity` has been proposed in [this pull request](https://github.com/hicommonwealth/commonwealth/pull/4200). This optimized query operates under 200ms, improving the speed and efficiency of the system.
 
 Additionally, this update also addresses code duplication between `viewUserActivity` and `viewGlobalActivity`. The redundant code has been consolidated into a single 'activity' query. When this query is passed a user_id, it returns user-specific activity; otherwise, it delivers global activity. This change enhances the code's maintainability and readability while still retaining its functionality.
+
+# Change Log
+
+- 230629: Authored by Nakul Manchanda.

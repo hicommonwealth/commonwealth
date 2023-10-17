@@ -1,3 +1,11 @@
+**Contents**
+- [Rationale](#rationale)
+  * [Current State](#current-state)
+  * [Proposed Implementation Approaches](#proposed-implementation-approaches)
+  * [Current Implementation](#current-implementation)
+  * [Consequences](#consequences)
+- [Change Log](#change-log)
+
 # Rationale
 
 To enhance query performance, we can store certain frequently needed values, like counts, as pre-computed metrics. This method circumvents the need to execute complex and potentially time-consuming aggregations or calculations each time these values are required.
@@ -28,3 +36,7 @@ Presently, our implementation relies on Database triggers. For more detailed inf
 ## Consequences
 
 Integrating pre-aggregated metrics can greatly expedite route queries. This optimization can improve the efficiency of routes such as `viewUserActivity`, `globalUserActivity`, `getThreads`, `bulkThreads`, and `activeThreads`, thereby contributing to a more responsive application and an enhanced user experience.
+
+# Change Log
+
+- 230713: Authored by Nakul Manchanda.

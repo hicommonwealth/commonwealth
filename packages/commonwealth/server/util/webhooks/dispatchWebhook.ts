@@ -11,57 +11,78 @@ import { WebhookInstance } from '../../models/webhook';
 import { sendZapierWebhook } from './destinations/zapier';
 import { rollbar } from '../rollbar';
 import { StatsDController } from 'common-common/src/statsd';
+import models from '../../database';
+import { ChainInstance } from '../../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 // TODO: @Timothee disable/deprecate a webhook ulr if it fails too many times (remove dead urls)
 export async function dispatchWebhooks(
-  notifDataCategory: NotificationDataAndCategory,
+  notification: NotificationDataAndCategory,
   webhooks?: WebhookInstance[]
 ) {
   if (
-    notifDataCategory.categoryId === NotificationCategories.SnapshotProposal ||
-    notifDataCategory.categoryId === NotificationCategories.ThreadEdit ||
-    notifDataCategory.categoryId === NotificationCategories.CommentEdit
+    notification.categoryId === NotificationCategories.SnapshotProposal ||
+    notification.categoryId === NotificationCategories.ThreadEdit ||
+    notification.categoryId === NotificationCategories.CommentEdit
   ) {
     log.warn(
-      `Webhooks not supported for ${notifDataCategory.categoryId} notifications`
+      `Webhooks not supported for ${notification.categoryId} notifications`
     );
     return;
   }
 
   if (!webhooks) {
-    webhooks = await fetchWebhooks(notifDataCategory);
+    webhooks = await fetchWebhooks(notification);
   }
-  const webhookData = await getWebhookData(notifDataCategory);
+
+  let chainId: string;
+  if (notification.categoryId === NotificationCategories.ChainEvent) {
+    chainId = notification.data.chain;
+  } else {
+    chainId = notification.data.chain_id;
+  }
+
+  const chain: ChainInstance | undefined = await models.Chain.findOne({
+    where: {
+      id: chainId,
+    },
+  });
+
+  const webhookData = Object.freeze(await getWebhookData(notification, chain));
 
   const webhookPromises = [];
   for (const webhook of webhooks) {
     switch (getWebhookDestination(webhook.url)) {
       case WebhookDestinations.Discord:
         webhookPromises.push(
-          sendDiscordWebhook(webhook.url, notifDataCategory.categoryId, {
-            ...webhookData,
-          })
+          sendDiscordWebhook(
+            webhook.url,
+            notification.categoryId,
+            {
+              ...webhookData,
+            },
+            chain
+          )
         );
         break;
       case WebhookDestinations.Slack:
         webhookPromises.push(
-          sendSlackWebhook(webhook.url, notifDataCategory.categoryId, {
+          sendSlackWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
           })
         );
         break;
       case WebhookDestinations.Telegram:
         webhookPromises.push(
-          sendTelegramWebhook(webhook.url, notifDataCategory.categoryId, {
+          sendTelegramWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
           })
         );
         break;
       case WebhookDestinations.Zapier:
         webhookPromises.push(
-          sendZapierWebhook(webhook.url, notifDataCategory.categoryId, {
+          sendZapierWebhook(webhook.url, notification.categoryId, {
             ...webhookData,
           })
         );

@@ -23,6 +23,7 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
 import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
 import { openConfirmation } from '../../modals/confirmation_modal';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -70,7 +71,8 @@ const DiscordForumConnections = ({
       buttons: [
         {
           label: 'Remove',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await app.discord.setForumChannelConnection(topicId, null);
@@ -84,7 +86,8 @@ const DiscordForumConnections = ({
         },
         {
           label: 'No',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -212,6 +215,9 @@ export const ChainMetadataRows = ({
     name: string;
   } | null>(null);
   const [selectedChannelLoaded, setSelectedChannelLoaded] = useState(false);
+  const [discordWebhooksEnabled, setDiscordWebhooksEnabled] = useState(
+    chain.discordBotWebhooksEnabled
+  );
 
   useEffect(() => {
     setDiscordBotConnected(chain.discordConfigId !== null);
@@ -345,6 +351,19 @@ export const ChainMetadataRows = ({
       notifySuccess('Snapshot Notifications Settings Saved');
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const updateDiscordWebhookEnabled = async () => {
+    try {
+      await chain.updateChainData({
+        discord_bot_webhooks_enabled: !discordWebhooksEnabled,
+      });
+      setDiscordWebhooksEnabled(!discordWebhooksEnabled);
+
+      notifySuccess('Settings updated');
+    } catch (e) {
+      notifyError(e || 'Update failed');
     }
   };
 
@@ -689,12 +708,18 @@ export const ChainMetadataRows = ({
                 />
               )}
             </div>
-            {/* <CWButton
-              label="Save Commonbot Settings"
-              className="save-snapshot"
-              buttonType="primary-black"
-              onClick={handleSaveCommonbotSettings}
-            /> */}
+
+            <div className="toggle-section">
+              <CWToggle
+                checked={discordWebhooksEnabled}
+                onChange={() => {
+                  updateDiscordWebhookEnabled();
+                }}
+              />
+              <CWText type="b2" fontWeight="regular">
+                Allow webhook notifications for Bridged Forum posts.
+              </CWText>
+            </div>
           </>
         ) : discordBotConnecting ? (
           <>

@@ -8,6 +8,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import { slugify } from '../../../shared/utils';
 import { WebhookDestinations } from './types';
+import { ChainInstance } from '../../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -85,7 +86,8 @@ export async function getPreviewImageUrl(
   notification: Exclude<
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
-  >
+  >,
+  chain?: ChainInstance
 ): Promise<{ previewImageUrl: string; previewAltText: string }> {
   // case 1: embedded imaged in thread body
   if (
@@ -101,17 +103,6 @@ export async function getPreviewImageUrl(
   }
 
   // case 2: chain icon
-  let chainId: string;
-  if (notification.categoryId === NotificationCategories.ChainEvent) {
-    chainId = notification.data.chain;
-  } else {
-    chainId = notification.data.chain_id;
-  }
-  const chain = await models.Chain.findOne({
-    where: {
-      id: chainId,
-    },
-  });
   if (chain?.icon_url) {
     const previewImageUrl = chain.icon_url.match(`^(http|https)://`)
       ? chain.icon_url

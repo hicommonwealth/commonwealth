@@ -1,60 +1,46 @@
 @import '../shared';
 
 .PollEditorModal {
-  width: 400px;
-
-  @include extraSmall {
-    width: 100%;
-  }
-
-  .compact-modal-body {
+  .options-and-label-container {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    height: 504px;
 
-    .options-and-label-container {
+    .options-container {
       display: flex;
       flex-direction: column;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+  }
 
-      .options-container {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        margin-bottom: 16px;
+  .buttons-row {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .duration-row {
+    background-color: $neutral-50;
+    border-radius: $border-radius-corners;
+    border: 1px solid $neutral-100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    width: 100%;
+
+    .poll-duration-text.Text {
+      margin-bottom: 8px;
+
+      @include extraSmall {
+        max-width: 280px;
       }
     }
 
-    .buttons-row {
+    .duration-row-actions {
       display: flex;
       gap: 8px;
-      justify-content: flex-end;
-    }
-
-    .duration-row {
-      background-color: $neutral-50;
-      border-radius: $border-radius-corners;
-      border: 1px solid $neutral-100;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 16px;
-      width: 100%;
-
-      .poll-duration-text.Text {
-        min-height: 48px;
-        margin-bottom: 8px;
-
-        @include extraSmall {
-          max-width: 280px;
-        }
-      }
-
-      .duration-row-actions {
-        display: flex;
-        gap: 8px;
-        justify-content: space-between;
-      }
+      justify-content: space-between;
     }
   }
 }

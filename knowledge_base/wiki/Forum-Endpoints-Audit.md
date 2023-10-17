@@ -1,6 +1,13 @@
-📄 = Create // 👁 = Read // ✏️ = Update // ❌  = Delete
+# Audit
 
-Threads
+Key:
+📄 = Create
+👁 = Read
+✏️ = Update
+❌  = Delete
+
+## Threads
+
 - 📄`/createThread`
   - Will upsert topic, create thread, create attachments, and update author `last_active` timestamp, then creates subscription between author and thread comments/reactions.
 - 👁️ `/getThreads`
@@ -19,7 +26,7 @@ Threads
 - 👁 `/searchDiscussions`
   - With a search term passed via query params, returns threads with matching search index data.
 
-Comments
+## Comments
 - 📄`/createComment`
   - With parent comment ID, thread ID and text passed via body, creates a comment and attachments, creates subscription between author and reactions/comments, emits `NewMention` notification to new mentions, then updates author `last_active` timestamp and thread `last_commented_on` timestamp.
 - 👁 `/viewComments`
@@ -37,7 +44,8 @@ Comments
 - 👁 `/searchComments`
    - With a search term passed via query params, returns comments with matching search index data.
 
-Reactions
+## Reactions
+
 - 📄`/createReaction`
   - Upserts a reaction by thread ID or proposal ID or comment ID
 - 👁 `/viewReactions`
@@ -49,8 +57,11 @@ Reactions
 - 👁 `/reactionsCounts`
   - Returns all counts of reactions given a list of thread IDs, comment IDs and proposal IDs
 
---
+# General Suggestions (230522)
 
-General Suggestions:
 - Found a common pattern where the user's `last_active` column is updated when various actions are performed. Change into a middleware or helper utility function?
 - Found a common pattern where the text of a thread/comment is parsed for mentions and new mentions are notified. Move logic into helper utility function?
+
+# Change Log
+
+- 230522: Authored by Ryan Bennett

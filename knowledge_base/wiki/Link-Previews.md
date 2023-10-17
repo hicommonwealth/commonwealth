@@ -15,3 +15,7 @@ To get link previews, you will need to do the following:
 
 1. With the site running, query the link preview with `curl -G http://localhost:8080/<url>`
 2. Ensure it works on production using [https://cards-dev.twitter.com/validator](https://cards-dev.twitter.com/validator)
+
+# Change Log
+
+- 230426: Authored by Jake Naviaski.

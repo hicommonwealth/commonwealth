@@ -1,8 +1,20 @@
+**Contents**
+
+- [Questions](#questions)
+  * [I started chain-events with `yarn start-all` but I don't see any new events?](#i-started-chain-events-with--yarn-start-all--but-i-don-t-see-any-new-events-)
+  * [I don't see any proposals on the client. How do I debug?](#i-don-t-see-any-proposals-on-the-client-how-do-i-debug-)
+  * [Some proposals are missing from the client. How do I fix this?](#some-proposals-are-missing-from-the-client-how-do-i-fix-this-)
+- [Change Log](#change-log)
+
+# Questions
+
 ## I started chain-events with `yarn start-all` but I don't see any new events?
+
 - Check that chains are actually being listened to by check the `active listeners` log.
 - If the above is correct it may be that the chains you are listening to are not currently producing events. Protocols such as Aave or tokens such as USDC (usd-coin) emit lots of events while Substrate chains may emit less.
 
 ## I don't see any proposals on the client. How do I debug?
+
 1. Check the `/entities` route with browser dev tools. Did it return the entities you expect? If not:
    - check your `ENTITIES_URL` env var (link coming soon). If the `ENTITIES_URL` env var is correct then you may need migrate the existing entities into the chain-events database. See the [`migrateEvents` docs][1] for instructions on migrating the missing events. Make sure that the database you are migrating matches the app that the `ENTITIES_URL` points to.
    - If you are not using the `ENTITIES_URL` and you are running the chain-events app locally ensure you have started the app. See [here][3].
@@ -16,3 +28,7 @@
 [1]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events%20Overview#migrating-eventsentities
 [2]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events%20Overview#enforcing-chain-event-data-consistency
 [3]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Service-Common-Scenarios#starting-chain-events-locally-from-scratch
+
+# Change Log
+
+- 230123: Authored by Timothee Legros
