@@ -88,6 +88,7 @@ async function _thresholdCheck(
         break;
       }
       case 'cosmos_native': {
+        //chainNetwork not used downstream by tbc other than EVM contracts, Osmosis works for all cosmos chains
         chainNetwork = ChainNetwork.Osmosis;
         chainId = thresholdData.source.cosmos_chain_id;
         break;
