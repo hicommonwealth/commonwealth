@@ -7,7 +7,7 @@ import {
 } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
@@ -156,7 +156,7 @@ export const ReactionButton = ({
           )}
         />
       )}
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}

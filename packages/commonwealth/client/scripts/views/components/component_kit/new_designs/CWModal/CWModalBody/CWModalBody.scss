@@ -1,0 +1,11 @@
+.CWModalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-inline: 24px;
+
+  // For content that may overflow the parent container (e.g. Dropdowns)
+  &.allowOverflow {
+    overflow: unset;
+  }
+}
