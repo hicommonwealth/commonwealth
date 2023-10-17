@@ -1,5 +1,5 @@
 import React from 'react';
-import 'modals/archive_thread_modal.scss';
+import 'modals/ArchiveThreadModal.scss';
 import type Thread from '../../models/Thread';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
