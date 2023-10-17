@@ -1,27 +1,25 @@
-## Purpose
+# Purpose
+
 This doc describes the current state of thread flow + process logic, in as much detail as possible. 
 
 Providing a solution to improve existing thread workflows is a non-goal of this document.
 
-## Code Audit
-### Threads init
+# Code Audit
+## Threads Init
 
-In `state.ts`
-- The `/status` api responds with recent threads (`recentThreads`) that get stored in `recent_activity.ts` and then used in different parts of the app to sort the communities/chains based on threads count.
-
-In `IChainAdapter.ts`
-- The `/bulkOffChain` api responds with `numTotalThreads` (used on the `/:community/discussions` page to show the total threads count) and `numVotingThreads` (used on the `/:community/discussions` page on the stages menu filter)
-- `IChainAdapter.ts` calls a method in `recent_activity.ts` -> The `/activeThreads` api responds with threads that get stored in the `threads.ts` store in the `overviewStore` sub store key and get used in the `/:community/overview` page to show monthly threads count.
-- `IChainAdapter.ts` calls a method in `threadsUsersCountAndAvatars.ts` -> The `/threadsUsersCountAndAvatars` api if given threads as payload will respond with unique users for list of threads(thread_id), first 2 avatars for each group of users and lastly some latest comments. However when called from IChainAdapter this api responds with an empty array since it uses the `listingStore` sub store from `threads.ts` to get pinned threads as payload but at this time the listing store mostly has no pinned threads.
-
-`DiscussionsPage.tsx` calls a method in `threads.ts`
-- The `bulkThreads` api responds with 20 threads paginated based on the params provided in payload. These threads are then added to the `store` and `listingStore` substores in the `threads.ts` store which are then used on the `/:community/overview` and on the `/:community/discussions` (only on the `/:community/discussions` page the `store` substore in threads is used as cached data). And more threads on the `/overview` and `/discussions` pages are loaded by this same api. New responses are concatenated with existing ones + duplicates are removed.
-The `/reactionsCounts` api responds with user interaction data from the provided thread ids as payload. This data is then propagated to the `reactionCounts.ts` store and used in different parts of the app for reaction counts.
-
-`threads.ts` calls a method in `threadsUsersCountAndAvatars.ts`
-- The `/threadsUsersCountAndAvatars` api is triggered again but this time it is given given threads from the `/bulkThreads` api response as payload. The new response is handled in the same way. At this time we dont query for pinned threads (we don’t send the boolean pinned key as payload)
+1. In `state.ts`, the `/status` endpoint responds with recent threads (`recentThreads`) that are stored in `recent_activity.ts` and then used in different parts of the app to sort the communities/chains based on threads count.
+2. In `IChainAdapter.ts`, the `/bulkOffChain` api responds with `numTotalThreads` (used on the `/:community/discussions` page to show the total threads count) and `numVotingThreads` (used on the `/:community/discussions` page on the stages menu filter).
+3. `IChainAdapter.ts` calls a method in `recent_activity.ts` and the `/activeThreads` api responds with threads that get stored in the `threads.ts` store in the `overviewStore` sub store key and get used in the `/:community/overview` page to show monthly threads count.
+4. `IChainAdapter.ts` hits the `/threadsUsersCountAndAvatars` endpoint which, if provided threads as payload, will respond with unique users for list of threads(thread_id), first 2 avatars for each group of users and lastly some latest comments. 
+  - However, when called from IChainAdapter, the endpoint responds with an empty array since it uses the `listingStore` sub store from `threads.ts` to get pinned threads as payload but at this time the listing store mostly has no pinned threads.
+5. `DiscussionsPage.tsx` calls the `bulkThreads` method in `threads.ts`. The `bulkThreads` api responds with 20 threads paginated based on the params provided in payload. 
+  - These threads are then added to the `store` and `listingStore` substores in the `threads.ts` store which are then used on the `/:community/overview` and on the `/:community/discussions` (only on the `/:community/discussions` page the `store` substore in threads is used as cached data). 
+  - Threads on the `/overview` and `/discussions` pages are loaded by this same api. New responses are concatenated with existing ones + duplicates are removed.
+6. The `/reactionsCounts` api responds with user interaction data from the provided thread ids as payload. This data is then propagated to the `reactionCounts.ts` store and used in different parts of the app for reaction counts.
+7. `threads.ts` calls a method in `threadsUsersCountAndAvatars.ts`. The `/threadsUsersCountAndAvatars` api is triggered again but this time it is given given threads from the `/bulkThreads` api response as payload. The new response is handled in the same way. At this time we dont query for pinned threads (we don’t send the boolean pinned key as payload)
 
 #### Thread init on the “viewing a thread” page
+
 - The `/getThreads` api will get a thread details from the api. This is then added/merged/updated in `store` substore in `threads.ts`, if this thread was not fetched before then the `app.threads.numTotalThreads` is incremented by 1.
 - The `/reactionCounts` api is triggered and response is added to the `reactionCounts.ts` store and used in different parts of the app for reaction counts.
 - The `/viewComments` api is triggered and the response is added to the `store` in `comments.ts` store
@@ -29,6 +27,7 @@ The `/reactionsCounts` api responds with user interaction data from the provided
 - The `/viewCount` api is triggered, the response from the api is not stored anywhere in any store.
 
 ### Threads processes
+
 On Scroll in `DiscussionsPage.tsx`
 - The `/bulkThreads` api is triggered when the user scrolls down, 20 more threads are loaded from api until api has no more threads for the provided payload.
 

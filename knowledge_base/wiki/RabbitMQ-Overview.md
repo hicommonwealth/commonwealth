@@ -31,10 +31,13 @@ To ensure consistent data sharing over queues, every message that is sent to a q
 # Rascal
 In order to manage RabbitMQ configuration and connections we use [Rascal][1]. The current Rascal/RabbitMQ configuration can be found [here][4].
 
-
-
 [1]: https://www.npmjs.com/package/rascal
 [2]: https://github.com/hicommonwealth/commonwealth/tree/master/packages/common-common/src/rabbitmq
 [3]: https://github.com/hicommonwealth/commonwealth/wiki/RabbitMQ%20Preventing%20Data%20Loss
 [4]: https://github.com/hicommonwealth/commonwealth/blob/master/packages/common-common/src/rabbitmq/rabbitMQConfig.ts
 [5]: https://github.com/hicommonwealth/commonwealth/tree/master/packages/common-common/src/rabbitmq
+
+# Change Log 
+
+- 231013: Flagged by Graham Johnson for consolidation with other RabbitMQ files. 
+- 230123: Authored by Timothee Legros.

@@ -1,4 +1,5 @@
-```{
+```json
+{
   "$schema": "https://json-schema.org/draft/2019-09/schema",
   "type": "object",
   "refs": {
@@ -62,4 +63,10 @@
     "form_fields",
     "tx_template"
   ]
-}```
+}
+```
+
+# Change Log
+
+- 231013: Flagged by Graham Johnson for certification. 
+- 230204: Authored by Forest Mars.

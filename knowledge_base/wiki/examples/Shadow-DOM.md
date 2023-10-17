@@ -15,3 +15,7 @@ class ShadowSubtreeComponent extends React.Component {
   }
 }
 ```
+
+# Change Log
+
+- 230216: Authored by Forest Mars.

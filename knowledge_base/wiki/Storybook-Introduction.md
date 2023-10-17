@@ -1,8 +1,15 @@
-## Storybook staging environment
+**Contents**
+- [Storybook staging environment](#storybook-staging-environment)
+- [Motivation](#motivation)
+- [Page example](#page-example)
+- [References](#references)
+- [Change Log](#change-log)
+
+# Storybook staging environment
 
 [Chromatic link](https://645a5781c0021a5d05d60c23-lgrriagthp.chromatic.com/)
 
-## Motivation
+# Motivation
 
 We currently have the [/components](https://commonwealth.im/components) page to showcase all commonwealth components. This page is a static and general listing and you can't do a lot with them.
 
@@ -10,15 +17,14 @@ Storybook allows us to display simple or complex components, see their behaviour
 
 It's a great place to collaborate on UI develoment with designers, product managers, developers or other stakeholders.
 
-## Page example
+# Page example
 
 https://github.com/hicommonwealth/commonwealth/assets/30223098/97f7662e-6750-4fba-be9f-dc9d3d4588fb
 
-## References
+# References
 1. [Storybook website](https://storybook.js.org/)
 2. [Why Storybook?](https://storybook.js.org/docs/react/get-started/why-storybook)
 
----
+# Change Log
 
-Next page: [Stories](https://github.com/hicommonwealth/commonwealth/wiki/Stories)
-
+- 230530: Authored by Daniel Martins.

@@ -131,6 +131,10 @@ If fixes are minor or urgent (i.e. can or should be addressed quickly), ping Gra
 
 If pages are merged together, this should be noted in the change log of the merged-into page, and a compressive summary of the merged page should be provided below.
 
+#### Ownership Transferred To
+
+Authors and certifiers are implicitly assumed to hold some notion of ownership over a docs entry. When an engineer leaves the company, or is re-assigned to a different team, the ownership of their entries may change. 
+
 #### Split Off By
 
 If a section is moved out of one entry and into another, this should be listed explicitly in the change logs, so that engineers who have come to rely on the section's previous location are able to find it.
