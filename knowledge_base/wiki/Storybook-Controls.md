@@ -3,15 +3,15 @@ Storybook Controls gives us a graphical UI to interact with a component's argume
 To use Controls addon, all we need to do is to write the stories using [args](https://storybook.js.org/docs/react/writing-stories/args). Storybook will automatically generate UI controls based on the args provided and what it can infer about the component.
 
 
-# Example
+## Example
 
 https://github.com/hicommonwealth/commonwealth/assets/30223098/97f7662e-6750-4fba-be9f-dc9d3d4588fb
 
 
-# References
+## References
 
 1. https://storybook.js.org/docs/react/essentials/controls
 
-# Change Log
+---
 
-- 230530: Authored by Daniel Martins.
+Next page: [State change](https://github.com/hicommonwealth/commonwealth/wiki/State-change)

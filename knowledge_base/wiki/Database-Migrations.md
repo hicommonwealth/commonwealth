@@ -6,8 +6,3 @@
 - All migrations should have corresponding `down()` functions, i.e. we should strive to ensure all migrations are properly reversible.
     - Migrations which for some reason cannot be reversed should have detailed explanations of why it cannot be reversed.
 - For performance, avoid queries inside loops wherever possible. Try to perform all necessary reads in a single SQL query.
-
-# Change Log
-
-- 230320: Ownership transferred to Jake Naviaski.
-- 230308: Authored by Alex Young.

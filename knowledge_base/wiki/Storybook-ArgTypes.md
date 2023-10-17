@@ -1,4 +1,4 @@
-# Definitions
+## Definitions
 
 With the argTypes we can define explicitly the type of every argument, change its input type and set all possible options.
 
@@ -45,7 +45,7 @@ export const Text: Story = {
 
 https://github.com/hicommonwealth/commonwealth/assets/30223098/b8afc832-7cb3-442a-8e90-1054b07c0332
 
-# Custom functions
+## Custom functions
 
 We can also define custom functions for different stories for the same component. All stories could have common argTypes but different options.
 
@@ -105,10 +105,10 @@ export const Secondary: Story = {
 };
 ```
 
-# References
+## References
 
 1. https://storybook.js.org/docs/react/api/argtypes
 
-# Change Log
+---
 
-- 230530: Authored by Daniel Martins.
+Next page: [Parameters](https://github.com/hicommonwealth/commonwealth/wiki/Parameters)

@@ -1,10 +1,4 @@
-**Contents**
-- [Providing args](#providing-args)
-- [Changing input type](#changing-input-type)
-- [References:](#references-)
-- [Change Log](#change-log)
-
-# Providing args
+## Providing args
 
 Args provide default values for controls we want to use.
 
@@ -21,15 +15,18 @@ Examples of the above:
 
 ![image](https://github.com/hicommonwealth/commonwealth/assets/30223098/cae0417d-6097-4f34-be83-bb0f87fccc43)
 
-# Changing input type
+## Changing input type
 
 Values from one type can have an input of a different type. An example is the [Button story](https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/.storybook/stories/atoms/Button.stories.tsx) args `buttonType: "primary-red",` with a radio button input with two or more options. Example:
 
 ![image](https://github.com/hicommonwealth/commonwealth/assets/30223098/2785ff04-61f1-4c45-9f4f-9afc9080e5fa)
 
-# References:
+
+---
+
+Next page: [ArgTypes](https://github.com/hicommonwealth/commonwealth/wiki/ArgTypes)
+
+---
+
+## References:
 1. https://storybook.js.org/docs/react/writing-stories/args
-
-# Change Log
-
-- 230530: Authored by Daniel Martins.

@@ -16,6 +16,3 @@ Here are some commonly used types of **observability metrics**:
 
 - **Synthetic Monitoring:** Synthetic monitoring (also known as active monitoring) is a method where scripted user flows are monitored at regular intervals to check system availability and performance.
 
-# Change Log
-
-- 230531: Authored by Nakul Manchanda.

@@ -1,3 +1,5 @@
+_Authored by Nakul Manchanda, 230714._
+
 # Content Delivery Network (CDN)
 
 ## Functionality
@@ -35,7 +37,3 @@ Increasing the Edge TTL limit can improve caching performance, especially for co
 
 ### Serving Images and Application Bundles via CDN
 Currently, images account for approximately 60% of all data downloads. Creating a new subdomain for serving images, and potentially another for application bundles, can parallelize loading and further improve performance.
-
-# Change Log
-
-- 230714: Authored by Nakul Manchanda.

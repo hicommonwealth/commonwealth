@@ -1,4 +1,4 @@
-As quoted in [Storybook-Writing-Stories.md](Storybook-Writing-Stories.md), we can define custom functional components to handle state change with args passed as parameter. The [Checkbox story](../../packages/commonwealth/.storybook/stories/old/molecules/Checkbox.stories.tsx) is a good example, as follows:
+As quoted in [this page](https://github.com/hicommonwealth/commonwealth/wiki/Writing-stories#custom-component-function), we can define custom functional components to handle state change with args passed as parameter. The [Checkbox story](https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/.storybook/stories/molecules/Checkbox.stories.tsx) is a good example, as follows:
 
 ```typescript
 const Checkbox: FC<CheckboxProps> = (props) => {
@@ -62,7 +62,6 @@ export const CheckboxStory = {
 }
 ```
 
-# Change Log
+---
 
-- 230113: Flagged by Graham Johnson for consolidation or relocation.
-- 230530: Authored by Daniel Martins.
+Next page: [Controls](https://github.com/hicommonwealth/commonwealth/wiki/Controls)

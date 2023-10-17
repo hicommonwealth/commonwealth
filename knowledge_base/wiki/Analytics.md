@@ -8,7 +8,3 @@ In the client, a hook called `useBrowserAnalyticsTrack` has been created to simp
 In the server, a function `serverAnalyticsTrack({...})` has been created and can be placed inside any server-side function to record events. 
 
 The client side code is generally more useful; most server tracking events are technically redundant and can be captured via SQL query. But being in the habit of adding analytics tracking to any part of the codebase you touch will pay dividends down the road. 
-
-# Change Log
-
-- 230531: Authored by Alex Young.

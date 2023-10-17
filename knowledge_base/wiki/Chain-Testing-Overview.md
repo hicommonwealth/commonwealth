@@ -1,15 +1,3 @@
-- [EVM Chain Testing Tools](#evm-chain-testing-tools)
-  * [Setup](#setup)
-  * [API](#api)
-      - [Chain Info/Interaction](#chain-info-interaction)
-      - [Token](#token)
-      - [Governance Routes](#governance-routes)
-  * [SDK](#sdk)
-      - [Methods](#methods)
-  * [Private Chain Customization](#private-chain-customization)
-      - [Potential Modifications](#potential-modifications)
-- [Change Log](#change-log)
-
 # EVM Chain Testing Tools
 
 The EVM testing tools provide an out of the box environment for testing various EVM funcitonalities. The following tools are provided:
@@ -23,6 +11,11 @@ The EVM testing tools provide an out of the box environment for testing various 
     * Get info and alter the chain(blocks and timestamps)
     * Create governance actions
     * A full-feature SDK to abstract API calls and use types
+
+[Setup](#Setup) - 
+[API](#API) - 
+[SDK](#SDK) - 
+[Chain Customization](#Private-chain-customization)
  
 ## Setup 
 
@@ -49,7 +42,7 @@ Post request types can be found in `src/types.ts`
 <details>
  <summary><code>GET /chain/accounts</code></summary>
 
-**Response**
+##### Response
 
 ```javascript
 [
@@ -62,7 +55,7 @@ Post request types can be found in `src/types.ts`
 <details>
  <summary><code>GET /chain/block</code></summary>
 
-**Response**
+##### Response
 
 See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 
@@ -71,7 +64,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /chain/advanceTime</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -79,7 +72,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 ```javascript
 {
@@ -93,7 +86,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /chain/getEth</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -109,7 +102,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /erc20/balance</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -119,7 +112,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 ```javascript
 {
@@ -131,7 +124,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /erc20/transfer</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -142,7 +135,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 200
 
@@ -151,7 +144,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /erc20/approve</code></summary
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -162,7 +155,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 200
 
@@ -171,7 +164,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /erc20/dex/getTokens</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -180,7 +173,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 200
 
@@ -191,7 +184,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /gov/compound/createProposal</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -199,7 +192,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 ```javascript
 {
     "proposalId": 123
@@ -211,7 +204,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /gov/compound/cancelProposal</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -219,7 +212,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 200
 
@@ -228,7 +221,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /gov/compound/castVote</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -238,7 +231,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 200
 
@@ -247,7 +240,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /gov/compound/proposalDetails</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -255,7 +248,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 ```javascript
 {
@@ -277,7 +270,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /gov/compound/getVotes</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -286,7 +279,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 200
 
@@ -295,7 +288,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /gov/compound/queue</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -303,7 +296,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 200
 
@@ -312,7 +305,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>POST /gov/compound/execute</code></summary>
 
-**Request**
+##### Request
 
 ```javascript
 {
@@ -320,7 +313,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 }
 ```
 
-**Response**
+##### Response
 
 200
 
@@ -329,7 +322,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 <details>
  <summary><code>GET /gov/compound/runFullCylce</code></summary>
 
-**Response**
+##### Response
 
 200
 
@@ -358,7 +351,7 @@ sdk.createProposal(0); // Create a Compound proposal
 <summary><code>constructor(host: string)</code>
 Creates a ChainTesting SDK instance.</summary>
 
-**Arguments**
+##### Arguments
 
 * `host (string)`: The chain-testing API host.
 
@@ -368,13 +361,13 @@ Creates a ChainTesting SDK instance.</summary>
 <summary><code>getBalance(tokenAddress: string, address: string, convert?: boolean)</code>
 Get the balance of a given wallet for any ERC20.</summary>
 
-**Arguments**
+##### Arguments
 
 * `tokenAddress (string)`: The address of ERC20 Token.
 * `address (string)`: The address to check balance.
 * `convert (boolean, optional)`: Convert from wei to ether? Default is undefined.`
 
-**Returns**
+##### Returns
 `Promise<string>`: The token balance.
 
 </details>
@@ -383,7 +376,7 @@ Get the balance of a given wallet for any ERC20.</summary>
 <summary><code>transferErc20(tokenAddress: string, to: string, amount: string, from?: string, accountIndex?: number)</code>
 Transfer an ERC20 token between addresses.</summary>
 
-**Arguments**
+##### Arguments
 
 * `tokenAddress (string)`: ERC20 token address.
 * `to (string)`: The address to transfer to.
@@ -397,7 +390,7 @@ Transfer an ERC20 token between addresses.</summary>
 <summary><code>getErc20(tokenAddress: string, to: string, amount: string)</code>
 Gets ERC20 tokens from a 'Bank Wallet'.</summary>
 
-**Arguments**
+##### Arguments
 
 * `tokenAddress (string)`: ERC20 token address.
 * `to (string)`: The address to transfer to.
@@ -409,7 +402,7 @@ Gets ERC20 tokens from a 'Bank Wallet'.</summary>
 <summary><code>getVotingPower(accountIndex: number, numberOfVotes: string)</code>
 Get voting power via ERC20 token for a given wallet.</summary>
 
-**Arguments**
+##### Arguments
 
 * `accountIndex (number)`: The account index of the test chain to get tokens.
 * `numberOfVotes (string)`: The amount of votes/tokens to receive.
@@ -420,11 +413,11 @@ Get voting power via ERC20 token for a given wallet.</summary>
 <summary><code>createProposal(accountIndex: number)</code>
 Creates an arbitrary Compound proposal.</summary>
 
-**Arguments**
+##### Arguments
 
 * `accountIndex (number)`: The account index.
 
-**Returns**
+##### Returns
 `Promise<string>`: The proposalId of create Proposal.
 
 </details>
@@ -433,11 +426,11 @@ Creates an arbitrary Compound proposal.</summary>
 <summary><code>cancelProposal(proposalId: string)</code>
 Cancel a proposal.</summary>
 
-**Arguments**
+##### Arguments
 
 * `proposalId (string)`: The proposal Id to cancel.
 
-**Returns**
+##### Returns
 `Promise<string>`: The proposalId of cancelled.
 
 </details>
@@ -446,7 +439,7 @@ Cancel a proposal.</summary>
 <summary><code>castVote(proposalId: string, accountIndex: number, forAgainst: boolean)</code>
 Cast a vote for an account on a proposal.</summary>
 
-**Arguments**
+##### Arguments
 
 * `proposalId (string)`: The proposal to vote on.
 * `accountIndex (number)`: The account index to vote.
@@ -458,7 +451,7 @@ Cast a vote for an account on a proposal.</summary>
 <summary><code>queueProposal(proposalId: string)</code>
 Queue a proposal for execution.</summary>
 
-**Arguments**
+##### Arguments
 
 * `proposalId (string)`: The proposalId.
 
@@ -468,7 +461,7 @@ Queue a proposal for execution.</summary>
 <summary><code>executeProposal(proposalId: string)</code>
 Execute a passed proposal.</summary>
 
-**Arguments**
+##### Arguments
 * `proposalId (string)`: The proposalId.
 
 </details>
@@ -480,11 +473,11 @@ Runs a full proposal cycle from getting voting power to execution.
 <summary><code>getProposalDetails(proposalId: string)</code>
 Gets proposal Details from contract</summary>
 
-**Arguments**
+##### Arguments
 
 * `proposalId (string)`: The proposalId
 
-**Response**
+##### Response
 
 JSON formatted proposal Details
 
@@ -497,7 +490,7 @@ JSON formatted proposal Details
 <details>
 <summary><code>getETH(toAddress: string, amount: string)</code>Get ETH to a given account</summary>
 
-**Arguments**
+##### Arguments
 * `toAddress (string)`: The address to send ETH to
 * `amount (string)`: The amount of eth in ether to receive
 
@@ -530,8 +523,3 @@ Here the following params can be defined as
    * set a value for `--wallet.totalAccounts` to include more generated accounts(defaults to 10)   
    * set a value for `--wallet.defaultBalance` to set the amount of ether to start each account with(defaults to 1000)
    * Add an unlocked wallet via an additional `--wallet.unlockAccounts`. This is helpful for emulating actions of other users/wallets etc
-
-# Change Log
-
-- 230515: Updated with Service Testing section by Timothee Legros.
-- 230218: Authored by Timothee Legros

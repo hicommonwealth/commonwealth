@@ -1,44 +1,16 @@
-**Contents**
-- [Prerequisites](#prerequisites)
-  * [Subscriptions](#subscriptions)
-  * [Notifications](#notifications)
-- [Forum](#forum)
-  * [Subscriptions](#subscriptions-1)
-    + [New Threads](#new-threads)
-    + [New Comments and New Reactions](#new-comments-and-new-reactions)
-    + [New Mention](#new-mention)
-    + [New Collaboration](#new-collaboration)
-  * [Notifications](#notifications-1)
-    + [New Threads](#new-threads-1)
-    + [New Comments](#new-comments)
-    + [New Reactions](#new-reactions)
-    + [New Mention](#new-mention-1)
-    + [New Collaboration](#new-collaboration-1)
-- [Snapshot](#snapshot)
-  * [Subscriptions](#subscriptions-2)
-  * [Notifications](#notifications-2)
-- [Chain Event](#chain-event)
-  * [Subscriptions](#subscriptions-3)
-  * [Notifications](#notifications-3)
-- [Change Log](#change-log
+_Authored by Timothee Legros, 230803._
 
 # Prerequisites
-
 ## Subscriptions
-
 - Be logged in on a new account with MetaMask that has no pre-existing joined communities.
 - Should have the `Networks` tab of Chrome Dev Tools open.
 ## Notifications
-
 - Be logged in on 2 new accounts both with MetaMask. This is most easily done by using Chrome and Firefox with different MetaMask accounts but you can also simply logout and log back in with a different account on the same browser.
 - The account used to receive and view notifications will be called the `viewer` and the account used to produce notifications will be called the `producer`.
 
 # Forum
-
 ## Subscriptions
-
 ### New Threads
-
 1. Navigate to any community's discussion page that you have not yet subscribed to e.g. [https://commonwealth.im/ethereum/discussions][1]
     - Ensure that the Notifications button in the sidebar (shown in the image below) shows `Notifications Off`
 3. Click on the button to turn on Notifications.
@@ -55,9 +27,7 @@
     - The row for the community you interacted with should no longer be listed under `Discussion`
 
 ### New Comments and New Reactions
-
 **Another User's Thread**
-
 1. Navigate to another user's thread e.g. [https://commonwealth.im/ethereum/discussion/12197-httpscommonwealthimethereumnewdiscussion][3]
 2. Click on the subscribe bell icon directly underneath the thread body.
     - The icon should switch to a bell with a line through it and it should say `unsubscribe`
@@ -87,7 +57,6 @@
     - The networks tab should show 2 new requests. One of the requests should be to `/createSubscription` and the body should contain `category: new-reaction`. The other request should be to `/enableSubscriptions` and the body should contain a single subscription id.
 
 **Your Thread**
-
 1. Navigate to any EVM community you have never interacted with.
 2. Create a thread on the General topic.
 3. Refresh the page to bypass known [issue #4647][4]
@@ -98,7 +67,6 @@
 5. Run through steps 5-13 of QAing another user's thread subscriptions above.
 
 **Your Comment**
-
 1. Navigate to any EVM community you have never interacted with.
 2. Create a comment on a thread that is not yours
 3. Nativate to your notifications settings page.
@@ -120,7 +88,6 @@ Due to [known bug #4657][9] you cannot manage your collaboration subscription fr
 
 ## Notifications
 ### New Threads
-
 1. With your viewer account navigate to any MetaMask-compatible community (preferably an unpopular one since notifications will be emitted faster e.g. alex-test-2). If you have not yet joined this community, join it now.
 2. Subscribe to new thread notifications using the viewer account by clicking the large `Notifications Off/On` button in the sidebar.
 3. With your producer account navigate to the same community (join it if you haven't already) and create a thread in the 'General' topic.
@@ -130,7 +97,6 @@ Due to [known bug #4657][9] you cannot manage your collaboration subscription fr
     - You should be taken to the thread page of the thread you just created from the producer.
 
 ### New Comments
-
 This section picks up exactly where the previous New Threads section left off (from the viewer account on the threads page).
 1. With your viewer account subscribe to comments and reactions on the thread using the `subscribe` button below the thread body.
 2. From your producer account, create a comment on the thread you created.
@@ -141,7 +107,6 @@ This section picks up exactly where the previous New Threads section left off (f
     - You should be taken to the comment on the thread you created with your producer account.
 
 ### New Reactions
-
 This section picks up exactly where the previous New Comments section left off (from the comment on the threads page).
 1. On your viewer account navigate back to the community discussion page.
 2. On your producer account upvote your own thread.
@@ -151,8 +116,7 @@ This section picks up exactly where the previous New Comments section left off (
     - You should be taken to the thread you created with your producer account.
 
 ### New Mention
-
-**As of 230803, not working due to [known bug #4690][11]**
+**Currently not working due to [known bug #4690][11]**
 
 This section picks up exactly where the previous New Reactions section left off (from the threads page).
 1. With your viewer account, unsubscribe from the thread.
@@ -164,7 +128,6 @@ This section picks up exactly where the previous New Reactions section left off 
     - You should be taken to the comment you are tagged in.
 
 ### New Collaboration
-
 This section picks up exactly where the previous New Mention section left off (from the threads page).
 1. With your viewer account, navigate back to the community discussion page.
 2. With your producer account, add the viewer account as a collaborator on the thread you created.
@@ -175,7 +138,6 @@ This section picks up exactly where the previous New Mention section left off (f
 
 # Snapshot
 ## Subscriptions
-
 1. Navigate to the snapshot page of a community that has an associated snapshot space like dYdX i.e. [https://commonwealth.im/dydx/snapshot/dydxgov.eth][6]
 2. Click on the `Subscribe to Notifications` button.
     - The network tab should show a single new successful request to `/createSubscription` where the payload contains the `snapshot_id`.
@@ -186,12 +148,10 @@ This section picks up exactly where the previous New Mention section left off (f
     - The network tab should show a single new successful request to `/deleteSubscriptions`
 
 ## Notifications
-
 Cannot QA Snapshot notifications until [#4667][10] is completed.
 
 # Chain Event
 ## Subscriptions
-
 1. Navigate to your [notifications settings page][2].
     - Assuming you haven't joined any communities, the `Chain Events` section will be empty.
 2. Join one of these communities (pick one you haven't joined before): osmosis, dydx, tribe, aave, moola-market, impactmarket, autonomies-testnet-dao.
@@ -209,8 +169,8 @@ Cannot QA Snapshot notifications until [#4667][10] is completed.
     - The console tab should show a single log: `Adding Websocket subscriptions for: ['tribe']`
 
 ## Notifications
-
 Cannot QA chain-event notifications until [#4667][10] is completed.
+
 
 [1]: https://commonwealth.im/ethereum/discussions
 [2]: https://commonwealth.im/notification-settings
@@ -223,8 +183,3 @@ Cannot QA chain-event notifications until [#4667][10] is completed.
 [9]: https://github.com/hicommonwealth/commonwealth/issues/4657
 [10]: https://github.com/hicommonwealth/commonwealth/issues/4667
 [11]: https://github.com/hicommonwealth/commonwealth/issues/4690
-
-# Change Log
-
-- 231012: Flagged by Graham Johnson to update links from footnote-style to inline.
-- 230803: Authored by Timothee Legros.

@@ -10,7 +10,7 @@ The smart contracts currently supported for Contract Action Templates are:
 - AAVE
 - MolochDAO
 
-## How It Works
+### How It Works
 
 - Navigate to the community you are an admin of using the search panel. Within the community page, navigate to Contracts under Admin Capabilities
 - Click on Add Contract on the right top corner. This will prompt you to add the Contract Address for your smart contract. The Contract ABI file will be visible once you add a Contract Address that is valid and supported (refer list above)
@@ -42,7 +42,3 @@ The smart contracts currently supported for Contract Action Templates are:
         - Proposal Processing
         - Rage Quit
         - Update Delegates
-
-# Change Log
-
-- 230411: Authored by Alex Young

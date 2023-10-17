@@ -1,5 +1,3 @@
-**THIS DOCUMENT IS OUT OF DATE.**
-
 environment variables with defaults for production:\
 NODE_URL=ws://testnet2.edgewa.re:9944\
 SERVER_URL=https://commonwealth.im \

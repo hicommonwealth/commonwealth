@@ -31,8 +31,3 @@ wait for it to complete and then wait another 60 seconds to perform the 2nd tran
 
 ### Next steps
 - [See how to use this ENS for setting up a snapshot space](https://github.com/hicommonwealth/commonwealth/wiki/Setup-snapshot-space)
-
-# Change Log
-
-- 231012: Flagged by Graham Johnson for asset transfer.
-- 230712: Authored by Malik Zulqurnain.

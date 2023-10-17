@@ -1,7 +1,4 @@
-**Contents**
-- [Notifications Refactor](#notifications-refactor)
-  * [Refactor Proposals](#refactor-proposals)
-- [Change Log](#change-log)
+_Authored by Nakul Manchanda 230731._
 
 # Notifications Refactor
 
@@ -39,7 +36,3 @@
        - Email Worker - dispatches emails.
        - Websocket Main server - retrieves notifications for in-app delivery to online users.
        - Push Notification Worker - posts enriched message to SNS using AWS topic ARN.
-
-# Change Log
-
-- 230731: Authored by Nakul Manchanda.

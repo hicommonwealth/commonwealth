@@ -1,31 +1,23 @@
 # Monitoring
-
-## Production
+### Production
 - To monitor the state of chain-event listeners, events received, and server metrics visit the [Chain-Events Datadog dashboard][1].
 - To view logs check the [Datadog logstream][5]
-## Staging
+### Staging
 [WIP] Improvements coming soon
 - View Heroku logs
 
 # Scaling
-
 ## Number of Dynos
-
 ### App or ChainEventsConsumer
-
 Scale like normal using Heroku sliders.
-
 ### ChainSubscriber
-
 1. Update the `NUM_CHAIN_SUBSCRIBERS` env var to the number of desired dynos.
 2. Add the number of desired dynos to the Procfile. Ensure that `CHAIN_SUBSCRIBER_INDEX` is set for every dyno (see [here][7]).
 
 ## Dyno Size
-
 Scaling the dyno size requires no secondary actions. That is all you need to do is change the dyno size on Heroku. Note that the Node memory option [max-old-space-size][6] which controls the size of the available Node heap is set automatically relative to the size of the dyno. This is thanks to the get-memory-size-limit.sh script which retrieves the dynos maximum available RAM and adjusts the memory limit accordingly.
 
 #### Note on the memory script
-
 By default the script gives Node 85% of the total dyno RAM. This percentage can be adjusted directly from the Procfile via the 'multiplier'. For example,
 `node --max_old_space_size=$(../../../../scripts/get-max-old-space-size.sh 1.1)`, this code has a multiplier of 1.1 which multiplied to the default 85% would mean (1.1 * 85) = 93.5% of the total dyno RAM is used.
 
@@ -48,6 +40,21 @@ To link a new or existing chain-events service to a new commonwealth service fol
 7. Run the enforceDataConsistency script as described [here][4].
 8. Turn on the chain-event dynos and take the app out of maintenance mode.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [1]: https://us5.datadoghq.com/dashboard/yjx-n4h-z6a/chain-events?
 [2]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events%20Environment%20Variables
 [3]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events%20Overview#migrating-eventsentities
@@ -55,7 +62,3 @@ To link a new or existing chain-events service to a new commonwealth service fol
 [5]: https://us5.datadoghq.com/logs?query=-service%3A%28cmn_staging%20OR%20cmn_prod%20OR%20commonbot-ui%20OR%20commonbot%20OR%20commonbot-ui-staging%29&cols=host%2Cservice&index=%2A&messageDisplay=inline&stream_sort=time%2Cdesc&viz=stream&from_ts=1674383847840&to_ts=1674384747840&live=true
 [6]: https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-megabytes
 [7]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Environment-Variables#heroku
-
-# Change Log
-
-- 230213: Authored by Forest Mars.

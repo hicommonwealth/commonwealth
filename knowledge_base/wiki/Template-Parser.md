@@ -69,8 +69,3 @@ function parseTemplate(json: any): { formFields: FormField[]; txTemplate: TxTemp
 
  
 ```
-
-# Change Log
-
-- 231013: Flagged by Graham Johnson for certification. 
-- 230204: Authored by Forest Mars.

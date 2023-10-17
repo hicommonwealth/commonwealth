@@ -1,21 +1,6 @@
-_For database migration best practices, see [Database-Migrations](./Database-Migrations.md)._
-
-**Contents**
-- [Overview](#overview)
-- [Overall Structure](#overall-structure)
-  * [Database Initialization](#database-initialization)
-  * [Models Folder](#models-folder)
-  * [Migrations Folder](#migrations-folder)
-- [Model Definition](#model-definition)
-  * [The Model File](#the-model-file)
-  * [Defining the Model](#defining-the-model)
-    + [Attributes](#attributes)
-    + [Options](#options)
-    + [Associations](#associations)
-- [Change Log](#change-log)
-
-
 ## Overview
+
+**If you're looking for database migration best practices, go [here](https://github.com/hicommonwealth/commonwealth/wiki/Database-Migrations) instead.**
 
 We currently use sequelize as an ORM for managing our relationship with our postgres backend. This page aims to collect information regarding the current structure and best practices around sequelize.
 
@@ -109,6 +94,6 @@ models.Address.belongsToMany(models.Thread, {
 
 **The use of new through tables for many-to-many associations is discouraged. Documentation here is for legacy purposes.**
 
-# Change Log
+## Model Usage
 
-- 230320: Authored by Jake Naviasky.
+TODO

@@ -5,10 +5,10 @@ We can customize the story parameters to show, for example, only the arguments w
 ![image](https://github.com/hicommonwealth/commonwealth/assets/30223098/b54ad642-6272-48e7-a9c7-e308b6c03464)
 
 
-# References:
+## References:
 
 1. https://storybook.js.org/docs/react/writing-stories/parameters
 
-# Change Log
+---
 
-- 230530: Authored by Daniel Martins.
+Next page: [Custom components](https://github.com/hicommonwealth/commonwealth/wiki/Custom-components)

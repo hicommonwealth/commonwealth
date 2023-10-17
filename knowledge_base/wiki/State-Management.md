@@ -1,30 +1,19 @@
-**Contents**
-- [Overview](#overview)
-- [Introduction](#introduction)
-- [Why two different state management tools?](#why-two-different-state-management-tools-)
-- [Zustand](#zustand)
-  * [Directory structure](#directory-structure)
-  * [Store file composition](#store-file-composition)
-  * [Middlewares](#middlewares)
-  * [Testing](#testing)
-  * [Usage](#usage)
-
-# Overview
+**Overview**
 
 This document is intended to provide the fundamental principles for creating the next parts of the store using best practices.
 
-# Introduction
+**Introduction**
 
 At the moment, the state management we have is from the time when we used Mithril as a UI library. It is not properly adjusted to our new UI library - React. As a consequence, we have decided that we will gradually introduce two solutions for the new state management, namely Zustand and React-Query. The goal is to rewrite the current state until it is completely dropped, which could take weeks or months.
 
-# Why two different state management tools?
+**Why two different state management tools?**
 
 Zustand and React Query serve different purposes and excel in different areas. Zustand is a lightweight state management library that focuses on managing local state within a component or a small portion of the application. It provides a simple and intuitive API for managing state without the need for a global store. On the other hand, React Query is a powerful data fetching library that handles remote data fetching, caching, and synchronization with minimal boilerplate. It means that Zustand and React Query can help separate concerns in our application. Zustand can handle UI-related state concerns such as form inputs, sidebars, modals, and local component state. React Query, on the other hand, can focus on handling API requests, caching responses, and managing the global data state. This separation can lead to cleaner and more maintainable code, as each library is responsible for its specific domain.
 
 # Zustand
 We should use Zustand for things that are related to the UI and that have nothing to do with the API. A good example of this is the sidebar, which can be visible or hidden and in addition can have different content. All this logic is temporary, client-only, not stored in any way on the backend.
 
-*Please take a look at #3893 to see the examples of below practices.*
+**Please take a look on [this PR](https://github.com/hicommonwealth/commonwealth/pull/3893) to see the examples of below practices.**
 
 ## Directory structure
 - There is a `state` folder that divides state for `ui` and `api`. In `ui` we keep Zustand files, while `api` is for React-Query.
@@ -71,4 +60,7 @@ sidebarStore
     .getState()
     .setMenu({ name: 'exploreCommunities', isVisible: true });
 ```
-*IMPORTANT: Do not use `sidebarStore.setState()` for mutating the state. Always define setter in the store and mutate that state only using this setter.*
+**IMPORTANT: Do not use `sidebarStore.setState()` for mutating the state. Always define setter in the store and mutate that state only using this setter.**
+
+# React-Query
+TBD

@@ -1,7 +1,5 @@
 # Service Tests
-
 ## Overview
-
 These tests located in `packages/chain-events/test/integration/service-tests/**` are end-to-end tests for chain events. In order for the tests to run a local instance of a blockchain and an SDK must be running (see [Chain Testing][1]).
 
 The tests are broken down as follows:
@@ -15,11 +13,9 @@ The tests are broken down as follows:
       - Event Type
 
 ### Subscriber Tests
-
 Subscriber tests must start an instance of the [ChainEventsSubscriber][2]. Specifically, tests should start the subscriber using the `runSubscriberAsFunction` function which accepts an instance of the [MockRabbitMqHandler][4] and an object which defines the `chain` the subscriber should be listening to. Using this function is crucial as it allows the subscriber to listen to a local chain without using a live RabbitMQ instance or a live Commonwealth database instance.
 
 ### Consumer Tests
-
 Consumer tests must start an instance of the [ChainEventsConsumer][5]. Specifically, tests should start the consumer directly using the `setupChainEventConsumer` function which accepts an instance of the [MockRabbitMqHandler][4]. Using this function is important as it bypasses the initialization of the actual RabbitMQController which would require a live RabbitMQ instance.
 
 ### App Tests

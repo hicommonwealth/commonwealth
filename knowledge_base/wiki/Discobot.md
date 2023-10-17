@@ -1,3 +1,5 @@
+_Authored by Alex Young, 230718._
+
 ## Overview
 
 “Discobot” refers to the set of entities and interactions that power the Commonwealth <> Discord integration. In particular, this is 3 things:
@@ -58,8 +60,3 @@ The following would be an order of operations for a full setup with the granular
 - In the server, visit the connect-common channel, click the link, and get directed to discord-bot-ui page.
 - If you are a new user, this will redirect to a CW page. Login here if not already logged in.
 - Redirect back to discord-bot-ui page and see confirmation screen.
-
-# Change Log
-
-- 231006: Ownership transferred to Ian Rowan.
-- 230718: Authored by Alex Young.

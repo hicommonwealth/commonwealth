@@ -45,7 +45,5 @@ https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle
 ## HEROKU BUILD AGENT CONF VARIABLES
 https://docs.datadoghq.com/agent/basic_agent_usage/heroku/#configuration
 
-# Change Log
 
-- 230331: Authored by Nakul Manchanda. 
-- 230516: Updated by Nakul Manchanda.
+

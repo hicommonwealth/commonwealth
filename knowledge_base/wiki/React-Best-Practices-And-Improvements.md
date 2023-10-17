@@ -1,3 +1,5 @@
+_Certified fresh 230815 by Graham Johnson. All React recommendations originally authored 230502 by Marcin Maslanka._
+
 - ⚠️ This entry intentionally stays silent on state management. See [State Management](./State-Management.md) entry instead.
 - ⚠️ This entry is not oriented toward performance improvements. It is concerned with improving developer experience, increasing readability, and aligning our codebase with current React standards.
 - ⚠️ This entry discusses aspirational ideals for our codebase, and is not a descriptive documentation of how our codebase is actually organized. Strong divergences between ideal and actual have been explicitly flagged, but few or none of the practices  delineated are consistently or fully implemented in our present codebase (230815).
@@ -195,8 +197,3 @@ const useComponent = () => {
 
 export default useComponent
 ```
-
-# Change Log
-
-- 230815: Certified fresh by Graham Johnson. 
-- 230502: Authored by Marcin Maslanka.
