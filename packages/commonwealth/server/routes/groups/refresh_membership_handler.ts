@@ -2,10 +2,7 @@ import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { RefreshMembershipResult } from '../../controllers/server_groups_methods/refresh_membership';
 import { AppError } from '../../../../common-common/src/errors';
-
-const Errors = {
-  InvalidTopicId: 'Invalid topic ID',
-};
+import z from 'zod';
 
 type RefreshMembershipBody = {
   topic_id: number;
@@ -18,13 +15,26 @@ export const refreshMembershipHandler = async (
   res: TypedResponse<RefreshMembershipResponse>
 ) => {
   const { user, address, chain } = req;
-  const { topic_id: topicId } = req.body;
+
+  const schema = z.object({
+    body: z.object({
+      topic_id: z.coerce.number().optional(),
+    }),
+  });
+  const validationResult = schema.safeParse(req);
+  if (validationResult.success === false) {
+    throw new AppError(JSON.stringify(validationResult.error));
+  }
+
+  const {
+    body: { topic_id },
+  } = validationResult.data;
 
   const result = await controllers.groups.refreshMembership({
     user,
     chain,
     address,
-    topicId,
+    topicId: topic_id,
   });
   return success(res, result);
 };
