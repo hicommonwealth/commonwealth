@@ -274,6 +274,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
+  const hasWebLinks = thread.links.find((x) => x.source === 'web');
+
   const canComment =
     !!hasJoinedCommunity ||
     (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
@@ -344,7 +346,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           showLinkedProposalOptions ||
           showLinkedThreadOptions ||
           polls?.length > 0 ||
-          isAuthor
+          isAuthor ||
+          hasWebLinks
         }
         isSpamThread={!!thread.markedAsSpamAt}
         title={
@@ -559,19 +562,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   },
                 ]
               : []),
-            ...[
-              {
-                label: 'Links',
-                item: (
-                  <div className="cards-column">
-                    <LinkedUrlCard
-                      thread={thread}
-                      allowLinking={isAuthor || isAdminOrMod}
-                    />
-                  </div>
-                ),
-              },
-            ],
+            ...(isAuthor || isAdmin || hasWebLinks
+              ? [
+                  {
+                    label: 'Web Links',
+                    item: (
+                      <div className="cards-column">
+                        <LinkedUrlCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                        />
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
               ? [
                   {

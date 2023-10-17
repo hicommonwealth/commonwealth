@@ -2,7 +2,7 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
-import { WebhookCategory } from 'types';
+import { WebhookCategory } from '../../shared/types';
 
 export type WebhookAttributes = {
   url: string;
