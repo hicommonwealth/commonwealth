@@ -2,17 +2,16 @@ import React, { useState } from 'react';
 
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import {
-  SnapshotProposal,
   loadMultipleSpacesData,
+  SnapshotProposal,
 } from 'helpers/snapshot_utils';
 
 import 'modals/update_proposal_status_modal.scss';
-import type ChainEntity from '../../models/ChainEntity';
 import type Thread from '../../models/Thread';
 import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
@@ -23,11 +22,12 @@ import {
   useDeleteThreadLinksMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
-import { ChainEntitiesSelector } from '../components/ChainEntitiesSelector';
+import { ProposalSelector } from '../components/ProposalSelector';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
+import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -37,7 +37,7 @@ const getInitialSnapshots = (thread: Thread) =>
 
 const getInitialProposals = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Proposal).map((l) => ({
-    typeId: l.identifier,
+    identifier: l.identifier,
     title: l.title,
   }));
 
@@ -76,7 +76,7 @@ export const UpdateProposalStatusModal = ({
     Array<Pick<SnapshotProposal, 'id' | 'title'>>
   >(getInitialSnapshots(thread));
   const [tempProposals, setTempProposals] = useState<
-    Array<Pick<ChainEntity, 'typeId'>>
+    Array<Pick<IAaveProposalResponse, 'identifier'>>
   >(getInitialProposals(thread));
   const [tempCosmosProposals, setTempCosmosProposals] = useState<
     Array<Pick<CosmosProposal, 'identifier' | 'title'>>
@@ -84,8 +84,11 @@ export const UpdateProposalStatusModal = ({
 
   const showSnapshot = !!app.chain.meta.snapshot?.length;
   const isCosmos = app.chain.base === ChainBase.CosmosSDK;
-  const showChainEvents =
-    !isCosmos && app.chainEntities.store.get(thread.chain)?.length > 0;
+  const showEvmProposals =
+    !isCosmos &&
+    app.chain.base === ChainBase.Ethereum &&
+    (app.chain.network === ChainNetwork.Aave ||
+      app.chain.network === ChainNetwork.Compound);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     chainId: app.activeChainId(),
@@ -188,16 +191,16 @@ export const UpdateProposalStatusModal = ({
       const { toAdd, toDelete } = getAddedAndDeleted(
         tempProposals,
         getInitialProposals(thread),
-        'typeId'
+        'identifier'
       );
 
       if (toAdd.length > 0) {
         const updatedThread = await addThreadLinks({
           chainId: app.activeChainId(),
           threadId: thread.id,
-          links: toAdd.map(({ typeId }) => ({
+          links: toAdd.map(({ identifier }) => ({
             source: LinkSource.Proposal,
-            identifier: String(typeId),
+            identifier,
           })),
         });
 
@@ -208,9 +211,9 @@ export const UpdateProposalStatusModal = ({
         const updatedThread = await deleteThreadLinks({
           chainId: app.activeChainId(),
           threadId: thread.id,
-          links: toDelete.map(({ typeId }) => ({
+          links: toDelete.map(({ identifier }) => ({
             source: LinkSource.Proposal,
-            identifier: String(typeId),
+            identifier,
           })),
         });
 
@@ -280,16 +283,16 @@ export const UpdateProposalStatusModal = ({
     setVotingStage();
   };
 
-  const handleSelectChainEntity = (ce: { typeId: string }) => {
+  const handleSelectEvmProposal = (ce: { identifier: string }) => {
     const isSelected = tempProposals.find(
-      ({ typeId }) => ce.typeId === String(typeId)
+      ({ identifier }) => ce.identifier === identifier
     );
 
-    const updatedChainEntities = isSelected
-      ? tempProposals.filter(({ typeId }) => ce.typeId !== String(typeId))
+    const updatedProposals = isSelected
+      ? tempProposals.filter(({ identifier }) => ce.identifier !== identifier)
       : [...tempProposals, ce];
 
-    setTempProposals(updatedChainEntities);
+    setTempProposals(updatedProposals);
     setVotingStage();
   };
 
@@ -337,9 +340,9 @@ export const UpdateProposalStatusModal = ({
             snapshotProposalsToSet={tempSnapshotProposals}
           />
         )}
-        {showChainEvents && (
-          <ChainEntitiesSelector
-            onSelect={handleSelectChainEntity}
+        {showEvmProposals && (
+          <ProposalSelector
+            onSelect={handleSelectEvmProposal}
             proposalsToSet={tempProposals}
           />
         )}

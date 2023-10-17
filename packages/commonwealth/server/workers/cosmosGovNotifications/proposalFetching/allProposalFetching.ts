@@ -1,6 +1,5 @@
 import { ChainInstance } from '../../../models/chain';
 import { factory, formatFilename } from 'common-common/src/logging';
-import Rollbar from 'rollbar';
 
 import {
   fetchLatestCosmosProposalV1,
@@ -25,8 +24,7 @@ const log = factory.getLogger(formatFilename(__filename));
  */
 export async function fetchUpToLatestCosmosProposals(
   chains: ChainInstance[],
-  latestProposalIds: Record<string, number>,
-  rollbar?: Rollbar
+  latestProposalIds: Record<string, number>
 ): Promise<AllCosmosProposals> {
   if (chains.length === 0) return { v1: {}, v1Beta1: {} };
 
@@ -55,8 +53,7 @@ export async function fetchUpToLatestCosmosProposals(
 
   const { v1Proposals, v1Beta1Proposals } = processProposalSettledPromises(
     v1ProposalResults,
-    v1BetaProposalResults,
-    rollbar
+    v1BetaProposalResults
   );
 
   return mapChainsToProposals(
@@ -71,8 +68,7 @@ export async function fetchUpToLatestCosmosProposals(
  * Fetches the last/latest proposal for each chain. Works for both v1 and v1beta1 gov modules.
  */
 export async function fetchLatestProposals(
-  chains: ChainInstance[],
-  rollbar?: Rollbar
+  chains: ChainInstance[]
 ): Promise<AllCosmosProposals> {
   if (chains.length === 0) return { v1: {}, v1Beta1: {} };
 
@@ -94,8 +90,7 @@ export async function fetchLatestProposals(
 
   const { v1Proposals, v1Beta1Proposals } = processProposalSettledPromises(
     v1ProposalResults,
-    v1Beta1ProposalResults,
-    rollbar
+    v1Beta1ProposalResults
   );
 
   return mapChainsToProposals(

@@ -149,14 +149,6 @@ export async function __createThreadReaction(
         author_chain: finalReaction.Address.chain,
       },
     },
-    webhookData: {
-      user: finalReaction.Address.address,
-      author_chain: finalReaction.Address.chain,
-      url: getThreadUrl(thread),
-      title: thread.title,
-      chain: finalReaction.chain,
-      body: '',
-    },
     excludeAddresses: [finalReaction.Address.address],
   };
 
