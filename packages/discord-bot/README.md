@@ -1,3 +1,5 @@
+<!-- FLAGGED FOR OVERLAP WITH KNOWLEDGE BASE ENTRY -->
+
 # Discord Bot 
 
 This package provides services to listen to forum channels that the CW discord bot is active in and publish forum posts to Commonwealth.
@@ -32,7 +34,7 @@ The discord listener is a self contained tsnode service. Follow these steps to s
     - Set `DISCORD_TOKEN` to bot's token
     - Set `DATABASE_URL` like other areas of app(not required for local)
     - SSet `RABBITMQ_URI` if running in a non-local environment
-3. If running local, run `yarn start-rmq` from root directory
+3. If running local, run `yarn start-rmq` from root directory (requires Docker to be installed)
 4. Run `yarn start` from discord-bot directory
 
 ## Consumer Setup 

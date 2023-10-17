@@ -24,7 +24,7 @@ The discord listener is a self contained tsnode service. Follow these steps to s
     - Set `DISCORD_TOKEN` to bot's token
     - Set `DATABASE_URL` like other areas of app(not required for local)
     - SSet `RABBITMQ_URI` if running in a non-local environment
-3. If running local, run `yarn start-rmq` from root directory
+3. If running local, run `yarn start-rmq` from root directory (requires Docker to be installed)
 4. Run `yarn start` from discord-bot directory
 
 ## Consumer Setup 
@@ -38,7 +38,7 @@ The discord consumer service is a rabbitmq subscriber which could be replicated 
     - Set `SERVER_URL` to the Commonwealth URI 
     - Set `CW_BOT_KEY` to key used in app
     - Set `RABBITMQ_URI` if running in a non-local environment
-4. If running local, run `yarn start-rmq` from root directory
+4. If running local, run `yarn start-rmq` from root directory (requires Docker to be installed)
 5. Run `yarn start-consumer`
 
 ## Full setup 
