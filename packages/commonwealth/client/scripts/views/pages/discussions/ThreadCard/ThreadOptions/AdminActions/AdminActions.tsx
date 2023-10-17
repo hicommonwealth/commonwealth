@@ -11,7 +11,7 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { ArchiveThreadModal } from 'views/modals/archive_thread_modal';
+import { ArchiveThreadModal } from 'client/scripts/views/modals/ArchiveThreadModal';
 import {
   notifyError,
   notifySuccess,
