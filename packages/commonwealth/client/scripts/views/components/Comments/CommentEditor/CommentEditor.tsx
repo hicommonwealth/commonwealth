@@ -12,6 +12,7 @@ import BN from 'bn.js';
 import { weiToTokens, getDecimals } from 'helpers';
 import { ContentType } from 'types';
 import type { DeltaStatic } from 'quill';
+import './CommentEditor.scss';
 
 type CommentEditorProps = {
   parentType: ContentType;
@@ -47,12 +48,11 @@ export const CommentEditor = ({
   author,
   editorValue,
   shouldFocus,
-}: CommentEditorProps ) => {
-
+}: CommentEditorProps) => {
   const decimals = getDecimals(app.chain);
 
   return (
-    <div className="CreateComment">
+    <div className="CommentEditor">
       <div className="attribution-row">
         <div className="attribution-left-content">
           <CWText type="caption">
@@ -108,5 +108,5 @@ export const CommentEditor = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import BN from 'bn.js';
 
-import 'components/Comments/CreateComment.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
@@ -19,8 +18,8 @@ import {
   getTextFromDelta,
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
-import { CommentEditor } from './CommentEditor/CommentEditor';
-import { ArchiveMsg } from './ArchiveMsg/ArchiveMsg';
+import { CommentEditor } from './CommentEditor';
+import { ArchiveMsg } from './ArchiveMsg';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
