@@ -13,6 +13,12 @@ $width: 360px;
   padding: 24px;
   width: 100%;
 
+  .modal-gallery {
+    @include gallery-grid(8px, row);
+
+    margin-top: -32px;
+  }
+
   .basic-gallery {
     @include gallery-grid(8px, column);
     width: $width;
@@ -88,7 +94,6 @@ $width: 360px;
       display: flex;
       flex-flow: row;
       flex-wrap: wrap;
-      height: 448px;
       margin-bottom: 16px;
       width: fit-content;
 
@@ -184,13 +189,22 @@ $width: 360px;
   }
 
   .tag-gallery {
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+
     .tag-row {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 15px;
+
+      >.Text {
+        min-width: 140px;
+      }
     }
   }
-  
+
   .editor-toggle {
     display: flex;
     align-items: center;
@@ -222,5 +236,10 @@ $width: 360px;
     .typeahead-row {
       margin-bottom: 20px;
     }
+  }
+
+  .new-tabs {
+    width: max(100%, 300px);
+    overflow-x: auto;
   }
 }

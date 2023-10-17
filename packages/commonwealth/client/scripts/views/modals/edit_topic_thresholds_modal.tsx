@@ -1,18 +1,26 @@
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { getDecimals } from 'helpers';
-import 'modals/edit_topic_thresholds_modal.scss';
 import React from 'react';
-import app from 'state';
+
+import type Topic from '../../models/Topic';
+import app from '../../state';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
+import { getDecimals } from '../../helpers';
 import {
   useFetchTopicsQuery,
   useSetTopicThresholdMutation,
-} from 'state/api/topics';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
-import type Topic from '../../models/Topic';
+} from '../../state/api/topics';
 import Permissions from '../../utils/Permissions';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { TokenDecimalInput } from '../components/token_decimal_input';
 import { CWText } from '../components/component_kit/cw_text';
+import {
+  CWModalBody,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+
+import '../../../styles/modals/edit_topic_thresholds_modal.scss';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 type EditTopicThresholdsRowProps = {
   topic: Topic;
@@ -46,6 +54,7 @@ const EditTopicThresholdsRow = ({
         />
         <CWButton
           label="Update"
+          buttonHeight="sm"
           disabled={!newTokenThresholdInWei}
           onClick={async (e) => {
             e.preventDefault();
@@ -88,11 +97,11 @@ export const EditTopicThresholdsModal = ({
 
   return (
     <div className="EditTopicThresholdsModal">
-      <div className="compact-modal-title">
-        <h3>Edit topic thresholds</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader
+        label="Edit topic thresholds"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody className="EditTopicThresholdsBody">
         {topics.length > 0 ? (
           topics
             .sort((a, b) => {
@@ -116,7 +125,7 @@ export const EditTopicThresholdsModal = ({
         ) : (
           <CWText>There are no topics in this community yet</CWText>
         )}
-      </div>
+      </CWModalBody>
     </div>
   );
 };
