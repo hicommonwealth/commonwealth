@@ -1,26 +1,6 @@
-import type { Any } from 'cosmjs-types/google/protobuf/any';
 import type { TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import type { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import type {
-  QueryClient,
-  StakingExtension,
-  GovExtension,
-  BankExtension,
-  Coin,
-} from '@cosmjs/stargate';
+import type { Coin } from '@cosmjs/stargate';
 import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-
-export interface ListenerOptions {
-  url: string;
-  skipCatchup: boolean;
-  pollTime?: number;
-}
-
-export type Api = {
-  tm: Tendermint34Client;
-  rpc: QueryClient & StakingExtension & GovExtension & BankExtension;
-  lcd: LCD;
-};
 
 // currently just used for gov v1, but this can be expanded
 export type LCD = {
@@ -29,11 +9,6 @@ export type LCD = {
       v1: GovV1Client;
     };
   };
-};
-
-export type RawEvent = {
-  message: Any;
-  height: number;
 };
 
 // eslint-disable-next-line no-shadow
@@ -91,5 +66,3 @@ export interface IVote extends IEvent {
 }
 
 export type IEventData = ISubmitProposal | IDeposit | IVote;
-
-export const EventKinds: EventKind[] = Object.values(EventKind);

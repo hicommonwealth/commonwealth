@@ -1,46 +1,3 @@
-import type { IAaveGovernanceV2 } from '../../contractTypes';
-import { AaveGovernanceV2 } from '../../contractTypes';
-
-// Used to unwrap promises returned by contract functions
-type UnPromisify<T> = T extends Promise<infer U> ? U : T;
-export type Proposal = UnPromisify<
-  ReturnType<IAaveGovernanceV2['getProposalById']>
->;
-
-// API is imported contracts classes
-interface IAaveContracts {
-  governance: IAaveGovernanceV2;
-}
-
-export interface ListenerOptions {
-  url: string;
-  govContractAddress: string;
-  skipCatchup?: boolean;
-}
-
-export type Api = IAaveContracts;
-
-// creates a FilterEventTypes mapped type that iterates over all the keys of the filters object,
-// gets the return type of each function using ReturnType, and then returns an object with the
-// same keys and the corresponding return types
-type FilterEventTypes<T> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => any
-    ? ReturnType<T[K]>
-    : never;
-};
-
-// The union of all Aave event types
-type EventArgs = FilterEventTypes<
-  AaveGovernanceV2['filters']
->[keyof AaveGovernanceV2['filters']];
-
-export interface RawEvent {
-  address: string;
-  args: any;
-  name: string;
-  blockNumber: number;
-}
-
 // eslint-disable-next-line no-shadow
 export enum EntityKind {
   // eslint-disable-next-line no-shadow
@@ -170,6 +127,3 @@ export type IEventData =
   | IDelegatedPowerChanged
   | ITransfer
   | IApproval;
-// eslint-disable-next-line semi-style
-
-export const EventKinds: EventKind[] = Object.values(EventKind);

@@ -1,10 +1,3 @@
-/* eslint-disable no-shadow */
-import type { TypedEvent } from '../../contractTypes/commons';
-import type {
-  GovernorAlpha,
-  GovernorCompatibilityBravo,
-} from '../../contractTypes';
-
 export enum ProposalState {
   Pending = 0,
   Active = 1,
@@ -14,32 +7,6 @@ export enum ProposalState {
   Queued = 5,
   Expired = 6,
   Executed = 7,
-}
-
-export enum BravoSupport {
-  Against = 0,
-  For = 1,
-  Abstain = 2,
-}
-
-export type Api = GovernorAlpha | GovernorCompatibilityBravo;
-export function isGovernorAlpha(a: Api): a is GovernorAlpha {
-  return !!a.interface.functions['guardian()'];
-}
-
-// options for the listener class
-export interface ListenerOptions {
-  url: string;
-  skipCatchup: boolean;
-  contractAddress: string;
-}
-
-export interface RawEvent {
-  address: string;
-  args: any;
-  name: string;
-  blockNumber: number;
-  data: any;
 }
 
 // eslint-disable-next-line no-shadow
@@ -107,5 +74,3 @@ export type IEventData =
   | IProposalExecuted
   | IProposalQueued
   | IVoteCast;
-
-export const EventKinds: EventKind[] = Object.values(EventKind);
