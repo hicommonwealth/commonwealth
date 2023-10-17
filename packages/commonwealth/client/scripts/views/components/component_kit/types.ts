@@ -42,6 +42,7 @@ export enum ComponentType {
   Socials = 'Socials',
   Spinner = 'Spinner',
   Tab = 'Tab',
+  TabDeprecated = 'TabDeprecated',
   TabBar = 'TabBar',
   Table = 'Table',
   Tag = 'Tag',
