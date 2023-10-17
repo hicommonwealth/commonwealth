@@ -4,7 +4,6 @@ import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
 import { validateOwner } from '../../util/validateOwner';
 import { QueryTypes } from 'sequelize';
-import { sequelize } from '../../database';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -44,7 +43,7 @@ export async function __deleteTopic(
   }
 
   // remove topic from threads, then delete topic
-  await sequelize.transaction(async (transaction) => {
+  await this.models.sequelize.transaction(async (transaction) => {
     await this.models.sequelize.query(
       `UPDATE "Threads" SET topic_id=null WHERE topic_id = $id AND chain = $chain;`,
       {
