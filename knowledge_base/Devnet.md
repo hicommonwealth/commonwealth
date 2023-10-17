@@ -1,5 +1,7 @@
 To develop and test new features for different chains, we use containerized testnet deployments (AKA devnets).
 
+<!-- Flagged: Only a Cosmos Devnet entry, no EVM. We should rename and cover EVM. -->
+
 ## Cosmos SDK
 
 Note: Currently, the sandbox communities csdk, csdk-beta, and evmos-dev are on a minimal heroku plan, so they restart intermittently. This means they work fine for manual testing, but created proposals will only persist until the heroku app resets.
