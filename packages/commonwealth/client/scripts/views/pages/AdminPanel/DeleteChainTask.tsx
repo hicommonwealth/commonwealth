@@ -21,7 +21,8 @@ const DeleteChainTask = () => {
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await deleteChain({ id: deleteChainValue });
@@ -36,7 +37,8 @@ const DeleteChainTask = () => {
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });

@@ -1,13 +1,10 @@
 import type CosmosChain from 'controllers/chain/cosmos/chain';
-import type { CosmosToken } from 'controllers/chain/cosmos/types';
 import type { IAccountsModule } from '../../../models/interfaces';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import CosmosAccount from './account';
 
-export default class CosmosAccounts
-  implements IAccountsModule<CosmosToken, CosmosAccount>
-{
+export default class CosmosAccounts implements IAccountsModule<CosmosAccount> {
   private _initialized = false;
   public get initialized() {
     return this._initialized;

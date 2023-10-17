@@ -1,5 +1,5 @@
 import type moment from 'moment';
-import { AbiType } from 'shared/types';
+import { AbiType } from '../../../shared/types';
 
 class Contract {
   public readonly id: number;

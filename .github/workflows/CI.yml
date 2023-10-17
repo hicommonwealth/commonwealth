@@ -57,6 +57,9 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Add node-gyp
+        run: yarn global add node-gyp
+
       - name: Install dependencies
         run: yarn --ignore-engines
 
@@ -152,6 +155,9 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Add node-gyp
+        run: yarn global add node-gyp
+
       - name: Install dependencies
         run: yarn --ignore-engines
 
@@ -245,6 +251,9 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Add node-gyp
+        run: yarn global add node-gyp
+
       - name: Install dependencies
         run: yarn --ignore-engines
 
@@ -302,6 +311,9 @@ jobs:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
+      - name: Add node-gyp
+        run: yarn global add node-gyp
+
       - name: Install dependencies
         run: yarn --ignore-engines
 
@@ -327,7 +339,7 @@ jobs:
         node: [ 18 ]
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     services:
       postgres:
@@ -365,6 +377,9 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Add node-gyp
+        run: yarn global add node-gyp
 
       - name: Install dependencies
         run: yarn --ignore-engines
@@ -446,6 +461,9 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Add node-gyp
+        run: yarn global add node-gyp
 
       - name: Install dependencies
         run: yarn --ignore-engines

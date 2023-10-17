@@ -16,11 +16,11 @@ export type validateGroupMembershipResponse = {
  * @param tbc initialized Token Balance Cache instance
  * @returns validateGroupMembershipResponse validity and messages on requirements that failed
  */
-export default function validateGroupMembership(
+export default async function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
   tbc?: TokenBalanceCache
-): validateGroupMembershipResponse {
+): Promise<validateGroupMembershipResponse> {
   return {
     isValid: true,
   };

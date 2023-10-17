@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 
-import { parseCustomStages, threadStageToLabel } from 'helpers';
+import type Thread from '../../models/Thread';
+import { parseCustomStages, threadStageToLabel } from '../../helpers';
 import {
   loadMultipleSpacesData,
   SnapshotProposal,
 } from 'helpers/snapshot_utils';
 
-import 'modals/update_proposal_status_modal.scss';
-import type Thread from '../../models/Thread';
 import { ThreadStage } from '../../models/types';
 import { SelectList } from '../components/component_kit/cw_select_list';
 
@@ -24,10 +23,14 @@ import {
 } from 'state/api/threads';
 import { ProposalSelector } from '../components/ProposalSelector';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -314,11 +317,11 @@ export const UpdateProposalStatusModal = ({
 
   return (
     <div className="UpdateProposalStatusModal">
-      <div className="compact-modal-title">
-        <h3>Update proposal status</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader
+        label="Update proposal status"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody allowOverflow>
         <SelectList
           defaultValue={
             tempStage
@@ -352,15 +355,21 @@ export const UpdateProposalStatusModal = ({
             proposalsToSet={tempCosmosProposals}
           />
         )}
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary-blue"
-            onClick={onModalClose}
-          />
-          <CWButton label="Save changes" onClick={handleSaveChanges} />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          buttonType="primary"
+          buttonHeight="sm"
+          label="Save changes"
+          onClick={handleSaveChanges}
+        />
+      </CWModalFooter>
     </div>
   );
 };

@@ -1,5 +1,8 @@
 import { expect } from 'chai';
-import { minimalToNaturalDenom, naturalDenomToMinimal } from 'shared/utils';
+import {
+  minimalToNaturalDenom,
+  naturalDenomToMinimal,
+} from '../../../shared/utils';
 
 describe('shared utils unit tests', () => {
   it('minimalToNaturalDenom() should convert large numbers in minimal format to natural denom format', () => {

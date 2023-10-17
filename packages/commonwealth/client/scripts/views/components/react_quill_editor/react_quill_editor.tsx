@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { SerializableDeltaStatic } from './utils';
 import { getTextFromDelta } from './utils';
 import { PreviewModal } from '../../modals/preview_modal';
-import { Modal } from '../component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { nextTick } from 'process';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { LoadingIndicator } from './loading_indicator';
@@ -142,7 +142,8 @@ const ReactQuillEditor = ({
           buttons: [
             {
               label: 'Yes',
-              buttonType: 'mini-red',
+              buttonType: 'destructive',
+              buttonHeight: 'sm',
               onClick: () => {
                 editor.removeFormat(0, editor.getLength());
                 setIsMarkdownEnabled(newMarkdownEnabled);
@@ -154,7 +155,8 @@ const ReactQuillEditor = ({
             },
             {
               label: 'No',
-              buttonType: 'mini-white',
+              buttonType: 'secondary',
+              buttonHeight: 'sm',
             },
           ],
         });
@@ -231,7 +233,8 @@ const ReactQuillEditor = ({
       >
         {showTooltip && <QuillTooltip label={tooltipLabel} />}
         {isUploading && <LoadingIndicator />}
-        <Modal
+        <CWModal
+          size="medium"
           content={
             <PreviewModal
               doc={

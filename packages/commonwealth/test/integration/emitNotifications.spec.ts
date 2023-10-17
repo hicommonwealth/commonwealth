@@ -396,6 +396,7 @@ describe('emitNotifications tests', () => {
           category_id: NotificationCategories.SnapshotProposal,
         },
       });
+
       expect(notif).to.exist;
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -405,6 +406,7 @@ describe('emitNotifications tests', () => {
           user_id: userId,
         },
       });
+
       expect(notifRead).to.exist;
     });
   });

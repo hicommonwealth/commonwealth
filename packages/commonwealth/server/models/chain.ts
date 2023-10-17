@@ -52,6 +52,7 @@ export type ChainAttributes = {
   ce_verbose?: boolean;
   discord_config_id?: number;
   category?: any;
+  discord_bot_webhooks_enabled?: boolean;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -140,6 +141,10 @@ export default (
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
       category: { type: dataTypes.JSONB, allowNull: true },
+      discord_bot_webhooks_enabled: {
+        type: dataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
