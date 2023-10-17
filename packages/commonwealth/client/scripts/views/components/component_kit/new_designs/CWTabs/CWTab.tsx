@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTag } from 'views/components/component_kit/new_designs/cw_tag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 
 import './CWTab.scss';
 
