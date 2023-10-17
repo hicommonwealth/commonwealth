@@ -1,6 +1,5 @@
-# Purpose
-
-This doc describes the current state of thread flow + process logic, in as much detail as possible. 
+## Purpose
+This doc describes the current state of thread flow + process logic, in as much detail as possible.
 
 Providing a solution to improve existing thread workflows is a non-goal of this document.
 
@@ -50,7 +49,7 @@ On updating a thread topic
 On updating a thread privacy
 - The `/updateThreadPrivacy` will trigger and on response, the `store`, `listingStore` and `overview` substore in `threads.ts` will update the newly set privacy status of the thread.
 
-On pinning a thread 
+On pinning a thread
 - The `/updateThreadPinned` will trigger and on response, the `listingStore` substore in `thread.ts` will update the newly set pinned status for the thread.
 
 On updating a thread stage
@@ -61,9 +60,9 @@ On comment
 - Removing a comment will trigger `/deleteComment` and on response we decrement the `numOfComments` for the thread in the `store` substore in `threads.ts`
 
 On poll
-- The `/getPolls` api will trigger on visit to the thread view page and on response we update the local state of the thread view page.
-- On the `/createPoll` api response we update the thread with the active poll status + the `polls.ts` store. This api is triggered from the thread view page.
-- On the `/deletePoll` api response we update the `polls.ts` store. This api is triggered from the thread view page.
+- The `/GET threads/:id/polls` api will trigger on visit to the thread view page and on response we update the local state of the thread view page.
+- On the `POST /threads/:id/polls` api response we update the thread with the active poll status + the `polls.ts` store. This api is triggered from the thread view page.
+- On the `DELETE /polls/:id` api response we update the `polls.ts` store. This api is triggered from the thread view page.
 
 On thread linking
 - The `linking/getLinks` will get triggered on the view threads page. The response is stored in local component state
