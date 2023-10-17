@@ -1,5 +1,5 @@
 import type { CWEvent } from 'chain-events/src';
-import { Label as ChainEventLabel } from 'chain-events/src';
+import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
