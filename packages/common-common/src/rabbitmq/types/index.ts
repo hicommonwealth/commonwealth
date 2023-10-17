@@ -1,7 +1,3 @@
-import type { RmqCENotificationCUD } from './chainEventNotificationsCUD';
-
-export * from './chainEventNotificationsCUD';
-
 export * from './chainEvents';
 export * from './chainEventNotification';
 import type { RmqCWEvent } from './chainEvents';
