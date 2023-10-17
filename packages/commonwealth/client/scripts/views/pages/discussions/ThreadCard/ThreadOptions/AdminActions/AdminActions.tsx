@@ -60,7 +60,8 @@ export const AdminActions = ({
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
     useState(false);
-  const [isArchiveThreadModalOpen, setIsArchiveThreadModalOpen] = useState(false);
+  const [isArchiveThreadModalOpen, setIsArchiveThreadModalOpen] =
+    useState(false);
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -81,8 +82,8 @@ export const AdminActions = ({
   });
 
   const { RevalidationModal } = useSessionRevalidationModal({
-      handleClose: resetDeleteThreadMutation,
-      error: deleteThreadError,
+    handleClose: resetDeleteThreadMutation,
+    error: deleteThreadError,
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
@@ -260,7 +261,7 @@ export const AdminActions = ({
 
   const handleArchiveThread = () => {
     if (thread.archivedAt === null) {
-      setIsArchiveThreadModalOpen(true)
+      setIsArchiveThreadModalOpen(true);
     } else {
       editThread({
         threadId: thread.id,
@@ -268,14 +269,18 @@ export const AdminActions = ({
         archived: !thread.archivedAt,
         address: app.user?.activeAccount?.address,
       })
-      .then(() => {
-        notifySuccess(`Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`)
-      })
-      .catch(() => {
-        notifyError(`Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`)
-      })
+        .then(() => {
+          notifySuccess(
+            `Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`
+          );
+        })
+        .catch(() => {
+          notifyError(
+            `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`
+          );
+        });
     }
-  }
+  };
 
   return (
     <>
@@ -288,9 +293,10 @@ export const AdminActions = ({
         <PopoverMenu
           className="AdminActions compact"
           menuItems={[
-            ...(thread.archivedAt === null && (hasAdminPermissions ||
-            isThreadAuthor ||
-            (isThreadCollaborator && !thread.readOnly))
+            ...(thread.archivedAt === null &&
+            (hasAdminPermissions ||
+              isThreadAuthor ||
+              (isThreadCollaborator && !thread.readOnly))
               ? [
                   {
                     label: 'Edit',
@@ -336,7 +342,10 @@ export const AdminActions = ({
                     : []),
                   {
                     label: thread.archivedAt === null ? 'Archive' : 'Unarchive',
-                    iconLeft: thread.archivedAt === null ? 'archiveTray' as const : 'archiveTrayFilled' as const,
+                    iconLeft:
+                      thread.archivedAt === null
+                        ? ('archiveTray' as const)
+                        : ('archiveTrayFilled' as const),
                     iconLeftWeight: 'bold' as const,
                     onClick: handleArchiveThread,
                   },
@@ -375,7 +384,8 @@ export const AdminActions = ({
                   ...(thread.archivedAt === null
                     ? [
                         {
-                          onClick: () => setIsUpdateProposalStatusModalOpen(true),
+                          onClick: () =>
+                            setIsUpdateProposalStatusModalOpen(true),
                           label: 'Update status',
                           iconLeft: 'democraticProposal' as const,
                           iconLeftWeight: 'bold' as const,

@@ -31,7 +31,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
-  const [includeArchivedThreads, setIncludeArchivedThreads] = useState<boolean>(false);
+  const [includeArchivedThreads, setIncludeArchivedThreads] =
+    useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
@@ -49,7 +50,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
 
-  const onArchivePage = location.pathname === `/${app.activeChainId()}/archived`;
+  const onArchivePage =
+    location.pathname === `/${app.activeChainId()}/archived`;
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
@@ -131,11 +133,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">
-                {
-                  onArchivePage
+                {onArchivePage
                   ? 'There are currently no archived threads.'
-                  : 'There are no threads matching your filter.'
-                }
+                  : 'There are no threads matching your filter.'}
               </CWText>
             ),
           Header: () => {
