@@ -6,7 +6,7 @@ import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import app from 'state';
 import { slugify } from 'utils';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
@@ -82,6 +82,7 @@ export const TopicSummaryRow = ({
 
           const isStageDefault = isDefaultStage(thread.stage);
           const isTagsRowVisible = thread.stage && !isStageDefault;
+          const stageLabel = threadStageToLabel(thread.stage)
 
           return (
             <div key={idx}>
@@ -134,7 +135,8 @@ export const TopicSummaryRow = ({
                 {isTagsRowVisible && (
                   <div className="tags-row">
                     <CWTag
-                      label={threadStageToLabel(thread.stage)}
+                      label={stageLabel}
+                      classNames={stageLabel}
                       trimAt={20}
                       type="stage"
                     />

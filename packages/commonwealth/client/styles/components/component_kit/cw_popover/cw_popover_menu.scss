@@ -81,4 +81,10 @@
     width: 100%;
     margin: 8px 0;
   }
+
+  &.compact {
+    .PopoverMenuItem {
+      padding: 6px 12px;
+    }
+  }
 }

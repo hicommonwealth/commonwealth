@@ -38,10 +38,13 @@ import { withPhosphorIcon } from './cw_phosphor_icons';
 
 export const iconLookup = {
   archiveTrayFilled: Icons.CWArchiveTrayFilled,
+  arrowDownBlue500: Icons.CWArrowDownBlue500,
   arrowFatUp: Icons.CWArrowFatUp,
   arrowFatUpNeutral: Icons.CWArrowFatUpNeutral,
   arrowFatUpBlue500: Icons.CWArrowFatUpBlue500,
   arrowFatUpBlue600: Icons.CWArrowFatUpBlue600,
+  arrowUpBlue500: Icons.CWArrowUpBlue500,
+  arrowUpNeutral400: Icons.CWArrowUpNeutral400,
   keyLockOpened: withPhosphorIcon(LockKeyOpen),
   keyLockClosed: withPhosphorIcon(LockKey),
   eye: withPhosphorIcon(Eye),

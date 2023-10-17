@@ -5,7 +5,7 @@ import {
   Popover,
   usePopover,
 } from 'views/components/component_kit/cw_popover/cw_popover';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';
@@ -98,7 +98,7 @@ export const AuthorAndPublishInfo = ({
             <b>{discord_meta?.user?.username}</b>
           </CWText>
           {dotIndicator}
-          <CWTag label={'Discord'} type={'discord'} iconName="discord" />
+          <CWTag label={'Discord'} type={'login'} iconName="discord" />
           {dotIndicator}
           <CWText type="caption" className="discord-author">
             Bridged from Discord
@@ -205,8 +205,6 @@ export const AuthorAndPublishInfo = ({
       <NewThreadTag threadCreatedAt={moment(publishDate)} />
 
       {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
-
-      {isSpamThread && <CWTag label={'SPAM'} type={'disabled'} />}
 
       {isLocked && lockedAt && lastUpdated && (
         <LockWithTooltip

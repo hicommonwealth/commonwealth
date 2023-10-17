@@ -242,7 +242,7 @@ Running chain-events as a CW DB node lets us run a cluster of chain-events node 
 needing for each of them to be aware of each other or implementing load-balancing. This is achieved by having the chain
 events DB nodes poll the database for the information that is specific to them.
 
-####Environment Variables
+#### Environment Variables
 
 - `NUM_WORKERS`: The total number of chain-events DB nodes in the cluster. This is used to ensure even separation of
   listeners among the different chain-events DB nodes.
