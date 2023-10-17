@@ -194,9 +194,6 @@ export async function manageRegularListeners(
 
   // update existing listeners whose verbose_logging or substrate_spec has changed
   await updateExistingListeners(chains, listenerInstances, rollbar);
-
-  // fetch and publish on-chain substrate identities
-  // await fetchSubstrateIdentities(chains, listenerInstances, pool, producer, rollbar);
 }
 
 /**

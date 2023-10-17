@@ -55,20 +55,6 @@ export interface IAccountsModule<A extends Account> extends StorageModule {
   get(address: string, keytype?: string, ignoreProfile?: boolean): A;
 }
 
-// Offchain stores and management for discussion features.
-export interface IOffchainAccountsModule<C extends Coin, A extends Account>
-  extends StorageModule {
-  get(address: string, chain?: string): A;
-}
-
-export interface ITransactionResult {
-  status: TransactionStatus;
-  hash?: string;
-  err?: string;
-  blocknum?: number;
-  timestamp?: moment.Moment;
-}
-
 export type IBalanceAccount<C extends Coin> = Account & { balance: Promise<C> };
 
 export interface IVote<C extends Coin> {
