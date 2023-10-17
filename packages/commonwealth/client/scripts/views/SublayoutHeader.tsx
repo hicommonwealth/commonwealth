@@ -4,27 +4,25 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import useSidebarStore from 'state/ui/sidebar';
 import 'SublayoutHeader.scss';
-import app, { initAppState } from '../state';
+import app from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import {
   isWindowMediumSmallInclusive,
-  isWindowSmallInclusive
+  isWindowSmallInclusive,
 } from './components/component_kit/helpers';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from './components/component_kit/new_designs/CWModal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { setDarkMode } from 'helpers/darkMode';
-import WebWalletController from 'controllers/app/web_wallets';
-import { WalletId } from 'common-common/src/types';
-import axios from 'axios';
 import clsx from 'clsx';
 import { CWButton } from './components/component_kit/new_designs/cw_button';
 import { LoginModal } from 'views/modals/login_modal';
 import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
+import { featureFlags } from '../helpers/feature-flags';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { HelpMenuPopover } from 'views/menus/help_menu';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -40,7 +38,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
     setMobileMenuName,
     mobileMenuName,
     setUserToggledVisibility,
-    setRecentlyUpdatedVisibility
+    setRecentlyUpdatedVisibility,
   } = useSidebarStore();
   const { isLoggedIn } = useUserLoggedIn();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -48,7 +46,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
 
   useEffect(() => {
     setRecentlyUpdatedVisibility(menuVisible);
-  }, [menuVisible]);
+  }, [menuVisible, setRecentlyUpdatedVisibility]);
 
   function handleToggle() {
     const isVisible = !menuVisible;
@@ -57,29 +55,6 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   }
-
-  const resetWalletConnectSession = async () => {
-    /**
-     * Imp to reset wc session on logout as subsequent login attempts fail
-     */
-    const walletConnectWallet = WebWalletController.Instance.getByName(
-      WalletId.WalletConnect
-    );
-    await walletConnectWallet.reset();
-  };
-
-  const handleLogout = async () => {
-    try {
-      await axios.get(`${app.serverUrl()}/logout`);
-      await initAppState();
-      await resetWalletConnectSession();
-      notifySuccess('Logged out');
-      setDarkMode(false);
-    } catch (err) {
-      notifyError('Something went wrong during logging out.');
-      window.location.reload();
-    }
-  };
 
   return (
     <>
@@ -99,6 +74,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
                 navigate('/', {}, null);
               } else {
                 if (isLoggedIn) {
+                  setMobileMenuName(null);
                   navigate('/dashboard/for-you', {}, null);
                 } else {
                   navigate('/dashboard/global', {}, null);
@@ -109,7 +85,7 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {onMobile && app.activeChainId() && (
+          {(featureFlags.sidebarToggle || onMobile) && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
               iconName={menuVisible ? 'sidebarCollapse' : 'sidebarExpand'}
@@ -131,38 +107,29 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           </div>
           <div
             className={clsx('DesktopMenuContainer', 'session-keys', {
-              isLoggedIn
+              isLoggedIn,
             })}
           >
             <CreateContentPopover />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="compassPhosphor"
-              onClick={() => navigate('/communities', {}, null)}
+            <CWTooltip
+              content="Explore communities"
+              placement="bottom"
+              renderTrigger={(handleInteraction) => (
+                <CWIconButton
+                  iconButtonTheme="black"
+                  iconName="compassPhosphor"
+                  onClick={() => navigate('/communities', {}, null)}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                />
+              )}
             />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="question"
-              onClick={() => setIsFeedbackModalOpen(true)}
-            />
-            <CWIconButton
-              iconButtonTheme="black"
-              iconName="paperPlaneTilt"
-              onClick={() =>
-                window.open('https://docs.commonwealth.im/commonwealth/')
-              }
-            />
+
+            <HelpMenuPopover />
+
             {isLoggedIn && <NotificationsMenuPopover />}
           </div>
           {isLoggedIn && <UserDropdown />}
-          {isLoggedIn && (
-            <CWIconButton
-              className="logout-button"
-              iconButtonTheme="black"
-              iconName="signOut"
-              onClick={handleLogout}
-            />
-          )}
           {!isLoggedIn && (
             <CWButton
               buttonType="primary"
@@ -175,14 +142,15 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           )}
         </div>
       </div>
-      <Modal
+      <CWModal
+        size="small"
         content={
           <FeedbackModal onModalClose={() => setIsFeedbackModalOpen(false)} />
         }
         onClose={() => setIsFeedbackModalOpen(false)}
         open={isFeedbackModalOpen}
       />
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}

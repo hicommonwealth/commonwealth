@@ -9,7 +9,7 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
-import { Modal } from '../component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
 import { UserSkeleton } from './UserSkeleton';
@@ -188,7 +188,7 @@ export const User = ({
                 to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
               >
                 {!profile || !profile?.id ? (
-                  !profile?.id ? (
+                  !profile?.id && userAddress ? (
                     `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
                   ) : (
                     redactedAddress
@@ -218,14 +218,15 @@ export const User = ({
                 onClick={() => {
                   setIsModalOpen(true);
                 }}
-                label="Ban User"
+                label="Ban address"
                 buttonType="primary-red"
               />
             </div>
           )}
         </div>
       )}
-      <Modal
+      <CWModal
+        size="small"
         content={
           <BanUserModal
             address={userAddress}

@@ -3,7 +3,7 @@ import type { Response } from 'express';
 import { ContractsStore } from 'stores';
 import Contract from '../../models/Contract';
 import app from 'state';
-import { AbiType } from 'shared/types';
+import { AbiType } from '../../../../shared/types';
 
 type AddCommunityContractTemplateAttributes = {
   slug: string;

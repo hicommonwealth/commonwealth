@@ -1,9 +1,15 @@
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/cw_button';
 import React from 'react';
 
-import 'components/Header/TOSModal.scss';
+import app from '../../../state';
+import { CWText } from '../component_kit/cw_text';
+import { CWButton } from '../component_kit/new_designs/cw_button';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../component_kit/new_designs/CWModal';
+
+import '../../../../styles/components/Header/TOSModal.scss';
 
 type TOSModalProps = {
   onAccept: () => void;
@@ -11,23 +17,38 @@ type TOSModalProps = {
 };
 
 export const TOSModal = ({ onModalClose, onAccept }: TOSModalProps) => {
+  const terms = app.chain?.meta?.terms;
+
   return (
     <div className="TOSModal">
-      <div className="close-button-wrapper">
-        <CWIconButton
-          iconButtonTheme="primary"
-          iconName="close"
-          iconSize="small"
-          className="close-icon"
+      <CWModalHeader
+        label="Terms of Service"
+        icon="warning"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody>
+        <CWText className="body">
+          By clicking accept you agree to the community's
+          <a href={terms} target="_blank">
+            Terms of Service
+          </a>
+          .
+        </CWText>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
           onClick={onModalClose}
         />
-      </div>
-      <div className="content-wrapper">
-        <CWText>
-          By clicking accept you agree to the community's Terms of Service
-        </CWText>
-        <CWButton onClick={onAccept} label="Accept" />
-      </div>
+        <CWButton
+          buttonType="primary"
+          buttonHeight="sm"
+          onClick={onAccept}
+          label="Accept"
+        />
+      </CWModalFooter>
     </div>
   );
 };

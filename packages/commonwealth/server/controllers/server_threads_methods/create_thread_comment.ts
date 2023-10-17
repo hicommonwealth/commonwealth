@@ -1,6 +1,6 @@
 import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
-import { CommentAttributes, CommentInstance } from '../../models/comment';
+import { CommentAttributes } from '../../models/comment';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { TrackOptions } from '../server_analytics_methods/track';
@@ -13,7 +13,7 @@ import {
 } from '../../../../common-common/src/types';
 import { findAllRoles } from '../../util/roles';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
+import { ServerError } from '../../../../common-common/src/errors';
 import { AppError } from '../../../../common-common/src/errors';
 import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import moment from 'moment';
@@ -277,14 +277,6 @@ export async function __createThreadComment(
         author_chain: finalComment.Address.chain,
       },
     },
-    webhookData: {
-      user: finalComment.Address.address,
-      author_chain: finalComment.Address.chain,
-      url: cwUrl,
-      title: root_title,
-      chain: finalComment.chain,
-      body: finalComment.text,
-    },
     excludeAddresses: rootNotifExcludeAddresses,
   });
 
@@ -307,7 +299,6 @@ export async function __createThreadComment(
           author_chain: finalComment.Address.chain,
         },
       },
-      webhookData: null,
       excludeAddresses: excludedAddrs,
     });
 
@@ -335,7 +326,6 @@ export async function __createThreadComment(
                 author_chain: finalComment.Address.chain,
               },
             },
-            webhookData: null,
             excludeAddresses: [finalComment.Address.address],
           });
         }

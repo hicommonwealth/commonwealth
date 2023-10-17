@@ -10,7 +10,7 @@ import {
 } from '../../../../common-common/src/types';
 import { findAllRoles } from '../../util/roles';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
+import { ServerError } from '../../../../common-common/src/errors';
 import { AppError } from '../../../../common-common/src/errors';
 import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -148,14 +148,6 @@ export async function __createThreadReaction(
         author_address: finalReaction.Address.address,
         author_chain: finalReaction.Address.chain,
       },
-    },
-    webhookData: {
-      user: finalReaction.Address.address,
-      author_chain: finalReaction.Address.chain,
-      url: getThreadUrl(thread),
-      title: thread.title,
-      chain: finalReaction.chain,
-      body: '',
     },
     excludeAddresses: [finalReaction.Address.address],
   };
