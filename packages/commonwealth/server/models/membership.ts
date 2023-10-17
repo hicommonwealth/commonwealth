@@ -30,10 +30,13 @@ export default (
     },
     {
       underscored: true,
+      timestamps: false,
       tableName: 'Memberships',
       indexes: [{ fields: ['group_id'] }],
     }
   );
+
+  Membership.removeAttribute('id');
 
   Membership.associate = (models) => {
     models.Membership.belongsTo(models.Group, {

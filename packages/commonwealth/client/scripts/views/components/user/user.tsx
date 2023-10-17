@@ -188,7 +188,7 @@ export const User = ({
                 to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
               >
                 {!profile || !profile?.id ? (
-                  !profile?.id ? (
+                  !profile?.id && userAddress ? (
                     `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
                   ) : (
                     redactedAddress

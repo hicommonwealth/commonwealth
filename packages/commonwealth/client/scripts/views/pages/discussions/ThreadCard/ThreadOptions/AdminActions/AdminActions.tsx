@@ -271,7 +271,7 @@ export const AdminActions = ({
         }}
       >
         <PopoverMenu
-          className="AdminActions"
+          className="AdminActions compact"
           menuItems={[
             ...(hasAdminPermissions ||
             isThreadAuthor ||
