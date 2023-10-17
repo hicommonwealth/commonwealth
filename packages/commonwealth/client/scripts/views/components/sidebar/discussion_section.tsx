@@ -246,7 +246,7 @@ export const DiscussionSection = () => {
       );
     },
     displayData: null,
-  }
+  };
 
   discussionsGroupData.push(archivedSectionGroup);
 
