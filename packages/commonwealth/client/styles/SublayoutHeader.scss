@@ -33,7 +33,9 @@ html.todesktop .SublayoutHeader {
     gap: 8px;
     height: 100%;
 
-    .logo, .community-avatar-container, .IconButton {
+    .logo,
+    .community-avatar-container,
+    .IconButton {
       -webkit-app-region: no-drag;
     }
   }
@@ -60,6 +62,10 @@ html.todesktop .SublayoutHeader {
 
     .MobileMenuContainer {
       display: none;
+
+      @include mediumSmallMid {
+        display: flex;
+      }
 
       @include extraSmall {
         display: flex;
@@ -91,12 +97,16 @@ html.todesktop .SublayoutHeader {
         display: flex;
       }
 
+      @include mediumSmallMid {
+        display: none;
+      }
+
       @include extraSmall {
         display: none;
       }
     }
-    
-    .LoginSelector{
+
+    .LoginSelector {
       -webkit-app-region: no-drag;
     }
 

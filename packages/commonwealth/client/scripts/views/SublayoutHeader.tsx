@@ -82,9 +82,10 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
               }
             }}
           />
-          {isWindowSmallInclusive(window.innerWidth) && (
-            <CWDivider isVertical />
-          )}
+          {isWindowSmallInclusive(window.innerWidth) &&
+            isWindowMediumSmallInclusive(window.innerWidth) && (
+              <CWDivider isVertical />
+            )}
           {(featureFlags.sidebarToggle || onMobile) && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
