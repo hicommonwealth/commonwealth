@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { Op } from 'sequelize';
 
 import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
@@ -14,17 +13,12 @@ import {
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from '../../../../common-common/src/errors';
 import { AppError } from '../../../../common-common/src/errors';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { ServerThreadsController } from '../server_threads_controller';
-import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
-import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
-import { DB } from '../../models';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import { validateOwner } from '../../util/validateOwner';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -183,15 +177,15 @@ export async function __createThread(
           allowGodMode: true,
         });
         if (!isAdmin) {
-          const canCreateThread = await checkCanCreateThread(
+          const { isValid, message } = await validateTopicGroupsMembership(
             this.models,
             this.tokenBalanceCache,
             topicId,
             chain,
             address
           );
-          if (!canCreateThread) {
-            throw new AppError(Errors.FailedCreateThread);
+          if (!isValid) {
+            throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
           }
         }
       }
@@ -318,56 +312,4 @@ export async function __createThread(
   };
 
   return [finalThread.toJSON(), allNotificationOptions, analyticsOptions];
-}
-
-async function checkCanCreateThread(
-  models: DB,
-  tokenBalanceCache: TokenBalanceCache,
-  topicId: number,
-  chain: ChainInstance,
-  address: AddressInstance
-): Promise<boolean> {
-  if (FEATURE_FLAG_GROUP_CHECK_ENABLED) {
-    // check via groups
-
-    // get all groups of topic
-    const topic = await models.Topic.findOne({
-      where: {
-        chain_id: chain.id,
-        id: topicId,
-      },
-    });
-    const groups = await models.Group.findAll({
-      where: {
-        id: { [Op.in]: topic.group_ids },
-      },
-    });
-
-    // check membership for all groups of topic
-    for (const { requirements } of groups) {
-      const { isValid } = await validateGroupMembership(
-        address.address,
-        requirements,
-        tokenBalanceCache
-      );
-      if (!isValid) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  // check via TBC
-  try {
-    const canReact = await validateTopicThreshold(
-      tokenBalanceCache,
-      models,
-      topicId,
-      address.address
-    );
-    return canReact;
-  } catch (e) {
-    throw new ServerError(Errors.BalanceCheckFailed, e);
-  }
 }

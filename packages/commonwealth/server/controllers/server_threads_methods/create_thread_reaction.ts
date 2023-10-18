@@ -8,14 +8,12 @@ import {
   ChainType,
   NotificationCategories,
 } from '../../../../common-common/src/types';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from '../../../../common-common/src/errors';
 import { AppError } from '../../../../common-common/src/errors';
-import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';
+import { validateOwner } from '../../util/validateOwner';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -23,6 +21,7 @@ export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
   ThreadArchived: 'Thread is archived',
+  FailedCreateReaction: 'Failed to create reaction',
 };
 
 export type CreateThreadReactionOptions = {
@@ -84,29 +83,24 @@ export async function __createThreadReaction(
     chain &&
     (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
   ) {
-    const addressAdminRoles = await findAllRoles(
-      this.models,
-      { where: { address_id: address.id } },
-      chain.id,
-      ['admin']
-    );
-    const isGodMode = user.isAdmin;
-    const hasAdminRole = addressAdminRoles.length > 0;
-    if (!isGodMode && !hasAdminRole) {
-      let canReact;
-      try {
-        canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
-      } catch (e) {
-        throw new ServerError(Errors.BalanceCheckFailed, e);
-      }
-
-      if (!canReact) {
-        throw new AppError(Errors.InsufficientTokenBalance);
+    const isAdmin = await validateOwner({
+      models: this.models,
+      user,
+      chainId: chain.id,
+      entity: thread,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      const { isValid, message } = await validateTopicGroupsMembership(
+        this.models,
+        this.tokenBalanceCache,
+        thread.topic_id,
+        chain,
+        address
+      );
+      if (!isValid) {
+        throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
       }
     }
   }
