@@ -16,6 +16,8 @@ import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import DirectoryMenuItem from '../DirectoryMenuItem';
 
 export const CommunitySection = ({ showSkeleton }) => {
   const navigate = useCommonNavigate();
@@ -48,8 +50,15 @@ export const CommunitySection = ({ showSkeleton }) => {
           <CWText>Home</CWText>
         </div>
       )}
+
+      <CWDivider />
       <DiscussionSection />
+      <CWDivider />
       <GovernanceSection />
+      <CWDivider />
+      <DirectoryMenuItem />
+      <CWDivider />
+
       <ExternalLinksModule />
       <div className="buttons-container">
         {isLoggedIn && app.chain && (
