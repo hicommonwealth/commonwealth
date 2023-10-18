@@ -2,13 +2,12 @@ import axios from 'axios';
 import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { uuidv4 } from 'lib/util';
 import 'pages/manage_community/chain_metadata_rows.scss';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
-import type ChainInfo from '../../../models/ChainInfo';
+import type CommunityInfo from '../../../models/ChainInfo';
 import type RoleInfo from '../../../models/RoleInfo';
 import { AvatarUpload } from '../../components/Avatar';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -27,7 +26,7 @@ import { CWToggle } from '../../components/component_kit/cw_toggle';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
-  chain?: ChainInfo;
+  community?: CommunityInfo;
   mods: any;
   onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   onSave: () => void;
@@ -156,7 +155,7 @@ const DiscordForumConnections = ({
 };
 
 export const ChainMetadataRows = ({
-  chain,
+  community,
   admins,
   mods,
   onRoleUpdate,
@@ -176,37 +175,43 @@ export const ChainMetadataRows = ({
       chainId: app.activeChainId(),
     });
 
-  const [name, setName] = useState(chain.name);
-  const [description, setDescription] = useState(chain.description);
-  const [website, setWebsite] = useState(chain.website);
-  const [discord, setDiscord] = useState(chain.discord);
-  const [element, setElement] = useState(chain.element);
-  const [telegram, setTelegram] = useState(chain.telegram);
-  const [github, setGithub] = useState(chain.github);
-  const [stagesEnabled, setStagesEnabled] = useState(chain.stagesEnabled);
-  const [customStages, setCustomStages] = useState(chain.customStages);
-  const [customDomain, setCustomDomain] = useState(chain.customDomain);
-  const [terms, setTerms] = useState(chain.terms);
-  const [iconUrl, setIconUrl] = useState(chain.iconUrl);
-  const [snapshot, setSnapshot] = useState(chain.snapshot);
+  const [name, setName] = useState(community.name);
+  const [description, setDescription] = useState(community.description);
+  const [website, setWebsite] = useState(community.website);
+  const [discord, setDiscord] = useState(community.discord);
+  const [element, setElement] = useState(community.element);
+  const [telegram, setTelegram] = useState(community.telegram);
+  const [github, setGithub] = useState(community.github);
+  const [stagesEnabled, setStagesEnabled] = useState(community.stagesEnabled);
+  const [customStages, setCustomStages] = useState(community.customStages);
+  const [customDomain, setCustomDomain] = useState(community.customDomain);
+  const [terms, setTerms] = useState(community.terms);
+  const [iconUrl, setIconUrl] = useState(community.iconUrl);
+  const [snapshot, setSnapshot] = useState(community.snapshot);
   const [snapshotString, setSnapshotString] = useState(
-    chain.snapshot.toString()
+    community.snapshot.toString()
   );
-  const [defaultOverview, setDefaultOverview] = useState(chain.defaultOverview);
-  const [defaultPage, setDefaultPage] = useState(chain.defaultPage);
-  const [hasHomepage, setHasHomepage] = useState(chain.hasHomepage);
-  const [selectedTags2, setSelectedTags2] = useState(setSelectedTags(chain.id));
+  const [defaultOverview, setDefaultOverview] = useState(
+    community.defaultOverview
+  );
+  const [defaultPage, setDefaultPage] = useState(community.defaultPage);
+  const [hasHomepage, setHasHomepage] = useState(community.hasHomepage);
+  const [selectedTags2, setSelectedTags2] = useState(
+    setSelectedTags(community.id)
+  );
   const [discordBotConnected, setDiscordBotConnected] = useState(
     returningFromDiscordCallback === 'true'
       ? true
-      : chain.discordConfigId !== null
+      : community.discordConfigId !== null
   );
   const [discordBotConnecting, setDiscordBotConnecting] = useState(
     returningFromDiscordCallback === 'true'
       ? true
-      : chain.discordConfigId !== null
+      : community.discordConfigId !== null
   );
-  const [communityBanner, setCommunityBanner] = useState(chain.communityBanner);
+  const [communityBanner, setCommunityBanner] = useState(
+    community.communityBanner
+  );
   const [uploadInProgress, setUploadInProgress] = useState(false);
   const [snapshotNotificationsEnabled, setSnapshotNotificationsEnabled] =
     useState(false);
@@ -216,12 +221,12 @@ export const ChainMetadataRows = ({
   } | null>(null);
   const [selectedChannelLoaded, setSelectedChannelLoaded] = useState(false);
   const [discordWebhooksEnabled, setDiscordWebhooksEnabled] = useState(
-    chain.discordBotWebhooksEnabled
+    community.discordBotWebhooksEnabled
   );
 
   useEffect(() => {
-    setDiscordBotConnected(chain.discordConfigId !== null);
-  }, [chain]);
+    setDiscordBotConnected(community.discordConfigId !== null);
+  }, [community]);
 
   useEffect(() => {
     if (
@@ -252,7 +257,7 @@ export const ChainMetadataRows = ({
 
     // Update ChainCategories
     try {
-      await setChainCategories(selectedTags2, chain.id);
+      await setChainCategories(selectedTags2, community.id);
     } catch (err) {
       console.log(err);
     }
@@ -260,7 +265,7 @@ export const ChainMetadataRows = ({
     try {
       axios
         .post(`${app.serverUrl()}/updateBanner`, {
-          chain_id: chain.id,
+          chain_id: community.id,
           banner_text: communityBanner,
           auth: true,
           jwt: app.user.jwt,
@@ -276,7 +281,7 @@ export const ChainMetadataRows = ({
       console.log(err);
     }
     try {
-      await chain.updateChainData({
+      await community.updateChainData({
         name,
         description,
         website,
@@ -356,7 +361,7 @@ export const ChainMetadataRows = ({
 
   const updateDiscordWebhookEnabled = async () => {
     try {
-      await chain.updateChainData({
+      await community.updateChainData({
         discord_bot_webhooks_enabled: !discordWebhooksEnabled,
       });
       setDiscordWebhooksEnabled(!discordWebhooksEnabled);

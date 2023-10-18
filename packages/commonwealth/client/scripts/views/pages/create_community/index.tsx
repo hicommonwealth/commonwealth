@@ -111,8 +111,12 @@ const CreateCommunity = (props: CreateCommunityProps) => {
   const [currentForm, setCurrentForm] = useState<CommunityType>(
     getFormType(type)
   );
-  const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
-    useEthChainFormState();
+  const {
+    ethCommunities,
+    setEthCommunities,
+    ethCommunityNames,
+    setEthCommunityNames,
+  } = useEthChainFormState();
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -121,38 +125,40 @@ const CreateCommunity = (props: CreateCommunityProps) => {
   });
 
   useEffect(() => {
-    const fetchEthChains = async () => {
+    const fetchEthCommunities = async () => {
       await $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(
         (res) => {
           if (res.status === 'Success') {
-            setEthChains(res.result);
+            setEthCommunities(res.result);
           }
         }
       );
     };
 
-    fetchEthChains();
+    fetchEthCommunities();
   }, []);
 
   useNecessaryEffect(() => {
-    const fetchEthChainNames = async () => {
-      const chains = await $.getJSON('https://chainid.network/chains.json');
+    const fetchEthCommunityNames = async () => {
+      const communities = await $.getJSON(
+        'https://chainid.network/chains.json'
+      );
 
       const newObject = {};
 
-      for (const id of Object.keys(ethChains)) {
-        const chain = chains.find((c) => c.chainId === +id);
+      for (const id of Object.keys(ethCommunities)) {
+        const community = ethCommunity.find((c) => c.communityId === +id);
 
-        if (chain) {
-          newObject[id] = chain.name;
+        if (community) {
+          newObject[id] = community.name;
         }
       }
 
-      setEthChainNames(newObject);
+      setEthCommunityNames(newObject);
     };
 
-    fetchEthChainNames();
-  }, [ethChains]);
+    fetchEthCommunityNames();
+  }, [ethCommunities]);
 
   const getCurrentForm = () => {
     switch (type) {
@@ -160,11 +166,17 @@ const CreateCommunity = (props: CreateCommunityProps) => {
         return <StarterCommunityForm />;
       case 'erc20':
         return (
-          <ERC20Form ethChains={ethChains} ethChainNames={ethChainNames} />
+          <ERC20Form
+            ethCommunities={ethCommunities}
+            ethCommunityNames={ethCommunityNames}
+          />
         );
       case 'erc721':
         return (
-          <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
+          <ERC721Form
+            ethCommunities={ethCommunities}
+            ethCommunityNames={ethCommunityNames}
+          />
         );
       case 'sputnik':
         return <SputnikForm />;
@@ -174,11 +186,17 @@ const CreateCommunity = (props: CreateCommunityProps) => {
         return <CosmosForm />;
       case 'ethdao':
         return (
-          <EthDaoForm ethChains={ethChains} ethChainNames={ethChainNames} />
+          <EthDaoForm
+            ethCommunities={ethCommunities}
+            ethCommunityNames={ethCommunityNames}
+          />
         );
       case 'polygon':
         return (
-          <PolygonForm ethChains={ethChains} ethChainNames={ethChainNames} />
+          <PolygonForm
+            ethCommunities={ethCommunities}
+            ethCommunityNames={ethCommunityNames}
+          />
         );
       case 'solana':
         return <SplTokenForm />;
@@ -214,7 +232,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
             );
           })}
       </CWTabBar>
-      {Object.keys(ethChainNames).length !== 0 ? (
+      {Object.keys(ethCommunityNames).length !== 0 ? (
         getCurrentForm()
       ) : (
         <div className="SpinnerContainer">

@@ -1,5 +1,5 @@
 import NodeInfo from 'models/NodeInfo';
-import ChainInfo from 'models/ChainInfo';
+import CommunityInfo from 'models/ChainInfo';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import React, { useState } from 'react';
@@ -17,7 +17,7 @@ import { ValidationStatus } from '../../components/component_kit/cw_validation_t
 const RPCEndpointTask = () => {
   const [rpcEndpointChainValue, setRpcEndpointChainValue] =
     useState<string>('');
-  const [rpcEndpointChain, setRpcEndpointChain] = useState<ChainInfo>(null);
+  const [rpcEndpointChain, setRpcEndpointChain] = useState<CommunityInfo>(null);
   const [rpcEndpoint, setRpcEndpoint] = useState<string>('');
   const [rpcEndpointChainValueValidated, setRpcEndpointChainValueValidated] =
     useState<boolean>(false);
@@ -69,12 +69,12 @@ const RPCEndpointTask = () => {
   };
 
   const idValidationFn = (value: string): [ValidationStatus, string] | [] => {
-    const chainInfo = app.config.chains.getById(value);
-    if (!chainInfo) {
+    const communityInfo = app.config.chains.getById(value);
+    if (!communityInfo) {
       setRpcEndpointChainValueValidated(false);
       return ['failure', 'Community not found'];
     }
-    setRpcEndpointChain(chainInfo);
+    setRpcEndpointChain(communityInfo);
     setRpcEndpointChainValueValidated(true);
     return [];
   };

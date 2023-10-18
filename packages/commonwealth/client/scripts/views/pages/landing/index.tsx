@@ -2,7 +2,7 @@ import React from 'react';
 
 import 'pages/landing/index.scss';
 
-import ChainInfo from '../../../models/ChainInfo';
+import CommunityInfo from '../../../models/ChainInfo';
 
 import app, { LoginState } from 'state';
 import { Header } from './header';
@@ -16,39 +16,42 @@ import useForceRerender from 'hooks/useForceRerender';
 import { CWText } from '../../components/component_kit/cw_text';
 import { Carousel } from './carousel';
 
-export type Chain = {
-  chainInfo: ChainInfo;
+export type Community = {
+  communityInfo: CommunityInfo;
   id: string;
   img: string;
   name: string;
   placeholder?: boolean;
 };
 
-const sortedChains: Array<Chain> = app.config.chains
+const sortedCommunities: Array<Community> = app.config.chains
   .getAll()
   .sort((a, b) => {
     const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
     const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
     return threadCountB - threadCountA;
   })
-  .map((chain) => {
+  .map((community) => {
     return {
-      img: chain.iconUrl,
-      id: chain.id,
-      chainInfo: chain,
-      name: chain.name,
+      img: community.iconUrl,
+      id: community.id,
+      communityInfo: community,
+      name: community.name,
     };
   });
 
-const sortedChainsAndCommunities = sortedChains.filter(
-  (c) => !c.chainInfo.collapsedOnHomepage
+const sortedChainsAndCommunities = sortedCommunities.filter(
+  (c) => !c.communityInfo.collapsedOnHomepage
 );
 
-const betaChainsAndCommunities = sortedChains.filter(
-  (c) => c.chainInfo.collapsedOnHomepage
+const betaChainsAndCommunities = sortedCommunities.filter(
+  (c) => c.communityInfo.collapsedOnHomepage
 );
 
-const chains = [...sortedChainsAndCommunities, ...betaChainsAndCommunities];
+const communities = [
+  ...sortedChainsAndCommunities,
+  ...betaChainsAndCommunities,
+];
 
 const LandingPage = () => {
   const forceRerender = useForceRerender();
@@ -57,8 +60,8 @@ const LandingPage = () => {
     return (
       <div className="LandingPage">
         <Header onLogin={forceRerender} />
-        <CommunitySearch chains={chains} />
-        <Carousel chains={chains} />
+        <CommunitySearch chains={communities} />
+        <Carousel chains={communities} />
         <CreatorsGallery />
         <TokenHolders />
         <CrowdfundingGallery />

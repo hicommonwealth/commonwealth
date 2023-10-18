@@ -7,7 +7,7 @@ import numeral from 'numeral';
 import 'pages/communities.scss';
 import React from 'react';
 import app from 'state';
-import ChainInfo from '../../models/ChainInfo';
+import CommunityInfo from '../../models/ChainInfo';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
@@ -48,7 +48,7 @@ const CommunitiesPage = () => {
     setFilterMap((prevState) => ({ ...prevState, [key]: !filterMap[key] }));
   };
 
-  const chainBaseFilter = (list: ChainInfo[]) => {
+  const chainBaseFilter = (list: CommunityInfo[]) => {
     return list.filter((data) => {
       const chainBase =
         Object.keys(ChainBase)[Object.values(ChainBase).indexOf(data.base)];
@@ -57,7 +57,7 @@ const CommunitiesPage = () => {
     });
   };
 
-  const chainNetworkFilter = (list: ChainInfo[]) => {
+  const chainNetworkFilter = (list: CommunityInfo[]) => {
     return list.filter((data) => {
       const chainNetwork =
         Object.keys(ChainNetwork)[
@@ -87,7 +87,7 @@ const CommunitiesPage = () => {
     });
   };
 
-  const sortChains = (list: ChainInfo[]) => {
+  const sortCommunities = (list: CommunityInfo[]) => {
     let filteredList = list;
 
     if (Object.values(filterMap).includes(true)) {
@@ -122,14 +122,14 @@ const CommunitiesPage = () => {
         const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
         return threadCountB - threadCountA;
       })
-      .map((chain: ChainInfo, i) => {
-        return <CommunityCard key={i} chain={chain} />;
+      .map((community: CommunityInfo, i) => {
+        return <CommunityCard key={i} chain={community} />;
       });
 
     return res;
   };
 
-  const sortedChains = sortChains(app.config.chains.getAll());
+  const sortedCommunities = sortCommunities(app.config.chains.getAll());
 
   return (
     <div className="CommunitiesPage">
@@ -139,7 +139,7 @@ const CommunitiesPage = () => {
             Explore Communities
           </CWText>
           <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            {buildCommunityString(sortedChains.length)}
+            {buildCommunityString(sortedCommunities.length)}
           </CWText>
         </div>
         <div className="filter-buttons">
@@ -188,7 +188,7 @@ const CommunitiesPage = () => {
         </div>
       </div>
       <div className="communities-list">
-        {sortedChains}
+        {sortedCommunities}
         <NewCommunityCard />
       </div>
     </div>
