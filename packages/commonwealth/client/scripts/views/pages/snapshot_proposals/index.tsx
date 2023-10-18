@@ -99,6 +99,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
         <CWTabsRow>
           {['Active', 'Ended'].map((tabName, index) => (
             <CWTab
+              key={index}
               label={tabName}
               isSelected={activeTab === index + 1}
               onClick={() => setActiveTab(index + 1)}
