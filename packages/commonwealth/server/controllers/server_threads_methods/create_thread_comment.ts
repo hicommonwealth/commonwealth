@@ -12,7 +12,7 @@ import {
   ProposalType,
 } from '../../../../common-common/src/types';
 import { AppError } from '../../../../common-common/src/errors';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { renderQuillDeltaToText } from '../../../shared/utils';
 import moment from 'moment';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
