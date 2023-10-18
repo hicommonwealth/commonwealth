@@ -9,12 +9,6 @@ export enum ProposalState {
   Executed = 7,
 }
 
-// eslint-disable-next-line no-shadow
-export enum EntityKind {
-  // eslint-disable-next-line no-shadow
-  Proposal = 'proposal',
-}
-
 export enum EventKind {
   ProposalExecuted = 'proposal-executed',
   ProposalCreated = 'proposal-created',
