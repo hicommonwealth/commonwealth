@@ -10,6 +10,7 @@ export const getChainNodesHandler = async (
   req: TypedRequestQuery<GetChainNodesRequestParams>,
   res: TypedResponse<GetChainNodesResponse>
 ) => {
+  const temp
   const results = await controllers.chains.getChainNodes({});
   return success(res, results);
 };
