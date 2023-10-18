@@ -23,7 +23,9 @@ const RequirementSubForm = ({
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
 
   useEffect(() => {
-    setRequirementType(defaultValues?.requirementType?.value || '');
+    defaultValues?.requirementType?.value &&
+      !requirementType &&
+      setRequirementType(defaultValues?.requirementType?.value);
   }, [defaultValues]);
 
   return (
