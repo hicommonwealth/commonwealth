@@ -5,12 +5,6 @@ dotenv.config();
 
 export const PORT = process.env.PORT || '8080';
 
-export const NODE_URL =
-  process.env.NODE_URL ||
-  (process.env.NODE_ENV === 'production'
-    ? 'ws://testnet2.edgewa.re:9944'
-    : 'ws://localhost:9944');
-
 export const SERVER_URL =
   process.env.SERVER_URL ||
   (process.env.NODE_ENV === 'production'
@@ -112,9 +106,6 @@ export const DEFAULT_COMMONWEALTH_LOGO =
   'https://commonwealth.im/static/brand_assets/logo_stacked.png';
 
 export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
-
-export const WEBSOCKET_ADMIN_USERNAME = process.env.WEBSOCKET_ADMIN_USERNAME;
-export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
 
 export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
