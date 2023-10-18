@@ -31,6 +31,7 @@ import {
   NotePencil,
   Users,
   Notepad,
+  ArrowRight,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -50,6 +51,7 @@ export const iconLookup = {
   archiveTray: withPhosphorIcon(ArchiveTray),
   arrowLeft: Icons.CWArrowLeft,
   arrowRight: Icons.CWArrowRight,
+  arrowRightPhosphor: withPhosphorIcon(ArrowRight),
   backer: Icons.CWBacker,
   badge: Icons.CWBadge,
   bell: withPhosphorIcon(BellSimple),
