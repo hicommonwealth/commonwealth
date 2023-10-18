@@ -3,7 +3,7 @@ import { StartedPostgreSqlContainer } from '@testcontainers/postgresql/build/pos
 import { spawnSync } from 'child_process';
 import * as process from 'process';
 import { Sequelize } from 'sequelize';
-import { sequelizeMigrationUp } from '../util/sequlizeMigration';
+import { sequelizeMigrationUp } from '../util/sequelizeMigration';
 
 async function startE2e() {
   const args: string[] = process.argv[2]
