@@ -64,6 +64,7 @@ export const CompoundProposalForm = () => {
         <CWTabsRow>
           {aaveProposalState.map((_, index) => (
             <CWTab
+              key={index}
               label={`Call ${index + 1}`}
               isSelected={activeTabIndex === index}
               onClick={() => {
