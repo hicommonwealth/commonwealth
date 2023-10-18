@@ -136,7 +136,7 @@ const GroupsSection = () => {
       {/* Groups list section */}
       <section className="groups-list">
         {getFilteredGroups().map((group, index) => (
-          <GroupCard {...group} />
+          <GroupCard {...group} key={index} />
         ))}
       </section>
     </section>
