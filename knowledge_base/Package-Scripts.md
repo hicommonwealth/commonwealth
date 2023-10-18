@@ -28,6 +28,7 @@ If you add a script to the package.json, you must add documentation here, descri
   - [lint](#lint)
   - [lint-all](#lint-all)
   - [lint-branch](#lint-branch)
+  - [lint-branch-warnings](#lint-branch-warnings)
   - [style-lint](#style-lint)
 - [Mobile](#mobile)
   - [build-android](#build-android)
@@ -238,6 +239,12 @@ Definition: `./scripts/lint-branch.sh`
 Description: Redundant with [lint](#lint) script, which uses 'git status' instead of 'git diff' but is build toward the same action (isolating changed files for linting).
 
 Considerations: Recommend eliminating either [lint](#lint) or [lint-branch](#lint-branch) scripts. Problematically, lint-branch only checks .ts files. **Flagged for possible removal.**
+
+## lint-branch-warnings
+
+Definition: `FAIL_WARNINGS=1 ./scripts/lint-branch.sh`
+
+Description: Used in the CI. Lints based on the target branch, fails on linter warnings
 
 ## style-lint
 
