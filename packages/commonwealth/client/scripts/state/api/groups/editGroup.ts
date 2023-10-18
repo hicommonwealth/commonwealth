@@ -3,20 +3,37 @@ import axios from 'axios';
 import app from 'state';
 
 interface EditGroupProps {
-  chainId: string;
   groupId: string;
+  chainId: string;
   address: string;
+  groupName: string;
+  groupDescription?: string;
+  requirementsToFulfill: number | undefined;
+  requirements?: any[];
 }
 
-const editGroup = async ({ groupId, chainId, address }: EditGroupProps) => {
+const editGroup = async ({
+  groupId,
+  chainId,
+  address,
+  groupName,
+  groupDescription,
+  requirementsToFulfill,
+  requirements = [],
+}: EditGroupProps) => {
   return await axios.put(`${app.serverUrl()}/groups/${groupId}`, {
     jwt: app.user.jwt,
     chain: chainId,
     author_chain: chainId,
     address,
-    // TODO: get this data when api is complete
-    metadata: {},
-    requirements: [],
+    metadata: {
+      name: groupName,
+      description: groupDescription,
+      ...(requirementsToFulfill && {
+        required_requirements: requirementsToFulfill,
+      }),
+    },
+    requirements,
   });
 };
 

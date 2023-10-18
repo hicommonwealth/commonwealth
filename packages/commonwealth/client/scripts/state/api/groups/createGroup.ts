@@ -29,12 +29,12 @@ const createGroup = async ({
     metadata: {
       name: groupName,
       description: groupDescription,
-      topics: topicIds,
       ...(requirementsToFulfill && {
         required_requirements: requirementsToFulfill,
       }),
     },
     requirements,
+    topics: topicIds,
   });
 };
 
