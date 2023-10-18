@@ -1,53 +1,19 @@
-import { getClasses } from 'views/components/component_kit/helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
 import app from 'state';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import { Select } from 'views/components/Select';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
-import { useCommonNavigate } from 'navigation/helpers';
+import { PageLoading } from '../../../loading';
 
 const groupsFilter = ['All groups', 'In group', 'Not in group'];
-const groupData = {
-  isJoined: true,
-  groupName: 'Hedgies Pod',
-  groupDescription:
-    'Lorem ipsum dolor sit amet consectetur. Urna et at velit platea sagittis feugiat gravida augue. Et mi quam mattis nisl proin scelerisque ultricies enim. Purus in eget sed rutrum vulputate in fermentum. Quam etiam nunc tristique nibh arcu tempor.',
-  requirementsToFulfill: 'ALL',
-  requirements: [
-    {
-      requirementAmount: '100',
-      requirementChain: 'Ethereum',
-      requirementContractAddress: '0x9AEFd6d4feF5b70119FC194D81EbAD761A3269C4',
-      requirementType: 'ERC-20',
-      requirementCondition: 'Equal to',
-    },
-    {
-      requirementAmount: '50',
-      requirementChain: 'Ethereum',
-      requirementType: 'Evm Base Tokens',
-      requirementCondition: 'Equal to',
-    },
-  ],
-  topics: [
-    {
-      id: 1,
-      name: 'Call updates',
-    },
-    {
-      id: 2,
-      name: 'Hedgies',
-    },
-  ],
-};
-const sampleGroups = new Array(10)
-  .fill(groupData)
-  .map((x, index) => ({ ...x, isJoined: (index + 1) % 2 === 0 }));
 
 type GroupCategory = 'All groups' | 'In group' | 'Not in group';
 type GroupFilters = {
@@ -57,16 +23,19 @@ type GroupFilters = {
 
 const GroupsSection = () => {
   const navigate = useCommonNavigate();
+  const { data: groups = [], isLoading } = useFetchGroupsQuery({
+    chainId: app.activeChainId(),
+  });
   const [groupFilters, setGroupFilters] = useState<GroupFilters>({
     searchText: '',
     category: 'All groups',
   });
 
   const getFilteredGroups = () => {
-    return sampleGroups
+    return groups
       .filter((group) =>
         groupFilters.searchText
-          ? group.groupName
+          ? group.name
               .toLowerCase()
               .includes(groupFilters.searchText.toLowerCase())
           : true
@@ -75,8 +44,8 @@ const GroupsSection = () => {
         groupFilters.category === 'All groups'
           ? true
           : groupFilters.category === 'In group'
-          ? group.isJoined
-          : !group.isJoined
+          ? (group as any).isJoined
+          : !(group as any).isJoined
       );
   };
 
@@ -135,9 +104,28 @@ const GroupsSection = () => {
 
       {/* Groups list section */}
       <section className="groups-list">
-        {getFilteredGroups().map((group, index) => (
-          <GroupCard {...group} key={index} />
-        ))}
+        {isLoading ? (
+          <PageLoading />
+        ) : (
+          getFilteredGroups().map((group, index) => (
+            <GroupCard
+              key={index}
+              groupName={group.name}
+              groupDescription={group.description}
+              requirements={group.requirements.map((r) => ({
+                requirementType: r.data.source.source_type,
+                requirementChain:
+                  r.data.source.evm_chain_id || r.data.source.cosmos_chain_id,
+                requirementContractAddress: r.data.source.contract_address,
+                requirementAmount: r.data.threshold,
+                requirementCondition: '', // TODO: get this from api
+              }))}
+              requirementsToFulfill={'ALL'} // TODO: get this from api
+              isJoined={false} // TODO: get this from api
+              topics={[]}
+            />
+          ))
+        )}
       </section>
     </section>
   );
