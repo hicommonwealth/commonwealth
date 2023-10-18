@@ -10,6 +10,7 @@ import {
   methodNotAllowedMiddleware,
   registerRoute,
 } from '../middleware/methodNotAllowed';
+import { getRelatedCommunitiesHandler } from '../routes/chains/get_related_communities_handler';
 
 import domain from '../routes/domain';
 import { status } from '../routes/status';
@@ -358,6 +359,12 @@ function setupRouter(
     'get',
     '/nodes',
     getChainNodesHandler.bind(this, serverControllers)
+  );
+  registerRoute(
+    router,
+    'get',
+    '/relatedCommunities',
+    getRelatedCommunitiesHandler.bind(this, serverControllers)
   );
 
   registerRoute(
@@ -1315,6 +1322,12 @@ function setupRouter(
     router,
     'post',
     '/getChainNode',
+    getChainNode.bind(this, models)
+  );
+  registerRoute(
+    router,
+    'get',
+    '/relatedCommunities',
     getChainNode.bind(this, models)
   );
   registerRoute(
