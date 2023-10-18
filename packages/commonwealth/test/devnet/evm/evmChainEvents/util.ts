@@ -1,5 +1,4 @@
-import { ChainTesting } from 'chain-events/evm-chain-testing/sdk/chainTesting';
-import models from '../../../../server/database';
+import { ChainTesting } from '../../../util/evm-chain-testing/sdk/chainTesting';
 
 export const localRpc = 'http://localhost:8545';
 export const sdk = new ChainTesting('http://127.0.0.1:3000');
