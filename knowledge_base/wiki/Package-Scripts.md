@@ -42,7 +42,6 @@ If you add a script to the package.json, you must add documentation here, descri
   - [send-notification-digest-emails](#send-notification-digest-emails)
   - [storybook](#storybook)
 - [Playwright](#playwright)
-  - [e2e-start-server](#e2e-start-server)
   - [start-e2e](#start-e2e)
   - [test-e2e](#test-e2e)
   - [test-e2e-serial](#test-e2e-serial)
@@ -332,20 +331,11 @@ Contributor: Daniel Martins
 
 # Playwright
 
-## e2e-start-server
-
-Definition: `ETH_RPC=e2e-test yarn start`
-
-Description: Starts the app server with the ETH_RPC env variable set to “e2e-test,” to trigger our MockMetaMask provider for wallet testing.
-
-Contributor: Kurtis Assad
-
 ## start-e2e
 
 Definition: `yarn start-e2e [test-suite]`
 
-Description: Runs a start script to add a postgresql docker container to attach to the test on a random port. Starts the
-test suite specified passed in to the command, or the mature suite by default.
+Description: The entrypoint for running all e2e tests. Runs a start script to add a postgresql docker container to attach to the test on a random port. Starts the test suite specified passed in to the command, or the mature suite by default.
 
 Contributor: Kurtis Assad
 
