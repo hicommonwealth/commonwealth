@@ -1,16 +1,16 @@
-import { NotificationDataAndCategory } from '../../../shared/types';
-import { NotificationCategories } from 'common-common/src/types';
-import { ChainEventWebhookData, ForumWebhookData } from './types';
 import { Label as chainEventLabel } from 'chain-events/src';
+import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
-import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';
+import { NotificationDataAndCategory } from '../../../shared/types';
 import { SERVER_URL } from '../../config';
+import { ChainInstance } from '../../models/chain';
+import { ChainEventWebhookData, ForumWebhookData } from './types';
 import {
   getActorProfile,
   getPreviewImageUrl,
+  getThreadSummaryFromNotification,
   getThreadUrlFromNotification,
 } from './util';
-import { ChainInstance } from '../../models/chain';
 
 export async function getWebhookData(
   notification: Exclude<
@@ -66,17 +66,7 @@ export async function getWebhookData(
 
     let objectSummary: string;
     if (notification.categoryId !== NotificationCategories.NewReaction) {
-      const bodytext = decodeURIComponent(notification.data.comment_text);
-      try {
-        // parse and use quill document
-        const doc = JSON.parse(bodytext);
-        if (!doc.ops) throw new Error();
-        const text = renderQuillDeltaToText(doc);
-        objectSummary = smartTrim(text);
-      } catch (err) {
-        // use markdown document directly
-        objectSummary = smartTrim(bodytext);
-      }
+      objectSummary = getThreadSummaryFromNotification(notification);
     } else {
       objectSummary = 'New Like';
     }
