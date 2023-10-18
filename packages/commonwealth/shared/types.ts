@@ -148,10 +148,6 @@ export interface IChainEventNotificationData {
   event_data: any;
   network: SupportedNetwork;
   chain: string;
-
-  // TODO: @Timothee remove these once chain-events is removed
-  queued?: number;
-  entity_id?: number;
 }
 
 export type NotificationDataTypes =
