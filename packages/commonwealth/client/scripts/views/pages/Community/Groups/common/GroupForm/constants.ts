@@ -1,11 +1,11 @@
 export const TOKENS = {
-  COSMOS_TOKEN: 'cosmos-token',
-  EVM_TOKEN: 'evm-token',
+  COSMOS_TOKEN: 'cosmos_native',
+  EVM_TOKEN: 'eth_native',
 };
 
 export const SPECIFICATIONS = {
-  ERC_20: 'ERC-20',
-  ERC_721: 'ERC-721',
+  ERC_20: 'erc20',
+  ERC_721: 'erc721',
 };
 
 export const BLOCKCHAINS = {

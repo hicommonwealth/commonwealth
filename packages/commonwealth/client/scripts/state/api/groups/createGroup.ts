@@ -5,17 +5,36 @@ import app from 'state';
 interface CreateGroupProps {
   chainId: string;
   address: string;
+  groupName: string;
+  topicIds: string[];
+  groupDescription?: string;
+  requirementsToFulfill: number | undefined;
+  requirements?: any[];
 }
 
-const createGroup = async ({ chainId, address }: CreateGroupProps) => {
+const createGroup = async ({
+  chainId,
+  address,
+  groupName,
+  groupDescription,
+  topicIds,
+  requirementsToFulfill,
+  requirements = [],
+}: CreateGroupProps) => {
   return await axios.post(`${app.serverUrl()}/groups`, {
     jwt: app.user.jwt,
     chain: chainId,
     author_chain: chainId,
     address,
-    // TODO: get this data when api is complete
-    metadata: {},
-    requirements: [],
+    metadata: {
+      name: groupName,
+      description: groupDescription,
+      topics: topicIds,
+      ...(requirementsToFulfill && {
+        required_requirements: requirementsToFulfill,
+      }),
+    },
+    requirements,
   });
 };
 

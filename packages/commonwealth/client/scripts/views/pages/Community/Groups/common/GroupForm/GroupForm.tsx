@@ -15,6 +15,7 @@ import { ZodError, ZodObject } from 'zod';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
+import { TOKENS } from './constants';
 import {
   CWRequirementsLabelInputFieldState,
   FormSubmitValues,
@@ -76,7 +77,7 @@ const MAX_REQUIREMENTS = 10;
 const getRequirementSubFormSchema = (
   requirementType: string
 ): ZodObject<any> => {
-  const isTokenRequirement = requirementType.toLowerCase().includes('token');
+  const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
   const schema = isTokenRequirement
     ? requirementSubFormValidationSchema.omit({
         requirementContractAddress: true,
@@ -169,11 +170,11 @@ const GroupForm = ({
 
     // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
     const isTokenRequirementTypeAdded =
-      !allRequirements[index].values.requirementType
-        ?.toLowerCase()
-        ?.includes('token') &&
+      !Object.values(TOKENS).includes(
+        allRequirements[index].values.requirementType
+      ) &&
       val.requirementType &&
-      val.requirementType?.toLowerCase()?.includes('token');
+      Object.values(TOKENS).includes(val.requirementType);
     if (isTokenRequirementTypeAdded) {
       allRequirements[index].errors.requirementContractAddress = '';
     }

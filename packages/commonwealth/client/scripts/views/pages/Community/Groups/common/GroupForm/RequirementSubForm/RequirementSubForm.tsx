@@ -42,7 +42,7 @@ const RequirementSubForm = ({
   onChange = () => null,
 }: RequirementSubFormType) => {
   const [requirementType, setRequirementType] = useState('');
-  const isTokenRequirement = requirementType.toLowerCase().includes('token');
+  const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
 
   return (
     <div className="RequirementSubForm">

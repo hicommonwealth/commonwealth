@@ -37,7 +37,8 @@ export const groupValidationSchema = z.object({
     .max(40, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
   groupDescription: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
+    .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
+    .optional(),
   requirementsToFulfill: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
