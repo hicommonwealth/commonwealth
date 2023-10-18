@@ -1,5 +1,8 @@
 import _ from 'underscore';
-import type { IChainEventData, SupportedNetwork } from 'chain/types/types';
+import type {
+  IChainEventData,
+  SupportedNetwork,
+} from '../../../shared/chain/types/types';
 
 class ChainEvent {
   public readonly id?: number;

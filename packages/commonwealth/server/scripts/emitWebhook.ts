@@ -3,7 +3,7 @@ import { hideBin } from 'yargs/helpers';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
-import { SupportedNetwork } from 'chain/types/types';
+import { SupportedNetwork } from '../../shared/chain/types/types';
 import models from '../database';
 import { WebhookDestinations } from '../util/webhooks/types';
 import { WebhookInstance } from '../models/webhook';

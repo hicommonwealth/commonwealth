@@ -5,7 +5,7 @@ import models from '../../database';
 import { QueryTypes } from 'sequelize';
 import { NotificationDataAndCategory } from 'types';
 import { NotificationCategories } from 'common-common/src/types';
-import type { SupportedNetwork } from 'chain/types/types';
+import type { SupportedNetwork } from '../../../shared/chain/types/types';
 import emitNotifications from '../../util/emitNotifications';
 import { rollbar } from '../../util/rollbar';
 import { factory, formatFilename } from 'common-common/src/logging';

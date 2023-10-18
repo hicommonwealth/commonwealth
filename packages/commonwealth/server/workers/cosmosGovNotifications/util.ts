@@ -1,7 +1,7 @@
 import { ChainBase, NotificationCategories } from 'common-common/src/types';
 import emitNotifications from '../../util/emitNotifications';
-import { SupportedNetwork } from 'chain/types/types';
-import { coinToCoins, EventKind } from 'chain/types/cosmos';
+import { SupportedNetwork } from '../../../shared/chain/types/types';
+import { coinToCoins, EventKind } from '../../../shared/chain/types/cosmos';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { DB } from '../../models';

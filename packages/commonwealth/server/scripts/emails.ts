@@ -1,4 +1,4 @@
-import type { CWEvent } from 'chain/types/types';
+import type { CWEvent } from '../../shared/chain/types/types';
 import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 
 import { factory, formatFilename } from 'common-common/src/logging';

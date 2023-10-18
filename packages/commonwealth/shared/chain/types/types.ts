@@ -1,6 +1,6 @@
-import { IEventData as CompoundEventData } from 'chain/types/compound';
-import { IEventData as AaveEventData } from 'chain/types/aave';
-import { IEventData as CosmosEventData } from 'chain/types/cosmos';
+import { IEventData as CompoundEventData } from '../../../shared/chain/types/compound';
+import { IEventData as AaveEventData } from '../../../shared/chain/types/aave';
+import { IEventData as CosmosEventData } from '../../../shared/chain/types/cosmos';
 
 export type IChainEventData =
   | CompoundEventData

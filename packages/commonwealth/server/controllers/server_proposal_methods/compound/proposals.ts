@@ -6,7 +6,7 @@ import {
 } from 'common-common/src/eth/types';
 import { TypedEvent } from 'common-common/src/eth/types/commons';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { ProposalState } from 'chain/types/compound';
+import { ProposalState } from '../../../../shared/chain/types/compound';
 import { getCompoundGovContractAndVersion } from './compoundVersion';
 import {
   CompoundProposalType,

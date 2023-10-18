@@ -7,7 +7,7 @@ import {
   NotificationDataAndCategory,
   SnapshotEventType,
 } from 'types';
-import { SupportedNetwork } from 'chain/types/types';
+import { SupportedNetwork } from '../../../shared/chain/types/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;
