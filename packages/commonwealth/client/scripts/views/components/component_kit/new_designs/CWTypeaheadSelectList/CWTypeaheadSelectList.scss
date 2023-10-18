@@ -9,10 +9,15 @@
     border-radius: $border-radius-corners-wider;
 
     &.disabled {
-      background-color: $neutral-50;
-      color: $neutral-400;
-
       .tasl__control {
+        background-color: $neutral-50;
+        color: $neutral-400;
+
+        &.tasl__control--is-disabled {
+          pointer-events: auto;
+          cursor: not-allowed;
+        }
+
         .tasl__indicators {
           .tasl__indicator {
             svg {

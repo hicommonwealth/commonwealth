@@ -3,9 +3,10 @@ import Select, { components } from 'react-select';
 import { ComponentType } from '../../types';
 import './CWTypeaheadSelectList.scss';
 import { CWIcon } from '../../cw_icons/cw_icon';
+import clsx from 'clsx';
 
 type SelectListOption = {
-  value: any;
+  value: string;
   label: string;
 };
 
@@ -69,7 +70,7 @@ export const CWTypeaheadSelectList = ({
         placeholder={placeholder}
         noOptionsMessage={() => 'No matches found.'}
         isDisabled={isDisabled}
-        className={`SelectList ${isDisabled ? 'disabled' : ''}`}
+        className={clsx(`SelectList`, isDisabled && 'disabled')}
       />
     </div>
   );
