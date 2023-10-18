@@ -13,7 +13,10 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderSearchResults } from './helpers';
 import { useInView } from 'react-intersection-observer';
@@ -255,7 +258,7 @@ const SearchPage = () => {
       {
         <>
           <div className="search-results">
-            <CWTabBar>
+            <CWTabsRow>
               {VISIBLE_TABS.map((s, i) => (
                 <CWTab
                   key={i}
@@ -264,7 +267,7 @@ const SearchPage = () => {
                   onClick={() => setActiveTab(s)}
                 />
               ))}
-            </CWTabBar>
+            </CWTabsRow>
             <>
               {isLoading && <PageLoading />}
               {!isLoading && (
