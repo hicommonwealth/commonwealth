@@ -1,9 +1,10 @@
 import ChainInfo from './ChainInfo';
+import { WebhookCategory } from 'types';
 
 class Webhook {
   public readonly id: number;
   public readonly url: string;
-  public categories: string[];
+  public categories: WebhookCategory[];
   public readonly chain_id?: string;
   public readonly Chain?: ChainInfo;
 

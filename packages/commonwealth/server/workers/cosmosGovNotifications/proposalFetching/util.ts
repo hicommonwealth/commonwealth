@@ -2,9 +2,9 @@ import { ChainInstance } from '../../../models/chain';
 import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { AllCosmosProposals } from './types';
-import Rollbar from 'rollbar';
 import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { rollbar } from '../../../util/rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -68,8 +68,7 @@ export function mapChainsToProposals(
 
 export function processProposalSettledPromises(
   v1ProposalResults: PromiseSettledResult<ProposalSDKType[]>[],
-  v1Beta1ProposalResults: PromiseSettledResult<Proposal[]>[],
-  rollbar?: Rollbar
+  v1Beta1ProposalResults: PromiseSettledResult<Proposal[]>[]
 ) {
   const v1Proposals: ProposalSDKType[][] = [];
   for (const result of v1ProposalResults) {

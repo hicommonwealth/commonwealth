@@ -7,7 +7,7 @@ import type { Action, Session } from '@canvas-js/interfaces';
 import type Comment from 'models/Comment';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
@@ -156,7 +156,7 @@ export const CommentCard = ({
         </div>
       ) : (
         <div className="comment-content">
-          {isSpam && <CWTag label="SPAM" type="disabled" />}
+          {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
             <QuillRenderer doc={comment.text} />
           </CWText>

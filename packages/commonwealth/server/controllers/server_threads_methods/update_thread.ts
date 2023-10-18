@@ -278,8 +278,6 @@ export async function __updateThread(
         author_chain: finalThread.Address.chain,
       },
     },
-    // don't send webhook notifications for edits
-    webhookData: null,
     excludeAddresses: [address.address],
   });
 
@@ -344,7 +342,6 @@ export async function __updateThread(
             author_chain: finalThread.Address.chain,
           },
         },
-        webhookData: null,
         excludeAddresses: [finalThread.Address.address],
       });
     });

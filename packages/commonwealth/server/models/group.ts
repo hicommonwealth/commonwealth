@@ -7,8 +7,8 @@ import { Requirement } from '../util/requirementsModule/requirementsTypes';
 export type GroupMetadata = {
   name: string;
   description: string;
-  required_requirements: number;
-  membership_ttl: number;
+  required_requirements?: number; // NOT USED
+  membership_ttl?: number; // NOT USED
 };
 
 export type GroupAttributes = {
