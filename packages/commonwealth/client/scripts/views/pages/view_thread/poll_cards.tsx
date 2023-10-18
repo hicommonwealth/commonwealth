@@ -39,6 +39,7 @@ export const ThreadPollEditorCard = ({
         content={
           <div className="PollEditorCard">
             <CWButton
+              className="create-poll-button"
               buttonType="mini-black"
               label="Create poll"
               onClick={(e) => {
@@ -134,6 +135,8 @@ export const ThreadPollCard = ({
             await app.polls.deletePoll({
               threadId: poll.threadId,
               pollId: poll.id,
+              address: app.user.activeAccount.address,
+              authorChain: app.user.activeAccount.chain.id,
             });
             if (onDelete) onDelete();
             notifySuccess('Poll deleted');

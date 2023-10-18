@@ -182,8 +182,10 @@ export const CWWalletsList = (props: WalletsListProps) => {
                         if (app.chain) {
                           return addressSwapper({
                             address: wallet.accounts[accountIndex].address,
-                            currentPrefix: (app.chain as Substrate).chain
-                              .ss58Format,
+                            currentPrefix: parseInt(
+                              (app.chain as Substrate).meta.ss58Prefix,
+                              10
+                            ),
                           });
                         }
                         return wallet.accounts[accountIndex].address;
