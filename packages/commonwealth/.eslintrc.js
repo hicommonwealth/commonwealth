@@ -90,7 +90,8 @@ module.exports = {
     'react/destructuring-assignment': [1, 'always'],
     'react/function-component-definition': [1, { "namedComponents": "arrow-function" }],
     'react/no-multi-comp': [1, { "ignoreStateless": false }],
-    'react/jsx-curly-brace-presence': [1, { props: "never", children: "never" }]
+    'react/jsx-curly-brace-presence': [1, { props: "never", children: "never" }],
+    '@typescript-eslint/no-unused-vars': 1
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [

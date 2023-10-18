@@ -1,9 +1,18 @@
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React from 'react';
-import app from 'state';
+
+import app from '../../state';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 import { useBanProfileByAddressMutation } from 'state/api/profiles';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWText } from 'views/components/component_kit/cw_text';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
@@ -36,23 +45,32 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
   };
 
   return (
-    <React.Fragment>
-      <div className="compact-modal-title ban-user">
-        <h3>Are You Sure?</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
-      </div>
-      <div className="compact-modal-body">
-        <div>
-          Banning an address prevents it from interacting with the forum.
-        </div>
-        <div className="ban-modal-content">
-          <CWButton
-            label="Ban Address (just click once and wait)"
-            buttonType="primary-red"
-            onClick={onBanConfirmation}
-          />
-        </div>
-      </div>
-    </React.Fragment>
+    <div className="BanUserModal">
+      <CWModalHeader
+        label="Are You Sure?"
+        icon="danger"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody>
+        <CWText>
+          Banning an address prevents it from interacting with the forum. This
+          may take a few moments. Please click once and wait.
+        </CWText>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          label="Ban Address"
+          buttonType="destructive"
+          buttonHeight="sm"
+          onClick={onBanConfirmation}
+        />
+      </CWModalFooter>
+    </div>
   );
 };

@@ -16,7 +16,6 @@ import models from '../database/database';
 import { RABBITMQ_URI, ROLLBAR_ENV, ROLLBAR_SERVER_TOKEN } from '../config';
 
 import EventStorageHandler from './ChainEventHandlers/storage';
-import NotificationsHandler from './ChainEventHandlers/notification';
 import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
 import type { Ithis as ChainEventsProcessorContextType } from './MessageProcessors/ChainEventsQueue';
 import { processChainEvents } from './MessageProcessors/ChainEventsQueue';
@@ -64,14 +63,8 @@ export async function setupChainEventConsumer(
     rmqController
   );
 
-  const notificationsHandler = new NotificationsHandler(models, rmqController);
-
   // WARNING: due to dbEvent in each handler ORDER OF HANDLERS MATTERS!
-  const allChainEventHandlers = [
-    storageHandler,
-    entityArchivalHandler,
-    notificationsHandler,
-  ];
+  const allChainEventHandlers = [storageHandler, entityArchivalHandler];
 
   // setup Chain
   const chainEventsProcessorContext: ChainEventsProcessorContextType = {

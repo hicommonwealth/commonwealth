@@ -10,18 +10,14 @@ import {
   getUniqueEntityKey,
   SupportedNetwork,
 } from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types';
-import type { ProposalType } from 'common-common/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import getFetch from 'helpers/getFetch';
-import { proposalSlugToChainEntityType } from '../../identifiers';
 import ChainEntity from '../../models/ChainEntity';
 import ChainEvent from '../../models/ChainEvent';
 import type ChainInfo from '../../models/ChainInfo';
 import app from 'state';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
-  if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
   if (c.base === ChainBase.CosmosSDK) return SupportedNetwork.Cosmos;
   if (c.network === ChainNetwork.ERC20) return SupportedNetwork.ERC20;
   if (c.network === ChainNetwork.ERC721) return SupportedNetwork.ERC721;
@@ -43,39 +39,6 @@ class ChainEntityController {
 
   private _subscriber: IEventSubscriber<any, any>;
   private _handlers: { [t: string]: EntityHandler[] } = {};
-
-  public getByUniqueId(chain: string, uniqueId: string): ChainEntity {
-    const [slug, type_id] = uniqueId.split('_');
-    const type = proposalSlugToChainEntityType(<ProposalType>slug);
-
-    return this._store
-      .get(chain)
-      .filter((e) => e.type === type && e.typeId === type_id)[0];
-  }
-
-  public getPreimage(hash: string) {
-    const chainEntities: ChainEntity[] = Array.from(
-      this._store.values()
-    ).flat();
-    const preimage = chainEntities.filter(
-      (preimageEntity) =>
-        preimageEntity.typeId === hash && preimageEntity.chainEvents.length > 0
-    );
-
-    if (preimage.length === 0) {
-      return null;
-    }
-
-    const notedEvent = preimage[0].chainEvents.find(
-      (event) => event.data.kind === SubstrateTypes.EventKind.PreimageNoted
-    );
-
-    if (notedEvent && notedEvent.data) {
-      return (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
-    } else {
-      return null;
-    }
-  }
 
   public getByType(type: IChainEntityKind): ChainEntity[] {
     return Array.from(this._store.values())
