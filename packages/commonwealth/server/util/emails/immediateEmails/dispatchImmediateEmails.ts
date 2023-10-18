@@ -37,6 +37,7 @@ export async function dispatchImmediateEmails(
   const emailObject = await createEmailObject(notification, emailSubs);
 
   try {
+    console.log(emailObject);
     await sendEmails(emailObject);
   } catch (e) {
     const msg = `Failed to send emails for the following notification ${JSON.stringify(
