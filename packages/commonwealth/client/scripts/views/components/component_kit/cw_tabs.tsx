@@ -23,7 +23,7 @@ export const CWTab = (props: TabProps) => {
     <div
       className={getClasses<TabStyleProps>(
         { isSelected, disabled },
-        ComponentType.Tab
+        ComponentType.TabDeprecated
       )}
       onClick={onClick}
     >

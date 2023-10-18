@@ -6,6 +6,7 @@ import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
 import PollStore from 'stores/PollStore';
 import Poll from '../../models/Poll';
 import Vote from '../../models/Vote';
+import axios from 'axios';
 
 export const modelFromServer = (poll) => {
   const {
@@ -47,11 +48,10 @@ class PollsController {
 
   public async fetchPolls(chainId: string, threadId: number) {
     await $.ajax({
-      url: `${app.serverUrl()}/getPolls`,
+      url: `${app.serverUrl()}/threads/${threadId}/polls`,
       type: 'GET',
       data: {
         chain: chainId,
-        thread_id: threadId,
       },
       success: (response) => {
         for (const poll of response.result) {
@@ -85,49 +85,44 @@ class PollsController {
     const { threadId, prompt, options, customDuration, authorChain, address } =
       args;
 
-    await $.ajax({
-      url: `${app.serverUrl()}/createPoll`,
-      type: 'POST',
-      data: {
+    const response = await axios.post(
+      `${app.serverUrl()}/threads/${threadId}/polls`,
+      {
         chain: app.activeChainId(),
-        thread_id: threadId,
-        prompt,
-        options: JSON.stringify(options),
-        custom_duration: customDuration?.split(' ')[0],
         author_chain: authorChain,
         address,
         jwt: app.user.jwt,
-      },
-      success: (response) => {
-        const modeledPoll = modelFromServer(response.result);
-        // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
-        // This is an exception until polls get migrated to react query
-        updateThreadInAllCaches(app.activeChainId(), threadId, {
-          hasPoll: true,
-        });
-        this._store.add(modeledPoll);
-      },
-      error: (err) => {
-        console.log('Failed to initialize polling');
-        throw new Error(
-          err.responseJSON && err.responseJSON.error
-            ? err.responseJSON.error
-            : 'Failed to initialize polling'
-        );
-      },
+        prompt,
+        options,
+        custom_duration: customDuration?.split(' ')[0],
+      }
+    );
+
+    const modeledPoll = modelFromServer(response.data.result);
+    // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
+    // This is an exception until polls get migrated to react query
+    updateThreadInAllCaches(app.activeChainId(), threadId, {
+      hasPoll: true,
     });
+    this._store.add(modeledPoll);
   }
 
-  public async deletePoll(args: { threadId: number; pollId: number }) {
-    const { threadId, pollId } = args;
+  public async deletePoll(args: {
+    authorChain: string;
+    address: string;
+    threadId: number;
+    pollId: number;
+  }) {
+    const { authorChain, address, threadId, pollId } = args;
     await $.ajax({
-      url: `${app.serverUrl()}/deletePoll`,
+      url: `${app.serverUrl()}/polls/${pollId}`,
       type: 'DELETE',
       data: {
-        thread_id: threadId,
-        poll_id: pollId,
         chain_id: app.activeChainId(),
+        author_chain: authorChain,
+        address,
         jwt: app.user.jwt,
+        poll_id: pollId,
       },
       success: (response) => {
         // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder

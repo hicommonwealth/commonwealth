@@ -21,7 +21,7 @@ import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { CWButton } from '../components/component_kit/cw_button';
-import { Modal } from '../components/component_kit/cw_modal';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { LoginModal } from '../modals/login_modal';
@@ -255,7 +255,7 @@ const FinishNearLogin = () => {
     }
 
     return (
-      <Modal
+      <CWModal
         content={
           <LoginModal
             onModalClose={() => {

@@ -12,7 +12,7 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import { Modal } from '../component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { useCommonNavigate } from 'navigation/helpers';
 import { featureFlags } from 'helpers/feature-flags';
 import { matchRoutes, useLocation } from 'react-router-dom';
@@ -226,14 +226,16 @@ const AdminSectionComponent = () => {
   return (
     <React.Fragment>
       <SidebarSectionGroup {...sidebarSectionData} />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <NewTopicModal onModalClose={() => setIsNewTopicModalOpen(false)} />
         }
         onClose={() => setIsNewTopicModalOpen(false)}
         open={isNewTopicModalOpen}
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <OrderTopicsModal
             onModalClose={() => setIsOrderTopicsModalOpen(false)}
@@ -242,7 +244,8 @@ const AdminSectionComponent = () => {
         onClose={() => setIsOrderTopicsModalOpen(false)}
         open={isOrderTopicsModalOpen}
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <EditTopicThresholdsModal
             onModalClose={() => setIsEditTopicThresholdsModalOpen(false)}

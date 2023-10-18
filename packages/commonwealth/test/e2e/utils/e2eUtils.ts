@@ -216,14 +216,12 @@ export async function createInitialUser() {
         created_at,
         updated_at,
         profile_name,
-        is_default,
         socials
       ) VALUES (
         ${userId[0][0]['id']},
         '2023-07-14 13:03:56.203-07',
         '2023-07-14 13:03:56.415-07',
         'TestAddress',
-        false,
         '{}'
       ) RETURNING id
     `)

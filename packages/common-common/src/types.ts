@@ -14,18 +14,11 @@ export type NotificationCategory =
   typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
-  SubstrateDemocracyReferendum = 'referendum',
-  SubstrateDemocracyProposal = 'democracyproposal',
-  SubstrateTreasuryTip = 'treasurytip',
-  SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
-  SubstrateTreasuryProposal = 'treasuryproposal',
   Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   CompoundProposal = 'compoundproposal',
   AaveProposal = 'onchainproposal',
   SputnikProposal = 'sputnikproposal',
-  SubstratePreimage = 'democracypreimage',
-  SubstrateImminentPreimage = 'democracyimminent',
 }
 
 export enum ChainBase {
