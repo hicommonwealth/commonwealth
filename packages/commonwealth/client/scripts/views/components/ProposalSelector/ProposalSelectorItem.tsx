@@ -4,7 +4,6 @@ import { chainEntityTypeToProposalName } from 'identifiers';
 import { CWText } from '../component_kit/cw_text';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { IChainEntityKind } from 'chain-events/src';
 
 interface ProposalSelectorItemProps {
   proposal: IAaveProposalResponse | ICompoundProposalResponse;
@@ -24,7 +23,7 @@ const ProposalSelectorItem = ({
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
         <CWText fontWeight="medium" truncate noWrap>
-          {chainEntityTypeToProposalName('proposal' as IChainEntityKind) +
+          {chainEntityTypeToProposalName() +
             (proposal.identifier.startsWith('0x')
               ? ` ${proposal.identifier.slice(0, 6)}...`
               : ` #${proposal.identifier}`)}
