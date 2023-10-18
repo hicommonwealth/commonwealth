@@ -12,7 +12,7 @@ import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
 import { CWCard } from '../cw_card';
-import { CWTab, CWTabBar } from '../cw_tabs';
+import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
 import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';
@@ -217,7 +217,7 @@ export const CWContentPage = ({
         </div>
       ) : (
         <div className="tabs-view">
-          <CWTabBar>
+          <CWTabsRow>
             <CWTab
               label={contentBodyLabel}
               onClick={() => {
@@ -235,7 +235,7 @@ export const CWContentPage = ({
                 isSelected={tabSelected === i + 1}
               />
             ))}
-          </CWTabBar>
+          </CWTabsRow>
           {tabSelected === 0 && mainBody}
           {sidebarComponents?.length >= 1 &&
             tabSelected === 1 &&
