@@ -12,12 +12,6 @@ export type LCD = {
 };
 
 // eslint-disable-next-line no-shadow
-export enum EntityKind {
-  // eslint-disable-next-line no-shadow
-  Proposal = 'proposal',
-}
-
-// eslint-disable-next-line no-shadow
 export enum EventKind {
   SubmitProposal = 'msg-submit-proposal',
   Deposit = 'msg-deposit',

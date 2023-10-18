@@ -6,7 +6,7 @@ import {
   createDefaultAminoConverters,
 } from '@cosmjs/stargate';
 import { CosmosApiType } from './chain';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from 'chain/types/cosmos';
 import { createAltGovAminoConverters } from './gov/aminomessages';
 
 export const getTMClient = async (

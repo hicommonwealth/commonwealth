@@ -17,7 +17,7 @@ import {
   getActiveProposalsV1,
   getCompletedProposalsV1,
 } from 'controllers/chain/cosmos/gov/v1/utils-v1';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from 'chain/types/cosmos';
 import {
   deposit,
   sendTx,

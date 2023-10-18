@@ -2,9 +2,9 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import { IEventData as CompoundEventData } from './chains/compound/types';
-import { IEventData as AaveEventData } from './chains/aave/types';
-import { IEventData as CosmosEventData } from './chains/cosmos/types';
+import { IEventData as CompoundEventData } from '../../commonwealth/shared/chain/types/compound';
+import { IEventData as AaveEventData } from '../../commonwealth/shared/chain/types/aave';
+import { IEventData as CosmosEventData } from '../../commonwealth/shared/chain/types/cosmos';
 
 export type IChainEventData =
   | CompoundEventData

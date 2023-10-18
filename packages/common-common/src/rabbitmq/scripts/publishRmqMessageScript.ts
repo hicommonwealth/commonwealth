@@ -1,10 +1,16 @@
 import { publishRmqMsg } from 'common-common/src/rabbitmq/util';
-import type { ITransfer, IEventData } from 'chain-events/src/chains/aave/types';
-import { EventKind } from 'chain-events/src/chains/aave/types';
+import type {
+  ITransfer,
+  IEventData,
+} from '../../../../commonwealth/shared/chain/types/aave';
+import { EventKind } from '../../../../commonwealth/shared/chain/types/aave';
 import type { CWEvent } from 'chain-events/src';
 import { SupportedNetwork } from 'chain-events/src';
 import { v4 as uuidv4 } from 'uuid';
-import { RascalExchanges, RascalRoutingKeys } from 'common-common/src/rabbitmq/types';
+import {
+  RascalExchanges,
+  RascalRoutingKeys,
+} from 'common-common/src/rabbitmq/types';
 import { RABBITMQ_API_URI } from 'commonwealth/server/config';
 
 async function publishRmqMessageScript() {
