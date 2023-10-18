@@ -483,7 +483,7 @@ jobs:
         run: yarn --cwd packages/token-balance-cache test --forbid-only
 
       - name: Run EVM Devnet tests
-        run: TEST_DIR=evm yarn --cwd commonwealth/packages test-devnet --forbid-only
+        run: TEST_DIR=evm yarn --cwd packages/commonwealth test-devnet --forbid-only
 
       - name: Stop EVM Chain
         run: docker stop chain
@@ -511,7 +511,7 @@ jobs:
 
       - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && TEST_DIR=cosmos yarn --cwd commonwealth/packages test-devnet --forbid-only)
+        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && TEST_DIR=cosmos yarn --cwd packages/commonwealth test-devnet --forbid-only)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true
