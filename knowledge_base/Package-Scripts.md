@@ -375,7 +375,7 @@ Open considerations:
 
 ## integration-test
 
-Definition: `nyc ts-mocha --project tsconfig.json ./test/integration/**/*.spec.ts`
+Definition: `nyc ts-mocha --project tsconfig.json './test/integration/**/*.spec.ts'`
 
 Description: Runs all tests in our integration folder and its subdirectories.
 
@@ -383,31 +383,31 @@ Considerations: This script breaks our more usual test script syntax, which typi
 
 ## test
 
-Definition: `nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts`
+Definition: `nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
 
 Description: Runs all tests in our /test directory.
 
 ## test-api
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/api/**/*.spec.ts`
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'`
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
 ## test-devnet
 
-Definition: `nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts`
+Definition: `nyc ts-mocha --project tsconfig.json './test/devnet/${TEST_DIR:-.}/**/*.spec.ts'`
 
 Description: Runs all tests in our `/devnet`` folder.
 
 ## test-emit-notif
 
-Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/emitNotifications.spec.ts`
+Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/emitNotifications.spec.ts'`
 
 Description: Runs only the `emitNotifications.spec.ts` test, of the three `/integration`` folder "utils."
 
 ## test-integration-util
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts`
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/*.spec.ts'`
 
 Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing).
 
@@ -423,7 +423,7 @@ Description: Append a path to run specific test files or folders.
 
 ## test-suite
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts`
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
 
 Description: Runs all tests in our /test directory.
 
