@@ -5,7 +5,10 @@ import 'pages/create_community.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
@@ -192,7 +195,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       <CWText type="h3" fontWeight="semiBold">
         New Commonwealth Community
       </CWText>
-      <CWTabBar>
+      <CWTabsRow>
         {Object.values(CommunityType)
           .filter((t) => {
             return (
@@ -213,7 +216,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
               />
             );
           })}
-      </CWTabBar>
+      </CWTabsRow>
       {Object.keys(ethChainNames).length !== 0 ? (
         getCurrentForm()
       ) : (
