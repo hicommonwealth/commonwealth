@@ -273,7 +273,8 @@ const SearchPage = () => {
               {!isLoading && (
                 <>
                   <CWText isCentered className="search-results-caption">
-                    {totalResultsText} matching '{queryParams.q}' {scopeText}
+                    {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
+                    {scopeText}
                     {chain !== 'all_chains' && !app.isCustomDomain() && (
                       <a
                         href="#"
