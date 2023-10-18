@@ -8,7 +8,10 @@ import { NotificationCategories } from '../../../../../../common-common/src/type
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { SnapshotProposalCard } from './SnapshotProposalCard';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
@@ -93,7 +96,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
         Snapshots
       </CWText>
       <div className="top-bar">
-        <CWTabBar>
+        <CWTabsRow>
           {['Active', 'Ended'].map((tabName, index) => (
             <CWTab
               label={tabName}
@@ -101,7 +104,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
               onClick={() => setActiveTab(index + 1)}
             />
           ))}
-        </CWTabBar>
+        </CWTabsRow>
         <div>
           <CWButton
             label={
