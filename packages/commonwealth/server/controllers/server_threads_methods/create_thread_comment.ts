@@ -251,7 +251,6 @@ export async function __createThreadComment(
     rootNotifExcludeAddresses.push(parentComment.Address.address);
   }
 
-  const cwUrl = getThreadUrl(thread, finalComment.id);
   const root_title = thread.title || '';
 
   const allNotificationOptions: EmitOptions[] = [];
