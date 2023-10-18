@@ -5,7 +5,7 @@ import {
   NotificationCategories,
   NotificationCategory,
 } from 'common-common/src/types';
-import { SupportedNetwork } from 'chain-events/src';
+import type { SupportedNetwork } from 'chain/types/types';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',

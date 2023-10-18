@@ -1,4 +1,4 @@
-import { SupportedNetwork } from 'chain-events/src';
+import { SupportedNetwork } from 'commonwealth/shared/chain/types/types';
 
 export enum NotificationCategories {
   NewComment = 'new-comment-creation',

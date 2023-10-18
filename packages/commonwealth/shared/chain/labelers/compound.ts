@@ -1,7 +1,7 @@
-import type { LabelerFilter, IEventLabel } from 'chain-events/src/interfaces';
-import { SupportedNetwork } from 'chain-events/src/interfaces';
-import type { IEventData } from 'chain/types/compound';
-import { EventKind } from 'chain/types/compound';
+import type { IEventData } from '../types/compound';
+import { EventKind } from '../types/compound';
+import { IEventLabel, LabelerFilter } from './util';
+import { SupportedNetwork } from '../types/types';
 
 /**
  * This a labeler function, which takes event data and describes it in "plain english",

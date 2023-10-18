@@ -1,7 +1,7 @@
-import type { LabelerFilter, IEventLabel } from 'chain-events/src/interfaces';
-import { SupportedNetwork } from 'chain-events/src/interfaces';
-import type { IEventData } from 'chain/types/cosmos';
-import { EventKind } from 'chain/types/cosmos';
+import type { IEventData } from '../types/cosmos';
+import { EventKind } from '../types/cosmos';
+import { IEventLabel, LabelerFilter } from './util';
+import { SupportedNetwork } from '../types/types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';

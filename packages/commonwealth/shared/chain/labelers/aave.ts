@@ -1,9 +1,9 @@
 import moment from 'moment';
 
-import type { LabelerFilter, IEventLabel } from 'chain-events/src/interfaces';
-import { SupportedNetwork } from 'chain-events/src/interfaces';
-import type { IEventData } from 'chain/types/aave';
-import { EventKind } from 'chain/types/aave';
+import type { IEventData } from '../types/aave';
+import { EventKind } from '../types/aave';
+import { IEventLabel, LabelerFilter } from './util';
+import { SupportedNetwork } from '../types/types';
 
 function fmtAddr(addr: string) {
   if (!addr) return '';

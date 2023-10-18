@@ -1,4 +1,4 @@
-import type { CWEvent } from 'chain-events/src';
+import type { CWEvent } from 'commonwealth/shared/chain/types/types';
 import type { RmqMsgNamespace } from 'common-common/src/rabbitmq/types';
 import { RmqMsgFormatError } from 'common-common/src/rabbitmq/types';
 

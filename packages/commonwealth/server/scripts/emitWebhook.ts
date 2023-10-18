@@ -3,11 +3,10 @@ import { hideBin } from 'yargs/helpers';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
-import { SupportedNetwork } from 'chain-events/src';
+import { SupportedNetwork } from 'chain/types/types';
 import models from '../database';
 import { WebhookDestinations } from '../util/webhooks/types';
 import { WebhookInstance } from '../models/webhook';
-import { TELEGRAM_BOT_TOKEN } from '../config';
 
 async function main() {
   const argv = await yargs(hideBin(process.argv))

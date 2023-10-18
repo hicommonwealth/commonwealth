@@ -1,7 +1,23 @@
-import { CWEvent, IEventLabel, SupportedNetwork } from 'chain-events/src';
+import { SupportedNetwork } from '../types/types';
+import type { CWEvent, IChainEventData } from '../types/types';
 import { Label as AaveLabel } from './aave';
 import { Label as CompoundLabel } from './compound';
 import { Label as CosmosLabel } from './cosmos';
+
+// a set of labels used to display notifications
+export interface IEventLabel {
+  heading: string;
+  label: string;
+  linkUrl?: string;
+  icon?: string;
+}
+
+// a function that prepares chain data for user display
+export type LabelerFilter = (
+  chainId: string,
+  data: IChainEventData,
+  ...formatters
+) => IEventLabel;
 
 export function Label(
   chain: string,

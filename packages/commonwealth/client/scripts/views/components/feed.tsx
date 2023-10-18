@@ -8,8 +8,7 @@ import type DashboardActivityNotification from '../../models/DashboardActivityNo
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
-import { IEventLabel } from 'chain-events/src';
-import { Label as ChainEventLabel } from '../../../../shared/chain/labelers/util';
+import { IEventLabel, Label as ChainEventLabel } from 'chain/labelers/util';
 
 type FeedProps = {
   fetchData: () => Promise<any>;

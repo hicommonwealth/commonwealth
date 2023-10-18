@@ -1,4 +1,4 @@
-import type { IChainEventData, SupportedNetwork } from 'chain-events/src';
+import type { IChainEventData, SupportedNetwork } from 'chain/types/types';
 import moment from 'moment';
 import { ProfileWithAddress } from '../views/components/component_kit/cw_avatar_group';
 
