@@ -1,24 +1,30 @@
 import moment from 'moment';
+import { Op } from 'sequelize';
+
 import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ThreadAttributes } from '../../models/thread';
 import { TrackOptions } from '../server_analytics_methods/track';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { findAllRoles } from '../../util/roles';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
 import { ServerError } from '../../../../common-common/src/errors';
 import { AppError } from '../../../../common-common/src/errors';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { ServerThreadsController } from '../server_threads_controller';
+import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
+import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
+import { DB } from '../../models';
+import { TokenBalanceCache } from '../../../../token-balance-cache/src';
+import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -169,27 +175,23 @@ export async function __createThread(
           chain.network === ChainNetwork.Ethereum)
       ) {
         // skip check for admins
-        const isAdmin = await findAllRoles(
-          this.models,
-          { where: { address_id: address.id } },
-          chain.id,
-          ['admin']
-        );
-        if (!user.isAdmin && isAdmin.length === 0) {
-          let canReact;
-          try {
-            canReact = await validateTopicThreshold(
-              this.tokenBalanceCache,
-              this.models,
-              topicId,
-              address.address
-            );
-          } catch (e) {
-            throw new ServerError(Errors.BalanceCheckFailed, e);
-          }
-
-          if (!canReact) {
-            throw new AppError(Errors.InsufficientTokenBalance);
+        const isAdmin = await validateOwner({
+          models: this.models,
+          user,
+          chainId: chain.id,
+          allowAdmin: true,
+          allowGodMode: true,
+        });
+        if (!isAdmin) {
+          const canCreateThread = await checkCanCreateThread(
+            this.models,
+            this.tokenBalanceCache,
+            topicId,
+            chain,
+            address
+          );
+          if (!canCreateThread) {
+            throw new AppError(Errors.FailedCreateThread);
           }
         }
       }
@@ -316,4 +318,56 @@ export async function __createThread(
   };
 
   return [finalThread.toJSON(), allNotificationOptions, analyticsOptions];
+}
+
+async function checkCanCreateThread(
+  models: DB,
+  tokenBalanceCache: TokenBalanceCache,
+  topicId: number,
+  chain: ChainInstance,
+  address: AddressInstance
+): Promise<boolean> {
+  if (FEATURE_FLAG_GROUP_CHECK_ENABLED) {
+    // check via groups
+
+    // get all groups of topic
+    const topic = await models.Topic.findOne({
+      where: {
+        chain_id: chain.id,
+        id: topicId,
+      },
+    });
+    const groups = await models.Group.findAll({
+      where: {
+        id: { [Op.in]: topic.group_ids },
+      },
+    });
+
+    // check membership for all groups of topic
+    for (const { requirements } of groups) {
+      const { isValid } = await validateGroupMembership(
+        address.address,
+        requirements,
+        tokenBalanceCache
+      );
+      if (!isValid) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // check via TBC
+  try {
+    const canReact = await validateTopicThreshold(
+      tokenBalanceCache,
+      models,
+      topicId,
+      address.address
+    );
+    return canReact;
+  } catch (e) {
+    throw new ServerError(Errors.BalanceCheckFailed, e);
+  }
 }
