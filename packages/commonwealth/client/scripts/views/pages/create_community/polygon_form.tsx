@@ -19,14 +19,14 @@ import {
   defaultCommunityRows,
   EthCommunityRows,
   updateAdminOnCreateCommunity,
-} from './chain_input_rows';
+} from './community_input_rows';
 import type { EthCommunityFormState } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 
 export const PolygonForm = ({
@@ -36,13 +36,13 @@ export const PolygonForm = ({
   const [, setDecimals] = useState(18);
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const communityFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
-  const ethCommunityFormFields = useEthChainFormFields();
+  const ethCommunityFormFields = useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
 
@@ -55,7 +55,10 @@ export const PolygonForm = ({
   const validAddress = isAddress(ethCommunityFormFields.address);
 
   const updateTokenForum = async () => {
-    if (!ethCommunityFormFields.address || !ethCommunityFormFields.ethChainId) {
+    if (
+      !ethCommunityFormFields.address ||
+      !ethCommunityFormFields.ethCommunityId
+    ) {
       return;
     }
 
@@ -65,7 +68,7 @@ export const PolygonForm = ({
 
     const args = {
       address: ethCommunityFormFields.address,
-      community_id: ethCommunityFormFields.ethCommunityId,
+      chain_id: ethCommunityFormFields.ethCommunityId,
       url: ethCommunityFormFields.nodeUrl,
     };
 
@@ -223,8 +226,8 @@ export const PolygonForm = ({
               id: id,
               name: name,
               address: ethCommunityFormFields.address,
-              community_string: ethCommunityFormFields.communityString,
-              eth_community_id: ethCommunityFormFields.ethCommunityId,
+              chain_string: ethCommunityFormFields.communityString,
+              eth_chain_id: ethCommunityFormFields.ethCommunityId,
               icon_url: communityFormDefaultFields.iconUrl,
               jwt: app.user.jwt,
               network: ChainNetwork.ERC20,

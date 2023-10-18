@@ -15,25 +15,25 @@ import { baseToNetwork } from '../../../helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import {
-  defaultChainRows,
+  defaultCommunityRows,
   updateAdminOnCreateCommunity,
-} from './chain_input_rows';
+} from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormDefaultFields,
-  useChainFormIdFields,
-  useChainFormState,
+  useCommunityFormDefaultFields,
+  useCommunityFormIdFields,
+  useCommunityFormState,
 } from './hooks';
 
 export const StarterCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const chainFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const { saving, setSaving } = useChainFormState();
+  const { saving, setSaving } = useCommunityFormState();
 
   const navigate = useCommonNavigate();
 
@@ -68,7 +68,7 @@ export const StarterCommunityForm = () => {
           setBase(o.value as ChainBase);
         }}
       />
-      {defaultChainRows(chainFormDefaultFields)}
+      {defaultCommunityRows(communityFormDefaultFields)}
       <CWButton
         label="Save changes"
         disabled={saving || id.length < 1}
@@ -125,17 +125,17 @@ export const StarterCommunityForm = () => {
               address: '',
               type: ChainType.Offchain,
               network: baseToNetwork(base),
-              icon_url: chainFormDefaultFields.iconUrl,
+              icon_url: communityFormDefaultFields.iconUrl,
               id,
               name,
               default_symbol: symbol,
               base,
-              description: chainFormDefaultFields.description,
-              discord: chainFormDefaultFields.discord,
-              element: chainFormDefaultFields.element,
-              github: chainFormDefaultFields.github,
-              telegram: chainFormDefaultFields.telegram,
-              website: chainFormDefaultFields.website,
+              description: communityFormDefaultFields.description,
+              discord: communityFormDefaultFields.discord,
+              element: communityFormDefaultFields.element,
+              github: communityFormDefaultFields.github,
+              telegram: communityFormDefaultFields.telegram,
+              website: communityFormDefaultFields.website,
               ...additionalArgs,
             });
 

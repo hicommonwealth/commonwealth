@@ -15,15 +15,15 @@ import {
 } from '../../components/component_kit/cw_validation_text';
 import { IdRow, InputRow } from '../../components/metadata_rows';
 import {
-  defaultChainRows,
+  defaultCommunityRows,
   updateAdminOnCreateCommunity,
-} from './chain_input_rows';
+} from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 
 export const CosmosForm = () => {
@@ -35,27 +35,27 @@ export const CosmosForm = () => {
     setId,
     name,
     setName,
-    chainName,
-    setChainName,
+    communityName,
+    setCommunityName,
     symbol,
     setSymbol,
-  } = useChainFormIdFields();
+  } = useCommunityFormIdFields();
 
-  const chainFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const { message, saving, setMessage, setSaving } = useChainFormState();
+  const { message, saving, setMessage, setSaving } = useCommunityFormState();
 
-  const { altWalletUrl, chainString, ethChainId, nodeUrl, setNodeUrl } =
-    useEthChainFormFields();
+  const { altWalletUrl, communityString, ethCommunityId, nodeUrl, setNodeUrl } =
+    useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
 
-  const chainNameValidationFn = (
+  const communityNameValidationFn = (
     value: string
   ): [ValidationStatus, string] | [] => {
-    const validChainNameRegex = /^[a-z0-9]+$/;
+    const validCommunityNameRegex = /^[a-z0-9]+$/;
 
-    if (!validChainNameRegex.test(value)) {
+    if (!validCommunityNameRegex.test(value)) {
       return [
         'failure',
         'Must be lowercase, alphanumeric, and equal to Cosmos Chain Registry entry',
@@ -85,13 +85,13 @@ export const CosmosForm = () => {
       />
       <IdRow id={id} />
       <InputRow
-        title="Registered Cosmos Chain Name"
-        value={chainName}
+        title="Registered Cosmos Community Name"
+        value={communityName}
         placeholder={name.toLowerCase()}
         onChangeHandler={(v) => {
-          setChainName(v);
+          setCommunityName(v);
         }}
-        inputValidationFn={chainNameValidationFn}
+        inputValidationFn={communityNameValidationFn}
       />
       <InputRow
         title="Symbol"
@@ -116,7 +116,7 @@ export const CosmosForm = () => {
           setDecimals(+v);
         }}
       />
-      {defaultChainRows(chainFormDefaultFields)}
+      {defaultCommunityRows(communityFormDefaultFields)}
       <CWButton
         label="Save changes"
         disabled={saving}
@@ -128,15 +128,15 @@ export const CosmosForm = () => {
               alt_wallet_url: altWalletUrl,
               id: id,
               name: name,
-              cosmos_chain_id: chainName,
+              cosmos_chain_id: communityName,
               base: ChainBase.CosmosSDK,
               bech32_prefix: bech32Prefix,
-              chain_string: chainString,
-              eth_chain_id: ethChainId,
+              chain_string: communityString,
+              eth_chain_id: ethCommunityId,
               jwt: app.user.jwt,
               network: id,
               node_url: nodeUrl,
-              icon_url: chainFormDefaultFields.iconUrl,
+              icon_url: communityFormDefaultFields.iconUrl,
               type: ChainType.Chain,
               default_symbol: symbol,
               // ...form, <-- not typed so I don't know what's needed

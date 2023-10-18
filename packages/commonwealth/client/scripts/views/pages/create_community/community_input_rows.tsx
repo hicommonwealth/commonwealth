@@ -13,7 +13,7 @@ import type {
   EthCommunityFormState,
   UseCommunityFormDefaultFieldsHookType,
   UseCommunityFormStateHookType,
-  UseEthCommunityFormFieldsHookType,
+  UseEthCommunityFormFieldsHookType
 } from './types';
 
 export async function updateAdminOnCreateCommunity(communityId: string) {
@@ -24,8 +24,8 @@ export async function updateAdminOnCreateCommunity(communityId: string) {
   const roles = await axios.get(`${app.serverUrl()}/roles`, {
     params: {
       chain_id: communityId,
-      permissions: ['admin'],
-    },
+      permissions: ['admin']
+    }
   });
 
   app.roles.addRole(roles.data.result[0]);
@@ -41,7 +41,7 @@ export const initCommunityForm = (): CommunityFormDefaultFields => {
     iconUrl: '',
     telegram: '',
     uploadInProgress: false,
-    website: '',
+    website: ''
   };
 };
 
@@ -153,10 +153,10 @@ export const EthCommunityRows = (
           (c) =>
             ({
               label: props.ethCommunityNames[c],
-              value: props.ethCommunityNames[c],
-            } || { label: c, value: c })
+              value: props.ethCommunityNames[c]
+            }) || { label: c, value: c }
         ),
-        app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
+        app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {}
       ] as Array<DropdownItemType>,
     [props.ethChains, props.ethChainNames]
   );

@@ -11,7 +11,7 @@ import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
 import { EthDaoForm } from './eth_dao_form';
-import { useEthChainFormState } from './hooks';
+import { useEthCommunityFormState } from './hooks';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
@@ -116,7 +116,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
     setEthCommunities,
     ethCommunityNames,
     setEthCommunityNames,
-  } = useEthChainFormState();
+  } = useEthCommunityFormState();
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -147,7 +147,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       const newObject = {};
 
       for (const id of Object.keys(ethCommunities)) {
-        const community = ethCommunity.find((c) => c.communityId === +id);
+        const community = communities.find((c) => c.communityId === +id);
 
         if (community) {
           newObject[id] = community.name;

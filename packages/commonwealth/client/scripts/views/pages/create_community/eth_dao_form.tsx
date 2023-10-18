@@ -17,7 +17,7 @@ import {
   defaultCommunityRows,
   EthCommunityRows,
   updateAdminOnCreateCommunity,
-} from 'views/pages/create_community/chain_input_rows';
+} from 'client/scripts/views/pages/create_community/community_input_rows';
 import type { EthCommunityFormState } from 'views/pages/create_community/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
@@ -29,10 +29,10 @@ import CompoundAPI, {
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
 
@@ -46,13 +46,13 @@ export const EthDaoForm = ({
   const [tokenName, setTokenName] = useState('token');
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const communityFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
-  const ethCommunityFormFields = useEthChainFormFields();
+  const ethCommunityFormFields = useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
 

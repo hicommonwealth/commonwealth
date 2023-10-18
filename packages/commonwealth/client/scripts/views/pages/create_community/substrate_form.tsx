@@ -13,15 +13,15 @@ import { slugify } from 'utils';
 import { InputRow } from 'views/components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import {
-  defaultChainRows,
+  defaultCommunityRows,
   updateAdminOnCreateCommunity,
-} from './chain_input_rows';
+} from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 
 const defaultSubstrateSpec = `{"types": {"Address": "MultiAddress", "ChainId": "u8", 
@@ -45,13 +45,13 @@ const defaultSubstrateSpec = `{"types": {"Address": "MultiAddress", "ChainId": "
 export const SubstrateForm = () => {
   const [substrateSpec, setSubstrateSpec] = useState('');
 
-  const { name, setName, symbol, setSymbol } = useChainFormIdFields();
+  const { name, setName, symbol, setSymbol } = useCommunityFormIdFields();
 
-  const chainFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const chainFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
-  const ethChainFormFields = useEthChainFormFields();
+  const ethCommunityFormFields = useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
 
@@ -66,10 +66,10 @@ export const SubstrateForm = () => {
       />
       <InputRow
         title="Node URL"
-        value={ethChainFormFields.nodeUrl}
+        value={ethCommunityFormFields.nodeUrl}
         placeholder="wss://"
         onChangeHandler={(v) => {
-          ethChainFormFields.setNodeUrl(v);
+          ethCommunityFormFields.setNodeUrl(v);
         }}
       />
       <InputRow
@@ -103,7 +103,7 @@ export const SubstrateForm = () => {
           const polkadot = await import('@polkadot/api');
           // create new API
           const provider = new polkadot.WsProvider(
-            constructSubstrateUrl(ethChainFormFields.nodeUrl),
+            constructSubstrateUrl(ethCommunityFormFields.nodeUrl),
             false
           );
           try {
@@ -121,10 +121,10 @@ export const SubstrateForm = () => {
           }
         }}
       />
-      {defaultChainRows(chainFormDefaultFields)}
+      {defaultCommunityRows(communityFormDefaultFields)}
       <CWButton
         label="Save changes"
-        disabled={chainFormState.saving}
+        disabled={communityFormState.saving}
         onClick={async () => {
           try {
             JSON.parse(substrateSpec);
@@ -133,15 +133,15 @@ export const SubstrateForm = () => {
             return;
           }
 
-          chainFormState.setSaving(true);
+          communityFormState.setSaving(true);
 
           $.post(`${app.serverUrl()}/createChain`, {
             base: ChainBase.Substrate,
-            icon_url: chainFormDefaultFields.iconUrl,
+            icon_url: communityFormDefaultFields.iconUrl,
             id: slugify(name),
             jwt: app.user.jwt,
             network: slugify(name),
-            node_url: ethChainFormFields.nodeUrl,
+            node_url: ethCommunityFormFields.nodeUrl,
             substrate_spec: substrateSpec,
             type: ChainType.Chain,
             default_symbol: symbol,
@@ -164,7 +164,7 @@ export const SubstrateForm = () => {
               );
             })
             .always(() => {
-              chainFormState.setSaving(false);
+              communityFormState.setSaving(false);
             });
         }}
       />

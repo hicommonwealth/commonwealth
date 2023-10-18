@@ -19,14 +19,14 @@ import {
   defaultCommunityRows,
   EthCommunityRows,
   updateAdminOnCreateCommunity,
-} from './chain_input_rows';
+} from './community_input_rows';
 import type { EthCommunityFormState } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
 
@@ -37,13 +37,13 @@ export const ERC20Form = ({
   const [, setDecimals] = useState(18);
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const communityFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
-  const ethCommunityFormFields = useEthChainFormFields();
+  const ethCommunityFormFields = useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
 
@@ -223,14 +223,14 @@ export const ERC20Form = ({
           communityFormState.setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createCommunity`, {
+            const res = await $.post(`${app.serverUrl()}/createChain`, {
               alt_wallet_url: ethCommunityFormFields.altWalletUrl,
               base: ChainBase.Ethereum,
               id: id,
               name: name,
               address: ethCommunityFormFields.address,
-              community_string: ethCommunityFormFields.communityString,
-              eth_community_id: ethCommunityFormFields.ethCommunityId,
+              chain_string: ethCommunityFormFields.communityString,
+              eth_chain_id: ethCommunityFormFields.ethCommunityId,
               icon_url: communityFormDefaultFields.iconUrl,
               jwt: app.user.jwt,
               network: ChainNetwork.ERC20,
@@ -243,8 +243,8 @@ export const ERC20Form = ({
             if (res.result.admin_address) {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
-                res.result.role.community_id,
-                res.result.role.community_id
+                res.result.role.chain_id,
+                res.result.role.chain_id
               );
             }
 

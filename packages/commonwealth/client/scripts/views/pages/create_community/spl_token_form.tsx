@@ -15,14 +15,14 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import {
-  defaultChainRows,
+  defaultCommunityRows,
   updateAdminOnCreateCommunity,
-} from './chain_input_rows';
+} from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
 } from './hooks';
 
 export const SplTokenForm = () => {
@@ -31,19 +31,19 @@ export const SplTokenForm = () => {
   const [mint, setMint] = useState('');
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const chainFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const chainFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
   const navigate = useCommonNavigate();
 
-  const disableField = !chainFormState.loaded;
+  const disableField = !communityFormState.loaded;
 
   const updateTokenForum = async () => {
     status = undefined;
-    chainFormState.setMessage('');
+    communityFormState.setMessage('');
 
     let mintPubKey: solanaWeb3.PublicKey;
 
@@ -52,14 +52,14 @@ export const SplTokenForm = () => {
     try {
       mintPubKey = new solw3.PublicKey(mint);
     } catch (e) {
-      chainFormState.setStatus('failure');
-      chainFormState.setMessage('Invalid mint address');
+      communityFormState.setStatus('failure');
+      communityFormState.setMessage('Invalid mint address');
       return false;
     }
 
     if (!mintPubKey) return;
 
-    chainFormState.setLoading(true);
+    communityFormState.setLoading(true);
 
     try {
       const url = solw3.clusterApiUrl(cluster);
@@ -69,17 +69,17 @@ export const SplTokenForm = () => {
       const { decimals: supplyDecimals, amount } = supply.value;
 
       setDecimals(supplyDecimals);
-      chainFormState.setLoaded(true);
-      chainFormState.setStatus('success');
-      chainFormState.setMessage(`Found ${amount} supply!`);
+      communityFormState.setLoaded(true);
+      communityFormState.setStatus('success');
+      communityFormState.setMessage(`Found ${amount} supply!`);
     } catch (err) {
-      chainFormState.setStatus('failure');
-      chainFormState.setMessage(
+      communityFormState.setStatus('failure');
+      communityFormState.setMessage(
         `Error: ${err.message}` || 'Failed to load token'
       );
     }
 
-    chainFormState.setLoading(false);
+    communityFormState.setLoading(false);
   };
 
   return (
@@ -93,7 +93,7 @@ export const SplTokenForm = () => {
         ]}
         onSelect={(o) => {
           setCluster(o.value as solanaWeb3.Cluster);
-          chainFormState.setLoaded(false);
+          communityFormState.setLoaded(false);
         }}
       />
       <InputRow
@@ -102,20 +102,20 @@ export const SplTokenForm = () => {
         placeholder="2sgDUTgTP6e9CrJtexGdba7qZZajVVHf9TiaCtS9Hp3P"
         onChangeHandler={(v) => {
           setMint(v.trim());
-          chainFormState.setLoaded(false);
+          communityFormState.setLoaded(false);
         }}
       />
       <CWButton
         label="Check address"
-        disabled={chainFormState.saving || !chainFormState.loaded}
+        disabled={communityFormState.saving || !communityFormState.loaded}
         onClick={async () => {
           await updateTokenForum();
         }}
       />
-      {chainFormState.message && (
+      {communityFormState.message && (
         <CWValidationText
-          message={chainFormState.message}
-          status={chainFormState.status}
+          message={communityFormState.message}
+          status={communityFormState.status}
         />
       )}
       <InputRow
@@ -145,12 +145,12 @@ export const SplTokenForm = () => {
           setDecimals(+v);
         }}
       />
-      {defaultChainRows(chainFormDefaultFields, disableField)}
+      {defaultCommunityRows(communityFormDefaultFields, disableField)}
       <CWButton
         label="Save changes"
-        disabled={chainFormState.saving || !chainFormState.loaded}
+        disabled={communityFormState.saving || !communityFormState.loaded}
         onClick={async () => {
-          chainFormState.setSaving(true);
+          communityFormState.setSaving(true);
 
           try {
             const res = await $.post(`${app.serverUrl()}/createChain`, {
@@ -158,7 +158,7 @@ export const SplTokenForm = () => {
               name: name,
               address: mint,
               base: ChainBase.Solana,
-              icon_url: chainFormDefaultFields.iconUrl,
+              icon_url: communityFormDefaultFields.iconUrl,
               jwt: app.user.jwt,
               network: ChainNetwork.SPL,
               node_url: cluster,
@@ -178,13 +178,13 @@ export const SplTokenForm = () => {
             await initAppState(false);
             await updateAdminOnCreateCommunity(id);
 
-            navigate(`/${res.result.chain?.id}`);
+            navigate(`/${res.result.community?.id}`);
           } catch (err) {
             notifyError(
               err.responseJSON?.error || 'Creating new SPL community failed'
             );
           } finally {
-            chainFormState.setSaving(false);
+            communityFormState.setSaving(false);
           }
         }}
       />
