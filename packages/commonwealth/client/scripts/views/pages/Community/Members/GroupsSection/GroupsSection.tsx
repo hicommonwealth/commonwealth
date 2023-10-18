@@ -10,6 +10,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
+import { useCommonNavigate } from 'navigation/helpers';
 
 const groupsFilter = ['All groups', 'In group', 'Not in group'];
 const groupData = {
@@ -55,7 +56,7 @@ type GroupFilters = {
 };
 
 const GroupsSection = () => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
   const [groupFilters, setGroupFilters] = useState<GroupFilters>({
     searchText: '',
     category: 'All groups',
