@@ -177,11 +177,7 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      {archivedAt && (
-        <ArchiveTrayWithTooltip
-          archivedAt={moment(archivedAt)}
-        />
-      )}
+      {archivedAt && <ArchiveTrayWithTooltip archivedAt={moment(archivedAt)} />}
 
       {threadStage && (
         <>
