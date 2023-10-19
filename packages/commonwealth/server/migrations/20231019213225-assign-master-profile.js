@@ -62,13 +62,11 @@ module.exports = {
         { transaction: t }
       );
 
-      console.log('# hexAddresses with a profile_id', hexAddresses.length);
+      console.log('# hexAddresses with a profile_id', hexAddresses.length); // 36325
 
       const profileIds = hexAddresses
         .map((address) => address.profile_id)
         .join(',');
-
-      console.log('# profileIds', profileIds.split(',').length);
 
       const [profiles] = await queryInterface.sequelize.query(
         `
@@ -100,7 +98,7 @@ module.exports = {
         }
       });
 
-      console.log('# signers', signers.length);
+      console.log('# signers', signers.length); // 31729
 
       const signersWithMultipleProfiles = signers.filter(
         (signer) => signer.profiles.length > 1
@@ -109,12 +107,11 @@ module.exports = {
       console.log(
         '# signersWithMultipleProfiles',
         signersWithMultipleProfiles.length
-      );
-      console.log(
-        'signersWithMultipleProfiles',
-        signersWithMultipleProfiles[0]
-      );
+      ); // 473
 
+      const signersLast12Months = signersWithMultipleProfiles.filter((s) =>
+        s.addresses.some((a) => a.last_active > new Date('2022-10-01'))
+      );
       const signersLast6Months = signersWithMultipleProfiles.filter((s) =>
         s.addresses.some((a) => a.last_active > new Date('2023-04-01'))
       );
@@ -122,9 +119,10 @@ module.exports = {
         s.addresses.some((a) => a.last_active > new Date('2023-07-01'))
       );
 
-      console.log('# signersLast6Months', signersLast6Months.length);
-      console.log('# signersLast3Months', signersLast3Months.length);
-      console.log('signersLast3Months', signersLast3Months[0]);
+      console.log('# signersLast12Months', signersLast12Months.length); // 298
+      console.log('# signersLast6Months', signersLast6Months.length); // 81
+      console.log('# signersLast3Months', signersLast3Months.length); // 10
+      console.log(' signersLast3Months', signersLast3Months[2]);
 
       for (let i = 0; i < signersWithMultipleProfiles.length; i++) {
         const masterProfile = signersWithMultipleProfiles[i].profiles.reduce(
@@ -233,8 +231,7 @@ module.exports = {
           }
         });
       }
-      console.log('updateCount', updateCount); // 2777 ... 20231005213247-assign_master_profile: migrated (77.703s)
-      // 2373 == 20231005213247-assign_master_profile: migrated (52.780s)
+      console.log('updateCount', updateCount); // 473 == 20231019213225-assign-master-profile: migrated (16.604s)
     });
   },
 
