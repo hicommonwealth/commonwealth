@@ -1,15 +1,14 @@
-import { ChainInstance } from '../../models/chain';
-import { ServerChainsController } from '../server_chains_controller';
-import { AddressInstance } from '../../models/address';
-import { UserInstance } from '../../models/user';
-import { Op, Sequelize, WhereOptions } from 'sequelize';
-import { TopicAttributes } from '../../models/topic';
-import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
-import moment from 'moment';
-import { MembershipInstance } from '../../models/membership';
 import { flatten, uniq } from 'lodash';
+import moment from 'moment';
+import { Op, Sequelize } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { MembershipInstance } from '../../models/membership';
+import { UserInstance } from '../../models/user';
+import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
+import { ServerChainsController } from '../server_chains_controller';
 
 const MEMBERSHIP_TTL_SECONDS = 60 * 2;
 
@@ -32,7 +31,7 @@ export async function __refreshMembership(
   // get all groups across the chain topics
   const chainTopics = await this.models.Topic.findAll({
     where: {
-      chain_id: chain.id,
+      community_id: chain.id,
       ...(topicId ? { id: topicId } : {}),
     },
   });

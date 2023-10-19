@@ -13,7 +13,11 @@ export type ValidateChainParams = {
   chain_id?: string;
 };
 
-const getChainQuery = (chain_id: string, models: DB, includeTopics: boolean) => ({
+const getChainQuery = (
+  chain_id: string,
+  models: DB,
+  includeTopics: boolean
+) => ({
   where: {
     id: chain_id,
   },
@@ -24,7 +28,7 @@ const getChainQuery = (chain_id: string, models: DB, includeTopics: boolean) => 
             model: models.Topic,
             as: 'topics',
             required: false,
-            attributes: ['id', 'name', 'chain_id'],
+            attributes: ['id', 'name', 'community_id'],
           },
         ]
       : []),

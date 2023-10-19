@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
-import { AddressAttributes, AddressInstance } from 'server/models/address';
+import { AddressInstance } from 'server/models/address';
 import { ChainInstance } from 'server/models/chain';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
@@ -44,7 +44,7 @@ const createMockedGroupsController = () => {
   const topics: TopicAttributes[] = [
     {
       id: 1,
-      chain_id: 'ethereum',
+      community_id: 'ethereum',
       token_threshold: '1000',
       name: 'hello',
       featured_in_sidebar: false,

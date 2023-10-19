@@ -19,12 +19,12 @@ import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-import { RoleInstanceWithPermission } from '../util/roles';
-import testSubstrateSpec from '../util/testSubstrateSpec';
-import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import axios from 'axios';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import axios from 'axios';
+import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import { RoleInstanceWithPermission } from '../util/roles';
+import testSubstrateSpec from '../util/testSubstrateSpec';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
@@ -449,7 +449,7 @@ const createChain = async (
   delete nodeJSON.private_url;
 
   await models.Topic.create({
-    chain_id: chain.id,
+    community_id: chain.id,
     name: 'General',
     featured_in_sidebar: true,
   });

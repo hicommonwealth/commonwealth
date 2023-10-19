@@ -1,15 +1,15 @@
-import { ChainInstance } from '../../models/chain';
-import { ServerChainsController } from '../server_chains_controller';
-import { AddressInstance } from '../../models/address';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
-import { UserInstance } from '../../models/user';
-import validateRequirements from '../../util/requirementsModule/validateRequirements';
-import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from '../../util/validateOwner';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { Op } from 'sequelize';
+import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../database';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { GroupAttributes, GroupMetadata } from '../../models/group';
+import { UserInstance } from '../../models/user';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
+import validateRequirements from '../../util/requirementsModule/validateRequirements';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerChainsController } from '../server_chains_controller';
 
 const MAX_GROUPS_PER_CHAIN = 20;
 
@@ -74,7 +74,7 @@ export async function __createGroup(
       id: {
         [Op.in]: topics || [],
       },
-      chain_id: chain.id,
+      community_id: chain.id,
     },
   });
   if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {

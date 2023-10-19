@@ -1,23 +1,23 @@
+import { uniq } from 'lodash';
 import moment from 'moment';
-import { UserInstance } from '../../models/user';
-import { ServerThreadsController } from '../server_threads_controller';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { Op, Sequelize, Transaction } from 'sequelize';
-import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { parseUserMentions } from '../../util/parseUserMentions';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { DB } from '../../models';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { ThreadAttributes, ThreadInstance } from '../../models/thread';
+import { UserInstance } from '../../models/user';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { uniq } from 'lodash';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -621,7 +621,7 @@ async function setThreadTopic(
       const [topic] = await models.Topic.findOrCreate({
         where: {
           name: topicName,
-          chain_id: thread.chain,
+          community_id: thread.chain,
         },
       });
       toUpdate.topic_id = topic.id;

@@ -1,9 +1,9 @@
-import { TopicAttributes } from '../../models/topic';
-import { ChainInstance } from '../../models/chain';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
+import { ChainInstance } from '../../models/chain';
+import { TopicAttributes } from '../../models/topic';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -70,13 +70,13 @@ export async function __createTopic(
     featured_in_sidebar,
     featured_in_new_post,
     default_offchain_template: default_offchain_template || '',
-    chain_id: chain.id,
+    community_id: chain.id,
   };
 
   const [newTopic] = await this.models.Topic.findOrCreate({
     where: {
       name,
-      chain_id: chain.id,
+      community_id: chain.id,
     },
     defaults: options,
   });

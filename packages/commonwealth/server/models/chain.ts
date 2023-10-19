@@ -163,7 +163,7 @@ export default (
     models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Chain.hasMany(models.Topic, {
       as: 'topics',
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
     });
     models.Chain.hasMany(models.Thread, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });

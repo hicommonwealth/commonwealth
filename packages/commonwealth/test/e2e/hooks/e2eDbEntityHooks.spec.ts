@@ -1,4 +1,3 @@
-import * as process from 'process';
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
@@ -256,7 +255,7 @@ export async function createTestEntities() {
           where: {
             id: -1,
             name: 'testTopic',
-            chain_id: 'cmntest',
+            community_id: 'cmntest',
           },
         })
       )[0],
@@ -265,7 +264,7 @@ export async function createTestEntities() {
           where: {
             id: -2,
             name: 'testTopic2',
-            chain_id: 'cmntest',
+            community_id: 'cmntest',
           },
         })
       )[0],

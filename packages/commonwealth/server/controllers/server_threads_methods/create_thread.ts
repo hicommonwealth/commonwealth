@@ -1,23 +1,22 @@
 import moment from 'moment';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
-import { ThreadAttributes } from '../../models/thread';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { ThreadAttributes } from '../../models/thread';
+import { UserInstance } from '../../models/user';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from '../../../../common-common/src/errors';
-import { AppError } from '../../../../common-common/src/errors';
-import { parseUserMentions } from '../../util/parseUserMentions';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -149,7 +148,7 @@ export async function __createThread(
         const [topic] = await this.models.Topic.findOrCreate({
           where: {
             name: topicName,
-            chain_id: chain?.id || null,
+            community_id: chain?.id || null,
           },
           transaction,
         });

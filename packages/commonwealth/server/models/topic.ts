@@ -10,7 +10,7 @@ export type TopicAttributes = {
   featured_in_new_post: boolean;
   order?: number;
   id?: number;
-  chain_id: string;
+  community_id: string;
   description?: string;
   telegram?: string;
   channel_id?: string;
@@ -22,7 +22,7 @@ export type TopicAttributes = {
   group_ids: number[];
 
   // associations
-  chain?: ChainAttributes;
+  community?: ChainAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
 };
 
@@ -43,7 +43,7 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.TEXT, allowNull: false, defaultValue: '' },
       telegram: { type: dataTypes.STRING, allowNull: true },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       deleted_at: { type: dataTypes.DATE, allowNull: true },
@@ -89,8 +89,8 @@ export default (
 
   Topic.associate = (models) => {
     models.Topic.belongsTo(models.Chain, {
-      as: 'chain',
-      foreignKey: 'chain_id',
+      as: 'community',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Topic.hasMany(models.Thread, {

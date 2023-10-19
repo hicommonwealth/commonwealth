@@ -1,11 +1,15 @@
 import type {
-  // PostProfilesReq,
   PostReactionsReq,
   PostTopicsReq,
   PutCommentsReq,
 } from 'common-common/src/api/extApiTypes';
+import type { Express } from 'express';
 import express from 'express';
+import type Router from 'express/lib/router/index';
+import passport from 'passport';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
 import type { DB } from '../models';
+import { addEntities } from '../routes/addEntities';
 import {
   getComments,
   getCommentsValidation,
@@ -13,18 +17,6 @@ import {
 import getCommunities, {
   getCommunitiesValidation,
 } from '../routes/communities/getCommunities';
-import getProfiles, {
-  getProfilesValidation,
-} from '../routes/profiles/getProfiles';
-import getReactions, {
-  getReactionsValidation,
-} from '../routes/reactions/getReactions';
-import { getThreads, getThreadsValidation } from '../routes/threads/getThreads';
-import type { Express } from 'express';
-import type Router from 'express/lib/router/index';
-import passport from 'passport';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
-import { addEntities } from '../routes/addEntities';
 import {
   putCommunities,
   putCommunitiesValidation,
@@ -42,6 +34,13 @@ import {
   getTokenBalance,
   getTokenBalanceValidation,
 } from '../routes/getTokenBalance';
+import getProfiles, {
+  getProfilesValidation,
+} from '../routes/profiles/getProfiles';
+import getReactions, {
+  getReactionsValidation,
+} from '../routes/reactions/getReactions';
+import { getThreads, getThreadsValidation } from '../routes/threads/getThreads';
 import { getTopics, getTopicsValidation } from '../routes/topics/getTopics';
 import type { TypedRequest } from '../types';
 import {
@@ -133,7 +132,7 @@ export function addExternalRoutes(
     postTopicsValidation,
     addEntities.bind(
       this,
-      'chain_id',
+      'community_id',
       models,
       (a) => models.Topic.bulkCreate(a),
       (req: TypedRequest<PostTopicsReq>) => req.body.topics
@@ -142,7 +141,7 @@ export function addExternalRoutes(
   router.delete(
     '/topics',
     onlyIds,
-    deleteEntities.bind(this, 'chain_id', models, models.Topic)
+    deleteEntities.bind(this, 'community_id', models, models.Topic)
   );
 
   router.get(

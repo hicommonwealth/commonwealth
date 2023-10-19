@@ -7,14 +7,14 @@ import { ServerError } from 'common-common/src/errors';
 //
 import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
+import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
+import { TopicInstance } from 'server/models/topic';
 import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
-import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { ThreadInstance } from '../models/thread';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-import { TopicInstance } from 'server/models/topic';
 
 export const Errors = {};
 
@@ -196,7 +196,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
     }),
     models.Topic.findAll({
       where: {
-        chain_id: chain.id,
+        community_id: chain.id,
         token_threshold: {
           [Op.and]: [
             {

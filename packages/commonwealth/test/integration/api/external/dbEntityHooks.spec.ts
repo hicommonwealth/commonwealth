@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import * as process from 'process';
 import Sequelize from 'sequelize';
@@ -11,9 +12,8 @@ import type { ReactionAttributes } from 'server/models/reaction';
 import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
 import type { UserInstance } from 'server/models/user';
-import type { ProfileAttributes } from '../../../../server/models/profile';
-import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../../../../server/config';
+import type { ProfileAttributes } from '../../../../server/models/profile';
 
 const Op = Sequelize.Op;
 
@@ -172,7 +172,7 @@ export async function createTestEntities() {
         where: {
           id: -1,
           name: 'testTopic',
-          chain_id: 'cmntest',
+          community_id: 'cmntest',
         },
       })
     )[0],
@@ -181,7 +181,7 @@ export async function createTestEntities() {
         where: {
           id: -2,
           name: 'testTopic2',
-          chain_id: 'cmntest',
+          community_id: 'cmntest',
         },
       })
     )[0],
