@@ -235,7 +235,6 @@ export const ComponentShowcase = () => {
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
-  const [selectedTab, setSelectedTab] = useState<number>(1);
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
     useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
