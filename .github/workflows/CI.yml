@@ -242,6 +242,43 @@ jobs:
           name: code-coverage-report
           path: coverage
 
+  # Lint with recommendations
+  commonwealth-code-quality-recommendations:
+    strategy:
+      matrix:
+        node: [ 18 ]
+    name: Code Quality Recommendations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Add node-gyp
+        run: yarn global add node-gyp
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn --ignore-engines
+
+      - name: Run linter
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: yarn lint-branch-warnings
+
   # Lint and Typecheck
   commonwealth-code-quality:
     strategy:
