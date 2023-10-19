@@ -11,6 +11,16 @@ import { ServerChainsController } from '../server_chains_controller';
  */
 export type GetRelatedCommunitiesOptions = { chainNodeId: number, communitySearchName?: string };
 
+/**
+ * Response for the getRelatedCommunities function.
+ *
+ * @typedef {Object} GetRelatedCommunitiesResult
+ * @property {string} id - The id of the community
+ * @property {string} community - The name of the community
+ * @property {string} icon_url - The icon url of the community
+ * @property {number} thread_count - The Number of threads associated with the community
+ * @property {number} address_count - The Number of addresses associated with the community
+ */
 export type GetRelatedCommunitiesResult = {
   id: string;
   community: string;
