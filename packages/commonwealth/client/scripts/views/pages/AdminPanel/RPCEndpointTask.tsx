@@ -134,8 +134,8 @@ const RPCEndpointTask = () => {
     <div className="TaskGroup">
       <CWText type="h4">Switch/Add RPC Endpoint</CWText>
       <CWText type="caption">
-        Changes the RPC endpoint for a specific chain, or adds an endpoint if it
-        doesn't yet exist.
+        {`Changes the RPC endpoint for a specific chain, or adds an endpoint if it
+        doesn't yet exist.`}
       </CWText>
       <div className="MultiRow">
         <div className="TaskRow">
