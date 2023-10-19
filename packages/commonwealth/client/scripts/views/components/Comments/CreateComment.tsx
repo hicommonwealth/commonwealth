@@ -13,10 +13,7 @@ import { useCreateCommentMutation } from 'state/api/comments';
 import { ContentType } from 'types';
 import Permissions from '../../../utils/Permissions';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
-import {
-  createDeltaFromText,
-  getTextFromDelta,
-} from '../react_quill_editor';
+import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { CommentEditor } from './CommentEditor';
 import { ArchiveMsg } from './ArchiveMsg';
@@ -153,7 +150,7 @@ export const CreateComment = ({
     userFailsThreshold ||
     !canComment;
 
-  const cancel = (e) => {
+  const handleCancel = (e) => {
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
@@ -169,7 +166,7 @@ export const CreateComment = ({
 
   return (
     <>
-      { rootThread.archivedAt === null ? (
+      {rootThread.archivedAt === null ? (
         <>
           <CommentEditor
             parentType={parentType}
@@ -182,7 +179,7 @@ export const CreateComment = ({
             activeTopic={activeTopic}
             userBalance={userBalance}
             disabled={disabled}
-            cancel={cancel}
+            onCancel={handleCancel}
             isAdmin={isAdmin}
             author={author}
             editorValue={editorValue}
@@ -190,14 +187,9 @@ export const CreateComment = ({
           />
           {RevalidationModal}
         </>
-      ): (
-            <ArchiveMsg
-              archivedAt={rootThread.archivedAt}
-            />
-          )
-        }
+      ) : (
+        <ArchiveMsg archivedAt={rootThread.archivedAt} />
+      )}
     </>
   );
 };
-
-

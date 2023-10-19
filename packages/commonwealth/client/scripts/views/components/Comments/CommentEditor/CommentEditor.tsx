@@ -25,7 +25,7 @@ type CommentEditorProps = {
   activeTopic: Topic;
   userBalance: BN;
   disabled: boolean;
-  cancel: (e: any) => void;
+  onCancel: (e: any) => void;
   isAdmin: boolean;
   author: Account;
   editorValue: string;
@@ -43,7 +43,7 @@ export const CommentEditor = ({
   activeTopic,
   userBalance,
   disabled,
-  cancel,
+  onCancel,
   isAdmin,
   author,
   editorValue,
@@ -97,7 +97,7 @@ export const CommentEditor = ({
       <div className="form-bottom">
         <div className="form-buttons">
           {editorValue.length > 0 && (
-            <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
+            <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
           )}
           <CWButton
             buttonWidth="wide"
