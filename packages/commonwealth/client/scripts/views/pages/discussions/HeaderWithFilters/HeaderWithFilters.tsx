@@ -34,7 +34,7 @@ type HeaderWithFiltersProps = {
   onIncludeSpamThreads: (includeSpams: boolean) => any;
   isIncludingArchivedThreads: boolean;
   onIncludeArchivedThreads: (includeArchived: boolean) => any;
-  onArchivePage?: boolean;
+  isOnArchivePage?: boolean;
 };
 
 export const HeaderWithFilters = ({
@@ -47,7 +47,7 @@ export const HeaderWithFilters = ({
   onIncludeSpamThreads,
   isIncludingArchivedThreads,
   onIncludeArchivedThreads,
-  onArchivePage,
+  isOnArchivePage,
 }: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
@@ -148,7 +148,7 @@ export const HeaderWithFilters = ({
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
           {isUndefined(topic)
-            ? onArchivePage
+            ? isOnArchivePage
               ? 'Archived'
               : 'All Discussions'
             : topic}
@@ -190,7 +190,7 @@ export const HeaderWithFilters = ({
         <CWText className="subheader-text">{selectedTopic.description}</CWText>
       )}
 
-      {onArchivePage && (
+      {isOnArchivePage && (
         <CWText className="subheader-text">
           This section is for all archived posts. Archived posts will always be
           visible here and can be linked to new thread posts, but they can’t be
@@ -353,7 +353,7 @@ export const HeaderWithFilters = ({
           }}
         />
 
-        {!onArchivePage && (
+        {!isOnArchivePage && (
           <CWCheckbox
             checked={isIncludingArchivedThreads}
             label="Include archived posts"

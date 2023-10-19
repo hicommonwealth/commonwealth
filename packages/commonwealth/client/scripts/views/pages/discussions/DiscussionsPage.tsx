@@ -50,7 +50,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
 
-  const onArchivePage =
+  const isOnArchivePage =
     location.pathname === `/${app.activeChainId()}/archived`;
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
@@ -65,7 +65,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       orderBy: featuredFilter,
       toDate: dateCursor.toDate,
       fromDate: dateCursor.fromDate,
-      onArchivePage: onArchivePage,
+      isOnArchivePage: isOnArchivePage,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -87,13 +87,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           if (!includeSpamThreads && thread.markedAsSpamAt) return null;
 
           if (
-            !onArchivePage &&
+            !isOnArchivePage &&
             !includeArchivedThreads &&
             thread.archivedAt !== null
           )
             return null;
 
-          if (onArchivePage && thread.archivedAt === null) return null;
+          if (isOnArchivePage && thread.archivedAt === null) return null;
 
           const canReact =
             hasJoinedCommunity && !thread.lockedAt && !thread.archivedAt;
@@ -133,7 +133,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">
-                {onArchivePage
+                {isOnArchivePage
                   ? 'There are currently no archived threads.'
                   : 'There are no threads matching your filter.'}
               </CWText>
@@ -150,7 +150,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 onIncludeSpamThreads={setIncludeSpamThreads}
                 isIncludingArchivedThreads={includeArchivedThreads}
                 onIncludeArchivedThreads={setIncludeArchivedThreads}
-                onArchivePage={onArchivePage}
+                isOnArchivePage={isOnArchivePage}
               />
             );
           },
