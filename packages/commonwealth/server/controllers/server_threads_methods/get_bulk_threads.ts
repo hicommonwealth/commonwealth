@@ -1,10 +1,10 @@
 import moment from 'moment';
-import { ChainInstance } from '../../models/chain';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { ServerThreadsController } from '../server_threads_controller';
 import { QueryTypes } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
+import { ChainInstance } from '../../models/chain';
+import { ThreadAttributes, ThreadInstance } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export type GetBulkThreadsOptions = {
   chain?: ChainInstance;
@@ -88,7 +88,7 @@ export async function __getBulkThreads(
         threads.reaction_ids, threads.reaction_type, threads.addresses_reacted, COALESCE(threads.total_likes, 0) as threads_total_likes,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
-        topics.chain_id AS topic_chain,
+        topics.community_id AS topic_community_id,
         topics.telegram AS topic_telegram,
         collaborators
       FROM "Addresses" AS addr
@@ -218,7 +218,7 @@ export async function __getBulkThreads(
         id: t.topic_id,
         name: t.topic_name,
         description: t.topic_description,
-        chainId: t.topic_chain,
+        communityId: t.topic_community_id,
         telegram: t.telegram,
       };
     }

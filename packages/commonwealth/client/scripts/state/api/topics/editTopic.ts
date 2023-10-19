@@ -1,7 +1,7 @@
-import Topic from 'models/Topic';
-import axios from 'axios';
-import app from 'state';
 import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import Topic from 'models/Topic';
+import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface EditTopicProps {
@@ -12,7 +12,7 @@ interface EditTopicProps {
 const editTopic = async ({ topic, featuredOrder }: EditTopicProps) => {
   const response = await axios.patch(`${app.serverUrl()}/topics/${topic.id}`, {
     id: topic.id,
-    chain: topic.chainId,
+    chain: topic.communityId,
     name: topic.name,
     description: topic.description,
     telegram: topic.telegram,
@@ -32,7 +32,7 @@ const useEditTopicMutation = () => {
     mutationFn: editTopic,
     onSuccess: async (data, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, variables.topic.chainId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, variables.topic.communityId],
       });
     },
   });

@@ -1,7 +1,7 @@
-import axios from 'axios';
-import app from 'state';
-import Topic from 'models/Topic';
 import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import Topic from 'models/Topic';
+import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface CreateTopicProps {
@@ -43,7 +43,7 @@ const useCreateTopicMutation = () => {
     mutationFn: createTopic,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, data.chainId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, data.communityId],
       });
     },
   });
