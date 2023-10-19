@@ -1,4 +1,6 @@
+import { Label as chainEventLabel } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
+import { capitalize } from 'lodash';
 import { NotificationDataAndCategory } from 'types';
 import { formatAddressShort } from '../../../../shared/utils';
 import { SERVER_URL } from '../../../config';
@@ -8,6 +10,14 @@ import {
   getThreadSummaryFromNotification,
   getThreadUrlFromNotification,
 } from '../../webhooks/util';
+
+export interface ChainEventEmailData {
+  emailSubject: string;
+  community_id: string;
+  blockNumber?: number;
+  label: string;
+  url: string;
+}
 
 export interface ForumEmailData {
   emailSubject: string;
@@ -29,8 +39,25 @@ export async function getEmailData(
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
   >
-): Promise<ForumEmailData> {
+): Promise<ChainEventEmailData | ForumEmailData> {
   if (notification.categoryId === NotificationCategories.ChainEvent) {
+    const event = {
+      blockNumber: notification.data.block_number,
+      data: notification.data.event_data,
+      network: notification.data.network,
+      chain: notification.data.chain,
+    };
+    const eventLabel = chainEventLabel(notification.data.chain, event);
+
+    return {
+      emailSubject: `${eventLabel.heading} on ${capitalize(
+        notification.data.chain
+      )}`,
+      community_id: notification.data.chain,
+      blockNumber: notification.data.block_number,
+      label: eventLabel.label,
+      url: SERVER_URL + eventLabel.linkUrl,
+    };
   } else {
     let title: string;
     try {

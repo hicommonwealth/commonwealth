@@ -1,14 +1,15 @@
 import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import {
   DynamicTemplate,
   NotificationDataAndCategory,
 } from '../../../../shared/types';
 import { SubscriptionInstance } from '../../../models/subscription';
-import { getEmailData } from './getEmailData';
-
-const log = factory.getLogger(formatFilename(__filename));
+import {
+  ChainEventEmailData,
+  ForumEmailData,
+  getEmailData,
+} from './getEmailData';
 
 export async function createEmailObject(
   notification: Exclude<
@@ -19,12 +20,31 @@ export async function createEmailObject(
   >,
   emailSubscriptions: SubscriptionInstance[]
 ): Promise<MailDataRequired> {
+  const from = 'Commonwealth <no-reply@commonwealth.im>';
+  const to = emailSubscriptions.map((s) => s.User.email);
+
   if (notification.categoryId === NotificationCategories.ChainEvent) {
-  } else {
-    const emailData = await getEmailData(notification);
+    const emailData = (await getEmailData(notification)) as ChainEventEmailData;
     return {
-      from: 'Commonwealth <no-reply@commonwealth.im>',
-      to: emailSubscriptions.map((s) => s.User.email),
+      from,
+      to,
+      subject: emailData.emailSubject,
+      templateId: DynamicTemplate.ImmediateEmailNotification,
+      dynamicTemplateData: {
+        notification: {
+          chainId: emailData.community_id,
+          blockNumber: emailData.blockNumber,
+          subject: emailData.emailSubject,
+          label: emailData.label,
+          path: emailData.url,
+        },
+      },
+    };
+  } else {
+    const emailData = (await getEmailData(notification)) as ForumEmailData;
+    return {
+      from,
+      to,
       subject: emailData.emailSubject,
       templateId: DynamicTemplate.ImmediateEmailNotification,
       dynamicTemplateData: {
