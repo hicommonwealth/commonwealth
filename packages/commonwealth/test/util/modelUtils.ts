@@ -564,7 +564,7 @@ export const editTopic = async (args: EditTopicArgs) => {
   } = args;
   const res = await chai.request
     .agent(app)
-    .post('/api/editTopic')
+    .post(`/api/topics/${id}`)
     .set('Accept', 'application/json')
     .send({
       id,

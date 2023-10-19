@@ -213,12 +213,13 @@ const ProposalsPage = () => {
         No past proposals
       </div>,
     ]
-  ) : inactiveCosmosProposals?.length || [] ? (
-    inactiveCosmosProposals.map((proposal) => (
-      <ProposalCard key={proposal.identifier} proposal={proposal} />
-    ))
   ) : (
     []
+      .concat(
+        (inactiveCosmosProposals || []).map((proposal) => (
+          <ProposalCard key={proposal.identifier} proposal={proposal} />
+        ))
+      )
       .concat(
         (inactiveCompoundProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
