@@ -32,7 +32,7 @@ export const Errors = {
   InvalidDefaultPage: 'Default page does not exist',
 };
 
-type UpdateChainReq = ChainAttributes & {
+export type UpdateChainReq = ChainAttributes & {
   id: string;
   'featured_topics[]'?: string[];
   'snapshot[]'?: string[];
