@@ -55,7 +55,7 @@ module.exports = {
       // get all addresses with hex and their profiles by profile_id:
       const [hexAddresses] = await queryInterface.sequelize.query(
         `
-        SELECT hex, id, user_id, profile_id
+        SELECT hex, id, user_id, profile_id, last_active, address
         FROM "Addresses"
         WHERE hex IS NOT NULL AND profile_id IS NOT NULL;
         `,
@@ -83,14 +83,20 @@ module.exports = {
         const signer = signers.find((signer) => signer.hex === address.hex);
         const profile = profiles.find((p) => p.id === address.profile_id);
         if (signer) {
-          signer.addresses.push(address);
-          signer.profiles.push(profile);
+          if (!signer.addresses.find((a) => a.id === address.id)) {
+            signer.addresses.push(address);
+          }
+          if (!signer.profiles.find((p) => p.id === profile.id)) {
+            signer.profiles.push(profile);
+          }
         } else {
-          signers.push({
-            hex: address.hex,
-            addresses: [address],
-            profiles: [profile],
-          });
+          if (!signers.find((s) => s.hex === address.hex)) {
+            signers.push({
+              hex: address.hex,
+              addresses: [address],
+              profiles: [profile],
+            });
+          }
         }
       });
 
@@ -103,6 +109,10 @@ module.exports = {
       console.log(
         '# signersWithMultipleProfiles',
         signersWithMultipleProfiles.length
+      );
+      console.log(
+        'signersWithMultipleProfiles',
+        signersWithMultipleProfiles[0]
       );
 
       const signersLast6Months = signersWithMultipleProfiles.filter((s) =>
