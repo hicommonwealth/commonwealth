@@ -1,23 +1,23 @@
-import crypto from 'crypto';
+import { bech32 } from 'bech32';
+import { AppError } from 'common-common/src/errors';
 import {
   ChainBase,
   ChainNetwork,
   WalletId,
   WalletSsoSource,
 } from 'common-common/src/types';
-import { bech32 } from 'bech32';
+import crypto from 'crypto';
 import type { NextFunction } from 'express';
-import { AppError } from 'common-common/src/errors';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { createRole, findOneRole } from './roles';
-import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import type { UserInstance } from '../models/user';
-import type { DB } from '../models';
-import { addressSwapper } from '../../shared/utils';
-import { Errors } from '../routes/createAddress';
 import { Op } from 'sequelize';
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { AddressInstance } from 'server/models/address';
+import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
+import { addressSwapper } from '../../shared/utils';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+import type { DB } from '../models';
+import type { UserInstance } from '../models/user';
+import { Errors } from '../routes/createAddress';
+import { createRole, findOneRole } from './roles';
 
 type CreateAddressReq = {
   address: string;

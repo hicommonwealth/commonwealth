@@ -105,6 +105,17 @@ module.exports = {
         signersWithMultipleProfiles.length
       );
 
+      const signersLast6Months = signersWithMultipleProfiles.filter((s) =>
+        s.addresses.some((a) => a.last_active > new Date('2023-04-01'))
+      );
+      const signersLast3Months = signersWithMultipleProfiles.filter((s) =>
+        s.addresses.some((a) => a.last_active > new Date('2023-07-01'))
+      );
+
+      console.log('# signersLast6Months', signersLast6Months.length);
+      console.log('# signersLast3Months', signersLast3Months.length);
+      console.log('signersLast3Months', signersLast3Months[0]);
+
       for (let i = 0; i < signersWithMultipleProfiles.length; i++) {
         const masterProfile = signersWithMultipleProfiles[i].profiles.reduce(
           (master, profile) => {
@@ -213,6 +224,7 @@ module.exports = {
         });
       }
       console.log('updateCount', updateCount); // 2777 ... 20231005213247-assign_master_profile: migrated (77.703s)
+      // 2373 == 20231005213247-assign_master_profile: migrated (52.780s)
     });
   },
 
