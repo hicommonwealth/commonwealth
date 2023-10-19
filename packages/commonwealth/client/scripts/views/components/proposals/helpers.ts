@@ -17,7 +17,6 @@ import {
   NearSputnikProposalStatus,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus, VotingUnit } from '../../../models/types';
@@ -125,12 +124,7 @@ export const getCanVote = (
   ) {
     canVote = false;
   } else if (hasVotedForAnyChoice) {
-    // enable re-voting for particular types
-    if (proposal instanceof SubstrateDemocracyProposal) {
-      canVote = true;
-    } else {
-      canVote = false;
-    }
+    canVote = false;
   }
 
   return canVote;
@@ -144,14 +138,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
   let hasVotedForAnyChoice;
   let hasVotedRemove;
 
-  if (proposal instanceof SubstrateDemocracyProposal) {
-    hasVotedYes =
-      proposal.getVotes().filter((vote) => {
-        return vote.account.address === user.address;
-      }).length > 0;
-
-    hasVotedForAnyChoice = hasVotedYes;
-  } else if (proposal instanceof CosmosProposal) {
+  if (proposal instanceof CosmosProposal) {
     hasVotedYes =
       user &&
       proposal

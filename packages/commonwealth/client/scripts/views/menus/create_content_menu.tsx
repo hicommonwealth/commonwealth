@@ -18,8 +18,13 @@ import {
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
+import { isMobile } from 'react-device-detect';
 
 const resetSidebarState = () => {
+  //Bouncer pattern -- I have found isMobile does not always detect screen
+  //size when responsively resizing so added a redundancy with window.innerWidth
+  if (!isMobile || window.innerWidth > 425) return;
+
   if (sidebarStore.getState().userToggledVisibility !== 'open') {
     sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
   } else {
@@ -98,42 +103,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
               navigate('/new/proposal');
             },
             iconLeft: 'democraticProposal',
-          },
-        ]
-      : [];
-
-  const getSubstrateProposalItems = (): PopoverMenuItem[] =>
-    showSubstrateProposalItems
-      ? [
-          {
-            label: 'New treasury proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateTreasuryProposal,
-              });
-            },
-            iconLeft: 'treasuryProposal',
-          },
-          {
-            label: 'New democracy proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateDemocracyProposal,
-              });
-            },
-            iconLeft: 'democraticProposal',
-          },
-          {
-            label: 'New tip',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateTreasuryTip,
-              });
-            },
-            iconLeft: 'jar',
           },
         ]
       : [];
@@ -242,7 +211,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),
-          ...getSubstrateProposalItems(),
           ...getSnapshotProposalItem(),
           ...getTemplateItems(),
           ...getDiscordBotConnectionItems(),

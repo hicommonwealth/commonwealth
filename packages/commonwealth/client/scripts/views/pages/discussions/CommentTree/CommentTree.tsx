@@ -160,7 +160,8 @@ export const CommentTree = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await deleteComment({
@@ -181,7 +182,8 @@ export const CommentTree = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -198,7 +200,8 @@ export const CommentTree = ({
         buttons: [
           {
             label: 'Yes',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: () => {
               setEdits((p) => ({
                 ...p,
@@ -214,7 +217,8 @@ export const CommentTree = ({
           },
           {
             label: 'No',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
           },
         ],
       });
@@ -245,7 +249,8 @@ export const CommentTree = ({
         buttons: [
           {
             label: 'Restore',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: () => {
               setEdits((p) => ({
                 ...p,
@@ -261,7 +266,8 @@ export const CommentTree = ({
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
             onClick: () => {
               setEdits((p) => ({
                 ...p,
@@ -376,11 +382,13 @@ export const CommentTree = ({
       buttons: [
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
         {
           label: !comment.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await toggleCommentSpamStatus({
@@ -434,7 +442,7 @@ export const CommentTree = ({
                   canReact={
                     !!hasJoinedCommunity ||
                     isAdmin ||
-                    !app.chain.isGatedTopic(thread.topic.id)
+                    !app.chain.isGatedTopic(thread.topic?.id)
                   }
                   canEdit={
                     !isLocked && (comment.isCommentAuthor || isAdminOrMod)

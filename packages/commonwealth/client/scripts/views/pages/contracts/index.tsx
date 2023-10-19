@@ -77,7 +77,7 @@ const ContractsPage = () => {
         buttons: [
           {
             label: 'Close',
-            buttonType: 'secondary-black',
+            buttonType: 'secondary',
           },
         ],
       });
@@ -93,7 +93,8 @@ const ContractsPage = () => {
         buttons: [
           {
             label: 'Delete',
-            buttonType: 'mini-red',
+            buttonType: 'destructive',
+            buttonHeight: 'sm',
             onClick: async () => {
               try {
                 await app.contracts.deleteTemplate({
@@ -108,7 +109,8 @@ const ContractsPage = () => {
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
           },
         ],
       });

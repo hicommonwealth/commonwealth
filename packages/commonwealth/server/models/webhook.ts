@@ -2,10 +2,11 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
+import { WebhookCategory } from '../../shared/types';
 
 export type WebhookAttributes = {
   url: string;
-  categories: string[];
+  categories: WebhookCategory[];
   id?: number;
   chain_id: string;
   created_at?: Date;
