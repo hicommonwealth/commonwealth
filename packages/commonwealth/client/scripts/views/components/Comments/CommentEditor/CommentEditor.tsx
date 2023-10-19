@@ -22,7 +22,7 @@ type CommentEditorProps = {
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
   tokenPostingThreshold: BN;
-  activeTopic: Topic;
+  topicName: string;
   userBalance: BN;
   disabled: boolean;
   onCancel: (e: any) => void;
@@ -40,7 +40,7 @@ export const CommentEditor = ({
   contentDelta,
   setContentDelta,
   tokenPostingThreshold,
-  activeTopic,
+  topicName,
   userBalance,
   disabled,
   onCancel,
@@ -83,7 +83,7 @@ export const CommentEditor = ({
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
         <CWText className="token-req-text">
-          Commenting in {activeTopic?.name} requires{' '}
+          Commenting in {topicName} requires{' '}
           {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
           {app.chain.meta.default_symbol}.{' '}
           {userBalance && (
