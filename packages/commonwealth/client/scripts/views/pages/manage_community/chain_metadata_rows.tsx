@@ -24,7 +24,7 @@ import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 
-type ChainMetadataRowsProps = {
+type CommunityMetadataRowsProps = {
   admins: Array<RoleInfo>;
   community?: CommunityInfo;
   mods: any;
@@ -154,13 +154,13 @@ const DiscordForumConnections = ({
   );
 };
 
-export const ChainMetadataRows = ({
+export const CommunityMetadataRows = ({
   community,
   admins,
   mods,
   onRoleUpdate,
   onSave,
-}: ChainMetadataRowsProps) => {
+}: CommunityMetadataRowsProps) => {
   const params = new URLSearchParams(window.location.search);
   const returningFromDiscordCallback = params.get(
     'returningFromDiscordCallback'

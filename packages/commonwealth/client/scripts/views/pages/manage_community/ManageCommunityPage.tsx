@@ -10,7 +10,7 @@ import NewProfilesController from '../../../controllers/server/newProfiles';
 import RoleInfo from '../../../models/RoleInfo';
 import Permissions from '../../../utils/Permissions';
 import { AdminPanelTabs } from './admin_panel_tabs';
-import { ChainMetadataRows } from './chain_metadata_rows';
+import { CommunityMetadataRows } from './chain_metadata_rows';
 import ErrorPage from '../error';
 import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import {
@@ -156,9 +156,9 @@ const ManageCommunityPage = () => {
       <CWText type="h2" fontWeight="medium">
         Manage Community
       </CWText>
-      <ChainMetadataRows
+      <CommunityMetadataRows
         admins={admins}
-        chain={app.config.chains.getById(app.activeChainId())}
+        community={app.config.chains.getById(app.activeChainId())}
         mods={mods}
         onRoleUpdate={handleRoleUpdate}
         onSave={() => forceRerender()}
