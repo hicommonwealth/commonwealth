@@ -53,6 +53,8 @@ export type ChainAttributes = {
   discord_config_id?: number;
   category?: any;
   discord_bot_webhooks_enabled?: boolean;
+  directory_page_enabled?: boolean;
+  directory_page_option?: string;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -145,6 +147,8 @@ export default (
         type: dataTypes.BOOLEAN,
         defaultValue: false,
       },
+      directory_page_enabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      directory_page_option: { type: dataTypes.STRING, allowNull: true, defaultValue: null },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
