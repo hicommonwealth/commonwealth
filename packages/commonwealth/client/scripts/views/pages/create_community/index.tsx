@@ -109,7 +109,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
     } else {
       setCurrentForm(getFormType(type));
     }
-  }, [type]);
+  }, [type, navigate]);
 
   const [currentForm, setCurrentForm] = useState<CommunityType>(
     getFormType(type)
@@ -135,7 +135,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
     };
 
     fetchEthChains();
-  }, []);
+  }, [setEthChains]);
 
   useNecessaryEffect(() => {
     const fetchEthChainNames = async () => {
