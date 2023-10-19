@@ -13,7 +13,7 @@ export const getRelatedCommunitiesHandler = async (
   req: TypedRequestQuery<GetRelatedCommunitiesParams>,
   res: TypedResponse<GetRelatedCommunitiesResponse>
 ) => {
-  const { base } = req.query;
-  const results = await controllers.chains.getRelatedCommunities({base});
+  const { base, searchName } = req.query;
+  const results = await controllers.chains.getRelatedCommunities({ base, searchName });
   return success(res, results);
 };

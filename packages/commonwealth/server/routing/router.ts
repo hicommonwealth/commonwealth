@@ -1326,12 +1326,6 @@ function setupRouter(
   );
   registerRoute(
     router,
-    'get',
-    '/relatedCommunities',
-    getChainNode.bind(this, models)
-  );
-  registerRoute(
-    router,
     'post',
     '/getChainContracts',
     getChainContracts.bind(this, models)
