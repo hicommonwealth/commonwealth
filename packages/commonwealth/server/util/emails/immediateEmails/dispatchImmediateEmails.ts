@@ -1,4 +1,5 @@
 import { factory, formatFilename } from 'common-common/src/logging';
+import { StatsDController } from 'common-common/src/statsd';
 import { NotificationCategories } from 'common-common/src/types';
 import { NotificationDataAndCategory } from '../../../../shared/types';
 import { SubscriptionInstance } from '../../../models/subscription';
@@ -39,6 +40,7 @@ export async function dispatchImmediateEmails(
   try {
     console.log(emailObject);
     await sendEmails(emailObject);
+    StatsDController.get().increment('emails.immediate.sent');
   } catch (e) {
     const msg = `Failed to send emails for the following notification ${JSON.stringify(
       notification
