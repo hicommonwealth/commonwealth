@@ -53,8 +53,6 @@ const chains = [...sortedChainsAndCommunities, ...betaChainsAndCommunities];
 const LandingPage = () => {
   const forceRerender = useForceRerender();
 
-  console.log(app.config.chains)
-
   if (app.loginState !== LoginState.LoggedIn && app.platform() === 'web') {
     return (
       <div className="LandingPage">
