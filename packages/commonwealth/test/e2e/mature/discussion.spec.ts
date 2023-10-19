@@ -66,7 +66,7 @@ test.describe('Discussion Page Tests', () => {
     await commentOptionButton.click();
     await page.locator('div.PopoverMenuItem').nth(2).click();
 
-    const deleteButton = await page.locator('button.mini-red');
+    const deleteButton = await page.locator('button.destructive');
     await deleteButton.click();
 
     let commentExists = await page.getByText(commentText).count();
