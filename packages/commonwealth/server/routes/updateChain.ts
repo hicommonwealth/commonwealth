@@ -91,7 +91,7 @@ const updateChain = async (
     chain_node_id,
     discord_bot_webhooks_enabled,
     directory_page_enabled,
-    directory_page_option,
+    directory_page_chain_node_id,
   } = req.body;
 
   let snapshot = req.body['snapshot[]'];
@@ -207,8 +207,8 @@ const updateChain = async (
   if (directory_page_enabled) {
     chain.directory_page_enabled = directory_page_enabled;
   }
-  if (directory_page_option) {
-    chain.directory_page_option = directory_page_option;
+  if (directory_page_chain_node_id) {
+    chain.directory_page_chain_node_id = directory_page_chain_node_id;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle

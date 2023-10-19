@@ -164,7 +164,7 @@ class ChainInfo {
     discord_config_id,
     discord_bot_webhooks_enabled,
     directory_page_enabled,
-    directory_page_option,
+    directory_page_chain_node_id,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -224,7 +224,7 @@ class ChainInfo {
       cosmosGovernanceVersion: cosmos_governance_version,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
       directoryPageEnabled: directory_page_enabled,
-      directoryPageOption: directory_page_option
+      directoryPageOption: directory_page_chain_node_id
     });
   }
 
@@ -292,7 +292,7 @@ class ChainInfo {
     chain_node_id,
     discord_bot_webhooks_enabled,
     directory_page_enabled,
-    directory_page_option
+    directory_page_chain_node_id
   }: {
     name?: string;
     description?: string;
@@ -314,7 +314,7 @@ class ChainInfo {
     chain_node_id?: string;
     discord_bot_webhooks_enabled?: boolean;
     directory_page_enabled?: boolean;
-    directory_page_option?: string;
+    directory_page_chain_node_id?: number;
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -339,7 +339,7 @@ class ChainInfo {
       cosmos_governance_version,
       discord_bot_webhooks_enabled,
       directory_page_enabled,
-      directory_page_option,
+      directory_page_chain_node_id,
       jwt: app.user.jwt,
     });
     const updatedChain = r.result;
@@ -362,7 +362,7 @@ class ChainInfo {
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
     this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
     this.directoryPageEnabled = updatedChain.directory_page_enabled;
-    this.directoryPageOption = updatedChain.directory_page_option;
+    this.directoryPageOption = updatedChain.directory_page_chain_node_id;
   }
 }
 

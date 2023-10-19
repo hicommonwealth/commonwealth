@@ -8,8 +8,8 @@ module.exports = {
         allowNull: false,
         defaultValue: false,
       }, {transaction: t});
-      await queryInterface.addColumn('Chains', 'directory_page_option', {
-        type: Sequelize.STRING,
+      await queryInterface.addColumn('Chains', 'directory_page_chain_node_id', {
+        type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: null,
       }, {transaction: t});
@@ -18,6 +18,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn('Chains', 'directory_page_enabled');
-    await queryInterface.removeColumn('Chains', 'directory_page_option');
+    await queryInterface.removeColumn('Chains', 'directory_page_chain_node_id');
   }
 };

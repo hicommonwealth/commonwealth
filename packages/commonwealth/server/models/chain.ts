@@ -54,7 +54,7 @@ export type ChainAttributes = {
   category?: any;
   discord_bot_webhooks_enabled?: boolean;
   directory_page_enabled?: boolean;
-  directory_page_option?: string;
+  directory_page_chain_node_id?: number;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -148,7 +148,7 @@ export default (
         defaultValue: false,
       },
       directory_page_enabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-      directory_page_option: { type: dataTypes.STRING, allowNull: true, defaultValue: null },
+      directory_page_chain_node_id: { type: dataTypes.INTEGER, allowNull: true, defaultValue: null },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
