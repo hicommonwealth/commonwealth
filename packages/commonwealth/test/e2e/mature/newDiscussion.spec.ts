@@ -4,7 +4,6 @@ import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks';
 import {
   addAddressIfNone,
   login,
-  testAddress,
   dbClient,
 } from '../utils/e2eUtils';
 

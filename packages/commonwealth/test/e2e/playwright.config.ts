@@ -1,8 +1,10 @@
 import { PlaywrightTestConfig } from '@playwright/test';
 
-require('dotenv').config();
+import { config } from 'dotenv';
 
-const config: PlaywrightTestConfig = {
+config();
+
+const pwConfig: PlaywrightTestConfig = {
   use: {
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
@@ -21,4 +23,4 @@ const config: PlaywrightTestConfig = {
   },
 };
 
-export default config;
+export default pwConfig;

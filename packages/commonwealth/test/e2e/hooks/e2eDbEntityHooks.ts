@@ -1,5 +1,3 @@
-import * as process from 'process';
-import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
 import type { ChainInstance } from 'server/models/chain';
@@ -11,9 +9,6 @@ import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
 import type { UserInstance } from 'server/models/user';
 import { ProfileAttributes } from '../../../server/models/profile';
-import { testAddress } from '../utils/e2eUtils';
-
-const Op = Sequelize.Op;
 
 export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];

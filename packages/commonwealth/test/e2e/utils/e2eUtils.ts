@@ -7,11 +7,11 @@ export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
 
 export let dbClient = process.env.DATABASE_URL
   ? new Sequelize(process.env.DATABASE_URL, {
-      logging: false,
-    })
+    logging: false,
+  })
   : new Sequelize('postgresql://commonwealth:edgeware@localhost/commonwealth', {
-      logging: false,
-    });
+    logging: false,
+  });
 
 // Logs in user for specific chain
 export async function login(page) {
@@ -26,14 +26,14 @@ export async function login(page) {
   }).toPass();
 
   // Basic idea is that we lazily load the metamask mock (otherwise it will include ethereum to our initial bundle)
-  // As a result, the metamask button will not appear right away, because the lazy loading is initialized on login screen
-  // Therefore we need to re-open the login screen a few times waiting for it to finish lazy loading.
+  // As a result, the metamask button will not appear right away, because the lazy loading is initialized on
+  // login screen. Therefore we need to re-open the login screen a few times waiting for it to finish lazy loading.
   await expect(async () => {
     await page.mouse.click(0, 0);
     button = await page.getByRole('button', { name: 'Login' });
     await button.click();
-    await expect(page.locator("text='Metamask'")).toBeVisible({ timeout: 100 });
-    await page.locator("text='Metamask'").click();
+    await expect(page.locator('text=\'Metamask\'')).toBeVisible({ timeout: 100 });
+    await page.locator('text=\'Metamask\'').click();
     await expect(page.locator('.LoginDesktop')).toHaveCount(0, {
       timeout: 10000,
     });
@@ -174,7 +174,7 @@ export async function createAddress(
       false,
       ${profileId},
       'metamask',
-      '{"number":17693949,"hash":"0x26664b8151811ad3a2c4fc9091d248e5105950c91b87d71ca7a1d30cfa0cbede", "timestamp":1689365027}',
+      null,
       false,
       'member'
     ) ON CONFLICT DO NOTHING

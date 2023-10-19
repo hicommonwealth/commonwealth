@@ -1,7 +1,7 @@
-import { expect as pwexpect, test } from '@playwright/test';
+import { expect as pwexpect } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { Page } from 'playwright-core/index';
+import { Page } from 'playwright-core';
 import { testThreads } from '../hooks/e2eDbEntityHooks';
 import { login } from '../utils/e2eUtils';
 

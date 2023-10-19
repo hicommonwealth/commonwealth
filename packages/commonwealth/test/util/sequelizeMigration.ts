@@ -1,12 +1,13 @@
-import path from 'path';
+import myPath from 'path';
 import { Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 
 export async function sequelizeMigrationUp(sequelize) {
   const umzug = new Umzug({
     migrations: {
-      glob: ['*.js', { cwd: path.join(__dirname, '../../server/migrations') }],
+      glob: ['*.js', { cwd: myPath.join(__dirname, '../../server/migrations') }],
       resolve: ({ name, path, context }) => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const migration = require(path || '');
         return {
           name,
