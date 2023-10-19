@@ -36,16 +36,4 @@ describe('GetRelatedCommunities Tests', () => {
     assert.equal(yearnFinanceCommunity.thread_count, 0);
     assert.equal(yearnFinanceCommunity.icon_url, '/static/img/protocols/eth.png');
   });
-
-  it('Correctly returns results if base matches some chainNode.name and filters based on query name', async () => {
-    const controller = new ServerChainsController(models, null, null);
-    const response = await controller.getRelatedCommunities({ chainNodeId: 2, communitySearchName: 'eth' })
-
-    assert.equal(response.length, 1);
-
-    const ethereumCommunity = response.find(r => r.community === 'Ethereum');
-    assert.equal(ethereumCommunity.address_count, 1);
-    assert.equal(ethereumCommunity.thread_count, 0);
-    assert.equal(ethereumCommunity.icon_url, '/static/img/protocols/eth.png');
-  });
 });

@@ -7,9 +7,8 @@ import { ServerChainsController } from '../server_chains_controller';
  *
  * @typedef {Object} GetRelatedCommunitiesOptions
  * @property {string} chainNodeId - The id of the ChainNode variable for filtering.
- * @property {string} [communitySearchName] - The optional search term for fuzzy searching chain names (Chains.name).
  */
-export type GetRelatedCommunitiesOptions = { chainNodeId: number, communitySearchName?: string };
+export type GetRelatedCommunitiesOptions = { chainNodeId: number };
 
 /**
  * Response for the getRelatedCommunities function.
@@ -31,11 +30,8 @@ export type GetRelatedCommunitiesResult = {
 
 export async function __getRelatedCommunities(
   this: ServerChainsController,
-  { chainNodeId, communitySearchName }: GetRelatedCommunitiesOptions
+  { chainNodeId }: GetRelatedCommunitiesOptions
 ): Promise<GetRelatedCommunitiesResult> {
-  const replacements = communitySearchName ? { chainNodeId, searchName: `%${communitySearchName}%` } : { chainNodeId };
-  const filterString = communitySearchName ? 'AND c.name ILIKE :searchName' : ''
-
   // Although this subquery is not necessary as is currently, We should keep it because in the future if we want to
   // paginate, then we will need to paginate through the subquery.
   return await sequelize.query(
@@ -49,7 +45,7 @@ export async function __getRelatedCommunities(
     FROM 
         (SELECT c.id, c.icon_url, c.name, COUNT(t) as thread_count 
         FROM "ChainNodes" as cn 
-        JOIN "Chains" as c on c.chain_node_id = cn.id ${filterString} 
+        JOIN "Chains" as c on c.chain_node_id = cn.id 
         LEFT JOIN "Threads" as t on t.chain = c.id 
         WHERE cn.id = :chainNodeId 
         GROUP BY c.id) as popular_chains 
@@ -59,7 +55,7 @@ export async function __getRelatedCommunities(
     `,
     {
       type: QueryTypes.SELECT,
-      replacements
+      replacements: { chainNodeId }
     }
   );
 }
