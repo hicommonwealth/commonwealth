@@ -12,10 +12,10 @@ import {
   __getCommunities,
 } from './server_communities_methods/get_communities';
 import {
-  GetCommunityNodesOptions,
-  GetCommunityNodesResult,
-  __getCommunityNodes,
-} from './server_communities_methods/get_community_nodes';
+  GetChainNodesOptions,
+  GetChainNodesResult,
+  __getChainNodes,
+} from './server_communities_methods/get_chain_nodes';
 import {
   CreateCommunityOptions,
   CreateCommunityResult,
@@ -37,10 +37,10 @@ import {
   __getCommunityStats,
 } from './server_communities_methods/get_community_stats';
 import {
-  CreateCommunityNodeOptions,
-  CreateCommunityNodeResult,
-  __createCommunityNode,
-} from './server_communities_methods/create_community_node';
+  CreateChainNodeOptions,
+  CreateChainNodeResult,
+  __createChainNode,
+} from './server_communities_methods/create_chain_node';
 
 /**
  * Implements methods related to communities
@@ -62,18 +62,6 @@ export class ServerCommunitiesController {
     options: GetCommunitiesOptions
   ): Promise<GetCommunitiesResult> {
     return __getCommunities.call(this, options);
-  }
-
-  async getCommunityNodes(
-    options: GetCommunityNodesOptions
-  ): Promise<GetCommunityNodesResult> {
-    return __getCommunityNodes.call(this, options);
-  }
-
-  async createCommunityNode(
-    options: CreateCommunityNodeOptions
-  ): Promise<CreateCommunityNodeResult> {
-    return __createCommunityNode.call(this, options);
   }
 
   async createCommunity(
@@ -98,5 +86,17 @@ export class ServerCommunitiesController {
     options: GetCommunityStatsOptions
   ): Promise<GetCommunityStatsResult> {
     return __getCommunityStats.call(this, options);
+  }
+
+ async getChainNodes(
+    options: GetChainNodesOptions
+  ): Promise<GetChainNodesResult> {
+    return __getChainNodes.call(this, options);
+  }
+
+  async createChainNode(
+    options: CreateChainNodeOptions
+  ): Promise<CreateChainNodeResult> {
+    return __createChainNode.call(this, options);
   }
 }

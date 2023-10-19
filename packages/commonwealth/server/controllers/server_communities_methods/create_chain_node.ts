@@ -8,19 +8,19 @@ export const Errors = {
   NotAdmin: 'Not an admin',
 };
 
-export type CreateCommunityNodeOptions = {
+export type CreateChainNodeOptions = {
   user: UserInstance;
   url: string;
   name?: string;
   bech32?: string;
   balanceType?: string;
 };
-export type CreateCommunityNodeResult = { node_id: number };
+export type CreateChainNodeResult = { node_id: number };
 
-export async function __createCommunityNode(
+export async function __createChainNode(
   this: ServerCommunitiesController,
-  { user, url, name, bech32, balanceType }: CreateCommunityNodeOptions
-): Promise<CreateCommunityNodeResult> {
+  { user, url, name, bech32, balanceType }: CreateChainNodeOptions
+): Promise<CreateChainNodeResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
