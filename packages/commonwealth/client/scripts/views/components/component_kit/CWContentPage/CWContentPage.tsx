@@ -170,7 +170,7 @@ export const CWContentPage = ({
     <div className="main-body-container">
       <div className="header">
         {typeof title === 'string' ? (
-          <h1 className="title">{truncate({ str: title })}</h1>
+          <h1 className="title">{truncate(title)}</h1>
         ) : (
           title
         )}

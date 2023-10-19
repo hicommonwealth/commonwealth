@@ -1,14 +1,8 @@
-type Truncate = {
-  str: string;
-  maxCharLength?: number;
-  ellipsisPadding?: number;
-};
-
-export const truncate = ({
-  str,
+export const truncate = (
+  str: string,
   maxCharLength = 140,
-  ellipsisPadding = 4,
-}: Truncate): string => {
+  ellipsisPadding = 4
+): string => {
   // Get the available width of the container or the window
   const availableWidth = window.innerWidth;
 
