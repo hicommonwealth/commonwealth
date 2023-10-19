@@ -44,7 +44,7 @@ export const AaveProposalForm = () => {
     };
 
     getExecutors();
-  }, []);
+  }, [aave.governance.api]);
 
   const updateAaveProposalState = <K extends keyof AaveProposalState>(
     index: number,
