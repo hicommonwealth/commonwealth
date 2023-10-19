@@ -147,7 +147,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       const newObject = {};
 
       for (const id of Object.keys(ethCommunities)) {
-        const community = communities.find((c) => c.communityId === +id);
+        const community = communities.find((c) => c.chainId === +id);
 
         if (community) {
           newObject[id] = community.name;

@@ -17,7 +17,7 @@ import {
   defaultCommunityRows,
   EthCommunityRows,
   updateAdminOnCreateCommunity,
-} from 'client/scripts/views/pages/create_community/community_input_rows';
+} from './community_input_rows';
 import type { EthCommunityFormState } from 'views/pages/create_community/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';

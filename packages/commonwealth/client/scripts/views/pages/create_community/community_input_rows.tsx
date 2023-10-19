@@ -13,7 +13,7 @@ import type {
   EthCommunityFormState,
   UseCommunityFormDefaultFieldsHookType,
   UseCommunityFormStateHookType,
-  UseEthCommunityFormFieldsHookType
+  UseEthCommunityFormFieldsHookType,
 } from './types';
 
 export async function updateAdminOnCreateCommunity(communityId: string) {
@@ -24,8 +24,8 @@ export async function updateAdminOnCreateCommunity(communityId: string) {
   const roles = await axios.get(`${app.serverUrl()}/roles`, {
     params: {
       chain_id: communityId,
-      permissions: ['admin']
-    }
+      permissions: ['admin'],
+    },
   });
 
   app.roles.addRole(roles.data.result[0]);
@@ -41,7 +41,7 @@ export const initCommunityForm = (): CommunityFormDefaultFields => {
     iconUrl: '',
     telegram: '',
     uploadInProgress: false,
-    website: ''
+    website: '',
   };
 };
 
@@ -145,7 +145,8 @@ export const EthCommunityRows = (
   props: EthCommunityFormState,
   state: EthCommunityState
 ) => {
-  const [defaultChainNode, setDefaultChainNode] = useState<DropdownItemType>();
+  const [defaultCommunityNode, setDefaultCommunityNode] =
+    useState<DropdownItemType>();
   const options = useMemo(
     () =>
       [
@@ -153,12 +154,12 @@ export const EthCommunityRows = (
           (c) =>
             ({
               label: props.ethCommunityNames[c],
-              value: props.ethCommunityNames[c]
-            }) || { label: c, value: c }
+              value: props.ethCommunityNames[c],
+            } || { label: c, value: c })
         ),
-        app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {}
+        app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
       ] as Array<DropdownItemType>,
-    [props.ethChains, props.ethChainNames]
+    [props.ethCommunities, props.ethCommunityNames]
   );
 
   const onSelectHandler = useCallback(
@@ -188,27 +189,27 @@ export const EthCommunityRows = (
   // chainString is the key we use to set all the other fields:
   useEffect(() => {
     if (state?.communityString && options?.length > 0) {
-      const foundChainNode = options.find(
+      const foundCommunityNode = options.find(
         (o) => o.label === state.communityString
       );
-      setDefaultChainNode(foundChainNode || options[0]);
+      setDefaultCommunityNode(foundCommunityNode || options[0]);
     }
   }, [state?.communityString, options]);
 
-  // when we know the defaultChainNode, we can set the other fields:
+  // when we know the defaultCommunityNode, we can set the other fields:
   useEffect(() => {
-    if (defaultChainNode && !state.nodeUrl) {
-      onSelectHandler(defaultChainNode);
+    if (defaultCommunityNode && !state.nodeUrl) {
+      onSelectHandler(defaultCommunityNode);
     }
-  }, [defaultChainNode, state?.nodeUrl, onSelectHandler]);
+  }, [defaultCommunityNode, state?.nodeUrl, onSelectHandler]);
 
   return (
     <>
-      {defaultChainNode ? (
+      {defaultCommunityNode ? (
         <CWDropdown
-          label="Chain"
+          label="Community"
           options={options}
-          initialValue={defaultChainNode}
+          initialValue={defaultCommunityNode}
           onSelect={(o) => onSelectHandler(o)}
           disabled={!!props.disabled}
         />
@@ -217,7 +218,7 @@ export const EthCommunityRows = (
       )}
       {state.communityString === 'Custom' && (
         <InputRow
-          title="Chain ID"
+          title="Community ID"
           value={state.ethCommunityId}
           placeholder="1"
           onChangeHandler={async (v) => {
