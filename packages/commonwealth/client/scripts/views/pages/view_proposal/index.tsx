@@ -3,7 +3,6 @@ import { ChainNetwork } from 'common-common/src/types';
 import _ from 'lodash';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import useForceRerender from 'hooks/useForceRerender';
@@ -23,16 +22,14 @@ import { CWContentPage } from '../../components/component_kit/CWContentPage';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { Skeleton } from '../../components/Skeleton';
-import { TipDetail } from '../tip_detail';
 import { AaveViewProposalDetail } from './aave_summary';
-import type { LinkedSubstrateProposal } from './linked_proposals_embed';
-import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import type { SubheaderProposalType } from './proposal_components';
 import { ProposalSubheader } from './proposal_components';
 import { JSONDisplay } from './json_display';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   useAaveProposalsQuery,
+  useCompoundProposalsQuery,
   useCosmosProposalMetadataQuery,
   useCosmosProposalQuery,
   useCosmosProposalTallyQuery,
@@ -76,7 +73,7 @@ const ViewProposalPage = ({
     setProposal(cosmosProposal);
     setTitle(cosmosProposal?.title);
     setDescription(cosmosProposal?.description);
-  }, [cosmosProposal]);
+  }, [cosmosProposal, app.chain.apiInitialized]);
 
   useEffect(() => {
     if (_.isEmpty(metadata)) return;
@@ -110,6 +107,14 @@ const ViewProposalPage = ({
       chainId: app.chain?.id,
     });
 
+  const onCompound = app.chain?.network === ChainNetwork.Compound;
+  const fetchCompoundData = onCompound && isAdapterLoaded;
+  const { data: cachedCompoundProposals, isLoading: compoundProposalsLoading } =
+    useCompoundProposalsQuery({
+      moduleReady: fetchCompoundData,
+      chainId: app.chain?.id,
+    });
+
   useEffect(() => {
     if (!aaveProposalsLoading && fetchAaveData && !proposal) {
       const foundProposal = cachedAaveProposals?.find(
@@ -123,12 +128,17 @@ const ViewProposalPage = ({
       } else {
         setProposal(foundProposal);
       }
+    } else if (!compoundProposalsLoading && fetchCompoundData && !proposal) {
+      const foundProposal = cachedCompoundProposals?.find(
+        (p) => p.identifier === proposalId
+      );
+      setProposal(foundProposal);
     }
-  }, [cachedAaveProposals]);
+  }, [cachedAaveProposals, cachedCompoundProposals, isAdapterLoaded]);
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {
-      if (onAave) return;
+      if (onAave || onCompound) return;
       try {
         const proposalFromStore = getProposalFromStore();
         setProposal(proposalFromStore);
@@ -172,11 +182,6 @@ const ViewProposalPage = ({
     }
   }
 
-  // special case loading for tips
-  if (proposal instanceof SubstrateTreasuryTip) {
-    return <TipDetail proposal={proposal} />;
-  }
-
   const toggleVotingModal = (newModalState: boolean) => {
     setVotingModalOpen(newModalState);
   };
@@ -206,9 +211,6 @@ const ViewProposalPage = ({
       }
       subBody={
         <>
-          <LinkedProposalsEmbed
-            proposal={proposal as LinkedSubstrateProposal}
-          />
           {proposal instanceof AaveProposal && (
             <AaveViewProposalDetail proposal={proposal} />
           )}

@@ -26,7 +26,7 @@ import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource } from '../../../models/Thread';
+import { Link, LinkSource, LinkDisplay } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -52,8 +52,14 @@ import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 import { useSearchParams } from 'react-router-dom';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
+import { TemplateActionCard } from './TemplateActionCard';
+import { ViewTemplateFormCard } from './ViewTemplateFormCard';
+import ViewTemplate from '../view_template/view_template';
+import { featureFlags } from 'helpers/feature-flags';
 
 import 'pages/view_thread/index.scss';
+import { LinkedUrlCard } from './LinkedUrlCard';
+import { commentsByDate } from 'helpers/dates';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -126,7 +132,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   }, [fetchCommentsError]);
 
   const { isWindowLarge } = useBrowserWindow({
-    // const { isWindowMedium } = useBrowserWindow({
     onResize: () =>
       breakpointFnValidator(
         isCollapsedSize,
@@ -230,7 +235,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
   }
 
-  if ((!isLoading && !thread) || fetchThreadError) {
+  if (
+    (!isLoading && !thread) ||
+    fetchThreadError ||
+    thread.chain !== app.activeChainId()
+  ) {
     return <PageNotFound />;
   }
 
@@ -243,6 +252,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
   const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+  const linkedTemplates = filterLinks(thread.links, LinkSource.Template);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
@@ -257,7 +267,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
+  const showTemplateOptions =
+    featureFlags.proposalTemplates && (isAuthor || isAdminOrMod);
+  const showLinkedTemplateOptions =
+    featureFlags.proposalTemplates && linkedTemplates.length > 0;
+
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
+
+  const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
   const canComment =
     !!hasJoinedCommunity ||
@@ -301,11 +318,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const sortedComments = [...comments]
     .filter((c) => !c.parentComment)
-    .sort((a, b) =>
-      commentSortType === CommentsFeaturedFilterTypes.Oldest
-        ? moment(a.createdAt).diff(moment(b.createdAt))
-        : moment(b.createdAt).diff(moment(a.createdAt))
-    );
+    .sort((a, b) => commentsByDate(a, b, commentSortType));
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
   const fromDiscordBot =
@@ -333,7 +346,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           showLinkedProposalOptions ||
           showLinkedThreadOptions ||
           polls?.length > 0 ||
-          isAuthor
+          isAuthor ||
+          hasWebLinks
         }
         isSpamThread={!!thread.markedAsSpamAt}
         title={
@@ -366,7 +380,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           )
         }
         thread={thread}
-        onLockToggle={(isLock) => {
+        onLockToggle={() => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
         }}
@@ -390,7 +404,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           setIsGloballyEditing(true);
           setIsEditingBody(true);
         }}
-        onSpamToggle={(updatedThread) => {
+        onSpamToggle={() => {
           setIsGloballyEditing(false);
           setIsEditingBody(false);
         }}
@@ -419,6 +433,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             ) : (
               <>
                 <QuillRenderer doc={thread.body} cutoffLines={50} />
+                {showLinkedTemplateOptions &&
+                  linkedTemplates[0]?.display !== LinkDisplay.sidebar && (
+                    <ViewTemplate
+                      contract_address={
+                        linkedTemplates[0]?.identifier.split('/')[1]
+                      }
+                      slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                      setTemplateNickname={null}
+                      isForm={true}
+                    />
+                  )}
                 {thread.readOnly || fromDiscordBot ? (
                   <>
                     {threadOptionsComp}
@@ -508,6 +533,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               setParentCommentId={setParentCommentId}
               canComment={canComment}
               fromDiscordBot={fromDiscordBot}
+              commentSortType={commentSortType}
             />
           </>
         }
@@ -531,6 +557,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             allowLinking={isAuthor || isAdminOrMod}
                           />
                         )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(isAuthor || isAdmin || hasWebLinks
+              ? [
+                  {
+                    label: 'Web Links',
+                    item: (
+                      <div className="cards-column">
+                        <LinkedUrlCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                        />
                       </div>
                     ),
                   },
@@ -584,6 +625,34 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               onPollCreate={() => setInitializedPolls(false)}
                             />
                           )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showLinkedTemplateOptions &&
+            linkedTemplates[0]?.display !== LinkDisplay.inline
+              ? [
+                  {
+                    label: 'View Template',
+                    item: (
+                      <div className="cards-column">
+                        <ViewTemplateFormCard
+                          address={linkedTemplates[0]?.identifier.split('/')[1]}
+                          slug={linkedTemplates[0]?.identifier.split('/')[2]}
+                        />
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(showTemplateOptions
+              ? [
+                  {
+                    label: 'Template',
+                    item: (
+                      <div className="cards-column">
+                        <TemplateActionCard thread={thread} />
                       </div>
                     ),
                   },

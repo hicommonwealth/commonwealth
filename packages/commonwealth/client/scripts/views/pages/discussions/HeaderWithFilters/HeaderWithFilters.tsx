@@ -12,7 +12,7 @@ import { Select } from 'views/components/Select';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import type Topic from '../../../../models/Topic';
@@ -23,8 +23,6 @@ import {
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
-import SwitchAddressBanner from 'views/components/SwitchAddressBanner';
-import { featureFlags } from 'helpers/feature-flags';
 
 type HeaderWithFiltersProps = {
   stage: string;
@@ -139,25 +137,8 @@ export const HeaderWithFilters = ({
     );
   };
 
-  const handleSwitchAddress = () => {
-    console.log('click switch address');
-  };
-
-  const handleJoinCommunity = () => {
-    console.log('click handle join');
-  };
-
   return (
     <div className="HeaderWithFilters">
-      {featureFlags.sessionKeys && (
-        // TODO adjust communityName and onClose to be dynamic once the logic is ready
-        <SwitchAddressBanner
-          communityName="dydx"
-          onCommunityJoin={handleJoinCommunity}
-          onAddressSwitch={handleSwitchAddress}
-          onClose={() => console.log('close')}
-        />
-      )}
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
           {isUndefined(topic) ? 'All Discussions' : topic}
@@ -354,7 +335,8 @@ export const HeaderWithFilters = ({
         }}
       />
 
-      <Modal
+      <CWModal
+        size="medium"
         content={
           <EditTopicModal
             topic={topicSelectedToEdit}

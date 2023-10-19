@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { LoginModal } from 'views/modals/login_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { Modal } from '../../components/component_kit/cw_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWText } from '../../components/component_kit/cw_text';
 
 type HeaderProps = {
@@ -37,14 +37,14 @@ export const Header = ({ onLogin }: HeaderProps) => {
               Why Commonwealth?
             </CWText>
             <CWButton
-              label="Login"
+              label="Sign in"
               buttonType="primary-black"
               onClick={() => setIsModalOpen(true)}
             />
           </div>
         )}
       </div>
-      <Modal
+      <CWModal
         content={
           <LoginModal
             onSuccess={onLogin}

@@ -9,7 +9,7 @@ import AddressInfo from 'models/AddressInfo';
 import { isSameAccount } from 'helpers';
 import ITokenAdapter from 'models/ITokenAdapter';
 import React, { useState } from 'react';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import { TOSModal } from 'views/components/Header/TOSModal';
 import { LoginModal } from 'views/modals/login_modal';
@@ -118,13 +118,13 @@ const useJoinCommunity = () => {
           const { verification_token, addresses, encodedAddress } = res.result;
           app.user.setAddresses(
             addresses.map((a) => {
-              return new AddressInfo(
-                a.id,
-                a.address,
-                a.chain,
-                a.keytype,
-                a.wallet_id
-              );
+              return new AddressInfo({
+                id: a.id,
+                address: a.address,
+                chainId: a.chain,
+                keytype: a.keytype,
+                walletId: a.wallet_id,
+              });
             })
           );
           const addressInfo = app.user.addresses.find(
@@ -192,7 +192,8 @@ const useJoinCommunity = () => {
   };
 
   const AccountSelectorModal = (
-    <Modal
+    <CWModal
+      size="small"
       content={
         <AccountSelector
           accounts={sameBaseAddressesRemoveDuplicates.map((addressInfo) => ({
@@ -213,7 +214,8 @@ const useJoinCommunity = () => {
   );
 
   const TermsOfServiceModal = (
-    <Modal
+    <CWModal
+      size="medium"
       content={
         <TOSModal
           onAccept={async () => {
@@ -229,7 +231,7 @@ const useJoinCommunity = () => {
   );
 
   const LoginModalWrapper = (
-    <Modal
+    <CWModal
       content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
       isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
       onClose={() => setIsLoginModalOpen(false)}

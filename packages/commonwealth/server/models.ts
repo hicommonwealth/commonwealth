@@ -12,6 +12,8 @@ import type { CommunitySnapshotSpaceModelStatic } from './models/community_snaps
 import type { ContractModelStatic } from './models/contract';
 import type { ContractAbiModelStatic } from './models/contract_abi';
 import type { DiscordBotConfigModelStatic } from './models/discord_bot_config';
+import type { EvmEventSourceModelStatic } from './models/evmEventSource';
+import type { LastProcessedEvmBlockModelStatic } from './models/lastProcessedEvmBlock';
 import type { LoginTokenModelStatic } from './models/login_token';
 import type { NotificationModelStatic } from './models/notification';
 import type { NotificationCategoryModelStatic } from './models/notification_category';
@@ -35,6 +37,8 @@ import type { WebhookModelStatic } from './models/webhook';
 import type { CommunityContractTemplateStatic } from './models/community_contract_template';
 import type { CommunityContractTemplateMetadataStatic } from './models/community_contract_metadata';
 import type { TemplateModelStatic } from './models/template';
+import type { GroupModelStatic } from './models/group';
+import type { MembershipModelStatic } from './models/membership';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -51,12 +55,16 @@ export type Models = {
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
   DiscordBotConfig: DiscordBotConfigModelStatic;
+  EvmEventSource: EvmEventSourceModelStatic;
+  LastProcessedEvmBlock: LastProcessedEvmBlockModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;
   NotificationCategory: NotificationCategoryModelStatic;
   NotificationsRead: NotificationsReadModelStatic;
   Comment: CommentModelStatic;
   Poll: PollModelStatic;
+  Group: GroupModelStatic;
+  Membership: MembershipModelStatic;
   Reaction: ReactionModelStatic;
   Thread: ThreadModelStatic;
   Topic: TopicModelStatic;

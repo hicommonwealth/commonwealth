@@ -17,7 +17,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import {
   defaultChainRows,
-  ethChainRows,
+  EthChainRows,
   updateAdminOnCreateCommunity,
 } from './chain_input_rows';
 import type { EthChainFormState } from './types';
@@ -46,9 +46,10 @@ export const PolygonForm = (props: EthChainFormState) => {
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    ethChainFormFields.setChainString('Ethereum Mainnet');
-    ethChainFormFields.setNodeUrl(ethChains[1].url);
-  }, []);
+    if (!ethChainFormFields.chainString) {
+      ethChainFormFields.setChainString('Polygon Mainnet');
+    }
+  }, [ethChainFormFields]);
 
   const validAddress = isAddress(ethChainFormFields.address);
 
@@ -161,7 +162,7 @@ export const PolygonForm = (props: EthChainFormState) => {
 
   return (
     <div className="CreateCommunityForm">
-      {ethChainRows(
+      {EthChainRows(
         { ethChainNames, ethChains, disabled: true },
         { ...ethChainFormFields, ...chainFormState }
       )}

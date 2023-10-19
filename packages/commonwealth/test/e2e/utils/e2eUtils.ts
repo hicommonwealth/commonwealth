@@ -2,14 +2,7 @@
 import { expect } from '@playwright/test';
 import * as process from 'process';
 import { Sequelize } from 'sequelize';
-
-export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
-
-export let dbClient = process.env.DATABASE_URL
-  ? new Sequelize(process.env.DATABASE_URL, {
-      logging: false,
-    })
-  : null;
+import { DATABASE_URI } from '../../../server/config';
 
 // Logs in user for specific chain
 export async function login(page) {
@@ -38,6 +31,12 @@ export async function login(page) {
   }).toPass();
 }
 
+// This connection is used to speed up tests, so we don't need to load in all the models with the associated
+// imports. This can only be used with raw sql queries.
+export const dbClient = new Sequelize(DATABASE_URI, { logging: false });
+
+export const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
+
 export async function addAlchemyKey() {
   const apiKey = process.env.ETH_ALCHEMY_API_KEY;
   if (!apiKey) {
@@ -46,7 +45,10 @@ export async function addAlchemyKey() {
 
   // If chainNode for eth doesn't exist, add it and add key.
   const ethChainNodeExists = await dbClient.query(
-    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1'
+    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1 OR id = 37'
+  );
+  const polygonChainNodeExists = await dbClient.query(
+    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 137 OR id = 56'
   );
   if (ethChainNodeExists[0].length === 0) {
     try {
@@ -56,7 +58,19 @@ export async function addAlchemyKey() {
          'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4', 'ethereum', 'Ethereum (Mainnet)');
     `);
     } catch (e) {
-      console.log(e);
+      console.log('ethChainNodeExists ERROR: ', e);
+    }
+
+    if (polygonChainNodeExists[0].length === 0) {
+      try {
+        await dbClient.query(`
+        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name)
+        VALUES (56, 'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 137,
+        'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 'ethereum', 'Polygon');
+    `);
+      } catch (e) {
+        console.log('polygonChainNodeExists ERROR: ', e);
+      }
     }
 
     return;
@@ -113,16 +127,7 @@ export async function removeUser() {
   await dbClient.query(removeQuery);
 }
 
-export async function createAddress(
-  chain,
-  profileId,
-  userId,
-  passedDbClient = null
-) {
-  if (passedDbClient) {
-    dbClient = passedDbClient;
-  }
-
+export async function createAddress(chain, profileId, userId) {
   await dbClient.query(`
     INSERT INTO "Addresses" (
       address,
@@ -162,11 +167,7 @@ export async function createAddress(
   `);
 }
 
-export async function createInitialUser(passedDbClient = null) {
-  if (passedDbClient) {
-    dbClient = passedDbClient;
-  }
-
+export async function createInitialUser() {
   const userExists = await dbClient.query(
     `select 1 from "Addresses" where address = '${testAddress}' and chain = 'ethereum'`
   );
@@ -201,14 +202,12 @@ export async function createInitialUser(passedDbClient = null) {
         created_at,
         updated_at,
         profile_name,
-        is_default,
         socials
       ) VALUES (
         ${userId[0][0]['id']},
         '2023-07-14 13:03:56.203-07',
         '2023-07-14 13:03:56.415-07',
         'TestAddress',
-        false,
         '{}'
       ) RETURNING id
     `)

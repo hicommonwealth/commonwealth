@@ -1,5 +1,6 @@
 import type ChainInfo from '../../../models/ChainInfo';
 import type { IconName } from './cw_icons/cw_icon_lookup';
+import { IconSize } from 'views/components/component_kit/cw_icons/types';
 
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
@@ -27,7 +28,7 @@ export enum ComponentType {
   Label = 'Label',
   MessageBanner = 'MessageBanner',
   MobileMenu = 'MobileMenu',
-  Modal = 'Modal',
+  Modal = 'CWModal',
   OldTextInput = 'OldTextInput',
   OldTooltip = 'OldTooltip',
   Popover = 'Popover',
@@ -35,12 +36,15 @@ export enum ComponentType {
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  RelatedCommunityCard = 'RelatedCommunityCard',
   Searchbar = 'Searchbar',
   SidebarMenu = 'SidebarMenu',
   Socials = 'Socials',
   Spinner = 'Spinner',
   Tab = 'Tab',
+  TabDeprecated = 'TabDeprecated',
   TabBar = 'TabBar',
+  Table = 'Table',
   Tag = 'Tag',
   Text = 'Text',
   TextArea = 'TextArea',
@@ -49,9 +53,11 @@ export enum ComponentType {
   ThreadVoteButton = 'ThreadVoteButton',
   Toggle = 'Toggle',
   Tooltip = 'Tooltip',
+  TypeaheadSelectList = 'TypeaheadSelectList',
   Upvote = 'Upvote',
   ValidationText = 'ValidationText',
   WalletOptionRow = 'WalletOptionRow',
+  SelectList = 'SelectList',
 }
 
 export type BaseStyleProps = {
@@ -71,6 +77,7 @@ export type DefaultMenuItem = {
   disabled?: boolean;
   iconLeft?: IconName;
   iconLeftWeight?: 'fill' | 'bold';
+  iconLeftSize?: IconSize;
   iconRight?: IconName;
   iconRightWeight?: 'fill' | 'bold';
   isSecondary?: boolean;

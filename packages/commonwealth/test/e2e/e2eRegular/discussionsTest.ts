@@ -1,8 +1,9 @@
-import { expect as pwexpect } from '@playwright/test';
+import { Page, expect as pwexpect } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { testThreads } from '../hooks/e2eDbEntityHooks';
-import { login } from '../utils/e2eUtils';
+import { testChains, testThreads } from '../hooks/e2eDbEntityHooks.spec';
+import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
+import { PORT } from '../../../server/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -101,5 +102,33 @@ export const discussionTests = (test) => {
         );
       }).toPass({ timeout: 5_000 });
     });
+
+    // test('Check User can interact with polls', async ({
+    //   page,
+    // }: {
+    //   page: Page;
+    // }) => {
+    //   const threadId = (
+    //     await testDb.query(`
+    //     INSERT INTO "Threads" (address_id, title, body, chain, topic_id, kind, created_at, updated_at)
+    //     VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    //     RETURNING id;
+    // `)
+    //   )[0][0]['id'];
+
+    //   await page.goto(
+    //     `http://localhost:${PORT}/${testChains[0].id}/discussion/${threadId}`
+    //   );
+    //   await login(page);
+
+    //   const createPollButtonSelector = 'div.create-poll-button';
+    //   await page.waitForSelector(createPollButtonSelector);
+    //   await page.click(createPollButtonSelector);
+
+    //   await page.waitForSelector('#QuestionInput');
+    //   await page.type('#QuestionInput', 'my question?');
+    //   await page.type('input[placeholder="1."]', 'q1');
+    //   await page.type('input[placeholder="2."]', 'q2');
+    // });
   };
 };

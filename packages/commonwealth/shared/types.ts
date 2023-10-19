@@ -220,3 +220,11 @@ export type RoleObject = {
   allow: number;
   deny: number;
 };
+
+export type AbiType = Record<string, unknown>[];
+
+export type WebhookCategory =
+  | NotificationCategories.ChainEvent
+  | NotificationCategories.NewThread
+  | NotificationCategories.NewComment
+  | NotificationCategories.NewReaction;

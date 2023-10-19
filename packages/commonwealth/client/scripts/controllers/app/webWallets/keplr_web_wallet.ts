@@ -75,14 +75,14 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: SessionPayload
+    canvasSessionPayload: SessionPayload
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
     const chainId = this.getChainId();
     const stdSignature = await window.keplr.signArbitrary(
       chainId,
       account.address,
-      canvas.serializeSessionPayload(canvasMessage)
+      canvas.serializeSessionPayload(canvasSessionPayload)
     );
     return JSON.stringify(stdSignature);
   }
@@ -116,7 +116,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`
         );
 
-        const bech32Prefix = app.chain.meta.bech32Prefix;
+        const bech32Prefix = app.chain.meta.bech32Prefix?.toLowerCase();
         const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain.meta.name,

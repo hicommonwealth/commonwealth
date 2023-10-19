@@ -1,7 +1,6 @@
 import { ProposalType } from 'common-common/src/types';
 import type ChainEntity from 'models/ChainEntity';
 import moment, { Moment } from 'moment';
-import app from 'state';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';
@@ -112,12 +111,20 @@ export enum LinkSource {
   Proposal = 'proposal',
   Thread = 'thread',
   Web = 'web',
+  Template = 'template',
+}
+
+export enum LinkDisplay {
+  inline = 'inline',
+  sidebar = 'sidebar',
+  both = 'both',
 }
 
 export type Link = {
   source: LinkSource;
   identifier: string;
   title?: string;
+  display?: LinkDisplay;
 };
 
 export class Thread implements IUniqueId {

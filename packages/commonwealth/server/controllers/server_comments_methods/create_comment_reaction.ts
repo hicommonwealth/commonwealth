@@ -1,7 +1,7 @@
 import { ReactionAttributes } from '../../models/reaction';
 import { findAllRoles } from '../../util/roles';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
+import { ServerError } from '../../../../common-common/src/errors';
 import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
@@ -152,14 +152,6 @@ export async function __createCommentReaction(
         author_address: finalReaction.Address.address,
         author_chain: finalReaction.Address.chain,
       },
-    },
-    webhookData: {
-      user: finalReaction.Address.address,
-      author_chain: finalReaction.Address.chain,
-      url: getThreadUrl(thread),
-      title: thread.title,
-      chain: finalReaction.chain,
-      body: comment.text,
     },
     excludeAddresses: [finalReaction.Address.address],
   });

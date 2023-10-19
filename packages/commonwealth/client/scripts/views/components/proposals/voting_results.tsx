@@ -21,7 +21,10 @@ import {
   YesNoRejectVotingResult,
 } from './voting_result_components';
 import useForceRerender from 'hooks/useForceRerender';
-import { useAaveProposalVotesQuery } from 'state/api/proposals';
+import {
+  useAaveProposalVotesQuery,
+  useCompoundProposalVotesQuery,
+} from 'state/api/proposals';
 import { ChainNetwork } from 'common-common/src/types';
 
 type VotingResultsProps = { proposal: AnyProposal };
@@ -50,13 +53,20 @@ export const VotingResults = (props: VotingResultsProps) => {
     };
   }, [forceRerender]);
 
-  const { data } = useAaveProposalVotesQuery({
+  const { data: aaveVotes } = useAaveProposalVotesQuery({
     moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
     chainId: app.chain?.id,
     proposalId: proposal.identifier,
   });
 
-  const votes = data || proposal.getVotes();
+  const { data: compoundVotes } = useCompoundProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+    chainId: app.chain?.id,
+    proposalId: proposal.data.id,
+    proposalIdentifier: proposal.identifier,
+  });
+
+  const votes = aaveVotes || compoundVotes || proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
   if (

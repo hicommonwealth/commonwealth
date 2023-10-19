@@ -5,7 +5,7 @@ import {
   useDeleteThreadMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
@@ -21,6 +21,8 @@ import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { SessionKeyError } from 'controllers/server/sessions';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -66,10 +68,19 @@ export const AdminActions = ({
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
 
-  const { mutateAsync: deleteThread } = useDeleteThreadMutation({
+  const {
+    mutateAsync: deleteThread,
+    reset: resetDeleteThreadMutation,
+    error: deleteThreadError,
+  } = useDeleteThreadMutation({
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetDeleteThreadMutation,
+    error: deleteThreadError,
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
@@ -86,28 +97,29 @@ export const AdminActions = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await deleteThread({
                 threadId: thread.id,
                 chainId: app.activeChainId(),
                 address: app.user.activeAccount.address,
-              })
-                .then(() => {
-                  onDelete && onDelete();
-                })
-                .catch(() => {
-                  notifyError('Could not delete thread');
-                });
+              });
+              onDelete?.();
             } catch (err) {
-              console.log(err);
+              if (err instanceof SessionKeyError) {
+                return;
+              }
+              console.error(err?.responseJSON?.error || err?.message);
+              notifyError('Failed to delete thread');
             }
           },
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -148,11 +160,13 @@ export const AdminActions = ({
       buttons: [
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
         {
           label: !thread.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             const isSpam = !thread.markedAsSpamAt;
             try {
@@ -220,12 +234,14 @@ export const AdminActions = ({
         buttons: [
           {
             label: 'Restore',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: onEditConfirm,
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
             onClick: onEditCancel,
           },
         ],
@@ -255,7 +271,7 @@ export const AdminActions = ({
         }}
       >
         <PopoverMenu
-          className="AdminActions"
+          className="AdminActions compact"
           menuItems={[
             ...(hasAdminPermissions ||
             isThreadAuthor ||
@@ -361,7 +377,9 @@ export const AdminActions = ({
         />
       </span>
 
-      <Modal
+      <CWModal
+        size="small"
+        visibleOverflow
         content={
           <ChangeThreadTopicModal
             thread={thread}
@@ -372,7 +390,8 @@ export const AdminActions = ({
         open={isChangeTopicModalOpen}
       />
 
-      <Modal
+      <CWModal
+        size="medium"
         content={
           <UpdateProposalStatusModal
             onChangeHandler={(s) =>
@@ -384,9 +403,11 @@ export const AdminActions = ({
         }
         onClose={() => setIsUpdateProposalStatusModalOpen(false)}
         open={isUpdateProposalStatusModalOpen}
+        visibleOverflow
       />
 
-      <Modal
+      <CWModal
+        size="small"
         content={
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
@@ -397,6 +418,8 @@ export const AdminActions = ({
         onClose={() => setIsEditCollaboratorsModalOpen(false)}
         open={isEditCollaboratorsModalOpen}
       />
+
+      {RevalidationModal}
     </>
   );
 };
