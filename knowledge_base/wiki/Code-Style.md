@@ -5,22 +5,10 @@ Unless otherwise noted, code styles in this guideline are for NodeJS & TypeScrip
 For a list of React-specific guidelines, see [React Best Practices](./React-Best-Practices-And-Improvements.md).
 
 **Contents**
-- [Imports](#imports)
 - [Inline Documentation](#inline-documentation)
   + [TSDoc](#tsdoc)
   + [Inline Comments](#inline-comments)
 - [Change Log](#change-log)
-
-# Imports
-
-On server, use relative imports, not absolute: `import foo from '../foobar';`
-
-On client, only some absolute imports are valid. Do not prefix with:
-- `commonwealth/`
-- `client/` or `client/scripts/`
-- `shared/`
-
-Never import `server/` on the client.
 
 # Inline documentation
 
@@ -85,5 +73,5 @@ In cases where TSDoc is inappropriate for inline documentation, the following st
 
 # Change Log
 
-- 231010: Updated with TSDoc guidelines by Graham Johnson (#5254).
+- 231010: Updated by Graham Johnson with TSDoc guidelines. Import guidelines removed until new approach is implemented. (#5254).
 - 231010: Renamed from `Code-Requirements.md` to `Code-Style.md` (#5254).
