@@ -6,10 +6,10 @@ import { ServerChainsController } from '../server_chains_controller';
  * Options for the getRelatedCommunities function.
  *
  * @typedef {Object} GetRelatedCommunitiesOptions
- * @property {string} base - The base variable for filtering (e.g., ChainNodes.name).
- * @property {string} [searchName] - The optional search term for fuzzy searching chain names (Chains.name).
+ * @property {string} chainNodeId - The id of the ChainNode variable for filtering.
+ * @property {string} [communitySearchName] - The optional search term for fuzzy searching chain names (Chains.name).
  */
-export type GetRelatedCommunitiesOptions = { base: string, searchName?: string };
+export type GetRelatedCommunitiesOptions = { chainNodeId: number, communitySearchName?: string };
 
 export type GetRelatedCommunitiesResult = {
   id: string;
@@ -21,10 +21,10 @@ export type GetRelatedCommunitiesResult = {
 
 export async function __getRelatedCommunities(
   this: ServerChainsController,
-  { base, searchName }: GetRelatedCommunitiesOptions
+  { chainNodeId, communitySearchName }: GetRelatedCommunitiesOptions
 ): Promise<GetRelatedCommunitiesResult> {
-  const replacements = searchName ? { base, searchName: `%${searchName}%` } : { base };
-  const filterString = searchName ? 'AND c.name ILIKE :searchName' : ''
+  const replacements = communitySearchName ? { chainNodeId, searchName: `%${communitySearchName}%` } : { chainNodeId };
+  const filterString = communitySearchName ? 'AND c.name ILIKE :searchName' : ''
 
   // Although this subquery is not necessary as is currently, We should keep it because in the future if we want to
   // paginate, then we will need to paginate through the subquery.
@@ -41,14 +41,13 @@ export async function __getRelatedCommunities(
         FROM "ChainNodes" as cn 
         JOIN "Chains" as c on c.chain_node_id = cn.id ${filterString} 
         LEFT JOIN "Threads" as t on t.chain = c.id 
-        WHERE cn.name = :base 
+        WHERE cn.id = :chainNodeId 
         GROUP BY c.id) as popular_chains 
     LEFT JOIN "Addresses" as a on a.chain = popular_chains.id 
     GROUP BY popular_chains.id, popular_chains.icon_url, popular_chains.name, popular_chains.thread_count 
     ORDER BY address_count DESC;
     `,
     {
-      logging: console.log,
       type: QueryTypes.SELECT,
       replacements
     }
