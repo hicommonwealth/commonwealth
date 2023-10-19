@@ -5,6 +5,7 @@ import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import type Account from '../../../../models/Account';
+import { truncate } from 'helpers/truncate';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
 import { Thread } from '../../../../models/Thread';
@@ -128,22 +129,6 @@ export const CWContentPage = ({
     });
   };
 
-  const truncate = (str: string) => {
-    // Get the available width of the container or the window
-    const availableWidth = window.innerWidth;
-
-    // Define the maximum allowed width
-    const maxWidth = 0.5 * availableWidth;
-
-    if (str.length > 140 || availableWidth < maxWidth) {
-      const ellipsisWidth = '...'.length * 4;
-      const truncatedLength = Math.floor((maxWidth - ellipsisWidth) / 8);
-      return str.substring(0, truncatedLength) + '...';
-    }
-
-    return str;
-  };
-
   if (showSkeleton) {
     return (
       <CWContentPageSkeleton
@@ -185,7 +170,7 @@ export const CWContentPage = ({
     <div className="main-body-container">
       <div className="header">
         {typeof title === 'string' ? (
-          <h1 className="title">{truncate(title)}</h1>
+          <h1 className="title">{truncate({ str: title })}</h1>
         ) : (
           title
         )}
