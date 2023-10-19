@@ -230,7 +230,14 @@ const SearchPage = () => {
           break;
       }
     }
-  }, [activeTab, bottomInView]);
+  }, [
+    activeTab,
+    bottomInView,
+    threadsFetchNextPage,
+    commentsFetchNextPage,
+    chainsFetchNextPage,
+    profilesFetchNextPage,
+  ]);
 
   const isLoading = useMemo(() => {
     switch (activeTab) {
@@ -255,71 +262,69 @@ const SearchPage = () => {
 
   return (
     <div className="SearchPage">
-      {
-        <>
-          <div className="search-results">
-            <CWTabsRow>
-              {VISIBLE_TABS.map((s, i) => (
-                <CWTab
-                  key={i}
-                  label={s}
-                  isSelected={activeTab === s}
-                  onClick={() => setActiveTab(s)}
-                />
-              ))}
-            </CWTabsRow>
-            <>
-              {isLoading && <PageLoading />}
-              {!isLoading && (
-                <>
-                  <CWText isCentered className="search-results-caption">
-                    {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
-                    {scopeText}
-                    {chain !== 'all_chains' && !app.isCustomDomain() && (
-                      <a
-                        href="#"
-                        className="search-all-communities"
-                        onClick={handleSearchAllCommunities}
-                      >
-                        Search all communities?
-                      </a>
-                    )}
-                  </CWText>
-                  {VISIBLE_TABS.length > 0 &&
-                    [SearchScope.Threads, SearchScope.Replies].includes(
-                      activeTab
-                    ) && (
-                      <div className="search-results-filters">
-                        <CWText type="h5">Sort By:</CWText>
-                        <CWDropdown
-                          label=""
-                          onSelect={handleSortChange}
-                          initialValue={{
-                            label: queryParams.sort,
-                            value: queryParams.sort,
-                          }}
-                          options={Object.keys(SearchSort).map((k) => ({
-                            label: k,
-                            value: k,
-                          }))}
-                        />
-                      </div>
-                    )}
-                  <div className="search-results-list">
-                    {renderSearchResults(
-                      results as any,
-                      queryParams.q,
-                      activeTab,
-                      commonNavigate
-                    )}
-                    <div ref={bottomRef}></div>
-                  </div>
-                </>
-              )}
-            </>
-          </div>
-        </>
-      }
+      <>
+        <div className="search-results">
+          <CWTabsRow>
+            {VISIBLE_TABS.map((s, i) => (
+              <CWTab
+                key={i}
+                label={s}
+                isSelected={activeTab === s}
+                onClick={() => setActiveTab(s)}
+              />
+            ))}
+          </CWTabsRow>
+          <>
+            {isLoading && <PageLoading />}
+            {!isLoading && (
+              <>
+                <CWText isCentered className="search-results-caption">
+                  {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
+                  {scopeText}
+                  {chain !== 'all_chains' && !app.isCustomDomain() && (
+                    <a
+                      href="#"
+                      className="search-all-communities"
+                      onClick={handleSearchAllCommunities}
+                    >
+                      Search all communities?
+                    </a>
+                  )}
+                </CWText>
+                {VISIBLE_TABS.length > 0 &&
+                  [SearchScope.Threads, SearchScope.Replies].includes(
+                    activeTab
+                  ) && (
+                    <div className="search-results-filters">
+                      <CWText type="h5">Sort By:</CWText>
+                      <CWDropdown
+                        label=""
+                        onSelect={handleSortChange}
+                        initialValue={{
+                          label: queryParams.sort,
+                          value: queryParams.sort,
+                        }}
+                        options={Object.keys(SearchSort).map((k) => ({
+                          label: k,
+                          value: k,
+                        }))}
+                      />
+                    </div>
+                  )}
+                <div className="search-results-list">
+                  {renderSearchResults(
+                    results as any,
+                    queryParams.q,
+                    activeTab,
+                    commonNavigate
+                  )}
+                  <div ref={bottomRef}></div>
+                </div>
+              </>
+            )}
+          </>
+        </div>
+      </>
     </div>
   );
 };
