@@ -7,6 +7,7 @@ import {
   WebhookDataByCategory,
 } from '../types';
 import { REGEX_EMOJI } from '../util';
+import { ChainInstance } from '../../../models/chain';
 
 type DiscordWebhookMessage = {
   username: string;
@@ -83,9 +84,13 @@ function formatDiscordMessage<C extends NotificationCategories>(
 export async function sendDiscordWebhook(
   webhookUrl: string,
   category: NotificationCategories,
-  data: ForumWebhookData | ChainEventWebhookData
+  data: ForumWebhookData | ChainEventWebhookData,
+  chain?: ChainInstance
 ) {
-  if ('profileName' in data && data.profileName === 'Discord Bot') return;
+  if ('profileName' in data && data.profileName === 'Discord Bot') {
+    if (!chain) return;
+    else if (chain && !chain.discord_bot_webhooks_enabled) return;
+  }
 
   const discordMessage = formatDiscordMessage(category, data);
 
