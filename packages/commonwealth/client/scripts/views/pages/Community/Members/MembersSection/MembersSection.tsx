@@ -3,7 +3,7 @@ import { VirtuosoHandle } from 'react-virtuoso';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import {
