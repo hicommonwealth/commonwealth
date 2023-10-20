@@ -1,3 +1,5 @@
+import app from 'state';
+
 export const TOKENS = {
   COSMOS_TOKEN: 'cosmos_native',
   EVM_TOKEN: 'eth_native',
@@ -32,16 +34,26 @@ export const requirementTypes = [
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
 ];
 
-export const chainTypes = [
-  { value: BLOCKCHAINS.AXIE_INFINITY, label: 'Axie Infinity' },
-  { value: BLOCKCHAINS.COSMOS, label: 'Cosmos' },
-  { value: BLOCKCHAINS.ETHEREUM, label: 'Ethereum' },
-  { value: BLOCKCHAINS.INJECTIVE, label: 'Injective' },
-  { value: BLOCKCHAINS.NEAR, label: 'NEAR' },
-  { value: BLOCKCHAINS.POLKADOT, label: 'Polkadot' },
-  { value: BLOCKCHAINS.POLYGON, label: 'Polygon' },
-  { value: BLOCKCHAINS.SOLANA, label: 'Solana' },
+// Get eth chain id from the app.config.chains for these chains
+const chainIdsToFind = [
+  'axie-infinity',
+  'cosmos',
+  'ethereum',
+  'injective',
+  'near',
+  'polkadot',
+  'polygon',
+  'solana',
 ];
+const foundChains = app.config.chains
+  .getAll()
+  .filter((x) => chainIdsToFind.includes(x.id.toLowerCase()));
+export const chainTypes = chainIdsToFind.map((x, index) => ({
+  value:
+    foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode?.ethChainId ||
+    index - 999, // TODO: some chains don't have an ethChainId
+  label: x.replace(/\b\w/g, (l) => l.toUpperCase()),
+}));
 
 export const conditionTypes = [
   { value: AMOUNT_CONDITIONS.MORE, label: 'More than' },

@@ -8,14 +8,19 @@ const GROUPS_STALE_TIME = 5000; // 5 seconds
 
 interface FetchGroupsProps {
   chainId: string;
+  includeTopics?: boolean;
 }
 
-const fetchGroups = async ({ chainId }: FetchGroupsProps) => {
+const fetchGroups = async ({
+  chainId,
+  includeTopics = false,
+}: FetchGroupsProps) => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_GROUPS}`,
     {
       params: {
         chain_id: chainId,
+        include_topics: includeTopics,
       },
     }
   );
@@ -23,11 +28,11 @@ const fetchGroups = async ({ chainId }: FetchGroupsProps) => {
   return response.data.result.map((t) => new Group(t));
 };
 
-const useFetchGroupsQuery = ({ chainId }: FetchGroupsProps) => {
+const useFetchGroupsQuery = ({ chainId, includeTopics }: FetchGroupsProps) => {
   return useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [ApiEndpoints.FETCH_GROUPS, chainId],
-    queryFn: () => fetchGroups({ chainId }),
+    queryFn: () => fetchGroups({ chainId, includeTopics }),
     staleTime: GROUPS_STALE_TIME,
   });
 };

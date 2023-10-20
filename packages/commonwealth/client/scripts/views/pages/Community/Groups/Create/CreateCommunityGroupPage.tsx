@@ -49,7 +49,7 @@ const CreateCommunityGroupPage = () => {
                 threshold: x.requirementAmount,
                 source: {
                   source_type: x.requirementType,
-                  evm_chain_id: x.requirementChain,
+                  evm_chain_id: parseInt(x.requirementChain),
                   contract_address: x.requirementContractAddress,
                 },
               },
@@ -79,7 +79,7 @@ const CreateCommunityGroupPage = () => {
                 threshold: x.requirementAmount,
                 source: {
                   source_type: x.requirementType,
-                  evm_chain_id: x.requirementChain,
+                  evm_chain_id: parseInt(x.requirementChain),
                 },
               },
             });

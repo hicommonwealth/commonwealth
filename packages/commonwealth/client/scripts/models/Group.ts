@@ -15,7 +15,7 @@ interface APIResponseFormat {
       token_symbol?: string;
     };
   }[];
-  topicIds: number[];
+  topics: any[];
   updated_at: string;
   created_at: string;
 }
@@ -28,7 +28,7 @@ class Group {
   public name: string;
   public description?: string;
   public requirements: any[];
-  public topicIds: number[];
+  public topics: any[];
 
   constructor({
     id,
@@ -37,7 +37,7 @@ class Group {
     updated_at,
     metadata,
     requirements,
-    topicIds,
+    topics,
   }: APIResponseFormat) {
     this.id = id;
     this.chainId = chain_id;
@@ -46,7 +46,7 @@ class Group {
     this.name = metadata.name;
     this.description = metadata.description;
     this.requirements = requirements;
-    this.topicIds = topicIds;
+    this.topics = topics;
   }
 }
 

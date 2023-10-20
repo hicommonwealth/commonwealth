@@ -74,7 +74,6 @@ export const CWTextArea = (props: TextAreaProps) => {
         />
       )}
       <textarea
-        {...formFieldContext}
         autoFocus={autoFocus}
         autoComplete={autoComplete}
         className={getClasses<TextAreaStyleProps & { isTyping: boolean }>({
@@ -90,6 +89,8 @@ export const CWTextArea = (props: TextAreaProps) => {
         name={name}
         placeholder={placeholder}
         ref={textareaRef}
+        value={value}
+        {...formFieldContext}
         onInput={(e) => {
           if (onInput) onInput(e);
 
@@ -129,7 +130,6 @@ export const CWTextArea = (props: TextAreaProps) => {
             }
           }
         }}
-        value={value}
       />
       {label && (
         <NewMessageRow

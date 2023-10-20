@@ -1,27 +1,29 @@
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import Group from 'models/Group';
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
-import { useEditGroupMutation } from 'state/api/groups';
-import { useFetchGroupsQuery } from 'state/api/groups';
+import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import { PageNotFound } from '../../../404';
-import { GroupForm } from '../common/GroupForm';
-import './UpdateCommunityGroupPage.scss';
 import { PageLoading } from '../../../loading';
-import Group from 'models/Group';
+import { GroupForm } from '../common/GroupForm';
 import {
+  AMOUNT_CONDITIONS,
   SPECIFICATIONS,
   TOKENS,
   chainTypes,
+  conditionTypes,
   requirementTypes,
 } from '../common/GroupForm/constants';
-import { useCommonNavigate } from 'navigation/helpers';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
   const { mutateAsync: editGroup } = useEditGroupMutation();
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
+    includeTopics: true,
   });
   const foundGroup: Group = groups.find((x) => x.id === parseInt(`${groupId}`));
 
@@ -59,10 +61,15 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             ).label,
           },
           requirementContractAddress: x.data.source.contract_address || '',
-          // requirementCondition // TODO: API doesn't return this
+          requirementCondition: conditionTypes.find(
+            (x) => x.value === AMOUNT_CONDITIONS.MORE
+          ), // TODO: API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
         })),
         // requirementsToFulfill: foundGroup.requirementsToFulfill || [], TODO: API doesn't return this
-        // topics: foundGroup.topicIds || [], TODO: API doesn't return this
+        topics: (foundGroup.topics || []).map((x) => ({
+          label: x.name,
+          value: x.id,
+        })), // TODO: This is non-modifiable in the edit request, the input can be disabled
       }}
       onSubmit={(values) => {
         const payload = {

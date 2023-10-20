@@ -85,7 +85,7 @@ const RequirementSubForm = ({
             })}
             options={chainTypes.map((chainType) => ({
               label: chainType.label,
-              value: chainType.value,
+              value: `${chainType.value}`,
             }))}
             onChange={(newValue) => {
               onChange({
