@@ -1,6 +1,6 @@
 # Overview
 
-Unlike unit or integration tests, e2e tests assewss an app from the user’s perspective, locating and interacting with elements on rendered pages. E2e tests are written in the Playwright framework.
+Unlike unit or integration tests, e2e tests assess an app from the user’s perspective, locating and interacting with elements on rendered pages.
 
 # Running e2e tests
 
