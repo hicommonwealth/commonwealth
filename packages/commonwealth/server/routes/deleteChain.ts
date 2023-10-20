@@ -5,7 +5,6 @@ import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { findAllRoles } from '../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -125,7 +124,7 @@ const deleteChain = async (
           });
 
           await models.Vote.destroy({
-            where: { chain_id: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 

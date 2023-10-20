@@ -1,12 +1,12 @@
 import moment from 'moment';
 
 import { UserInstance } from 'server/models/user';
-import { ServerThreadsController } from '../server_threads_controller';
-import { VoteAttributes } from '../../models/vote';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { VoteAttributes } from '../../models/vote';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -83,8 +83,8 @@ export async function __updatePollVote(
     const voteData: Partial<VoteAttributes> = {
       poll_id: poll.id,
       address: address.address,
-      author_chain: address.chain,
-      chain_id: chain.id,
+      author_community_id: address.chain,
+      community_id: chain.id,
     };
     // delete existing votes
     await this.models.Vote.destroy({

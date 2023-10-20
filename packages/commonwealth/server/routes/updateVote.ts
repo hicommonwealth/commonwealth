@@ -88,8 +88,8 @@ const updateVote = async (
       where: {
         poll_id: poll.id,
         address,
-        author_chain,
-        chain_id: chain.id,
+        author_community_id: author_chain,
+        community_id: chain.id,
       },
       transaction: t,
     });
@@ -98,8 +98,8 @@ const updateVote = async (
       {
         poll_id: poll.id,
         address,
-        author_chain,
-        chain_id: chain.id,
+        author_community_id: author_chain,
+        community_id: chain.id,
         option: selected_option,
       },
       { transaction: t }
