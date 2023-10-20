@@ -137,7 +137,9 @@ const GroupsSection = () => {
                 requirementCondition: 'More than', // TODO: api doesn't return this
               }))}
               requirementsToFulfill={'ALL'} // TODO: api doesn't return this
-              isJoined={false} // TODO: get this from api
+              isJoined={(group.members || []).find(
+                (x) => x?.address?.address === app.user.activeAccount.address
+              )}
               topics={group.topics.map((x) => ({ id: x.id, name: x.name }))}
             />
           ))
