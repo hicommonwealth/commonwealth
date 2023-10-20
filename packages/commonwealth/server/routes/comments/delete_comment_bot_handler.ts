@@ -19,7 +19,7 @@ export const deleteBotCommentHandler = async (
   await controllers.comments.deleteComment({
     user,
     address,
-    chain,
+    community: chain,
     messageId: message_id, // Discord bot only
   });
 

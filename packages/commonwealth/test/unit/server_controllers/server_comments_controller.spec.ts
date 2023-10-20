@@ -463,7 +463,7 @@ describe('ServerCommentsController', () => {
 
       const chain = { id: 'ethereum' };
       const searchOptions: SearchCommentsOptions = {
-        chain: chain as ChainInstance,
+        community: chain as ChainInstance,
         search: 'hello',
         limit: 5,
         page: 2,
@@ -747,7 +747,7 @@ describe('ServerCommentsController', () => {
       await serverCommentsController.deleteComment({
         user: user as any,
         address: address as any,
-        chain: chain as any,
+        community: chain as any,
         commentId,
       });
       expect(didDestroy).to.be.true;
@@ -759,7 +759,7 @@ describe('ServerCommentsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          chain: chain as any,
+          community: chain as any,
           commentId,
         })
       ).to.be.rejectedWith('Ban error: banned');

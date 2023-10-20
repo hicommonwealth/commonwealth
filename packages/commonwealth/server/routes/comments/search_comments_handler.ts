@@ -35,7 +35,7 @@ export const searchCommentsHandler = async (
   }
 
   const commentSearchResults = await controllers.comments.searchComments({
-    chain: req.chain,
+    community: req.chain,
     search: options.search,
     limit: parseInt(options.limit, 10) || 0,
     page: parseInt(options.page, 10) || 0,

@@ -97,7 +97,7 @@ export async function __createThread(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: chain.id,
     address: address.address,
   });
   if (!canInteract) {

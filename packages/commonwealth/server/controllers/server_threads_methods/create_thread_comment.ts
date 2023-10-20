@@ -71,7 +71,7 @@ export async function __createThreadComment(
 ): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: chain.id,
     address: address.address,
   });
   if (!canInteract) {

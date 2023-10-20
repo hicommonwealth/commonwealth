@@ -61,7 +61,7 @@ export async function __updateComment(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: chain.id,
     address: address.address,
   });
   if (!canInteract) {
