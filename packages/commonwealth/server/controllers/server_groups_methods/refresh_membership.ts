@@ -57,8 +57,12 @@ export async function __refreshMembership(
           reject_reason: null,
           last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
         },
+        include: [{
+          model: this.models.Group,
+          as: 'group'
+        }]
       });
-      membership.Group = group;
+      membership.group = group;
 
       if (!created) {
         const expiresAt = moment(membership.last_checked).add(
@@ -78,11 +82,11 @@ export async function __refreshMembership(
 
   // transform memberships to result shape
   const results = updatedMemberships.map((membership) => {
-    const group = chainTopics.find((topic) =>
+    const topic = chainTopics.find((topic) =>
       topic.group_ids.includes(membership.group_id)
     );
     return {
-      topicId: group.id,
+      topicId: topic.id,
       allowed: !membership.reject_reason,
       rejectReason: membership.reject_reason,
     };
@@ -103,10 +107,10 @@ async function recomputeMembership(
   address: AddressInstance,
   tokenBalanceCache: TokenBalanceCache
 ): Promise<MembershipInstance> {
-  if (!membership.Group) {
+  if (!membership.group) {
     throw new ServerError('membership Group is not populated');
   }
-  const { requirements } = membership.Group;
+  const { requirements } = membership.group;
   const { isValid, messages } = await validateGroupMembership(
     address.address,
     requirements,
