@@ -113,7 +113,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                 source: {
                   source_type: x.requirementType,
                   cosmos_chain_id: x.requirementChain,
-                  token_symbol: '', // TODO: get symbol
+                  token_symbol: 'COS',
                 },
               },
             });
