@@ -48,7 +48,7 @@ const CommunityMembersPage = () => {
 
   const { data: members, fetchNextPage } = useSearchProfilesQuery({
     chainId: app.activeChainId(),
-    searchTerm: debouncedSearchTerm,
+    searchTerm: '',
     limit: 10,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
@@ -85,8 +85,16 @@ const CommunityMembersPage = () => {
             )
           )
           .map((x) => x.name),
-      }));
-  }, [members, groups]);
+      }))
+      .filter((p) =>
+        debouncedSearchTerm
+          ? p.groups.find((g) =>
+              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+            ) ||
+            p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+          : true
+      );
+  }, [members, groups, debouncedSearchTerm]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
 
