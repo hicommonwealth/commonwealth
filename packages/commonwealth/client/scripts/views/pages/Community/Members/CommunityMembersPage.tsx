@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import MinimumProfile from 'models/MinimumProfile';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import app from 'state';
+import { useFetchGroupsQuery } from 'state/api/groups';
+import { useSearchProfilesQuery } from 'state/api/profiles';
+import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
+import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { Select } from 'views/components/Select';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -18,7 +24,6 @@ import { GroupCategory, SearchFilters } from './index.types';
 const FEATURE_FLAGS = {
   GATING: true,
 };
-const totalResults = 8888; // TODO: get these from API
 
 const TABS = ['All members'];
 FEATURE_FLAGS.GATING && TABS.push('Groups');
@@ -36,6 +41,83 @@ const CommunityMembersPage = () => {
     searchText: '',
     category: GROUP_FILTERS[0],
   });
+
+  const debouncedSearchTerm = useDebounce<string>(
+    searchFilters.searchText,
+    500
+  );
+
+  const { data: members, fetchNextPage } = useSearchProfilesQuery({
+    chainId: app.activeChainId(),
+    searchTerm: debouncedSearchTerm,
+    limit: 10,
+    orderBy: APIOrderBy.LastActive,
+    orderDirection: APIOrderDirection.Desc,
+    includeRoles: true,
+  });
+
+  const { data: groups } = useFetchGroupsQuery({
+    chainId: app.activeChainId(),
+    shouldIncludeMembers: true,
+  });
+
+  const formattedMembers = useMemo(() => {
+    if (!members?.pages?.length) {
+      return [];
+    }
+
+    return members.pages
+      .reduce((acc, page) => {
+        return [...acc, ...page.results];
+      }, [] as SearchProfilesResponse['results'])
+      .map((p) => ({
+        id: p.id,
+        address_id: p.addresses?.[0]?.id,
+        address: p.addresses?.[0]?.address,
+        address_chain: p.addresses?.[0]?.chain,
+        chain: p.addresses?.[0]?.chain,
+        profile_name: p.profile_name,
+        avatar_url: p.avatar_url,
+        roles: p.roles,
+      }))
+      .map((p) => {
+        const minProfile = new MinimumProfile(p.address, p.chain);
+        minProfile.initialize(
+          p.profile_name,
+          p.address,
+          p.avatar_url,
+          p.id,
+          p.chain,
+          null
+        );
+        return {
+          profile: minProfile,
+          role: p.roles.find(
+            (role) =>
+              role.chain_id === app.activeChainId() &&
+              [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
+                role.permission
+              )
+          ),
+          groups: (groups || []).filter((g) =>
+            (g.members || []).find(
+              (x) => x?.address?.address === minProfile.address
+            )
+          ),
+        };
+      });
+  }, [members, groups]);
+
+  const totalResults = members?.pages?.[0]?.totalResults || 0;
+
+  // fixes bug that prevents scrolling on initial page load
+  useEffect(() => {
+    const shouldFetchMore = formattedMembers.length < 50 && totalResults > 50;
+    if (!shouldFetchMore) {
+      return;
+    }
+    fetchNextPage();
+  }, [formattedMembers, totalResults, fetchNextPage]);
 
   useEffect(() => {
     // Set the active tab based on URL
@@ -132,7 +214,13 @@ const CommunityMembersPage = () => {
       {selectedTab === TABS[1] ? (
         <GroupsSection searchFilters={searchFilters} />
       ) : (
-        <MembersSection searchFilters={searchFilters} />
+        <MembersSection
+          members={formattedMembers.map((x) => ({
+            name: x.profile.name,
+            role: x?.role?.permission,
+            groups: x.groups.map((y) => y.name) || [],
+          }))}
+        />
       )}
     </section>
   );
