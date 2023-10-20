@@ -1,0 +1,30 @@
+@import '../../../../styles/shared';
+
+.DirectoryPage {
+  width: 100%;
+  padding: 76px 56px 0;
+
+  @include smallInclusive {
+    padding: 24px;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .page-description {
+    padding-block: 24px;
+    color: $neutral-500;
+  }
+
+  .subtitle {
+    padding: 32px 0 24px;
+  }
+
+  .community-search {
+    max-width: 520px;
+    margin-bottom: 24px;
+  }
+}

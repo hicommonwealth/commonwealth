@@ -1,9 +1,9 @@
 import React from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 
+import { useCommonNavigate } from 'navigation/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { SubSectionGroup } from '../sidebar_section';
-import { useCommonNavigate } from 'navigation/helpers';
 
 import './DirectoryMenuItem.scss';
 
@@ -11,9 +11,8 @@ const DirectoryMenuItem = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
-  // TODO change from manage to /directory
   const matchesDirectoryRoute = matchRoutes(
-    [{ path: '/manage' }, { path: ':scope/manage' }],
+    [{ path: '/directory' }, { path: ':scope/directory' }],
     location
   );
 
@@ -27,8 +26,7 @@ const DirectoryMenuItem = () => {
       containsChildren={false}
       displayData={[]}
       hasDefaultToggle={false}
-      // TODO change to /directory
-      onClick={() => navigate('/manage')}
+      onClick={() => navigate('/directory')}
       rightIcon={<CWTag label="New" type="new" iconName="newStar" />}
     />
   );

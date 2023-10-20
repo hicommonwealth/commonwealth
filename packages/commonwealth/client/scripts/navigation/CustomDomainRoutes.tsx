@@ -9,6 +9,7 @@ const SearchPage = lazy(() => import('views/pages/search'));
 const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(() => import('views/pages/members'));
+const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
@@ -114,6 +115,10 @@ const CustomDomainRoutes = () => {
       element={withLayout(MembersPage, {
         scoped: true,
       })}
+    />,
+    <Route
+      path="/directory"
+      element={withLayout(DirectoryPage, { scoped: true })}
     />,
     <Route
       path="/sputnik-daos"

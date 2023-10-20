@@ -14,6 +14,7 @@ const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(() => import('views/pages/members'));
+const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
@@ -141,6 +142,10 @@ const CommonDomainRoutes = () => [
     element={withLayout(MembersPage, {
       scoped: true,
     })}
+  />,
+  <Route
+    path="/:scope/directory"
+    element={withLayout(DirectoryPage, { scoped: true })}
   />,
   <Route
     path="/:scope/sputnik-daos"
