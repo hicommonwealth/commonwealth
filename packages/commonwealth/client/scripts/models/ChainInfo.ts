@@ -46,7 +46,7 @@ class ChainInfo {
   public cosmosGovernanceVersion?: string;
   public discordBotWebhooksEnabled?: boolean;
   public directoryPageEnabled?: boolean;
-  public directoryPageOption?: boolean;
+  public directoryPageChainNodeId?: boolean;
 
   public get node() {
     return this.ChainNode;
@@ -88,7 +88,7 @@ class ChainInfo {
     cosmosGovernanceVersion,
     discordBotWebhooksEnabled,
     directoryPageEnabled,
-    directoryPageOption
+    directoryPageChainNodeId
   }) {
     this.id = id;
     this.network = network;
@@ -126,7 +126,7 @@ class ChainInfo {
     this.cosmosGovernanceVersion = cosmosGovernanceVersion;
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;
     this.directoryPageEnabled = directoryPageEnabled;
-    this.directoryPageOption = directoryPageOption;
+    this.directoryPageChainNodeId = directoryPageChainNodeId;
   }
 
   public static fromJSON({
@@ -224,7 +224,7 @@ class ChainInfo {
       cosmosGovernanceVersion: cosmos_governance_version,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
       directoryPageEnabled: directory_page_enabled,
-      directoryPageOption: directory_page_chain_node_id
+      directoryPageChainNodeId: directory_page_chain_node_id
     });
   }
 
@@ -362,7 +362,7 @@ class ChainInfo {
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
     this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
     this.directoryPageEnabled = updatedChain.directory_page_enabled;
-    this.directoryPageOption = updatedChain.directory_page_chain_node_id;
+    this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
   }
 }
 
