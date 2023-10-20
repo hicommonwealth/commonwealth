@@ -1,5 +1,4 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
-import MinimumProfile from 'models/MinimumProfile';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import app from 'state';
@@ -71,41 +70,22 @@ const CommunityMembersPage = () => {
         return [...acc, ...page.results];
       }, [] as SearchProfilesResponse['results'])
       .map((p) => ({
-        id: p.id,
-        address_id: p.addresses?.[0]?.id,
-        address: p.addresses?.[0]?.address,
-        address_chain: p.addresses?.[0]?.chain,
-        chain: p.addresses?.[0]?.chain,
-        profile_name: p.profile_name,
-        avatar_url: p.avatar_url,
-        roles: p.roles,
-      }))
-      .map((p) => {
-        const minProfile = new MinimumProfile(p.address, p.chain);
-        minProfile.initialize(
-          p.profile_name,
-          p.address,
-          p.avatar_url,
-          p.id,
-          p.chain,
-          null
-        );
-        return {
-          profile: minProfile,
-          role: p.roles.find(
-            (role) =>
-              role.chain_id === app.activeChainId() &&
-              [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
-                role.permission
-              )
-          ),
-          groups: (groups || []).filter((g) =>
-            (g.members || []).find(
-              (x) => x?.address?.address === minProfile.address
+        name: p.profile_name,
+        role: p.roles.find(
+          (role) =>
+            role.chain_id === app.activeChainId() &&
+            [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
+              role.permission
             )
-          ),
-        };
-      });
+        )?.permission,
+        groups: (groups || [])
+          .filter((g) =>
+            (g.members || []).find(
+              (x) => x?.address?.address === p.addresses?.[0]?.address
+            )
+          )
+          .map((x) => x.name),
+      }));
   }, [members, groups]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
@@ -214,13 +194,7 @@ const CommunityMembersPage = () => {
       {selectedTab === TABS[1] ? (
         <GroupsSection searchFilters={searchFilters} />
       ) : (
-        <MembersSection
-          members={formattedMembers.map((x) => ({
-            name: x.profile.name,
-            role: x?.role?.permission,
-            groups: x.groups.map((y) => y.name) || [],
-          }))}
-        />
+        <MembersSection members={formattedMembers} />
       )}
     </section>
   );
