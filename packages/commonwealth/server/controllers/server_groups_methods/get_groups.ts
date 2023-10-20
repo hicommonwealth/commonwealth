@@ -43,6 +43,10 @@ export async function __getGroups(
     }
     const members = await this.models.Membership.findAll({
       where,
+      include: [{
+        model: this.models.Address,
+        as: 'address'
+      }]
     });
     const groupIdMembersMap: Record<
       number,
@@ -64,7 +68,7 @@ export async function __getGroups(
       where: {
         chain_id: chain.id,
         group_ids: {
-          [Op.contains]: groupsResult.map(({ id }) => id)
+          [Op.overlap]: groupsResult.map(({ id }) => id)
         }
       }
     })

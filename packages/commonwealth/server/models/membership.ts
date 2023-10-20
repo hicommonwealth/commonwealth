@@ -46,6 +46,7 @@ export default (
     models.Membership.belongsTo(models.Address, {
       foreignKey: 'address_id',
       targetKey: 'id',
+      as: 'address'
     });
   };
 
