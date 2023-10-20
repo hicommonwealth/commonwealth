@@ -69,6 +69,20 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
+  const filteredThreads = threads.filter(t => {
+    if (!includeSpamThreads && t.markedAsSpamAt) return null;
+
+    if (
+      !isOnArchivePage &&
+      !includeArchivedThreads &&
+      t.archivedAt !== null
+    )
+      return null;
+
+    if (isOnArchivePage && t.archivedAt === null) return null;
+
+    return t
+  })
 
   useManageDocumentTitle('Discussions');
 
@@ -77,23 +91,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
-        data={isInitialLoading ? [] : threads}
+        data={isInitialLoading ? [] : filteredThreads}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`
           );
-
-          if (!includeSpamThreads && thread.markedAsSpamAt) return null;
-
-          if (
-            !isOnArchivePage &&
-            !includeArchivedThreads &&
-            thread.archivedAt !== null
-          )
-            return null;
-
-          if (isOnArchivePage && thread.archivedAt === null) return null;
 
           const canReact =
             hasJoinedCommunity && !thread.lockedAt && !thread.archivedAt;
