@@ -1,6 +1,5 @@
 'use strict';
 
-const { transactions } = require('near-api-js');
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
