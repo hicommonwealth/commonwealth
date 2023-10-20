@@ -127,6 +127,8 @@ const CommunityMembersPage = () => {
     navigate({ pathname: `${app.activeChainId()}/members/groups/create` });
   };
 
+  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin()
+
   return (
     <section className="CommunityMembersPage">
       {/* TODO: add breadcrums here */}
@@ -152,8 +154,8 @@ const CommunityMembersPage = () => {
           'cols-4': boolean;
         }>(
           {
-            'cols-3': !Permissions.isCommunityAdmin(),
-            'cols-4': Permissions.isCommunityAdmin(),
+            'cols-3': !isAdmin,
+            'cols-4': isAdmin,
           },
           'filters'
         )}
@@ -185,7 +187,7 @@ const CommunityMembersPage = () => {
             }}
           />
         </>}
-        {Permissions.isCommunityAdmin() && (
+        {isAdmin && (
           <CWButton
             buttonWidth="full"
             label="Create group"
