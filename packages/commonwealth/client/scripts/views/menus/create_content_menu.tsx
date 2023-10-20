@@ -107,42 +107,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
         ]
       : [];
 
-  const getSubstrateProposalItems = (): PopoverMenuItem[] =>
-    showSubstrateProposalItems
-      ? [
-          {
-            label: 'New treasury proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateTreasuryProposal,
-              });
-            },
-            iconLeft: 'treasuryProposal',
-          },
-          {
-            label: 'New democracy proposal',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateDemocracyProposal,
-              });
-            },
-            iconLeft: 'democraticProposal',
-          },
-          {
-            label: 'New tip',
-            onClick: () => {
-              resetSidebarState();
-              navigate('/new/proposal/:type', {
-                type: ProposalType.SubstrateTreasuryTip,
-              });
-            },
-            iconLeft: 'jar',
-          },
-        ]
-      : [];
-
   const getSnapshotProposalItem = (): PopoverMenuItem[] =>
     showSnapshotOptions
       ? [
@@ -247,7 +211,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
           } as PopoverMenuItem,
           ...getOnChainProposalItem(),
           ...getSputnikProposalItem(),
-          ...getSubstrateProposalItems(),
           ...getSnapshotProposalItem(),
           ...getTemplateItems(),
           ...getDiscordBotConnectionItems(),

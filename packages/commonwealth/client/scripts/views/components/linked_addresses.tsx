@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import 'components/linked_addresses.scss';
 
 import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
-import { Modal } from './component_kit/cw_modal';
+import { CWModal } from './component_kit/new_designs/CWModal';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
@@ -74,7 +74,8 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
           />
         );
       })}
-      <Modal
+      <CWModal
+        size="small"
         content={
           <DeleteAddressModal
             profile={profile}
@@ -87,7 +88,10 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
             }}
           />
         }
-        onClose={() => setCurrentAddress(null)}
+        onClose={() => {
+          setIsRemoveModalOpen(false);
+          setCurrentAddress(null);
+        }}
         open={isRemoveModalOpen}
       />
     </div>

@@ -5,15 +5,8 @@ import { AaveTypes, CompoundTypes } from 'chain-events/src/types';
 import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 
 import { blocknumToDuration, formatNumberLong } from 'helpers';
-import {
-  chainEntityTypeToProposalShortName,
-  proposalSlugToChainEntityType,
-} from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus } from '../../../models/types';
 import moment from 'moment';
@@ -35,11 +28,7 @@ export const getStatusClass = (proposal: AnyProposal, isLoading?: boolean) => {
 
 export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
   if (isLoading) return 'loading...';
-  if (proposal.completed && proposal instanceof SubstrateDemocracyProposal) {
-    if (proposal.isPassing === ProposalStatus.Passed)
-      return 'Passed, moved to referendum';
-    return 'Cancelled';
-  } else if (proposal.completed && proposal instanceof AaveProposal) {
+  if (proposal.completed && proposal instanceof AaveProposal) {
     if (proposal.state === AaveTypes.ProposalState.CANCELED) return 'Cancelled';
     if (proposal.state === AaveTypes.ProposalState.EXECUTED) return 'Executed';
     if (proposal.state === AaveTypes.ProposalState.EXPIRED) return 'Expired';
@@ -139,11 +128,6 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
       countdown.length === 2 ? countdown[0] : '???',
     ];
   if (proposal.isPassing === ProposalStatus.Failed) return 'Did not pass';
-  if (
-    proposal.isPassing === ProposalStatus.Passing &&
-    proposal instanceof SubstrateDemocracyProposal
-  )
-    return ['Expected to pass and move to referendum, ', countdown];
   if (proposal.isPassing === ProposalStatus.Passing)
     return ['Passing, ', countdown];
   if (proposal.isPassing === ProposalStatus.Failing) {
@@ -153,30 +137,4 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
 };
 
 export const getPrimaryTagText = (proposal: AnyProposal) => `
-  ${chainEntityTypeToProposalShortName(
-    proposalSlugToChainEntityType(proposal.slug)
-  )} ${proposal.shortIdentifier}`;
-
-export const getSecondaryTagText = (proposal: AnyProposal) => {
-  if (
-    proposal instanceof SubstrateDemocracyProposal &&
-    proposal.getReferendum()
-  ) {
-    return `REF #${proposal.getReferendum().identifier}`;
-  } else if (proposal instanceof SubstrateDemocracyReferendum) {
-    const originatingProposalOrMotion = proposal.getProposalOrMotion(
-      proposal.preimage
-    );
-
-    return originatingProposalOrMotion instanceof SubstrateDemocracyProposal
-      ? `PROP #${originatingProposalOrMotion.identifier}`
-      : 'MISSING PROP';
-  } else if (
-    proposal instanceof SubstrateTreasuryProposal &&
-    !proposal.data.index
-  ) {
-    return 'MISSING DATA';
-  } else {
-    return null;
-  }
-};
+  Prop ${proposal.shortIdentifier}`;
