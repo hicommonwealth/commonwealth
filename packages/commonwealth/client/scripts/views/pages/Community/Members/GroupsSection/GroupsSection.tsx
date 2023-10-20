@@ -66,9 +66,9 @@ const GroupsSection = ({ searchFilters }: GroupsSectionProps) => {
     <section className="GroupsSection">
       {/* Groups list section */}
       <section className="groups-list">
-        {getFilteredGroups().map((group, index) => (
+        {/* {getFilteredGroups().map((group, index) => (
           <GroupCard {...group} />
-        ))}
+        ))} */}
       </section>
     </section>
   );
