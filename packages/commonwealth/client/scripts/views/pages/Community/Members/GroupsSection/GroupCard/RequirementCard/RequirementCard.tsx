@@ -3,7 +3,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import './RequirementCard.scss';
 
-const InfoBlock = ({ label, value }) => {
+const InfoBlock = ({ label, value }: {label: string; value: string}) => {
   return (
     <div className="info-block">
       <CWText type="caption" fontWeight="bold">

@@ -138,8 +138,9 @@ const CommunityMembersPage = () => {
 
       {/* Tabs section */}
       <CWTabBar>
-        {TABS.map((tab) => (
+        {TABS.map((tab, index) => (
           <CWTab
+            key={index}
             label={tab}
             onClick={() => setSelectedTab(tab)}
             isSelected={selectedTab.toLowerCase() === tab.toLowerCase()}

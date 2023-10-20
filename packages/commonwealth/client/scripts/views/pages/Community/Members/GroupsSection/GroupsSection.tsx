@@ -1,6 +1,5 @@
 import React from 'react';
 import { SearchFilters } from '../index.types';
-import GroupCard from './GroupCard';
 import './GroupsSection.scss';
 
 const groupData = {
@@ -44,24 +43,6 @@ type GroupsSectionProps = {
 };
 
 const GroupsSection = ({ searchFilters }: GroupsSectionProps) => {
-  const getFilteredGroups = () => {
-    return sampleGroups
-      .filter((group) =>
-        searchFilters.searchText
-          ? group.groupName
-              .toLowerCase()
-              .includes(searchFilters.searchText.toLowerCase())
-          : true
-      )
-      .filter((group) =>
-        searchFilters.category === 'All groups'
-          ? true
-          : searchFilters.category === 'In group'
-          ? group.isJoined
-          : !group.isJoined
-      );
-  };
-
   return (
     <section className="GroupsSection">
       {/* Groups list section */}
