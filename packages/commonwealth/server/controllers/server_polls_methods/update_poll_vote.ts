@@ -31,7 +31,7 @@ export type UpdatePollVoteResult = VoteAttributes;
 
 export async function __updatePollVote(
   this: ServerThreadsController,
-  { user, address, chain, pollId, option }: UpdatePollVoteOptions
+  { address, chain, pollId, option }: UpdatePollVoteOptions
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
     where: { id: pollId, chain_id: chain.id },

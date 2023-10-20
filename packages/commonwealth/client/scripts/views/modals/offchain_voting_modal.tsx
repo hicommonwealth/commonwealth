@@ -42,7 +42,7 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
           </a>
         </div>
         {votes.map((vote) => (
-          <div className="offchain-poll-voter">
+          <div className="offchain-poll-voter" key={vote.id}>
             <div className="offchain-poll-voter-user">
               <User
                 shouldShowPopover

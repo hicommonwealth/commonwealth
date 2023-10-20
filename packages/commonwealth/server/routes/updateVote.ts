@@ -39,8 +39,6 @@ const updateVote = async (
 ) => {
   const chain = req.chain;
 
-  const author = req.address;
-
   const { poll_id, address, author_chain, option } = req.body;
 
   const poll = await models.Poll.findOne({
