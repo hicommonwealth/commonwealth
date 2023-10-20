@@ -277,7 +277,7 @@ describe('Webhook Tests', () => {
         sign: loggedInSession.sign,
       });
       // expect(res.statusCode).to.be.equal(200);
-      res = await modelUtils.createThread({
+      await modelUtils.createThread({
         chainId: chain,
         topicName,
         topicId,
