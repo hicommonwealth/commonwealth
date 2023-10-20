@@ -42,14 +42,14 @@ const RequirementCard = ({
             'cols-4'?: boolean;
           }>(
             {
-              'cols-3': !!requirementContractAddress,
-              'cols-4': !requirementContractAddress,
+              'cols-3': !requirementContractAddress,
+              'cols-4': !!requirementContractAddress,
             },
             `row-2`
           )}
         >
           <InfoBlock label={'Chain'} value={requirementChain} />
-          {!requirementContractAddress && (
+          {!!requirementContractAddress && (
             <InfoBlock
               label={'Contract address'}
               value={requirementContractAddress}

@@ -51,15 +51,15 @@ const GroupCard = ({
           ? 'All requirements must be satisfied'
           : `At least ${requirementsToFulfill} # of all requirements`}
       </CWText>
-      {requirements.map((r) => (
-        <RequirementCard {...r} />
+      {requirements.map((r, index) => (
+        <RequirementCard key={index} {...r} />
       ))}
 
       {/* Gated topics */}
       <CWText type="h5">Gated Topics</CWText>
       <div className="gating-tags">
-        {topics.map((t) => (
-          <CWTag label={t.name} type="referendum" />
+        {topics.map((t, index) => (
+          <CWTag key={index} label={t.name} type="referendum" />
         ))}
       </div>
     </section>

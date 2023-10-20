@@ -9,9 +9,10 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { PageLoading } from '../../../loading';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
-import { PageLoading } from '../../../loading';
+import { chainTypes, requirementTypes } from './constants';
 
 const groupsFilter = ['All groups', 'In group', 'Not in group'];
 
@@ -25,6 +26,8 @@ const GroupsSection = () => {
   const navigate = useCommonNavigate();
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
+    includeTopics: true,
+    includeMembers: true,
   });
   const [groupFilters, setGroupFilters] = useState<GroupFilters>({
     searchText: '',
@@ -111,18 +114,31 @@ const GroupsSection = () => {
             <GroupCard
               key={index}
               groupName={group.name}
-              groupDescription={group.description}
+              groupDescription={group.description || 'jcvduhcvdhvhv'}
               requirements={group.requirements.map((r) => ({
-                requirementType: r.data.source.source_type,
+                requirementType: requirementTypes.find(
+                  (x) => x.value === r.data.source.source_type
+                ).label,
                 requirementChain:
-                  r.data.source.evm_chain_id || r.data.source.cosmos_chain_id,
+                  chainTypes
+                    .find(
+                      (x) =>
+                        `${x.value}` ===
+                        `${
+                          r?.data?.source?.evm_chain_id ||
+                          r?.data?.source?.cosmos_chain_id ||
+                          ''
+                        }`
+                    )
+                    ?.label?.split('-')
+                    ?.join(' ') || '{_chain_}',
                 requirementContractAddress: r.data.source.contract_address,
                 requirementAmount: r.data.threshold,
-                requirementCondition: '', // TODO: get this from api
+                requirementCondition: 'More than', // TODO: api doesn't return this
               }))}
-              requirementsToFulfill={'ALL'} // TODO: get this from api
+              requirementsToFulfill={'ALL'} // TODO: api doesn't return this
               isJoined={false} // TODO: get this from api
-              topics={[]}
+              topics={group.topics.map((x) => ({ id: x.id, name: x.name }))}
             />
           ))
         )}
