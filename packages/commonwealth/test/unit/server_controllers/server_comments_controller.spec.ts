@@ -485,8 +485,7 @@ describe('ServerCommentsController', () => {
 
   describe('#updateComment', () => {
     it('should update a comment', async () => {
-      let data;
-      data = {
+      const data = {
         id: 123,
         thread_id: 2,
         text: 'Wasup',
@@ -585,8 +584,7 @@ describe('ServerCommentsController', () => {
     });
 
     it('should throw error (banned)', async () => {
-      let data;
-      data = {
+      const data = {
         id: 123,
         thread_id: 2,
         text: 'Wasup',
@@ -651,8 +649,7 @@ describe('ServerCommentsController', () => {
     });
 
     it('should throw error (thread not found)', async () => {
-      let data;
-      data = {
+      const data = {
         id: 123,
         thread_id: 2,
         text: 'Wasup',
