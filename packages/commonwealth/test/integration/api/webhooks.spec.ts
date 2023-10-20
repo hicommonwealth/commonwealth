@@ -59,11 +59,9 @@ describe('Webhook Tests', () => {
     // get not logged in address
     result = await modelUtils.createAndVerifyAddress({ chain });
     notLoggedInAddr = result.address;
-    notLoggedInSession = { session: result.session, sign: result.sign };
     // get logged in not admin address
     result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInNotAdminAddr = result.address;
-    loggedInNotAdminSession = { session: result.session, sign: result.sign };
     notAdminJWT = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET
@@ -81,7 +79,7 @@ describe('Webhook Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
-      expect(res.body.result.chain_id).to.be.equal(chain);
+      expect(res.body.result.community_id).to.be.equal(chain);
       expect(res.body.result.url).to.be.equal(webhookUrl);
     });
 
