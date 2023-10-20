@@ -96,7 +96,7 @@ describe('Webhook Tests', () => {
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      let webhookUrls = await models['Webhook'].findAll({
+      let webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(1);
@@ -106,7 +106,7 @@ describe('Webhook Tests', () => {
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
       expectErrorOnResponse(400, Errors.NoDuplicates, errorRes);
-      webhookUrls = await models['Webhook'].findAll({
+      webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(1);
@@ -127,7 +127,7 @@ describe('Webhook Tests', () => {
           jwt: jwt.sign({ id: -999999, email: null }, JWT_SECRET),
         });
       expectErrorOnResponse(401, undefined, errorRes);
-      const webhookUrls = await models['Webhook'].findAll({
+      const webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(0);
@@ -149,7 +149,7 @@ describe('Webhook Tests', () => {
           jwt: notAdminJWT,
         });
       expectErrorOnResponse(400, Errors.NotAdmin, errorRes);
-      const webhookUrls = await models['Webhook'].findAll({
+      const webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(0);
@@ -157,21 +157,21 @@ describe('Webhook Tests', () => {
 
     it('should delete a webhook', async () => {
       const webhookUrl = faker.internet.url();
-      let res = await chai.request
+      await chai.request
         .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      let webhookUrls = await models['Webhook'].findAll({
+      let webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(1);
-      res = await chai.request
+      await chai.request
         .agent(app)
         .post('/api/deleteWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      webhookUrls = await models['Webhook'].findAll({
+      webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(0);
