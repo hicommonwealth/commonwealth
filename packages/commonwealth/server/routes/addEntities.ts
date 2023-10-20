@@ -46,7 +46,7 @@ export async function addEntities<
 
   entityCopy.forEach((c) => {
     c[chainIdFieldName] = c['community_id'];
-    delete c['community_id'];
+    if (chainIdFieldName !== 'community_id') delete c['community_id'];
 
     // all the entities use the address_id field. If user passed in address, map it to address_id
     if (addressMap && c.address) {
