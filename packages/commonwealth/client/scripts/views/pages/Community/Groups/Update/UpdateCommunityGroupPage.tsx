@@ -62,7 +62,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           },
           requirementContractAddress: x.data.source.contract_address || '',
           requirementCondition: conditionTypes.find(
-            (x) => x.value === AMOUNT_CONDITIONS.MORE
+            (y) => y.value === AMOUNT_CONDITIONS.MORE
           ), // TODO: API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
         })),
         // requirementsToFulfill: foundGroup.requirementsToFulfill || [], TODO: API doesn't return this
