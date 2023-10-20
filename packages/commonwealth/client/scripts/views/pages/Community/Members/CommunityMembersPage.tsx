@@ -173,7 +173,7 @@ const CommunityMembersPage = () => {
             }))
           }
         />
-        {isGatingEnabled && <>
+        {isGatingEnabled && <div className='select-dropdown-container'>
           <CWText type="b2" fontWeight="bold" className="filter-text">
             Filter
           </CWText>
@@ -186,7 +186,7 @@ const CommunityMembersPage = () => {
               setSearchFilters((g) => ({ ...g, category: item.value }));
             }}
           />
-        </>}
+        </div>}
         {isAdmin && (
           <CWButton
             buttonWidth="full"
