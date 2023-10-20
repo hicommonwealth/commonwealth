@@ -15,24 +15,29 @@ type MembersSectionProps = {
   members: Member[];
 };
 
+const isGatingEnabled =  process.env.GATING_API_ENABLED || true;
+
+const columns = [
+  {
+    key: 'name',
+    header: 'Name',
+    numeric: false,
+    sortable: true,
+  }
+]
+
+isGatingEnabled && columns.push({
+  key: 'groups',
+  header: 'Groups',
+  numeric: false,
+  sortable: true,
+})
+
 const MembersSection = ({ members }: MembersSectionProps) => {
   return (
     <div className="MembersSection">
       <CWTable
-        columnInfo={[
-          {
-            key: 'name',
-            header: 'Name',
-            numeric: false,
-            sortable: true,
-          },
-          {
-            key: 'groups',
-            header: 'Groups',
-            numeric: false,
-            sortable: true,
-          },
-        ]}
+        columnInfo={columns}
         rowData={members.map((member) => ({
           name: (
             <div className="table-cell">
@@ -47,7 +52,7 @@ const MembersSection = ({ members }: MembersSectionProps) => {
           ),
           groups: (
             <div className="table-cell">
-              {member.groups.map((group, index) => (
+              {isGatingEnabled && member.groups.map((group, index) => (
                 <CWTag key={index} label={group} type="referendum" />
               ))}
             </div>

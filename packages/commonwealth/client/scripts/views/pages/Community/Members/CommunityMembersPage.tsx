@@ -19,13 +19,9 @@ import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
 import { GroupCategory, SearchFilters } from './index.types';
 
-// TEMP: consider it a feature flag, remove this after https://github.com/hicommonwealth/commonwealth/issues/4989
-const FEATURE_FLAGS = {
-  GATING: true,
-};
-
+const isGatingEnabled = process.env.GATING_API_ENABLED || true;
 const TABS = ['All members'];
-FEATURE_FLAGS.GATING && TABS.push('Groups');
+isGatingEnabled && TABS.push('Groups');
 const GROUP_FILTERS: GroupCategory[] = [
   'All groups',
   'In group',
@@ -89,9 +85,9 @@ const CommunityMembersPage = () => {
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
-              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-            ) ||
-            p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+            g.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+          ) ||
+          p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
           : true
       );
   }, [members, groups, debouncedSearchTerm]);
@@ -116,7 +112,7 @@ const CommunityMembersPage = () => {
     ) {
       setSelectedTab(TABS[0]);
     } else if (
-      FEATURE_FLAGS.GATING &&
+      isGatingEnabled &&
       window.location.search.includes(
         `tab=${TABS[1].split(' ').join('-').toLowerCase()}`
       )
@@ -165,9 +161,8 @@ const CommunityMembersPage = () => {
         <CWTextInput
           size="large"
           fullWidth
-          placeholder={`Search ${
-            selectedTab === TABS[0] ? 'members' : 'groups'
-          }`}
+          placeholder={`Search ${selectedTab === TABS[0] ? 'members' : 'groups'
+            }`}
           iconLeft={<CWIcon iconName="search" className="search-icon" />}
           onInput={(e) =>
             setSearchFilters((g) => ({
@@ -176,18 +171,20 @@ const CommunityMembersPage = () => {
             }))
           }
         />
-        <CWText type="b2" fontWeight="bold" className="filter-text">
-          Filter
-        </CWText>
-        <Select
-          containerClassname="select-dropdown"
-          options={GROUP_FILTERS.map((x) => ({ id: x, label: x, value: x }))}
-          selected={searchFilters.category}
-          dropdownPosition="bottom-end"
-          onSelect={(item: any) => {
-            setSearchFilters((g) => ({ ...g, category: item.value }));
-          }}
-        />
+        {isGatingEnabled && <>
+          <CWText type="b2" fontWeight="bold" className="filter-text">
+            Filter
+          </CWText>
+          <Select
+            containerClassname="select-dropdown"
+            options={GROUP_FILTERS.map((x) => ({ id: x, label: x, value: x }))}
+            selected={searchFilters.category}
+            dropdownPosition="bottom-end"
+            onSelect={(item: any) => {
+              setSearchFilters((g) => ({ ...g, category: item.value }));
+            }}
+          />
+        </>}
         {Permissions.isCommunityAdmin() && (
           <CWButton
             buttonWidth="full"
