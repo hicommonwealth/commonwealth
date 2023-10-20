@@ -119,7 +119,7 @@ export const ReactionButton = ({
         <CWUpvoteSmall
           voteCount={reactors.length}
           disabled={isUserForbidden || disabled}
-          threadArchived={!!thread.archivedAt}
+          isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
           onMouseEnter={() => undefined}
           onClick={handleVoteClick}

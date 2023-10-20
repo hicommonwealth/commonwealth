@@ -11,7 +11,7 @@ interface CWUpvoteSmallProps {
   onMouseEnter: () => void;
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   tooltipContent: JSX.Element;
-  threadArchived?: boolean;
+  isThreadArchived?: boolean;
 }
 
 const CWUpvoteSmall = ({
@@ -21,7 +21,7 @@ const CWUpvoteSmall = ({
   selected,
   disabled,
   tooltipContent,
-  threadArchived,
+  isThreadArchived,
 }: CWUpvoteSmallProps) => {
   const handleClick = (e) => {
     if (disabled) {
@@ -47,7 +47,7 @@ const CWUpvoteSmall = ({
             >
               <CWThreadAction
                 action="upvote"
-                threadArchived={threadArchived}
+                isThreadArchived={isThreadArchived}
                 selected={selected}
                 label={String(voteCount)}
                 disabled={disabled}
@@ -59,7 +59,7 @@ const CWUpvoteSmall = ({
         <>
           <CWThreadAction
             action="upvote"
-            threadArchived={threadArchived}
+            isThreadArchived={isThreadArchived}
             selected={selected}
             label={String(voteCount)}
             disabled={disabled}
