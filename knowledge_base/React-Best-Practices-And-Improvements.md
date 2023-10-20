@@ -92,6 +92,8 @@ A component's name should be identical to the file name.
 
 Files should not house more than a single component.
 
+Per React best practices, we use class names rather than ids. Component class names should replicate their component name.
+
 ### Imports
 
 We should move towards configuring our eslint library to perform automatic import sorting. There are many plugins that would make our job easier; see [here](https://levelup.gitconnected.com/how-to-sort-imports-in-react-project-550f5ce70cbf).
