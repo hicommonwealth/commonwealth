@@ -1,7 +1,7 @@
 import React from 'react';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTag } from 'views/components/component_kit/new_designs/cw_tag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
 
