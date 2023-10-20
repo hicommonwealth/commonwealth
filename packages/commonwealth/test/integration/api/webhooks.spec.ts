@@ -248,12 +248,12 @@ describe('Webhook Tests', () => {
     // we want to test that no errors occur up to the point the webhook is hit
     it('should send a webhook for markdown and rich text content', async () => {
       const webhookUrl = process.env.SLACK_FEEDBACK_WEBHOOK;
-      let res = await modelUtils.createWebhook({
+      await modelUtils.createWebhook({
         chain,
         webhookUrl,
         jwt: jwtToken,
       });
-      res = await modelUtils.createThread({
+      await modelUtils.createThread({
         chainId: chain,
         topicName,
         topicId,
@@ -267,7 +267,7 @@ describe('Webhook Tests', () => {
         sign: loggedInSession.sign,
       });
       // expect(res.statusCode).to.be.equal(200);
-      res = await modelUtils.createComment({
+      await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
