@@ -80,7 +80,12 @@ const deleteChain = async (
 
           // Add the created by field to comments for redundancy
           await sequelize.query(
-            `UPDATE "Comments" SET created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id) WHERE chain = '${chain.id}'`,
+            `UPDATE "Comments" 
+                 SET created_by = (
+                    SELECT address 
+                    FROM "Addresses" 
+                    WHERE "Comments".address_id = "Addresses".id)
+                 WHERE chain = '${chain.id}'`,
             { transaction: t }
           );
 
@@ -135,7 +140,12 @@ const deleteChain = async (
 
           // Add the created by field to threads for redundancy
           await sequelize.query(
-            `UPDATE "Threads" SET created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id) WHERE chain = '${chain.id}'`,
+            `UPDATE "Threads" 
+                 SET created_by = (
+                    SELECT address 
+                    FROM "Addresses" 
+                    WHERE "Threads".address_id = "Addresses".id) 
+                 WHERE chain = '${chain.id}'`,
             { transaction: t }
           );
 
@@ -147,10 +157,6 @@ const deleteChain = async (
           await models.StarredCommunity.destroy({
             where: { chain: chain.id },
             transaction: t,
-          });
-
-          const addresses = await models.Address.findAll({
-            where: { chain: chain.id },
           });
 
           await models.CommunityBanner.destroy({

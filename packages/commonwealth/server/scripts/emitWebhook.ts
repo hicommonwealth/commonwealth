@@ -162,7 +162,7 @@ async function main() {
     } else if (
       argv.notificationCategory === NotificationCategories.NewComment
     ) {
-      const [comment, created] = await models.Comment.findOrCreate({
+      const [comment] = await models.Comment.findOrCreate({
         where: {
           chain: chain.id,
           thread_id: thread.id,

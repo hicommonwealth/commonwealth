@@ -32,11 +32,7 @@ describe('Webhook Tests', () => {
   let loggedInAddr;
   let notLoggedInAddr;
   let loggedInNotAdminAddr;
-
   let loggedInSession;
-  let notLoggedInSession;
-  let loggedInNotAdminSession;
-
   let notAdminJWT;
   const chain = 'ethereum';
   const topicName = 'test';
@@ -206,7 +202,7 @@ describe('Webhook Tests', () => {
   describe('/getWebhooks', () => {
     it('should get all webhooks', async () => {
       const urls = await Promise.all(
-        [1, 2, 3, 4, 5].map(async (i) => {
+        [1, 2, 3, 4, 5].map(async () => {
           const webhookUrl = faker.internet.url();
           await chai.request
             .agent(app)
@@ -227,7 +223,7 @@ describe('Webhook Tests', () => {
 
     it('should fail to get webhooks from non-admin', async () => {
       const urls = await Promise.all(
-        [1, 2, 3, 4, 5].map(async (i) => {
+        [1, 2, 3, 4, 5].map(async () => {
           const webhookUrl = faker.internet.url();
           await chai.request
             .agent(app)
@@ -297,7 +293,7 @@ describe('Webhook Tests', () => {
         sign: loggedInSession.sign,
       });
       // expect(res.statusCode).to.be.equal(200);
-      res = await modelUtils.createComment({
+      await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
