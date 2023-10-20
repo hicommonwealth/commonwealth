@@ -23,7 +23,7 @@ const createTopic = async ({
   tokenThreshold,
   defaultOffchainTemplate,
 }: CreateTopicProps) => {
-  const response = await axios.post(`${app.serverUrl()}/createTopic`, {
+  const response = await axios.post(`${app.serverUrl()}/topics`, {
     name,
     description,
     telegram,

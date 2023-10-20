@@ -106,7 +106,7 @@ export const CosmosForm = () => {
         value={bech32Prefix}
         placeholder="cosmos"
         onChangeHandler={async (v) => {
-          setBech32Prefix(v);
+          setBech32Prefix(v.toLowerCase());
         }}
       />
       <InputRow
