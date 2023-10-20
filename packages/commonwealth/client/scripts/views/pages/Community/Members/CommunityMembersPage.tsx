@@ -70,7 +70,7 @@ const CommunityMembersPage = () => {
         return [...acc, ...page.results];
       }, [] as SearchProfilesResponse['results'])
       .map((p) => ({
-        name: p.profile_name,
+        name: p.profile_name || 'Anonymous',
         role: p.roles.find(
           (role) =>
             role.chain_id === app.activeChainId() &&
