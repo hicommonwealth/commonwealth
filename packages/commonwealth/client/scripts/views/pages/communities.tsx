@@ -17,23 +17,25 @@ const buildCommunityString = (numCommunities: number) =>
     ? `${numeral(numCommunities).format('0.0a')} Communities`
     : `${numCommunities} Communities`;
 
-const chainToCategoriesMap = app.config.chainCategoryMap;
+const communityToCategoriesMap = app.config.chainCategoryMap;
 // Handle mapping provided by ChainCategories table
-const chainCategories = Object.values(ChainCategoryType);
-const chainNetworks = Object.keys(ChainNetwork).filter(
+const communityCategories = Object.values(ChainCategoryType);
+const communityNetworks = Object.keys(ChainNetwork).filter(
   (val) => val === 'ERC20'
 ); // We only are allowing ERC20 for now
-const chainBases = Object.keys(ChainBase);
+const communityBases = Object.keys(ChainBase);
 
 const getInitialFilterMap = (): Record<string, unknown> => {
-  const filterMapChainCategories = chainCategories.map((c) => ({
+  const filterMapCommunityCategories = communityCategories.map((c) => ({
     [c]: false,
   }));
-  const filterMapChainBases = chainBases.map((c) => ({ [c]: false }));
-  const filterMapChainNetworks = chainNetworks.map((c) => ({ [c]: false }));
-  const allArrays = filterMapChainCategories.concat(
-    filterMapChainBases,
-    filterMapChainNetworks
+  const filterMapCommunityBases = communityBases.map((c) => ({ [c]: false }));
+  const filterMapCommunityNetworks = communityNetworks.map((c) => ({
+    [c]: false,
+  }));
+  const allArrays = filterMapCommunityCategories.concat(
+    filterMapCommunityBases,
+    filterMapCommunityNetworks
   );
 
   return Object.assign({}, ...allArrays);
@@ -48,37 +50,39 @@ const CommunitiesPage = () => {
     setFilterMap((prevState) => ({ ...prevState, [key]: !filterMap[key] }));
   };
 
-  const chainBaseFilter = (list: CommunityInfo[]) => {
+  const communityBaseFilter = (list: CommunityInfo[]) => {
     return list.filter((data) => {
-      const chainBase =
+      const communityBase =
         Object.keys(ChainBase)[Object.values(ChainBase).indexOf(data.base)];
       // Converts chain.base into a ChainBase key to match our filterMap keys
-      return filterMap[chainBase];
+      return filterMap[communityBase];
     });
   };
 
-  const chainNetworkFilter = (list: CommunityInfo[]) => {
+  const communityNetworkFilter = (list: CommunityInfo[]) => {
     return list.filter((data) => {
-      const chainNetwork =
+      const communityNetwork =
         Object.keys(ChainNetwork)[
           Object.values(ChainNetwork).indexOf(data.network)
         ]; // Converts chain.base into a ChainBase key to match our filterMap keys
 
-      if (chainNetworks.includes(chainNetwork)) {
-        return filterMap[chainNetwork];
+      if (communityNetworks.includes(communityNetwork)) {
+        return filterMap[communityNetwork];
       } else {
         return false;
       }
     });
   };
 
-  const chainCategoryFilter = (list) => {
+  const communityCategoryFilter = (list) => {
     return list.filter((data) => {
-      for (const cat of chainCategories) {
+      for (const cat of communityCategories) {
         if (
           filterMap[cat] &&
-          (!chainToCategoriesMap[data.id] ||
-            !chainToCategoriesMap[data.id].includes(cat as ChainCategoryType))
+          (!communityToCategoriesMap[data.id] ||
+            !communityToCategoriesMap[data.id].includes(
+              cat as ChainCategoryType
+            ))
         ) {
           return false;
         }
@@ -92,27 +96,29 @@ const CommunitiesPage = () => {
 
     if (Object.values(filterMap).includes(true)) {
       // Handle Overlaps
-      if (chainBases.filter((val) => filterMap[val]).length > 1) {
+      if (communityBases.filter((val) => filterMap[val]).length > 1) {
         filteredList = [];
       }
 
-      if (chainNetworks.filter((val) => filterMap[val]).length > 1) {
+      if (communityNetworks.filter((val) => filterMap[val]).length > 1) {
         filteredList = [];
       }
 
       // Filter for ChainBase
-      if (chainBases.filter((base) => filterMap[base]).length > 0) {
-        filteredList = chainBaseFilter(filteredList);
+      if (communityBases.filter((base) => filterMap[base]).length > 0) {
+        filteredList = communityBaseFilter(filteredList);
       }
 
       // Filter for ChainNetwork
-      if (chainNetworks.filter((network) => filterMap[network]).length > 0) {
-        filteredList = chainNetworkFilter(filteredList);
+      if (
+        communityNetworks.filter((network) => filterMap[network]).length > 0
+      ) {
+        filteredList = communityNetworkFilter(filteredList);
       }
 
       // Filter for ChainCategory
-      if (chainCategories.filter((cat) => filterMap[cat]).length > 0) {
-        filteredList = chainCategoryFilter(filteredList);
+      if (communityCategories.filter((cat) => filterMap[cat]).length > 0) {
+        filteredList = communityCategoryFilter(filteredList);
       }
     }
     // Filter by recent thread activity
@@ -143,7 +149,7 @@ const CommunitiesPage = () => {
           </CWText>
         </div>
         <div className="filter-buttons">
-          {chainCategories.map((cat, i) => {
+          {communityCategories.map((cat, i) => {
             return (
               <CWButton
                 key={i}
@@ -157,7 +163,7 @@ const CommunitiesPage = () => {
               />
             );
           })}
-          {chainNetworks.map((network, i) => {
+          {communityNetworks.map((network, i) => {
             return (
               <CWButton
                 key={i}
@@ -171,7 +177,7 @@ const CommunitiesPage = () => {
               />
             );
           })}
-          {chainBases.map((base, i) => {
+          {communityBases.map((base, i) => {
             return (
               <CWButton
                 key={i}

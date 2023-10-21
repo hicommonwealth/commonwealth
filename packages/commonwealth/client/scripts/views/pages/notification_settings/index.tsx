@@ -92,13 +92,15 @@ const NotificationSettingsPage = () => {
     app?.user.notifications.chainEventSubscriptions
   );
 
-  const subscribedChainIds =
+  const subscribedCommunityIds =
     app?.user.notifications.chainEventSubscribedChainIds;
 
   // chains/communities the user has addresses for but does not have existing subscriptions for
   const relevantSubscribedCommunities = app?.user.addresses
     .map((x) => x.chain)
-    .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
+    .filter(
+      (x) => subscribedCommunityIds.includes(x.id) && !chainEventSubs[x.id]
+    );
 
   return (
     <div className="NotificationSettingsPage">

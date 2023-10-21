@@ -255,9 +255,9 @@ export const CommunityMetadataRows = ({
       }
     }
 
-    // Update ChainCategories
+    // Update communityCategories
     try {
-      await setChainCategories(selectedTags2, community.id);
+      await setCommunityCategories(selectedTags2, community.id);
     } catch (err) {
       console.log(err);
     }
