@@ -3,6 +3,7 @@ export const truncate = (
   maxCharLength = 140,
   ellipsisPadding = 4
 ): string => {
+
   // Get the available width of the container or the window
   const availableWidth = window.innerWidth;
 
@@ -23,6 +24,7 @@ export const truncate = (
     );
 
     return str.substring(0, truncatedLength) + '...';
+
   }
 
   return str;
