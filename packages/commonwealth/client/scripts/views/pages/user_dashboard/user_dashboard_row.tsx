@@ -17,15 +17,18 @@ type UserDashboardRowProps = {
   label?: IEventLabel;
 };
 
-export const UserDashboardRow = (props: UserDashboardRowProps) => {
-  const { notification, showSkeleton, isChainEventsRow, label } = props;
-
+export const UserDashboardRow = ({
+  notification,
+  showSkeleton,
+  isChainEventsRow,
+  label,
+}: UserDashboardRowProps) => {
   if (showSkeleton) {
     if (isChainEventsRow) {
       return (
         <UserDashboardChainEventRow
           blockNumber={0}
-          chain={{} as any}
+          community={{} as any}
           label={{} as any}
           showSkeleton
         />
@@ -47,23 +50,16 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
     );
   }
 
-  const {
-    commentCount,
-    categoryId,
-    threadId,
-    blockNumber,
-    eventNetwork,
-    chain,
-    commenters,
-  } = notification;
+  const { commentCount, categoryId, threadId, blockNumber, chain, commenters } =
+    notification;
 
   if (categoryId === 'chain-event') {
-    const chainInfo = app.config.chains.getById(chain);
+    const communityInfo = app.config.chains.getById(chain);
 
     return (
       <UserDashboardChainEventRow
         blockNumber={blockNumber}
-        chain={chainInfo}
+        community={communityInfo}
         label={label}
       />
     );

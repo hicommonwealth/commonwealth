@@ -16,7 +16,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
-import { setChainCategories, setSelectedTags } from './helpers';
+import { setCommunityCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';

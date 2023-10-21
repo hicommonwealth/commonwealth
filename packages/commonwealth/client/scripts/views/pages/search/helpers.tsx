@@ -87,7 +87,6 @@ const ThreadResultRow = ({
 export type ReplyResult = {
   id: number;
   proposalid: number;
-  communtiy: string;
   community: string;
   title: string;
   text: string;

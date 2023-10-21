@@ -13,7 +13,7 @@ export const sortAdminsAndModsFirst = (a, b) => {
   return a.Address.address.localeCompare(b.Address.address);
 };
 
-export const setChainCategories = async (
+export const setCommunityCategories = async (
   selected_tags: { [tag: string]: boolean },
   chain_id: string
 ) => {
@@ -39,9 +39,9 @@ export const setChainCategories = async (
   });
 };
 
-export const setSelectedTags = (chain: string) => {
+export const setSelectedTags = (community: string) => {
   const chainToCategoriesMap: {
-    [chain: string]: ChainCategoryType[];
+    [community: string]: ChainCategoryType[];
   } = app.config.chainCategoryMap;
 
   const types = Object.keys(ChainCategoryType);
@@ -51,8 +51,8 @@ export const setSelectedTags = (chain: string) => {
     selectedTags[type] = false;
   }
 
-  if (chainToCategoriesMap[chain]) {
-    for (const tag of chainToCategoriesMap[chain]) {
+  if (chainToCategoriesMap[community]) {
+    for (const tag of chainToCategoriesMap[community]) {
       selectedTags[tag] = true;
     }
   }

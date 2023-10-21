@@ -5,7 +5,7 @@ import { sortBy } from 'lodash';
 
 import 'pages/landing/community_search.scss';
 
-import type { Chain } from './index';
+import type { Community } from './index';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -18,7 +18,7 @@ const strip = (str: string) => {
 };
 
 type CommunitySearchProps = {
-  chains: Array<Chain>;
+  chains: Array<Community>;
 };
 
 export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
@@ -26,7 +26,7 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<Chain>>([]);
+  const [searchResults, setSearchResults] = useState<Array<Community>>([]);
 
   const debouncedValue = useDebounce<string>(searchTerm, 500);
 
@@ -107,7 +107,10 @@ export const CommunitySearch = ({ chains }: CommunitySearchProps) => {
                     onClick={() => navigate(c.id)}
                     className="search-result-row"
                   >
-                    <CWCommunityAvatar community={c.chainInfo} size="small" />
+                    <CWCommunityAvatar
+                      community={c.communityInfo}
+                      size="small"
+                    />
                     <CWText fontWeight="medium">{c.name}</CWText>
                   </div>
                 ))}

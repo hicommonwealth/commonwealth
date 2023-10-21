@@ -3,14 +3,14 @@ import { useInterval } from 'usehooks-ts';
 
 import 'pages/landing/carousel.scss';
 
-import type { Chain } from './index';
+import type { Community } from './index';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 
 type CarouselProps = {
-  chains: Array<Chain>;
+  chains: Array<Community>;
 };
 
 export const Carousel = ({ chains }: CarouselProps) => {
@@ -47,7 +47,7 @@ export const Carousel = ({ chains }: CarouselProps) => {
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
           >
-            <CWCommunityAvatar community={c.chainInfo} size="xxl" />
+            <CWCommunityAvatar community={c.communityInfo} size="xxl" />
             <CWText type="h4" fontWeight="semiBold" isCentered>
               {c.name}
             </CWText>
