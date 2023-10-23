@@ -11,13 +11,9 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
-import { CWSelectList } from './new_designs/CWSelectList';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import { CWTable } from './new_designs/CWTable';
-import { makeData, createColumnInfo } from './showcase_helpers';
-import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -36,7 +32,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
-import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
@@ -47,24 +42,28 @@ import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWSpinner } from './cw_spinner';
-import { CWTab as CWTabOld, CWTabBar } from './cw_tabs';
+import { CWTabBar, CWTab as CWTabOld } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
+import { CWForm } from './new_designs/CWForm';
+import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
+import { ModalSize } from './new_designs/CWModal/CWModal';
+import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import { CWSearchBar } from './new_designs/CWSearchBar';
+import { CWSelectList } from './new_designs/CWSelectList';
+import { CWTable } from './new_designs/CWTable';
+import { CWTab, CWTabsRow } from './new_designs/CWTabs';
+import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
+import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
 import { CWButton } from './new_designs/cw_button';
-import { CWForm } from './new_designs/CWForm';
-import { CWTag } from './new_designs/CWTag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
-import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
-import { optionList } from './showcase_helpers';
-import { ModalSize } from './new_designs/CWModal/CWModal';
-import { CWTabsRow, CWTab } from './new_designs/CWTabs';
+import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -1909,7 +1908,11 @@ export const ComponentShowcase = () => {
       <div className="community-card">
         <CWText type="h3"> Community Card </CWText>
         <CWRelatedCommunityCard
-          chain={app.config.chains.getById('basindao')}
+          communityName={app.config.chains.getById('basindao').name}
+          communityDescription={
+            app.config.chains.getById('basindao').description
+          }
+          communityIconUrl={app.config.chains.getById('basindao').iconUrl}
           memberCount={2623}
           threadCount={437}
           actions={

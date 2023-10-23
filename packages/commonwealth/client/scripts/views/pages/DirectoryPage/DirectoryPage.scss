@@ -2,7 +2,7 @@
 
 .DirectoryPage {
   width: 100%;
-  padding: 76px 56px 0;
+  padding: 76px 56px 24px;
 
   @include smallInclusive {
     padding: 24px;
@@ -23,8 +23,61 @@
     padding: 32px 0 24px;
   }
 
-  .community-search {
-    max-width: 520px;
+  .search-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 24px;
+
+    .community-search {
+      max-width: 520px;
+      width: 100%;
+
+      .input-and-icon-container {
+        .text-input-left-icon > svg {
+          left: 16px;
+          color: $neutral-400;
+        }
+
+        input.hasLeftIcon {
+          padding-left: 48px;
+        }
+      }
+    }
+
+    .toggle-view-icons {
+      display: flex;
+      gap: 8px;
+      cursor: pointer;
+      margin-left: 8px;
+
+      .icon-container {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &.selected {
+          background-color: $neutral-50;
+          border-radius: 6px;
+        }
+
+        svg {
+          color: $black;
+        }
+      }
+    }
+  }
+
+  .tiles-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(506px, 1fr));
+    gap: 24px;
+
+    @include medium {
+      background-color: red;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    }
   }
 }
