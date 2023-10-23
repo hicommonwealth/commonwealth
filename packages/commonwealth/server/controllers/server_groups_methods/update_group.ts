@@ -1,5 +1,5 @@
+import { ServerCommunitiesController } from '../server_communities_controller';
 import { ChainInstance } from '../../models/chain';
-import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { UserInstance } from '../../models/user';
@@ -29,7 +29,7 @@ export type UpdateGroupOptions = {
 export type UpdateGroupResult = GroupAttributes;
 
 export async function __updateGroup(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   { user, chain, groupId, metadata, requirements }: UpdateGroupOptions
 ): Promise<UpdateGroupResult> {
   const isAdmin = await validateOwner({

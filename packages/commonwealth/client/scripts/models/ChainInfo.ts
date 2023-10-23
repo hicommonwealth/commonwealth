@@ -6,6 +6,7 @@ import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
 import { ETHERMINT_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
+import axios from 'axios';
 
 class ChainInfo {
   public readonly id: string;
@@ -300,9 +301,9 @@ class ChainInfo {
     chain_node_id?: string;
     discord_bot_webhooks_enabled?: boolean;
   }) {
-    // TODO: Change to PUT /chain
-    const r = await $.post(`${app.serverUrl()}/updateChain`, {
-      id: app.activeChainId() ?? this.id,
+    const id = app.activeChainId() ?? this.id;
+    const r = await axios.patch(`${app.serverUrl()}/communities/${id}`, {
+      id,
       name,
       description,
       website,
@@ -323,7 +324,7 @@ class ChainInfo {
       discord_bot_webhooks_enabled,
       jwt: app.user.jwt,
     });
-    const updatedChain = r.result;
+    const updatedChain = r.data.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
     this.website = updatedChain.website;

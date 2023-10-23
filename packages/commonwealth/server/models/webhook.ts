@@ -1,14 +1,14 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { WebhookCategory } from '../../shared/types';
 import type { ChainAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
-import { WebhookCategory } from '../../shared/types';
 
 export type WebhookAttributes = {
   url: string;
   categories: WebhookCategory[];
   id?: number;
-  chain_id: string;
+  community_id: string;
   created_at?: Date;
   updated_at?: Date;
   Chain?: ChainAttributes;
@@ -27,7 +27,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       url: { type: dataTypes.STRING, allowNull: false },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       categories: {
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: false,
@@ -39,13 +39,12 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [{ fields: ['url'] }, { fields: ['chain_id'] }],
     }
   );
 
   Webhook.associate = (models) => {
     models.Webhook.belongsTo(models.Chain, {
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
   };

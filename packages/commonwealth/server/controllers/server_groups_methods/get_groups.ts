@@ -1,9 +1,9 @@
-import { ServerChainsController } from '../server_chains_controller';
 import { GroupAttributes } from 'server/models/group';
 import { ChainInstance } from 'server/models/chain';
 import { Op, WhereOptions } from 'sequelize';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
+import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupsOptions = {
   chain: ChainInstance;
@@ -19,7 +19,7 @@ type GroupWithExtras = GroupAttributes & {
 export type GetGroupsResult = GroupWithExtras[];
 
 export async function __getGroups(
-  this: ServerChainsController,
+  this: ServerGroupsController,
   { chain, addressId, includeMembers, includeTopics }: GetGroupsOptions
 ): Promise<GetGroupsResult> {
   const groups = await this.models.Group.findAll({

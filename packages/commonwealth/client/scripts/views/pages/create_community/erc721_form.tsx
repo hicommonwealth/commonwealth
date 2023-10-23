@@ -208,7 +208,7 @@ export const ERC721Form = (props: EthChainFormState) => {
           chainFormState.setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               alt_wallet_url: ethChainFormFields.altWalletUrl,
               id: id,
               name: name,
