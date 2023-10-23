@@ -1,6 +1,6 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
 import app from 'state';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useSearchProfilesQuery } from 'state/api/profiles';
@@ -29,7 +29,7 @@ const GROUP_FILTERS: GroupCategory[] = [
 ];
 
 const CommunityMembersPage = () => {
-  const navigate = useNavigate();
+  const navigate = useCommonNavigate();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0]);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
