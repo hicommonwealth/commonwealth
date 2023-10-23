@@ -24,22 +24,22 @@ import {
   useEthChainFormFields,
 } from './hooks';
 
-const defaultSubstrateSpec = `{"types": {"Address": "MultiAddress", "ChainId": "u8", 
-"Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128", 
-"VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type": 
-"VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"}, 
-"VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]}, 
-"TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum": 
-["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]", 
-"VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals", 
-"outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo": 
-"AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>", 
-"VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>", 
-"DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes", 
-"ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber", 
-"votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord": 
-{"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId", 
-"vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus": 
+const defaultSubstrateSpec = `{"types": {"Address": "MultiAddress", "ChainId": "u8",
+"Reveals": "Vec<(AccountId, Vec<VoteOutcome>)>", "Balance2": "u128",
+"VoteData": {"stage": "VoteStage", "initiator": "AccountId", "vote_type":
+"VoteType", "tally_type": "TallyType", "is_commit_reveal": "bool"},
+"VoteType": {"_enum": ["Binary", "MultiOption", "RankedChoice"]},
+"TallyType": {"_enum": ["OnePerson", "OneCoin"]}, "VoteStage": {"_enum":
+["PreVoting", "Commit", "Voting", "Completed"]}, "ResourceId": "[u8; 32]",
+"VoteRecord": {"id": "u64", "data": "VoteData", "reveals": "Reveals",
+"outcomes": "Vec<VoteOutcome>", "commitments": "Commitments"}, "AccountInfo":
+"AccountInfoWithRefCount", "Commitments": "Vec<(AccountId, VoteOutcome)>",
+"VoteOutcome": "[u8; 32]", "VotingTally": "Option<Vec<(VoteOutcome, u128)>>",
+"DepositNonce": "u64", "LookupSource": "MultiAddress", "ProposalTitle": "Bytes",
+"ProposalVotes": {"staus": "ProposalStatus", "expiry": "BlockNumber",
+"votes_for": "Vec<AccountId>", "votes_against": "Vec<AccountId>"}, "ProposalRecord":
+{"index": "u32", "stage": "VoteStage", "title": "Text", "author": "AccountId",
+"vote_id": "u64", "contents": "Text", "transition_time": "u32"}, "ProposalStatus":
 {"_enum": ["Initiated", "Approved", "Rejected"]}, "ProposalContents": "Bytes"}}`;
 
 export const SubstrateForm = () => {
@@ -135,7 +135,7 @@ export const SubstrateForm = () => {
 
           chainFormState.setSaving(true);
 
-          $.post(`${app.serverUrl()}/createChain`, {
+          $.post(`${app.serverUrl()}/communities`, {
             base: ChainBase.Substrate,
             icon_url: chainFormDefaultFields.iconUrl,
             id: slugify(name),

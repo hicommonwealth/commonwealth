@@ -405,14 +405,18 @@ const useWallets = (walletProps: IuseWalletProps) => {
           primaryAccount.profile.address
         );
       const currentUserUpdatedProfile = updatedProfiles[0];
-      primaryAccount.profile.initialize(
-        currentUserUpdatedProfile?.name,
-        currentUserUpdatedProfile.address,
-        currentUserUpdatedProfile?.avatarUrl,
-        currentUserUpdatedProfile.id,
-        primaryAccount.profile.chain,
-        currentUserUpdatedProfile?.lastActive
-      );
+      if (!currentUserUpdatedProfile) {
+        console.log('No profile yet.');
+      } else {
+        primaryAccount.profile.initialize(
+          currentUserUpdatedProfile?.name,
+          currentUserUpdatedProfile.address,
+          currentUserUpdatedProfile?.avatarUrl,
+          currentUserUpdatedProfile.id,
+          primaryAccount.profile.chain,
+          currentUserUpdatedProfile?.lastActive
+        );
+      }
     } catch (e) {
       console.log(e);
       notifyError('Failed to create account. Please try again.');

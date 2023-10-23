@@ -31,7 +31,6 @@ import viewComments from '../routes/viewComments';
 import reactionsCounts from '../routes/reactionsCounts';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
-import createChain from '../routes/createChain';
 import createContract from '../routes/contracts/createContract';
 import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
@@ -42,9 +41,7 @@ import {
   fetchEtherscanContractAbi,
 } from '../routes/etherscanAPI';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
-import adminAnalytics, {
-  communitySpecificAnalytics,
-} from '../routes/adminAnalytics';
+import adminAnalytics from '../routes/adminAnalytics';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -70,8 +67,6 @@ import setDefaultRole from '../routes/setDefaultRole';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
-import deleteChain from '../routes/deleteChain';
-import updateChain from '../routes/updateChain';
 import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
@@ -120,7 +115,6 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
-import createChainNode from '../routes/createChainNode';
 import { RedisCache } from 'common-common/src/redisCache';
 
 import {
@@ -144,7 +138,6 @@ import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
 import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
 import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
-import exportMembersList from '../routes/exportMembersList';
 import viewChainActivity from '../routes/viewChainActivity';
 
 import { ServerThreadsController } from '../controllers/server_threads_controller';
@@ -153,7 +146,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerNotificationsController } from '../controllers/server_notifications_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
-import { ServerChainsController } from '../controllers/server_chains_controller';
+import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 import { ServerProposalsController } from '../controllers/server_proposals_controller';
 import { ServerPollsController } from '../controllers/server_polls_controller';
 import { ServerGroupsController } from '../controllers/server_groups_controller';
@@ -173,8 +166,9 @@ import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_h
 import { updateThreadHandler } from '../routes/threads/update_thread_handler';
 import { createThreadHandler } from '../routes/threads/create_thread_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
-import { getChainsHandler } from '../routes/chains/get_chains_handler';
-import { getChainNodesHandler } from '../routes/chains/get_chain_nodes_handler';
+import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
+import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
+import exportMembersList from '../routes/exportMembersList';
 import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
@@ -187,6 +181,11 @@ import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
+import { createCommunityHandler } from '../routes/communities/create_community_handler';
+import { updateCommunityHandler } from '../routes/communities/update_community_handler';
+import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
+import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
+import { getCommunityStatsHandler } from '../routes/communities/get_community_stats_handler';
 import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { createTopicHandler } from '../routes/topics/create_topic_handler';
 import { updateTopicHandler } from '../routes/topics/update_topic_handler';
@@ -201,7 +200,7 @@ export type ServerControllers = {
   notifications: ServerNotificationsController;
   analytics: ServerAnalyticsController;
   profiles: ServerProfilesController;
-  chains: ServerChainsController;
+  communities: ServerCommunitiesController;
   proposals: ServerProposalsController;
   polls: ServerPollsController;
   groups: ServerGroupsController;
@@ -230,7 +229,11 @@ function setupRouter(
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
-    chains: new ServerChainsController(models, tokenBalanceCache, banCache),
+    communities: new ServerCommunitiesController(
+      models,
+      tokenBalanceCache,
+      banCache
+    ),
     polls: new ServerPollsController(models, tokenBalanceCache),
     proposals: new ServerProposalsController(models, redisCache),
     groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
@@ -332,27 +335,40 @@ function setupRouter(
     selectChain.bind(this, models)
   );
 
-  // chains
+  // communities
   registerRoute(
     router,
     'post',
-    '/createChain',
+    '/communities' /* prev: POST /createChain */,
     passport.authenticate('jwt', { session: false }),
-    createChain.bind(this, models)
+    createCommunityHandler.bind(this, serverControllers)
   );
-  registerRoute(router, 'post', '/deleteChain', deleteChain.bind(this, models));
   registerRoute(
     router,
-    'post',
-    '/updateChain',
+    'delete',
+    '/communities/:communityId' /* prev: POST /deleteChain */,
     passport.authenticate('jwt', { session: false }),
-    updateChain.bind(this, models)
+    deleteCommunityHandler.bind(this, serverControllers)
+  );
+  registerRoute(
+    router,
+    'patch',
+    '/communities/:communityId' /* prev: POST /updateChain */,
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
     'get',
-    '/chains',
-    getChainsHandler.bind(this, serverControllers)
+    '/communities' /* prev: GET /chains */,
+    getCommunitiesHandler.bind(this, serverControllers)
+  );
+  registerRoute(
+    router,
+    'get',
+    '/communities/:communityId/stats' /* prev: POST /communitySpecificAnalytics */,
+    passport.authenticate('jwt', { session: false }),
+    getCommunityStatsHandler.bind(this, serverControllers)
   );
   registerRoute(
     router,
@@ -366,7 +382,15 @@ function setupRouter(
     '/relatedCommunities',
     getRelatedCommunitiesHandler.bind(this, serverControllers)
   );
+  registerRoute(
+    router,
+    'post',
+    '/nodes' /* prev: POST /createChainNode */,
+    passport.authenticate('jwt', { session: false }),
+    createChainNodeHandler.bind(this, serverControllers)
+  );
 
+  // ----
   registerRoute(
     router,
     'post',
@@ -424,24 +448,9 @@ function setupRouter(
 
   registerRoute(
     router,
-    'post',
-    '/createChainNode',
-    passport.authenticate('jwt', { session: false }),
-    createChainNode.bind(this, models)
-  );
-
-  registerRoute(
-    router,
     'get',
     '/adminAnalytics',
     adminAnalytics.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/communitySpecificAnalytics',
-    databaseValidationService.validateChain,
-    communitySpecificAnalytics.bind(this, models)
   );
 
   // threads

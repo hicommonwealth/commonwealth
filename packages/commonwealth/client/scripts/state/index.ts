@@ -230,7 +230,7 @@ export async function initAppState(
       { data: nodesRes },
     ] = await Promise.all([
       axios.get(`${app.serverUrl()}/status`),
-      axios.get(`${app.serverUrl()}/chains?snapshots=true`),
+      axios.get(`${app.serverUrl()}/communities?snapshots=true`),
       axios.get(`${app.serverUrl()}/nodes`),
     ]);
 
