@@ -24,7 +24,7 @@ import { GroupCategory, SearchFilters } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
-  { value: 'groups', label: 'Groups' },
+  ...(process.env.GATING_ENABLED ? [{ value: 'groups', label: 'Groups' }] : []),
 ];
 
 const GROUP_FILTERS: GroupCategory[] = [
@@ -126,7 +126,7 @@ const CommunityMembersPage = () => {
       return;
     }
 
-    updateActiveTab(TABS[1].value);
+    process.env.GATING_ENABLED && updateActiveTab(TABS[1].value);
   }, []);
 
   const navigateToCreateGroupPage = () => {
@@ -161,8 +161,8 @@ const CommunityMembersPage = () => {
           'cols-4': boolean;
         }>(
           {
-            'cols-3': !isAdmin,
-            'cols-4': isAdmin,
+            'cols-3': process.env.GATING_ENABLED && !isAdmin,
+            'cols-4': process.env.GATING_ENABLED && isAdmin,
           },
           'filters'
         )}
@@ -181,25 +181,27 @@ const CommunityMembersPage = () => {
             }))
           }
         />
-        <div className="select-dropdown-container">
-          <CWText type="b2" fontWeight="bold" className="filter-text">
-            Filter
-          </CWText>
-          <Select
-            containerClassname="select-dropdown"
-            options={GROUP_FILTERS.map((x) => ({
-              id: x,
-              label: x,
-              value: x,
-            }))}
-            selected={searchFilters.category}
-            dropdownPosition="bottom-end"
-            onSelect={(item: any) => {
-              setSearchFilters((g) => ({ ...g, category: item.value }));
-            }}
-          />
-        </div>
-        {isAdmin && (
+        {process.env.GATING_ENABLED && (
+          <div className="select-dropdown-container">
+            <CWText type="b2" fontWeight="bold" className="filter-text">
+              Filter
+            </CWText>
+            <Select
+              containerClassname="select-dropdown"
+              options={GROUP_FILTERS.map((x) => ({
+                id: x,
+                label: x,
+                value: x,
+              }))}
+              selected={searchFilters.category}
+              dropdownPosition="bottom-end"
+              onSelect={(item: any) => {
+                setSearchFilters((g) => ({ ...g, category: item.value }));
+              }}
+            />
+          </div>
+        )}
+        {process.env.GATING_ENABLED && isAdmin && (
           <CWButton
             buttonWidth="full"
             label="Create group"
@@ -210,7 +212,7 @@ const CommunityMembersPage = () => {
       </section>
 
       {/* Main content section: based on the selected tab */}
-      {selectedTab === TABS[1].value ? (
+      {process.env.GATING_ENABLED && selectedTab === TABS[1].value ? (
         <GroupsSection />
       ) : (
         <MembersSection

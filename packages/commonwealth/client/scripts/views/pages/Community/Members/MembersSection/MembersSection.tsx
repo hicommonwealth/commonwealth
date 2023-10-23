@@ -26,12 +26,16 @@ const columns = [
     numeric: false,
     sortable: true,
   },
-  {
-    key: 'groups',
-    header: 'Groups',
-    numeric: false,
-    sortable: true,
-  },
+  ...(process.env.GATING_ENABLED
+    ? [
+        {
+          key: 'groups',
+          header: 'Groups',
+          numeric: false,
+          sortable: true,
+        },
+      ]
+    : []),
 ];
 
 const MembersSection = ({
