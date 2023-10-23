@@ -9,8 +9,10 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
 import { ZodError, ZodObject } from 'zod';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
@@ -390,14 +392,35 @@ const GroupForm = ({
               ))}
 
               {requirementSubForms.length < MAX_REQUIREMENTS && (
-                <CWButton
-                  type="button"
-                  label="Add requirement"
-                  iconLeft="plus"
-                  buttonWidth="full"
-                  buttonType="secondary"
-                  buttonHeight="med"
-                  onClick={addRequirementSubForm}
+                <CWTooltip
+                  content="Cannot add more than 10 requirements"
+                  placement="bottom"
+                  renderTrigger={(handleInteraction, isTooltipOpen) => (
+                    <CWButton
+                      type="button"
+                      label="Add requirement"
+                      iconLeft="plus"
+                      buttonWidth="full"
+                      buttonType="secondary"
+                      buttonHeight="med"
+                      onClick={addRequirementSubForm}
+                      disabled={requirementSubForms.length >= MAX_REQUIREMENTS}
+                      onMouseEnter={(e) => {
+                        if (requirementSubForms.length >= MAX_REQUIREMENTS) {
+                          handleMouseEnter({ e, handleInteraction });
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (requirementSubForms.length >= MAX_REQUIREMENTS) {
+                          handleMouseLeave({
+                            e,
+                            isTooltipOpen,
+                            handleInteraction,
+                          });
+                        }
+                      }}
+                    />
+                  )}
                 />
               )}
 
