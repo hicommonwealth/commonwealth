@@ -1,4 +1,4 @@
-import type { WalletId, WalletSsoSource } from 'common-common/src/types';
+import { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes, ChainInstance } from './chain';
@@ -26,6 +26,10 @@ export type AddressAttributes = {
   is_councillor?: boolean;
   is_validator?: boolean;
   ghost_address?: boolean;
+  // Cosmos self-custodial wallets only.
+  // hex is derived from bech32 address using bech32ToHex function in
+  // packages/commonwealth/shared/utils.ts
+  hex?: string;
   profile_id?: number;
   wallet_id?: WalletId;
   wallet_sso_source?: WalletSsoSource;
@@ -92,6 +96,26 @@ export default (
       wallet_id: { type: dataTypes.STRING, allowNull: true },
       wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
       block_info: { type: dataTypes.STRING, allowNull: true },
+      hex: {
+        type: dataTypes.STRING,
+        allowNull: true,
+        validate: {
+          isRequiredForCosmos(value) {
+            if (
+              [
+                WalletId.Keplr,
+                WalletId.KeplrEthereum,
+                WalletId.TerraStation,
+                WalletId.CosmosEvmMetamask,
+              ].includes(value.wallet_id)
+            ) {
+              if (!value.hex) {
+                throw new Error('hex is required for cosmos addresses');
+              }
+            }
+          },
+        },
+      },
     },
     {
       timestamps: true,

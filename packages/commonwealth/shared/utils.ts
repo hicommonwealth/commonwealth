@@ -1,10 +1,10 @@
+import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
   checkAddress,
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { AccessLevel } from './permissions';
 import type { RoleObject } from './types';
 
@@ -308,4 +308,19 @@ export function naturalDenomToMinimal(
 
   // 0 decimal places because this is max precision for the chain
   return intPretty.toDec().toString(0);
+}
+
+/**
+ * Convert Cosmos bech32 address to a hex string
+ * hex is used as a common identifier for addresses across chains.
+ * This allows us to achieve One Signer, One Account
+ *
+ * Example:
+ * bech32ToHex('osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6') => '3822bfccc76238c527ad043fbf1a85ccbbc64373'
+ * bech32ToHex('cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg') => '3822bfccc76238c527ad043fbf1a85ccbbc64373' (same)
+ */
+export async function bech32ToHex(address: string) {
+  const { toHex, fromBech32 } = await import('@cosmjs/encoding');
+  const encodedData = fromBech32(address).data;
+  return toHex(encodedData);
 }

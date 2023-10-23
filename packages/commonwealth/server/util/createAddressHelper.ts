@@ -9,8 +9,9 @@ import {
 import crypto from 'crypto';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { AddressInstance } from 'server/models/address';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { addressSwapper } from '../../shared/utils';
+import { addressSwapper, bech32ToHex } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { DB } from '../models';
@@ -64,6 +65,8 @@ export async function createAddressHelper(
 
   // test / convert address as needed
   let encodedAddress = (req.address as string).trim();
+  let addressHex: string;
+  let existingAddressWithHex: AddressInstance;
   try {
     if (chain.base === ChainBase.Substrate) {
       encodedAddress = addressSwapper({
@@ -74,6 +77,26 @@ export async function createAddressHelper(
       // cosmos or injective
       const { words } = bech32.decode(req.address, 50);
       encodedAddress = bech32.encode(chain.bech32_prefix, words);
+
+      try {
+        addressHex = await bech32ToHex(req.address);
+      } catch (e) {
+        console.log(`Error converting bech32 to hex: ${e}. Hex was not added.`);
+      }
+
+      // check all addresses for matching hex
+      const existingHexes = await models.Address.scope(
+        'withPrivateData'
+      ).findAll({
+        where: { hex: addressHex, verified: { [Op.ne]: null } },
+      });
+      const existingHexesSorted = existingHexes.sort((a, b) => {
+        // sort by latest last_active
+        return +b.dataValues.last_active - +a.dataValues.last_active;
+      });
+
+      // use the latest active address with this hex to assign profile
+      existingAddressWithHex = existingHexesSorted?.[0];
     } else if (chain.base === ChainBase.Ethereum) {
       const Web3 = (await import('web3-utils')).default;
       if (!Web3.isAddress(encodedAddress)) {
@@ -94,18 +117,17 @@ export async function createAddressHelper(
   } catch (e) {
     return next(new AppError(Errors.InvalidAddress));
   }
-
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
       where: { community_id: req.chain, address: encodedAddress },
     }
   );
 
-  const existingAddressOnOtherChain = await models.Address.scope(
-    'withPrivateData'
-  ).findOne({
-    where: { community_id: { [Op.ne]: req.chain }, address: encodedAddress },
-  });
+  const addressExistsOnOtherChain =
+    !!existingAddressWithHex ||
+    (await models.Address.scope('withPrivateData').findOne({
+      where: { community_id: { [Op.ne]: req.chain }, address: encodedAddress },
+    }));
 
   if (existingAddress) {
     // address already exists on another user, only take ownership if
@@ -140,6 +162,8 @@ export async function createAddressHelper(
     existingAddress.last_active = new Date();
     existingAddress.block_info = req.block_info;
 
+    existingAddress.hex = addressHex;
+
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.wallet_id;
     existingAddress.wallet_sso_source = req.wallet_sso_source;
@@ -169,7 +193,11 @@ export async function createAddressHelper(
       );
       const last_active = new Date();
       let profile_id: number;
-      const user_id = user ? user.id : null;
+      let user_id = user ? user.id : null;
+
+      if (existingAddressWithHex) {
+        user_id = existingAddressWithHex.user_id;
+      }
 
       if (user_id) {
         const profile = await models.Profile.findOne({
@@ -178,11 +206,17 @@ export async function createAddressHelper(
         });
         profile_id = profile?.id;
       }
+
+      if (existingAddressWithHex && !profile_id) {
+        profile_id = existingAddressWithHex.profile_id;
+      }
+
       const newObj = await models.Address.create({
         user_id,
         profile_id,
         community_id: req.chain,
         address: encodedAddress,
+        hex: addressHex,
         verification_token,
         verification_token_expires,
         block_info: req.block_info,
@@ -210,7 +244,7 @@ export async function createAddressHelper(
 
       return {
         ...newObj.toJSON(),
-        newly_created: !existingAddressOnOtherChain,
+        newly_created: !addressExistsOnOtherChain,
       };
     } catch (e) {
       return next(e);
