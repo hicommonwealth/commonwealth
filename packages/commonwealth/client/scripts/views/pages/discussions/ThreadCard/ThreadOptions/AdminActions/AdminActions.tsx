@@ -322,14 +322,14 @@ export const AdminActions = ({
               : []),
             ...(hasAdminPermissions
               ? [
-                  {
-                    onClick: handleThreadPinToggle,
-                    label: thread.pinned ? 'Unpin' : 'Pin',
-                    iconLeft: 'pin' as const,
-                    iconLeftWeight: 'bold' as const,
-                  },
                   ...(thread.archivedAt === null
                     ? [
+                        {
+                          onClick: handleThreadPinToggle,
+                          label: thread.pinned ? 'Unpin' : 'Pin',
+                          iconLeft: 'pin' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
                         {
                           onClick: handleThreadLockToggle,
                           label: thread.readOnly ? 'Unlock' : 'Lock',

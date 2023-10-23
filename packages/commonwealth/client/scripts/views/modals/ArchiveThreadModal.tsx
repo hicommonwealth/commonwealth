@@ -33,6 +33,7 @@ export const ArchiveThreadModal = ({
       chainId: app.activeChainId(),
       archived: !thread.archivedAt,
       address: app.user?.activeAccount?.address,
+      pinned: false,
     })
       .then(() => {
         notifySuccess(
