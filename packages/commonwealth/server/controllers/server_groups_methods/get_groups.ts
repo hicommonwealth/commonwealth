@@ -1,4 +1,4 @@
-import { ServerChainsController } from '../server_chains_controller';
+import { ServerCommunitiesController } from '../server_communities_controller';
 import { GroupAttributes } from 'server/models/group';
 import { ChainInstance } from 'server/models/chain';
 import { Op, WhereOptions } from 'sequelize';
@@ -16,7 +16,7 @@ type GroupWithMemberships = GroupAttributes & {
 export type GetGroupsResult = GroupWithMemberships[];
 
 export async function __getGroups(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   { chain, addressId, includeMembers }: GetGroupsOptions
 ): Promise<GetGroupsResult> {
   const groups = await this.models.Group.findAll({
@@ -40,15 +40,13 @@ export async function __getGroups(
     const members = await this.models.Membership.findAll({
       where,
     });
-    const groupIdMembersMap: Record<
-      number,
-      MembershipAttributes[]
-    > = members.reduce((acc, member) => {
-      return {
-        ...acc,
-        [member.group_id]: (acc[member.group_id] || []).concat(member),
-      };
-    }, {});
+    const groupIdMembersMap: Record<number, MembershipAttributes[]> =
+      members.reduce((acc, member) => {
+        return {
+          ...acc,
+          [member.group_id]: (acc[member.group_id] || []).concat(member),
+        };
+      }, {});
     const groupsWithMemberships = groups.map((group) => ({
       ...group.toJSON(),
       memberships: groupIdMembersMap[group.id] || [],
