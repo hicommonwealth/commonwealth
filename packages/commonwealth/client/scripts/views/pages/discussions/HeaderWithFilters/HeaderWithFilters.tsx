@@ -121,6 +121,11 @@ export const HeaderWithFilters = ({
     location
   );
 
+  const matchesArchivedRoute = matchRoutes(
+    [{ path: '/archived' }, { path: ':scope/archived' }],
+    location
+  );
+
   const onFilterSelect = ({
     pickedTopic = matchesDiscussionsTopicRoute?.[0]?.params?.topic || '',
     filterKey = '',
@@ -135,12 +140,21 @@ export const HeaderWithFilters = ({
       delete urlParams[filterKey];
     }
 
-    navigate(
-      `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
-        Object.keys(urlParams)
-          .map((x) => `${x}=${urlParams[x]}`)
-          .join('&')
-    );
+    if (matchesArchivedRoute && !pickedTopic) {
+      navigate(
+        `/archived?` +
+          Object.keys(urlParams)
+            .map((x) => `${x}=${urlParams[x]}`)
+            .join('&')
+      );
+    } else {
+      navigate(
+        `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
+          Object.keys(urlParams)
+            .map((x) => `${x}=${urlParams[x]}`)
+            .join('&')
+      );
+    }
   };
 
   return (
