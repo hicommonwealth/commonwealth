@@ -199,7 +199,7 @@ const CommunityMembersPage = () => {
           <CWButton
             buttonWidth="full"
             label="Create group"
-            iconLeft={'plus'}
+            iconLeft="plus"
             onClick={navigateToCreateGroupPage}
           />
         )}
