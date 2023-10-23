@@ -1,4 +1,4 @@
-import models from '../../server/database';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   BalanceType,
   ChainBase,
@@ -6,7 +6,7 @@ import {
   ChainType,
   NotificationCategories,
 } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
+import models from '../../server/database';
 import { ChainNodeAttributes } from '../../server/models/chain_node';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -210,7 +210,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         {
           user_id: 1,
           address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
-          chain: 'ethereum',
+          community_id: 'ethereum',
           // selected: true,
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
@@ -218,7 +218,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         },
         {
           address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',
-          chain: 'edgeware',
+          community_id: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -226,7 +226,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         },
         {
           address: 'ik52qFh92pboSctWPSFKtQwGEpypzz2m6D5ZRP8AYxqjHpM',
-          chain: 'edgeware',
+          community_id: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -234,7 +234,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         },
         {
           address: 'js4NB7G3bqEsSYq4ruj9Lq24QHcoKaqauw6YDPD7hMr1Roj',
-          chain: 'edgeware',
+          community_id: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),

@@ -4,10 +4,10 @@ import { Label as ChainEventLabel } from 'chain-events/src';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import type {
-  IForumNotificationData,
   IChainEventNotificationData,
+  IForumNotificationData,
   ISnapshotNotificationData,
 } from '../../shared/types';
 import {
@@ -19,8 +19,9 @@ import {
 
 import { DynamicTemplate } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
-import type { UserAttributes } from '../models/user';
 import { DB } from '../models';
+import { AddressAttributes } from '../models/address';
+import type { UserAttributes } from '../models/user';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -60,11 +61,15 @@ const getForumNotificationCopy = async (
       : 'New activity on Commonwealth';
 
   // author
+  const addressWhere: WhereOptions<AddressAttributes> = {
+    address: author_address,
+    community_id: author_chain || null,
+  };
   const authorProfile = await models.Profile.findOne({
     include: [
       {
         model: models.Address,
-        where: { address: author_address, chain: author_chain || null },
+        where: addressWhere,
         required: true,
       },
     ],

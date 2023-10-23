@@ -1,24 +1,23 @@
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { CommentAttributes } from '../../models/comment';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { getCommentDepth } from '../../util/getCommentDepth';
+import moment from 'moment';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { CommentAttributes } from '../../models/comment';
+import { UserInstance } from '../../models/user';
+import { getCommentDepth } from '../../util/getCommentDepth';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from '../../../../common-common/src/errors';
-import { AppError } from '../../../../common-common/src/errors';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
-import moment from 'moment';
-import { parseUserMentions } from '../../util/parseUserMentions';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
@@ -234,7 +233,7 @@ export async function __createThreadComment(
         mentions.map(async (mention) => {
           const mentionedUser = await this.models.Address.findOne({
             where: {
-              chain: mention[0] || null,
+              community_id: mention[0] || null,
               address: mention[1],
             },
             include: [this.models.User],
@@ -274,7 +273,7 @@ export async function __createThreadComment(
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
         author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+        author_chain: finalComment.Address.community_id,
       },
     },
     excludeAddresses: rootNotifExcludeAddresses,
@@ -296,7 +295,7 @@ export async function __createThreadComment(
           parent_comment_text: parentComment.text,
           chain_id: finalComment.chain,
           author_address: finalComment.Address.address,
-          author_chain: finalComment.Address.chain,
+          author_chain: finalComment.Address.community_id,
         },
       },
       excludeAddresses: excludedAddrs,
@@ -323,7 +322,7 @@ export async function __createThreadComment(
                 comment_text: finalComment.text,
                 chain_id: finalComment.chain,
                 author_address: finalComment.Address.address,
-                author_chain: finalComment.Address.chain,
+                author_chain: finalComment.Address.community_id,
               },
             },
             excludeAddresses: [finalComment.Address.address],

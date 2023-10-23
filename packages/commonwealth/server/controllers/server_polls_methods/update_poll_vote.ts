@@ -83,7 +83,7 @@ export async function __updatePollVote(
     const voteData: Partial<VoteAttributes> = {
       poll_id: poll.id,
       address: address.address,
-      author_community_id: address.chain,
+      author_community_id: address.community_id,
       community_id: chain.id,
     };
     // delete existing votes

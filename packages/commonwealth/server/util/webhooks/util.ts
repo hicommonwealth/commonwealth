@@ -60,7 +60,7 @@ export async function getActorProfile(
   const address = await models.Address.findOne({
     where: {
       address: notif.data.author_address,
-      chain: notif.data.chain_id,
+      community_id: notif.data.chain_id,
     },
     include: [models.Profile],
   });

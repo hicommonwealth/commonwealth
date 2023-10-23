@@ -1,20 +1,18 @@
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { ReactionAttributes } from '../../models/reaction';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
 } from '../../../../common-common/src/types';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { ReactionAttributes } from '../../models/reaction';
+import { UserInstance } from '../../models/user';
 import { findAllRoles } from '../../util/roles';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from '../../../../common-common/src/errors';
-import { AppError } from '../../../../common-common/src/errors';
-import { getThreadUrl } from '../../../shared/utils';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -146,7 +144,7 @@ export async function __createThreadReaction(
         root_type: 'discussion',
         chain_id: finalReaction.chain,
         author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.chain,
+        author_chain: finalReaction.Address.community_id,
       },
     },
     excludeAddresses: [finalReaction.Address.address],

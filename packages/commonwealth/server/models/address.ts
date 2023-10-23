@@ -10,7 +10,7 @@ import type { UserAttributes, UserInstance } from './user';
 
 export type AddressAttributes = {
   address: string;
-  chain: string;
+  community_id: string;
   verification_token: string;
   role: Role;
   is_user_default: boolean;
@@ -30,7 +30,7 @@ export type AddressAttributes = {
   wallet_id?: WalletId;
   wallet_sso_source?: WalletSsoSource;
   // associations
-  Chain?: ChainAttributes;
+  Community?: ChainAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
   SsoToken?: SsoTokenAttributes;
@@ -54,7 +54,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address: { type: dataTypes.STRING, allowNull: false },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       role: {
         type: dataTypes.ENUM('member', 'moderator', 'admin'),
         defaultValue: 'member',
@@ -100,7 +100,7 @@ export default (
       underscored: true,
       tableName: 'Addresses',
       indexes: [
-        { fields: ['address', 'chain'], unique: true },
+        { fields: ['address', 'community'], unique: true },
         { fields: ['user_id'] },
       ],
       defaultScope: {
@@ -122,7 +122,7 @@ export default (
 
   Address.associate = (models) => {
     models.Address.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Address.belongsTo(models.Profile, {

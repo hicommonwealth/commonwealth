@@ -1,7 +1,7 @@
-import type { FindOptions, Transaction } from 'sequelize';
+import type { FindOptions, Transaction, WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
-import type { AddressInstance } from '../models/address';
+import type { AddressAttributes, AddressInstance } from '../models/address';
 import type { CommunityRoleAttributes } from '../models/community_role';
 import type { Role } from '../models/role';
 import type { RoleAssignmentAttributes } from '../models/role_assignment';
@@ -99,7 +99,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
   // we need to take care of includes, if it includes models.Address, we need to remove this from the query
   // but keep the where portion and merge it in with our where portion
   const includeList = {};
-  const addressWhere = {};
+  const addressWhere: WhereOptions<AddressAttributes> = {};
   if (Array.isArray(findOptions.include)) {
     // if address is included in list of includes, add it to query
     const addressIncludeIndex = findOptions.include.findIndex(
@@ -137,7 +137,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
     const communityRole: CommunityRoleAttributes = {
       id: a.id,
       name: a.role,
-      chain_id: a.chain,
+      chain_id: a.community_id,
       allow: 0 as any,
       deny: 0 as any,
       created_at: a.created_at,

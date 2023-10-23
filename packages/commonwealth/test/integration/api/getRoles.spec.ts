@@ -22,7 +22,7 @@ describe('get roles Integration Tests', () => {
   it('should return an error response if there is an invalid chain specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
-      author_chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
     };
 
     const response = await get('/api/roles', invalidRequest, true, app);
@@ -34,8 +34,8 @@ describe('get roles Integration Tests', () => {
   it('should return an error response if an invalid permission is specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
+      chain: testAddresses[0].community_id,
       permissions: null,
     };
 
@@ -48,8 +48,8 @@ describe('get roles Integration Tests', () => {
   it('should get roles and return a success response', async () => {
     const validRequest = {
       jwt: jwtToken,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
+      chain: testAddresses[0].community_id,
       permission: ['member', 'moderator', 'admin'],
     };
 
