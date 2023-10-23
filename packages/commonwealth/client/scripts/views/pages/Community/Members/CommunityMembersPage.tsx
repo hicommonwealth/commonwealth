@@ -85,9 +85,9 @@ const CommunityMembersPage = () => {
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
-            g.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-          ) ||
-          p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+            ) ||
+            p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
           : true
       );
   }, [members, groups, debouncedSearchTerm]);
@@ -127,7 +127,7 @@ const CommunityMembersPage = () => {
     navigate(`/${app.activeChainId()}/members/groups/create`);
   };
 
-  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin()
+  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
   return (
     <section className="CommunityMembersPage">
@@ -164,8 +164,9 @@ const CommunityMembersPage = () => {
         <CWTextInput
           size="large"
           fullWidth
-          placeholder={`Search ${selectedTab === TABS[0] ? 'members' : 'groups'
-            }`}
+          placeholder={`Search ${
+            selectedTab === TABS[0] ? 'members' : 'groups'
+          }`}
           iconLeft={<CWIcon iconName="search" className="search-icon" />}
           onInput={(e) =>
             setSearchFilters((g) => ({
@@ -174,20 +175,26 @@ const CommunityMembersPage = () => {
             }))
           }
         />
-        {isGatingEnabled && <div className='select-dropdown-container'>
-          <CWText type="b2" fontWeight="bold" className="filter-text">
-            Filter
-          </CWText>
-          <Select
-            containerClassname="select-dropdown"
-            options={GROUP_FILTERS.map((x) => ({ id: x, label: x, value: x }))}
-            selected={searchFilters.category}
-            dropdownPosition="bottom-end"
-            onSelect={(item: any) => {
-              setSearchFilters((g) => ({ ...g, category: item.value }));
-            }}
-          />
-        </div>}
+        {isGatingEnabled && (
+          <div className="select-dropdown-container">
+            <CWText type="b2" fontWeight="bold" className="filter-text">
+              Filter
+            </CWText>
+            <Select
+              containerClassname="select-dropdown"
+              options={GROUP_FILTERS.map((x) => ({
+                id: x,
+                label: x,
+                value: x,
+              }))}
+              selected={searchFilters.category}
+              dropdownPosition="bottom-end"
+              onSelect={(item: any) => {
+                setSearchFilters((g) => ({ ...g, category: item.value }));
+              }}
+            />
+          </div>
+        )}
         {isAdmin && (
           <CWButton
             buttonWidth="full"
@@ -200,7 +207,7 @@ const CommunityMembersPage = () => {
 
       {/* Main content section: based on the selected tab */}
       {selectedTab === TABS[1] ? (
-        <GroupsSection searchFilters={searchFilters} />
+        <GroupsSection />
       ) : (
         <MembersSection members={formattedMembers} />
       )}

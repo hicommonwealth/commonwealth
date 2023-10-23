@@ -40,14 +40,4 @@
   .cursor-pointer {
     cursor: pointer;
   }
-
-  .info-block {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-
-    .caption {
-      color: $neutral-500;
-    }
-  }
 }
