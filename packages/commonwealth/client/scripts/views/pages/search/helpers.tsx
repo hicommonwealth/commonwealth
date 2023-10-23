@@ -17,7 +17,7 @@ import { User } from '../../components/user/user';
 
 export type ThreadResult = {
   id: number;
-  community: string;
+  chain: string;
   title: string;
   body: string;
   address_id: number;
@@ -44,10 +44,10 @@ const ThreadResultRow = ({
   }, [thread.title]);
 
   const handleClick = () => {
-    setRoute(`/discussion/${thread.id}`, {}, thread.community);
+    setRoute(`/discussion/${thread.id}`, {}, thread.chain);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== thread.community) {
+  if (app.isCustomDomain() && app.customDomainId() !== thread.chain) {
     return <></>;
   }
 
@@ -56,7 +56,7 @@ const ThreadResultRow = ({
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
-          {`discussion - ${thread.community}`}
+          {`discussion - ${thread.chain}`}
         </CWText>
         <CWText className="search-results-thread-title" fontWeight="medium">
           {renderTruncatedHighlights(searchTerm, title)}
@@ -87,7 +87,7 @@ const ThreadResultRow = ({
 export type ReplyResult = {
   id: number;
   proposalid: number;
-  community: string;
+  chain: string;
   title: string;
   text: string;
   address_id: number;
@@ -106,7 +106,7 @@ const ReplyResultRow = ({
   setRoute,
 }: ReplyResultRowProps) => {
   const proposalId = comment.proposalid;
-  const community = comment.community;
+  const community = comment.chain;
 
   const title = useMemo(() => {
     try {
@@ -129,7 +129,7 @@ const ReplyResultRow = ({
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontWeight="medium">{`comment - ${
-          comment.community || comment.community
+          comment.chain || comment.chain
         }`}</CWText>
         <CWText className="search-results-thread-title">
           {renderTruncatedHighlights(searchTerm, title)}

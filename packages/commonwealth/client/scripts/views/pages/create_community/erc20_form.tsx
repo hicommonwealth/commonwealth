@@ -20,46 +20,46 @@ import {
   EthCommunityRows,
   updateAdminOnCreateCommunity,
 } from './community_input_rows';
-import type { EthCommunityFormState } from './types';
+import type { EthChainFormState } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCommunityFormIdFields,
-  useCommunityFormDefaultFields,
-  useCommunityFormState,
-  useEthCommunityFormFields,
+  useChainFormIdFields,
+  useChainFormDefaultFields,
+  useChainFormState,
+  useEthChainFormFields,
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
 
 export const ERC20Form = ({
-  ethCommunityNames,
-  ethCommunities,
-}: EthCommunityFormState) => {
+  ethChainNames,
+  ethChains,
+}: EthChainFormState) => {
   const [, setDecimals] = useState(18);
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useCommunityFormIdFields();
+    useChainFormIdFields();
 
-  const communityFormDefaultFields = useCommunityFormDefaultFields();
+  const communityFormDefaultFields = useChainFormDefaultFields();
 
-  const communityFormState = useCommunityFormState();
+  const communityFormState = useChainFormState();
 
-  const ethCommunityFormFields = useEthCommunityFormFields();
+  const ethChainFormFields = useEthChainFormFields();
 
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!ethCommunityFormFields.communityString) {
-      ethCommunityFormFields.setCommunityString(ETHEREUM_MAINNET);
+    if (!ethChainFormFields.chainString) {
+      ethChainFormFields.setChainString(ETHEREUM_MAINNET);
     }
-  }, [ethCommunityFormFields]);
+  }, [ethChainFormFields]);
 
-  const validAddress = isAddress(ethCommunityFormFields.address);
+  const validAddress = isAddress(ethChainFormFields.address);
   const disableField = !validAddress || !communityFormState.loaded;
 
   const updateTokenForum = async () => {
     if (
-      !ethCommunityFormFields.address ||
-      !ethCommunityFormFields.ethCommunityId
+      !ethChainFormFields.address ||
+      !ethChainFormFields.ethChainId
     ) {
       return;
     }
@@ -69,9 +69,9 @@ export const ERC20Form = ({
     communityFormState.setLoading(true);
 
     const args = {
-      address: ethCommunityFormFields.address,
-      chain_id: ethCommunityFormFields.ethCommunityId,
-      url: ethCommunityFormFields.nodeUrl,
+      address: ethChainFormFields.address,
+      chain_id: ethChainFormFields.ethChainId,
+      url: ethChainFormFields.nodeUrl,
     };
 
     try {
@@ -171,15 +171,15 @@ export const ERC20Form = ({
   return (
     <div className="CreateCommunityForm">
       {EthCommunityRows(
-        { ethCommunityNames, ethCommunities },
-        { ...ethCommunityFormFields, ...communityFormState }
+        { ethChainNames, ethChains },
+        { ...ethChainFormFields, ...communityFormState }
       )}
       <CWButton
         label="Populate fields"
         disabled={
           communityFormState.saving ||
           !validAddress ||
-          !ethCommunityFormFields.ethCommunityId ||
+          !ethChainFormFields.ethChainId ||
           communityFormState.loading
         }
         onClick={async () => {
@@ -223,18 +223,18 @@ export const ERC20Form = ({
           communityFormState.setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
-              alt_wallet_url: ethCommunityFormFields.altWalletUrl,
+            const res = await $.post(`${app.serverUrl()}/communities`, {
+              alt_wallet_url: ethChainFormFields.altWalletUrl,
               base: ChainBase.Ethereum,
               id: id,
               name: name,
-              address: ethCommunityFormFields.address,
-              chain_string: ethCommunityFormFields.communityString,
-              eth_chain_id: ethCommunityFormFields.ethCommunityId,
+              address: ethChainFormFields.address,
+              chain_string: ethChainFormFields.chainString,
+              eth_chain_id: ethChainFormFields.ethChainId,
               icon_url: communityFormDefaultFields.iconUrl,
               jwt: app.user.jwt,
               network: ChainNetwork.ERC20,
-              node_url: ethCommunityFormFields.nodeUrl,
+              node_url: ethChainFormFields.nodeUrl,
               type: ChainType.Token,
               default_symbol: symbol,
               // ...form, <-- not typed so I don't know what's needed

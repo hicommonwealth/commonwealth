@@ -20,33 +20,36 @@ import {
 } from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCommunityFormIdFields,
-  useCommunityFormDefaultFields,
-  useCommunityFormState,
-  useEthCommunityFormFields,
+  useChainFormIdFields,
+  useChainFormDefaultFields,
+  useChainFormState,
+  useEthChainFormFields,
 } from './hooks';
 
 export const CosmosForm = () => {
   const [bech32Prefix, setBech32Prefix] = useState('');
   const [decimals, setDecimals] = useState(6); // can be 6 or 18
 
+
+  
   const {
     id,
     setId,
     name,
     setName,
-    communityName,
-    setCommunityName,
+    chainName,
+    setChainName,
     symbol,
     setSymbol,
-  } = useCommunityFormIdFields();
+  } = useChainFormIdFields();
 
-  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const { message, saving, setMessage, setSaving } = useCommunityFormState();
+  const communityFormDefaultFields = useChainFormDefaultFields();
 
-  const { altWalletUrl, communityString, ethCommunityId, nodeUrl, setNodeUrl } =
-    useEthCommunityFormFields();
+  const { message, saving, setMessage, setSaving } = useChainFormState();
+
+   const { altWalletUrl, chainString, ethChainId, nodeUrl, setNodeUrl } =
+    useEthChainFormFields();
 
   const navigate = useCommonNavigate();
 
@@ -86,10 +89,10 @@ export const CosmosForm = () => {
       <IdRow id={id} />
       <InputRow
         title="Registered Cosmos Community Name"
-        value={communityName}
+        value={chainName}
         placeholder={name.toLowerCase()}
         onChangeHandler={(v) => {
-          setCommunityName(v);
+          setChainName(v);
         }}
         inputValidationFn={communityNameValidationFn}
       />
@@ -106,7 +109,7 @@ export const CosmosForm = () => {
         value={bech32Prefix}
         placeholder="cosmos"
         onChangeHandler={async (v) => {
-          setBech32Prefix(v);
+          setBech32Prefix(v.toLowerCase());
         }}
       />
       <InputRow
@@ -124,15 +127,15 @@ export const CosmosForm = () => {
           setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               alt_wallet_url: altWalletUrl,
               id: id,
               name: name,
-              cosmos_chain_id: communityName,
+              cosmos_chain_id: chainName,
               base: ChainBase.CosmosSDK,
               bech32_prefix: bech32Prefix,
-              chain_string: communityString,
-              eth_chain_id: ethCommunityId,
+              chain_string: chainString,
+              eth_chain_id: ethChainId,
               jwt: app.user.jwt,
               network: id,
               node_url: nodeUrl,

@@ -50,12 +50,12 @@ const CommunitiesPage = () => {
     setFilterMap((prevState) => ({ ...prevState, [key]: !filterMap[key] }));
   };
 
-  const communityBaseFilter = (list: CommunityInfo[]) => {
+  const chainBaseFilter = (list: CommunityInfo[]) => {
     return list.filter((data) => {
-      const communityBase =
+      const chainBase =
         Object.keys(ChainBase)[Object.values(ChainBase).indexOf(data.base)];
       // Converts chain.base into a ChainBase key to match our filterMap keys
-      return filterMap[communityBase];
+      return filterMap[chainBase];
     });
   };
 
@@ -106,7 +106,7 @@ const CommunitiesPage = () => {
 
       // Filter for ChainBase
       if (communityBases.filter((base) => filterMap[base]).length > 0) {
-        filteredList = communityBaseFilter(filteredList);
+        filteredList = chainBaseFilter(filteredList);
       }
 
       // Filter for ChainNetwork

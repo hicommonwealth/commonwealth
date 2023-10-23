@@ -20,9 +20,9 @@ import {
 } from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCommunityFormIdFields,
-  useCommunityFormDefaultFields,
-  useCommunityFormState,
+  useChainFormIdFields,
+  useChainFormDefaultFields,
+  useChainFormState,
 } from './hooks';
 
 export const SplTokenForm = () => {
@@ -31,11 +31,11 @@ export const SplTokenForm = () => {
   const [mint, setMint] = useState('');
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useCommunityFormIdFields();
+    useChainFormIdFields();
 
-  const communityFormDefaultFields = useCommunityFormDefaultFields();
+  const communityFormDefaultFields = useChainFormDefaultFields();
 
-  const communityFormState = useCommunityFormState();
+  const communityFormState = useChainFormState();
 
   const navigate = useCommonNavigate();
 
@@ -153,7 +153,7 @@ export const SplTokenForm = () => {
           communityFormState.setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               id: id,
               name: name,
               address: mint,

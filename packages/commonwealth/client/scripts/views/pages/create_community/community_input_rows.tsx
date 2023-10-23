@@ -9,11 +9,11 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { Skeleton } from '../../components/Skeleton';
 import type {
-  CommunityFormDefaultFields,
-  EthCommunityFormState,
-  UseCommunityFormDefaultFieldsHookType,
-  UseCommunityFormStateHookType,
-  UseEthCommunityFormFieldsHookType,
+  ChainFormDefaultFields,
+  EthChainFormState,
+  UseChainFormDefaultFieldsHookType,
+  UseChainFormStateHookType,
+  UseEthChainFormFieldsHookType,
 } from './types';
 
 export async function updateAdminOnCreateCommunity(communityId: string) {
@@ -32,7 +32,7 @@ export async function updateAdminOnCreateCommunity(communityId: string) {
   app.skipDeinitChain = true;
 }
 
-export const initCommunityForm = (): CommunityFormDefaultFields => {
+export const initCommunityForm = (): ChainFormDefaultFields => {
   return {
     description: '',
     discord: '',
@@ -46,7 +46,7 @@ export const initCommunityForm = (): CommunityFormDefaultFields => {
 };
 
 export const defaultCommunityRows = <
-  T extends UseCommunityFormDefaultFieldsHookType
+  T extends UseChainFormDefaultFieldsHookType
 >(
   state: T,
   disabled = false
@@ -138,63 +138,63 @@ export const defaultCommunityRows = <
   );
 };
 
-type EthCommunityState = UseEthCommunityFormFieldsHookType &
-  UseCommunityFormStateHookType;
+type EthChainState = UseEthChainFormFieldsHookType &
+  UseChainFormStateHookType;
 
 export const EthCommunityRows = (
-  props: EthCommunityFormState,
-  state: EthCommunityState
+  props: EthChainFormState,
+  state: EthChainState
 ) => {
   const [defaultCommunityNode, setDefaultCommunityNode] =
     useState<DropdownItemType>();
   const options = useMemo(
     () =>
       [
-        ...Object.keys(props.ethCommunities).map(
+        ...Object.keys(props.ethChains).map(
           (c) =>
             ({
-              label: props.ethCommunityNames[c],
-              value: props.ethCommunityNames[c],
+              label: props.ethChainNames[c],
+              value: props.ethChainNames[c],
             } || { label: c, value: c })
         ),
         app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
       ] as Array<DropdownItemType>,
-    [props.ethCommunities, props.ethCommunityNames]
+    [props.ethChains, props.ethChainNames]
   );
 
   const onSelectHandler = useCallback(
     (o) => {
       if (!o?.value) return;
-      state.setCommunityString(o.value);
+      state.setChainString(o.value);
 
       if (o.value !== 'Custom') {
         const [id] =
-          Object.entries(props.ethCommunityNames).find(
+          Object.entries(props.ethChainNames).find(
             ([, name]) => name === o.value
           ) ||
-          Object.keys(props.ethCommunities).find((cId) => `${cId}` === o.value);
+          Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
 
-        state.setEthCommunityId(id);
-        state.setNodeUrl(props.ethCommunities[id].url);
-        state.setAltWalletUrl(props.ethCommunities[id].alt_wallet_url);
+        state.setEthChainId(id);
+        state.setNodeUrl(props.ethChains[id].url);
+        state.setAltWalletUrl(props.ethChains[id].alt_wallet_url);
       } else {
-        state.setEthCommunityId('');
+        state.setEthChainId('');
         state.setNodeUrl('');
         state.setAltWalletUrl('');
       }
     },
-    [state, props.ethCommunities, props.ethCommunityNames]
+    [state, props.ethChains, props.ethChainNames]
   );
 
   // chainString is the key we use to set all the other fields:
   useEffect(() => {
-    if (state?.communityString && options?.length > 0) {
+    if (state?.chainString && options?.length > 0) {
       const foundCommunityNode = options.find(
-        (o) => o.label === state.communityString
+        (o) => o.label === state.chainString
       );
       setDefaultCommunityNode(foundCommunityNode || options[0]);
     }
-  }, [state?.communityString, options]);
+  }, [state?.chainString, options]);
 
   // when we know the defaultCommunityNode, we can set the other fields:
   useEffect(() => {
@@ -216,18 +216,18 @@ export const EthCommunityRows = (
       ) : (
         <Skeleton height="62px" />
       )}
-      {state.communityString === 'Custom' && (
+      {state.chainString === 'Custom' && (
         <InputRow
           title="Community ID"
-          value={state.ethCommunityId}
+          value={state.ethChainId}
           placeholder="1"
           onChangeHandler={async (v) => {
-            state.setEthCommunityId(v);
+            state.setEthChainId(v);
             state.setLoaded(false);
           }}
         />
       )}
-      {state.communityString === 'Custom' && (
+      {state.chainString === 'Custom' && (
         <InputRow
           title="Websocket URL"
           value={state.nodeUrl}
@@ -238,7 +238,7 @@ export const EthCommunityRows = (
           }}
         />
       )}
-      {state.communityString === 'Custom' && (
+      {state.chainString === 'Custom' && (
         <InputRow
           title="HTTP URL"
           value={state.altWalletUrl}

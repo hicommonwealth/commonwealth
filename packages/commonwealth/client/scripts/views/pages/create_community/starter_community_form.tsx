@@ -20,20 +20,20 @@ import {
 } from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCommunityFormDefaultFields,
-  useCommunityFormIdFields,
-  useCommunityFormState,
+  useChainFormDefaultFields,
+  useChainFormIdFields,
+  useChainFormState,
 } from './hooks';
 
 export const StarterCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useCommunityFormIdFields();
+    useChainFormIdFields();
 
-  const communityFormDefaultFields = useCommunityFormDefaultFields();
+  const communityFormDefaultFields = useChainFormDefaultFields();
 
-  const { saving, setSaving } = useCommunityFormState();
+  const { saving, setSaving } = useChainFormState();
 
   const navigate = useCommonNavigate();
 
@@ -120,7 +120,7 @@ export const StarterCommunityForm = () => {
           }
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               jwt: app.user.jwt,
               address: '',
               type: ChainType.Offchain,

@@ -20,19 +20,19 @@ import {
 } from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCommunityFormIdFields,
-  useCommunityFormDefaultFields,
-  useCommunityFormState,
+  useChainFormIdFields,
+  useChainFormDefaultFields,
+  useChainFormState,
 } from './hooks';
 
 export const SputnikForm = () => {
   const [isMainnet, setIsMainnet] = useState(true);
 
-  const { name, setName } = useCommunityFormIdFields();
+  const { name, setName } = useChainFormIdFields();
 
-  const communityFormDefaultFields = useCommunityFormDefaultFields();
+  const communityFormDefaultFields = useChainFormDefaultFields();
 
-  const { saving, setSaving } = useCommunityFormState();
+  const { saving, setSaving } = useChainFormState();
 
   const navigate = useCommonNavigate();
 
@@ -119,7 +119,7 @@ export const SputnikForm = () => {
 
             // POST object
             const res = await $.post(
-              `${app.serverUrl()}/createChain`,
+              `${app.serverUrl()}/communities`,
               createCommunityArgs
             );
 

@@ -2,36 +2,35 @@ import { useState } from 'react';
 
 import type { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import type {
-  EthCommunityNamesType,
-  EthCommunityType,
-  UseCommunityFormDefaultFieldsHookType,
-  UseCommunityFormIdFieldsHookType,
-  UseCommunityFormStateHookType,
-  UseEthCommunityFormFieldsHookType,
-  UseEthCommunityFormStateHookType,
+  EthChainNamesType,
+  EthChainsType,
+  UseChainFormDefaultFieldsHookType,
+  UseChainFormIdFieldsHookType,
+  UseChainFormStateHookType,
+  UseEthChainFormFieldsHookType,
+  UseEthChainFormStateHookType,
 } from './types';
 
-export const useCommunityFormIdFields =
-  (): UseCommunityFormIdFieldsHookType => {
-    const [id, setId] = useState('');
-    const [name, setName] = useState('');
-    const [communityName, setCommunityName] = useState('');
-    const [symbol, setSymbol] = useState('XYZ');
+export const useChainFormIdFields = (): UseChainFormIdFieldsHookType => {
+  const [id, setId] = useState('');
+  const [name, setName] = useState('');
+  const [chainName, setChainName] = useState('');
+  const [symbol, setSymbol] = useState('XYZ');
 
-    return {
-      id,
-      name,
-      communityName,
-      setId,
-      setName,
-      setCommunityName,
-      setSymbol,
-      symbol,
-    };
+  return {
+    id,
+    name,
+    chainName,
+    setId,
+    setName,
+    setChainName,
+    setSymbol,
+    symbol,
   };
+};
 
-export const useCommunityFormDefaultFields =
-  (): UseCommunityFormDefaultFieldsHookType => {
+export const useChainFormDefaultFields =
+  (): UseChainFormDefaultFieldsHookType => {
     const [description, setDescription] = useState('');
     const [discord, setDiscord] = useState('');
     const [element, setElement] = useState('');
@@ -61,7 +60,7 @@ export const useCommunityFormDefaultFields =
     };
   };
 
-export const useCommunityFormState = (): UseCommunityFormStateHookType => {
+export const useChainFormState = (): UseChainFormStateHookType => {
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -82,38 +81,35 @@ export const useCommunityFormState = (): UseCommunityFormStateHookType => {
   };
 };
 
-export const useEthCommunityFormState =
-  (): UseEthCommunityFormStateHookType => {
-    const [ethCommunities, setEthCommunities] = useState<EthCommunityType>({});
-    const [ethCommunityNames, setEthCommunityNames] =
-      useState<EthCommunityNamesType>({});
+export const useEthChainFormState = (): UseEthChainFormStateHookType => {
+  const [ethChains, setEthChains] = useState<EthChainsType>({});
+  const [ethChainNames, setEthChainNames] = useState<EthChainNamesType>({});
 
-    return {
-      ethCommunities,
-      setEthCommunities,
-      ethCommunityNames,
-      setEthCommunityNames,
-    };
+  return {
+    ethChains,
+    setEthChains,
+    ethChainNames,
+    setEthChainNames,
   };
+};
 
-export const useEthCommunityFormFields =
-  (): UseEthCommunityFormFieldsHookType => {
-    const [address, setAddress] = useState('');
-    const [altWalletUrl, setAltWalletUrl] = useState('');
-    const [communityString, setCommunityString] = useState('');
-    const [ethCommunityId, setEthCommunityId] = useState('');
-    const [nodeUrl, setNodeUrl] = useState('');
+export const useEthChainFormFields = (): UseEthChainFormFieldsHookType => {
+  const [address, setAddress] = useState('');
+  const [altWalletUrl, setAltWalletUrl] = useState('');
+  const [chainString, setChainString] = useState('');
+  const [ethChainId, setEthChainId] = useState('');
+  const [nodeUrl, setNodeUrl] = useState('');
 
-    return {
-      address,
-      altWalletUrl,
-      communityString,
-      ethCommunityId,
-      nodeUrl,
-      setAddress,
-      setAltWalletUrl,
-      setCommunityString,
-      setEthCommunityId,
-      setNodeUrl,
-    };
+  return {
+    address,
+    altWalletUrl,
+    chainString,
+    ethChainId,
+    nodeUrl,
+    setAddress,
+    setAltWalletUrl,
+    setChainString,
+    setEthChainId,
+    setNodeUrl,
   };
+};

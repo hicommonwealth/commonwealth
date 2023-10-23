@@ -29,10 +29,10 @@ import CompoundAPI, {
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCommunityFormIdFields,
-  useCommunityFormDefaultFields,
-  useCommunityFormState,
-  useEthCommunityFormFields,
+  useChainFormIdFields,
+  useChainFormDefaultFields,
+  useChainFormState,
+  useEthChainFormFields,
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
 
@@ -46,30 +46,30 @@ export const EthDaoForm = ({
   const [tokenName, setTokenName] = useState('token');
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useCommunityFormIdFields();
+    useChainFormIdFields();
 
-  const communityFormDefaultFields = useCommunityFormDefaultFields();
+  const communityFormDefaultFields = useChainFormDefaultFields();
 
-  const communityFormState = useCommunityFormState();
+  const communityFormState = useChainFormState();
 
-  const ethCommunityFormFields = useEthCommunityFormFields();
+  const ethChainFormFields = useEthChainFormFields();
 
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!ethCommunityFormFields.communityString) {
-      ethCommunityFormFields.setCommunityString(ETHEREUM_MAINNET);
+    if (!ethChainFormFields.communityString) {
+      ethChainFormFields.setCommunityString(ETHEREUM_MAINNET);
     }
-  }, [ethCommunityFormFields]);
+  }, [ethChainFormFields]);
 
-  const validAddress = isAddress(ethCommunityFormFields.address);
+  const validAddress = isAddress(ethChainFormFields.address);
   const disableField = !validAddress || !communityFormState.loaded;
 
   const updateDAO = async () => {
     if (
-      !ethCommunityFormFields.address ||
-      !ethCommunityFormFields.ethCommunityId ||
-      ethCommunityFormFields.nodeUrl
+      !ethChainFormFields.address ||
+      !ethChainFormFields.ethCommunityId ||
+      ethChainFormFields.nodeUrl
     ) {
       return;
     }
@@ -82,14 +82,14 @@ export const EthDaoForm = ({
       if (network === ChainNetwork.Compound) {
         const Web3 = (await import('web3')).default;
         const provider =
-          ethCommunityFormFields.nodeUrl.slice(0, 4) == 'http'
-            ? new Web3.providers.HttpProvider(ethCommunityFormFields.nodeUrl)
+          ethChainFormFields.nodeUrl.slice(0, 4) == 'http'
+            ? new Web3.providers.HttpProvider(ethChainFormFields.nodeUrl)
             : new Web3.providers.WebsocketProvider(
-                ethCommunityFormFields.nodeUrl
+                ethChainFormFields.nodeUrl
               );
 
         const compoundApi = new CompoundAPI(
-          ethCommunityFormFields.address,
+          ethChainFormFields.address,
           provider
         );
 
@@ -111,15 +111,15 @@ export const EthDaoForm = ({
       } else if (network === ChainNetwork.Aave) {
         const Web3 = (await import('web3')).default;
         const provider =
-          ethCommunityFormFields.nodeUrl.slice(0, 4) == 'http'
-            ? new Web3.providers.HttpProvider(ethCommunityFormFields.nodeUrl)
+          ethChainFormFields.nodeUrl.slice(0, 4) == 'http'
+            ? new Web3.providers.HttpProvider(ethChainFormFields.nodeUrl)
             : new Web3.providers.WebsocketProvider(
-                ethCommunityFormFields.nodeUrl
+                ethChainFormFields.nodeUrl
               );
 
         const aaveApi = new AaveApi(
           IAaveGovernanceV2__factory.connect,
-          ethCommunityFormFields.address,
+          ethChainFormFields.address,
           provider
         );
 
@@ -144,7 +144,7 @@ export const EthDaoForm = ({
     <div className="CreateCommunityForm">
       {EthCommunityRows(
         { ethCommunityNames, ethCommunities },
-        { ...ethCommunityFormFields, ...communityFormState }
+        { ...ethChainFormFields, ...communityFormState }
       )}
       <CWDropdown
         label="DAO Type"
@@ -172,7 +172,7 @@ export const EthDaoForm = ({
         disabled={
           communityFormState.saving ||
           !validAddress ||
-          !ethCommunityFormFields.ethCommunityId ||
+          !ethChainFormFields.ethChainId ||
           communityFormState.loading
         }
         onClick={async () => {
@@ -216,15 +216,15 @@ export const EthDaoForm = ({
           communityFormState.setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               base: ChainBase.Ethereum,
               id: id,
               name: name,
-              address: ethCommunityFormFields.address,
-              community_string: ethCommunityFormFields.communityString,
-              eth_community_id: ethCommunityFormFields.ethCommunityId,
+              address: ethChainFormFields.address,
+              chain_string: ethChainFormFields.chainString,
+              eth_community_id: ethChainFormFields.ethChainId,
               jwt: app.user.jwt,
-              node_url: ethCommunityFormFields.nodeUrl,
+              node_url: ethChainFormFields.nodeUrl,
               icon_url: communityFormDefaultFields.iconUrl,
               token_name: tokenName,
               type: ChainType.DAO,

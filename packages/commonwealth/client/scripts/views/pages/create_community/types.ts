@@ -3,21 +3,21 @@ import type {
   ValidationTextProps,
 } from '../../components/component_kit/cw_validation_text';
 
-export type CommunityFormIdFields = {
+export type ChainFormIdFields = {
   id: string;
   name: string;
-  communityName: string; // canonical identifer for chain that agrees with cosmos.directory
+  chainName: string; // canonical identifer for chain that agrees with cosmos.directory
   symbol: string;
 };
 
-export type CommunityFormIdFieldSetters = {
+export type ChainFormIdFieldSetters = {
   setId: React.Dispatch<React.SetStateAction<string>>;
   setName: React.Dispatch<React.SetStateAction<string>>;
-  setCommunityName: React.Dispatch<React.SetStateAction<string>>;
+  setChainName: React.Dispatch<React.SetStateAction<string>>;
   setSymbol: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export type CommunityFormDefaultFields = {
+export type ChainFormDefaultFields = {
   description: string;
   discord: string;
   element: string;
@@ -28,10 +28,10 @@ export type CommunityFormDefaultFields = {
   website: string;
 };
 
-export type UseCommunityFormIdFieldsHookType = CommunityFormIdFields &
-  CommunityFormIdFieldSetters;
+export type UseChainFormIdFieldsHookType = ChainFormIdFields &
+  ChainFormIdFieldSetters;
 
-export type CommunityFormDefaultFieldSetters = {
+export type ChainFormDefaultFieldSetters = {
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   setDiscord: React.Dispatch<React.SetStateAction<string>>;
   setElement: React.Dispatch<React.SetStateAction<string>>;
@@ -42,19 +42,18 @@ export type CommunityFormDefaultFieldSetters = {
   setWebsite: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export type UseCommunityFormDefaultFieldsHookType = CommunityFormDefaultFields &
-  CommunityFormDefaultFieldSetters;
+export type UseChainFormDefaultFieldsHookType = ChainFormDefaultFields &
+  ChainFormDefaultFieldSetters;
 
-export type CommunityFormFields = CommunityFormIdFields &
-  CommunityFormDefaultFields;
+export type ChainFormFields = ChainFormIdFields & ChainFormDefaultFields;
 
-export type CommunityFormState = {
+export type ChainFormState = {
   loaded: boolean;
   loading: boolean;
   saving: boolean;
 } & ValidationTextProps;
 
-export type CommunityFormStateSetters = {
+export type ChainFormStateSetters = {
   setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setSaving: React.Dispatch<React.SetStateAction<boolean>>;
@@ -62,49 +61,45 @@ export type CommunityFormStateSetters = {
   setStatus: React.Dispatch<React.SetStateAction<ValidationStatus>>;
 };
 
-export type UseCommunityFormStateHookType = CommunityFormState &
-  CommunityFormStateSetters;
+export type UseChainFormStateHookType = ChainFormState & ChainFormStateSetters;
 
-export type EthCommunityType = {
+export type EthChainsType = {
   [id: number]: { url: string; alt_wallet_url: string };
 };
 
-export type EthCommunityNamesType = { [id: number]: string };
+export type EthChainNamesType = { [id: number]: string };
 
-export type EthCommunityFormState = {
-  ethCommunities: EthCommunityType;
-  ethCommunityNames: EthCommunityNamesType;
+export type EthChainFormState = {
+  ethChains: EthChainsType;
+  ethChainNames: EthChainNamesType;
   disabled?: boolean;
 };
 
-export type EthCommunityFormStateSetters = {
-  setEthCommunities: React.Dispatch<React.SetStateAction<EthCommunityType>>;
-  setEthCommunityNames: React.Dispatch<
-    React.SetStateAction<EthCommunityNamesType>
-  >;
+export type EthChainFormStateSetters = {
+  setEthChains: React.Dispatch<React.SetStateAction<EthChainsType>>;
+  setEthChainNames: React.Dispatch<React.SetStateAction<EthChainNamesType>>;
 };
 
-export type UseEthCommunityFormStateHookType = EthCommunityFormState &
-  EthCommunityFormStateSetters;
+export type UseEthChainFormStateHookType = EthChainFormState &
+  EthChainFormStateSetters;
 
 export type EthFormFields = {
   address: string;
   altWalletUrl: string;
-  communityString: string;
-  ethCommunityId: string | number;
+  chainString: string;
+  ethChainId: string | number;
   nodeUrl: string;
 };
 
 export type EthFormFieldSetters = {
   setAddress: React.Dispatch<React.SetStateAction<string>>;
   setAltWalletUrl: React.Dispatch<React.SetStateAction<string>>;
-  setCommunityString: React.Dispatch<React.SetStateAction<string>>;
-  setEthCommunityId: React.Dispatch<React.SetStateAction<string | number>>;
+  setChainString: React.Dispatch<React.SetStateAction<string>>;
+  setEthChainId: React.Dispatch<React.SetStateAction<string | number>>;
   setNodeUrl: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export type UseEthCommunityFormFieldsHookType = EthFormFields &
-  EthFormFieldSetters;
+export type UseEthChainFormFieldsHookType = EthFormFields & EthFormFieldSetters;
 
 // export type EthDaoFormFields = {
 //   network: ChainNetwork.Ethereum;
