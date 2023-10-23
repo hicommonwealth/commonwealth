@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 
+import moment from 'moment';
 import type Poll from '../../../models/Poll';
 import type Thread from '../../../models/Thread';
-import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
 
-import app from 'state';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { CWButton } from '../../components/component_kit/cw_button';
+import app from 'state';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { PollCard } from '../../components/poll_card';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { PollEditorModal } from '../../modals/poll_editor_modal';
 import { getPollTimestamp, handlePollVote } from './helpers';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 
 type ThreadPollEditorCardProps = {
   thread: Thread;
@@ -89,14 +89,14 @@ export const ThreadPollCard = ({
         hasVoted={
           app.user.activeAccount &&
           !!poll.getUserVote(
-            app.user.activeAccount?.chain?.id,
+            app.user.activeAccount?.community?.id,
             app.user.activeAccount?.address
           )
         }
         disableVoteButton={!app.user.activeAccount}
         votedFor={
           poll.getUserVote(
-            app.user.activeAccount?.chain?.id,
+            app.user.activeAccount?.community?.id,
             app.user.activeAccount?.address
           )?.option
         }
@@ -136,7 +136,7 @@ export const ThreadPollCard = ({
               threadId: poll.threadId,
               pollId: poll.id,
               address: app.user.activeAccount.address,
-              authorChain: app.user.activeAccount.chain.id,
+              authorChain: app.user.activeAccount.community.id,
             });
             if (onDelete) onDelete();
             notifySuccess('Poll deleted');

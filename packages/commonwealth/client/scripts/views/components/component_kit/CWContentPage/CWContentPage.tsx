@@ -1,11 +1,11 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import 'components/component_kit/CWContentPage.scss';
+import { truncate } from 'helpers/truncate';
 import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
-import type Account from '../../../../models/Account';
-import { truncate } from 'helpers/truncate';
+import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
 import { Thread } from '../../../../models/Thread';
@@ -139,6 +139,13 @@ export const CWContentPage = ({
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
 
+  let authorCommunityId: string;
+  if (author instanceof MinimumProfile) {
+    authorCommunityId = author?.chain;
+  } else if (author instanceof Account) {
+    authorCommunityId = author.community.id;
+  }
+
   const authorAndPublishInfoRow = (
     <div className="header-info-row">
       <AuthorAndPublishInfo
@@ -152,9 +159,7 @@ export const CWContentPage = ({
           lastUpdated: thread.updatedAt.toISOString(),
         })}
         authorAddress={author?.address}
-        authorChainId={
-          typeof author?.chain === 'string' ? author?.chain : author?.chain?.id
-        }
+        authorChainId={authorCommunityId}
         collaboratorsInfo={collaborators}
         publishDate={moment(createdOrEditedDate)}
         viewsCount={viewCount}

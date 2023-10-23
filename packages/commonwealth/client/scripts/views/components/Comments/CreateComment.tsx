@@ -9,12 +9,14 @@ import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
 import clsx from 'clsx';
+import { SessionKeyError } from 'controllers/server/sessions';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 import { useDraft } from 'hooks/useDraft';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import Permissions from '../../../utils/Permissions';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { CWText } from '../component_kit/cw_text';
@@ -26,8 +28,6 @@ import {
   getTextFromDelta,
 } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
-import { SessionKeyError } from 'controllers/server/sessions';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -190,7 +190,7 @@ export const CreateComment = ({
             >
               <User
                 userAddress={author?.address}
-                userChainId={author?.chain.id}
+                userChainId={author?.community.id}
                 shouldHideAvatar
                 shouldLinkProfile
               />

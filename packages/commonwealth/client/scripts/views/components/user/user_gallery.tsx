@@ -33,7 +33,7 @@ export const UserGallery = (props: UserGalleryProps) => {
           return (
             <User
               userAddress={user.address}
-              userChainId={user.chain?.id || user.profile?.chain}
+              userChainId={user.community?.id || user.profile?.chain}
               shouldShowAvatarOnly
               shouldShowAsDeleted
               shouldShowPopover={popover}

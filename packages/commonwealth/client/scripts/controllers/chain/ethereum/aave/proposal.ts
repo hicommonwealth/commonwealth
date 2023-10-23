@@ -8,30 +8,29 @@ import BN from 'bn.js';
 import bs58 from 'bs58';
 import { AaveTypes } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
+import { EventEmitter } from 'events';
 import { blocknumToTime } from 'helpers';
 import $ from 'jquery';
-import { EventEmitter } from 'events';
+import moment from 'moment';
+import Web3 from 'web3-utils';
 import type ChainEvent from '../../../../models/ChainEvent';
-import type { ITXModalData, IVote } from '../../../../models/interfaces';
 import Proposal from '../../../../models/Proposal';
+import type { ITXModalData, IVote } from '../../../../models/interfaces';
 import type { ProposalEndTime } from '../../../../models/types';
 import {
   ProposalStatus,
   VotingType,
   VotingUnit,
 } from '../../../../models/types';
-import moment from 'moment';
-import Web3 from 'web3-utils';
 import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 
+import axios from 'axios';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
+import { ApiEndpoints } from 'state/api/config';
 import type AaveAPI from './api';
 import type AaveGovernance from './governance';
-import getFetch from 'helpers/getFetch';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
-import axios from 'axios';
-import { ApiEndpoints } from 'state/api/config';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
@@ -46,7 +45,7 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
 
   public format(): string {
     return `${formatNumberLong(+Web3.fromWei(this.power.toString()))} ${
-      this.account.chain.default_symbol
+      this.account.community.default_symbol
     }`;
   }
 }

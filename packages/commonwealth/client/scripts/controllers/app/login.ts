@@ -1,13 +1,13 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { initAppState } from 'state';
+import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
-import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
+import { initAppState } from 'state';
 
 import app from 'state';
 import Account from '../../models/Account';
@@ -66,7 +66,7 @@ export async function setActiveAccount(
   try {
     const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
-      author_chain: account.chain.id,
+      author_chain: account.community.id,
       chain,
       jwt: app.user.jwt,
       auth: true,
@@ -100,14 +100,15 @@ export async function setActiveAccount(
 export async function completeClientLogin(account: Account) {
   try {
     let addressInfo = app.user.addresses.find(
-      (a) => a.address === account.address && a.chain.id === account.chain.id
+      (a) =>
+        a.address === account.address && a.community.id === account.community.id
     );
 
     if (!addressInfo && account.addressId) {
       addressInfo = new AddressInfo({
         id: account.addressId,
         address: account.address,
-        chainId: account.chain.id,
+        chainId: account.community.id,
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
@@ -158,7 +159,7 @@ export async function updateActiveAddresses({
   // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
     app.user.addresses
-      .filter((a) => a.chain.id === chain.id)
+      .filter((a) => a.community.id === chain.id)
       .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
       .filter((addr) => addr),
     shouldRedraw
@@ -184,7 +185,7 @@ export async function updateActiveAddresses({
     if (existingAddress) {
       const account = app.user.activeAccounts.find((a) => {
         return (
-          a.chain.id === existingAddress.chain.id &&
+          a.community.id === existingAddress.community.id &&
           a.address === existingAddress.address
         );
       });
@@ -266,7 +267,7 @@ export async function createUserWithAddress(
   const account = new Account({
     addressId: id,
     address,
-    chain: chainInfo,
+    community: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,
@@ -281,14 +282,14 @@ export async function unlinkLogin(account: AddressInfo) {
   // TODO: Change to DELETE /address
   await $.post(`${app.serverUrl()}/deleteAddress`, {
     address: account.address,
-    chain: account.chain.id,
+    chain: account.community.id,
     auth: true,
     jwt: app.user.jwt,
   });
   // remove deleted role from app.roles
   app.roles.deleteRole({
     address: account,
-    chain: account.chain.id,
+    chain: account.community.id,
   });
   // Remove from all address stores in the frontend state.
   // This might be more gracefully handled by calling initAppState again.

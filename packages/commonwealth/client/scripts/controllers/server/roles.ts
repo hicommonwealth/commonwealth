@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import app from 'state';
 
 import { AccessLevel } from 'permissions';
@@ -16,7 +15,7 @@ const getPermissionLevel = (permission: AccessLevel | undefined) => {
 };
 
 export class RolesController {
-  constructor(public readonly User: UserController) { }
+  constructor(public readonly User: UserController) {}
 
   private _roles: RoleInfo[] = [];
   public get roles(): RoleInfo[] {
@@ -59,13 +58,10 @@ export class RolesController {
       deny: 0,
       is_user_default: true,
       permission: AccessLevel.Member,
-    } as any)
+    } as any);
   }
 
-  public deleteRole(options: {
-    address: AddressInfo;
-    chain: string;
-  }): any {
+  public deleteRole(options: { address: AddressInfo; chain: string }): any {
     this.removeRole((r) => {
       return (
         r.chain_id === options.chain && r.address_id === options.address.id
@@ -88,7 +84,9 @@ export class RolesController {
     if (!account) return;
 
     const address_id = this.User.addresses.find((a) => {
-      return a.address === account.address && a.chain.id === account.chain.id;
+      return (
+        a.address === account.address && a.community.id === account.community.id
+      );
     })?.id;
 
     return this.roles.find((r) => {
@@ -160,7 +158,7 @@ export class RolesController {
     community?: string;
   }): AddressInfo[] {
     return options.chain
-      ? this.User.addresses.filter((a) => a.chain.id === options.chain)
+      ? this.User.addresses.filter((a) => a.community.id === options.chain)
       : this.User.addresses;
   }
 
@@ -229,10 +227,10 @@ export class RolesController {
     const addressinfo: AddressInfo | undefined =
       options.account instanceof Account
         ? this.User.addresses.find(
-          (a) =>
-            options.account.address === a.address &&
-            (options.account.chain as ChainInfo).id === a.chain.id
-        )
+            (a) =>
+              options.account.address === a.address &&
+              (options.account.community as ChainInfo).id === a.community.id
+          )
         : options.account;
     const roles = this.roles.filter((role) =>
       addressinfo ? role.address_id === addressinfo.id : true

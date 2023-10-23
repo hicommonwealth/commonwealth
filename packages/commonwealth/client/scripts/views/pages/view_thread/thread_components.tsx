@@ -30,7 +30,7 @@ export const ThreadAuthor = ({ author, collaborators }: ThreadAuthorProps) => {
       <User
         avatarSize={24}
         userAddress={user.address}
-        userChainId={user.chain?.id || user.profile?.chain}
+        userChainId={user.community?.id || user.profile?.chain}
         shouldShowPopover
         shouldLinkProfile
       />

@@ -30,7 +30,7 @@ class AddressInfo extends Account {
     if (!chain) throw new Error(`Failed to locate chain: ${chainId}`);
     super({
       address,
-      chain,
+      community: chain,
       addressId: id,
       walletId,
       walletSsoSource,
