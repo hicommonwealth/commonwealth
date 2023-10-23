@@ -3,7 +3,7 @@ import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';
 import { uuidv4 } from 'lib/util';
-import 'pages/manage_community/chain_metadata_rows.scss';
+import 'pages/manage_community/community_metadata_rows.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
