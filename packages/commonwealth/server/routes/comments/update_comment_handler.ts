@@ -25,7 +25,7 @@ export const updateCommentHandler = async (
     await controllers.comments.updateComment({
       user,
       address,
-      chain,
+      community: chain,
       commentId,
       commentBody,
       discordMeta,

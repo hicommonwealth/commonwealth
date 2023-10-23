@@ -541,7 +541,7 @@ describe('ServerCommentsController', () => {
         await serverCommentsController.updateComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           commentId,
           commentBody,
         });
@@ -553,7 +553,7 @@ describe('ServerCommentsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          chain: chain as any,
+          community: chain as any,
           commentId,
           commentBody,
         })
@@ -643,7 +643,7 @@ describe('ServerCommentsController', () => {
         serverCommentsController.updateComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           commentId,
           commentBody,
         })
@@ -704,7 +704,7 @@ describe('ServerCommentsController', () => {
         serverCommentsController.updateComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           commentId,
           commentBody,
         })

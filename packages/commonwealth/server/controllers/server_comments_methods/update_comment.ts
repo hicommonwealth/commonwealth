@@ -25,7 +25,7 @@ const Errors = {
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   commentId?: number;
   commentBody: string;
   discordMeta?: any;
@@ -38,7 +38,7 @@ export async function __updateComment(
   {
     user,
     address,
-    chain,
+    community: chain,
     commentId,
     commentBody,
     discordMeta,
