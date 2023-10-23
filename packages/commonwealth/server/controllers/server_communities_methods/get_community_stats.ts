@@ -76,7 +76,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain_id: chainId,
+      community_id: chainId,
     },
   });
 

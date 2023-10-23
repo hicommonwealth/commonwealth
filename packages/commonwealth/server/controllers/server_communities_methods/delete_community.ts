@@ -96,7 +96,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.Webhook.destroy({
-            where: { chain_id: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 
@@ -113,7 +113,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.Vote.destroy({
-            where: { chain_id: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 
