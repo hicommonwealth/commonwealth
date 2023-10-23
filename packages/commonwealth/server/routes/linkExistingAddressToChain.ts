@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { addressSwapper } from '../../shared/utils';
+import { addressSwapper, bech32ToHex } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { DB } from '../models';
@@ -120,6 +120,11 @@ const linkExistingAddressToChain = async (
       where: { community_id: req.body.chain, address: encodedAddress },
     });
 
+    let hex;
+    if (chain.base === ChainBase.CosmosSDK) {
+      hex = await bech32ToHex(req.body.address);
+    }
+
     let addressId: number;
     if (existingAddress) {
       // refer edge case 2)
@@ -136,6 +141,7 @@ const linkExistingAddressToChain = async (
       existingAddress.verification_token_expires = verificationTokenExpires;
       existingAddress.last_active = new Date();
       existingAddress.verified = originalAddress.verified;
+      existingAddress.hex = hex;
       const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
     } else {
@@ -144,6 +150,7 @@ const linkExistingAddressToChain = async (
         profile_id: originalAddress.profile_id,
         address: encodedAddress,
         community_id: req.body.chain,
+        hex,
         verification_token: verificationToken,
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,
