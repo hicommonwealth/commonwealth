@@ -10,13 +10,6 @@ import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
 
 class Account {
-  // TODO: uncomment for safety and add to constructor
-  // private readonly _chain: ChainInfo;
-  // public get chain() {
-  //   console.error('Account.chain' is deprecated. Please use 'Account.community' instead.);
-  //   return this._chain;
-  // }
-
   public readonly address: string;
   public readonly community: ChainInfo;
   public readonly ghostAddress: boolean;

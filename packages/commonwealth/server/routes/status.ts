@@ -19,12 +19,12 @@ import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
 
-type ThreadCountQueryData = {
+export type ThreadCountQueryData = {
   concat: string;
   count: number;
 };
 
-type StatusResp = {
+export type StatusResp = {
   notificationCategories: NotificationCategoryInstance[];
   recentThreads: ThreadCountQueryData[];
   roles?: RoleInstanceWithPermission[];
