@@ -1,13 +1,12 @@
-import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
+import { SupportedNetwork } from 'chain-events/src';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
-import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
-import { SupportedNetwork } from 'chain-events/src';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 import models from '../database';
-import { WebhookDestinations } from '../util/webhooks/types';
 import { WebhookInstance } from '../models/webhook';
-import { TELEGRAM_BOT_TOKEN } from '../config';
+import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
+import { WebhookDestinations } from '../util/webhooks/types';
 
 async function main() {
   const argv = await yargs(hideBin(process.argv))
@@ -72,7 +71,7 @@ async function main() {
   let url: string;
   const webhooks: WebhookInstance[] = [];
   const genericWebhookOptions = {
-    chain_id: chain.id,
+    community_id: chain.id,
     categories: [argv.notificationCategory],
   };
   if (argv.url) {
@@ -163,7 +162,7 @@ async function main() {
     } else if (
       argv.notificationCategory === NotificationCategories.NewComment
     ) {
-      const [comment, created] = await models.Comment.findOrCreate({
+      const [comment] = await models.Comment.findOrCreate({
         where: {
           chain: chain.id,
           thread_id: thread.id,

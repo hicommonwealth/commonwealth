@@ -1,14 +1,14 @@
-import { WebhookInstance } from '../../models/webhook';
-import { ProfileAttributes } from '../../models/profile';
-import models from '../../database';
-import { NotificationDataAndCategory } from '../../../shared/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
+import { NotificationDataAndCategory } from '../../../shared/types';
 import { slugify } from '../../../shared/utils';
-import { WebhookDestinations } from './types';
+import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
+import models from '../../database';
 import { ChainInstance } from '../../models/chain';
+import { ProfileAttributes } from '../../models/profile';
+import { WebhookInstance } from '../../models/webhook';
+import { WebhookDestinations } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -35,7 +35,7 @@ export async function fetchWebhooks(
 
   return await models.Webhook.findAll({
     where: {
-      chain_id: chainId,
+      community_id: chainId,
       categories: {
         [Op.contains]: [notifDataCategory.categoryId],
       },
