@@ -3,7 +3,7 @@ import type {
   ValidationTextProps,
 } from '../../components/component_kit/cw_validation_text';
 
-export type ChainFormIdFields = {
+export type CommunityFormIdFields = {
   id: string;
   name: string;
   chainName: string; // canonical identifer for chain that agrees with cosmos.directory
@@ -28,7 +28,7 @@ export type ChainFormDefaultFields = {
   website: string;
 };
 
-export type UseChainFormIdFieldsHookType = ChainFormIdFields &
+export type UseCommunityFormIdFieldsHookType = CommunityFormIdFields &
   ChainFormIdFieldSetters;
 
 export type ChainFormDefaultFieldSetters = {
@@ -42,12 +42,12 @@ export type ChainFormDefaultFieldSetters = {
   setWebsite: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export type UseChainFormDefaultFieldsHookType = ChainFormDefaultFields &
+export type UseCommunityFormDefaultFieldsHookType = ChainFormDefaultFields &
   ChainFormDefaultFieldSetters;
 
-export type ChainFormFields = ChainFormIdFields & ChainFormDefaultFields;
+export type ChainFormFields = CommunityFormIdFields & ChainFormDefaultFields;
 
-export type ChainFormState = {
+export type CommunityFormState = {
   loaded: boolean;
   loading: boolean;
   saving: boolean;
@@ -61,7 +61,7 @@ export type ChainFormStateSetters = {
   setStatus: React.Dispatch<React.SetStateAction<ValidationStatus>>;
 };
 
-export type UseChainFormStateHookType = ChainFormState & ChainFormStateSetters;
+export type UseCommunityFormStateHookType = CommunityFormState & ChainFormStateSetters;
 
 export type EthChainsType = {
   [id: number]: { url: string; alt_wallet_url: string };
@@ -80,7 +80,7 @@ export type EthChainFormStateSetters = {
   setEthChainNames: React.Dispatch<React.SetStateAction<EthChainNamesType>>;
 };
 
-export type UseEthChainFormStateHookType = EthChainFormState &
+export type UseEthCommunityFormStateHookType = EthChainFormState &
   EthChainFormStateSetters;
 
 export type EthFormFields = {
@@ -99,7 +99,7 @@ export type EthFormFieldSetters = {
   setNodeUrl: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export type UseEthChainFormFieldsHookType = EthFormFields & EthFormFieldSetters;
+export type UseEthCommunityFormFieldsHookType = EthFormFields & EthFormFieldSetters;
 
 // export type EthDaoFormFields = {
 //   network: ChainNetwork.Ethereum;

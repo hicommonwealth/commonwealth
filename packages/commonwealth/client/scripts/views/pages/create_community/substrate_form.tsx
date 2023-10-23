@@ -18,10 +18,10 @@ import {
 } from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 
 const defaultSubstrateSpec = `{"types": {"Address": "MultiAddress", "ChainId": "u8",
@@ -45,13 +45,13 @@ const defaultSubstrateSpec = `{"types": {"Address": "MultiAddress", "ChainId": "
 export const SubstrateForm = () => {
   const [substrateSpec, setSubstrateSpec] = useState('');
 
-  const { name, setName, symbol, setSymbol } = useChainFormIdFields();
+  const { name, setName, symbol, setSymbol } = useCommunityFormIdFields();
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const communityFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
-  const ethCommunityFormFields = useEthChainFormFields();
+  const ethCommunityFormFields = useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
 

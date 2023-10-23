@@ -20,20 +20,20 @@ import {
 } from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormDefaultFields,
-  useChainFormIdFields,
-  useChainFormState,
+  useCommunityFormDefaultFields,
+  useCommunityFormIdFields,
+  useCommunityFormState,
 } from './hooks';
 
 export const StarterCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const { saving, setSaving } = useChainFormState();
+  const { saving, setSaving } = useCommunityFormState();
 
   const navigate = useCommonNavigate();
 

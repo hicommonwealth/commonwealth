@@ -20,9 +20,9 @@ import {
 } from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
 } from './hooks';
 
 export const SplTokenForm = () => {
@@ -31,11 +31,11 @@ export const SplTokenForm = () => {
   const [mint, setMint] = useState('');
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const communityFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
   const navigate = useCommonNavigate();
 

@@ -23,10 +23,10 @@ import {
 import type { EthChainFormState } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 
 export const PolygonForm = ({
@@ -36,13 +36,13 @@ export const PolygonForm = ({
   const [, setDecimals] = useState(18);
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const communityFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
-  const ethChainFormFields = useEthChainFormFields();
+  const ethChainFormFields = useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
 
@@ -240,8 +240,8 @@ export const PolygonForm = ({
             if (res.result.admin_address) {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
-                res.result.role.community_id,
-                res.result.role.community_id
+                res.result.role.chain_id,
+                res.result.role.chain_id
               );
             }
 

@@ -4,14 +4,14 @@ import type { ValidationStatus } from '../../components/component_kit/cw_validat
 import type {
   EthChainNamesType,
   EthChainsType,
-  UseChainFormDefaultFieldsHookType,
-  UseChainFormIdFieldsHookType,
-  UseChainFormStateHookType,
-  UseEthChainFormFieldsHookType,
-  UseEthChainFormStateHookType,
+  UseCommunityFormDefaultFieldsHookType,
+  UseCommunityFormIdFieldsHookType,
+  UseCommunityFormStateHookType,
+  UseEthCommunityFormFieldsHookType,
+  UseEthCommunityFormStateHookType,
 } from './types';
 
-export const useChainFormIdFields = (): UseChainFormIdFieldsHookType => {
+export const useCommunityFormIdFields = (): UseCommunityFormIdFieldsHookType => {
   const [id, setId] = useState('');
   const [name, setName] = useState('');
   const [chainName, setChainName] = useState('');
@@ -29,8 +29,8 @@ export const useChainFormIdFields = (): UseChainFormIdFieldsHookType => {
   };
 };
 
-export const useChainFormDefaultFields =
-  (): UseChainFormDefaultFieldsHookType => {
+export const useCommunityFormDefaultFields =
+  (): UseCommunityFormDefaultFieldsHookType => {
     const [description, setDescription] = useState('');
     const [discord, setDiscord] = useState('');
     const [element, setElement] = useState('');
@@ -60,7 +60,7 @@ export const useChainFormDefaultFields =
     };
   };
 
-export const useChainFormState = (): UseChainFormStateHookType => {
+export const useCommunityFormState = (): UseCommunityFormStateHookType => {
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -81,7 +81,7 @@ export const useChainFormState = (): UseChainFormStateHookType => {
   };
 };
 
-export const useEthChainFormState = (): UseEthChainFormStateHookType => {
+export const useEthCommunityFormState = (): UseEthCommunityFormStateHookType => {
   const [ethChains, setEthChains] = useState<EthChainsType>({});
   const [ethChainNames, setEthChainNames] = useState<EthChainNamesType>({});
 
@@ -93,7 +93,7 @@ export const useEthChainFormState = (): UseEthChainFormStateHookType => {
   };
 };
 
-export const useEthChainFormFields = (): UseEthChainFormFieldsHookType => {
+export const useEthCommunityFormFields = (): UseEthCommunityFormFieldsHookType => {
   const [address, setAddress] = useState('');
   const [altWalletUrl, setAltWalletUrl] = useState('');
   const [chainString, setChainString] = useState('');

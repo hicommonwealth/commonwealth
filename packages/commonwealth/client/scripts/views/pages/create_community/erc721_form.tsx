@@ -23,10 +23,10 @@ import {
 import type { EthChainFormState } from './types';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
 
@@ -35,29 +35,29 @@ export const ERC721Form = ({
   ethChains,
 }: EthChainFormState) => {
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const communityFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
-  const ethChainFormFields = useEthChainFormFields();
+  const ethCommunityFormFields = useEthCommunityFormFields()
 
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!ethChainFormFields.chainString) {
-      ethChainFormFields.setChainString(ETHEREUM_MAINNET);
+    if (!ethCommunityFormFields.chainString) {
+      ethCommunityFormFields.setChainString(ETHEREUM_MAINNET);
     }
-  }, [ethChainFormFields]);
+  }, [ethCommunityFormFields]);
 
-  const validAddress = isAddress(ethChainFormFields.address);
+  const validAddress = isAddress(ethCommunityFormFields.address);
   const disableField = !validAddress || !communityFormState.loaded;
 
   const updateTokenForum = async () => {
     if (
-      !ethChainFormFields.address ||
-      !ethChainFormFields.ethChainId
+      !ethCommunityFormFields.address ||
+      !ethCommunityFormFields.ethChainId
     )
       return;
 
@@ -66,9 +66,9 @@ export const ERC721Form = ({
     communityFormState.setLoading(true);
 
     const args = {
-      address: ethChainFormFields.address,
-      chain_id: ethChainFormFields.ethChainId,
-      url: ethChainFormFields.nodeUrl,
+      address: ethCommunityFormFields.address,
+      chain_id: ethCommunityFormFields.ethChainId,
+      url: ethCommunityFormFields.nodeUrl,
     };
 
     try {
@@ -166,14 +166,14 @@ export const ERC721Form = ({
     <div className="CreateCommunityForm">
       {EthCommunityRows(
         { ethChainNames, ethChains },
-        { ...ethChainFormFields, ...communityFormState }
+        { ...ethCommunityFormFields, ...communityFormState }
       )}
       <CWButton
         label="Populate fields"
         disabled={
           communityFormState.saving ||
           !validAddress ||
-          !ethChainFormFields.ethChainId ||
+          !ethCommunityFormFields.ethChainId ||
           communityFormState.loading
         }
         onClick={async () => {
@@ -218,17 +218,17 @@ export const ERC721Form = ({
 
           try {
             const res = await $.post(`${app.serverUrl()}/communities`, {
-              alt_wallet_url: ethChainFormFields.altWalletUrl,
+              alt_wallet_url: ethCommunityFormFields.altWalletUrl,
               id: id,
               name: name,
-              address: ethChainFormFields.address,
+              address: ethCommunityFormFields.address,
               base: ChainBase.Ethereum,
-              chain_string: ethChainFormFields.chainString,
-              eth_chain_id: ethChainFormFields.ethChainId,
+              chain_string: ethCommunityFormFields.chainString,
+              eth_chain_id: ethCommunityFormFields.ethChainId,
               jwt: app.user.jwt,
               icon_url: communityFormDefaultFields.iconUrl,
               network: ChainNetwork.ERC721,
-              node_url: ethChainFormFields.nodeUrl,
+              node_url: ethCommunityFormFields.nodeUrl,
               type: ChainType.Token,
               default_symbol: symbol,
               // ...form, <-- not typed so I don't know what's needed

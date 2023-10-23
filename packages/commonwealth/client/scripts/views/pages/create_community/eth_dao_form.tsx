@@ -18,7 +18,7 @@ import {
   EthCommunityRows,
   updateAdminOnCreateCommunity,
 } from './community_input_rows';
-import type { EthCommunityFormState } from 'views/pages/create_community/types';
+import type { EthChainFormState } from 'views/pages/create_community/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError } from 'controllers/app/notifications';
 import AaveApi from 'controllers/chain/ethereum/aave/api';
@@ -29,36 +29,36 @@ import CompoundAPI, {
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
 
 export const EthDaoForm = ({
-  ethCommunityNames,
-  ethCommunities,
-}: EthCommunityFormState) => {
+  ethChainNames,
+  ethChains,
+}: EthChainFormState) => {
   const [network, setNetwork] = useState<
     ChainNetwork.Aave | ChainNetwork.Compound
   >(ChainNetwork.Compound);
   const [tokenName, setTokenName] = useState('token');
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const communityFormState = useChainFormState();
+  const communityFormState = useCommunityFormState();
 
-  const ethChainFormFields = useEthChainFormFields();
+  const ethChainFormFields = useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!ethChainFormFields.communityString) {
-      ethChainFormFields.setCommunityString(ETHEREUM_MAINNET);
+    if (!ethChainFormFields.chainString) {
+      ethChainFormFields.setChainString(ETHEREUM_MAINNET);
     }
   }, [ethChainFormFields]);
 
@@ -68,7 +68,7 @@ export const EthDaoForm = ({
   const updateDAO = async () => {
     if (
       !ethChainFormFields.address ||
-      !ethChainFormFields.ethCommunityId ||
+      !ethChainFormFields.ethChainId ||
       ethChainFormFields.nodeUrl
     ) {
       return;
@@ -143,7 +143,7 @@ export const EthDaoForm = ({
   return (
     <div className="CreateCommunityForm">
       {EthCommunityRows(
-        { ethCommunityNames, ethCommunities },
+        { ethChainNames, ethChains },
         { ...ethChainFormFields, ...communityFormState }
       )}
       <CWDropdown
@@ -235,8 +235,8 @@ export const EthDaoForm = ({
             if (res.result.admin_address) {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
-                res.result.role.community_id,
-                res.result.role.community_id
+                res.result.role.chain_id,
+                res.result.role.chain_id
               );
             }
 

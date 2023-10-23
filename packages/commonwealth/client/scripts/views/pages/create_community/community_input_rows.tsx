@@ -11,9 +11,9 @@ import { Skeleton } from '../../components/Skeleton';
 import type {
   ChainFormDefaultFields,
   EthChainFormState,
-  UseChainFormDefaultFieldsHookType,
-  UseChainFormStateHookType,
-  UseEthChainFormFieldsHookType,
+  UseCommunityFormDefaultFieldsHookType,
+  UseCommunityFormStateHookType,
+  UseEthCommunityFormFieldsHookType,
 } from './types';
 
 export async function updateAdminOnCreateCommunity(communityId: string) {
@@ -46,7 +46,7 @@ export const initCommunityForm = (): ChainFormDefaultFields => {
 };
 
 export const defaultCommunityRows = <
-  T extends UseChainFormDefaultFieldsHookType
+  T extends UseCommunityFormDefaultFieldsHookType
 >(
   state: T,
   disabled = false
@@ -138,8 +138,8 @@ export const defaultCommunityRows = <
   );
 };
 
-type EthChainState = UseEthChainFormFieldsHookType &
-  UseChainFormStateHookType;
+type EthChainState = UseEthCommunityFormFieldsHookType &
+  UseCommunityFormStateHookType;
 
 export const EthCommunityRows = (
   props: EthChainFormState,

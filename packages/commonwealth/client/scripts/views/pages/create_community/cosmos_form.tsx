@@ -20,10 +20,10 @@ import {
 } from './community_input_rows';
 import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
-  useEthChainFormFields,
+  useCommunityFormIdFields,
+  useCommunityFormDefaultFields,
+  useCommunityFormState,
+  useEthCommunityFormFields,
 } from './hooks';
 
 export const CosmosForm = () => {
@@ -41,15 +41,15 @@ export const CosmosForm = () => {
     setChainName,
     symbol,
     setSymbol,
-  } = useChainFormIdFields();
+  } = useCommunityFormIdFields();
 
 
-  const communityFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const { message, saving, setMessage, setSaving } = useChainFormState();
+  const { message, saving, setMessage, setSaving } = useCommunityFormState();
 
    const { altWalletUrl, chainString, ethChainId, nodeUrl, setNodeUrl } =
-    useEthChainFormFields();
+    useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
 
