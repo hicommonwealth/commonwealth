@@ -1,7 +1,6 @@
 import React from 'react';
 import { CWText } from '../../component_kit/cw_text';
 import { User } from 'views/components/user/user';
-import Topic from 'client/scripts/models/Topic';
 import Account from 'client/scripts/models/Account';
 import app from 'state';
 import clsx from 'clsx';
