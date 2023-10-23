@@ -216,7 +216,7 @@ const CommunityMembersPage = () => {
         <MembersSection
           members={formattedMembers}
           onLoadMoreMembers={() => {
-            if (members?.pages?.[0]?.totalResults < formattedMembers.length) {
+            if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
               fetchNextPage();
             }
           }}
