@@ -61,6 +61,8 @@ import { CWTag } from './new_designs/CWTag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
+import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
+import { optionList } from './showcase_helpers';
 import { ModalSize } from './new_designs/CWModal/CWModal';
 import { CWTabsRow, CWTab } from './new_designs/CWTabs';
 
@@ -1644,6 +1646,25 @@ export const ComponentShowcase = () => {
               />
             );
           })}
+        </div>
+      </div>
+      <div className="typeahead-gallery">
+        <CWText type="h3"> Typeahead Dropdown</CWText>
+        <div className="typeahead-row">
+          <CWTypeaheadSelectList
+            options={optionList}
+            defaultValue={optionList[0]}
+            placeholder="Select chain"
+            isDisabled={false}
+          />
+        </div>
+        <div className="typeahead-row">
+          <CWTypeaheadSelectList
+            options={optionList}
+            defaultValue={optionList[0]}
+            placeholder="Select chain"
+            isDisabled={true}
+          />
         </div>
       </div>
       <CWText type="h3">Tooltip</CWText>

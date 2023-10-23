@@ -14,12 +14,13 @@ type CosmosSource = {
   cosmos_chain_id: string;
   token_symbol: string;
 };
-type ThresholdData = {
+
+export type ThresholdData = {
   threshold: string;
   source: ContractSource | NativeSource | CosmosSource;
 };
 
-type AllowlistData = {
+export type AllowlistData = {
   allow: string[];
 };
 

@@ -199,7 +199,7 @@ $width: 360px;
       gap: 8px;
       margin-bottom: 15px;
 
-      > .Text {
+      >.Text {
         min-width: 140px;
       }
     }
@@ -230,6 +230,12 @@ $width: 360px;
 
   .searchbar-gallery {
     @include gallery-grid(8px, column);
+  }
+
+  .typeahead-gallery {
+    .typeahead-row {
+      margin-bottom: 20px;
+    }
   }
 
   .new-tabs {
