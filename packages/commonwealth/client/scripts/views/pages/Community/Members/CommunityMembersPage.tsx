@@ -126,7 +126,7 @@ const CommunityMembersPage = () => {
   }, []);
 
   const navigateToCreateGroupPage = () => {
-    navigate(`/${app.activeChainId()}/members/groups/create`);
+    navigate(`/members/groups/create`);
   };
 
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
