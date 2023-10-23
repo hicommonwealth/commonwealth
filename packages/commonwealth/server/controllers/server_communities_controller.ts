@@ -2,6 +2,11 @@ import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { TokenBalanceCache } from '../../../token-balance-cache/src';
 import {
+  __getRelatedCommunities,
+  GetRelatedCommunitiesOptions,
+  GetRelatedCommunitiesResult
+} from './server_communities_methods/get_related_communities';
+import {
   SearchCommunitiesOptions,
   SearchCommunitiesResult,
   __searchCommunities,
@@ -98,5 +103,11 @@ export class ServerCommunitiesController {
     options: CreateChainNodeOptions
   ): Promise<CreateChainNodeResult> {
     return __createChainNode.call(this, options);
+  }
+
+  async getRelatedCommunities(
+    options: GetRelatedCommunitiesOptions
+  ): Promise<GetRelatedCommunitiesResult> {
+    return __getRelatedCommunities.call(this, options);
   }
 }

@@ -10,7 +10,7 @@ import {
   methodNotAllowedMiddleware,
   registerRoute,
 } from '../middleware/methodNotAllowed';
-import { getRelatedCommunitiesHandler } from '../routes/chains/get_related_communities_handler';
+import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 
 import domain from '../routes/domain';
 import { status } from '../routes/status';
@@ -378,16 +378,16 @@ function setupRouter(
   );
   registerRoute(
     router,
-    'get',
-    '/relatedCommunities',
-    getRelatedCommunitiesHandler.bind(this, serverControllers)
-  );
-  registerRoute(
-    router,
     'post',
     '/nodes' /* prev: POST /createChainNode */,
     passport.authenticate('jwt', { session: false }),
     createChainNodeHandler.bind(this, serverControllers)
+  );
+  registerRoute(
+    router,
+    'get',
+    '/relatedCommunities',
+    getRelatedCommunitiesHandler.bind(this, serverControllers)
   );
 
   // ----

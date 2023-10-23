@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import RoleInfo from './RoleInfo';

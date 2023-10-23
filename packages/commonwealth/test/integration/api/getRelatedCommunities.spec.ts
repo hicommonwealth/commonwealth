@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { ServerChainsController } from '../../../server/controllers/server_chains_controller';
+import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { resetDatabase } from '../../util/resetDatabase';
 import models from 'server/database';
 
@@ -9,14 +9,14 @@ describe('GetRelatedCommunities Tests', () => {
   });
 
   it('Correctly returns nothing if base does not match chainNode', async () => {
-    const controller = new ServerChainsController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null, null);
     const response = await controller.getRelatedCommunities({ chainNodeId: -100 })
 
     assert.equal(response.length, 0);
   });
 
   it('Correctly returns results if base matchs some chainNode.name', async () => {
-    const controller = new ServerChainsController(models, null, null);
+    const controller = new ServerCommunitiesController(models, null, null);
     const response = await controller.getRelatedCommunities({ chainNodeId: 2 })
 
     assert.equal(response.length, 3);

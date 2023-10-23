@@ -1,7 +1,7 @@
 import {
   GetRelatedCommunitiesOptions,
   GetRelatedCommunitiesResult
-} from '../../controllers/server_chains_methods/get_related_communities';
+} from '../../controllers/server_communities_methods/get_related_communities';
 import { ServerControllers } from '../../routing/router';
 import { success, TypedRequestQuery, TypedResponse } from '../../types';
 
@@ -14,6 +14,6 @@ export const getRelatedCommunitiesHandler = async (
   res: TypedResponse<GetRelatedCommunitiesResponse>
 ) => {
   const { chainNodeId } = req.query;
-  const results = await controllers.chains.getRelatedCommunities({ chainNodeId });
+  const results = await controllers.communities.getRelatedCommunities({ chainNodeId });
   return success(res, results);
 };

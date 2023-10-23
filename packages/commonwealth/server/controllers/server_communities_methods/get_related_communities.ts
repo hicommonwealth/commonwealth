@@ -1,6 +1,6 @@
 import { QueryTypes } from 'sequelize';
 import { sequelize } from '../../database';
-import { ServerChainsController } from '../server_chains_controller';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 /**
  * Options for the getRelatedCommunities function.
@@ -29,7 +29,7 @@ export type GetRelatedCommunitiesResult = {
 }[];
 
 export async function __getRelatedCommunities(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   { chainNodeId }: GetRelatedCommunitiesOptions
 ): Promise<GetRelatedCommunitiesResult> {
   // Although this subquery is not necessary as is currently, We should keep it because in the future if we want to

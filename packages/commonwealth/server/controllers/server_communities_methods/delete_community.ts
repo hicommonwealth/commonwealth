@@ -1,7 +1,6 @@
 import { AppError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
 import { sequelize } from '../../database';
-import { success } from '../../types';
 import { ServerCommunitiesController } from '../server_communities_controller';
 import { UserInstance } from 'server/models/user';
 
