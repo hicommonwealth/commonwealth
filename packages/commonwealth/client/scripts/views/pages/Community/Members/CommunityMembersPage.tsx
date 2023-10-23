@@ -9,9 +9,12 @@ import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { Select } from 'views/components/Select';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import {
+  CWTab,
+  CWTabsRow,
+} from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './CommunityMembersPage.scss';
@@ -139,7 +142,7 @@ const CommunityMembersPage = () => {
       <CWText type="h2">Members ({totalResults})</CWText>
 
       {/* Tabs section */}
-      <CWTabBar>
+      <CWTabsRow>
         {TABS.map((tab, index) => (
           <CWTab
             key={index}
@@ -148,7 +151,7 @@ const CommunityMembersPage = () => {
             isSelected={selectedTab.toLowerCase() === tab.toLowerCase()}
           />
         ))}
-      </CWTabBar>
+      </CWTabsRow>
 
       {/* Filter section */}
       <section
