@@ -64,7 +64,8 @@ export const ArchiveThreadModal = ({
           <CWText className="middle">
             Archived posts are hidden from the main feed and can no longer be
             interacted with. Archiving will move the post to a new topic section
-            titled "Archived," which is still viewable by all community members.
+            titled &quot;Archived,&quot; which is still viewable by all
+            community members.
           </CWText>
 
           <CWText>Note that you can always unarchive a post.</CWText>

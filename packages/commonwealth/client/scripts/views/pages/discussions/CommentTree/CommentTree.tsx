@@ -359,8 +359,8 @@ export const CommentTree = ({
             Flagging as spam will help filter out unwanted content. Comments
             flagged as spam are hidden from the main feed and can't be
             interacted with. For transparency, spam can still be viewed by
-            community members if they choose to "Include comments flagged as
-            spam."
+            community members if they choose to &quot;Include comments flagged
+            as spam.&quot;
           </p>
           <br />
           <p>Note that you can always unflag a comment as spam.</p>
@@ -374,7 +374,7 @@ export const CommentTree = ({
           <br />
           <p>
             For transparency, spam can still be viewed by community members if
-            they choose to “Include comments flagged as spam.”
+            they choose to &quot;Include comments flagged as spam.&quot;
             <br />
           </p>
         </>

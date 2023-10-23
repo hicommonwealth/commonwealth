@@ -141,7 +141,8 @@ export const AdminActions = ({
             Flagging as spam will help filter out unwanted content. Posts
             flagged as spam are hidden from the main feed and can't be
             interacted with. For transparency, spam can still be viewed by
-            community members if they choose to "Include posts flagged as spam."
+            community members if they choose to &quot;Include posts flagged as
+            spam.&quot;
           </p>
           <br />
           <p>Note that you can always unflag a post as spam.</p>
@@ -155,7 +156,7 @@ export const AdminActions = ({
           <br />
           <p>
             For transparency, spam can still be viewed by community members if
-            they choose to “Include posts flagged as spam.”
+            they choose to &quot;Include posts flagged as spam.&quot;
             <br />
           </p>
         </>
