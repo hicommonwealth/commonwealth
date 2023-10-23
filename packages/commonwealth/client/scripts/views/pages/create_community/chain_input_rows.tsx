@@ -4,10 +4,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { AvatarUpload } from 'views/components/Avatar';
 import { InputRow } from 'views/components/metadata_rows';
+import { Skeleton } from '../../components/Skeleton';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { Skeleton } from '../../components/Skeleton';
 import type {
   ChainFormDefaultFields,
   EthChainFormState,
@@ -143,6 +143,7 @@ export const EthChainRows = (
   state: EthChainState
 ) => {
   const [defaultChainNode, setDefaultChainNode] = useState<DropdownItemType>();
+  const [customInputs, setCustomInputs] = useState(false);
   const options = useMemo(
     () =>
       [
@@ -176,6 +177,7 @@ export const EthChainRows = (
         state.setEthChainId('');
         state.setNodeUrl('');
         state.setAltWalletUrl('');
+        setCustomInputs(true);
       }
     },
     [state, props.ethChains, props.ethChainNames]
@@ -209,38 +211,36 @@ export const EthChainRows = (
       ) : (
         <Skeleton height="62px" />
       )}
-      {state.chainString === 'Custom' && (
-        <InputRow
-          title="Chain ID"
-          value={state.ethChainId}
-          placeholder="1"
-          onChangeHandler={async (v) => {
-            state.setEthChainId(v);
-            state.setLoaded(false);
-          }}
-        />
-      )}
-      {state.chainString === 'Custom' && (
-        <InputRow
-          title="Websocket URL"
-          value={state.nodeUrl}
-          placeholder="wss://... (leave empty for default)"
-          onChangeHandler={async (v) => {
-            state.setNodeUrl(v);
-            state.setLoaded(false);
-          }}
-        />
-      )}
-      {state.chainString === 'Custom' && (
-        <InputRow
-          title="HTTP URL"
-          value={state.altWalletUrl}
-          placeholder="https://...  (leave empty for default)"
-          onChangeHandler={async (v) => {
-            state.setAltWalletUrl(v);
-            state.setLoaded(false);
-          }}
-        />
+      {customInputs && (
+        <>
+          <InputRow
+            title="Chain ID"
+            value={state.ethChainId}
+            placeholder="1"
+            onChangeHandler={async (v) => {
+              state.setEthChainId(v);
+              state.setLoaded(false);
+            }}
+          />
+          <InputRow
+            title="Websocket URL"
+            value={state.nodeUrl}
+            placeholder="wss://... (leave empty for default)"
+            onChangeHandler={async (v) => {
+              state.setNodeUrl(v);
+              state.setLoaded(false);
+            }}
+          />
+          <InputRow
+            title="HTTP URL"
+            value={state.altWalletUrl}
+            placeholder="https://...  (leave empty for default)"
+            onChangeHandler={async (v) => {
+              state.setAltWalletUrl(v);
+              state.setLoaded(false);
+            }}
+          />
+        </>
       )}
       <InputRow
         title="Token Contract Address"
