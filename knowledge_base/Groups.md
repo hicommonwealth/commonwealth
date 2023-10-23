@@ -1,4 +1,5 @@
 **Contents**
+- [Introduction to Groups](#introduction-to-groups)
 - [API Diagrams](#api-diagrams)
   * [Membership Check](#membership-check)
   * [User Performs Mutation Action](#user-performs-mutation-action)
@@ -6,6 +7,14 @@
   * [View Group Memberships](#view-group-memberships)
   * [Update/delete Group](#update-delete-group)
 - [Change Log](#change-log)
+
+# Introduction to Groups
+
+Groups are defined by sets of Requirements. A Requirement is a rule or logical statement that qualifies a given address for Group membership. As of 231023, the two supported Requirements are token thresholds (i.e., the address has a certain token balance) and allowlists (i.e., whitelists). 
+
+From a database perspective, Groups consist of a metadata object, an associated community/chain id, and an array of Requirements. Requirement objects consist of a `rule` string (e.g. "threshold") and a data object (e.g. `ThresholdData`). Membership validation checks, and requirement types can be found in the `/server/util/requirementsModule` directory.
+
+What is the function of creating, or belonging to, a Group? Forum actions are always topic-scoped; whenever a user creates a new thread, reacts to a comment, or participates in a poll, they are operating within the scope of a topic. Groups allow admins to "gate" user actions, within a given topic-scope, based on a set of Requirements.
 
 # API Diagrams
 
@@ -107,4 +116,4 @@ sequenceDiagram
 
 # Change Log
 
-- 231023: Authored by Graham Johnson with initial API diagrams.
+- 231023: Authored by Graham Johnson with initial API diagrams and introduction.
