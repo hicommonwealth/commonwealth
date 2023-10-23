@@ -81,8 +81,8 @@ export async function __refreshMembership(
 
   // transform memberships to result shape
   const results = updatedMemberships.map((membership) => {
-    const topic = chainTopics.find((topic) =>
-      topic.group_ids.includes(membership.group_id)
+    const topic = chainTopics.find((t) =>
+      t.group_ids.includes(membership.group_id)
     );
     return {
       topicId: topic.id,
