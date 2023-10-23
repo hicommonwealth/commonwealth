@@ -85,7 +85,7 @@ export const CWArchiveTray = (props: IconProps) => {
       <path
         d="M7.35156 9.22656L10 11.875L12.6484 9.22656"
         stroke="#656167"
-        stroke-width="0.9375"
+        strokeWidth="0.9375"
         strokeLinecap="round"
         strokeLinejoin="round"
       ></path>
@@ -150,19 +150,29 @@ export const CWArrowDownBlue500 = (props: IconProps) => {
   } = props;
   return (
     <svg
-    className={getClasses<IconStyleProps>(
-      { className, disabled, iconButtonTheme, iconSize, selected },
-      componentType
-    )}
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    fill="none"
-    viewBox="0 0 16 16"
-    {...otherProps}
-  >
-    <path d="M8 2.5V13.5" stroke="#338FFF" strokeLinecap="round" strokeLinejoin="round"></path>
-    <path d="M3.5 9L8 13.5L12.5 9" stroke="#338FFF" strokeLinecap="round" strokeLinejoin="round"></path>
+      className={getClasses<IconStyleProps>(
+        { className, disabled, iconButtonTheme, iconSize, selected },
+        componentType
+      )}
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="none"
+      viewBox="0 0 16 16"
+      {...otherProps}
+    >
+      <path
+        d="M8 2.5V13.5"
+        stroke="#338FFF"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+      <path
+        d="M3.5 9L8 13.5L12.5 9"
+        stroke="#338FFF"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
     </svg>
   );
 };
@@ -388,8 +398,18 @@ export const CWArrowUpBlue500 = (props: IconProps) => {
       viewBox="0 0 16 16"
       {...otherProps}
     >
-    <path d="M8 13.5V2.5" stroke="#338FFF" strokeLinecap="round" strokeLinejoin="round"></path>
-    <path d="M3.5 7L8 2.5L12.5 7" stroke="#338FFF" strokeLinecap="round" strokeLinejoin="round"></path>
+      <path
+        d="M8 13.5V2.5"
+        stroke="#338FFF"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+      <path
+        d="M3.5 7L8 2.5L12.5 7"
+        stroke="#338FFF"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
     </svg>
   );
 };
@@ -417,8 +437,20 @@ export const CWArrowUpNeutral400 = (props: IconProps) => {
       viewBox="0 0 16 16"
       {...otherProps}
     >
-      <path d="M8 13.5V2.5" stroke="#A09DA1" strokeLinecap="round" strokeLinejoin="round"> </path>
-      <path d="M3.5 7L8 2.5L12.5 7" stroke="#A09DA1" strokeLinecap="round" strokeLinejoin="round"></path>
+      <path
+        d="M8 13.5V2.5"
+        stroke="#A09DA1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {' '}
+      </path>
+      <path
+        d="M3.5 7L8 2.5L12.5 7"
+        stroke="#A09DA1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
     </svg>
   );
 };
@@ -1323,9 +1355,22 @@ export const CWDotsHorizontal = (props: IconProps) => {
       viewBox="0 0 16 16"
       {...otherProps}
     >
-      <path d="M8.96875 8C8.96875 8.53503 8.53503 8.96875 8 8.96875C7.46497 8.96875 7.03125 8.53503 7.03125 8C7.03125 7.46497 7.46497 7.03125 8 7.03125C8.53503 7.03125 8.96875 7.46497 8.96875 8Z" fill="#656167" stroke="#656167" stroke-width="0.0625"></path>
-      <path xmlns="http://www.w3.org/2000/svg" d="M4 9C4.55228 9 5 8.55228 5 8C5 7.44772 4.55228 7 4 7C3.44772 7 3 7.44772 3 8C3 8.55228 3.44772 9 4 9Z" fill="#656167"></path>
-      <path xmlns="http://www.w3.org/2000/svg" d="M12 9C12.5523 9 13 8.55228 13 8C13 7.44772 12.5523 7 12 7C11.4477 7 11 7.44772 11 8C11 8.55228 11.4477 9 12 9Z" fill="#656167"></path>
+      <path
+        d="M8.96875 8C8.96875 8.53503 8.53503 8.96875 8 8.96875C7.46497 8.96875 7.03125 8.53503 7.03125 8C7.03125 7.46497 7.46497 7.03125 8 7.03125C8.53503 7.03125 8.96875 7.46497 8.96875 8Z"
+        fill="#656167"
+        stroke="#656167"
+        strokeWidth="0.0625"
+      ></path>
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M4 9C4.55228 9 5 8.55228 5 8C5 7.44772 4.55228 7 4 7C3.44772 7 3 7.44772 3 8C3 8.55228 3.44772 9 4 9Z"
+        fill="#656167"
+      ></path>
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M12 9C12.5523 9 13 8.55228 13 8C13 7.44772 12.5523 7 12 7C11.4477 7 11 7.44772 11 8C11 8.55228 11.4477 9 12 9Z"
+        fill="#656167"
+      ></path>
     </svg>
   );
 };
