@@ -209,7 +209,7 @@ export const EthDaoForm = (props: EthChainFormState) => {
           chainFormState.setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               base: ChainBase.Ethereum,
               id: id,
               name: name,
