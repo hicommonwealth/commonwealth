@@ -30,8 +30,6 @@ export const CosmosForm = () => {
   const [bech32Prefix, setBech32Prefix] = useState('');
   const [decimals, setDecimals] = useState(6); // can be 6 or 18
 
-
-  
   const {
     id,
     setId,
@@ -42,7 +40,6 @@ export const CosmosForm = () => {
     symbol,
     setSymbol,
   } = useCommunityFormIdFields();
-
 
   const communityFormDefaultFields = useCommunityFormDefaultFields();
 
