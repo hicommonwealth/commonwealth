@@ -57,7 +57,7 @@ export const SearchBarThreadPreviewRow = ({
   const content = decodeURIComponent(searchResult.body);
 
   const handleClick = () => {
-    const path = `/${searchResult.community}/discussion/${searchResult.id}`;
+    const path = `/${searchResult.chain}/discussion/${searchResult.id}`;
     navigate(path, {}, null);
   };
 
@@ -103,7 +103,7 @@ export const SearchBarCommentPreviewRow = (
   const content = searchResult.text;
 
   const handleClick = () => {
-    const path = `/${searchResult.community}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
+    const path = `/${searchResult.chain}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
     navigate(path, {}, null);
   };
 
