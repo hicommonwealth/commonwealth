@@ -69,20 +69,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
-  const filteredThreads = threads.filter(t => {
+  const filteredThreads = threads.filter((t) => {
     if (!includeSpamThreads && t.markedAsSpamAt) return null;
 
-    if (
-      !isOnArchivePage &&
-      !includeArchivedThreads &&
-      t.archivedAt !== null
-    )
+    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt !== null)
       return null;
 
     if (isOnArchivePage && t.archivedAt === null) return null;
 
-    return t
-  })
+    return t;
+  });
 
   useManageDocumentTitle('Discussions');
 
@@ -137,7 +133,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             ) : (
               <CWText type="b1" className="no-threads-text">
                 {isOnArchivePage
-                  ? 'There are currently no archived threads.'
+                  ? 'There are no archived threads matching your filter.'
                   : 'There are no threads matching your filter.'}
               </CWText>
             ),
