@@ -1,11 +1,23 @@
 @import '../../../../../styles/shared';
 
 .CommunityMembersPage {
-  padding: 20px 56px;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  padding: 40px;
+
+  @include medium {
+    padding: 40px;
+  }
+
+  @include mediumSmall {
+    padding: 32px;
+  }
+
+  @include smallInclusive {
+    padding: 24px;
+  }
 
   .filters {
     display: grid;
