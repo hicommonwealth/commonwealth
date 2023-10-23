@@ -129,7 +129,7 @@ const deleteChain = async (
           });
 
           await models.Vote.destroy({
-            where: { chain_id: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 

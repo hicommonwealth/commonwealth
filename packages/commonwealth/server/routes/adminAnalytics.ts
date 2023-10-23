@@ -1,7 +1,7 @@
+import { AppError } from 'common-common/src/errors';
 import { Op, QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
-import { AppError } from 'common-common/src/errors';
 import { success } from '../types';
 
 export const Errors = {
@@ -180,7 +180,7 @@ export const communitySpecificAnalytics = async (
         created_at: {
           [Op.gte]: oneMonthAgo,
         },
-        chain_id: chainId,
+        community_id: chainId,
       },
     });
 
