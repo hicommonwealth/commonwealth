@@ -2,8 +2,7 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 import { ChainInstance } from '../../models/chain';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
-import { Op, Sequelize, WhereOptions } from 'sequelize';
-import { TopicAttributes } from '../../models/topic';
+import { Op, Sequelize } from 'sequelize';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import moment from 'moment';
 import { MembershipInstance } from '../../models/membership';
@@ -27,7 +26,7 @@ export type RefreshMembershipResult = {
 
 export async function __refreshMembership(
   this: ServerCommunitiesController,
-  { user, chain, address, topicId }: RefreshMembershipOptions
+  { chain, address, topicId }: RefreshMembershipOptions
 ): Promise<RefreshMembershipResult> {
   // get all groups across the chain topics
   const chainTopics = await this.models.Topic.findAll({
