@@ -33,7 +33,7 @@ const deleteWebhook = async (
   if (!req.body.webhookUrl) return next(new AppError(Errors.MissingWebhook));
   const webhook = await models.Webhook.findOne({
     where: {
-      chain_id: chain.id,
+      community_id: chain.id,
       url: req.body.webhookUrl,
     },
   });

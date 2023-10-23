@@ -30,7 +30,7 @@ const getWebhooks = async (
     return next(new AppError(Errors.NotAdmin));
   // fetch webhooks
   const webhooks = await models.Webhook.findAll({
-    where: { chain_id: chain.id },
+    where: { community_id: chain.id },
   });
   return res.json({
     status: 'Success',
