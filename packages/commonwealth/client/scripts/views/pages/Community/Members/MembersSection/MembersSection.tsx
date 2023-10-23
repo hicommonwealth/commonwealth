@@ -1,12 +1,14 @@
 import React from 'react';
 import Permissions from 'utils/Permissions';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { User } from 'views/components/user/user';
 import './MembersSection.scss';
 
 type Member = {
   name: string;
+  address: string;
+  chain: string;
   role: 'admin' | 'moderator' | '';
   groups: string[];
 };
@@ -15,7 +17,7 @@ type MembersSectionProps = {
   members: Member[];
 };
 
-const isGatingEnabled =  process.env.GATING_API_ENABLED || true;
+const isGatingEnabled = process.env.GATING_API_ENABLED || true;
 
 const columns = [
   {
@@ -23,15 +25,16 @@ const columns = [
     header: 'Name',
     numeric: false,
     sortable: true,
-  }
-]
+  },
+];
 
-isGatingEnabled && columns.push({
-  key: 'groups',
-  header: 'Groups',
-  numeric: false,
-  sortable: true,
-})
+isGatingEnabled &&
+  columns.push({
+    key: 'groups',
+    header: 'Groups',
+    numeric: false,
+    sortable: true,
+  });
 
 const MembersSection = ({ members }: MembersSectionProps) => {
   return (
@@ -41,7 +44,11 @@ const MembersSection = ({ members }: MembersSectionProps) => {
         rowData={members.map((member) => ({
           name: (
             <div className="table-cell">
-              <CWText type="b2">{member.name}</CWText>
+              <User
+                userAddress={member.address}
+                userChainId={member.chain}
+                shouldLinkProfile
+              />
               {member.role === Permissions.ROLES.ADMIN && (
                 <CWTag label="Admin" type="referendum" />
               )}
@@ -52,9 +59,10 @@ const MembersSection = ({ members }: MembersSectionProps) => {
           ),
           groups: (
             <div className="table-cell">
-              {isGatingEnabled && member.groups.map((group, index) => (
-                <CWTag key={index} label={group} type="referendum" />
-              ))}
+              {isGatingEnabled &&
+                member.groups.map((group, index) => (
+                  <CWTag key={index} label={group} type="referendum" />
+                ))}
             </div>
           ),
         }))}

@@ -67,6 +67,8 @@ const CommunityMembersPage = () => {
       }, [] as SearchProfilesResponse['results'])
       .map((p) => ({
         name: p.profile_name || 'Anonymous',
+        address: p.addresses?.[0]?.address,
+        chain: p.addresses?.[0]?.chain,
         role: p.roles.find(
           (role) =>
             role.chain_id === app.activeChainId() &&
