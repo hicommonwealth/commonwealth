@@ -17,8 +17,6 @@ type MembersSectionProps = {
   members: Member[];
 };
 
-const isGatingEnabled = process.env.GATING_API_ENABLED || true;
-
 const columns = [
   {
     key: 'name',
@@ -26,15 +24,13 @@ const columns = [
     numeric: false,
     sortable: true,
   },
-];
-
-isGatingEnabled &&
-  columns.push({
+  {
     key: 'groups',
     header: 'Groups',
     numeric: false,
     sortable: true,
-  });
+  },
+];
 
 const MembersSection = ({ members }: MembersSectionProps) => {
   return (
@@ -59,10 +55,9 @@ const MembersSection = ({ members }: MembersSectionProps) => {
           ),
           groups: (
             <div className="table-cell">
-              {isGatingEnabled &&
-                member.groups.map((group, index) => (
-                  <CWTag key={index} label={group} type="referendum" />
-                ))}
+              {member.groups.map((group, index) => (
+                <CWTag key={index} label={group} type="referendum" />
+              ))}
             </div>
           ),
         }))}

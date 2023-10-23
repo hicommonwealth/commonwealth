@@ -22,9 +22,11 @@ import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
 import { GroupCategory, SearchFilters } from './index.types';
 
-const isGatingEnabled = process.env.GATING_API_ENABLED || true;
-const TABS = ['All members'];
-isGatingEnabled && TABS.push('Groups');
+const TABS = [
+  { value: 'all-members', label: 'All members' },
+  { value: 'groups', label: 'Groups' },
+];
+
 const GROUP_FILTERS: GroupCategory[] = [
   'All groups',
   'In group',
@@ -34,7 +36,7 @@ const GROUP_FILTERS: GroupCategory[] = [
 const CommunityMembersPage = () => {
   const navigate = useCommonNavigate();
 
-  const [selectedTab, setSelectedTab] = useState(TABS[0]);
+  const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
     category: GROUP_FILTERS[0],
@@ -99,6 +101,17 @@ const CommunityMembersPage = () => {
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
 
+  const updateActiveTab = (activeTab: string) => {
+    const params = new URLSearchParams();
+    params.set('tab', activeTab);
+    history.pushState(
+      null,
+      '',
+      `${window.location.pathname}?${params.toString()}`
+    );
+    setSelectedTab(activeTab);
+  };
+
   // fixes bug that prevents scrolling on initial page load
   useEffect(() => {
     const shouldFetchMore = formattedMembers.length < 50 && totalResults > 50;
@@ -110,22 +123,15 @@ const CommunityMembersPage = () => {
 
   useEffect(() => {
     // Set the active tab based on URL
-    if (
-      window.location.search.includes(
-        `tab=${TABS[0].split(' ').join('-').toLowerCase()}`
-      )
-    ) {
-      setSelectedTab(TABS[0]);
-    } else if (
-      isGatingEnabled &&
-      window.location.search.includes(
-        `tab=${TABS[1].split(' ').join('-').toLowerCase()}`
-      )
-    ) {
-      setSelectedTab(TABS[1]);
-    } else {
-      setSelectedTab(TABS[0]);
+    const params = new URLSearchParams(window.location.search.toLowerCase());
+    const activeTab = params.get('tab')?.toLowerCase();
+
+    if (!activeTab || activeTab === TABS[0].value) {
+      updateActiveTab(TABS[0].value);
+      return;
     }
+
+    updateActiveTab(TABS[1].value);
   }, []);
 
   const navigateToCreateGroupPage = () => {
@@ -146,9 +152,9 @@ const CommunityMembersPage = () => {
         {TABS.map((tab, index) => (
           <CWTab
             key={index}
-            label={tab}
-            onClick={() => setSelectedTab(tab)}
-            isSelected={selectedTab.toLowerCase() === tab.toLowerCase()}
+            label={tab.label}
+            onClick={() => updateActiveTab(tab.value)}
+            isSelected={selectedTab === tab.value}
           />
         ))}
       </CWTabsRow>
@@ -170,7 +176,7 @@ const CommunityMembersPage = () => {
           size="large"
           fullWidth
           placeholder={`Search ${
-            selectedTab === TABS[0] ? 'members' : 'groups'
+            selectedTab === TABS[0].value ? 'members' : 'groups'
           }`}
           iconLeft={<CWIcon iconName="search" className="search-icon" />}
           onInput={(e) =>
@@ -180,26 +186,24 @@ const CommunityMembersPage = () => {
             }))
           }
         />
-        {isGatingEnabled && (
-          <div className="select-dropdown-container">
-            <CWText type="b2" fontWeight="bold" className="filter-text">
-              Filter
-            </CWText>
-            <Select
-              containerClassname="select-dropdown"
-              options={GROUP_FILTERS.map((x) => ({
-                id: x,
-                label: x,
-                value: x,
-              }))}
-              selected={searchFilters.category}
-              dropdownPosition="bottom-end"
-              onSelect={(item: any) => {
-                setSearchFilters((g) => ({ ...g, category: item.value }));
-              }}
-            />
-          </div>
-        )}
+        <div className="select-dropdown-container">
+          <CWText type="b2" fontWeight="bold" className="filter-text">
+            Filter
+          </CWText>
+          <Select
+            containerClassname="select-dropdown"
+            options={GROUP_FILTERS.map((x) => ({
+              id: x,
+              label: x,
+              value: x,
+            }))}
+            selected={searchFilters.category}
+            dropdownPosition="bottom-end"
+            onSelect={(item: any) => {
+              setSearchFilters((g) => ({ ...g, category: item.value }));
+            }}
+          />
+        </div>
         {isAdmin && (
           <CWButton
             buttonWidth="full"
@@ -211,7 +215,7 @@ const CommunityMembersPage = () => {
       </section>
 
       {/* Main content section: based on the selected tab */}
-      {selectedTab === TABS[1] ? (
+      {selectedTab === TABS[1].value ? (
         <GroupsSection />
       ) : (
         <MembersSection members={formattedMembers} />
