@@ -47,7 +47,11 @@ const CommunityMembersPage = () => {
     500
   );
 
-  const { data: members, fetchNextPage } = useSearchProfilesQuery({
+  const {
+    data: members,
+    fetchNextPage,
+    isLoading,
+  } = useSearchProfilesQuery({
     chainId: app.activeChainId(),
     searchTerm: '',
     limit: 10,
@@ -111,15 +115,6 @@ const CommunityMembersPage = () => {
     );
     setSelectedTab(activeTab);
   };
-
-  // fixes bug that prevents scrolling on initial page load
-  useEffect(() => {
-    const shouldFetchMore = formattedMembers.length < 50 && totalResults > 50;
-    if (!shouldFetchMore) {
-      return;
-    }
-    fetchNextPage();
-  }, [formattedMembers, totalResults, fetchNextPage]);
 
   useEffect(() => {
     // Set the active tab based on URL
@@ -218,7 +213,15 @@ const CommunityMembersPage = () => {
       {selectedTab === TABS[1].value ? (
         <GroupsSection />
       ) : (
-        <MembersSection members={formattedMembers} />
+        <MembersSection
+          members={formattedMembers}
+          onLoadMoreMembers={() => {
+            if (members?.pages?.[0]?.totalResults < formattedMembers.length) {
+              fetchNextPage();
+            }
+          }}
+          isLoadingMoreMembers={isLoading}
+        />
       )}
     </section>
   );

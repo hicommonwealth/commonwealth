@@ -15,6 +15,8 @@ type Member = {
 
 type MembersSectionProps = {
   members: Member[];
+  onLoadMoreMembers: () => any;
+  isLoadingMoreMembers?: boolean;
 };
 
 const columns = [
@@ -32,7 +34,11 @@ const columns = [
   },
 ];
 
-const MembersSection = ({ members }: MembersSectionProps) => {
+const MembersSection = ({
+  members,
+  onLoadMoreMembers,
+  isLoadingMoreMembers,
+}: MembersSectionProps) => {
   return (
     <div className="MembersSection">
       <CWTable
@@ -61,6 +67,8 @@ const MembersSection = ({ members }: MembersSectionProps) => {
             </div>
           ),
         }))}
+        onScrollEnd={onLoadMoreMembers}
+        isLoadingMoreRows={isLoadingMoreMembers}
       />
     </div>
   );
