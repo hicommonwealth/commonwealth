@@ -76,7 +76,7 @@ describe('ServerCommentsController', () => {
         await serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           commentId,
         });
@@ -88,7 +88,7 @@ describe('ServerCommentsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           commentId,
         })
@@ -189,7 +189,7 @@ describe('ServerCommentsController', () => {
         serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           commentId: 123,
         })
@@ -258,7 +258,7 @@ describe('ServerCommentsController', () => {
         serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           commentId: 123,
         })
@@ -332,7 +332,7 @@ describe('ServerCommentsController', () => {
         serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           commentId,
         })
@@ -430,7 +430,7 @@ describe('ServerCommentsController', () => {
         serverCommentsController.createCommentReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           commentId,
         })
