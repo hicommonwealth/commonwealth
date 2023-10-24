@@ -1,3 +1,4 @@
+import { featureFlags } from 'client/scripts/helpers/feature-flags';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -24,7 +25,7 @@ import { GroupCategory, SearchFilters } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
-  ...(process.env.GATING_ENABLED ? [{ value: 'groups', label: 'Groups' }] : []),
+  ...(featureFlags.gatingEnabled ? [{ value: 'groups', label: 'Groups' }] : []),
 ];
 
 const GROUP_FILTERS: GroupCategory[] = [
@@ -126,7 +127,7 @@ const CommunityMembersPage = () => {
       return;
     }
 
-    process.env.GATING_ENABLED && updateActiveTab(TABS[1].value);
+    featureFlags.gatingEnabled && updateActiveTab(TABS[1].value);
   }, []);
 
   const navigateToCreateGroupPage = () => {
@@ -161,8 +162,8 @@ const CommunityMembersPage = () => {
           'cols-4': boolean;
         }>(
           {
-            'cols-3': process.env.GATING_ENABLED && !isAdmin,
-            'cols-4': process.env.GATING_ENABLED && isAdmin,
+            'cols-3': featureFlags.gatingEnabled && !isAdmin,
+            'cols-4': featureFlags.gatingEnabled && isAdmin,
           },
           'filters'
         )}
@@ -181,7 +182,7 @@ const CommunityMembersPage = () => {
             }))
           }
         />
-        {process.env.GATING_ENABLED && (
+        {featureFlags.gatingEnabled && (
           <div className="select-dropdown-container">
             <CWText type="b2" fontWeight="bold" className="filter-text">
               Filter
@@ -201,7 +202,7 @@ const CommunityMembersPage = () => {
             />
           </div>
         )}
-        {process.env.GATING_ENABLED && isAdmin && (
+        {featureFlags.gatingEnabled && isAdmin && (
           <CWButton
             buttonWidth="full"
             label="Create group"
@@ -212,7 +213,7 @@ const CommunityMembersPage = () => {
       </section>
 
       {/* Main content section: based on the selected tab */}
-      {process.env.GATING_ENABLED && selectedTab === TABS[1].value ? (
+      {featureFlags.gatingEnabled && selectedTab === TABS[1].value ? (
         <GroupsSection />
       ) : (
         <MembersSection

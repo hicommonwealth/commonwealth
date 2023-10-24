@@ -1,3 +1,4 @@
+import { featureFlags } from 'client/scripts/helpers/feature-flags';
 import React from 'react';
 import Permissions from 'utils/Permissions';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
@@ -26,7 +27,7 @@ const columns = [
     numeric: false,
     sortable: true,
   },
-  ...(process.env.GATING_ENABLED
+  ...(featureFlags.gatingEnabled
     ? [
         {
           key: 'groups',
