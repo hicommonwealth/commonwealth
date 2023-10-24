@@ -1,15 +1,16 @@
 import { featureFlags } from 'helpers/feature-flags';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
+import { Avatar } from 'views/components/Avatar';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { User } from 'views/components/user/user';
 import './MembersSection.scss';
 
 type Member = {
+  id: number;
+  avatarUrl: string;
   name: string;
-  address: string;
-  chain: string;
   role: 'admin' | 'moderator' | '';
   groups: string[];
 };
@@ -51,11 +52,10 @@ const MembersSection = ({
         rowData={members.map((member) => ({
           name: (
             <div className="table-cell">
-              <User
-                userAddress={member.address}
-                userChainId={member.chain}
-                shouldLinkProfile
-              />
+              <Link to={`/profile/id/${member.id}`} className="user-info">
+                <Avatar url={member.avatarUrl} size={24} address={member.id} />
+                <p>{member.name}</p>
+              </Link>
               {member.role === Permissions.ROLES.ADMIN && (
                 <CWTag label="Admin" type="referendum" />
               )}
