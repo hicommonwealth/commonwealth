@@ -1,9 +1,10 @@
 import type { RegisteredTypes } from '@polkadot/types/types';
+import axios from 'axios';
 import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
-import type NodeInfo from './NodeInfo';
 import { ETHERMINT_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
-import axios from 'axios';
+import app from 'state';
+import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 
 class ChainInfo {
@@ -87,7 +88,7 @@ class ChainInfo {
     cosmosGovernanceVersion,
     discordBotWebhooksEnabled,
     directoryPageEnabled,
-    directoryPageChainNodeId
+    directoryPageChainNodeId,
   }) {
     this.id = id;
     this.network = network;
@@ -223,7 +224,7 @@ class ChainInfo {
       cosmosGovernanceVersion: cosmos_governance_version,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
       directoryPageEnabled: directory_page_enabled,
-      directoryPageChainNodeId: directory_page_chain_node_id
+      directoryPageChainNodeId: directory_page_chain_node_id,
     });
   }
 
@@ -272,7 +273,7 @@ class ChainInfo {
     chain_node_id,
     discord_bot_webhooks_enabled,
     directory_page_enabled,
-    directory_page_chain_node_id
+    directory_page_chain_node_id,
   }: {
     name?: string;
     description?: string;
