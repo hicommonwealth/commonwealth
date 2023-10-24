@@ -1,22 +1,22 @@
+import { PopperPlacementType } from '@mui/base/Popper';
 import { threadStageToLabel } from 'helpers';
+import { getRelativeTimestamp } from 'helpers/dates';
 import moment from 'moment';
 import React, { useRef } from 'react';
 import {
   Popover,
   usePopover,
 } from 'views/components/component_kit/cw_popover/cw_popover';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';
 import { User } from 'views/components/user/user';
 import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { NewThreadTag } from '../../NewThreadTag';
 import './AuthorAndPublishInfo.scss';
-import { PopperPlacementType } from '@mui/base/Popper';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { getRelativeTimestamp } from 'helpers/dates';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
 
 export type AuthorAndPublishInfoProps = {
@@ -118,13 +118,13 @@ export const AuthorAndPublishInfo = ({
             <Popover
               content={
                 <div className="collaborators">
-                  {collaboratorsInfo.map(({ address, chain }) => {
+                  {collaboratorsInfo.map(({ address, community_id }) => {
                     return (
                       <User
                         shouldLinkProfile
                         key={address}
                         userAddress={address}
-                        userChainId={chain}
+                        userChainId={community_id}
                       />
                     );
                   })}

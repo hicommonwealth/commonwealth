@@ -1,11 +1,11 @@
-import $ from 'jquery';
 import type { RegisteredTypes } from '@polkadot/types/types';
-import app from 'state';
-import RoleInfo from './RoleInfo';
 import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
-import type NodeInfo from './NodeInfo';
 import { ETHERMINT_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
+import $ from 'jquery';
+import app from 'state';
+import type NodeInfo from './NodeInfo';
+import RoleInfo from './RoleInfo';
 
 class ChainInfo {
   public readonly id: string;
@@ -218,25 +218,6 @@ class ChainInfo {
     });
   }
 
-  public setMembers(roles) {
-    this.members = [];
-    roles.forEach((r) => {
-      this.members.push(
-        new RoleInfo(
-          r.id,
-          r.address_id,
-          r.Address.address,
-          r.Address.chain,
-          r.chain_id,
-          r.permission,
-          r.allow,
-          r.deny,
-          r.is_user_default
-        )
-      );
-    });
-  }
-
   public setAdmins(roles) {
     this.adminsAndMods = [];
     roles.forEach((r) => {
@@ -245,7 +226,7 @@ class ChainInfo {
           r.id,
           r.address_id,
           r.Address.address,
-          r.Address.chain,
+          r.Address.community_id,
           r.chain_id,
           r.permission,
           r.allow,

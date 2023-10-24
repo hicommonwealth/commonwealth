@@ -3,7 +3,6 @@ import app from 'state';
 import { AccessLevel } from 'permissions';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
-import ChainInfo from '../../models/ChainInfo';
 import RoleInfo from '../../models/RoleInfo';
 import type { UserController } from './user';
 
@@ -27,7 +26,7 @@ export class RolesController {
     roles.forEach((role) => {
       if (!roleIds.includes(role.id)) {
         role.address = role.Address.address;
-        role.address_chain = role.Address.chain;
+        role.address_chain = role.Address.community_id;
         delete role.Address;
         this._roles.push(role);
       }
@@ -44,7 +43,7 @@ export class RolesController {
   }
 
   public createRole(options: {
-    address: AddressInfo | Omit<AddressInfo, 'chain'>;
+    address: AddressInfo | Omit<AddressInfo, 'community'>;
     chain?: string;
     community?: string;
   }): any {
@@ -222,14 +221,13 @@ export class RolesController {
   public isMember(options: {
     account: AddressInfo | Account | undefined;
     chain?: string;
-    community?: string;
   }): boolean {
     const addressinfo: AddressInfo | undefined =
       options.account instanceof Account
         ? this.User.addresses.find(
             (a) =>
               options.account.address === a.address &&
-              (options.account.community as ChainInfo).id === a.community.id
+              options.account.community.id === a.community.id
           )
         : options.account;
     const roles = this.roles.filter((role) =>

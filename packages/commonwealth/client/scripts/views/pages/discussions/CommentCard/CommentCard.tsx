@@ -1,23 +1,23 @@
-import type { DeltaStatic } from 'quill';
-import React, { useState, useEffect } from 'react';
-import app from 'state';
-import { verify } from 'canvas';
 import type { Action, Session } from '@canvas-js/interfaces';
+import { verify } from 'canvas';
+import type { DeltaStatic } from 'quill';
+import React, { useEffect, useState } from 'react';
+import app from 'state';
 
 import type Comment from 'models/Comment';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
+import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
-import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
-import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { SharePopover } from 'views/components/share_popover';
+import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
@@ -116,7 +116,7 @@ export const CommentCard = ({
         ) : (
           <AuthorAndPublishInfo
             authorAddress={author.address}
-            authorChainId={author.chain?.id || author?.profile?.chain}
+            authorChainId={author.community?.id || author?.profile?.chain}
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"

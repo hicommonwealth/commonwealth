@@ -1,8 +1,14 @@
+import { Capacitor } from '@capacitor/core';
 import axios from 'axios';
 import { ChainCategoryType } from 'common-common/src/types';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
+import CosmosAccount from 'controllers/chain/cosmos/account';
+import EthereumAccount from 'controllers/chain/ethereum/account';
+import { NearAccount } from 'controllers/chain/near/account';
 import SnapshotController from 'controllers/chain/snapshot';
+import SolanaAccount from 'controllers/chain/solana/account';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import ChainEntityController from 'controllers/server/chain_entities';
 import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
@@ -17,7 +23,6 @@ import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
-import { Capacitor } from '@capacitor/core';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -34,7 +39,14 @@ export const enum LoginState {
 
 export interface IApp {
   socket: WebSocketController;
-  chain: IChainAdapter<any, any>;
+  chain: IChainAdapter<
+    any,
+    | CosmosAccount
+    | EthereumAccount
+    | NearAccount
+    | SolanaAccount
+    | SubstrateAccount
+  >;
   chainEntities: ChainEntityController;
 
   // XXX: replace this with some app.chain helper

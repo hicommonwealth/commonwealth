@@ -1,11 +1,11 @@
 import { ProposalType } from 'common-common/src/types';
 import type ChainEntity from 'models/ChainEntity';
+import type MinimumProfile from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
-import type MinimumProfile from 'models/MinimumProfile';
 
 function getDecodedString(str: string) {
   try {
@@ -97,7 +97,7 @@ export interface VersionHistory {
 
 export interface IThreadCollaborator {
   address: string;
-  chain: string;
+  community_id: string;
 }
 
 export type AssociatedReaction = {
@@ -251,7 +251,7 @@ export class Thread implements IUniqueId {
     this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
     this.kind = kind;
     this.stage = stage;
-    this.authorChain = Address.chain;
+    this.authorChain = Address.community_id;
     this.pinned = pinned;
     this.url = url;
     this.chain = chain;

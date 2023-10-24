@@ -83,7 +83,7 @@ const EditProfileComponent = () => {
             return new AddressInfo({
               id: a.id,
               address: a.address,
-              chainId: a.chain,
+              chainId: a.community_id,
               keytype: a.keytype,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,

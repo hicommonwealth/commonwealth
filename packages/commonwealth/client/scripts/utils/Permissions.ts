@@ -33,7 +33,7 @@ const isThreadCollaborator = (thread: Thread) => {
     thread.collaborators?.filter((c) => {
       return (
         c.address === app.user.activeAccount?.address &&
-        c.chain === app.user.activeAccount?.community.id
+        c.community_id === app.user.activeAccount?.community.id
       );
     }).length > 0
   );

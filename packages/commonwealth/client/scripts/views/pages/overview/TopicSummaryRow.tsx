@@ -6,7 +6,6 @@ import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import app from 'state';
 import { slugify } from 'utils';
-import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
@@ -14,6 +13,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
+import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
 import { NewThreadTag } from '../discussions/NewThreadTag';
@@ -83,7 +83,7 @@ export const TopicSummaryRow = ({
 
           const isStageDefault = isDefaultStage(thread.stage);
           const isTagsRowVisible = thread.stage && !isStageDefault;
-          const stageLabel = threadStageToLabel(thread.stage)
+          const stageLabel = threadStageToLabel(thread.stage);
 
           return (
             <div key={idx}>
@@ -101,7 +101,7 @@ export const TopicSummaryRow = ({
                   <div className="user-and-date-row">
                     <User
                       userAddress={user.address}
-                      userChainId={user.chain?.id || user.profile?.chain}
+                      userChainId={user.community?.id || user.profile?.chain}
                       shouldShowAddressWithDisplayName
                       shouldLinkProfile
                       avatarSize={24}
