@@ -23,7 +23,7 @@ interface APIResponseFormat {
 
 class Group {
   public id: number;
-  public chainId: string;
+  public communityId: string;
   public createdAt: string; // ISO string
   public updatedAt: string; // ISO string
   public name: string;
@@ -43,7 +43,7 @@ class Group {
     topicIds,
   }: APIResponseFormat) {
     this.id = id;
-    this.chainId = chain_id;
+    this.communityId = chain_id;
     this.createdAt = created_at;
     this.updatedAt = updated_at;
     this.name = metadata.name;
