@@ -1,7 +1,6 @@
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { ThreadAttributes } from '../../models/thread';
-import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {
   InvalidThreadID: 'Invalid thread ID',

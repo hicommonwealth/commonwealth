@@ -1309,7 +1309,6 @@ describe('ServerThreadsController', () => {
       const [
         thread,
         notificationOptions,
-        analyticsOptions,
       ] = await serverThreadsController.createThread({
         user: user as any,
         address: address as any,

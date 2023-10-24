@@ -3,7 +3,6 @@ import { AppError } from '../../../../common-common/src/errors';
 import { ServerThreadsController } from '../server_threads_controller';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
-import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
 import { validateOwner } from '../../util/validateOwner';
 

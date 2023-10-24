@@ -1,32 +1,12 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
-import { AddressAttributes, AddressInstance } from 'server/models/address';
+import { AddressInstance } from 'server/models/address';
 import { ChainInstance } from 'server/models/chain';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
 import { UserInstance } from 'server/models/user';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
 
-const VALID_REQUIREMENTS: Requirement[] = [
-  {
-    rule: 'threshold',
-    data: {
-      threshold: '1000',
-      source: {
-        source_type: 'erc20',
-        evm_chain_id: 1,
-        contract_address: '0x0000000000000000000000000000000000000000',
-      },
-    },
-  },
-  {
-    rule: 'allow',
-    data: {
-      allow: ['0x0000000000000000000000000000000000000000'],
-    },
-  },
-];
 const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 
 const createMockedGroupsController = () => {

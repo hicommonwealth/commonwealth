@@ -10,8 +10,7 @@ export type GetCommunitiesResult = {
 }[];
 
 export async function __getCommunities(
-  this: ServerCommunitiesController,
-  options: GetCommunitiesOptions
+  this: ServerCommunitiesController
 ): Promise<GetCommunitiesResult> {
   const [communities] = await Promise.all([
     this.models.Chain.findAll({

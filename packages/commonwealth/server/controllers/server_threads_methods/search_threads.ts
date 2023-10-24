@@ -1,4 +1,4 @@
-import { Op, QueryTypes } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { ServerThreadsController } from '../server_threads_controller';
 import {
   PaginationSqlBind,

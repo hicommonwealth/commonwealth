@@ -5,7 +5,7 @@ import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ThreadAttributes } from '../../models/thread';
 import { TrackOptions } from '../server_analytics_methods/track';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   ChainNetwork,
   ChainType,

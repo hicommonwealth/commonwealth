@@ -15,7 +15,7 @@ import { findAllRoles } from '../../util/roles';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
 import { ServerError } from '../../../../common-common/src/errors';
 import { AppError } from '../../../../common-common/src/errors';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { renderQuillDeltaToText } from '../../../shared/utils';
 import moment from 'moment';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
@@ -256,7 +256,6 @@ export async function __createThreadComment(
     rootNotifExcludeAddresses.push(parentComment.Address.address);
   }
 
-  const cwUrl = getThreadUrl(thread, finalComment.id);
   const root_title = thread.title || '';
 
   const allNotificationOptions: EmitOptions[] = [];
