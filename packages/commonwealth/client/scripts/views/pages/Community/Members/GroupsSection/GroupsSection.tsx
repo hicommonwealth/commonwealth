@@ -17,7 +17,7 @@ const GroupsSection = ({ groups }: GroupSectionProps) => {
           <GroupCard
             key={index}
             groupName={group.name}
-            groupDescription={group.description || 'jcvduhcvdhvhv'}
+            groupDescription={group.description}
             requirements={group.requirements.map((r) => ({
               requirementType: requirementTypes?.find(
                 (x) => x.value === r?.data?.source?.source_type
@@ -27,13 +27,14 @@ const GroupsSection = ({ groups }: GroupSectionProps) => {
                   .find(
                     (x) =>
                       `${x.value}` ===
-                      `${r?.data?.source?.evm_chain_id ||
-                      r?.data?.source?.cosmos_chain_id ||
-                      ''
+                      `${
+                        r?.data?.source?.evm_chain_id ||
+                        r?.data?.source?.cosmos_chain_id ||
+                        ''
                       }`
                   )
                   ?.label?.split('-')
-                  ?.join(' ') || '{_chain_}',
+                  ?.join(' ') || '',
               requirementContractAddress: r.data.source.contract_address,
               requirementAmount: r.data.threshold,
               requirementCondition: 'More than', // hardcoded in api
