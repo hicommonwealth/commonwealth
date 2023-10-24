@@ -124,7 +124,7 @@ class PollsController {
         jwt: app.user.jwt,
         poll_id: pollId,
       },
-      success: (response) => {
+      success: () => {
         // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
         // This is an exception until polls get migrated to react query
         updateThreadInAllCaches(app.activeChainId(), threadId, {

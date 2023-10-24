@@ -24,7 +24,7 @@ const createMockedGroupsController = () => {
   const topics: TopicAttributes[] = [
     {
       id: 1,
-      chain_id: 'ethereum',
+      community_id: 'ethereum',
       token_threshold: '1000',
       name: 'hello',
       featured_in_sidebar: false,
@@ -90,7 +90,7 @@ const createMockedGroupsController = () => {
       findAll: async () => [
         {
           toJSON: () => ({
-            chain_id: 'ethereum',
+            community_id: 'ethereum',
             name: 'member',
             allow: '0',
             deny: '0',
@@ -152,7 +152,7 @@ describe('ServerGroupsController', () => {
     });
     expect(result).to.have.length(1);
     expect(result[0]).to.have.property('id');
-    expect(result[0]).to.have.property('chain_id');
+    expect(result[0]).to.have.property('community_id');
     expect(result[0]).to.have.property('metadata');
     expect(result[0]).to.have.property('requirements');
     expect(result[0]).to.have.property('memberships');
@@ -178,7 +178,7 @@ describe('ServerGroupsController', () => {
       topics: [],
     });
     expect(result).to.have.property('id');
-    expect(result).to.have.property('chain_id');
+    expect(result).to.have.property('community_id');
     expect(result).to.have.property('metadata');
     expect(result).to.have.property('requirements');
   });
@@ -216,7 +216,7 @@ describe('ServerGroupsController', () => {
       requirements: [],
     });
     expect(result).to.have.property('id');
-    expect(result).to.have.property('chain_id');
+    expect(result).to.have.property('community_id');
     expect(result).to.have.property('metadata');
     expect(result).to.have.property('requirements');
   });
