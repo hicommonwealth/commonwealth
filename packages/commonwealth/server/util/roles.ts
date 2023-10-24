@@ -73,21 +73,16 @@ export async function findAllCommunityRolesWithRoleAssignments(
   chain_id?: string,
   permissions?: Role[]
 ): Promise<CommunityRoleAttributes[]> {
-  let roleFindOptions: any;
+  const roleWhereOptions: WhereOptions<AddressAttributes> = {};
+  let roleFindOptions: FindOptions<AddressAttributes> = {
+    where: roleWhereOptions,
+  };
   if (permissions) {
-    roleFindOptions = {
-      where: {
-        role: { [Op.in]: permissions },
-      },
-    };
-  } else {
-    roleFindOptions = {
-      where: {},
-    };
+    roleWhereOptions.role = { [Op.in]: permissions };
   }
 
   if (chain_id) {
-    roleFindOptions['where']['chain'] = chain_id;
+    roleWhereOptions.community_id = chain_id;
   }
 
   // if where exists, replace address_id with id, append it to our where

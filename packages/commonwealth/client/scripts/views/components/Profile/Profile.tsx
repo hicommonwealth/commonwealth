@@ -6,13 +6,13 @@ import AddressInfo from '../../../models/AddressInfo';
 import Comment from '../../../models/Comment';
 import NewProfile from '../../../models/NewProfile';
 import Thread from '../../../models/Thread';
+import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../../pages/404';
 import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
 import { CWSpinner } from '../component_kit/cw_spinner';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivity from './ProfileActivity';
 import ProfileHeader from './ProfileHeader';
-import { CWText } from '../../components/component_kit/cw_text';
 
 enum ProfileError {
   None,
@@ -58,7 +58,7 @@ const Profile = ({ profileId }: ProfileProps) => {
             return new AddressInfo({
               id: a.id,
               address: a.address,
-              chainId: a.chain,
+              chainId: a.community_id,
               keytype: a.keytype,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,
