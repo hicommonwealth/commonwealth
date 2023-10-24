@@ -89,10 +89,10 @@ export const TemplateDisplayTab = ({
           </div>
         </div>
         {templates.length > 0 ? (
-          templates.map((template) => {
+          templates.map((template, index) => {
             const creator: Account = app.chain.accounts.get(template.createdBy);
             return (
-              <div className="table-row">
+              <div className="table-row" key={index}>
                 <div className="table-column">
                   <CWText>{template.name}</CWText>
                 </div>

@@ -74,7 +74,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
   permissions?: Role[]
 ): Promise<CommunityRoleAttributes[]> {
   const roleWhereOptions: WhereOptions<AddressAttributes> = {};
-  let roleFindOptions: FindOptions<AddressAttributes> = {
+  const roleFindOptions: FindOptions<AddressAttributes> = {
     where: roleWhereOptions,
   };
   if (permissions) {

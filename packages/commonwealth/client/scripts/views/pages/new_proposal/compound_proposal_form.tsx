@@ -66,6 +66,7 @@ export const CompoundProposalForm = () => {
               onClick={() => {
                 setActiveTabIndex(index);
               }}
+              key={index}
             />
           ))}
         </CWTabBar>

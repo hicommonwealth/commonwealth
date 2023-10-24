@@ -166,8 +166,8 @@ const NotificationSettingsPage = () => {
               <>
                 <CWText type="h5">Email Request</CWText>
                 <CWText type="b1">
-                  Mmm...seems like we don't have your email on file? Enter your
-                  email below so we can send you scheduled email digests.
+                  {"Mmm...seems like we don't have your email on file? Enter your " +
+                    'email below so we can send you scheduled email digests.'}
                 </CWText>
                 <div className="email-input-row">
                   <CWTextInput

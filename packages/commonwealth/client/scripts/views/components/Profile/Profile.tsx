@@ -137,7 +137,7 @@ const Profile = ({ profileId }: ProfileProps) => {
       >
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            {profile.name}'s Profile
+            {`${profile.name}'s Profile`}
           </CWText>
         </div>
         <div
