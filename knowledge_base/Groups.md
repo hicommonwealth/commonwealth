@@ -18,7 +18,7 @@ sequenceDiagram
 
   Note over Client: Lands on a community page, <br> immediately checks membership <br> status in background
 
-  Client->>API: PUT /refresh-membership body: <br> (jwt, chain, address, topic_id)
+  Client->>API: PUT /refresh-membership body: <br> (user, chain, address, topicId)
 
   Note over API: Checks membership status of address, <br> for group(s), on specified topic. <br><br> If membership missing or stale, <br> compute membership status, <br> save and return membership <br><br> If membership fresh, <br> return membership. <br><br> Membership model (saved to DB): <br><br> group_id: number <br> address_id: number <br> allowed: boolean <br> reject_reason?: string <br> last checked: Date
 
@@ -38,9 +38,9 @@ sequenceDiagram
 
   Note over Client: Attempts to perform gated action, <br> (e.g. create thread, create comment)
 
-  Client->>API: Request <br> body: (jwt, chain, address, …data)
+  Client->>API: Request <br> body: (user, address, chain, …data)
 
-  Note over API: Checks membership status of address, <br> for group(s), on thread's topic. <br><br> Always compute membership status and save. <br><br> If rejected, save Membership.reject_reason <br> and throw unauthorized error <br><br> If allowed, proceed with action.
+  Note over API: Checks membership status of address, <br> for group(s), on thread's topic, <br> using validateGroupMembership. <br><br> Always compute membership status and save. <br><br> If rejected, save Membership.reject_reason <br> and throw unauthorized error <br><br> If allowed, proceed with action.
 
    alt Rejected
         API-->>Client: { error: <reject reason> }
@@ -60,9 +60,10 @@ sequenceDiagram
 
   Note over Client: Admin creates a Group
 
-  Client->>API: POST /groups <br> body: (jwt, chain_id, address, metadata, requirements, topics)
 
-  Note over API: Validate schema. <br><br> Check limit of 20 groups per chain <br><br> Save group <br><br> Optionally add group to each specified topic
+  Client->>API: POST /groups <br> body: (user, chain, address, metadata, requirements, topics)
+
+  Note over API: Validate schema. <br><br> Check limit of 20 groups per chain. <br><br> Save group <br><br> Optionally add group to each specified topic.
 
   API-->>Client: Response payload (Group): <br><br> id: number <br> chain_id: string <br> metadata: MetadataJSON <br> requirements: RequirementsJSON
 
@@ -96,9 +97,9 @@ sequenceDiagram
 
   Note over Client: Admin updates/deletes Group
 
-  Client ->> API: DELETE /groups/:id <br> body: (jwt, chain_id, address)
+  Client ->> API: DELETE /groups/:id <br> body: (user, chain, address)
 
-  Note over API: Deletes all Memberships of the group, <br> then updates/deletes the group
+  Note over API: Deletes all Memberships of the group, <br> then updates/deletes the group.
 
   API -->> Client: OK
 
