@@ -72,7 +72,6 @@ const UserDropdown = () => {
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
 
-  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>', app.user.activeAccounts);
   const addresses: PopoverMenuItem[] = app.user.activeAccounts.map(
     (account) => {
       const signed = authenticatedAddresses[account.address];

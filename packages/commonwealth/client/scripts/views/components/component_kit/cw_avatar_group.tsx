@@ -26,7 +26,6 @@ export const CWAvatarGroup = (props: AvatarGroupProps) => {
   if (!profiles || profiles?.filter((p) => !!p && p.Addresses).length === 0)
     return;
 
-  console.log('______________:', profiles);
   const truncatedProfiles = profiles
     .filter((p) => !!p && p.Addresses)
     .slice(0, 4)
