@@ -13,7 +13,7 @@ export const createChainNode = async ({
   bech32: string;
   balance_type: BalanceType;
 }) => {
-  return await axios.post(`${app.serverUrl()}/createChainNode`, {
+  return await axios.post(`${app.serverUrl()}/nodes`, {
     url,
     name,
     bech32,
@@ -23,9 +23,10 @@ export const createChainNode = async ({
 };
 
 export const deleteChain = async ({ id }: { id: string }) => {
-  await axios.post(`${app.serverUrl()}/deleteChain`, {
-    id,
-    jwt: app.user.jwt,
+  await axios.delete(`${app.serverUrl()}/communities/${id}`, {
+    data: {
+      jwt: app.user.jwt,
+    },
   });
 };
 
