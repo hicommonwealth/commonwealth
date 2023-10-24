@@ -3,17 +3,15 @@ import { ServerControllers } from '../../routing/router';
 import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { AppError } from '../../../../common-common/src/errors';
+import z from 'zod';
+import { GroupMetadata } from '../../models/group';
 
-const Errors = {
-  InvalidMetadata: 'Invalid metadata',
-  InvalidRequirements: 'Invalid requirements',
-  InvalidTopics: 'Invalid topics',
-};
+const Errors = {};
 
 type CreateGroupBody = {
-  metadata: any; // TODO: use proper type
+  metadata: GroupMetadata;
   requirements: Requirement[];
-  topics: number[];
+  topics?: number[];
 };
 type CreateGroupResponse = CreateGroupResult;
 
@@ -23,25 +21,31 @@ export const createGroupHandler = async (
   res: TypedResponse<CreateGroupResponse>
 ) => {
   const { user, address, chain } = req;
-  const { metadata, requirements, topics } = req.body;
-  if (!metadata) {
-    throw new AppError(Errors.InvalidMetadata);
+
+  const schema = z.object({
+    body: z.object({
+      metadata: z.object({
+        name: z.string(),
+        description: z.string(),
+        required_requirements: z.number().optional(),
+      }),
+      requirements: z.array(z.any()), // validated in controller
+      topics: z.array(z.number()).optional(),
+    }),
+  });
+  const validationResult = schema.safeParse(req);
+  if (validationResult.success === false) {
+    throw new AppError(JSON.stringify(validationResult.error));
   }
-  if (!requirements) {
-    throw new AppError(Errors.InvalidRequirements);
-  }
-  if (topics) {
-    for (const topicId of topics) {
-      if (typeof topicId !== 'number') {
-        throw new AppError(Errors.InvalidTopics);
-      }
-    }
-  }
+  const {
+    body: { metadata, requirements, topics },
+  } = validationResult.data;
+
   const result = await controllers.groups.createGroup({
     user,
     chain,
     address,
-    metadata,
+    metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
   });

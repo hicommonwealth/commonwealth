@@ -6,6 +6,7 @@ import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
 import type NodeInfo from './NodeInfo';
 import { ETHERMINT_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
+import axios from 'axios';
 
 class ChainInfo {
   public readonly id: string;
@@ -44,6 +45,7 @@ class ChainInfo {
   public communityBanner?: string;
   public discordConfigId?: string;
   public cosmosGovernanceVersion?: string;
+  public discordBotWebhooksEnabled?: boolean;
 
   public get node() {
     return this.ChainNode;
@@ -83,6 +85,7 @@ class ChainInfo {
     adminOnlyPolling,
     discord_config_id,
     cosmosGovernanceVersion,
+    discordBotWebhooksEnabled,
   }) {
     this.id = id;
     this.network = network;
@@ -118,6 +121,7 @@ class ChainInfo {
     this.communityBanner = null;
     this.discordConfigId = discord_config_id;
     this.cosmosGovernanceVersion = cosmosGovernanceVersion;
+    this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;
   }
 
   public static fromJSON({
@@ -153,6 +157,7 @@ class ChainInfo {
     ChainNode,
     admin_only_polling,
     discord_config_id,
+    discord_bot_webhooks_enabled,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -210,6 +215,7 @@ class ChainInfo {
       adminOnlyPolling: admin_only_polling,
       discord_config_id,
       cosmosGovernanceVersion: cosmos_governance_version,
+      discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
     });
   }
 
@@ -274,6 +280,7 @@ class ChainInfo {
     defaultPage,
     hasHomepage,
     chain_node_id,
+    discord_bot_webhooks_enabled,
   }: {
     name?: string;
     description?: string;
@@ -292,10 +299,11 @@ class ChainInfo {
     defaultPage?: DefaultPage;
     hasHomepage?: boolean;
     chain_node_id?: string;
+    discord_bot_webhooks_enabled?: boolean;
   }) {
-    // TODO: Change to PUT /chain
-    const r = await $.post(`${app.serverUrl()}/updateChain`, {
-      id: app.activeChainId() ?? this.id,
+    const id = app.activeChainId() ?? this.id;
+    const r = await axios.patch(`${app.serverUrl()}/communities/${id}`, {
+      id,
       name,
       description,
       website,
@@ -313,9 +321,10 @@ class ChainInfo {
       default_page: defaultPage,
       has_homepage: hasHomepage,
       chain_node_id,
+      discord_bot_webhooks_enabled,
       jwt: app.user.jwt,
     });
-    const updatedChain = r.result;
+    const updatedChain = r.data.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
     this.website = updatedChain.website;
@@ -333,6 +342,7 @@ class ChainInfo {
     this.defaultPage = updatedChain.default_page;
     this.hasHomepage = updatedChain.has_homepage;
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
+    this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
   }
 }
 

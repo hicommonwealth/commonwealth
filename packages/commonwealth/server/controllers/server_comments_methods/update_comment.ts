@@ -137,12 +137,6 @@ export async function __updateComment(
         author_chain: finalComment.Address.chain,
       },
     },
-    webhookData: {
-      user: finalComment.Address.address,
-      url: cwUrl,
-      title: thread.title || '',
-      chain: finalComment.chain,
-    },
     excludeAddresses: [finalComment.Address.address],
   });
 
@@ -206,7 +200,6 @@ export async function __updateComment(
             author_chain: finalComment.Address.chain,
           },
         },
-        webhookData: null,
         excludeAddresses: [finalComment.Address.address],
       });
     });

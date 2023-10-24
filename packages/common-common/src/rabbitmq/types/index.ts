@@ -9,7 +9,6 @@ import type { RmqCENotification } from './chainEventNotification';
 import type { RmqSnapshotEvent } from './snapshotListener';
 import type { RmqSnapshotNotification } from './snapshotNotification';
 import { Sequelize } from 'sequelize';
-import { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
 import { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
 import { RmqDiscordMessage } from './discordMessage';
 
@@ -28,7 +27,6 @@ export class RmqMsgFormatError extends Error {
  * anywhere, it MUST be one of these types
  */
 export type TRmqMessages =
-  | RmqCENotificationCUD.RmqMsgType
   | RmqCWEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
   | RmqSnapshotEvent.RmqMsgType
@@ -43,7 +41,6 @@ export interface RmqMsgNamespace<MsgType> {
 
 export enum RascalPublications {
   ChainEvents = 'ChainEventsPublication',
-  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
   SnapshotListener = 'SnapshotListenerPublication',
   DiscordListener = 'DiscordMessageSubscription',
@@ -51,7 +48,6 @@ export enum RascalPublications {
 
 export enum RascalSubscriptions {
   ChainEvents = 'ChainEventsSubscription',
-  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDSubscription',
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
   SnapshotListener = 'SnapshotListenerSubscription',
   DiscordListener = 'DiscordMessageSubscription',
@@ -59,7 +55,6 @@ export enum RascalSubscriptions {
 
 export enum RascalExchanges {
   ChainEvents = 'ChainEventsExchange',
-  CUD = 'CreateUpdateDeleteExchange',
   Notifications = 'NotificationsExchange',
   SnapshotListener = 'SnapshotListenerExchange',
   DeadLetter = 'DeadLetterExchange',
@@ -68,7 +63,6 @@ export enum RascalExchanges {
 
 export enum RascalQueues {
   ChainEvents = 'ChainEventsQueueV2',
-  ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueueV2',
   ChainEventNotifications = 'ChainEventNotificationsQueueV2',
   DeadLetter = 'DeadLetterQueue',
   SnapshotListener = 'SnapshotListenerQueueV2',
@@ -77,7 +71,6 @@ export enum RascalQueues {
 
 export enum RascalBindings {
   ChainEvents = 'ChainEventsBinding',
-  ChainEventNotificationsCUD = 'ChainEventNotificationsCUDBinding',
   ChainEventNotifications = 'ChainEventNotificationsBinding',
   SnapshotListener = 'SnapshotListenerBinding',
   DeadLetter = 'DeadLetterBinding',
@@ -86,7 +79,6 @@ export enum RascalBindings {
 
 export enum RascalRoutingKeys {
   ChainEvents = 'ChainEvents',
-  ChainEventNotificationsCUD = 'ChainEventNotificationsCUD',
   ChainEventNotifications = 'ChainEventNotifications',
   SnapshotListener = 'SnapshotListener',
   DeadLetter = 'DeadLetter',

@@ -382,7 +382,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
       description: constructTxPreview(), // TODO: Replace with some preview we like
       buttons: [
         {
-          buttonType: 'primary-black',
+          buttonType: 'primary',
           label: 'confirm',
           onClick: async () => {
             try {
@@ -411,7 +411,7 @@ const ViewTemplatePage = (formData?: ViewTemplateFormProps) => {
           },
         },
         {
-          buttonType: 'secondary-black',
+          buttonType: 'secondary',
           label: 'cancel',
           onClick: () => {
             console.log('transaction cancelled');

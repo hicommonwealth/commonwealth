@@ -39,17 +39,7 @@ const Analytics = () => {
 
   const getCommunityAnalytics = async (chainId: string) => {
     axios
-      .post(
-        `${app.serverUrl()}/communitySpecificAnalytics`,
-        {
-          chain: chainId,
-        },
-        {
-          headers: {
-            'content-type': 'application/json',
-          },
-        }
-      )
+      .get(`${app.serverUrl()}/communities/${chainId}/stats`)
       .then((response) => {
         setChainLookupCompleted(true);
         setCommunityAnalytics(response.data.result);
@@ -113,6 +103,7 @@ const Analytics = () => {
         <>
           <div className="AnalyticsSection">
             <CWText type="h4">Site Statistics</CWText>
+
             <CWText type="caption">
               All stats pulled from the last 30 days of global site activity.
             </CWText>

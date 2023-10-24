@@ -21,7 +21,6 @@ const NotificationSettingsPage = lazy(
   () => import('views/pages/notification_settings')
 );
 
-const ReferendaPage = lazy(() => import('views/pages/referenda'));
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
 const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
@@ -50,9 +49,6 @@ const NewContractTemplatePage = lazy(
   () => import('views/pages/new_contract_template')
 );
 const ViewTemplatePage = lazy(() => import('views/pages/view_template'));
-
-const TreasuryPage = lazy(() => import('views/pages/treasury'));
-const TipsPage = lazy(() => import('views/pages/tips'));
 
 const ManageCommunityPage = lazy(
   () => import('views/pages/manage_community/ManageCommunityPage')
@@ -161,12 +157,6 @@ const CustomDomainRoutes = () => {
 
     // GOVERNANCE
     <Route
-      path="/referenda"
-      element={withLayout(ReferendaPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
       path="/proposals"
       element={withLayout(ProposalsPage, {
         scoped: true,
@@ -267,21 +257,6 @@ const CustomDomainRoutes = () => {
         ]
       : []),
     // CONTRACTS END
-
-    // TREASURY
-    <Route
-      path="/treasury"
-      element={withLayout(TreasuryPage, {
-        scoped: true,
-      })}
-    />,
-    <Route
-      path="/tips"
-      element={withLayout(TipsPage, {
-        scoped: true,
-      })}
-    />,
-    // TREASURY END
 
     // ADMIN
     <Route

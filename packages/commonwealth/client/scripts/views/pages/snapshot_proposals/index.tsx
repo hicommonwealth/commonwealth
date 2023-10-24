@@ -89,6 +89,9 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   return (
     <div className="SnapshotProposalsPage">
+      <CWText type="h2" fontWeight="medium">
+        Snapshots
+      </CWText>
       <div className="top-bar">
         <CWTabBar>
           {['Active', 'Ended'].map((tabName, index) => (

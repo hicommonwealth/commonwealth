@@ -1,12 +1,12 @@
 type ContractSource = {
   source_type: 'erc20' | 'erc721';
-  evm_chain_id: 1;
+  evm_chain_id: number;
   contract_address: string;
 };
 
 type NativeSource = {
   source_type: 'eth_native';
-  evm_chain_id: 1;
+  evm_chain_id: number;
 };
 
 type CosmosSource = {
@@ -14,12 +14,13 @@ type CosmosSource = {
   cosmos_chain_id: string;
   token_symbol: string;
 };
-type ThresholdData = {
+
+export type ThresholdData = {
   threshold: string;
   source: ContractSource | NativeSource | CosmosSource;
 };
 
-type AllowlistData = {
+export type AllowlistData = {
   allow: string[];
 };
 

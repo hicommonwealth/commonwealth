@@ -79,6 +79,7 @@ export const PopoverMenu = ({
                     isSecondary,
                     iconLeft,
                     iconLeftWeight,
+                    iconLeftSize,
                     label,
                     onClick,
                   } = item;
@@ -108,7 +109,7 @@ export const PopoverMenu = ({
                         <CWIcon
                           className="menu-item-icon"
                           iconName={iconLeft}
-                          iconSize="small"
+                          iconSize={iconLeftSize || 'small'}
                           weight={iconLeftWeight}
                         />
                       )}

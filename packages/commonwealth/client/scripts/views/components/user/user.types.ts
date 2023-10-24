@@ -1,5 +1,7 @@
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
+import { PopperPlacementType } from '@mui/base/Popper';
+
 export type AddressDisplayOptions = {
   autoTruncate?: boolean;
   maxCharLength?: number;
@@ -30,6 +32,7 @@ export type UserAttrs = {
   shouldShowAddressWithDisplayName?: boolean;
   avatarSize?: number;
   role?: { permission: string };
+  popoverPlacement?: PopperPlacementType;
 };
 
 export type UserAttrsWithSkeletonProp = UserAttrs & {

@@ -1,9 +1,9 @@
 import moment from 'moment';
 import { ChainInstance } from '../../models/chain';
-import { Link, ThreadAttributes, ThreadInstance } from '../../models/thread';
+import { ThreadAttributes, ThreadInstance } from '../../models/thread';
 import { ServerThreadsController } from '../server_threads_controller';
 import { QueryTypes } from 'sequelize';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
+import { ServerError } from '../../../../common-common/src/errors';
 import { getLastEdited } from '../../util/getLastEdited';
 
 export type GetBulkThreadsOptions = {

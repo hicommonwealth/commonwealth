@@ -1,15 +1,18 @@
 import React from 'react';
-
 import $ from 'jquery';
 
-import 'modals/feedback_modal.scss';
-
-import app from 'state';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWTextArea } from '../components/component_kit/cw_text_area';
+import app from '../../state';
 import type { ValidationStatus } from '../components/component_kit/cw_validation_text';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+
+import '../../../styles/modals/feedback_modal.scss';
 
 type FeedbackModalProps = {
   onModalClose: () => void;
@@ -25,11 +28,8 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
 
   return (
     <div className="FeedbackModal">
-      <div className="compact-modal-title">
-        <h3>Send feedback</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader label="Send feedback" onModalClose={onModalClose} />
+      <CWModalBody>
         <CWTextArea
           placeholder="Report a bug, or suggest an improvement"
           value={feedbackText}
@@ -37,7 +37,12 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
             setFeedbackText(e.target.value);
           }}
         />
+      </CWModalBody>
+      <CWModalFooter>
+        {message && <CWValidationText message={message} status={status} />}
         <CWButton
+          buttonType="primary"
+          buttonHeight="sm"
           disabled={isSending}
           label="Send feedback"
           onClick={(e) => {
@@ -64,8 +69,7 @@ export const FeedbackModal = (props: FeedbackModalProps) => {
             );
           }}
         />
-        {message && <CWValidationText message={message} status={status} />}
-      </div>
+      </CWModalFooter>
     </div>
   );
 };

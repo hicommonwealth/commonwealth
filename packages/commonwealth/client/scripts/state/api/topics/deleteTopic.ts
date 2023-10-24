@@ -10,10 +10,11 @@ interface DeleteTopicProps {
 }
 
 const deleteTopic = async ({ topicId, chainId }: DeleteTopicProps) => {
-  await axios.post(`${app.serverUrl()}/deleteTopic`, {
-    id: topicId,
-    chain: chainId,
-    jwt: app.user.jwt,
+  await axios.delete(`${app.serverUrl()}/topics/${topicId}`, {
+    data: {
+      chain: chainId,
+      jwt: app.user.jwt,
+    },
   });
 };
 
