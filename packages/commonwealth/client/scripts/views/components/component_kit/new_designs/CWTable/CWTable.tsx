@@ -136,7 +136,7 @@ export const CWTable = ({
               return info.getValue();
             }
           },
-          footer: (props) => props.column.id,
+          footer: (props: any) => props.column.id,
           enableSorting: col.sortable,
         };
       }),
