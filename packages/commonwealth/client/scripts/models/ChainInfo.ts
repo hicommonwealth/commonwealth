@@ -46,7 +46,7 @@ class ChainInfo {
   public cosmosGovernanceVersion?: string;
   public discordBotWebhooksEnabled?: boolean;
   public directoryPageEnabled?: boolean;
-  public directoryPageChainNodeId?: boolean;
+  public directoryPageChainNodeId?: number;
 
   public get node() {
     return this.ChainNode;

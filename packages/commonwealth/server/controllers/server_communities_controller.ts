@@ -3,7 +3,7 @@ import BanCache from '../util/banCheckCache';
 import { TokenBalanceCache } from '../../../token-balance-cache/src';
 import {
   __getRelatedCommunities,
-  GetRelatedCommunitiesOptions,
+  GetRelatedCommunitiesQuery,
   GetRelatedCommunitiesResult
 } from './server_communities_methods/get_related_communities';
 import {
@@ -106,7 +106,7 @@ export class ServerCommunitiesController {
   }
 
   async getRelatedCommunities(
-    options: GetRelatedCommunitiesOptions
+    options: GetRelatedCommunitiesQuery
   ): Promise<GetRelatedCommunitiesResult> {
     return __getRelatedCommunities.call(this, options);
   }

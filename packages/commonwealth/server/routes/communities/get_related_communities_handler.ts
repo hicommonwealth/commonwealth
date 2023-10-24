@@ -1,11 +1,11 @@
 import {
-  GetRelatedCommunitiesOptions,
+  GetRelatedCommunitiesQuery,
   GetRelatedCommunitiesResult
 } from '../../controllers/server_communities_methods/get_related_communities';
 import { ServerControllers } from '../../routing/router';
 import { success, TypedRequestQuery, TypedResponse } from '../../types';
 
-type GetRelatedCommunitiesParams = GetRelatedCommunitiesOptions;
+type GetRelatedCommunitiesParams = GetRelatedCommunitiesQuery;
 type GetRelatedCommunitiesResponse = GetRelatedCommunitiesResult;
 
 export const getRelatedCommunitiesHandler = async (

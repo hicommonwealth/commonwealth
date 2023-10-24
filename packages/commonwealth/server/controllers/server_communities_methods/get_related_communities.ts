@@ -5,10 +5,10 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 /**
  * Options for the getRelatedCommunities function.
  *
- * @typedef {Object} GetRelatedCommunitiesOptions
+ * @typedef {Object} GetRelatedCommunitiesQuery
  * @property {string} chainNodeId - The id of the ChainNode variable for filtering.
  */
-export type GetRelatedCommunitiesOptions = { chainNodeId: number };
+export type GetRelatedCommunitiesQuery = { chainNodeId: number };
 
 /**
  * Response for the getRelatedCommunities function.
@@ -26,11 +26,12 @@ export type GetRelatedCommunitiesResult = {
   icon_url: string;
   thread_count: number;
   address_count: number;
+  description: string;
 }[];
 
 export async function __getRelatedCommunities(
   this: ServerCommunitiesController,
-  { chainNodeId }: GetRelatedCommunitiesOptions
+  { chainNodeId }: GetRelatedCommunitiesQuery
 ): Promise<GetRelatedCommunitiesResult> {
   // Although this subquery is not necessary as is currently, We should keep it because in the future if we want to
   // paginate, then we will need to paginate through the subquery.
@@ -39,18 +40,20 @@ export async function __getRelatedCommunities(
     SELECT 
         popular_chains.id as id, 
         popular_chains.name as community, 
+        popular_chains.description as description,
         popular_chains.icon_url, 
         popular_chains.thread_count, 
         COUNT(a) as address_count 
     FROM 
-        (SELECT c.id, c.icon_url, c.name, COUNT(t) as thread_count 
+        (SELECT c.id, c.icon_url, c.name, c.description, COUNT(t) as thread_count 
         FROM "ChainNodes" as cn 
         JOIN "Chains" as c on c.chain_node_id = cn.id 
         LEFT JOIN "Threads" as t on t.chain = c.id 
         WHERE cn.id = :chainNodeId and t.deleted_at IS NULL
         GROUP BY c.id) as popular_chains 
     LEFT JOIN "Addresses" as a on a.chain = popular_chains.id 
-    GROUP BY popular_chains.id, popular_chains.icon_url, popular_chains.name, popular_chains.thread_count 
+    GROUP BY popular_chains.id, popular_chains.icon_url, popular_chains.name,
+     popular_chains.description, popular_chains.thread_count 
     ORDER BY address_count DESC;
     `,
     {

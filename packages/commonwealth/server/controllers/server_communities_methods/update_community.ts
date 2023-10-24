@@ -93,6 +93,8 @@ export async function __updateCommunity(
     has_homepage,
     terms,
     chain_node_id,
+    directory_page_enabled,
+    directory_page_chain_node_id,
   } = rest;
 
   // Handle single string case and undefined case
@@ -200,6 +202,12 @@ export async function __updateCommunity(
   }
   if (chain_node_id) {
     chain.chain_node_id = chain_node_id;
+  }
+  if (directory_page_enabled !== undefined) {
+    chain.directory_page_enabled = directory_page_enabled;
+  }
+  if (directory_page_chain_node_id) {
+    chain.directory_page_chain_node_id = directory_page_chain_node_id;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
