@@ -119,6 +119,7 @@ export const ReactionButton = ({
         <CWUpvoteSmall
           voteCount={reactors.length}
           disabled={isUserForbidden || disabled}
+          isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
           onMouseEnter={() => undefined}
           onClick={handleVoteClick}
@@ -127,7 +128,14 @@ export const ReactionButton = ({
           })}
         />
       ) : disabled ? (
-        <TooltipWrapper disabled={disabled} text="Join community to upvote">
+        <TooltipWrapper
+          disabled={disabled}
+          text={
+            thread.archivedAt
+              ? 'Thread is archived'
+              : `Join community to upvote`
+          }
+        >
           <CWUpvote
             onClick={handleVoteClick}
             voteCount={reactors.length}

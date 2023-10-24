@@ -84,6 +84,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CommonDomainRoutes = () => [
   <Route
+    key={0}
     path="/"
     element={withLayout(LandingPage, {
       scoped: false,
@@ -91,85 +92,105 @@ const CommonDomainRoutes = () => [
     })}
   />,
   <Route
+    key={0}
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
   <Route
+    key={0}
     path="/createCommunity/:type"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
   <Route
+    key={0}
     path="/whyCommonwealth"
     element={withLayout(WhyCommonwealthPage, {
       type: 'common',
     })}
   />,
   <Route
+    key={0}
     path="/dashboard"
     element={withLayout(DashboardPage, { type: 'common' })}
   />,
   <Route
+    key={0}
     path="/dashboard/:type"
     element={withLayout(DashboardPage, { type: 'common' })}
   />,
   <Route
+    key={0}
     path="/communities"
     element={withLayout(CommunitiesPage, {
       type: 'common',
     })}
   />,
-  <Route path="/search" element={withLayout(SearchPage, { type: 'common' })} />,
   <Route
+    key={0}
+    path="/search"
+    element={withLayout(SearchPage, { type: 'common' })}
+  />,
+  <Route
+    key={0}
     path="/web3login"
     element={withLayout(Web3LoginPage, { type: 'common' })}
   />,
   // scoped
   <Route
+    key={0}
     path="/:scope/overview"
     element={withLayout(OverviewPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/search"
     element={withLayout(SearchPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/members"
     element={withLayout(MembersPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/sputnik-daos"
     element={withLayout(SputnikDaosPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/finishNearLogin"
     element={withLayout(FinishNearLoginPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/finishaxielogin"
     element={withLayout(FinishAxieLoginPage, { type: 'common' })}
   />,
   <Route
+    key={0}
     path="/finishsociallogin"
     element={withLayout(FinishSocialLoginPage, { type: 'common' })}
   />,
   // NOTIFICATIONS
   <Route
+    key={0}
     path="/:scope/notifications"
     element={withLayout(NotificationsPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/notifications"
     element={withLayout(NotificationsPage, {
       scoped: true,
@@ -177,10 +198,12 @@ const CommonDomainRoutes = () => [
     })}
   />,
   <Route
+    key={0}
     path="/notification-settings"
     element={withLayout(NotificationSettingsPage, { type: 'common' })}
   />,
   <Route
+    key={0}
     path="/:scope/notification-settings"
     element={<Navigate to="/notification-settings" />}
   />,
@@ -188,36 +211,42 @@ const CommonDomainRoutes = () => [
 
   // GOVERNANCE
   <Route
+    key={0}
     path="/:scope/proposals"
     element={withLayout(ProposalsPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/proposal/:type/:identifier"
     element={withLayout(ViewProposalPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/proposal/:identifier"
     element={withLayout(ViewProposalPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/new/proposal/:type"
     element={withLayout(NewProposalPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/new/proposal"
     element={withLayout(NewProposalPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/proposal/discussion/:identifier"
     element={
       <Navigate to={(parameters) => `/discussion/${parameters.identifier}`} />
@@ -227,36 +256,42 @@ const CommonDomainRoutes = () => [
 
   // DISCUSSIONS
   <Route
+    key={0}
     path="/:scope/discussions"
     element={withLayout(DiscussionsPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/discussions/:topicName"
     element={withLayout(DiscussionsPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/discussion/:identifier"
     element={withLayout(ViewThreadPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/discussion/:identifier"
     element={withLayout(ThreadRedirectPage, {
       scope: false,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/new/discussion"
     element={withLayout(NewThreadPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/proposal/discussion/:identifier"
     element={
       <Navigate
@@ -267,6 +302,7 @@ const CommonDomainRoutes = () => [
     }
   />,
   <Route
+    key={0}
     path="/:scope"
     element={withLayout(DiscussionsRedirectPage, {
       scoped: true,
@@ -275,6 +311,7 @@ const CommonDomainRoutes = () => [
   ...(featureFlags.communityHomepage
     ? [
         <Route
+          key={0}
           path="/:scope/feed"
           element={withLayout(FeedPage, {
             scoped: true,
@@ -282,36 +319,48 @@ const CommonDomainRoutes = () => [
         />,
       ]
     : []),
+  <Route
+    key={0}
+    path="/:scope/archived"
+    element={withLayout(DiscussionsPage, {
+      scoped: true,
+    })}
+  />,
   // DISCUSSIONS END
 
   // CONTRACTS
   ...(featureFlags.proposalTemplates
     ? [
         <Route
+          key={0}
           path="/:scope/contracts"
           element={withLayout(ContractsPage, {
             scoped: true,
           })}
         />,
         <Route
+          key={0}
           path="/:scope/new/contract"
           element={withLayout(NewContractPage, {
             scoped: true,
           })}
         />,
         <Route
+          key={0}
           path="/:scope/new/contract_template/:contract_id"
           element={withLayout(NewContractTemplatePage, {
             scoped: true,
           })}
         />,
         <Route
+          key={0}
           path="/:scope/contract/:contractAddress"
           element={withLayout(GeneralContractPage, {
             scoped: true,
           })}
         />,
         <Route
+          key={0}
           path="/:scope/:contract_address/:slug"
           element={withLayout(ViewTemplatePage, {
             scoped: true,
@@ -323,49 +372,61 @@ const CommonDomainRoutes = () => [
 
   // SITE ADMIN
   <Route
+    key={0}
     path="/admin-panel"
     element={withLayout(AdminPanelPage, { type: 'common' })}
   />,
 
   // ADMIN
   <Route
+    key={0}
     path="/:scope/manage"
     element={withLayout(ManageCommunityPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/discord-callback"
     element={withLayout(DiscordCallbackPage, {
       scoped: true,
     })}
   />,
-  <Route path="/manage" element={withLayout(ManageCommunityPage, {})} />,
   <Route
+    key={0}
+    path="/manage"
+    element={withLayout(ManageCommunityPage, {})}
+  />,
+  <Route
+    key={0}
     path="/:scope/analytics"
     element={withLayout(AnalyticsPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/snapshot/:snapshotId"
     element={withLayout(SnapshotProposalPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/multiple-snapshots"
     element={withLayout(ViewMultipleSnapshotsPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/snapshot/:snapshotId/:identifier"
     element={withLayout(ViewSnapshotsProposalPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/new/snapshot/:snapshotId"
     element={withLayout(NewSnapshotProposalPage, {
       scoped: true,
@@ -373,6 +434,7 @@ const CommonDomainRoutes = () => [
   />,
   // snapshot proposals redirects
   <Route
+    key={0}
     path="/:scope/snapshot-proposals/:snapshotId"
     element={
       // redirect to SnapshotProposalPage
@@ -384,6 +446,7 @@ const CommonDomainRoutes = () => [
     }
   />,
   <Route
+    key={0}
     path="/:scope/snapshot-proposal/:snapshotId/:identifier"
     element={
       // redirect to ViewSnapshotsProposalPage
@@ -395,6 +458,7 @@ const CommonDomainRoutes = () => [
     }
   />,
   <Route
+    key={0}
     path="/:scope/snapshot-proposals/:snapshotId/:identifier"
     element={
       // redirect to ViewSnapshotsProposalPage
@@ -406,6 +470,7 @@ const CommonDomainRoutes = () => [
     }
   />,
   <Route
+    key={0}
     path="/:scope/new/snapshot-proposal/:snapshotId"
     element={
       // redirect to NewSnapshotProposalPage
@@ -417,6 +482,7 @@ const CommonDomainRoutes = () => [
     }
   />,
   <Route
+    key={0}
     path="/:scope/new/snapshot-proposals/:snapshotId"
     element={
       // redirect to NewSnapshotProposalPage
@@ -431,18 +497,21 @@ const CommonDomainRoutes = () => [
 
   // PROFILES
   <Route
+    key={0}
     path="/:scope/account/:address"
     element={withLayout(ProfilePageRedirect, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/account"
     element={withLayout(ProfilePageRedirect, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/profile/id/:profileId"
     element={withLayout(NewProfilePage, {
       scoped: true,
@@ -450,6 +519,7 @@ const CommonDomainRoutes = () => [
     })}
   />,
   <Route
+    key={0}
     path="/profile/edit"
     element={withLayout(EditNewProfilePage, {
       scoped: true,
@@ -466,12 +536,14 @@ const CommonDomainRoutes = () => [
   // (b) produce a correct link to the entity (whether /snapshot/space/id or /proposal/id), and
   // (c) update the link objects associated with the identifer to point at the correct page.
   <Route
+    key={0}
     path="/:scope/link/chain-entity/:identifier"
     element={withLayout(ChainEntityLinkRedirectPage, {
       scoped: true,
     })}
   />,
   <Route
+    key={0}
     path="/:scope/link/snapshot-proposal/:identifier"
     element={withLayout(SnapshotProposalLinkRedirectPage, {
       scoped: true,
@@ -480,9 +552,10 @@ const CommonDomainRoutes = () => [
 
   // LEGACY REDIRECTS
   //here for compatibility only
-  <Route path="/discussions" element={<Navigate to="/" />} />,
-  <Route path="/home" element={<Navigate to="/" />} />,
+  <Route key={0} path="/discussions" element={<Navigate to="/" />} />,
+  <Route key={0} path="/home" element={<Navigate to="/" />} />,
   <Route
+    key={0}
     path="/:scope/home"
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,

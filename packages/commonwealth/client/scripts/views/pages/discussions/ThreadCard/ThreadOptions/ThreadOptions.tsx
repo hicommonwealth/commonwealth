@@ -81,7 +81,7 @@ export const ThreadOptions = ({
           <ReactionButton
             thread={thread}
             size="small"
-            disabled={!hasJoinedCommunity}
+            disabled={!hasJoinedCommunity || !!thread.archivedAt}
           />
         )}
 
