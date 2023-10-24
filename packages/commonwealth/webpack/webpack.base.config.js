@@ -69,7 +69,7 @@ module.exports = {
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
     }),
     new webpack.DefinePlugin({
-      'process.env.GATING_ENABLED': process.env.GATING_ENABLED,
+      'process.env.GATING_API_ENABLED': process.env.GATING_API_ENABLED,
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
