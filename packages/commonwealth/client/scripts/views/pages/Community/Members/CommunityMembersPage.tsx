@@ -54,7 +54,7 @@ const CommunityMembersPage = () => {
   } = useSearchProfilesQuery({
     chainId: app.activeChainId(),
     searchTerm: '',
-    limit: 10,
+    limit: 30,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
