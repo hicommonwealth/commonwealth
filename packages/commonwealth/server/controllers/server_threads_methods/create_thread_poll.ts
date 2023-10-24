@@ -90,7 +90,7 @@ export async function __createThreadPoll(
     return this.models.Poll.create(
       {
         thread_id: thread.id,
-        chain_id: thread.chain,
+        community_id: thread.chain,
         prompt,
         options: JSON.stringify(options),
         ends_at,

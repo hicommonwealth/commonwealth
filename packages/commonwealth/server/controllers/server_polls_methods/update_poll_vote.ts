@@ -34,7 +34,7 @@ export async function __updatePollVote(
   { address, community, pollId, option }: UpdatePollVoteOptions
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
-    where: { id: pollId, chain_id: community.id },
+    where: { id: pollId, community_id: community.id },
   });
   if (!poll) {
     throw new AppError(Errors.NoPoll);
