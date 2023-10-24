@@ -9,26 +9,26 @@ import {
 import 'pages/search/index.scss';
 
 import React, { useEffect, useMemo } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import {
-  CWTab,
-  CWTabsRow,
-} from '../../components/component_kit/new_designs/CWTabs';
-import { CWText } from '../../components/component_kit/cw_text';
-import { renderSearchResults } from './helpers';
-import { useInView } from 'react-intersection-observer';
-import { useCommonNavigate } from '../../../navigation/helpers';
-import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
-import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
-import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
-import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
+import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
+import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
+import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
+import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
+import { useCommonNavigate } from '../../../navigation/helpers';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWText } from '../../components/component_kit/cw_text';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
+import { renderSearchResults } from './helpers';
 
 const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
   (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope)
@@ -262,69 +262,67 @@ const SearchPage = () => {
 
   return (
     <div className="SearchPage">
-      <>
-        <div className="search-results">
-          <CWTabsRow>
-            {VISIBLE_TABS.map((s, i) => (
-              <CWTab
-                key={i}
-                label={s}
-                isSelected={activeTab === s}
-                onClick={() => setActiveTab(s)}
-              />
-            ))}
-          </CWTabsRow>
-          <>
-            {isLoading && <PageLoading />}
-            {!isLoading && (
-              <>
-                <CWText isCentered className="search-results-caption">
-                  {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
-                  {scopeText}
-                  {chain !== 'all_chains' && !app.isCustomDomain() && (
-                    <a
-                      href="#"
-                      className="search-all-communities"
-                      onClick={handleSearchAllCommunities}
-                    >
-                      Search all communities?
-                    </a>
-                  )}
-                </CWText>
-                {VISIBLE_TABS.length > 0 &&
-                  [SearchScope.Threads, SearchScope.Replies].includes(
-                    activeTab
-                  ) && (
-                    <div className="search-results-filters">
-                      <CWText type="h5">Sort By:</CWText>
-                      <CWDropdown
-                        label=""
-                        onSelect={handleSortChange}
-                        initialValue={{
-                          label: queryParams.sort,
-                          value: queryParams.sort,
-                        }}
-                        options={Object.keys(SearchSort).map((k) => ({
-                          label: k,
-                          value: k,
-                        }))}
-                      />
-                    </div>
-                  )}
-                <div className="search-results-list">
-                  {renderSearchResults(
-                    results as any,
-                    queryParams.q,
-                    activeTab,
-                    commonNavigate
-                  )}
-                  <div ref={bottomRef}></div>
-                </div>
-              </>
-            )}
-          </>
-        </div>
-      </>
+      <div className="search-results">
+        <CWTabsRow>
+          {VISIBLE_TABS.map((s, i) => (
+            <CWTab
+              key={i}
+              label={s}
+              isSelected={activeTab === s}
+              onClick={() => setActiveTab(s)}
+            />
+          ))}
+        </CWTabsRow>
+        <>
+          {isLoading && <PageLoading />}
+          {!isLoading && (
+            <>
+              <CWText isCentered className="search-results-caption">
+                {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
+                {scopeText}
+                {chain !== 'all_chains' && !app.isCustomDomain() && (
+                  <a
+                    href="#"
+                    className="search-all-communities"
+                    onClick={handleSearchAllCommunities}
+                  >
+                    Search all communities?
+                  </a>
+                )}
+              </CWText>
+              {VISIBLE_TABS.length > 0 &&
+                [SearchScope.Threads, SearchScope.Replies].includes(
+                  activeTab
+                ) && (
+                  <div className="search-results-filters">
+                    <CWText type="h5">Sort By:</CWText>
+                    <CWDropdown
+                      label=""
+                      onSelect={handleSortChange}
+                      initialValue={{
+                        label: queryParams.sort,
+                        value: queryParams.sort,
+                      }}
+                      options={Object.keys(SearchSort).map((k) => ({
+                        label: k,
+                        value: k,
+                      }))}
+                    />
+                  </div>
+                )}
+              <div className="search-results-list">
+                {renderSearchResults(
+                  results as any,
+                  queryParams.q,
+                  activeTab,
+                  commonNavigate
+                )}
+                <div ref={bottomRef}></div>
+              </div>
+            </>
+          )}
+        </>
+      </div>
     </div>
   );
 };
