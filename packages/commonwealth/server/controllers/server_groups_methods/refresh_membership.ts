@@ -1,5 +1,5 @@
+import { ServerCommunitiesController } from '../server_communities_controller';
 import { ChainInstance } from '../../models/chain';
-import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
 import { Op, Sequelize, WhereOptions } from 'sequelize';
@@ -26,7 +26,7 @@ export type RefreshMembershipResult = {
 }[];
 
 export async function __refreshMembership(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   { user, chain, address, topicId }: RefreshMembershipOptions
 ): Promise<RefreshMembershipResult> {
   // get all groups across the chain topics

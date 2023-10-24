@@ -1,10 +1,8 @@
 import { AppError } from 'common-common/src/errors';
-import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { sequelize } from '../database';
-import type { DB } from '../models';
-import type { TypedRequestBody, TypedResponse } from '../types';
-import { success } from '../types';
+import { sequelize } from '../../database';
+import { ServerCommunitiesController } from '../server_communities_controller';
+import { UserInstance } from 'server/models/user';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -18,50 +16,40 @@ export const Errors = {
     'There exists an admin in this community, cannot delete if there is an admin!',
 };
 
-// const protectedIdList = [];
-
-type deleteChainReq = {
+export type DeleteCommunityOptions = {
+  user: UserInstance;
   id: string;
 };
+export type DeleteCommunityResult = void;
 
-type deleteChainResp = { result: string };
-
-const deleteChain = async (
-  models: DB,
-  req: TypedRequestBody<deleteChainReq>,
-  res: TypedResponse<deleteChainResp>,
-  next: NextFunction
-) => {
-  const { id } = req.body;
-
-  if (!req.user.isAdmin) {
-    return next(new AppError(Errors.NotAdmin));
+export async function __deleteCommunity(
+  this: ServerCommunitiesController,
+  { user, id }: DeleteCommunityOptions
+): Promise<DeleteCommunityResult> {
+  if (!user.isAdmin) {
+    throw new AppError(Errors.NotAdmin);
   }
 
   if (!id) {
-    return next(new AppError(Errors.NeedChainId));
+    throw new AppError(Errors.NeedChainId);
   }
 
-  // if (protectedIdList.includes(id)) {
-  //   return next(new AppError(Errors.CannotDeleteChain));
-  // }
-
-  const chain = await models.Chain.findOne({
+  const chain = await this.models.Chain.findOne({
     where: {
       id,
       has_chain_events_listener: false, // make sure no chain events
     },
   });
   if (!chain) {
-    return next(new AppError(Errors.NoChain));
+    throw new AppError(Errors.NoChain);
   }
 
   try {
     // eslint-disable-next-line no-new
     await new Promise<void>(async (resolve, reject) => {
       try {
-        await models.sequelize.transaction(async (t) => {
-          await models.User.update(
+        await this.models.sequelize.transaction(async (t) => {
+          await this.models.User.update(
             {
               selected_chain_id: null,
             },
@@ -73,109 +61,107 @@ const deleteChain = async (
             }
           );
 
-          await models.Reaction.destroy({
+          await this.models.Reaction.destroy({
             where: { chain: chain.id },
             transaction: t,
           });
 
           // Add the created by field to comments for redundancy
           await sequelize.query(
-            `UPDATE "Comments" 
-                 SET created_by = (
-                    SELECT address 
-                    FROM "Addresses" 
-                    WHERE "Comments".address_id = "Addresses".id)
-                 WHERE chain = '${chain.id}'`,
+            `UPDATE "Comments" SET
+                created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id)
+             WHERE chain = '${chain.id}'`,
             { transaction: t }
           );
 
-          await models.Comment.destroy({
+          await this.models.Comment.destroy({
             where: { chain: chain.id },
             transaction: t,
           });
 
-          await models.Topic.destroy({
+          await this.models.Topic.destroy({
             where: { chain_id: chain.id },
             transaction: t,
           });
 
-          await models.Subscription.destroy({
+          await this.models.Subscription.destroy({
             where: { chain_id: chain.id },
             transaction: t,
           });
 
-          await models.CommunityContract.destroy({
+          await this.models.CommunityContract.destroy({
             where: {
               chain_id: chain.id,
             },
             transaction: t,
           });
 
-          await models.Webhook.destroy({
+          await this.models.Webhook.destroy({
             where: { community_id: chain.id },
             transaction: t,
           });
 
-          const threads = await models.Thread.findAll({
+          const threads = await this.models.Thread.findAll({
             where: { chain: chain.id },
             attributes: ['id'],
           });
 
-          await models.Collaboration.destroy({
+          await this.models.Collaboration.destroy({
             where: {
               thread_id: { [Op.in]: threads.map((thread) => thread.id) },
             },
             transaction: t,
           });
 
-          await models.Vote.destroy({
+          await this.models.Vote.destroy({
             where: { community_id: chain.id },
             transaction: t,
           });
 
-          await models.Poll.destroy({
+          await this.models.Poll.destroy({
             where: { chain_id: chain.id },
             transaction: t,
           });
 
           // Add the created by field to threads for redundancy
           await sequelize.query(
-            `UPDATE "Threads" 
-                 SET created_by = (
-                    SELECT address 
-                    FROM "Addresses" 
-                    WHERE "Threads".address_id = "Addresses".id) 
-                 WHERE chain = '${chain.id}'`,
+            `UPDATE "Threads" SET
+                created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id)
+             WHERE chain = '${chain.id}'`,
             { transaction: t }
           );
 
-          await models.Thread.destroy({
+          await this.models.Thread.destroy({
             where: { chain: chain.id },
             transaction: t,
           });
 
-          await models.StarredCommunity.destroy({
+          await this.models.StarredCommunity.destroy({
             where: { chain: chain.id },
             transaction: t,
           });
 
-          await models.CommunityBanner.destroy({
+          await this.models.Address.findAll({
+            where: { chain: chain.id },
+          });
+
+          await this.models.CommunityBanner.destroy({
             where: { chain_id: chain.id },
             transaction: t,
           });
 
           // notifications + notifications_read (cascade)
-          await models.Notification.destroy({
+          await this.models.Notification.destroy({
             where: { chain_id: chain.id },
             transaction: t,
           });
 
-          await models.Address.destroy({
+          await this.models.Address.destroy({
             where: { chain: chain.id },
             transaction: t,
           });
 
-          await models.Chain.destroy({
+          await this.models.Chain.destroy({
             where: { id: chain.id },
             transaction: t,
           });
@@ -187,12 +173,8 @@ const deleteChain = async (
         reject(e);
       }
     });
-
-    return success(res, { result: 'success' });
   } catch (e) {
     console.log(e);
-    return next(new AppError(Errors.CannotDeleteChain));
+    throw new AppError(Errors.CannotDeleteChain);
   }
-};
-
-export default deleteChain;
+}
