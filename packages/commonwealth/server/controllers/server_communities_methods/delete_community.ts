@@ -1,7 +1,6 @@
 import { AppError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
 import { sequelize } from '../../database';
-import { success } from '../../types';
 import { ServerCommunitiesController } from '../server_communities_controller';
 import { UserInstance } from 'server/models/user';
 
@@ -69,7 +68,9 @@ export async function __deleteCommunity(
 
           // Add the created by field to comments for redundancy
           await sequelize.query(
-            `UPDATE "Comments" SET created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id) WHERE chain = '${community.id}'`,
+            `UPDATE "Comments" SET
+                created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id)
+             WHERE chain = '${community.id}'`,
             { transaction: t }
           );
 
@@ -124,7 +125,9 @@ export async function __deleteCommunity(
 
           // Add the created by field to threads for redundancy
           await sequelize.query(
-            `UPDATE "Threads" SET created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id) WHERE chain = '${community.id}'`,
+            `UPDATE "Threads" SET
+                created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id)
+             WHERE chain = '${community.id}'`,
             { transaction: t }
           );
 
@@ -138,7 +141,7 @@ export async function __deleteCommunity(
             transaction: t,
           });
 
-          const addresses = await this.models.Address.findAll({
+          await this.models.Address.findAll({
             where: { chain: community.id },
           });
 
