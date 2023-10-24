@@ -12,6 +12,7 @@ import { NotificationStore } from 'stores';
 import Notification from '../../models/Notification';
 import { NotificationCategories } from 'common-common/src/types';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
+import { SubscriptionInstance } from 'server/models/subscription';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
@@ -122,10 +123,10 @@ class NotificationsController {
         '/createSubscription',
         {
           category: data.categoryId,
-          ...requestData,
           is_active: true,
+          ...requestData,
         },
-        (result) => {
+        (result: SubscriptionInstance) => {
           const newSubscription = modelFromServer(result);
           if (newSubscription.category === 'chain-event')
             app.socket.chainEventsNs.addChainEventSubscriptions([

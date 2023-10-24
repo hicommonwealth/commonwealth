@@ -204,7 +204,7 @@ const FinishNearLogin = () => {
         const chainCreateArgs = JSON.parse(chainCreateArgString);
 
         const res = await $.post(
-          `${app.serverUrl()}/createChain`,
+          `${app.serverUrl()}/communities`,
           chainCreateArgs
         );
 

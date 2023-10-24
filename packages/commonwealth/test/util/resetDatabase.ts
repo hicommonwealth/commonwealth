@@ -188,6 +188,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         name: 'Sushi',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
+        description: 'sushi community description',
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,

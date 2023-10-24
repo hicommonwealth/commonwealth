@@ -2,6 +2,11 @@ import app from 'state';
 import Account from '../models/Account';
 import Thread from '../models/Thread';
 
+const ROLES = {
+  ADMIN: 'admin',
+  MODERATOR: 'moderator',
+};
+
 const isSiteAdmin = () => {
   return app.user.activeAccount && app.user.isSiteAdmin;
 };
@@ -10,7 +15,7 @@ const isCommunityAdmin = (account?: Account) => {
   return (
     app.user.activeAccount &&
     app.roles.isRoleOfCommunity({
-      role: 'admin',
+      role: ROLES.ADMIN,
       chain: app.activeChainId(),
       ...(account && { account }),
     })
@@ -21,7 +26,7 @@ const isCommunityModerator = (account?: Account) => {
   return (
     app.user.activeAccount &&
     app.roles.isRoleOfCommunity({
-      role: 'moderator',
+      role: ROLES.MODERATOR,
       chain: app.activeChainId(),
       ...(account && { account }),
     })
@@ -52,4 +57,5 @@ export default {
   isCommunityModerator,
   isThreadCollaborator,
   isThreadAuthor,
+  ROLES,
 };

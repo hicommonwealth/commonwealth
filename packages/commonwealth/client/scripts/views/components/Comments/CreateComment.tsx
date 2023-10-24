@@ -2,32 +2,23 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import BN from 'bn.js';
 
-import 'components/Comments/CreateComment.scss';
 import { notifyError } from 'controllers/app/notifications';
-import { getDecimals, weiToTokens } from 'helpers';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
-import clsx from 'clsx';
-import { SessionKeyError } from 'controllers/server/sessions';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 import { useDraft } from 'hooks/useDraft';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { ContentType } from 'types';
-import { User } from 'views/components/user/user';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import Permissions from '../../../utils/Permissions';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
-import { CWText } from '../component_kit/cw_text';
-import { CWValidationText } from '../component_kit/cw_validation_text';
-import { CWButton } from '../component_kit/new_designs/cw_button';
-import {
-  ReactQuillEditor,
-  createDeltaFromText,
-  getTextFromDelta,
-} from '../react_quill_editor';
+import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
+import { CommentEditor } from './CommentEditor';
+import { ArchiveMsg } from './ArchiveMsg';
+import { SessionKeyError } from 'controllers/server/sessions';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -159,9 +150,7 @@ export const CreateComment = ({
     userFailsThreshold ||
     !canComment;
 
-  const decimals = getDecimals(app.chain);
-
-  const cancel = (e) => {
+  const handleCancel = (e) => {
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
     if (handleIsReplying) {
@@ -177,63 +166,30 @@ export const CreateComment = ({
 
   return (
     <>
-      <div className="CreateComment">
-        <div className="attribution-row">
-          <div className="attribution-left-content">
-            <CWText type="caption">
-              {parentType === ContentType.Comment ? 'Reply as' : 'Comment as'}
-            </CWText>
-            <CWText
-              type="caption"
-              fontWeight="medium"
-              className={clsx('user-link-text', { disabled: !canComment })}
-            >
-              <User
-                userAddress={author?.address}
-                userChainId={author?.community.id}
-                shouldHideAvatar
-                shouldLinkProfile
-              />
-            </CWText>
-          </div>
-          {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
-        </div>
-        <ReactQuillEditor
-          className="editor"
-          contentDelta={contentDelta}
-          setContentDelta={setContentDelta}
-          isDisabled={!canComment}
-          tooltipLabel="Join community to comment"
-          shouldFocus={shouldFocusEditor}
-        />
-        {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-          <CWText className="token-req-text">
-            Commenting in {activeTopic?.name} requires{' '}
-            {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-            {app.chain.meta.default_symbol}.{' '}
-            {userBalance && (
-              <>
-                You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-                {app.chain.meta.default_symbol}.
-              </>
-            )}
-          </CWText>
-        )}
-        <div className="form-bottom">
-          <div className="form-buttons">
-            {editorValue.length > 0 && (
-              <CWButton buttonType="tertiary" onClick={cancel} label="Cancel" />
-            )}
-            <CWButton
-              buttonWidth="wide"
-              disabled={disabled && !isAdmin}
-              onClick={handleSubmitComment}
-              label="Submit"
-            />
-          </div>
-        </div>
-      </div>
-      {RevalidationModal}
+      {rootThread.archivedAt === null ? (
+        <>
+          <CommentEditor
+            parentType={parentType}
+            canComment={canComment}
+            handleSubmitComment={handleSubmitComment}
+            errorMsg={errorMsg}
+            contentDelta={contentDelta}
+            setContentDelta={setContentDelta}
+            tokenPostingThreshold={tokenPostingThreshold}
+            topicName={activeTopic?.name}
+            userBalance={userBalance}
+            disabled={disabled}
+            onCancel={handleCancel}
+            isAdmin={isAdmin}
+            author={author}
+            editorValue={editorValue}
+            shouldFocus={shouldFocusEditor}
+          />
+          {RevalidationModal}
+        </>
+      ) : (
+        <ArchiveMsg archivedAt={rootThread.archivedAt} />
+      )}
     </>
   );
 };

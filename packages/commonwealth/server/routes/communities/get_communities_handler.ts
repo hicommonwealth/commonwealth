@@ -5,35 +5,35 @@ import {
   success,
 } from '../../types';
 import { ServerControllers } from '../../routing/router';
-import { GetChainsWithSnapshotsResult } from 'server/controllers/server_chains_methods/get_chains_with_snapshots';
-import { SearchChainsResult } from 'server/controllers/server_chains_methods/search_chains';
+import { GetCommunitiesResult } from 'server/controllers/server_communities_methods/get_communities';
+import { SearchCommunitiesResult } from 'server/controllers/server_communities_methods/search_communities';
 import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   InvalidRequest: 'Invalid request',
 };
 
-type GetChainsRequestParams = {
-  snapshots?: boolean;
+type GetCommunitiesRequestQuery = {
+  snapshots?: string;
   search?: string;
 } & PaginationQueryParams;
 
-export const getChainsHandler = async (
+export const getCommunitiesHandler = async (
   controllers: ServerControllers,
-  req: TypedRequestQuery<GetChainsRequestParams>,
-  res: TypedResponse<GetChainsWithSnapshotsResult | SearchChainsResult>
+  req: TypedRequestQuery<GetCommunitiesRequestQuery>,
+  res: TypedResponse<GetCommunitiesResult | SearchCommunitiesResult>
 ) => {
   const options = req.query;
 
   // get chains, with snapshots
-  if (options.snapshots) {
-    const results = await controllers.chains.getChainsWithSnapshots({});
+  if (options.snapshots === 'true') {
+    const results = await controllers.communities.getCommunities({});
     return success(res, results);
   }
 
   // search chains
   if (options.search) {
-    const results = await controllers.chains.searchChains({
+    const results = await controllers.communities.searchCommunities({
       search: options.search,
       limit: parseInt(options.limit, 10) || 0,
       page: parseInt(options.page, 10) || 0,
