@@ -6,6 +6,7 @@ import { AppError } from '../../../../common-common/src/errors';
 
 type GetGroupsQueryQuery = {
   include_members?: string;
+  include_topics?: string;
   address_id?: string;
 };
 type GetGroupsResponse = GetGroupsResult;
@@ -19,6 +20,7 @@ export const getGroupsHandler = async (
     query: z.object({
       address_id: z.coerce.number().optional(),
       include_members: z.coerce.boolean().optional(),
+      include_topics: z.coerce.boolean().optional(),
     }),
   });
   const validationResult = schema.safeParse(req);
@@ -26,12 +28,13 @@ export const getGroupsHandler = async (
     throw new AppError(JSON.stringify(validationResult.error));
   }
   const {
-    query: { address_id, include_members },
+    query: { address_id, include_members, include_topics },
   } = validationResult.data;
 
   const result = await controllers.groups.getGroups({
     community: req.chain,
     includeMembers: include_members,
+    includeTopics: include_topics,
     addressId: address_id,
   });
   return success(res, result);
