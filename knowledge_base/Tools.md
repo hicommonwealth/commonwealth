@@ -35,5 +35,5 @@ For route validation, our current pattern is to `import z from 'zod'`, construct
 # Change Log
 
 - 231024: Updated with "Zod" entry by Graham Johnson
-- 231024: "Kong" entry merged in by Graham Johnson.
+- 231024: "Kong" entry merged into "Tools" bucket entry by Graham Johnson.
 - 230205: "Kong" entry authored by Kurtis Assad.
