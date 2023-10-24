@@ -15,7 +15,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -26,7 +26,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -60,17 +60,14 @@ describe('ServerThreadsController', () => {
         banCache as any
       );
 
-      const [
-        newReaction,
-        notificationOptions,
-        analyticsOptions,
-      ] = await serverThreadsController.createThreadReaction({
-        user: user as any,
-        address: address as any,
-        chain: chain as any,
-        reaction: reaction as any,
-        threadId: threadId,
-      });
+      const [newReaction, notificationOptions, analyticsOptions] =
+        await serverThreadsController.createThreadReaction({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          reaction: reaction as any,
+          threadId: threadId,
+        });
 
       expect(
         serverThreadsController.createThreadReaction({
@@ -121,7 +118,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -132,7 +129,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -184,7 +181,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -195,7 +192,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -253,7 +250,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -264,7 +261,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -321,7 +318,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -332,7 +329,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -478,21 +475,18 @@ describe('ServerThreadsController', () => {
         banCache as any
       );
 
-      const [
-        newComment,
-        notificationOptions,
-        analyticsOptions,
-      ] = await serverThreadsController.createThreadComment({
-        user: user as any,
-        address: address as any,
-        chain: chain as any,
-        parentId,
-        threadId,
-        text,
-        canvasAction,
-        canvasSession,
-        canvasHash,
-      });
+      const [newComment, notificationOptions, analyticsOptions] =
+        await serverThreadsController.createThreadComment({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          parentId,
+          threadId,
+          text,
+          canvasAction,
+          canvasSession,
+          canvasHash,
+        });
 
       expect(
         serverThreadsController.createThreadComment({
@@ -1250,13 +1244,13 @@ describe('ServerThreadsController', () => {
             ...data,
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             toJSON: () => ({
               ...data,
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
             }),
           }),
@@ -1306,26 +1300,23 @@ describe('ServerThreadsController', () => {
       const canvasSession = undefined;
       const canvasHash = undefined;
 
-      const [
-        thread,
-        notificationOptions,
-        analyticsOptions,
-      ] = await serverThreadsController.createThread({
-        user: user as any,
-        address: address as any,
-        chain: chain as any,
-        title,
-        body,
-        kind,
-        readOnly,
-        topicId,
-        topicName,
-        stage,
-        url,
-        canvasAction,
-        canvasSession,
-        canvasHash,
-      });
+      const [thread, notificationOptions, analyticsOptions] =
+        await serverThreadsController.createThread({
+          user: user as any,
+          address: address as any,
+          chain: chain as any,
+          title,
+          body,
+          kind,
+          readOnly,
+          topicId,
+          topicName,
+          stage,
+          url,
+          canvasAction,
+          canvasSession,
+          canvasHash,
+        });
 
       expect(
         serverThreadsController.createThread({
