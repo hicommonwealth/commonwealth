@@ -32,7 +32,7 @@ export const Errors = {
   InvalidDefaultPage: 'Default page does not exist',
 };
 
-type UpdateChainReq = ChainAttributes & {
+export type UpdateChainReq = ChainAttributes & {
   id: string;
   'featured_topics[]'?: string[];
   'snapshot[]'?: string[];
@@ -90,6 +90,8 @@ const updateChain = async (
     terms,
     chain_node_id,
     discord_bot_webhooks_enabled,
+    directory_page_enabled,
+    directory_page_chain_node_id,
   } = req.body;
 
   let snapshot = req.body['snapshot[]'];
@@ -201,6 +203,12 @@ const updateChain = async (
   }
   if (discord_bot_webhooks_enabled) {
     chain.discord_bot_webhooks_enabled = discord_bot_webhooks_enabled;
+  }
+  if (directory_page_enabled) {
+    chain.directory_page_enabled = directory_page_enabled;
+  }
+  if (directory_page_chain_node_id) {
+    chain.directory_page_chain_node_id = directory_page_chain_node_id;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
