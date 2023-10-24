@@ -1,7 +1,6 @@
 import { ProposalType } from 'common-common/src/types';
 import type ChainEntity from 'models/ChainEntity';
 import moment, { Moment } from 'moment';
-import app from 'state';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';
@@ -152,6 +151,7 @@ export class Thread implements IUniqueId {
   public readonly createdAt: Moment;
   public readonly updatedAt: Moment;
   public readonly lastCommentedOn: Moment;
+  public archivedAt: Moment | null;
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
@@ -160,7 +160,6 @@ export class Thread implements IUniqueId {
   public readonly lastEdited: Moment;
 
   public markedAsSpamAt: Moment;
-  public archivedAt: Moment;
   public readonly lockedAt: Moment;
 
   public readonly hasPoll: boolean;

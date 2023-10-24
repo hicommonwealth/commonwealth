@@ -106,7 +106,7 @@ export const CosmosForm = () => {
         value={bech32Prefix}
         placeholder="cosmos"
         onChangeHandler={async (v) => {
-          setBech32Prefix(v);
+          setBech32Prefix(v.toLowerCase());
         }}
       />
       <InputRow
@@ -124,7 +124,7 @@ export const CosmosForm = () => {
           setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               alt_wallet_url: altWalletUrl,
               id: id,
               name: name,

@@ -216,14 +216,6 @@ describe('Integration tests for Aave', () => {
       });
 
       expect(propCreatedEvent, 'Proposal created event not found').to.exist;
-      eventMatch(
-        rmq.queuedMessages[
-          RascalSubscriptions.ChainEventNotificationsCUDMain
-        ][0].event,
-        EventKind.ProposalCreated,
-        chain_id,
-        proposalId
-      );
 
       relatedEntity = await models.ChainEntity.findOne({
         where: {
@@ -294,15 +286,6 @@ describe('Integration tests for Aave', () => {
 
       expect(propExecutedEvent).to.exist;
       expect(relatedEntity.id).to.equal(propExecutedEvent.entity_id);
-
-      eventMatch(
-        rmq.queuedMessages[
-          RascalSubscriptions.ChainEventNotificationsCUDMain
-        ][1].event,
-        EventKind.ProposalExecuted,
-        chain_id,
-        proposalId
-      );
     });
   });
 

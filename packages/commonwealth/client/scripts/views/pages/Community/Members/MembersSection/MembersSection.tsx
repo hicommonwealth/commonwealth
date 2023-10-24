@@ -1,111 +1,79 @@
+import { featureFlags } from 'helpers/feature-flags';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Permissions from 'utils/Permissions';
+import { Avatar } from 'views/components/Avatar';
+import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './MembersSection.scss';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
-import app from 'state';
-import { useDebounce } from 'usehooks-ts';
-import { User } from 'views/components/user/user';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from '../../../../../helpers/constants';
-import { useSearchProfilesQuery } from '../../../../../state/api/profiles';
-import { SearchProfilesResponse } from '../../../../../state/api/profiles/searchProfiles';
-import MinimumProfile from '../../../../../models/MinimumProfile';
-import { CWText } from '../../../../components/component_kit/cw_text';
-import { MembersSearchBar } from '../../../../components/members_search_bar';
 
-const MembersSection = () => {
-  const containerRef = useRef<VirtuosoHandle>();
+type Member = {
+  id: number;
+  avatarUrl: string;
+  name: string;
+  role: 'admin' | 'moderator' | '';
+  groups: string[];
+};
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
+type MembersSectionProps = {
+  members: Member[];
+  onLoadMoreMembers: () => any;
+  isLoadingMoreMembers?: boolean;
+};
 
-  const { data, fetchNextPage } = useSearchProfilesQuery({
-    chainId: app.activeChainId(),
-    searchTerm: debouncedSearchTerm,
-    limit: 10,
-    orderBy: APIOrderBy.LastActive,
-    orderDirection: APIOrderDirection.Desc,
-    includeRoles: true,
-  });
+const columns = [
+  {
+    key: 'name',
+    header: 'Name',
+    numeric: false,
+    sortable: true,
+  },
+  ...(featureFlags.gatingEnabled
+    ? [
+        {
+          key: 'groups',
+          header: 'Groups',
+          numeric: false,
+          sortable: true,
+        },
+      ]
+    : []),
+];
 
-  const members = useMemo(() => {
-    if (!data?.pages?.length) {
-      return [];
-    }
-    return data.pages
-      .reduce((acc, page) => {
-        return [...acc, ...page.results];
-      }, [] as SearchProfilesResponse['results'])
-      .map((p) => ({
-        id: p.id,
-        address_id: p.addresses?.[0]?.id,
-        address: p.addresses?.[0]?.address,
-        address_chain: p.addresses?.[0]?.chain,
-        chain: p.addresses?.[0]?.chain,
-        profile_name: p.profile_name,
-        avatar_url: p.avatar_url,
-        roles: p.roles,
-      }))
-      .map((p) => {
-        const minProfile = new MinimumProfile(p.address, p.chain);
-        minProfile.initialize(
-          p.profile_name,
-          p.address,
-          p.avatar_url,
-          p.id,
-          p.chain,
-          null
-        );
-        return {
-          profile: minProfile,
-          role: p.roles.find(
-            (role) =>
-              role.chain_id === app.activeChainId() &&
-              ['admin', 'moderator'].includes(role.permission)
-          ),
-        };
-      });
-  }, [data]);
-
-  const totalResults = data?.pages?.[0]?.totalResults || 0;
-
-  // fixes bug that prevents scrolling on initial page load
-  useEffect(() => {
-    const shouldFetchMore = members.length < 50 && totalResults > 50;
-    if (!shouldFetchMore) {
-      return;
-    }
-    fetchNextPage();
-  }, [members, totalResults, fetchNextPage]);
-
+const MembersSection = ({
+  members,
+  onLoadMoreMembers,
+  isLoadingMoreMembers,
+}: MembersSectionProps) => {
   return (
     <div className="MembersSection">
-      <CWText type="h3" fontWeight="medium">
-        Members ({totalResults})
-      </CWText>
-      <MembersSearchBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        chainName={app.activeChainId()}
-      />
-      <Virtuoso
-        ref={containerRef}
-        data={members}
-        endReached={() => fetchNextPage()}
-        itemContent={(index, profileInfo) => {
-          return (
-            <div className="member-row" key={index}>
-              <User
-                userAddress={profileInfo.profile.address}
-                userChainId={profileInfo.profile.chain}
-                role={profileInfo.role}
-                shouldShowRole
-                shouldLinkProfile
-              />
+      <CWTable
+        columnInfo={columns}
+        rowData={members.map((member) => ({
+          name: (
+            <div className="table-cell">
+              <Link to={`/profile/id/${member.id}`} className="user-info">
+                <Avatar url={member.avatarUrl} size={24} address={member.id} />
+                <p>{member.name}</p>
+              </Link>
+              {member.role === Permissions.ROLES.ADMIN && (
+                <CWTag label="Admin" type="referendum" />
+              )}
+              {member.role === Permissions.ROLES.MODERATOR && (
+                <CWTag label="Moderator" type="referendum" />
+              )}
             </div>
-          );
-        }}
+          ),
+          groups: (
+            <div className="table-cell">
+              {member.groups.map((group, index) => (
+                <CWTag key={index} label={group} type="referendum" />
+              ))}
+            </div>
+          ),
+        }))}
+        onScrollEnd={onLoadMoreMembers}
+        isLoadingMoreRows={isLoadingMoreMembers}
       />
     </div>
   );

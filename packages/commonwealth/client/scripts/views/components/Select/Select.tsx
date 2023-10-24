@@ -2,8 +2,8 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 import type { Placement } from '@popperjs/core/lib';
 import React from 'react';
 import { CWButton } from '../component_kit/cw_button';
-import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { Option } from './Option';
 import './Select.scss';
@@ -88,9 +88,11 @@ export const Select = ({
                     key={i}
                     size={size}
                     label={label}
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.preventDefault();
                       onSelect(option);
+                      popoverProps.setAnchorEl(null);
+                      onClose && (await onClose());
                     }}
                     isSelected={selected === current}
                     iconLeft={option && option.iconLeft ? option.iconLeft : ''}
@@ -104,6 +106,14 @@ export const Select = ({
                             popoverProps.setAnchorEl(null);
                             onOptionEdit && (await onOptionEdit(option));
                           }}
+                        />
+                      ),
+                    })}
+                    {...(option.value === 'Archived' && {
+                      iconRight: (
+                        <CWIconButton
+                          iconName="archiveTray"
+                          iconSize="small"
                         />
                       ),
                     })}

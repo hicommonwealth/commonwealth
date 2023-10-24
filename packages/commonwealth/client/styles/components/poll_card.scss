@@ -134,19 +134,9 @@
 }
 
 .DeleteThreadModal {
-  width: 504px;
+  width: 100%;
 
   @include smallInclusive {
     width: 100%;
-  }
-
-  .modal-text {
-    color: $white;
-  }
-
-  .modal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
   }
 }

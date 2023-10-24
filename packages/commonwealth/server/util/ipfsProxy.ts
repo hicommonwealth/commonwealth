@@ -21,8 +21,13 @@ function setupIpfsProxy(app: Express) {
               origin: 'https://commonwealth.im',
             },
             timeout: 5000,
+            responseType: 'arraybuffer',
           }
         );
+        const contentType = response.headers['content-type'];
+        if (contentType) {
+          res.setHeader('Content-Type', contentType);
+        }
         return res.send(response.data);
       } catch (err) {
         res.status(500).json({ message: err.message });

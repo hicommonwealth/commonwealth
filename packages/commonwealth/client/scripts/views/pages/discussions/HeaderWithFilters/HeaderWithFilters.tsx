@@ -12,7 +12,7 @@ import { Select } from 'views/components/Select';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import type Topic from '../../../../models/Topic';
@@ -32,6 +32,9 @@ type HeaderWithFiltersProps = {
   totalThreadCount: number;
   isIncludingSpamThreads: boolean;
   onIncludeSpamThreads: (includeSpams: boolean) => any;
+  isIncludingArchivedThreads: boolean;
+  onIncludeArchivedThreads: (includeArchived: boolean) => any;
+  isOnArchivePage?: boolean;
 };
 
 export const HeaderWithFilters = ({
@@ -42,6 +45,9 @@ export const HeaderWithFilters = ({
   totalThreadCount,
   isIncludingSpamThreads,
   onIncludeSpamThreads,
+  isIncludingArchivedThreads,
+  onIncludeArchivedThreads,
+  isOnArchivePage,
 }: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<Topic>(null);
@@ -115,6 +121,11 @@ export const HeaderWithFilters = ({
     location
   );
 
+  const matchesArchivedRoute = matchRoutes(
+    [{ path: '/archived' }, { path: ':scope/archived' }],
+    location
+  );
+
   const onFilterSelect = ({
     pickedTopic = matchesDiscussionsTopicRoute?.[0]?.params?.topic || '',
     filterKey = '',
@@ -129,19 +140,32 @@ export const HeaderWithFilters = ({
       delete urlParams[filterKey];
     }
 
-    navigate(
-      `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
-        Object.keys(urlParams)
-          .map((x) => `${x}=${urlParams[x]}`)
-          .join('&')
-    );
+    if (matchesArchivedRoute && !pickedTopic) {
+      navigate(
+        `/archived?` +
+          Object.keys(urlParams)
+            .map((x) => `${x}=${urlParams[x]}`)
+            .join('&')
+      );
+    } else {
+      navigate(
+        `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
+          Object.keys(urlParams)
+            .map((x) => `${x}=${urlParams[x]}`)
+            .join('&')
+      );
+    }
   };
 
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
         <CWText type="h3" fontWeight="semiBold" className="header-text">
-          {isUndefined(topic) ? 'All Discussions' : topic}
+          {isUndefined(topic)
+            ? isOnArchivePage
+              ? 'Archived'
+              : 'All Discussions'
+            : topic}
         </CWText>
         <div className="count-and-button">
           <CWText
@@ -178,6 +202,14 @@ export const HeaderWithFilters = ({
 
       {selectedTopic?.description && (
         <CWText className="subheader-text">{selectedTopic.description}</CWText>
+      )}
+
+      {isOnArchivePage && (
+        <CWText className="subheader-text">
+          This section is for all archived posts. Archived posts will always be
+          visible here and can be linked to new thread posts, but they can’t be
+          upvoted or receive new comments.
+        </CWText>
       )}
 
       {app.chain?.meta && (
@@ -326,16 +358,28 @@ export const HeaderWithFilters = ({
         </div>
       )}
 
-      <CWCheckbox
-        checked={isIncludingSpamThreads}
-        label="Include posts flagged as spam"
-        className="ml-auto"
-        onChange={(e) => {
-          onIncludeSpamThreads(e.target.checked);
-        }}
-      />
+      <div className="checkboxes">
+        <CWCheckbox
+          checked={isIncludingSpamThreads}
+          label="Include posts flagged as spam"
+          onChange={(e) => {
+            onIncludeSpamThreads(e.target.checked);
+          }}
+        />
 
-      <Modal
+        {!isOnArchivePage && (
+          <CWCheckbox
+            checked={isIncludingArchivedThreads}
+            label="Include archived posts"
+            onChange={(e) => {
+              onIncludeArchivedThreads(e.target.checked);
+            }}
+          />
+        )}
+      </div>
+
+      <CWModal
+        size="medium"
         content={
           <EditTopicModal
             topic={topicSelectedToEdit}

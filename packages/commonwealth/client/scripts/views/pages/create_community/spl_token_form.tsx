@@ -153,7 +153,7 @@ export const SplTokenForm = () => {
           chainFormState.setSaving(true);
 
           try {
-            const res = await $.post(`${app.serverUrl()}/createChain`, {
+            const res = await $.post(`${app.serverUrl()}/communities`, {
               id: id,
               name: name,
               address: mint,

@@ -1,4 +1,4 @@
-import { NotificationDataAndCategory } from 'types';
+import { NotificationDataAndCategory } from '../../../shared/types';
 import { sendDiscordWebhook } from './destinations/discord';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';

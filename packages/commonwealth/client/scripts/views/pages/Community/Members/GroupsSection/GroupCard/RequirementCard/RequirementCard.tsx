@@ -1,18 +1,7 @@
 import React from 'react';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import { InfoBlock } from './InfoBlock';
 import './RequirementCard.scss';
-
-const InfoBlock = ({ label, value }: { label: string; value: string }) => {
-  return (
-    <div className="info-block">
-      <CWText type="caption" fontWeight="bold">
-        {label}
-      </CWText>
-      <CWText type="b2">{value}</CWText>
-    </div>
-  );
-};
 
 type RequirementCardProps = {
   requirementType: string;
@@ -32,7 +21,7 @@ const RequirementCard = ({
   return (
     <div className="RequirementCard">
       <div className="row-1">
-        <InfoBlock label={'Requirement type'} value={requirementType} />
+        <InfoBlock label="Requirement type" value={requirementType} />
       </div>
 
       {requirementType && (
@@ -48,15 +37,15 @@ const RequirementCard = ({
             `row-2`
           )}
         >
-          <InfoBlock label={'Chain'} value={requirementChain} />
+          <InfoBlock label="Chain" value={requirementChain} />
           {!!requirementContractAddress && (
             <InfoBlock
-              label={'Contract address'}
+              label="Contract address"
               value={requirementContractAddress}
             />
           )}
-          <InfoBlock label={'Condition'} value={requirementCondition} />
-          <InfoBlock label={'Amount'} value={requirementAmount} />
+          <InfoBlock label="Condition" value={requirementCondition} />
+          <InfoBlock label="Amount" value={requirementAmount} />
         </div>
       )}
     </div>

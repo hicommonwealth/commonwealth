@@ -5,6 +5,7 @@ import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import type Account from '../../../../models/Account';
+import { truncate } from 'helpers/truncate';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
 import { Thread } from '../../../../models/Thread';
@@ -161,6 +162,7 @@ export const CWContentPage = ({
         showEditedLabelWithDate={!!lastEdited}
         isSpamThread={isSpamThread}
         threadStage={stageLabel}
+        archivedAt={thread?.archivedAt}
       />
     </div>
   );
@@ -168,7 +170,11 @@ export const CWContentPage = ({
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
-        {typeof title === 'string' ? <h1 className="title">{title}</h1> : title}
+        {typeof title === 'string' ? (
+          <h1 className="title">{truncate(title)}</h1>
+        ) : (
+          title
+        )}
         {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}

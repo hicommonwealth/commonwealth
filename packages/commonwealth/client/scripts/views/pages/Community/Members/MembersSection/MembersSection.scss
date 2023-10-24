@@ -5,27 +5,33 @@
   flex: 1;
   flex-direction: column;
   gap: 24px;
-  padding: 24px;
   padding-right: 0px;
 
-  .member-row {
-    padding: 0px;
-    margin: 0px;
-    align-items: center;
-    display: flex;
-    height: 32px;
+  table {
+    width: 100%;
 
-    a {
-      color: $neutral-800;
-      text-decoration: none;
+    .table-cell {
+      display: flex;
+      gap: 8px;
+      align-items: center;
 
-      .User {
-        align-items: center;
+      .user-info {
+        text-decoration: none;
         display: flex;
+        align-items: center;
+        gap: 8px;
+        color: black;
 
-        .username {
-          align-items: center;
+        div {
           display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        :hover,
+        :focus,
+        :visited {
+          text-decoration: underline;
         }
       }
     }

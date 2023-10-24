@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-import 'modals/linked_thread_modal.scss';
-
 import { notifyError } from 'controllers/app/notifications';
 import { getAddedAndDeleted } from 'helpers/threads';
 import { Link, LinkSource } from 'models/Thread';
@@ -11,11 +9,15 @@ import {
   useDeleteThreadLinksMutation,
 } from 'state/api/threads';
 import type Thread from '../../models/Thread';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { UrlSelector } from '../components/UrlLinkSelector/UrlSelector';
 import { CWText } from '../components/component_kit/cw_text';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from 'views/components/component_kit/new_designs/CWModal';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 type LinkedUrlModalProps = {
   urlLinks: Link[];
@@ -123,53 +125,53 @@ export const LinkedUrlModal = ({
     !newUrl.includes('.') ||
     newTitle == '' ||
     newTitle == null;
-  return (
-    <div className="LinkedThreadModal">
-      <div className="compact-modal-title">
-        <h3>Add external links</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
-      </div>
-      <div className="compact-modal-body">
-        <div className="link-input">
-          <CWText>New link details</CWText>
-          <CWTextInput
-            placeholder="https://..."
-            value={newUrl}
-            onInput={(e) => setNewUrl(e.target.value)}
-            containerClassName="input-label"
-            inputValidationFn={(e) => {
-              if (!e.startsWith('https://') || !newUrl.includes('.')) {
-                return ['failure', 'Must be a valid link'];
-              } else {
-                return ['success', 'Input validated'];
-              }
-            }}
-          />
-          <CWTextInput
-            placeholder="Title"
-            value={newTitle}
-            onInput={(e) => setNewTitle(e.target.value)}
-          />
-          <div className="add-button">
-            <CWText style={{ marginRight: '3px' }}>Add link</CWText>
-            <CWIconButton
-              disabled={disableAdd}
-              iconName="plusCircle"
-              onClick={handleAddThread}
-            />
-          </div>
-        </div>
-        <UrlSelector urlsToSet={tempLinkedUrls} onSelect={handleSelectThread} />
 
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary-blue"
-            onClick={onModalClose}
-          />
-          <CWButton label="Save changes" onClick={handleSaveChanges} />
-        </div>
-      </div>
+  return (
+    <div className="LinkedUrlModal">
+      <CWModalHeader onModalClose={onModalClose} label="Add external links" />
+      <CWModalBody>
+        <CWText>New link details</CWText>
+        <CWTextInput
+          placeholder="https://..."
+          value={newUrl}
+          onInput={(e) => setNewUrl(e.target.value)}
+          containerClassName="input-label"
+          inputValidationFn={(e) => {
+            if (!e.startsWith('https://') || !newUrl.includes('.')) {
+              return ['failure', 'Must be a valid link'];
+            } else {
+              return ['success', 'Input validated'];
+            }
+          }}
+        />
+        <CWTextInput
+          placeholder="Title"
+          value={newTitle}
+          onInput={(e) => setNewTitle(e.target.value)}
+        />
+        <CWButton
+          label="Add link"
+          iconLeft="plusCircle"
+          disabled={disableAdd}
+          onClick={handleAddThread}
+          buttonHeight="sm"
+          buttonType="secondary"
+        />
+        <UrlSelector urlsToSet={tempLinkedUrls} onSelect={handleSelectThread} />
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonHeight="sm"
+          buttonType="secondary"
+          onClick={onModalClose}
+        />
+        <CWButton
+          buttonHeight="sm"
+          label="Save changes"
+          onClick={handleSaveChanges}
+        />
+      </CWModalFooter>
     </div>
   );
 };
