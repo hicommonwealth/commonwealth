@@ -30,7 +30,6 @@ const fetchGroups = async ({
 
 const useFetchGroupsQuery = ({ chainId }: FetchGroupsProps) => {
   return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [ApiEndpoints.FETCH_GROUPS, chainId],
     queryFn: () => fetchGroups({ chainId }),
     staleTime: GROUPS_STALE_TIME,
