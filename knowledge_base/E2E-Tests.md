@@ -25,9 +25,9 @@ test('Can click on Sign in button', async ({ page: Page }) => {
 
 E2E tests are housed in the following subdirectories of `/test/E2E`:
 
-- `/E2EStateful`: This relies on the DB to be set up with a dump of the test entities
+- `/E2EStateful`: This relies on the DB to be set up with a dump of the test entities.
 
-- `/E2ESerial`: The tests in this suite will be run in serial (Avoids race conditions)
+- `/E2ESerial`: The tests in this suite will be run in serial (Avoids race conditions).
 
 - `/E2ERegular`: The tests in this suite are set up with a default empty DB (need to make your own test entities) as well as being run in parallel.
 
@@ -70,7 +70,7 @@ Because we can't manually check if the server has started, we rely on `wait-serv
 
 # Debugging E2E Tests
 
-When E2E tests fail, we record a video of the failed run. To view and navigate these videos, you may use Playwright's [Trace Viewer](https://trace.playwright.dev/).
+When E2E tests fail, we record a video of the failed run. These videos can be viewed and navigated via Playwright's [Trace Viewer](https://trace.playwright.dev/).
 
 - If you add `--debug` to the `test-E2E` command, it will open a debug box which will allow you to step through the code line by line, and allow you to test locators to see which elements it will grab. `npx playwright test --debug ...`
 
