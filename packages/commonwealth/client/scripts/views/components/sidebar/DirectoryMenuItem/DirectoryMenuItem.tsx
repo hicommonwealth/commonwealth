@@ -2,6 +2,7 @@ import React from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { SubSectionGroup } from '../sidebar_section';
 
@@ -16,10 +17,13 @@ const DirectoryMenuItem = () => {
     location
   );
 
+  const directoryPageEnabled = app.config.chains.getById(
+    app.activeChainId()
+  )?.directoryPageEnabled;
+
   return (
     <SubSectionGroup
-      // TODO show it depending on toggle value in manage community
-      isVisible={true}
+      isVisible={directoryPageEnabled}
       isActive={!!matchesDirectoryRoute}
       className="DirectoryMenuItem"
       title="Directory"

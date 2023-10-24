@@ -1,28 +1,56 @@
 import React, { Dispatch, SetStateAction } from 'react';
 
-import './DirectoryPageSection.scss';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWToggle } from 'views/components/component_kit/cw_toggle';
-import { CWTypeaheadSelectList } from 'views/components/component_kit/new_designs/CWTypeaheadSelectList';
-import { CWLabel } from 'views/components/component_kit/cw_label';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import { CWLabel } from 'views/components/component_kit/cw_label';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWToggle } from 'views/components/component_kit/cw_toggle';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import {
+  CWTypeaheadSelectList,
+  SelectListOption,
+} from 'views/components/component_kit/new_designs/CWTypeaheadSelectList';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import './DirectoryPageSection.scss';
 
 interface DirectoryPageSectionProps {
   directoryPageEnabled: boolean;
   setDirectoryPageEnabled: Dispatch<SetStateAction<boolean>>;
-  isGoToDirectoryButtonVisible: boolean;
+  isGoToDirectoryButtonEnabled: boolean;
+  selectedChainNodeId: number;
+  setSelectedChainNodeId: Dispatch<SetStateAction<number>>;
 }
 const DirectoryPageSection = ({
   directoryPageEnabled,
   setDirectoryPageEnabled,
-  isGoToDirectoryButtonVisible,
+  isGoToDirectoryButtonEnabled,
+  selectedChainNodeId,
+  setSelectedChainNodeId,
 }: DirectoryPageSectionProps) => {
   const navigate = useCommonNavigate();
 
   const handleGoToDirectory = () => {
     navigate('/directory');
+  };
+
+  const chains = app.config.nodes.getAll() || [];
+  const chainOptions = chains.map((chain) => ({
+    value: String(chain.id),
+    label: chain.name,
+  }));
+  const chainOptionsSorted = chainOptions.sort((a, b) =>
+    a.label.localeCompare(b.label)
+  );
+
+  const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
+  const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
+  const defaultOption = chainOptionsSorted.find(
+    (option) => option.value === String(defaultChainNodeId)
+  );
+
+  const handleSelectChange = (newOption: SelectListOption) => {
+    setSelectedChainNodeId(Number(newOption.value));
   };
 
   return (
@@ -47,20 +75,38 @@ const DirectoryPageSection = ({
         <>
           <CWLabel label="Enter or select your community's chain" />
           <CWTypeaheadSelectList
-            options={[]}
-            defaultValue={{ value: 'value', label: 'label' }}
+            options={chainOptionsSorted}
+            defaultValue={defaultOption}
             placeholder="Select community's chain"
+            onChange={handleSelectChange}
           />
         </>
       )}
-      {isGoToDirectoryButtonVisible && (
-        <CWButton
-          buttonType="tertiary"
-          buttonHeight="sm"
-          label="Go to directory"
-          iconRight="arrowRightPhosphor"
-          onClick={handleGoToDirectory}
-        />
+      {directoryPageEnabled && (
+        <CWTooltip
+          placement="top"
+          content={
+            isGoToDirectoryButtonEnabled
+              ? null
+              : 'Save changes to enable directory page'
+          }
+          renderTrigger={(handleInteraction) => (
+            <div
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleInteraction}
+              className="cta-button-container"
+            >
+              <CWButton
+                disabled={!isGoToDirectoryButtonEnabled}
+                buttonType="tertiary"
+                buttonHeight="sm"
+                label="Go to directory"
+                iconRight="arrowRightPhosphor"
+                onClick={handleGoToDirectory}
+              />
+            </div>
+          )}
+        ></CWTooltip>
       )}
     </div>
   );

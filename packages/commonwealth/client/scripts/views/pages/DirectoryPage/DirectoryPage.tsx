@@ -12,6 +12,7 @@ import {
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -35,17 +36,15 @@ const DirectoryPage = () => {
     navigate('/createCommunity/starter', {}, null);
   };
 
-  // TODO make this value dynamic
-  const isDirectoryPageEnabled = true;
+  const directoryPageEnabled = app.config.chains.getById(
+    app.activeChainId()
+  )?.directoryPageEnabled;
 
-  if (!isDirectoryPageEnabled) {
+  if (!directoryPageEnabled) {
     return (
       <ErrorPage message="Directory Page is not enabled for this community." />
     );
   }
-
-  console.log('rowData', rowData);
-  console.log('columnInfo', columnInfo);
 
   return (
     <div className="DirectoryPage">
