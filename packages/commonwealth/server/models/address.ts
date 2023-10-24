@@ -100,7 +100,7 @@ export default (
       underscored: true,
       tableName: 'Addresses',
       indexes: [
-        { fields: ['address', 'community'], unique: true },
+        { fields: ['address', 'community_id'], unique: true },
         { fields: ['user_id'] },
       ],
       defaultScope: {
