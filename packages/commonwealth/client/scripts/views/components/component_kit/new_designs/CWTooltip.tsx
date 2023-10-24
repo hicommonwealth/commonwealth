@@ -2,12 +2,12 @@ import React, { FC } from 'react';
 
 import 'components/component_kit/new_designs/CWTooltip.scss';
 
-import { Popover, usePopover } from '../cw_popover/cw_popover';
-import type { PopoverTriggerProps } from '../cw_popover/cw_popover';
-import { CWText } from '../cw_text';
-import { ComponentType } from '../types';
-import { getClasses } from '../helpers';
 import { Placement } from '@popperjs/core/lib';
+import type { PopoverTriggerProps } from '../cw_popover/cw_popover';
+import { Popover, usePopover } from '../cw_popover/cw_popover';
+import { CWText } from '../cw_text';
+import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
 
 type TooltipProps = {
   content: string | React.ReactNode;
@@ -52,16 +52,18 @@ export const CWTooltip: FC<TooltipProps> = ({
   return (
     <>
       {renderTrigger(popoverProps.handleInteraction, popoverProps.open)}
-      <Popover
-        disablePortal={disablePortal}
-        placement={placement}
-        content={
-          <Container placement={placement}>
-            <CWText type="caption">{content}</CWText>
-          </Container>
-        }
-        {...popoverProps}
-      />
+      {content && (
+        <Popover
+          disablePortal={disablePortal}
+          placement={placement}
+          content={
+            <Container placement={placement}>
+              <CWText type="caption">{content}</CWText>
+            </Container>
+          }
+          {...popoverProps}
+        />
+      )}
     </>
   );
 };

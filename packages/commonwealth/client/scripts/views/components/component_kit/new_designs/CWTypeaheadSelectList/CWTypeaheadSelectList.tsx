@@ -1,11 +1,11 @@
+import clsx from 'clsx';
 import React from 'react';
 import Select, { components } from 'react-select';
+import { CWIcon } from '../../cw_icons/cw_icon';
 import { ComponentType } from '../../types';
 import './CWTypeaheadSelectList.scss';
-import { CWIcon } from '../../cw_icons/cw_icon';
-import clsx from 'clsx';
 
-type SelectListOption = {
+export type SelectListOption = {
   value: string;
   label: string;
 };
@@ -15,6 +15,7 @@ type TypeaheadSelectListProps = {
   defaultValue: SelectListOption;
   placeholder: string;
   isDisabled?: boolean;
+  onChange?: (newOption: SelectListOption) => void;
 };
 
 const DropdownIndicator = (props) => {
@@ -44,6 +45,7 @@ export const CWTypeaheadSelectList = ({
   defaultValue,
   placeholder,
   isDisabled = false,
+  onChange,
 }: TypeaheadSelectListProps) => {
   return (
     <div className={ComponentType.TypeaheadSelectList}>
@@ -71,6 +73,7 @@ export const CWTypeaheadSelectList = ({
         noOptionsMessage={() => 'No matches found.'}
         isDisabled={isDisabled}
         className={clsx(`SelectList`, isDisabled && 'disabled')}
+        onChange={onChange}
       />
     </div>
   );

@@ -6,6 +6,9 @@ import { uuidv4 } from 'lib/util';
 import 'pages/manage_community/chain_metadata_rows.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import type ChainInfo from '../../../models/ChainInfo';
 import type RoleInfo from '../../../models/RoleInfo';
@@ -13,18 +16,15 @@ import { AvatarUpload } from '../../components/Avatar';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
+import { openConfirmation } from '../../modals/confirmation_modal';
+import DirectoryPageSection from './DirectoryPageSection';
 import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
-import { useFetchTopicsQuery } from 'state/api/topics';
-import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
-import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
-import { openConfirmation } from '../../modals/confirmation_modal';
-import { CWToggle } from '../../components/component_kit/cw_toggle';
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import DirectoryPageSection from './DirectoryPageSection';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -186,12 +186,12 @@ export const ChainMetadataRows = ({
   const [github, setGithub] = useState(chain.github);
   const [stagesEnabled, setStagesEnabled] = useState(chain.stagesEnabled);
   const [customStages, setCustomStages] = useState(chain.customStages);
-
-  // TODO add dynamic value from "chain" when backend is ready
-  const [directoryPageEnabled, setDirectoryPageEnabled] = useState(false);
-  const [isGoToDirectoryButtonVisible, setIsGoToDirectoryButtonVisible] =
-    useState(false);
-
+  const [directoryPageEnabled, setDirectoryPageEnabled] = useState(
+    chain.directoryPageEnabled
+  );
+  const [selectedChainNodeId, setSelectedChainNodeId] = useState(
+    chain.directoryPageChainNodeId
+  );
   const [customDomain, setCustomDomain] = useState(chain.customDomain);
   const [terms, setTerms] = useState(chain.terms);
   const [iconUrl, setIconUrl] = useState(chain.iconUrl);
@@ -301,10 +301,10 @@ export const ChainMetadataRows = ({
         defaultPage,
         hasHomepage,
         chain_node_id: null,
+        directory_page_enabled: directoryPageEnabled,
+        directory_page_chain_node_id: selectedChainNodeId,
       });
       onSave();
-      // TODO temp solution - remove when backend will be hooked up
-      setIsGoToDirectoryButtonVisible(directoryPageEnabled);
       notifySuccess('Chain updated');
       app.sidebarRedraw.emit('redraw');
     } catch (err) {
@@ -405,6 +405,15 @@ export const ChainMetadataRows = ({
       setDiscordBotConnecting(true);
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const handleToggleEnableDirectoryPage = (enabled: boolean) => {
+    setDirectoryPageEnabled(enabled);
+
+    // reset selectedChainNodeId to the default saved in the DB
+    if (!enabled) {
+      setSelectedChainNodeId(chain.directoryPageChainNodeId);
     }
   };
 
@@ -546,11 +555,13 @@ export const ChainMetadataRows = ({
       />
 
       <CWDivider className="directory-page-divider" />
+
       <DirectoryPageSection
         directoryPageEnabled={directoryPageEnabled}
-        setDirectoryPageEnabled={setDirectoryPageEnabled}
-        // TODO change this to chain.X value
-        isGoToDirectoryButtonVisible={isGoToDirectoryButtonVisible}
+        setDirectoryPageEnabled={handleToggleEnableDirectoryPage}
+        isGoToDirectoryButtonEnabled={chain.directoryPageEnabled}
+        selectedChainNodeId={selectedChainNodeId}
+        setSelectedChainNodeId={setSelectedChainNodeId}
       />
       <CWDivider className="directory-page-divider" />
 
