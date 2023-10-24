@@ -77,7 +77,7 @@ const createPoll = async (
 
     const finalPoll = await models.Poll.create({
       thread_id,
-      chain_id: chain.id,
+      community_id: chain.id,
       prompt,
       options,
       ends_at,

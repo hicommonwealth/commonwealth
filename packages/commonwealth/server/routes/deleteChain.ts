@@ -80,10 +80,10 @@ const deleteChain = async (
 
           // Add the created by field to comments for redundancy
           await sequelize.query(
-            `UPDATE "Comments" 
+            `UPDATE "Comments"
                  SET created_by = (
-                    SELECT address 
-                    FROM "Addresses" 
+                    SELECT address
+                    FROM "Addresses"
                     WHERE "Comments".address_id = "Addresses".id)
                  WHERE chain = '${chain.id}'`,
             { transaction: t }
@@ -134,17 +134,17 @@ const deleteChain = async (
           });
 
           await models.Poll.destroy({
-            where: { chain_id: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 
           // Add the created by field to threads for redundancy
           await sequelize.query(
-            `UPDATE "Threads" 
+            `UPDATE "Threads"
                  SET created_by = (
-                    SELECT address 
-                    FROM "Addresses" 
-                    WHERE "Threads".address_id = "Addresses".id) 
+                    SELECT address
+                    FROM "Addresses"
+                    WHERE "Threads".address_id = "Addresses".id)
                  WHERE chain = '${chain.id}'`,
             { transaction: t }
           );

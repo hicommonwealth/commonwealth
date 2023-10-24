@@ -13,7 +13,7 @@ const createMockedGroupsController = () => {
   const groups: GroupAttributes[] = [
     {
       id: 1,
-      chain_id: 'ethereum',
+      community_id: 'ethereum',
       metadata: {
         name: 'hello',
         description: '123',

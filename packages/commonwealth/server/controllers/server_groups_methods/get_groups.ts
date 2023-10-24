@@ -24,7 +24,7 @@ export async function __getGroups(
 ): Promise<GetGroupsResult> {
   const groups = await this.models.Group.findAll({
     where: {
-      chain_id: community.id,
+      community_id: community.id,
     },
   });
 

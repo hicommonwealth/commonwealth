@@ -62,7 +62,7 @@ export async function __createGroup(
 
   const numChainGroups = await this.models.Group.count({
     where: {
-      chain_id: community.id,
+      community_id: community.id,
     },
   });
   if (numChainGroups >= MAX_GROUPS_PER_CHAIN) {
@@ -87,7 +87,7 @@ export async function __createGroup(
       // create group
       const group = await this.models.Group.create(
         {
-          chain_id: community.id,
+          community_id: community.id,
           metadata,
           requirements,
         },

@@ -63,7 +63,7 @@ export async function __updateGroup(
   const group = await this.models.Group.findOne({
     where: {
       id: groupId,
-      chain_id: community.id,
+      community_id: community.id,
     },
   });
   if (!group) {

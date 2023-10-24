@@ -119,7 +119,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.Poll.destroy({
-            where: { chain_id: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 

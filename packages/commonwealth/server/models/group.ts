@@ -13,7 +13,7 @@ export type GroupMetadata = {
 
 export type GroupAttributes = {
   id: number;
-  chain_id: string;
+  community_id: string;
   metadata: GroupMetadata;
   requirements: Requirement[];
 
@@ -21,7 +21,7 @@ export type GroupAttributes = {
   updated_at?: Date;
 
   // associations
-  Chain?: ChainAttributes;
+  Community?: ChainAttributes;
 };
 
 export type GroupInstance = ModelInstance<GroupAttributes>;
@@ -35,7 +35,7 @@ export default (
     'Group',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       metadata: { type: dataTypes.JSON, allowNull: false },
       requirements: { type: dataTypes.JSON, allowNull: false },
 
@@ -48,13 +48,13 @@ export default (
       updatedAt: 'updated_at',
       underscored: true,
       tableName: 'Groups',
-      indexes: [{ fields: ['chain_id'] }],
+      indexes: [{ fields: ['community_id'] }],
     }
   );
 
   Group.associate = (models) => {
     models.Group.belongsTo(models.Chain, {
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Group.hasMany(models.Membership, {

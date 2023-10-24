@@ -18,7 +18,7 @@ export type PollAttributes = {
 
   // associations
   Thread: ThreadAttributes;
-  Chain: ChainAttributes;
+  Community: ChainAttributes;
 };
 
 export type PollInstance = ModelInstance<PollAttributes>;
