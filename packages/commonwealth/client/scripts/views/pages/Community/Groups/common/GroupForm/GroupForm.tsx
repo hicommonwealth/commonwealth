@@ -12,7 +12,6 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
 import { ZodError, ZodObject } from 'zod';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
@@ -395,7 +394,7 @@ const GroupForm = ({
                 <CWTooltip
                   content="Cannot add more than 10 requirements"
                   placement="bottom"
-                  renderTrigger={(handleInteraction, isTooltipOpen) => (
+                  renderTrigger={(handleInteraction) => (
                     <CWButton
                       type="button"
                       label="Add requirement"
@@ -405,20 +404,14 @@ const GroupForm = ({
                       buttonHeight="med"
                       onClick={addRequirementSubForm}
                       disabled={requirementSubForms.length >= MAX_REQUIREMENTS}
-                      onMouseEnter={(e) => {
-                        if (requirementSubForms.length >= MAX_REQUIREMENTS) {
-                          handleMouseEnter({ e, handleInteraction });
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (requirementSubForms.length >= MAX_REQUIREMENTS) {
-                          handleMouseLeave({
-                            e,
-                            isTooltipOpen,
-                            handleInteraction,
-                          });
-                        }
-                      }}
+                      onMouseEnter={
+                        requirementSubForms.length >= MAX_REQUIREMENTS &&
+                        handleInteraction
+                      }
+                      onMouseLeave={
+                        requirementSubForms.length >= MAX_REQUIREMENTS &&
+                        handleInteraction
+                      }
                     />
                   )}
                 />
