@@ -1,4 +1,4 @@
-import { featureFlags } from 'client/scripts/helpers/feature-flags';
+import { featureFlags } from 'helpers/feature-flags';
 import React from 'react';
 import Permissions from 'utils/Permissions';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';

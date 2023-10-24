@@ -1,5 +1,5 @@
-import { featureFlags } from 'client/scripts/helpers/feature-flags';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
