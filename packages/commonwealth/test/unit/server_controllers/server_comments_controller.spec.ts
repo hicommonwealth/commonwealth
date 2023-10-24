@@ -9,7 +9,7 @@ import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerCommentsController', () => {
   describe('#createCommentReaction', () => {
-    it.only('should create a comment reaction (new reaction)', async () => {
+    it('should create a comment reaction (new reaction)', async () => {
       const sandbox = Sinon.createSandbox();
       const db = {
         Reaction: {
