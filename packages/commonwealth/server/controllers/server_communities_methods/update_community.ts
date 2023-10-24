@@ -206,7 +206,7 @@ export async function __updateCommunity(
   if (directory_page_enabled !== undefined) {
     chain.directory_page_enabled = directory_page_enabled;
   }
-  if (directory_page_chain_node_id) {
+  if (directory_page_chain_node_id !== undefined) {
     chain.directory_page_chain_node_id = directory_page_chain_node_id;
   }
 

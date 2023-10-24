@@ -15,7 +15,7 @@ describe('GetRelatedCommunities Tests', () => {
     assert.equal(response.length, 0);
   });
 
-  it('Correctly returns results if base matchs some chainNode.name', async () => {
+  it('Correctly returns results if base matches some chainNode.name', async () => {
     const controller = new ServerCommunitiesController(models, null, null);
     const response = await controller.getRelatedCommunities({ chainNodeId: 2 })
 

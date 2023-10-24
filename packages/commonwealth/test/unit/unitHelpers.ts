@@ -27,7 +27,7 @@ export function postReq<
 
 type UserBuilder = {models: DB, userAttributes: UserAttributes}
 
-function buildUser(userBuilder: UserBuilder): Express.User {
+export function buildUser(userBuilder: UserBuilder): Express.User {
   return {
     ...userBuilder.userAttributes,
     getAddresses: () => userBuilder.models.Address.findAll({ where: { user_id: userBuilder.userAttributes.id } })
