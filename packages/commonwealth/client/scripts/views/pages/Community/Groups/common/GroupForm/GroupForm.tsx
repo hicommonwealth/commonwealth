@@ -15,7 +15,7 @@ import { ZodError, ZodObject } from 'zod';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
-import { TOKENS } from './constants';
+import { AMOUNT_CONDITIONS, TOKENS, conditionTypes } from './constants';
 import {
   CWRequirementsLabelInputFieldState,
   FormSubmitValues,
@@ -101,10 +101,15 @@ const GroupForm = ({
     RequirementSubFormsState[]
   >([
     {
+      defaultValues: {
+        requirementCondition: conditionTypes.find(
+          (x) => x.value === AMOUNT_CONDITIONS.MORE
+        ),
+      },
       values: {
         requirementAmount: '',
         requirementChain: '',
-        requirementCondition: '',
+        requirementCondition: AMOUNT_CONDITIONS.MORE,
         requirementContractAddress: '',
         requirementType: '',
       },
@@ -116,11 +121,16 @@ const GroupForm = ({
     if (initialValues.requirements) {
       setRequirementSubForms(
         initialValues.requirements.map((x) => ({
-          defaultValues: x,
+          defaultValues: {
+            ...x,
+            requirementCondition: conditionTypes.find(
+              (x) => x.value === AMOUNT_CONDITIONS.MORE
+            ),
+          },
           values: {
             requirementAmount: x?.requirementAmount || '',
             requirementChain: x?.requirementChain?.value || '',
-            requirementCondition: x?.requirementCondition?.value || '',
+            requirementCondition: AMOUNT_CONDITIONS.MORE,
             requirementContractAddress: x?.requirementContractAddress || '',
             requirementType: x?.requirementType?.value || '',
           },
@@ -150,10 +160,15 @@ const GroupForm = ({
     setRequirementSubForms([
       ...requirementSubForms,
       {
+        defaultValues: {
+          requirementCondition: conditionTypes.find(
+            (x) => x.value === AMOUNT_CONDITIONS.MORE
+          ),
+        },
         values: {
           requirementAmount: '',
           requirementChain: '',
-          requirementCondition: '',
+          requirementCondition: AMOUNT_CONDITIONS.MORE,
           requirementContractAddress: '',
           requirementType: '',
         },

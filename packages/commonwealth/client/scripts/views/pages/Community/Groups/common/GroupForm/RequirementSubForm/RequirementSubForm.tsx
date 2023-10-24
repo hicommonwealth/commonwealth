@@ -132,6 +132,10 @@ const RequirementSubForm = ({
               });
             }}
             customError={errors.requirementCondition}
+            // ---
+            // ATM the API only supports the "More" option, we make this field disabled with "More" as the only selected option
+            isDisabled
+            // ---
           />
           <CWTextInput
             key={defaultValues.requirementAmount}
