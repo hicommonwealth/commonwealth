@@ -136,7 +136,6 @@ export async function __createCommentReaction(
   // build notification options
   const allNotificationOptions: EmitOptions[] = [];
 
-  console.log('??????????????????????', finalReaction.Address);
   allNotificationOptions.push({
     notification: {
       categoryId: NotificationCategories.NewReaction,
