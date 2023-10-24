@@ -12,7 +12,7 @@ _This entry serves as a bucket entry for documenting libraries and tools employe
 
 Kong Gateway is an open-source API gateway and microservices management tool acting as an intermediary between clients and the app. 
 
-To switch which URL Kong is gating, navigate to Kong's Konnect Service Hub:
+To switch which URL Kong is gating, and alter the destination of incoming requests, navigate to Kong's Konnect Service Hub:
 
 <img width="233" alt="Screenshot 2023-02-05 at 11 47 36 AM" src="https://user-images.githubusercontent.com/14794654/216841309-bde025ac-48d9-47be-ae47-44ba72b1760a.png">
 
@@ -20,7 +20,7 @@ Then navigate to the following gateway:
 
 ![Kong Gateway](./assets/Kong-Gateway-2.png)
 
-...where you will be able to view the upstream url:
+...where you will be able to view the upstream URL. This setting determines the target server or service that Kong Gateway will direct incoming requests to.
 
 ![Kong Gateway](./assets/Kong-Gateway.png)
 
