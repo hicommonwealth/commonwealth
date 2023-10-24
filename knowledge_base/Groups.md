@@ -16,15 +16,15 @@ sequenceDiagram
 
   rect rgb(100, 100, 0)
 
-  Note over Client: Lands on a community page, <br/> immediately checks membership <br/> status in background
+  Note over Client: Lands on a community page, <br> immediately checks membership <br> status in background
 
-  Client->>API: PUT /refresh-membership body: <br/> (jwt, chain, address, topic_id)
+  Client->>API: PUT /refresh-membership body: <br> (jwt, chain, address, topic_id)
 
-  Note over API: Checks membership status of address, <br/> for group(s), on specified topic. <br/> &nbsp <br /> If membership missing or stale, <br/> compute membership status, <br/> save and return membership <br/> &nbsp <br /> If membership fresh, <br/> return membership. <br/> &nbsp <br /> Membership model (saved to DB): <br/> &nbsp <br /> group_id: number <br/> address_id: number <br/> allowed: boolean <br/> reject_reason?: string <br/> last checked: Date
+  Note over API: Checks membership status of address, <br> for group(s), on specified topic. <br><br> If membership missing or stale, <br> compute membership status, <br> save and return membership <br><br> If membership fresh, <br> return membership. <br><br> Membership model (saved to DB): <br><br> group_id: number <br> address_id: number <br> allowed: boolean <br> reject_reason?: string <br> last checked: Date
 
-  API-->>Client: Response payload: <br/> &nbsp <br/> topic_id: number <br/> allowed: boolean <br/> reject_reason?: string
+  API-->>Client: Response payload: <br><br> topic_id: number <br> allowed: boolean <br> reject_reason?: string
 
-  Note over Client: If address not allowed on topic, <br/>  show banner with reject reason
+  Note over Client: If address not allowed on topic, <br>  show banner with reject reason
 
   end
 ```
@@ -36,11 +36,11 @@ sequenceDiagram
 
   rect rgb(100, 0, 0)
 
-  Note over Client: Attempts to perform gated action, <br/> (e.g. create thread, create comment)
+  Note over Client: Attempts to perform gated action, <br> (e.g. create thread, create comment)
 
-  Client->>API: Request <br/> body: (jwt, chain, address, …data)
+  Client->>API: Request <br> body: (jwt, chain, address, …data)
 
-  Note over API: Checks membership status of address, <br/> for group(s), on thread's topic. <br/> &nbsp <br /> Always compute membership status and save. <br/> &nbsp <br /> If rejected, save Membership.reject_reason <br/> and throw unauthorized error <br/> &nbsp <br /> If allowed, proceed with action.
+  Note over API: Checks membership status of address, <br> for group(s), on thread's topic. <br><br> Always compute membership status and save. <br><br> If rejected, save Membership.reject_reason <br> and throw unauthorized error <br><br> If allowed, proceed with action.
 
    alt Rejected
         API-->>Client: { error: <reject reason> }
@@ -60,11 +60,11 @@ sequenceDiagram
 
   Note over Client: Admin creates a Group
 
-  Client->>API: POST /groups <br/> body: (jwt, chain_id, address, metadata, requirements, topics)
+  Client->>API: POST /groups <br> body: (jwt, chain_id, address, metadata, requirements, topics)
 
-  Note over API: Validate schema. <br/> &nbsp <br/> Check limit of 20 groups per chain <br/> &nbsp <br/> Save group <br/> &nbsp <br/> Optionally add group to each specified topic
+  Note over API: Validate schema. <br><br> Check limit of 20 groups per chain <br><br> Save group <br><br> Optionally add group to each specified topic
 
-  API-->>Client: Response payload (Group): <br/> &nbsp <br/> id: number <br/> chain_id: string <br/> metadata: MetadataJSON <br/> requirements: RequirementsJSON
+  API-->>Client: Response payload (Group): <br><br> id: number <br> chain_id: string <br> metadata: MetadataJSON <br> requirements: RequirementsJSON
 
   end
 ```
@@ -78,11 +78,11 @@ sequenceDiagram
 
   Note over Client: Admin views Group Memberships page
 
-  Client ->> API: GET /groups?chain_id=XXX&members=true <br/>(no auth)
+  Client ->> API: GET /groups?chain_id=XXX&members=true <br>(no auth)
 
-  Note over API: Gets all allowed memberships, <br/> for all groups, for all topics <br/> in the community. <br/> &nbsp <br/> No compute, only DB query. <br/> &nbsp <br/> Rejected memberships are not returned (?).
+  Note over API: Gets all allowed memberships, <br> for all groups, for all topics <br> in the community. <br><br> No compute, only DB query. <br><br> Rejected memberships are not returned (?).
 
-  API -->> Client: Response payload (Group w/ members): <br/> &nbsp <br/> id: number <br/> chain_id: string <br/> metadata: MetadataJSON <br/> requirements: RequirementsJSON <br/> members?: { <br/> group_id: number <br/> address_id: number <br/> allowed: true <br/> last checked: Date<br/>}[]
+  API -->> Client: Response payload (Group w/ members): <br><br> id: number <br> chain_id: string <br> metadata: MetadataJSON <br> requirements: RequirementsJSON <br> members?: { <br> group_id: number <br> address_id: number <br> allowed: true <br> last checked: Date<br>}[]
 
   end
 ```
@@ -96,9 +96,9 @@ sequenceDiagram
 
   Note over Client: Admin updates/deletes Group
 
-  Client ->> API: DELETE /groups/:id <br/> body: (jwt, chain_id, address)
+  Client ->> API: DELETE /groups/:id <br> body: (jwt, chain_id, address)
 
-  Note over API: Deletes all Memberships of the group, <br/> then updates/deletes the group
+  Note over API: Deletes all Memberships of the group, <br> then updates/deletes the group
 
   API -->> Client: OK
 
