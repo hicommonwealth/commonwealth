@@ -8,7 +8,7 @@ module.exports = {
       });
       await queryInterface.sequelize.query(
         `
-        ALTER INDEX "addresses_public_key_chain" RENAME TO "Addresses_address_community_id";
+        ALTER INDEX IF EXISTS "addresses_public_key_chain" RENAME TO "Addresses_address_community_id";
       `,
         { transaction }
       );
@@ -29,7 +29,7 @@ module.exports = {
       });
       await queryInterface.sequelize.query(
         `
-        ALTER INDEX "Addresses_address_community_id" RENAME TO "addresses_public_key_chain";
+        ALTER INDEX IF EXISTS "Addresses_address_community_id" RENAME TO "addresses_public_key_chain";
       `,
         { transaction }
       );
