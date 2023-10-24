@@ -1,4 +1,5 @@
 import { NotificationCategories } from 'common-common/src/types';
+import { getMultipleSpacesById } from 'helpers/snapshot_utils';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -23,7 +24,6 @@ import {
   SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
-import { getMultipleSpacesById } from 'helpers/snapshot_utils';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -205,8 +205,8 @@ const NotificationSettingsPage = () => {
               <>
                 <CWText type="h5">Email Request</CWText>
                 <CWText type="b1">
-                  Mmm...seems like we don't have your email on file? Enter your
-                  email below so we can send you scheduled email digests.
+                  {`Mmm...seems like we don't have your email on file? Enter your
+                  email below so we can send you scheduled email digests.`}
                 </CWText>
                 <div className="email-input-row">
                   <CWTextInput
