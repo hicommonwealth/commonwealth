@@ -209,7 +209,7 @@ export const CWTable = ({
     return () => {
       observer?.disconnect();
     };
-  }, [isLoadingMoreRows, tableRef]);
+  }, [isLoadingMoreRows, tableRef, onScrollEnd]);
 
   return (
     <div className={ComponentType.Table}>
