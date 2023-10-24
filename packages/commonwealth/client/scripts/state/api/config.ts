@@ -22,5 +22,5 @@ export const ApiEndpoints = {
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
-  searchChains: (searchTerm: string) => `/chains?search=${searchTerm}`,
+  searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
 };
