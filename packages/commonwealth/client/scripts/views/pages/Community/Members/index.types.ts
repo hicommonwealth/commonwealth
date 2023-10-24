@@ -1,4 +1,4 @@
-export type GroupCategory = 'All groups' | 'In group' | 'Not in group';
+export type GroupCategory = 'All' | 'In group' | 'Not in group';
 
 export type SearchFilters = {
   searchText?: string;

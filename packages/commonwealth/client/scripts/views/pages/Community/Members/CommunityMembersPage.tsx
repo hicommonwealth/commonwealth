@@ -28,8 +28,8 @@ const TABS = [
   ...(featureFlags.gatingEnabled ? [{ value: 'groups', label: 'Groups' }] : []),
 ];
 
-const GROUP_FILTERS: GroupCategory[] = [
-  'All groups',
+const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
+  'All',
   'In group',
   'Not in group',
 ];
@@ -40,7 +40,7 @@ const CommunityMembersPage = () => {
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
-    category: GROUP_FILTERS[0],
+    category: GROUP_AND_MEMBER_FILTERS[0],
   });
 
   const debouncedSearchTerm = useDebounce<string>(
@@ -101,8 +101,19 @@ const CommunityMembersPage = () => {
             ) ||
             p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
           : true
-      );
-  }, [members, groups, debouncedSearchTerm]);
+      )
+      .filter((p) => {
+        if (searchFilters.category === GROUP_AND_MEMBER_FILTERS[0]) {
+          return true;
+        }
+
+        if (searchFilters.category === GROUP_AND_MEMBER_FILTERS[1]) {
+          return p.groups.length > 0;
+        }
+
+        return p.groups.length === 0;
+      });
+  }, [members, groups, debouncedSearchTerm, searchFilters.category]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
 
@@ -189,7 +200,7 @@ const CommunityMembersPage = () => {
             </CWText>
             <Select
               containerClassname="select-dropdown"
-              options={GROUP_FILTERS.map((x) => ({
+              options={GROUP_AND_MEMBER_FILTERS.map((x) => ({
                 id: x,
                 label: x,
                 value: x,
