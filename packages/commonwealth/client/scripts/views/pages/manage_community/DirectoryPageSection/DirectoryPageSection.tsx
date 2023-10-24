@@ -34,18 +34,17 @@ const DirectoryPageSection = ({
     navigate('/directory');
   };
 
-  const chains = app.config.nodes.getAll() || [];
-  const chainOptions = chains.map((chain) => ({
+  const chainNodes = app.config.nodes.getAll() || [];
+  const chainNodeOptions = chainNodes.map((chain) => ({
     value: String(chain.id),
     label: chain.name,
   }));
-  const chainOptionsSorted = chainOptions.sort((a, b) =>
+  const chainNodeOptionsSorted = chainNodeOptions.sort((a, b) =>
     a.label.localeCompare(b.label)
   );
-
   const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
   const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
-  const defaultOption = chainOptionsSorted.find(
+  const defaultOption = chainNodeOptionsSorted.find(
     (option) => option.value === String(defaultChainNodeId)
   );
 
@@ -75,7 +74,7 @@ const DirectoryPageSection = ({
         <>
           <CWLabel label="Enter or select your community's chain" />
           <CWTypeaheadSelectList
-            options={chainOptionsSorted}
+            options={chainNodeOptionsSorted}
             defaultValue={defaultOption}
             placeholder="Select community's chain"
             onChange={handleSelectChange}

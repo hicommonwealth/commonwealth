@@ -1,26 +1,21 @@
+import faker from 'faker';
 import React, { useState } from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import {
-  createColumnInfo,
-  makeData,
-} from 'views/components/component_kit/showcase_helpers';
 
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import ErrorPage from 'views/pages/error';
 import './DirectoryPage.scss';
-
-const rowData = makeData(25);
-const columnInfo = createColumnInfo();
 
 enum ViewType {
   Rows = 'Rows',
@@ -39,12 +34,57 @@ const DirectoryPage = () => {
   const directoryPageEnabled = app.config.chains.getById(
     app.activeChainId()
   )?.directoryPageEnabled;
+  const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
+  const selectedChainNodeId = app.config.chains.getById(
+    app.activeChainId()
+  )?.directoryPageChainNodeId;
+  const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
+  const baseChain = app.config.nodes.getById(defaultChainNodeId);
+
+  const { data: relatedCommunities } = useFetchRelatedCommunitiesQuery({
+    chainNodeId: baseChain.id,
+  });
 
   if (!directoryPageEnabled) {
     return (
       <ErrorPage message="Directory Page is not enabled for this community." />
     );
   }
+
+  const columnInfo = [
+    {
+      key: 'name',
+      header: 'Community',
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'description',
+      header: 'Description',
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'members',
+      header: 'Members',
+      numeric: true,
+      sortable: true,
+    },
+    {
+      key: 'threads',
+      header: 'Threads',
+      numeric: true,
+      sortable: true,
+    },
+  ];
+
+  const rowData = (relatedCommunities || []).map((c) => ({
+    name: c.community,
+    description: c.description || faker.lorem.paragraph(),
+    members: c.address_count,
+    threads: c.thread_count,
+    avatars: { name: c.icon_url },
+  }));
 
   return (
     <div className="DirectoryPage">
@@ -62,7 +102,7 @@ const DirectoryPage = () => {
       </CWText>
       <CWDivider />
       <CWText type="h4" className="subtitle">
-        [Base chain] ecosystem
+        {baseChain?.name} ecosystem
       </CWText>
       <div className="search-row">
         <div className="community-search">
