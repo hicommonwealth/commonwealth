@@ -252,7 +252,7 @@ export const CWTable = ({
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row, index) => {
+          {table.getRowModel().rows.map((row) => {
             return (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => {
