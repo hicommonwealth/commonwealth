@@ -17,7 +17,7 @@ export const getCommunityStatsHandler = async (
 ) => {
   const community = await controllers.communities.getCommunityStats({
     user: req.user,
-    chainId: req.params.communityId,
+    communityId: req.params.communityId,
   });
   return success(res, community);
 };

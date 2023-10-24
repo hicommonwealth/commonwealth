@@ -23,7 +23,7 @@ describe('validateOwner', () => {
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
@@ -55,7 +55,7 @@ describe('validateOwner', () => {
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
@@ -80,7 +80,7 @@ describe('validateOwner', () => {
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
@@ -119,7 +119,7 @@ describe('validateOwner', () => {
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
@@ -155,7 +155,7 @@ describe('validateOwner', () => {
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
@@ -191,7 +191,7 @@ describe('validateOwner', () => {
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
@@ -225,7 +225,7 @@ describe('validateOwner', () => {
       const result = await validateOwner({
         models,
         user,
-        chainId,
+        communityId: chainId,
         entity,
         allowMod,
         allowAdmin,
@@ -260,7 +260,7 @@ describe('validateOwner', () => {
     const result = await validateOwner({
       models,
       user,
-      chainId,
+      communityId: chainId,
       entity,
       allowMod,
       allowAdmin,
@@ -294,7 +294,7 @@ describe('validateOwner', () => {
     const result = await validateOwner({
       models,
       user,
-      chainId,
+      communityId: chainId,
       entity,
       allowMod,
       allowAdmin,

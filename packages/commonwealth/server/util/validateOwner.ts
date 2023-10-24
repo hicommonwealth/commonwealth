@@ -9,7 +9,7 @@ import { Role } from 'server/models/role';
 type ValidateOwnerOptions = {
   models: DB;
   user: UserInstance;
-  chainId: string;
+  communityId: string;
   entity?: ThreadAttributes | CommentAttributes;
   allowMod?: boolean;
   allowAdmin?: boolean;
@@ -19,7 +19,7 @@ type ValidateOwnerOptions = {
 export const validateOwner = async ({
   models,
   user,
-  chainId,
+  communityId,
   entity,
   allowMod,
   allowAdmin,
@@ -51,11 +51,11 @@ export const validateOwner = async ({
   const roles = await findAllRoles(
     models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    chainId,
+    communityId,
     requiredRoles
   );
   const role = roles.find((r) => {
-    return r.chain_id === chainId && requiredRoles.includes(r.permission);
+    return r.chain_id === communityId && requiredRoles.includes(r.permission);
   });
   if (role) {
     return true;

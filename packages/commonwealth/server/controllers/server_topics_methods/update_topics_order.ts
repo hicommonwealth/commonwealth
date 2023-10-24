@@ -16,7 +16,7 @@ const Errors = {
 
 export type UpdateTopicsOrderOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   body: {
     orderedIds: string[];
   };
@@ -26,7 +26,7 @@ export type UpdateTopicsOrderResult = TopicAttributes[];
 
 export async function __updateTopicsOrder(
   this: ServerTopicsController,
-  { user, chain, body: { orderedIds: newTopicOrder } }: UpdateTopicsOrderOptions
+  { user, community, body: { orderedIds: newTopicOrder } }: UpdateTopicsOrderOptions
 ): Promise<UpdateTopicsOrderResult> {
   if (!user) {
     throw new AppError(Errors.NoUser);
@@ -35,7 +35,7 @@ export async function __updateTopicsOrder(
   const isAdminOrMod = await validateOwner({
     models: this.models,
     user: user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,

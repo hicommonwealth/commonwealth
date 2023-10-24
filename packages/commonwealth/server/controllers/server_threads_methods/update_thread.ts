@@ -38,7 +38,7 @@ export const Errors = {
 export type UpdateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   threadId?: number;
   title?: string;
   body?: string;
@@ -71,7 +71,7 @@ export async function __updateThread(
   {
     user,
     address,
-    chain,
+    community,
     threadId,
     title,
     body,
@@ -106,7 +106,7 @@ export async function __updateThread(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -125,16 +125,16 @@ export async function __updateThread(
   const roles = await findAllRoles(
     this.models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    chain.id,
+    community.id,
     ['moderator', 'admin']
   );
 
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
   const isMod = !!roles.find(
-    (r) => r.chain_id === chain.id && r.permission === 'moderator'
+    (r) => r.chain_id === community.id && r.permission === 'moderator'
   );
   const isAdmin = !!roles.find(
-    (r) => r.chain_id === chain.id && r.permission === 'admin'
+    (r) => r.chain_id === community.id && r.permission === 'admin'
   );
   const isSuperAdmin = user.isAdmin;
   if (!isThreadOwner && !isMod && !isAdmin && !isSuperAdmin) {
@@ -202,7 +202,7 @@ export async function __updateThread(
     await setThreadStage(
       permissions,
       stage,
-      chain,
+      community,
       allAnalyticsOptions,
       toUpdate
     );
@@ -545,7 +545,7 @@ async function setThreadSpam(
 async function setThreadStage(
   permissions: UpdateThreadPermissions,
   stage: string | undefined,
-  chain: ChainInstance,
+  community: ChainInstance,
   allAnalyticsOptions: TrackOptions[],
   toUpdate: Partial<ThreadAttributes>
 ) {
@@ -560,7 +560,7 @@ async function setThreadStage(
     // fetch available stages
     let customStages = [];
     try {
-      const chainStages = JSON.parse(chain.custom_stages);
+      const chainStages = JSON.parse(community.custom_stages);
       if (Array.isArray(chainStages)) {
         customStages = Array.from(chainStages)
           .map((s) => s.toString())

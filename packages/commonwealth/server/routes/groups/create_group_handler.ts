@@ -6,8 +6,6 @@ import { AppError } from '../../../../common-common/src/errors';
 import z from 'zod';
 import { GroupMetadata } from '../../models/group';
 
-const Errors = {};
-
 type CreateGroupBody = {
   metadata: GroupMetadata;
   requirements: Requirement[];
@@ -20,7 +18,7 @@ export const createGroupHandler = async (
   req: TypedRequestBody<CreateGroupBody>,
   res: TypedResponse<CreateGroupResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
 
   const schema = z.object({
     body: z.object({
@@ -43,7 +41,7 @@ export const createGroupHandler = async (
 
   const result = await controllers.groups.createGroup({
     user,
-    chain,
+    community,
     address,
     metadata: metadata as Required<typeof metadata>,
     requirements,

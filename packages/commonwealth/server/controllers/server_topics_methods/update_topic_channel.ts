@@ -13,7 +13,7 @@ const Errors = {
 
 export type UpdateTopicChannelOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   topicId: number;
   channelId: string;
 };
@@ -22,12 +22,12 @@ export type UpdateTopicChannelResult = void;
 
 export async function __updateTopicChannel(
   this: ServerTopicsController,
-  { user, chain, topicId, channelId }: UpdateTopicChannelOptions
+  { user, community, topicId, channelId }: UpdateTopicChannelOptions
 ): Promise<UpdateTopicChannelResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user: user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -88,7 +88,7 @@ export async function __updateTopicChannel(
     // No previous topic associated with channel. Set all threads with channel id to new topic
     const threadsOnTopicFromDiscordBot = await this.models.Thread.findAll({
       where: {
-        chain: chain.id,
+        chain: community.id,
         // discord meta is not null
         discord_meta: {
           [Op.contains]: { channel_id: channelId },

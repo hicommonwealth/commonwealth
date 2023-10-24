@@ -34,7 +34,7 @@ export const Errors = {
 export type CreateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   title: string;
   body: string;
   kind: string;
@@ -60,7 +60,7 @@ export async function __createThread(
   {
     user,
     address,
-    chain,
+    community,
     title,
     body,
     kind,
@@ -97,7 +97,7 @@ export async function __createThread(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -123,7 +123,7 @@ export async function __createThread(
   const version_history: string[] = [JSON.stringify(firstVersion)];
 
   const threadContent: Partial<ThreadAttributes> = {
-    chain: chain.id,
+    chain: community.id,
     address_id: address.id,
     title,
     body,
@@ -149,14 +149,14 @@ export async function __createThread(
         const [topic] = await this.models.Topic.findOrCreate({
           where: {
             name: topicName,
-            chain_id: chain?.id || null,
+            chain_id: community?.id || null,
           },
           transaction,
         });
         threadContent.topic_id = topic.id;
         topicId = topic.id;
       } else {
-        if (chain.topics?.length) {
+        if (community.topics?.length) {
           throw new AppError(
             'Must pass a topic_name string and/or a numeric topic_id'
           );
@@ -164,15 +164,15 @@ export async function __createThread(
       }
 
       if (
-        chain &&
-        (chain.type === ChainType.Token ||
-          chain.network === ChainNetwork.Ethereum)
+        community &&
+        (community.type === ChainType.Token ||
+          community.network === ChainNetwork.Ethereum)
       ) {
         // skip check for admins
         const isAdmin = await findAllRoles(
           this.models,
           { where: { address_id: address.id } },
-          chain.id,
+          community.id,
           ['admin']
         );
         if (!user.isAdmin && isAdmin.length === 0) {
@@ -311,7 +311,7 @@ export async function __createThread(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
-    community: chain.id,
+    community: community.id,
     isCustomDomain: null,
   };
 

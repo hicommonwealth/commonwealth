@@ -154,7 +154,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const results = await controller.refreshMembership({
       user,
-      chain,
+      community: chain,
       address,
       topicId: 1,
     });
@@ -167,7 +167,7 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const { chain } = createMockParams();
     const result = await controller.getGroups({
-      chain,
+      community: chain,
       includeMembers: true,
     });
     expect(result).to.have.length(1);
@@ -188,7 +188,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const result = await controller.createGroup({
       user,
-      chain,
+      community: chain,
       address,
       metadata: {
         name: 'blah',
@@ -209,7 +209,7 @@ describe('ServerGroupsController', () => {
     expect(
       controller.createGroup({
         user,
-        chain,
+        community: chain,
         address,
         metadata: {
           name: 'blah',
@@ -226,7 +226,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const result = await controller.updateGroup({
       user,
-      chain,
+      community: chain,
       address,
       groupId: 1,
       metadata: {
@@ -247,7 +247,7 @@ describe('ServerGroupsController', () => {
     expect(
       controller.updateGroup({
         user,
-        chain,
+        community: chain,
         address,
         groupId: 1,
         metadata: {
@@ -264,7 +264,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const result = await controller.deleteGroup({
       user,
-      chain,
+      community: chain,
       address,
       groupId: 1,
     });

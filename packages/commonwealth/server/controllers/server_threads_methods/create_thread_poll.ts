@@ -16,8 +16,7 @@ export const Errors = {
 
 export type CreateThreadPollOptions = {
   user: UserInstance;
-  address: AddressInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   threadId: number;
   prompt: string;
   options: string[];
@@ -29,8 +28,7 @@ export async function __createThreadPoll(
   this: ServerThreadsController,
   {
     user,
-    address,
-    chain,
+    community,
     threadId,
     prompt,
     options,
@@ -67,7 +65,7 @@ export async function __createThreadPoll(
   const isThreadOwner = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     entity: thread,
   });
   if (!isThreadOwner) {
@@ -79,7 +77,7 @@ export async function __createThreadPoll(
     const isAdmin = await validateOwner({
       models: this.models,
       user,
-      chainId: chain.id,
+      communityId: community.id,
       allowAdmin: true,
     });
     if (!isAdmin) {

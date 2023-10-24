@@ -15,7 +15,7 @@ const MEMBERSHIP_TTL_SECONDS = 60 * 2;
 
 export type RefreshMembershipOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   address: AddressInstance;
   topicId: number;
 };
@@ -27,12 +27,12 @@ export type RefreshMembershipResult = {
 
 export async function __refreshMembership(
   this: ServerCommunitiesController,
-  { user, chain, address, topicId }: RefreshMembershipOptions
+  { user, community, address, topicId }: RefreshMembershipOptions
 ): Promise<RefreshMembershipResult> {
   // get all groups across the chain topics
   const chainTopics = await this.models.Topic.findAll({
     where: {
-      chain_id: chain.id,
+      chain_id: community.id,
       ...(topicId ? { id: topicId } : {}),
     },
   });

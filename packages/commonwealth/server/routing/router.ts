@@ -171,7 +171,7 @@ import exportMembersList from '../routes/exportMembersList';
 import { getProposalsHandler } from '../routes/proposals/getProposalsHandler';
 import { getProposalVotesHandler } from '../routes/proposals/getProposalVotesHandler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
-import { getThreadPollsHandler } from '../routes/threads/get_thread_polls';
+import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
 import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';

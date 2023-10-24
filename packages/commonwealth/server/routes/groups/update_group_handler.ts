@@ -18,7 +18,7 @@ export const updateGroupHandler = async (
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
   res: TypedResponse<UpdateGroupResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
 
   const schema = z.object({
     params: z.object({
@@ -46,7 +46,7 @@ export const updateGroupHandler = async (
 
   const result = await controllers.groups.updateGroup({
     user,
-    chain,
+    community,
     address,
     groupId,
     metadata: metadata as Required<typeof metadata>,

@@ -16,7 +16,7 @@ const Errors = {
 
 type SearchCommentsRequestParams = {
   search: string;
-  chain?: string;
+  community?: string;
   include_roles?: string;
 } & PaginationQueryParams;
 
@@ -28,16 +28,16 @@ export const searchProfilesHandler = async (
   res: TypedResponse<SearchCommentsResponse>
 ) => {
   const options = req.query;
-  if (!options.chain) {
+  if (!options.community) {
     throw new AppError(Errors.NoChains);
   }
-  if (!req.chain && options.chain !== ALL_CHAINS) {
+  if (!req.chain && options.community !== ALL_CHAINS) {
     // if no chain resolved, ensure that client explicitly requested all chains
     throw new AppError(Errors.NoChains);
   }
 
   const profileSearchResults = await controllers.profiles.searchProfiles({
-    chain: req.chain,
+    community: req.chain,
     search: options.search,
     includeRoles: options.include_roles === 'true',
     limit: parseInt(options.limit, 10) || 0,

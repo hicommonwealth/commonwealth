@@ -14,7 +14,7 @@ import { ChainInstance } from 'server/models/chain';
 export const Errors = {};
 
 export type SearchProfilesOptions = {
-  chain: ChainInstance;
+  community: ChainInstance;
   search: string;
   includeRoles?: boolean;
   limit?: number;
@@ -38,7 +38,7 @@ export type SearchProfilesResult = TypedPaginatedResult<{
 export async function __searchProfiles(
   this: ServerProfilesController,
   {
-    chain,
+    community,
     search,
     includeRoles,
     limit,
@@ -80,11 +80,11 @@ export async function __searchProfiles(
     searchTerm: `%${search}%`,
     ...paginationBind,
   };
-  if (chain) {
-    bind.chain = chain.id;
+  if (community) {
+    bind.community = community.id;
   }
 
-  const chainWhere = bind.chain ? `"Addresses".chain = $chain AND` : '';
+  const chainWhere = bind.chain ? `"Addresses".chain = $community AND` : '';
 
   const sqlWithoutPagination = `
     SELECT
@@ -159,7 +159,7 @@ export async function __searchProfiles(
           },
         },
       },
-      chain?.id,
+      community?.id,
       ['member', 'moderator', 'admin']
     );
 

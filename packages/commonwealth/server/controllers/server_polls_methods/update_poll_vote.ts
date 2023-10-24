@@ -22,7 +22,7 @@ export const Errors = {
 export type UpdatePollVoteOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   pollId: number;
   option: string;
 };
@@ -31,10 +31,10 @@ export type UpdatePollVoteResult = VoteAttributes;
 
 export async function __updatePollVote(
   this: ServerThreadsController,
-  { address, chain, pollId, option }: UpdatePollVoteOptions
+  { address, community, pollId, option }: UpdatePollVoteOptions
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
-    where: { id: pollId, chain_id: chain.id },
+    where: { id: pollId, chain_id: community.id },
   });
   if (!poll) {
     throw new AppError(Errors.NoPoll);
@@ -84,7 +84,7 @@ export async function __updatePollVote(
       poll_id: poll.id,
       address: address.address,
       author_community_id: address.chain,
-      community_id: chain.id,
+      community_id: community.id,
     };
     // delete existing votes
     await this.models.Vote.destroy({

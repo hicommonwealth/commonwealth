@@ -15,7 +15,7 @@ export const Errors = {
 
 export type DeleteTopicOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   topicId: number;
 };
 
@@ -23,12 +23,12 @@ export type DeleteTopicResult = void;
 
 export async function __deleteTopic(
   this: ServerTopicsController,
-  { user, chain, topicId }: DeleteTopicOptions
+  { user, community, topicId }: DeleteTopicOptions
 ): Promise<DeleteTopicResult> {
   const isAdmin = validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -49,7 +49,7 @@ export async function __deleteTopic(
       {
         bind: {
           id: topicId,
-          chain: chain.id,
+          chain: community.id,
         },
         type: QueryTypes.UPDATE,
         transaction,

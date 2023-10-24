@@ -35,13 +35,13 @@ export async function __deleteCommunity(
     throw new AppError(Errors.NeedChainId);
   }
 
-  const chain = await this.models.Chain.findOne({
+  const community = await this.models.Chain.findOne({
     where: {
       id,
       has_chain_events_listener: false, // make sure no chain events
     },
   });
-  if (!chain) {
+  if (!community) {
     throw new AppError(Errors.NoChain);
   }
 
@@ -56,52 +56,52 @@ export async function __deleteCommunity(
             },
             {
               where: {
-                selected_chain_id: chain.id,
+                selected_chain_id: community.id,
               },
               transaction: t,
             }
           );
 
           await this.models.Reaction.destroy({
-            where: { chain: chain.id },
+            where: { chain: community.id },
             transaction: t,
           });
 
           // Add the created by field to comments for redundancy
           await sequelize.query(
-            `UPDATE "Comments" SET created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id) WHERE chain = '${chain.id}'`,
+            `UPDATE "Comments" SET created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id) WHERE chain = '${community.id}'`,
             { transaction: t }
           );
 
           await this.models.Comment.destroy({
-            where: { chain: chain.id },
+            where: { chain: community.id },
             transaction: t,
           });
 
           await this.models.Topic.destroy({
-            where: { chain_id: chain.id },
+            where: { chain_id: community.id },
             transaction: t,
           });
 
           await this.models.Subscription.destroy({
-            where: { chain_id: chain.id },
+            where: { chain_id: community.id },
             transaction: t,
           });
 
           await this.models.CommunityContract.destroy({
             where: {
-              chain_id: chain.id,
+              chain_id: community.id,
             },
             transaction: t,
           });
 
           await this.models.Webhook.destroy({
-            where: { community_id: chain.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 
           const threads = await this.models.Thread.findAll({
-            where: { chain: chain.id },
+            where: { chain: community.id },
             attributes: ['id'],
           });
 
@@ -113,53 +113,53 @@ export async function __deleteCommunity(
           });
 
           await this.models.Vote.destroy({
-            where: { community_id: chain.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 
           await this.models.Poll.destroy({
-            where: { chain_id: chain.id },
+            where: { chain_id: community.id },
             transaction: t,
           });
 
           // Add the created by field to threads for redundancy
           await sequelize.query(
-            `UPDATE "Threads" SET created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id) WHERE chain = '${chain.id}'`,
+            `UPDATE "Threads" SET created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id) WHERE chain = '${community.id}'`,
             { transaction: t }
           );
 
           await this.models.Thread.destroy({
-            where: { chain: chain.id },
+            where: { chain: community.id },
             transaction: t,
           });
 
           await this.models.StarredCommunity.destroy({
-            where: { chain: chain.id },
+            where: { chain: community.id },
             transaction: t,
           });
 
           const addresses = await this.models.Address.findAll({
-            where: { chain: chain.id },
+            where: { chain: community.id },
           });
 
           await this.models.CommunityBanner.destroy({
-            where: { chain_id: chain.id },
+            where: { chain_id: community.id },
             transaction: t,
           });
 
           // notifications + notifications_read (cascade)
           await this.models.Notification.destroy({
-            where: { chain_id: chain.id },
+            where: { chain_id: community.id },
             transaction: t,
           });
 
           await this.models.Address.destroy({
-            where: { chain: chain.id },
+            where: { chain: community.id },
             transaction: t,
           });
 
           await this.models.Chain.destroy({
-            where: { id: chain.id },
+            where: { id: community.id },
             transaction: t,
           });
 

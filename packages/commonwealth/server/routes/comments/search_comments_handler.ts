@@ -13,7 +13,7 @@ const Errors = {
   NoChains: 'No chains resolved to execute search',
 };
 
-type SearchCommentsRequestParams = {
+type SearchCommentsRequestQuery = {
   search: string;
   chain?: string;
 } & PaginationQueryParams;
@@ -22,7 +22,7 @@ type SearchCommentsResponse = SearchCommentsResult;
 
 export const searchCommentsHandler = async (
   controllers: ServerControllers,
-  req: TypedRequestQuery<SearchCommentsRequestParams>,
+  req: TypedRequestQuery<SearchCommentsRequestQuery>,
   res: TypedResponse<SearchCommentsResponse>
 ) => {
   const options = req.query;

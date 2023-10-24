@@ -90,7 +90,7 @@ describe('ServerThreadsController', () => {
           getAddresses: async () => [address],
         } as any,
         address: address as any,
-        chain: {
+        community: {
           id: 'ethereum',
         } as ChainInstance,
         threadId: 1,

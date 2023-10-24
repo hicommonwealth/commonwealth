@@ -14,7 +14,7 @@ import {
 import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 
 export type GetProposalVotesOptions = {
-  chainId: string;
+  communityId: string;
   proposalId: string;
 };
 
@@ -24,7 +24,7 @@ export type GetProposalVotesResult =
 
 export async function __getProposalVotes(
   this: ServerProposalsController,
-  { chainId, proposalId }: GetProposalVotesOptions,
+  { communityId, proposalId }: GetProposalVotesOptions,
   provider: providers.Web3Provider,
   contractInfo: ContractInfo
 ): Promise<GetProposalVotesResult> {
@@ -46,7 +46,7 @@ export async function __getProposalVotes(
     votes = votesArgs.map((vote) => formatCompoundProposalVote(vote));
   } else {
     throw new ServerError(
-      `Proposal fetching not supported for chain ${chainId} on network ${contractInfo.type}`
+      `Proposal fetching not supported for chain ${communityId} on network ${contractInfo.type}`
     );
   }
 

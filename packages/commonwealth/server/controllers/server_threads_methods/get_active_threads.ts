@@ -6,7 +6,7 @@ const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
 
 export type GetActiveThreadsOptions = {
-  chain: ChainInstance;
+  community: ChainInstance;
   threadsPerTopic: number;
 };
 
@@ -14,7 +14,7 @@ export type GetActiveThreadsResult = ThreadAttributes[];
 
 export async function __getActiveThreads(
   this: ServerThreadsController,
-  { chain, threadsPerTopic }: GetActiveThreadsOptions
+  { community, threadsPerTopic }: GetActiveThreadsOptions
 ): Promise<GetActiveThreadsResult> {
   const allThreads = [];
   if (
@@ -26,7 +26,7 @@ export async function __getActiveThreads(
     threadsPerTopic = 3;
   }
 
-  const communityWhere = { chain_id: chain.id };
+  const communityWhere = { chain_id: community.id };
   const communityTopics = await this.models.Topic.findAll({
     where: communityWhere,
   });

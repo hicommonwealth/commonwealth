@@ -5,7 +5,7 @@ import { Op, WhereOptions } from 'sequelize';
 import { MembershipAttributes } from 'server/models/membership';
 
 export type GetGroupsOptions = {
-  chain: ChainInstance;
+  community: ChainInstance;
   includeMembers?: boolean;
   addressId?: number;
 };
@@ -17,11 +17,11 @@ export type GetGroupsResult = GroupWithMemberships[];
 
 export async function __getGroups(
   this: ServerCommunitiesController,
-  { chain, addressId, includeMembers }: GetGroupsOptions
+  { community, addressId, includeMembers }: GetGroupsOptions
 ): Promise<GetGroupsResult> {
   const groups = await this.models.Group.findAll({
     where: {
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
   const groupIds = groups.map(({ id }) => id);

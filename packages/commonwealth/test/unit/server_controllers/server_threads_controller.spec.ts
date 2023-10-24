@@ -67,7 +67,7 @@ describe('ServerThreadsController', () => {
       ] = await serverThreadsController.createThreadReaction({
         user: user as any,
         address: address as any,
-        chain: chain as any,
+        community: chain as any,
         reaction: reaction as any,
         threadId: threadId,
       });
@@ -79,7 +79,7 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId: threadId,
         })
@@ -168,7 +168,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId: 123,
         })
@@ -237,7 +237,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId,
         })
@@ -305,7 +305,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId,
         })
@@ -397,7 +397,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId,
         })
@@ -485,7 +485,7 @@ describe('ServerThreadsController', () => {
       ] = await serverThreadsController.createThreadComment({
         user: user as any,
         address: address as any,
-        chain: chain as any,
+        community: chain as any,
         parentId,
         threadId,
         text,
@@ -501,7 +501,7 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
@@ -592,7 +592,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
@@ -669,7 +669,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
@@ -759,7 +759,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
@@ -839,7 +839,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
@@ -923,7 +923,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
@@ -1004,7 +1004,7 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
@@ -1313,7 +1313,7 @@ describe('ServerThreadsController', () => {
       ] = await serverThreadsController.createThread({
         user: user as any,
         address: address as any,
-        chain: chain as any,
+        community: chain as any,
         title,
         body,
         kind,
@@ -1334,7 +1334,7 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          chain: chain as any,
+          community: chain as any,
           title,
           body,
           kind,

@@ -28,7 +28,7 @@ const banAddress = async (
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain.id,
+    communityId: chain.id,
     allowAdmin: true,
     allowGodMode: true,
   });

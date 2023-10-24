@@ -14,7 +14,7 @@ const Errors = {
 
 export type DeleteGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   address: AddressInstance;
   groupId: number;
 };
@@ -23,12 +23,12 @@ export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
   this: ServerCommunitiesController,
-  { user, chain, groupId }: DeleteGroupOptions
+  { user, community, groupId }: DeleteGroupOptions
 ): Promise<DeleteGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -40,7 +40,7 @@ export async function __deleteGroup(
   const group = await this.models.Group.findOne({
     where: {
       id: groupId,
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
   if (!group) {

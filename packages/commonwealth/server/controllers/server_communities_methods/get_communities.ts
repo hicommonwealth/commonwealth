@@ -13,18 +13,18 @@ export async function __getCommunities(
   this: ServerCommunitiesController,
   options: GetCommunitiesOptions
 ): Promise<GetCommunitiesResult> {
-  const [chains] = await Promise.all([
+  const [communities] = await Promise.all([
     this.models.Chain.findAll({
       where: { active: true },
     }),
   ]);
 
-  const chainsIds = chains.map((chain) => chain.id);
+  const communityIds = communities.map((community) => community.id);
   const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
     await this.models.CommunitySnapshotSpaces.findAll({
       where: {
         chain_id: {
-          [Op.in]: chainsIds,
+          [Op.in]: communityIds,
         },
       },
       include: {
@@ -33,18 +33,18 @@ export async function __getCommunities(
       },
     });
 
-  const chainsWithSnapshots = chains.map((chain) => {
-    const chainSnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.chain_id === chain.id
+  const communitiesWithSnapshots = communities.map((community) => {
+    const communitySnapshotSpaces = snapshotSpaces.filter(
+      (space) => space.chain_id === community.id
     );
-    const snapshotSpaceNames = chainSnapshotSpaces.map(
+    const snapshotSpaceNames = communitySnapshotSpaces.map(
       (space) => space.snapshot_space?.snapshot_space
     );
     return {
-      chain,
+      chain: community,
       snapshot: snapshotSpaceNames.length > 0 ? snapshotSpaceNames : [],
     };
   });
 
-  return chainsWithSnapshots;
+  return communitiesWithSnapshots;
 }

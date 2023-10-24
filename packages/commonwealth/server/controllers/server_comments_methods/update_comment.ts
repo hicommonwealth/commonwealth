@@ -4,7 +4,7 @@ import moment from 'moment';
 import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
 import { UserInstance } from '../../models/user';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   NotificationCategories,
   ProposalType,
@@ -38,7 +38,7 @@ export async function __updateComment(
   {
     user,
     address,
-    community: chain,
+    community,
     commentId,
     commentBody,
     discordMeta,
@@ -61,7 +61,7 @@ export async function __updateComment(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -117,7 +117,6 @@ export async function __updateComment(
     include: [this.models.Address],
   });
 
-  const cwUrl = getThreadUrl(thread, comment?.id);
   const root_title = thread.title || '';
 
   const allNotificationOptions: EmitOptions[] = [];

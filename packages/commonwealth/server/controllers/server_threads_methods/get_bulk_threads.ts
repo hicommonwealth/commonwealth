@@ -7,7 +7,7 @@ import { ServerError } from '../../../../common-common/src/errors';
 import { getLastEdited } from '../../util/getLastEdited';
 
 export type GetBulkThreadsOptions = {
-  chain?: ChainInstance;
+  community?: ChainInstance;
   stage: string;
   topicId: number;
   includePinnedThreads: boolean;
@@ -29,7 +29,7 @@ export type GetBulkThreadsResult = {
 export async function __getBulkThreads(
   this: ServerThreadsController,
   {
-    chain,
+    community,
     stage,
     topicId,
     includePinnedThreads,
@@ -54,7 +54,7 @@ export async function __getBulkThreads(
       page: _page,
       limit: _limit,
       offset: _offset,
-      ...(chain && { chain: chain.id }),
+      ...(community && { community_id: community.id }),
       ...(stage && { stage }),
       ...(topicId && { topic_id: topicId }),
     };
@@ -120,18 +120,18 @@ export async function __getBulkThreads(
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
             STRING_AGG(r.id::text, ',') AS reaction_ids
             FROM "Reactions" as r
-            JOIN "Threads" t2 
-            ON r.thread_id = t2.id and t2.chain = $chain ${
+            JOIN "Threads" t2
+            ON r.thread_id = t2.id and t2.chain = $community_id ${
               topicId ? ` AND t2.topic_id = $topic_id ` : ''
             }
             LEFT JOIN "Addresses" ad
             ON r.address_id = ad.id
-            where r.chain = $chain
+            where r.chain = $community_id
             GROUP BY thread_id
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          ${chain ? ` AND t.chain = $chain` : ''}
+          ${community ? ` AND t.chain = $community_id` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
@@ -228,7 +228,7 @@ export async function __getBulkThreads(
   const countsQuery = `
      SELECT id, title, stage FROM "Threads"
      WHERE ${
-       chain ? 'chain = $chain AND' : ''
+       community ? 'chain = $community_id AND' : ''
      } (stage = 'proposal_in_review' OR stage = 'voting')`;
 
   const threadsInVoting: ThreadInstance[] = await this.models.sequelize.query(

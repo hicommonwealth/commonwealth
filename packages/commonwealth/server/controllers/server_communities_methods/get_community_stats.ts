@@ -11,7 +11,7 @@ export const Errors = {
 
 export type GetCommunityStatsOptions = {
   user: UserInstance;
-  chainId: string;
+  communityId: string;
 };
 
 export type GetCommunityStatsResult = {
@@ -25,13 +25,13 @@ export type GetCommunityStatsResult = {
 
 export async function __getCommunityStats(
   this: ServerCommunitiesController,
-  { user, chainId }: GetCommunityStatsOptions
+  { user, communityId }: GetCommunityStatsOptions
 ): Promise<GetCommunityStatsResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
-  const chain = await this.models.Chain.findByPk(chainId);
+  const chain = await this.models.Chain.findByPk(communityId);
   if (!chain) {
     throw new AppError(Errors.ChainNotFound);
   }
@@ -46,7 +46,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: chainId,
+      chain: communityId,
     },
   });
 
@@ -56,7 +56,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: chainId,
+      chain: communityId,
     },
   });
 
@@ -66,7 +66,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: chainId,
+      chain: communityId,
     },
   });
 
@@ -76,7 +76,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain_id: chainId,
+      community_id: communityId
     },
   });
 
@@ -86,7 +86,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain_id: chainId,
+      chain_id: communityId,
     },
   });
 
@@ -95,7 +95,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: chainId,
+      chain: communityId,
     },
   });
 

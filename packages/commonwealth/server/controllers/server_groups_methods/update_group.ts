@@ -19,7 +19,7 @@ const Errors = {
 
 export type UpdateGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   address: AddressInstance;
   groupId: number;
   metadata?: GroupMetadata;
@@ -30,12 +30,12 @@ export type UpdateGroupResult = GroupAttributes;
 
 export async function __updateGroup(
   this: ServerCommunitiesController,
-  { user, chain, groupId, metadata, requirements }: UpdateGroupOptions
+  { user, community, groupId, metadata, requirements }: UpdateGroupOptions
 ): Promise<UpdateGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -63,7 +63,7 @@ export async function __updateGroup(
   const group = await this.models.Group.findOne({
     where: {
       id: groupId,
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
   if (!group) {

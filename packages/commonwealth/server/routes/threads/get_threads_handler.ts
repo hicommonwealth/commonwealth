@@ -54,7 +54,7 @@ export const getThreadsHandler = async (
   >,
   res: TypedResponse<GetThreadsResponse>
 ) => {
-  const { chain } = req;
+  const { chain: community } = req;
   const { thread_ids, bulk, active, search } = req.query;
 
   // get threads by IDs
@@ -83,12 +83,12 @@ export const getThreadsHandler = async (
       archived,
     } = req.query as BulkThreadsRequestQuery;
 
-    if (!chain && req.query.chain !== ALL_CHAINS) {
+    if (!community && req.query.chain !== ALL_CHAINS) {
       throw new AppError(Errors.NoChains);
     }
 
     const bulkThreads = await controllers.threads.getBulkThreads({
-      chain,
+      community,
       stage,
       topicId: parseInt(topic_id, 10),
       includePinnedThreads: includePinnedThreads === 'true',
@@ -107,7 +107,7 @@ export const getThreadsHandler = async (
     const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
 
     const activeThreads = await controllers.threads.getActiveThreads({
-      chain,
+      community,
       threadsPerTopic: parseInt(threads_per_topic, 10),
     });
     return success(res, activeThreads);
@@ -123,7 +123,7 @@ export const getThreadsHandler = async (
     }
 
     const searchResults = await controllers.threads.searchThreads({
-      chain,
+      community,
       searchTerm: search,
       threadTitleOnly: thread_title_only === 'true',
       limit: parseInt(limit, 10) || 0,

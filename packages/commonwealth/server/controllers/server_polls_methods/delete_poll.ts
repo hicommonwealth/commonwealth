@@ -16,7 +16,7 @@ export const Errors = {
 export type DeletePollOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   pollId: number;
 };
 
@@ -24,7 +24,7 @@ export type DeletePollResult = void;
 
 export async function __deletePoll(
   this: ServerThreadsController,
-  { user, chain, pollId }: DeletePollOptions
+  { user, community, pollId }: DeletePollOptions
 ): Promise<DeletePollResult> {
   const poll = await this.models.Poll.findByPk(pollId);
   if (!poll) {
@@ -43,7 +43,7 @@ export async function __deletePoll(
   const isThreadOwnerOrAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     entity: thread,
     allowAdmin: true,
     allowGodMode: true,

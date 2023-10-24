@@ -12,7 +12,6 @@ import { findAllRoles } from '../../util/roles';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
 import { ServerError } from '../../../../common-common/src/errors';
 import { AppError } from '../../../../common-common/src/errors';
-import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -28,7 +27,7 @@ export const Errors = {
 export type CreateThreadReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   reaction: string;
   threadId: number;
   canvasAction?: any;
@@ -47,7 +46,7 @@ export async function __createThreadReaction(
   {
     user,
     address,
-    chain,
+    community,
     reaction,
     threadId,
     canvasAction,
@@ -69,9 +68,9 @@ export async function __createThreadReaction(
   }
 
   // check address ban
-  if (chain) {
+  if (community) {
     const [canInteract, banError] = await this.banCache.checkBan({
-      communityId: chain.id,
+      communityId: community.id,
       address: address.address,
     });
     if (!canInteract) {
@@ -81,13 +80,13 @@ export async function __createThreadReaction(
 
   // check balance (bypass for admin)
   if (
-    chain &&
-    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+    community &&
+    (community.type === ChainType.Token || community.network === ChainNetwork.Ethereum)
   ) {
     const addressAdminRoles = await findAllRoles(
       this.models,
       { where: { address_id: address.id } },
-      chain.id,
+      community.id,
       ['admin']
     );
     const isGodMode = user.isAdmin;
@@ -115,7 +114,7 @@ export async function __createThreadReaction(
   const reactionData: ReactionAttributes = {
     reaction,
     address_id: address.id,
-    chain: chain.id,
+    chain: community.id,
     thread_id: thread.id,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -155,7 +154,7 @@ export async function __createThreadReaction(
   // build analytics options
   const analyticsOptions: TrackOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
-    community: chain.id,
+    community: community.id,
     isCustomDomain: null,
   };
 

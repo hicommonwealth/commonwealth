@@ -38,7 +38,7 @@ const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 export type CreateThreadCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   parentId: number;
   threadId: number;
   text: string;
@@ -59,7 +59,7 @@ export async function __createThreadComment(
   {
     user,
     address,
-    chain,
+    community,
     parentId,
     threadId,
     text,
@@ -71,7 +71,7 @@ export async function __createThreadComment(
 ): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    communityId: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -103,7 +103,7 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        chain: chain.id,
+        chain: community.id,
       },
       include: [this.models.Address],
     });
@@ -123,13 +123,13 @@ export async function __createThreadComment(
 
   // check balance (bypass for admin)
   if (
-    chain &&
-    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+    community &&
+    (community.type === ChainType.Token || community.network === ChainNetwork.Ethereum)
   ) {
     const addressAdminRoles = await findAllRoles(
       this.models,
       { where: { address_id: address.id } },
-      chain.id,
+      community.id,
       ['admin']
     );
     const isGodMode = user.isAdmin;
@@ -174,7 +174,7 @@ export async function __createThreadComment(
     plaintext,
     version_history,
     address_id: address.id,
-    chain: chain.id,
+    chain: community.id,
     parent_id: null,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -343,7 +343,7 @@ export async function __createThreadComment(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-    community: chain.id,
+    community: community.id,
     isCustomDomain: null,
   };
 

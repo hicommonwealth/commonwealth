@@ -3,7 +3,6 @@ import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import {
   TypedRequest,
-  TypedRequestBody,
   TypedResponse,
   success,
 } from '../../types';
@@ -27,7 +26,7 @@ export const updateTopicHandler = async (
 ) => {
   const {
     user,
-    chain,
+    chain: community,
     params: { topicId },
     body,
   } = req;
@@ -56,7 +55,7 @@ export const updateTopicHandler = async (
 
   const topic = await controllers.topics.updateTopic({
     user,
-    chain,
+    community,
     body: validationResult.data,
   });
 

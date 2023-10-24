@@ -23,7 +23,7 @@ const Errors = {
 
 export type CreateGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   address: AddressInstance;
   metadata: GroupMetadata;
   requirements: Requirement[];
@@ -34,12 +34,12 @@ export type CreateGroupResult = GroupAttributes;
 
 export async function __createGroup(
   this: ServerCommunitiesController,
-  { user, chain, metadata, requirements, topics }: CreateGroupOptions
+  { user, community, metadata, requirements, topics }: CreateGroupOptions
 ): Promise<CreateGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -62,7 +62,7 @@ export async function __createGroup(
 
   const numChainGroups = await this.models.Group.count({
     where: {
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
   if (numChainGroups >= MAX_GROUPS_PER_CHAIN) {
@@ -74,7 +74,7 @@ export async function __createGroup(
       id: {
         [Op.in]: topics || [],
       },
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
   if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
@@ -87,7 +87,7 @@ export async function __createGroup(
       // create group
       const group = await this.models.Group.create(
         {
-          chain_id: chain.id,
+          chain_id: community.id,
           metadata,
           requirements,
         },

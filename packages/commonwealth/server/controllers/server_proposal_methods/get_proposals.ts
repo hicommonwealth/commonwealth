@@ -10,13 +10,11 @@ import {
   formatCompoundBravoProposal,
   getCompoundProposals,
 } from './compound/proposals';
-import { DB } from '../../models';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { RedisCache } from 'common-common/src/redisCache';
 
 export type GetProposalsOptions = {
-  chainId: string;
+  communityId: string;
 };
 
 export type GetProposalsResult =
@@ -25,7 +23,7 @@ export type GetProposalsResult =
 
 export async function __getProposals(
   this: ServerProposalsController,
-  { chainId }: GetProposalsOptions,
+  { communityId }: GetProposalsOptions,
   provider: providers.Web3Provider,
   contractInfo: ContractInfo
 ): Promise<GetProposalsResult> {
@@ -45,7 +43,7 @@ export async function __getProposals(
     formattedProposals = proposals.map((p) => formatCompoundBravoProposal(p));
   } else {
     throw new ServerError(
-      `Proposal fetching not supported for chain ${chainId} on network ${contractInfo.type}`
+      `Proposal fetching not supported for chain ${communityId} on network ${contractInfo.type}`
     );
   }
 

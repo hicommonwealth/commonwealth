@@ -104,7 +104,7 @@ const createContract = async (
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain_id,
+    communityId: chain_id,
     allowAdmin: true,
     allowGodMode: true,
   });
