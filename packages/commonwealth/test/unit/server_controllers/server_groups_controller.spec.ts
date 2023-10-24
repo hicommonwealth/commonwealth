@@ -24,7 +24,7 @@ const createMockedGroupsController = () => {
   const topics: TopicAttributes[] = [
     {
       id: 1,
-      community_id: 'ethereum',
+      chain_id: 'ethereum',
       token_threshold: '1000',
       name: 'hello',
       featured_in_sidebar: false,
