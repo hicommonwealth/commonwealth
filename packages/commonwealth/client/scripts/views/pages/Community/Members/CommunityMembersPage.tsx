@@ -116,23 +116,27 @@ const CommunityMembersPage = () => {
       });
   }, [members, groups, debouncedSearchTerm, searchFilters.category]);
 
-  const filteredGroups =useMemo(() => {
+  const filteredGroups = useMemo(() => {
     return (groups || [])
       .filter((group) =>
         searchFilters.searchText
           ? group.name
-            .toLowerCase()
-            .includes(searchFilters.searchText.toLowerCase())
+              .toLowerCase()
+              .includes(searchFilters.searchText.toLowerCase())
           : true
       )
       .filter((group) =>
         searchFilters.category === 'All'
           ? true
           : searchFilters.category === 'In group'
-            ? (group as any).isJoined
-            : !(group as any).isJoined
+          ? (group.members || []).find(
+              (x) => x?.address?.address === app.user.activeAccount.address
+            )
+          : !(group.members || []).find(
+              (x) => x?.address?.address === app.user.activeAccount.address
+            )
       );
-  },[groups, searchFilters]);
+  }, [groups, searchFilters]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
 
