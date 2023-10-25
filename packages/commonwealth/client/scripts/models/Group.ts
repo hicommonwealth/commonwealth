@@ -5,7 +5,6 @@ interface APIResponseFormat {
     name: string;
     description?: string;
   };
-  memberships: any[];
   requirements: {
     rule: 'threshold';
     source: {
@@ -16,7 +15,8 @@ interface APIResponseFormat {
       token_symbol?: string;
     };
   }[];
-  topicIds: number[];
+  topics: any[];
+  memberships: any[];
   updated_at: string;
   created_at: string;
 }
@@ -29,8 +29,8 @@ class Group {
   public name: string;
   public description?: string;
   public requirements: any[];
+  public topics: any[];
   public members: any[];
-  public topicIds: number[];
 
   constructor({
     id,
@@ -39,8 +39,8 @@ class Group {
     updated_at,
     metadata,
     requirements,
+    topics,
     memberships,
-    topicIds,
   }: APIResponseFormat) {
     this.id = id;
     this.communityId = chain_id;
@@ -49,8 +49,8 @@ class Group {
     this.name = metadata.name;
     this.description = metadata.description;
     this.requirements = requirements;
+    this.topics = topics;
     this.members = memberships;
-    this.topicIds = topicIds;
   }
 }
 
