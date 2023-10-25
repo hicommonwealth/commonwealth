@@ -89,7 +89,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             requirementsToFulfill:
               values.requirementsToFulfill === 'ALL'
                 ? undefined
-                : values.requirementsToFulfill, // TODO: confirm if undefined means all requirements need to be satisfied
+                : // TODO: confirm if undefined means all requirements need to be satisfied
+                  values.requirementsToFulfill,
             requirements: [],
           };
 

@@ -26,6 +26,7 @@ const RequirementSubForm = ({
     defaultValues?.requirementType?.value &&
       !requirementType &&
       setRequirementType(defaultValues?.requirementType?.value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultValues]);
 
   return (
@@ -133,7 +134,8 @@ const RequirementSubForm = ({
             }}
             customError={errors.requirementCondition}
             // ---
-            // ATM the API only supports the "More" option, we make this field disabled with "More" as the only selected option
+            // ATM the API only supports the "More" option, we make this field disabled with "More" as the
+            // only selected option
             isDisabled
             // ---
           />
