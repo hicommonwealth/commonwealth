@@ -1,27 +1,27 @@
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/create_community.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
 import { EthDaoForm } from './eth_dao_form';
 import { useEthChainFormState } from './hooks';
+import { PolygonForm } from './polygon_form';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
-import { PolygonForm } from './polygon_form';
-import { useCommonNavigate } from 'navigation/helpers';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -195,28 +195,30 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       <CWText type="h3" fontWeight="semiBold">
         New Commonwealth Community
       </CWText>
-      <CWTabsRow>
-        {Object.values(CommunityType)
-          .filter((t) => {
-            return (
-              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
-              t !== CommunityType.AbiFactory
-            );
-          })
-          .map((t, i) => {
-            return (
-              <CWTab
-                key={i}
-                label={t.toString()}
-                isSelected={currentForm === t}
-                onClick={() => {
-                  setCurrentForm(t);
-                  navigate(`/createCommunity/${getTypeUrl(t)}`);
-                }}
-              />
-            );
-          })}
-      </CWTabsRow>
+      <div className="cw-tabs-row-container">
+        <CWTabsRow>
+          {Object.values(CommunityType)
+            .filter((t) => {
+              return (
+                (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
+                t !== CommunityType.AbiFactory
+              );
+            })
+            .map((t, i) => {
+              return (
+                <CWTab
+                  key={i}
+                  label={t.toString()}
+                  isSelected={currentForm === t}
+                  onClick={() => {
+                    setCurrentForm(t);
+                    navigate(`/createCommunity/${getTypeUrl(t)}`);
+                  }}
+                />
+              );
+            })}
+        </CWTabsRow>
+      </div>
       {Object.keys(ethChainNames).length !== 0 ? (
         getCurrentForm()
       ) : (

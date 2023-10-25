@@ -263,21 +263,23 @@ const SearchPage = () => {
   return (
     <div className="SearchPage">
       <div className="search-results">
-        <CWTabsRow>
-          {VISIBLE_TABS.map((s, i) => (
-            <CWTab
-              key={i}
-              label={s}
-              isSelected={activeTab === s}
-              onClick={() => setActiveTab(s)}
-            />
-          ))}
-        </CWTabsRow>
+        <div className="cw-tabs-row-container">
+          <CWTabsRow>
+            {VISIBLE_TABS.map((s, i) => (
+              <CWTab
+                key={i}
+                label={s}
+                isSelected={activeTab === s}
+                onClick={() => setActiveTab(s)}
+              />
+            ))}
+          </CWTabsRow>
+        </div>
         <>
           {isLoading && <PageLoading />}
           {!isLoading && (
             <>
-              <CWText isCentered className="search-results-caption">
+              <CWText className="search-results-caption">
                 {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
                 {scopeText}
                 {chain !== 'all_chains' && !app.isCustomDomain() && (
