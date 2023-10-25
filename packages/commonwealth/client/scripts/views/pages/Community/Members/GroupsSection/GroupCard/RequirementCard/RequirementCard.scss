@@ -31,10 +31,20 @@
 
   .cols-4 {
     grid-template-columns: 1fr 2fr 1fr 1fr;
+
+    @include mediumSmallInclusive {
+      grid-template-columns: initial;
+      grid-template-rows: 1fr 1fr 1fr 1fr;
+    }
   }
 
   .cols-3 {
     grid-template-columns: 3fr 1fr 1fr;
+
+    @include mediumSmallInclusive {
+      grid-template-columns: initial;
+      grid-template-rows: 1fr 1fr 1fr;
+    }
   }
 
   .cursor-pointer {

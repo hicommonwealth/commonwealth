@@ -51,7 +51,7 @@ const CommunityMembersPage = () => {
   const {
     data: members,
     fetchNextPage,
-    isLoading,
+    isLoading: isLoadingMembers,
   } = useSearchProfilesQuery({
     chainId: app.activeChainId(),
     searchTerm: '',
@@ -61,9 +61,10 @@ const CommunityMembersPage = () => {
     includeRoles: true,
   });
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups, isLoading: isLoadingGroups } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
-    shouldIncludeMembers: true,
+    includeMembers: true,
+    includeTopics: true,
   });
 
   const formattedMembers = useMemo(() => {
@@ -114,6 +115,28 @@ const CommunityMembersPage = () => {
         return p.groups.length === 0;
       });
   }, [members, groups, debouncedSearchTerm, searchFilters.category]);
+
+  const filteredGroups = useMemo(() => {
+    return (groups || [])
+      .filter((group) =>
+        searchFilters.searchText
+          ? group.name
+              .toLowerCase()
+              .includes(searchFilters.searchText.toLowerCase())
+          : true
+      )
+      .filter((group) =>
+        searchFilters.category === 'All'
+          ? true
+          : searchFilters.category === 'In group'
+          ? (group.members || []).find(
+              (x) => x?.address?.address === app.user.activeAccount.address
+            )
+          : !(group.members || []).find(
+              (x) => x?.address?.address === app.user.activeAccount.address
+            )
+      );
+  }, [groups, searchFilters]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
 
@@ -225,7 +248,7 @@ const CommunityMembersPage = () => {
 
       {/* Main content section: based on the selected tab */}
       {featureFlags.gatingEnabled && selectedTab === TABS[1].value ? (
-        <GroupsSection />
+        <GroupsSection groups={filteredGroups} />
       ) : (
         <MembersSection
           members={formattedMembers}
@@ -234,7 +257,7 @@ const CommunityMembersPage = () => {
               fetchNextPage();
             }
           }}
-          isLoadingMoreMembers={isLoading}
+          isLoadingMoreMembers={isLoadingMembers}
         />
       )}
     </section>
