@@ -257,7 +257,7 @@ const CommunityMembersPage = () => {
         <GroupsSection
           filteredGroups={filteredGroups}
           canManageGroups={isAdmin}
-          hasNoGroups={groups.length === 0}
+          hasNoGroups={groups?.length === 0}
         />
       ) : (
         <MembersSection
