@@ -106,7 +106,7 @@ export abstract class ProposalModule<
   */
   public abstract init(
     ChainInfo: IChainModule<any, any>,
-    Accounts: IAccountsModule<any, any>
+    Accounts: IAccountsModule<any>
   ): Promise<void>;
 
   public deinit() {

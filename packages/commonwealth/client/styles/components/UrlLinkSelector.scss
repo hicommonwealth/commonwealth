@@ -11,6 +11,13 @@
     flex: 1;
   }
 
+  .empty-component {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .proposal-item {
     padding-block: 6px;
     display: flex;

@@ -2,6 +2,7 @@ import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ModelInstance, ModelStatic } from './types';
 import { GroupAttributes } from './group';
+import { AddressAttributes } from './address';
 
 export type MembershipAttributes = {
   group_id: number;
@@ -10,7 +11,8 @@ export type MembershipAttributes = {
   last_checked: Date;
 
   // associations
-  Group?: GroupAttributes;
+  group?: GroupAttributes;
+  address?: AddressAttributes;
 };
 
 export type MembershipInstance = ModelInstance<MembershipAttributes>;
@@ -42,10 +44,12 @@ export default (
     models.Membership.belongsTo(models.Group, {
       foreignKey: 'group_id',
       targetKey: 'id',
+      as: 'group'
     });
     models.Membership.belongsTo(models.Address, {
       foreignKey: 'address_id',
       targetKey: 'id',
+      as: 'address'
     });
   };
 

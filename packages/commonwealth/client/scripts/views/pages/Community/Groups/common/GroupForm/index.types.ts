@@ -65,4 +65,5 @@ export type GroupFormProps = {
   formType: 'create' | 'edit';
   onSubmit: (values: GroupResponseValuesType) => any;
   initialValues?: Partial<GroupInitialValuesTypeWithLabel>;
+  onDelete?: () => any;
 };

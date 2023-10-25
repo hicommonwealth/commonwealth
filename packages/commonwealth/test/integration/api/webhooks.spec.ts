@@ -32,11 +32,7 @@ describe('Webhook Tests', () => {
   let loggedInAddr;
   let notLoggedInAddr;
   let loggedInNotAdminAddr;
-
   let loggedInSession;
-  let notLoggedInSession;
-  let loggedInNotAdminSession;
-
   let notAdminJWT;
   const chain = 'ethereum';
   const topicName = 'test';
@@ -63,11 +59,9 @@ describe('Webhook Tests', () => {
     // get not logged in address
     result = await modelUtils.createAndVerifyAddress({ chain });
     notLoggedInAddr = result.address;
-    notLoggedInSession = { session: result.session, sign: result.sign };
     // get logged in not admin address
     result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInNotAdminAddr = result.address;
-    loggedInNotAdminSession = { session: result.session, sign: result.sign };
     notAdminJWT = jwt.sign(
       { id: result.user_id, email: result.email },
       JWT_SECRET
@@ -85,7 +79,7 @@ describe('Webhook Tests', () => {
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
-      expect(res.body.result.chain_id).to.be.equal(chain);
+      expect(res.body.result.community_id).to.be.equal(chain);
       expect(res.body.result.url).to.be.equal(webhookUrl);
     });
 
@@ -96,7 +90,7 @@ describe('Webhook Tests', () => {
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      let webhookUrls = await models['Webhook'].findAll({
+      let webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(1);
@@ -106,7 +100,7 @@ describe('Webhook Tests', () => {
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
       expectErrorOnResponse(400, Errors.NoDuplicates, errorRes);
-      webhookUrls = await models['Webhook'].findAll({
+      webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(1);
@@ -127,7 +121,7 @@ describe('Webhook Tests', () => {
           jwt: jwt.sign({ id: -999999, email: null }, JWT_SECRET),
         });
       expectErrorOnResponse(401, undefined, errorRes);
-      const webhookUrls = await models['Webhook'].findAll({
+      const webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(0);
@@ -149,7 +143,7 @@ describe('Webhook Tests', () => {
           jwt: notAdminJWT,
         });
       expectErrorOnResponse(400, Errors.NotAdmin, errorRes);
-      const webhookUrls = await models['Webhook'].findAll({
+      const webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(0);
@@ -157,21 +151,21 @@ describe('Webhook Tests', () => {
 
     it('should delete a webhook', async () => {
       const webhookUrl = faker.internet.url();
-      let res = await chai.request
+      await chai.request
         .agent(app)
         .post('/api/createWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      let webhookUrls = await models['Webhook'].findAll({
+      let webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(1);
-      res = await chai.request
+      await chai.request
         .agent(app)
         .post('/api/deleteWebhook')
         .set('Accept', 'application/json')
         .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
-      webhookUrls = await models['Webhook'].findAll({
+      webhookUrls = await models.Webhook.findAll({
         where: { url: webhookUrl },
       });
       expect(webhookUrls).to.have.length(0);
@@ -206,7 +200,7 @@ describe('Webhook Tests', () => {
   describe('/getWebhooks', () => {
     it('should get all webhooks', async () => {
       const urls = await Promise.all(
-        [1, 2, 3, 4, 5].map(async (i) => {
+        [1, 2, 3, 4, 5].map(async () => {
           const webhookUrl = faker.internet.url();
           await chai.request
             .agent(app)
@@ -227,7 +221,7 @@ describe('Webhook Tests', () => {
 
     it('should fail to get webhooks from non-admin', async () => {
       const urls = await Promise.all(
-        [1, 2, 3, 4, 5].map(async (i) => {
+        [1, 2, 3, 4, 5].map(async () => {
           const webhookUrl = faker.internet.url();
           await chai.request
             .agent(app)
@@ -254,12 +248,12 @@ describe('Webhook Tests', () => {
     // we want to test that no errors occur up to the point the webhook is hit
     it('should send a webhook for markdown and rich text content', async () => {
       const webhookUrl = process.env.SLACK_FEEDBACK_WEBHOOK;
-      let res = await modelUtils.createWebhook({
+      await modelUtils.createWebhook({
         chain,
         webhookUrl,
         jwt: jwtToken,
       });
-      res = await modelUtils.createThread({
+      await modelUtils.createThread({
         chainId: chain,
         topicName,
         topicId,
@@ -273,7 +267,7 @@ describe('Webhook Tests', () => {
         sign: loggedInSession.sign,
       });
       // expect(res.statusCode).to.be.equal(200);
-      res = await modelUtils.createComment({
+      await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
@@ -283,7 +277,7 @@ describe('Webhook Tests', () => {
         sign: loggedInSession.sign,
       });
       // expect(res.statusCode).to.be.equal(200);
-      res = await modelUtils.createThread({
+      await modelUtils.createThread({
         chainId: chain,
         topicName,
         topicId,
@@ -297,7 +291,7 @@ describe('Webhook Tests', () => {
         sign: loggedInSession.sign,
       });
       // expect(res.statusCode).to.be.equal(200);
-      res = await modelUtils.createComment({
+      await modelUtils.createComment({
         chain,
         address: loggedInAddr,
         jwt: jwtToken,
