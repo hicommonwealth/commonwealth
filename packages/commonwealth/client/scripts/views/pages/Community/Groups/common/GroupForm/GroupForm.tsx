@@ -389,34 +389,30 @@ const GroupForm = ({
                   onRemove={() => removeRequirementByIndex(index)}
                 />
               ))}
-
-              {requirementSubForms.length < MAX_REQUIREMENTS && (
-                <CWTooltip
-                  content="Cannot add more than 10 requirements"
-                  placement="bottom"
-                  renderTrigger={(handleInteraction) => (
-                    <CWButton
-                      type="button"
-                      label="Add requirement"
-                      iconLeft="plus"
-                      buttonWidth="full"
-                      buttonType="secondary"
-                      buttonHeight="med"
-                      onClick={addRequirementSubForm}
-                      disabled={requirementSubForms.length >= MAX_REQUIREMENTS}
-                      onMouseEnter={
-                        requirementSubForms.length >= MAX_REQUIREMENTS &&
-                        handleInteraction
-                      }
-                      onMouseLeave={
-                        requirementSubForms.length >= MAX_REQUIREMENTS &&
-                        handleInteraction
-                      }
-                    />
-                  )}
-                />
-              )}
-
+              <CWTooltip
+                content="Cannot add more than 10 requirements"
+                placement="bottom"
+                renderTrigger={(handleInteraction) => (
+                  <CWButton
+                    type="button"
+                    label="Add requirement"
+                    iconLeft="plus"
+                    buttonWidth="full"
+                    buttonType="secondary"
+                    buttonHeight="med"
+                    onClick={addRequirementSubForm}
+                    disabled={requirementSubForms.length >= MAX_REQUIREMENTS}
+                    onMouseEnter={
+                      requirementSubForms.length >= MAX_REQUIREMENTS &&
+                      handleInteraction
+                    }
+                    onMouseLeave={
+                      requirementSubForms.length >= MAX_REQUIREMENTS &&
+                      handleInteraction
+                    }
+                  />
+                )}
+              />
               <CWText
                 type="h4"
                 fontWeight="semiBold"
