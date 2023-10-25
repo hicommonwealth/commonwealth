@@ -1,3 +1,5 @@
+/* eslint-disable react/no-multi-comp */
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -90,7 +92,9 @@ const GroupForm = ({
   formType,
   onSubmit,
   initialValues = {},
+  onDelete = () => {},
 }: GroupFormProps) => {
+  const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
@@ -124,7 +128,7 @@ const GroupForm = ({
           defaultValues: {
             ...x,
             requirementCondition: conditionTypes.find(
-              (x) => x.value === AMOUNT_CONDITIONS.MORE
+              (y) => y.value === AMOUNT_CONDITIONS.MORE
             ),
           },
           values: {
@@ -346,7 +350,7 @@ const GroupForm = ({
           {/* Form header */}
           <div className="header-row">
             <CWText type="h2" fontWeight="semiBold" className="header-text">
-              {formType === 'create' ? 'Create a group' : 'Update your group'}
+              {formType === 'create' ? 'Create a group' : 'Edit group'}
             </CWText>
             <CWText type="b2">
               {formType === 'create'
@@ -484,20 +488,43 @@ const GroupForm = ({
             </section>
           </section>
 
-          <TopicGatingHelpMessage />
+          {formType === 'create' && <TopicGatingHelpMessage />}
 
           {/* Form action buttons */}
           <div className="action-buttons">
-            <CWButton
-              label="Back"
-              buttonWidth="wide"
-              buttonType="secondary"
-              type="button"
-            />
+            {formType === 'edit' ? (
+              <CWButton
+                label="Delete group"
+                buttonWidth="narrow"
+                buttonType="destructive"
+                type="button"
+                onClick={onDelete}
+              />
+            ) : (
+              <CWButton
+                label="Back"
+                buttonWidth="wide"
+                buttonType="secondary"
+                type="button"
+                onClick={() => navigate('/members?tab=groups')}
+              />
+            )}
+
+            {formType === 'edit' && (
+              <CWButton
+                containerClassName="ml-auto"
+                label="Cancel"
+                buttonWidth="narrow"
+                buttonType="secondary"
+                type="button"
+                onClick={() => navigate('/members?tab=groups')}
+              />
+            )}
+
             <CWButton
               type="submit"
               buttonWidth="wide"
-              label={formType === 'create' ? 'Create group' : 'Update group'}
+              label={formType === 'create' ? 'Create group' : 'Save changes'}
             />
           </div>
         </>
