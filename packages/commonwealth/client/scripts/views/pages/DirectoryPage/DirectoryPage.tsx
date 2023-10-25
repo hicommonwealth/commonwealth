@@ -1,5 +1,4 @@
-import faker from 'faker';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -11,6 +10,7 @@ import clsx from 'clsx';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
+import { useDebounce } from 'usehooks-ts';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -22,10 +22,39 @@ enum ViewType {
   Tiles = 'Tiles',
 }
 
+const columnInfo = [
+  {
+    key: 'name',
+    header: 'Community',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'description',
+    header: 'Description',
+    numeric: false,
+    sortable: true,
+  },
+  {
+    key: 'members',
+    header: 'Members',
+    numeric: true,
+    sortable: true,
+  },
+  {
+    key: 'threads',
+    header: 'Threads',
+    numeric: true,
+    sortable: true,
+  },
+];
+
 const DirectoryPage = () => {
   const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
+
+  const debouncedSearchTerm = useDebounce<string>(communitySearch, 500);
 
   const handleCreateCommunity = () => {
     navigate('/createCommunity/starter', {}, null);
@@ -45,46 +74,31 @@ const DirectoryPage = () => {
     chainNodeId: baseChain.id,
   });
 
+  const relatedCommunitiesData = useMemo(
+    () =>
+      (relatedCommunities || []).map((c) => ({
+        name: c.community,
+        description: c.description,
+        members: c.address_count,
+        threads: c.thread_count,
+        avatars: { name: c.icon_url },
+      })),
+    [relatedCommunities]
+  );
+
+  const filteredRelatedCommunitiesData = useMemo(
+    () =>
+      relatedCommunitiesData.filter((c) =>
+        c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase().trim())
+      ),
+    [debouncedSearchTerm, relatedCommunitiesData]
+  );
+
   if (!directoryPageEnabled) {
     return (
       <ErrorPage message="Directory Page is not enabled for this community." />
     );
   }
-
-  const columnInfo = [
-    {
-      key: 'name',
-      header: 'Community',
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'description',
-      header: 'Description',
-      numeric: false,
-      sortable: true,
-    },
-    {
-      key: 'members',
-      header: 'Members',
-      numeric: true,
-      sortable: true,
-    },
-    {
-      key: 'threads',
-      header: 'Threads',
-      numeric: true,
-      sortable: true,
-    },
-  ];
-
-  const rowData = (relatedCommunities || []).map((c) => ({
-    name: c.community,
-    description: c.description || faker.lorem.paragraph(),
-    members: c.address_count,
-    threads: c.thread_count,
-    avatars: { name: c.icon_url },
-  }));
 
   return (
     <div className="DirectoryPage">
@@ -141,10 +155,13 @@ const DirectoryPage = () => {
       </div>
 
       {selectedViewType === ViewType.Rows ? (
-        <CWTable columnInfo={columnInfo} rowData={rowData} />
+        <CWTable
+          columnInfo={columnInfo}
+          rowData={filteredRelatedCommunitiesData}
+        />
       ) : (
         <div className="tiles-container">
-          {rowData.map((community, index) => (
+          {filteredRelatedCommunitiesData.map((community, index) => (
             <CWRelatedCommunityCard
               key={`${community.name}-${index}`}
               communityName={community.name}

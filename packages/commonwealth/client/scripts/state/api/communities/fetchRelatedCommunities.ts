@@ -9,6 +9,15 @@ interface FetchRelatedCommunitiesProps {
   chainNodeId: number;
 }
 
+interface FetchRelatedCommunitiesResponse {
+  address_count: string;
+  community: string;
+  description: string;
+  icon_url: string;
+  id: string;
+  thread_count: string;
+}
+
 const fetchRelatedCommunities = async ({
   chainNodeId,
 }: FetchRelatedCommunitiesProps) => {
@@ -27,7 +36,7 @@ const fetchRelatedCommunities = async ({
 const useFetchRelatedCommunitiesQuery = ({
   chainNodeId,
 }: FetchRelatedCommunitiesProps) => {
-  return useQuery({
+  return useQuery<FetchRelatedCommunitiesResponse[]>({
     queryKey: [ApiEndpoints.FETCH_RELATED_COMMUNITIES, chainNodeId],
     queryFn: () => fetchRelatedCommunities({ chainNodeId }),
     staleTime: RELATED_COMMUNITIES_STALE_TIME,

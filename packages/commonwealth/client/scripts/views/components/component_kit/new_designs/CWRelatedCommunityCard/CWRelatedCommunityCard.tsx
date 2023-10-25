@@ -12,8 +12,8 @@ type CWRelatedCommunityCardProps = {
   communityName: string;
   communityIconUrl: string;
   communityDescription: string;
-  memberCount: number;
-  threadCount: number;
+  memberCount: string;
+  threadCount: string;
   actions?: JSX.Element;
 };
 
@@ -49,10 +49,12 @@ export const CWRelatedCommunityCard = ({
         <div className="metadata">
           <div className="member-data">
             <CWIcon iconName="users" iconSize="small" />
-            <span className="count">{memberCount.toLocaleString('en-US')}</span>
+            <span className="count">
+              {Number(memberCount).toLocaleString('en-US')}
+            </span>
 
             <span className="text">
-              {pluralizeWithoutNumberPrefix(memberCount, 'member')}
+              {pluralizeWithoutNumberPrefix(Number(memberCount), 'member')}
             </span>
           </div>
 
@@ -62,9 +64,11 @@ export const CWRelatedCommunityCard = ({
 
           <div className="thread-data">
             <CWIcon iconName="notepad" />
-            <span className="count">{threadCount.toLocaleString('en-US')}</span>
+            <span className="count">
+              {Number(threadCount).toLocaleString('en-US')}
+            </span>
             <span className="text">
-              {pluralizeWithoutNumberPrefix(threadCount, 'thread')}
+              {pluralizeWithoutNumberPrefix(Number(threadCount), 'thread')}
             </span>
           </div>
         </div>
