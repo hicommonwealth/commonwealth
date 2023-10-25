@@ -254,10 +254,14 @@ const CommunityMembersPage = () => {
 
       {/* Main content section: based on the selected tab */}
       {featureFlags.gatingEnabled && selectedTab === TABS[1].value ? (
-        <GroupsSection groups={filteredGroups} canManageGroups={isAdmin} />
+        <GroupsSection
+          filteredGroups={filteredGroups}
+          canManageGroups={isAdmin}
+          hasNoGroups={groups.length === 0}
+        />
       ) : (
         <MembersSection
-          members={formattedMembers}
+          filteredMembers={formattedMembers}
           onLoadMoreMembers={() => {
             if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
               fetchNextPage();
