@@ -5,9 +5,9 @@ import app from 'state';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { chainTypes, requirementTypes } from '../../common/constants';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
-import { chainTypes, requirementTypes } from './constants';
 
 type GroupSectionProps = {
   groups: Group[];

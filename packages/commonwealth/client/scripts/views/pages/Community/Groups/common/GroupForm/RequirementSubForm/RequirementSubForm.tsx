@@ -8,7 +8,7 @@ import {
   chainTypes,
   conditionTypes,
   requirementTypes,
-} from '../constants';
+} from '../../../../common/constants';
 import { RequirementSubFormType } from '../index.types';
 import './RequirementSubForm.scss';
 

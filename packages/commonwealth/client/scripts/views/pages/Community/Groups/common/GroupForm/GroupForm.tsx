@@ -14,10 +14,14 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
+import {
+  AMOUNT_CONDITIONS,
+  TOKENS,
+  conditionTypes,
+} from '../../../common/constants';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
-import { AMOUNT_CONDITIONS, TOKENS, conditionTypes } from './constants';
 import {
   CWRequirementsLabelInputFieldState,
   FormSubmitValues,

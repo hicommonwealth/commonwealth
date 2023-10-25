@@ -5,8 +5,8 @@ import app from 'state';
 import { useCreateGroupMutation } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import { PageNotFound } from '../../../404';
+import { SPECIFICATIONS, TOKENS } from '../../common/constants';
 import { GroupForm } from '../common/GroupForm';
-import { SPECIFICATIONS, TOKENS } from '../common/GroupForm/constants';
 import './CreateCommunityGroupPage.scss';
 
 const CreateCommunityGroupPage = () => {

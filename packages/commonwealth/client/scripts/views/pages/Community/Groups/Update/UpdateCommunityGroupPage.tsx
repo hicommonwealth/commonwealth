@@ -7,8 +7,6 @@ import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
 import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
-import { DeleteGroupModal } from '../DeleteGroupModal';
-import { GroupForm } from '../common/GroupForm';
 import {
   AMOUNT_CONDITIONS,
   SPECIFICATIONS,
@@ -16,7 +14,9 @@ import {
   chainTypes,
   conditionTypes,
   requirementTypes,
-} from '../common/GroupForm/constants';
+} from '../../common/constants';
+import { DeleteGroupModal } from '../DeleteGroupModal';
+import { GroupForm } from '../common/GroupForm';
 import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
