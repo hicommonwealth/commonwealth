@@ -53,6 +53,7 @@ type InputInternalStyleProps = {
 type InputFormValidationProps = {
   name?: string;
   hookToForm?: boolean;
+  customError?: string;
 };
 
 type TextInputProps = BaseTextInputProps &
@@ -92,6 +93,7 @@ const CWTextInput = (props: TextInputProps) => {
     manualStatusMessage = '',
     instructionalMessage,
     hookToForm,
+    customError,
   } = props;
 
   const formContext = useFormContext();
@@ -136,7 +138,7 @@ const CWTextInput = (props: TextInputProps) => {
             size: isCompact ? 'small' : 'large',
             validationStatus:
               validationProps.validationStatus ||
-              (formFieldErrorMessage ? 'failure' : undefined),
+              (formFieldErrorMessage || customError ? 'failure' : undefined),
             disabled,
             displayOnly,
             hasLeftIcon: !!iconLeft,
@@ -205,17 +207,20 @@ const CWTextInput = (props: TextInputProps) => {
           validationStatus={validationProps.validationStatus}
         />
       )}
-      {label && (
+      {(label || customError) && (
         <MessageRow
-          hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}
+          hasFeedback={
+            !!inputValidationFn || !!formFieldErrorMessage || !!customError
+          }
           statusMessage={
             manualStatusMessage ||
             validationProps.statusMessage ||
-            formFieldErrorMessage
+            formFieldErrorMessage ||
+            customError
           }
           validationStatus={
             validationProps.validationStatus ||
-            (formFieldErrorMessage ? 'failure' : undefined)
+            (formFieldErrorMessage || customError ? 'failure' : undefined)
           }
         />
       )}
