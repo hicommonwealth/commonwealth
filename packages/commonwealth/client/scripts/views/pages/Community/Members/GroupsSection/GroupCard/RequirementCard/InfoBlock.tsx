@@ -1,5 +1,6 @@
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
+import './InfoBlock.scss';
 
 export const InfoBlock = ({
   label,
