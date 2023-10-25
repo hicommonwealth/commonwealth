@@ -1,11 +1,11 @@
 import React from 'react';
 
 import Vote from '../../models/Vote';
-import { User } from '../components/user/user';
 import {
   CWModalBody,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { User } from '../components/user/user';
 
 import '../../../styles/modals/offchain_voting_modal.scss';
 
@@ -42,13 +42,13 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
           </a>
         </div>
         {votes.map((vote) => (
-          <div className="offchain-poll-voter">
+          <div className="offchain-poll-voter" key={vote.id}>
             <div className="offchain-poll-voter-user">
               <User
                 shouldShowPopover
                 shouldLinkProfile
                 userAddress={vote.address}
-                userChainId={vote.authorChain}
+                userChainId={vote.authorCommunityId}
               />
             </div>
             <div className="offchain-poll-voter-choice">{vote.option}</div>
