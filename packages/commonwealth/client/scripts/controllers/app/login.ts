@@ -277,37 +277,6 @@ export async function createUserWithAddress(
   return { account, newlyCreated: response.result.newly_created };
 }
 
-export async function unlinkLogin(account: AddressInfo) {
-  const unlinkingCurrentlyActiveAccount = app.user.activeAccount === account;
-  // TODO: Change to DELETE /address
-  await $.post(`${app.serverUrl()}/deleteAddress`, {
-    address: account.address,
-    chain: account.community.id,
-    auth: true,
-    jwt: app.user.jwt,
-  });
-  // remove deleted role from app.roles
-  app.roles.deleteRole({
-    address: account,
-    chain: account.community.id,
-  });
-  // Remove from all address stores in the frontend state.
-  // This might be more gracefully handled by calling initAppState again.
-  let index = app.user.activeAccounts.indexOf(account);
-  app.user.activeAccounts.splice(index, 1);
-  index = app.user.addresses.indexOf(
-    app.user.addresses.find((a) => a.address === account.address)
-  );
-  app.user.addresses.splice(index, 1);
-
-  if (!unlinkingCurrentlyActiveAccount) return;
-  if (app.user.activeAccounts.length > 0) {
-    await setActiveAccount(app.user.activeAccounts[0]);
-  } else {
-    app.user.ephemerallySetActiveAccount(null);
-  }
-}
-
 async function constructMagic(isCosmos: boolean, chain?: string) {
   const { Magic } = await import('magic-sdk');
   const { OAuthExtension } = await import('@magic-ext/oauth');
