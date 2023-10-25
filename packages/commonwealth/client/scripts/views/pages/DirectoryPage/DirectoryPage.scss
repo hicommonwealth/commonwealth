@@ -72,11 +72,15 @@
 
   .tiles-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(506px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(506px, 1fr));
     gap: 24px;
 
     @include medium {
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+
+    @include extraSmall {
+      grid-template-columns: 1fr;
     }
   }
 
@@ -86,5 +90,9 @@
     gap: 8px;
     align-items: center;
     cursor: pointer;
+
+    @include extraSmall {
+      min-width: unset;
+    }
   }
 }
