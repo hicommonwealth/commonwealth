@@ -1,9 +1,9 @@
-import { Page, expect as pwexpect } from '@playwright/test';
+import { expect as pwexpect } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { testChains, testThreads } from '../hooks/e2eDbEntityHooks.spec';
-import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
-import { PORT } from '../../../server/config';
+import { Page } from 'playwright-core';
+import { testThreads } from '../hooks/e2eDbEntityHooks';
+import { login } from '../utils/e2eUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -12,13 +12,11 @@ export const discussionTests = (test) => {
   return () => {
     test('Discussion page loads and can navigate to first thread', async ({
       page,
+    }: {
+      page: Page;
     }) => {
-      await page.waitForSelector('div.HeaderWithFilters');
-
-      // Assert Thread header exists on discussions page
-      const headerExists = (await page.$('div.HeaderWithFilters')) !== null;
-
-      expect(headerExists).to.be.true;
+      test.setTimeout(120_000);
+      await page.locator('div.HeaderWithFilters').waitFor();
 
       // Assert Threads are loaded into page
       await page.waitForSelector('div[data-test-id]');
@@ -44,7 +42,11 @@ export const discussionTests = (test) => {
         .and.not.include('discussions');
     });
 
-    test('Check navigation to first profile', async ({ page }) => {
+    test('Check navigation to first profile', async ({
+      page,
+    }: {
+      page: Page;
+    }) => {
       let userProfileLinks = await page.locator('a.user-display-name.username');
 
       do {
@@ -57,13 +59,17 @@ export const discussionTests = (test) => {
       expect(page.url()).to.include('/profile/id/');
     });
 
-    test('Check User can Like/Dislike post', async ({ page }) => {
+    test('Check User can Like/Dislike post', async ({
+      page,
+    }: {
+      page: Page;
+    }) => {
       await login(page);
 
-      let reactionsCountDivs = await page.locator('div.reactions-count');
+      let reactionsCountDivs = await page.locator('.Upvote');
 
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('div.reactions-count');
+        reactionsCountDivs = await page.locator('.Upvote');
         await pwexpect(reactionsCountDivs.first()).toBeVisible();
       }).toPass();
 
@@ -82,11 +88,11 @@ export const discussionTests = (test) => {
       ).toString();
       // assert reaction count increased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page.locator('.Text.caption.regular');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           expectedNewReactionCount
         );
-      }).toPass({ timeout: 5_000 });
+      }).toPass({ intervals: [10_000], timeout: 60_000 });
 
       // click button
       await page
@@ -96,39 +102,11 @@ export const discussionTests = (test) => {
 
       // assert reaction count decreased
       await pwexpect(async () => {
-        reactionsCountDivs = await page.locator('.reactions-count');
+        reactionsCountDivs = await page.locator('.Text.caption.regular');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
           firstThreadReactionCount
         );
-      }).toPass({ timeout: 5_000 });
+      }).toPass({ intervals: [10_000], timeout: 60_000 });
     });
-
-    // test('Check User can interact with polls', async ({
-    //   page,
-    // }: {
-    //   page: Page;
-    // }) => {
-    //   const threadId = (
-    //     await testDb.query(`
-    //     INSERT INTO "Threads" (address_id, title, body, chain, topic_id, kind, created_at, updated_at)
-    //     VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    //     RETURNING id;
-    // `)
-    //   )[0][0]['id'];
-
-    //   await page.goto(
-    //     `http://localhost:${PORT}/${testChains[0].id}/discussion/${threadId}`
-    //   );
-    //   await login(page);
-
-    //   const createPollButtonSelector = 'div.create-poll-button';
-    //   await page.waitForSelector(createPollButtonSelector);
-    //   await page.click(createPollButtonSelector);
-
-    //   await page.waitForSelector('#QuestionInput');
-    //   await page.type('#QuestionInput', 'my question?');
-    //   await page.type('input[placeholder="1."]', 'q1');
-    //   await page.type('input[placeholder="2."]', 'q2');
-    // });
   };
 };

@@ -1,5 +1,3 @@
-import * as process from 'process';
-import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
 import type { ChainInstance } from 'server/models/chain';
@@ -11,9 +9,6 @@ import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
 import type { UserInstance } from 'server/models/user';
 import { ProfileAttributes } from '../../../server/models/profile';
-import { testAddress } from '../utils/e2eUtils';
-
-const Op = Sequelize.Op;
 
 export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
@@ -26,129 +21,7 @@ export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
 
-export async function clearTestEntities() {
-  try {
-    const testAddressInfo = await models.Address.findAll({
-      where: { address: testAddress },
-    });
-
-    const testAddressId: number = testAddressInfo[0]['id'];
-
-    const threadsToDelete = await models.Thread.findAll({
-      where: {
-        [Op.or]: [
-          { id: { [Op.lt]: 0 } },
-          { address_id: { [Op.lt]: 0 } },
-          { address_id: testAddressId },
-        ],
-      },
-    });
-
-    const usersToDelete = await models.User.findAll({
-      where: {
-        [Op.or]: [
-          { id: { [Op.lt]: 0 } },
-          { selected_chain_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
-        ],
-      },
-    });
-
-    const commentsToDelete = await models.Comment.findAll({
-      where: {
-        [Op.or]: [
-          { id: { [Op.lt]: 0 } },
-          { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
-          { address_id: { [Op.lt]: 0 } },
-          { address_id: testAddressId },
-        ],
-      },
-    });
-
-    const chainsToDelete = await models.Chain.findAll({
-      where: { chain_node_id: { [Op.lt]: 0 } },
-    });
-
-    await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Reaction.destroy({
-      where: {
-        [Op.or]: [
-          { id: { [Op.lt]: 0 } },
-          { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
-          { comment_id: { [Op.in]: commentsToDelete.map((t) => t['id']) } },
-          { address_id: { [Op.lt]: 0 } },
-          { address_id: testAddressId },
-        ],
-      },
-      force: true,
-    });
-    await models.Collaboration.destroy({
-      where: { thread_id: { [Op.lt]: 0 } },
-      force: true,
-    });
-    await models.Comment.destroy({
-      where: {
-        [Op.or]: [
-          { id: { [Op.in]: commentsToDelete.map((c) => c['id']) } },
-          { thread_id: { [Op.in]: threadsToDelete.map((t) => t['id']) } },
-          { address_id: { [Op.lt]: 0 } },
-          { address_id: testAddressId },
-        ],
-      },
-      force: true,
-    });
-    await models.Thread.destroy({
-      where: {
-        id: { [Op.in]: threadsToDelete.map((t) => t['id']) },
-      },
-      force: true,
-    });
-    await models.Address.destroy({
-      where: {
-        [Op.or]: [
-          { id: { [Op.lt]: 0 } },
-          { user_id: { [Op.in]: usersToDelete.map((u) => u['id']) } },
-          { chain: { [Op.in]: ['cmntest', 'cmntest2'] } },
-        ],
-      },
-      force: true,
-    });
-    await models.Subscription.destroy({
-      where: {
-        subscriber_id: { [Op.in]: usersToDelete.map((u) => u['id']) },
-      },
-      force: true,
-    });
-    await models.User.destroy({
-      where: {
-        id: { [Op.in]: usersToDelete.map((u) => u['id']) },
-      },
-      force: true,
-    });
-    await models.Notification.destroy({
-      where: {
-        [Op.or]: [
-          { thread_id: { [Op.lt]: 0 } },
-          { chain_id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
-        ],
-      },
-      force: true,
-    });
-    await models.Chain.destroy({
-      where: { id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
-      force: true,
-    });
-    await models.ChainNode.destroy({
-      where: { id: { [Op.lt]: 0 } },
-      force: true,
-    });
-    await models.Profile.destroy({
-      where: { id: { [Op.lt]: 0 } },
-      force: true,
-    });
-  } catch (e) {
-    console.log(e);
-  }
-}
+const idOffset = 1000;
 
 export async function createTestEntities() {
   try {
@@ -158,8 +31,8 @@ export async function createTestEntities() {
           (
             await models.User.findOrCreate({
               where: {
-                id: -i - 1,
-                email: `test${i - 1}@gmail.com`,
+                id: i + idOffset,
+                email: `test${i + idOffset}@gmail.com`,
                 emailVerified: true,
                 isAdmin: true,
               },
@@ -174,11 +47,11 @@ export async function createTestEntities() {
           (
             await models.Profile.findOrCreate({
               where: {
-                id: -i - 1,
-                profile_name: `testName${-i - 1}`,
-                avatar_url: `testAvatarUrl${-i - 1}`,
-                email: `test${i - 1}@gmail.com`,
-                user_id: -i - 1,
+                id: i + idOffset,
+                profile_name: `testName${i + idOffset}`,
+                avatar_url: `testAvatarUrl${i + idOffset}`,
+                email: `test${i + idOffset}@gmail.com`,
+                user_id: i + idOffset,
               },
             })
           )[0]
@@ -189,20 +62,20 @@ export async function createTestEntities() {
       (
         await models.ChainNode.findOrCreate({
           where: {
-            id: -1,
-            eth_chain_id: -1,
-            url: 'test1',
+            id: idOffset,
+            eth_chain_id: idOffset,
+            url: `test1`,
             balance_type: 'ethereum',
-            name: 'TestName1',
+            name: `TestName1`,
           },
         })
       )[0],
       (
         await models.ChainNode.findOrCreate({
           where: {
-            id: -2,
-            eth_chain_id: -2,
-            url: 'test2',
+            id: idOffset + 1,
+            eth_chain_id: idOffset + 1,
+            url: `test2`,
             balance_type: 'ethereum',
             name: 'TestName2',
           },
@@ -215,7 +88,7 @@ export async function createTestEntities() {
         await models.Chain.findOrCreate({
           where: {
             id: 'cmntest',
-            chain_node_id: -1,
+            chain_node_id: idOffset,
             name: 'cmntest',
             network: 'ethereum',
             type: 'offchain',
@@ -236,7 +109,7 @@ export async function createTestEntities() {
         await models.Chain.findOrCreate({
           where: {
             id: 'cmntest2',
-            chain_node_id: -2,
+            chain_node_id: idOffset + 1,
             name: 'cmntest2',
             network: 'cmntest',
             type: 'offchain',
@@ -254,7 +127,7 @@ export async function createTestEntities() {
       (
         await models.Topic.findOrCreate({
           where: {
-            id: -1,
+            id: idOffset,
             name: 'testTopic',
             chain_id: 'cmntest',
           },
@@ -263,7 +136,7 @@ export async function createTestEntities() {
       (
         await models.Topic.findOrCreate({
           where: {
-            id: -2,
+            id: idOffset + 1,
             name: 'testTopic2',
             chain_id: 'cmntest',
           },
@@ -284,12 +157,12 @@ export async function createTestEntities() {
           (
             await models.Address.findOrCreate({
               where: {
-                id: -i - 1,
-                user_id: -i - 1,
+                id: i + idOffset,
+                user_id: i + idOffset,
                 address: addresses[i],
                 chain: 'cmntest',
                 verification_token: '',
-                profile_id: i < 2 ? -1 : -2,
+                profile_id: i < 2 ? idOffset : idOffset + 1,
               },
             })
           )[0]
@@ -302,12 +175,12 @@ export async function createTestEntities() {
           (
             await models.Thread.findOrCreate({
               where: {
-                id: -i - 1,
-                address_id: -1,
-                title: `testThread Title ${-i - 1}`,
-                body: `testThread Body ${-i - 1}`,
+                id: i + idOffset,
+                address_id: idOffset,
+                title: `testThread Title ${i + idOffset}`,
+                body: `testThread Body ${i + idOffset}`,
                 chain: 'cmntest',
-                topic_id: -1,
+                topic_id: idOffset,
                 kind: 'discussion',
               },
             })
@@ -322,12 +195,12 @@ export async function createTestEntities() {
             (
               await models.Thread.findOrCreate({
                 where: {
-                  id: -i - 1 - 2,
-                  address_id: -2,
-                  title: `testThread Title ${-i - 1 - 2}`,
-                  body: `testThread Body ${-i - 1 - 2}`,
+                  id: i + idOffset + 2,
+                  address_id: idOffset + 1,
+                  title: `testThread Title ${i + idOffset + 2}`,
+                  body: `testThread Body ${i + idOffset + 2}`,
                   chain: 'cmntest',
-                  topic_id: -2,
+                  topic_id: idOffset + 1,
                   kind: 'discussion',
                 },
               })
@@ -342,8 +215,8 @@ export async function createTestEntities() {
           (
             await models.Collaboration.findOrCreate({
               where: {
-                thread_id: -1,
-                address_id: -i - 1,
+                thread_id: idOffset,
+                address_id: i + idOffset,
               },
             })
           )[0]
@@ -356,11 +229,11 @@ export async function createTestEntities() {
           (
             await models.Comment.findOrCreate({
               where: {
-                id: -i - 1,
+                id: i + idOffset,
                 chain: 'cmntest',
-                address_id: -1,
+                address_id: idOffset,
                 text: '',
-                thread_id: -1,
+                thread_id: idOffset,
                 plaintext: '',
               },
             })
@@ -375,11 +248,11 @@ export async function createTestEntities() {
             (
               await models.Comment.findOrCreate({
                 where: {
-                  id: -i - 1 - 2,
+                  id: i + idOffset + 2,
                   chain: 'cmntest',
-                  address_id: -2,
+                  address_id: idOffset + 1,
                   text: '',
-                  thread_id: -2,
+                  thread_id: idOffset + 1,
                   plaintext: '',
                 },
               })
@@ -394,10 +267,10 @@ export async function createTestEntities() {
           (
             await models.Reaction.findOrCreate({
               where: {
-                id: -i - 1,
+                id: i + idOffset,
                 reaction: 'like',
-                address_id: -1,
-                thread_id: -1,
+                address_id: idOffset,
+                thread_id: idOffset,
                 chain: 'cmntest',
               },
             })
@@ -412,10 +285,10 @@ export async function createTestEntities() {
             (
               await models.Reaction.findOrCreate({
                 where: {
-                  id: -i - 1 - 2,
+                  id: i + idOffset + 2,
                   reaction: 'like',
-                  address_id: -2,
-                  comment_id: -2,
+                  address_id: idOffset + 1,
+                  comment_id: idOffset + 1,
                   chain: 'cmntest',
                 },
               })

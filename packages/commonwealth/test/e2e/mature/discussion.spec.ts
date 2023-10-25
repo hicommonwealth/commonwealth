@@ -1,21 +1,19 @@
 import { expect, test } from '@playwright/test';
 import { parseInt } from 'lodash';
 import { PORT } from '../../../server/config';
-import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks.spec';
-import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
-
-test.beforeEach(async () => {
-  await createTestEntities();
-});
+import { createTestEntities, testChains } from '../hooks/e2eDbEntityHooks';
+import { addAddressIfNone, dbClient, login } from '../utils/e2eUtils';
 
 test.describe('Discussion Page Tests', () => {
   let threadId;
 
   test.beforeEach(async ({ page }) => {
+    await createTestEntities();
+
     threadId = (
-      await testDb.query(`
+      await dbClient.query(`
         INSERT INTO "Threads" (address_id, title, body, chain, topic_id, kind, created_at, updated_at)
-        VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        VALUES (1, 'Example Title', 'Example Body', 'cmntest', 1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         RETURNING id;
     `)
     )[0][0]['id'];
@@ -68,7 +66,7 @@ test.describe('Discussion Page Tests', () => {
     await commentOptionButton.click();
     await page.locator('div.PopoverMenuItem').nth(2).click();
 
-    const deleteButton = await page.locator('button.mini-red');
+    const deleteButton = await page.locator('button.destructive');
     await deleteButton.click();
 
     let commentExists = await page.getByText(commentText).count();

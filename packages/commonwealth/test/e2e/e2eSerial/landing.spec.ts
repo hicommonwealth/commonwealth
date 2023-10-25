@@ -8,7 +8,7 @@ test.describe('Test landing login', () => {
 
     await login(page);
 
-    await page.waitForSelector('.new-or-returning');
+    await page.waitForSelector('.AccountCreationButton');
     await page.getByText('New Account').click();
     await page.getByText('Finish').click();
     await page.waitForSelector('.username');
