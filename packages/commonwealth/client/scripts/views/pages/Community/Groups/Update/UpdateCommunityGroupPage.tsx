@@ -25,6 +25,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     chainId: app.activeChainId(),
     includeTopics: true,
   });
+
+  console.log('does this work:', groups);
   const foundGroup: Group = groups.find((x) => x.id === parseInt(`${groupId}`));
 
   if (
