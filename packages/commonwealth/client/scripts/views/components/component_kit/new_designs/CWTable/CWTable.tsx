@@ -198,7 +198,7 @@ export const CWTable = ({
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && !isLoadingMoreRows) {
-        onScrollEnd();
+        onScrollEnd?.();
       }
     });
 

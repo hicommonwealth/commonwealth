@@ -5,7 +5,8 @@
   display: flex;
   border-radius: 6px;
   border: 1px solid $neutral-100;
-  background: #fff;
+  background: $white;
+  cursor: pointer;
 
   &:hover {
     box-shadow: $elevation-2;

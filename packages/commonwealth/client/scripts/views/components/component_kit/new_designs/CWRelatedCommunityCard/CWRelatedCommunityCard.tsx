@@ -1,5 +1,6 @@
 import type ChainInfo from 'client/scripts/models/ChainInfo';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
@@ -9,6 +10,7 @@ import './CWRelatedCommunityCard.scss';
 import { addPeriodToText } from './utils';
 
 type CWRelatedCommunityCardProps = {
+  id: string;
   communityName: string;
   communityIconUrl: string;
   communityDescription: string;
@@ -18,6 +20,7 @@ type CWRelatedCommunityCardProps = {
 };
 
 export const CWRelatedCommunityCard = ({
+  id,
   communityName,
   communityIconUrl,
   communityDescription,
@@ -25,13 +28,17 @@ export const CWRelatedCommunityCard = ({
   threadCount,
   actions,
 }: CWRelatedCommunityCardProps) => {
+  const navigate = useCommonNavigate();
   const communityAvatar = {
     iconUrl: communityIconUrl,
     name: communityName,
   } as ChainInfo;
 
   return (
-    <div className={ComponentType.RelatedCommunityCard}>
+    <div
+      className={ComponentType.RelatedCommunityCard}
+      onClick={() => navigate(`/${id}`, {}, null)}
+    >
       <div className="content-container">
         <div className="top-content">
           <div className="header">

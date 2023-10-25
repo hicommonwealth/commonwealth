@@ -183,9 +183,10 @@ const DirectoryPage = () => {
         <CWTable columnInfo={columnInfo} rowData={tableData} />
       ) : (
         <div className="tiles-container">
-          {filteredRelatedCommunitiesData.map((community, index) => (
+          {filteredRelatedCommunitiesData.map((community) => (
             <CWRelatedCommunityCard
-              key={`${community.name}-${index}`}
+              key={community.id}
+              id={community.id}
               communityName={community.name}
               communityDescription={community.description}
               communityIconUrl={community.iconUrl}
