@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -7,22 +7,17 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
-import ChainInfo from 'models/ChainInfo';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
-import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
-import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import useDirectoryPageData, {
+  ViewType,
+} from 'views/pages/DirectoryPage/useDirectoryPageData';
 import ErrorPage from 'views/pages/error';
 import './DirectoryPage.scss';
-
-enum ViewType {
-  Rows = 'Rows',
-  Tiles = 'Tiles',
-}
 
 const columnInfo = [
   {
@@ -55,12 +50,7 @@ const DirectoryPage = () => {
   const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
-
   const debouncedSearchTerm = useDebounce<string>(communitySearch, 500);
-
-  const handleCreateCommunity = () => {
-    navigate('/createCommunity/starter', {}, null);
-  };
 
   const directoryPageEnabled = app.config.chains.getById(
     app.activeChainId()
@@ -72,52 +62,15 @@ const DirectoryPage = () => {
   const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
   const baseChain = app.config.nodes.getById(defaultChainNodeId);
 
-  const { data: relatedCommunities } = useFetchRelatedCommunitiesQuery({
+  const { tableData, filteredRelatedCommunitiesData } = useDirectoryPageData({
     chainNodeId: baseChain.id,
+    debouncedSearchTerm,
+    selectedViewType,
   });
 
-  const relatedCommunitiesData = useMemo(
-    () =>
-      (relatedCommunities || []).map((c) => ({
-        name: c.community,
-        description: c.description,
-        members: c.address_count,
-        threads: c.thread_count,
-        iconUrl: c.icon_url,
-        id: c.id,
-      })),
-    [relatedCommunities]
-  );
-
-  const filteredRelatedCommunitiesData = useMemo(
-    () =>
-      relatedCommunitiesData.filter((c) =>
-        c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase().trim())
-      ),
-    [debouncedSearchTerm, relatedCommunitiesData]
-  );
-
-  const tableData = useMemo(
-    () =>
-      filteredRelatedCommunitiesData.map((c) => ({
-        ...c,
-        community: (
-          <div
-            className="community-name-cell"
-            onClick={() => navigate(`/${c.id}`, {}, null)}
-          >
-            <CWCommunityAvatar
-              size="medium"
-              community={{ iconUrl: c.iconUrl, name: c.name } as ChainInfo}
-            />
-            <CWText type="b2" fontWeight="medium">
-              {c.name}
-            </CWText>
-          </div>
-        ),
-      })),
-    [filteredRelatedCommunitiesData, navigate]
-  );
+  const handleCreateCommunity = () => {
+    navigate('/createCommunity/starter', {}, null);
+  };
 
   if (!directoryPageEnabled) {
     return (
