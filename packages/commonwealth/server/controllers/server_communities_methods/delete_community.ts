@@ -103,6 +103,7 @@ export async function __deleteCommunity(
           const threads = await this.models.Thread.findAll({
             where: { chain: chain.id },
             attributes: ['id'],
+            paranoid: false, // necessary in order to delete associations with soft-deleted threads
           });
 
           await this.models.Collaboration.destroy({
