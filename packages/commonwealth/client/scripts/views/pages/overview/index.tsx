@@ -12,8 +12,8 @@ import type Topic from '../../../models/Topic';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
+import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './TopicSummaryRow';
 
 const OverviewPage = () => {
@@ -57,7 +57,12 @@ const OverviewPage = () => {
     topic: Topic;
   }> = topicsSorted.map((topic) => {
     const monthlyThreads = (recentlyActiveThreads || []).filter(
-      (thread) => topic?.id && thread.topic?.id && topic.id === thread.topic.id
+      (thread) =>
+        topic?.id &&
+        thread.topic?.id &&
+        topic.id === thread.topic.id &&
+        thread.archivedAt === null &&
+        !thread.markedAsSpamAt
     );
 
     return {

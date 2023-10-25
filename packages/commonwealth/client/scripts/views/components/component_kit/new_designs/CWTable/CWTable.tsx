@@ -65,12 +65,12 @@ key matches the associated key in the data and the value is the URL where the av
 data structure).
 */
 
-import React, { useMemo, useState } from 'react';
-import { CWIcon } from '../../cw_icons/cw_icon';
-import './CWTable.scss';
-import { Avatar } from '../../../Avatar';
-import { ComponentType } from '../../types';
 import clsx from 'clsx';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Avatar } from '../../../Avatar';
+import { CWIcon } from '../../cw_icons/cw_icon';
+import { ComponentType } from '../../types';
+import './CWTable.scss';
 
 import {
   ColumnDef,
@@ -95,13 +95,21 @@ type RowData = {
 type TableProps = {
   columnInfo: ColumnDescriptor[];
   rowData: any[];
+  isLoadingMoreRows?: boolean;
+  onScrollEnd?: () => any;
 };
 
-export const CWTable = ({ columnInfo, rowData }: TableProps) => {
+export const CWTable = ({
+  columnInfo,
+  rowData,
+  onScrollEnd,
+  isLoadingMoreRows,
+}: TableProps) => {
+  const tableRef = useRef();
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: columnInfo[0].key,
-      desc: false,
+      desc: true,
     },
   ]);
 
@@ -128,7 +136,7 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
               return info.getValue();
             }
           },
-          footer: (props) => props.column.id,
+          footer: (footerProps) => footerProps.column.id,
           enableSorting: col.sortable,
         };
       }),
@@ -186,6 +194,22 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
 
     return sortDirections[sortDirection];
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !isLoadingMoreRows) {
+        onScrollEnd();
+      }
+    });
+
+    if (tableRef.current) {
+      observer.observe(tableRef.current);
+    }
+
+    return () => {
+      observer?.disconnect();
+    };
+  }, [isLoadingMoreRows, tableRef, onScrollEnd]);
 
   return (
     <div className={ComponentType.Table}>
@@ -245,6 +269,7 @@ export const CWTable = ({ columnInfo, rowData }: TableProps) => {
             );
           })}
         </tbody>
+        <div ref={tableRef} style={{ height: '1px' }}></div>
       </table>
     </div>
   );

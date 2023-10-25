@@ -16,8 +16,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 import { SharePopover } from '../../components/share_popover';
 import { User } from '../../components/user/user';
-import { NewThreadTag } from '../discussions/NewThreadTag';
-import { getLastUpdated, isHot } from '../discussions/helpers';
+import { getLastUpdated, isHot, isNewThread } from '../discussions/helpers';
 import { TopicSummaryRowSkeleton } from './TopicSummaryRowSkeleton';
 
 type TopicSummaryRowProps = {
@@ -83,7 +82,7 @@ export const TopicSummaryRow = ({
 
           const isStageDefault = isDefaultStage(thread.stage);
           const isTagsRowVisible = thread.stage && !isStageDefault;
-          const stageLabel = threadStageToLabel(thread.stage)
+          const stageLabel = threadStageToLabel(thread.stage);
 
           return (
             <div key={idx}>
@@ -114,7 +113,9 @@ export const TopicSummaryRow = ({
                     >
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
-                    <NewThreadTag threadCreatedAt={thread.createdAt} />
+                    {isNewThread(thread.createdAt) && (
+                      <CWTag label={'New'} type={'new'} iconName={'newStar'} />
+                    )}
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
                     )}

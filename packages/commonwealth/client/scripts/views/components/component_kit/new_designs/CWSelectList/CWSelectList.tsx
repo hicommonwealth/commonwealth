@@ -6,11 +6,13 @@ import { CWIcon } from '../../cw_icons/cw_icon';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 import { MessageRow } from '../CWTextInput/MessageRow';
+import './CWSelectList.scss';
 import { useFormContext } from 'react-hook-form';
 
 type CustomCWSelectListProps = {
   label?: string;
   hookToForm?: boolean;
+  customError?: string;
 };
 
 export const CWSelectList = <
@@ -27,6 +29,9 @@ export const CWSelectList = <
   const formFieldErrorMessage =
     props.hookToForm &&
     (formContext?.formState?.errors?.[props.name]?.message as string);
+  const defaultFormContextValue = props.hookToForm
+    ? formContext?.getValues?.(props?.name)
+    : null;
 
   useEffect(() => {
     props.hookToForm &&
@@ -42,7 +47,7 @@ export const CWSelectList = <
       props.name &&
       props.value &&
       formContext.setValue(props.name, props.value);
-  }, [props.hookToForm, props.name, props.value, formContext]);
+    }, [props.hookToForm, props.name, props.value, formContext]);
 
   return (
     <div className="CWSelectList">
@@ -50,6 +55,7 @@ export const CWSelectList = <
       <Select
         {...props}
         {...formFieldContext}
+        {...(defaultFormContextValue && { value: defaultFormContextValue })}
         isDisabled={props?.isDisabled || formFieldContext?.disabled}
         required={props?.required || formFieldContext?.required}
         onBlur={(e) => {
@@ -111,16 +117,18 @@ export const CWSelectList = <
         }>(
           {
             className: props.className,
-            failure: !!formFieldErrorMessage,
+            failure: !!formFieldErrorMessage || !!props.customError,
           },
           ComponentType.SelectList
         )}
       />
-      {formFieldErrorMessage && (
+      {(formFieldErrorMessage || props.customError) && (
         <MessageRow
-          hasFeedback={!!formFieldErrorMessage}
-          statusMessage={formFieldErrorMessage}
-          validationStatus={formFieldErrorMessage ? 'failure' : undefined}
+          hasFeedback={!!formFieldErrorMessage || !!props.customError}
+          statusMessage={formFieldErrorMessage || props.customError}
+          validationStatus={
+            formFieldErrorMessage || props.customError ? 'failure' : undefined
+          }
         />
       )}
     </div>

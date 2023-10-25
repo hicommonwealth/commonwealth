@@ -1,5 +1,5 @@
+import { ServerCommunitiesController } from '../server_communities_controller';
 import { ChainInstance } from '../../models/chain';
-import { ServerChainsController } from '../server_chains_controller';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { UserInstance } from '../../models/user';
@@ -33,7 +33,7 @@ export type CreateGroupOptions = {
 export type CreateGroupResult = GroupAttributes;
 
 export async function __createGroup(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   { user, chain, metadata, requirements, topics }: CreateGroupOptions
 ): Promise<CreateGroupResult> {
   const isAdmin = await validateOwner({
