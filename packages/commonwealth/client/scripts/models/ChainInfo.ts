@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
 import RoleInfo from './RoleInfo';
@@ -46,6 +45,8 @@ class ChainInfo {
   public discordConfigId?: string;
   public cosmosGovernanceVersion?: string;
   public discordBotWebhooksEnabled?: boolean;
+  public directoryPageEnabled?: boolean;
+  public directoryPageChainNodeId?: number;
 
   public get node() {
     return this.ChainNode;
@@ -86,6 +87,8 @@ class ChainInfo {
     discord_config_id,
     cosmosGovernanceVersion,
     discordBotWebhooksEnabled,
+    directoryPageEnabled,
+    directoryPageChainNodeId
   }) {
     this.id = id;
     this.network = network;
@@ -122,6 +125,8 @@ class ChainInfo {
     this.discordConfigId = discord_config_id;
     this.cosmosGovernanceVersion = cosmosGovernanceVersion;
     this.discordBotWebhooksEnabled = discordBotWebhooksEnabled;
+    this.directoryPageEnabled = directoryPageEnabled;
+    this.directoryPageChainNodeId = directoryPageChainNodeId;
   }
 
   public static fromJSON({
@@ -158,6 +163,8 @@ class ChainInfo {
     admin_only_polling,
     discord_config_id,
     discord_bot_webhooks_enabled,
+    directory_page_enabled,
+    directory_page_chain_node_id,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -216,6 +223,8 @@ class ChainInfo {
       discord_config_id,
       cosmosGovernanceVersion: cosmos_governance_version,
       discordBotWebhooksEnabled: discord_bot_webhooks_enabled,
+      directoryPageEnabled: directory_page_enabled,
+      directoryPageChainNodeId: directory_page_chain_node_id
     });
   }
 
@@ -279,8 +288,11 @@ class ChainInfo {
     defaultOverview,
     defaultPage,
     hasHomepage,
+    cosmos_governance_version,
     chain_node_id,
     discord_bot_webhooks_enabled,
+    directory_page_enabled,
+    directory_page_chain_node_id
   }: {
     name?: string;
     description?: string;
@@ -298,8 +310,11 @@ class ChainInfo {
     defaultOverview?: boolean;
     defaultPage?: DefaultPage;
     hasHomepage?: boolean;
+    cosmos_governance_version?: string;
     chain_node_id?: string;
     discord_bot_webhooks_enabled?: boolean;
+    directory_page_enabled?: boolean;
+    directory_page_chain_node_id?: number;
   }) {
     const id = app.activeChainId() ?? this.id;
     const r = await axios.patch(`${app.serverUrl()}/communities/${id}`, {
@@ -321,7 +336,10 @@ class ChainInfo {
       default_page: defaultPage,
       has_homepage: hasHomepage,
       chain_node_id,
+      cosmos_governance_version,
       discord_bot_webhooks_enabled,
+      directory_page_enabled,
+      directory_page_chain_node_id,
       jwt: app.user.jwt,
     });
     const updatedChain = r.data.result;
@@ -343,6 +361,8 @@ class ChainInfo {
     this.hasHomepage = updatedChain.has_homepage;
     this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
     this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
+    this.directoryPageEnabled = updatedChain.directory_page_enabled;
+    this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
   }
 }
 

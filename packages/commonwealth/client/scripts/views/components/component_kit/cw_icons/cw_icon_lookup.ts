@@ -40,6 +40,7 @@ import * as Icons from './cw_icons';
 import { withPhosphorIcon } from './cw_phosphor_icons';
 
 export const iconLookup = {
+  archiveTrayFilled: Icons.CWArchiveTrayFilled,
   arrowDownBlue500: Icons.CWArrowDownBlue500,
   arrowFatUp: Icons.CWArrowFatUp,
   arrowFatUpNeutral: Icons.CWArrowFatUpNeutral,
@@ -93,6 +94,7 @@ export const iconLookup = {
   dot: Icons.CWDot,
   dots: Icons.CWDots,
   dotsVertical: Icons.CWDotsVertical,
+  dotsHorizontal: Icons.CWDotsHorizontal,
   downvote: withPhosphorIcon(ArrowFatDown),
   edgeware: Icons.CWEdgeware,
   element: Icons.CWElement,

@@ -1,6 +1,6 @@
-@import '../../shared';
+@import '../../../../../styles/shared.scss';
 
-.CreateComment {
+.CommentEditor {
   display: flex;
   flex-direction: column;
   gap: 8px;
