@@ -37,7 +37,8 @@ const useFetchGroupsQuery = ({
   includeTopics,
 }: FetchGroupsProps) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_GROUPS, chainId, includeMembers, includeTopics],
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [ApiEndpoints.FETCH_GROUPS, chainId],
     queryFn: () => fetchGroups({ chainId, includeMembers, includeTopics }),
     staleTime: GROUPS_STALE_TIME,
   });

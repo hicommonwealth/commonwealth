@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { ApiEndpoints, queryClient } from '../config';
 
 interface EditGroupProps {
   groupId: string;
@@ -37,11 +38,13 @@ const editGroup = async ({
   });
 };
 
-const useEditGroupMutation = () => {
+const useEditGroupMutation = ({ chainId }: { chainId: string }) => {
   return useMutation({
     mutationFn: editGroup,
     onSuccess: async () => {
-      // TODO: manage cache if any
+      const key = [ApiEndpoints.FETCH_GROUPS, chainId];
+      queryClient.cancelQueries(key);
+      queryClient.refetchQueries(key);
     },
   });
 };

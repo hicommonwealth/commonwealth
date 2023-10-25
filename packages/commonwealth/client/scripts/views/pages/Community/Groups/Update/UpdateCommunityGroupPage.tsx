@@ -22,7 +22,9 @@ import './UpdateCommunityGroupPage.scss';
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const { mutateAsync: editGroup } = useEditGroupMutation();
+  const { mutateAsync: editGroup } = useEditGroupMutation({
+    chainId: app.activeChainId(),
+  });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
     includeTopics: true,

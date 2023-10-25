@@ -29,7 +29,9 @@ export const DeleteGroupModal = ({
   onClose = () => {},
 }: DeleteGroupModalAttrs) => {
   const navigate = useCommonNavigate();
-  const { mutateAsync: deleteGroup } = useDeleteGroupMutation();
+  const { mutateAsync: deleteGroup } = useDeleteGroupMutation({
+    chainId: app.activeChainId(),
+  });
 
   const handleDelete = async () => {
     await deleteGroup({
