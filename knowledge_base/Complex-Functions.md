@@ -1,10 +1,10 @@
 # Complex Functions
 
-> Functions that attempt to perform multiple tasks, thus violating the single responsibility principle (SRP), also known as the Don't Repeat Yourself (DRY) principle.
+> Functions that attempt to perform multiple tasks, thus violating the single responsibility principle (SRP), and the Don't Repeat Yourself (DRY) principle.
 
 We can find many examples in our codebase!
 
-![Complex Action](../assets/framework/complex-function.png)
+![Complex Functions](./assets/Complex-Functions.png)
 
 ## Server Architecture Background
 
@@ -299,8 +299,9 @@ We can use the "builder" pattern to initialize the application with various adap
 Additionally, we can employ convention-over-configuration techniques to define the commands we expose through the API, including their schemas and implementation specifics.
 
 ```typescript
+// something like this - TBD
 export const updateComment:Command<Request,Response> = {
-  auth: request => {...},
+  auth: [role1, role2], // RBAC, undefined => anonymous
   body: z.object(...),
   response: z.object(...),
   callback: (actor, body) => {
@@ -323,6 +324,7 @@ app().listen()
 The pseudocode representation of a refactored handler might appear as follows, leaving the developer solely responsible for implementing the business callback interface:
 
 ```typescript
+// TBD
 const command = (actor, body, callback) => {
   // These steps are guaranteed by the framework, including spec documentation
   // 1. Authorize Command Execution - *`Auth`*
@@ -332,6 +334,7 @@ const command = (actor, body, callback) => {
   try {
     // CORE business - callback configured
     const state, events = callback(actor, body) {
+      // Loading step can be placed inside or outside (more generic) the callback - TBD
       // 4. Load Aggregate - *`Repository`*
       const state = await repo().loadBy(...)
       // 5. Validate Invariants (Business Rules) - *`Business Invariants`*
