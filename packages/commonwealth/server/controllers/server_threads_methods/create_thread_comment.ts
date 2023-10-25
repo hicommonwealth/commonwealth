@@ -1,24 +1,24 @@
-import moment from 'moment';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { CommentAttributes } from '../../models/comment';
+import { UserInstance } from '../../models/user';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { getCommentDepth } from '../../util/getCommentDepth';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { CommentAttributes } from '../../models/comment';
-import { UserInstance } from '../../models/user';
-import { getCommentDepth } from '../../util/getCommentDepth';
+import { AppError } from '../../../../common-common/src/errors';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import moment from 'moment';
 import { parseUserMentions } from '../../util/parseUserMentions';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { EmitOptions } from '../server_notifications_methods/emit';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { ServerThreadsController } from '../server_threads_controller';
+import { validateOwner } from '../../util/validateOwner';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -30,6 +30,7 @@ const Errors = {
   BalanceCheckFailed: 'Could not verify user token balance',
   ThreadArchived: 'Thread is archived',
   ParseMentionsFailed: 'Failed to parse mentions',
+  FailedCreateComment: 'Failed to create comment',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -125,29 +126,24 @@ export async function __createThreadComment(
     chain &&
     (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
   ) {
-    const addressAdminRoles = await findAllRoles(
-      this.models,
-      { where: { address_id: address.id } },
-      chain.id,
-      ['admin']
-    );
-    const isGodMode = user.isAdmin;
-    const hasAdminRole = addressAdminRoles.length > 0;
-    if (!isGodMode && !hasAdminRole) {
-      let canReact;
-      try {
-        canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
-      } catch (e) {
-        throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
-      }
-
-      if (!canReact) {
-        throw new AppError(Errors.InsufficientTokenBalance);
+    const isAdmin = await validateOwner({
+      models: this.models,
+      user,
+      chainId: chain.id,
+      entity: thread,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      const { isValid, message } = await validateTopicGroupsMembership(
+        this.models,
+        this.tokenBalanceCache,
+        thread.topic_id,
+        chain,
+        address
+      );
+      if (!isValid) {
+        throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
       }
     }
   }
@@ -255,7 +251,6 @@ export async function __createThreadComment(
     rootNotifExcludeAddresses.push(parentComment.Address.address);
   }
 
-  const cwUrl = getThreadUrl(thread, finalComment.id);
   const root_title = thread.title || '';
 
   const allNotificationOptions: EmitOptions[] = [];

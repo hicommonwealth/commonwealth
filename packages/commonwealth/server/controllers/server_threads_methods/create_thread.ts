@@ -1,23 +1,24 @@
 import moment from 'moment';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
+
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { UserInstance } from '../../models/user';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ThreadAttributes } from '../../models/thread';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { renderQuillDeltaToText } from '../../../shared/utils';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { ThreadAttributes } from '../../models/thread';
-import { UserInstance } from '../../models/user';
+import { AppError } from '../../../../common-common/src/errors';
 import { parseUserMentions } from '../../util/parseUserMentions';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { EmitOptions } from '../server_notifications_methods/emit';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { ServerThreadsController } from '../server_threads_controller';
+import { validateOwner } from '../../util/validateOwner';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -168,27 +169,23 @@ export async function __createThread(
           chain.network === ChainNetwork.Ethereum)
       ) {
         // skip check for admins
-        const isAdmin = await findAllRoles(
-          this.models,
-          { where: { address_id: address.id } },
-          chain.id,
-          ['admin']
-        );
-        if (!user.isAdmin && isAdmin.length === 0) {
-          let canReact;
-          try {
-            canReact = await validateTopicThreshold(
-              this.tokenBalanceCache,
-              this.models,
-              topicId,
-              address.address
-            );
-          } catch (e) {
-            throw new ServerError(Errors.BalanceCheckFailed, e);
-          }
-
-          if (!canReact) {
-            throw new AppError(Errors.InsufficientTokenBalance);
+        const isAdmin = await validateOwner({
+          models: this.models,
+          user,
+          chainId: chain.id,
+          allowAdmin: true,
+          allowGodMode: true,
+        });
+        if (!isAdmin) {
+          const { isValid, message } = await validateTopicGroupsMembership(
+            this.models,
+            this.tokenBalanceCache,
+            topicId,
+            chain,
+            address
+          );
+          if (!isValid) {
+            throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
           }
         }
       }

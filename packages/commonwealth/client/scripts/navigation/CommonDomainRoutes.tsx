@@ -13,8 +13,12 @@ const Web3LoginPage = lazy(() => import('views/pages/web3login'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
-const MembersPage = lazy(
-  () => import('views/pages/Community/Members/CommunityMembersPage')
+const MembersPage = lazy(() => import('views/pages/Community/Members/CommunityMembersPage'));
+const CreateMembersGroupPage = lazy(
+  () => import('views/pages/Community/Groups/Create')
+);
+const UpdateMembersGroupPage = lazy(
+  () => import('views/pages/Community/Groups/Update')
 );
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
@@ -156,6 +160,20 @@ const CommonDomainRoutes = () => [
     key="/:scope/members"
     path="/:scope/members"
     element={withLayout(MembersPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/members/groups/create"
+    path="/:scope/members/groups/create"
+    element={withLayout(CreateMembersGroupPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/members/groups/:groupId/update"
+    path="/:scope/members/groups/:groupId/update"
+    element={withLayout(UpdateMembersGroupPage, {
       scoped: true,
     })}
   />,

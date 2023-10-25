@@ -11,6 +11,12 @@ const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
   () => import('views/pages/Community/Members/CommunityMembersPage')
 );
+const CreateMembersGroupPage = lazy(
+  () => import('views/pages/Community/Groups/Create')
+);
+const UpdateMembersGroupPage = lazy(
+  () => import('views/pages/Community/Groups/Update')
+);
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
@@ -120,6 +126,20 @@ const CustomDomainRoutes = () => {
       key="/members"
       path="/members"
       element={withLayout(MembersPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/members/groups/create"
+      path="/members/groups/create"
+      element={withLayout(CreateMembersGroupPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/members/groups/:groupId/update"
+      path="/members/groups/:groupId/update"
+      element={withLayout(UpdateMembersGroupPage, {
         scoped: true,
       })}
     />,

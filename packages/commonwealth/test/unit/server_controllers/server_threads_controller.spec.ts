@@ -404,7 +404,11 @@ describe('ServerThreadsController', () => {
 
   describe('#createThreadComment', () => {
     it('should create a thread comment', async () => {
-      const user = { id: 1, save: async () => ({}) };
+      const user = {
+        id: 1,
+        save: async () => ({}),
+        getAddresses: async () => [{}],
+      };
       const address = {
         id: 1,
         address: '0x123',
