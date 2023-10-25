@@ -1,9 +1,8 @@
 import _ from 'underscore';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type Rollbar from 'rollbar';
 
-import type { SubstrateEvents } from '../../src';
 import {
   createListener,
   ErcLoggingHandler,
@@ -11,7 +10,6 @@ import {
   LoggingHandler,
   SupportedNetwork,
 } from '../../src';
-import { SubstrateTypes } from '../../src/types';
 import type { DB } from '../database/database';
 import models from '../database/database';
 
@@ -196,9 +194,6 @@ export async function manageRegularListeners(
 
   // update existing listeners whose verbose_logging or substrate_spec has changed
   await updateExistingListeners(chains, listenerInstances, rollbar);
-
-  // fetch and publish on-chain substrate identities
-  // await fetchSubstrateIdentities(chains, listenerInstances, pool, producer, rollbar);
 }
 
 /**

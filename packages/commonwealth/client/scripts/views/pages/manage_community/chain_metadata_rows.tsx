@@ -71,7 +71,8 @@ const DiscordForumConnections = ({
       buttons: [
         {
           label: 'Remove',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await app.discord.setForumChannelConnection(topicId, null);
@@ -85,7 +86,8 @@ const DiscordForumConnections = ({
         },
         {
           label: 'No',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });

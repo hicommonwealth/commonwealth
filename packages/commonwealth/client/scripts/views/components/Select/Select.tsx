@@ -29,6 +29,7 @@ export type SelectProps = {
     v: string | { id: string | number; value: any; label: string }
   ) => any;
   dropdownPosition?: Placement;
+  containerClassname?: string;
 };
 
 export const Select = ({
@@ -43,6 +44,7 @@ export const Select = ({
   dropdownPosition,
   placeholder = 'Select an option',
   label = '',
+  containerClassname,
 }: SelectProps) => {
   const popoverProps = usePopover();
 
@@ -58,7 +60,7 @@ export const Select = ({
       }}
     >
       {/* needs to be div instead of fragment so listener can work */}
-      <div>
+      <div className={containerClassname}>
         {label && <MessageRow label={label} />}
         <CWButton
           className={`Select ${
@@ -90,9 +92,11 @@ export const Select = ({
                     key={i}
                     size={size}
                     label={optionLabel}
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.preventDefault();
                       onSelect(option);
+                      popoverProps.setAnchorEl(null);
+                      onClose && (await onClose());
                     }}
                     isSelected={selected === current}
                     iconLeft={option && option.iconLeft ? option.iconLeft : ''}
@@ -106,6 +110,14 @@ export const Select = ({
                             popoverProps.setAnchorEl(null);
                             onOptionEdit && (await onOptionEdit(option));
                           }}
+                        />
+                      ),
+                    })}
+                    {...(option.value === 'Archived' && {
+                      iconRight: (
+                        <CWIconButton
+                          iconName="archiveTray"
+                          iconSize="small"
                         />
                       ),
                     })}

@@ -11,7 +11,7 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
@@ -46,6 +46,7 @@ type CommentCardProps = {
   canToggleSpam?: boolean;
   // actual comment
   comment: Comment<any>;
+  isThreadArchived: boolean;
 };
 
 export const CommentCard = ({
@@ -73,6 +74,7 @@ export const CommentCard = ({
   canToggleSpam,
   // actual comment
   comment,
+  isThreadArchived,
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
@@ -166,7 +168,7 @@ export const CommentCard = ({
 
               <SharePopover commentId={comment.id} />
 
-              {replyBtnVisible && (
+              {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
                   disabled={maxReplyLimitReached || !canReply}
@@ -183,7 +185,7 @@ export const CommentCard = ({
                 />
               )}
 
-              {(canEdit || canDelete) && (
+              {!isThreadArchived && (canEdit || canDelete) && (
                 <PopoverMenu
                   className="CommentActions"
                   renderTrigger={(onClick) => (
@@ -214,8 +216,14 @@ export const CommentCard = ({
               )}
 
               {isCanvasVerifyModalVisible && (
-                <Modal
-                  content={<CanvasVerifyDataModal obj={comment} />}
+                <CWModal
+                  size="medium"
+                  content={
+                    <CanvasVerifyDataModal
+                      obj={comment}
+                      onClose={() => setIsCanvasVerifyDataModalVisible(false)}
+                    />
+                  }
                   onClose={() => setIsCanvasVerifyDataModalVisible(false)}
                   open={isCanvasVerifyModalVisible}
                 />

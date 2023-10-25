@@ -113,7 +113,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`
         );
 
-        const bech32Prefix = app.chain.meta.bech32Prefix;
+        const bech32Prefix = app.chain.meta.bech32Prefix?.toLowerCase();
         const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain.meta.name,

@@ -25,7 +25,8 @@ const MakeSiteAdminTask = () => {
       buttons: [
         {
           label: 'promote',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await updateSiteAdmin({
@@ -43,7 +44,8 @@ const MakeSiteAdminTask = () => {
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });

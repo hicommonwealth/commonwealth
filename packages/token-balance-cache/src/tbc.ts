@@ -53,6 +53,8 @@ export class TokenBalanceCache
 {
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider<any> } = {};
+  // Maps global chain id -> Common DB chainIds for quick lookup in _nodes
+  private _chainIds: { [id: string]: number } = {};
   private _lastQueryTime = 0;
   private statsDSender: TbcStatsDSender = new TbcStatsDSender();
   private cacheContents = { zero: 0, nonZero: 0 };
@@ -256,12 +258,36 @@ export class TokenBalanceCache
     }
   }
 
+  public async fetchUserBalanceWithChain(
+    network: ChainNetwork,
+    userAddress: string,
+    chainId: string,
+    contractAddress?: string
+  ): Promise<string> {
+    const nodeId = this._chainIds[chainId];
+    if (!nodeId) {
+      throw new Error('Invalid Chain Id');
+    }
+    const balance = await this.fetchUserBalance(
+      network,
+      nodeId,
+      userAddress,
+      contractAddress
+    );
+    return balance;
+  }
+
   private async _refreshNodes() {
     const lastQueryTime = this._lastQueryTime;
     this._lastQueryTime = Math.floor(Date.now() / 1000);
     const nodes = await this._nodesProvider(lastQueryTime);
     for (const n of nodes) {
       this._nodes[n.id] = n;
+      if (n.eth_chain_id) {
+        this._chainIds[n.eth_chain_id.toString()] = n.id;
+      } else if (n.cosmos_chain_id) {
+        this._chainIds[n.cosmos_chain_id] = n.id;
+      }
     }
   }
 

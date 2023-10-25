@@ -16,19 +16,21 @@ interface APIResponseFormat {
     };
   }[];
   topics: any[];
+  memberships: any[];
   updated_at: string;
   created_at: string;
 }
 
 class Group {
   public id: number;
-  public chainId: string;
+  public communityId: string;
   public createdAt: string; // ISO string
   public updatedAt: string; // ISO string
   public name: string;
   public description?: string;
   public requirements: any[];
   public topics: any[];
+  public members: any[];
 
   constructor({
     id,
@@ -38,15 +40,17 @@ class Group {
     metadata,
     requirements,
     topics,
+    memberships,
   }: APIResponseFormat) {
     this.id = id;
-    this.chainId = chain_id;
+    this.communityId = chain_id;
     this.createdAt = created_at;
     this.updatedAt = updated_at;
     this.name = metadata.name;
     this.description = metadata.description;
     this.requirements = requirements;
     this.topics = topics;
+    this.members = memberships;
   }
 }
 
