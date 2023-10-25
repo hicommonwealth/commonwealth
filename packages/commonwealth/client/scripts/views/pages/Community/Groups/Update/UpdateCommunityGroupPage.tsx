@@ -52,22 +52,24 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               value: x.data.source.source_type,
               label: requirementTypes.find(
                 (y) => y.value === x.data.source.source_type
-              ).label,
+              )?.label,
             },
             requirementAmount: x.data.threshold,
             requirementChain: {
-              value:
-                x.data.source.cosmos_chain_id || x.data.source.evm_chain_id,
+              value: `${
+                x.data.source.cosmos_chain_id || x.data.source.evm_chain_id || 0
+              }`,
               label: chainTypes.find(
                 (c) =>
-                  c.value === x.data.source.cosmos_chain_id ||
+                  c.value == x.data.source.cosmos_chain_id ||
                   x.data.source.evm_chain_id
               )?.label,
             },
             requirementContractAddress: x.data.source.contract_address || '',
+            // TODO: API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
             requirementCondition: conditionTypes.find(
               (y) => y.value === AMOUNT_CONDITIONS.MORE
-            ), // TODO: API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
+            ),
           })),
           // requirementsToFulfill: foundGroup.requirementsToFulfill || [], TODO: API doesn't return this
           topics: (foundGroup.topics || []).map((x) => ({
