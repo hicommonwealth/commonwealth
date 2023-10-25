@@ -85,6 +85,7 @@ export async function __refreshMembership(
       t.group_ids.includes(membership.group_id)
     );
     return {
+      groupId: membership.group_id,
       topicId: topic.id,
       allowed: !membership.reject_reason,
       rejectReason: membership.reject_reason,
