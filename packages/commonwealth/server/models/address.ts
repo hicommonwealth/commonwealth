@@ -100,16 +100,16 @@ export default (
         type: dataTypes.STRING,
         allowNull: true,
         validate: {
-          isRequiredForCosmos(value) {
+          isRequiredForCosmos() {
             if (
               [
                 WalletId.Keplr,
                 WalletId.KeplrEthereum,
                 WalletId.TerraStation,
                 WalletId.CosmosEvmMetamask,
-              ].includes(value.wallet_id)
+              ].includes(this.wallet_id)
             ) {
-              if (!value.hex) {
+              if (!this.hex) {
                 throw new Error('hex is required for cosmos addresses');
               }
             }

@@ -9,7 +9,7 @@ import {
   NotificationCategories,
 } from 'common-common/src/types';
 import { Op } from 'sequelize';
-import { urlHasValidHTTPPrefix } from '../../../shared/utils';
+import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import type { AddressInstance } from '../../models/address';
 import type { ChainAttributes } from '../../models/chain';
@@ -61,7 +61,8 @@ export const Errors = {
   NotAdmin: 'Must be admin',
   ImageDoesntExist: `Image url provided doesn't exist`,
   ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
-  UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
+  UnegisteredCosmosChain: `Check https://cosmos.directory. 
+  Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
 export type CreateCommunityOptions = {
@@ -146,6 +147,7 @@ export async function __createCommunity(
   let altWalletUrl = community.alt_wallet_url;
   let privateUrl: string | undefined;
   let sanitizedSpec;
+  let hex;
 
   // always generate a chain id
   if (community.base === ChainBase.Ethereum) {
@@ -492,11 +494,16 @@ export async function __createCommunity(
   }
 
   if (addressToBeAdmin) {
+    if (chain.base === ChainBase.CosmosSDK) {
+      hex = await bech32ToHex(addressToBeAdmin.address);
+    }
+
     const newAddress = await this.models.Address.create({
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
       community_id: chain.id,
+      hex,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,

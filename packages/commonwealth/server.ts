@@ -1,8 +1,15 @@
 import bodyParser from 'body-parser';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
-  getRabbitMQConfig,
   RabbitMQController,
+  getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import { RedisCache } from 'common-common/src/redisCache';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
 import { StatsDController } from 'common-common/src/statsd';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -18,6 +25,7 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import * as v8 from 'v8';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   DATABASE_CLEAN_HOUR,
@@ -41,18 +49,11 @@ import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
+import { databaseCleaner } from './server/util/databaseCleaner';
 import GlobalActivityCache from './server/util/globalActivityCache';
+import { hexCreator } from './server/util/hexCreator';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
-import * as v8 from 'v8';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { databaseCleaner } from './server/util/databaseCleaner';
-import { RedisCache } from 'common-common/src/redisCache';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import {
-  ServiceKey,
-  startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
 
 let isServiceHealthy = false;
 
@@ -319,6 +320,9 @@ async function main() {
     redisCache,
     rollbar
   );
+
+  // TODO: delete after this has run successfully in all envs
+  hexCreator.initJob(models, rollbar);
 
   isServiceHealthy = true;
 }

@@ -77,12 +77,7 @@ export async function createAddressHelper(
       // cosmos or injective
       const { words } = bech32.decode(req.address, 50);
       encodedAddress = bech32.encode(chain.bech32_prefix, words);
-
-      try {
-        addressHex = await bech32ToHex(req.address);
-      } catch (e) {
-        console.log(`Error converting bech32 to hex: ${e}. Hex was not added.`);
-      }
+      addressHex = await bech32ToHex(req.address);
 
       // check all addresses for matching hex
       const existingHexes = await models.Address.scope(
