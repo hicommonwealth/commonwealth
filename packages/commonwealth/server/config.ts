@@ -149,3 +149,6 @@ export const TELEGRAM_BOT_TOKEN =
 export const SEND_WEBHOOKS_EMAILS =
   process.env.NODE_ENV === 'production' &&
   process.env.SEND_WEBHOOKS_EMAILS === 'true';
+
+export const FEATURE_FLAG_GROUP_CHECK_ENABLED =
+  process.env.FEATURE_FLAG_GROUP_CHECK_ENABLED === 'true' || false;

@@ -1,12 +1,7 @@
 import { AppError } from '../../../../common-common/src/errors';
 import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
-import {
-  TypedRequest,
-  TypedRequestBody,
-  TypedResponse,
-  success,
-} from '../../types';
+import { TypedRequest, TypedResponse, success } from '../../types';
 import z from 'zod';
 
 const Errors = {
@@ -41,6 +36,7 @@ export const updateTopicHandler = async (
     featured_in_new_post: z.coerce.boolean().optional(),
     default_offchain_template: z.string().optional(),
     telegram: z.string().nullable().optional(),
+    group_ids: z.array(z.number()).optional(),
     chain_id: z.string().optional(),
   });
 

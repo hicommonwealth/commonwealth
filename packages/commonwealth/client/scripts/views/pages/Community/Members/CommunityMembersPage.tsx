@@ -61,7 +61,7 @@ const CommunityMembersPage = () => {
     includeRoles: true,
   });
 
-  const { data: groups, isLoading: isLoadingGroups } = useFetchGroupsQuery({
+  const { data: groups } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
     includeMembers: true,
     includeTopics: true,
@@ -190,68 +190,78 @@ const CommunityMembersPage = () => {
       </CWTabsRow>
 
       {/* Filter section */}
-      <section
-        className={getClasses<{
-          'cols-3': boolean;
-          'cols-4': boolean;
-        }>(
-          {
-            'cols-3': featureFlags.gatingEnabled && !isAdmin,
-            'cols-4': featureFlags.gatingEnabled && isAdmin,
-          },
-          'filters'
-        )}
-      >
-        <CWTextInput
-          size="large"
-          fullWidth
-          placeholder={`Search ${
-            selectedTab === TABS[0].value ? 'members' : 'groups'
-          }`}
-          iconLeft={<CWIcon iconName="search" className="search-icon" />}
-          onInput={(e) =>
-            setSearchFilters((g) => ({
-              ...g,
-              searchText: e.target.value?.trim(),
-            }))
-          }
-        />
-        {featureFlags.gatingEnabled && (
-          <div className="select-dropdown-container">
-            <CWText type="b2" fontWeight="bold" className="filter-text">
-              Filter
-            </CWText>
-            <Select
-              containerClassname="select-dropdown"
-              options={GROUP_AND_MEMBER_FILTERS.map((x) => ({
-                id: x,
-                label: x,
-                value: x,
-              }))}
-              selected={searchFilters.category}
-              dropdownPosition="bottom-end"
-              onSelect={(item: any) => {
-                setSearchFilters((g) => ({ ...g, category: item.value }));
-              }}
-            />
-          </div>
-        )}
-        {featureFlags.gatingEnabled && isAdmin && (
-          <CWButton
-            buttonWidth="full"
-            label="Create group"
-            iconLeft="plus"
-            onClick={navigateToCreateGroupPage}
+      {featureFlags.gatingEnabled &&
+      selectedTab === TABS[1].value &&
+      groups?.length === 0 ? (
+        <></>
+      ) : (
+        <section
+          className={getClasses<{
+            'cols-3': boolean;
+            'cols-4': boolean;
+          }>(
+            {
+              'cols-3': featureFlags.gatingEnabled && !isAdmin,
+              'cols-4': featureFlags.gatingEnabled && isAdmin,
+            },
+            'filters'
+          )}
+        >
+          <CWTextInput
+            size="large"
+            fullWidth
+            placeholder={`Search ${
+              selectedTab === TABS[0].value ? 'members' : 'groups'
+            }`}
+            iconLeft={<CWIcon iconName="search" className="search-icon" />}
+            onInput={(e) =>
+              setSearchFilters((g) => ({
+                ...g,
+                searchText: e.target.value?.trim(),
+              }))
+            }
           />
-        )}
-      </section>
+          {featureFlags.gatingEnabled && (
+            <div className="select-dropdown-container">
+              <CWText type="b2" fontWeight="bold" className="filter-text">
+                Filter
+              </CWText>
+              <Select
+                containerClassname="select-dropdown"
+                options={GROUP_AND_MEMBER_FILTERS.map((x) => ({
+                  id: x,
+                  label: x,
+                  value: x,
+                }))}
+                selected={searchFilters.category}
+                dropdownPosition="bottom-end"
+                onSelect={(item: any) => {
+                  setSearchFilters((g) => ({ ...g, category: item.value }));
+                }}
+              />
+            </div>
+          )}
+          {featureFlags.gatingEnabled && isAdmin && (
+            <CWButton
+              buttonWidth="full"
+              label="Create group"
+              iconLeft="plus"
+              onClick={navigateToCreateGroupPage}
+            />
+          )}
+        </section>
+      )}
 
       {/* Main content section: based on the selected tab */}
       {featureFlags.gatingEnabled && selectedTab === TABS[1].value ? (
-        <GroupsSection groups={filteredGroups} />
+        <GroupsSection
+          filteredGroups={filteredGroups}
+          canManageGroups={isAdmin}
+          hasNoGroups={groups?.length === 0}
+        />
       ) : (
         <MembersSection
-          members={formattedMembers}
+          filteredMembers={formattedMembers}
           onLoadMoreMembers={() => {
             if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
               fetchNextPage();

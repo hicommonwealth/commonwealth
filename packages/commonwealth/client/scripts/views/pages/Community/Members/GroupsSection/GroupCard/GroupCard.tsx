@@ -1,5 +1,6 @@
 import React from 'react';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './GroupCard.scss';
@@ -20,6 +21,8 @@ type GroupCardProps = {
   requirements: RequirementCardProps[];
   requirementsToFulfill: 'ALL' | number;
   topics: { id: number; name: string }[];
+  canEdit?: boolean;
+  onEditClick?: () => any;
 };
 
 const GroupCard = ({
@@ -29,6 +32,8 @@ const GroupCard = ({
   requirements,
   requirementsToFulfill,
   topics,
+  canEdit,
+  onEditClick = () => {},
 }: GroupCardProps) => {
   return (
     <section className="GroupCard">
@@ -39,7 +44,17 @@ const GroupCard = ({
       />
 
       {/* Name and description */}
-      <CWText type="h3">{groupName}</CWText>
+      <div className="group-name-row">
+        <CWText type="h3" className="group-name-text">
+          {groupName}
+        </CWText>
+        {canEdit && (
+          <button className="group-edit-button" onClick={onEditClick}>
+            <CWIcon iconName="notePencil" iconSize="medium" />
+            <CWText type="caption">Edit</CWText>
+          </button>
+        )}
+      </div>
       {groupDescription && <CWText type="b2">{groupDescription}</CWText>}
 
       <CWDivider />
