@@ -90,7 +90,7 @@ const CreateCommunityGroupPage = () => {
         createGroup(payload)
           .then(() => {
             notifySuccess('Group Created');
-            navigate(`/members`);
+            navigate(`/members?tab=groups`);
           })
           .catch(() => {
             notifyError('Failed to create group');

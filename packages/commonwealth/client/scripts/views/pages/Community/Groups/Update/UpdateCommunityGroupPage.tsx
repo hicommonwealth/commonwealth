@@ -142,7 +142,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           editGroup(payload)
             .then(() => {
               notifySuccess('Group Updated');
-              navigate(`/members`);
+              navigate(`/members?tab=groups`);
             })
             .catch(() => {
               notifyError('Failed to update group');
