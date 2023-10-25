@@ -10,6 +10,23 @@ export const SPECIFICATIONS = {
   ERC_721: 'erc721',
 };
 
+export const BLOCKCHAINS = {
+  AXIE_INFINITY: 'axie-infinity',
+  COSMOS: 'cosmos',
+  ETHEREUM: 'ethereum',
+  INJECTIVE: 'injective',
+  NEAR: 'near',
+  POLKADOT: 'polkadot',
+  POLYGON: 'polygon',
+  SOLANA: 'solana',
+};
+
+export const AMOUNT_CONDITIONS = {
+  MORE: 'more',
+  EQUAL: 'equal',
+  LESS: 'less',
+};
+
 export const requirementTypes = [
   { value: TOKENS.COSMOS_TOKEN, label: 'Cosmos base tokens' },
   { value: SPECIFICATIONS.ERC_20, label: 'ERC-20' },
@@ -37,3 +54,9 @@ export const chainTypes = chainIdsToFind.map((x, index) => ({
     index - 999, // TODO: some chains don't have an ethChainId
   label: x.replace(/\b\w/g, (l) => l.toUpperCase()),
 }));
+
+export const conditionTypes = [
+  { value: AMOUNT_CONDITIONS.MORE, label: 'More than' },
+  { value: AMOUNT_CONDITIONS.EQUAL, label: 'Equal to' },
+  { value: AMOUNT_CONDITIONS.LESS, label: 'Less than' },
+];
