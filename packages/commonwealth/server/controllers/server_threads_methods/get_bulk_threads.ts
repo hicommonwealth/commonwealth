@@ -201,7 +201,7 @@ export async function __getBulkThreads(
       Address: {
         id: t.addr_id,
         address: t.addr_address,
-        chain: t.addr_chain,
+        community_id: t.addr_chain,
       },
       numberOfComments: t.threads_number_of_comments,
       reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
