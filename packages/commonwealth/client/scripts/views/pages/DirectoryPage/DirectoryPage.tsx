@@ -7,10 +7,12 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
+import ChainInfo from 'models/ChainInfo';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
+import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -24,7 +26,7 @@ enum ViewType {
 
 const columnInfo = [
   {
-    key: 'name',
+    key: 'community',
     header: 'Community',
     numeric: false,
     sortable: true,
@@ -81,7 +83,8 @@ const DirectoryPage = () => {
         description: c.description,
         members: c.address_count,
         threads: c.thread_count,
-        avatars: { name: c.icon_url },
+        iconUrl: c.icon_url,
+        id: c.id,
       })),
     [relatedCommunities]
   );
@@ -92,6 +95,28 @@ const DirectoryPage = () => {
         c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase().trim())
       ),
     [debouncedSearchTerm, relatedCommunitiesData]
+  );
+
+  const tableData = useMemo(
+    () =>
+      filteredRelatedCommunitiesData.map((c) => ({
+        ...c,
+        community: (
+          <div
+            className="community-name-cell"
+            onClick={() => navigate(`/${c.id}`, {}, null)}
+          >
+            <CWCommunityAvatar
+              size="medium"
+              community={{ iconUrl: c.iconUrl, name: c.name } as ChainInfo}
+            />
+            <CWText type="b2" fontWeight="medium">
+              {c.name}
+            </CWText>
+          </div>
+        ),
+      })),
+    [filteredRelatedCommunitiesData, navigate]
   );
 
   if (!directoryPageEnabled) {
@@ -155,10 +180,7 @@ const DirectoryPage = () => {
       </div>
 
       {selectedViewType === ViewType.Rows ? (
-        <CWTable
-          columnInfo={columnInfo}
-          rowData={filteredRelatedCommunitiesData}
-        />
+        <CWTable columnInfo={columnInfo} rowData={tableData} />
       ) : (
         <div className="tiles-container">
           {filteredRelatedCommunitiesData.map((community, index) => (
@@ -166,7 +188,7 @@ const DirectoryPage = () => {
               key={`${community.name}-${index}`}
               communityName={community.name}
               communityDescription={community.description}
-              communityIconUrl={community.avatars.name}
+              communityIconUrl={community.iconUrl}
               memberCount={community.members}
               threadCount={community.threads}
             />
