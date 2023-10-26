@@ -5,13 +5,13 @@ RED='\033[31m'
 YELLOW='\033[33m'
 NC='\033[0m' 
 
-FILES=$(git diff origin/master...HEAD --name-only --diff-filter=d)
+FILES=$(git diff HEAD~1...HEAD --name-only --diff-filter=d)
 
 if [ -n "$FILES" ]
 then
     echo -e -n $YELLOW
     echo "------------------------------------------------------"
-    echo -e "Formatting files before committing..."
+    echo -e "Formatting files before commit..."
     echo "------------------------------------------------------"
     echo -e -n $GRAY
     echo "$FILES" | tr ' ' '\n' | xargs -I {} echo "- {}"
