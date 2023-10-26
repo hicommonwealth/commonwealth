@@ -58,13 +58,8 @@ const DiscordForumConnections = ({
   );
 
   const [connectionVerified, setConnectionVerified] = useState(true);
-  const [topicIdToRemoveConnection, setTopicIdToRemoveConnection] = useState<
-    string | null
-  >(null);
 
   const removeConnection = (topicId: string) => {
-    setTopicIdToRemoveConnection(topicId);
-
     openConfirmation({
       title: 'Warning',
       // eslint-disable-next-line max-len
@@ -172,10 +167,9 @@ export const ChainMetadataRows = ({
     chainId: app.activeChainId(),
   });
 
-  const { data: discordChannels, refetch: refetchDiscordSettings } =
-    useFetchDiscordChannelsQuery({
-      chainId: app.activeChainId(),
-    });
+  const { data: discordChannels } = useFetchDiscordChannelsQuery({
+    chainId: app.activeChainId(),
+  });
 
   const [name, setName] = useState(chain.name);
   const [description, setDescription] = useState(chain.description);
@@ -221,7 +215,6 @@ export const ChainMetadataRows = ({
     id: string;
     name: string;
   } | null>(null);
-  const [selectedChannelLoaded, setSelectedChannelLoaded] = useState(false);
   const [discordWebhooksEnabled, setDiscordWebhooksEnabled] = useState(
     chain.discordBotWebhooksEnabled
   );
@@ -238,7 +231,6 @@ export const ChainMetadataRows = ({
     ) {
       setSelectedSnapshotChannel(discordChannels.selectedChannel);
       setSnapshotNotificationsEnabled(true);
-      setSelectedChannelLoaded(true);
     }
   }, [discordChannels]);
 
