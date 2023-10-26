@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
+import { featureFlags } from 'helpers/feature-flags';
 import { filterLinks } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -12,8 +13,10 @@ import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
@@ -25,8 +28,9 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource, LinkDisplay } from '../../../models/Thread';
+import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -41,25 +45,23 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
+import CWBanner from '../../components/component_kit/new_designs/CWBanner';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import ViewTemplate from '../view_template/view_template';
+import { TemplateActionCard } from './TemplateActionCard';
+import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
-import { useSearchParams } from 'react-router-dom';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import { TemplateActionCard } from './TemplateActionCard';
-import { ViewTemplateFormCard } from './ViewTemplateFormCard';
-import ViewTemplate from '../view_template/view_template';
-import { featureFlags } from 'helpers/feature-flags';
 
+import { commentsByDate } from 'helpers/dates';
 import 'pages/view_thread/index.scss';
 import { LinkedUrlCard } from './LinkedUrlCard';
-import { commentsByDate } from 'helpers/dates';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -98,11 +100,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [arePollsFetched, setArePollsFetched] = useState(false);
   const [isViewMarked, setIsViewMarked] = useState(false);
 
+  const [hideGatingBanner, setHideGatingBanner] = useState(false);
+  const [gatedGroups, setGatedGroups] = useState([]);
+
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const [searchParams] = useSearchParams();
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
+
+  const { data: groups } = useFetchGroupsQuery({
+    chainId: app.activeChainId(),
+    includeMembers: true,
+    includeTopics: true,
+  });
 
   const {
     data,
@@ -152,6 +163,38 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       isWindowMediumSmallInclusive
     );
   }, []);
+
+  useEffect(() => {
+    if (groups && thread?.topic) {
+      const topicId = thread.topic.id;
+      const addressTopicMemberIds = app.user.addresses.map(
+        (ids) => ids.address
+      );
+
+      const groupsWithTopic = groups.filter((community) =>
+        community.topics.some((topic) => topic.id === topicId)
+      );
+
+      // Extract the names of the groups that have the current topic
+      const groupNamesWithTopic = groupsWithTopic.map((community) => ({
+        id: community.id,
+        name: community.name,
+      }));
+
+      // Set the gatedGroups state to the list of group names
+      setGatedGroups(groupNamesWithTopic);
+
+      if (groupsWithTopic.length > 0) {
+        // Check if the user is a member of any of the groups with the current topic
+        const isMemberOfAnyGroup = groupsWithTopic.some((community) =>
+          community.members.some((id) => addressTopicMemberIds.includes(id))
+        );
+
+        // You can use the 'isMemberOfAnyGroup' variable as needed
+        setHideGatingBanner(isMemberOfAnyGroup);
+      }
+    }
+  }, [groups, thread?.topic]);
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
@@ -477,6 +520,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       canComment={canComment}
                       shouldFocusEditor={shouldFocusCommentEditor}
                     />
+                    {!hideGatingBanner && (
+                      <CWBanner
+                        title="This topic is gated"
+                        body="Only members within the following group(s) can interact with this topic:"
+                        type="info"
+                        gatedGroups={gatedGroups}
+                        buttons={[
+                          {
+                            label: 'See all groups',
+                            onClick: () => navigate('/members?tab=groups'),
+                          },
+                          { label: 'Learn more about gating' },
+                        ]}
+                        onClose={() => setHideGatingBanner(true)}
+                      />
+                    )}
                     {showBanner && (
                       <JoinCommunityBanner
                         onClose={handleCloseBanner}

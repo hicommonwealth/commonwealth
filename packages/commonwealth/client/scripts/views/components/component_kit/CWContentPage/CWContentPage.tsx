@@ -1,11 +1,11 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import 'components/component_kit/CWContentPage.scss';
+import { truncate } from 'helpers/truncate';
 import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import type Account from '../../../../models/Account';
-import { truncate } from 'helpers/truncate';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
 import { Thread } from '../../../../models/Thread';

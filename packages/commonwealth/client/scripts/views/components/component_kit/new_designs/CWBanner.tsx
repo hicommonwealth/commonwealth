@@ -1,21 +1,22 @@
-import React from 'react';
 import {
-  X,
-  Info,
   CheckCircle,
-  WarningCircle,
-  Warning,
   IconProps,
+  Info,
+  Warning,
+  WarningCircle,
+  X,
 } from '@phosphor-icons/react';
+import React from 'react';
 
+import clsx from 'clsx';
 import 'components/component_kit/new_designs/CWBanner.scss';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import {
   ButtonProps,
   ButtonType,
   CWButton,
 } from 'views/components/component_kit/new_designs/cw_button';
-import clsx from 'clsx';
 
 // TODO this component covers only one type of Banner,
 // it should be extended with other types
@@ -41,6 +42,7 @@ interface CWBannerProps {
   buttons?: ButtonProps[];
   className?: string;
   onClose: () => void;
+  gatedGroups?: Array<{ id: number; name: string }>;
 }
 
 const getButtonType = (index: number, bannerType: BannerType): ButtonType => {
@@ -62,6 +64,7 @@ const CWBanner = ({
   buttons,
   className,
   onClose,
+  gatedGroups,
 }: CWBannerProps) => {
   const TypeIcon = typeIconLookup[type];
 
@@ -77,9 +80,18 @@ const CWBanner = ({
           {title}
         </CWText>
         {body && (
-          <CWText type="b2" className="body">
-            {body}
-          </CWText>
+          <div>
+            <CWText type="b2" className="body">
+              {body}
+            </CWText>
+            {gatedGroups && (
+              <div className="gating-tags">
+                {gatedGroups.map((t) => (
+                  <CWTag key={t.id} label={t.name} type="referendum" />
+                ))}
+              </div>
+            )}
+          </div>
         )}
         {buttons?.length > 0 && (
           <div className="actions-row">
