@@ -723,14 +723,7 @@ function setupRouter(
   );
 
   // topics
-  registerRoute(
-    router,
-    'post',
-    '/topics' /* OLD: /createTopic */,
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createTopicHandler.bind(this, serverControllers)
-  );
+  registerRoute(router, 'post', '/topics' /* OLD: /createTopic */, passport.authenticate('jwt', { session: false }), databaseValidationService.validateChain, createTopicHandler.bind(this, serverControllers));
   registerRoute(
     router,
     'patch',
