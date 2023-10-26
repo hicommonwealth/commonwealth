@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -94,6 +95,15 @@ const GroupForm = ({
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
+
+  const { data: groups = [] } = useFetchGroupsQuery({
+    chainId: app.activeChainId(),
+  });
+
+  const takenGroupNames = groups.map(({ name }) => name.toLowerCase());
+
+  const [isNameTaken, setIsNameTaken] = useState(false);
+
   const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
   const [cwRequiremenetsLabelInputField, setCwRequiremenetsLabelInputField] =
     useState<CWRequirementsLabelInputFieldState>({ value: '1', error: '' });
@@ -367,6 +377,15 @@ const GroupForm = ({
               placeholder="Group name"
               fullWidth
               instructionalMessage="Can be up to 40 characters long."
+              customError={isNameTaken ? 'Group name is already taken' : ''}
+              onInput={(e) => {
+                const value = e.target.value.toLowerCase();
+                if (takenGroupNames.includes(value)) {
+                  setIsNameTaken(true);
+                } else {
+                  setIsNameTaken(false);
+                }
+              }}
             />
             <CWTextArea
               name="groupDescription"
@@ -498,6 +517,7 @@ const GroupForm = ({
               type="submit"
               buttonWidth="wide"
               label={formType === 'create' ? 'Create group' : 'Update group'}
+              disabled={isNameTaken}
             />
           </div>
         </>
