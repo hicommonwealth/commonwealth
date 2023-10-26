@@ -17,4 +17,5 @@ then
     echo "$FILES" | tr ' ' '\n' | xargs -I {} echo "- {}"
     echo -e $NC
     echo "$FILES" | tr ' ' '\n' | xargs -I {} npx prettier --write --ignore-unknown {}
+    git add .
 fi
