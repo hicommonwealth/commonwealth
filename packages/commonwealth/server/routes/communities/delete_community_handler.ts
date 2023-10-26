@@ -1,9 +1,9 @@
-import { TypedRequestParams, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
 import {
   DeleteCommunityOptions,
   DeleteCommunityResult,
 } from 'server/controllers/server_communities_methods/delete_community';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestParams, TypedResponse, success } from '../../types';
 
 type DeleteCommunityRequestParams = DeleteCommunityOptions;
 type DeleteCommunityResponse = DeleteCommunityResult;
@@ -15,7 +15,7 @@ export const deleteCommunityHandler = async (
 ) => {
   const community = await controllers.communities.deleteCommunity({
     user: req.user,
-    id: req.params.id,
+    communityId: req.params.communityId,
   });
   return success(res, community);
 };

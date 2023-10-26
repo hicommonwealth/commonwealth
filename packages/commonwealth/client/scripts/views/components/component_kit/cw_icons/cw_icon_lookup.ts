@@ -174,6 +174,7 @@ export const iconLookup = {
   wallet: Icons.CWWallet,
   website: Icons.CWWebsite,
   write: Icons.CWWrite,
+  members: Icons.CWMembers,
 };
 
 export const customIconLookup = {
