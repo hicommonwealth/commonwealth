@@ -726,6 +726,10 @@ function setupRouter(
     searchCommentsHandler.bind(this, serverControllers)
   );
 
+  const x = (test) => {
+    console.log('random')
+  }
+
   // topics
   registerRoute(
     router,
