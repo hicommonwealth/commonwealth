@@ -25,7 +25,7 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
-import { CWContentPageCard } from './CWContentPage';
+import { CWContentPageCard } from './CWContentPageCard';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';

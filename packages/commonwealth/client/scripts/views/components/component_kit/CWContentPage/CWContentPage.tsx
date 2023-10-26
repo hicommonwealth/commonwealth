@@ -1,21 +1,19 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
-import 'components/component_kit/CWContentPage.scss';
+import { truncate } from 'helpers/truncate';
 import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import type Account from '../../../../models/Account';
-import { truncate } from 'helpers/truncate';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
 import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
-import { CWCard } from '../cw_card';
 import { CWTab, CWTabBar } from '../cw_tabs';
-import { CWText } from '../cw_text';
 import { ComponentType } from '../types';
+import './CWContentPage.scss';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';
 
 export type ContentPageSidebarItem = {
@@ -255,25 +253,5 @@ export const CWContentPage = ({
         </div>
       )}
     </div>
-  );
-};
-
-type ContentPageCardProps = {
-  content: ReactNode;
-  header: string;
-};
-
-export const CWContentPageCard = (props: ContentPageCardProps) => {
-  const { content, header } = props;
-
-  return (
-    <CWCard className="ContentPageCard">
-      <div className="header-container">
-        <CWText type="h5" fontWeight="semiBold">
-          {header}
-        </CWText>
-      </div>
-      {content}
-    </CWCard>
   );
 };
