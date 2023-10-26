@@ -23,6 +23,11 @@ export const isHot = (thread: Thread) => {
   );
 };
 
+export const isNewThread = (threadCreatedAt: moment.Moment) => {
+  const diffInMs = moment().diff(threadCreatedAt);
+  return moment.duration(diffInMs).asHours() < 48;
+}
+
 export const getLastUpdate = (thread: Thread): number => {
   const lastComment = thread.lastCommentedOn?.unix() || 0;
   const createdAt = thread.createdAt?.unix() || 0;
@@ -94,7 +99,8 @@ export const getReactionSubscription = (thread: Thread) => {
 
 export const getThreadSubScriptionMenuItem = (
   thread: Thread,
-  setIsSubscribed: Dispatch<SetStateAction<boolean>>
+  setIsSubscribed: Dispatch<SetStateAction<boolean>>,
+  archivedAt: moment.Moment | null
 ): PopoverMenuItem => {
   const commentSubscription = getCommentSubscription(thread);
   const reactionSubscription = getReactionSubscription(thread);
@@ -114,6 +120,7 @@ export const getThreadSubScriptionMenuItem = (
     },
     label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
     iconLeft: isSubscribed ? 'unsubscribe' : 'bell',
+    disabled: archivedAt ? true : false
   };
 };
 

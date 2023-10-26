@@ -8,7 +8,6 @@ import type { ChainInstance } from 'commonwealth/server/models/chain';
 import type { StorageFilterConfig } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   EntityArchivalHandler,
-  NotificationHandler,
   StorageHandler,
 } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import type { BrokerConfig } from 'rascal';
@@ -53,10 +52,6 @@ export const generateHandlers = (
     storageConfig
   );
 
-  // emits notifications by writing into the db's Notifications table, and also optionally
-  // sending a notification to the client via websocket
-  const notificationHandler = new NotificationHandler(ceModels, rmqController);
-
   // creates and updates ChainEntity rows corresponding with entity-related events
   const entityArchivalHandler = new EntityArchivalHandler(
     ceModels,
@@ -65,11 +60,7 @@ export const generateHandlers = (
   );
 
   // the set of handlers, run sequentially on all incoming chain events
-  const handlers: IEventHandler[] = [
-    storageHandler,
-    notificationHandler,
-    entityArchivalHandler,
-  ];
+  const handlers: IEventHandler[] = [storageHandler, entityArchivalHandler];
 
   return handlers;
 };

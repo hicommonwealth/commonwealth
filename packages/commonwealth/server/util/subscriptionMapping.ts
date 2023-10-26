@@ -1,8 +1,6 @@
-import { NotificationDataAndCategory } from 'types';
+import { NotificationDataAndCategory } from '../../shared/types';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { CreationAttributes } from 'sequelize';
-import { SubscriptionInstance } from '../models/subscription';
 
 const log = factory.getLogger(formatFilename(__filename));
 

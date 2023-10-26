@@ -7,7 +7,7 @@ import {
 } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
@@ -119,6 +119,7 @@ export const ReactionButton = ({
         <CWUpvoteSmall
           voteCount={reactors.length}
           disabled={isUserForbidden || disabled}
+          isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
           onMouseEnter={() => undefined}
           onClick={handleVoteClick}
@@ -127,7 +128,14 @@ export const ReactionButton = ({
           })}
         />
       ) : disabled ? (
-        <TooltipWrapper disabled={disabled} text="Join community to upvote">
+        <TooltipWrapper
+          disabled={disabled}
+          text={
+            thread.archivedAt
+              ? 'Thread is archived'
+              : `Join community to upvote`
+          }
+        >
           <CWUpvote
             onClick={handleVoteClick}
             voteCount={reactors.length}
@@ -156,7 +164,7 @@ export const ReactionButton = ({
           )}
         />
       )}
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}

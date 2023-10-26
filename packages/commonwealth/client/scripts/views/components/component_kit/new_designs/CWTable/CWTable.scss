@@ -1,6 +1,8 @@
 @import '../../../../../../styles/shared.scss';
 
 .Table {
+  overflow-x: auto;
+
   table {
     @include b2;
     letter-spacing: 0.14px;

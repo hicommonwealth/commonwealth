@@ -5,7 +5,6 @@ import {
   encodeAddress,
 } from '@polkadot/util-crypto';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
-import { ProposalType } from 'common-common/src/types';
 import { AccessLevel } from './permissions';
 import type { RoleObject } from './types';
 
@@ -35,16 +34,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .replace(/(\s|-)+/g, '-')
     .replace(/^-|-$/g, '')
     .toLowerCase();
-};
-
-export const requiresTypeSlug = (type: ProposalType): boolean => {
-  return (
-    type === ProposalType.SubstrateDemocracyReferendum ||
-    type === ProposalType.SubstrateDemocracyProposal ||
-    type === ProposalType.SubstrateTreasuryTip ||
-    type === ProposalType.SubstrateTechnicalCommitteeMotion ||
-    type === ProposalType.SubstrateTreasuryProposal
-  );
 };
 
 /* eslint-disable */

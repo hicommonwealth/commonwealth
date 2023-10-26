@@ -88,14 +88,23 @@ class Account {
       DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(chain?.id, address).then(
         (res) => {
           const data = res[0];
-          updatedProfile.initialize(
-            data?.name,
-            data.address,
-            data?.avatarUrl,
-            data.id,
-            updatedProfile.chain,
-            data?.lastActive
-          );
+          if (!data) {
+            console.log(
+              'No profile data found for address',
+              address,
+              'on chain',
+              chain?.id
+            );
+          } else {
+            updatedProfile.initialize(
+              data?.name,
+              data.address,
+              data?.avatarUrl,
+              data.id,
+              updatedProfile.chain,
+              data?.lastActive
+            );
+          }
           // manually trigger an update signal when data is fetched
           NewProfilesController.Instance.isFetched.emit('redraw');
         }

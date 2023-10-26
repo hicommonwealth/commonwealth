@@ -48,7 +48,7 @@ export const PopoverMenu = ({
   return (
     <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
       {/* needs to be div instead of fragment so listener can work */}
-      <div>
+      <div className="popover-container">
         {renderTrigger(handleInteraction, open)}
         <Popover
           modifiers={modifiers}

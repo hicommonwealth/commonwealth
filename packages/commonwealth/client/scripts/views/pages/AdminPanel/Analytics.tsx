@@ -39,17 +39,7 @@ const Analytics = () => {
 
   const getCommunityAnalytics = async (chainId: string) => {
     axios
-      .post(
-        `${app.serverUrl()}/communitySpecificAnalytics`,
-        {
-          chain: chainId,
-        },
-        {
-          headers: {
-            'content-type': 'application/json',
-          },
-        }
-      )
+      .get(`${app.serverUrl()}/communities/${chainId}/stats`)
       .then((response) => {
         setChainLookupCompleted(true);
         setCommunityAnalytics(response.data.result);

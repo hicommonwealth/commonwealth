@@ -1,8 +1,22 @@
-import React from 'react';
 import faker from 'faker';
+import React from 'react';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { CWButton } from './new_designs/cw_button';
 
+// CWTypeaheadSelectList
+export const optionList = [
+  { value: '1inch', label: '1 Inch' },
+  { value: 'atom-blockchain', label: 'Atom Blockchain' },
+  { value: 'dydx', label: 'dydx' },
+  { value: 'edgeware', label: 'Edgeware' },
+  { value: 'maia-dao', label: 'Maia Dao' },
+  { value: 'oraichain', label: 'Oraichain' },
+  { value: 'stargate-finance', label: 'Stargate Finance' },
+  { value: 'stargaze', label: 'Stargaze' },
+  { value: 'terra-classic', label: 'Terra Classic' },
+];
+
+// CWTable
 const range = (len: number) => {
   const arr = [];
   for (let i = 0; i < len; i++) {

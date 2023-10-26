@@ -174,7 +174,7 @@ export async function createAddressHelper(
       if (user_id) {
         const profile = await models.Profile.findOne({
           attributes: ['id'],
-          where: { is_default: true, user_id },
+          where: { user_id },
         });
         profile_id = profile?.id;
       }

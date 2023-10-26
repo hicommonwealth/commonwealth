@@ -34,9 +34,6 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 
 type CannotVoteProps = { label: string };
 
@@ -72,14 +69,6 @@ export const VotingActions = (props: VotingActionsProps) => {
       app.loginStateEmitter.removeAllListeners();
     };
   }, [app.loginState]);
-
-  if (
-    proposal instanceof SubstrateDemocracyProposal ||
-    proposal instanceof SubstrateDemocracyReferendum ||
-    proposal instanceof SubstrateTreasuryProposal
-  ) {
-    return null;
-  }
 
   if (!isLoggedIn) {
     return <CannotVote label="Sign in to vote" />;
@@ -283,7 +272,6 @@ export const VotingActions = (props: VotingActionsProps) => {
     />
   );
 
-  // substrate: multi-deposit approve
   const multiDepositApproveButton = (
     <CWButton
       disabled={!canVote || votingModalOpen}

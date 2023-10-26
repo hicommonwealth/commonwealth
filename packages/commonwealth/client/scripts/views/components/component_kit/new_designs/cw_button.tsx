@@ -2,12 +2,12 @@ import React from 'react';
 
 import 'components/component_kit/new_designs/cw_button.scss';
 
-import type { IconName } from '../cw_icons/cw_icon_lookup';
 import { CWIcon } from '../cw_icons/cw_icon';
+import type { IconName } from '../cw_icons/cw_icon_lookup';
+import { CWText } from '../cw_text';
+import { getClasses } from '../helpers';
 import type { BaseStyleProps } from '../types';
 import { ComponentType } from '../types';
-import { getClasses } from '../helpers';
-import { CWText } from '../cw_text';
 
 export type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'destructive';
 
@@ -26,6 +26,7 @@ export type ButtonProps = {
   iconRight?: IconName;
   label: string | React.ReactNode;
   type?: 'reset' | 'submit' | 'button';
+  containerClassName?: string;
 } & ButtonStyleProps &
   React.HTMLAttributes<HTMLButtonElement>;
 
@@ -40,6 +41,7 @@ export const CWButton = (props: ButtonProps) => {
     iconRight,
     label,
     onClick,
+    containerClassName,
     ...otherProps
   } = props;
 
@@ -50,6 +52,7 @@ export const CWButton = (props: ButtonProps) => {
         buttonType,
         disabled,
         buttonWidth: buttonWidth === 'full' ? 'full' : '',
+        containerClassName,
       })}
     >
       <button

@@ -1,5 +1,7 @@
 .CanvasVerifyDataModal {
-  max-width: 600px;
+  .CWModalBody {
+    margin-bottom: 24px;
+  }
 
   h2 {
     padding-bottom: 12px;
