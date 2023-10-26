@@ -9,7 +9,10 @@ import app from 'state';
 import { CWBreadcrumbs } from 'views/components/component_kit/cw_breadcrumbs';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { PageLoading } from '../loading';
 import { ContractCard } from './contract_card';
@@ -137,7 +140,7 @@ const ContractsPage = () => {
       </CWText>
 
       <div className="Tabs">
-        <CWTabBar>
+        <CWTabsRow>
           <CWTab
             label="Contracts and actions"
             onClick={() => {
@@ -152,7 +155,7 @@ const ContractsPage = () => {
             }}
             isSelected={tabOn === 'templates'}
           />
-        </CWTabBar>
+        </CWTabsRow>
       </div>
       {tabOn === 'contracts' ? (
         <>

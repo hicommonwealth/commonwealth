@@ -47,7 +47,6 @@ import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWSpinner } from './cw_spinner';
-import { CWTab as CWTabOld, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
@@ -236,7 +235,6 @@ export const ComponentShowcase = () => {
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
-  const [selectedTab, setSelectedTab] = useState<number>(1);
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
     useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
@@ -1050,33 +1048,6 @@ export const ComponentShowcase = () => {
           voteCount={voteCount}
         />
       </div>
-      <div className="basic-gallery">
-        <CWText type="h3">Old Tabs</CWText>
-        <CWTabBar>
-          <CWTabOld
-            label="A tab"
-            onClick={() => {
-              setSelectedTab(1);
-            }}
-            isSelected={selectedTab === 1}
-          />
-          <CWTabOld
-            label="Another tab"
-            onClick={() => {
-              setSelectedTab(2);
-            }}
-            isSelected={selectedTab === 2}
-          />
-          <CWTabOld
-            label="Yet another tab"
-            onClick={() => {
-              setSelectedTab(3);
-            }}
-            isSelected={selectedTab === 3}
-          />
-        </CWTabBar>
-      </div>
-
       <div className="new-tabs">
         <CWText type="h3">New Tabs</CWText>
         <CWTabsRow>
