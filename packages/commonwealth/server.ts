@@ -41,7 +41,6 @@ import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
-import setupCEProxy from './server/util/entitiesProxy';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
@@ -294,7 +293,6 @@ async function main() {
 
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
-  setupCEProxy(app);
 
   if (!NO_CLIENT_SERVER) {
     if (DEV) {
