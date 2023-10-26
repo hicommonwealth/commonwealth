@@ -580,12 +580,6 @@ async function setThreadStage(
     }
 
     // validate stage
-    console.log(
-      '\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>',
-      customStages,
-      stage,
-      '\n\n\n'
-    );
     if (!customStages.includes(stage)) {
       throw new AppError(Errors.InvalidStage);
     }
