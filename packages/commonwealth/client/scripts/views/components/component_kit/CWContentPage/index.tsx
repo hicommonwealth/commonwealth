@@ -1,1 +1,1 @@
-export * from './CWContentPage';
+export { CWContentPage } from './CWContentPage';
