@@ -520,7 +520,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       canComment={canComment}
                       shouldFocusEditor={shouldFocusCommentEditor}
                     />
-                    {!hideGatingBanner && (
+                    {!hideGatingBanner && gatedGroups.length > 0 && (
                       <CWBanner
                         title="This topic is gated"
                         body="Only members within the following group(s) can interact with this topic:"
