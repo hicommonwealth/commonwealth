@@ -1318,27 +1318,6 @@ function setupRouter(
     getSnapshotProposal.bind(this, models)
   );
 
-  // These routes behave like get (fetch data) but use POST because a secret
-  // is passed in the request body -> passing the secret via query parameters is not safe
-  registerRoute(
-    router,
-    'post',
-    '/getChainEventServiceData',
-    getChainEventServiceData.bind(this, models)
-  );
-  registerRoute(router, 'post', '/getChain', getChain.bind(this, models));
-  registerRoute(
-    router,
-    'post',
-    '/getChainNode',
-    getChainNode.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/getChainContracts',
-    getChainContracts.bind(this, models)
-  );
   registerRoute(
     router,
     'post',
