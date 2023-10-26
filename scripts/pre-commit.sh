@@ -16,5 +16,5 @@ then
     echo -e -n $GRAY
     echo "$FILES" | tr ' ' '\n' | xargs -I {} echo "- {}"
     echo -e $NC
-    echo "$FILES" | tr ' ' '\n' | xargs -I {} npx prettier {} --write --ignore-unknown
+    echo "$FILES" | tr ' ' '\n' | xargs -I {} npx prettier --write --ignore-unknown {}
 fi
