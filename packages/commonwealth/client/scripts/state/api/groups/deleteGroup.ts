@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { ApiEndpoints, queryClient } from '../config';
 
 interface DeleteGroupProps {
   groupId: number;
@@ -14,17 +15,19 @@ const deleteGroup = async ({ groupId, chainId, address }: DeleteGroupProps) => {
       jwt: app.user.jwt,
       chain: chainId,
       author_chain: chainId,
-      address,
-    },
+      address
+    }
   });
 };
 
-const useDeleteGroupMutation = () => {
+const useDeleteGroupMutation = ({ chainId }: { chainId: string }) => {
   return useMutation({
     mutationFn: deleteGroup,
     onSuccess: async () => {
-      // TODO: manage cache if any
-    },
+      const key = [ApiEndpoints.FETCH_GROUPS, chainId];
+      queryClient.cancelQueries(key);
+      queryClient.refetchQueries(key);
+    }
   });
 };
 

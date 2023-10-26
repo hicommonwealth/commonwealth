@@ -201,7 +201,8 @@ const GroupForm = ({
   ) => {
     const allRequirements = [...requirementSubForms];
 
-    // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
+    // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
+    // manually using javascript
     const isTokenRequirementTypeAdded =
       !Object.values(TOKENS).includes(
         allRequirements[index].values.requirementType
@@ -255,7 +256,8 @@ const GroupForm = ({
 
     requirementSubForms.map((subForm, index) => {
       try {
-        // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
+        // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
+        // manually using javascript
         const schema = getRequirementSubFormSchema(
           subForm.values.requirementType
         );

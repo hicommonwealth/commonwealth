@@ -14,7 +14,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import {
   CWTab,
-  CWTabsRow,
+  CWTabsRow
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
@@ -25,13 +25,13 @@ import { GroupCategory, SearchFilters } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
-  ...(featureFlags.gatingEnabled ? [{ value: 'groups', label: 'Groups' }] : []),
+  ...(featureFlags.gatingEnabled ? [{ value: 'groups', label: 'Groups' }] : [])
 ];
 
 const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
   'All',
   'In group',
-  'Not in group',
+  'Not in group'
 ];
 
 const CommunityMembersPage = () => {
@@ -40,7 +40,7 @@ const CommunityMembersPage = () => {
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
-    category: GROUP_AND_MEMBER_FILTERS[0],
+    category: GROUP_AND_MEMBER_FILTERS[0]
   });
 
   const debouncedSearchTerm = useDebounce<string>(
@@ -51,20 +51,20 @@ const CommunityMembersPage = () => {
   const {
     data: members,
     fetchNextPage,
-    isLoading: isLoadingMembers,
+    isLoading: isLoadingMembers
   } = useSearchProfilesQuery({
     chainId: app.activeChainId(),
     searchTerm: '',
     limit: 30,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
-    includeRoles: true,
+    includeRoles: true
   });
 
   const { data: groups } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
     includeMembers: true,
-    includeTopics: true,
+    includeTopics: true
   });
 
   const formattedMembers = useMemo(() => {
@@ -73,9 +73,12 @@ const CommunityMembersPage = () => {
     }
 
     return members.pages
-      .reduce((acc, page) => {
-        return [...acc, ...page.results];
-      }, [] as SearchProfilesResponse['results'])
+      .reduce(
+        (acc, page) => {
+          return [...acc, ...page.results];
+        },
+        [] as SearchProfilesResponse['results']
+      )
       .map((p) => ({
         id: p.id,
         avatarUrl: p.avatar_url,
@@ -93,7 +96,7 @@ const CommunityMembersPage = () => {
               (x) => x?.address?.address === p.addresses?.[0]?.address
             )
           )
-          .map((x) => x.name),
+          .map((x) => x.name)
       }))
       .filter((p) =>
         debouncedSearchTerm
@@ -202,7 +205,7 @@ const CommunityMembersPage = () => {
           }>(
             {
               'cols-3': featureFlags.gatingEnabled && !isAdmin,
-              'cols-4': featureFlags.gatingEnabled && isAdmin,
+              'cols-4': featureFlags.gatingEnabled && isAdmin
             },
             'filters'
           )}
@@ -217,7 +220,7 @@ const CommunityMembersPage = () => {
             onInput={(e) =>
               setSearchFilters((g) => ({
                 ...g,
-                searchText: e.target.value?.trim(),
+                searchText: e.target.value?.trim()
               }))
             }
           />
@@ -231,7 +234,7 @@ const CommunityMembersPage = () => {
                 options={GROUP_AND_MEMBER_FILTERS.map((x) => ({
                   id: x,
                   label: x,
-                  value: x,
+                  value: x
                 }))}
                 selected={searchFilters.category}
                 dropdownPosition="bottom-end"
@@ -254,10 +257,14 @@ const CommunityMembersPage = () => {
 
       {/* Main content section: based on the selected tab */}
       {featureFlags.gatingEnabled && selectedTab === TABS[1].value ? (
-        <GroupsSection groups={filteredGroups} canManageGroups={isAdmin} />
+        <GroupsSection
+          filteredGroups={filteredGroups}
+          canManageGroups={isAdmin}
+          hasNoGroups={groups?.length === 0}
+        />
       ) : (
         <MembersSection
-          members={formattedMembers}
+          filteredMembers={formattedMembers}
           onLoadMoreMembers={() => {
             if (members?.pages?.[0]?.totalResults > formattedMembers.length) {
               fetchNextPage();

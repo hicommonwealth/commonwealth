@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
+import { ApiEndpoints, queryClient } from '../config';
 
 interface EditGroupProps {
   groupId: string;
@@ -19,7 +20,7 @@ const editGroup = async ({
   groupName,
   groupDescription,
   requirementsToFulfill,
-  requirements = [],
+  requirements = []
 }: EditGroupProps) => {
   return await axios.put(`${app.serverUrl()}/groups/${groupId}`, {
     jwt: app.user.jwt,
@@ -30,19 +31,21 @@ const editGroup = async ({
       name: groupName,
       description: groupDescription,
       ...(requirementsToFulfill && {
-        required_requirements: requirementsToFulfill,
-      }),
+        required_requirements: requirementsToFulfill
+      })
     },
-    requirements,
+    requirements
   });
 };
 
-const useEditGroupMutation = () => {
+const useEditGroupMutation = ({ chainId }: { chainId: string }) => {
   return useMutation({
     mutationFn: editGroup,
     onSuccess: async () => {
-      // TODO: manage cache if any
-    },
+      const key = [ApiEndpoints.FETCH_GROUPS, chainId];
+      queryClient.cancelQueries(key);
+      queryClient.refetchQueries(key);
+    }
   });
 };
 

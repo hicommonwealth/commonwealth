@@ -16,7 +16,7 @@ type Member = {
 };
 
 type MembersSectionProps = {
-  members: Member[];
+  filteredMembers: Member[];
   onLoadMoreMembers: () => any;
   isLoadingMoreMembers?: boolean;
 };
@@ -41,7 +41,7 @@ const columns = [
 ];
 
 const MembersSection = ({
-  members,
+  filteredMembers,
   onLoadMoreMembers,
   isLoadingMoreMembers,
 }: MembersSectionProps) => {
@@ -49,7 +49,7 @@ const MembersSection = ({
     <div className="MembersSection">
       <CWTable
         columnInfo={columns}
-        rowData={members.map((member) => ({
+        rowData={filteredMembers.map((member) => ({
           name: (
             <div className="table-cell">
               <Link to={`/profile/id/${member.id}`} className="user-info">

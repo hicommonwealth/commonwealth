@@ -1,4 +1,5 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { featureFlags } from 'helpers/feature-flags';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -13,7 +14,7 @@ import {
   TOKENS,
   chainTypes,
   conditionTypes,
-  requirementTypes,
+  requirementTypes
 } from '../../common/constants';
 import { DeleteGroupModal } from '../DeleteGroupModal';
 import { GroupForm } from '../common/GroupForm';
@@ -22,16 +23,17 @@ import './UpdateCommunityGroupPage.scss';
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const { mutateAsync: editGroup } = useEditGroupMutation();
+  const { mutateAsync: editGroup } = useEditGroupMutation({
+    chainId: app.activeChainId()
+  });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
-    includeTopics: true,
+    includeTopics: true
   });
-
-  console.log('does this work:', groups);
   const foundGroup: Group = groups.find((x) => x.id === parseInt(`${groupId}`));
 
   if (
+    !featureFlags.gatingEnabled ||
     !app.isLoggedIn() ||
     !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
   ) {
@@ -54,7 +56,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               value: x.data.source.source_type,
               label: requirementTypes.find(
                 (y) => y.value === x.data.source.source_type
-              )?.label,
+              )?.label
             },
             requirementAmount: x.data.threshold,
             requirementChain: {
@@ -65,19 +67,19 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                 (c) =>
                   c.value == x.data.source.cosmos_chain_id ||
                   x.data.source.evm_chain_id
-              )?.label,
+              )?.label
             },
             requirementContractAddress: x.data.source.contract_address || '',
             // TODO: API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
             requirementCondition: conditionTypes.find(
               (y) => y.value === AMOUNT_CONDITIONS.MORE
-            ),
+            )
           })),
           // requirementsToFulfill: foundGroup.requirementsToFulfill || [], TODO: API doesn't return this
           topics: (foundGroup.topics || []).map((x) => ({
             label: x.name,
-            value: x.id,
-          })), // TODO: This is non-modifiable in the edit request, the input can be disabled
+            value: x.id
+          })) // TODO: This is non-modifiable in the edit request, the input can be disabled
         }}
         onSubmit={(values) => {
           const payload = {
@@ -89,8 +91,9 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             requirementsToFulfill:
               values.requirementsToFulfill === 'ALL'
                 ? undefined
-                : values.requirementsToFulfill, // TODO: confirm if undefined means all requirements need to be satisfied
-            requirements: [],
+                : // TODO: confirm if undefined means all requirements need to be satisfied
+                  values.requirementsToFulfill,
+            requirements: []
           };
 
           // map requirements and add to payload
@@ -106,9 +109,9 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                   source: {
                     source_type: x.requirementType,
                     evm_chain_id: x.requirementChain,
-                    contract_address: x.requirementContractAddress,
-                  },
-                },
+                    contract_address: x.requirementContractAddress
+                  }
+                }
               });
               return;
             }
@@ -121,9 +124,9 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                   source: {
                     source_type: x.requirementType,
                     cosmos_chain_id: x.requirementChain,
-                    token_symbol: 'COS',
-                  },
-                },
+                    token_symbol: 'COS'
+                  }
+                }
               });
               return;
             }
@@ -135,9 +138,9 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                   threshold: x.requirementAmount,
                   source: {
                     source_type: x.requirementType,
-                    evm_chain_id: x.requirementChain,
-                  },
-                },
+                    evm_chain_id: x.requirementChain
+                  }
+                }
               });
               return;
             }
