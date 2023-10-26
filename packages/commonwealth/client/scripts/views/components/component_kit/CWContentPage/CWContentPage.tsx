@@ -1,11 +1,14 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
 import 'components/component_kit/CWContentPage.scss';
+import { truncate } from 'helpers/truncate';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
+import app from 'state';
+import { useRefreshMembershipQuery } from 'state/api/groups';
 import type Account from '../../../../models/Account';
-import { truncate } from 'helpers/truncate';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
 import { Thread } from '../../../../models/Thread';
@@ -111,6 +114,16 @@ export const CWContentPage = ({
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+  });
+
+  const restrictedTopicIds = (memberships || [])
+    .filter((x) => x.rejectReason)
+    .map((x) => parseInt(`${x.topicId}`));
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
@@ -167,6 +180,13 @@ export const CWContentPage = ({
     </div>
   );
 
+  const disabledActionsTooltipText = (() => {
+    if (!hasJoinedCommunity) return 'Join community to upvote';
+    if (thread.archivedAt) return 'Thread is archived';
+    if (thread.lockedAt) return 'Thread is locked';
+    if (restrictedTopicIds.includes(thread?.topic?.id)) return 'Topic is gated';
+  })();
+
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
@@ -198,7 +218,10 @@ export const CWContentPage = ({
             onEditStart={onEditStart}
             canUpdateThread={canUpdateThread}
             hasPendingEdits={hasPendingEdits}
+            canReact={!disabledActionsTooltipText}
+            canComment={!disabledActionsTooltipText}
             onProposalStageChange={onProposalStageChange}
+            disabledActionTooltipText={disabledActionsTooltipText}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
           />
         )}

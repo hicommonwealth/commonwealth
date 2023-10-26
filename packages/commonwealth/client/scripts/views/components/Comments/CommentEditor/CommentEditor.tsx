@@ -1,16 +1,16 @@
-import React from 'react';
-import { CWText } from '../../component_kit/cw_text';
-import { User } from 'views/components/user/user';
-import Account from 'client/scripts/models/Account';
-import app from 'state';
-import clsx from 'clsx';
-import { ReactQuillEditor } from '../../react_quill_editor';
-import { CWButton } from '../../component_kit/new_designs/cw_button';
-import { CWValidationText } from '../../component_kit/cw_validation_text';
 import BN from 'bn.js';
-import { weiToTokens, getDecimals } from 'helpers';
-import { ContentType } from 'types';
+import Account from 'client/scripts/models/Account';
+import clsx from 'clsx';
+import { getDecimals, weiToTokens } from 'helpers';
 import type { DeltaStatic } from 'quill';
+import React from 'react';
+import app from 'state';
+import { ContentType } from 'types';
+import { User } from 'views/components/user/user';
+import { CWText } from '../../component_kit/cw_text';
+import { CWValidationText } from '../../component_kit/cw_validation_text';
+import { CWButton } from '../../component_kit/new_designs/cw_button';
+import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
 
 type CommentEditorProps = {
@@ -29,6 +29,7 @@ type CommentEditorProps = {
   author: Account;
   editorValue: string;
   shouldFocus: boolean;
+  tooltipText?: string;
 };
 
 export const CommentEditor = ({
@@ -47,6 +48,7 @@ export const CommentEditor = ({
   author,
   editorValue,
   shouldFocus,
+  tooltipText,
 }: CommentEditorProps) => {
   const decimals = getDecimals(app.chain);
 
@@ -77,7 +79,7 @@ export const CommentEditor = ({
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
         isDisabled={!canComment}
-        tooltipLabel="Join community to comment"
+        tooltipLabel={tooltipText}
         shouldFocus={shouldFocus}
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
