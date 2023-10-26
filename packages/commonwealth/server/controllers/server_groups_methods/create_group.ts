@@ -1,15 +1,15 @@
-import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
-import { AddressInstance } from '../../models/address';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
-import { UserInstance } from '../../models/user';
-import validateRequirements from '../../util/requirementsModule/validateRequirements';
-import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from '../../util/validateOwner';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { Op } from 'sequelize';
+import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../database';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { GroupAttributes, GroupMetadata } from '../../models/group';
+import { UserInstance } from '../../models/user';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
+import validateRequirements from '../../util/requirementsModule/validateRequirements';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerGroupsController } from '../server_groups_controller';
 
 const MAX_GROUPS_PER_CHAIN = 20;
 
@@ -23,7 +23,7 @@ const Errors = {
 
 export type CreateGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: ChainInstance;
   address: AddressInstance;
   metadata: GroupMetadata;
   requirements: Requirement[];
@@ -33,13 +33,13 @@ export type CreateGroupOptions = {
 export type CreateGroupResult = GroupAttributes;
 
 export async function __createGroup(
-  this: ServerCommunitiesController,
-  { user, chain, metadata, requirements, topics }: CreateGroupOptions
+  this: ServerGroupsController,
+  { user, community, metadata, requirements, topics }: CreateGroupOptions
 ): Promise<CreateGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    chainId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -62,7 +62,7 @@ export async function __createGroup(
 
   const numChainGroups = await this.models.Group.count({
     where: {
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
   if (numChainGroups >= MAX_GROUPS_PER_CHAIN) {
@@ -74,7 +74,7 @@ export async function __createGroup(
       id: {
         [Op.in]: topics || [],
       },
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
   if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
@@ -87,7 +87,7 @@ export async function __createGroup(
       // create group
       const group = await this.models.Group.create(
         {
-          chain_id: chain.id,
+          chain_id: community.id,
           metadata,
           requirements,
         },

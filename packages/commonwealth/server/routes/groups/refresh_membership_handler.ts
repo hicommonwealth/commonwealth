@@ -1,8 +1,8 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { RefreshMembershipResult } from '../../controllers/server_groups_methods/refresh_membership';
-import { AppError } from '../../../../common-common/src/errors';
 import z from 'zod';
+import { AppError } from '../../../../common-common/src/errors';
+import { RefreshMembershipResult } from '../../controllers/server_groups_methods/refresh_membership';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type RefreshMembershipBody = {
   topic_id: number;
@@ -32,7 +32,7 @@ export const refreshMembershipHandler = async (
 
   const result = await controllers.groups.refreshMembership({
     user,
-    chain,
+    community: chain,
     address,
     topicId: topic_id,
   });

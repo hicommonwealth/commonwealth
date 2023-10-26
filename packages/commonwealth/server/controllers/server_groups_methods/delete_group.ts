@@ -1,11 +1,11 @@
-import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
-import { AddressInstance } from '../../models/address';
-import { UserInstance } from '../../models/user';
-import { validateOwner } from '../../util/validateOwner';
+import { Op } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../database';
-import { Op } from 'sequelize';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { UserInstance } from '../../models/user';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerGroupsController } from '../server_groups_controller';
 
 const Errors = {
   Unauthorized: 'Unauthorized',
@@ -22,7 +22,7 @@ export type DeleteGroupOptions = {
 export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
-  this: ServerCommunitiesController,
+  this: ServerGroupsController,
   { user, chain, groupId }: DeleteGroupOptions
 ): Promise<DeleteGroupResult> {
   const isAdmin = await validateOwner({

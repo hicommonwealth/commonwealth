@@ -1,10 +1,10 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
-import { AppError } from '../../../../common-common/src/errors';
 import z from 'zod';
+import { AppError } from '../../../../common-common/src/errors';
+import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
 import { GroupMetadata } from '../../models/group';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 const Errors = {};
 
@@ -20,7 +20,7 @@ export const createGroupHandler = async (
   req: TypedRequestBody<CreateGroupBody>,
   res: TypedResponse<CreateGroupResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
 
   const schema = z.object({
     body: z.object({
@@ -43,11 +43,17 @@ export const createGroupHandler = async (
 
   const result = await controllers.groups.createGroup({
     user,
-    chain,
+    community,
     address,
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
   });
+
+  // refresh memberships in background
+  controllers.groups
+    .refreshCommunityMemberships({ community })
+    .catch(console.error);
+
   return success(res, result);
 };

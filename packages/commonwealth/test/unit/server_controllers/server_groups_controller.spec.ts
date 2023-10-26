@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
-import { AddressAttributes, AddressInstance } from 'server/models/address';
+import { AddressInstance } from 'server/models/address';
 import { ChainInstance } from 'server/models/chain';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
@@ -154,7 +154,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const results = await controller.refreshMembership({
       user,
-      chain,
+      community: chain,
       address,
       topicId: 1,
     });
@@ -188,7 +188,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const result = await controller.createGroup({
       user,
-      chain,
+      community: chain,
       address,
       metadata: {
         name: 'blah',
@@ -209,7 +209,7 @@ describe('ServerGroupsController', () => {
     expect(
       controller.createGroup({
         user,
-        chain,
+        community: chain,
         address,
         metadata: {
           name: 'blah',
