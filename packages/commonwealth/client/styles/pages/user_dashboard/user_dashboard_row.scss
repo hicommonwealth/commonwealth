@@ -27,7 +27,7 @@
   border-bottom: 1px solid $neutral-100;
   display: flex;
   gap: 16px;
-  padding: 16px 0px 16px 0px;
+  padding: 16px;
   width: 768px;
 
   @include mediumSmallInclusive {
@@ -46,7 +46,10 @@
   max-width: 0;
   color: unset !important;
   text-decoration: none;
-  padding-left: 0;
+
+  @include smallInclusive {
+    padding: 16px 0 16px 0;
+  }
 
   a {
     color: unset !important;
