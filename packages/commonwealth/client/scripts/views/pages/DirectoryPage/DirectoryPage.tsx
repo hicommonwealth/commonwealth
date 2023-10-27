@@ -1,55 +1,27 @@
-import React, { useDeferredValue, useState } from 'react';
-
-import { CWDivider } from 'views/components/component_kit/cw_divider';
-import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
+import React, { useState } from 'react';
+import { useDebounce } from 'usehooks-ts';
+
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import DirectoryPageContent from 'views/pages/DirectoryPage/DirectoryPageContent';
 import useDirectoryPageData, {
   ViewType,
 } from 'views/pages/DirectoryPage/useDirectoryPageData';
 import ErrorPage from 'views/pages/error';
 import './DirectoryPage.scss';
 
-const columnInfo = [
-  {
-    key: 'community',
-    header: 'Community',
-    numeric: false,
-    sortable: true,
-  },
-  {
-    key: 'description',
-    header: 'Description',
-    numeric: false,
-    sortable: true,
-  },
-  {
-    key: 'members',
-    header: 'Members',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'threads',
-    header: 'Threads',
-    numeric: true,
-    sortable: true,
-  },
-];
-
 const DirectoryPage = () => {
   const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
-  const communitySearchDeferred = useDeferredValue(communitySearch);
+  const communitySearchDebounced = useDebounce<string>(communitySearch, 500);
 
   const directoryPageEnabled = app.config.chains.getById(
     app.activeChainId()
@@ -61,9 +33,15 @@ const DirectoryPage = () => {
   const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
   const baseChain = app.config.nodes.getById(defaultChainNodeId);
 
-  const { tableData, filteredRelatedCommunitiesData } = useDirectoryPageData({
+  const {
+    tableData,
+    filteredRelatedCommunitiesData,
+    isLoading,
+    noFilteredCommunities,
+    noCommunitiesInChain,
+  } = useDirectoryPageData({
     chainNodeId: baseChain.id,
-    searchTerm: communitySearchDeferred.toLowerCase().trim(),
+    searchTerm: communitySearchDebounced.toLowerCase().trim(),
     selectedViewType,
   });
 
@@ -131,23 +109,16 @@ const DirectoryPage = () => {
         </div>
       </div>
 
-      {selectedViewType === ViewType.Rows ? (
-        <CWTable columnInfo={columnInfo} rowData={tableData} />
-      ) : (
-        <div className="tiles-container">
-          {filteredRelatedCommunitiesData.map((community) => (
-            <CWRelatedCommunityCard
-              key={community.id}
-              id={community.id}
-              communityName={community.name}
-              communityDescription={community.description}
-              communityIconUrl={community.iconUrl}
-              memberCount={community.members}
-              threadCount={community.threads}
-            />
-          ))}
-        </div>
-      )}
+      <DirectoryPageContent
+        isLoading={isLoading}
+        noFilteredCommunities={noFilteredCommunities}
+        noCommunitiesInChain={noCommunitiesInChain}
+        chainName={baseChain?.name}
+        communitySearch={communitySearch}
+        filteredRelatedCommunitiesData={filteredRelatedCommunitiesData}
+        tableData={tableData}
+        selectedViewType={selectedViewType}
+      />
     </div>
   );
 };

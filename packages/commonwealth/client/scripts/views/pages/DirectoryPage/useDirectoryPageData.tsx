@@ -21,9 +21,10 @@ const useDirectoryPageData = ({
   selectedViewType,
 }: UseDirectoryPageDataProps) => {
   const navigate = useCommonNavigate();
-  const { data: relatedCommunities = [] } = useFetchRelatedCommunitiesQuery({
-    chainNodeId,
-  });
+  const { data: relatedCommunities = [], isLoading } =
+    useFetchRelatedCommunitiesQuery({
+      chainNodeId,
+    });
 
   const relatedCommunitiesData = useMemo(
     () =>
@@ -69,7 +70,16 @@ const useDirectoryPageData = ({
     }));
   }, [filteredRelatedCommunitiesData, navigate, selectedViewType]);
 
-  return { filteredRelatedCommunitiesData, tableData };
+  const noCommunitiesInChain = relatedCommunitiesData.length === 0;
+  const noFilteredCommunities = filteredRelatedCommunitiesData.length === 0;
+
+  return {
+    filteredRelatedCommunitiesData,
+    tableData,
+    isLoading,
+    noCommunitiesInChain,
+    noFilteredCommunities,
+  };
 };
 
 export default useDirectoryPageData;
