@@ -147,7 +147,12 @@ const GroupForm = ({
     setRequirementSubForms(requirementSubForms.splice(index, 1));
   };
 
+  const [requirementLimit, setRequirementLimit] = useState(false);
+
   const addRequirementSubForm = () => {
+    if (requirementSubForms.length >= MAX_REQUIREMENTS) {
+      setRequirementLimit(true);
+    }
     setRequirementSubForms([
       ...requirementSubForms,
       {
@@ -401,15 +406,9 @@ const GroupForm = ({
                     buttonType="secondary"
                     buttonHeight="med"
                     onClick={addRequirementSubForm}
-                    disabled={requirementSubForms.length >= MAX_REQUIREMENTS}
-                    onMouseEnter={
-                      requirementSubForms.length >= MAX_REQUIREMENTS &&
-                      handleInteraction
-                    }
-                    onMouseLeave={
-                      requirementSubForms.length >= MAX_REQUIREMENTS &&
-                      handleInteraction
-                    }
+                    disabled={requirementLimit}
+                    onMouseEnter={requirementLimit && handleInteraction}
+                    onMouseLeave={requirementLimit && handleInteraction}
                   />
                 )}
               />
