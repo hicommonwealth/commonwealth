@@ -1,8 +1,8 @@
 import Bluebird from 'bluebird';
 import { flatten } from 'lodash';
 import { Op } from 'sequelize';
-import { MembershipAttributes } from 'server/models/membership';
 import { ChainInstance } from '../../models/chain';
+import { MembershipAttributes } from '../../models/membership';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
 

@@ -42,14 +42,14 @@ The existing utility functions should be used for both ORM queries and raw SQL q
 import { formatPagination } from '../util/queries';
 
 const paginationOptions = {
-    liimt: 10,
+    limit: 10,
     page: 3
 }
 
 // spread the `formatPagination` result into the sequelize options
 const result = await models.Comment.count({
   where: {
-    …  
+    …
   },
   ...formatPagination(paginationOptions),
 });
@@ -81,12 +81,12 @@ const result = await models.sequelize.query(sqlQuery, {
 
 ⭐️ The response body of the request should contain pagination info, since it will help reduce the state complexity of the client side.
 
-Example:
+Use `TypedPaginationResult<T>`, which has the following shape:
 
-```js
+```ts
 {
     results: [
-        // items
+        // items of type T
     ],
     limit: 10,
     page: 3,
@@ -97,4 +97,5 @@ Example:
 
 # Change Log
 
+- 231027: Fixed code typo + added response body type.
 - 230714: Authored by Ryan Bennett.
