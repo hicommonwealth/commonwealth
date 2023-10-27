@@ -5,7 +5,7 @@ RED='\033[31m'
 YELLOW='\033[33m'
 NC='\033[0m' 
 
-FILES=$(git diff HEAD~1...HEAD --name-only --diff-filter=d)
+FILES=$(git diff --staged --name-only --diff-filter=d)
 
 if [ -n "$FILES" ]
 then
