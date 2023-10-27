@@ -41,7 +41,8 @@ interface DirectoryPageContentProps {
 
 const columnInfo = [
   {
-    key: 'community',
+    key: 'name',
+    customElementKey: 'community',
     header: 'Community',
     numeric: false,
     sortable: true,
@@ -101,7 +102,11 @@ const DirectoryPageContent = ({
   }
 
   return selectedViewType === ViewType.Rows ? (
-    <CWTable columnInfo={columnInfo} rowData={tableData} />
+    <CWTable
+      columnInfo={columnInfo}
+      rowData={tableData}
+      defaultSortColumnKey="members"
+    />
   ) : (
     <div className="directory-tiles-container">
       {filteredRelatedCommunitiesData.map((community) => (
