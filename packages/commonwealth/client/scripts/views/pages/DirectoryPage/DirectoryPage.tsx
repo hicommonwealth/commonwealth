@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useDeferredValue, useState } from 'react';
 
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -9,7 +9,6 @@ import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
-import { useDebounce } from 'usehooks-ts';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWRelatedCommunityCard } from 'views/components/component_kit/new_designs/CWRelatedCommunityCard';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -50,7 +49,7 @@ const DirectoryPage = () => {
   const navigate = useCommonNavigate();
   const [communitySearch, setCommunitySearch] = useState('');
   const [selectedViewType, setSelectedViewType] = useState(ViewType.Rows);
-  const debouncedSearchTerm = useDebounce<string>(communitySearch, 500);
+  const communitySearchDeferred = useDeferredValue(communitySearch);
 
   const directoryPageEnabled = app.config.chains.getById(
     app.activeChainId()
@@ -64,7 +63,7 @@ const DirectoryPage = () => {
 
   const { tableData, filteredRelatedCommunitiesData } = useDirectoryPageData({
     chainNodeId: baseChain.id,
-    debouncedSearchTerm,
+    searchTerm: communitySearchDeferred.toLowerCase().trim(),
     selectedViewType,
   });
 

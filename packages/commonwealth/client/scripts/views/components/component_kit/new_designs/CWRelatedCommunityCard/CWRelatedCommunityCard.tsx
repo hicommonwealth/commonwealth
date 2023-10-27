@@ -1,7 +1,7 @@
 import type ChainInfo from 'client/scripts/models/ChainInfo';
-import { pluralizeWithoutNumberPrefix } from 'helpers';
-import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import { isCommandClick, pluralizeWithoutNumberPrefix } from 'helpers';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import React, { useCallback } from 'react';
 import { CWCommunityAvatar } from '../../cw_community_avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { CWText } from '../../cw_text';
@@ -34,10 +34,22 @@ export const CWRelatedCommunityCard = ({
     name: communityName,
   } as ChainInfo;
 
+  const handleClick = useCallback(
+    (e, communityId: string) => {
+      e.preventDefault();
+      if (isCommandClick(e)) {
+        window.open(`/${communityId}`, '_blank');
+        return;
+      }
+      navigateToCommunity({ navigate, path: '', chain: communityId });
+    },
+    [navigate]
+  );
+
   return (
     <div
       className={ComponentType.RelatedCommunityCard}
-      onClick={() => navigate(`/${id}`, {}, null)}
+      onClick={(e) => handleClick(e, id)}
     >
       <div className="content-container">
         <div className="top-content">

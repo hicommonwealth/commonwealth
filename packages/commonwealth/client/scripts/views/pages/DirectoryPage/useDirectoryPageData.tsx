@@ -11,23 +11,25 @@ export enum ViewType {
 }
 interface UseDirectoryPageDataProps {
   chainNodeId: number;
-  debouncedSearchTerm: string;
+  searchTerm: string;
   selectedViewType: ViewType;
 }
+
 const useDirectoryPageData = ({
   chainNodeId,
-  debouncedSearchTerm,
+  searchTerm,
   selectedViewType,
 }: UseDirectoryPageDataProps) => {
   const navigate = useCommonNavigate();
-  const { data: relatedCommunities } = useFetchRelatedCommunitiesQuery({
+  const { data: relatedCommunities = [] } = useFetchRelatedCommunitiesQuery({
     chainNodeId,
   });
 
   const relatedCommunitiesData = useMemo(
     () =>
-      (relatedCommunities || []).map((c) => ({
+      relatedCommunities.map((c) => ({
         name: c.community,
+        nameLower: c.community.toLowerCase(),
         description: c.description,
         members: c.address_count,
         threads: c.thread_count,
@@ -39,10 +41,8 @@ const useDirectoryPageData = ({
 
   const filteredRelatedCommunitiesData = useMemo(
     () =>
-      relatedCommunitiesData.filter((c) =>
-        c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase().trim())
-      ),
-    [debouncedSearchTerm, relatedCommunitiesData]
+      relatedCommunitiesData.filter((c) => c.nameLower.includes(searchTerm)),
+    [searchTerm, relatedCommunitiesData]
   );
 
   const tableData = useMemo(() => {

@@ -138,6 +138,7 @@ export const CWTable = ({
           },
           footer: (footerProps) => footerProps.column.id,
           enableSorting: col.sortable,
+          isNumeric: col.numeric,
         };
       }),
     [columnInfo]
@@ -226,7 +227,11 @@ export const CWTable = ({
                           className: clsx(
                             'header-content',
                             header.column.getCanSort() &&
-                              'cursor-pointer select-none'
+                              'cursor-pointer select-none',
+                            {
+                              numeric: (header.column.columnDef as any)
+                                .isNumeric,
+                            }
                           ),
                         }}
                       >

@@ -2,7 +2,7 @@
 
 .DirectoryPage {
   width: 100%;
-  padding: 76px 56px 24px;
+  padding: 32px 56px 24px;
 
   @include smallInclusive {
     padding: 24px;
@@ -90,6 +90,10 @@
     gap: 8px;
     align-items: center;
     cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
 
     @include extraSmall {
       min-width: unset;
