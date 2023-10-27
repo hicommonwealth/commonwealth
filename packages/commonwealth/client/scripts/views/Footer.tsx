@@ -21,7 +21,7 @@ const footercontents = [
   {
     text: 'Telegram',
     externalLink: 'https://t.me/HiCommonwealth',
-  }
+  },
 ];
 
 export const Footer = () => {
