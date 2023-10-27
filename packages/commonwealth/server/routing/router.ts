@@ -344,7 +344,7 @@ function setupRouter(
     'delete',
     '/communities/:communityId' /* prev: POST /deleteChain */,
     passport.authenticate('jwt', { session: false }),
-    deleteCommunityHandler.bind(this, serverControllers)
+    deleteCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
