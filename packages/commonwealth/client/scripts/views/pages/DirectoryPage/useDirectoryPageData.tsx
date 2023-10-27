@@ -1,6 +1,7 @@
+import { isCommandClick } from 'helpers';
 import ChainInfo from 'models/ChainInfo';
-import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo } from 'react';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import React, { useCallback, useMemo } from 'react';
 import { useFetchRelatedCommunitiesQuery } from 'state/api/communities';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -25,6 +26,18 @@ const useDirectoryPageData = ({
     useFetchRelatedCommunitiesQuery({
       chainNodeId,
     });
+
+  const handleClick = useCallback(
+    (e, communityId: string) => {
+      e.preventDefault();
+      if (isCommandClick(e)) {
+        window.open(`/${communityId}`, '_blank');
+        return;
+      }
+      navigateToCommunity({ navigate, path: '', chain: communityId });
+    },
+    [navigate]
+  );
 
   const relatedCommunitiesData = useMemo(
     () =>
@@ -56,7 +69,7 @@ const useDirectoryPageData = ({
       community: (
         <div
           className="community-name-cell"
-          onClick={() => navigate(`/${c.id}`, {}, null)}
+          onClick={(e) => handleClick(e, c.id)}
         >
           <CWCommunityAvatar
             size="medium"
@@ -68,7 +81,7 @@ const useDirectoryPageData = ({
         </div>
       ),
     }));
-  }, [filteredRelatedCommunitiesData, navigate, selectedViewType]);
+  }, [filteredRelatedCommunitiesData, handleClick, selectedViewType]);
 
   const noCommunitiesInChain = relatedCommunitiesData.length === 0;
   const noFilteredCommunities = filteredRelatedCommunitiesData.length === 0;
