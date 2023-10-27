@@ -6,12 +6,11 @@ import {
   WarningCircle,
   X,
 } from '@phosphor-icons/react';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import clsx from 'clsx';
 import 'components/component_kit/new_designs/CWBanner.scss';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import {
   ButtonProps,
   ButtonType,
@@ -42,7 +41,7 @@ interface CWBannerProps {
   buttons?: ButtonProps[];
   className?: string;
   onClose: () => void;
-  gatedGroups?: Array<{ id: number; name: string }>;
+  footer?: ReactNode;
 }
 
 const getButtonType = (index: number, bannerType: BannerType): ButtonType => {
@@ -64,7 +63,7 @@ const CWBanner = ({
   buttons,
   className,
   onClose,
-  gatedGroups,
+  footer,
 }: CWBannerProps) => {
   const TypeIcon = typeIconLookup[type];
 
@@ -84,13 +83,7 @@ const CWBanner = ({
             <CWText type="b2" className="body">
               {body}
             </CWText>
-            {gatedGroups && (
-              <div className="gating-tags">
-                {gatedGroups.map((t) => (
-                  <CWTag key={t.id} label={t.name} type="referendum" />
-                ))}
-              </div>
-            )}
+            {footer && footer}
           </div>
         )}
         {buttons?.length > 0 && (

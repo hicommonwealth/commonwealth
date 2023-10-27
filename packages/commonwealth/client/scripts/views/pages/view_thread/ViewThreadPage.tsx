@@ -46,6 +46,7 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import CWBanner from '../../components/component_kit/new_designs/CWBanner';
+import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
@@ -520,12 +521,24 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       canComment={canComment}
                       shouldFocusEditor={shouldFocusCommentEditor}
                     />
-                    {!hideGatingBanner && gatedGroups.length > 0 && (
+                    {featureFlags.gatingEnabled && gatedGroups.length > 0 && (
                       <CWBanner
                         title="This topic is gated"
                         body="Only members within the following group(s) can interact with this topic:"
                         type="info"
-                        gatedGroups={gatedGroups}
+                        footer={
+                          gatedGroups && (
+                            <div className="gating-tags">
+                              {gatedGroups.map((t) => (
+                                <CWTag
+                                  key={t.id}
+                                  label={t.name}
+                                  type="referendum"
+                                />
+                              ))}
+                            </div>
+                          )
+                        }
                         buttons={[
                           {
                             label: 'See all groups',
