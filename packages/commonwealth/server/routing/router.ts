@@ -344,14 +344,14 @@ function setupRouter(
     'delete',
     '/communities/:communityId' /* prev: POST /deleteChain */,
     passport.authenticate('jwt', { session: false }),
-    deleteCommunityHandler.bind(this, serverControllers)
+    deleteCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
     'patch',
     '/communities/:communityId' /* prev: POST /updateChain */,
     passport.authenticate('jwt', { session: false }),
-    updateCommunityHandler.bind(this, serverControllers)
+    updateCommunityHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
