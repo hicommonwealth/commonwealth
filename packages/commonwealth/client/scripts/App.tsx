@@ -7,7 +7,7 @@ import React, { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
-import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
+import { Splash } from './Splash';
 
 const unleashConfig = {
   url: process.env.UNLEASH_URL,
@@ -16,14 +16,6 @@ const unleashConfig = {
   appName: 'commonwealth-web',
 };
 
-const Splash = () => {
-  return (
-    <div className="Splash">
-      {/* This can be a moving bobber, atm it is still */}
-      <CWIcon iconName="cow" iconSize="xxl" />
-    </div>
-  );
-};
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();
