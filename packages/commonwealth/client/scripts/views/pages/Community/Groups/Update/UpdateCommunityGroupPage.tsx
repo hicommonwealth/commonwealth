@@ -1,4 +1,5 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { featureFlags } from 'helpers/feature-flags';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -32,6 +33,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const foundGroup: Group = groups.find((x) => x.id === parseInt(`${groupId}`));
 
   if (
+    !featureFlags.gatingEnabled ||
     !app.isLoggedIn() ||
     !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
   ) {

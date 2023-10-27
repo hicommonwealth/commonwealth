@@ -6,12 +6,26 @@ import {
   EvmSource,
   RawEvmEvent,
 } from './types';
-import { decimalToHex } from 'chain-events/src';
 import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { rollbar } from '../../util/rollbar';
 
 const logger = factory.getLogger(formatFilename(__filename));
+
+/**
+ * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
+ * https://ethereum.org/en/developers/docs/apis/json-rpc/#quantities-encoding
+ * @param decimal
+ */
+function decimalToHex(decimal: number | string) {
+  if (decimal == '0') {
+    return '0x0';
+  } else {
+    return ethers.utils.hexStripZeros(
+      ethers.BigNumber.from(decimal).toHexString()
+    );
+  }
+}
 
 export function getProvider(rpc: string) {
   return new ethers.providers.JsonRpcProvider(rpc);

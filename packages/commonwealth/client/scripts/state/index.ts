@@ -9,7 +9,6 @@ import { NearAccount } from 'controllers/chain/near/account';
 import SnapshotController from 'controllers/chain/snapshot';
 import SolanaAccount from 'controllers/chain/solana/account';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import ChainEntityController from 'controllers/server/chain_entities';
 import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
@@ -47,7 +46,6 @@ export interface IApp {
     | SolanaAccount
     | SubstrateAccount
   >;
-  chainEntities: ChainEntityController;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -135,7 +133,6 @@ const roles = new RolesController(user);
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
-  chainEntities: new ChainEntityController(),
   activeChainId: () => app.chain?.id,
 
   chainPreloading: false,

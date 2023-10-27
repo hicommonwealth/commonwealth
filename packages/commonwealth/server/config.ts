@@ -5,24 +5,11 @@ dotenv.config();
 
 export const PORT = process.env.PORT || '8080';
 
-export const NODE_URL =
-  process.env.NODE_URL ||
-  (process.env.NODE_ENV === 'production'
-    ? 'ws://testnet2.edgewa.re:9944'
-    : 'ws://localhost:9944');
-
 export const SERVER_URL =
   process.env.SERVER_URL ||
   (process.env.NODE_ENV === 'production'
     ? 'https://commonwealth.im'
     : 'http://localhost:8080');
-
-export const CE_URL =
-  process.env.ENTITIES_URL ||
-  process.env.CE_URL ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://chain-events.herokuapp.com/api'
-    : 'http://localhost:8081/api');
 
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
@@ -120,15 +107,10 @@ export const DEFAULT_COMMONWEALTH_LOGO =
 
 export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
 
-export const WEBSOCKET_ADMIN_USERNAME = process.env.WEBSOCKET_ADMIN_USERNAME;
-export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
-
 export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
 
 export const ETHERSCAN_JS_API_KEY = process.env.ETHERSCAN_JS_API_KEY;
-export const CHAIN_EVENT_SERVICE_SECRET =
-  process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
 export const ETH_RPC = process.env.ETH_RPC || 'prod';
 
 export const COSMOS_GOV_V1_CHAIN_IDS = process.env.COSMOS_GOV_V1

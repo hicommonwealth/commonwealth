@@ -12,7 +12,10 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import type { AaveProposalState } from './types';
@@ -58,9 +61,10 @@ export const CompoundProposalForm = () => {
         resizeWithText
       />
       <div className="tab-selector">
-        <CWTabBar>
+        <CWTabsRow>
           {aaveProposalState.map((_, index) => (
             <CWTab
+              key={index}
               label={`Call ${index + 1}`}
               isSelected={activeTabIndex === index}
               onClick={() => {
@@ -69,7 +73,7 @@ export const CompoundProposalForm = () => {
               key={index}
             />
           ))}
-        </CWTabBar>
+        </CWTabsRow>
         <PopoverMenu
           menuItems={[
             {

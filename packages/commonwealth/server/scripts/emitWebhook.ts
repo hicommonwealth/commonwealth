@@ -1,4 +1,4 @@
-import { SupportedNetwork } from 'chain-events/src';
+import { SupportedNetwork } from '../../shared/chain/types/types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import yargs from 'yargs';
