@@ -104,10 +104,6 @@ import authCallback from '../routes/authCallback';
 import viewChainIcons from '../routes/viewChainIcons';
 
 import generateImage from '../routes/generateImage';
-import { getChainEventServiceData } from '../routes/getChainEventServiceData';
-import { getChain } from '../routes/getChain';
-import { getChainNode } from '../routes/getChainNode';
-import { getChainContracts } from '../routes/getChainContracts';
 import { getSubscribedChains } from '../routes/getSubscribedChains';
 import type GlobalActivityCache from '../util/globalActivityCache';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -1318,27 +1314,6 @@ function setupRouter(
     getSnapshotProposal.bind(this, models)
   );
 
-  // These routes behave like get (fetch data) but use POST because a secret
-  // is passed in the request body -> passing the secret via query parameters is not safe
-  registerRoute(
-    router,
-    'post',
-    '/getChainEventServiceData',
-    getChainEventServiceData.bind(this, models)
-  );
-  registerRoute(router, 'post', '/getChain', getChain.bind(this, models));
-  registerRoute(
-    router,
-    'post',
-    '/getChainNode',
-    getChainNode.bind(this, models)
-  );
-  registerRoute(
-    router,
-    'post',
-    '/getChainContracts',
-    getChainContracts.bind(this, models)
-  );
   registerRoute(
     router,
     'post',

@@ -1,7 +1,7 @@
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { IEventLabel } from '../../../../../../chain-events/src';
+import type { IEventLabel } from 'chain/labelers/util';
 import ChainInfo from '../../../models/ChainInfo';
 import { Skeleton } from '../../components/Skeleton';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';

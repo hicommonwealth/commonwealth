@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
 import { Warning, WarningOctagon, X } from '@phosphor-icons/react';
+import React, { FC } from 'react';
 
 import { CWText } from '../../../cw_text';
 
@@ -22,7 +22,7 @@ const CWModalHeader: FC<CWModalHeaderProps> = ({
 }) => {
   return (
     <div className="CWModalHeader">
-      <div className="Header">
+      <div className="ModalHeader">
         {icon === 'warning' && (
           <Warning className="warning-icon" weight="fill" size={24} />
         )}

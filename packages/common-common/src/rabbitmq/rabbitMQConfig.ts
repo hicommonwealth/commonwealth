@@ -10,7 +10,6 @@ import { getAllRascalConfigs } from './configuration/rascalConfig';
 
 export enum RascalConfigServices {
   CommonwealthService = 'commonwealth',
-  ChainEventsService = 'chainEvents',
   SnapshotService = 'snapshot',
   DiscobotService = 'discobot',
 }
@@ -88,20 +87,6 @@ export function getRabbitMQConfig(
       RascalSubscriptions.ChainEventNotifications,
       RascalSubscriptions.SnapshotListener,
       RascalSubscriptions.DiscordListener,
-    ]);
-  } else if (service === RascalConfigServices.ChainEventsService) {
-    copyConfigs(allExchanges, vhostConfig.exchanges, [
-      RascalExchanges.ChainEvents,
-    ]);
-    copyConfigs(allQueues, vhostConfig.queues, [RascalQueues.ChainEvents]);
-    copyConfigs(allBindings, vhostConfig.bindings, [
-      RascalBindings.ChainEvents,
-    ]);
-    copyConfigs(allPublications, vhostConfig.publications, [
-      RascalPublications.ChainEvents,
-    ]);
-    copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
-      RascalSubscriptions.ChainEvents,
     ]);
   } else if (service === RascalConfigServices.SnapshotService) {
     copyConfigs(allExchanges, vhostConfig.exchanges, [

@@ -1,7 +1,7 @@
 import { NotificationDataAndCategory } from '../../../shared/types';
 import { NotificationCategories } from 'common-common/src/types';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
-import { Label as chainEventLabel } from 'chain-events/src';
+import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
 import { capitalize } from 'lodash';
 import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';
 import { SERVER_URL } from '../../config';
