@@ -1,10 +1,10 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { GroupMetadata } from 'server/models/group';
 import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
+import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type UpdateGroupParams = { id: string };
 type UpdateGroupBody = {
@@ -18,7 +18,7 @@ export const updateGroupHandler = async (
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
   res: TypedResponse<UpdateGroupResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
 
   const schema = z.object({
     params: z.object({
@@ -46,11 +46,17 @@ export const updateGroupHandler = async (
 
   const result = await controllers.groups.updateGroup({
     user,
-    chain,
+    community,
     address,
     groupId,
     metadata: metadata as Required<typeof metadata>,
     requirements,
   });
+
+  // refresh memberships in background
+  controllers.groups
+    .refreshCommunityMemberships({ community })
+    .catch(console.error);
+
   return success(res, result);
 };

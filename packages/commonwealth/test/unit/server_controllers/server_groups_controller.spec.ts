@@ -226,7 +226,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const result = await controller.updateGroup({
       user,
-      chain,
+      community: chain,
       address,
       groupId: 1,
       metadata: {
@@ -247,7 +247,7 @@ describe('ServerGroupsController', () => {
     expect(
       controller.updateGroup({
         user,
-        chain,
+        community: chain,
         address,
         groupId: 1,
         metadata: {

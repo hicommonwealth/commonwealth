@@ -6,8 +6,6 @@ import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
-const Errors = {};
-
 type CreateGroupBody = {
   metadata: GroupMetadata;
   requirements: Requirement[];
