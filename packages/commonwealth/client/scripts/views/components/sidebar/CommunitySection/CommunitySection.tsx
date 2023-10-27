@@ -1,23 +1,28 @@
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { featureFlags } from 'helpers/feature-flags';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { SubscriptionButton } from 'views/components/subscription_button';
 import Permissions from '../../../../utils/Permissions';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
+import DirectoryMenuItem from '../DirectoryMenuItem';
 import { AdminSection } from '../admin_section';
 import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
-export const CommunitySection = ({ showSkeleton }) => {
+interface CommunitySectionProps {
+  showSkeleton: boolean;
+}
+export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const navigate = useCommonNavigate();
   const { pathname } = useLocation();
   const { isLoggedIn } = useUserLoggedIn();
@@ -48,8 +53,15 @@ export const CommunitySection = ({ showSkeleton }) => {
           <CWText>Home</CWText>
         </div>
       )}
+
+      <CWDivider />
       <DiscussionSection />
+      <CWDivider />
       <GovernanceSection />
+      <CWDivider />
+      <DirectoryMenuItem />
+      <CWDivider />
+
       <ExternalLinksModule />
       <div className="buttons-container">
         {isLoggedIn && app.chain && (

@@ -16,8 +16,8 @@ import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
 import { CWCard } from '../cw_card';
-import { CWTab, CWTabBar } from '../cw_tabs';
 import { CWText } from '../cw_text';
+import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
 import { ComponentType } from '../types';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';
 
@@ -246,25 +246,27 @@ export const CWContentPage = ({
         </div>
       ) : (
         <div className="tabs-view">
-          <CWTabBar>
-            <CWTab
-              label={contentBodyLabel}
-              onClick={() => {
-                setTabSelected(0);
-              }}
-              isSelected={tabSelected === 0}
-            />
-            {sidebarComponents?.map((item, i) => (
+          <div className="cw-tabs-row-container">
+            <CWTabsRow>
               <CWTab
-                key={item.label}
-                label={item.label}
+                label={contentBodyLabel}
                 onClick={() => {
-                  setTabSelected(i + 1);
+                  setTabSelected(0);
                 }}
-                isSelected={tabSelected === i + 1}
+                isSelected={tabSelected === 0}
               />
-            ))}
-          </CWTabBar>
+              {sidebarComponents?.map((item, i) => (
+                <CWTab
+                  key={item.label}
+                  label={item.label}
+                  onClick={() => {
+                    setTabSelected(i + 1);
+                  }}
+                  isSelected={tabSelected === i + 1}
+                />
+              ))}
+            </CWTabsRow>
+          </div>
           {tabSelected === 0 && mainBody}
           {sidebarComponents?.length >= 1 &&
             tabSelected === 1 &&
@@ -286,6 +288,7 @@ type ContentPageCardProps = {
   header: string;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWContentPageCard = (props: ContentPageCardProps) => {
   const { content, header } = props;
 

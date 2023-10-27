@@ -43,11 +43,6 @@
       width: 100%;
     }
 
-    .TabBar {
-      justify-content: center;
-      margin-bottom: 0;
-    }
-
     .search-results-caption.Text {
       color: $neutral-500;
 
@@ -63,7 +58,6 @@
     .search-results-filters {
       display: flex;
       align-items: baseline;
-      justify-content: center;
       gap: 8px;
     }
 

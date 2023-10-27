@@ -86,6 +86,7 @@ type ColumnDescriptor = {
   header: string;
   numeric: boolean;
   sortable: boolean;
+  customElementKey?: string;
 };
 
 type RowData = {
@@ -97,6 +98,8 @@ type TableProps = {
   rowData: any[];
   isLoadingMoreRows?: boolean;
   onScrollEnd?: () => any;
+  defaultSortColumnKey?: string;
+  defaultSortDesc?: boolean;
 };
 
 export const CWTable = ({
@@ -104,12 +107,14 @@ export const CWTable = ({
   rowData,
   onScrollEnd,
   isLoadingMoreRows,
+  defaultSortColumnKey = columnInfo[0].key,
+  defaultSortDesc = true,
 }: TableProps) => {
   const tableRef = useRef();
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: columnInfo[0].key,
-      desc: true,
+      id: defaultSortColumnKey,
+      desc: defaultSortDesc,
     },
   ]);
 
@@ -123,21 +128,28 @@ export const CWTable = ({
             const currentRow = info.row.original as RowData;
             const avatarUrl = currentRow.avatars?.[col.key];
 
+            if (col.customElementKey) {
+              return currentRow[col.customElementKey];
+            }
+
             if (col.numeric) {
               return <div className="numeric">{info.getValue()}</div>;
-            } else if (avatarUrl) {
+            }
+
+            if (avatarUrl) {
               return (
                 <div className="avatar-cell">
                   <Avatar url={avatarUrl} size={20} />
                   <div className="text">{info.getValue()}</div>
                 </div>
               );
-            } else {
-              return info.getValue();
             }
+
+            return info.getValue();
           },
           footer: (footerProps) => footerProps.column.id,
           enableSorting: col.sortable,
+          isNumeric: col.numeric,
         };
       }),
     [columnInfo]
@@ -198,7 +210,7 @@ export const CWTable = ({
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && !isLoadingMoreRows) {
-        onScrollEnd();
+        onScrollEnd?.();
       }
     });
 
@@ -226,7 +238,11 @@ export const CWTable = ({
                           className: clsx(
                             'header-content',
                             header.column.getCanSort() &&
-                              'cursor-pointer select-none'
+                              'cursor-pointer select-none',
+                            {
+                              numeric: (header.column.columnDef as any)
+                                .isNumeric,
+                            }
                           ),
                         }}
                       >

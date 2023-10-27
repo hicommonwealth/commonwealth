@@ -1,11 +1,12 @@
+import clsx from 'clsx';
 import React from 'react';
-import Select, { components } from 'react-select';
+import Select from 'react-select';
 import { ComponentType } from '../../types';
 import './CWTypeaheadSelectList.scss';
-import { CWIcon } from '../../cw_icons/cw_icon';
-import clsx from 'clsx';
+import { DropdownIndicator } from './DropdownIndicator';
+import { Option } from './Option';
 
-type SelectListOption = {
+export type SelectListOption = {
   value: string;
   label: string;
 };
@@ -15,28 +16,7 @@ type TypeaheadSelectListProps = {
   defaultValue: SelectListOption;
   placeholder: string;
   isDisabled?: boolean;
-};
-
-const DropdownIndicator = (props) => {
-  const isMenuOpen = props.selectProps.menuIsOpen;
-
-  return (
-    <components.DropdownIndicator {...props}>
-      {isMenuOpen ? (
-        <CWIcon iconName="chevronUp" iconSize="small" />
-      ) : (
-        <CWIcon iconName="chevronDown" iconSize="small" />
-      )}
-    </components.DropdownIndicator>
-  );
-};
-
-const Option = (props) => {
-  return (
-    <components.Option {...props}>
-      <div className="text-container">{props.label}</div>
-    </components.Option>
-  );
+  onChange?: (newOption: SelectListOption) => void;
 };
 
 export const CWTypeaheadSelectList = ({
@@ -44,6 +24,7 @@ export const CWTypeaheadSelectList = ({
   defaultValue,
   placeholder,
   isDisabled = false,
+  onChange,
 }: TypeaheadSelectListProps) => {
   return (
     <div className={ComponentType.TypeaheadSelectList}>
@@ -71,6 +52,7 @@ export const CWTypeaheadSelectList = ({
         noOptionsMessage={() => 'No matches found.'}
         isDisabled={isDisabled}
         className={clsx(`SelectList`, isDisabled && 'disabled')}
+        onChange={onChange}
       />
     </div>
   );

@@ -4,7 +4,10 @@ import type RoleInfo from '../../../models/RoleInfo';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { UpgradeRolesForm } from './upgrade_roles_form';
 import { WebhooksForm } from './webhooks_form';
 
@@ -25,7 +28,7 @@ export const AdminPanelTabs = ({
 
   return (
     <div className="AdminPanelTabs">
-      <CWTabBar>
+      <CWTabsRow>
         <CWTab
           label="Admins"
           isSelected={currentTab === 1}
@@ -40,7 +43,7 @@ export const AdminPanelTabs = ({
             setCurrentTab(2);
           }}
         />
-      </CWTabBar>
+      </CWTabsRow>
       {currentTab === 1 && (
         <UpgradeRolesForm
           roleData={roleData}
