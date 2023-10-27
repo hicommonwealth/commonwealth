@@ -10,9 +10,8 @@ FILES=$(git diff origin/master...HEAD --name-only --diff-filter=d | grep -E '\.t
 if [ -n "$FILES" ]
 then
     echo -e -n $YELLOW
-    echo "------------------------------------------------------"
-    echo -e "Linting files before pushing..."
-    echo "------------------------------------------------------"
+    echo -e "🧹 eslint check before push..."
+    echo "-------------------------------"
     echo -e -n $GRAY
     echo "$FILES" | tr ' ' '\n' | xargs -I {} echo "- {}"
     echo -e $NC

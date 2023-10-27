@@ -10,9 +10,8 @@ FILES=$(git diff --staged --name-only --diff-filter=d)
 if [ -n "$FILES" ]
 then
     echo -e -n $YELLOW
-    echo "------------------------------------------------------"
-    echo -e "Formatting files before commit..."
-    echo "------------------------------------------------------"
+    echo -e "📐 prettier staged before commit..."
+    echo "------------------------------------"
     echo -e -n $GRAY
     echo "$FILES" | tr ' ' '\n' | xargs -I {} echo "- {}"
     echo -e $NC
