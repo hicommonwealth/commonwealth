@@ -33,18 +33,24 @@ html.todesktop .SublayoutHeader {
     gap: 8px;
     height: 100%;
 
-    .logo, .community-avatar-container, .IconButton {
+    .logo,
+    .community-avatar-container,
+    .IconButton {
       -webkit-app-region: no-drag;
     }
   }
 
-  .SearchBar {
-    @include extraSmall {
-      display: none;
-    }
+  .searchbar {
+    width: 608px;
 
-    input {
-      -webkit-app-region: no-drag;
+    .SearchBar {
+      @include extraSmall {
+        display: none;
+      }
+
+      input {
+        -webkit-app-region: no-drag;
+      }
     }
   }
 
@@ -100,7 +106,7 @@ html.todesktop .SublayoutHeader {
       -webkit-app-region: no-drag;
     }
     
-    .LoginSelector{
+    .LoginSelector {
       -webkit-app-region: no-drag;
     }
 
