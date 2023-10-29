@@ -2,32 +2,33 @@ import React, { useState } from 'react';
 import app, { initAppState } from 'state';
 import { User } from 'views/components/user/user';
 
-import './UserDropdown.scss';
+import clsx from 'clsx';
+import { WalletSsoSource } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+import { useCommonNavigate } from 'navigation/helpers';
+import useCheckAuthenticatedAddresses from 'views/components/Header/UserDropdown/useCheckAuthenticatedAddresses';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {
   PopoverMenu,
   PopoverMenuItem,
 } from 'views/components/component_kit/cw_popover/cw_popover_menu';
-import clsx from 'clsx';
 import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
-import { useCommonNavigate } from 'navigation/helpers';
-import { CWModal } from '../../component_kit/new_designs/CWModal';
-import { LoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
-import { UserDropdownItem } from './UserDropdownItem';
-import { WalletSsoSource } from 'common-common/src/types';
-import { setActiveAccount } from 'controllers/app/login';
 import SessionRevalidationModal from 'views/modals/SessionRevalidationModal';
-import useCheckAuthenticatedAddresses from 'views/components/Header/UserDropdown/useCheckAuthenticatedAddresses';
+import { LoginModal } from 'views/modals/login_modal';
+import { CWModal } from '../../component_kit/new_designs/CWModal';
+import './UserDropdown.scss';
+import { UserDropdownItem } from './UserDropdownItem';
 
 /* used for logout */
-import WebWalletController from 'controllers/app/web_wallets';
-import { WalletId } from 'common-common/src/types';
 import axios from 'axios';
+import { WalletId } from 'common-common/src/types';
+import { constructMagic } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import WebWalletController from 'controllers/app/web_wallets';
 import { setDarkMode } from 'helpers/darkMode';
 
 const resetWalletConnectSession = async () => {
@@ -68,6 +69,12 @@ const UserDropdown = () => {
   const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
     recheck: isOpen,
   });
+
+  const constructMagicAsync = async () => {
+    return await constructMagic(false);
+  };
+
+  const magic = constructMagicAsync();
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
@@ -128,6 +135,19 @@ const UserDropdown = () => {
           {
             type: 'header',
             label: 'Settings',
+          },
+          {
+            type: 'default',
+            label: 'Manage Wallet',
+            onClick: async () => {
+              const magic = await constructMagicAsync();
+              // TODO: This is a hacky way to get the wallet to show up
+              // TODO: Also, this is not the place to put this button
+              // app.user.addresses[0].walletId === WalletID.Magic
+              // We Should before load construct magic or use
+              // Previously constructed magic
+              magic.wallet.showUI();
+            },
           },
           {
             type: 'default',

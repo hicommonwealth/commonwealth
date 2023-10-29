@@ -1,13 +1,13 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { initAppState } from 'state';
+import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
-import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
+import { initAppState } from 'state';
 
 import app from 'state';
 import Account from '../../models/Account';
@@ -307,7 +307,7 @@ export async function unlinkLogin(account: AddressInfo) {
   }
 }
 
-async function constructMagic(isCosmos: boolean, chain?: string) {
+export async function constructMagic(isCosmos: boolean, chain?: string) {
   const { Magic } = await import('magic-sdk');
   const { OAuthExtension } = await import('@magic-ext/oauth');
   const { CosmosExtension } = await import('@magic-ext/cosmos');
