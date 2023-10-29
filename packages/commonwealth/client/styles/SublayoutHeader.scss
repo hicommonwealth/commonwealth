@@ -95,6 +95,10 @@ html.todesktop .SublayoutHeader {
         display: none;
       }
     }
+
+    .Button {
+      -webkit-app-region: no-drag;
+    }
     
     .LoginSelector{
       -webkit-app-region: no-drag;
