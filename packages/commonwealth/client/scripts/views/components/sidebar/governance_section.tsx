@@ -5,7 +5,11 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
 
+import { useCommonNavigate } from 'navigation/helpers';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import { sidebarStore } from 'state/ui/sidebar';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
 import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import type {
@@ -13,10 +17,6 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
-import { matchRoutes, useLocation } from 'react-router-dom';
-import { sidebarStore } from 'state/ui/sidebar';
-import { isWindowSmallInclusive } from '../component_kit/helpers';
 
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {
@@ -80,6 +80,7 @@ export const GovernanceSection = () => {
       app.chain.network !== ChainNetwork.Terra) ||
     app.chain?.network === ChainNetwork.Sputnik ||
     app.chain?.network === ChainNetwork.Compound ||
+    app.chain.network === ChainNetwork.Osmosis ||
     app.chain?.network === ChainNetwork.Aave;
 
   // ---------- Build Toggle Tree ---------- //
