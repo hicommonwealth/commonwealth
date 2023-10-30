@@ -33,18 +33,19 @@ export const requirementTypes = [
 ];
 
 // Get eth chain id from the app.config.chains for these chains
-const chainIdsToFind = [
+export const cosmosBaseChainIds = ['cosmos', 'injective'];
+export const ethBaseChainIds = [
   'axie-infinity',
-  'cosmos',
   'ethereum',
-  'injective',
   'polkadot',
   'polygon',
 ];
+const chainIdsToFind = [...cosmosBaseChainIds, ...ethBaseChainIds];
 const foundChains = app.config.chains
   .getAll()
   .filter((x) => chainIdsToFind.includes(x.id.toLowerCase()));
 export const chainTypes = chainIdsToFind.map((x, index) => ({
+  chainBase: cosmosBaseChainIds.includes(x) ? 'cosmos' : 'ethereum',
   value:
     foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode?.ethChainId ||
     index - 999, // TODO: some chains don't have an ethChainId

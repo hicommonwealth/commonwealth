@@ -21,6 +21,7 @@ const RequirementSubForm = ({
 }: RequirementSubFormType) => {
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const isCosmosRequirement = requirementType === TOKENS.COSMOS_TOKEN;
 
   useEffect(() => {
     defaultValues?.requirementType?.value &&
@@ -84,10 +85,15 @@ const RequirementSubForm = ({
             {...(defaultValues.requirementChain && {
               defaultValue: [defaultValues.requirementChain],
             })}
-            options={chainTypes.map((chainType) => ({
-              label: chainType.label,
-              value: `${chainType.value}`,
-            }))}
+            options={chainTypes
+              .filter(
+                (x) =>
+                  x.chainBase === (isCosmosRequirement ? 'cosmos' : 'ethereum')
+              )
+              .map((chainType) => ({
+                label: chainType.label,
+                value: `${chainType.value}`,
+              }))}
             onChange={(newValue) => {
               onChange({
                 requirementChain: newValue.value,
