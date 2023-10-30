@@ -59,6 +59,18 @@ const createMockedGroupsController = () => {
       reject_reason: null,
       last_checked: new Date(),
     },
+    {
+      group_id: 1,
+      address_id: 1,
+      reject_reason: null,
+      last_checked: new Date(),
+    },
+    {
+      group_id: 1,
+      address_id: 1,
+      reject_reason: null,
+      last_checked: new Date(),
+    },
   ];
   const db: any = {
     Topic: {
@@ -104,6 +116,7 @@ const createMockedGroupsController = () => {
         };
         return [membership, true];
       },
+      count: async () => memberships.length,
       destroy: async () => {},
     },
     CommunityRole: {
@@ -168,19 +181,12 @@ describe('ServerGroupsController', () => {
     const { chain } = createMockParams();
     const result = await controller.getGroups({
       chain,
-      includeMembers: true,
     });
     expect(result).to.have.length(1);
     expect(result[0]).to.have.property('id');
     expect(result[0]).to.have.property('chain_id');
     expect(result[0]).to.have.property('metadata');
     expect(result[0]).to.have.property('requirements');
-    expect(result[0]).to.have.property('memberships');
-    expect(result[0].memberships).to.have.length(1);
-    expect(result[0].memberships[0]).to.have.property('group_id');
-    expect(result[0].memberships[0]).to.have.property('address_id');
-    expect(result[0].memberships[0]).to.have.property('reject_reason');
-    expect(result[0].memberships[0]).to.have.property('last_checked');
   });
 
   describe('#createGroup', async () => {
@@ -269,5 +275,21 @@ describe('ServerGroupsController', () => {
       groupId: 1,
     });
     expect(result).to.be.undefined;
+  });
+
+  describe('#getGroupMembers', async () => {
+    const controller = createMockedGroupsController();
+    const { user, chain, address } = createMockParams();
+    const result = await controller.getGroupMembers({
+      community: chain,
+      groupId: 1,
+      limit: 10,
+      page: 1,
+    });
+    expect(result.results).to.have.length(3);
+    expect(result.limit).to.equal(10);
+    expect(result.page).to.equal(1);
+    expect(result.totalPages).to.equal(1);
+    expect(result.totalResults).to.equal(3);
   });
 });
