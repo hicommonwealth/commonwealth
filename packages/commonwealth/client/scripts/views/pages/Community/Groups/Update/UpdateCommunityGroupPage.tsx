@@ -88,6 +88,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             groupId: groupId,
             groupName: values.groupName,
             groupDescription: values.groupDescription,
+            topicIds: values.topics.map((x) => x.value),
             requirementsToFulfill:
               values.requirementsToFulfill === 'ALL'
                 ? undefined
@@ -95,6 +96,8 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                   values.requirementsToFulfill,
             requirements: [],
           };
+
+          console.log('data => ', { values, payload });
 
           // map requirements and add to payload
           values.requirements.map((x) => {
