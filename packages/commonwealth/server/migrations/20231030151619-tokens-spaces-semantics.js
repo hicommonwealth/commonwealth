@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.renameColumn('Tokens', 'chain_id', 'community_id', {
+      await queryInterface.renameColumn('Tokens', 'chain_id', 'eth_chain_id', {
         transaction,
       });
       await queryInterface.renameColumn('CommunitySnapshotSpace', 'chain_id', 'community_id', {
