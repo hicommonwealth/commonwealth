@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
@@ -13,7 +13,7 @@ export type StarredCommunityAttributes = {
 
   // associations
   User?: UserAttributes | UserAttributes['id'];
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
 };
 
 export type StarredCommunityInstance =

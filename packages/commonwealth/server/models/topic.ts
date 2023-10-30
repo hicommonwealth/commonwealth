@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './chain';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -22,7 +22,7 @@ export type TopicAttributes = {
   group_ids: number[];
 
   // associations
-  chain?: ChainAttributes;
+  chain?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
 };
 

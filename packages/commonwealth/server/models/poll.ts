@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './chain';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -18,7 +18,7 @@ export type PollAttributes = {
 
   // associations
   Thread: ThreadAttributes;
-  Chain: ChainAttributes;
+  Chain: CommunityAttributes;
 };
 
 export type PollInstance = ModelInstance<PollAttributes>;

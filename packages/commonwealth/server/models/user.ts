@@ -2,7 +2,7 @@ import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { AddressAttributes, AddressInstance } from './address';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { CommunityAttributes, ChainInstance } from './chain';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import type {
   SocialAccountAttributes,
@@ -24,11 +24,11 @@ export type UserAttributes = {
   updated_at?: Date;
 
   // associations (see https://vivacitylabs.com/setup-typescript-sequelize/)
-  selectedChain?: ChainAttributes | ChainAttributes['id'];
+  selectedChain?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   Profiles?: ProfileAttributes[];
   SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
-  Chains?: ChainAttributes[] | ChainAttributes['id'][];
+  Chains?: CommunityAttributes[] | CommunityAttributes['id'][];
 };
 
 // eslint-disable-next-line no-use-before-define

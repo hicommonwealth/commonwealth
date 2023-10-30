@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
-import { ChainAttributes } from './chain';
+import { CommunityAttributes } from './chain';
 import { ModelInstance, ModelStatic } from './types';
 import { Requirement } from '../util/requirementsModule/requirementsTypes';
 
@@ -21,7 +21,7 @@ export type GroupAttributes = {
   updated_at?: Date;
 
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
 };
 
 export type GroupInstance = ModelInstance<GroupAttributes>;

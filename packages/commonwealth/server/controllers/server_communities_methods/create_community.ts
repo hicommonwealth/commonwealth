@@ -12,7 +12,7 @@ import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import type { AddressInstance } from '../../models/address';
-import type { ChainAttributes } from '../../models/chain';
+import type { CommunityAttributes } from '../../models/chain';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { RoleAttributes } from '../../models/role';
 
@@ -66,7 +66,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: Omit<ChainAttributes, 'substrate_spec'> &
+  community: Omit<CommunityAttributes, 'substrate_spec'> &
     Omit<ChainNodeAttributes, 'id'> & {
       id: string;
       node_url: string;
@@ -77,7 +77,7 @@ export type CreateCommunityOptions = {
 };
 
 export type CreateCommunityResult = {
-  chain: ChainAttributes;
+  chain: CommunityAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
   admin_address: string;

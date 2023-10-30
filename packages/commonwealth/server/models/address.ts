@@ -1,7 +1,7 @@
 import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { CommunityAttributes, ChainInstance } from './chain';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
@@ -30,7 +30,7 @@ export type AddressAttributes = {
   wallet_id?: WalletId;
   wallet_sso_source?: WalletSsoSource;
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
   SsoToken?: SsoTokenAttributes;

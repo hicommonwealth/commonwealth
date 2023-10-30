@@ -17,7 +17,7 @@ import type { TopicAttributes, TopicInstance } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
-export type ChainAttributes = {
+export type CommunityAttributes = {
   name: string;
   chain_node_id: number;
   default_symbol: string;
@@ -73,7 +73,7 @@ export type ChainAttributes = {
   updated_at?: Date;
 };
 
-export type ChainInstance = ModelInstance<ChainAttributes> & {
+export type ChainInstance = ModelInstance<CommunityAttributes> & {
   // add mixins as needed
   getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<

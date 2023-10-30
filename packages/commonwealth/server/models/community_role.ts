@@ -1,4 +1,4 @@
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './chain';
 import type { Role } from './role';
 import type { RoleAssignmentAttributes } from './role_assignment';
 
@@ -13,5 +13,5 @@ export type CommunityRoleAttributes = {
 
   // associations
   RoleAssignments?: RoleAssignmentAttributes[];
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
 };

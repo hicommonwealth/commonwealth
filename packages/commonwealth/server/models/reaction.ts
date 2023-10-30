@@ -1,7 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './chain';
 import type { ModelInstance, ModelStatic } from './types';
 import { StatsDController } from 'common-common/src/statsd';
 
@@ -24,7 +24,7 @@ export type ReactionAttributes = {
   created_at?: Date;
   updated_at?: Date;
 
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Address?: AddressAttributes;
 };
 

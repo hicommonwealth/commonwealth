@@ -1,5 +1,5 @@
 import { RawEvmEvent } from './types';
-import { ChainAttributes } from '../../models/chain';
+import { CommunityAttributes } from '../../models/chain';
 import { ContractAttributes } from '../../models/contract';
 import models from '../../database';
 import { QueryTypes } from 'sequelize';
@@ -27,8 +27,8 @@ export async function emitChainEventNotifs(
   ]);
 
   const chainData: {
-    chain_id: ChainAttributes['id'];
-    chain_network: ChainAttributes['network'];
+    chain_id: CommunityAttributes['id'];
+    chain_network: CommunityAttributes['network'];
     contract_address: ContractAttributes['address'];
     chain_node_id: ContractAttributes['chain_node_id'];
   }[] = await models.sequelize.query(
