@@ -8,12 +8,6 @@ module.exports = {
       });
       await queryInterface.sequelize.query(
         `
-        CREATE VIEW "Chains" AS SELECT * FROM "Communities";
-      `,
-        { transaction }
-      );
-      await queryInterface.sequelize.query(
-        `
         ALTER INDEX "Chains_pkey" RENAME TO "Communities_pkey";
       `,
         { transaction }
@@ -23,18 +17,18 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.sequelize.query(
+        `
+        DROP VIEW "Chains";
+      `,
+        { transaction }
+      );
       await queryInterface.renameTable('Communities', 'Chains', {
         transaction,
       });
       await queryInterface.sequelize.query(
         `
-        CREATE VIEW "Chains" AS SELECT * FROM "Communities";
-      `,
-        { transaction }
-      );
-      await queryInterface.sequelize.query(
-        `
-        ALTER INDEX "Chains_pkey" RENAME TO "Communities_pkey";
+        ALTER INDEX "Communities_pkey" RENAME TO "Chains_pkey";
       `,
         { transaction }
       );
