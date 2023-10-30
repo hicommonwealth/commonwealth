@@ -22,7 +22,7 @@ import {
 } from '../../shared/canvas';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
-import type { CommunityInstance } from '../models/chain';
+import type { CommunityInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 
 import { factory, formatFilename } from 'common-common/src/logging';

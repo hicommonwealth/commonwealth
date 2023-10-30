@@ -1,5 +1,5 @@
 import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { ServerCommentsController } from '../server_comments_controller';
 import { Op } from 'sequelize';

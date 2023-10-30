@@ -1,5 +1,5 @@
 import { LCDQueryClient as GovV1Client } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/query.lcd';
-import { CommunityInstance } from '../../../models/chain';
+import { CommunityInstance } from '../../../models/community';
 import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
 import { createLCDClient } from 'common-common/src/cosmos-ts/src/codegen/cosmos/lcd';
 import * as tm from '@cosmjs/tendermint-rpc';

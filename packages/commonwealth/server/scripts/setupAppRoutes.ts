@@ -3,7 +3,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
-import type { CommunityInstance } from '../models/chain';
+import type { CommunityInstance } from '../models/community';
 
 const log = factory.getLogger(formatFilename(__filename));
 

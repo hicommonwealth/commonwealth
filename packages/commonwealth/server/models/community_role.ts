@@ -1,4 +1,4 @@
-import type { CommunityAttributes } from './chain';
+import type { CommunityAttributes } from './community';
 import type { Role } from './role';
 import type { RoleAssignmentAttributes } from './role_assignment';
 

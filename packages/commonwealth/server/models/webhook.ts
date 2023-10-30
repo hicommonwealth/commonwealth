@@ -1,7 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import { WebhookCategory } from '../../shared/types';
-import type { CommunityAttributes } from './chain';
+import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type WebhookAttributes = {

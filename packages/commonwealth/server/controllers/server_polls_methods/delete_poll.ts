@@ -2,7 +2,7 @@ import { ServerThreadsController } from '../server_threads_controller';
 import { validateOwner } from '../../util/validateOwner';
 import { UserInstance } from '../../models/user';
 import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {

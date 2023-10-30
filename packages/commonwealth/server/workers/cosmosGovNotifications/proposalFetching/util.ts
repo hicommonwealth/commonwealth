@@ -1,4 +1,4 @@
-import { CommunityInstance } from '../../../models/chain';
+import { CommunityInstance } from '../../../models/community';
 import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { AllCosmosProposals } from './types';

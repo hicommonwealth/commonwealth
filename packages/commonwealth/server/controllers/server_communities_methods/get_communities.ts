@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { CommunitySnapshotSpaceWithSpaceAttached } from '../../models/community_snapshot_spaces';
 
 export type GetCommunitiesOptions = {};

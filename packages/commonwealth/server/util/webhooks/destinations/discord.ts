@@ -7,7 +7,7 @@ import {
   WebhookDataByCategory,
 } from '../types';
 import { REGEX_EMOJI } from '../util';
-import { CommunityInstance } from '../../../models/chain';
+import { CommunityInstance } from '../../../models/community';
 
 type DiscordWebhookMessage = {
   username: string;

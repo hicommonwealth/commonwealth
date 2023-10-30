@@ -2,7 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../../models';
 import Errors from './errors';
-import { CommunityInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../models/community';
 import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
 import { NotificationCategories } from 'common-common/src/types';
 import { CommentInstance } from '../../models/comment';

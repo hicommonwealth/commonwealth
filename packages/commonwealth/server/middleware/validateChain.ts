@@ -2,7 +2,7 @@
 // If a community is found, also check that the user is allowed to see it.
 
 import type { DB } from '../models';
-import type { CommunityInstance } from '../models/chain';
+import type { CommunityInstance } from '../models/community';
 
 export const ChainCommunityErrors = {
   ChainDNE: 'Chain does not exist',

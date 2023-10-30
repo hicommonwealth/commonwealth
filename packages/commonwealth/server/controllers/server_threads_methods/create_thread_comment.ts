@@ -1,5 +1,5 @@
 import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { CommentAttributes } from '../../models/comment';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';

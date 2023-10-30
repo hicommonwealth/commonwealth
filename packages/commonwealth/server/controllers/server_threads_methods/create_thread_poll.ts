@@ -4,7 +4,7 @@ import { ServerThreadsController } from '../server_threads_controller';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
 import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {

@@ -9,7 +9,7 @@ import {
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
 import { uniq } from 'lodash';
 import { ServerProfilesController } from '../server_profiles_controller';
-import { CommunityInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../models/community';
 
 export const Errors = {};
 

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
-import { CommunityInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../../server/models/community';
 import { UserInstance } from 'server/models/user';
 
 const createMockedTopicsController = (isAdmin: boolean = false) => {

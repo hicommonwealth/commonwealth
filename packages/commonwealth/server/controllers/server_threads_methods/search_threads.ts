@@ -6,7 +6,7 @@ import {
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ThreadAttributes } from '../../models/thread';
 import { TypedPaginatedResult } from 'server/types';
 

@@ -1,4 +1,4 @@
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ServerCommentsController } from '../server_comments_controller';
 import {
   PaginationSqlOptions,

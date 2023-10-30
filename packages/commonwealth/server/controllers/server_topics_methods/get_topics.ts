@@ -1,6 +1,6 @@
 import { QueryTypes } from 'sequelize';
 import { TopicAttributes } from '../../models/topic';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ServerTopicsController } from '../server_topics_controller';
 
 export type GetTopicsOptions = {

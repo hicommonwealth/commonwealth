@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
-import { CommunityAttributes } from './chain';
+import { CommunityAttributes } from './community';
 import { ModelInstance, ModelStatic } from './types';
 import { Requirement } from '../util/requirementsModule/requirementsTypes';
 

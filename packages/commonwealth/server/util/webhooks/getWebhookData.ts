@@ -10,7 +10,7 @@ import {
   getPreviewImageUrl,
   getThreadUrlFromNotification,
 } from './util';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 
 export async function getWebhookData(
   notification: Exclude<

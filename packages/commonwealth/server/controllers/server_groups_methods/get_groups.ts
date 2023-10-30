@@ -1,5 +1,5 @@
 import { GroupAttributes } from 'server/models/group';
-import { CommunityInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../models/community';
 import { Op, WhereOptions } from 'sequelize';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';

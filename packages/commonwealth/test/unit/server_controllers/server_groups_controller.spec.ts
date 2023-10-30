@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
 import { AddressAttributes, AddressInstance } from 'server/models/address';
-import { CommunityInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../../server/models/community';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';

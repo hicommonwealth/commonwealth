@@ -4,7 +4,7 @@ import { ChainBase } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
-import type { CommunityAttributes } from '../../models/chain';
+import type { CommunityAttributes } from '../../models/community';
 import { findOneRole } from '../../util/roles';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { ServerCommunitiesController } from '../server_communities_controller';

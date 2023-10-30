@@ -1,4 +1,4 @@
-import { CommunityInstance } from '../../../models/chain';
+import { CommunityInstance } from '../../../models/community';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import {

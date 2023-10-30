@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ThreadAttributes } from '../../models/thread';

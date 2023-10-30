@@ -12,7 +12,7 @@ import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import type { AddressInstance } from '../../models/address';
-import type { CommunityAttributes } from '../../models/chain';
+import type { CommunityAttributes } from '../../models/community';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { RoleAttributes } from '../../models/role';
 

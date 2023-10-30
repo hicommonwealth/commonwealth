@@ -12,7 +12,7 @@ import { sendZapierWebhook } from './destinations/zapier';
 import { rollbar } from '../rollbar';
 import { StatsDController } from 'common-common/src/statsd';
 import models from '../../database';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 
 const log = factory.getLogger(formatFilename(__filename));
 

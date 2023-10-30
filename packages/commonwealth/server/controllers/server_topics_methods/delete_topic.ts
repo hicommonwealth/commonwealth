@@ -1,4 +1,4 @@
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ServerTopicsController } from '../server_topics_controller';
 import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';

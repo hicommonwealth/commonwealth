@@ -1,6 +1,6 @@
 import { DB } from '../../models';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { AddressInstance } from '../../models/address';
 import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
 import validateGroupMembership from './validateGroupMembership';

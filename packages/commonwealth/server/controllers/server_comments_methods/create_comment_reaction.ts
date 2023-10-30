@@ -8,11 +8,10 @@ import {
   ChainType,
   NotificationCategories,
 } from '../../../../common-common/src/types';
-import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { UserInstance } from '../../models/user';
 import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ServerCommentsController } from '../server_comments_controller';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { EmitOptions } from '../server_notifications_methods/emit';

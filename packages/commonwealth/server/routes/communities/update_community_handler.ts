@@ -5,7 +5,7 @@ import {
   UpdateCommunityResult,
 } from 'server/controllers/server_communities_methods/update_community';
 import { MixpanelCommunityCreationEvent } from 'shared/analytics/types';
-import { CommunityAttributes } from 'server/models/chain';
+import { CommunityAttributes } from '../../models/community';
 
 type UpdateCommunityRequestBody = CommunityAttributes & {
   id: string;

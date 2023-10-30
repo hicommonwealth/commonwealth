@@ -18,7 +18,7 @@ import { sequelize } from '../database';
 import { validateChain } from '../middleware/validateChain';
 import type { DB } from '../models';
 import { AddressAttributes, AddressInstance } from '../models/address';
-import { CommunityInstance } from '../models/chain';
+import { CommunityInstance } from '../models/community';
 import type { ProfileAttributes, ProfileInstance } from '../models/profile';
 import { SsoTokenInstance } from '../models/sso_token';
 import { UserAttributes, UserInstance } from '../models/user';

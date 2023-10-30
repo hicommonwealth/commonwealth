@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
-import type { CommunityAttributes, CommunityInstance } from './chain';
+import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ContractAttributes, ContractInstance } from './contract';
 import type { ModelInstance, ModelStatic } from './types';
 

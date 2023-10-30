@@ -1,5 +1,5 @@
 import { RawEvmEvent } from './types';
-import { CommunityAttributes } from '../../models/chain';
+import { CommunityAttributes } from '../../models/community';
 import { ContractAttributes } from '../../models/contract';
 import models from '../../database';
 import { QueryTypes } from 'sequelize';

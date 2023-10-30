@@ -1,6 +1,6 @@
 import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
-import type { CommunityAttributes } from './chain';
+import type { CommunityAttributes } from './community';
 import type { CommentAttributes } from './comment';
 import type { NotificationCategoryAttributes } from './notification_category';
 import emitNotifications from '../util/emitNotifications';
