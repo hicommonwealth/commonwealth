@@ -44,7 +44,7 @@ const getDiscordChannels = async (
 
   const configEntry = await models.DiscordBotConfig.findOne({
     where: {
-      chain_id,
+      community_id: chain_id,
     },
   });
 
