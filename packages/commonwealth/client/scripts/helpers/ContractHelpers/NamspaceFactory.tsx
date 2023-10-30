@@ -1,4 +1,6 @@
 import { AbiItem } from 'web3-utils';
+import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
+import { reservationHookAbi } from './Abi/ReservationHookAbi';
 import ContractBase from './ContractBase';
 
 /**
@@ -12,7 +14,7 @@ class NamespaceFactory extends ContractBase {
    * @param factoryAddress the address of the active factory to use
    */
   constructor(factoryAddress: string) {
-    super(factoryAddress, []);
+    super(factoryAddress, namespaceFactoryAbi);
     this.contract.methods
       .reservationHook()
       .call()
@@ -21,7 +23,7 @@ class NamespaceFactory extends ContractBase {
           addr.toLowerCase() !== '0x0000000000000000000000000000000000000000'
         ) {
           this.reservationHook = new this.web3.eth.Contract(
-            [] as AbiItem[],
+            reservationHookAbi as AbiItem[],
             addr
           );
         }
