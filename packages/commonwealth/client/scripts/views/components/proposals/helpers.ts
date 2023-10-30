@@ -1,5 +1,5 @@
 import { formatCoin } from 'adapters/currency';
-import { CompoundTypes } from 'chain-events/src/types';
+import { ProposalState } from '../../../../../shared/chain/types/compound';
 import { notifyError } from 'controllers/app/notifications';
 import {
   CosmosProposal,
@@ -114,7 +114,7 @@ export const getCanVote = (
     canVote = false;
   } else if (
     proposal instanceof CompoundProposal &&
-    proposal.state !== CompoundTypes.ProposalState.Active
+    proposal.state !== ProposalState.Active
   ) {
     canVote = false;
   } else if (
