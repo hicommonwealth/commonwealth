@@ -8,12 +8,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { Select } from 'views/components/Select';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import type Topic from '../../../../models/Topic';
 import {
@@ -22,7 +23,6 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 
 type HeaderWithFiltersProps = {
   stage: string;
@@ -186,8 +186,8 @@ export const HeaderWithFilters = ({
             />
           ) : (
             <CWButton
-              buttonType="mini-black"
-              label="Create Thread"
+              buttonType="primary-black"
+              label="Create thread"
               iconLeft="plus"
               onClick={() => {
                 navigate(
@@ -240,8 +240,8 @@ export const HeaderWithFilters = ({
                 {
                   id: 3,
                   value: ThreadFeaturedFilterTypes.MostLikes,
-                  label: 'Likes',
-                  iconLeft: 'heart',
+                  label: 'Upvotes',
+                  iconLeft: 'upvote',
                 },
                 {
                   id: 4,

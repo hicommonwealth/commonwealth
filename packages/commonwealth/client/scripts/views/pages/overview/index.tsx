@@ -102,8 +102,8 @@ const OverviewPage = () => {
           />
         ) : (
           <CWButton
-            buttonType="mini-black"
-            label="Create Thread"
+            buttonType="primary-black"
+            label="Create thread"
             iconLeft="plus"
             onClick={() => {
               navigate('/new/discussion');
