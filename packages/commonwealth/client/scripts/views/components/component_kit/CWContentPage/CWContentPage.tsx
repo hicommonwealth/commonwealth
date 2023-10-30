@@ -182,8 +182,8 @@ export const CWContentPage = ({
 
   const disabledActionsTooltipText = (() => {
     if (!hasJoinedCommunity) return 'Join community to upvote';
-    if (thread.archivedAt) return 'Thread is archived';
-    if (thread.lockedAt) return 'Thread is locked';
+    if (thread?.archivedAt) return 'Thread is archived';
+    if (thread?.lockedAt) return 'Thread is locked';
     if (restrictedTopicIds.includes(thread?.topic?.id)) return 'Topic is gated';
   })();
 

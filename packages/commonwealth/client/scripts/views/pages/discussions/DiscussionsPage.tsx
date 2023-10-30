@@ -109,8 +109,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
           const disabledActionsTooltipText = (() => {
             if (!hasJoinedCommunity) return 'Join community to upvote';
-            if (thread.archivedAt) return 'Thread is archived';
-            if (thread.lockedAt) return 'Thread is locked';
+            if (thread?.archivedAt) return 'Thread is archived';
+            if (thread?.lockedAt) return 'Thread is locked';
             if (restrictedTopicIds.includes(topicId)) return 'Topic is gated';
           })();
 
