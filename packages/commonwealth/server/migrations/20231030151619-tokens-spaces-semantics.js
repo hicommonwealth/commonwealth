@@ -6,7 +6,7 @@ module.exports = {
       await queryInterface.renameColumn('Tokens', 'chain_id', 'eth_chain_id', {
         transaction,
       });
-      await queryInterface.renameColumn('CommunitySnapshotSpace', 'chain_id', 'community_id', {
+      await queryInterface.renameColumn('CommunitySnapshotSpaces', 'chain_id', 'community_id', {
         transaction,
       });
     });
@@ -14,10 +14,10 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.renameColumn('Tokens', 'community_id', 'chain_id', {
+      await queryInterface.renameColumn('Tokens', 'eth_chain_id', 'chain_id', {
         transaction,
       });
-      await queryInterface.renameColumn('CommunitySnapshotSpace', 'community_id', 'chain_id',{
+      await queryInterface.renameColumn('CommunitySnapshotSpaces', 'community_id', 'chain_id',{
         transaction,
       });
     });
