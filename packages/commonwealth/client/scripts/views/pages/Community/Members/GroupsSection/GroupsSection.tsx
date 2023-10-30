@@ -18,10 +18,9 @@ type GroupSectionProps = {
 const GroupsSection = ({
   filteredGroups,
   canManageGroups,
-  hasNoGroups
+  hasNoGroups,
 }: GroupSectionProps) => {
   const navigate = useCommonNavigate();
-
   return (
     <section className="GroupsSection">
       {hasNoGroups && (
@@ -70,12 +69,13 @@ const GroupsSection = ({
                     ?.join(' ') || '',
                 requirementContractAddress: r.data.source.contract_address,
                 requirementAmount: r.data.threshold,
-                requirementCondition: 'More than' // hardcoded in api
+                requirementCondition: 'More than', // hardcoded in api
               }))}
               requirementsToFulfill="ALL" // api doesn't return this
-              isJoined={(group.members || []).find(
-                (x) => x?.address?.address === app.user.activeAccount.address
-              )}
+              isJoined={(group.members || []).find((x) => {
+                if (!app.user.activeAccount) return;
+                x?.address?.address === app.user.activeAccount.address;
+              })}
               topics={group.topics.map((x) => ({ id: x.id, name: x.name }))}
               canEdit={canManageGroups}
               onEditClick={() => navigate(`/members/groups/${group.id}/update`)}

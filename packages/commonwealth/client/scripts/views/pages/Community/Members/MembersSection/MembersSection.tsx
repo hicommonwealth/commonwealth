@@ -45,6 +45,10 @@ const MembersSection = ({
   onLoadMoreMembers,
   isLoadingMoreMembers,
 }: MembersSectionProps) => {
+  filteredMembers.forEach((item) => {
+    item.groups.sort((a, b) => a.localeCompare(b));
+  });
+
   return (
     <div className="MembersSection">
       <CWTable
