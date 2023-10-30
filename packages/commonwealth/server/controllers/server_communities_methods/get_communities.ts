@@ -3,7 +3,6 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 import { ChainInstance } from '../../models/chain';
 import { CommunitySnapshotSpaceWithSpaceAttached } from '../../models/community_snapshot_spaces';
 
-export type GetCommunitiesOptions = {};
 export type GetCommunitiesResult = {
   chain: ChainInstance;
   snapshot: string[];

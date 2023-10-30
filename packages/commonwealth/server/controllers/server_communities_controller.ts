@@ -12,7 +12,6 @@ import {
   __searchCommunities,
 } from './server_communities_methods/search_communities';
 import {
-  GetCommunitiesOptions,
   GetCommunitiesResult,
   __getCommunities,
 } from './server_communities_methods/get_communities';
