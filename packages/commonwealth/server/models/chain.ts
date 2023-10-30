@@ -89,13 +89,13 @@ export type CommunityInstance = ModelInstance<CommunityAttributes> & {
   getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>;
 };
 
-export type ChainModelStatic = ModelStatic<CommunityInstance>;
+export type CommunityModelStatic = ModelStatic<CommunityInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): ChainModelStatic => {
-  const Chain = <ChainModelStatic>sequelize.define(
+): CommunityModelStatic => {
+  const Chain = <CommunityModelStatic>sequelize.define(
     'Chain',
     {
       id: { type: dataTypes.STRING, primaryKey: true },
