@@ -61,7 +61,7 @@ export async function __searchCommunities(
       "Communities".type,
       "Communities".icon_url,
       "Communities".created_at
-    FROM "Communities" C
+    FROM "Communities"
     WHERE
       "Communities".active = TRUE AND
       (
