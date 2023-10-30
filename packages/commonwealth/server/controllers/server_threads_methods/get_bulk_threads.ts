@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 import { ThreadAttributes, ThreadInstance } from '../../models/thread';
 import { ServerThreadsController } from '../server_threads_controller';
 import { QueryTypes } from 'sequelize';
@@ -7,7 +7,7 @@ import { ServerError } from '../../../../common-common/src/errors';
 import { getLastEdited } from '../../util/getLastEdited';
 
 export type GetBulkThreadsOptions = {
-  chain?: ChainInstance;
+  chain?: CommunityInstance;
   stage: string;
   topicId: number;
   includePinnedThreads: boolean;

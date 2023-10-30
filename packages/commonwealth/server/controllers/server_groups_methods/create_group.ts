@@ -1,5 +1,5 @@
 import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { UserInstance } from '../../models/user';
@@ -23,7 +23,7 @@ const Errors = {
 
 export type CreateGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   address: AddressInstance;
   metadata: GroupMetadata;
   requirements: Requirement[];

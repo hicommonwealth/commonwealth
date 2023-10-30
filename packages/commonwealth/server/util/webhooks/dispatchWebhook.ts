@@ -12,7 +12,7 @@ import { sendZapierWebhook } from './destinations/zapier';
 import { rollbar } from '../rollbar';
 import { StatsDController } from 'common-common/src/statsd';
 import models from '../../database';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -43,7 +43,7 @@ export async function dispatchWebhooks(
     chainId = notification.data.chain_id;
   }
 
-  const chain: ChainInstance | undefined = await models.Chain.findOne({
+  const chain: CommunityInstance | undefined = await models.Chain.findOne({
     where: {
       id: chainId,
     },

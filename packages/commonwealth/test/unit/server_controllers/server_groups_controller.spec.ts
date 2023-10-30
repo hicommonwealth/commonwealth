@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
 import { AddressAttributes, AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/chain';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
@@ -143,7 +143,7 @@ const createMockParams = () => {
     },
     isAdmin: true,
   } as UserInstance;
-  const chain = {} as ChainInstance;
+  const chain = {} as CommunityInstance;
   const address = {} as AddressInstance;
   return { user, chain, address };
 };

@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import moment from 'moment';
 
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 import { UserInstance } from '../../models/user';
 import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import {
@@ -25,7 +25,7 @@ const Errors = {
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   commentId?: number;
   commentBody: string;
   discordMeta?: any;

@@ -73,7 +73,7 @@ export type CommunityAttributes = {
   updated_at?: Date;
 };
 
-export type ChainInstance = ModelInstance<CommunityAttributes> & {
+export type CommunityInstance = ModelInstance<CommunityAttributes> & {
   // add mixins as needed
   getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<
@@ -89,7 +89,7 @@ export type ChainInstance = ModelInstance<CommunityAttributes> & {
   getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>;
 };
 
-export type ChainModelStatic = ModelStatic<ChainInstance>;
+export type ChainModelStatic = ModelStatic<CommunityInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

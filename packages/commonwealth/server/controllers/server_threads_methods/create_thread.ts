@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ThreadAttributes } from '../../models/thread';
@@ -34,7 +34,7 @@ export const Errors = {
 export type CreateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   title: string;
   body: string;
   kind: string;

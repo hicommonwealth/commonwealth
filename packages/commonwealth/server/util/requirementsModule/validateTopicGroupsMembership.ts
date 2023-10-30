@@ -1,6 +1,6 @@
 import { DB } from '../../models';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 import { AddressInstance } from '../../models/address';
 import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
 import validateGroupMembership from './validateGroupMembership';
@@ -28,7 +28,7 @@ export async function validateTopicGroupsMembership(
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   topicId: number,
-  chain: ChainInstance,
+  chain: CommunityInstance,
   address: AddressInstance
 ): Promise<{ isValid: boolean; message?: string }> {
   if (FEATURE_FLAG_GROUP_CHECK_ENABLED) {

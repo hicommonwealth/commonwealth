@@ -1,4 +1,4 @@
-import { ChainInstance } from '../../../models/chain';
+import { CommunityInstance } from '../../../models/chain';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import {
@@ -23,7 +23,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * v1beta1 gov modules.
  */
 export async function fetchUpToLatestCosmosProposals(
-  chains: ChainInstance[],
+  chains: CommunityInstance[],
   latestProposalIds: Record<string, number>
 ): Promise<AllCosmosProposals> {
   if (chains.length === 0) return { v1: {}, v1Beta1: {} };
@@ -68,7 +68,7 @@ export async function fetchUpToLatestCosmosProposals(
  * Fetches the last/latest proposal for each chain. Works for both v1 and v1beta1 gov modules.
  */
 export async function fetchLatestProposals(
-  chains: ChainInstance[]
+  chains: CommunityInstance[]
 ): Promise<AllCosmosProposals> {
   if (chains.length === 0) return { v1: {}, v1Beta1: {} };
 

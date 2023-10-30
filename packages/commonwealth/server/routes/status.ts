@@ -2,7 +2,7 @@ import { ServerError } from 'common-common/src/errors';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
+import type { CommunityInstance } from 'server/models/chain';
 import type { NotificationCategoryInstance } from 'server/models/notification_category';
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
@@ -36,7 +36,7 @@ type StatusResp = {
     jwt: string;
     addresses: AddressInstance[];
     socialAccounts: SocialAccountInstance[];
-    selectedChain: ChainInstance;
+    selectedChain: CommunityInstance;
     isAdmin: boolean;
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];

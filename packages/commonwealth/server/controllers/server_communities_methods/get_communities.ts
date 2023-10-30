@@ -1,11 +1,11 @@
 import { Op } from 'sequelize';
 import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 import { CommunitySnapshotSpaceWithSpaceAttached } from '../../models/community_snapshot_spaces';
 
 export type GetCommunitiesOptions = {};
 export type GetCommunitiesResult = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   snapshot: string[];
 }[];
 

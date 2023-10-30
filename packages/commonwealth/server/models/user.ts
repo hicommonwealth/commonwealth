@@ -2,7 +2,7 @@ import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { AddressAttributes, AddressInstance } from './address';
-import type { CommunityAttributes, ChainInstance } from './chain';
+import type { CommunityAttributes, CommunityInstance } from './chain';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import type {
   SocialAccountAttributes,
@@ -33,10 +33,10 @@ export type UserAttributes = {
 
 // eslint-disable-next-line no-use-before-define
 export type UserInstance = ModelInstance<UserAttributes> & {
-  getSelectedChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getSelectedChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   setSelectedChain: Sequelize.BelongsToSetAssociationMixin<
-    ChainInstance,
-    ChainInstance['id']
+    CommunityInstance,
+    CommunityInstance['id']
   >;
 
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<

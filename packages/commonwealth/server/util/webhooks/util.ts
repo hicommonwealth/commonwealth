@@ -5,7 +5,7 @@ import { NotificationDataAndCategory } from '../../../shared/types';
 import { slugify } from '../../../shared/utils';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import models from '../../database';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 import { ProfileAttributes } from '../../models/profile';
 import { WebhookInstance } from '../../models/webhook';
 import { WebhookDestinations } from './types';
@@ -87,7 +87,7 @@ export async function getPreviewImageUrl(
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
   >,
-  chain?: ChainInstance
+  chain?: CommunityInstance
 ): Promise<{ previewImageUrl: string; previewAltText: string }> {
   // case 1: embedded imaged in thread body
   if (

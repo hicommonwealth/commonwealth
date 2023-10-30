@@ -1,5 +1,5 @@
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 import { ReactionAttributes } from '../../models/reaction';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -27,7 +27,7 @@ export const Errors = {
 export type CreateThreadReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   reaction: string;
   threadId: number;
   canvasAction?: any;

@@ -1,4 +1,4 @@
-import { ChainInstance } from '../../../models/chain';
+import { CommunityInstance } from '../../../models/chain';
 import {
   ProposalSDKType,
   ProposalStatus,
@@ -18,7 +18,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * See /gov/v1beta1/proposals at https://v1.cosmos.network/rpc/v0.45.1 for more details on pagination values.
  */
 export async function fetchLatestCosmosProposalV1(
-  chain: ChainInstance
+  chain: CommunityInstance
 ): Promise<ProposalSDKType[]> {
   const client = await getCosmosClient<GovV1Client>(chain);
   let nextKey: Uint8Array, finalProposalsPage: ProposalSDKType[];
@@ -59,7 +59,7 @@ export async function fetchLatestCosmosProposalV1(
  */
 export async function fetchUpToLatestCosmosProposalV1(
   proposalId: number,
-  chain: ChainInstance
+  chain: CommunityInstance
 ): Promise<ProposalSDKType[]> {
   const client = await getCosmosClient<GovV1Client>(chain);
 

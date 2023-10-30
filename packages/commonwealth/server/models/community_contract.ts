@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
-import type { CommunityAttributes, ChainInstance } from './chain';
+import type { CommunityAttributes, CommunityInstance } from './chain';
 import type { ContractAttributes, ContractInstance } from './contract';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -16,7 +16,7 @@ export type CommunityContractAttributes = {
 
 export type CommunityContractInstance =
   ModelInstance<CommunityContractAttributes> & {
-    getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+    getChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
     getContract: Sequelize.BelongsToGetAssociationMixin<ContractInstance>;
   };
 

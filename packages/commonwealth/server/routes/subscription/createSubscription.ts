@@ -2,7 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../../models';
 import Errors from './errors';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/chain';
 import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
 import { NotificationCategories } from 'common-common/src/types';
 import { CommentInstance } from '../../models/comment';
@@ -35,7 +35,7 @@ export default async (
   }
 
   let obj: WhereOptions<SubscriptionAttributes>,
-    chain: ChainInstance,
+    chain: CommunityInstance,
     thread: ThreadInstance,
     comment: CommentInstance;
 

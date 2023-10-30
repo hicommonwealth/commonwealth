@@ -10,7 +10,7 @@ import {
   getPreviewImageUrl,
   getThreadUrlFromNotification,
 } from './util';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 
 export async function getWebhookData(
   notification: Exclude<
@@ -19,7 +19,7 @@ export async function getWebhookData(
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
   >,
-  chain?: ChainInstance
+  chain?: CommunityInstance
 ): Promise<ForumWebhookData | ChainEventWebhookData> {
   if (notification.categoryId === NotificationCategories.ChainEvent) {
     const event = {

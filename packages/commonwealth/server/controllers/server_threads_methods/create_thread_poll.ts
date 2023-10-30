@@ -4,7 +4,7 @@ import { ServerThreadsController } from '../server_threads_controller';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/chain';
 import { validateOwner } from '../../util/validateOwner';
 
 export const Errors = {
@@ -17,7 +17,7 @@ export const Errors = {
 export type CreateThreadPollOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   threadId: number;
   prompt: string;
   options: string[];
