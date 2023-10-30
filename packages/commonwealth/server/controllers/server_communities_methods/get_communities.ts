@@ -11,7 +11,6 @@ export type GetCommunitiesResult = {
 
 export async function __getCommunities(
   this: ServerCommunitiesController,
-  options: GetCommunitiesOptions
 ): Promise<GetCommunitiesResult> {
   const [chains] = await Promise.all([
     this.models.Chain.findAll({

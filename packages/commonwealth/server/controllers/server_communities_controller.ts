@@ -63,10 +63,8 @@ export class ServerCommunitiesController {
     return __searchCommunities.call(this, options);
   }
 
-  async getCommunities(
-    options: GetCommunitiesOptions
-  ): Promise<GetCommunitiesResult> {
-    return __getCommunities.call(this, options);
+  async getCommunities(): Promise<GetCommunitiesResult> {
+    return __getCommunities.call(this);
   }
 
   async createCommunity(
