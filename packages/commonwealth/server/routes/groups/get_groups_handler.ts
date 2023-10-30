@@ -1,11 +1,10 @@
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
 import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
+import { GetGroupsResult } from '../../controllers/server_groups_methods/get_groups';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestQuery, TypedResponse, success } from '../../types';
 
 type GetGroupsQueryQuery = {
-  include_members?: string;
   include_topics?: string;
   address_id?: string;
 };
@@ -28,12 +27,11 @@ export const getGroupsHandler = async (
     throw new AppError(JSON.stringify(validationResult.error));
   }
   const {
-    query: { address_id, include_members, include_topics },
+    query: { address_id, include_topics },
   } = validationResult.data;
 
   const result = await controllers.groups.getGroups({
     chain: req.chain,
-    includeMembers: include_members,
     includeTopics: include_topics,
     addressId: address_id,
   });
