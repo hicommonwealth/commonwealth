@@ -1,23 +1,23 @@
-import type { DeltaStatic } from 'quill';
-import React, { useState, useEffect } from 'react';
-import app from 'state';
-import { verify } from 'canvas';
 import type { Action, Session } from '@canvas-js/interfaces';
+import { verify } from 'canvas';
+import type { DeltaStatic } from 'quill';
+import React, { useEffect, useState } from 'react';
+import app from 'state';
 
 import type Comment from 'models/Comment';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
+import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
-import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { SharePopover } from 'views/components/share_popover';
+import { CanvasVerifyDataModal } from 'views/modals/canvas_verify_data_modal';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
@@ -46,6 +46,7 @@ type CommentCardProps = {
   canToggleSpam?: boolean;
   // actual comment
   comment: Comment<any>;
+  isThreadArchived: boolean;
 };
 
 export const CommentCard = ({
@@ -73,6 +74,7 @@ export const CommentCard = ({
   canToggleSpam,
   // actual comment
   comment,
+  isThreadArchived,
 }: CommentCardProps) => {
   const commentBody = deserializeDelta(editDraft || comment.text);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
@@ -116,7 +118,7 @@ export const CommentCard = ({
         ) : (
           <AuthorAndPublishInfo
             authorAddress={author.address}
-            authorChainId={author.chain?.id || author?.profile?.chain}
+            authorChainId={author.community?.id || author?.profile?.chain}
             publishDate={comment.createdAt}
             discord_meta={comment.discord_meta}
             popoverPlacement="top"
@@ -156,7 +158,7 @@ export const CommentCard = ({
         </div>
       ) : (
         <div className="comment-content">
-          {isSpam && <CWTag label="SPAM" type="disabled" />}
+          {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
             <QuillRenderer doc={comment.text} />
           </CWText>
@@ -166,7 +168,7 @@ export const CommentCard = ({
 
               <SharePopover commentId={comment.id} />
 
-              {replyBtnVisible && (
+              {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
                   disabled={maxReplyLimitReached || !canReply}
@@ -183,7 +185,7 @@ export const CommentCard = ({
                 />
               )}
 
-              {(canEdit || canDelete) && (
+              {!isThreadArchived && (canEdit || canDelete) && (
                 <PopoverMenu
                   className="CommentActions"
                   renderTrigger={(onClick) => (
@@ -214,8 +216,14 @@ export const CommentCard = ({
               )}
 
               {isCanvasVerifyModalVisible && (
-                <Modal
-                  content={<CanvasVerifyDataModal obj={comment} />}
+                <CWModal
+                  size="medium"
+                  content={
+                    <CanvasVerifyDataModal
+                      obj={comment}
+                      onClose={() => setIsCanvasVerifyDataModalVisible(false)}
+                    />
+                  }
                   onClose={() => setIsCanvasVerifyDataModalVisible(false)}
                   open={isCanvasVerifyModalVisible}
                 />

@@ -39,7 +39,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   }
 
   public abstract chain: IChainModule<C, A>;
-  public abstract accounts: IAccountsModule<C, A>;
+  public abstract accounts: IAccountsModule<A>;
   public readonly communityBanner?: string;
 
   protected _serverLoaded: boolean;
@@ -98,9 +98,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       totalThreadsInCommunity: 0,
       totalThreadsInCommunityForVoting: 0,
     });
-    if (this.app.chainEntities) {
-      this.app.chainEntities.deinit();
-    }
     console.log(`${this.meta.name} stopped`);
   }
 
@@ -175,15 +172,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public abstract base: ChainBase;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
-  public networkError: string;
 
   public readonly meta: ChainInfo;
   public readonly block: IBlockInfo;
 
   public app: IApp;
-  public version: string;
-  public name: string;
-  public runtimeName: string;
   public gatedTopics: IGatedTopic[];
 
   constructor(meta: ChainInfo, app: IApp) {

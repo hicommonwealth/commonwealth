@@ -33,9 +33,3 @@ export const Countdown = (props: CountdownProps) => {
 type CountdownUntilBlockProps = {
   block: number;
 };
-
-export const CountdownUntilBlock = (props: CountdownUntilBlockProps) => {
-  const { block } = props;
-
-  return <Countdown duration={blocknumToDuration(block)} />;
-};

@@ -6,7 +6,7 @@ import { useDebounce } from 'usehooks-ts';
 import { User } from 'views/components/user/user';
 import {
   APIOrderBy,
-  APIOrderDirection,
+  APIOrderDirection
 } from '../../../scripts/helpers/constants';
 import { useSearchProfilesQuery } from '../../../scripts/state/api/profiles';
 import { SearchProfilesResponse } from '../../../scripts/state/api/profiles/searchProfiles';
@@ -26,7 +26,7 @@ const MembersPage = () => {
     limit: 10,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
-    includeRoles: true,
+    includeRoles: true
   });
 
   const members = useMemo(() => {
@@ -34,9 +34,12 @@ const MembersPage = () => {
       return [];
     }
     return data.pages
-      .reduce((acc, page) => {
-        return [...acc, ...page.results];
-      }, [] as SearchProfilesResponse['results'])
+      .reduce(
+        (acc, page) => {
+          return [...acc, ...page.results];
+        },
+        [] as SearchProfilesResponse['results']
+      )
       .map((p) => ({
         id: p.id,
         address_id: p.addresses?.[0]?.id,
@@ -45,7 +48,7 @@ const MembersPage = () => {
         chain: p.addresses?.[0]?.chain,
         profile_name: p.profile_name,
         avatar_url: p.avatar_url,
-        roles: p.roles,
+        roles: p.roles
       }))
       .map((p) => {
         const minProfile = new MinimumProfile(p.address, p.chain);
@@ -63,7 +66,7 @@ const MembersPage = () => {
             (role) =>
               role.chain_id === app.activeChainId() &&
               ['admin', 'moderator'].includes(role.permission)
-          ),
+          )
         };
       });
   }, [data]);

@@ -1,8 +1,8 @@
 import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories, WalletId } from 'common-common/src/types';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { DynamicTemplate } from '../../shared/types';
 import { AXIE_SHARED_SECRET } from '../config';
@@ -16,8 +16,8 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { createRole } from '../util/roles';
 
-import { redirectWithLoginError } from './finishEmailLogin';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+import { redirectWithLoginError } from './finishEmailLogin';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -138,7 +138,7 @@ const finishSsoLogin = async (
     {
       where: {
         address: checksumAddress,
-        chain: 'axie-infinity',
+        community_id: 'axie-infinity',
       },
       include: [
         {
@@ -325,7 +325,7 @@ const finishSsoLogin = async (
       const newAddress = await models.Address.create(
         {
           address: checksumAddress,
-          chain: AXIE_INFINITY_CHAIN_ID,
+          community_id: AXIE_INFINITY_CHAIN_ID,
           verification_token: 'SSO',
           verification_token_expires: null,
           verified: new Date(), // trust addresses from magic

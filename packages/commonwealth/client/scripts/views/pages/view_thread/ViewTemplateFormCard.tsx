@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
-import ViewTemplate from '../view_template/view_template';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
 import '../../../../styles/pages/view_thread/ViewTemplateFormCard.scss';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
+import ViewTemplate from '../view_template/view_template';
 
-export const ViewTemplateFormCard = ({ address, slug }) => {
+type ViewTemplateFormCardProps = {
+  address: string;
+  slug: string;
+};
+
+export const ViewTemplateFormCard = ({
+  address,
+  slug,
+}: ViewTemplateFormCardProps) => {
   const [nickname, setNickname] = useState('Template Form');
 
   return (

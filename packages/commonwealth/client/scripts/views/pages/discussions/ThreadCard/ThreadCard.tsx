@@ -1,17 +1,13 @@
-import { IChainEntityKind } from 'chain-events/src';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import {
-  chainEntityTypeToProposalShortName,
-  getProposalUrlPath,
-} from 'identifiers';
+import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTag } from 'views/components/component_kit/cw_tag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
@@ -86,6 +82,7 @@ export const ThreadCard = ({
   const isStageDefault = isDefaultStage(thread.stage);
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals.length > 0;
+  const stageLabel = threadStageToLabel(thread.stage);
 
   return (
     <>
@@ -116,6 +113,7 @@ export const ThreadCard = ({
                 lastUpdated: thread.updatedAt.toISOString(),
               })}
               discord_meta={thread.discord_meta}
+              archivedAt={thread.archivedAt}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -151,7 +149,8 @@ export const ThreadCard = ({
             <div className="content-tags">
               {thread.stage && !isStageDefault && (
                 <CWTag
-                  label={threadStageToLabel(thread.stage)}
+                  label={stageLabel}
+                  classNames={stageLabel}
                   trimAt={20}
                   type="stage"
                   onClick={async (e) => {
@@ -167,9 +166,7 @@ export const ThreadCard = ({
                   <CWTag
                     key={`${link.source}-${link.identifier}`}
                     type="proposal"
-                    label={`${chainEntityTypeToProposalShortName(
-                      'proposal' as IChainEntityKind
-                    )} 
+                    label={`Prop 
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''

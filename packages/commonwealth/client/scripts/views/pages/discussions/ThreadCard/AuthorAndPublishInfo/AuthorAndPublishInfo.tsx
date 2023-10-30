@@ -1,22 +1,23 @@
+import { PopperPlacementType } from '@mui/base/Popper';
 import { threadStageToLabel } from 'helpers';
+import { getRelativeTimestamp } from 'helpers/dates';
 import moment from 'moment';
 import React, { useRef } from 'react';
 import {
   Popover,
   usePopover,
 } from 'views/components/component_kit/cw_popover/cw_popover';
-import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { LockWithTooltip } from 'views/components/lock_with_tooltip';
 import { User } from 'views/components/user/user';
 import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { NewThreadTag } from '../../NewThreadTag';
+import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import './AuthorAndPublishInfo.scss';
-import { PopperPlacementType } from '@mui/base/Popper';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { getRelativeTimestamp } from 'helpers/dates';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
 
 export type AuthorAndPublishInfoProps = {
@@ -41,6 +42,7 @@ export type AuthorAndPublishInfoProps = {
   isSpamThread?: boolean;
   threadStage?: ThreadStage;
   onThreadStageLabelClick?: (threadStage: ThreadStage) => Promise<any>;
+  archivedAt?: moment.Moment;
   popoverPlacement?: PopperPlacementType;
 };
 
@@ -62,6 +64,7 @@ export const AuthorAndPublishInfo = ({
   threadStage,
   onThreadStageLabelClick,
   collaboratorsInfo,
+  archivedAt,
   popoverPlacement,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
@@ -95,7 +98,7 @@ export const AuthorAndPublishInfo = ({
             <b>{discord_meta?.user?.username}</b>
           </CWText>
           {dotIndicator}
-          <CWTag label={'Discord'} type={'discord'} iconName="discord" />
+          <CWTag label={'Discord'} type={'login'} iconName="discord" />
           {dotIndicator}
           <CWText type="caption" className="discord-author">
             Bridged from Discord
@@ -118,13 +121,13 @@ export const AuthorAndPublishInfo = ({
             <Popover
               content={
                 <div className="collaborators">
-                  {collaboratorsInfo.map(({ address, chain }) => {
+                  {collaboratorsInfo.map(({ address, community_id }) => {
                     return (
                       <User
                         shouldLinkProfile
                         key={address}
                         userAddress={address}
-                        userChainId={chain}
+                        userChainId={community_id}
                       />
                     );
                   })}
@@ -174,6 +177,8 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
+      {archivedAt && <ArchiveTrayWithTooltip archivedAt={moment(archivedAt)} />}
+
       {threadStage && (
         <>
           {dotIndicator}
@@ -196,8 +201,6 @@ export const AuthorAndPublishInfo = ({
       <NewThreadTag threadCreatedAt={moment(publishDate)} />
 
       {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
-
-      {isSpamThread && <CWTag label={'SPAM'} type={'disabled'} />}
 
       {isLocked && lockedAt && lastUpdated && (
         <LockWithTooltip

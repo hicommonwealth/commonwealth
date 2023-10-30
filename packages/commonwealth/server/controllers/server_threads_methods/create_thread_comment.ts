@@ -1,6 +1,6 @@
 import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
-import { CommentAttributes, CommentInstance } from '../../models/comment';
+import { CommentAttributes } from '../../models/comment';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { TrackOptions } from '../server_analytics_methods/track';
@@ -11,15 +11,14 @@ import {
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import { AppError } from '../../../../common-common/src/errors';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { renderQuillDeltaToText } from '../../../shared/utils';
 import moment from 'moment';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { ServerThreadsController } from '../server_threads_controller';
+import { validateOwner } from '../../util/validateOwner';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -31,6 +30,7 @@ const Errors = {
   BalanceCheckFailed: 'Could not verify user token balance',
   ThreadArchived: 'Thread is archived',
   ParseMentionsFailed: 'Failed to parse mentions',
+  FailedCreateComment: 'Failed to create comment',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -126,29 +126,24 @@ export async function __createThreadComment(
     chain &&
     (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
   ) {
-    const addressAdminRoles = await findAllRoles(
-      this.models,
-      { where: { address_id: address.id } },
-      chain.id,
-      ['admin']
-    );
-    const isGodMode = user.isAdmin;
-    const hasAdminRole = addressAdminRoles.length > 0;
-    if (!isGodMode && !hasAdminRole) {
-      let canReact;
-      try {
-        canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
-      } catch (e) {
-        throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
-      }
-
-      if (!canReact) {
-        throw new AppError(Errors.InsufficientTokenBalance);
+    const isAdmin = await validateOwner({
+      models: this.models,
+      user,
+      chainId: chain.id,
+      entity: thread,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      const { isValid, message } = await validateTopicGroupsMembership(
+        this.models,
+        this.tokenBalanceCache,
+        thread.topic_id,
+        chain,
+        address
+      );
+      if (!isValid) {
+        throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
       }
     }
   }
@@ -234,7 +229,7 @@ export async function __createThreadComment(
         mentions.map(async (mention) => {
           const mentionedUser = await this.models.Address.findOne({
             where: {
-              chain: mention[0] || null,
+              community_id: mention[0] || null,
               address: mention[1],
             },
             include: [this.models.User],
@@ -256,7 +251,6 @@ export async function __createThreadComment(
     rootNotifExcludeAddresses.push(parentComment.Address.address);
   }
 
-  const cwUrl = getThreadUrl(thread, finalComment.id);
   const root_title = thread.title || '';
 
   const allNotificationOptions: EmitOptions[] = [];
@@ -274,7 +268,7 @@ export async function __createThreadComment(
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
         author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+        author_chain: finalComment.Address.community_id,
       },
     },
     excludeAddresses: rootNotifExcludeAddresses,
@@ -296,7 +290,7 @@ export async function __createThreadComment(
           parent_comment_text: parentComment.text,
           chain_id: finalComment.chain,
           author_address: finalComment.Address.address,
-          author_chain: finalComment.Address.chain,
+          author_chain: finalComment.Address.community_id,
         },
       },
       excludeAddresses: excludedAddrs,
@@ -323,7 +317,7 @@ export async function __createThreadComment(
                 comment_text: finalComment.text,
                 chain_id: finalComment.chain,
                 author_address: finalComment.Address.address,
-                author_chain: finalComment.Address.chain,
+                author_chain: finalComment.Address.community_id,
               },
             },
             excludeAddresses: [finalComment.Address.address],

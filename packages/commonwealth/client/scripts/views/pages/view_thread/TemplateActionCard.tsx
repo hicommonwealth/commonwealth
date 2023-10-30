@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { TemplateActionModal } from '../../modals/TemplateActionModal'; // Import the new modal component
 
 import 'pages/view_thread/TemplateActionCard.scss';
 import Thread, { Link, LinkDisplay, LinkSource } from 'models/Thread';
-import { Modal } from '../../components/component_kit/cw_modal';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import {
   CWDropdown,
   DropdownItemType,
@@ -104,7 +104,8 @@ export const TemplateActionCard = ({ thread }: TemplateActionCardProps) => {
           </div>
         }
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <TemplateActionModal
             isOpen={isModalOpen}

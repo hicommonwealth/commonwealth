@@ -5,19 +5,20 @@ import models from '../../database';
 import { QueryTypes } from 'sequelize';
 import { NotificationDataAndCategory } from 'types';
 import { NotificationCategories } from 'common-common/src/types';
-import { SupportedNetwork } from 'chain-events/src';
+import type { SupportedNetwork } from '../../../shared/chain/types/types';
 import emitNotifications from '../../util/emitNotifications';
 import { rollbar } from '../../util/rollbar';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { NotificationInstance } from '../../models/notification';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export async function emitChainEventNotifs(
   chainNodeId: number,
   events: RawEvmEvent[]
-): Promise<void> {
+): Promise<Promise<void | NotificationInstance>[]> {
   if (!events.length) {
-    return;
+    return [];
   }
 
   const queryFilter: [string, number][] = events.map((event) => [
@@ -41,6 +42,7 @@ export async function emitChainEventNotifs(
     { type: QueryTypes.SELECT, raw: true, replacements: [queryFilter] }
   );
 
+  const notifPromises: Promise<void | NotificationInstance>[] = [];
   for (const event of events) {
     const chain = chainData.find(
       (c) =>
@@ -48,29 +50,42 @@ export async function emitChainEventNotifs(
         c.chain_node_id === chainNodeId
     );
 
-    const notification: NotificationDataAndCategory = {
-      categoryId: NotificationCategories.ChainEvent,
-      data: {
-        chain: chain.chain_id,
-        network: chain.chain_network as unknown as SupportedNetwork,
-        block_number: event.blockNumber,
-        event_data: {
-          kind: event.kind,
-          // TODO: @Timothee for now all event sources have proposal id as the first argument in the future
-          //  we will store raw arguments and use the custom labeling system when pulling/viewing event notifications
-          // use toString to accommodate for open zeppelin gov (impact market) proposal id's which are hashes
-          id: event.args[0].toString(),
+    let notification: NotificationDataAndCategory;
+    try {
+      notification = {
+        categoryId: NotificationCategories.ChainEvent,
+        data: {
+          chain: chain.chain_id,
+          network: chain.chain_network as unknown as SupportedNetwork,
+          block_number: event.blockNumber,
+          event_data: {
+            kind: event.kind,
+            // TODO: @Timothee for now all event sources have proposal id as the first argument in the future
+            //  we will store raw arguments and use the custom labeling system when pulling/viewing event notifications
+            // use toString to accommodate for open zeppelin gov (impact market) proposal id's which are hashes
+            id: event.args[0].toString(),
+          },
         },
-      },
-    };
-    emitNotifications(models, notification).catch((e) => {
-      const msg = `Error occurred while emitting a chain-event notification for event: ${JSON.stringify(
-        event,
-        null,
-        2
-      )}`;
+      };
+    } catch (e) {
+      const msg = `Error formatting event: ${JSON.stringify(event, null, 2)}`;
       log.error(msg, e);
       rollbar.error(msg, e);
-    });
+      continue;
+    }
+
+    notifPromises.push(
+      emitNotifications(models, notification).catch((e) => {
+        const msg = `Error occurred while emitting a chain-event notification for event: ${JSON.stringify(
+          event,
+          null,
+          2
+        )}`;
+        log.error(msg, e);
+        rollbar.error(msg, e);
+      })
+    );
   }
+
+  return notifPromises;
 }

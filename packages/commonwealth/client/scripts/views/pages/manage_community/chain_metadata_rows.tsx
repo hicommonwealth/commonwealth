@@ -2,11 +2,13 @@ import axios from 'axios';
 import { ChainBase, DefaultPage } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { uuidv4 } from 'lib/util';
 import 'pages/manage_community/chain_metadata_rows.scss';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
+import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import type ChainInfo from '../../../models/ChainInfo';
 import type RoleInfo from '../../../models/RoleInfo';
@@ -14,15 +16,15 @@ import { AvatarUpload } from '../../components/Avatar';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
+import { openConfirmation } from '../../modals/confirmation_modal';
+import DirectoryPageSection from './DirectoryPageSection';
 import { setChainCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
-import { useFetchTopicsQuery } from 'state/api/topics';
-import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
-import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
-import { openConfirmation } from '../../modals/confirmation_modal';
 
 type ChainMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -56,13 +58,8 @@ const DiscordForumConnections = ({
   );
 
   const [connectionVerified, setConnectionVerified] = useState(true);
-  const [topicIdToRemoveConnection, setTopicIdToRemoveConnection] = useState<
-    string | null
-  >(null);
 
   const removeConnection = (topicId: string) => {
-    setTopicIdToRemoveConnection(topicId);
-
     openConfirmation({
       title: 'Warning',
       // eslint-disable-next-line max-len
@@ -70,7 +67,8 @@ const DiscordForumConnections = ({
       buttons: [
         {
           label: 'Remove',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await app.discord.setForumChannelConnection(topicId, null);
@@ -84,7 +82,8 @@ const DiscordForumConnections = ({
         },
         {
           label: 'No',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -168,10 +167,9 @@ export const ChainMetadataRows = ({
     chainId: app.activeChainId(),
   });
 
-  const { data: discordChannels, refetch: refetchDiscordSettings } =
-    useFetchDiscordChannelsQuery({
-      chainId: app.activeChainId(),
-    });
+  const { data: discordChannels } = useFetchDiscordChannelsQuery({
+    chainId: app.activeChainId(),
+  });
 
   const [name, setName] = useState(chain.name);
   const [description, setDescription] = useState(chain.description);
@@ -182,6 +180,12 @@ export const ChainMetadataRows = ({
   const [github, setGithub] = useState(chain.github);
   const [stagesEnabled, setStagesEnabled] = useState(chain.stagesEnabled);
   const [customStages, setCustomStages] = useState(chain.customStages);
+  const [directoryPageEnabled, setDirectoryPageEnabled] = useState(
+    chain.directoryPageEnabled
+  );
+  const [selectedChainNodeId, setSelectedChainNodeId] = useState(
+    chain.directoryPageChainNodeId
+  );
   const [customDomain, setCustomDomain] = useState(chain.customDomain);
   const [terms, setTerms] = useState(chain.terms);
   const [iconUrl, setIconUrl] = useState(chain.iconUrl);
@@ -211,7 +215,9 @@ export const ChainMetadataRows = ({
     id: string;
     name: string;
   } | null>(null);
-  const [selectedChannelLoaded, setSelectedChannelLoaded] = useState(false);
+  const [discordWebhooksEnabled, setDiscordWebhooksEnabled] = useState(
+    chain.discordBotWebhooksEnabled
+  );
 
   useEffect(() => {
     setDiscordBotConnected(chain.discordConfigId !== null);
@@ -225,7 +231,6 @@ export const ChainMetadataRows = ({
     ) {
       setSelectedSnapshotChannel(discordChannels.selectedChannel);
       setSnapshotNotificationsEnabled(true);
-      setSelectedChannelLoaded(true);
     }
   }, [discordChannels]);
 
@@ -288,6 +293,8 @@ export const ChainMetadataRows = ({
         defaultPage,
         hasHomepage,
         chain_node_id: null,
+        directory_page_enabled: directoryPageEnabled,
+        directory_page_chain_node_id: selectedChainNodeId,
       });
       onSave();
       notifySuccess('Chain updated');
@@ -348,6 +355,19 @@ export const ChainMetadataRows = ({
     }
   };
 
+  const updateDiscordWebhookEnabled = async () => {
+    try {
+      await chain.updateChainData({
+        discord_bot_webhooks_enabled: !discordWebhooksEnabled,
+      });
+      setDiscordWebhooksEnabled(!discordWebhooksEnabled);
+
+      notifySuccess('Settings updated');
+    } catch (e) {
+      notifyError(e || 'Update failed');
+    }
+  };
+
   const handleConnectBot = async () => {
     try {
       const verification_token = uuidv4();
@@ -377,6 +397,15 @@ export const ChainMetadataRows = ({
       setDiscordBotConnecting(true);
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const handleToggleEnableDirectoryPage = (enabled: boolean) => {
+    setDirectoryPageEnabled(enabled);
+
+    // reset selectedChainNodeId to the default saved in the DB
+    if (!enabled) {
+      setSelectedChainNodeId(chain.directoryPageChainNodeId);
     }
   };
 
@@ -516,6 +545,18 @@ export const ChainMetadataRows = ({
         placeholder='["Temperature Check", "Consensus Check"]'
         onChangeHandler={(v) => setCustomStages(v)}
       />
+
+      <CWDivider className="directory-page-divider" />
+
+      <DirectoryPageSection
+        directoryPageEnabled={directoryPageEnabled}
+        setDirectoryPageEnabled={handleToggleEnableDirectoryPage}
+        isGoToDirectoryButtonEnabled={chain.directoryPageEnabled}
+        selectedChainNodeId={selectedChainNodeId}
+        setSelectedChainNodeId={setSelectedChainNodeId}
+      />
+      <CWDivider className="directory-page-divider" />
+
       <InputRow
         title="Domain"
         value={customDomain}
@@ -689,12 +730,18 @@ export const ChainMetadataRows = ({
                 />
               )}
             </div>
-            {/* <CWButton
-              label="Save Commonbot Settings"
-              className="save-snapshot"
-              buttonType="primary-black"
-              onClick={handleSaveCommonbotSettings}
-            /> */}
+
+            <div className="toggle-section">
+              <CWToggle
+                checked={discordWebhooksEnabled}
+                onChange={() => {
+                  updateDiscordWebhookEnabled();
+                }}
+              />
+              <CWText type="b2" fontWeight="regular">
+                Allow webhook notifications for Bridged Forum posts.
+              </CWText>
+            </div>
           </>
         ) : discordBotConnecting ? (
           <>

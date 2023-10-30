@@ -10,6 +10,10 @@
   user-select: none;
   border-radius: $border-radius-md !important;
 
+  .archiveTrayIcon {
+    fill: none;
+  }
+
   .menu-item-text.Text {
     font-size: 14px !important;
     color: $neutral-800;
@@ -20,7 +24,7 @@
   }
 
   &:hover {
-    background-color: $neutral-50;
+    background-color: $neutral-100;
   }
 
   &:active {
@@ -75,5 +79,12 @@
     background-color: $neutral-100;
     height: 1px;
     width: 100%;
+    margin: 8px 0;
+  }
+
+  &.compact {
+    .PopoverMenuItem {
+      padding: 6px 12px;
+    }
   }
 }

@@ -1,20 +1,18 @@
-import { ReactionAttributes } from '../../models/reaction';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
 } from '../../../../common-common/src/types';
-import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { UserInstance } from '../../models/user';
 import { AddressInstance } from '../../models/address';
 import { ChainInstance } from '../../models/chain';
-import { ServerCommentsController } from '../server_comments_controller';
+import { ReactionAttributes } from '../../models/reaction';
+import { UserInstance } from '../../models/user';
+import { findAllRoles } from '../../util/roles';
+import validateTopicThreshold from '../../util/validateTopicThreshold';
 import { TrackOptions } from '../server_analytics_methods/track';
+import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 
 const Errors = {
@@ -150,7 +148,7 @@ export async function __createCommentReaction(
         root_type: null, // What is this for?
         chain_id: finalReaction.chain,
         author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.chain,
+        author_chain: finalReaction.Address.community_id,
       },
     },
     excludeAddresses: [finalReaction.Address.address],

@@ -1,12 +1,12 @@
+import { QueryTypes } from 'sequelize';
+import { TypedPaginatedResult } from 'server/types';
 import { ChainInstance } from '../../models/chain';
-import { ServerCommentsController } from '../server_comments_controller';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
-import { QueryTypes } from 'sequelize';
-import { TypedPaginatedResult } from 'server/types';
+import { ServerCommentsController } from '../server_comments_controller';
 
 export type SearchCommentsOptions = {
   chain: ChainInstance;
@@ -82,7 +82,7 @@ export async function __searchComments(
       'comment' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".chain as address_chain,
+      "Addresses".community_id as address_chain,
       "Comments".created_at,
       "Threads".chain,
       ts_rank_cd("Comments"._search, query) as rank

@@ -1,8 +1,9 @@
 node_modules/
 */build
 */dist
-*/.DS_Store
+**/.DS_Store
 *.env
 *.log
 */build/
 .idea
+.vscode

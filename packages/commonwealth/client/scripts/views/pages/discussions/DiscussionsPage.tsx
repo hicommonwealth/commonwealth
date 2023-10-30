@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -10,17 +10,17 @@ import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
 import { CWText } from 'views/components/component_kit/cw_text';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   ThreadFeaturedFilterTypes,
-  ThreadTimelineFilterTypes,
+  ThreadTimelineFilterTypes
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
+import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import { Breadcrumbs } from '../../components/Breadcrumbs';
 
 import 'pages/discussions/index.scss';
 
@@ -32,6 +32,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const navigate = useCommonNavigate();
   const { totalThreadsInCommunity } = useEXCEPTION_CASE_threadCountersStore();
   const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
+  const [includeArchivedThreads, setIncludeArchivedThreads] =
+    useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
@@ -41,13 +43,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange'
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    chainId: app.activeChainId()
   });
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { dateCursor } = useDateCursor({
-    dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
+    dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes
   });
+
+  const isOnArchivePage =
+    location.pathname === `/${app.activeChainId()}/archived`;
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
@@ -61,12 +66,23 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       orderBy: featuredFilter,
       toDate: dateCursor.toDate,
       fromDate: dateCursor.fromDate,
+      isOnArchivePage: isOnArchivePage
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
   //
   //Checks if the current page is a discussion page and if the window is small enough to render the mobile menu
   //Checks both for mobile device and inner window size for desktop responsiveness
+  const filteredThreads = threads.filter((t) => {
+    if (!includeSpamThreads && t.markedAsSpamAt) return null;
+
+    if (!isOnArchivePage && !includeArchivedThreads && t.archivedAt !== null)
+      return null;
+
+    if (isOnArchivePage && t.archivedAt === null) return null;
+
+    return t;
+  });
 
   useManageDocumentTitle('Discussions');
 
@@ -93,14 +109,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}
-        data={isInitialLoading ? [] : threads}
+        data={isInitialLoading ? [] : filteredThreads}
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`
           );
-
-          if (!includeSpamThreads && thread.markedAsSpamAt) return null;
 
           const canReact =
             hasJoinedCommunity && !thread.lockedAt && !thread.archivedAt;
@@ -140,7 +154,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               </div>
             ) : (
               <CWText type="b1" className="no-threads-text">
-                There are no threads matching your filter.
+                {isOnArchivePage
+                  ? 'There are no archived threads matching your filter.'
+                  : 'There are no threads matching your filter.'}
               </CWText>
             ),
           Header: () => {
@@ -160,9 +176,21 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isIncludingSpamThreads={includeSpamThreads}
                   onIncludeSpamThreads={setIncludeSpamThreads}
                 />
+                <HeaderWithFilters
+                  topic={topicName}
+                  stage={stageName}
+                  featuredFilter={featuredFilter}
+                  dateRange={dateRange}
+                  totalThreadCount={threads ? totalThreadsInCommunity : 0}
+                  isIncludingSpamThreads={includeSpamThreads}
+                  onIncludeSpamThreads={setIncludeSpamThreads}
+                  isIncludingArchivedThreads={includeArchivedThreads}
+                  onIncludeArchivedThreads={setIncludeArchivedThreads}
+                  isOnArchivePage={isOnArchivePage}
+                />
               </>
             );
-          },
+          }
         }}
       />
     </div>

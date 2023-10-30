@@ -8,7 +8,10 @@ import React, { useState } from 'react';
 import app from 'state';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { PageLoading } from '../loading';
 import { ContractCard } from './contract_card';
@@ -76,7 +79,7 @@ const ContractsPage = () => {
         buttons: [
           {
             label: 'Close',
-            buttonType: 'secondary-black',
+            buttonType: 'secondary',
           },
         ],
       });
@@ -92,7 +95,8 @@ const ContractsPage = () => {
         buttons: [
           {
             label: 'Delete',
-            buttonType: 'mini-red',
+            buttonType: 'destructive',
+            buttonHeight: 'sm',
             onClick: async () => {
               try {
                 await app.contracts.deleteTemplate({
@@ -107,7 +111,8 @@ const ContractsPage = () => {
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
           },
         ],
       });
@@ -131,7 +136,7 @@ const ContractsPage = () => {
       </CWText>
 
       <div className="Tabs">
-        <CWTabBar>
+        <CWTabsRow>
           <CWTab
             label="Contracts and actions"
             onClick={() => {
@@ -146,7 +151,7 @@ const ContractsPage = () => {
             }}
             isSelected={tabOn === 'templates'}
           />
-        </CWTabBar>
+        </CWTabsRow>
       </div>
       {tabOn === 'contracts' ? (
         <>

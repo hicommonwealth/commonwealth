@@ -13,7 +13,7 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
+import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
@@ -160,13 +160,13 @@ export const NewThreadForm = () => {
           </CWText>
         </div>
         <div className="new-thread-header">
-          <CWTabBar>
+          <CWTabsRow>
             <CWTab
               label={capitalize(ThreadKind.Discussion)}
               isSelected={threadKind === ThreadKind.Discussion}
               onClick={() => setThreadKind(ThreadKind.Discussion)}
             />
-          </CWTabBar>
+          </CWTabsRow>
         </div>
         <div className="new-thread-body">
           <div className="new-thread-form-inputs">

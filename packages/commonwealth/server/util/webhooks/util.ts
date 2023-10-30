@@ -1,12 +1,13 @@
-import { WebhookInstance } from '../../models/webhook';
-import { ProfileAttributes } from '../../models/profile';
-import models from '../../database';
-import { NotificationDataAndCategory } from 'types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
+import { NotificationDataAndCategory } from '../../../shared/types';
 import { slugify } from '../../../shared/utils';
+import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
+import models from '../../database';
+import { ChainInstance } from '../../models/chain';
+import { ProfileAttributes } from '../../models/profile';
+import { WebhookInstance } from '../../models/webhook';
 import { WebhookDestinations } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -34,7 +35,7 @@ export async function fetchWebhooks(
 
   return await models.Webhook.findAll({
     where: {
-      chain_id: chainId,
+      community_id: chainId,
       categories: {
         [Op.contains]: [notifDataCategory.categoryId],
       },
@@ -59,7 +60,7 @@ export async function getActorProfile(
   const address = await models.Address.findOne({
     where: {
       address: notif.data.author_address,
-      chain: notif.data.chain_id,
+      community_id: notif.data.chain_id,
     },
     include: [models.Profile],
   });
@@ -85,7 +86,8 @@ export async function getPreviewImageUrl(
   notification: Exclude<
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
-  >
+  >,
+  chain?: ChainInstance
 ): Promise<{ previewImageUrl: string; previewAltText: string }> {
   // case 1: embedded imaged in thread body
   if (
@@ -101,17 +103,6 @@ export async function getPreviewImageUrl(
   }
 
   // case 2: chain icon
-  let chainId: string;
-  if (notification.categoryId === NotificationCategories.ChainEvent) {
-    chainId = notification.data.chain;
-  } else {
-    chainId = notification.data.chain_id;
-  }
-  const chain = await models.Chain.findOne({
-    where: {
-      id: chainId,
-    },
-  });
   if (chain?.icon_url) {
     const previewImageUrl = chain.icon_url.match(`^(http|https)://`)
       ? chain.icon_url

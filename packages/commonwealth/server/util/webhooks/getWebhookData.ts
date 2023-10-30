@@ -1,7 +1,7 @@
-import { NotificationDataAndCategory } from 'types';
+import { NotificationDataAndCategory } from '../../../shared/types';
 import { NotificationCategories } from 'common-common/src/types';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
-import { Label as chainEventLabel } from 'chain-events/src';
+import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
 import { capitalize } from 'lodash';
 import { renderQuillDeltaToText, smartTrim } from '../../../shared/utils';
 import { SERVER_URL } from '../../config';
@@ -10,6 +10,7 @@ import {
   getPreviewImageUrl,
   getThreadUrlFromNotification,
 } from './util';
+import { ChainInstance } from '../../models/chain';
 
 export async function getWebhookData(
   notification: Exclude<
@@ -17,7 +18,8 @@ export async function getWebhookData(
     | { categoryId: NotificationCategories.SnapshotProposal }
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
-  >
+  >,
+  chain?: ChainInstance
 ): Promise<ForumWebhookData | ChainEventWebhookData> {
   if (notification.categoryId === NotificationCategories.ChainEvent) {
     const event = {
@@ -28,7 +30,7 @@ export async function getWebhookData(
     };
     const eventLabel = chainEventLabel(notification.data.chain, event);
 
-    const previewImage = await getPreviewImageUrl(notification);
+    const previewImage = await getPreviewImageUrl(notification, chain);
 
     return {
       title: `${eventLabel.heading} on ${capitalize(notification.data.chain)}`,
