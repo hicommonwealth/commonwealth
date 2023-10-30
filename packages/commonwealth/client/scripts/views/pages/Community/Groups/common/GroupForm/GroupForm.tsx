@@ -11,6 +11,7 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
@@ -105,6 +106,9 @@ const GroupForm = ({
   const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
   const [cwRequiremenetsLabelInputField, setCwRequiremenetsLabelInputField] =
     useState<CWRequirementsLabelInputFieldState>({ value: '1', error: '' });
+
+  const [overRequirementLimit, setOverRequirementLimit] = useState(false);
+
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
   >([
@@ -165,6 +169,12 @@ const GroupForm = ({
   };
 
   const addRequirementSubForm = () => {
+    if (requirementSubForms.length <= MAX_REQUIREMENTS) {
+      setOverRequirementLimit(false);
+    }
+    if (requirementSubForms.length >= MAX_REQUIREMENTS) {
+      setOverRequirementLimit(true);
+    }
     setRequirementSubForms([
       ...requirementSubForms,
       {
@@ -415,18 +425,28 @@ const GroupForm = ({
                 />
               ))}
 
-              {requirementSubForms.length < MAX_REQUIREMENTS && (
-                <CWButton
-                  type="button"
-                  label="Add requirement"
-                  iconLeft="plus"
-                  buttonWidth="full"
-                  buttonType="secondary"
-                  buttonHeight="med"
-                  onClick={addRequirementSubForm}
-                />
-              )}
-
+              <CWTooltip
+                content="Cannot add more than 10 requirements"
+                placement="bottom"
+                renderTrigger={(handleInteraction) => (
+                  <CWButton
+                    type="button"
+                    label="Add requirement"
+                    disabled={overRequirementLimit}
+                    iconLeft="plus"
+                    buttonWidth="full"
+                    buttonType="secondary"
+                    buttonHeight="med"
+                    onClick={addRequirementSubForm}
+                    onMouseEnter={() => {
+                      overRequirementLimit && handleInteraction;
+                    }}
+                    onMouseLeave={() => {
+                      overRequirementLimit && handleInteraction;
+                    }}
+                  />
+                )}
+              />
               <CWText
                 type="h4"
                 fontWeight="semiBold"
