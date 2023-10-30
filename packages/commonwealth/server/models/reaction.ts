@@ -157,7 +157,7 @@ export default (
   );
 
   Reaction.associate = (models) => {
-    models.Reaction.belongsTo(models.Chain, {
+    models.Reaction.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });

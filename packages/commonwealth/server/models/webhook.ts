@@ -43,7 +43,7 @@ export default (
   );
 
   Webhook.associate = (models) => {
-    models.Webhook.belongsTo(models.Chain, {
+    models.Webhook.belongsTo(models.Community, {
       foreignKey: 'community_id',
       targetKey: 'id',
     });

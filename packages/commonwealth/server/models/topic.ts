@@ -88,7 +88,7 @@ export default (
   );
 
   Topic.associate = (models) => {
-    models.Topic.belongsTo(models.Chain, {
+    models.Topic.belongsTo(models.Community, {
       as: 'chain',
       foreignKey: 'chain_id',
       targetKey: 'id',

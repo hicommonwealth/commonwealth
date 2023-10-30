@@ -121,7 +121,7 @@ export default (
   );
 
   Address.associate = (models) => {
-    models.Address.belongsTo(models.Chain, {
+    models.Address.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });

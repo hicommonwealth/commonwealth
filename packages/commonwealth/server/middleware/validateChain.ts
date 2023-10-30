@@ -42,7 +42,7 @@ export const validateChain = async (
 ): Promise<[CommunityInstance, string]> => {
   const chain_id = params.chain || params.chain_id;
   if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
-  const chain = await models.Chain.findOne(
+  const chain = await models.Community.findOne(
     getChainQuery(chain_id, models, includeTopics)
   );
   // searching for chain that doesn't exist

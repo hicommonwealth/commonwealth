@@ -149,7 +149,7 @@ const createChain = async (
     where: { user_id: req.user.id, verified: { [Op.ne]: null } },
     include: [
       {
-        model: models.Chain,
+        model: models.Community,
         where: { base: req.body.base },
         attributes: ['id'],
       },
@@ -354,7 +354,7 @@ const createChain = async (
     return next(new AppError(Errors.InvalidIconUrl));
   }
 
-  const oldChain = await models.Chain.findOne({
+  const oldChain = await models.Community.findOne({
     where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
   });
   if (oldChain && oldChain.id === req.body.id) {
@@ -390,7 +390,7 @@ const createChain = async (
     },
   });
 
-  const chain = await models.Chain.create({
+  const chain = await models.Community.create({
     id,
     name,
     default_symbol,

@@ -30,7 +30,7 @@ export async function __getCommunityStats(
     throw new AppError(Errors.NotAdmin);
   }
 
-  const chain = await this.models.Chain.findByPk(chainId);
+  const chain = await this.models.Community.findByPk(chainId);
   if (!chain) {
     throw new AppError(Errors.ChainNotFound);
   }

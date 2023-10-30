@@ -54,7 +54,7 @@ export async function __updateCommunity(
     throw new AppError(Errors.CantChangeNetwork);
   }
 
-  const chain = await this.models.Chain.findOne({ where: { id: id } });
+  const chain = await this.models.Community.findOne({ where: { id: id } });
   if (!chain) {
     throw new AppError(Errors.NoChainFound);
   } else {

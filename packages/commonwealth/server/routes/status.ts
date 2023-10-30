@@ -49,7 +49,7 @@ type StatusResp = {
 
 const getChainStatus = async (models: DB) => {
   const [chains, notificationCategories] = await Promise.all([
-    models.Chain.findAll({
+    models.Community.findAll({
       where: { active: true },
     }),
     models.NotificationCategory.findAll(),
@@ -87,7 +87,7 @@ const getChainStatus = async (models: DB) => {
 };
 
 export const getUserStatus = async (models: DB, user: UserInstance) => {
-  const chains = await models.Chain.findAll({
+  const chains = await models.Community.findAll({
     where: { active: true },
     attributes: ['id'],
   });

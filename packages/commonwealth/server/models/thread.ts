@@ -178,7 +178,7 @@ export default (
   );
 
   Thread.associate = (models) => {
-    models.Thread.belongsTo(models.Chain, {
+    models.Thread.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });

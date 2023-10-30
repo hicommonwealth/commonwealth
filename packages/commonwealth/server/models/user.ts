@@ -137,7 +137,7 @@ export default (
   };
 
   User.associate = (models) => {
-    models.User.belongsTo(models.Chain, {
+    models.User.belongsTo(models.Community, {
       as: 'selectedChain',
       foreignKey: 'selected_chain_id',
       constraints: false,

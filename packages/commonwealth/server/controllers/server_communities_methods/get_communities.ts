@@ -14,7 +14,7 @@ export async function __getCommunities(
   options: GetCommunitiesOptions
 ): Promise<GetCommunitiesResult> {
   const [chains] = await Promise.all([
-    this.models.Chain.findAll({
+    this.models.Community.findAll({
       where: { active: true },
     }),
   ]);

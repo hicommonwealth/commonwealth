@@ -131,7 +131,7 @@ export async function __createCommunity(
     throw new AppError(Errors.ImageTooLarge);
   }
 
-  const existingBaseChain = await this.models.Chain.findOne({
+  const existingBaseChain = await this.models.Community.findOne({
     where: { base: community.base },
   });
   if (!existingBaseChain) {
@@ -327,7 +327,7 @@ export async function __createCommunity(
     throw new AppError(Errors.InvalidIconUrl);
   }
 
-  const oldChain = await this.models.Chain.findOne({
+  const oldChain = await this.models.Community.findOne({
     where: { [Op.or]: [{ name: community.name }, { id: community.id }] },
   });
   if (oldChain && oldChain.id === community.id) {
@@ -365,7 +365,7 @@ export async function __createCommunity(
     },
   });
 
-  const chain = await this.models.Chain.create({
+  const chain = await this.models.Community.create({
     id,
     name,
     default_symbol,
@@ -446,7 +446,7 @@ export async function __createCommunity(
       },
       include: [
         {
-          model: this.models.Chain,
+          model: this.models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -464,7 +464,7 @@ export async function __createCommunity(
       },
       include: [
         {
-          model: this.models.Chain,
+          model: this.models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -483,7 +483,7 @@ export async function __createCommunity(
       },
       include: [
         {
-          model: this.models.Chain,
+          model: this.models.Community,
           where: { base: chain.base },
           required: true,
         },

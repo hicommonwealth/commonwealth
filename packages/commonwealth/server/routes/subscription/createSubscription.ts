@@ -43,7 +43,7 @@ export default async (
     case NotificationCategories.NewThread: {
       // this check avoids a 500 error -> 'WHERE parameter "id" has invalid "undefined" value'
       if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
-      chain = await models.Chain.findOne({
+      chain = await models.Community.findOne({
         where: {
           id: req.body.chain_id,
         },
@@ -96,7 +96,7 @@ export default async (
     case NotificationCategories.ChainEvent: {
       if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
 
-      chain = await models.Chain.findOne({
+      chain = await models.Community.findOne({
         where: {
           id: req.body.chain_id,
         },

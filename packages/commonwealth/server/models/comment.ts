@@ -150,7 +150,7 @@ export default (
   );
 
   Comment.associate = (models) => {
-    models.Comment.belongsTo(models.Chain, {
+    models.Comment.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });

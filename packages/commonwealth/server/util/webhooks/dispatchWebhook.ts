@@ -43,7 +43,7 @@ export async function dispatchWebhooks(
     chainId = notification.data.chain_id;
   }
 
-  const chain: CommunityInstance | undefined = await models.Chain.findOne({
+  const chain: CommunityInstance | undefined = await models.Community.findOne({
     where: {
       id: chainId,
     },

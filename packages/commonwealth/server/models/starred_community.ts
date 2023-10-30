@@ -45,7 +45,7 @@ export default (
 
   StarredCommunity.associate = (models) => {
     models.StarredCommunity.belongsTo(models.User);
-    models.StarredCommunity.belongsTo(models.Chain, {
+    models.StarredCommunity.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });

@@ -137,7 +137,7 @@ export default (
       foreignKey: 'subscription_id',
       onDelete: 'cascade',
     });
-    models.Subscription.belongsTo(models.Chain, {
+    models.Subscription.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

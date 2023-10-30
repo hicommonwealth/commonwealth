@@ -51,7 +51,7 @@ export default (
       foreignKey: 'contract_id',
       targetKey: 'id',
     });
-    models.CommunityContract.belongsTo(models.Chain, {
+    models.CommunityContract.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

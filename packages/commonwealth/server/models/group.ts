@@ -53,7 +53,7 @@ export default (
   );
 
   Group.associate = (models) => {
-    models.Group.belongsTo(models.Chain, {
+    models.Group.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

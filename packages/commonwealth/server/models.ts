@@ -43,7 +43,7 @@ import type { MembershipModelStatic } from './models/membership';
 export type Models = {
   Address: AddressModelStatic;
   Ban: BanModelStatic;
-  Chain: CommunityModelStatic;
+  Community: CommunityModelStatic;
   ChainNode: ChainNodeModelStatic;
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;

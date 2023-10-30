@@ -57,7 +57,7 @@ export default (
       foreignKey: 'thread_id',
       targetKey: 'id',
     });
-    models.Poll.belongsTo(models.Chain, {
+    models.Poll.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

@@ -69,7 +69,7 @@ export async function __deleteComment(
       where: {
         id: commentId,
       },
-      include: [this.models.Chain],
+      include: [this.models.Community],
     });
     if (!comment) {
       throw new AppError(Errors.CommentNotFound);
