@@ -95,7 +95,11 @@ export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
 ): CommunityModelStatic => {
-  const Chain = <CommunityModelStatic>sequelize.define(
+  const Community = <CommunityModelStatic>sequelize.define(
+    // Leave this as is for now so that we don't need to alias and models can join
+    // with this model using .Chain rather than .Community. Models should incrementally
+    // be aliased via `as: 'Community'` until all models use Community at which point,
+    // this can be updated to 'Community' and all aliases can be removed.
     'Chain',
     {
       id: { type: dataTypes.STRING, primaryKey: true },
@@ -153,7 +157,7 @@ export default (
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
-      tableName: 'Chains',
+      tableName: 'Communities',
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
@@ -161,7 +165,7 @@ export default (
     }
   );
 
-  Chain.associate = (models) => {
+  Community.associate = (models) => {
     models.Chain.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id' });
     models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
     models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
@@ -177,5 +181,5 @@ export default (
     });
   };
 
-  return Chain;
+  return Community;
 };
