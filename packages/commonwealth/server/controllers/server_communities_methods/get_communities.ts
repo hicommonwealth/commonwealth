@@ -23,7 +23,7 @@ export async function __getCommunities(
   const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
     await this.models.CommunitySnapshotSpaces.findAll({
       where: {
-        chain_id: {
+        community_id: {
           [Op.in]: chainsIds,
         },
       },
@@ -35,7 +35,7 @@ export async function __getCommunities(
 
   const chainsWithSnapshots = chains.map((chain) => {
     const chainSnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.chain_id === chain.id
+      (space) => space.community_id === chain.id
     );
     const snapshotSpaceNames = chainSnapshotSpaces.map(
       (space) => space.snapshot_space?.snapshot_space

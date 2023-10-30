@@ -134,7 +134,7 @@ export async function __updateCommunity(
 
   const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
     await this.models.CommunitySnapshotSpaces.findAll({
-      where: { chain_id: chain.id },
+      where: { community_id: chain.id },
       include: {
         model: this.models.SnapshotSpace,
         as: 'snapshot_space',
@@ -162,7 +162,7 @@ export async function __updateCommunity(
       // if it isnt, create it
       await this.models.CommunitySnapshotSpaces.create({
         snapshot_space_id: spaceModelInstance[0].snapshot_space,
-        chain_id: chain.id,
+        community_id: chain.id,
       });
     }
   }
@@ -172,7 +172,7 @@ export async function __updateCommunity(
     await this.models.CommunitySnapshotSpaces.destroy({
       where: {
         snapshot_space_id: removedSpace.snapshot_space_id,
-        chain_id: chain.id,
+        community_id: chain.id,
       },
     });
   }

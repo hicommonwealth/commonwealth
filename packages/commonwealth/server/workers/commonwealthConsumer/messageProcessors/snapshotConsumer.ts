@@ -134,7 +134,7 @@ export async function processSnapshotMessage(
   }
 
   for (const community of associatedCommunities) {
-    const communityId = community.chain_id;
+    const communityId = community.community_id;
     const communityDiscordConfig = await this.models.DiscordBotConfig.findAll({
       where: {
         chain_id: communityId,
