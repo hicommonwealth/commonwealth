@@ -16,12 +16,12 @@ import type { ChainAttributes } from '../../models/chain';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { RoleAttributes } from '../../models/role';
 
-import { RoleInstanceWithPermission } from '../../util/roles';
-import testSubstrateSpec from '../../util/testSubstrateSpec';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import axios from 'axios';
+import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { UserInstance } from '../../models/user';
 import { getFileSizeBytes } from '../../util/getFilesSizeBytes';
+import { RoleInstanceWithPermission } from '../../util/roles';
+import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 const MAX_IMAGE_SIZE_KB = 500;
@@ -496,7 +496,7 @@ export async function __createCommunity(
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
-      chain: chain.id,
+      community_id: chain.id,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,

@@ -89,14 +89,14 @@ export const ThreadPollCard = ({
         hasVoted={
           app.user.activeAccount &&
           !!poll.getUserVote(
-            app.user.activeAccount?.chain?.id,
+            app.user.activeAccount?.community?.id,
             app.user.activeAccount?.address
           )
         }
         disableVoteButton={!app.user.activeAccount}
         votedFor={
           poll.getUserVote(
-            app.user.activeAccount?.chain?.id,
+            app.user.activeAccount?.community?.id,
             app.user.activeAccount?.address
           )?.option
         }
@@ -136,7 +136,7 @@ export const ThreadPollCard = ({
               threadId: poll.threadId,
               pollId: poll.id,
               address: app.user.activeAccount.address,
-              authorChain: app.user.activeAccount.chain.id,
+              authorChain: app.user.activeAccount.community.id,
             });
             if (onDelete) onDelete();
             notifySuccess('Poll deleted');

@@ -20,6 +20,7 @@ const CreateMembersGroupPage = lazy(
 const UpdateMembersGroupPage = lazy(
   () => import('views/pages/Community/Groups/Update')
 );
+const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const SputnikDaosPage = lazy(() => import('views/pages/sputnikdaos'));
 const FinishNearLoginPage = lazy(() => import('views/pages/finish_near_login'));
 const FinishAxieLoginPage = lazy(() => import('views/pages/finish_axie_login'));
@@ -46,9 +47,6 @@ const ThreadRedirectPage = lazy(() => import('views/pages/thread_redirect'));
 const NewThreadPage = lazy(() => import('views/pages/new_thread'));
 const DiscussionsRedirectPage = lazy(
   () => import('views/pages/discussions_redirect')
-);
-const ChainEntityLinkRedirectPage = lazy(
-  () => import('views/pages/chain_entity_link_redirect')
 );
 const SnapshotProposalLinkRedirectPage = lazy(
   () => import('views/pages/snapshot_proposal_link_redirect')
@@ -176,6 +174,11 @@ const CommonDomainRoutes = () => [
     element={withLayout(UpdateMembersGroupPage, {
       scoped: true,
     })}
+  />,
+  <Route
+    key="/:scope/directory"
+    path="/:scope/directory"
+    element={withLayout(DirectoryPage, { scoped: true })}
   />,
   <Route
     key="/:scope/sputnik-daos"
@@ -555,13 +558,6 @@ const CommonDomainRoutes = () => [
   // (a) load external data as needed (from snapshot, chain events, etc) to
   // (b) produce a correct link to the entity (whether /snapshot/space/id or /proposal/id), and
   // (c) update the link objects associated with the identifer to point at the correct page.
-  <Route
-    key="/:scope/link/chain-entity/:identifier"
-    path="/:scope/link/chain-entity/:identifier"
-    element={withLayout(ChainEntityLinkRedirectPage, {
-      scoped: true,
-    })}
-  />,
   <Route
     key="/:scope/link/snapshot-proposal/:identifier"
     path="/:scope/link/snapshot-proposal/:identifier"

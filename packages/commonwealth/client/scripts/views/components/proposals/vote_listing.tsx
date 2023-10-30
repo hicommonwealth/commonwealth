@@ -15,6 +15,7 @@ import { VotingUnit } from '../../../models/types';
 import { BinaryVote, DepositVote } from '../../../models/votes';
 
 import app from 'state';
+import Account from '../../../models/Account';
 import { User } from '../../components/user/user';
 import { CWText } from '../component_kit/cw_text';
 
@@ -73,11 +74,17 @@ export const VoteListing = (props: VoteListingProps) => {
     );
   }
 
-  const VoterInfo = ({ voter, shouldShowPopover = true }) => {
+  const VoterInfo = ({
+    voter,
+    shouldShowPopover = true,
+  }: {
+    voter: Account;
+    shouldShowPopover?: boolean;
+  }) => {
     return (
       <User
         userAddress={voter.address}
-        userChainId={voter.chain?.id || voter.profile?.chain}
+        userChainId={voter.community?.id || voter.profile?.chain}
         shouldLinkProfile
         shouldShowPopover={shouldShowPopover}
       />
@@ -146,9 +153,7 @@ export const VoteListing = (props: VoteListingProps) => {
                     </CWText>
                     <CWText
                       noWrap
-                      title={
-                        (vote as any).weight && `${(vote as any).weight}x`
-                      }
+                      title={(vote as any).weight && `${(vote as any).weight}x`}
                     >
                       {(vote as any).weight && `${(vote as any).weight}x`}
                     </CWText>

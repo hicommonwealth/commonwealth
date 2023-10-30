@@ -51,14 +51,14 @@ export async function __getRelatedCommunities(
         LEFT JOIN "Threads" as t on t.chain = c.id 
         WHERE cn.id = :chainNodeId and t.deleted_at IS NULL
         GROUP BY c.id) as popular_chains 
-    LEFT JOIN "Addresses" as a on a.chain = popular_chains.id 
+    LEFT JOIN "Addresses" as a on a.community_id = popular_chains.id 
     GROUP BY popular_chains.id, popular_chains.icon_url, popular_chains.name,
      popular_chains.description, popular_chains.thread_count 
     ORDER BY address_count DESC;
     `,
     {
       type: QueryTypes.SELECT,
-      replacements: { chainNodeId }
+      replacements: { chainNodeId },
     }
   );
 }

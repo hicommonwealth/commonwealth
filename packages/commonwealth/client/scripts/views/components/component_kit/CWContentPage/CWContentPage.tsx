@@ -4,14 +4,14 @@ import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
-import type Account from '../../../../models/Account';
+import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
 import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
-import { CWTab, CWTabBar } from '../cw_tabs';
+import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
 import { ComponentType } from '../types';
 import './CWContentPage.scss';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';
@@ -137,6 +137,13 @@ export const CWContentPage = ({
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
 
+  let authorCommunityId: string;
+  if (author instanceof MinimumProfile) {
+    authorCommunityId = author?.chain;
+  } else if (author instanceof Account) {
+    authorCommunityId = author.community.id;
+  }
+
   const authorAndPublishInfoRow = (
     <div className="header-info-row">
       <AuthorAndPublishInfo
@@ -150,9 +157,7 @@ export const CWContentPage = ({
           lastUpdated: thread.updatedAt.toISOString(),
         })}
         authorAddress={author?.address}
-        authorChainId={
-          typeof author?.chain === 'string' ? author?.chain : author?.chain?.id
-        }
+        authorChainId={authorCommunityId}
         collaboratorsInfo={collaborators}
         publishDate={moment(createdOrEditedDate)}
         viewsCount={viewCount}
@@ -221,25 +226,27 @@ export const CWContentPage = ({
         </div>
       ) : (
         <div className="tabs-view">
-          <CWTabBar>
-            <CWTab
-              label={contentBodyLabel}
-              onClick={() => {
-                setTabSelected(0);
-              }}
-              isSelected={tabSelected === 0}
-            />
-            {sidebarComponents?.map((item, i) => (
+          <div className="cw-tabs-row-container">
+            <CWTabsRow>
               <CWTab
-                key={item.label}
-                label={item.label}
+                label={contentBodyLabel}
                 onClick={() => {
-                  setTabSelected(i + 1);
+                  setTabSelected(0);
                 }}
-                isSelected={tabSelected === i + 1}
+                isSelected={tabSelected === 0}
               />
-            ))}
-          </CWTabBar>
+              {sidebarComponents?.map((item, i) => (
+                <CWTab
+                  key={item.label}
+                  label={item.label}
+                  onClick={() => {
+                    setTabSelected(i + 1);
+                  }}
+                  isSelected={tabSelected === i + 1}
+                />
+              ))}
+            </CWTabsRow>
+          </div>
           {tabSelected === 0 && mainBody}
           {sidebarComponents?.length >= 1 &&
             tabSelected === 1 &&

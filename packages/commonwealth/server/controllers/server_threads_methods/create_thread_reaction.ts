@@ -140,7 +140,7 @@ export async function __createThreadReaction(
         root_type: 'discussion',
         chain_id: finalReaction.chain,
         author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.chain,
+        author_chain: finalReaction.Address.community_id,
       },
     },
     excludeAddresses: [finalReaction.Address.address],

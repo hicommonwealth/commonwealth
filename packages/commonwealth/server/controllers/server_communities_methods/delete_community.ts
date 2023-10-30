@@ -142,7 +142,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.Address.findAll({
-            where: { chain: chain.id },
+            where: { community_id: chain.id },
           });
 
           await this.models.CommunityBanner.destroy({
@@ -157,7 +157,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.Address.destroy({
-            where: { chain: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 
