@@ -17,12 +17,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.sequelize.query(
-        `
-        DROP VIEW "Chains";
-      `,
-        { transaction }
-      );
       await queryInterface.renameTable('Communities', 'Chains', {
         transaction,
       });
