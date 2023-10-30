@@ -52,7 +52,7 @@ export const ManageRoles = ({
   const handleDeleteRole = async (role: RoleInfo) => {
     const isSelf =
       role.Address.address === app.user.activeAccount?.address &&
-      role.chain_id === app.user.activeAccount?.chain.id;
+      role.chain_id === app.user.activeAccount?.community.id;
 
     const roleBelongsToUser = !!app.user.addresses.filter(
       (addr_) => addr_.id === (role.address_id || role.Address.id)

@@ -64,7 +64,7 @@ export default class WebWalletController {
     try {
       await $.post(`${app.serverUrl()}/setAddressWallet`, {
         address: account.address,
-        author_chain: account.chain.id,
+        author_chain: account.community.id,
         wallet_id: wallet,
         wallet_sso_source: null,
         jwt: app.user.jwt,
@@ -78,7 +78,7 @@ export default class WebWalletController {
     account: Account,
     chain?: ChainBase
   ): Promise<IWebWallet<any>> {
-    if (chain && account.chain.base !== chain) {
+    if (chain && account.community.base !== chain) {
       throw new Error('account on wrong chain base');
     }
     if (account.walletId) {

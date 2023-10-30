@@ -28,7 +28,7 @@ const deleteAddress = async (
   }
 
   const addressObj = await models.Address.findOne({
-    where: { chain: req.body.chain, address: req.body.address },
+    where: { community_id: req.body.chain, address: req.body.address },
   });
   if (!addressObj || addressObj.user_id !== req.user.id) {
     return next(new AppError(Errors.AddressNotFound));

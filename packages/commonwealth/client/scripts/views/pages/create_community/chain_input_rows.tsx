@@ -4,10 +4,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { AvatarUpload } from 'views/components/Avatar';
 import { InputRow } from 'views/components/metadata_rows';
+import { Skeleton } from '../../components/Skeleton';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { Skeleton } from '../../components/Skeleton';
 import type {
   ChainFormDefaultFields,
   EthChainFormState,
@@ -18,7 +18,7 @@ import type {
 
 export async function updateAdminOnCreateCommunity(chainId: string) {
   app.user.ephemerallySetActiveAccount(
-    app.user.addresses.filter((a) => a.chain.id === chainId)[0]
+    app.user.addresses.filter((a) => a.community.id === chainId)[0]
   );
 
   const roles = await axios.get(`${app.serverUrl()}/roles`, {

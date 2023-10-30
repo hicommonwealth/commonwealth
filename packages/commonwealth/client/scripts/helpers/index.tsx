@@ -1,9 +1,9 @@
-import React from 'react';
+import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import moment from 'moment';
+import React from 'react';
 import app from 'state';
-import type { Coin } from 'adapters/currency';
 import Account from '../models/Account';
 import IChainAdapter from '../models/IChainAdapter';
 import { ThreadStage } from '../models/types';
@@ -66,10 +66,6 @@ export function extractDomain(url) {
   return re.exec(url)[1];
 }
 
-export function removeUrlPrefix(url) {
-  return url.replace(/^https?:\/\//, '');
-}
-
 /*
  * comparators
  */
@@ -81,25 +77,13 @@ export function byAscendingCreationDate(a, b) {
   return +a.createdAt - +b.createdAt;
 }
 
-export function byDescendingUpdatedDate(a, b) {
-  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt);
-}
-
-export function byAscendingUpdatedDate(a, b) {
-  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt);
-}
-
-export function orderAccountsByAddress(a, b) {
-  return a.address < b.address ? -1 : a.address > b.address ? 1 : 0;
-}
-
-export function isSameAccount(a, b) {
+export function isSameAccount(a: Account, b: Account) {
   return (
     a &&
     b &&
-    a.chain &&
-    b.chain &&
-    a.chain.id === b.chain.id &&
+    a.community &&
+    b.community &&
+    a.community.id === b.community.id &&
     a.address === b.address
   );
 }

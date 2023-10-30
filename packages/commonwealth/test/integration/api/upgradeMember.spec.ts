@@ -23,8 +23,8 @@ describe('upgradeMember Integration Tests', () => {
   it('should return an error response if there is an invalid role specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
+      chain: testAddresses[0].community_id,
       new_role: 'invalid role',
       address: testAddresses[0].address,
     };
@@ -43,8 +43,8 @@ describe('upgradeMember Integration Tests', () => {
   it('should return an error response if an invalid address is specified', async () => {
     const invalidRequest = {
       jwt: jwtToken,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
+      chain: testAddresses[0].community_id,
       new_role: 'member',
       address: true,
     };
@@ -73,8 +73,8 @@ describe('upgradeMember Integration Tests', () => {
     );
     const validRequest = {
       jwt: jwtToken,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
+      chain: testAddresses[0].community_id,
       new_role: 'admin',
       address: testAddresses[1].address,
     };
