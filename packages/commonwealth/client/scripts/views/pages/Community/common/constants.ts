@@ -46,9 +46,10 @@ const foundChains = app.config.chains
   .filter((x) => chainIdsToFind.includes(x.id.toLowerCase()));
 export const chainTypes = chainIdsToFind.map((x, index) => ({
   chainBase: cosmosBaseChainIds.includes(x) ? 'cosmos' : 'ethereum',
-  value:
-    foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode?.ethChainId ||
-    index - 999, // TODO: some chains don't have an ethChainId
+  value: cosmosBaseChainIds.includes(x)
+    ? 'cosmos' // cosmos and injective have 'cosmos' id
+    : foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode
+        ?.ethChainId || index - 999, // TODO: polkadot don't have an ethChainId
   label: x.replace(/\b\w/g, (l) => l.toUpperCase()),
 }));
 
