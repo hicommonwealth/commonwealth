@@ -3,8 +3,9 @@ import type {
   GetCommentsResp,
 } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import Sequelize from 'sequelize';
+import Sequelize, { WhereOptions } from 'sequelize';
 import type { DB } from '../../models';
+import { CommentAttributes } from '../../models/comment';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
@@ -32,7 +33,7 @@ export const getComments = async (
 
   const { community_id, addresses, thread_ids, count_only } = req.query;
 
-  const where = { chain: community_id };
+  const where: WhereOptions<CommentAttributes> = { chain: community_id };
 
   // if address is included, find which addressIds they correspond to.
   if (addresses) {

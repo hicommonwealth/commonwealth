@@ -737,6 +737,7 @@ function setupRouter(
     'patch',
     '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     updateTopicChannelHandler.bind(this, serverControllers)
   );
   registerRoute(

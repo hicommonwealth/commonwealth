@@ -61,7 +61,7 @@ const exportMembersList = async (
       LEFT JOIN 
           "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."chain" = :chainId
       WHERE 
-          "a"."chain" = :chainId
+          "a"."community_id" = :chainId
       GROUP BY 
           "a"."address", "p"."profile_name"
     `,

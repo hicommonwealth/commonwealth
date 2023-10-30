@@ -1,6 +1,6 @@
+import { VersionHistory } from 'models/Thread';
 import type momentType from 'moment';
 import moment from 'moment';
-import { VersionHistory } from 'models/Thread';
 import AddressInfo from './AddressInfo';
 import Reaction from './Reaction';
 import type { IUniqueId } from './interfaces';
@@ -83,7 +83,7 @@ export class Comment<T extends IUniqueId> {
     this.id = id;
     this.createdAt = moment(created_at);
     this.parentComment = Number(parent_id) || null;
-    this.authorChain = Address?.chain || authorChain;
+    this.authorChain = Address?.community_id || authorChain;
     this.lastEdited = last_edited
       ? moment(last_edited)
       : versionHistory && versionHistory?.length > 1

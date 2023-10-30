@@ -37,7 +37,7 @@ export class NearAccount extends Account {
     Accounts: NearAccounts,
     address: string
   ) {
-    super({ chain: app.chain.meta, address });
+    super({ community: app.chain.meta, address });
     this._walletConnection = new NearJsAccount(Chain.api.connection, address);
     this._Chain = Chain;
     this._Accounts = Accounts;

@@ -1,19 +1,19 @@
-import { Op } from 'sequelize';
 import moment from 'moment';
+import { Op } from 'sequelize';
 
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { UserInstance } from '../../models/user';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { parseUserMentions } from '../../util/parseUserMentions';
+import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
 import { CommentAttributes } from '../../models/comment';
+import { UserInstance } from '../../models/user';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
-import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   ThreadNotFoundForComment: 'Thread not found for comment',
@@ -134,7 +134,7 @@ export async function __updateComment(
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
         author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+        author_chain: finalComment.Address.community_id,
       },
     },
     excludeAddresses: [finalComment.Address.address],
@@ -166,7 +166,7 @@ export async function __updateComment(
       mentions.map(async (mention) => {
         const mentionedUser = await this.models.Address.findOne({
           where: {
-            chain: mention[0],
+            community_id: mention[0],
             address: mention[1],
           },
           include: [this.models.User],
@@ -197,7 +197,7 @@ export async function __updateComment(
             comment_text: finalComment.text,
             chain_id: finalComment.chain,
             author_address: finalComment.Address.address,
-            author_chain: finalComment.Address.chain,
+            author_chain: finalComment.Address.community_id,
           },
         },
         excludeAddresses: [finalComment.Address.address],

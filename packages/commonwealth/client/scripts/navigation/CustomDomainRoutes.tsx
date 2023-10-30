@@ -11,6 +11,7 @@ const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
   () => import('views/pages/Community/Members/CommunityMembersPage')
 );
+const DirectoryPage = lazy(() => import('views/pages/DirectoryPage'));
 const CreateMembersGroupPage = lazy(
   () => import('views/pages/Community/Groups/Create')
 );
@@ -139,6 +140,11 @@ const CustomDomainRoutes = () => {
       element={withLayout(UpdateMembersGroupPage, {
         scoped: true,
       })}
+    />,
+    <Route
+      key="/directory"
+      path="/directory"
+      element={withLayout(DirectoryPage, { scoped: true })}
     />,
     <Route
       key="/sputnik-daos"

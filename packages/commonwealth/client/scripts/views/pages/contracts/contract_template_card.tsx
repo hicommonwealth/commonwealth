@@ -139,7 +139,9 @@ export const ContractTemplateCard = ({
                 <div className="enabledby-row">
                   <User
                     userAddress={enabler.address}
-                    userChainId={enabler.chain?.id || enabler?.profile?.chain}
+                    userChainId={
+                      enabler.community?.id || enabler?.profile?.chain
+                    }
                     shouldShowAddressWithDisplayName
                   />
                   <div className="text-group">

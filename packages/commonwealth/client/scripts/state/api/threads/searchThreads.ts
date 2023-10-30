@@ -75,7 +75,6 @@ const useSearchThreadsQuery = ({
   orderBy,
   orderDirection,
   threadTitleOnly,
-
   enabled = true,
 }: SearchThreadsProps) => {
   const key = [

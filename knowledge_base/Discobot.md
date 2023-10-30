@@ -61,5 +61,7 @@ The following would be an order of operations for a full setup with the granular
 
 # Change Log
 
+- 231025: Flagged by Timothee Legros - local testing instructions do not work. Updates needed for discobot-staging 
+and Frick setup instructions (e.g. Discord server must have community enabled).
 - 231006: Ownership transferred to Ian Rowan.
 - 230718: Authored by Alex Young.
