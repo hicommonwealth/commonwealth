@@ -15,10 +15,8 @@ export const BLOCKCHAINS = {
   COSMOS: 'cosmos',
   ETHEREUM: 'ethereum',
   INJECTIVE: 'injective',
-  NEAR: 'near',
   POLKADOT: 'polkadot',
   POLYGON: 'polygon',
-  SOLANA: 'solana',
 };
 
 export const AMOUNT_CONDITIONS = {
@@ -40,10 +38,8 @@ const chainIdsToFind = [
   'cosmos',
   'ethereum',
   'injective',
-  'near',
   'polkadot',
   'polygon',
-  'solana',
 ];
 const foundChains = app.config.chains
   .getAll()
