@@ -27,7 +27,7 @@ export async function __refreshCommunityMemberships(
   // refresh memberships for all addresses in community
   const addresses = await this.models.Address.findAll({
     where: {
-      chain: community.id,
+      community_id: community.id,
       verified: {
         [Op.ne]: null,
       },
