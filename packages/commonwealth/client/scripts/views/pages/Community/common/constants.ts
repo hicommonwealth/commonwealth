@@ -34,12 +34,7 @@ export const requirementTypes = [
 
 // Get eth chain id from the app.config.chains for these chains
 export const cosmosBaseChainIds = ['cosmos', 'injective'];
-export const ethBaseChainIds = [
-  'axie-infinity',
-  'ethereum',
-  'polkadot',
-  'polygon',
-];
+export const ethBaseChainIds = ['axie-infinity', 'ethereum', 'polygon'];
 const chainIdsToFind = [...cosmosBaseChainIds, ...ethBaseChainIds];
 const foundChains = app.config.chains
   .getAll()
