@@ -47,7 +47,7 @@ export async function __getRelatedCommunities(
     FROM 
         (SELECT c.id, c.icon_url, c.name, c.description, COUNT(t) as thread_count 
         FROM "ChainNodes" as cn 
-        JOIN "Chains" as c on c.chain_node_id = cn.id 
+        JOIN "Communities" as c on c.chain_node_id = cn.id 
         LEFT JOIN "Threads" as t on t.chain = c.id 
         WHERE cn.id = :chainNodeId and t.deleted_at IS NULL
         GROUP BY c.id) as popular_chains 

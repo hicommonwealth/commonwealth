@@ -36,7 +36,7 @@ export async function emitChainEventNotifs(
     SELECT CH.id as chain_id, CH.network as chain_network, C.address as contract_address, C.chain_node_id
     FROM "Contracts" C
              JOIN "CommunityContracts" CC on C.id = CC.contract_id
-             JOIN "Chains" CH ON CC.chain_id = CH.id
+             JOIN "Communities" CH ON CC.chain_id = CH.id
     WHERE (C.address, C.chain_node_id) IN (?);
   `,
     { type: QueryTypes.SELECT, raw: true, replacements: [queryFilter] }
