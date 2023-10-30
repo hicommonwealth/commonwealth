@@ -1,7 +1,7 @@
-import { ServerCommunitiesController } from '../server_communities_controller';
+import { Op } from 'sequelize';
 import { UserInstance } from 'server/models/user';
 import { AppError } from '../../../../common-common/src/errors';
-import { Op } from 'sequelize';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
   NotAdmin: 'Must be a site admin',
@@ -94,7 +94,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: chainId,
+      community_id: chainId,
     },
   });
 

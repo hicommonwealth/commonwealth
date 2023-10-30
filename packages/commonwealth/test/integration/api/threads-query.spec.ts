@@ -18,7 +18,7 @@ describe('Thread queries', () => {
       await models.Address.findOrCreate({
         where: {
           address: 'JhgYcbJOdWHLVFHJKLPhC12',
-          chain: chain.id,
+          community_id: chain.id,
           verification_token: 'fgdfgd',
         },
       })

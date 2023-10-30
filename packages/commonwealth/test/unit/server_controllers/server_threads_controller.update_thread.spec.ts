@@ -81,7 +81,7 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x1234',
         role: 'admin',
-        chain: 'ethereum',
+        community_id: 'ethereum',
         verified: true,
         update: async () => null,
       };

@@ -31,7 +31,7 @@ const createReaction = async ({
   return await axios.post(
     `${app.serverUrl()}/comments/${commentId}/reactions`,
     {
-      author_chain: app.user.activeAccount.chain.id,
+      author_chain: app.user.activeAccount.community.id,
       chain: chainId,
       address,
       reaction: reactionType,

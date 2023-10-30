@@ -1,9 +1,9 @@
 // Helper function to look up an (address, author_chain) pair of parameters,
 // and check that it's owned by the current user. Only for POST requests.
 
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import type { DB } from '../models';
-import type { AddressInstance } from '../models/address';
+import type { AddressAttributes, AddressInstance } from '../models/address';
 import type { UserInstance } from '../models/user';
 
 type AddressChainReq = {
@@ -20,8 +20,8 @@ export const filterAddressOwnedByUser = async (
   addresses: string[],
   addressIds: number[]
 ): Promise<{ owned: AddressInstance[]; unowned: UnownedAddresses[] }> => {
-  const where = {
-    chain: { [Op.in]: chains },
+  const where: WhereOptions<AddressAttributes> = {
+    community_id: { [Op.in]: chains },
     user_id,
   };
 
@@ -71,12 +71,8 @@ const lookupAddressIsOwnedByUser = async (
     return [null, 'Must provide an address'];
   }
 
-  const query: {
-    chain: string;
-    address: string;
-    user_id?: number;
-  } = {
-    chain: req.body.author_chain,
+  const query: WhereOptions<AddressAttributes> = {
+    community_id: req.body.author_chain,
     address: req.body.address,
   };
 

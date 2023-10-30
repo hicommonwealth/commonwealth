@@ -1,14 +1,14 @@
-import { Op, QueryTypes } from 'sequelize';
-import { ServerThreadsController } from '../server_threads_controller';
+import { QueryTypes } from 'sequelize';
+import { TypedPaginatedResult } from 'server/types';
+import { CommunityInstance } from '../../models/community';
+import { ThreadAttributes } from '../../models/thread';
 import {
   PaginationSqlBind,
   PaginationSqlOptions,
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
-import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes } from '../../models/thread';
-import { TypedPaginatedResult } from 'server/types';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export type SearchThreadsOptions = {
   chain: CommunityInstance;
@@ -88,7 +88,7 @@ export async function __searchThreads(
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".chain as address_chain,
+      "Addresses".community_id as address_chain,
       "Threads".created_at,
       "Threads".chain,
       ts_rank_cd("Threads"._search, query) as rank

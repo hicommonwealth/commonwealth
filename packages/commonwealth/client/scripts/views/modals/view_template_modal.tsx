@@ -1,20 +1,21 @@
 import React from 'react';
 
-import app from '../../state';
-import Template from '../../models/Template';
 import { renderDisabledTemplate } from '../../helpers/action_template_helpers';
-import { CWText } from '../components/component_kit/cw_text';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import Template from '../../models/Template';
+import app from '../../state';
 import { CWCommunityAvatar } from '../components/component_kit/cw_community_avatar';
-import { User } from '../components/user/user';
 import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWText } from '../components/component_kit/cw_text';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { User } from '../components/user/user';
 
 import '../../../styles/modals/view_template_modal.scss';
+import Account from '../../models/Account';
 
 const ViewTemplateModal = ({
   template,
@@ -23,7 +24,7 @@ const ViewTemplateModal = ({
   template: Template;
   onClose: () => void;
 }) => {
-  const creator = app.chain.accounts.get(template.createdBy);
+  const creator: Account = app.chain.accounts.get(template.createdBy);
 
   return (
     <div className="ViewTemplateModal">
@@ -33,7 +34,7 @@ const ViewTemplateModal = ({
           <CWText type="b2">By</CWText>
           <User
             userAddress={creator.address}
-            userChainId={creator.chain?.id || creator?.profile?.chain}
+            userChainId={creator.community?.id || creator?.profile?.chain}
             shouldShowAddressWithDisplayName
           />
           <CWText type="b2">•</CWText>

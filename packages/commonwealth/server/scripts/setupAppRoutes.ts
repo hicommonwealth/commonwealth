@@ -88,7 +88,7 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     // Retrieve title, description, and author from the database
     let title, description, author, profileData, image;
     const address = await models.Address.findOne({
-      where: { chain: req.params.scope, address: req.params.address },
+      where: { community_id: req.params.scope, address: req.params.address },
       include: [models.Profile],
     });
     const profile = await address.getProfile();

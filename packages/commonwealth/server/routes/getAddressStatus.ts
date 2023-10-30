@@ -33,7 +33,7 @@ const getAddressStatus = async (
 
   const existingAddress = await models.Address.findOne({
     where: {
-      chain: req.body.chain,
+      community_id: req.body.chain,
       address: req.body.address,
       verified: { [Op.ne]: null },
     },

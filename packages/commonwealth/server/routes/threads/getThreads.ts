@@ -3,8 +3,9 @@ import type {
   GetThreadsResp,
 } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import Sequelize from 'sequelize';
+import Sequelize, { WhereOptions } from 'sequelize';
 import type { DB } from '../../models';
+import { ThreadAttributes } from '../../models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
@@ -46,14 +47,14 @@ export const getThreads = async (
   const pagination = formatPagination(req.query);
 
   // if address is included, find which thread_ids they correspond to.
-  const where = { chain: community_id };
+  const where: WhereOptions<ThreadAttributes> = { chain: community_id };
   if (addresses) {
     const addressIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },
       attributes: ['id'],
     });
 
-    where['address_id'] = { [Op.in]: addressIds.map((p) => p.id) };
+    where.address_id = { [Op.in]: addressIds.map((p) => p.id) };
   }
 
   const include: any = [
@@ -71,8 +72,8 @@ export const getThreads = async (
       ...attributes.exclude,
       ...['body', 'plaintext', 'version_history'],
     ];
-  if (topic_id) where['topic_id'] = topic_id;
-  if (address_ids) where['address_id'] = { [Op.in]: address_ids };
+  if (topic_id) where.topic_id = topic_id;
+  if (address_ids) where.address_id = { [Op.in]: address_ids };
   if (include_comments)
     include.push({ model: models.Comment, required: false });
 

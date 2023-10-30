@@ -6,15 +6,15 @@ import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import * as siwe from 'siwe';
-import { createCanvasSessionPayload } from '../../../shared/canvas';
+import { ChainBase } from '../../../../common-common/src/types';
 import app, { resetDatabase } from '../../../server-test';
 import {
-  createSiweMessage,
-  TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
+  TEST_BLOCK_INFO_STRING,
+  createSiweMessage,
 } from '../../../shared/adapters/chain/ethereum/keys';
+import { createCanvasSessionPayload } from '../../../shared/canvas';
 import * as modelUtils from '../../util/modelUtils';
-import { ChainBase } from '../../../../common-common/src/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -52,7 +52,7 @@ describe('API Tests', () => {
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
       expect(res.body.result.address).to.be.equal(address);
-      expect(res.body.result.chain).to.equal(chain);
+      expect(res.body.result.community_id).to.equal(chain);
       expect(res.body.result.verification_token).to.be.not.null;
     });
 

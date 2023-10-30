@@ -1,4 +1,3 @@
-import * as process from 'process';
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
@@ -107,7 +106,7 @@ export async function clearTestEntities() {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
           { user_id: { [Op.in]: usersToDelete.map((u) => u['id']) } },
-          { chain: { [Op.in]: ['cmntest', 'cmntest2'] } },
+          { community_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
         ],
       },
       force: true,
@@ -287,7 +286,7 @@ export async function createTestEntities() {
                 id: -i - 1,
                 user_id: -i - 1,
                 address: addresses[i],
-                chain: 'cmntest',
+                community_id: 'cmntest',
                 verification_token: '',
                 profile_id: i < 2 ? -1 : -2,
               },
