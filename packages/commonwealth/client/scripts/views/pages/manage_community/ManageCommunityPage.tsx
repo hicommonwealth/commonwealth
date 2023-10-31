@@ -131,7 +131,7 @@ const ManageCommunityPage = () => {
         newRole.address_id,
         newRole.Address?.id || newRole.address_id,
         newRole.Address.address,
-        newRole.Address.chain,
+        newRole.Address.community_id,
         newRole.chain_id,
         newRole.permission,
         newRole.allow,

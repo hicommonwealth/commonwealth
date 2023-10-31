@@ -10,12 +10,12 @@ import {
 } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 
+import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
 import type { ProfileAttributes } from '../models/profile';
-import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
@@ -54,7 +54,7 @@ const processAddress = async (
 ): Promise<void> => {
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { chain: chain.id, address },
+      where: { community_id: chain.id, address },
     }
   );
   if (!addressInstance) {
@@ -239,7 +239,7 @@ const verifyAddress = async (
   } else {
     // if user isn't logged in, log them in now
     const newAddress = await models.Address.findOne({
-      where: { chain: req.body.chain, address },
+      where: { community_id: req.body.chain, address },
     });
     const user = await models.User.scope('withPrivateData').findOne({
       where: { id: newAddress.user_id },

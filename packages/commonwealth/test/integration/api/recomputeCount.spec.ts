@@ -1,12 +1,12 @@
-import { Op, QueryTypes } from 'sequelize';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
+import { Op, QueryTypes } from 'sequelize';
 import models from '../../../server/database';
 import {
   testAddresses,
-  testThreads,
   testComments,
   testJwtToken,
+  testThreads,
 } from './external/dbEntityHooks.spec';
 
 import { recomputeCounts } from '../../../scripts/recompute-count-job';
@@ -402,7 +402,7 @@ describe('recomputeCounts', () => {
         jwt: testJwtToken,
         reaction: 'like',
         thread_id: testThreads[0].id,
-        author_chain: testAddresses[0].chain,
+        author_chain: testAddresses[0].community_id,
         session: testVerifiedChainAddress.session,
         sign: testVerifiedChainAddress.sign,
       });
@@ -422,7 +422,7 @@ describe('recomputeCounts', () => {
         jwt: testJwtToken,
         reaction: 'like',
         comment_id: testComments[0].id,
-        author_chain: testAddresses[0].chain,
+        author_chain: testAddresses[0].community_id,
         session: testVerifiedChainAddress.session,
         sign: testVerifiedChainAddress.sign,
       });
