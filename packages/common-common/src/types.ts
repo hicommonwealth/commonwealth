@@ -162,7 +162,8 @@ export type DiscordAction =
   | 'create'
   | 'update'
   | 'thread-delete'
-  | 'comment-delete';
+  | 'comment-delete'
+  | 'thread-update';
 
 export interface IDiscordMessage {
   user?: {
