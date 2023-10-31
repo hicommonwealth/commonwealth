@@ -1,8 +1,8 @@
-import { formatAddressShort } from '../../shared/utils';
-import { SENDGRID_API_KEY } from '../config';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { DynamicTemplate } from '../../shared/types';
+import { formatAddressShort } from '../../shared/utils';
+import { SENDGRID_API_KEY } from '../config';
 import models from '../database';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -82,7 +82,7 @@ export const getTopThreads = async (
       const addressData = await models.Address.findOne({
         where: {
           address: row.author_address,
-          chain: communityId,
+          community_id: communityId,
         },
       });
 
@@ -233,8 +233,8 @@ export const emailDigestBuilder = async (
     });
 
     const userCommunities = userAddresses.reduce((acc, address) => {
-      if (address.chain && !acc.includes(address.chain)) {
-        acc.push(address.chain);
+      if (address.community_id && !acc.includes(address.community_id)) {
+        acc.push(address.community_id);
       }
       return acc;
     }, [] as string[]);

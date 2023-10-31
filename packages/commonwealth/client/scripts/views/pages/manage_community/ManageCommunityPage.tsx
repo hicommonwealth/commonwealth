@@ -5,18 +5,18 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
 import { AccessLevel } from '../../../../../shared/permissions';
-import { CWText } from '../../components/component_kit/cw_text';
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import RoleInfo from '../../../models/RoleInfo';
-import Permissions from '../../../utils/Permissions';
-import { AdminPanelTabs } from './admin_panel_tabs';
-import { ChainMetadataRows } from './chain_metadata_rows';
-import ErrorPage from '../error';
-import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
+import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
+import NewProfilesController from '../../../controllers/server/newProfiles';
+import RoleInfo from '../../../models/RoleInfo';
+import Permissions from '../../../utils/Permissions';
+import { CWText } from '../../components/component_kit/cw_text';
+import ErrorPage from '../error';
+import { AdminPanelTabs } from './admin_panel_tabs';
+import { ChainMetadataRows } from './chain_metadata_rows';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -131,7 +131,7 @@ const ManageCommunityPage = () => {
         newRole.address_id,
         newRole.Address?.id || newRole.address_id,
         newRole.Address.address,
-        newRole.Address.chain,
+        newRole.Address.community_id,
         newRole.chain_id,
         newRole.permission,
         newRole.allow,

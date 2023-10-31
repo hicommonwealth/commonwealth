@@ -1,6 +1,6 @@
 import app from 'state';
-import Thread from '../models/Thread';
 import Account from '../models/Account';
+import Thread from '../models/Thread';
 
 const ROLES = {
   ADMIN: 'admin',
@@ -38,7 +38,7 @@ const isThreadCollaborator = (thread: Thread) => {
     thread.collaborators?.filter((c) => {
       return (
         c.address === app.user.activeAccount?.address &&
-        c.chain === app.user.activeAccount?.chain.id
+        c.community_id === app.user.activeAccount?.community.id
       );
     }).length > 0
   );
@@ -47,7 +47,7 @@ const isThreadCollaborator = (thread: Thread) => {
 const isThreadAuthor = (thread: Thread) => {
   return (
     app.user.activeAccount?.address === thread.author &&
-    app.user.activeAccount?.chain.id === thread.authorChain
+    app.user.activeAccount?.community.id === thread.authorChain
   );
 };
 

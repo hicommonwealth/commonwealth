@@ -148,7 +148,7 @@ async function main() {
       root_type: ProposalType.Thread,
       chain_id: thread.chain,
       author_address: thread.Address.address,
-      author_chain: thread.Address.chain,
+      author_chain: thread.Address.community_id,
     };
 
     if (argv.notificationCategory === NotificationCategories.NewThread) {
@@ -186,7 +186,7 @@ async function main() {
     ) {
       const anotherAddress = await models.Address.findOne({
         where: {
-          chain: chain.id,
+          community_id: chain.id,
         },
       });
       await models.Reaction.findOrCreate({

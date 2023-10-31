@@ -243,7 +243,7 @@ export async function __createThread(
         mentions.map(async (mention) => {
           return this.models.Address.findOne({
             where: {
-              chain: mention[0] || null,
+              community_id: mention[0] || null,
               address: mention[1] || null,
             },
             include: [this.models.User],
@@ -274,7 +274,7 @@ export async function __createThread(
         comment_text: finalThread.body,
         chain_id: finalThread.chain,
         author_address: finalThread.Address.address,
-        author_chain: finalThread.Address.chain,
+        author_chain: finalThread.Address.community_id,
       },
     },
     excludeAddresses: excludedAddrs,
@@ -298,7 +298,7 @@ export async function __createThread(
             comment_text: finalThread.body,
             chain_id: finalThread.chain,
             author_address: finalThread.Address.address,
-            author_chain: finalThread.Address.chain,
+            author_chain: finalThread.Address.community_id,
           },
         },
         excludeAddresses: [finalThread.Address.address],
