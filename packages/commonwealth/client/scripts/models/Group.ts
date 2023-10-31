@@ -4,6 +4,7 @@ interface APIResponseFormat {
   metadata: {
     name: string;
     description?: string;
+    required_requirements?: number;
   };
   requirements: {
     rule: 'threshold';
@@ -31,6 +32,7 @@ class Group {
   public requirements: any[];
   public topics: any[];
   public members: any[];
+  public requirementsToFulfill: number;
 
   constructor({
     id,
@@ -51,6 +53,7 @@ class Group {
     this.requirements = requirements;
     this.topics = topics;
     this.members = memberships;
+    this.requirementsToFulfill = metadata.required_requirements;
   }
 }
 

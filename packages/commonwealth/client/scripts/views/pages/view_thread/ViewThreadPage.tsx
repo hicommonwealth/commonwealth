@@ -19,7 +19,7 @@ import { useFetchCommentsQuery } from 'state/api/comments';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
-  useGetThreadsByIdQuery,
+  useGetThreadsByIdQuery
 } from 'state/api/threads';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
@@ -43,7 +43,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import {
   breakpointFnValidator,
-  isWindowMediumSmallInclusive,
+  isWindowMediumSmallInclusive
 } from '../../components/component_kit/helpers';
 import CWBanner from '../../components/component_kit/new_designs/CWBanner';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
@@ -110,20 +110,20 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [searchParams] = useSearchParams();
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups = [] } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
     includeMembers: true,
-    includeTopics: true,
+    includeTopics: true
   });
 
   const {
     data,
     error: fetchThreadError,
-    isLoading,
+    isLoading
   } = useGetThreadsByIdQuery({
     chainId: app.activeChainId(),
     ids: [+threadId].filter(Boolean),
-    apiCallEnabled: !!threadId, // only call the api if we have thread id
+    apiCallEnabled: !!threadId // only call the api if we have thread id
   });
 
   const thread = data?.[0];
@@ -131,12 +131,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
       chainId: app.activeChainId(),
-      threadId: parseInt(`${threadId}`),
+      threadId: parseInt(`${threadId}`)
     });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
     chainId: app.activeChainId(),
-    threadId: parseInt(threadId),
+    threadId: parseInt(threadId)
   });
 
   useEffect(() => {
@@ -152,7 +152,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         },
         isWindowMediumSmallInclusive
       ),
-    resizeListenerUpdateDeps: [isCollapsedSize],
+    resizeListenerUpdateDeps: [isCollapsedSize]
   });
 
   useEffect(() => {
@@ -165,40 +165,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
   }, []);
 
-  useEffect(() => {
-    if (groups && thread?.topic) {
-      const topicId = thread.topic.id;
-      const addressTopicMemberIds = app.user.addresses.map(
-        (ids) => ids.address
+  // // find if the current topic is gated
+  const foundGatedTopic = groups.find((x) => {
+    if (thread?.topic) {
+      return (
+        Array.isArray(x.topics) &&
+        x.topics.find((y) => y.id === thread.topic.id)
       );
-
-      const groupsWithTopic = groups.filter((community) =>
-        community.topics.some((topic) => topic.id === topicId)
-      );
-
-      // Extract the names of the groups that have the current topic
-      const groupNamesWithTopic = groupsWithTopic.map((community) => ({
-        id: community.id,
-        name: community.name,
-      }));
-
-      // Set the gatedGroups state to the list of group names
-      setGatedGroups(groupNamesWithTopic);
-
-      if (groupsWithTopic.length > 0) {
-        // Check if the user is a member of any of the groups with the current topic
-        const isMemberOfAnyGroup = groupsWithTopic.some((community) =>
-          community.members.some((id) => addressTopicMemberIds.includes(id))
-        );
-
-        // You can use the 'isMemberOfAnyGroup' variable as needed
-        setHideGatingBanner(isMemberOfAnyGroup);
-      }
     }
-  }, [groups, thread?.topic]);
+  });
 
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW }
   });
 
   useEffect(() => {
@@ -251,7 +229,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     axios
       .post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        object_id: thread.id,
+        object_id: thread.id
       })
       .then((response) => {
         setViewCount(response?.data?.result?.view_count || 0);
@@ -326,7 +304,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const handleNewSnapshotChange = async ({
     id,
-    snapshot_title,
+    snapshot_title
   }: {
     id: string;
     snapshot_title: string;
@@ -334,7 +312,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const newLink: Link = {
       source: LinkSource.Snapshot,
       identifier: id,
-      title: snapshot_title,
+      title: snapshot_title
     };
     const toAdd = [newLink]; // Add this line to create an array with the new link
 
@@ -343,7 +321,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         await addThreadLinks({
           chainId: app.activeChainId(),
           threadId: thread.id,
-          links: toAdd,
+          links: toAdd
         });
       } catch {
         notifyError('Failed to update linked threads');
@@ -521,7 +499,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       canComment={canComment}
                       shouldFocusEditor={shouldFocusCommentEditor}
                     />
-                    {featureFlags.gatingEnabled && gatedGroups.length > 0 && (
+                    {featureFlags.gatingEnabled && foundGatedTopic && (
                       <CWBanner
                         title="This topic is gated"
                         body="Only members within the following group(s) can interact with this topic:"
@@ -540,9 +518,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         buttons={[
                           {
                             label: 'See all groups',
-                            onClick: () => navigate('/members?tab=groups'),
+                            onClick: () => navigate('/members?tab=groups')
                           },
-                          { label: 'Learn more about gating' },
+                          { label: 'Learn more about gating' }
                         ]}
                         onClose={() => setHideGatingBanner(true)}
                       />
@@ -575,14 +553,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       id: 1,
                       value: CommentsFeaturedFilterTypes.Newest,
                       label: 'Newest',
-                      iconLeft: 'sparkle',
+                      iconLeft: 'sparkle'
                     },
                     {
                       id: 2,
                       value: CommentsFeaturedFilterTypes.Oldest,
                       label: 'Oldest',
-                      iconLeft: 'clockCounterClockwise',
-                    },
+                      iconLeft: 'clockCounterClockwise'
+                    }
                   ]}
                 />
                 <CWCheckbox
@@ -628,8 +606,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           />
                         )}
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(isAuthor || isAdmin || hasWebLinks
@@ -643,8 +621,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           allowLinking={isAuthor || isAdminOrMod}
                         />
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
@@ -659,8 +637,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           onChangeHandler={handleNewSnapshotChange}
                         />
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(polls?.length > 0 ||
@@ -673,7 +651,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         {[
                           ...new Map(
                             polls?.map((poll) => [poll.id, poll])
-                          ).values(),
+                          ).values()
                         ].map((poll: Poll) => {
                           return (
                             <ThreadPollCard
@@ -696,8 +674,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             />
                           )}
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(showLinkedTemplateOptions &&
@@ -712,8 +690,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           slug={linkedTemplates[0]?.identifier.split('/')[2]}
                         />
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(showTemplateOptions
@@ -724,10 +702,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <div className="cards-column">
                         <TemplateActionCard thread={thread} />
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
-              : []),
+              : [])
           ] as SidebarComponents
         }
       />
