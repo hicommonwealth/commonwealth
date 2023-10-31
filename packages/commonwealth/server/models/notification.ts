@@ -93,7 +93,7 @@ export default (
       foreignKey: 'category_id',
       targetKey: 'name',
     });
-    models.Notification.belongsTo(models.Chain, {
+    models.Notification.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

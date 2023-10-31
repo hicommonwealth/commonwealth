@@ -37,7 +37,7 @@ export default (
   );
 
   CommunityBanner.associate = (models) => {
-    models.CommunityBanner.belongsTo(models.Chain);
+    models.CommunityBanner.belongsTo(models.Community);
   };
 
   return CommunityBanner;

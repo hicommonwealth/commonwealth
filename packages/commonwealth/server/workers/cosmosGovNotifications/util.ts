@@ -23,7 +23,7 @@ export async function fetchCosmosNotifChains(models: DB) {
     },
   });
 
-  const result = await models.Chain.findAll({
+  const result = await models.Community.findAll({
     where: {
       id: chainIds.map((c) => c.chain_id),
       base: ChainBase.CosmosSDK,

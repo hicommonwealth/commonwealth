@@ -1,5 +1,5 @@
 import { TopicAttributes, TopicInstance } from '../../models/topic';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ServerTopicsController } from '../server_topics_controller';
 import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
@@ -16,7 +16,7 @@ const Errors = {
 
 export type UpdateTopicsOrderOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   body: {
     orderedIds: string[];
   };

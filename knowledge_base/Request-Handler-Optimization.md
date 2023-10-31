@@ -55,8 +55,9 @@ async function getStatus(models, req) {
 
 ## Remove Unwanted Data - Eliminating Joins
 As the code evolved over the years, two unnecessary joins were identified and removed. This was a lucky scenario where the attached data from the `models.Chain` query was not even being used:
+
 ```javascript
-models.Chain.findAll({
+models.Community.findAll({
   where: { active: true },
   include: [
     {
@@ -71,8 +72,9 @@ models.Chain.findAll({
 })
 ```
 By removing the unnecessary inclusions, the following simplified query was used, resulting in another 50% improvement in performance:
+
 ```javascript
-models.Chain.findAll({
+models.Community.findAll({
   where: { active: true },
 })
 ```
