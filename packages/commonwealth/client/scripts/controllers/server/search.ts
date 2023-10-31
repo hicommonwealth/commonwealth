@@ -1,11 +1,11 @@
+import axios from 'axios';
+import Thread from 'models/Thread';
 import moment from 'moment';
 import app from 'state';
 import SearchStore from 'stores/SearchStore';
 import { SearchContentType } from 'types';
-import Thread from 'models/Thread';
-import SearchQuery, { SearchScope } from '../../models/SearchQuery';
 import type { SearchParams } from '../../models/SearchQuery';
-import axios from 'axios';
+import SearchQuery, { SearchScope } from '../../models/SearchQuery';
 
 const SEARCH_PREVIEW_SIZE = 6;
 const SEARCH_PAGE_SIZE = 10;
@@ -99,7 +99,7 @@ class SearchController {
               id: profile.id,
               profile_id: profile.id,
               address: profile.addresses[0]?.address,
-              chain: profile.addresses[0]?.chain,
+              chain: profile.addresses[0]?.community_id,
               name: profile.profile_name,
               user_id: profile.user_id,
               UserId: profile.user_id,

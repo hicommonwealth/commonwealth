@@ -40,7 +40,7 @@ export default class SolanaAccount extends Account {
     Accounts: SolanaAccounts,
     address: string
   ) {
-    super({ chain: app.chain.meta, address });
+    super({ community: app.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

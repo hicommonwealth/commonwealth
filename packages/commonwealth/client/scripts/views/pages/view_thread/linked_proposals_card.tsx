@@ -12,7 +12,7 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
 import type Thread from '../../../models/Thread';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';

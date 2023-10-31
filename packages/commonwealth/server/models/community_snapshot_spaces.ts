@@ -51,7 +51,7 @@ export default (
   );
 
   CommunitySnapshotSpaces.associate = (models) => {
-    models.CommunitySnapshotSpaces.belongsTo(models.Chain, {
+    models.CommunitySnapshotSpaces.belongsTo(models.Community, {
       foreignKey: 'community_id',
       targetKey: 'id',
     });

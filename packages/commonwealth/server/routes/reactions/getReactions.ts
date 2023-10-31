@@ -3,8 +3,9 @@ import type {
   GetReactionsResp,
 } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import Sequelize from 'sequelize';
+import Sequelize, { WhereOptions } from 'sequelize';
 import type { DB } from '../../models';
+import { ReactionAttributes } from '../../models/reaction';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
@@ -33,8 +34,8 @@ const getReactions = async (
   }
   const { community_id, comment_id, addresses, count_only } = req.query;
 
-  const where = { chain: community_id };
-  if (comment_id) where['comment_id'] = comment_id;
+  const where: WhereOptions<ReactionAttributes> = { chain: community_id };
+  if (comment_id) where.comment_id = comment_id;
 
   // if address is included, find which addressIds they correspond to.
   if (addresses) {
@@ -43,7 +44,7 @@ const getReactions = async (
       attributes: ['id'],
     });
 
-    where['address_id'] = { [Op.in]: addressIds.map((p) => p.id) };
+    where.address_id = { [Op.in]: addressIds.map((p) => p.id) };
   }
 
   const include = [

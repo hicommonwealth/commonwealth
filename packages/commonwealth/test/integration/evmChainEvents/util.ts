@@ -59,7 +59,7 @@ export async function getTestChain(version?: 'v1' | 'v2') {
     defaultSymbol = 'DYDX';
   }
 
-  const [chain, created] = await models.Chain.findOrCreate({
+  const [chain, created] = await models.Community.findOrCreate({
     where: {
       id: chainId,
       chain_node_id: chainNode.id,

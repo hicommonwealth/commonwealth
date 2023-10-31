@@ -49,7 +49,7 @@ const createDiscordBotConfig = async (
     // check if already exists
     const existing = await models.DiscordBotConfig.findOne({
       where: {
-        chain_id,
+        community_id: chain_id,
       },
     });
 
@@ -61,12 +61,12 @@ const createDiscordBotConfig = async (
         },
         {
           where: {
-            chain_id,
+            community_id: chain_id,
           },
         }
       );
 
-      await models.Chain.update(
+      await models.Community.update(
         { discord_config_id: existingConfig.id },
         { where: { id: chain_id } }
       );
@@ -76,7 +76,7 @@ const createDiscordBotConfig = async (
       });
     } else {
       await models.DiscordBotConfig.create({
-        chain_id,
+        community_id: chain_id,
         verification_token,
         token_expiration,
       });

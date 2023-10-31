@@ -283,7 +283,7 @@ const GroupForm = ({
 
   const handleSubmit = async (values: FormSubmitValues) => {
     const hasSubFormErrors = validateSubForms();
-    if (hasSubFormErrors) {
+    if (hasSubFormErrors || cwRequiremenetsLabelInputField.error) {
       return;
     }
 
@@ -313,7 +313,7 @@ const GroupForm = ({
         !requirementsToFulfill ||
         requirementsToFulfill < 1 ||
         requirementsToFulfill > MAX_REQUIREMENTS ||
-        cwRequiremenetsLabelInputField.value.includes('.')
+        /[^0-9]/g.test(cwRequiremenetsLabelInputField.value)
       ) {
         setCwRequiremenetsLabelInputField({
           ...cwRequiremenetsLabelInputField,
@@ -448,8 +448,8 @@ const GroupForm = ({
                   inputValue={cwRequiremenetsLabelInputField.value}
                   onInputValueChange={(value) =>
                     setCwRequiremenetsLabelInputField({
-                      ...cwRequiremenetsLabelInputField,
                       value,
+                      error: '',
                     })
                   }
                 />
