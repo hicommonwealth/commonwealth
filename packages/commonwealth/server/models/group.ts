@@ -1,13 +1,13 @@
 import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
+import { Requirement } from '../util/requirementsModule/requirementsTypes';
 import { CommunityAttributes } from './community';
 import { ModelInstance, ModelStatic } from './types';
-import { Requirement } from '../util/requirementsModule/requirementsTypes';
 
 export type GroupMetadata = {
   name: string;
   description: string;
-  required_requirements?: number; // NOT USED
+  required_requirements?: number;
   membership_ttl?: number; // NOT USED
 };
 
