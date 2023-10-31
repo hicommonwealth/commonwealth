@@ -61,6 +61,8 @@ async function startDiscordListener() {
     isServiceHealthy = true;
   });
 
+  // event types can be found here: https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584
+
   client.on('threadDelete', async (thread: ThreadChannel) => {
     await handleMessage(
       controller,
