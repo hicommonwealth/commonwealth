@@ -1,26 +1,30 @@
 **Contents**
+
 - [Data Over-Fetching](#data-over-fetching)
   * [Changes Made](#changes-made)
   * [Examples](#examples)
-    + [Scenario 1: Accidentally pulling all attributes using Sequelize](#scenario-1--accidentally-pulling-all-attributes-using-sequelize)
-    + [Scenario 2: Response format doesn't allow pagination](#scenario-2--response-format-doesn-t-allow-pagination)
-    + [Scenario 3: Grabbing unused data](#scenario-3--grabbing-unused-data)
+    + [Scenario 1: Accidentally pulling all attributes using Sequelize](#scenario-1-accidentally-pulling-all-attributes-using-sequelize)
+    + [Scenario 2: Response format doesn't allow pagination](#scenario-2-response-format-doesnt-allow-pagination)
+    + [Scenario 3: Grabbing unused data](#scenario-3-grabbing-unused-data)
 - [Change Log](#change-log)
 
 # Data Over-Fetching
+
 This pertains to situations where we retrieve more data than required. This is commonly observed when Sequelize queries behind endpoints extract excessive information.
 
 **Few Example(s):**
+
 - **User Profile** - Our primary need is the user's name and avatar URL. Despite this, we are also pulling in extra data like the user's biography and all corresponding addresses.
 - **Comment Text** - We're primarily interested in the text content of the comments. However, we're presently extracting the full version history as well.
 - **Threaded Discussions with Comments** - While our main goal is to extract only the threads, we're currently compiling all related comments along with their extensive version histories. A more efficient approach would be to limit the export to the 50 most recent comments.
 
-
 **Process Improvement:**
+
 - **Regular Audit and Clean-up:** Regularly reviewing your data needs, ensuring that you're only fetching the data that you need.
 - **Close Collaboration Between Teams:** The backend team and the frontend team should have good communication to ensure the backend is providing exactly what the frontend needs.
 
 ## Changes Made
+
 Check out the changes in this [pull request](https://github.com/hicommonwealth/commonwealth/pull/3966).
 
 ## Examples
@@ -183,11 +187,13 @@ By excluding certain attributes, we managed to reduce data size by 15 times, shr
 Even when fetching paginated threads, the comments array for each thread is fetched without pagination. This approach can result in substantial memory usage for threads with many comments. The code snippet responsible for this behavior can be found in the [getThreads with include_comments](https://github.com/hicommonwealth/commonwealth/blob/0fca7428d17cb860a676eaf9c28825ad7d4416ed/packages/commonwealth/server/routes/threads/getThreads.ts#L77) function.
 
 This endpoint fetches all **700+ threads for Osmosis, including all comments** associated with each thread:
+
 ```http
 GET http://localhost:8080/external/threads?community_id=osmosis&include_comments=true
 ```
 
 Response structure:
+
 ```json
 {
   "threads": {
@@ -196,6 +202,7 @@ Response structure:
   }
 }
 ```
+
 This issue is addressed in the changes of pull request [3966](https://github.com/hicommonwealth/commonwealth/pull/3966).
 
 ### Scenario 3: Grabbing unused data
@@ -203,12 +210,14 @@ This issue is addressed in the changes of pull request [3966](https://github.com
 - **Unnecessary joining and fetching of attributes** in a fairly frequently used query that are not utilized in the frontend is a prevalent issue. This is seen in `viewUserActivity` and `viewGlobalActivity`. For instance, reactions and profile information are fetched even though they are not required.
 
 Code Snippet is from [here](https://github.com/hicommonwealth/commonwealth/blob/0fca7428d17cb860a676eaf9c28825ad7d4416ed/packages/commonwealth/server/routes/viewUserActivity.ts#L50)
+
 ```sql
 LEFT JOIN "Reactions" tr ON nt.thread_id = CAST(tr.thread_id AS VARCHAR)
 LEFT JOIN "Reactions" cr ON oc.id = cr.comment_id
 ```
 
 Code Snippet is from [here](https://github.com/hicommonwealth/commonwealth/blob/0fca7428d17cb860a676eaf9c28825ad7d4416ed/packages/commonwealth/server/routes/viewUserActivity.ts#L76)
+
 ```javascript
 const profiles = await models.Profile.findAll({
 where: {
@@ -226,6 +235,6 @@ A new query for `viewUserActivity` and `viewGlobalActivity` has been proposed in
 
 Additionally, this update also addresses code duplication between `viewUserActivity` and `viewGlobalActivity`. The redundant code has been consolidated into a single 'activity' query. When this query is passed a user_id, it returns user-specific activity; otherwise, it delivers global activity. This change enhances the code's maintainability and readability while still retaining its functionality.
 
-# Change Log
+## Change Log
 
 - 230629: Authored by Nakul Manchanda.

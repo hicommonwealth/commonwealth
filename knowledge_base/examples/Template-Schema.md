@@ -154,7 +154,7 @@
 }
 ```
 
-# Change Log
+## Change Log
 
 - 231013: Flagged by Graham Johnson for certification (see also `Template-Schema.v0.1`) 
 - 230204: Authored by Forest Mars.

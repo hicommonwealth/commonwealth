@@ -27,7 +27,7 @@ const Debouncer = () => {
 export default Debouncer;
 ```
 
-# Change Log
+## Change Log
 
 - 230209: Updated by, and ownership transferred to, Timothee Legros.
 - 230206: Authored by Forest Mars.

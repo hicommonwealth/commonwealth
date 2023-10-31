@@ -1,4 +1,7 @@
 {
   "MD003": { "style": "atx" },
-  "MD013": false
+  "MD004": false,
+  "MD013": false,
+  "MD048": { "style": "backtick" },
+  "MD050": { "style": "asterisk" }
 }
