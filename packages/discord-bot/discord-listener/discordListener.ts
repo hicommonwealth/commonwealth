@@ -95,7 +95,7 @@ async function startDiscordListener() {
   client.on(
     'threadUpdate',
     async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
-      await handleThreadChannel(newThread, 'thread-update', oldThread);
+      await handleThreadChannel(controller, newThread, 'thread-update', oldThread);
     }
   );
 

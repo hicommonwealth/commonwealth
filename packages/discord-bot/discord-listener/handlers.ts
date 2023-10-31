@@ -1,13 +1,16 @@
-import {Client, Message, ThreadChannel} from "discord.js";
-import {DiscordAction, IDiscordMessage} from "common-common/src/types";
-import {getForumLinkedTopicId, getImageUrls} from "discord-bot/discord-listener/util";
-import {RascalPublications} from "common-common/src/rabbitmq/types";
-import {RabbitMQController} from "common-common/src/rabbitmq";
-import {factory, formatFilename} from "common-common/src/logging";
+import { factory, formatFilename } from 'common-common/src/logging';
+import { RabbitMQController } from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
+import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
+import {
+  getForumLinkedTopicId,
+  getImageUrls,
+} from 'discord-bot/discord-listener/util';
+import { Client, Message, ThreadChannel } from 'discord.js';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export async function handleMessage (
+export async function handleMessage(
   controller: RabbitMQController,
   client: Client,
   message: Partial<Message>,
@@ -57,7 +60,8 @@ export async function handleMessage (
   }
 }
 
-export async function handleThreadChannel (
+export async function handleThreadChannel(
+  controller: RabbitMQController,
   thread: ThreadChannel,
   action: DiscordAction,
   oldThread?: ThreadChannel
@@ -72,10 +76,27 @@ export async function handleThreadChannel (
     if (!topicId) return;
 
     if (action === 'thread-delete') {
+      await controller.publish(
+        {
+          message_id: thread.id,
+          channel_id: thread.parentId,
+          action,
+        } as any,
+        RascalPublications.DiscordListener
+      );
+    } else {
+      if (!oldThread) return;
 
+      if (thread.name !== oldThread.name) {
+        await controller.publish(
+          {
+            action,
+          } as any,
+          RascalPublications.DiscordListener
+        );
+      }
     }
-
   } catch (e) {
-
+    log.info(`Error Processing Discord Message`, e);
   }
 }
