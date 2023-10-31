@@ -15,7 +15,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -26,7 +26,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -118,7 +118,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -129,7 +129,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -181,7 +181,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -192,7 +192,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -250,7 +250,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -261,7 +261,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -318,7 +318,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -329,7 +329,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -1248,13 +1248,13 @@ describe('ServerThreadsController', () => {
             ...data,
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             toJSON: () => ({
               ...data,
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
             }),
           }),

@@ -29,7 +29,7 @@ class Reaction {
   }) {
     this.id = id;
     this.author = Address.address;
-    this.chain = Address.chain;
+    this.chain = Address.community_id;
     this.reaction = reaction;
     this.threadId = thread_id;
     this.commentId = comment_id;
