@@ -1,5 +1,5 @@
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { CommentAttributes } from '../../models/comment';
 import { UserInstance } from '../../models/user';
 import { EmitOptions } from '../server_notifications_methods/emit';
@@ -38,7 +38,7 @@ const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 export type CreateThreadCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   parentId: number;
   threadId: number;
   text: string;
@@ -229,7 +229,7 @@ export async function __createThreadComment(
         mentions.map(async (mention) => {
           const mentionedUser = await this.models.Address.findOne({
             where: {
-              chain: mention[0] || null,
+              community_id: mention[0] || null,
               address: mention[1],
             },
             include: [this.models.User],
@@ -268,7 +268,7 @@ export async function __createThreadComment(
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
         author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+        author_chain: finalComment.Address.community_id,
       },
     },
     excludeAddresses: rootNotifExcludeAddresses,
@@ -290,7 +290,7 @@ export async function __createThreadComment(
           parent_comment_text: parentComment.text,
           chain_id: finalComment.chain,
           author_address: finalComment.Address.address,
-          author_chain: finalComment.Address.chain,
+          author_chain: finalComment.Address.community_id,
         },
       },
       excludeAddresses: excludedAddrs,
@@ -317,7 +317,7 @@ export async function __createThreadComment(
                 comment_text: finalComment.text,
                 chain_id: finalComment.chain,
                 author_address: finalComment.Address.address,
-                author_chain: finalComment.Address.chain,
+                author_chain: finalComment.Address.community_id,
               },
             },
             excludeAddresses: [finalComment.Address.address],

@@ -30,7 +30,7 @@ export const ThreadAuthor = ({ author, collaborators }: ThreadAuthorProps) => {
       <User
         avatarSize={24}
         userAddress={user.address}
-        userChainId={user.chain?.id || user.profile?.chain}
+        userChainId={user.community?.id || user.profile?.chain}
         shouldShowPopover
         shouldLinkProfile
       />
@@ -47,12 +47,12 @@ export const ThreadAuthor = ({ author, collaborators }: ThreadAuthorProps) => {
             <Popover
               content={
                 <div className="collaborators">
-                  {collaborators.map(({ address, chain }) => {
+                  {collaborators.map(({ address, community_id }) => {
                     return (
                       <User
                         key={address}
                         shouldLinkProfile
-                        userChainId={chain}
+                        userChainId={community_id}
                         userAddress={address}
                       />
                     );

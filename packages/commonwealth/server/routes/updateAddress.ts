@@ -27,12 +27,16 @@ const updateAddress = async (
     if (req.user.id) {
       const { id: ghostAddressId } =
         (await models.Address.scope('withPrivateData').findOne({
-          where: { chain, ghost_address: true, user_id: req.user.id },
+          where: {
+            community_id: chain,
+            ghost_address: true,
+            user_id: req.user.id,
+          },
         })) || {};
 
       const { id: newAddressId } =
         (await models.Address.scope('withPrivateData').findOne({
-          where: { chain, user_id: req.user.id, address },
+          where: { community_id: chain, user_id: req.user.id, address },
         })) || {};
 
       if (ghostAddressId && newAddressId) {

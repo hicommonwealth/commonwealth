@@ -1,11 +1,11 @@
-import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
 import type { AccessLevel } from './permissions';
 import {
+  ChainEventAttributes,
   NotificationCategories,
   NotificationCategory,
 } from 'common-common/src/types';
-import { SupportedNetwork } from 'chain-events/src';
+import type { SupportedNetwork } from '../shared/chain/types/types';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
@@ -148,10 +148,6 @@ export interface IChainEventNotificationData {
   event_data: any;
   network: SupportedNetwork;
   chain: string;
-
-  // TODO: @Timothee remove these once chain-events is removed
-  queued?: number;
-  entity_id?: number;
 }
 
 export type NotificationDataTypes =

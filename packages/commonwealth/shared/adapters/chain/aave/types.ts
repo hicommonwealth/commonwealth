@@ -1,8 +1,8 @@
-import type { AaveTypes } from 'chain-events/src/types';
+import type { IProposalCreated, IVoteEmitted } from '../../../chain/types/aave';
 import type { ICompletable } from '../../shared';
 import { BigNumber } from 'ethers';
 
-export type IAaveProposalResponse = Omit<AaveTypes.IProposalCreated, 'kind'> &
+export type IAaveProposalResponse = Omit<IProposalCreated, 'kind'> &
   ICompletable & {
     executionTime?: number;
     queued: boolean;
@@ -16,4 +16,4 @@ export type IAaveProposalResponse = Omit<AaveTypes.IProposalCreated, 'kind'> &
     executionTimeWithGracePeriod: BigNumber;
   };
 
-export type IAaveVoteResponse = Omit<AaveTypes.IVoteEmitted, 'kind'>;
+export type IAaveVoteResponse = Omit<IVoteEmitted, 'kind'>;

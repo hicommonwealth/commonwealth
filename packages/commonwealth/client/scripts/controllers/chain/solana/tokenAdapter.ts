@@ -28,7 +28,7 @@ export default class Token extends Solana implements ITokenAdapter {
       const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
         chain: this.meta.id,
         address: account.address,
-        author_chain: account.chain.id,
+        author_chain: account.community.id,
         contract_address: this.contractAddress,
       });
       if (balanceResp.result) {

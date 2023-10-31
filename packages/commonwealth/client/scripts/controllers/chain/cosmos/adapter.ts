@@ -8,8 +8,8 @@ import type ITokenAdapter from '../../../models/ITokenAdapter';
 import type CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
-import CosmosGovernance from './gov/v1beta1/governance-v1beta1';
 import CosmosGovernanceV1 from './gov/v1/governance-v1';
+import CosmosGovernance from './gov/v1beta1/governance-v1beta1';
 import type { CosmosToken } from './types';
 
 class Cosmos
@@ -65,7 +65,7 @@ class Cosmos
       const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
         chain: this.meta.id,
         address: account.address,
-        author_chain: account.chain.id,
+        author_chain: account.community.id,
       });
       if (balanceResp.result) {
         const balance = new BN(balanceResp.result, 10);

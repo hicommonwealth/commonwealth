@@ -1,12 +1,12 @@
 import { GroupAttributes } from 'server/models/group';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../models/community';
 import { Op, WhereOptions } from 'sequelize';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupsOptions = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   includeMembers?: boolean;
   includeTopics?: boolean;
   addressId?: number;

@@ -1,5 +1,5 @@
 import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { AddressInstance } from '../../models/address';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { UserInstance } from '../../models/user';
@@ -19,7 +19,7 @@ const Errors = {
 
 export type UpdateGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   address: AddressInstance;
   groupId: number;
   metadata?: GroupMetadata;

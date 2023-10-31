@@ -16,7 +16,7 @@ describe('getProfiles Tests', () => {
 
     chai.assert.lengthOf(resp.result.profiles, 2);
     chai.assert.lengthOf(resp.result.profiles[0].Addresses, 2);
-    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
+    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Community);
 
     const profiles = resp.result.profiles.filter(
       (p) => p.id === testAddresses[0].id
@@ -36,7 +36,7 @@ describe('getProfiles Tests', () => {
 
     chai.assert.lengthOf(resp.result.profiles, 2);
     chai.assert.lengthOf(resp.result.profiles[0].Addresses, 2);
-    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Chain);
+    chai.assert.isNotNull(resp.result.profiles[0].Addresses[0].Community);
 
     const profiles = resp.result.profiles.filter(
       (p) => p.id === testAddresses[0].id

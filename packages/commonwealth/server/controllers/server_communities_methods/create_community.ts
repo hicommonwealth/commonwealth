@@ -12,16 +12,16 @@ import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import type { AddressInstance } from '../../models/address';
-import type { ChainAttributes } from '../../models/chain';
+import type { CommunityAttributes } from '../../models/community';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { RoleAttributes } from '../../models/role';
 
-import { RoleInstanceWithPermission } from '../../util/roles';
-import testSubstrateSpec from '../../util/testSubstrateSpec';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import axios from 'axios';
+import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { UserInstance } from '../../models/user';
 import { getFileSizeBytes } from '../../util/getFilesSizeBytes';
+import { RoleInstanceWithPermission } from '../../util/roles';
+import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 const MAX_IMAGE_SIZE_KB = 500;
@@ -66,7 +66,7 @@ export const Errors = {
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: Omit<ChainAttributes, 'substrate_spec'> &
+  community: Omit<CommunityAttributes, 'substrate_spec'> &
     Omit<ChainNodeAttributes, 'id'> & {
       id: string;
       node_url: string;
@@ -77,7 +77,7 @@ export type CreateCommunityOptions = {
 };
 
 export type CreateCommunityResult = {
-  chain: ChainAttributes;
+  chain: CommunityAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
   admin_address: string;
@@ -131,7 +131,7 @@ export async function __createCommunity(
     throw new AppError(Errors.ImageTooLarge);
   }
 
-  const existingBaseChain = await this.models.Chain.findOne({
+  const existingBaseChain = await this.models.Community.findOne({
     where: { base: community.base },
   });
   if (!existingBaseChain) {
@@ -327,7 +327,7 @@ export async function __createCommunity(
     throw new AppError(Errors.InvalidIconUrl);
   }
 
-  const oldChain = await this.models.Chain.findOne({
+  const oldChain = await this.models.Community.findOne({
     where: { [Op.or]: [{ name: community.name }, { id: community.id }] },
   });
   if (oldChain && oldChain.id === community.id) {
@@ -365,7 +365,7 @@ export async function __createCommunity(
     },
   });
 
-  const chain = await this.models.Chain.create({
+  const chain = await this.models.Community.create({
     id,
     name,
     default_symbol,
@@ -446,7 +446,7 @@ export async function __createCommunity(
       },
       include: [
         {
-          model: this.models.Chain,
+          model: this.models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -464,7 +464,7 @@ export async function __createCommunity(
       },
       include: [
         {
-          model: this.models.Chain,
+          model: this.models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -483,7 +483,7 @@ export async function __createCommunity(
       },
       include: [
         {
-          model: this.models.Chain,
+          model: this.models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -496,7 +496,7 @@ export async function __createCommunity(
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
-      chain: chain.id,
+      community_id: chain.id,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,

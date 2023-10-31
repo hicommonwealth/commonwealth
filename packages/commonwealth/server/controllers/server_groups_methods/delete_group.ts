@@ -1,5 +1,5 @@
 import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
@@ -14,7 +14,7 @@ const Errors = {
 
 export type DeleteGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   address: AddressInstance;
   groupId: number;
 };

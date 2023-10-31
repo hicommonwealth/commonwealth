@@ -1,25 +1,25 @@
+import moment from 'moment';
 import React, { useRef, useState } from 'react';
 import _ from 'underscore';
-import moment from 'moment';
 
-import type Thread from '../../models/Thread';
-import app from '../../state';
 import {
   notifyError,
   notifySuccess,
 } from '../../controllers/app/notifications';
 import { pluralize } from '../../helpers';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import type Thread from '../../models/Thread';
+import app from '../../state';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWLabel } from '../components/component_kit/cw_label';
+import { SelectList } from '../components/component_kit/cw_select_list';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { SelectList } from '../components/component_kit/cw_select_list';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 import '../../../styles/modals/poll_editor_modal.scss';
 
@@ -108,7 +108,7 @@ export const PollEditorModal = ({
         options,
         customDuration: customDurationEnabled ? customDuration : null,
         address: app.user.activeAccount.address,
-        authorChain: app.user.activeAccount.chain.id,
+        authorChain: app.user.activeAccount.community.id,
       });
       notifySuccess('Poll creation succeeded');
       onPollCreate();
