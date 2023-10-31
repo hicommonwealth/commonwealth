@@ -1,4 +1,7 @@
-```openapi: 3.0.0
+# Template OAS
+
+```yml
+openapi: 3.0.0
 info:
   title: Community Contract Template API
   version: I 0.0.1
@@ -122,5 +125,5 @@ components:
 
 ## Change Log
 
-- 231013: Flagged by Graham Johnson for certification. 
+- 231013: Flagged by Graham Johnson for certification.
 - 230204: Authored by Forest Mars.

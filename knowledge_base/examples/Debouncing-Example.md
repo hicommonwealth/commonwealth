@@ -1,4 +1,6 @@
-```Typescript
+# Debouncing Example
+
+```ts
 import React, { useState, useEffect } from 'react';
 
 const Debouncer = () => {
