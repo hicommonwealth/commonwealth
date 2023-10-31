@@ -1,15 +1,15 @@
 /* eslint-disable no-script-url */
+import { WalletId } from 'common-common/src/types';
 import 'components/user/user.scss';
 import { capitalize } from 'lodash';
 import React from 'react';
+import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
-import type Account from '../../../models/Account';
+import Account from '../../../models/Account';
 import AddressInfo from '../../../models/AddressInfo';
 import MinimumProfile from '../../../models/MinimumProfile';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
-import { WalletId } from 'common-common/src/types';
-import app from 'state';
 
 export const formatAddress = (address: string) => {
   return `${address.slice(0, 8)}...${address.slice(-5)}`;
@@ -38,11 +38,17 @@ export const UserBlock = (props: {
     selected,
   } = props;
 
+  let userCommunityId: string;
+  if (user instanceof MinimumProfile) {
+    userCommunityId = user.chain;
+  } else if (user instanceof Account) {
+    userCommunityId = user.community.id;
+  }
   const { data: users } = useFetchProfilesByAddressesQuery({
-    profileChainIds: [(user?.chain as any)?.id],
+    profileChainIds: [userCommunityId],
     profileAddresses: [user?.address],
     currentChainId: app.activeChainId(),
-    apiCallEnabled: !!((user?.chain as any)?.id && user?.address),
+    apiCallEnabled: !!(userCommunityId && user?.address),
   });
   const profile = users?.[0];
 
@@ -88,9 +94,9 @@ export const UserBlock = (props: {
           )}
           {showChainName && (
             <div>
-              {typeof user.chain === 'string'
+              {user instanceof MinimumProfile
                 ? capitalize(user.chain)
-                : capitalize(user.chain.name)}
+                : capitalize(user.community.name)}
             </div>
           )}
         </div>
@@ -122,12 +128,12 @@ const UserLoginBadge = ({ user }: { user: Account | AddressInfo }) => {
 
   React.useEffect(() => {
     const matchingAddress = app.user.addresses.find(
-      (a) => a.chain.id === user.chain?.id && a.address === user.address
+      (a) => a.community.id === user.community?.id && a.address === user.address
     );
     if (matchingAddress) {
       setAddress(matchingAddress);
     }
-  }, [user.address, user.chain?.id]);
+  }, [user.address, user.community?.id]);
 
   return (
     <>

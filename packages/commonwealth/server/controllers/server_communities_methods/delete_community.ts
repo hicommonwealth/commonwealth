@@ -34,7 +34,7 @@ export async function __deleteCommunity(
     throw new AppError(Errors.NeedChainId);
   }
 
-  const chain = await this.models.Chain.findOne({
+  const chain = await this.models.Community.findOne({
     where: {
       id: communityId,
     },
@@ -142,7 +142,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.Address.findAll({
-            where: { chain: chain.id },
+            where: { community_id: chain.id },
           });
 
           await this.models.CommunityBanner.destroy({
@@ -157,11 +157,11 @@ export async function __deleteCommunity(
           });
 
           await this.models.Address.destroy({
-            where: { chain: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 
-          await this.models.Chain.destroy({
+          await this.models.Community.destroy({
             where: { id: chain.id },
             transaction: t,
           });

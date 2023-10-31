@@ -7,7 +7,7 @@ interface CreateGroupProps {
   chainId: string;
   address: string;
   groupName: string;
-  topicIds: string[];
+  topicIds: number[];
   groupDescription?: string;
   requirementsToFulfill: number | undefined;
   requirements?: any[];

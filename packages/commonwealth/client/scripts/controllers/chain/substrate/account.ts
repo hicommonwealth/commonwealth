@@ -1,10 +1,10 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
+import { decodeAddress } from '@polkadot/util-crypto';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import Account from '../../../models/Account';
 import { IAccountsModule } from '../../../models/interfaces';
-import { decodeAddress } from '@polkadot/util-crypto';
 
 export class SubstrateAccount extends Account {
   private _Accounts: SubstrateAccounts;
@@ -20,9 +20,9 @@ export class SubstrateAccount extends Account {
   ) {
     if (!app.isModuleReady) {
       // defer chain initialization
-      super({ chain: app.chain.meta, address });
+      super({ community: app.chain.meta, address });
     } else {
-      super({ chain: app.chain.meta, address });
+      super({ community: app.chain.meta, address });
     }
     this.isEd25519 = isEd25519;
     this._Accounts = Accounts;

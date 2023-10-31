@@ -1,5 +1,5 @@
-import type { DB } from '../models';
 import { Op } from 'sequelize';
+import type { DB } from '../models';
 
 export async function getActivityFeed(models: DB, id = 0) {
   /**
@@ -7,7 +7,7 @@ export async function getActivityFeed(models: DB, id = 0) {
    */
 
   const filterByChainForUsers = id
-    ? 'JOIN "Addresses" a on a.chain=t.chain and a.user_id = ?'
+    ? 'JOIN "Addresses" a on a.community_id=t.chain and a.user_id = ?'
     : '';
 
   const query = `
@@ -55,7 +55,7 @@ export async function getActivityFeed(models: DB, id = 0) {
         [Op.in]: comments.map((c) => c.address_id),
       },
     },
-    attributes: ['id', 'address', 'chain', 'profile_id'],
+    attributes: ['id', 'address', 'community_id', 'profile_id'],
   });
 
   const profiles = addresses.map((a) => {

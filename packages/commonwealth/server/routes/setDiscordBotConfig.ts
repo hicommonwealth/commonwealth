@@ -67,7 +67,7 @@ const setDiscordBotConfig = async (
   const existingCommunityWithGuildConnected =
     await models.DiscordBotConfig.findAll({ where: { guild_id } });
 
-  const chainInstance = await models.Chain.findOne({
+  const chainInstance = await models.Community.findOne({
     where: { id: chain_id },
   });
 
@@ -104,7 +104,7 @@ const setDiscordBotConfig = async (
         user_id: profile.user_id,
         profile_id: profile.id,
         address: '0xdiscordbot',
-        chain: chain_id,
+        community_id: chain_id,
         role: 'admin',
         verification_token: '123456',
         verification_token_expires: new Date(2030, 1, 1),

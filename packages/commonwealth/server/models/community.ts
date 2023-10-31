@@ -17,7 +17,7 @@ import type { TopicAttributes, TopicInstance } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
 
-export type ChainAttributes = {
+export type CommunityAttributes = {
   name: string;
   chain_node_id: number;
   default_symbol: string;
@@ -73,7 +73,7 @@ export type ChainAttributes = {
   updated_at?: Date;
 };
 
-export type ChainInstance = ModelInstance<ChainAttributes> & {
+export type CommunityInstance = ModelInstance<CommunityAttributes> & {
   // add mixins as needed
   getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
   hasAddresses: Sequelize.HasManyHasAssociationsMixin<
@@ -89,13 +89,17 @@ export type ChainInstance = ModelInstance<ChainAttributes> & {
   getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>;
 };
 
-export type ChainModelStatic = ModelStatic<ChainInstance>;
+export type CommunityModelStatic = ModelStatic<CommunityInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
-): ChainModelStatic => {
-  const Chain = <ChainModelStatic>sequelize.define(
+): CommunityModelStatic => {
+  const Community = <CommunityModelStatic>sequelize.define(
+    // Leave this as is for now so that we don't need to alias and models can join
+    // with this model using .Chain rather than .Community. Models should incrementally
+    // be aliased via `as: 'Community'` until all models use Community at which point,
+    // this can be updated to 'Community' and all aliases can be removed.
     'Chain',
     {
       id: { type: dataTypes.STRING, primaryKey: true },
@@ -153,7 +157,7 @@ export default (
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
     {
-      tableName: 'Chains',
+      tableName: 'Communities',
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
@@ -161,21 +165,21 @@ export default (
     }
   );
 
-  Chain.associate = (models) => {
-    models.Chain.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id' });
-    models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
-    models.Chain.hasMany(models.Topic, {
+  Community.associate = (models) => {
+    models.Community.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id' });
+    models.Community.hasMany(models.Address, { foreignKey: 'community_id' });
+    models.Community.hasMany(models.Notification, { foreignKey: 'chain_id' });
+    models.Community.hasMany(models.Topic, {
       as: 'topics',
       foreignKey: 'chain_id',
     });
-    models.Chain.hasMany(models.Thread, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.Comment, { foreignKey: 'chain' });
-    models.Chain.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
-    models.Chain.belongsToMany(models.Contract, {
+    models.Community.hasMany(models.Thread, { foreignKey: 'chain' });
+    models.Community.hasMany(models.Comment, { foreignKey: 'chain' });
+    models.Community.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
+    models.Community.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });
   };
 
-  return Chain;
+  return Community;
 };

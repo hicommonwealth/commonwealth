@@ -1,16 +1,16 @@
-import React from 'react';
-import { CWText } from '../../component_kit/cw_text';
-import { User } from 'views/components/user/user';
-import Account from 'client/scripts/models/Account';
-import app from 'state';
-import clsx from 'clsx';
-import { ReactQuillEditor } from '../../react_quill_editor';
-import { CWButton } from '../../component_kit/new_designs/cw_button';
-import { CWValidationText } from '../../component_kit/cw_validation_text';
 import BN from 'bn.js';
-import { weiToTokens, getDecimals } from 'helpers';
-import { ContentType } from 'types';
+import Account from 'client/scripts/models/Account';
+import clsx from 'clsx';
+import { getDecimals, weiToTokens } from 'helpers';
 import type { DeltaStatic } from 'quill';
+import React from 'react';
+import app from 'state';
+import { ContentType } from 'types';
+import { User } from 'views/components/user/user';
+import { CWText } from '../../component_kit/cw_text';
+import { CWValidationText } from '../../component_kit/cw_validation_text';
+import { CWButton } from '../../component_kit/new_designs/cw_button';
+import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
 
 type CommentEditorProps = {
@@ -64,7 +64,7 @@ export const CommentEditor = ({
           >
             <User
               userAddress={author?.address}
-              userChainId={author?.chain.id}
+              userChainId={author?.community.id}
               shouldHideAvatar
               shouldLinkProfile
             />

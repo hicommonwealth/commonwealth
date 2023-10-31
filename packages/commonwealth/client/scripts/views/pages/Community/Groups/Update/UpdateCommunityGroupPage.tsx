@@ -10,14 +10,13 @@ import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
 import {
   AMOUNT_CONDITIONS,
-  SPECIFICATIONS,
-  TOKENS,
   chainTypes,
   conditionTypes,
   requirementTypes
 } from '../../common/constants';
 import { DeleteGroupModal } from '../DeleteGroupModal';
 import { GroupForm } from '../common/GroupForm';
+import { makeGroupDataBaseAPIPayload } from '../common/helpers';
 import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
@@ -70,83 +69,27 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               )?.label
             },
             requirementContractAddress: x.data.source.contract_address || '',
-            // TODO: API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
+            // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
             requirementCondition: conditionTypes.find(
               (y) => y.value === AMOUNT_CONDITIONS.MORE
             )
           })),
-          // requirementsToFulfill: foundGroup.requirementsToFulfill || [], TODO: API doesn't return this
+          requirementsToFulfill:
+            foundGroup.requirementsToFulfill === foundGroup.requirements.length
+              ? 'ALL'
+              : foundGroup.requirementsToFulfill,
           topics: (foundGroup.topics || []).map((x) => ({
             label: x.name,
             value: x.id
-          })) // TODO: This is non-modifiable in the edit request, the input can be disabled
+          }))
         }}
         onSubmit={(values) => {
-          const payload = {
-            chainId: app.activeChainId(),
-            address: app.user.activeAccount.address,
-            groupId: groupId,
-            groupName: values.groupName,
-            groupDescription: values.groupDescription,
-            requirementsToFulfill:
-              values.requirementsToFulfill === 'ALL'
-                ? undefined
-                : // TODO: confirm if undefined means all requirements need to be satisfied
-                  values.requirementsToFulfill,
-            requirements: []
-          };
+          const payload = makeGroupDataBaseAPIPayload(values);
 
-          // map requirements and add to payload
-          values.requirements.map((x) => {
-            if (
-              x.requirementType === SPECIFICATIONS.ERC_20 ||
-              x.requirementType === SPECIFICATIONS.ERC_721
-            ) {
-              payload.requirements.push({
-                rule: 'threshold',
-                data: {
-                  threshold: x.requirementAmount,
-                  source: {
-                    source_type: x.requirementType,
-                    evm_chain_id: x.requirementChain,
-                    contract_address: x.requirementContractAddress
-                  }
-                }
-              });
-              return;
-            }
-
-            if (x.requirementType === TOKENS.COSMOS_TOKEN) {
-              payload.requirements.push({
-                rule: 'threshold',
-                data: {
-                  threshold: x.requirementAmount,
-                  source: {
-                    source_type: x.requirementType,
-                    cosmos_chain_id: x.requirementChain,
-                    token_symbol: 'COS'
-                  }
-                }
-              });
-              return;
-            }
-
-            if (x.requirementType === TOKENS.EVM_TOKEN) {
-              payload.requirements.push({
-                rule: 'threshold',
-                data: {
-                  threshold: x.requirementAmount,
-                  source: {
-                    source_type: x.requirementType,
-                    evm_chain_id: x.requirementChain
-                  }
-                }
-              });
-              return;
-            }
-          });
-
-          editGroup(payload)
+          editGroup({
+            ...payload,
+            groupId: groupId
+          })
             .then(() => {
               notifySuccess('Group Updated');
               navigate(`/members?tab=groups`);

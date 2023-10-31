@@ -28,7 +28,7 @@ const createReaction = async ({
   });
 
   return await axios.post(`${app.serverUrl()}/threads/${threadId}/reactions`, {
-    author_chain: app.user.activeAccount.chain.id,
+    author_chain: app.user.activeAccount.community.id,
     thread_id: threadId,
     chain: app.chain.id,
     address,

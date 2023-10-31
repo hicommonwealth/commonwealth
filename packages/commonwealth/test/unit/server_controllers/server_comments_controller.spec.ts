@@ -1,11 +1,11 @@
 import BN from 'bn.js';
 import { expect } from 'chai';
+import { NotificationCategories } from 'common-common/src/types';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../../server/models/community';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
-import { NotificationCategories } from 'common-common/src/types';
 
 describe('ServerCommentsController', () => {
   describe('#createCommentReaction', () => {
@@ -18,7 +18,7 @@ describe('ServerCommentsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -29,7 +29,7 @@ describe('ServerCommentsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -104,6 +104,7 @@ describe('ServerCommentsController', () => {
       );
 
       expect(notification.data).to.have.property('created_at');
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>', notification.data);
       expect(notification.data).to.include({
         thread_id: 4,
         comment_id: 3,
@@ -135,7 +136,7 @@ describe('ServerCommentsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -146,7 +147,7 @@ describe('ServerCommentsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -205,7 +206,7 @@ describe('ServerCommentsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -216,7 +217,7 @@ describe('ServerCommentsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -274,7 +275,7 @@ describe('ServerCommentsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -285,7 +286,7 @@ describe('ServerCommentsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -348,7 +349,7 @@ describe('ServerCommentsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -359,7 +360,7 @@ describe('ServerCommentsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -463,7 +464,7 @@ describe('ServerCommentsController', () => {
 
       const chain = { id: 'ethereum' };
       const searchOptions: SearchCommentsOptions = {
-        chain: chain as ChainInstance,
+        chain: chain as CommunityInstance,
         search: 'hello',
         limit: 5,
         page: 2,
@@ -494,7 +495,7 @@ describe('ServerCommentsController', () => {
         chain: 'ethereum',
         Address: {
           address: '0x123',
-          chain: 'ethereum',
+          community_id: 'ethereum',
           save: async () => ({}),
         },
         save: async () => ({}),
@@ -594,7 +595,7 @@ describe('ServerCommentsController', () => {
         chain: 'ethereum',
         Address: {
           address: '0x123',
-          chain: 'ethereum',
+          community_id: 'ethereum',
           save: async () => ({}),
         },
         save: async () => ({}),
@@ -660,7 +661,7 @@ describe('ServerCommentsController', () => {
         chain: 'ethereum',
         Address: {
           address: '0x123',
-          chain: 'ethereum',
+          community_id: 'ethereum',
           save: async () => ({}),
         },
         save: async () => ({}),

@@ -5,7 +5,7 @@ import { NotificationDataAndCategory } from '../../../shared/types';
 import { slugify } from '../../../shared/utils';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import models from '../../database';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ProfileAttributes } from '../../models/profile';
 import { WebhookInstance } from '../../models/webhook';
 import { WebhookDestinations } from './types';
@@ -60,7 +60,7 @@ export async function getActorProfile(
   const address = await models.Address.findOne({
     where: {
       address: notif.data.author_address,
-      chain: notif.data.chain_id,
+      community_id: notif.data.chain_id,
     },
     include: [models.Profile],
   });
@@ -87,7 +87,7 @@ export async function getPreviewImageUrl(
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
   >,
-  chain?: ChainInstance
+  chain?: CommunityInstance
 ): Promise<{ previewImageUrl: string; previewAltText: string }> {
   // case 1: embedded imaged in thread body
   if (
