@@ -6,7 +6,6 @@ import { TypedRequestQuery, TypedResponse, success } from '../../types';
 
 type GetGroupsQueryQuery = {
   include_topics?: string;
-  address_id?: string;
 };
 type GetGroupsResponse = GetGroupsResult;
 
@@ -27,13 +26,12 @@ export const getGroupsHandler = async (
     throw new AppError(JSON.stringify(validationResult.error));
   }
   const {
-    query: { address_id, include_topics },
+    query: { include_topics },
   } = validationResult.data;
 
   const result = await controllers.groups.getGroups({
-    chain: req.chain,
+    community: req.chain,
     includeTopics: include_topics,
-    addressId: address_id,
   });
   return success(res, result);
 };

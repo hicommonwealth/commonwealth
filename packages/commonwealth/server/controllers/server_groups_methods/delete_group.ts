@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../database';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerGroupsController } from '../server_groups_controller';
@@ -14,7 +14,7 @@ const Errors = {
 
 export type DeleteGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
 };
@@ -23,12 +23,12 @@ export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
   this: ServerGroupsController,
-  { user, chain, groupId }: DeleteGroupOptions
+  { user, community, groupId }: DeleteGroupOptions
 ): Promise<DeleteGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    chainId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -40,7 +40,7 @@ export async function __deleteGroup(
   const group = await this.models.Group.findOne({
     where: {
       id: groupId,
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
   if (!group) {

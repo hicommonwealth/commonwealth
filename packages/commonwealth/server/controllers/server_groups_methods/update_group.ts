@@ -1,7 +1,7 @@
 import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../database';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { UserInstance } from '../../models/user';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
@@ -19,7 +19,7 @@ const Errors = {
 
 export type UpdateGroupOptions = {
   user: UserInstance;
-  community: ChainInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
   metadata?: GroupMetadata;

@@ -1,14 +1,14 @@
 import { flatten, uniq } from 'lodash';
 import { Op } from 'sequelize';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type RefreshMembershipOptions = {
   user: UserInstance;
-  community: ChainInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   topicId: number;
 };
@@ -47,6 +47,7 @@ export async function __refreshMembership(
   const results = memberships.map((membership) => {
     const topic = topics.find((t) => t.group_ids.includes(membership.group_id));
     return {
+      groupId: membership.group_id,
       topicId: topic.id,
       allowed: !membership.reject_reason,
       rejectReason: membership.reject_reason,

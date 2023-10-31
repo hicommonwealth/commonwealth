@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { TemplateActionModal } from '../../modals/TemplateActionModal'; // Import the new modal component
 
 import 'pages/view_thread/TemplateActionCard.scss';

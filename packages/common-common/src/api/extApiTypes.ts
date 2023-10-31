@@ -1,6 +1,5 @@
 // contains types for external api
 
-import type { ChainAttributes } from 'commonwealth/server/models/chain';
 import type { CommentAttributes } from 'commonwealth/server/models/comment';
 import type { ProfileAttributes } from 'commonwealth/server/models/profile';
 import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
@@ -11,6 +10,7 @@ import type {
   BalanceProviderResp,
   ChainNodeResp,
 } from 'token-balance-cache/src';
+import type { CommunityAttributes } from '../../../commonwealth/server/models/community';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -77,7 +77,7 @@ export type GetCommunitiesReq = {
 };
 
 export type PutCommunitiesReq = {
-  community: ChainAttributes;
+  community: CommunityAttributes;
   contract: { token_type: string; address: string };
   admin_addresses: string[];
 };
@@ -85,7 +85,7 @@ export type PutCommunitiesReq = {
 export type PutCommunitiesResp = { url: string; error?: string };
 
 export type GetCommunitiesResp = {
-  communities?: ChainAttributes[];
+  communities?: CommunityAttributes[];
   count: number;
 };
 

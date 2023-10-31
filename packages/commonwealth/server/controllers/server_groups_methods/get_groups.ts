@@ -1,14 +1,14 @@
 import { Op } from 'sequelize';
-import { ChainInstance } from 'server/models/chain';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
+import { CommunityInstance } from '../../models/community';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupsOptions = {
-  chain: ChainInstance;
+  community: CommunityInstance;
+  includeMembers?: boolean;
   includeTopics?: boolean;
-  addressId?: number;
 };
 
 type GroupWithExtras = GroupAttributes & {
@@ -19,11 +19,11 @@ export type GetGroupsResult = GroupWithExtras[];
 
 export async function __getGroups(
   this: ServerGroupsController,
-  { chain, addressId, includeTopics }: GetGroupsOptions
+  { community, includeTopics }: GetGroupsOptions
 ): Promise<GetGroupsResult> {
   const groups = await this.models.Group.findAll({
     where: {
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
 
@@ -32,7 +32,7 @@ export async function __getGroups(
   if (includeTopics) {
     const topics = await this.models.Topic.findAll({
       where: {
-        chain_id: chain.id,
+        chain_id: community.id,
         group_ids: {
           [Op.overlap]: groupsResult.map(({ id }) => id),
         },

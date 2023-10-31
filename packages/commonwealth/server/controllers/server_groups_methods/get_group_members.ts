@@ -1,13 +1,13 @@
 import { WhereOptions } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 import { OrderByOptions } from '../../../../common-common/src/api/extApiTypes';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { MembershipAttributes } from '../../models/membership';
 import { formatPagination } from '../../util/queries';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupMembersOptions = {
-  community: ChainInstance;
+  community: CommunityInstance;
   groupId: number;
   limit?: number;
   page?: number;

@@ -7,7 +7,7 @@ import {
   WebhookDataByCategory,
 } from '../types';
 import { REGEX_EMOJI } from '../util';
-import { ChainInstance } from '../../../models/chain';
+import { CommunityInstance } from '../../../models/community';
 
 type DiscordWebhookMessage = {
   username: string;
@@ -85,7 +85,7 @@ export async function sendDiscordWebhook(
   webhookUrl: string,
   category: NotificationCategories,
   data: ForumWebhookData | ChainEventWebhookData,
-  chain?: ChainInstance
+  chain?: CommunityInstance
 ) {
   if ('profileName' in data && data.profileName === 'Discord Bot') {
     if (!chain) return;

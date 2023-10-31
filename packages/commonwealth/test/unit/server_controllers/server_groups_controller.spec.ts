@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
 import { AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/community';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
@@ -156,7 +156,7 @@ const createMockParams = () => {
     },
     isAdmin: true,
   } as UserInstance;
-  const chain = {} as ChainInstance;
+  const chain = {} as CommunityInstance;
   const address = {} as AddressInstance;
   return { user, chain, address };
 };
@@ -180,7 +180,7 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const { chain } = createMockParams();
     const result = await controller.getGroups({
-      chain,
+      community: chain,
     });
     expect(result).to.have.length(1);
     expect(result[0]).to.have.property('id');
@@ -270,7 +270,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const result = await controller.deleteGroup({
       user,
-      chain,
+      community: chain,
       address,
       groupId: 1,
     });

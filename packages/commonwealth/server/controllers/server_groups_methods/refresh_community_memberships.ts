@@ -1,13 +1,13 @@
 import Bluebird from 'bluebird';
 import { flatten } from 'lodash';
 import { Op } from 'sequelize';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from 'server/models/community';
 import { MembershipAttributes } from '../../models/membership';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
 
 export type RefreshCommunityMembershipsOptions = {
-  community: ChainInstance;
+  community: CommunityInstance;
 };
 export type RefreshCommunityMembershipsResult = MembershipAttributes[];
 

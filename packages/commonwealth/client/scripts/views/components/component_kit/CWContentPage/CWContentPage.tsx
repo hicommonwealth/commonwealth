@@ -1,5 +1,4 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
-import 'components/component_kit/CWContentPage.scss';
 import { truncate } from 'helpers/truncate';
 import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
@@ -12,10 +11,9 @@ import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
-import { CWCard } from '../cw_card';
-import { CWText } from '../cw_text';
 import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
 import { ComponentType } from '../types';
+import './CWContentPage.scss';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';
 
 export type ContentPageSidebarItem = {
@@ -262,25 +260,5 @@ export const CWContentPage = ({
         </div>
       )}
     </div>
-  );
-};
-
-type ContentPageCardProps = {
-  content: ReactNode;
-  header: string;
-};
-
-export const CWContentPageCard = (props: ContentPageCardProps) => {
-  const { content, header } = props;
-
-  return (
-    <CWCard className="ContentPageCard">
-      <div className="header-container">
-        <CWText type="h5" fontWeight="semiBold">
-          {header}
-        </CWText>
-      </div>
-      {content}
-    </CWCard>
   );
 };

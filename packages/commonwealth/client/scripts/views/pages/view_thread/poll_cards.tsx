@@ -8,7 +8,7 @@ import 'pages/view_thread/poll_cards.scss';
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import app from 'state';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { PollCard } from '../../components/poll_card';
