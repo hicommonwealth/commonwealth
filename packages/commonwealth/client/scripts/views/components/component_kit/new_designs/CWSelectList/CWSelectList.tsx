@@ -1,13 +1,14 @@
-import './CWSelectList.scss';
 import React, { useEffect } from 'react';
+import { useFormContext } from 'react-hook-form';
 import type { GroupBase, Props } from 'react-select';
-import Select, { components } from 'react-select';
-import { CWIcon } from '../../cw_icons/cw_icon';
+import Select from 'react-select';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 import { MessageRow } from '../CWTextInput/MessageRow';
 import './CWSelectList.scss';
-import { useFormContext } from 'react-hook-form';
+import { DropdownIndicator } from './DropdownIndicator';
+import { MultiValueRemove } from './MultiValueRemove';
+import { Option } from './Option';
 
 type CustomCWSelectListProps = {
   label?: string;
@@ -47,7 +48,7 @@ export const CWSelectList = <
       props.name &&
       props.value &&
       formContext.setValue(props.name, props.value);
-    }, [props.hookToForm, props.name, props.value, formContext]);
+  }, [props.hookToForm, props.name, props.value, formContext]);
 
   return (
     <div className="CWSelectList">
@@ -98,18 +99,9 @@ export const CWSelectList = <
           },
         }}
         components={{
-          DropdownIndicator: () => (
-            <CWIcon
-              className="caret-icon"
-              iconName="caretDown"
-              iconSize="small"
-            />
-          ),
-          MultiValueRemove: (removeProps) => (
-            <components.MultiValueRemove {...removeProps}>
-              <CWIcon iconName="close" className="close-btn" />
-            </components.MultiValueRemove>
-          ),
+          DropdownIndicator,
+          MultiValueRemove,
+          Option,
         }}
         className={getClasses<{
           className?: string;
