@@ -1,13 +1,16 @@
 **Engineering Praxis**
+
 - [Code Style](Code-Style.md)
 - [Ways of Working](Ways-Of-Working.md)
 - [Analytics](Analytics.md)
 - [Migration Best Practices](Database-Migrations.md)
 
 **API Gateway**
-  - [Kong](Kong.md)
+
+- [Kong](Kong.md)
 
 **Services & Tooling**
+
 - [Sequelize](Sequelize.md)
 - [Discobot](Discobot.md)
 - [React Notes](React-Notes.md)
@@ -23,6 +26,7 @@
 - [Notifications](Notifications.md)
 
 **Current Roadmap**
+
 - [React Conversion](React-Milestone.md)
 - [Rules Engine](Rules-Module.md)
 - [Environment Variables](Environment-Variables.md)
@@ -34,6 +38,7 @@
 - [Observability](Observability.md)
 
 **Templating Engine**
+
 - [Proposal Templates](Proposal-Templates.md)
 - [Template OAS](Template-OAS.md)
 - [Templating JSON Schema - HEAD](examples/Template-Schema.md)
@@ -43,19 +48,12 @@
 - [Template Parser](examples/Template-Parser.md)
 - [Contract Components Kit](Contract-Components-Kit.md)
 
-**Chain Events**
-- [Overview](Chain-Events-Overview.md)
-- [Environment Variables](Chain-Events-Environment-Variables.md)
-- [Chain Events Service](Chain-Events-Service.md)
-- [Common Scenarios](Chain-Events-Service-Common-Scenarios.md)
-- [Testing](Chain-Events-Testing.md)
-- [FAQ](Chain-Events-Service-FAQ.md)
-- [Common Errors](Chain-Events-Service-Common-Errors.md)
-
 **Chain Testing**
+
 - [EVM Overview and Docs](Chain-Testing-Overview.md)
 
 **RabbitMQ**
+
 - [Overview](RabbitMQ-Overview.md)
 - [RabbitMQ](RabbitMQ.md)
 - [Management Panel](RabbitMQ-Management-Panel.md)
@@ -63,13 +61,16 @@
 - [FAQ](RabbitMQ-FAQ.md)
 
 **Notifications**
+
 - [QA](Notifications-QA.md)
 
 **Pattern Library**
+
 - [Debouncing in Pure React](./examples/Debouncing-in-Pure-React.md)
 - [Shadow DOM](./examples/Shadow-DOM.md)
 
 **Storybook**
+
 - [Introduction](Storybook-Introduction.md)
 - [Stories](Storybook-Stories.md)
 - [Component Story Format](Storybook-Component-Story-Format.md)
