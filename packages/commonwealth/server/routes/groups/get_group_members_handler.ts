@@ -14,8 +14,8 @@ export const getGroupMembersHandler = async (
   const schema = z.object({
     query: z.object({
       address_id: z.coerce.number().optional(),
-      limit: z.coerce.number().min(1).max(50).optional(),
-      page: z.coerce.number().min(1).optional(),
+      limit: z.coerce.number().min(1).max(50).optional().default(10),
+      page: z.coerce.number().min(1).optional().default(1),
     }),
     params: z.object({
       groupId: z.coerce.number(),
