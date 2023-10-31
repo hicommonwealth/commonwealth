@@ -197,7 +197,7 @@ export async function createCosmosChains() {
       balance_type: BalanceType.Cosmos,
     });
 
-    await models.Chain.create(
+    await models.Community.create(
       {
         id: 'kyve',
         name: 'KYVE',
@@ -211,7 +211,7 @@ export async function createCosmosChains() {
       { transaction }
     );
 
-    await models.Chain.create(
+    await models.Community.create(
       {
         id: 'osmosis',
         name: 'Osmosis',
@@ -315,7 +315,7 @@ describe('Cosmos Governance Notification Generator', () => {
     );
 
     it('should not generate notifications if there are no cosmos chains', async () => {
-      await models.Chain.destroy({
+      await models.Community.destroy({
         where: {
           base: ChainBase.CosmosSDK,
         },

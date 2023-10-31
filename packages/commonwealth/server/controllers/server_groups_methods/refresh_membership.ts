@@ -4,7 +4,7 @@ import { Op, Sequelize } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { MembershipInstance } from '../../models/membership';
 import { UserInstance } from '../../models/user';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
@@ -14,7 +14,7 @@ const MEMBERSHIP_TTL_SECONDS = 60 * 2;
 
 export type RefreshMembershipOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   address: AddressInstance;
   topicId: number;
 };

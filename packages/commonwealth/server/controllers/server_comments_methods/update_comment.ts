@@ -8,7 +8,7 @@ import {
 } from '../../../../common-common/src/types';
 import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { CommentAttributes } from '../../models/comment';
 import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
@@ -25,7 +25,7 @@ const Errors = {
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   commentId?: number;
   commentBody: string;
   discordMeta?: any;

@@ -13,7 +13,7 @@ import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-import type { ChainAttributes } from '../models/chain';
+import type { CommunityAttributes } from '../models/community';
 import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -67,7 +67,7 @@ export const Errors = {
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
-export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
+export type CreateChainReq = Omit<CommunityAttributes, 'substrate_spec'> &
   Omit<ChainNodeAttributes, 'id'> & {
     id: string;
     node_url: string;
@@ -77,7 +77,7 @@ export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
   };
 
 type CreateChainResp = {
-  chain: ChainAttributes;
+  chain: CommunityAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
   admin_address: string;
@@ -149,7 +149,7 @@ const createChain = async (
     where: { user_id: req.user.id, verified: { [Op.ne]: null } },
     include: [
       {
-        model: models.Chain,
+        model: models.Community,
         where: { base: req.body.base },
         attributes: ['id'],
       },
@@ -354,7 +354,7 @@ const createChain = async (
     return next(new AppError(Errors.InvalidIconUrl));
   }
 
-  const oldChain = await models.Chain.findOne({
+  const oldChain = await models.Community.findOne({
     where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
   });
   if (oldChain && oldChain.id === req.body.id) {
@@ -390,7 +390,7 @@ const createChain = async (
     },
   });
 
-  const chain = await models.Chain.create({
+  const chain = await models.Community.create({
     id,
     name,
     default_symbol,
