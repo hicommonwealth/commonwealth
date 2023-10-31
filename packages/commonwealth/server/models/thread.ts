@@ -5,6 +5,7 @@ import type { ChainAttributes } from './chain';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
 import { NotificationAttributes } from './notification';
+import {IDiscordMeta} from "common-common/src/types";
 
 export enum LinkSource {
   Snapshot = 'snapshot',
@@ -52,7 +53,7 @@ export type ThreadAttributes = {
   marked_as_spam_at?: Date;
   archived_at?: Date;
   locked_at?: Date;
-  discord_meta?: any;
+  discord_meta?: IDiscordMeta;
 
   // associations
   Chain?: ChainAttributes;

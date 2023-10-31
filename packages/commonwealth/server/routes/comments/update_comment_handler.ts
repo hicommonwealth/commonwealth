@@ -1,10 +1,11 @@
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { CommentAttributes } from 'server/models/comment';
+import {IDiscordMeta} from "common-common/src/types";
 
 type UpdateCommentRequestBody = {
   body: string;
-  discord_meta?: any;
+  discord_meta?: IDiscordMeta;
 };
 type UpdateCommentRequestParams = {
   id: number;

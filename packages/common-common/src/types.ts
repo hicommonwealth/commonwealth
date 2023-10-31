@@ -180,6 +180,15 @@ export interface IDiscordMessage {
   action: DiscordAction;
 }
 
+export interface IDiscordMeta {
+  user: {
+    id: string,
+    username: string,
+  },
+  channel_id: string,
+  message_id: string,
+}
+
 export type HttpMethod =
   | 'get'
   | 'post'
