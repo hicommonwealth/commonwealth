@@ -57,8 +57,7 @@ const client = new Client({
 
 const handleMessage = async (
   message: Partial<Message>,
-  action: DiscordAction,
-  oldMessage?: Partial<Message>
+  action: DiscordAction
 ) => {
   try {
     // 1. Filter for designated forum channels
@@ -91,7 +90,6 @@ const handleMessage = async (
       // If title is nothing == comment. channel_id will correspond to the thread channel id.
       content: message.content ?? null,
       message_id: message.id ?? null,
-      old_message_id: oldMessage?.id ?? null,
       channel_id: message.channelId ?? null,
       parent_channel_id: parent_id ?? null,
       guild_id: message.guildId ?? null,
@@ -136,7 +134,7 @@ client.on('messageDelete', async (message: Message) => {
 });
 
 client.on('messageUpdate', async (oldMessage: Message, newMessage: Message) => {
-  await handleMessage(newMessage, 'update', oldMessage);
+  await handleMessage(newMessage, 'update');
 });
 
 client.on('messageCreate', async (message: Message) => {

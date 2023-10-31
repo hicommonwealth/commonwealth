@@ -2,7 +2,6 @@ import { ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 import { verifyThread } from '../../../shared/canvas/serverVerify';
-import {IDiscordMeta} from "../../util/discobotTypes";
 
 type CreateThreadRequestBody = {
   topic_id: string;
@@ -16,7 +15,7 @@ type CreateThreadRequestBody = {
   canvas_action?: any;
   canvas_session?: any;
   canvas_hash?: any;
-  discord_meta?: IDiscordMeta;
+  discord_meta?: any;
 };
 type CreateThreadResponse = ThreadAttributes;
 

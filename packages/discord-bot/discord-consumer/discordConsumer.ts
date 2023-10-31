@@ -91,10 +91,8 @@ async function consumeMessages() {
           canvas_session: null,
           discord_meta: {
             message_id: parsedMessage.message_id,
-            old_message_id: undefined,
             channel_id: parsedMessage.parent_channel_id,
             user: parsedMessage.user,
-
           },
           auth: CW_BOT_KEY,
         };
@@ -102,7 +100,6 @@ async function consumeMessages() {
         if (action === 'create') {
           await axios.post(`${SERVER_URL}/api/bot/threads`, thread);
         } else if (action === 'update') {
-          thread.discord_meta.old_message_id = parsedMessage.old_message_id;
           await axios.patch(`${SERVER_URL}/api/bot/threads`, thread);
         }
 

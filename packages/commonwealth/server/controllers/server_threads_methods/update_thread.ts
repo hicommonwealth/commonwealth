@@ -18,7 +18,6 @@ import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
-import {IDiscordMeta} from "../../util/discobotTypes";
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -58,7 +57,7 @@ export type UpdateThreadOptions = {
   canvasSession?: any;
   canvasAction?: any;
   canvasHash?: any;
-  discordMeta?: IDiscordMeta;
+  discordMeta?: any;
 };
 
 export type UpdateThreadResult = [
@@ -91,40 +90,17 @@ export async function __updateThread(
     discordMeta,
   }: UpdateThreadOptions
 ): Promise<UpdateThreadResult> {
-  const toUpdate: Partial<ThreadAttributes> = {};
-
   // Discobot handling
   if (!threadId) {
-    if (!discordMeta || !discordMeta.old_message_id) {
+    if (!discordMeta) {
       throw new AppError(Errors.ThreadNotFound);
     }
-
-    // post/thread body update (message.id is the same)
-    let existingThread: ThreadInstance;
-    if (discordMeta.old_message_id === discordMeta.message_id) {
-      delete discordMeta.old_message_id;
-      existingThread = await this.models.Thread.findOne({
-        where: { discord_meta: discordMeta },
-      });
-    } else {
-      // post/thread title update (message.id is updated)
-      const newMessageId = discordMeta.message_id;
-      discordMeta.message_id = discordMeta.old_message_id;
-      delete discordMeta.old_message_id;
-      existingThread = await this.models.Thread.findOne({
-        where: { discord_meta: discordMeta },
-      });
-
-      if (existingThread) {
-        discordMeta.message_id = newMessageId;
-        toUpdate.discord_meta = discordMeta;
-      }
-    }
-
+    const existingThread = await this.models.Thread.findOne({
+      where: { discord_meta: discordMeta },
+    });
     if (!existingThread) {
       throw new AppError(Errors.ThreadNotFound);
     }
-
     threadId = existingThread.id;
   }
 
@@ -199,6 +175,8 @@ export async function __updateThread(
   const transaction = await this.models.sequelize.transaction();
 
   try {
+    const toUpdate: Partial<ThreadAttributes> = {};
+
     await setThreadAttributes(
       permissions,
       thread,

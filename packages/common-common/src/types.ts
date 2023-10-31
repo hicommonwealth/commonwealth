@@ -172,7 +172,6 @@ export interface IDiscordMessage {
   title?: string;
   content: string;
   message_id: string;
-  old_message_id?: string;
   channel_id?: string;
   parent_channel_id?: string;
   guild_id?: string;

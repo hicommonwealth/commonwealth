@@ -2,7 +2,6 @@ import { TypedRequest, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { ThreadAttributes } from '../../models/thread';
 import { AppError } from '../../../../common-common/src/errors';
-import {IDiscordMeta} from "../../util/discobotTypes";
 
 export const Errors = {
   InvalidThreadID: 'Invalid thread ID',
@@ -27,7 +26,7 @@ type UpdateThreadRequestBody = {
   canvasSession?: any;
   canvasAction?: any;
   canvasHash?: any;
-  discord_meta?: IDiscordMeta; // Only comes from the discord bot
+  discord_meta?: any; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;
 

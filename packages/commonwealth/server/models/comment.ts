@@ -7,7 +7,6 @@ import type { ModelInstance, ModelStatic } from './types';
 import { StatsDController } from 'common-common/src/statsd';
 
 import { factory, formatFilename } from 'common-common/src/logging';
-import {IDiscordMeta} from "../util/discobotTypes";
 const log = factory.getLogger(formatFilename(__filename));
 
 export type CommentAttributes = {
@@ -28,7 +27,7 @@ export type CommentAttributes = {
   updated_at?: Date;
   deleted_at?: Date;
   marked_as_spam_at?: Date;
-  discord_meta?: IDiscordMeta;
+  discord_meta?: any;
 
   // associations
   Chain?: ChainAttributes;
