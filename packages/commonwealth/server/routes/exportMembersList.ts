@@ -31,7 +31,7 @@ const exportMembersList = async (
 
   const { chainId } = req.body;
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id: chainId,
     },

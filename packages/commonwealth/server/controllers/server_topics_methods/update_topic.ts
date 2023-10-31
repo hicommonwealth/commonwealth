@@ -1,5 +1,5 @@
 import { TopicAttributes } from '../../models/topic';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ServerTopicsController } from '../server_topics_controller';
 import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
@@ -18,7 +18,7 @@ export const Errors = {
 
 export type UpdateTopicOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   body: Partial<TopicAttributes>;
 };
 

@@ -62,7 +62,7 @@ async function main() {
     );
   }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id: 'dydx',
     },

@@ -2,7 +2,7 @@ import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
 import { uniq } from 'lodash';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/community';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
@@ -14,7 +14,7 @@ import { ServerProfilesController } from '../server_profiles_controller';
 export const Errors = {};
 
 export type SearchProfilesOptions = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   search: string;
   includeRoles?: boolean;
   limit?: number;
