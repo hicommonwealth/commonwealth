@@ -14,6 +14,7 @@ import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
+import {IDiscordMeta} from "../../util/discobotTypes";
 
 const Errors = {
   ThreadNotFoundForComment: 'Thread not found for comment',
@@ -28,7 +29,7 @@ export type UpdateCommentOptions = {
   chain: ChainInstance;
   commentId?: number;
   commentBody: string;
-  discordMeta?: any;
+  discordMeta?: IDiscordMeta;
 };
 
 export type UpdateCommentResult = [CommentAttributes, EmitOptions[]];
@@ -48,7 +49,7 @@ export async function __updateComment(
     throw new AppError(Errors.NoId);
   }
 
-  if (discordMeta !== undefined && discordMeta !== null) {
+  if (!!discordMeta) {
     const existingComment = await this.models.Comment.findOne({
       where: { discord_meta: discordMeta },
     });
