@@ -1,7 +1,7 @@
 import { QueryTypes } from 'sequelize';
-import { CommunityInstance } from 'server/models/community';
-import { ThreadAttributes } from 'server/models/thread';
 import { TypedPaginatedResult } from 'server/types';
+import { CommunityInstance } from '../../models/community';
+import { ThreadAttributes } from '../../models/thread';
 import {
   PaginationSqlBind,
   PaginationSqlOptions,

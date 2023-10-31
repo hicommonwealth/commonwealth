@@ -11,7 +11,7 @@ import validateRequirements from '../../util/requirementsModule/validateRequirem
 import { validateOwner } from '../../util/validateOwner';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
-const MAX_GROUPS_PER_CHAIN = 20;
+const MAX_GROUPS_PER_COMMUNITY = 20;
 
 const Errors = {
   InvalidMetadata: 'Invalid requirements',
@@ -65,7 +65,7 @@ export async function __createGroup(
       community_id: community.id,
     },
   });
-  if (numChainGroups >= MAX_GROUPS_PER_CHAIN) {
+  if (numChainGroups >= MAX_GROUPS_PER_COMMUNITY) {
     throw new AppError(Errors.MaxGroups);
   }
 

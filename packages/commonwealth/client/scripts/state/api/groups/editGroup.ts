@@ -9,6 +9,7 @@ interface EditGroupProps {
   address: string;
   groupName: string;
   groupDescription?: string;
+  topicIds: number[];
   requirementsToFulfill: number | undefined;
   requirements?: any[];
 }
@@ -19,6 +20,7 @@ const editGroup = async ({
   address,
   groupName,
   groupDescription,
+  topicIds,
   requirementsToFulfill,
   requirements = [],
 }: EditGroupProps) => {
@@ -35,6 +37,7 @@ const editGroup = async ({
       }),
     },
     requirements,
+    topics: topicIds,
   });
 };
 

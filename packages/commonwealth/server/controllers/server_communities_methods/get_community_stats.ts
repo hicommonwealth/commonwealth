@@ -5,7 +5,7 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
   NotAdmin: 'Must be a site admin',
-  ChainNotFound: 'Chain not found',
+  CommunityNotFound: 'Community not found',
 };
 
 export type GetCommunityStatsOptions = {
@@ -30,9 +30,9 @@ export async function __getCommunityStats(
     throw new AppError(Errors.NotAdmin);
   }
 
-  const chain = await this.models.Community.findByPk(communityId);
-  if (!chain) {
-    throw new AppError(Errors.ChainNotFound);
+  const community = await this.models.Community.findByPk(communityId);
+  if (!community) {
+    throw new AppError(Errors.CommunityNotFound);
   }
 
   // Community Stats
@@ -94,7 +94,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      community_id: communityId,
+      community_id: community.id,
     },
   });
 

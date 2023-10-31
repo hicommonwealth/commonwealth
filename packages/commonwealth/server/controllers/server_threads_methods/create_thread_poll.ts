@@ -1,7 +1,7 @@
 import moment from 'moment';
-import { AddressInstance } from 'server/models/address';
-import { CommunityInstance } from 'server/models/community';
 import { AppError } from '../../../../common-common/src/errors';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';

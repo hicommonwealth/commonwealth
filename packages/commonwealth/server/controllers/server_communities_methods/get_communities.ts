@@ -12,11 +12,9 @@ export type GetCommunitiesResult = {
 export async function __getCommunities(
   this: ServerCommunitiesController
 ): Promise<GetCommunitiesResult> {
-  const [communities] = await Promise.all([
-    this.models.Community.findAll({
-      where: { active: true },
-    }),
-  ]);
+  const communities = await this.models.Community.findAll({
+    where: { active: true },
+  });
 
   const communityIds = communities.map((community) => community.id);
   const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
