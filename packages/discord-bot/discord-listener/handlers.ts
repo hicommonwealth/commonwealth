@@ -7,6 +7,7 @@ import {
   getImageUrls,
 } from 'discord-bot/discord-listener/util';
 import { Client, Message, ThreadChannel } from 'discord.js';
+import {rollbar} from "discord-bot/utils/rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -57,6 +58,7 @@ export async function handleMessage(
     }
   } catch (error) {
     log.info(`Error Processing Discord Message`, error);
+    rollbar.error(`Error Processing Discord Message`, error)
   }
 }
 
@@ -98,5 +100,6 @@ export async function handleThreadChannel(
     }
   } catch (e) {
     log.info(`Error Processing Discord Message`, e);
+    rollbar.error(`Error Processing Discord Message`, e)
   }
 }

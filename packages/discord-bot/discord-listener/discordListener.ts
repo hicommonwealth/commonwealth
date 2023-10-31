@@ -21,6 +21,7 @@ import {
 } from 'discord.js';
 import v8 from 'v8';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
+import {rollbar} from "discord-bot/utils/rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -103,5 +104,5 @@ async function startDiscordListener() {
 }
 
 startDiscordListener().catch((e) => {
-  console.error(e);
+  rollbar.critical(e);
 });
