@@ -93,6 +93,7 @@ const CommunityMembersPage = () => {
               (x) => x?.address?.address === p.addresses?.[0]?.address
             )
           )
+          .sort((a, b) => a.name.localeCompare(b.name))
           .map((x) => x.name),
       }))
       .filter((p) =>
@@ -135,7 +136,8 @@ const CommunityMembersPage = () => {
           : !(group.members || []).find(
               (x) => x?.address?.address === app.user.activeAccount.address
             )
-      );
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [groups, searchFilters]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;

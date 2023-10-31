@@ -73,7 +73,8 @@ const GroupsSection = ({
               }))}
               requirementsToFulfill="ALL" // api doesn't return this
               isJoined={(group.members || []).find((x) => {
-                if (!app.user.activeAccount) return;
+                if (!app.user.activeAccount || app.user.activeAccount === null)
+                  return;
                 x?.address?.address === app.user.activeAccount.address;
               })}
               topics={group.topics.map((x) => ({ id: x.id, name: x.name }))}
