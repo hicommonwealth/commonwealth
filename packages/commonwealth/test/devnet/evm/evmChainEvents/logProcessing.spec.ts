@@ -14,11 +14,11 @@ import {
 import {
   aavePropCreatedSignature,
   aavePropQueuedSignature,
+  getEvmSecondsAndBlocks,
   localRpc,
   sdk,
 } from './util';
 import models from '../../../../server/database';
-import { getEvmSecondsAndBlocks } from 'chain-events/test/util';
 import { AbiType } from '../../../../shared/types';
 import { Log } from '@ethersproject/providers';
 

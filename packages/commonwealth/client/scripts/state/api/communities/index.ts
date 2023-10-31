@@ -1,3 +1,4 @@
+import useFetchRelatedCommunitiesQuery from './fetchRelatedCommunities';
 import useToggleCommunityStarMutation from './toggleCommunityStar';
 
-export { useToggleCommunityStarMutation };
+export { useFetchRelatedCommunitiesQuery, useToggleCommunityStarMutation };

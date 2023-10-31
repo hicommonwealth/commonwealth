@@ -1,9 +1,9 @@
-import { assert, expect, use as chaiUse } from 'chai';
+import { assert } from 'chai';
 import { BalanceType } from 'common-common/src/types';
 import { IChainNode } from '../src/types';
 import { TokenBalanceCache } from '../src/tbc';
 import { default as evmBalanceProvider } from '../src/providers/ethToken';
-import { ChainTesting } from '../../chain-events/chain-testing/sdk/chainTesting';
+import { ChainTesting } from '../../commonwealth/test/util/evm-chain-testing/sdk/chainTesting';
 
 async function mockNodesProvider(): Promise<IChainNode[]> {
   return [

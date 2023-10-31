@@ -8,7 +8,7 @@ import { getClasses } from 'views/components/component_kit/helpers';
 import { ComponentType } from 'views/components/component_kit/types';
 
 interface CWTabProps {
-  label: string;
+  label: string | React.ReactNode;
   isSelected: boolean;
   onClick: () => void;
   isDisabled?: boolean;

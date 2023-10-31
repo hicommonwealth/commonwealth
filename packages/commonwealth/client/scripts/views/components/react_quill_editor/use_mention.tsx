@@ -1,13 +1,13 @@
-import MinimumProfile from '../../../models/MinimumProfile';
+import moment from 'moment';
 import { RangeStatic } from 'quill';
+import QuillMention from 'quill-mention';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
-import moment from 'moment';
-import QuillMention from 'quill-mention';
+import MinimumProfile from '../../../models/MinimumProfile';
 
-import app from 'state';
-import { debounce } from 'lodash';
 import axios from 'axios';
+import { debounce } from 'lodash';
+import app from 'state';
 import {
   APIOrderBy,
   APIOrderDirection,
@@ -109,7 +109,7 @@ export const useMention = ({
               const profileId = p.id;
               const profileAddress = p.addresses[0]?.address;
               const profileName = p.profile_name;
-              const profileChain = p.addresses[0]?.chain;
+              const profileChain = p.addresses[0]?.community_id;
               const avatarUrl = p.avatar_url;
 
               const profile = new MinimumProfile(profileAddress, profileChain);

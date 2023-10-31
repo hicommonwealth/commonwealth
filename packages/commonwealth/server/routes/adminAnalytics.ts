@@ -199,7 +199,7 @@ export const communitySpecificAnalytics = async (
         created_at: {
           [Op.gte]: oneMonthAgo,
         },
-        chain: chainId,
+        community_id: chainId,
       },
     });
 

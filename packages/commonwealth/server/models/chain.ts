@@ -53,6 +53,8 @@ export type ChainAttributes = {
   discord_config_id?: number;
   category?: any;
   discord_bot_webhooks_enabled?: boolean;
+  directory_page_enabled?: boolean;
+  directory_page_chain_node_id?: number;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -145,6 +147,8 @@ export default (
         type: dataTypes.BOOLEAN,
         defaultValue: false,
       },
+      directory_page_enabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      directory_page_chain_node_id: { type: dataTypes.INTEGER, allowNull: true, defaultValue: null },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
@@ -159,7 +163,7 @@ export default (
 
   Chain.associate = (models) => {
     models.Chain.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id' });
-    models.Chain.hasMany(models.Address, { foreignKey: 'chain' });
+    models.Chain.hasMany(models.Address, { foreignKey: 'community_id' });
     models.Chain.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Chain.hasMany(models.Topic, {
       as: 'topics',

@@ -21,9 +21,9 @@ import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { LoginModal } from '../modals/login_modal';
 
 // TODO:
@@ -76,7 +76,7 @@ const FinishNearLogin = () => {
   const validate = async (wallet: WalletConnection) => {
     try {
       // TODO: do we need to do this every time, or only on first connect?
-      const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
+      const acct = app.chain.accounts.get(wallet.getAccountId()) as NearAccount;
 
       const chain =
         app.user.selectedChain ||
@@ -204,7 +204,7 @@ const FinishNearLogin = () => {
         const chainCreateArgs = JSON.parse(chainCreateArgString);
 
         const res = await $.post(
-          `${app.serverUrl()}/createChain`,
+          `${app.serverUrl()}/communities`,
           chainCreateArgs
         );
 

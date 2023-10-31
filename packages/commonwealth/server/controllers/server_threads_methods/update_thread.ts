@@ -1,23 +1,23 @@
+import { uniq } from 'lodash';
 import moment from 'moment';
-import { UserInstance } from '../../models/user';
-import { ServerThreadsController } from '../server_threads_controller';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { Op, Sequelize, Transaction } from 'sequelize';
-import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { parseUserMentions } from '../../util/parseUserMentions';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { DB } from '../../models';
+import { AddressInstance } from '../../models/address';
+import { ChainInstance } from '../../models/chain';
+import { ThreadAttributes, ThreadInstance } from '../../models/thread';
+import { UserInstance } from '../../models/user';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { uniq } from 'lodash';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -275,7 +275,7 @@ export async function __updateThread(
         root_title: finalThread.title,
         chain_id: finalThread.chain,
         author_address: finalThread.Address.address,
-        author_chain: finalThread.Address.chain,
+        author_chain: finalThread.Address.community_id,
       },
     },
     excludeAddresses: [address.address],
@@ -306,7 +306,7 @@ export async function __updateThread(
         try {
           const mentionedUser = await this.models.Address.findOne({
             where: {
-              chain: mention[0],
+              community_id: mention[0],
               address: mention[1],
             },
             include: [this.models.User],
@@ -339,7 +339,7 @@ export async function __updateThread(
             comment_text: finalThread.body,
             chain_id: finalThread.chain,
             author_address: finalThread.Address.address,
-            author_chain: finalThread.Address.chain,
+            author_chain: finalThread.Address.community_id,
           },
         },
         excludeAddresses: [finalThread.Address.address],
@@ -665,7 +665,7 @@ async function updateThreadCollaborators(
     if (toAddUnique.length > 0) {
       const collaboratorAddresses = await models.Address.findAll({
         where: {
-          chain: thread.chain,
+          community_id: thread.chain,
           id: {
             [Op.in]: toAddUnique,
           },

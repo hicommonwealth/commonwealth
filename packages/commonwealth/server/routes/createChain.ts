@@ -19,12 +19,12 @@ import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-import { RoleInstanceWithPermission } from '../util/roles';
-import testSubstrateSpec from '../util/testSubstrateSpec';
-import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import axios from 'axios';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import axios from 'axios';
+import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import { RoleInstanceWithPermission } from '../util/roles';
+import testSubstrateSpec from '../util/testSubstrateSpec';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
@@ -458,7 +458,7 @@ const createChain = async (
     user_id: req.user.id,
     profile_id: addressToBeAdmin.profile_id,
     address: addressToBeAdmin.address,
-    chain: chain.id,
+    community_id: chain.id,
     verification_token: addressToBeAdmin.verification_token,
     verification_token_expires: addressToBeAdmin.verification_token_expires,
     verified: addressToBeAdmin.verified,
