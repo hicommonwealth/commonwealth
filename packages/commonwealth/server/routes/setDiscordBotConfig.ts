@@ -32,7 +32,7 @@ const setDiscordBotConfig = async (
     req.body;
 
   const [chain, error] = await validateChain(models, { chain_id });
-  if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
+  if (!chain || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   if (snapshot_channel_id) {
     // An update that comes from CW, not the bot. Handle accordingly
