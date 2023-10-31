@@ -26,7 +26,7 @@ psql postgres -h 127.0.0.1 -U commonwealth -c "CREATE DATABASE commonwealth;"
 
 This should start a new Postgres server with superuser `commonwealth` and password `edgeware`.
 
-To get a fresh production database dump from Heroku, run `yarn dump-db`. To reset, seed, and migrate your local database using the obtained dump file, run `yarn db-all`.
+To get a fresh production database dump from Heroku, run `yarn dump-db`. To reset, seed, and migrate your local database using the obtained dump file, run `yarn db-all`. Enter `edgeware` if prompted for a password.
 
 To start the app, run `yarn start`.
 
@@ -42,4 +42,4 @@ ENTITIES_URL=https://chain-events.herokuapp.com/api
 MAGIC_DEFAULT_CHAIN='ethereum'
 REDIS_URL=redis://localhost:6379
 SERVER_URL=https://commonwealth.im
-``` 
+```
