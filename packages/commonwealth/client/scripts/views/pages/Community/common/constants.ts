@@ -15,7 +15,6 @@ export const BLOCKCHAINS = {
   COSMOS: 'cosmos',
   ETHEREUM: 'ethereum',
   INJECTIVE: 'injective',
-  POLKADOT: 'polkadot',
   POLYGON: 'polygon',
 };
 
@@ -43,8 +42,7 @@ export const chainTypes = chainIdsToFind.map((x) => ({
   chainBase: cosmosBaseChainIds.includes(x) ? 'cosmos' : 'ethereum',
   value: cosmosBaseChainIds.includes(x)
     ? 'cosmos' // cosmos and injective have 'cosmos' id
-    : // TODO: polkadot doesn't have an ethChainId
-      foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode?.ethChainId,
+    : foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode?.ethChainId,
   label: x.replace(/\b\w/g, (l) => l.toUpperCase()),
 }));
 
