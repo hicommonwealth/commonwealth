@@ -159,6 +159,7 @@ const RequirementSubForm = ({
               });
             }}
             customError={errors.requirementAmount}
+            fullWidth
           />
         </div>
       )}
