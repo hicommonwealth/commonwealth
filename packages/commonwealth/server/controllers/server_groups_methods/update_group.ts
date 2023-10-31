@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import { TopicInstance } from 'server/models/topic';
 import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../database';
 import { AddressInstance } from '../../models/address';
@@ -63,7 +64,7 @@ export async function __updateGroup(
     }
   }
 
-  let topicsToAssociate;
+  let topicsToAssociate: TopicInstance[];
   if (typeof topics !== 'undefined') {
     topicsToAssociate = await this.models.Topic.findAll({
       where: {
