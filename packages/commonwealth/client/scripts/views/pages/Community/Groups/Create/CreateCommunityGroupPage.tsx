@@ -36,8 +36,8 @@ const CreateCommunityGroupPage = () => {
           topicIds: values.topics.map((x) => x.value),
           requirementsToFulfill:
             values.requirementsToFulfill === 'ALL'
-              ? undefined
-              : values.requirementsToFulfill, // TODO: confirm if undefined means all requirements need to be satisfied
+              ? values.requirements.length
+              : values.requirementsToFulfill,
           requirements: [],
         };
 
