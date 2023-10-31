@@ -72,7 +72,11 @@ const GroupsSection = ({
                 requirementAmount: r.data.threshold,
                 requirementCondition: 'More than', // hardcoded in api
               }))}
-              requirementsToFulfill="ALL" // api doesn't return this
+              requirementsToFulfill={
+                group.requirementsToFulfill === group.requirements.length
+                  ? 'ALL'
+                  : group.requirementsToFulfill
+              }
               isJoined={(group.members || []).find(
                 (x) => x?.address?.address === app.user.activeAccount.address
               )}
