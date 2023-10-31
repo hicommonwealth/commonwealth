@@ -1,10 +1,11 @@
 import moment from 'moment';
+import { AddressInstance } from 'server/models/address';
+import { CommunityInstance } from 'server/models/community';
 import { AppError } from '../../../../common-common/src/errors';
-import { ServerThreadsController } from '../server_threads_controller';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
-import { ChainInstance } from '../../models/chain';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -15,7 +16,8 @@ export const Errors = {
 
 export type CreateThreadPollOptions = {
   user: UserInstance;
-  community: ChainInstance;
+  address: AddressInstance;
+  community: CommunityInstance;
   threadId: number;
   prompt: string;
   options: string[];

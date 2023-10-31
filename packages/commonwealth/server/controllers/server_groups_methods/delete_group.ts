@@ -1,11 +1,11 @@
-import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
-import { AddressInstance } from '../../models/address';
-import { UserInstance } from '../../models/user';
-import { validateOwner } from '../../util/validateOwner';
+import { Op } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../database';
-import { Op } from 'sequelize';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 const Errors = {
   Unauthorized: 'Unauthorized',
@@ -14,7 +14,7 @@ const Errors = {
 
 export type DeleteGroupOptions = {
   user: UserInstance;
-  community: ChainInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
 };

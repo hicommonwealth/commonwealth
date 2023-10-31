@@ -1,8 +1,6 @@
 @import '../../../../../../styles/shared';
 
 .TypeaheadSelectList {
-  width: 400px;
-
   .SelectList {
     @include inputStyles;
     font-family: $font-family-neue-haas-unica;

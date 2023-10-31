@@ -40,6 +40,16 @@
   gap: 16px;
 }
 
+.thread-actions .popover-container {
+  display: flex;
+  border-radius: $border-radius-corners;
+
+  &:hover {
+    background-color: $neutral-100;
+  }
+}
+
+
 .comments-filter-row {
   display: flex;
   justify-content: space-between;

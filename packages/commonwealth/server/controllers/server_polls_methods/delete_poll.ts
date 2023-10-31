@@ -1,9 +1,9 @@
-import { ServerThreadsController } from '../server_threads_controller';
-import { validateOwner } from '../../util/validateOwner';
-import { UserInstance } from '../../models/user';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { AppError } from '../../../../common-common/src/errors';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -16,7 +16,7 @@ export const Errors = {
 export type DeletePollOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: ChainInstance;
+  community: CommunityInstance;
   pollId: number;
 };
 

@@ -33,7 +33,7 @@ import type CompoundGovernance from './governance';
 import {
   EventKind,
   ProposalState,
-} from 'chain-events/src/chains/compound/types';
+} from '../../../../../../shared/chain/types/compound';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import axios from 'axios';
 import { ApiEndpoints } from 'state/api/config';

@@ -1,4 +1,3 @@
-import { IChainEntityKind } from 'chain-events/src';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { filterLinks } from 'helpers/threads';
 import {
@@ -11,10 +10,9 @@ import 'pages/view_thread/linked_proposals_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
-import type ChainEntity from '../../../models/ChainEntity';
 import type Thread from '../../../models/Thread';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -23,34 +21,21 @@ import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_m
 type LinkedProposalProps = {
   thread: Thread;
   title: string;
-  ceType: ChainEntity['type'];
-  ceTypeId: ChainEntity['typeId'];
-  ceCompleted?: ChainEntity['completed'];
+  identifier: string;
 };
 
-const LinkedProposal = ({
-  thread,
-  title,
-  ceType,
-  ceTypeId,
-  ceCompleted,
-}: LinkedProposalProps) => {
-  const slug = chainEntityTypeToProposalSlug(ceType);
+const LinkedProposal = ({ thread, title, identifier }: LinkedProposalProps) => {
+  const slug = chainEntityTypeToProposalSlug();
 
-  const threadLink =
-    thread.chain === 'edgeware' && !ceType.includes('/')
-      ? `/${thread.chain}/link/chain-entity/${ceTypeId}`
-      : `${app.isCustomDomain() ? '' : `/${thread.chain}`}${getProposalUrlPath(
-          slug,
-          ceTypeId,
-          true
-        )}`;
+  const threadLink = `${
+    app.isCustomDomain() ? '' : `/${thread.chain}`
+  }${getProposalUrlPath(slug, identifier, true)}`;
 
   return (
     <ReactRouterLink to={threadLink}>
       {`${
-        title ?? chainEntityTypeToProposalName(ceType) ?? 'Proposal'
-      } #${ceTypeId} ${ceCompleted ? ' (Completed)' : ''}`}
+        title ?? chainEntityTypeToProposalName() ?? 'Proposal'
+      } #${identifier}`}
     </ReactRouterLink>
   );
 };
@@ -134,8 +119,7 @@ export const LinkedProposalsCard = ({
                             key={l.identifier}
                             thread={thread}
                             title={l.title}
-                            ceType={'proposal' as IChainEntityKind}
-                            ceTypeId={l.identifier}
+                            identifier={l.identifier}
                           />
                         );
                       })}

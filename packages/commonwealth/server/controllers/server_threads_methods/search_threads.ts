@@ -1,17 +1,17 @@
 import { QueryTypes } from 'sequelize';
-import { ServerThreadsController } from '../server_threads_controller';
+import { CommunityInstance } from 'server/models/community';
+import { ThreadAttributes } from 'server/models/thread';
+import { TypedPaginatedResult } from 'server/types';
 import {
   PaginationSqlBind,
   PaginationSqlOptions,
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
-import { ChainInstance } from '../../models/chain';
-import { ThreadAttributes } from '../../models/thread';
-import { TypedPaginatedResult } from 'server/types';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export type SearchThreadsOptions = {
-  community: ChainInstance;
+  community: CommunityInstance;
   searchTerm: string;
   threadTitleOnly: boolean;
   limit?: number;
@@ -72,7 +72,9 @@ export async function __searchThreads(
     bind.community = community.id;
   }
 
-  const communityWhere = bind.community ? '"Threads".chain = $community AND' : '';
+  const communityWhere = bind.community
+    ? '"Threads".chain = $community AND'
+    : '';
 
   let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
   if (!threadTitleOnly) {
@@ -88,7 +90,7 @@ export async function __searchThreads(
       'thread' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".chain as address_chain,
+      "Addresses".community_id as address_chain,
       "Threads".created_at,
       "Threads".chain,
       ts_rank_cd("Threads"._search, query) as rank

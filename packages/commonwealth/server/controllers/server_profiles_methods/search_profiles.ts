@@ -1,20 +1,20 @@
 import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
+import { uniq } from 'lodash';
+import { CommunityInstance } from 'server/models/community';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
 import { RoleInstanceWithPermission, findAllRoles } from '../../util/roles';
-import { uniq } from 'lodash';
 import { ServerProfilesController } from '../server_profiles_controller';
-import { ChainInstance } from 'server/models/chain';
 
 export const Errors = {};
 
 export type SearchProfilesOptions = {
-  community: ChainInstance;
+  community: CommunityInstance;
   search: string;
   includeRoles?: boolean;
   limit?: number;
@@ -84,7 +84,9 @@ export async function __searchProfiles(
     bind.community = community.id;
   }
 
-  const chainWhere = bind.chain ? `"Addresses".chain = $community AND` : '';
+  const communityWhere = bind.community
+    ? `"Addresses".community_id = $community AND`
+    : '';
 
   const sqlWithoutPagination = `
     SELECT
@@ -94,7 +96,7 @@ export async function __searchProfiles(
       "Profiles".avatar_url,
       "Profiles".created_at,
       array_agg("Addresses".id) as address_ids,
-      array_agg("Addresses".chain) as chains,
+      array_agg("Addresses".community_id) as chains,
       array_agg("Addresses".address) as addresses,
       MAX("Addresses".last_active) as last_active
     FROM
@@ -102,7 +104,7 @@ export async function __searchProfiles(
     JOIN
       "Addresses" on "Profiles".user_id = "Addresses".user_id
     WHERE
-      ${chainWhere}
+      ${communityWhere}
       (
         "Profiles".profile_name ILIKE '%' || $searchTerm || '%'
         OR

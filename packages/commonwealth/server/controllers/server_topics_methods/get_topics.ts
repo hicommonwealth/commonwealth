@@ -1,10 +1,10 @@
 import { QueryTypes } from 'sequelize';
+import { CommunityInstance } from '../../models/community';
 import { TopicAttributes } from '../../models/topic';
-import { ChainInstance } from '../../models/chain';
 import { ServerTopicsController } from '../server_topics_controller';
 
 export type GetTopicsOptions = {
-  community: ChainInstance;
+  community: CommunityInstance;
 };
 
 type TopicWithTotalThreads = TopicAttributes & { total_threads: number };

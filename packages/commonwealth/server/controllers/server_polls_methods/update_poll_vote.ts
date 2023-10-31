@@ -3,7 +3,7 @@ import moment from 'moment';
 import { UserInstance } from 'server/models/user';
 import { AppError, ServerError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { VoteAttributes } from '../../models/vote';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -22,7 +22,7 @@ export const Errors = {
 export type UpdatePollVoteOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: ChainInstance;
+  community: CommunityInstance;
   pollId: number;
   option: string;
 };
@@ -83,7 +83,7 @@ export async function __updatePollVote(
     const voteData: Partial<VoteAttributes> = {
       poll_id: poll.id,
       address: address.address,
-      author_community_id: address.chain,
+      author_community_id: address.community_id,
       community_id: community.id,
     };
     // delete existing votes

@@ -11,6 +11,7 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
+import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
 import {
   notifyError,
   notifySuccess,
@@ -58,6 +59,8 @@ export const AdminActions = ({
     useState(false);
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
+    useState(false);
+  const [isArchiveThreadModalOpen, setIsArchiveThreadModalOpen] =
     useState(false);
 
   const hasAdminPermissions =
@@ -136,9 +139,10 @@ export const AdminActions = ({
           <br />
           <p>
             Flagging as spam will help filter out unwanted content. Posts
-            flagged as spam are hidden from the main feed and can't be
+            flagged as spam are hidden from the main feed and can&apos;t be
             interacted with. For transparency, spam can still be viewed by
-            community members if they choose to "Include posts flagged as spam."
+            community members if they choose to &quot;Include posts flagged as
+            spam.&quot;
           </p>
           <br />
           <p>Note that you can always unflag a post as spam.</p>
@@ -152,7 +156,7 @@ export const AdminActions = ({
           <br />
           <p>
             For transparency, spam can still be viewed by community members if
-            they choose to “Include posts flagged as spam.”
+            they choose to &quot;Include posts flagged as spam.&quot;
             <br />
           </p>
         </>
@@ -262,6 +266,29 @@ export const AdminActions = ({
     );
   };
 
+  const handleArchiveThread = () => {
+    if (thread.archivedAt === null) {
+      setIsArchiveThreadModalOpen(true);
+    } else {
+      editThread({
+        threadId: thread.id,
+        chainId: app.activeChainId(),
+        archived: !thread.archivedAt,
+        address: app.user?.activeAccount?.address,
+      })
+        .then(() => {
+          notifySuccess(
+            `Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`
+          );
+        })
+        .catch(() => {
+          notifyError(
+            `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`
+          );
+        });
+    }
+  };
+
   return (
     <>
       <span
@@ -273,9 +300,10 @@ export const AdminActions = ({
         <PopoverMenu
           className="AdminActions compact"
           menuItems={[
-            ...(hasAdminPermissions ||
-            isThreadAuthor ||
-            (isThreadCollaborator && !thread.readOnly)
+            ...(thread.archivedAt === null &&
+            (hasAdminPermissions ||
+              isThreadAuthor ||
+              (isThreadCollaborator && !thread.readOnly))
               ? [
                   {
                     label: 'Edit',
@@ -295,25 +323,38 @@ export const AdminActions = ({
               : []),
             ...(hasAdminPermissions
               ? [
+                  ...(thread.archivedAt === null
+                    ? [
+                        {
+                          onClick: handleThreadPinToggle,
+                          label: thread.pinned ? 'Unpin' : 'Pin',
+                          iconLeft: 'pin' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        {
+                          onClick: handleThreadLockToggle,
+                          label: thread.readOnly ? 'Unlock' : 'Lock',
+                          iconLeft: thread.readOnly
+                            ? ('keyLockOpened' as const)
+                            : ('keyLockClosed' as const),
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        {
+                          onClick: () => setIsChangeTopicModalOpen(true),
+                          label: 'Change topic',
+                          iconLeft: 'filter' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                      ]
+                    : []),
                   {
-                    onClick: handleThreadPinToggle,
-                    label: thread.pinned ? 'Unpin' : 'Pin',
-                    iconLeft: 'pin' as const,
+                    label: thread.archivedAt === null ? 'Archive' : 'Unarchive',
+                    iconLeft:
+                      thread.archivedAt === null
+                        ? ('archiveTray' as const)
+                        : ('archiveTrayFilled' as const),
                     iconLeftWeight: 'bold' as const,
-                  },
-                  {
-                    onClick: handleThreadLockToggle,
-                    label: thread.readOnly ? 'Unlock' : 'Lock',
-                    iconLeft: thread.readOnly
-                      ? ('keyLockOpened' as const)
-                      : ('keyLockClosed' as const),
-                    iconLeftWeight: 'bold' as const,
-                  },
-                  {
-                    onClick: () => setIsChangeTopicModalOpen(true),
-                    label: 'Change topic',
-                    iconLeft: 'filter' as const,
-                    iconLeftWeight: 'bold' as const,
+                    onClick: handleArchiveThread,
                   },
                 ]
               : []),
@@ -347,20 +388,25 @@ export const AdminActions = ({
                         },
                       ]
                     : []),
-                  {
-                    onClick: () => setIsUpdateProposalStatusModalOpen(true),
-                    label: 'Update status',
-                    iconLeft: 'democraticProposal' as const,
-                    iconLeftWeight: 'bold' as const,
-                  },
-                  {
-                    onClick: handleFlagMarkAsSpam,
-                    label: !thread.markedAsSpamAt
-                      ? 'Flag as spam'
-                      : 'Unflag as spam',
-                    iconLeft: 'flag' as const,
-                    iconLeftWeight: 'bold' as const,
-                  },
+                  ...(thread.archivedAt === null
+                    ? [
+                        {
+                          onClick: () =>
+                            setIsUpdateProposalStatusModalOpen(true),
+                          label: 'Update status',
+                          iconLeft: 'democraticProposal' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        {
+                          onClick: handleFlagMarkAsSpam,
+                          label: !thread.markedAsSpamAt
+                            ? 'Flag as spam'
+                            : 'Unflag as spam',
+                          iconLeft: 'flag' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                      ]
+                    : []),
                   {
                     onClick: handleDeleteThread,
                     label: 'Delete',
@@ -419,6 +465,16 @@ export const AdminActions = ({
         open={isEditCollaboratorsModalOpen}
       />
 
+      <CWModal
+        content={
+          <ArchiveThreadModal
+            thread={thread}
+            onModalClose={() => setIsArchiveThreadModalOpen(false)}
+          />
+        }
+        onClose={() => setIsArchiveThreadModalOpen(false)}
+        open={isArchiveThreadModalOpen}
+      />
       {RevalidationModal}
     </>
   );

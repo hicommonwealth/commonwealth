@@ -1,8 +1,8 @@
 import { AppError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
+import { UserInstance } from 'server/models/user';
 import { sequelize } from '../../database';
 import { ServerCommunitiesController } from '../server_communities_controller';
-import { UserInstance } from 'server/models/user';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -18,26 +18,25 @@ export const Errors = {
 
 export type DeleteCommunityOptions = {
   user: UserInstance;
-  id: string;
+  communityId: string;
 };
 export type DeleteCommunityResult = void;
 
 export async function __deleteCommunity(
   this: ServerCommunitiesController,
-  { user, id }: DeleteCommunityOptions
+  { user, communityId }: DeleteCommunityOptions
 ): Promise<DeleteCommunityResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
-  if (!id) {
+  if (!communityId) {
     throw new AppError(Errors.NeedChainId);
   }
 
-  const community = await this.models.Chain.findOne({
+  const community = await this.models.Community.findOne({
     where: {
-      id,
-      has_chain_events_listener: false, // make sure no chain events
+      id: communityId,
     },
   });
   if (!community) {
@@ -104,6 +103,7 @@ export async function __deleteCommunity(
           const threads = await this.models.Thread.findAll({
             where: { chain: community.id },
             attributes: ['id'],
+            paranoid: false, // necessary in order to delete associations with soft-deleted threads
           });
 
           await this.models.Collaboration.destroy({
@@ -142,7 +142,7 @@ export async function __deleteCommunity(
           });
 
           await this.models.Address.findAll({
-            where: { chain: community.id },
+            where: { community_id: community.id },
           });
 
           await this.models.CommunityBanner.destroy({
@@ -157,11 +157,11 @@ export async function __deleteCommunity(
           });
 
           await this.models.Address.destroy({
-            where: { chain: community.id },
+            where: { community_id: community.id },
             transaction: t,
           });
 
-          await this.models.Chain.destroy({
+          await this.models.Community.destroy({
             where: { id: community.id },
             transaction: t,
           });

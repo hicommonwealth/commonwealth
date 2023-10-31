@@ -1,15 +1,15 @@
-import { ChainInstance } from '../../models/chain';
-import { ServerCommentsController } from '../server_comments_controller';
+import { QueryTypes } from 'sequelize';
+import { TypedPaginatedResult } from 'server/types';
+import { CommunityInstance } from '../../models/community';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
-import { QueryTypes } from 'sequelize';
-import { TypedPaginatedResult } from 'server/types';
+import { ServerCommentsController } from '../server_comments_controller';
 
 export type SearchCommentsOptions = {
-  community: ChainInstance;
+  community: CommunityInstance;
   search: string;
   limit?: number;
   page?: number;
@@ -32,7 +32,14 @@ export type SearchCommentsResult = TypedPaginatedResult<{
 
 export async function __searchComments(
   this: ServerCommentsController,
-  { community, search, limit, page, orderBy, orderDirection }: SearchCommentsOptions
+  {
+    community,
+    search,
+    limit,
+    page,
+    orderBy,
+    orderDirection,
+  }: SearchCommentsOptions
 ): Promise<SearchCommentsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {
@@ -71,7 +78,9 @@ export async function __searchComments(
     bind.community = community.id;
   }
 
-  const communityWhere = bind.community ? '"Comments".chain = $community AND' : '';
+  const communityWhere = bind.community
+    ? '"Comments".chain = $community AND'
+    : '';
 
   const sqlBaseQuery = `
     SELECT
@@ -82,7 +91,7 @@ export async function __searchComments(
       'comment' as type,
       "Addresses".id as address_id,
       "Addresses".address,
-      "Addresses".chain as address_chain,
+      "Addresses".community_id as address_chain,
       "Comments".created_at,
       "Threads".chain,
       ts_rank_cd("Comments"._search, query) as rank

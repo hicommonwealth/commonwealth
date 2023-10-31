@@ -3,11 +3,10 @@
 .RelatedCommunityCard {
   padding: 24px;
   display: flex;
-  align-items: center;
-  width: 506px;
   border-radius: 6px;
   border: 1px solid $neutral-100;
-  background: #fff;
+  background: $white;
+  cursor: pointer;
 
   &:hover {
     box-shadow: $elevation-2;
@@ -33,6 +32,7 @@
         .Text {
           color: $neutral-900;
           letter-spacing: -0.18px;
+          word-break: break-word;
         }
       }
 
@@ -42,6 +42,7 @@
         font-size: 14px;
         font-weight: 400;
         line-height: 20px;
+        word-break: break-word;
       }
     }
 

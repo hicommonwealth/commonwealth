@@ -13,11 +13,13 @@ export const ApiEndpoints = {
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
   BULK_TOPICS: '/topics',
   FETCH_COMMENTS: '/viewComments',
+  FETCH_RELATED_COMMUNITIES: '/relatedCommunities',
   FETCH_THREADS: '/threads',
   FETCH_PROFILES: '/getAddressProfile',
   DISCORD_CHANNELS: '/getDiscordChannels',
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
+  FETCH_GROUPS: '/groups',
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,

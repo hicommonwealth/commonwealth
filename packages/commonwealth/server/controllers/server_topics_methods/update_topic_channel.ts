@@ -1,9 +1,9 @@
 import { Op } from 'sequelize';
-import { ChainInstance } from '../../models/chain';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 const Errors = {
   MissingTopic: 'Invalid topic ID',
@@ -13,7 +13,7 @@ const Errors = {
 
 export type UpdateTopicChannelOptions = {
   user: UserInstance;
-  community: ChainInstance;
+  community: CommunityInstance;
   topicId: number;
   channelId: string;
 };

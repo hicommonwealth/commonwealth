@@ -1,5 +1,4 @@
 import BN from 'bn.js';
-import { ContractType } from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/adapter';
 import $ from 'jquery';
 import type { IApp } from 'state';
@@ -32,7 +31,7 @@ export default class Token extends Ethereum implements ITokenAdapter {
       const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
         chain: this.meta.id,
         address: account.address,
-        author_chain: account.chain.id,
+        author_chain: account.community.id,
         contract_address: this.contractAddress,
       });
       if (balanceResp.result) {

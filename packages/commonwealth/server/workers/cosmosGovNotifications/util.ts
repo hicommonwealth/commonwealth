@@ -1,7 +1,7 @@
 import { ChainBase, NotificationCategories } from 'common-common/src/types';
 import emitNotifications from '../../util/emitNotifications';
-import { SupportedNetwork } from 'chain-events/src';
-import { coinToCoins, EventKind } from 'chain-events/src/chains/cosmos/types';
+import { SupportedNetwork } from '../../../shared/chain/types/types';
+import { coinToCoins, EventKind } from '../../../shared/chain/types/cosmos';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { fromTimestamp } from 'common-common/src/cosmos-ts/src/codegen/helpers';
 import { DB } from '../../models';
@@ -23,7 +23,7 @@ export async function fetchCosmosNotifChains(models: DB) {
     },
   });
 
-  const result = await models.Chain.findAll({
+  const result = await models.Community.findAll({
     where: {
       id: chainIds.map((c) => c.chain_id),
       base: ChainBase.CosmosSDK,

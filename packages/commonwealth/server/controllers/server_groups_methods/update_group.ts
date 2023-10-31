@@ -1,14 +1,14 @@
-import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
-import { AddressInstance } from '../../models/address';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
-import { UserInstance } from '../../models/user';
-import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from '../../util/validateOwner';
-import validateMetadata from '../../util/requirementsModule/validateMetadata';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { sequelize } from '../../database';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { GroupAttributes, GroupMetadata } from '../../models/group';
+import { UserInstance } from '../../models/user';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import validateMetadata from '../../util/requirementsModule/validateMetadata';
+import validateRequirements from '../../util/requirementsModule/validateRequirements';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
@@ -19,7 +19,7 @@ const Errors = {
 
 export type UpdateGroupOptions = {
   user: UserInstance;
-  community: ChainInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
   metadata?: GroupMetadata;

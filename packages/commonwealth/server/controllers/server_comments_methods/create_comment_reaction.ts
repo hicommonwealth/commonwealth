@@ -1,19 +1,18 @@
-import { ReactionAttributes } from '../../models/reaction';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from '../../../../common-common/src/errors';
-import { AppError } from '../../../../common-common/src/errors';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
 } from '../../../../common-common/src/types';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { UserInstance } from '../../models/user';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { ServerCommentsController } from '../server_comments_controller';
+import { CommunityInstance } from '../../models/community';
+import { ReactionAttributes } from '../../models/reaction';
+import { UserInstance } from '../../models/user';
+import { findAllRoles } from '../../util/roles';
+import validateTopicThreshold from '../../util/validateTopicThreshold';
 import { TrackOptions } from '../server_analytics_methods/track';
+import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
 
 const Errors = {
@@ -27,7 +26,7 @@ const Errors = {
 export type CreateCommentReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: ChainInstance;
+  community: CommunityInstance;
   reaction: string;
   commentId: number;
   canvasAction?: any;
@@ -82,7 +81,8 @@ export async function __createCommentReaction(
   // check balance (bypass for admin)
   if (
     community &&
-    (community.type === ChainType.Token || community.network === ChainNetwork.Ethereum)
+    (community.type === ChainType.Token ||
+      community.network === ChainNetwork.Ethereum)
   ) {
     const addressAdminRoles = await findAllRoles(
       this.models,
@@ -149,7 +149,7 @@ export async function __createCommentReaction(
         root_type: null, // What is this for?
         chain_id: finalReaction.chain,
         author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.chain,
+        author_chain: finalReaction.Address.community_id,
       },
     },
     excludeAddresses: [finalReaction.Address.address],

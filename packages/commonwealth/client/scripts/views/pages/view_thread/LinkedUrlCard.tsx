@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import type Thread from '../../../models/Thread';
 import { LinkSource } from '../../../models/Thread';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { LinkedUrlModal } from '../../modals/linked_url_modal';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';

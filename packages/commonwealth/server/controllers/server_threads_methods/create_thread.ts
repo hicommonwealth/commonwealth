@@ -1,23 +1,23 @@
 import moment from 'moment';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
-import { ThreadAttributes } from '../../models/thread';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { renderQuillDeltaToText } from '../../../shared/utils';
+
+import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from '../../../../common-common/src/errors';
-import { AppError } from '../../../../common-common/src/errors';
-import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { ThreadAttributes } from '../../models/thread';
+import { UserInstance } from '../../models/user';
+import { parseUserMentions } from '../../util/parseUserMentions';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -34,7 +34,7 @@ export const Errors = {
 export type CreateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  community: ChainInstance;
+  community: CommunityInstance;
   title: string;
   body: string;
   kind: string;
@@ -169,27 +169,23 @@ export async function __createThread(
           community.network === ChainNetwork.Ethereum)
       ) {
         // skip check for admins
-        const isAdmin = await findAllRoles(
-          this.models,
-          { where: { address_id: address.id } },
-          community.id,
-          ['admin']
-        );
-        if (!user.isAdmin && isAdmin.length === 0) {
-          let canReact;
-          try {
-            canReact = await validateTopicThreshold(
-              this.tokenBalanceCache,
-              this.models,
-              topicId,
-              address.address
-            );
-          } catch (e) {
-            throw new ServerError(Errors.BalanceCheckFailed, e);
-          }
-
-          if (!canReact) {
-            throw new AppError(Errors.InsufficientTokenBalance);
+        const isAdmin = await validateOwner({
+          models: this.models,
+          user,
+          communityId: community.id,
+          allowAdmin: true,
+          allowGodMode: true,
+        });
+        if (!isAdmin) {
+          const { isValid, message } = await validateTopicGroupsMembership(
+            this.models,
+            this.tokenBalanceCache,
+            topicId,
+            community,
+            address
+          );
+          if (!isValid) {
+            throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
           }
         }
       }
@@ -247,7 +243,7 @@ export async function __createThread(
         mentions.map(async (mention) => {
           return this.models.Address.findOne({
             where: {
-              chain: mention[0] || null,
+              community_id: mention[0] || null,
               address: mention[1] || null,
             },
             include: [this.models.User],
@@ -278,7 +274,7 @@ export async function __createThread(
         comment_text: finalThread.body,
         chain_id: finalThread.chain,
         author_address: finalThread.Address.address,
-        author_chain: finalThread.Address.chain,
+        author_chain: finalThread.Address.community_id,
       },
     },
     excludeAddresses: excludedAddrs,
@@ -302,7 +298,7 @@ export async function __createThread(
             comment_text: finalThread.body,
             chain_id: finalThread.chain,
             author_address: finalThread.Address.address,
-            author_chain: finalThread.Address.chain,
+            author_chain: finalThread.Address.community_id,
           },
         },
         excludeAddresses: [finalThread.Address.address],

@@ -29,15 +29,16 @@ export const UserGallery = (props: UserGalleryProps) => {
     <div className="UserGallery">
       {users
         .slice(0, Math.min(userCount, maxUsers))
-        .map((user: Account | AddressInfo) => {
+        .map((user: Account | AddressInfo, index) => {
           return (
             <User
               userAddress={user.address}
-              userChainId={user.chain?.id || user.profile?.chain}
+              userChainId={user.community?.id || user.profile?.chain}
               shouldShowAvatarOnly
               shouldShowAsDeleted
               shouldShowPopover={popover}
               avatarSize={avatarSize}
+              key={index}
             />
           );
         })}

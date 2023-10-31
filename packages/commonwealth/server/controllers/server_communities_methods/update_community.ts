@@ -4,7 +4,7 @@ import { ChainBase } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
-import type { ChainAttributes } from '../../models/chain';
+import type { CommunityAttributes } from '../../models/community';
 import { findOneRole } from '../../util/roles';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -30,12 +30,12 @@ export const Errors = {
   InvalidDefaultPage: 'Default page does not exist',
 };
 
-export type UpdateCommunityOptions = ChainAttributes & {
+export type UpdateCommunityOptions = CommunityAttributes & {
   user: UserInstance;
   featuredTopics?: string[];
   snapshot?: string[];
 };
-export type UpdateCommunityResult = ChainAttributes & { snapshot: string[] };
+export type UpdateCommunityResult = CommunityAttributes & { snapshot: string[] };
 
 export async function __updateCommunity(
   this: ServerCommunitiesController,
@@ -54,7 +54,7 @@ export async function __updateCommunity(
     throw new AppError(Errors.CantChangeNetwork);
   }
 
-  const chain = await this.models.Chain.findOne({ where: { id: id } });
+  const chain = await this.models.Community.findOne({ where: { id: id } });
   if (!chain) {
     throw new AppError(Errors.NoChainFound);
   } else {
@@ -93,6 +93,8 @@ export async function __updateCommunity(
     has_homepage,
     terms,
     chain_node_id,
+    directory_page_enabled,
+    directory_page_chain_node_id,
   } = rest;
 
   // Handle single string case and undefined case
@@ -200,6 +202,12 @@ export async function __updateCommunity(
   }
   if (chain_node_id) {
     chain.chain_node_id = chain_node_id;
+  }
+  if (directory_page_enabled !== undefined) {
+    chain.directory_page_enabled = directory_page_enabled;
+  }
+  if (directory_page_chain_node_id !== undefined) {
+    chain.directory_page_chain_node_id = directory_page_chain_node_id;
   }
 
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle

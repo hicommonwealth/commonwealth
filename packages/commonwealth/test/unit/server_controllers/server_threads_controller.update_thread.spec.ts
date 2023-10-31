@@ -5,7 +5,7 @@ import {
   UpdateThreadPermissions,
   validatePermissions,
 } from 'server/controllers/server_threads_methods/update_thread';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../../server/models/community';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
 describe('ServerThreadsController', () => {
@@ -81,7 +81,7 @@ describe('ServerThreadsController', () => {
         id: 1,
         address: '0x1234',
         role: 'admin',
-        chain: 'ethereum',
+        community_id: 'ethereum',
         verified: true,
         update: async () => null,
       };
@@ -92,7 +92,7 @@ describe('ServerThreadsController', () => {
         address: address as any,
         community: {
           id: 'ethereum',
-        } as ChainInstance,
+        } as CommunityInstance,
         threadId: 1,
         title: 'hello',
         body: 'wasup',

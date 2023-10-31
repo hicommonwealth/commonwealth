@@ -105,7 +105,7 @@ export class ServerProposalsController {
   }
 
   private async getRPCUrl(chainId: string): Promise<string> {
-    const chain = await this.models.Chain.findOne({
+    const chain = await this.models.Community.findOne({
       where: {
         id: chainId,
       },

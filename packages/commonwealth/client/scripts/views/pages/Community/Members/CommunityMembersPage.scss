@@ -1,0 +1,76 @@
+@import '../../../../../styles/shared';
+
+.CommunityMembersPage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px;
+
+  @include medium {
+    padding: 40px;
+  }
+
+  @include mediumSmall {
+    padding: 32px;
+  }
+
+  @include smallInclusive {
+    padding: 24px;
+  }
+
+  .filters {
+    display: grid;
+    height: fit-content;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+
+    &.cols-3 {
+      grid-template-columns: 9fr 3fr;
+
+      @include extraSmall {
+        grid-template-columns: initial;
+        grid-template-rows: 1fr 1fr;
+      }
+    }
+
+    &.cols-4 {
+      grid-template-columns: 7fr 3fr 2fr;
+
+      @include extraSmall {
+        grid-template-columns: initial;
+        grid-template-rows: 1fr 1fr 1fr;
+      }
+    }
+
+    .search-icon {
+      color: $neutral-400;
+    }
+
+    .filter-text {
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      margin: auto;
+
+      @include extraSmall {
+        margin-left: 0;
+      }
+    }
+
+    .select-dropdown-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .select-dropdown {
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

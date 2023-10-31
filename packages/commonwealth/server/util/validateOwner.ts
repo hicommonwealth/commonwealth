@@ -1,10 +1,10 @@
-import { UserInstance } from 'server/models/user';
-import { findAllRoles } from './roles';
 import { Op } from 'sequelize';
 import { DB } from 'server/models';
-import { ThreadAttributes } from 'server/models/thread';
 import { CommentAttributes } from 'server/models/comment';
 import { Role } from 'server/models/role';
+import { ThreadAttributes } from 'server/models/thread';
+import { UserInstance } from 'server/models/user';
+import { findAllRoles } from './roles';
 
 type ValidateOwnerOptions = {
   models: DB;
@@ -40,7 +40,7 @@ export const validateOwner = async ({
     return true;
   }
 
-  // check if user is mod or admin of chain
+  // check if user is mod or admin of community
   const requiredRoles: Role[] = [];
   if (allowMod) {
     requiredRoles.push('moderator');

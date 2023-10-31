@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -18,7 +18,7 @@ export type PollAttributes = {
 
   // associations
   Thread: ThreadAttributes;
-  Community: ChainAttributes;
+  Community: CommunityAttributes;
 };
 
 export type PollInstance = ModelInstance<PollAttributes>;
@@ -57,8 +57,8 @@ export default (
       foreignKey: 'thread_id',
       targetKey: 'id',
     });
-    models.Poll.belongsTo(models.Chain, {
-      foreignKey: 'community_id',
+    models.Poll.belongsTo(models.Community, {
+      foreignKey: 'chain_id',
       targetKey: 'id',
     });
     models.Poll.hasMany(models.Vote, {
