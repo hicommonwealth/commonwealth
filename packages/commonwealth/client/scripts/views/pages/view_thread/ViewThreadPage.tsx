@@ -527,17 +527,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         body="Only members within the following group(s) can interact with this topic:"
                         type="info"
                         footer={
-                          gatedGroups && (
-                            <div className="gating-tags">
-                              {gatedGroups.map((t) => (
-                                <CWTag
-                                  key={t.id}
-                                  label={t.name}
-                                  type="referendum"
-                                />
-                              ))}
-                            </div>
-                          )
+                          <div className="gating-tags">
+                            {gatedGroups.map((t) => (
+                              <CWTag
+                                key={t.id}
+                                label={t.name}
+                                type="referendum"
+                              />
+                            ))}
+                          </div>
                         }
                         buttons={[
                           {
