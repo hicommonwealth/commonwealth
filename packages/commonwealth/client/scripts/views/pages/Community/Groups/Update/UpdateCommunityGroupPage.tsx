@@ -10,14 +10,13 @@ import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
 import {
   AMOUNT_CONDITIONS,
-  SPECIFICATIONS,
-  TOKENS,
   chainTypes,
   conditionTypes,
   requirementTypes,
 } from '../../common/constants';
 import { DeleteGroupModal } from '../DeleteGroupModal';
 import { GroupForm } from '../common/GroupForm';
+import { makeGroupDataBaseAPIPayload } from '../common/helpers';
 import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
@@ -85,71 +84,12 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           })),
         }}
         onSubmit={(values) => {
-          const payload = {
-            chainId: app.activeChainId(),
-            address: app.user.activeAccount.address,
+          const payload = makeGroupDataBaseAPIPayload(values);
+
+          editGroup({
+            ...payload,
             groupId: groupId,
-            groupName: values.groupName,
-            groupDescription: values.groupDescription,
-            topicIds: values.topics.map((x) => x.value),
-            requirementsToFulfill:
-              values.requirementsToFulfill === 'ALL'
-                ? values.requirements.length
-                : values.requirementsToFulfill,
-            requirements: [],
-          };
-
-          // map requirements and add to payload
-          values.requirements.map((x) => {
-            if (
-              x.requirementType === SPECIFICATIONS.ERC_20 ||
-              x.requirementType === SPECIFICATIONS.ERC_721
-            ) {
-              payload.requirements.push({
-                rule: 'threshold',
-                data: {
-                  threshold: x.requirementAmount,
-                  source: {
-                    source_type: x.requirementType,
-                    evm_chain_id: parseInt(x.requirementChain),
-                    contract_address: x.requirementContractAddress,
-                  },
-                },
-              });
-              return;
-            }
-
-            if (x.requirementType === TOKENS.COSMOS_TOKEN) {
-              payload.requirements.push({
-                rule: 'threshold',
-                data: {
-                  threshold: x.requirementAmount,
-                  source: {
-                    source_type: x.requirementType,
-                    cosmos_chain_id: x.requirementChain,
-                    token_symbol: 'COS',
-                  },
-                },
-              });
-              return;
-            }
-
-            if (x.requirementType === TOKENS.EVM_TOKEN) {
-              payload.requirements.push({
-                rule: 'threshold',
-                data: {
-                  threshold: x.requirementAmount,
-                  source: {
-                    source_type: x.requirementType,
-                    evm_chain_id: parseInt(x.requirementChain),
-                  },
-                },
-              });
-              return;
-            }
-          });
-
-          editGroup(payload)
+          })
             .then(() => {
               notifySuccess('Group Updated');
               navigate(`/members?tab=groups`);

@@ -9,7 +9,7 @@ interface EditGroupProps {
   address: string;
   groupName: string;
   groupDescription?: string;
-  topicIds: string[];
+  topicIds: number[];
   requirementsToFulfill: number | undefined;
   requirements?: any[];
 }
