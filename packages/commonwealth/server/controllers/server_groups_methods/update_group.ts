@@ -1,14 +1,14 @@
 import { Op } from 'sequelize';
 import { TopicInstance } from 'server/models/topic';
+import { CommunityInstance } from '../../models/community';
+import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../database';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { UserInstance } from '../../models/user';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
-import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
@@ -22,7 +22,7 @@ const Errors = {
 
 export type UpdateGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   address: AddressInstance;
   groupId: number;
   metadata?: GroupMetadata;

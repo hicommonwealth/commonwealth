@@ -1,12 +1,12 @@
-import { DB } from '../../models';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import { ChainInstance } from '../../models/chain';
-import { AddressInstance } from '../../models/address';
-import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
-import validateGroupMembership from './validateGroupMembership';
-import validateTopicThreshold from '../validateTopicThreshold';
-import { ServerError } from '../../../../common-common/src/errors';
 import { Op } from 'sequelize';
+import { ServerError } from '../../../../common-common/src/errors';
+import { TokenBalanceCache } from '../../../../token-balance-cache/src';
+import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
+import { DB } from '../../models';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import validateTopicThreshold from '../validateTopicThreshold';
+import validateGroupMembership from './validateGroupMembership';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -28,7 +28,7 @@ export async function validateTopicGroupsMembership(
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   topicId: number,
-  chain: ChainInstance,
+  chain: CommunityInstance,
   address: AddressInstance
 ): Promise<{ isValid: boolean; message?: string }> {
   if (FEATURE_FLAG_GROUP_CHECK_ENABLED) {
@@ -48,15 +48,27 @@ export async function validateTopicGroupsMembership(
     });
 
     // check membership for all groups of topic
-    for (const { requirements } of groups) {
+    let numValidGroups = 0;
+    const allErrorMessages: string[] = [];
+
+    for (const { metadata, requirements } of groups) {
       const { isValid, messages } = await validateGroupMembership(
         address.address,
         requirements,
-        tokenBalanceCache
+        tokenBalanceCache,
+        metadata.required_requirements || 0
       );
-      if (!isValid) {
-        return { isValid: false, message: JSON.stringify(messages) };
+      if (isValid) {
+        numValidGroups++;
+      } else {
+        for (const message of messages) {
+          allErrorMessages.push(JSON.stringify(message));
+        }
       }
+    }
+
+    if (numValidGroups === 0) {
+      return { isValid: false, message: allErrorMessages.join('\n') };
     }
 
     return { isValid: true };
