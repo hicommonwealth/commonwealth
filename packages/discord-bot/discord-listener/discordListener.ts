@@ -138,7 +138,12 @@ client.on('messageUpdate', async (oldMessage: Message, newMessage: Message) => {
 });
 
 client.on('messageCreate', async (message: Message) => {
+  console.log('Message Created:', message);
   await handleMessage(message, 'create');
 });
+
+client.on('threadUpdate', async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
+  console.log('Thread update:', oldThread, newThread);
+})
 
 client.login(DISCORD_TOKEN);
