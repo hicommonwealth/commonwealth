@@ -21,6 +21,7 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
+import { getThreadActionTooltipText } from 'helpers/threads';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 
@@ -107,12 +108,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             `${thread.identifier}-${slugify(thread.title)}`
           );
 
-          const disabledActionsTooltipText = (() => {
-            if (!hasJoinedCommunity) return 'Join community to upvote';
-            if (thread?.archivedAt) return 'Thread is archived';
-            if (thread?.lockedAt) return 'Thread is locked';
-            if (restrictedTopicIds.includes(topicId)) return 'Topic is gated';
-          })();
+          const disabledActionsTooltipText = getThreadActionTooltipText({
+            isCommunityMember: !!hasJoinedCommunity,
+            isThreadArchived: !!thread?.archivedAt,
+            isThreadLocked: !!thread?.lockedAt,
+            isThreadTopicGated: restrictedTopicIds.includes(topicId),
+          });
 
           return (
             <ThreadCard

@@ -1,6 +1,7 @@
-import { IThreadCollaborator } from 'client/scripts/models/Thread';
+import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
@@ -183,12 +184,12 @@ export const CWContentPage = ({
     </div>
   );
 
-  const disabledActionsTooltipText = (() => {
-    if (!hasJoinedCommunity) return 'Join community to upvote';
-    if (thread?.archivedAt) return 'Thread is archived';
-    if (thread?.lockedAt) return 'Thread is locked';
-    if (restrictedTopicIds.includes(thread?.topic?.id)) return 'Topic is gated';
-  })();
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!hasJoinedCommunity,
+    isThreadArchived: !!thread?.archivedAt,
+    isThreadLocked: !!thread?.lockedAt,
+    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+  });
 
   const mainBody = (
     <div className="main-body-container">

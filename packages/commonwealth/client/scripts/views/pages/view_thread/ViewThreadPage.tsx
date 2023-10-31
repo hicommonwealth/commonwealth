@@ -3,7 +3,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
 import { featureFlags } from 'helpers/feature-flags';
-import { filterLinks } from 'helpers/threads';
+import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -347,12 +347,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
-  const disabledActionsTooltipText = (() => {
-    if (!hasJoinedCommunity) return 'Join community to upvote';
-    if (thread?.archivedAt) return 'Thread is archived';
-    if (thread?.lockedAt) return 'Thread is locked';
-    if (restrictedTopicIds.includes(thread?.topic?.id)) return 'Topic is gated';
-  })();
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!hasJoinedCommunity,
+    isThreadArchived: !!thread?.archivedAt,
+    isThreadLocked: !!thread?.lockedAt,
+    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+  });
 
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
