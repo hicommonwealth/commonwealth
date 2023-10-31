@@ -1,5 +1,4 @@
 import { IThreadCollaborator } from 'client/scripts/models/Thread';
-import 'components/component_kit/CWContentPage.scss';
 import { truncate } from 'helpers/truncate';
 import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
@@ -106,7 +105,7 @@ export const CWContentPage = ({
   showTabs = false,
   showSkeleton,
   isEditing = false,
-  sidebarComponentsSkeletonCount = 2
+  sidebarComponentsSkeletonCount = 2,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -124,7 +123,7 @@ export const CWContentPage = ({
     newQueryParams.set('tab', `${newTab}`);
     navigate({
       pathname: location.pathname,
-      search: `?${newQueryParams.toString()}`
+      search: `?${newQueryParams.toString()}`,
     });
   };
 
@@ -152,10 +151,10 @@ export const CWContentPage = ({
         discord_meta={discord_meta}
         isLocked={thread?.readOnly}
         {...(thread?.lockedAt && {
-          lockedAt: thread.lockedAt.toISOString()
+          lockedAt: thread.lockedAt.toISOString(),
         })}
         {...(thread?.updatedAt && {
-          lastUpdated: thread.updatedAt.toISOString()
+          lastUpdated: thread.updatedAt.toISOString(),
         })}
         authorAddress={author?.address}
         authorChainId={authorCommunityId}
