@@ -84,7 +84,7 @@ export type CreateCommunityResult = {
 
 export async function __createCommunity(
   this: ServerCommunitiesController,
-  { user, community }: CreateCommunityOptions
+  { user, community }: CreateCommunityOptions,
 ): Promise<CreateCommunityResult> {
   if (!user) {
     throw new AppError('Not signed in');
@@ -151,7 +151,10 @@ export async function __createCommunity(
   }
 
   // cosmos_chain_id is the canonical identifier for a cosmos chain.
-  if (community.base === ChainBase.CosmosSDK) {
+  if (
+    community.base === ChainBase.CosmosSDK &&
+    community.type !== ChainType.Offchain
+  ) {
     // Our convention is to follow the "chain_name" standard established by the
     // Cosmos Chain Registry:
     // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
@@ -174,14 +177,14 @@ export async function __createCommunity(
 
     const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
     const { data: chains } = await axios.get(
-      `${REGISTRY_API_URL}/api/v1/mainnet`
+      `${REGISTRY_API_URL}/api/v1/mainnet`,
     );
     const foundRegisteredChain = chains?.find(
-      (chain) => chain === cosmos_chain_id
+      (chain) => chain === cosmos_chain_id,
     );
     if (!foundRegisteredChain) {
       throw new AppError(
-        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`
+        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
       );
     }
   }
@@ -333,7 +336,7 @@ export async function __createCommunity(
   }
 
   const [node] = await this.models.ChainNode.scope(
-    'withPrivateData'
+    'withPrivateData',
   ).findOrCreate({
     where: { [Op.or]: [{ url }, { eth_chain_id }] },
     defaults: {
@@ -431,7 +434,7 @@ export async function __createCommunity(
 
   if (chain.base === ChainBase.Ethereum) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -449,7 +452,7 @@ export async function __createCommunity(
     });
   } else if (chain.base === ChainBase.NEAR) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -467,7 +470,7 @@ export async function __createCommunity(
     });
   } else if (chain.base === ChainBase.Solana) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -507,7 +510,7 @@ export async function __createCommunity(
       chain.id,
       'admin',
       0,
-      0
+      0,
     );
 
     await this.models.Subscription.findOrCreate({
