@@ -8,7 +8,7 @@ export const TOKENS = {
 export const SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
-  ERC_1155: 'erc_1155'
+  ERC_1155: 'erc1155'
 };
 
 export const BLOCKCHAINS = {

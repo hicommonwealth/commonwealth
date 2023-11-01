@@ -70,6 +70,7 @@ const GroupsSection = ({
                     ?.join(' ') || '',
                 requirementContractAddress: r.data.source.contract_address,
                 requirementAmount: r.data.threshold,
+                requirementId: r.data.source.id,
                 requirementCondition: 'More than', // hardcoded in api
               }))}
               requirementsToFulfill={

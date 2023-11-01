@@ -101,6 +101,12 @@ async function _thresholdCheck(
         chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
+      case 'erc1155': {
+        chainNetwork = ChainNetwork.ERC1155;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.evm_chain_id.toString();
+        break;
+      }
       case 'eth_native': {
         chainNetwork = ChainNetwork.Ethereum;
         chainId = thresholdData.source.evm_chain_id.toString();

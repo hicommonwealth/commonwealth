@@ -12,6 +12,7 @@ type RequirementCardProps = {
   requirementContractAddress?: string;
   requirementCondition: string;
   requirementAmount: string;
+  requirementId?: string;
 };
 
 type GroupCardProps = {

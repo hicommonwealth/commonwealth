@@ -25,6 +25,7 @@ export const makeGroupDataBaseAPIPayload = (
     if (
       x.requirementType === SPECIFICATIONS.ERC_20 ||
       x.requirementType === SPECIFICATIONS.ERC_721 ||
+      x.requirementType === SPECIFICATIONS.ERC_1155 ||
       x.requirementType === TOKENS.EVM_TOKEN
     ) {
       payload.requirements.push({

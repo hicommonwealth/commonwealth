@@ -58,6 +58,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               )?.label,
             },
             requirementAmount: x.data.threshold,
+            requirementId: x.data.source.id,
             requirementChain: {
               value: `${
                 x.data.source.cosmos_chain_id || x.data.source.evm_chain_id || 0
@@ -73,6 +74,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             requirementCondition: conditionTypes.find(
               (y) => y.value === AMOUNT_CONDITIONS.MORE
             ),
+
           })),
           requirementsToFulfill:
             foundGroup.requirementsToFulfill === foundGroup.requirements.length

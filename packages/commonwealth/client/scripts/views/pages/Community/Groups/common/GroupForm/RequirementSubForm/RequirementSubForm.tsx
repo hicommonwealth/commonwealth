@@ -4,6 +4,7 @@ import { getClasses } from 'views/components/component_kit/helpers';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import {
+  SPECIFICATIONS,
   TOKENS,
   chainTypes,
   conditionTypes,
@@ -21,6 +22,7 @@ const RequirementSubForm = ({
 }: RequirementSubFormType) => {
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const is1155Requirement = requirementType === SPECIFICATIONS.ERC_1155;
   const isCosmosRequirement = requirementType === TOKENS.COSMOS_TOKEN;
 
   useEffect(() => {
@@ -69,12 +71,17 @@ const RequirementSubForm = ({
           className={getClasses<{
             'cols-3'?: boolean;
             'cols-4'?: boolean;
+            'cols-5'?: boolean;
+            'row-1': boolean;
+            'row-2': boolean;
           }>(
             {
               'cols-3': isTokenRequirement,
-              'cols-4': !isTokenRequirement,
-            },
-            `row-2`
+              'cols-4': !isTokenRequirement && !is1155Requirement,
+              'cols-5': !isTokenRequirement && is1155Requirement,
+              'row-1': !isTokenRequirement && is1155Requirement,
+              'row-2': !(!isTokenRequirement && is1155Requirement)
+            }
           )}
         >
           <CWSelectList
@@ -161,6 +168,24 @@ const RequirementSubForm = ({
             customError={errors.requirementAmount}
             fullWidth
           />
+          {
+            is1155Requirement && (<CWTextInput
+              key={defaultValues.requirementId}
+              name="requirementId"
+              label="ID"
+              placeholder="ID"
+              {...(defaultValues.requirementId && {
+                defaultValue: defaultValues.requirementId,
+              })}
+              onInput={(e) => {
+                onChange({
+                  requirementId: (e.target as any).value,
+                });
+              }}
+              customError={errors.requirementId}
+              fullWidth
+            />
+          )}
         </div>
       )}
     </div>

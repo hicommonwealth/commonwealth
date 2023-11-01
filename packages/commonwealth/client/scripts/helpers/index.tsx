@@ -341,6 +341,8 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
     decimals = chain.meta.decimals;
   } else if (chain.network === ChainNetwork.ERC721) {
     decimals = 0;
+  } else if (chain.network === ChainNetwork.ERC1155) {
+      decimals = 0;
   } else if (chain.base === ChainBase.CosmosSDK) {
     decimals = 6;
   }
