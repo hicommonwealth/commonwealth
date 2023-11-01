@@ -163,7 +163,9 @@ const GroupForm = ({
   }, []);
 
   const removeRequirementByIndex = (index: number) => {
-    setRequirementSubForms(requirementSubForms.splice(index, 1));
+    const updatedSubForms = [...requirementSubForms];
+    updatedSubForms.splice(index, 1);
+    setRequirementSubForms([...updatedSubForms]);
   };
 
   const addRequirementSubForm = () => {
