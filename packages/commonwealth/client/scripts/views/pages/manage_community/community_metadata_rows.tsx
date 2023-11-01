@@ -43,7 +43,7 @@ type DiscordChannelConnection = {
 const DiscordForumConnections = ({
   channels,
   topics,
-  refetchTopics
+  refetchTopics,
 }: {
   channels: DiscordChannelConnection[];
   topics: { id: string; name: string; channelId: string | null }[];
@@ -54,7 +54,7 @@ const DiscordForumConnections = ({
   });
 
   const connectedTopics = topics.filter(
-    (topic) => topic.channelId !== null && topic.channelId !== ''
+    (topic) => topic.channelId !== null && topic.channelId !== '',
   );
 
   const [connectionVerified, setConnectionVerified] = useState(true);
@@ -78,14 +78,14 @@ const DiscordForumConnections = ({
             } catch (e) {
               console.log(e);
             }
-          }
+          },
         },
         {
           label: 'No',
           buttonType: 'secondary',
-          buttonHeight: 'sm'
-        }
-      ]
+          buttonHeight: 'sm',
+        },
+      ],
     });
   };
 
@@ -102,20 +102,20 @@ const DiscordForumConnections = ({
 
       {channels.map((channel) => {
         const connectedTopic = topics.find(
-          (topic) => topic.channelId === channel.channelId
+          (topic) => topic.channelId === channel.channelId,
         );
 
         const remainingTopics = topicOptions.filter(
           (topic) =>
             !connectedTopics.find(
-              (connected_topic) => connected_topic.id === topic.value
-            )
+              (connected_topic) => connected_topic.id === topic.value,
+            ),
         );
 
         if (connectedTopic) {
           remainingTopics.push({
             label: connectedTopic.name,
-            value: connectedTopic.id
+            value: connectedTopic.id,
           });
         }
 
@@ -156,19 +156,19 @@ export const CommunityMetadataRows = ({
   admins,
   mods,
   onRoleUpdate,
-  onSave
+  onSave,
 }: CommunityMetadataRowsProps) => {
   const params = new URLSearchParams(window.location.search);
   const returningFromDiscordCallback = params.get(
-    'returningFromDiscordCallback'
+    'returningFromDiscordCallback',
   );
 
   const { data: topics, refetch: refetchTopics } = useFetchTopicsQuery({
-    chainId: app.activeChainId()
+    chainId: app.activeChainId(),
   });
 
   const { data: discordChannels } = useFetchDiscordChannelsQuery({
-    chainId: app.activeChainId()
+    chainId: app.activeChainId(),
   });
 
   const [name, setName] = useState(community.name);
@@ -183,36 +183,36 @@ export const CommunityMetadataRows = ({
   const [customDomain, setCustomDomain] = useState(community.customDomain);
   const [terms, setTerms] = useState(community.terms);
   const [directoryPageEnabled, setDirectoryPageEnabled] = useState(
-    community.directoryPageEnabled
+    community.directoryPageEnabled,
   );
   const [selectedChainNodeId, setSelectedChainNodeId] = useState(
-    community.directoryPageChainNodeId
+    community.directoryPageChainNodeId,
   );
   const [iconUrl, setIconUrl] = useState(community.iconUrl);
   const [snapshot, setSnapshot] = useState(community.snapshot);
   const [snapshotString, setSnapshotString] = useState(
-    community.snapshot.toString()
+    community.snapshot.toString(),
   );
   const [defaultOverview, setDefaultOverview] = useState(
-    community.defaultOverview
+    community.defaultOverview,
   );
   const [defaultPage, setDefaultPage] = useState(community.defaultPage);
   const [hasHomepage, setHasHomepage] = useState(community.hasHomepage);
   const [selectedTags2, setSelectedTags2] = useState(
-    setSelectedTags(community.id)
+    setSelectedTags(community.id),
   );
   const [discordBotConnected, setDiscordBotConnected] = useState(
     returningFromDiscordCallback === 'true'
       ? true
-      : community.discordConfigId !== null
+      : community.discordConfigId !== null,
   );
   const [discordBotConnecting, setDiscordBotConnecting] = useState(
     returningFromDiscordCallback === 'true'
       ? true
-      : community.discordConfigId !== null
+      : community.discordConfigId !== null,
   );
   const [communityBanner, setCommunityBanner] = useState(
-    community.communityBanner
+    community.communityBanner,
   );
   const [uploadInProgress, setUploadInProgress] = useState(false);
   const [snapshotNotificationsEnabled, setSnapshotNotificationsEnabled] =
@@ -222,7 +222,7 @@ export const CommunityMetadataRows = ({
     name: string;
   } | null>(null);
   const [discordWebhooksEnabled, setDiscordWebhooksEnabled] = useState(
-    community.discordBotWebhooksEnabled
+    community.discordBotWebhooksEnabled,
   );
 
   useEffect(() => {
@@ -268,7 +268,7 @@ export const CommunityMetadataRows = ({
           chain_id: community.id,
           banner_text: communityBanner,
           auth: true,
-          jwt: app.user.jwt
+          jwt: app.user.jwt,
         })
         .then(() => {
           app.chain.meta.setBanner(communityBanner);
@@ -300,7 +300,7 @@ export const CommunityMetadataRows = ({
         hasHomepage,
         chain_node_id: null,
         directory_page_enabled: directoryPageEnabled,
-        directory_page_chain_node_id: selectedChainNodeId
+        directory_page_chain_node_id: selectedChainNodeId,
       });
       onSave();
       notifySuccess('Chain updated');
@@ -323,15 +323,17 @@ export const CommunityMetadataRows = ({
         }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
           `${
             !isCustomDomain ? window.location.origin : 'https://commonwealth.im'
-          }`
+          }`,
         )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
-            redirect_domain: isCustomDomain ? window.location.origin : undefined
-          })
+            redirect_domain: isCustomDomain
+              ? window.location.origin
+              : undefined,
+          }),
         )}`,
-        '_parent'
+        '_parent',
       );
 
       setDiscordBotConnected(false);
@@ -344,7 +346,7 @@ export const CommunityMetadataRows = ({
   const updateDiscordWebhookEnabled = async () => {
     try {
       await community.updateChainData({
-        discord_bot_webhooks_enabled: !discordWebhooksEnabled
+        discord_bot_webhooks_enabled: !discordWebhooksEnabled,
       });
       setDiscordWebhooksEnabled(!discordWebhooksEnabled);
 
@@ -368,15 +370,17 @@ export const CommunityMetadataRows = ({
         }&permissions=1024&scope=applications.commands%20bot&redirect_uri=${encodeURI(
           `${
             !isCustomDomain ? window.location.origin : 'https://commonwealth.im'
-          }`
+          }`,
         )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
-            redirect_domain: isCustomDomain ? window.location.origin : undefined
-          })
+            redirect_domain: isCustomDomain
+              ? window.location.origin
+              : undefined,
+          }),
         )}`,
-        '_parent'
+        '_parent',
       );
       setDiscordBotConnecting(true);
     } catch (e) {
@@ -485,16 +489,16 @@ export const CommunityMetadataRows = ({
           options={[
             {
               label: 'Discussions',
-              value: DefaultPage.Discussions
+              value: DefaultPage.Discussions,
             },
             {
               label: 'Overview',
-              value: DefaultPage.Overview
+              value: DefaultPage.Overview,
             },
             {
               label: 'Homepage',
-              value: DefaultPage.Homepage
-            }
+              value: DefaultPage.Homepage,
+            },
           ]}
           selected={defaultPage}
           onChange={(e) => {
@@ -510,12 +514,12 @@ export const CommunityMetadataRows = ({
           options={[
             {
               label: 'Discussions',
-              value: DefaultPage.Discussions
+              value: DefaultPage.Discussions,
             },
             {
               label: 'Overview',
-              value: DefaultPage.Overview
-            }
+              value: DefaultPage.Overview,
+            },
           ]}
           selected={
             defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions
@@ -598,7 +602,7 @@ export const CommunityMetadataRows = ({
                   onClick={() => {
                     setSelectedTags2({
                       ...selectedTags2,
-                      [key]: !selectedTags2[key]
+                      [key]: !selectedTags2[key],
                     });
                   }}
                 />
@@ -692,19 +696,19 @@ export const CommunityMetadataRows = ({
                         try {
                           await app.discord.setForumChannelConnection(
                             topicId,
-                            channel.id
+                            channel.id,
                           );
                           await refetchTopics();
                           notifySuccess(
                             `#${channel.name} connected to ${
                               topics.find((topic) => topic.id === topicId)?.name
-                            }!`
+                            }!`,
                           );
                         } catch (e) {
                           console.log(e);
                           notifyError('Error connecting channel to topic.');
                         }
-                      }
+                      },
                     };
                   })}
                   topics={topics}
