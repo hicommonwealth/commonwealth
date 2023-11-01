@@ -107,8 +107,6 @@ const GroupForm = ({
   const [cwRequiremenetsLabelInputField, setCwRequiremenetsLabelInputField] =
     useState<CWRequirementsLabelInputFieldState>({ value: '1', error: '' });
 
-  const [overRequirementLimit, setOverRequirementLimit] = useState(false);
-
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
   >([
@@ -169,12 +167,6 @@ const GroupForm = ({
   };
 
   const addRequirementSubForm = () => {
-    if (requirementSubForms.length <= MAX_REQUIREMENTS) {
-      setOverRequirementLimit(false);
-    }
-    if (requirementSubForms.length >= MAX_REQUIREMENTS) {
-      setOverRequirementLimit(true);
-    }
     setRequirementSubForms([
       ...requirementSubForms,
       {
@@ -432,18 +424,22 @@ const GroupForm = ({
                   <CWButton
                     type="button"
                     label="Add requirement"
-                    disabled={overRequirementLimit}
+                    disabled={requirementSubForms.length === MAX_REQUIREMENTS}
                     iconLeft="plus"
                     buttonWidth="full"
                     buttonType="secondary"
                     buttonHeight="med"
                     onClick={addRequirementSubForm}
-                    onMouseEnter={() => {
-                      overRequirementLimit && handleInteraction;
-                    }}
-                    onMouseLeave={() => {
-                      overRequirementLimit && handleInteraction;
-                    }}
+                    onMouseEnter={
+                      requirementSubForms.length === MAX_REQUIREMENTS
+                        ? handleInteraction
+                        : null
+                    }
+                    onMouseLeave={
+                      requirementSubForms.length === MAX_REQUIREMENTS
+                        ? handleInteraction
+                        : null
+                    }
                   />
                 )}
               />
