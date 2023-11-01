@@ -1,6 +1,7 @@
 The purpose of this doc is to present react-query as a tool that will help us handling application state - to be more specific - not a UI state, but the data coming from the backend server.
 
 **Contents**
+
 - [What is React-Query](#what-is-react-query)
 - [How **React-Query works in a nutshell**](#how---react-query-works-in-a-nutshell--)
 - [Why do we even consider React-Query?](#why-do-we-even-consider-react-query-)
@@ -50,8 +51,10 @@ At first glance, React-Query does not seem to be too complicated to use. On the 
 - [ ]  Decide on which part of store we want to transfer first.
 (From our perspective - Malik&Marcin - `topics` seems to be good shot, because it is not super complicated, but in the same time it has all CRUD operations so we can figure out both queries and mutations.)
 - [ ]  Work on first PR which will be about:
+
 1. Preparing the scaffold (directories, utils, cache keys approach, usage in components etc.) according to the style guide below.
 2. Moving first part of store to the new react-query approach (eg `topics`)
+
 - [ ]  Identify further areas that we would like to focus on.
 (From our perspective, a big gain will be the introduction of React-Query at `threads` so discussions page and thread page. Also, queries that are made during the initialisation are worth to consider. Basically we are looking for data that is not being changed so often, so we can cache it! It would be great if we had some analytics on which backend routes are hit most frequently and which routes are the heaviest)
 **Note: in this step it would be good to figure out which parts of the current store are feasible for React-Query and which parts should be handled by Zustand.**
@@ -64,18 +67,18 @@ At first glance, React-Query does not seem to be too complicated to use. On the 
 - we do not want to use react-query hooks in the components. From now on, we want the components to be responsible for rendering the data, not for handling the business logic. Thus, we want to create custom hooks that will expose react-query hooks and mutations and will be used in the components. For example `useTopics` will have all queries and mutations related to `topics` endpoints.
 [Example here](https://github.com/hicommonwealth/commonwealth/pull/3741/files#diff-089b03d43833900fae3040e6a7279eb567973b0ec5739153ee05292e0f0ac414)
 - Each query is identified by the `queryKey`. We need to build an easy approach to use queryKey effectively. There is an idea how to do this, but it needs evaluation:
-    - Each backend route as a base for the query key: [check comment](https://github.com/hicommonwealth/commonwealth/pull/3741/files#r1186838388)
+  - Each backend route as a base for the query key: [check comment](https://github.com/hicommonwealth/commonwealth/pull/3741/files#r1186838388)
 - We must not use jQuery for API calls. We use axios and we want to get rid of jQuery eventually.
 - optimistic update seems to add boilerplate and complexity to the code. Ideally, we should have custom hook which will be used instead of `useMutation` and it will be responsible for handling optimistic update by default eg `useOptimisticMutation`
 [See the comment](https://github.com/hicommonwealth/commonwealth/pull/3741/files#r1186518881)
 - naming convention for queries and mutations:
-    - Queries are for GET, so `const getTopicQuery = useQuery()`
-    - Mutations are for PUT, POST and DELETE so const `editTopicMutation = useMutation()`, `const createTopicMutation = useMutation()` etc
+  - Queries are for GET, so `const getTopicQuery = useQuery()`
+  - Mutations are for PUT, POST and DELETE so const `editTopicMutation = useMutation()`, `const createTopicMutation = useMutation()` etc
 - we should create and use methods for modifying arrays to avoid repeating code over and over again eg in optimistic updates. We can use methods from loadash.
 [See comment](https://github.com/hicommonwealth/commonwealth/pull/3741/files#r1186842517)
 - we should use default `staleTime` and `cacheTime` at the beginning as they work pretty nice out of the box. Later on we can play around with these values to adjust it to our needs.
 [See comment](https://github.com/hicommonwealth/commonwealth/pull/3741/files#r1186839947)
 
-# Change Log
+## Change Log
 
 - 230509: Authored by Marcin Maslanka.

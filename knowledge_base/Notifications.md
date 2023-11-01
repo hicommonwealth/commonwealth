@@ -116,7 +116,7 @@ The implementation will involve two elements:
 
 ## Kafka as a pub/sub queuing solution
 
-A comparison of RabbitMQ and Kafka can be found here: https://www.cloudamqp.com/blog/when-to-use-rabbitmq-or-apache-kafka.html. In summary, RabbitMQ messages are not available for another consumer/subscriber once read, whereas Kafka preserves messages and maintains offsets for each type of consumer. Kafka is natively supported on Heroku and can be shared between projects. In a simplified design, only two Kafka topics are needed: one for CDC Event (Notification) and the other for Notification (NotificationRead).
+A comparison of RabbitMQ and Kafka can be found here: <https://www.cloudamqp.com/blog/when-to-use-rabbitmq-or-apache-kafka.html>. In summary, RabbitMQ messages are not available for another consumer/subscriber once read, whereas Kafka preserves messages and maintains offsets for each type of consumer. Kafka is natively supported on Heroku and can be shared between projects. In a simplified design, only two Kafka topics are needed: one for CDC Event (Notification) and the other for Notification (NotificationRead).
 
 ## Apache Beam - Flink Runner
 
@@ -196,6 +196,6 @@ event_id: INTEGER or BIGINT (Foreign Key, references Event.event_id)
 user_id: INTEGER or BIGINT  
 read_ind: BOOLEAN
 
-# Change Log
+## Change Log
 
 - 230628: Authored by Nakul Manchanda.

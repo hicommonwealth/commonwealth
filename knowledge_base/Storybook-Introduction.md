@@ -1,4 +1,5 @@
 **Contents**
+
 - [Storybook staging environment](#storybook-staging-environment)
 - [Motivation](#motivation)
 - [Page example](#page-example)
@@ -19,12 +20,13 @@ It's a great place to collaborate on UI develoment with designers, product manag
 
 # Page example
 
-https://github.com/hicommonwealth/commonwealth/assets/30223098/97f7662e-6750-4fba-be9f-dc9d3d4588fb
+<https://github.com/hicommonwealth/commonwealth/assets/30223098/97f7662e-6750-4fba-be9f-dc9d3d4588fb>
 
 # References
+
 1. [Storybook website](https://storybook.js.org/)
 2. [Why Storybook?](https://storybook.js.org/docs/react/get-started/why-storybook)
 
-# Change Log
+## Change Log
 
 - 230530: Authored by Daniel Martins.
