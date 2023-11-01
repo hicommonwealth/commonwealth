@@ -45,7 +45,8 @@ const CreateCommunityGroupPage = () => {
         values.requirements.map((x) => {
           if (
             x.requirementType === SPECIFICATIONS.ERC_20 ||
-            x.requirementType === SPECIFICATIONS.ERC_721
+            x.requirementType === SPECIFICATIONS.ERC_721 ||
+            x.requirementType === SPECIFICATIONS.ERC_1155
           ) {
             payload.requirements.push({
               rule: 'threshold',
