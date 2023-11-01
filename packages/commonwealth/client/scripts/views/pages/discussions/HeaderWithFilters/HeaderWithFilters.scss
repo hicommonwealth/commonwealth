@@ -48,6 +48,12 @@
     width: 34px;
   }
 
+  .checkboxes {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+  }
+
   @include smallInclusive {
     .filter-row {
       flex-direction: column;

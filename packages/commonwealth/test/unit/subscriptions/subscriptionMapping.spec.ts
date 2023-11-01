@@ -7,7 +7,7 @@ import {
   NotificationDataAndCategory,
   SnapshotEventType,
 } from 'types';
-import { SupportedNetwork } from 'chain-events/src';
+import { SupportedNetwork } from '../../../shared/chain/types/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -166,8 +166,6 @@ describe('Subscription Mapping Tests', () => {
           id: 1,
           block_number: 1,
           event_data: {},
-          queued: 1,
-          entity_id: 1,
           network: SupportedNetwork.Aave,
           chain,
         },

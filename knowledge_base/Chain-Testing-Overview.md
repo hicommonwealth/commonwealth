@@ -1,38 +1,45 @@
+# Chain Testing Overview
+
+## Contents
+
 - [EVM Chain Testing Tools](#evm-chain-testing-tools)
   * [Setup](#setup)
   * [API](#api)
-      - [Chain Info/Interaction](#chain-info-interaction)
-      - [Token](#token)
-      - [Governance Routes](#governance-routes)
+    - [Chain Info/Interaction](#chain-info-interaction)
+    - [Token](#token)
+    - [Governance Routes](#governance-routes)
   * [SDK](#sdk)
-      - [Methods](#methods)
+    - [Methods](#methods)
   * [Private Chain Customization](#private-chain-customization)
-      - [Potential Modifications](#potential-modifications)
+    - [Potential Modifications](#potential-modifications)
 - [Change Log](#change-log)
 
 # EVM Chain Testing Tools
 
 The EVM testing tools provide an out of the box environment for testing various EVM funcitonalities. The following tools are provided:
+
 * Fully configured ganache private blockchain
-    * Default ETH mainnet fork at latest block
-    * unlocked important wallets
-    * 12 sec blocktime with automine option
+  * Default ETH mainnet fork at latest block
+  * unlocked important wallets
+  * 12 sec blocktime with automine option
 * Chain transaction abstraction API
-    * Automatically run set transactions and scripts for onchain activity
-    * Self-serve ERC20/ETH actions + Bank 
-    * Get info and alter the chain(blocks and timestamps)
-    * Create governance actions
-    * A full-feature SDK to abstract API calls and use types
- 
-## Setup 
+  * Automatically run set transactions and scripts for onchain activity
+  * Self-serve ERC20/ETH actions + Bank
+  * Get info and alter the chain(blocks and timestamps)
+  * Create governance actions
+  * A full-feature SDK to abstract API calls and use types
+
+## Setup
 
 The easiest way to access the tool is to run `docker compose up` this will create a docker deployment with two containers. The following networking configuration is as follows:
+
 1. Ganache Private Chain container - `localhost:8545`
 2. Abstraction API container - `localhost:3000`
 
 From here API routes can be used and the private chain can be used as an RPC host anywhere this is used(ie metamask)
 
 To run each service locally the follow this process from the chain-testing dir:
+
 1. run `npm install`
 2. Add the host `127.0.0.1       chain` to `/etc/hosts`
 3. run `yarn run ganache`
@@ -46,6 +53,7 @@ The following API routes are available(descriptions coming soon):
 Post request types can be found in `src/types.ts`
 
 #### Chain Info/Interaction
+
 <details>
  <summary><code>GET /chain/accounts</code></summary>
 
@@ -57,6 +65,7 @@ Post request types can be found in `src/types.ts`
 ....
 ]
 ```
+
 </details>
 
 <details>
@@ -126,6 +135,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
     "balance": "1000"
 }
 ```
+
 </details>
 
 <details>
@@ -200,6 +210,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 ```
 
 **Response**
+
 ```javascript
 {
     "proposalId": 123
@@ -338,6 +349,7 @@ See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
 ## SDK
 
 The Chain Testing Suite includes an SDK which wraps API calls into methods to be used in typescript code to further abstract use of chain automations. Transactions can be built into any ts project as easy as:
+
 ```typescript
 import { ChainTesting } from './sdk/chainTesting';
 
@@ -469,6 +481,7 @@ Queue a proposal for execution.</summary>
 Execute a passed proposal.</summary>
 
 **Arguments**
+
 * `proposalId (string)`: The proposalId.
 
 </details>
@@ -498,6 +511,7 @@ JSON formatted proposal Details
 <summary><code>getETH(toAddress: string, amount: string)</code>Get ETH to a given account</summary>
 
 **Arguments**
+
 * `toAddress (string)`: The address to send ETH to
 * `amount (string)`: The amount of eth in ether to receive
 
@@ -515,11 +529,13 @@ Features of the private chain can be adjusted to work for different use cases.
 A set of deployment params as follows can be found in both `package.json` and `docker-compose.yml`\
 `--fork --miner.blockTime 12 --wallet.unlockedAccounts 0xF977814e90dA44bFA03b6295A0616a897441aceC --wallet.unlockedAccounts 0xfA9b5f7fDc8AB34AAf3099889475d47febF830D7`
 Here the following params can be defined as
+
 * fork - Fork the ETH mainnet(uses built in infura endpoint) at latest block
-* miner.blockTime - the time between mining each block 
+* miner.blockTime - the time between mining each block
 * wallet.unlockedAccounts - This unlocks the following address for use in the 'from' field of an eth tx. ie allows user to access this wallet.
 
 #### Potential Modifications
+
 1. fork from a block or other evm network
    * Any ETH block can be selected as the starting block via `--fork [blockNumber]`
    * Any network can be forked by providing the RPC provider `--fork rpc.somePolygonRPC.com@[blockNumber]`
@@ -527,11 +543,11 @@ Here the following params can be defined as
    * The block time behind updated by modifying the value after `miner.blockTime`
    * Removing `miner.blockTime` will switch to insta-mining(good for contract unit tests)
 3. Modify available wallets/accounts
-   * set a value for `--wallet.totalAccounts` to include more generated accounts(defaults to 10)   
+   * set a value for `--wallet.totalAccounts` to include more generated accounts(defaults to 10)
    * set a value for `--wallet.defaultBalance` to set the amount of ether to start each account with(defaults to 1000)
    * Add an unlocked wallet via an additional `--wallet.unlockAccounts`. This is helpful for emulating actions of other users/wallets etc
 
-# Change Log
+## Change Log
 
 - 230515: Updated with Service Testing section by Timothee Legros.
 - 230218: Authored by Timothee Legros

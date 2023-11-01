@@ -5,18 +5,18 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
 import { AccessLevel } from '../../../../../shared/permissions';
-import { CWText } from '../../components/component_kit/cw_text';
+import {
+  APIOrderBy,
+  APIOrderDirection
+} from '../../../../scripts/helpers/constants';
+import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import NewProfilesController from '../../../controllers/server/newProfiles';
 import RoleInfo from '../../../models/RoleInfo';
 import Permissions from '../../../utils/Permissions';
-import { AdminPanelTabs } from './admin_panel_tabs';
-import { CommunityMetadataRows } from './chain_metadata_rows';
+import { CWText } from '../../components/component_kit/cw_text';
 import ErrorPage from '../error';
-import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from '../../../../scripts/helpers/constants';
+import { AdminPanelTabs } from './admin_panel_tabs';
+import { CommunityMetadataRows } from './community_metadata_rows';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -34,8 +34,8 @@ const ManageCommunityPage = () => {
       const res = await axios.get(`${app.serverUrl()}/roles`, {
         params: {
           chain_id: app.activeChainId(),
-          permissions: ['moderator', 'admin'],
-        },
+          permissions: ['moderator', 'admin']
+        }
       });
       const roles = res.data.result || [];
       roles.forEach((role) => {
@@ -59,7 +59,7 @@ const ManageCommunityPage = () => {
     limit: 20,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
-    includeRoles: true,
+    includeRoles: true
   });
 
   const roleData = useMemo(() => {
@@ -71,7 +71,7 @@ const ManageCommunityPage = () => {
         ...(profile.roles[0] || {}),
         Address: profile.addresses[0],
         id: profile.addresses[0].id,
-        displayName: profile.profile_name || 'Anonymous',
+        displayName: profile.profile_name || 'Anonymous'
       };
     });
   }, [searchResults]);
@@ -131,7 +131,7 @@ const ManageCommunityPage = () => {
         newRole.address_id,
         newRole.Address?.id || newRole.address_id,
         newRole.Address.address,
-        newRole.Address.chain,
+        newRole.Address.community_id,
         newRole.chain_id,
         newRole.permission,
         newRole.allow,

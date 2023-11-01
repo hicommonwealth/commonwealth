@@ -59,7 +59,7 @@ class DiscordController {
       await axios.patch(
         `${app.serverUrl()}/topics/${topicId}/channels/${channelId}`,
         {
-          chain_id: app.activeChainId(),
+          chain: app.activeChainId(),
           jwt: app.user.jwt,
         }
       );

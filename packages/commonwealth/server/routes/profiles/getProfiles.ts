@@ -4,8 +4,9 @@ import type {
 } from 'common-common/src/api/extApiTypes';
 import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
-import Sequelize from 'sequelize';
+import Sequelize, { WhereOptions } from 'sequelize';
 import type { DB } from '../../models';
+import { ProfileAttributes } from '../../models/profile';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
@@ -48,11 +49,11 @@ const getProfiles = async (
     });
   }
 
-  const where = {};
+  const where: WhereOptions<ProfileAttributes> = {};
   if (!profile_ids) {
-    where['id'] = { [Op.in]: newProfileIds.map((p) => p.profile_id) };
+    where.id = { [Op.in]: newProfileIds.map((p) => p.profile_id) };
   } else {
-    where['id'] = {
+    where.id = {
       [Op.in]: [...profile_ids, ...newProfileIds.map((p) => p.profile_id)],
     };
   }
@@ -62,7 +63,7 @@ const getProfiles = async (
       model: models.Address,
       required: true,
       include: [
-        { model: models.Chain, required: true, where: { active: true } },
+        { model: models.Community, required: true, where: { active: true } },
         { model: models.Thread },
         { model: models.Comment, include: [{ model: models.Thread }] },
       ],

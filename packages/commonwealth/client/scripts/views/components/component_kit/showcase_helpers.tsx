@@ -1,5 +1,5 @@
-import React from 'react';
 import faker from 'faker';
+import React from 'react';
 import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { CWButton } from './new_designs/cw_button';
 

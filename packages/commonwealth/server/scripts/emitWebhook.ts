@@ -1,4 +1,4 @@
-import { SupportedNetwork } from 'chain-events/src';
+import { SupportedNetwork } from '../../shared/chain/types/types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import yargs from 'yargs';
@@ -62,7 +62,7 @@ async function main() {
     );
   }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id: 'dydx',
     },
@@ -148,7 +148,7 @@ async function main() {
       root_type: ProposalType.Thread,
       chain_id: thread.chain,
       author_address: thread.Address.address,
-      author_chain: thread.Address.chain,
+      author_chain: thread.Address.community_id,
     };
 
     if (argv.notificationCategory === NotificationCategories.NewThread) {
@@ -186,7 +186,7 @@ async function main() {
     ) {
       const anotherAddress = await models.Address.findOne({
         where: {
-          chain: chain.id,
+          community_id: chain.id,
         },
       });
       await models.Reaction.findOrCreate({

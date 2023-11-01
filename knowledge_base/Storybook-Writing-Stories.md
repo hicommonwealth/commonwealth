@@ -1,4 +1,5 @@
 **Contents**
+
 - [Basics](#basics)
 - [Args and argTypes](#args-and-argtypes)
 - [Two or more stories for the same component](#two-or-more-stories-for-the-same-component)
@@ -10,6 +11,7 @@
 # Basics
 
 When writing stories to a component we essentially need to
+
 * Import components we want to show
 * Define the Component Story Format
 * Write one or more stories
@@ -136,9 +138,10 @@ export const VoteButtonStory = {
 
 ```
 
-# References:
-1. https://storybook.js.org/docs/react/writing-stories/introduction
+# References
 
-# Change Log
+1. <https://storybook.js.org/docs/react/writing-stories/introduction>
+
+## Change Log
 
 - 230530: Authored by Daniel Martins.

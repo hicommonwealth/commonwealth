@@ -1,24 +1,27 @@
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/create_community.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
+import {
+  CWTab,
+  CWTabsRow
+} from '../../components/component_kit/new_designs/CWTabs';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
 import { EthDaoForm } from './eth_dao_form';
 import { useEthCommunityFormState } from './hooks';
+import { PolygonForm } from './polygon_form';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
-import { PolygonForm } from './polygon_form';
-import { useCommonNavigate } from 'navigation/helpers';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -30,14 +33,14 @@ export enum CommunityType {
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
   Polygon = 'Polygon',
-  AbiFactory = 'Abi Factory',
+  AbiFactory = 'Abi Factory'
 }
 
 const ADMIN_ONLY_TABS = [
   CommunityType.SubstrateCommunity,
   CommunityType.Cosmos,
   CommunityType.EthDao,
-  CommunityType.SputnikDao,
+  CommunityType.SputnikDao
 ];
 
 export const ETHEREUM_MAINNET = 'Ethereum Mainnet';
@@ -106,22 +109,18 @@ const CreateCommunity = (props: CreateCommunityProps) => {
     } else {
       setCurrentForm(getFormType(type));
     }
-  }, [type]);
+  }, [type, navigate]);
 
   const [currentForm, setCurrentForm] = useState<CommunityType>(
     getFormType(type)
   );
-  const {
-    ethChains,
-    setEthChains,
-    ethChainNames,
-    setEthChainNames,
-  } = useEthCommunityFormState();
+  const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
+    useEthCommunityFormState();
 
   useBrowserAnalyticsTrack({
     payload: {
-      event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
-    },
+      event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW
+    }
   });
 
   useEffect(() => {
@@ -136,7 +135,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
     };
 
     fetchEthCommunities();
-  }, []);
+  }, [setEthChains]);
 
   useNecessaryEffect(() => {
     const fetchEthCommunityNames = async () => {
@@ -166,17 +165,11 @@ const CreateCommunity = (props: CreateCommunityProps) => {
         return <StarterCommunityForm />;
       case 'erc20':
         return (
-          <ERC20Form
-            ethChains={ethChains}
-            ethChainNames={ethChainNames}
-          />
+          <ERC20Form ethChains={ethChains} ethChainNames={ethChainNames} />
         );
       case 'erc721':
         return (
-          <ERC721Form
-            ethChains={ethChains}
-            ethChainNames={ethChainNames}
-          />
+          <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
         );
       case 'sputnik':
         return <SputnikForm />;
@@ -186,17 +179,11 @@ const CreateCommunity = (props: CreateCommunityProps) => {
         return <CosmosForm />;
       case 'ethdao':
         return (
-          <EthDaoForm
-            ethChains={ethChains}
-            ethChainNames={ethChainNames}
-          />
+          <EthDaoForm ethChains={ethChains} ethChainNames={ethChainNames} />
         );
       case 'polygon':
         return (
-          <PolygonForm
-            ethChains={ethChains}
-            ethChainNames={ethChainNames}
-          />
+          <PolygonForm ethChains={ethChains} ethChainNames={ethChainNames} />
         );
       case 'solana':
         return <SplTokenForm />;
@@ -210,28 +197,30 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       <CWText type="h3" fontWeight="semiBold">
         New Commonwealth Community
       </CWText>
-      <CWTabBar>
-        {Object.values(CommunityType)
-          .filter((t) => {
-            return (
-              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
-              t !== CommunityType.AbiFactory
-            );
-          })
-          .map((t, i) => {
-            return (
-              <CWTab
-                key={i}
-                label={t.toString()}
-                isSelected={currentForm === t}
-                onClick={() => {
-                  setCurrentForm(t);
-                  navigate(`/createCommunity/${getTypeUrl(t)}`);
-                }}
-              />
-            );
-          })}
-      </CWTabBar>
+      <div className="cw-tabs-row-container">
+        <CWTabsRow>
+          {Object.values(CommunityType)
+            .filter((t) => {
+              return (
+                (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
+                t !== CommunityType.AbiFactory
+              );
+            })
+            .map((t, i) => {
+              return (
+                <CWTab
+                  key={i}
+                  label={t.toString()}
+                  isSelected={currentForm === t}
+                  onClick={() => {
+                    setCurrentForm(t);
+                    navigate(`/createCommunity/${getTypeUrl(t)}`);
+                  }}
+                />
+              );
+            })}
+        </CWTabsRow>
+      </div>
       {Object.keys(ethChainNames).length !== 0 ? (
         getCurrentForm()
       ) : (

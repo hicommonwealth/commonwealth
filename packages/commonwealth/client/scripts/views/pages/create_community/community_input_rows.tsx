@@ -4,28 +4,28 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { AvatarUpload } from 'views/components/Avatar';
 import { InputRow } from 'views/components/metadata_rows';
+import { Skeleton } from '../../components/Skeleton';
 import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { Skeleton } from '../../components/Skeleton';
 import type {
   ChainFormDefaultFields,
   EthChainFormState,
   UseCommunityFormDefaultFieldsHookType,
   UseCommunityFormStateHookType,
-  UseEthCommunityFormFieldsHookType,
+  UseEthCommunityFormFieldsHookType
 } from './types';
 
 export async function updateAdminOnCreateCommunity(communityId: string) {
   app.user.ephemerallySetActiveAccount(
-    app.user.addresses.filter((a) => a.chain.id === communityId)[0]
+    app.user.addresses.filter((a) => a.community.id === communityId)[0]
   );
 
   const roles = await axios.get(`${app.serverUrl()}/roles`, {
     params: {
       chain_id: communityId,
-      permissions: ['admin'],
-    },
+      permissions: ['admin']
+    }
   });
 
   app.roles.addRole(roles.data.result[0]);
@@ -41,7 +41,7 @@ export const initCommunityForm = (): ChainFormDefaultFields => {
     iconUrl: '',
     telegram: '',
     uploadInProgress: false,
-    website: '',
+    website: ''
   };
 };
 
@@ -154,10 +154,10 @@ export const EthCommunityRows = (
           (c) =>
             ({
               label: props.ethChainNames[c],
-              value: props.ethChainNames[c],
-            } || { label: c, value: c })
+              value: props.ethChainNames[c]
+            }) || { label: c, value: c }
         ),
-        app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
+        app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {}
       ] as Array<DropdownItemType>,
     [props.ethChains, props.ethChainNames]
   );
@@ -171,8 +171,7 @@ export const EthCommunityRows = (
         const [id] =
           Object.entries(props.ethChainNames).find(
             ([, name]) => name === o.value
-          ) ||
-          Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
+          ) || Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
 
         state.setEthChainId(id);
         state.setNodeUrl(props.ethChains[id].url);

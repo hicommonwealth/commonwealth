@@ -1,8 +1,7 @@
-import { ServerCommunitiesController } from '../server_communities_controller';
-import { UserInstance } from 'server/models/user';
-import { ChainInstance } from 'server/models/chain';
-import { AppError } from '../../../../common-common/src/errors';
 import { Op } from 'sequelize';
+import { UserInstance } from 'server/models/user';
+import { AppError } from '../../../../common-common/src/errors';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
   NotAdmin: 'Must be a site admin',
@@ -31,7 +30,7 @@ export async function __getCommunityStats(
     throw new AppError(Errors.NotAdmin);
   }
 
-  const chain = await this.models.Chain.findByPk(chainId);
+  const chain = await this.models.Community.findByPk(chainId);
   if (!chain) {
     throw new AppError(Errors.ChainNotFound);
   }
@@ -95,7 +94,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: chainId,
+      community_id: chainId,
     },
   });
 

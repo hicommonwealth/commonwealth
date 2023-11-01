@@ -1,10 +1,14 @@
 # Monitoring
 
 ## Production
+
 - To monitor the state of chain-event listeners, events received, and server metrics visit the [Chain-Events Datadog dashboard][1].
 - To view logs check the [Datadog logstream][5]
+
 ## Staging
+
 [WIP] Improvements coming soon
+
 - View Heroku logs
 
 # Scaling
@@ -38,7 +42,9 @@ If the script fails at any point it returns a default memory limit of 1.5GB (a m
 # Speeding up chain discovery time
 
 # Linking CE to a new CW instance
+
 To link a new or existing chain-events service to a new commonwealth service follow these steps:
+
 1. Put the chain-events service in maintenance mode and turn off all dynos.
 2. Set the environment variables as described in [Environment Variables][2].
 3. Ensure the `ENTITIES_URL` env var does not exist in the commonwealth service that is being disconnected (if any).
@@ -56,6 +62,6 @@ To link a new or existing chain-events service to a new commonwealth service fol
 [6]: https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-megabytes
 [7]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Environment-Variables#heroku
 
-# Change Log
+## Change Log
 
 - 230213: Authored by Forest Mars.

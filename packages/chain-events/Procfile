@@ -1,6 +1,0 @@
-web: node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/chain-events/build/chain-events/services/app/Server.js
-subscriber1: CHAIN_SUBSCRIBER_INDEX=0 node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/chain-events/build/chain-events/services/ChainSubscriber/chainSubscriber.js
-subscriber2: CHAIN_SUBSCRIBER_INDEX=1 node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/chain-events/build/chain-events/services/ChainSubscriber/chainSubscriber.js
-subscriber3: CHAIN_SUBSCRIBER_INDEX=2 node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/chain-events/build/chain-events/services/ChainSubscriber/chainSubscriber.js
-consumer: node --max_old_space_size=$(./scripts/get-max-old-space-size.sh) packages/chain-events/build/chain-events/services/ChainEventsConsumer/chainEventsConsumer.js
-release: cd packages/chain-events && npx sequelize-cli db:migrate --config services/database/sequelize.json

@@ -120,7 +120,6 @@ export default async function emitNotifications(
         chain_event_id: chainEvent.id,
         category_id: 'chain-event',
         chain_id: chainEvent.chain,
-        entity_id: chainEvent.entity_id,
       });
     } else {
       notification = await models.Notification.create({

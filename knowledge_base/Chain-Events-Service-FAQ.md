@@ -1,9 +1,9 @@
 **Contents**
 
 - [Questions](#questions)
-  * [I started chain-events with `yarn start-all` but I don't see any new events?](#i-started-chain-events-with--yarn-start-all--but-i-don-t-see-any-new-events-)
-  * [I don't see any proposals on the client. How do I debug?](#i-don-t-see-any-proposals-on-the-client-how-do-i-debug-)
-  * [Some proposals are missing from the client. How do I fix this?](#some-proposals-are-missing-from-the-client-how-do-i-fix-this-)
+  * [I started chain-events with `yarn start-all` but I don't see any new events?](#i-started-chain-events-with-yarn-start-all-but-i-dont-see-any-new-events)
+  * [I don't see any proposals on the client. How do I debug?](#i-dont-see-any-proposals-on-the-client-how-do-i-debug)
+  * [Some proposals are missing from the client. How do I fix this?](#some-proposals-are-missing-from-the-client-how-do-i-fix-this)
 - [Change Log](#change-log)
 
 # Questions
@@ -21,14 +21,13 @@
 2. Check the `/getEntityMeta` route with browser dev tools. Did it return the entities you expected? If not, you may not have migrated the most updated EntityMeta into your database. See [here][1] for instructions on how to migrate the missing EntityMeta into your local database. Note this will have no effect if (1) is not completed first.
 
 ## Some proposals are missing from the client. How do I fix this?
+
 1. Run the [event migration][1] on the database instance pointed to by your `ENTITIES_URL`. For example, if your `ENTITIES_URL` is set to `https://chain-events-staging.herokuapp.com/api` that means you should the migration on a one-off dyno inside the `chain-events-staging` app e.g. `heroku run bash -a chain-events-staging`
 2. If (1) did not resolve your issue message Timothee or Jake as this may indicate a chain-events bug.
 
-
 [1]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events%20Overview#migrating-eventsentities
-[2]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events%20Overview#enforcing-chain-event-data-consistency
 [3]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Service-Common-Scenarios#starting-chain-events-locally-from-scratch
 
-# Change Log
+## Change Log
 
 - 230123: Authored by Timothee Legros

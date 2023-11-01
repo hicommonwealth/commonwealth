@@ -10,10 +10,9 @@ import {
   getTestSubscription,
   testChainId,
 } from '../../../integration/evmChainEvents/util';
-import { sdk } from './util';
+import { getEvmSecondsAndBlocks, sdk } from './util';
 import { NotificationCategories } from 'common-common/src/types';
 import { ContractInstance } from '../../../../server/models/contract';
-import { getEvmSecondsAndBlocks } from 'chain-events/test/util';
 
 async function verifyNumNotifications(num: number) {
   const notifications = await models.Notification.findAll();

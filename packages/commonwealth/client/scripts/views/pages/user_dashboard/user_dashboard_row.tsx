@@ -1,4 +1,4 @@
-import type { CWEvent, IEventLabel } from 'chain-events/src';
+import type { IEventLabel } from 'chain/labelers/util';
 import { getProposalUrlPath } from 'identifiers';
 import 'pages/user_dashboard/user_dashboard_row.scss';
 import React from 'react';

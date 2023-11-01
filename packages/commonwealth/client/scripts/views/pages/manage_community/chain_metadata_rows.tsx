@@ -6,6 +6,9 @@ import { uuidv4 } from 'lib/util';
 import 'pages/manage_community/community_metadata_rows.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import type CommunityInfo from '../../../models/ChainInfo';
 import type RoleInfo from '../../../models/RoleInfo';
@@ -13,16 +16,15 @@ import { AvatarUpload } from '../../components/Avatar';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
+import { openConfirmation } from '../../modals/confirmation_modal';
+import DirectoryPageSection from './DirectoryPageSection';
 import { setCommunityCategories, setSelectedTags } from './helpers';
 import { ManageRoles } from './manage_roles';
-import { useFetchTopicsQuery } from 'state/api/topics';
-import useFetchDiscordChannelsQuery from 'state/api/fetchDiscordChannels';
-import { CWClose } from '../../components/component_kit/cw_icons/cw_icons';
-import { openConfirmation } from '../../modals/confirmation_modal';
-import { CWToggle } from '../../components/component_kit/cw_toggle';
 
 type CommunityMetadataRowsProps = {
   admins: Array<RoleInfo>;
@@ -41,7 +43,7 @@ type DiscordChannelConnection = {
 const DiscordForumConnections = ({
   channels,
   topics,
-  refetchTopics,
+  refetchTopics
 }: {
   channels: DiscordChannelConnection[];
   topics: { id: string; name: string; channelId: string | null }[];
@@ -56,13 +58,8 @@ const DiscordForumConnections = ({
   );
 
   const [connectionVerified, setConnectionVerified] = useState(true);
-  const [topicIdToRemoveConnection, setTopicIdToRemoveConnection] = useState<
-    string | null
-  >(null);
 
   const removeConnection = (topicId: string) => {
-    setTopicIdToRemoveConnection(topicId);
-
     openConfirmation({
       title: 'Warning',
       // eslint-disable-next-line max-len
@@ -81,14 +78,14 @@ const DiscordForumConnections = ({
             } catch (e) {
               console.log(e);
             }
-          },
+          }
         },
         {
           label: 'No',
           buttonType: 'secondary',
-          buttonHeight: 'sm',
-        },
-      ],
+          buttonHeight: 'sm'
+        }
+      ]
     });
   };
 
@@ -118,7 +115,7 @@ const DiscordForumConnections = ({
         if (connectedTopic) {
           remainingTopics.push({
             label: connectedTopic.name,
-            value: connectedTopic.id,
+            value: connectedTopic.id
           });
         }
 
@@ -159,7 +156,7 @@ export const CommunityMetadataRows = ({
   admins,
   mods,
   onRoleUpdate,
-  onSave,
+  onSave
 }: CommunityMetadataRowsProps) => {
   const params = new URLSearchParams(window.location.search);
   const returningFromDiscordCallback = params.get(
@@ -167,13 +164,12 @@ export const CommunityMetadataRows = ({
   );
 
   const { data: topics, refetch: refetchTopics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    chainId: app.activeChainId()
   });
 
-  const { data: discordChannels, refetch: refetchDiscordSettings } =
-    useFetchDiscordChannelsQuery({
-      chainId: app.activeChainId(),
-    });
+  const { data: discordChannels } = useFetchDiscordChannelsQuery({
+    chainId: app.activeChainId()
+  });
 
   const [name, setName] = useState(community.name);
   const [description, setDescription] = useState(community.description);
@@ -186,6 +182,12 @@ export const CommunityMetadataRows = ({
   const [customStages, setCustomStages] = useState(community.customStages);
   const [customDomain, setCustomDomain] = useState(community.customDomain);
   const [terms, setTerms] = useState(community.terms);
+  const [directoryPageEnabled, setDirectoryPageEnabled] = useState(
+    community.directoryPageEnabled
+  );
+  const [selectedChainNodeId, setSelectedChainNodeId] = useState(
+    community.directoryPageChainNodeId
+  );
   const [iconUrl, setIconUrl] = useState(community.iconUrl);
   const [snapshot, setSnapshot] = useState(community.snapshot);
   const [snapshotString, setSnapshotString] = useState(
@@ -219,7 +221,6 @@ export const CommunityMetadataRows = ({
     id: string;
     name: string;
   } | null>(null);
-  const [selectedChannelLoaded, setSelectedChannelLoaded] = useState(false);
   const [discordWebhooksEnabled, setDiscordWebhooksEnabled] = useState(
     community.discordBotWebhooksEnabled
   );
@@ -236,7 +237,6 @@ export const CommunityMetadataRows = ({
     ) {
       setSelectedSnapshotChannel(discordChannels.selectedChannel);
       setSnapshotNotificationsEnabled(true);
-      setSelectedChannelLoaded(true);
     }
   }, [discordChannels]);
 
@@ -268,7 +268,7 @@ export const CommunityMetadataRows = ({
           chain_id: community.id,
           banner_text: communityBanner,
           auth: true,
-          jwt: app.user.jwt,
+          jwt: app.user.jwt
         })
         .then(() => {
           app.chain.meta.setBanner(communityBanner);
@@ -299,6 +299,8 @@ export const CommunityMetadataRows = ({
         defaultPage,
         hasHomepage,
         chain_node_id: null,
+        directory_page_enabled: directoryPageEnabled,
+        directory_page_chain_node_id: selectedChainNodeId
       });
       onSave();
       notifySuccess('Chain updated');
@@ -326,9 +328,7 @@ export const CommunityMetadataRows = ({
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
-            redirect_domain: isCustomDomain
-              ? window.location.origin
-              : undefined,
+            redirect_domain: isCustomDomain ? window.location.origin : undefined
           })
         )}`,
         '_parent'
@@ -341,28 +341,10 @@ export const CommunityMetadataRows = ({
     }
   };
 
-  const handleSaveCommonbotSettings = async () => {
-    if (snapshotNotificationsEnabled && !selectedSnapshotChannel?.name) {
-      notifyError('Please select a channel');
-      return;
-    }
-
-    try {
-      const channelId = snapshotNotificationsEnabled
-        ? selectedSnapshotChannel?.id
-        : 'disabled';
-
-      await app.discord.setConfig(channelId);
-      notifySuccess('Snapshot Notifications Settings Saved');
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   const updateDiscordWebhookEnabled = async () => {
     try {
       await community.updateChainData({
-        discord_bot_webhooks_enabled: !discordWebhooksEnabled,
+        discord_bot_webhooks_enabled: !discordWebhooksEnabled
       });
       setDiscordWebhooksEnabled(!discordWebhooksEnabled);
 
@@ -391,9 +373,7 @@ export const CommunityMetadataRows = ({
           JSON.stringify({
             cw_chain_id: app.activeChainId(),
             verification_token,
-            redirect_domain: isCustomDomain
-              ? window.location.origin
-              : undefined,
+            redirect_domain: isCustomDomain ? window.location.origin : undefined
           })
         )}`,
         '_parent'
@@ -401,6 +381,15 @@ export const CommunityMetadataRows = ({
       setDiscordBotConnecting(true);
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const handleToggleEnableDirectoryPage = (enabled: boolean) => {
+    setDirectoryPageEnabled(enabled);
+
+    // reset selectedChainNodeId to the default saved in the DB
+    if (!enabled) {
+      setSelectedChainNodeId(community.directoryPageChainNodeId);
     }
   };
 
@@ -496,16 +485,16 @@ export const CommunityMetadataRows = ({
           options={[
             {
               label: 'Discussions',
-              value: DefaultPage.Discussions,
+              value: DefaultPage.Discussions
             },
             {
               label: 'Overview',
-              value: DefaultPage.Overview,
+              value: DefaultPage.Overview
             },
             {
               label: 'Homepage',
-              value: DefaultPage.Homepage,
-            },
+              value: DefaultPage.Homepage
+            }
           ]}
           selected={defaultPage}
           onChange={(e) => {
@@ -521,12 +510,12 @@ export const CommunityMetadataRows = ({
           options={[
             {
               label: 'Discussions',
-              value: DefaultPage.Discussions,
+              value: DefaultPage.Discussions
             },
             {
               label: 'Overview',
-              value: DefaultPage.Overview,
-            },
+              value: DefaultPage.Overview
+            }
           ]}
           selected={
             defaultOverview ? DefaultPage.Overview : DefaultPage.Discussions
@@ -540,6 +529,18 @@ export const CommunityMetadataRows = ({
         placeholder='["Temperature Check", "Consensus Check"]'
         onChangeHandler={(v) => setCustomStages(v)}
       />
+
+      <CWDivider className="directory-page-divider" />
+
+      <DirectoryPageSection
+        directoryPageEnabled={directoryPageEnabled}
+        setDirectoryPageEnabled={handleToggleEnableDirectoryPage}
+        isGoToDirectoryButtonEnabled={community.directoryPageEnabled}
+        selectedChainNodeId={selectedChainNodeId}
+        setSelectedChainNodeId={setSelectedChainNodeId}
+      />
+      <CWDivider className="directory-page-divider" />
+
       <InputRow
         title="Domain"
         value={customDomain}
@@ -597,7 +598,7 @@ export const CommunityMetadataRows = ({
                   onClick={() => {
                     setSelectedTags2({
                       ...selectedTags2,
-                      [key]: !selectedTags2[key],
+                      [key]: !selectedTags2[key]
                     });
                   }}
                 />
@@ -703,7 +704,7 @@ export const CommunityMetadataRows = ({
                           console.log(e);
                           notifyError('Error connecting channel to topic.');
                         }
-                      },
+                      }
                     };
                   })}
                   topics={topics}
