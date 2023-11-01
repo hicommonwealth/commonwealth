@@ -19,14 +19,13 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 import axios from 'axios';
-import { getFileSizeBytes } from 'server/util/getFilesSizeBytes';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { MAX_COMMUNITY_IMAGE_SIZE_BYTES } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import { checkUrlFileSize } from '../util/checkUrlFileSize';
 import { RoleInstanceWithPermission } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-
-const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -62,8 +61,6 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  ImageDoesntExist: `Image url provided doesn't exist`,
-  ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
@@ -127,13 +124,7 @@ const createChain = async (
   }
 
   if (req.body.icon_url) {
-    const iconFileSize = await getFileSizeBytes(req.body.icon_url);
-    if (iconFileSize === 0) {
-      throw new AppError(Errors.ImageDoesntExist);
-    }
-    if (iconFileSize / 1024 > MAX_IMAGE_SIZE_KB) {
-      throw new AppError(Errors.ImageTooLarge);
-    }
+    await checkUrlFileSize(req.body.icon_url, MAX_COMMUNITY_IMAGE_SIZE_BYTES);
   }
 
   const validAdminAddresses = await models.Address.scope(
