@@ -12,8 +12,8 @@ import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import type { AddressInstance } from '../../models/address';
-import type { CommunityAttributes } from '../../models/community';
 import type { ChainNodeAttributes } from '../../models/chain_node';
+import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
 import axios from 'axios';
@@ -124,13 +124,15 @@ export async function __createCommunity(
     throw new AppError(Errors.NoBase);
   }
 
-  if (
-    community.icon_url &&
-    (await getFileSizeBytes(community.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB
-  ) {
-    throw new AppError(Errors.ImageTooLarge);
+  if (community.icon_url) {
+    const iconFileSize = await getFileSizeBytes(community.icon_url);
+    if (iconFileSize === 0) {
+      throw new AppError(Errors.ImageDoesntExist);
+    }
+    if (iconFileSize / 1024 > MAX_IMAGE_SIZE_KB) {
+      throw new AppError(Errors.ImageTooLarge);
+    }
   }
-
   const existingBaseChain = await this.models.Community.findOne({
     where: { base: community.base },
   });

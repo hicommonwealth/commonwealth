@@ -9,17 +9,17 @@ import {
   NotificationCategories,
 } from 'common-common/src/types';
 import type { NextFunction } from 'express';
-import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-import type { CommunityAttributes } from '../models/community';
 import type { ChainNodeAttributes } from '../models/chain_node';
+import type { CommunityAttributes } from '../models/community';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 import axios from 'axios';
+import { getFileSizeBytes } from 'server/util/getFilesSizeBytes';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
@@ -83,16 +83,6 @@ type CreateChainResp = {
   admin_address: string;
 };
 
-export async function getFileSizeBytes(url: string): Promise<number> {
-  try {
-    // Range header is to prevent it from reading any bytes from the GET request because we only want the headers.
-    const resp = await fetch(url, { headers: { Range: 'bytes=0-0' } });
-    return parseInt(resp.headers.get('content-range').split('/')[1], 10);
-  } catch (e) {
-    throw new AppError(Errors.ImageDoesntExist);
-  }
-}
-
 const createChain = async (
   models: DB,
   req: TypedRequestBody<CreateChainReq>,
@@ -136,11 +126,14 @@ const createChain = async (
     return next(new AppError(Errors.NoBase));
   }
 
-  if (
-    req.body.icon_url &&
-    (await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB
-  ) {
-    throw new AppError(Errors.ImageTooLarge);
+  if (req.body.icon_url) {
+    const iconFileSize = await getFileSizeBytes(req.body.icon_url);
+    if (iconFileSize === 0) {
+      throw new AppError(Errors.ImageDoesntExist);
+    }
+    if (iconFileSize / 1024 > MAX_IMAGE_SIZE_KB) {
+      throw new AppError(Errors.ImageTooLarge);
+    }
   }
 
   const validAdminAddresses = await models.Address.scope(
