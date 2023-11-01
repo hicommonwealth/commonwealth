@@ -4,6 +4,6 @@ The component kit is Engineering’s current implementation of that source of tr
 
 A rendered version of our component kit can be [viewed on the live site](https://commonwealth.im/components), or found in the codebase in the `component_kit` directory.
 
-# Change Log
+## Change Log
 
 - 230823: Authored by Graham Johnson.

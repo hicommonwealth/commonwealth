@@ -1,4 +1,7 @@
-**Contents**
+# Background Scheduler
+
+## Contents
+
 - [Heroku Scheduler](#heroku-scheduler)
   + [Overview](#overview)
   + [Best Practice](#best-practice)
@@ -7,8 +10,9 @@
   + [Scheduling Options](#scheduling-options)
   + [Deployment](#deployment)
 - [Scheduling externally vs in-memory](#scheduling-externally-vs-in-memory)
-- [Cron To Go: An Alternative](#cron-to-go--an-alternative)
+- [Cron To Go: An Alternative](#cron-to-go-an-alternative)
   + [Features](#features)
+
 ## Heroku Scheduler
 
 ### Overview
@@ -19,14 +23,15 @@
 - **Entry Point**: Post-installation, the user's script serves as the dyno's entry point.
 - **Integration with Datadog**: There's a possibility that one-off dynos may not integrate seamlessly with Datadog. However, this can be confirmed upon testing.
 - **Commandline**: Tools like psql, yarn, and others are accessible via the command line. This flexibility allows for the scheduling of raw commands. For instance:
-  ```bash
-  psql $DATABASE_URL -c "SELECT * FROM \"Threads\" LIMIT 1"
-  ```
+
+```bash
+psql $DATABASE_URL -c "SELECT * FROM \"Threads\" LIMIT 1"
+```
 
 ![image](https://github.com/hicommonwealth/commonwealth/assets/4791635/f6ca8c80-b73e-4b19-87a0-02ce98030841)
 
-
 ### Best Practice
+
 - **Script Exit**: Ensure scripts terminate correctly in both successful and error scenarios.
 - **Error Handling**: In case of errors, utilize `process.exit(non-zero code)` to exit the script.
 - **Logging**: Implement console logs at the beginning and end of the script. Also, log the duration it took for the script to execute.
@@ -64,10 +69,11 @@ By following these best practices and using the provided sample code as a templa
 
 - **Console Logs**: Use console logs for initial debugging during trial runs.
 - **Streaming Logs**: To monitor logs in real-time, stream them to your local machine using the following commands:
-  ```bash
-  heroku logs -a commonwealth-frick -t
-  heroku logs -a commonwealth-frick -t | grep "app\[scheduler"
-  ```
+
+```bash
+heroku logs -a commonwealth-frick -t
+heroku logs -a commonwealth-frick -t | grep "app\[scheduler"
+```
 
 ![image](https://github.com/hicommonwealth/commonwealth/assets/4791635/a372876a-0f79-45b6-8828-557245f3a25c)
 
@@ -80,27 +86,30 @@ By following these best practices and using the provided sample code as a templa
 
 - **UI Dependency**: Jobs can only be added through the UI.
 - **Package Installation**: All required packages are installed automatically similarly to the main app dyno. Tasks can be executed using npm scripts, for example:
-  ```
-  yarn --cwd packages/commonwealth recompute-counts
-  ```
+
+```bash
+yarn --cwd packages/commonwealth recompute-counts
+```
 
 ## Scheduling externally vs in-memory
 
 In general, scheduling externally is better than using javascript `settimeout`
 
  `settimeout`
-- it can be unreliable, especially during server restarts. 
+
+- it can be unreliable, especially during server restarts.
 - Coordinating tasks across multiple servers using locks in Redis can be complex.
 - In-house solutions for in-memory scheduling lack maturity in terms of how to time jobs across multiple server and lacks visibility.
 
-`scheduling externally` 
+`scheduling externally`
+
 - Operates on a separate dyno, ensuring the main server's compute resources are not utilized.
 - Offers superior scheduling capabilities.
 - Provides a dashboard to monitor all scheduled jobs and their last execution times.
 
 ## Cron To Go: An Alternative
 
-https://devcenter.heroku.com/articles/crontogo
+<https://devcenter.heroku.com/articles/crontogo>
 To overcome the limitations of the Heroku Scheduler, consider exploring alternatives like Cron To Go.
 
 ### Features
@@ -113,6 +122,6 @@ To overcome the limitations of the Heroku Scheduler, consider exploring alternat
 
 In conclusion, while Heroku Scheduler is a straightforward solution, Cron To Go offers more advanced features and flexibility. The choice between them depends on the specific needs and preferences of the project.
 
-# Change Log
+## Change Log
 
 - 230901: Authored by Nakul Manchanda (#4200)

@@ -4,9 +4,9 @@ More RabbitMQ info can be found in the README located at [`common-common/src/rab
 # Important Definitions
 
 - RabbitMQ Exchange
-    - Can be thought of as a ‘router’ for messages. Queues receive messages from exchanges based on how the exchange routes messages. There are multiple types of exchanges but the 2 main ones we use are fanout and topic. A fanout exchange sends every message it receives to all of the subscribed queues. A topic exchange routes messages to specific queues based on a routing key i.e. a queue defines a specific key and the exchange will route messages to that queue if the key defined in the message matches the key of the queue.
+  - Can be thought of as a ‘router’ for messages. Queues receive messages from exchanges based on how the exchange routes messages. There are multiple types of exchanges but the 2 main ones we use are fanout and topic. A fanout exchange sends every message it receives to all of the subscribed queues. A topic exchange routes messages to specific queues based on a routing key i.e. a queue defines a specific key and the exchange will route messages to that queue if the key defined in the message matches the key of the queue.
 - Rascal Publication/Subscription
-    - Abstractions over RabbitMQ exchanges/queues. You can think of a Rascal Publication as the ‘input’ end of an exchange or queue and the Rascal Subscription as the ‘output’ end of a queue.
+  - Abstractions over RabbitMQ exchanges/queues. You can think of a Rascal Publication as the ‘input’ end of an exchange or queue and the Rascal Subscription as the ‘output’ end of a queue.
 
 # Overview
 
@@ -29,6 +29,7 @@ To ensure consistent data sharing over queues, every message that is sent to a q
 **One of the most important aspects of this setup is we ensure no data (messages) are ever lost. To see an explanation of how this is addressed see [Preventing Data Loss][3]**
 
 # Rascal
+
 In order to manage RabbitMQ configuration and connections we use [Rascal][1]. The current Rascal/RabbitMQ configuration can be found [here][4].
 
 [1]: https://www.npmjs.com/package/rascal
@@ -37,7 +38,7 @@ In order to manage RabbitMQ configuration and connections we use [Rascal][1]. Th
 [4]: https://github.com/hicommonwealth/commonwealth/blob/master/packages/common-common/src/rabbitmq/rabbitMQConfig.ts
 [5]: https://github.com/hicommonwealth/commonwealth/tree/master/packages/common-common/src/rabbitmq
 
-# Change Log 
+## Change Log
 
-- 231013: Flagged by Graham Johnson for consolidation with other RabbitMQ files. 
+- 231013: Flagged by Graham Johnson for consolidation with other RabbitMQ files.
 - 230123: Authored by Timothee Legros.

@@ -1,42 +1,47 @@
-This is the starter page for the Commonwealth Code Style Guide. 
+# Code Style
 
-Unless otherwise noted, code styles in this guideline are for NodeJS & TypeScript. It is expected that engineers are already familiar with and follow the official [[TypeScript style guide](https://github.com/microsoft/TypeScript/wiki/Coding-guidelines)](https://github.com/microsoft/TypeScript/wiki/Coding-guidelines) which this document supplements. 
+This is the starter page for the Commonwealth Code Style Guide.
+
+Unless otherwise noted, code styles in this guideline are for NodeJS & TypeScript. It is expected that engineers are already familiar with and follow the official [[TypeScript style guide](https://github.com/microsoft/TypeScript/wiki/Coding-guidelines)](<https://github.com/microsoft/TypeScript/wiki/Coding-guidelines>) which this document supplements.
 
 For a list of React-specific guidelines, see [React Best Practices](./React-Best-Practices-And-Improvements.md).
 
-**Contents**
+## Contents
+
 - [Inline Documentation](#inline-documentation)
   + [TSDoc](#tsdoc)
   + [Inline Comments](#inline-comments)
 - [Change Log](#change-log)
 
-# Inline documentation
+## Inline documentation
 
-Inline documentation should be reserved for code that is complex or non-obvious. 
+Inline documentation should be reserved for code that is complex or non-obvious.
 
 Descriptive const names should be the first line of defense in producing human-readable code.
 
-## TSDoc
+### TSDoc
 
-TSDoc syntax is preferred over inline comments when documenting newly declared functions, including class functions. 
+TSDoc syntax is preferred over inline comments when documenting newly declared functions, including class functions.
 
 TSDoc syntax is especially preferred for code that is either exported or frequently re-invoked, so as to populate built-in IDE preview features.
 
 As with all inline documentation, TSDoc annotations should be used sparingly, for complex or non-obvious code. By extension, TSDoc annotations do not need to be "complete," in the sense of fully documenting a given function. If only a single param needs explaining, then only that param needs annotation.
 
 The full TSDoc annotation format is as follows:
-```
+
+```typescript
 /**
- * A description of the function
- * 
- * @param { type } paramName - Param description.
- * @param { type } secondParamName - Second param description.
- * @returns { type } A description of the return value.
- */
+  * A description of the function
+  * 
+  * @param { type } paramName - Param description.
+  * @param { type } secondParamName - Second param description.
+  * @returns { type } A description of the return value.
+  */
 ```
 
 Thus, an example function might be documented as follows:
-```
+
+```typescript
 /**
   * get current details of a proposal
   * @param proposalId
@@ -57,12 +62,12 @@ public async getProposalDetails(proposalId: string, govType = 'compound') {
 
 A complete list of TSDoc tags can be found at [TSDoc.org](https://tsdoc.org/pages/tags/alpha/). Most functions, however, will only require the following two tags:
 
-- @param: Used to document a function parameter.
-- @returns: Used to document a function’s return value.
+- `@param`: Used to document a function parameter.
+- `@returns`: Used to document a function’s return value.
 
 Additionally, we are moving towards use of the @deprecated to mark deprecated code.
 
-## Inline comments
+### Inline comments
 
 In cases where TSDoc is inappropriate for inline documentation, the following style guidelines should be observed instead:
 
@@ -71,7 +76,7 @@ In cases where TSDoc is inappropriate for inline documentation, the following st
 - Use descriptive variable and function names to reduce the need for comments by making the code more self-explanatory.
 - Datestamps, when used, should be formatted YYMMDD.
 
-# Change Log
+## Change Log
 
 - 231010: Updated by Graham Johnson with TSDoc guidelines. Import guidelines removed until new approach is implemented. (#5254).
 - 231010: Renamed from `Code-Requirements.md` to `Code-Style.md` (#5254).

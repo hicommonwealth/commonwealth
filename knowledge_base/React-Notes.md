@@ -8,7 +8,7 @@ When a React application is wrapped in React.StrictMode, React performs extra ch
 - Detecting unexpected side effects within the render phase and warning about it.
 - Detecting a few other potential issues.
 
-# Change Log 
+## Change Log 
 
 - 231013: Flagged by Graham Johnson for consolidation with `React-Best-Practices-And-Improvements.md`
 - 230221: Authored by Forest Mars.

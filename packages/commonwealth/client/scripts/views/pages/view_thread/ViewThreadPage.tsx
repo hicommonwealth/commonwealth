@@ -104,7 +104,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [isViewMarked, setIsViewMarked] = useState(false);
 
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
-  const [gatedGroups, setGatedGroups] = useState([]);
 
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
@@ -112,7 +111,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [searchParams] = useSearchParams();
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
-  const { data: groups } = useFetchGroupsQuery({
+  const { data: groups = [] } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
     includeMembers: true,
     includeTopics: true
@@ -175,37 +174,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
   }, []);
 
-  useEffect(() => {
-    if (groups && thread?.topic) {
-      const topicId = thread.topic.id;
-      const addressTopicMemberIds = app.user.addresses.map(
-        (ids) => ids.address
+  // find if the current topic is gated
+  const foundGatedTopic = groups.find((x) => {
+    if (thread?.topic) {
+      return (
+        Array.isArray(x.topics) &&
+        x.topics.find((y) => y.id === thread.topic.id)
       );
-
-      const groupsWithTopic = groups.filter((community) =>
-        community.topics.some((topic) => topic.id === topicId)
-      );
-
-      // Extract the names of the groups that have the current topic
-      const groupNamesWithTopic = groupsWithTopic.map((community) => ({
-        id: community.id,
-        name: community.name
-      }));
-
-      // Set the gatedGroups state to the list of group names
-      setGatedGroups(groupNamesWithTopic);
-
-      if (groupsWithTopic.length > 0) {
-        // Check if the user is a member of any of the groups with the current topic
-        const isMemberOfAnyGroup = groupsWithTopic.some((community) =>
-          community.members.some((id) => addressTopicMemberIds.includes(id))
-        );
-
-        // You can use the 'isMemberOfAnyGroup' variable as needed
-        setHideGatingBanner(isMemberOfAnyGroup);
-      }
     }
-  }, [groups, thread?.topic]);
+  });
 
   useBrowserAnalyticsTrack({
     payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW }
@@ -393,6 +370,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
+  const gatedGroupsMatchingTopic = groups?.filter((x) =>
+    x?.topics?.find((y) => y?.id === thread?.topic?.id)
+  );
+
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!hasJoinedCommunity,
     isThreadArchived: !!thread?.archivedAt,
@@ -542,15 +523,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
-                    {featureFlags.gatingEnabled && gatedGroups.length > 0 && (
-                      <CWBanner
-                        title="This topic is gated"
-                        body="Only members within the following group(s) can interact with this topic:"
-                        type="info"
-                        footer={
-                          gatedGroups && (
+                    {featureFlags.gatingEnabled &&
+                      foundGatedTopic &&
+                      !hideGatingBanner && (
+                        <CWBanner
+                          title="This topic is gated"
+                          body="Only members within the following group(s) can interact with this topic:"
+                          type="info"
+                          footer={
                             <div className="gating-tags">
-                              {gatedGroups.map((t) => (
+                              {gatedGroupsMatchingTopic.map((t) => (
                                 <CWTag
                                   key={t.id}
                                   label={t.name}
@@ -558,18 +540,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 />
                               ))}
                             </div>
-                          )
-                        }
-                        buttons={[
-                          {
-                            label: 'See all groups',
-                            onClick: () => navigate('/members?tab=groups')
-                          },
-                          { label: 'Learn more about gating' }
-                        ]}
-                        onClose={() => setHideGatingBanner(true)}
-                      />
-                    )}
+                          }
+                          buttons={[
+                            {
+                              label: 'See all groups',
+                              onClick: () => navigate('/members?tab=groups')
+                            },
+                            { label: 'Learn more about gating' }
+                          ]}
+                          onClose={() => setHideGatingBanner(true)}
+                        />
+                      )}
                     {showBanner && (
                       <JoinCommunityBanner
                         onClose={handleCloseBanner}
