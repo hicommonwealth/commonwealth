@@ -389,12 +389,9 @@ const GroupForm = ({
               instructionalMessage="Can be up to 40 characters long."
               customError={isNameTaken ? 'Group name is already taken' : ''}
               onInput={(e) => {
-                const value = e.target.value.toLowerCase();
-                if (takenGroupNames.includes(value)) {
-                  setIsNameTaken(true);
-                } else {
-                  setIsNameTaken(false);
-                }
+                setIsNameTaken(
+                  takenGroupNames.includes(e.target.value.toLowerCase())
+                );
               }}
             />
             <CWTextArea
