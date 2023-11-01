@@ -20,10 +20,12 @@ import { success } from '../types';
 
 import axios from 'axios';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
-import { MAX_COMMUNITY_IMAGE_SIZE_BYTES } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
-import { checkUrlFileSize } from '../util/checkUrlFileSize';
+import {
+  MAX_COMMUNITY_IMAGE_SIZE_BYTES,
+  checkUrlFileSize,
+} from '../util/checkUrlFileSize';
 import { RoleInstanceWithPermission } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 

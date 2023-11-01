@@ -134,5 +134,3 @@ export const SEND_WEBHOOKS_EMAILS =
 
 export const FEATURE_FLAG_GROUP_CHECK_ENABLED =
   process.env.FEATURE_FLAG_GROUP_CHECK_ENABLED === 'true' || false;
-
-export const MAX_COMMUNITY_IMAGE_SIZE_BYTES = 500 * 1024;

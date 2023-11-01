@@ -17,10 +17,12 @@ import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
 import axios from 'axios';
-import { MAX_COMMUNITY_IMAGE_SIZE_BYTES } from '../../config';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { UserInstance } from '../../models/user';
-import { checkUrlFileSize } from '../../util/checkUrlFileSize';
+import {
+  MAX_COMMUNITY_IMAGE_SIZE_BYTES,
+  checkUrlFileSize,
+} from '../../util/checkUrlFileSize';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
