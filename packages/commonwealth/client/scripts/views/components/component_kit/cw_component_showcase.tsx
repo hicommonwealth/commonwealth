@@ -1618,25 +1618,6 @@ export const ComponentShowcase = () => {
           })}
         </div>
       </div>
-      <div className="typeahead-gallery">
-        <CWText type="h3"> Typeahead Dropdown</CWText>
-        <div className="typeahead-row">
-          <CWTypeaheadSelectList
-            options={optionList}
-            defaultValue={optionList[0]}
-            placeholder="Select chain"
-            isDisabled={false}
-          />
-        </div>
-        <div className="typeahead-row">
-          <CWTypeaheadSelectList
-            options={optionList}
-            defaultValue={optionList[0]}
-            placeholder="Select chain"
-            isDisabled={true}
-          />
-        </div>
-      </div>
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
         <CWTooltip
@@ -1834,18 +1815,15 @@ export const ComponentShowcase = () => {
           )}
         </CWForm>
         {/* With tag input */}
-        <CWForm
-          className="w-full"
-          validationSchema={chainValidationSchema}
-          onSubmit={(values) => console.log('values => ', values)}
-        >
+      </div>
+      <div className="dropdowns">
+        <CWText type="h3">Dropdowns</CWText>
+        <div className="dropdown-type basic">
+          <CWText type="h4">Basic</CWText>
           <CWSelectList
-            label="Chain"
-            name="chain"
             placeholder="Add or select a chain"
-            isMulti
             isClearable={false}
-            defaultValue={[{ value: 'solana', label: 'Solana' }]}
+            isSearchable={false}
             options={[
               { value: 'solana', label: 'Solana' },
               { value: 'polkadot', label: 'Polkadot' },
@@ -1853,24 +1831,71 @@ export const ComponentShowcase = () => {
               { value: 'substrate', label: 'Substrate' },
               { value: 'binance', label: 'Binance' },
             ]}
-            hookToForm
           />
-          <CWButton label="Submit" type="submit" />
-        </CWForm>
-        <CWText type="h3">Multi select list</CWText>
-        <CWSelectList
-          placeholder="Add or select a chain"
-          isMulti
-          isClearable={false}
-          defaultValue={[{ value: 'solana', label: 'Solana' }]}
-          options={[
-            { value: 'solana', label: 'Solana' },
-            { value: 'polkadot', label: 'Polkadot' },
-            { value: 'ethereum', label: 'Ethereum' },
-            { value: 'substrate', label: 'Substrate' },
-            { value: 'binance', label: 'Binance' },
-          ]}
-        />
+        </div>
+        <div className="dropdown-type typeahead">
+          <CWText type="h4">Typeahead</CWText>
+          <div className="typeahead-row">
+            <CWTypeaheadSelectList
+              options={optionList}
+              defaultValue={optionList[0]}
+              placeholder="Select chain"
+              isDisabled={false}
+            />
+          </div>
+          <div className="typeahead-row">
+            <CWTypeaheadSelectList
+              options={optionList}
+              defaultValue={optionList[0]}
+              placeholder="Select chain"
+              isDisabled={true}
+            />
+          </div>
+        </div>
+        <div className="dropdown-type multi-select">
+          <CWText type="h4">Multi-select</CWText>
+          <div className="multi-select-row">
+            <CWForm
+              className="w-full"
+              validationSchema={chainValidationSchema}
+              onSubmit={(values) => console.log('values => ', values)}
+            >
+              <CWSelectList
+                label="Chain"
+                name="chain"
+                placeholder="Add or select a chain"
+                isMulti
+                isClearable={false}
+                defaultValue={[{ value: 'solana', label: 'Solana' }]}
+                options={[
+                  { value: 'solana', label: 'Solana' },
+                  { value: 'polkadot', label: 'Polkadot' },
+                  { value: 'ethereum', label: 'Ethereum' },
+                  { value: 'substrate', label: 'Substrate' },
+                  { value: 'binance', label: 'Binance' },
+                ]}
+                hookToForm
+              />
+              <CWButton label="Submit" type="submit" />
+            </CWForm>
+          </div>
+
+          <div className="multi-select-row">
+            <CWSelectList
+              placeholder="Add or select a chain"
+              isMulti
+              isClearable={false}
+              defaultValue={[{ value: 'solana', label: 'Solana' }]}
+              options={[
+                { value: 'solana', label: 'Solana' },
+                { value: 'polkadot', label: 'Polkadot' },
+                { value: 'ethereum', label: 'Ethereum' },
+                { value: 'substrate', label: 'Substrate' },
+                { value: 'binance', label: 'Binance' },
+              ]}
+            />
+          </div>
+        </div>
       </div>
       <div className="table">
         <CWText type="h3">Table</CWText>

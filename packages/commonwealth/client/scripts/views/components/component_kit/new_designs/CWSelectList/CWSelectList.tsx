@@ -82,21 +82,6 @@ export const CWSelectList = <
             ...baseStyles,
             maxHeight: '300px',
           }),
-          option: (baseStyles, state) => {
-            const base = { ...baseStyles };
-
-            if (state.isSelected) {
-              base.backgroundColor = '#F0EFF0 !important';
-              base.color = 'inherit';
-            }
-
-            if (state.isFocused) {
-              base.backgroundColor = '#F0EFF0 !important';
-              base.color = 'inherit';
-            }
-
-            return base;
-          },
         }}
         components={{
           DropdownIndicator,
@@ -106,13 +91,16 @@ export const CWSelectList = <
         className={getClasses<{
           className?: string;
           failure?: boolean;
+          searchable?: boolean;
         }>(
           {
             className: props.className,
             failure: !!formFieldErrorMessage || !!props.customError,
+            searchable: props.isSearchable,
           },
           ComponentType.SelectList
         )}
+        classNamePrefix={props.classNamePrefix || 'slct'}
       />
       {(formFieldErrorMessage || props.customError) && (
         <MessageRow
