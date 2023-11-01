@@ -1,10 +1,10 @@
+import type { SessionPayload } from '@canvas-js/interfaces';
 import type {
   AccountData,
   OfflineDirectSigner,
   OfflineSigner,
 } from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
-import type { SessionPayload } from '@canvas-js/interfaces';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
@@ -75,14 +75,14 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasSessionPayload: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string> {
     const canvas = await import('@canvas-js/interfaces');
     const chainId = this.getChainId();
     const stdSignature = await window.keplr.signArbitrary(
       chainId,
       account.address,
-      canvas.serializeSessionPayload(canvasSessionPayload)
+      canvas.serializeSessionPayload(canvasSessionPayload),
     );
     return JSON.stringify(stdSignature);
   }
@@ -101,7 +101,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     try {
       // fetch chain id from URL using stargate client
       const url = `${window.location.origin}/cosmosAPI/${
-        app.chain?.id || this.defaultNetwork
+        app.chain?.network || this.defaultNetwork
       }`;
       const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
@@ -113,7 +113,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
         await window.keplr.enable(this._chainId);
       } catch (err) {
         console.log(
-          `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`
+          `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`,
         );
 
         const bech32Prefix = app.chain.meta.bech32Prefix?.toLowerCase();
@@ -164,7 +164,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       console.log(`Enabled web wallet for ${this._chainId}`);
 
       this._offlineSigner = await window.keplr.getOfflineSignerAuto(
-        this._chainId
+        this._chainId,
       );
       this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;
