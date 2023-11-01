@@ -24,7 +24,7 @@ export type CommunitySnapshotSpaceModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommunitySnapshotSpaceModelStatic => {
   const CommunitySnapshotSpaces = <CommunitySnapshotSpaceModelStatic>(
     sequelize.define(
@@ -46,12 +46,12 @@ export default (
         underscored: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-      }
+      },
     )
   );
 
   CommunitySnapshotSpaces.associate = (models) => {
-    models.CommunitySnapshotSpaces.belongsTo(models.Chain, {
+    models.CommunitySnapshotSpaces.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

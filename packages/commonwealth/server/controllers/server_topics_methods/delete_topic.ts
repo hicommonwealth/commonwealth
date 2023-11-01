@@ -1,9 +1,9 @@
-import { ChainInstance } from '../../models/chain';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
-import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from '../../util/validateOwner';
 import { QueryTypes } from 'sequelize';
+import { AppError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -15,7 +15,7 @@ export const Errors = {
 
 export type DeleteTopicOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   topicId: number;
 };
 
@@ -23,7 +23,7 @@ export type DeleteTopicResult = void;
 
 export async function __deleteTopic(
   this: ServerTopicsController,
-  { user, chain, topicId }: DeleteTopicOptions
+  { user, chain, topicId }: DeleteTopicOptions,
 ): Promise<DeleteTopicResult> {
   const isAdmin = validateOwner({
     models: this.models,
@@ -53,7 +53,7 @@ export async function __deleteTopic(
         },
         type: QueryTypes.UPDATE,
         transaction,
-      }
+      },
     );
     await topic.destroy({ transaction });
   });

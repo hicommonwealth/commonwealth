@@ -1,5 +1,5 @@
-import './CWSelectList.scss';
 import React, { useEffect } from 'react';
+import { useFormContext } from 'react-hook-form';
 import type { GroupBase, Props } from 'react-select';
 import Select, { components } from 'react-select';
 import { CWIcon } from '../../cw_icons/cw_icon';
@@ -7,7 +7,6 @@ import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 import { MessageRow } from '../CWTextInput/MessageRow';
 import './CWSelectList.scss';
-import { useFormContext } from 'react-hook-form';
 
 type CustomCWSelectListProps = {
   label?: string;
@@ -18,9 +17,9 @@ type CustomCWSelectListProps = {
 export const CWSelectList = <
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >(
-  props: Props<Option, IsMulti, Group> & CustomCWSelectListProps
+  props: Props<Option, IsMulti, Group> & CustomCWSelectListProps,
 ) => {
   const formContext = useFormContext();
   const formFieldContext = props.hookToForm
@@ -47,7 +46,7 @@ export const CWSelectList = <
       props.name &&
       props.value &&
       formContext.setValue(props.name, props.value);
-    }, [props.hookToForm, props.name, props.value, formContext]);
+  }, [props.hookToForm, props.name, props.value, formContext]);
 
   return (
     <div className="CWSelectList">
@@ -111,6 +110,7 @@ export const CWSelectList = <
             </components.MultiValueRemove>
           ),
         }}
+        classNamePrefix="cwsl"
         className={getClasses<{
           className?: string;
           failure?: boolean;
@@ -119,7 +119,7 @@ export const CWSelectList = <
             className: props.className,
             failure: !!formFieldErrorMessage || !!props.customError,
           },
-          ComponentType.SelectList
+          ComponentType.SelectList,
         )}
       />
       {(formFieldErrorMessage || props.customError) && (

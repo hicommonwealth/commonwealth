@@ -25,7 +25,7 @@ const fetchGroups = async ({
         include_members: includeMembers,
         include_topics: includeTopics,
       },
-    }
+    },
   );
 
   return response.data.result.map((t) => new Group(t));
@@ -37,8 +37,12 @@ const useFetchGroupsQuery = ({
   includeTopics,
 }: FetchGroupsProps) => {
   return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [ApiEndpoints.FETCH_GROUPS, chainId],
+    queryKey: [
+      ApiEndpoints.FETCH_GROUPS,
+      chainId,
+      includeMembers,
+      includeTopics,
+    ],
     queryFn: () => fetchGroups({ chainId, includeMembers, includeTopics }),
     staleTime: GROUPS_STALE_TIME,
   });

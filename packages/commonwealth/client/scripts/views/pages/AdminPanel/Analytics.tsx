@@ -39,7 +39,12 @@ const Analytics = () => {
 
   const getCommunityAnalytics = async (chainId: string) => {
     axios
-      .get(`${app.serverUrl()}/communities/${chainId}/stats`)
+      .get(`${app.serverUrl()}/communities/${chainId}/stats`, {
+        params: {
+          auth: true,
+          jwt: app.user.jwt,
+        },
+      })
       .then((response) => {
         setChainLookupCompleted(true);
         setCommunityAnalytics(response.data.result);
@@ -61,7 +66,7 @@ const Analytics = () => {
         })
         .then((response) => {
           setLastMonthNewCommunities(
-            response.data.result.lastMonthNewCommunities
+            response.data.result.lastMonthNewCommunities,
           );
           setGlobalStats(response.data.result.totalStats);
         })

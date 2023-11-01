@@ -1,28 +1,31 @@
 import { DataTypes, Sequelize } from 'sequelize';
 import { DATABASE_URI } from './config';
 
+import { factory, formatFilename } from 'common-common/src/logging';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';
-import ChainFactory from './models/chain';
 import ChainNodeFactory from './models/chain_node';
 import CollaborationFactory from './models/collaboration';
 import CommentFactory from './models/comment';
+import ChainFactory from './models/community';
 import CommunityBannerFactory from './models/community_banner';
 import CommunityContractFactory from './models/community_contract';
+import CommunityContractTemplateMetadataFactory from './models/community_contract_metadata';
+import CommunityContractTemplateFactory from './models/community_contract_template';
 import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
 import EvmEventSourceFactory from './models/evmEventSource';
+import GroupFactory from './models/group';
 import LastProcessedEvmBlockFactory from './models/lastProcessedEvmBlock';
 import LoginTokenFactory from './models/login_token';
+import MembershipFactory from './models/membership';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
 import NotificationsReadFactory from './models/notifications_read';
 import PollFactory from './models/poll';
-import GroupFactory from './models/group';
-import MembershipFactory from './models/membership';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
 import SnapshotProposalFactory from './models/snapshot_proposal';
@@ -32,16 +35,13 @@ import SsoTokenFactory from './models/sso_token';
 import StarredCommunityFactory from './models/starred_community';
 import SubscriptionFactory from './models/subscription';
 import TaggedThreadFactory from './models/tagged_threads';
+import TemplateFactory from './models/template';
 import ThreadFactory from './models/thread';
 import TokenFactory from './models/token';
 import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
 import VoteFactory from './models/vote';
 import WebhookFactory from './models/webhook';
-import CommunityContractTemplateFactory from './models/community_contract_template';
-import CommunityContractTemplateMetadataFactory from './models/community_contract_metadata';
-import TemplateFactory from './models/template';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -72,7 +72,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),
-  Chain: ChainFactory(sequelize, DataTypes),
+  Community: ChainFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
@@ -80,11 +80,11 @@ const models: Models = {
   CommunityContract: CommunityContractFactory(sequelize, DataTypes),
   CommunityContractTemplate: CommunityContractTemplateFactory(
     sequelize,
-    DataTypes
+    DataTypes,
   ),
   CommunityContractTemplateMetadata: CommunityContractTemplateMetadataFactory(
     sequelize,
-    DataTypes
+    DataTypes,
   ),
   Template: TemplateFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),

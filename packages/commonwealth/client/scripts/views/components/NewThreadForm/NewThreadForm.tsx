@@ -1,5 +1,6 @@
 import 'components/NewThreadForm.scss';
 import { notifyError } from 'controllers/app/notifications';
+import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -8,26 +9,26 @@ import { capitalize } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
 import app from 'state';
+import { useRefreshMembershipQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
-import { ReactQuillEditor } from '../react_quill_editor';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
+import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
   getTextFromDelta,
   serializeDelta,
 } from '../react_quill_editor/utils';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -52,7 +53,7 @@ export const NewThreadForm = () => {
       }
       return acc;
     },
-    { enabledTopics: [], disabledTopics: [] }
+    { enabledTopics: [], disabledTopics: [] },
   );
 
   const {
@@ -75,6 +76,15 @@ export const NewThreadForm = () => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+  });
+
+  const restrictedTopicIds = memberships
+    .filter((x) => x.rejectReason)
+    .map((x) => parseInt(`${x.topicId}`));
+
   const {
     mutateAsync: createThread,
     error: createThreadError,
@@ -95,6 +105,11 @@ export const NewThreadForm = () => {
   }, [threadContentDelta, threadTitle]);
 
   const handleNewThreadCreation = async () => {
+    if (restrictedTopicIds.includes(threadTopic.id)) {
+      notifyError('Topic is gated!');
+      return;
+    }
+
     if (!isDiscussion && !detectURL(threadUrl)) {
       notifyError('Must provide a valid URL.');
       return;
@@ -105,7 +120,7 @@ export const NewThreadForm = () => {
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
       deltaString,
-      !!hasTopics
+      !!hasTopics,
     );
 
     setIsSaving(true);
@@ -144,7 +159,7 @@ export const NewThreadForm = () => {
     setThreadTitle('');
     setThreadTopic(
       topicsForSelector.enabledTopics.find((t) => t.name.includes('General')) ||
-        null
+        null,
     );
     setThreadContentDelta(createDeltaFromText(''));
   };

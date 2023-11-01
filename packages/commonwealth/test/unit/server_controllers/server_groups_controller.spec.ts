@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
-import { AddressAttributes, AddressInstance } from 'server/models/address';
-import { ChainInstance } from 'server/models/chain';
+import { AddressInstance } from 'server/models/address';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
 import { UserInstance } from 'server/models/user';
 import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+import { CommunityInstance } from '../../../server/models/community';
 
 const VALID_REQUIREMENTS: Requirement[] = [
   {
@@ -131,7 +131,7 @@ const createMockedGroupsController = () => {
   const controller = new ServerGroupsController(
     db,
     tokenBalanceCache,
-    banCache
+    banCache,
   );
   return controller;
 };
@@ -143,7 +143,7 @@ const createMockParams = () => {
     },
     isAdmin: true,
   } as UserInstance;
-  const chain = {} as ChainInstance;
+  const chain = {} as CommunityInstance;
   const address = {} as AddressInstance;
   return { user, chain, address };
 };
@@ -217,7 +217,7 @@ describe('ServerGroupsController', () => {
         },
         requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
         topics: [],
-      })
+      }),
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 
@@ -255,7 +255,7 @@ describe('ServerGroupsController', () => {
           description: 'blah',
         },
         requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
-      })
+      }),
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 

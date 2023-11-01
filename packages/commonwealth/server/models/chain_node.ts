@@ -23,7 +23,7 @@ export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): ChainNodeModelStatic => {
   const ChainNode = <ChainNodeModelStatic>sequelize.define(
     'ChainNode',
@@ -60,11 +60,11 @@ export default (
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   ChainNode.associate = (models) => {
-    models.ChainNode.hasMany(models.Chain, { foreignKey: 'chain_node_id' });
+    models.ChainNode.hasMany(models.Community, { foreignKey: 'chain_node_id' });
   };
 
   return ChainNode;

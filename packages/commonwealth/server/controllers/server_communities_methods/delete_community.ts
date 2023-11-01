@@ -24,7 +24,7 @@ export type DeleteCommunityResult = void;
 
 export async function __deleteCommunity(
   this: ServerCommunitiesController,
-  { user, communityId }: DeleteCommunityOptions
+  { user, communityId }: DeleteCommunityOptions,
 ): Promise<DeleteCommunityResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
@@ -34,7 +34,7 @@ export async function __deleteCommunity(
     throw new AppError(Errors.NeedChainId);
   }
 
-  const chain = await this.models.Chain.findOne({
+  const chain = await this.models.Community.findOne({
     where: {
       id: communityId,
     },
@@ -57,7 +57,7 @@ export async function __deleteCommunity(
                 selected_chain_id: chain.id,
               },
               transaction: t,
-            }
+            },
           );
 
           await this.models.Reaction.destroy({
@@ -70,7 +70,7 @@ export async function __deleteCommunity(
             `UPDATE "Comments" SET
                 created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id)
              WHERE chain = '${chain.id}'`,
-            { transaction: t }
+            { transaction: t },
           );
 
           await this.models.Comment.destroy({
@@ -128,7 +128,7 @@ export async function __deleteCommunity(
             `UPDATE "Threads" SET
                 created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id)
              WHERE chain = '${chain.id}'`,
-            { transaction: t }
+            { transaction: t },
           );
 
           await this.models.Thread.destroy({
@@ -161,7 +161,7 @@ export async function __deleteCommunity(
             transaction: t,
           });
 
-          await this.models.Chain.destroy({
+          await this.models.Community.destroy({
             where: { id: chain.id },
             transaction: t,
           });

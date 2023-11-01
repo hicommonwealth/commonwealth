@@ -3,7 +3,6 @@ import type { ChainCategoryType } from 'common-common/src/types';
 import jwt from 'jsonwebtoken';
 import { Op, QueryTypes } from 'sequelize';
 import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
 import type { NotificationCategoryInstance } from 'server/models/notification_category';
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
@@ -14,6 +13,7 @@ import type {
 import { ETH_RPC, JWT_SECRET } from '../config';
 import { sequelize } from '../database';
 import type { DB } from '../models';
+import type { CommunityInstance } from '../models/community';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
@@ -36,7 +36,7 @@ type StatusResp = {
     jwt: string;
     addresses: AddressInstance[];
     socialAccounts: SocialAccountInstance[];
-    selectedChain: ChainInstance;
+    selectedChain: CommunityInstance;
     isAdmin: boolean;
     disableRichText: boolean;
     starredCommunities: StarredCommunityAttributes[];
@@ -49,7 +49,7 @@ type StatusResp = {
 
 const getChainStatus = async (models: DB) => {
   const [chains, notificationCategories] = await Promise.all([
-    models.Chain.findAll({
+    models.Community.findAll({
       where: { active: true },
     }),
     models.NotificationCategory.findAll(),
@@ -63,7 +63,7 @@ const getChainStatus = async (models: DB) => {
   }
 
   const thirtyDaysAgo = new Date(
-    (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+    (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
   );
 
   const threadCountQueryData: ThreadCountQueryData[] =
@@ -76,7 +76,7 @@ const getChainStatus = async (models: DB) => {
       AND "Threads".chain IS NOT NULL
       GROUP BY "Threads".chain;
       `,
-      { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
+      { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT },
     );
 
   return {
@@ -87,7 +87,7 @@ const getChainStatus = async (models: DB) => {
 };
 
 export const getUserStatus = async (models: DB, user: UserInstance) => {
-  const chains = await models.Chain.findAll({
+  const chains = await models.Community.findAll({
     where: { active: true },
     attributes: ['id'],
   });
@@ -99,7 +99,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
       unfilteredAddresses.filter(
         (address) =>
           !!address.verified &&
-          chains.map((c) => c.id).includes(address.community_id)
+          chains.map((c) => c.id).includes(address.community_id),
       ),
       user.getSocialAccounts(),
       user.getSelectedChain(),
@@ -109,7 +109,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
 
   // look up my roles & private communities
   const myAddressIds: number[] = Array.from(
-    addresses.map((address) => address.id)
+    addresses.map((address) => address.id),
   );
 
   const roles = await findAllRoles(models, {
@@ -289,7 +289,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
 export const status = async (
   models: DB,
   req: TypedRequestQuery,
-  res: TypedResponse<StatusResp>
+  res: TypedResponse<StatusResp>,
 ) => {
   try {
     const chainStatusPromise = getChainStatus(models);
@@ -338,7 +338,7 @@ export const status = async (
 type ChainActivity = [chain: string, timestamp: string][];
 
 function getChainActivity(
-  addresses: AddressInstance[]
+  addresses: AddressInstance[],
 ): Promise<ChainActivity> {
   return Promise.all(
     addresses.map(async (address) => {
@@ -346,6 +346,6 @@ function getChainActivity(
       // Check if last_active is not null before calling toISOString
       const lastActiveISO = last_active ? last_active.toISOString() : 'N/A';
       return [community_id, lastActiveISO];
-    })
+    }),
   );
 }

@@ -1,22 +1,23 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import { GroupMetadata } from 'server/models/group';
 import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
+import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type UpdateGroupParams = { id: string };
 type UpdateGroupBody = {
   metadata: GroupMetadata;
   requirements: Requirement[];
+  topics?: number[];
 };
 type UpdateGroupResponse = UpdateGroupResult;
 
 export const updateGroupHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
-  res: TypedResponse<UpdateGroupResponse>
+  res: TypedResponse<UpdateGroupResponse>,
 ) => {
   const { user, address, chain } = req;
 
@@ -33,6 +34,7 @@ export const updateGroupHandler = async (
         })
         .optional(),
       requirements: z.array(z.any()).optional(), // validated in controller
+      topics: z.array(z.number()).optional(),
     }),
   });
   const validationResult = schema.safeParse(req);
@@ -41,7 +43,7 @@ export const updateGroupHandler = async (
   }
   const {
     params: { id: groupId },
-    body: { metadata, requirements },
+    body: { metadata, requirements, topics },
   } = validationResult.data;
 
   const result = await controllers.groups.updateGroup({
@@ -51,6 +53,7 @@ export const updateGroupHandler = async (
     groupId,
     metadata: metadata as Required<typeof metadata>,
     requirements,
+    topics,
   });
   return success(res, result);
 };

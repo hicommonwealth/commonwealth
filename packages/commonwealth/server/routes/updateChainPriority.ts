@@ -24,13 +24,13 @@ type updateChainPriorityResp = {
 const updateChainPriority = async (
   models: DB,
   req: TypedRequestBody<updateChainPriorityReq>,
-  res: TypedResponse<updateChainPriorityResp>
+  res: TypedResponse<updateChainPriorityResp>,
 ) => {
   // Verify Chain Exists
   const { chain_id, action, secret } = req.body;
   if (!chain_id) throw new AppError(UpdatePriorityErrors.NoChainID);
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: chain_id },
   });
   if (!chain) throw new AppError(UpdatePriorityErrors.NoChain);

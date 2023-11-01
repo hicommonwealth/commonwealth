@@ -30,7 +30,7 @@ const deleteChain = async (
   models: DB,
   req: TypedRequestBody<deleteChainReq>,
   res: TypedResponse<deleteChainResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { id } = req.body;
 
@@ -46,7 +46,7 @@ const deleteChain = async (
   //   return next(new AppError(Errors.CannotDeleteChain));
   // }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id,
       has_chain_events_listener: false, // make sure no chain events
@@ -70,7 +70,7 @@ const deleteChain = async (
                 selected_chain_id: chain.id,
               },
               transaction: t,
-            }
+            },
           );
 
           await models.Reaction.destroy({
@@ -86,7 +86,7 @@ const deleteChain = async (
                     FROM "Addresses" 
                     WHERE "Comments".address_id = "Addresses".id)
                  WHERE chain = '${chain.id}'`,
-            { transaction: t }
+            { transaction: t },
           );
 
           await models.Comment.destroy({
@@ -146,7 +146,7 @@ const deleteChain = async (
                     FROM "Addresses" 
                     WHERE "Threads".address_id = "Addresses".id) 
                  WHERE chain = '${chain.id}'`,
-            { transaction: t }
+            { transaction: t },
           );
 
           await models.Thread.destroy({
@@ -175,7 +175,7 @@ const deleteChain = async (
             transaction: t,
           });
 
-          await models.Chain.destroy({
+          await models.Community.destroy({
             where: { id: chain.id },
             transaction: t,
           });

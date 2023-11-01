@@ -26,7 +26,7 @@ type SetDiscordBotConfigResp = {
 const setDiscordBotConfig = async (
   models: DB,
   req: TypedRequestBody<SetDiscordBotConfigReq>,
-  res: TypedResponse<SetDiscordBotConfigResp>
+  res: TypedResponse<SetDiscordBotConfigResp>,
 ) => {
   const { chain_id, guild_id, verification_token, snapshot_channel_id } =
     req.body;
@@ -67,7 +67,7 @@ const setDiscordBotConfig = async (
   const existingCommunityWithGuildConnected =
     await models.DiscordBotConfig.findAll({ where: { guild_id } });
 
-  const chainInstance = await models.Chain.findOne({
+  const chainInstance = await models.Community.findOne({
     where: { id: chain_id },
   });
 
@@ -86,7 +86,7 @@ const setDiscordBotConfig = async (
         },
       });
       console.log(
-        'Attempted to add a guild that was already connected to another CW community.'
+        'Attempted to add a guild that was already connected to another CW community.',
       );
     } catch (e) {
       console.log(e);
@@ -132,7 +132,7 @@ const setDiscordBotConfig = async (
         where: {
           guild_id,
         },
-      }
+      },
     );
 
     return success(res, {

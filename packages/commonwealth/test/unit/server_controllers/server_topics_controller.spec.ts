@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
-import { ChainInstance } from 'server/models/chain';
 import { UserInstance } from 'server/models/user';
+import { CommunityInstance } from '../../../server/models/community';
 
 const createMockedTopicsController = (isAdmin: boolean = false) => {
   const db: any = {
@@ -62,13 +62,13 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
   const controller = new ServerTopicsController(
     db,
     tokenBalanceCache,
-    banCache
+    banCache,
   );
   const user = {
     getAddresses: async () => [],
     isAdmin,
   } as UserInstance;
-  const chain = {} as ChainInstance;
+  const chain = {} as CommunityInstance;
   return { controller, user, chain };
 };
 

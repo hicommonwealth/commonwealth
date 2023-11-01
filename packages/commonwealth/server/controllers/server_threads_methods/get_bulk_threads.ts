@@ -1,13 +1,13 @@
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ThreadAttributes, ThreadInstance } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export type GetBulkThreadsOptions = {
-  chain?: ChainInstance;
+  chain?: CommunityInstance;
   stage: string;
   topicId: number;
   includePinnedThreads: boolean;
@@ -39,7 +39,7 @@ export async function __getBulkThreads(
     fromDate,
     toDate,
     archived,
-  }: GetBulkThreadsOptions
+  }: GetBulkThreadsOptions,
 ): Promise<GetBulkThreadsResult> {
   // query params that bind to sql query
   const bind = (() => {
@@ -163,7 +163,7 @@ export async function __getBulkThreads(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     );
   } catch (e) {
     console.error(e);
@@ -236,10 +236,10 @@ export async function __getBulkThreads(
     {
       bind,
       type: QueryTypes.SELECT,
-    }
+    },
   );
   const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
+    (t) => t.stage === 'voting',
   ).length;
 
   threads = await Promise.all(threads);

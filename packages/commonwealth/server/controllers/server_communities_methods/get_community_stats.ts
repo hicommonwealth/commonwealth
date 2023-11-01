@@ -24,13 +24,13 @@ export type GetCommunityStatsResult = {
 
 export async function __getCommunityStats(
   this: ServerCommunitiesController,
-  { user, chainId }: GetCommunityStatsOptions
+  { user, chainId }: GetCommunityStatsOptions,
 ): Promise<GetCommunityStatsResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
-  const chain = await this.models.Chain.findByPk(chainId);
+  const chain = await this.models.Community.findByPk(chainId);
   if (!chain) {
     throw new AppError(Errors.ChainNotFound);
   }

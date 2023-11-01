@@ -1,11 +1,11 @@
 import moment from 'moment';
 import { AppError } from '../../../../common-common/src/errors';
-import { ServerThreadsController } from '../server_threads_controller';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -17,7 +17,7 @@ export const Errors = {
 export type CreateThreadPollOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   threadId: number;
   prompt: string;
   options: string[];
@@ -35,7 +35,7 @@ export async function __createThreadPoll(
     prompt,
     options,
     customDuration,
-  }: CreateThreadPollOptions
+  }: CreateThreadPollOptions,
 ): Promise<CreateThreadPollResult> {
   let finalCustomDuration: string | number = '';
   if (customDuration && customDuration !== 'Infinite') {
@@ -98,7 +98,7 @@ export async function __createThreadPoll(
         options: JSON.stringify(options),
         ends_at,
       },
-      { transaction }
+      { transaction },
     );
   });
 

@@ -1,20 +1,20 @@
 import { Op } from 'sequelize';
-import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { CommunitySnapshotSpaceWithSpaceAttached } from '../../models/community_snapshot_spaces';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type GetCommunitiesOptions = {};
 export type GetCommunitiesResult = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   snapshot: string[];
 }[];
 
 export async function __getCommunities(
   this: ServerCommunitiesController,
-  options: GetCommunitiesOptions
+  options: GetCommunitiesOptions,
 ): Promise<GetCommunitiesResult> {
   const [chains] = await Promise.all([
-    this.models.Chain.findAll({
+    this.models.Community.findAll({
       where: { active: true },
     }),
   ]);
@@ -35,10 +35,10 @@ export async function __getCommunities(
 
   const chainsWithSnapshots = chains.map((chain) => {
     const chainSnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.chain_id === chain.id
+      (space) => space.chain_id === chain.id,
     );
     const snapshotSpaceNames = chainSnapshotSpaces.map(
-      (space) => space.snapshot_space?.snapshot_space
+      (space) => space.snapshot_space?.snapshot_space,
     );
     return {
       chain,

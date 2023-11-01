@@ -33,7 +33,7 @@ export async function createAddressHelper(
   req: CreateAddressReq,
   models: DB,
   user: Express.User & UserInstance,
-  next: NextFunction
+  next: NextFunction,
 ) {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
@@ -54,7 +54,7 @@ export async function createAddressHelper(
     return next(new AppError('Cannot join with an injective address'));
   }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.chain },
   });
 
@@ -98,11 +98,11 @@ export async function createAddressHelper(
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
       where: { community_id: req.chain, address: encodedAddress },
-    }
+    },
   );
 
   const existingAddressOnOtherChain = await models.Address.scope(
-    'withPrivateData'
+    'withPrivateData',
   ).findOne({
     where: { community_id: { [Op.ne]: req.chain }, address: encodedAddress },
   });
@@ -125,7 +125,7 @@ export async function createAddressHelper(
     // Address.updateWithToken
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
     if (updatedId) {
       existingAddress.user_id = updatedId;
@@ -152,7 +152,7 @@ export async function createAddressHelper(
       const role = await findOneRole(
         models,
         { where: { address_id: updatedObj.id } },
-        req.community
+        req.community,
       );
       if (!role) {
         await createRole(models, updatedObj.id, req.community, 'member');
@@ -165,7 +165,7 @@ export async function createAddressHelper(
       // Address.createWithToken
       const verification_token = crypto.randomBytes(18).toString('hex');
       const verification_token_expires = new Date(
-        +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+        +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
       );
       const last_active = new Date();
       let profile_id: number;
@@ -205,7 +205,7 @@ export async function createAddressHelper(
           chain: req.chain,
           isCustomDomain: null,
         },
-        req
+        req,
       );
 
       return {

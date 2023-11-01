@@ -1,13 +1,13 @@
 import { NotificationCategories } from 'common-common/src/types';
-import { DEFAULT_COMMONWEALTH_LOGO } from '../../../config';
 import request from 'superagent';
+import { DEFAULT_COMMONWEALTH_LOGO } from '../../../config';
+import { CommunityInstance } from '../../../models/community';
 import {
   ChainEventWebhookData,
   ForumWebhookData,
   WebhookDataByCategory,
 } from '../types';
 import { REGEX_EMOJI } from '../util';
-import { ChainInstance } from '../../../models/chain';
 
 type DiscordWebhookMessage = {
   username: string;
@@ -26,13 +26,13 @@ type DiscordWebhookMessage = {
       thumbnail: {
         url: string;
       };
-    }
+    },
   ];
 };
 
 function formatDiscordMessage<C extends NotificationCategories>(
   category: C,
-  data: WebhookDataByCategory<C>
+  data: WebhookDataByCategory<C>,
 ): DiscordWebhookMessage {
   if (category === NotificationCategories.ChainEvent) {
     const typedData = data as ChainEventWebhookData;
@@ -85,7 +85,7 @@ export async function sendDiscordWebhook(
   webhookUrl: string,
   category: NotificationCategories,
   data: ForumWebhookData | ChainEventWebhookData,
-  chain?: ChainInstance
+  chain?: CommunityInstance,
 ) {
   if ('profileName' in data && data.profileName === 'Discord Bot') {
     if (!chain) return;

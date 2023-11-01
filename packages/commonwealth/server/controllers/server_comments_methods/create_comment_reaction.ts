@@ -6,7 +6,7 @@ import {
 } from '../../../../common-common/src/types';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ReactionAttributes } from '../../models/reaction';
 import { UserInstance } from '../../models/user';
 import { findAllRoles } from '../../util/roles';
@@ -26,7 +26,7 @@ const Errors = {
 export type CreateCommentReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   reaction: string;
   commentId: number;
   canvasAction?: any;
@@ -37,7 +37,7 @@ export type CreateCommentReactionOptions = {
 export type CreateCommentReactionResult = [
   ReactionAttributes,
   EmitOptions[],
-  TrackOptions[]
+  TrackOptions[],
 ];
 
 export async function __createCommentReaction(
@@ -51,7 +51,7 @@ export async function __createCommentReaction(
     canvasAction,
     canvasSession,
     canvasHash,
-  }: CreateCommentReactionOptions
+  }: CreateCommentReactionOptions,
 ): Promise<CreateCommentReactionResult> {
   const comment = await this.models.Comment.findOne({
     where: { id: commentId },
@@ -87,7 +87,7 @@ export async function __createCommentReaction(
       this.models,
       { where: { address_id: address.id } },
       chain.id,
-      ['admin']
+      ['admin'],
     );
     const isGodMode = user.isAdmin;
     const hasAdminRole = addressAdminRoles.length > 0;
@@ -98,7 +98,7 @@ export async function __createCommentReaction(
           this.tokenBalanceCache,
           this.models,
           thread.topic_id,
-          address.address
+          address.address,
         );
       } catch (e) {
         throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);

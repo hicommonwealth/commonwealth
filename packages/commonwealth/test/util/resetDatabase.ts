@@ -74,7 +74,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
       ] = await models.ChainNode.bulkCreate(Object.values(nodes));
 
       // Initialize different chain + node URLs
-      await models.Chain.create({
+      await models.Community.create({
         id: 'edgeware',
         network: ChainNetwork.Edgeware,
         default_symbol: 'EDG',
@@ -87,7 +87,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: edgewareNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
@@ -99,7 +99,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
       });
-      const alex = await models.Chain.create({
+      const alex = await models.Community.create({
         id: 'alex',
         network: ChainNetwork.ERC20,
         default_symbol: 'ALEX',
@@ -111,7 +111,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: testnetNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'osmosis',
         network: ChainNetwork.Osmosis,
         default_symbol: 'OSMO',
@@ -123,7 +123,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: osmosisNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'csdk-beta',
         network: ChainNetwork.Osmosis,
         default_symbol: 'STAKE',
@@ -135,7 +135,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: csdkBetaNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'csdk',
         network: ChainNetwork.Osmosis,
         default_symbol: 'STAKE',
@@ -158,7 +158,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_id: alex.id,
         contract_id: alexContract.id,
       });
-      const yearn = await models.Chain.create({
+      const yearn = await models.Community.create({
         id: 'yearn',
         network: ChainNetwork.ERC20,
         default_symbol: 'YFI',
@@ -181,7 +181,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_id: yearn.id,
         contract_id: yearnContract.id,
       });
-      const sushi = await models.Chain.create({
+      const sushi = await models.Community.create({
         id: 'sushi',
         network: ChainNetwork.ERC20,
         default_symbol: 'SUSHI',
@@ -305,7 +305,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         event: 'proposal/created',
         start: new Date().toString(),
         expire: new Date(
-          new Date().getTime() + 100 * 24 * 60 * 60 * 1000
+          new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
         ).toString(),
       });
 

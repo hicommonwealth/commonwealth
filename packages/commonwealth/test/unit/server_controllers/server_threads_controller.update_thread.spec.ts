@@ -5,8 +5,8 @@ import {
   UpdateThreadPermissions,
   validatePermissions,
 } from 'server/controllers/server_threads_methods/update_thread';
-import { ChainInstance } from 'server/models/chain';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
+import { CommunityInstance } from '../../../server/models/community';
 
 describe('ServerThreadsController', () => {
   describe('#validatePermissions', () => {
@@ -23,7 +23,7 @@ describe('ServerThreadsController', () => {
           isMod: true,
           isAdmin: true,
           isSuperAdmin: true,
-        })
+        }),
       ).to.throw('Unauthorized');
     });
 
@@ -39,28 +39,28 @@ describe('ServerThreadsController', () => {
       expect(() =>
         validatePermissions(permissions, {
           isThreadOwner: true,
-        })
+        }),
       ).to.throw('Unauthorized');
 
       // throws
       expect(() =>
         validatePermissions(permissions, {
           isMod: true,
-        })
+        }),
       ).to.throw('Unauthorized');
 
       // does NOT throw
       expect(() =>
         validatePermissions(permissions, {
           isAdmin: true,
-        })
+        }),
       ).to.not.throw();
 
       // throws
       expect(() =>
         validatePermissions(permissions, {
           isSuperAdmin: true,
-        })
+        }),
       ).to.throw('Unauthorized');
 
       // does NOT throw
@@ -70,7 +70,7 @@ describe('ServerThreadsController', () => {
           isMod: true,
           isAdmin: true,
           isSuperAdmin: true,
-        })
+        }),
       ).to.not.throw();
     });
   });
@@ -92,7 +92,7 @@ describe('ServerThreadsController', () => {
         address: address as any,
         chain: {
           id: 'ethereum',
-        } as ChainInstance,
+        } as CommunityInstance,
         threadId: 1,
         title: 'hello',
         body: 'wasup',
@@ -127,7 +127,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db,
         tokenBalanceCache,
-        banCache
+        banCache,
       );
       const [updatedThread, notificationOptions, analyticsOptions] =
         await serverThreadsController.updateThread(attributes);
@@ -139,7 +139,7 @@ describe('ServerThreadsController', () => {
             ...attributes.address,
             address: '0xbanned',
           },
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(updatedThread).to.be.ok;

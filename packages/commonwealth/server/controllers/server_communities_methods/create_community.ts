@@ -12,19 +12,20 @@ import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import type { AddressInstance } from '../../models/address';
-import type { ChainAttributes } from '../../models/chain';
 import type { ChainNodeAttributes } from '../../models/chain_node';
+import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
 import axios from 'axios';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { UserInstance } from '../../models/user';
-import { getFileSizeBytes } from '../../util/getFilesSizeBytes';
+import {
+  MAX_COMMUNITY_IMAGE_SIZE_BYTES,
+  checkUrlFileSize,
+} from '../../util/checkUrlFileSize';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
-
-const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -59,14 +60,12 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  ImageDoesntExist: `Image url provided doesn't exist`,
-  ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: Omit<ChainAttributes, 'substrate_spec'> &
+  community: Omit<CommunityAttributes, 'substrate_spec'> &
     Omit<ChainNodeAttributes, 'id'> & {
       id: string;
       node_url: string;
@@ -77,7 +76,7 @@ export type CreateCommunityOptions = {
 };
 
 export type CreateCommunityResult = {
-  chain: ChainAttributes;
+  chain: CommunityAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
   admin_address: string;
@@ -85,7 +84,7 @@ export type CreateCommunityResult = {
 
 export async function __createCommunity(
   this: ServerCommunitiesController,
-  { user, community }: CreateCommunityOptions
+  { user, community }: CreateCommunityOptions,
 ): Promise<CreateCommunityResult> {
   if (!user) {
     throw new AppError('Not signed in');
@@ -124,14 +123,10 @@ export async function __createCommunity(
     throw new AppError(Errors.NoBase);
   }
 
-  if (
-    community.icon_url &&
-    (await getFileSizeBytes(community.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB
-  ) {
-    throw new AppError(Errors.ImageTooLarge);
+  if (community.icon_url) {
+    await checkUrlFileSize(community.icon_url, MAX_COMMUNITY_IMAGE_SIZE_BYTES);
   }
-
-  const existingBaseChain = await this.models.Chain.findOne({
+  const existingBaseChain = await this.models.Community.findOne({
     where: { base: community.base },
   });
   if (!existingBaseChain) {
@@ -179,14 +174,14 @@ export async function __createCommunity(
 
     const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
     const { data: chains } = await axios.get(
-      `${REGISTRY_API_URL}/api/v1/mainnet`
+      `${REGISTRY_API_URL}/api/v1/mainnet`,
     );
     const foundRegisteredChain = chains?.find(
-      (chain) => chain === cosmos_chain_id
+      (chain) => chain === cosmos_chain_id,
     );
     if (!foundRegisteredChain) {
       throw new AppError(
-        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`
+        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
       );
     }
   }
@@ -327,7 +322,7 @@ export async function __createCommunity(
     throw new AppError(Errors.InvalidIconUrl);
   }
 
-  const oldChain = await this.models.Chain.findOne({
+  const oldChain = await this.models.Community.findOne({
     where: { [Op.or]: [{ name: community.name }, { id: community.id }] },
   });
   if (oldChain && oldChain.id === community.id) {
@@ -338,7 +333,7 @@ export async function __createCommunity(
   }
 
   const [node] = await this.models.ChainNode.scope(
-    'withPrivateData'
+    'withPrivateData',
   ).findOrCreate({
     where: { [Op.or]: [{ url }, { eth_chain_id }] },
     defaults: {
@@ -365,7 +360,7 @@ export async function __createCommunity(
     },
   });
 
-  const chain = await this.models.Chain.create({
+  const chain = await this.models.Community.create({
     id,
     name,
     default_symbol,
@@ -436,7 +431,7 @@ export async function __createCommunity(
 
   if (chain.base === ChainBase.Ethereum) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -446,7 +441,7 @@ export async function __createCommunity(
       },
       include: [
         {
-          model: this.models.Chain,
+          model: this.models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -454,7 +449,7 @@ export async function __createCommunity(
     });
   } else if (chain.base === ChainBase.NEAR) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -464,7 +459,7 @@ export async function __createCommunity(
       },
       include: [
         {
-          model: this.models.Chain,
+          model: this.models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -472,7 +467,7 @@ export async function __createCommunity(
     });
   } else if (chain.base === ChainBase.Solana) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -483,7 +478,7 @@ export async function __createCommunity(
       },
       include: [
         {
-          model: this.models.Chain,
+          model: this.models.Community,
           where: { base: chain.base },
           required: true,
         },
@@ -512,7 +507,7 @@ export async function __createCommunity(
       chain.id,
       'admin',
       0,
-      0
+      0,
     );
 
     await this.models.Subscription.findOrCreate({

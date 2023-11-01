@@ -1,10 +1,10 @@
+import { QueryTypes } from 'sequelize';
+import { TypedPaginatedResult } from 'server/types';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
   buildPaginationSql,
 } from '../../util/queries';
-import { QueryTypes } from 'sequelize';
-import { TypedPaginatedResult } from 'server/types';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type SearchCommunitiesOptions = {
@@ -21,7 +21,7 @@ export type SearchCommunitiesResult = TypedPaginatedResult<{
 
 export async function __searchCommunities(
   this: ServerCommunitiesController,
-  { search, limit, page, orderBy, orderDirection }: SearchCommunitiesOptions
+  { search, limit, page, orderBy, orderDirection }: SearchCommunitiesOptions,
 ): Promise<SearchCommunitiesResult> {
   let sortOptions: PaginationSqlOptions = {
     limit: Math.min(limit, 100) || 10,
@@ -34,13 +34,13 @@ export async function __searchCommunities(
     case 'created_at':
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Chains".${orderBy}`,
+        orderBy: `"Communities".${orderBy}`,
       };
       break;
     default:
       sortOptions = {
         ...sortOptions,
-        orderBy: `"Chains".created_at`,
+        orderBy: `"Communities".created_at`,
         orderDirection: 'ASC',
       };
   }
@@ -55,19 +55,19 @@ export async function __searchCommunities(
 
   const sqlWithoutPagination = `
     SELECT
-      "Chains".id,
-      "Chains".name,
-      "Chains".default_symbol,
-      "Chains".type,
-      "Chains".icon_url,
-      "Chains".created_at
-    FROM "Chains"
+      "Communities".id,
+      "Communities".name,
+      "Communities".default_symbol,
+      "Communities".type,
+      "Communities".icon_url,
+      "Communities".created_at
+    FROM "Communities"
     WHERE
-      "Chains".active = TRUE AND
+      "Communities".active = TRUE AND
       (
-        "Chains".name ILIKE '%' || $searchTerm || '%'
+        "Communities".name ILIKE '%' || $searchTerm || '%'
         OR
-        "Chains".default_symbol ILIKE '%' || $searchTerm || '%'
+        "Communities".default_symbol ILIKE '%' || $searchTerm || '%'
       )
   `;
   const [results, [{ count }]]: [any[], any[]] = await Promise.all([
@@ -80,7 +80,7 @@ export async function __searchCommunities(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     ),
   ]);
 

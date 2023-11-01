@@ -45,7 +45,7 @@ const CommunityMembersPage = () => {
 
   const debouncedSearchTerm = useDebounce<string>(
     searchFilters.searchText,
-    500
+    500,
   );
 
   const {
@@ -84,24 +84,24 @@ const CommunityMembersPage = () => {
           (role) =>
             role.chain_id === app.activeChainId() &&
             [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
-              role.permission
-            )
+              role.permission,
+            ),
         )?.permission,
         groups: (groups || [])
           .filter((g) =>
             (g.members || []).find(
-              (x) => x?.address?.address === p.addresses?.[0]?.address
-            )
+              (x) => x?.address?.address === p.addresses?.[0]?.address,
+            ),
           )
           .map((x) => x.name),
       }))
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
-              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
             ) ||
             p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-          : true
+          : true,
       )
       .filter((p) => {
         if (searchFilters.category === GROUP_AND_MEMBER_FILTERS[0]) {
@@ -123,18 +123,18 @@ const CommunityMembersPage = () => {
           ? group.name
               .toLowerCase()
               .includes(searchFilters.searchText.toLowerCase())
-          : true
+          : true,
       )
       .filter((group) =>
         searchFilters.category === 'All'
           ? true
           : searchFilters.category === 'In group'
           ? (group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address
+              (x) => x?.address?.address === app.user.activeAccount.address,
             )
           : !(group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address
-            )
+              (x) => x?.address?.address === app.user.activeAccount.address,
+            ),
       );
   }, [groups, searchFilters]);
 
@@ -146,7 +146,7 @@ const CommunityMembersPage = () => {
     history.pushState(
       null,
       '',
-      `${window.location.pathname}?${params.toString()}`
+      `${window.location.pathname}?${params.toString()}`,
     );
     setSelectedTab(activeTab);
   };
@@ -204,7 +204,7 @@ const CommunityMembersPage = () => {
               'cols-3': featureFlags.gatingEnabled && !isAdmin,
               'cols-4': featureFlags.gatingEnabled && isAdmin,
             },
-            'filters'
+            'filters',
           )}
         >
           <CWTextInput

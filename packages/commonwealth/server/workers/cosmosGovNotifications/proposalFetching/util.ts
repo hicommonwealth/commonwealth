@@ -1,10 +1,10 @@
-import { ChainInstance } from '../../../models/chain';
 import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { AllCosmosProposals } from './types';
-import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { COSMOS_GOV_V1_CHAIN_IDS } from '../../../config';
+import { CommunityInstance } from '../../../models/community';
 import { rollbar } from '../../../util/rollbar';
+import { AllCosmosProposals } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -33,7 +33,7 @@ export function numberToUint8ArrayBE(num, byteLength = 8) {
   return bytes;
 }
 
-export function filterV1GovChains(chains: ChainInstance[]) {
+export function filterV1GovChains(chains: CommunityInstance[]) {
   const v1Chains = [];
   const v1Beta1Chains = [];
 
@@ -49,26 +49,26 @@ export function filterV1GovChains(chains: ChainInstance[]) {
 }
 
 export function mapChainsToProposals(
-  v1Chains: ChainInstance[],
-  v1Beta1Chains: ChainInstance[],
+  v1Chains: CommunityInstance[],
+  v1Beta1Chains: CommunityInstance[],
   v1Proposals: ProposalSDKType[][],
-  v1Beta1Proposals: Proposal[][]
+  v1Beta1Proposals: Proposal[][],
 ): AllCosmosProposals {
   return {
     v1: v1Proposals.reduce(
       (acc, proposals, i) => ({ ...acc, [v1Chains[i].id]: proposals }),
-      {}
+      {},
     ),
     v1Beta1: v1Beta1Proposals.reduce(
       (acc, proposals, i) => ({ ...acc, [v1Beta1Chains[i].id]: proposals }),
-      {}
+      {},
     ),
   };
 }
 
 export function processProposalSettledPromises(
   v1ProposalResults: PromiseSettledResult<ProposalSDKType[]>[],
-  v1Beta1ProposalResults: PromiseSettledResult<Proposal[]>[]
+  v1Beta1ProposalResults: PromiseSettledResult<Proposal[]>[],
 ) {
   const v1Proposals: ProposalSDKType[][] = [];
   for (const result of v1ProposalResults) {

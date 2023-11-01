@@ -43,7 +43,7 @@ export const Text: Story = {
 };
 ```
 
-https://github.com/hicommonwealth/commonwealth/assets/30223098/b8afc832-7cb3-442a-8e90-1054b07c0332
+<https://github.com/hicommonwealth/commonwealth/assets/30223098/b8afc832-7cb3-442a-8e90-1054b07c0332>
 
 # Custom functions
 
@@ -107,8 +107,8 @@ export const Secondary: Story = {
 
 # References
 
-1. https://storybook.js.org/docs/react/api/argtypes
+1. <https://storybook.js.org/docs/react/api/argtypes>
 
-# Change Log
+## Change Log
 
 - 230530: Authored by Daniel Martins.

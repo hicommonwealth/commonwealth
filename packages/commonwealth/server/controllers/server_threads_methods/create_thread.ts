@@ -1,24 +1,24 @@
 import moment from 'moment';
 
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
-import { ThreadAttributes } from '../../models/thread';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { AppError } from '../../../../common-common/src/errors';
-import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { ServerThreadsController } from '../server_threads_controller';
-import { validateOwner } from '../../util/validateOwner';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { ThreadAttributes } from '../../models/thread';
+import { UserInstance } from '../../models/user';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -34,7 +34,7 @@ export const Errors = {
 export type CreateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   title: string;
   body: string;
   kind: string;
@@ -52,7 +52,7 @@ export type CreateThreadOptions = {
 export type CreateThreadResult = [
   ThreadAttributes,
   EmitOptions[],
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThread(
@@ -73,7 +73,7 @@ export async function __createThread(
     canvasSession,
     canvasHash,
     discordMeta,
-  }: CreateThreadOptions
+  }: CreateThreadOptions,
 ): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
@@ -158,7 +158,7 @@ export async function __createThread(
       } else {
         if (chain.topics?.length) {
           throw new AppError(
-            'Must pass a topic_name string and/or a numeric topic_id'
+            'Must pass a topic_name string and/or a numeric topic_id',
           );
         }
       }
@@ -182,7 +182,7 @@ export async function __createThread(
             this.tokenBalanceCache,
             topicId,
             chain,
-            address
+            address,
           );
           if (!isValid) {
             throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
@@ -199,7 +199,7 @@ export async function __createThread(
 
       return thread.id;
       // end of transaction
-    }
+    },
   );
 
   const finalThread = await this.models.Thread.findOne({
@@ -248,7 +248,7 @@ export async function __createThread(
             },
             include: [this.models.User],
           });
-        })
+        }),
       );
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);

@@ -1,7 +1,6 @@
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { CollaborationAttributes } from 'server/models/collaboration';
 import type { CommentInstance } from 'server/models/comment';
@@ -9,6 +8,7 @@ import type { ReactionAttributes } from 'server/models/reaction';
 import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
 import type { UserInstance } from 'server/models/user';
+import type { CommunityInstance } from '../../../server/models/community';
 import { ProfileAttributes } from '../../../server/models/profile';
 import { testAddress } from '../utils/e2eUtils';
 
@@ -18,7 +18,7 @@ export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
 export let testAddresses: AddressInstance[];
-export let testChains: ChainInstance[];
+export let testChains: CommunityInstance[];
 export let testCollaborations: CollaborationAttributes[];
 export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
@@ -63,7 +63,7 @@ export async function clearTestEntities() {
       },
     });
 
-    const chainsToDelete = await models.Chain.findAll({
+    const chainsToDelete = await models.Community.findAll({
       where: { chain_node_id: { [Op.lt]: 0 } },
     });
 
@@ -132,7 +132,7 @@ export async function clearTestEntities() {
       },
       force: true,
     });
-    await models.Chain.destroy({
+    await models.Community.destroy({
       where: { id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
       force: true,
     });
@@ -163,8 +163,8 @@ export async function createTestEntities() {
                 isAdmin: true,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testProfiles = await Promise.all(
@@ -180,8 +180,8 @@ export async function createTestEntities() {
                 user_id: -i - 1,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testChainNodes = [
@@ -211,7 +211,7 @@ export async function createTestEntities() {
 
     testChains = [
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest',
             chain_node_id: -1,
@@ -232,7 +232,7 @@ export async function createTestEntities() {
         })
       )[0],
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest2',
             chain_node_id: -2,
@@ -291,8 +291,8 @@ export async function createTestEntities() {
                 profile_id: i < 2 ? -1 : -2,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testThreads = await Promise.all(
@@ -310,8 +310,8 @@ export async function createTestEntities() {
                 kind: 'discussion',
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testThreads.push(
@@ -330,9 +330,9 @@ export async function createTestEntities() {
                   kind: 'discussion',
                 },
               })
-            )[0]
-        )
-      ))
+            )[0],
+        ),
+      )),
     );
 
     testCollaborations = await Promise.all(
@@ -345,8 +345,8 @@ export async function createTestEntities() {
                 address_id: -i - 1,
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testComments = await Promise.all(
@@ -363,8 +363,8 @@ export async function createTestEntities() {
                 plaintext: '',
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testComments.push(
@@ -382,9 +382,9 @@ export async function createTestEntities() {
                   plaintext: '',
                 },
               })
-            )[0]
-        )
-      ))
+            )[0],
+        ),
+      )),
     );
 
     testReactions = await Promise.all(
@@ -400,8 +400,8 @@ export async function createTestEntities() {
                 chain: 'cmntest',
               },
             })
-          )[0]
-      )
+          )[0],
+      ),
     );
 
     testReactions.push(
@@ -418,9 +418,9 @@ export async function createTestEntities() {
                   chain: 'cmntest',
                 },
               })
-            )[0]
-        )
-      ))
+            )[0],
+        ),
+      )),
     );
   } catch (e) {
     console.log(e);

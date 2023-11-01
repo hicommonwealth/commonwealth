@@ -1,7 +1,7 @@
-import { AllowlistData, Requirement, ThresholdData } from './requirementsTypes';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import { ChainNetwork } from 'common-common/src/types';
 import { toBN } from 'web3-utils';
+import { TokenBalanceCache } from '../../../../token-balance-cache/src';
+import { AllowlistData, Requirement, ThresholdData } from './requirementsTypes';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -21,13 +21,15 @@ export type ValidateGroupMembershipResponse = {
 export default async function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
-  tbc?: TokenBalanceCache
+  tbc?: TokenBalanceCache,
+  numRequiredRequirements: number = 0,
 ): Promise<ValidateGroupMembershipResponse> {
   const response: ValidateGroupMembershipResponse = {
     isValid: true,
     messages: [],
   };
   let allowListOverride = false;
+  let numRequirementsMet = 0;
   const checks = requirements.map(async (requirement) => {
     let checkResult: { result: boolean; message: string };
     switch (requirement.rule) {
@@ -38,7 +40,7 @@ export default async function validateGroupMembership(
       case 'allow': {
         checkResult = await _allowlistCheck(
           userAddress,
-          requirement.data as AllowlistData
+          requirement.data as AllowlistData,
         );
         if (checkResult.result) {
           allowListOverride = true;
@@ -52,7 +54,9 @@ export default async function validateGroupMembership(
         };
         break;
     }
-    if (!checkResult.result) {
+    if (checkResult.result) {
+      numRequirementsMet++;
+    } else {
       response.isValid = false;
       response.messages.push({
         requirement,
@@ -62,6 +66,14 @@ export default async function validateGroupMembership(
   });
   await Promise.all(checks);
   if (allowListOverride) {
+    // allow if address is whitelisted
+    return { isValid: true };
+  }
+  if (
+    numRequiredRequirements &&
+    numRequirementsMet >= numRequiredRequirements
+  ) {
+    // allow if minimum number of requirements met
     return { isValid: true };
   }
   return response;
@@ -70,7 +82,7 @@ export default async function validateGroupMembership(
 async function _thresholdCheck(
   userAddress: string,
   thresholdData: ThresholdData,
-  tbc: TokenBalanceCache
+  tbc: TokenBalanceCache,
 ): Promise<{ result: boolean; message: string }> {
   try {
     let chainNetwork: ChainNetwork;
@@ -107,7 +119,7 @@ async function _thresholdCheck(
       chainNetwork,
       userAddress,
       chainId,
-      contractAddress
+      contractAddress,
     );
 
     const result = toBN(balance).gt(toBN(thresholdData.threshold));
@@ -127,7 +139,7 @@ async function _thresholdCheck(
 
 async function _allowlistCheck(
   userAddress: string,
-  allowlistData: AllowlistData
+  allowlistData: AllowlistData,
 ): Promise<{ result: boolean; message: string }> {
   try {
     const result = allowlistData.allow.includes(userAddress);

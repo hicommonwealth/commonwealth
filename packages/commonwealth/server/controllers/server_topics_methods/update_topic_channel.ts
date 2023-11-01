@@ -1,9 +1,9 @@
 import { Op } from 'sequelize';
-import { ChainInstance } from '../../models/chain';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 const Errors = {
   MissingTopic: 'Invalid topic ID',
@@ -13,7 +13,7 @@ const Errors = {
 
 export type UpdateTopicChannelOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   topicId: number;
   channelId: string;
 };
@@ -22,7 +22,7 @@ export type UpdateTopicChannelResult = void;
 
 export async function __updateTopicChannel(
   this: ServerTopicsController,
-  { user, chain, topicId, channelId }: UpdateTopicChannelOptions
+  { user, chain, topicId, channelId }: UpdateTopicChannelOptions,
 ): Promise<UpdateTopicChannelResult> {
   const isAdmin = await validateOwner({
     models: this.models,
@@ -78,7 +78,7 @@ export async function __updateTopicChannel(
             [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
           },
         },
-      }
+      },
     );
 
     // Remove channel_id from old topic
@@ -107,7 +107,7 @@ export async function __updateTopicChannel(
             [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
           },
         },
-      }
+      },
     );
   }
 

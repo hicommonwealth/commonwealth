@@ -2,7 +2,7 @@ import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
 import { uniq } from 'lodash';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/community';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
@@ -14,7 +14,7 @@ import { ServerProfilesController } from '../server_profiles_controller';
 export const Errors = {};
 
 export type SearchProfilesOptions = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   search: string;
   includeRoles?: boolean;
   limit?: number;
@@ -45,7 +45,7 @@ export async function __searchProfiles(
     page,
     orderBy,
     orderDirection,
-  }: SearchProfilesOptions
+  }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
     limit: Math.min(limit, 100) || 10,
@@ -123,7 +123,7 @@ export async function __searchProfiles(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     ),
   ]);
 
@@ -160,7 +160,7 @@ export async function __searchProfiles(
         },
       },
       chain?.id,
-      ['member', 'moderator', 'admin']
+      ['member', 'moderator', 'admin'],
     );
 
     const addressIdRoles: Record<number, RoleInstanceWithPermission[]> = {};

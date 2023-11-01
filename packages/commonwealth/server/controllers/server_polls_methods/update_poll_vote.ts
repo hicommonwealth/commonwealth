@@ -3,7 +3,7 @@ import moment from 'moment';
 import { UserInstance } from 'server/models/user';
 import { AppError, ServerError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { VoteAttributes } from '../../models/vote';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
 import { ServerThreadsController } from '../server_threads_controller';
@@ -22,7 +22,7 @@ export const Errors = {
 export type UpdatePollVoteOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   pollId: number;
   option: string;
 };
@@ -31,7 +31,7 @@ export type UpdatePollVoteResult = VoteAttributes;
 
 export async function __updatePollVote(
   this: ServerThreadsController,
-  { address, chain, pollId, option }: UpdatePollVoteOptions
+  { address, chain, pollId, option }: UpdatePollVoteOptions,
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
     where: { id: pollId, chain_id: chain.id },
@@ -70,7 +70,7 @@ export async function __updatePollVote(
       this.tokenBalanceCache,
       this.models,
       thread.topic_id,
-      address.address
+      address.address,
     );
     if (!canVote) {
       throw new AppError(Errors.InsufficientTokenBalance);
@@ -97,7 +97,7 @@ export async function __updatePollVote(
         ...voteData,
         option: selectedOption,
       },
-      { transaction }
+      { transaction },
     );
   });
 

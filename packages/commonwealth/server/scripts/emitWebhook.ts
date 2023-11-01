@@ -1,8 +1,8 @@
-import { SupportedNetwork } from '../../shared/chain/types/types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import { SupportedNetwork } from '../../shared/chain/types/types';
 import models from '../database';
 import { WebhookInstance } from '../models/webhook';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
@@ -43,7 +43,7 @@ async function main() {
     .check((args) => {
       if (!args.url && !args.destination) {
         throw new Error(
-          'Must provide either a webhook url or a destination flag.'
+          'Must provide either a webhook url or a destination flag.',
         );
       }
       return true;
@@ -58,11 +58,11 @@ async function main() {
   ) {
     throw new Error(
       'Must have DISCORD_WEBHOOK_URL_DEV, SLACK_WEBHOOK_URL_DEV, ' +
-        'ZAPIER_WEBHOOK_URL_DEV, and TELEGRAM_BOT_TOKEN_DEV set in .env'
+        'ZAPIER_WEBHOOK_URL_DEV, and TELEGRAM_BOT_TOKEN_DEV set in .env',
     );
   }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id: 'dydx',
     },
@@ -101,7 +101,7 @@ async function main() {
       models.Webhook.build({
         url: process.env.ZAPIER_WEBHOOK_URL_DEV,
         ...genericWebhookOptions,
-      })
+      }),
     );
   } else {
     throw new Error(`Invalid webhook destination: ${argv.destination}`);
@@ -112,7 +112,7 @@ async function main() {
       models.Webhook.build({
         url,
         ...genericWebhookOptions,
-      })
+      }),
     );
   }
 

@@ -3,12 +3,12 @@ import { AppError } from 'common-common/src/errors';
 import { ChainBase } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
-import { urlHasValidHTTPPrefix } from '../../../shared/utils';
-import type { ChainAttributes } from '../../models/chain';
-import { findOneRole } from '../../util/roles';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
-import { ServerCommunitiesController } from '../server_communities_controller';
 import { UserInstance } from 'server/models/user';
+import { urlHasValidHTTPPrefix } from '../../../shared/utils';
+import { ALL_CHAINS } from '../../middleware/databaseValidationService';
+import type { CommunityAttributes } from '../../models/community';
+import { findOneRole } from '../../util/roles';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -30,16 +30,18 @@ export const Errors = {
   InvalidDefaultPage: 'Default page does not exist',
 };
 
-export type UpdateCommunityOptions = ChainAttributes & {
+export type UpdateCommunityOptions = CommunityAttributes & {
   user: UserInstance;
   featuredTopics?: string[];
   snapshot?: string[];
 };
-export type UpdateCommunityResult = ChainAttributes & { snapshot: string[] };
+export type UpdateCommunityResult = CommunityAttributes & {
+  snapshot: string[];
+};
 
 export async function __updateCommunity(
   this: ServerCommunitiesController,
-  { user, id, network, ...rest }: UpdateCommunityOptions
+  { user, id, network, ...rest }: UpdateCommunityOptions,
 ): Promise<UpdateCommunityResult> {
   if (!user) {
     throw new AppError(Errors.NotLoggedIn);
@@ -54,7 +56,7 @@ export async function __updateCommunity(
     throw new AppError(Errors.CantChangeNetwork);
   }
 
-  const chain = await this.models.Chain.findOne({ where: { id: id } });
+  const chain = await this.models.Community.findOne({ where: { id: id } });
   if (!chain) {
     throw new AppError(Errors.NoChainFound);
   } else {
@@ -65,7 +67,7 @@ export async function __updateCommunity(
       this.models,
       { where: { address_id: { [Op.in]: userAddressIds } } },
       chain.id,
-      ['admin']
+      ['admin'],
     );
     if (!user.isAdmin && !userMembership) {
       throw new AppError(Errors.NotAdmin);

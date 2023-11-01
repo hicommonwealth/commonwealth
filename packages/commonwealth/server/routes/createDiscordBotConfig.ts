@@ -22,7 +22,7 @@ const TOKEN_EXPIRATION_MINUTES = 5;
 const createDiscordBotConfig = async (
   models: DB,
   req: TypedRequestBody<CreateDiscordBotConfigReq>,
-  res: TypedResponse<CreateDiscordBotConfigResp>
+  res: TypedResponse<CreateDiscordBotConfigResp>,
 ) => {
   const { chain_id, verification_token } = req.body;
 
@@ -42,7 +42,7 @@ const createDiscordBotConfig = async (
   }
 
   const token_expiration = new Date(
-    +new Date() + TOKEN_EXPIRATION_MINUTES * 60 * 1000
+    +new Date() + TOKEN_EXPIRATION_MINUTES * 60 * 1000,
   );
 
   try {
@@ -63,12 +63,12 @@ const createDiscordBotConfig = async (
           where: {
             community_id: chain_id,
           },
-        }
+        },
       );
 
-      await models.Chain.update(
+      await models.Community.update(
         { discord_config_id: existingConfig.id },
-        { where: { id: chain_id } }
+        { where: { id: chain_id } },
       );
 
       return success(res, {

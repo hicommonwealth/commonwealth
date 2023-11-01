@@ -1,24 +1,24 @@
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { CommentAttributes } from '../../models/comment';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { getCommentDepth } from '../../util/getCommentDepth';
+import moment from 'moment';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { AppError } from '../../../../common-common/src/errors';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import moment from 'moment';
-import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { ServerThreadsController } from '../server_threads_controller';
-import { validateOwner } from '../../util/validateOwner';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
+import { CommentAttributes } from '../../models/comment';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { getCommentDepth } from '../../util/getCommentDepth';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -38,7 +38,7 @@ const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 export type CreateThreadCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   parentId: number;
   threadId: number;
   text: string;
@@ -51,7 +51,7 @@ export type CreateThreadCommentOptions = {
 export type CreateThreadCommentResult = [
   CommentAttributes,
   EmitOptions[],
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThreadComment(
@@ -67,7 +67,7 @@ export async function __createThreadComment(
     canvasSession,
     canvasHash,
     discordMeta,
-  }: CreateThreadCommentOptions
+  }: CreateThreadCommentOptions,
 ): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
@@ -114,7 +114,7 @@ export async function __createThreadComment(
     const [commentDepthExceeded] = await getCommentDepth(
       this.models,
       parentComment,
-      MAX_COMMENT_DEPTH
+      MAX_COMMENT_DEPTH,
     );
     if (commentDepthExceeded) {
       throw new AppError(Errors.NestingTooDeep);
@@ -140,7 +140,7 @@ export async function __createThreadComment(
         this.tokenBalanceCache,
         thread.topic_id,
         chain,
-        address
+        address,
       );
       if (!isValid) {
         throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
@@ -199,7 +199,7 @@ export async function __createThreadComment(
         comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
     await this.models.Subscription.create(
       {
@@ -209,7 +209,7 @@ export async function __createThreadComment(
         comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
 
     await transaction.commit();
@@ -235,7 +235,7 @@ export async function __createThreadComment(
             include: [this.models.User],
           });
           return mentionedUser;
-        })
+        }),
       );
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }

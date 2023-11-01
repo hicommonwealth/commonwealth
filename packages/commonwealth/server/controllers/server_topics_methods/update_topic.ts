@@ -1,9 +1,9 @@
-import { TopicAttributes } from '../../models/topic';
-import { ChainInstance } from '../../models/chain';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { TopicAttributes } from '../../models/topic';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -18,7 +18,7 @@ export const Errors = {
 
 export type UpdateTopicOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   body: Partial<TopicAttributes>;
 };
 
@@ -26,7 +26,7 @@ export type UpdateTopicResult = TopicAttributes;
 
 export async function __updateTopic(
   this: ServerTopicsController,
-  { user, chain, body }: UpdateTopicOptions
+  { user, chain, body }: UpdateTopicOptions,
 ): Promise<UpdateTopicResult> {
   if (!body.id) {
     throw new AppError(Errors.NoTopicId);

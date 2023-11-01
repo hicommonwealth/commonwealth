@@ -1,19 +1,19 @@
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { ReactionAttributes } from '../../models/reaction';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
 } from '../../../../common-common/src/types';
-import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { ServerThreadsController } from '../server_threads_controller';
-import { validateOwner } from '../../util/validateOwner';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { ReactionAttributes } from '../../models/reaction';
+import { UserInstance } from '../../models/user';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -27,7 +27,7 @@ export const Errors = {
 export type CreateThreadReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   reaction: string;
   threadId: number;
   canvasAction?: any;
@@ -38,7 +38,7 @@ export type CreateThreadReactionOptions = {
 export type CreateThreadReactionResult = [
   ReactionAttributes,
   EmitOptions,
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThreadReaction(
@@ -52,7 +52,7 @@ export async function __createThreadReaction(
     canvasAction,
     canvasSession,
     canvasHash,
-  }: CreateThreadReactionOptions
+  }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
   const thread = await this.models.Thread.findOne({
     where: { id: threadId },
@@ -97,7 +97,7 @@ export async function __createThreadReaction(
         this.tokenBalanceCache,
         thread.topic_id,
         chain,
-        address
+        address,
       );
       if (!isValid) {
         throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);

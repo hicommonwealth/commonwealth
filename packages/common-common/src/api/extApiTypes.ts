@@ -1,16 +1,16 @@
 // contains types for external api
 
-import type { ThreadAttributes } from 'commonwealth/server/models/thread';
 import type { CommentAttributes } from 'commonwealth/server/models/comment';
-import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
-import type { ChainAttributes } from 'commonwealth/server/models/chain';
 import type { ProfileAttributes } from 'commonwealth/server/models/profile';
+import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
+import type { RoleAttributes } from 'commonwealth/server/models/role';
+import type { ThreadAttributes } from 'commonwealth/server/models/thread';
+import type { TopicAttributes } from 'commonwealth/server/models/topic';
 import type {
   BalanceProviderResp,
   ChainNodeResp,
 } from 'token-balance-cache/src';
-import type { TopicAttributes } from 'commonwealth/server/models/topic';
-import type { RoleAttributes } from 'commonwealth/server/models/role';
+import type { CommunityAttributes } from '../../../commonwealth/server/models/community';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -76,7 +76,7 @@ export type GetCommunitiesReq = {
 };
 
 export type PutCommunitiesReq = {
-  community: ChainAttributes;
+  community: CommunityAttributes;
   contract: { token_type: string; address: string };
   admin_addresses: string[];
 };
@@ -84,7 +84,7 @@ export type PutCommunitiesReq = {
 export type PutCommunitiesResp = { url: string; error?: string };
 
 export type GetCommunitiesResp = {
-  communities?: ChainAttributes[];
+  communities?: CommunityAttributes[];
   count: number;
 };
 

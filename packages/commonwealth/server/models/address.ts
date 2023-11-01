@@ -1,7 +1,7 @@
 import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
@@ -30,14 +30,14 @@ export type AddressAttributes = {
   wallet_id?: WalletId;
   wallet_sso_source?: WalletSsoSource;
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
   SsoToken?: SsoTokenAttributes;
 };
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
-  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
@@ -47,7 +47,7 @@ export type AddressModelStatic = ModelStatic<AddressInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): AddressModelStatic => {
   const Address: AddressModelStatic = <AddressModelStatic>sequelize.define(
     'Address',
@@ -117,11 +117,11 @@ export default (
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   Address.associate = (models) => {
-    models.Address.belongsTo(models.Chain, {
+    models.Address.belongsTo(models.Community, {
       foreignKey: 'community_id',
       targetKey: 'id',
     });

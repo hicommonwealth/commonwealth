@@ -6,14 +6,14 @@ const viewChainIcons = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.chains) {
     return next(new AppError('Must provide a list of chains'));
   }
   const chains = JSON.parse(req.body.chains);
 
-  const iconUrls = await models.Chain.findAll({
+  const iconUrls = await models.Community.findAll({
     attributes: ['id', 'icon_url'],
     where: {
       id: chains,

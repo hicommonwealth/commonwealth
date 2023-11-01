@@ -1,12 +1,12 @@
-import { ServerThreadsController } from '../server_threads_controller';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ThreadAttributes } from '../../models/thread';
+import { ServerThreadsController } from '../server_threads_controller';
 
 const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
 
 export type GetActiveThreadsOptions = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   threadsPerTopic: number;
 };
 
@@ -14,7 +14,7 @@ export type GetActiveThreadsResult = ThreadAttributes[];
 
 export async function __getActiveThreads(
   this: ServerThreadsController,
-  { chain, threadsPerTopic }: GetActiveThreadsOptions
+  { chain, threadsPerTopic }: GetActiveThreadsOptions,
 ): Promise<GetActiveThreadsResult> {
   const allThreads = [];
   if (
@@ -51,7 +51,7 @@ export async function __getActiveThreads(
           ['last_commented_on', 'DESC'],
         ],
       });
-    })
+    }),
   );
 
   allRecentTopicThreadsRaw = allRecentTopicThreadsRaw.flat();
@@ -64,7 +64,7 @@ export async function __getActiveThreads(
 
   communityTopics.forEach((topic) => {
     const threadsWithCommentsCount = allRecentTopicThreads.filter(
-      (thread) => thread.topic_id === topic.id
+      (thread) => thread.topic_id === topic.id,
     );
     allThreads.push(...(threadsWithCommentsCount || []));
   });

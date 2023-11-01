@@ -12,7 +12,7 @@ const selectChain = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
@@ -21,7 +21,9 @@ const selectChain = async (
     return next(new AppError(Errors.NoChain));
   }
 
-  const chain = await models.Chain.findOne({ where: { id: req.body.chain } });
+  const chain = await models.Community.findOne({
+    where: { id: req.body.chain },
+  });
   if (!chain) {
     return next(new AppError(Errors.ChainNF));
   }

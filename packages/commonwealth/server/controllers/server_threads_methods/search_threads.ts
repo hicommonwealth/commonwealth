@@ -1,6 +1,6 @@
 import { QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ThreadAttributes } from '../../models/thread';
 import {
   PaginationSqlBind,
@@ -11,7 +11,7 @@ import {
 import { ServerThreadsController } from '../server_threads_controller';
 
 export type SearchThreadsOptions = {
-  chain: ChainInstance;
+  chain: CommunityInstance;
   searchTerm: string;
   threadTitleOnly: boolean;
   limit?: number;
@@ -34,7 +34,7 @@ export async function __searchThreads(
     page,
     orderBy,
     orderDirection,
-  }: SearchThreadsOptions
+  }: SearchThreadsOptions,
 ): Promise<SearchThreadsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {

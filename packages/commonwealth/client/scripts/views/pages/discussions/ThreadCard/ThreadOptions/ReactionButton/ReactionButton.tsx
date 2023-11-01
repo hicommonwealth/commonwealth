@@ -1,3 +1,4 @@
+import { SessionKeyError } from 'controllers/server/sessions';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -7,22 +8,22 @@ import {
 } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { LoginModal } from '../../../../../modals/login_modal';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
-import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
-import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
   showSkeleton?: boolean;
   disabled: boolean;
+  tooltipText?: string;
 };
 
 export const ReactionButton = ({
@@ -30,12 +31,13 @@ export const ReactionButton = ({
   size,
   disabled,
   showSkeleton,
+  tooltipText,
 }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
   const activeAddress = app.user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
-    (r) => r.address === activeAddress
+    (r) => r.address === activeAddress,
   );
   const hasReacted = thisUserReaction?.length !== 0;
   const reactedId =
@@ -126,16 +128,10 @@ export const ReactionButton = ({
           tooltipContent={getDisplayedReactorsForPopup({
             reactors: reactors,
           })}
+          tooltipText={tooltipText}
         />
-      ) : disabled ? (
-        <TooltipWrapper
-          disabled={disabled}
-          text={
-            thread.archivedAt
-              ? 'Thread is archived'
-              : `Join community to upvote`
-          }
-        >
+      ) : tooltipText ? (
+        <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
             voteCount={reactors.length}

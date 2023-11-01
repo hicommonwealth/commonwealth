@@ -8,8 +8,8 @@ import {
 } from '../../../../common-common/src/types';
 import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { CommentAttributes } from '../../models/comment';
+import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
@@ -25,7 +25,7 @@ const Errors = {
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   commentId?: number;
   commentBody: string;
   discordMeta?: any;
@@ -42,7 +42,7 @@ export async function __updateComment(
     commentId,
     commentBody,
     discordMeta,
-  }: UpdateCommentOptions
+  }: UpdateCommentOptions,
 ): Promise<UpdateCommentResult> {
   if (!commentId && !discordMeta) {
     throw new AppError(Errors.NoId);
@@ -105,7 +105,7 @@ export async function __updateComment(
   comment.plaintext = (() => {
     try {
       return renderQuillDeltaToText(
-        JSON.parse(decodeURIComponent(commentBody))
+        JSON.parse(decodeURIComponent(commentBody)),
       );
     } catch (e) {
       return decodeURIComponent(commentBody);
@@ -144,7 +144,7 @@ export async function __updateComment(
   try {
     const previousDraftMentions = parseUserMentions(latestVersion);
     const currentDraftMentions = parseUserMentions(
-      decodeURIComponent(commentBody)
+      decodeURIComponent(commentBody),
     );
     mentions = currentDraftMentions.filter((addrArray) => {
       let alreadyExists = false;
@@ -172,7 +172,7 @@ export async function __updateComment(
           include: [this.models.User],
         });
         return mentionedUser;
-      })
+      }),
     );
     // filter null results
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);

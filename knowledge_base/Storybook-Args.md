@@ -1,4 +1,5 @@
 **Contents**
+
 - [Providing args](#providing-args)
 - [Changing input type](#changing-input-type)
 - [References:](#references-)
@@ -9,6 +10,7 @@
 Args provide default values for controls we want to use.
 
 For every arg key-value pair, the story controls will infer its type and give the respective input. Examples:
+
 * [Button component](https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/.storybook/stories/atoms/Button.stories.tsx) and the attribute `label: "Primary",` corresponding input will be text
 * [Checkbox](https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/.storybook/stories/molecules/Checkbox.stories.tsx) component and the attribute `checked: false,` corresponding input will be a toggle with options _true_ and _false_
 * [VoteButton](https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/.storybook/stories/molecules/VoteButton.stories.tsx) component and the attribute `voteCount: 0,` corresponding input will be number
@@ -27,9 +29,10 @@ Values from one type can have an input of a different type. An example is the [B
 
 ![image](https://github.com/hicommonwealth/commonwealth/assets/30223098/2785ff04-61f1-4c45-9f4f-9afc9080e5fa)
 
-# References:
-1. https://storybook.js.org/docs/react/writing-stories/args
+# References
 
-# Change Log
+1. <https://storybook.js.org/docs/react/writing-stories/args>
+
+## Change Log
 
 - 230530: Authored by Daniel Martins.

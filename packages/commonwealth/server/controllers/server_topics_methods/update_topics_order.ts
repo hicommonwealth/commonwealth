@@ -1,9 +1,9 @@
-import { TopicAttributes, TopicInstance } from '../../models/topic';
-import { ChainInstance } from '../../models/chain';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { TopicAttributes, TopicInstance } from '../../models/topic';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 const Errors = {
   NoUser: 'Not signed in',
@@ -16,7 +16,7 @@ const Errors = {
 
 export type UpdateTopicsOrderOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   body: {
     orderedIds: string[];
   };
@@ -26,7 +26,11 @@ export type UpdateTopicsOrderResult = TopicAttributes[];
 
 export async function __updateTopicsOrder(
   this: ServerTopicsController,
-  { user, chain, body: { orderedIds: newTopicOrder } }: UpdateTopicsOrderOptions
+  {
+    user,
+    chain,
+    body: { orderedIds: newTopicOrder },
+  }: UpdateTopicsOrderOptions,
 ): Promise<UpdateTopicsOrderResult> {
   if (!user) {
     throw new AppError(Errors.NoUser);
@@ -61,7 +65,7 @@ export async function __updateTopicsOrder(
         await topic.save();
         return topic;
       })();
-    })
+    }),
   );
 
   return topics.map((t) => t.toJSON());
