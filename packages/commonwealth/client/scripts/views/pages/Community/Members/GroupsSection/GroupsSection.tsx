@@ -18,7 +18,7 @@ type GroupSectionProps = {
 const GroupsSection = ({
   filteredGroups,
   canManageGroups,
-  hasNoGroups
+  hasNoGroups,
 }: GroupSectionProps) => {
   const navigate = useCommonNavigate();
   return (
@@ -69,7 +69,7 @@ const GroupsSection = ({
                     ?.join(' ') || '',
                 requirementContractAddress: r.data.source.contract_address,
                 requirementAmount: r.data.threshold,
-                requirementCondition: 'More than' // hardcoded in api
+                requirementCondition: 'More than', // hardcoded in api
               }))}
               requirementsToFulfill={
                 group.requirementsToFulfill === group.requirements.length
@@ -79,7 +79,8 @@ const GroupsSection = ({
               isJoined={(group.members || []).find((x) => {
                 if (!app.user.activeAccount || app.user.activeAccount === null)
                   return;
-                x?.address?.address === app.user.activeAccount.address;
+
+                return x?.address?.address === app.user.activeAccount.address;
               })}
               topics={group.topics.map((x) => ({ id: x.id, name: x.name }))}
               canEdit={canManageGroups}
