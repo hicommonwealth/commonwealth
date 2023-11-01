@@ -1,4 +1,5 @@
 **Contents**
+
 - [API Pagination Standard](#api-pagination-standard)
   * [Request Query Params](#request-query-params)
   * [Limit/Offset vs Cursor Pagination](#limit-offset-vs-cursor-pagination)
@@ -22,6 +23,7 @@
 | `order_direction` | Direction to sort | string | `ASC` or `DESC`
 
 Additional Notes:
+
 - All pagination-related query params should be optional
 - Sensible default values should be provided
 
@@ -29,7 +31,7 @@ Additional Notes:
 
 ⭐️ For consistency, we should use limit/offset for ALL routes, unless a special exception needs to be made for performance reasons.
 
-Cursor based pagination is more performant than limit/offset pagination, particularly as the offset increases. (https://shopify.engineering/pagination-relative-cursors)
+Cursor based pagination is more performant than limit/offset pagination, particularly as the offset increases. (<https://shopify.engineering/pagination-relative-cursors>)
 
 However, `ts_rank_cd` is used in some queries to perform text search and sort by a computed rank column. Using cursor-based pagination with a computed column can result in inconsistent pagination results. It's also not very efficient since computed columns are not indexed. Cursor-based pagination works best on indexed columns with unique and sequential rows.
 
@@ -38,6 +40,7 @@ However, `ts_rank_cd` is used in some queries to perform text search and sort by
 The existing utility functions should be used for both ORM queries and raw SQL queries.
 
 ⭐️ Sequelize ORM example:
+
 ```js
 import { formatPagination } from '../util/queries';
 
@@ -56,6 +59,7 @@ const result = await models.Comment.count({
 ```
 
 ⭐️ Raw SQL example:
+
 ```js
 import { buildPaginationSql } from '../util/queries';
 
@@ -95,7 +99,7 @@ Use `TypedPaginationResult<T>`, which has the following shape:
 }
 ```
 
-# Change Log
+## Change Log
 
 - 231027: Fixed code typo + added response body type.
 - 230714: Authored by Ryan Bennett.

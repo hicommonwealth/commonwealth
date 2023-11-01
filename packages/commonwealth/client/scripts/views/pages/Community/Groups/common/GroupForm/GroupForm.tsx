@@ -2,6 +2,7 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -17,7 +18,7 @@ import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
   TOKENS,
-  conditionTypes,
+  conditionTypes
 } from '../../../common/constants';
 import TopicGatingHelpMessage from '../../TopicGatingHelpMessage';
 import './GroupForm.scss';
@@ -27,17 +28,17 @@ import {
   FormSubmitValues,
   GroupFormProps,
   RequirementSubFormsState,
-  RequirementSubType,
+  RequirementSubType
 } from './index.types';
 import {
   VALIDATION_MESSAGES,
   groupValidationSchema,
-  requirementSubFormValidationSchema,
+  requirementSubFormValidationSchema
 } from './validations';
 
 const REQUIREMENTS_TO_FULFILL = {
   ALL_REQUIREMENTS: 'ALL',
-  N_REQUIREMENTS: 'N',
+  N_REQUIREMENTS: 'N'
 };
 
 type CWRequirementsRadioButtonProps = {
@@ -49,7 +50,7 @@ type CWRequirementsRadioButtonProps = {
 const CWRequirementsRadioButton = ({
   inputError,
   inputValue,
-  onInputValueChange,
+  onInputValueChange
 }: CWRequirementsRadioButtonProps) => {
   const Label = (
     <span className="requirements-radio-btn-label">
@@ -86,7 +87,7 @@ const getRequirementSubFormSchema = (
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
   const schema = isTokenRequirement
     ? requirementSubFormValidationSchema.omit({
-        requirementContractAddress: true,
+        requirementContractAddress: true
       })
     : requirementSubFormValidationSchema;
   return schema;
@@ -96,12 +97,21 @@ const GroupForm = ({
   formType,
   onSubmit,
   initialValues = {},
-  onDelete = () => {},
+  onDelete = () => {}
 }: GroupFormProps) => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    chainId: app.activeChainId()
   });
+
+  const { data: groups = [] } = useFetchGroupsQuery({
+    chainId: app.activeChainId()
+  });
+
+  const takenGroupNames = groups.map(({ name }) => name.toLowerCase());
+
+  const [isNameTaken, setIsNameTaken] = useState(false);
+
   const sortedTopics = (topics || []).sort((a, b) => a?.name?.localeCompare(b));
   const [cwRequiremenetsLabelInputField, setCwRequiremenetsLabelInputField] =
     useState<CWRequirementsLabelInputFieldState>({ value: '1', error: '' });
@@ -112,17 +122,17 @@ const GroupForm = ({
       defaultValues: {
         requirementCondition: conditionTypes.find(
           (x) => x.value === AMOUNT_CONDITIONS.MORE
-        ),
+        )
       },
       values: {
         requirementAmount: '',
         requirementChain: '',
         requirementCondition: AMOUNT_CONDITIONS.MORE,
         requirementContractAddress: '',
-        requirementType: '',
+        requirementType: ''
       },
-      errors: {},
-    },
+      errors: {}
+    }
   ]);
 
   useEffect(() => {
@@ -133,16 +143,16 @@ const GroupForm = ({
             ...x,
             requirementCondition: conditionTypes.find(
               (y) => y.value === AMOUNT_CONDITIONS.MORE
-            ),
+            )
           },
           values: {
             requirementAmount: x?.requirementAmount || '',
             requirementChain: x?.requirementChain?.value || '',
             requirementCondition: AMOUNT_CONDITIONS.MORE,
             requirementContractAddress: x?.requirementContractAddress || '',
-            requirementType: x?.requirementType?.value || '',
+            requirementType: x?.requirementType?.value || ''
           },
-          errors: {},
+          errors: {}
         }))
       );
     }
@@ -154,7 +164,7 @@ const GroupForm = ({
     ) {
       setCwRequiremenetsLabelInputField({
         ...cwRequiremenetsLabelInputField,
-        value: `${initialValues.requirementsToFulfill}`,
+        value: `${initialValues.requirementsToFulfill}`
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -171,17 +181,17 @@ const GroupForm = ({
         defaultValues: {
           requirementCondition: conditionTypes.find(
             (x) => x.value === AMOUNT_CONDITIONS.MORE
-          ),
+          )
         },
         values: {
           requirementAmount: '',
           requirementChain: '',
           requirementCondition: AMOUNT_CONDITIONS.MORE,
           requirementContractAddress: '',
-          requirementType: '',
+          requirementType: ''
         },
-        errors: {},
-      },
+        errors: {}
+      }
     ]);
   };
 
@@ -207,13 +217,12 @@ const GroupForm = ({
       ...allRequirements[index],
       values: {
         ...allRequirements[index].values,
-        ...val,
-      },
+        ...val
+      }
     };
     const key = Object.keys(val)[0];
     try {
-      // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this
-      // manually using javascript
+      // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
       const schema = getRequirementSubFormSchema(
         allRequirements[index].values.requirementType
       );
@@ -223,8 +232,8 @@ const GroupForm = ({
         ...allRequirements[index],
         errors: {
           ...allRequirements[index].errors,
-          [key]: '',
-        },
+          [key]: ''
+        }
       };
     } catch (e: any) {
       const zodError = e as ZodError;
@@ -234,8 +243,8 @@ const GroupForm = ({
         ...allRequirements[index],
         errors: {
           ...allRequirements[index].errors,
-          [key]: message,
-        },
+          [key]: message
+        }
       };
     }
 
@@ -260,7 +269,7 @@ const GroupForm = ({
 
         updatedSubForms[index] = {
           ...updatedSubForms[index],
-          errors: {},
+          errors: {}
         };
       } catch (e: any) {
         const zodError = e as ZodError;
@@ -271,7 +280,7 @@ const GroupForm = ({
 
         updatedSubForms[index] = {
           ...updatedSubForms[index],
-          errors: errors as any,
+          errors: errors as any
         };
       }
     });
@@ -283,7 +292,7 @@ const GroupForm = ({
 
   const handleSubmit = async (values: FormSubmitValues) => {
     const hasSubFormErrors = validateSubForms();
-    if (hasSubFormErrors) {
+    if (hasSubFormErrors || cwRequiremenetsLabelInputField.error) {
       return;
     }
 
@@ -291,7 +300,7 @@ const GroupForm = ({
     let requirementsToFulfill: any = values.requirementsToFulfill;
     setCwRequiremenetsLabelInputField({
       ...cwRequiremenetsLabelInputField,
-      error: '',
+      error: ''
     });
     if (
       values.requirementsToFulfill === REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
@@ -300,7 +309,7 @@ const GroupForm = ({
       if (!cwRequiremenetsLabelInputField.value) {
         setCwRequiremenetsLabelInputField({
           ...cwRequiremenetsLabelInputField,
-          error: VALIDATION_MESSAGES.NO_INPUT,
+          error: VALIDATION_MESSAGES.NO_INPUT
         });
         return;
       }
@@ -313,11 +322,11 @@ const GroupForm = ({
         !requirementsToFulfill ||
         requirementsToFulfill < 1 ||
         requirementsToFulfill > MAX_REQUIREMENTS ||
-        cwRequiremenetsLabelInputField.value.includes('.')
+        /[^0-9]/g.test(cwRequiremenetsLabelInputField.value)
       ) {
         setCwRequiremenetsLabelInputField({
           ...cwRequiremenetsLabelInputField,
-          error: VALIDATION_MESSAGES.INVALID_VALUE,
+          error: VALIDATION_MESSAGES.INVALID_VALUE
         });
         return;
       }
@@ -326,7 +335,7 @@ const GroupForm = ({
     const formValues = {
       ...values,
       requirementsToFulfill,
-      requirements: requirementSubForms.map((x) => x.values),
+      requirements: requirementSubForms.map((x) => x.values)
     };
 
     await onSubmit(formValues);
@@ -344,7 +353,7 @@ const GroupForm = ({
             ? REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
             : REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
           : '',
-        topics: initialValues.topics || '',
+        topics: initialValues.topics || ''
       }}
       validationSchema={groupValidationSchema}
       onSubmit={handleSubmit}
@@ -378,6 +387,12 @@ const GroupForm = ({
               placeholder="Group name"
               fullWidth
               instructionalMessage="Can be up to 40 characters long."
+              customError={isNameTaken ? 'Group name is already taken' : ''}
+              onInput={(e) => {
+                setIsNameTaken(
+                  takenGroupNames.includes(e.target.value.toLowerCase())
+                );
+              }}
             />
             <CWTextArea
               name="groupDescription"
@@ -448,8 +463,8 @@ const GroupForm = ({
                   inputValue={cwRequiremenetsLabelInputField.value}
                   onInputValueChange={(value) =>
                     setCwRequiremenetsLabelInputField({
-                      ...cwRequiremenetsLabelInputField,
                       value,
+                      error: ''
                     })
                   }
                 />
@@ -489,7 +504,7 @@ const GroupForm = ({
                 placeholder="Type in topic name"
                 options={sortedTopics.map((topic) => ({
                   label: topic.name,
-                  value: topic.id,
+                  value: topic.id
                 }))}
               />
             </section>
@@ -531,6 +546,7 @@ const GroupForm = ({
             <CWButton
               type="submit"
               buttonWidth="wide"
+              disabled={isNameTaken}
               label={formType === 'create' ? 'Create group' : 'Save changes'}
             />
           </div>

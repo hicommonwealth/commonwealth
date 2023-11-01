@@ -9,12 +9,11 @@ import {
   NotificationCategories,
 } from 'common-common/src/types';
 import type { NextFunction } from 'express';
-import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-import type { CommunityAttributes } from '../models/community';
 import type { ChainNodeAttributes } from '../models/chain_node';
+import type { CommunityAttributes } from '../models/community';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -23,10 +22,12 @@ import axios from 'axios';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import {
+  MAX_COMMUNITY_IMAGE_SIZE_BYTES,
+  checkUrlFileSize,
+} from '../util/checkUrlFileSize';
 import { RoleInstanceWithPermission } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-
-const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -62,8 +63,6 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  ImageDoesntExist: `Image url provided doesn't exist`,
-  ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
@@ -82,16 +81,6 @@ type CreateChainResp = {
   role: RoleAttributes;
   admin_address: string;
 };
-
-export async function getFileSizeBytes(url: string): Promise<number> {
-  try {
-    // Range header is to prevent it from reading any bytes from the GET request because we only want the headers.
-    const resp = await fetch(url, { headers: { Range: 'bytes=0-0' } });
-    return parseInt(resp.headers.get('content-range').split('/')[1], 10);
-  } catch (e) {
-    throw new AppError(Errors.ImageDoesntExist);
-  }
-}
 
 const createChain = async (
   models: DB,
@@ -136,11 +125,8 @@ const createChain = async (
     return next(new AppError(Errors.NoBase));
   }
 
-  if (
-    req.body.icon_url &&
-    (await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB
-  ) {
-    throw new AppError(Errors.ImageTooLarge);
+  if (req.body.icon_url) {
+    await checkUrlFileSize(req.body.icon_url, MAX_COMMUNITY_IMAGE_SIZE_BYTES);
   }
 
   const validAdminAddresses = await models.Address.scope(

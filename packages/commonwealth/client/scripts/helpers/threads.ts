@@ -37,3 +37,21 @@ export const getAddedAndDeleted = <T>(
 
   return { toAdd, toDelete };
 };
+
+export const getThreadActionTooltipText = ({
+  isCommunityMember = false,
+  isThreadArchived = false,
+  isThreadLocked = false,
+  isThreadTopicGated = false,
+}: {
+  isCommunityMember?: boolean;
+  isThreadArchived?: boolean;
+  isThreadLocked?: boolean;
+  isThreadTopicGated?: boolean;
+}) => {
+  if (!isCommunityMember) return 'Join community to upvote';
+  if (isThreadArchived) return 'Thread is archived';
+  if (isThreadLocked) return 'Thread is locked';
+  if (isThreadTopicGated) return 'Topic is gated';
+  return '';
+};

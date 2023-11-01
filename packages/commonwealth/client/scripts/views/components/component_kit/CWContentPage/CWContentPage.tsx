@@ -1,9 +1,13 @@
-import { IThreadCollaborator } from 'client/scripts/models/Thread';
+import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
+import app from 'state';
+import { useRefreshMembershipQuery } from 'state/api/groups';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
@@ -109,6 +113,16 @@ export const CWContentPage = ({
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+  });
+
+  const restrictedTopicIds = (memberships || [])
+    .filter((x) => x.rejectReason)
+    .map((x) => parseInt(`${x.topicId}`));
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
@@ -170,6 +184,13 @@ export const CWContentPage = ({
     </div>
   );
 
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!hasJoinedCommunity,
+    isThreadArchived: !!thread?.archivedAt,
+    isThreadLocked: !!thread?.lockedAt,
+    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+  });
+
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
@@ -201,7 +222,10 @@ export const CWContentPage = ({
             onEditStart={onEditStart}
             canUpdateThread={canUpdateThread}
             hasPendingEdits={hasPendingEdits}
+            canReact={!disabledActionsTooltipText}
+            canComment={!disabledActionsTooltipText}
             onProposalStageChange={onProposalStageChange}
+            disabledActionTooltipText={disabledActionsTooltipText}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
           />
         )}

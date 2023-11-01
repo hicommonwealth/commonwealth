@@ -1,11 +1,11 @@
 **Contents**
+
 - [Errors](#errors)
   * [Could not fetch chain-event service data](#could-not-fetch-chain-event-service-data)
   * [Could not detect network](#could-not-detect-network)
   * [localhost:8081 ERR_CONNECTION_REFUSED](#localhost-8081-err-connection-refused)
   * [Sequelize Validation Error for Entity_Meta](#sequelize-validation-error-for-entity-meta)
 - [Change Log](#change-log)
-
 
 # Errors
 
@@ -48,7 +48,9 @@ UPDATE "ChainNodes" SET url = 'wss://eth-mainnet.g.alchemy.com/v2/[ETH_ALCHEMY_A
 ```
 GET http://localhost:8081/api/events?limit=50&ordered=true net::ERR_CONNECTION_REFUSED
 ```
+
 This error indicates that the chain-events service cannot be reached. You have 2 options:
+
 1. Run the chain-events app locally by running `yarn start-app` or `yarn start-all` from `packages/chain-events`
 2. Set the `ENTITIES_URL` env var which will tell the client to use a remote chain-event service e.g. `ENTITIES_URL=https://chain-events.herokuapp.com/api`. Note that to use this method you want to ensure you local CW database is in sync with the remote chain-events db you will be using. Instructions for syncing can be found [here][2].
 
@@ -88,7 +90,7 @@ This occurs because your chain-events database is behind (in terms of entities f
 [1]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events%20Environment%20Variables#heroku
 [2]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Overview#enforcing-chain-event-data-consistency
 
-# Change Log
+## Change Log
 
 - 231012: Flagged by Graham Johnson to update links from footnote-style to inline.
 - 230122: Authored by Timothee Legros

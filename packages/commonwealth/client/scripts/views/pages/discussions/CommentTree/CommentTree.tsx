@@ -1,4 +1,8 @@
+import clsx from 'clsx';
+import { SessionKeyError } from 'controllers/server/sessions';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -14,6 +18,7 @@ import {
   deserializeDelta,
   serializeDelta,
 } from 'views/components/react_quill_editor/utils';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { notifyError } from '../../../../controllers/app/notifications';
 import type { Comment as CommentType } from '../../../../models/Comment';
@@ -23,12 +28,7 @@ import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import './CommentTree.scss';
 import { jumpHighlightComment } from './helpers';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { CommentsFeaturedFilterTypes } from 'models/types';
-import clsx from 'clsx';
 import usePrepareCommentsList from './usePrepareCommentsList';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
 
 type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;
@@ -40,8 +40,11 @@ type CommentsTreeAttrs = {
   parentCommentId: number;
   setParentCommentId: (id: number) => void;
   fromDiscordBot?: boolean;
+  canReact?: boolean;
+  canReply?: boolean;
   canComment: boolean;
   commentSortType: CommentsFeaturedFilterTypes;
+  disabledActionsTooltipText?: string;
 };
 
 export const CommentTree = ({
@@ -54,8 +57,11 @@ export const CommentTree = ({
   setIsReplying,
   parentCommentId,
   setParentCommentId,
+  canReact = true,
+  canReply = true,
   canComment,
   commentSortType,
+  disabledActionsTooltipText,
 }: CommentsTreeAttrs) => {
   const [highlightedComment, setHighlightedComment] = useState(false);
 
@@ -437,14 +443,18 @@ export const CommentTree = ({
                   </div>
                 )}
                 <CommentCard
+                  disabledActionsTooltipText={disabledActionsTooltipText}
                   isThreadArchived={!!thread.archivedAt}
-                  canReply={!!hasJoinedCommunity && !thread.archivedAt}
+                  canReply={
+                    !!hasJoinedCommunity && !thread.archivedAt && canReply
+                  }
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
                     !thread.archivedAt &&
                     (!!hasJoinedCommunity ||
                       isAdmin ||
-                      !app.chain.isGatedTopic(thread.topic.id))
+                      !app.chain.isGatedTopic(thread.topic.id)) &&
+                    canReact
                   }
                   canEdit={
                     !isLocked && (comment.isCommentAuthor || isAdminOrMod)

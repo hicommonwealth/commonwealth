@@ -12,19 +12,20 @@ import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import type { AddressInstance } from '../../models/address';
-import type { CommunityAttributes } from '../../models/community';
 import type { ChainNodeAttributes } from '../../models/chain_node';
+import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
 import axios from 'axios';
 import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 import { UserInstance } from '../../models/user';
-import { getFileSizeBytes } from '../../util/getFilesSizeBytes';
+import {
+  MAX_COMMUNITY_IMAGE_SIZE_BYTES,
+  checkUrlFileSize,
+} from '../../util/checkUrlFileSize';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
-
-const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -59,8 +60,6 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  ImageDoesntExist: `Image url provided doesn't exist`,
-  ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
@@ -124,13 +123,9 @@ export async function __createCommunity(
     throw new AppError(Errors.NoBase);
   }
 
-  if (
-    community.icon_url &&
-    (await getFileSizeBytes(community.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB
-  ) {
-    throw new AppError(Errors.ImageTooLarge);
+  if (community.icon_url) {
+    await checkUrlFileSize(community.icon_url, MAX_COMMUNITY_IMAGE_SIZE_BYTES);
   }
-
   const existingBaseChain = await this.models.Community.findOne({
     where: { base: community.base },
   });
