@@ -39,6 +39,7 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.DISCORD_CLIENT_ID': JSON.stringify(
+        // TODO: @Timothee can we remove the default/hardcoded value here?
         process.env.DISCORD_CLIENT_ID || '1034502265664454776'
       ),
     }),
