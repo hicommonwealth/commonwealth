@@ -6,19 +6,19 @@ import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
+import { SessionKeyError } from 'controllers/server/sessions';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 import { useDraft } from 'hooks/useDraft';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { ContentType } from 'types';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import Permissions from '../../../utils/Permissions';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
-import { CommentEditor } from './CommentEditor';
 import { ArchiveMsg } from './ArchiveMsg';
-import { SessionKeyError } from 'controllers/server/sessions';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { CommentEditor } from './CommentEditor';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -26,6 +26,7 @@ type CreateCommentProps = {
   rootThread: Thread;
   canComment: boolean;
   shouldFocusEditor?: boolean;
+  tooltipText?: string;
 };
 
 export const CreateComment = ({
@@ -34,6 +35,7 @@ export const CreateComment = ({
   rootThread,
   canComment,
   shouldFocusEditor = false,
+  tooltipText = '',
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -184,6 +186,7 @@ export const CreateComment = ({
             author={author}
             editorValue={editorValue}
             shouldFocus={shouldFocusEditor}
+            tooltipText={tooltipText}
           />
           {RevalidationModal}
         </>
