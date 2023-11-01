@@ -16,10 +16,7 @@ export const BLOCKCHAINS = {
   COSMOS: 'cosmos',
   ETHEREUM: 'ethereum',
   INJECTIVE: 'injective',
-  NEAR: 'near',
-  POLKADOT: 'polkadot',
   POLYGON: 'polygon',
-  SOLANA: 'solana',
 };
 
 export const AMOUNT_CONDITIONS = {
@@ -37,23 +34,17 @@ export const requirementTypes = [
 ];
 
 // Get eth chain id from the app.config.chains for these chains
-const chainIdsToFind = [
-  'axie-infinity',
-  'cosmos',
-  'ethereum',
-  'injective',
-  'near',
-  'polkadot',
-  'polygon',
-  'solana',
-];
+export const cosmosBaseChainIds = ['cosmos', 'injective'];
+export const ethBaseChainIds = ['axie-infinity', 'ethereum', 'polygon'];
+const chainIdsToFind = [...cosmosBaseChainIds, ...ethBaseChainIds];
 const foundChains = app.config.chains
   .getAll()
   .filter((x) => chainIdsToFind.includes(x.id.toLowerCase()));
-export const chainTypes = chainIdsToFind.map((x, index) => ({
-  value:
-    foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode?.ethChainId ||
-    index - 999, // TODO: some chains don't have an ethChainId
+export const chainTypes = chainIdsToFind.map((x) => ({
+  chainBase: cosmosBaseChainIds.includes(x) ? 'cosmos' : 'ethereum',
+  value: cosmosBaseChainIds.includes(x)
+    ? 'cosmos' // cosmos and injective have 'cosmos' id
+    : foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode?.ethChainId,
   label: x.replace(/\b\w/g, (l) => l.toUpperCase()),
 }));
 
