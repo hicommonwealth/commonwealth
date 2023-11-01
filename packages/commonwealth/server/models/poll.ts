@@ -58,7 +58,7 @@ export default (
       targetKey: 'id',
     });
     models.Poll.belongsTo(models.Community, {
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Poll.hasMany(models.Vote, {

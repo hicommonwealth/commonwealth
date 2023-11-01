@@ -21,7 +21,7 @@ export type GroupAttributes = {
   updated_at?: Date;
 
   // associations
-  Chain?: CommunityAttributes;
+  community?: CommunityAttributes;
 };
 
 export type GroupInstance = ModelInstance<GroupAttributes>;
@@ -54,7 +54,7 @@ export default (
 
   Group.associate = (models) => {
     models.Group.belongsTo(models.Community, {
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Group.hasMany(models.Membership, {
