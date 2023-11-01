@@ -18,10 +18,13 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
-import { useRefreshMembershipQuery } from 'state/api/groups';
+import {
+  useFetchGroupsQuery,
+  useRefreshMembershipQuery
+} from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
-  useGetThreadsByIdQuery,
+  useGetThreadsByIdQuery
 } from 'state/api/threads';
 import { ContentType } from 'types';
 import { slugify } from 'utils';
@@ -45,8 +48,10 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import {
   breakpointFnValidator,
-  isWindowMediumSmallInclusive,
+  isWindowMediumSmallInclusive
 } from '../../components/component_kit/helpers';
+import CWBanner from '../../components/component_kit/new_designs/CWBanner';
+import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
@@ -98,20 +103,28 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [arePollsFetched, setArePollsFetched] = useState(false);
   const [isViewMarked, setIsViewMarked] = useState(false);
 
+  const [hideGatingBanner, setHideGatingBanner] = useState(false);
+
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const [searchParams] = useSearchParams();
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
+  const { data: groups = [] } = useFetchGroupsQuery({
+    chainId: app.activeChainId(),
+    includeMembers: true,
+    includeTopics: true
+  });
+
   const {
     data,
     error: fetchThreadError,
-    isLoading,
+    isLoading
   } = useGetThreadsByIdQuery({
     chainId: app.activeChainId(),
     ids: [+threadId].filter(Boolean),
-    apiCallEnabled: !!threadId, // only call the api if we have thread id
+    apiCallEnabled: !!threadId // only call the api if we have thread id
   });
 
   const thread = data?.[0];
@@ -119,17 +132,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
       chainId: app.activeChainId(),
-      threadId: parseInt(`${threadId}`),
+      threadId: parseInt(`${threadId}`)
     });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
     chainId: app.activeChainId(),
-    threadId: parseInt(threadId),
+    threadId: parseInt(threadId)
   });
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
-    address: app?.user?.activeAccount?.address,
+    address: app?.user?.activeAccount?.address
   });
   const restrictedTopicIds = (memberships || [])
     .filter((x) => x.rejectReason)
@@ -148,7 +161,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         },
         isWindowMediumSmallInclusive
       ),
-    resizeListenerUpdateDeps: [isCollapsedSize],
+    resizeListenerUpdateDeps: [isCollapsedSize]
   });
 
   useEffect(() => {
@@ -161,8 +174,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
   }, []);
 
+  // find if the current topic is gated
+  const foundGatedTopic = groups.find((x) => {
+    if (thread?.topic) {
+      return (
+        Array.isArray(x.topics) &&
+        x.topics.find((y) => y.id === thread.topic.id)
+      );
+    }
+  });
+
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW }
   });
 
   useEffect(() => {
@@ -215,7 +238,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     axios
       .post(`${app.serverUrl()}/viewCount`, {
         chain: app.activeChainId(),
-        object_id: thread.id,
+        object_id: thread.id
       })
       .then((response) => {
         setViewCount(response?.data?.result?.view_count || 0);
@@ -293,7 +316,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const handleNewSnapshotChange = async ({
     id,
-    snapshot_title,
+    snapshot_title
   }: {
     id: string;
     snapshot_title: string;
@@ -301,7 +324,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const newLink: Link = {
       source: LinkSource.Snapshot,
       identifier: id,
-      title: snapshot_title,
+      title: snapshot_title
     };
     const toAdd = [newLink]; // Add this line to create an array with the new link
 
@@ -310,7 +333,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         await addThreadLinks({
           chainId: app.activeChainId(),
           threadId: thread.id,
-          links: toAdd,
+          links: toAdd
         });
       } catch {
         notifyError('Failed to update linked threads');
@@ -347,11 +370,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
+  const gatedGroupsMatchingTopic = groups?.filter((x) =>
+    x?.topics?.find((y) => y?.id === thread?.topic?.id)
+  );
+
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!hasJoinedCommunity,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id)
   });
 
   return (
@@ -496,6 +523,34 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
+                    {featureFlags.gatingEnabled &&
+                      foundGatedTopic &&
+                      !hideGatingBanner && (
+                        <CWBanner
+                          title="This topic is gated"
+                          body="Only members within the following group(s) can interact with this topic:"
+                          type="info"
+                          footer={
+                            <div className="gating-tags">
+                              {gatedGroupsMatchingTopic.map((t) => (
+                                <CWTag
+                                  key={t.id}
+                                  label={t.name}
+                                  type="referendum"
+                                />
+                              ))}
+                            </div>
+                          }
+                          buttons={[
+                            {
+                              label: 'See all groups',
+                              onClick: () => navigate('/members?tab=groups')
+                            },
+                            { label: 'Learn more about gating' }
+                          ]}
+                          onClose={() => setHideGatingBanner(true)}
+                        />
+                      )}
                     {showBanner && (
                       <JoinCommunityBanner
                         onClose={handleCloseBanner}
@@ -524,14 +579,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       id: 1,
                       value: CommentsFeaturedFilterTypes.Newest,
                       label: 'Newest',
-                      iconLeft: 'sparkle',
+                      iconLeft: 'sparkle'
                     },
                     {
                       id: 2,
                       value: CommentsFeaturedFilterTypes.Oldest,
                       label: 'Oldest',
-                      iconLeft: 'clockCounterClockwise',
-                    },
+                      iconLeft: 'clockCounterClockwise'
+                    }
                   ]}
                 />
                 <CWCheckbox
@@ -580,8 +635,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           />
                         )}
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(isAuthor || isAdmin || hasWebLinks
@@ -595,8 +650,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           allowLinking={isAuthor || isAdminOrMod}
                         />
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(canCreateSnapshotProposal && !hasSnapshotProposal
@@ -611,8 +666,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           onChangeHandler={handleNewSnapshotChange}
                         />
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(polls?.length > 0 ||
@@ -625,7 +680,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         {[
                           ...new Map(
                             polls?.map((poll) => [poll.id, poll])
-                          ).values(),
+                          ).values()
                         ].map((poll: Poll) => {
                           return (
                             <ThreadPollCard
@@ -648,8 +703,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             />
                           )}
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(showLinkedTemplateOptions &&
@@ -664,8 +719,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           slug={linkedTemplates[0]?.identifier.split('/')[2]}
                         />
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
               : []),
             ...(showTemplateOptions
@@ -676,10 +731,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <div className="cards-column">
                         <TemplateActionCard thread={thread} />
                       </div>
-                    ),
-                  },
+                    )
+                  }
                 ]
-              : []),
+              : [])
           ] as SidebarComponents
         }
       />
