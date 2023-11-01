@@ -6,7 +6,9 @@ playwright framework.
 # Running e2e tests
 
 ## Locally
+
 To run e2e tests locally you need to first run `e2e-start-server`. When the server is ready run `test-e2e`.
+
 * `e2e-start-server`: Starts the server and injects a mocked metamask object. It allows you to have a default
 metamask account without needing to have the metamask extension installed.
 * `test-e2e`: Runs playwright on all the tests in the e2e folder.
@@ -48,12 +50,12 @@ So the ordering could be out of place, or previously ran tests could modify it.
 
 When e2e tests fail, we record a video of the failed run.
 
-* If you add `--debug` to the `test-e2e` command, it will open a debug box which will allow you to step through the code 
+* If you add `--debug` to the `test-e2e` command, it will open a debug box which will allow you to step through the code
 line by line, and allow you to test locators to see which elements it will grab. `npx playwright test --debug ...`
 * Locally: These video is stored in the test-results folder. They are named after the name of the test that failed
 and produced it.
 * CI: These videos are stored in the artifacts. They can be found and downlaoded at the bottom of the summary page.
 
-# Change Log
+## Change Log
 
 - 230907: Authored by Kurtis Assad (#4963)

@@ -1,3 +1,5 @@
+# Observability
+
 Here are some commonly used types of **observability metrics**:
 
 - **Logs:** Logs are a record of events that happened in a system. They are often used to understand what has happened historically. Logs typically contain details about an event, such as when the event occurred and what triggered the event.
@@ -16,6 +18,6 @@ Here are some commonly used types of **observability metrics**:
 
 - **Synthetic Monitoring:** Synthetic monitoring (also known as active monitoring) is a method where scripted user flows are monitored at regular intervals to check system availability and performance.
 
-# Change Log
+## Change Log
 
 - 230531: Authored by Nakul Manchanda.

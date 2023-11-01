@@ -1,9 +1,12 @@
 # Access
+
 1. See [this FAQ][1] for instructions on getting your RabbitMQ Management panel URL.
 2. If you are running a local or Vultr instance of RabbitMQ the username is 'guest' and the password is 'guest'.
 
 # Queues
+
 The Queues tab shows a list of all the existing queues. Columns:
+
 - State
   - Will usually vary between 'idle' and 'ready'. Either of these values is completely normal. If state is neither of these then contact an admin immediately.
 - Ready
@@ -14,6 +17,7 @@ The Queues tab shows a list of all the existing queues. Columns:
   - Ready + Unacked
 
 If you click on a specific queue there are several things you can do:
+
 - Get a message
   - You can pull a message from the queue. Depending on the option that you pick the message be or may not be re-queued.
 - Delete Queue
@@ -25,7 +29,7 @@ If you click on a specific queue there are several things you can do:
 
 [1]: https://github.com/hicommonwealth/commonwealth/wiki/RabbitMQ-FAQ#how-do-i-access-the-correct-rabbitmq-management-dashboard
 
-# Change Log 
+## Change Log
 
-- 231013: Flagged by Graham Johnson for consolidation with other RabbitMQ files. 
+- 231013: Flagged by Graham Johnson for consolidation with other RabbitMQ files.
 - 230122: Authored by Timothee Legros.
