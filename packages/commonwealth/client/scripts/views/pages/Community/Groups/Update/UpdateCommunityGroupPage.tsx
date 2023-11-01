@@ -12,7 +12,7 @@ import {
   AMOUNT_CONDITIONS,
   chainTypes,
   conditionTypes,
-  requirementTypes,
+  requirementTypes
 } from '../../common/constants';
 import { DeleteGroupModal } from '../DeleteGroupModal';
 import { GroupForm } from '../common/GroupForm';
@@ -23,11 +23,11 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { mutateAsync: editGroup } = useEditGroupMutation({
-    chainId: app.activeChainId(),
+    chainId: app.activeChainId()
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
-    includeTopics: true,
+    includeTopics: true
   });
   const foundGroup: Group = groups.find((x) => x.id === parseInt(`${groupId}`));
 
@@ -55,7 +55,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               value: x.data.source.source_type,
               label: requirementTypes.find(
                 (y) => y.value === x.data.source.source_type
-              )?.label,
+              )?.label
             },
             requirementAmount: x.data.threshold,
             requirementChain: {
@@ -66,13 +66,13 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                 (c) =>
                   c.value == x.data.source.cosmos_chain_id ||
                   x.data.source.evm_chain_id
-              )?.label,
+              )?.label
             },
             requirementContractAddress: x.data.source.contract_address || '',
             // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
             requirementCondition: conditionTypes.find(
               (y) => y.value === AMOUNT_CONDITIONS.MORE
-            ),
+            )
           })),
           requirementsToFulfill:
             foundGroup.requirementsToFulfill === foundGroup.requirements.length
@@ -80,15 +80,15 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               : foundGroup.requirementsToFulfill,
           topics: (foundGroup.topics || []).map((x) => ({
             label: x.name,
-            value: x.id,
-          })),
+            value: x.id
+          }))
         }}
         onSubmit={(values) => {
           const payload = makeGroupDataBaseAPIPayload(values);
 
           editGroup({
             ...payload,
-            groupId: groupId,
+            groupId: groupId
           })
             .then(() => {
               notifySuccess('Group Updated');
