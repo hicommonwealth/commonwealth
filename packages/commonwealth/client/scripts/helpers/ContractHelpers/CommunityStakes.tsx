@@ -85,11 +85,9 @@ class CommunityStakes extends ContractBase {
    */
   async buyStake(name: string, id: number, amount: number): Promise<any> {
     const namespaceAddress = await this.getNamespaceAddress(name);
-    const totalPrice = await this.contract.methods.getBuyPriceAfterFee(
-      namespaceAddress,
-      id,
-      amount
-    );
+    const totalPrice = await this.contract.methods
+      .getBuyPriceAfterFee(namespaceAddress, id, amount)
+      .call();
     let txReceipt;
     try {
       txReceipt = await this.contract.methods
