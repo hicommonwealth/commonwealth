@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
-import { filterLinks } from 'helpers/threads';
+import { commentsByDate } from 'helpers/dates';
+import { featureFlags } from 'helpers/feature-flags';
+import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -11,9 +13,12 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import { useRefreshMembershipQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
@@ -25,8 +30,9 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource, LinkDisplay } from '../../../models/Thread';
+import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
@@ -44,22 +50,16 @@ import {
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import ViewTemplate from '../view_template/view_template';
+import { LinkedUrlCard } from './LinkedUrlCard';
+import { TemplateActionCard } from './TemplateActionCard';
+import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
-import { useSearchParams } from 'react-router-dom';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import { TemplateActionCard } from './TemplateActionCard';
-import { ViewTemplateFormCard } from './ViewTemplateFormCard';
-import ViewTemplate from '../view_template/view_template';
-import { featureFlags } from 'helpers/feature-flags';
-
-import 'pages/view_thread/index.scss';
-import { LinkedUrlCard } from './LinkedUrlCard';
-import { commentsByDate } from 'helpers/dates';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -126,6 +126,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     chainId: app.activeChainId(),
     threadId: parseInt(threadId),
   });
+
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+  });
+  const restrictedTopicIds = (memberships || [])
+    .filter((x) => x.rejectReason)
+    .map((x) => parseInt(`${x.topicId}`));
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -276,9 +284,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
+  const isRestrictedMembership = restrictedTopicIds.includes(thread?.topic?.id);
+
   const canComment =
-    !!hasJoinedCommunity ||
-    (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
+    (!!hasJoinedCommunity ||
+      (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id))) &&
+    !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -335,6 +346,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadAuthor(thread) ||
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
+
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!hasJoinedCommunity,
+    isThreadArchived: !!thread?.archivedAt,
+    isThreadLocked: !!thread?.lockedAt,
+    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+  });
 
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
@@ -476,6 +494,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       rootThread={thread}
                       canComment={canComment}
                       shouldFocusEditor={shouldFocusCommentEditor}
+                      tooltipText={disabledActionsTooltipText}
                     />
                     {showBanner && (
                       <JoinCommunityBanner
@@ -532,8 +551,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               parentCommentId={parentCommentId}
               setParentCommentId={setParentCommentId}
               canComment={canComment}
+              canReact={!isRestrictedMembership}
+              canReply={!isRestrictedMembership}
               fromDiscordBot={fromDiscordBot}
               commentSortType={commentSortType}
+              disabledActionsTooltipText={disabledActionsTooltipText}
             />
           </>
         }

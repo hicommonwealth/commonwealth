@@ -22,6 +22,7 @@ import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 
 type CommentCardProps = {
+  disabledActionsTooltipText?: string;
   // Edit
   canEdit?: boolean;
   onEditStart?: () => any;
@@ -50,6 +51,7 @@ type CommentCardProps = {
 };
 
 export const CommentCard = ({
+  disabledActionsTooltipText = '',
   // edit
   editDraft,
   canEdit,
@@ -164,7 +166,11 @@ export const CommentCard = ({
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
-              <CommentReactionButton comment={comment} disabled={!canReact} />
+              <CommentReactionButton
+                comment={comment}
+                disabled={!canReact}
+                tooltipText={disabledActionsTooltipText}
+              />
 
               <SharePopover commentId={comment.id} />
 
@@ -173,7 +179,9 @@ export const CommentCard = ({
                   action="reply"
                   disabled={maxReplyLimitReached || !canReply}
                   tooltipText={
-                    canReply && maxReplyLimitReached
+                    disabledActionsTooltipText
+                      ? disabledActionsTooltipText
+                      : canReply && maxReplyLimitReached
                       ? 'Nested reply limit reached'
                       : ''
                   }

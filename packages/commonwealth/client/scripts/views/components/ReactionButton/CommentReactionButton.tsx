@@ -1,28 +1,30 @@
 import { notifyError } from 'controllers/app/notifications';
+import { SessionKeyError } from 'controllers/server/sessions';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import React, { useState } from 'react';
 import app from 'state';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import type Comment from '../../../models/Comment';
 import {
   useCreateCommentReactionMutation,
   useDeleteCommentReactionMutation,
 } from '../../../state/api/comments';
 import { LoginModal } from '../../modals/login_modal';
-import { CWModal } from '../component_kit/new_designs/CWModal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { getDisplayedReactorsForPopup } from './helpers';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { SessionKeyError } from 'controllers/server/sessions';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 
 type CommentReactionButtonProps = {
   comment: Comment<any>;
   disabled: boolean;
+  tooltipText?: string;
 };
 
 export const CommentReactionButton = ({
   comment,
   disabled,
+  tooltipText = '',
 }: CommentReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
@@ -120,6 +122,7 @@ export const CommentReactionButton = ({
         tooltipContent={getDisplayedReactorsForPopup({
           reactors: (comment.reactions || []).map((r) => r.author),
         })}
+        tooltipText={tooltipText}
       />
     </>
   );
