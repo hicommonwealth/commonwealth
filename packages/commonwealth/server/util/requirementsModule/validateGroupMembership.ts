@@ -88,6 +88,7 @@ async function _thresholdCheck(
     let chainNetwork: ChainNetwork;
     let contractAddress: string;
     let chainId: string;
+    let id: string;
     switch (thresholdData.source.source_type) {
       case 'erc20': {
         chainNetwork = ChainNetwork.ERC20;
@@ -104,6 +105,7 @@ async function _thresholdCheck(
       case 'erc1155': {
         chainNetwork = ChainNetwork.ERC1155;
         contractAddress = thresholdData.source.contract_address;
+        id = thresholdData.source.id;
         chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
