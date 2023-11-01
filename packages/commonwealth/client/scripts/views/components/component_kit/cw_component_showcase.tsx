@@ -924,7 +924,7 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div className="form-gallery">
-        <CWText type="h4">Dropdown</CWText>
+        <CWText type="h4">Old Dropdown</CWText>
         <CWDropdown
           label="Dropdown"
           options={[
@@ -1831,6 +1831,26 @@ export const ComponentShowcase = () => {
               { value: 'substrate', label: 'Substrate' },
               { value: 'binance', label: 'Binance' },
             ]}
+            onChange={(newValue) => {
+              console.log('selected value is: ', newValue.label);
+            }}
+          />
+
+          <CWText type="h4">Basic With Option Selection Override</CWText>
+          <CWSelectList
+            placeholder="Add or select a chain"
+            isClearable={false}
+            isSearchable={false}
+            options={[
+              { value: 'solana', label: 'Solana' },
+              { value: 'polkadot', label: 'Polkadot' },
+              { value: 'ethereum', label: 'Ethereum' },
+              { value: 'substrate', label: 'Substrate' },
+              { value: 'binance', label: 'Binance' },
+            ]}
+            isOptionSelected={(option) => {
+              return option.value === 'ethereum';
+            }}
           />
         </div>
         <div className="dropdown-type typeahead">
