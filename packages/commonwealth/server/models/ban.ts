@@ -37,7 +37,7 @@ export default (
   );
 
   Ban.associate = (models) => {
-    models.Ban.belongsTo(models.Chain);
+    models.Ban.belongsTo(models.Community);
   };
 
   return Ban;

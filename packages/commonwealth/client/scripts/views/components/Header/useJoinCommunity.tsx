@@ -1,19 +1,19 @@
-import app from 'state';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { addressSwapper } from 'utils';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
 } from 'controllers/app/login';
-import AddressInfo from 'models/AddressInfo';
 import { isSameAccount } from 'helpers';
+import AddressInfo from 'models/AddressInfo';
 import ITokenAdapter from 'models/ITokenAdapter';
 import React, { useState } from 'react';
-import { CWModal } from '../component_kit/new_designs/CWModal';
-import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
+import app from 'state';
+import { addressSwapper } from 'utils';
 import { TOSModal } from 'views/components/Header/TOSModal';
-import { LoginModal } from 'views/modals/login_modal';
+import { AccountSelector } from 'views/components/component_kit/cw_wallets_list';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { LoginModal } from 'views/modals/login_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 
 const NON_INTEROP_NETWORKS = [ChainNetwork.AxieInfinity];
 
@@ -35,7 +35,7 @@ const useJoinCommunity = () => {
     }
 
     // add all items on same base as active chain
-    const addressChainInfo = app.config.chains.getById(a.chain.id);
+    const addressChainInfo = app.config.chains.getById(a.community.id);
     if (addressChainInfo?.base !== activeBase) {
       return false;
     }
@@ -44,7 +44,8 @@ const useJoinCommunity = () => {
     const addressExists = !!app.user.addresses.slice(idx + 1).find(
       (prev) =>
         activeBase === ChainBase.Substrate &&
-        (app.config.chains.getById(prev.chain.id)?.base === ChainBase.Substrate
+        (app.config.chains.getById(prev.community.id)?.base ===
+        ChainBase.Substrate
           ? addressSwapper({
               address: prev.address,
               currentPrefix: 42,
@@ -104,14 +105,14 @@ const useJoinCommunity = () => {
 
     if (originAddressInfo) {
       try {
-        const targetChain = activeChainId || originAddressInfo.chain.id;
+        const targetChain = activeChainId || originAddressInfo.community.id;
 
         const address = originAddressInfo.address;
 
         const res = await linkExistingAddressToChainOrCommunity(
           address,
           targetChain,
-          originAddressInfo.chain.id
+          originAddressInfo.community.id
         );
 
         if (res && res.result) {
@@ -121,14 +122,15 @@ const useJoinCommunity = () => {
               return new AddressInfo({
                 id: a.id,
                 address: a.address,
-                chainId: a.chain,
+                chainId: a.community_id,
                 keytype: a.keytype,
                 walletId: a.wallet_id,
               });
             })
           );
           const addressInfo = app.user.addresses.find(
-            (a) => a.address === encodedAddress && a.chain.id === targetChain
+            (a) =>
+              a.address === encodedAddress && a.community.id === targetChain
           );
 
           const account = app.chain.accounts.get(

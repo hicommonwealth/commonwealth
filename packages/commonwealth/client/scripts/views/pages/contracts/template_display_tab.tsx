@@ -3,13 +3,14 @@ import Template from 'models/Template';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
+import Account from '../../../models/Account';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { User } from '../../components/user/user';
 import ViewTemplateModal from '../../modals/view_template_modal';
 
@@ -88,17 +89,19 @@ export const TemplateDisplayTab = ({
           </div>
         </div>
         {templates.length > 0 ? (
-          templates.map((template) => {
-            const creator = app.chain.accounts.get(template.createdBy);
+          templates.map((template, index) => {
+            const creator: Account = app.chain.accounts.get(template.createdBy);
             return (
-              <div className="table-row">
+              <div className="table-row" key={index}>
                 <div className="table-column">
                   <CWText>{template.name}</CWText>
                 </div>
                 <div className="table-column">
                   <User
                     userAddress={creator.address}
-                    userChainId={creator.chain?.id || creator?.profile?.chain}
+                    userChainId={
+                      creator.community?.id || creator?.profile?.chain
+                    }
                     shouldShowAddressWithDisplayName
                   />
                 </div>

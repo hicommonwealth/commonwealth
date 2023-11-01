@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import 'components/component_kit/new_designs/cw_radio_button.scss';
+import '../../../../../styles/components/component_kit/new_designs/cw_radio_button.scss';
 import { CWText } from '../cw_text';
 
 export type RadioButtonType = {
