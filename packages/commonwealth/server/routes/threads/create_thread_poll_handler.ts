@@ -20,7 +20,7 @@ export type CreateThreadPollResponse = PollAttributes;
 export const createThreadPollHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<CreateThreadPollBody, null, CreateThreadPollParams>,
-  res: TypedResponse<CreateThreadPollResponse>
+  res: TypedResponse<CreateThreadPollResponse>,
 ) => {
   const community = req.chain;
   const { id: threadId } = req.params;
@@ -42,7 +42,8 @@ export const createThreadPollHandler = async (
     threadId: parseInt(threadId, 10),
     prompt,
     options,
-    customDuration: custom_duration,
+    customDuration:
+      custom_duration === 'Infinite' ? Infinity : parseInt(custom_duration),
   });
 
   return success(res, poll);
