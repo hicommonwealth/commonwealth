@@ -86,7 +86,7 @@ Note: If you get error "No images to push," make sure Dockerfile is capitalized
 Local Development:
 If you ever need to run devnets locally on your machine, there are three helper scripts
 
-```
+```bash
 yarn cosmos:build # build & start first time only - this takes several minutes
 yarn cosmos:start # start container - if you have pre-built images
 yarn cosmos:stop  # stop container
@@ -119,7 +119,7 @@ a shared address for this purpose.
 
 # Manually testing evmos-dev (ethermint sandbox)
 
-- Add this mnemonic to Keplr:
+* Add this mnemonic to Keplr:
     `extra cute enough manage arctic acid ball divide reduce turtle pony duck remind short find feature tooth steak fix assault vote sad cattle roof`
 
 - Go to <http://localhost:8080/evmos-dev> and join community. You should be able to create proposals and vote.
@@ -127,5 +127,6 @@ a shared address for this purpose.
 
 ## Change Log
 
+- 231031: Flagged by Graham Johnson; `chain-events` package references are obsolete.
 - 230727: Updated with Cosmos SDK info by Mark Hagelberg.
 - 230418: Authored by Mark Hagelberg.
