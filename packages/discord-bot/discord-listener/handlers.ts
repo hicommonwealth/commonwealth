@@ -81,7 +81,7 @@ export async function handleThreadChannel(
       await controller.publish(
         {
           message_id: thread.id,
-          channel_id: thread.parentId,
+          parent_channel_id: thread.parentId,
           action,
         } as any,
         RascalPublications.DiscordListener,
@@ -90,8 +90,16 @@ export async function handleThreadChannel(
       if (!oldThread) return;
 
       if (thread.name !== oldThread.name) {
+        const owner = await thread.fetchOwner();
         await controller.publish(
           {
+            user: {
+              id: owner.user.id,
+              username: owner.user.username,
+            },
+            message_id: thread.id,
+            parent_channel_id: thread.parentId,
+            title: thread.name,
             action,
           } as any,
           RascalPublications.DiscordListener,
