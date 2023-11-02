@@ -2,12 +2,10 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMQController } from 'common-common/src/rabbitmq';
 import { RascalPublications } from 'common-common/src/rabbitmq/types';
 import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
-import {
-  getForumLinkedTopicId,
-  getImageUrls,
-} from 'discord-bot/discord-listener/util';
-import { rollbar } from 'discord-bot/utils/rollbar';
+import { getImageUrls } from 'discord-bot/discord-listener/util';
 import { Client, Message, ThreadChannel } from 'discord.js';
+import { rollbar } from '../utils/rollbar';
+import { getForumLinkedTopic } from '../utils/util';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -29,7 +27,7 @@ export async function handleMessage(
       channel?.type === 11 ? channel.parentId : channel.id ?? '0';
 
     // Only process messages from relevant channels
-    const topicId = await getForumLinkedTopicId(parent_id);
+    const topicId = await getForumLinkedTopic(parent_id);
     if (!topicId) return;
 
     // 2. Figure out if message is comment or thread
@@ -80,7 +78,7 @@ export async function handleThreadChannel(
     if (thread.type !== 11) return;
 
     // Only process messages from relevant channels
-    const topicId = await getForumLinkedTopicId(thread.parentId);
+    const topicId = await getForumLinkedTopic(thread.parentId);
     if (!topicId) return;
 
     if (action === 'thread-delete') {

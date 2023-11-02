@@ -21,3 +21,5 @@ export const CW_BOT_KEY = process.env.CW_BOT_KEY;
 export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
 
 export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
+
+export const DISCOBOT_ADDRESS = '0xdiscordbot';

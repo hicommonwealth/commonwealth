@@ -158,12 +158,16 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
-export type DiscordAction =
-  | 'create'
-  | 'update'
+export type ThreadDiscordActions =
   | 'thread-delete'
+  | 'thread-title-update'
+  | 'thread-body-update'
+  | 'thread-create';
+export type CommentDiscordActions =
   | 'comment-delete'
-  | 'thread-update';
+  | 'comment-update'
+  | 'comment-create';
+export type DiscordAction = ThreadDiscordActions | CommentDiscordActions;
 
 export interface IDiscordMessage {
   user?: {
