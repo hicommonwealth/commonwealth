@@ -14,7 +14,6 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
@@ -22,6 +21,7 @@ import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationMod
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
@@ -36,7 +36,7 @@ export const NewThreadForm = () => {
     chainId: app.activeChainId(),
   });
 
-  const chainId = app.chain.id;
+  const communityId = app.chain.id;
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
@@ -53,7 +53,7 @@ export const NewThreadForm = () => {
       }
       return acc;
     },
-    { enabledTopics: [], disabledTopics: [] }
+    { enabledTopics: [], disabledTopics: [] },
   );
 
   const {
@@ -70,7 +70,7 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-  } = useNewThreadForm(chainId, topicsForSelector.enabledTopics);
+  } = useNewThreadForm(communityId, topicsForSelector.enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -120,7 +120,7 @@ export const NewThreadForm = () => {
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
       deltaString,
-      !!hasTopics
+      !!hasTopics,
     );
 
     setIsSaving(true);
@@ -159,7 +159,7 @@ export const NewThreadForm = () => {
     setThreadTitle('');
     setThreadTopic(
       topicsForSelector.enabledTopics.find((t) => t.name.includes('General')) ||
-        null
+        null,
     );
     setThreadContentDelta(createDeltaFromText(''));
   };

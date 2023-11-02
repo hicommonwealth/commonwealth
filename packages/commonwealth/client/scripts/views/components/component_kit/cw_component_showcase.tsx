@@ -163,7 +163,7 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
 
 const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   (acc, el) => ({ ...acc, [el]: true }),
-  {} as { [K in BannerType]: boolean }
+  {} as { [K in BannerType]: boolean },
 );
 
 const rowData = makeData(25);
@@ -203,16 +203,16 @@ const validationSchema = z.object({
     .max(200, { message: 'Bio must not be more than 200 chars' }),
 });
 
-const chainValidationSchema = z.object({
-  chain: z
+const communityValidationSchema = z.object({
+  community: z
     .array(
       z.object({
         value: z.string().nonempty({ message: 'Invalid value' }),
         label: z.string().nonempty({ message: 'Invalid value' }),
-      })
+      }),
     )
-    .min(1, { message: 'At least 1 chain is required' })
-    .nonempty({ message: 'Chains are required' }),
+    .min(1, { message: 'At least 1 communityis required' })
+    .nonempty({ message: 'Communities are required' }),
 });
 
 const tagsList = [
@@ -238,23 +238,23 @@ export const ComponentShowcase = () => {
     useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
-    radioGroupOptions[2].value
+    radioGroupOptions[2].value,
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalSize, setModalSize] = useState<ModalSize>('small');
   useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on'
+    localStorage.getItem('dark-mode-state') === 'on',
   );
 
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
-  const allChains = app.config.chains.getAll();
-  const [chainId, setChainId] = useState(allChains[1]);
+  const allCommunities = app.config.chains.getAll();
+  const [communityId, setCommunityId] = useState(allCommunities[1]);
   const [currentTab, setCurrentTab] = useState(tagsList[0].id);
 
   const renderModal = (size?: ModalSize) => {
@@ -380,7 +380,7 @@ export const ComponentShowcase = () => {
               checkboxGroupSelected.push(itemValue);
             } else {
               setCheckboxGroupSelected(
-                checkboxGroupSelected.filter((item) => item !== itemValue)
+                checkboxGroupSelected.filter((item) => item !== itemValue),
               );
             }
           }}
@@ -635,12 +635,12 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Input Tag</CWText>
-          {chainId && (
+          {communityId && (
             <CWTag
-              label={allChains[1].name}
+              label={allCommunities[1].name}
               type="input"
-              community={allChains[1]}
-              onClick={() => setChainId(null)}
+              community={allCommunities[1]}
+              onClick={() => setCommunityId(null)}
             />
           )}
         </div>
@@ -1624,7 +1624,7 @@ export const ComponentShowcase = () => {
           <CWTypeaheadSelectList
             options={optionList}
             defaultValue={optionList[0]}
-            placeholder="Select chain"
+            placeholder="Select Community"
             isDisabled={false}
           />
         </div>
@@ -1632,7 +1632,7 @@ export const ComponentShowcase = () => {
           <CWTypeaheadSelectList
             options={optionList}
             defaultValue={optionList[0]}
-            placeholder="Select chain"
+            placeholder="Select Community"
             isDisabled={true}
           />
         </div>
@@ -1836,13 +1836,13 @@ export const ComponentShowcase = () => {
         {/* With tag input */}
         <CWForm
           className="w-full"
-          validationSchema={chainValidationSchema}
+          validationSchema={communityValidationSchema}
           onSubmit={(values) => console.log('values => ', values)}
         >
           <CWSelectList
-            label="Chain"
-            name="chain"
-            placeholder="Add or select a chain"
+            label="Community"
+            name="community"
+            placeholder="Add or select a community"
             isMulti
             isClearable={false}
             defaultValue={[{ value: 'solana', label: 'Solana' }]}
@@ -1859,7 +1859,7 @@ export const ComponentShowcase = () => {
         </CWForm>
         <CWText type="h3">Multi select list</CWText>
         <CWSelectList
-          placeholder="Add or select a chain"
+          placeholder="Add or select a community"
           isMulti
           isClearable={false}
           defaultValue={[{ value: 'solana', label: 'Solana' }]}

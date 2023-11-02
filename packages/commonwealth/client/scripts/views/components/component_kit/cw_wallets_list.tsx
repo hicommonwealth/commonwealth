@@ -1,8 +1,7 @@
-import React from 'react';
 import type { ChainNetwork } from 'common-common/src/types';
-import { WalletSsoSource } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase, WalletSsoSource } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
+import React from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
 import IWebWallet from '../../../models/IWebWallet';
@@ -16,15 +15,21 @@ import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 
 import 'components/component_kit/cw_wallets_list.scss';
 
-const LinkAccountItem = (props: {
+type LinkAccountItemProps = {
   account: { address: string; meta?: { name: string } };
   idx: number;
   onSelect: (idx: number) => void;
   walletChain: ChainBase;
   walletNetwork: ChainNetwork;
-}) => {
-  const { account, walletNetwork, walletChain, onSelect, idx } = props;
+};
 
+const LinkAccountItem = ({
+  account,
+  walletNetwork,
+  walletChain,
+  onSelect,
+  idx,
+}: LinkAccountItemProps) => {
   const address = app.chain
     ? addressSwapper({
         address: account.address,
@@ -51,7 +56,7 @@ const LinkAccountItem = (props: {
         <div className="account-user">
           <User
             userAddress={address}
-            userChainId={app.chain?.id || walletNetwork}
+            userCommunityId={app.chain?.id || walletNetwork}
             shouldShowAvatarOnly
             avatarSize={40}
           />
@@ -63,7 +68,7 @@ const LinkAccountItem = (props: {
           <div className="account-user">
             <User
               userAddress={address}
-              userChainId={app.chain?.id || walletNetwork}
+              userCommunityId={app.chain?.id || walletNetwork}
               shouldHideAvatar
             />
           </div>
@@ -123,11 +128,11 @@ type WalletsListProps = {
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onSocialLogin: (
     type: WalletSsoSource,
-    useSessionKeyRevalidationFlow: boolean
+    useSessionKeyRevalidationFlow: boolean,
   ) => Promise<void>;
   onWalletAddressSelect: (
     wallet: IWebWallet<any>,
-    address: string
+    address: string,
   ) => Promise<void>;
 };
 
@@ -154,7 +159,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
         <div
           className={getClasses<{ darkMode?: boolean }>(
             { darkMode },
-            'wallets'
+            'wallets',
           )}
         >
           {wallets.map((wallet: IWebWallet<any>, index) => (
@@ -184,7 +189,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                             address: wallet.accounts[accountIndex].address,
                             currentPrefix: parseInt(
                               (app.chain as Substrate).meta.ss58Prefix,
-                              10
+                              10,
                             ),
                           });
                         }
@@ -217,7 +222,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 onClick={async () =>
                   onSocialLogin(
                     WalletSsoSource.Google,
-                    useSessionKeyRevalidationFlow
+                    useSessionKeyRevalidationFlow,
                   )
                 }
               />
@@ -226,7 +231,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 type="b2"
                 className={getClasses<{ darkMode?: boolean }>(
                   { darkMode },
-                  'connect-another-way-link'
+                  'connect-another-way-link',
                 )}
               >
                 <a onClick={onConnectAnotherWay}>
@@ -251,7 +256,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={async () =>
               onSocialLogin(
                 WalletSsoSource.Discord,
-                useSessionKeyRevalidationFlow
+                useSessionKeyRevalidationFlow,
               )
             }
             className="DiscordAuthButton"
@@ -263,7 +268,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={() =>
               onSocialLogin(
                 WalletSsoSource.Github,
-                useSessionKeyRevalidationFlow
+                useSessionKeyRevalidationFlow,
               )
             }
           />
@@ -274,7 +279,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={() =>
               onSocialLogin(
                 WalletSsoSource.Twitter,
-                useSessionKeyRevalidationFlow
+                useSessionKeyRevalidationFlow,
               )
             }
           />
@@ -285,7 +290,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
               type="caption"
               className={getClasses<{ darkMode?: boolean }>(
                 { darkMode },
-                'reset-wc-link'
+                'reset-wc-link',
               )}
             >
               <a
@@ -321,7 +326,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                   type="caption"
                   className={getClasses<{ darkMode?: boolean }>(
                     { darkMode },
-                    'no-wallet-link'
+                    'no-wallet-link',
                   )}
                 >
                   Don't see your wallet?

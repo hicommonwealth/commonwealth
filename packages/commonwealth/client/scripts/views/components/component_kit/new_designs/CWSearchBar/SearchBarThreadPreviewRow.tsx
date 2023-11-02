@@ -33,7 +33,7 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
     <div className="SearchBarThreadPreviewRow" onClick={handleClick}>
       <div className="header-row">
         <User
-          userChainId={searchResult.chain}
+          userCommunityId={searchResult.chain}
           userAddress={searchResult.address}
         />
         <CWText className="last-updated-text">•</CWText>

@@ -14,7 +14,7 @@ interface SearchBarMemberPreviewRowProps {
 export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
   searchResult,
 }) => {
-  const chain = searchResult.addresses[0].chain;
+  const community = searchResult.addresses[0].chain;
   const address = searchResult.addresses[0].address;
 
   const navigate = useCommonNavigate();
@@ -25,7 +25,11 @@ export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
 
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
-      <User userAddress={address} userChainId={chain} shouldLinkProfile />
+      <User
+        userAddress={address}
+        userCommunityId={community}
+        shouldLinkProfile
+      />
     </div>
   );
 };
