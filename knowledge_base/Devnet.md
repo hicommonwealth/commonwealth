@@ -86,7 +86,7 @@ Note: If you get error "No images to push," make sure Dockerfile is capitalized
 Local Development:
 If you ever need to run devnets locally on your machine, there are three helper scripts
 
-```
+```bash
 yarn cosmos:build # build & start first time only - this takes several minutes
 yarn cosmos:start # start container - if you have pre-built images
 yarn cosmos:stop  # stop container
@@ -106,27 +106,27 @@ Browse to these to confirm node is running locally:
 To create a proposal or vote, you will need an account with staked tokens. We have
 a shared address for this purpose.
 
-* In Keplr add a wallet:
-  * click avatar in upper right corner
-  * Add wallet
-  * Import an existing wallet
-  * Use recover phrase or private key
-  * copy/paste this mnemonic:
+- In Keplr add a wallet:
+  - click avatar in upper right corner
+  - Add wallet
+  - Import an existing wallet
+  - Use recover phrase or private key
+  - copy/paste this mnemonic:
         `ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought`
-  * Give the wallet a name you can recognize, like "CW devnet"
+  - Give the wallet a name you can recognize, like "CW devnet"
 
-* Go to <http://localhost:8080/csdk-beta> or <http://localhost:8080/csdk> and join community. You should be able to create proposals and vote.
+- Go to <http://localhost:8080/csdk-beta> or <http://localhost:8080/csdk> and join community. You should be able to create proposals and vote.
 
 # Manually testing evmos-dev (ethermint sandbox)
 
 * Add this mnemonic to Keplr:
     `extra cute enough manage arctic acid ball divide reduce turtle pony duck remind short find feature tooth steak fix assault vote sad cattle roof`
 
-* Go to <http://localhost:8080/evmos-dev> and join community. You should be able to create proposals and vote.
-* Note: Set gas to zero. There is an issue with displaying tokens correctly, but this address should have tokens. See <https://github.com/hicommonwealth/commonwealth/issues/4909s>
+- Go to <http://localhost:8080/evmos-dev> and join community. You should be able to create proposals and vote.
+- Note: Set gas to zero. There is an issue with displaying tokens correctly, but this address should have tokens. See <https://github.com/hicommonwealth/commonwealth/issues/4909s>
 
-# Change Log
+## Change Log
 
-* 231031: Flagged by Graham Johnson; `chain-events` package references are obsolete.
-* 230727: Updated with Cosmos SDK info by Mark Hagelberg.
-* 230418: Authored by Mark Hagelberg.
+- 231031: Flagged by Graham Johnson; `chain-events` package references are obsolete.
+- 230727: Updated with Cosmos SDK info by Mark Hagelberg.
+- 230418: Authored by Mark Hagelberg.

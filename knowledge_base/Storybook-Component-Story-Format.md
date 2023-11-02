@@ -1,3 +1,5 @@
+# Storybook Component Story Format
+
 Component Story Format (CSF) is the recommended way to [write stories](https://storybook.js.org/docs/react/writing-stories/introduction). It's an [open standard](https://github.com/ComponentDriven/csf) based on ES6 modules that is portable beyond Storybook.
 
 # Default export
@@ -66,6 +68,6 @@ The stories result of the named exports:
 
 ---
 
-# Change Log
+## Change Log
 
 - 230530: Authored by Daniel Martins.

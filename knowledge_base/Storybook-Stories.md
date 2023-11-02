@@ -1,4 +1,5 @@
 **Contents**
+
 - [Definition](#definition)
 - [Example](#example)
 - [Stories file extension and where to add them](#stories-file-extension-and-where-to-add-them)
@@ -64,8 +65,9 @@ The location of all stories can be defined on Storybook main config file, as fol
 ![image](https://github.com/hicommonwealth/commonwealth/assets/30223098/4cf33e27-1440-4046-9d3e-312d4fcc2346)
 
 # References
+
 1. [How to write stories](https://storybook.js.org/docs/react/writing-stories/introduction)
 
-# Change Log
+## Change Log
 
 - 230530: Authored by Daniel Martins.
