@@ -68,20 +68,6 @@
             border-radius: $border-radius-corners-wider;
             font-size: 14px;
           }
-
-          &.tasl__option--is-focused {
-            .text-container {
-              background-color: $neutral-100;
-              color: $neutral-800;
-            }
-          }
-        }
-
-        .tasl__option--is-selected {
-          .text-container {
-            background-color: $neutral-50;
-            color: $neutral-800;
-          }
         }
       }
     }

@@ -1,4 +1,6 @@
-## Preventing data loss from the producer to the queue.
+# Rabbit MQ: Preventing Data Loss
+
+## Preventing data loss from the producer to the queue
 
 1. For whatever data we are putting in the queue have a `Queued` number column in the database.
 Publish the data. If the publish is successful increment the `Queued` column value. If the
@@ -17,7 +19,7 @@ While we could replicate RabbitMQ memory the method is complex, expensive, and u
 
 Direct write/update access should be restricted for any tables that share data with another service. No connection except the app itself (sequelize) should have write access to the database. As part of the deployment process, at the end of each migration execution, the script described above is executed to ensure that any changes made within migrations are copied over to the databases of the other services ([https://devcenter.heroku.com/articles/release-phase#specifying-release-phase-tasks](https://devcenter.heroku.com/articles/release-phase#specifying-release-phase-tasks)).
 
-# Change Log 
+## Change Log
 
-- 231013: Flagged by Graham Johnson for consolidation with other RabbitMQ files. 
+- 231013: Flagged by Graham Johnson for consolidation with other RabbitMQ files.
 - 230123: Authored by Timothee Legros.

@@ -86,7 +86,7 @@ Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dyna
 
 Definition: `yarn global add node-gyp`
 
-Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs. 
+Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
 
 # CI Scripts
 

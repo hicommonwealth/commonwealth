@@ -19,9 +19,9 @@ type CustomCWSelectListProps = {
 export const CWSelectList = <
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >(
-  props: Props<Option, IsMulti, Group> & CustomCWSelectListProps
+  props: Props<Option, IsMulti, Group> & CustomCWSelectListProps,
 ) => {
   const formContext = useFormContext();
   const formFieldContext = props.hookToForm
@@ -98,9 +98,9 @@ export const CWSelectList = <
             failure: !!formFieldErrorMessage || !!props.customError,
             searchable: props.isSearchable,
           },
-          ComponentType.SelectList
+          ComponentType.SelectList,
         )}
-        classNamePrefix={props.classNamePrefix || 'slct'}
+        classNamePrefix={props.classNamePrefix || 'cwsl'}
       />
       {(formFieldErrorMessage || props.customError) && (
         <MessageRow

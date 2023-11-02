@@ -110,14 +110,24 @@
             background-color: transparent;
           }
 
-          &.slct__option--is-selected {
+          &[class*='__option--is-selected'] {
             background-color: $neutral-50;
             color: $neutral-800;
+
+            .text-container {
+              background-color: $neutral-50;
+              color: $neutral-800;
+            }
           }
 
-          &.slct__option--is-focused {
+          &[class*='__option--is-focused'] {
             background-color: $neutral-100;
             color: $neutral-800;
+
+            .text-container {
+              background-color: $neutral-100;
+              color: $neutral-800;
+            }
           }
         }
       }

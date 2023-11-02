@@ -1,6 +1,6 @@
 import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './community';
 import type { CommentAttributes } from './comment';
 import type { NotificationCategoryAttributes } from './notification_category';
 import emitNotifications from '../util/emitNotifications';
@@ -37,7 +37,7 @@ export type SubscriptionAttributes = {
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   NotificationsRead?: NotificationsReadAttributes[];
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
 };
@@ -137,7 +137,7 @@ export default (
       foreignKey: 'subscription_id',
       onDelete: 'cascade',
     });
-    models.Subscription.belongsTo(models.Chain, {
+    models.Subscription.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

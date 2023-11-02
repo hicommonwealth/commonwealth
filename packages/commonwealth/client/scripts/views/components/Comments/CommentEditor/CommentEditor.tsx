@@ -29,6 +29,7 @@ type CommentEditorProps = {
   author: Account;
   editorValue: string;
   shouldFocus: boolean;
+  tooltipText?: string;
 };
 
 export const CommentEditor = ({
@@ -47,6 +48,7 @@ export const CommentEditor = ({
   author,
   editorValue,
   shouldFocus,
+  tooltipText,
 }: CommentEditorProps) => {
   const decimals = getDecimals(app.chain);
 
@@ -77,7 +79,7 @@ export const CommentEditor = ({
         contentDelta={contentDelta}
         setContentDelta={setContentDelta}
         isDisabled={!canComment}
-        tooltipLabel="Join community to comment"
+        tooltipLabel={tooltipText}
         shouldFocus={shouldFocus}
       />
       {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (

@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { NotificationCategories } from 'common-common/src/types';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../../server/models/community';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 
@@ -464,7 +464,7 @@ describe('ServerCommentsController', () => {
 
       const chain = { id: 'ethereum' };
       const searchOptions: SearchCommentsOptions = {
-        chain: chain as ChainInstance,
+        chain: chain as CommunityInstance,
         search: 'hello',
         limit: 5,
         page: 2,

@@ -163,7 +163,7 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
 
 const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   (acc, el) => ({ ...acc, [el]: true }),
-  {} as { [K in BannerType]: boolean }
+  {} as { [K in BannerType]: boolean },
 );
 
 const rowData = makeData(25);
@@ -209,7 +209,7 @@ const chainValidationSchema = z.object({
       z.object({
         value: z.string().nonempty({ message: 'Invalid value' }),
         label: z.string().nonempty({ message: 'Invalid value' }),
-      })
+      }),
     )
     .min(1, { message: 'At least 1 chain is required' })
     .nonempty({ message: 'Chains are required' }),
@@ -238,17 +238,17 @@ export const ComponentShowcase = () => {
     useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
-    radioGroupOptions[2].value
+    radioGroupOptions[2].value,
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalSize, setModalSize] = useState<ModalSize>('small');
   useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on'
+    localStorage.getItem('dark-mode-state') === 'on',
   );
 
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
@@ -380,7 +380,7 @@ export const ComponentShowcase = () => {
               checkboxGroupSelected.push(itemValue);
             } else {
               setCheckboxGroupSelected(
-                checkboxGroupSelected.filter((item) => item !== itemValue)
+                checkboxGroupSelected.filter((item) => item !== itemValue),
               );
             }
           }}
@@ -1886,6 +1886,7 @@ export const ComponentShowcase = () => {
                 placeholder="Add or select a chain"
                 isMulti
                 isClearable={false}
+                isSearchable={true}
                 defaultValue={[{ value: 'solana', label: 'Solana' }]}
                 options={[
                   { value: 'solana', label: 'Solana' },
@@ -1905,6 +1906,7 @@ export const ComponentShowcase = () => {
               placeholder="Add or select a chain"
               isMulti
               isClearable={false}
+              isSearchable={true}
               defaultValue={[{ value: 'solana', label: 'Solana' }]}
               options={[
                 { value: 'solana', label: 'Solana' },
