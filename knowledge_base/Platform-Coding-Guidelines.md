@@ -24,7 +24,7 @@ By using RESTful API conventions, the API becomes predictable and intuitive for 
 The straightforward approach for implementing a route is to simply add business logic directly into the route handler. The problem with that approach is that it results in business logic which is tightly coupled with the Express server, difficult to reuse, and difficult to write automated tests for.
 
 #### Solution + Guidelines
-The chosen solution for routes to use controllers as the way to access business logic. Controller classes are used in order to bucket business logic into logic domains (e.g. Threads, Comments, Reactions), and also to hold references to stateful objects (e.g. DB handle, TBC, banCache).
+The chosen solution is for routes to use controllers as the way to access business logic. Controller classes are used in order to bucket business logic into logical domains (e.g. Threads, Comments, Reactions), and also to hold references to stateful objects (e.g. DB handle, TBC, banCache).
 
 The stack for an API endpoint is: `Route -> Controller -> Method`
 
