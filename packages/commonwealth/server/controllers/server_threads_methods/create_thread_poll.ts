@@ -1,11 +1,11 @@
 import moment from 'moment';
 import { AppError } from '../../../../common-common/src/errors';
-import { ServerThreadsController } from '../server_threads_controller';
-import { PollAttributes } from '../../models/poll';
-import { UserInstance } from '../../models/user';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
+import { PollAttributes } from '../../models/poll';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -21,7 +21,7 @@ export type CreateThreadPollOptions = {
   threadId: number;
   prompt: string;
   options: string[];
-  customDuration?: string;
+  customDuration?: number | null;
 };
 export type CreateThreadPollResult = PollAttributes;
 
@@ -35,24 +35,21 @@ export async function __createThreadPoll(
     prompt,
     options,
     customDuration,
-  }: CreateThreadPollOptions
+  }: CreateThreadPollOptions,
 ): Promise<CreateThreadPollResult> {
-  let finalCustomDuration: string | number = '';
-  if (customDuration && customDuration !== 'Infinite') {
-    finalCustomDuration = Number(finalCustomDuration);
+  if (customDuration) {
     if (
-      !Number.isInteger(finalCustomDuration) ||
-      finalCustomDuration < 0 ||
-      finalCustomDuration > 31
+      customDuration !== Infinity &&
+      (customDuration < 0 || customDuration > 31)
     ) {
       throw new AppError(Errors.InvalidDuration);
     }
   }
   const ends_at =
-    finalCustomDuration === 'Infinite'
+    customDuration === Infinity
       ? null
-      : finalCustomDuration
-      ? moment().add(finalCustomDuration, 'days').toDate()
+      : customDuration
+      ? moment().add(customDuration, 'days').toDate()
       : moment().add(5, 'days').toDate();
 
   const thread = await this.models.Thread.findOne({
@@ -98,7 +95,7 @@ export async function __createThreadPoll(
         options: JSON.stringify(options),
         ends_at,
       },
-      { transaction }
+      { transaction },
     );
   });
 
