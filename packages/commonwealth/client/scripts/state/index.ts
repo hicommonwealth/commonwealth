@@ -257,13 +257,13 @@ export async function initAppState(
       });
 
     communitiesWithSnapshotsRes.result
-      .filter((chainsWithSnapshots) => chainsWithSnapshots.chain.active)
+      .filter((chainsWithSnapshots) => chainsWithSnapshots.community.active)
       .forEach((chainsWithSnapshots) => {
-        delete chainsWithSnapshots.chain.ChainNode;
+        delete chainsWithSnapshots.community.ChainNode;
         app.config.chains.add(
           ChainInfo.fromJSON({
             ChainNode: app.config.nodes.getById(
-              chainsWithSnapshots.chain.chain_node_id,
+              chainsWithSnapshots.community.chain_node_id,
             ),
             snapshot: chainsWithSnapshots.snapshot,
             ...chainsWithSnapshots.community,
