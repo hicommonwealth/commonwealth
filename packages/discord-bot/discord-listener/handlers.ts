@@ -17,6 +17,9 @@ export async function handleMessage(
   message: Partial<Message>,
   action: DiscordAction,
 ) {
+  log.info(
+    `Discord message received from channel ID: ${message.channelId} with action: ${action}`,
+  );
   try {
     // 1. Filter for designated forum channels
     const channel = client.channels.cache.get(message.channelId);
@@ -68,6 +71,9 @@ export async function handleThreadChannel(
   action: DiscordAction,
   oldThread?: ThreadChannel,
 ) {
+  log.info(
+    `Discord Thread Channel Event received from channel ID: ${thread.id} with action: ${action}`,
+  );
   try {
     // only handle public channels in the Discord forum
     // https://discord.com/developers/docs/resources/channel#channel-object-channel-types
