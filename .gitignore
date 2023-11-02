@@ -1,3 +1,7 @@
+.postgres
+.rabbitmq
+docker-compose.yaml
+stellar
 node_modules/
 */build
 */dist
