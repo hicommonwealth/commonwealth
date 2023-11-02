@@ -187,3 +187,5 @@ describe('ServerItemsController', () => {
   });
 })
 ```
+
+For logic which uses raw SQL queries, API tests provide stronger guarantees.
