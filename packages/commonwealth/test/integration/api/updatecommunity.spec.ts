@@ -17,7 +17,6 @@ describe('Update Community/Chain Tests', () => {
   let jwtToken;
   let loggedInAddr;
   const chain = 'ethereum';
-  let offchainCommunity;
 
   before('reset database', async () => {
     await resetDatabase();
@@ -47,8 +46,6 @@ describe('Update Community/Chain Tests', () => {
       description: 'Tester community community',
       default_chain: chain,
     };
-
-    offchainCommunity = await modelUtils.createCommunity(communityArgs);
   });
 
   describe('/updateChain route tests', () => {
