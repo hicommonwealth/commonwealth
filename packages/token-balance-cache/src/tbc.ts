@@ -230,14 +230,18 @@ export class TokenBalanceCache
       if (network !== ChainNetwork.ERC20 && network !== ChainNetwork.ERC721 && network !== ChainNetwork.ERC1155) {
         throw new Error(FetchTokenBalanceErrors.UnsupportedContractType);
       }
-      tokenId ? opts = {
-        tokenAddress: contractAddress,
-        contractType: network,
-      } : opts = {
-        tokenAddress: contractAddress,
-        contractType: network,
-        tokenId: tokenId
-      };
+      if (network === ChainNetwork.ERC1155) {
+        opts = {
+          tokenAddress: contractAddress,
+          contractType: network,
+          tokenId: tokenId
+        };
+      } else {
+        opts = {
+          tokenAddress: contractAddress,
+          contractType: network,
+        };
+      }
     }
 
     let balancesResp: TokenBalanceResp;
