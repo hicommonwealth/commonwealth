@@ -113,7 +113,7 @@ export async function __getItem(
   { itemId }: GetItemOptions
 ): Promise<GetItemResult> {
   // access DB and other class variables via "this"
-  const item = this.models.Item.find({ id: itemId })
+  const item = await this.models.Item.find({ id: itemId })
   return item
 }
 ```
