@@ -45,7 +45,7 @@ export async function __searchProfiles(
     page,
     orderBy,
     orderDirection,
-  }: SearchProfilesOptions
+  }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
     limit: Math.min(limit, 100) || 10,
@@ -125,7 +125,7 @@ export async function __searchProfiles(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     ),
   ]);
 
@@ -162,7 +162,7 @@ export async function __searchProfiles(
         },
       },
       community?.id,
-      ['member', 'moderator', 'admin']
+      ['member', 'moderator', 'admin'],
     );
 
     const addressIdRoles: Record<number, RoleInstanceWithPermission[]> = {};

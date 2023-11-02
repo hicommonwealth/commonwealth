@@ -1,17 +1,17 @@
+import { IAaveVoteResponse } from 'adapters/chain/aave/types';
+import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
+import { ChainNetwork } from 'common-common/src/types';
+import { providers } from 'ethers';
+import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import {
   ContractInfo,
   ServerProposalsController,
 } from '../server_proposals_controller';
-import { providers } from 'ethers';
-import { ChainNetwork } from 'common-common/src/types';
 import { formatAaveProposalVote, getAaveProposalVotes } from './aave/votes';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
-import { IAaveVoteResponse } from 'adapters/chain/aave/types';
 import {
   formatCompoundProposalVote,
   getCompoundProposalVotes,
 } from './compound/votes';
-import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 
 export type GetProposalVotesOptions = {
   communityId: string;
@@ -26,14 +26,14 @@ export async function __getProposalVotes(
   this: ServerProposalsController,
   { communityId, proposalId }: GetProposalVotesOptions,
   provider: providers.Web3Provider,
-  contractInfo: ContractInfo
+  contractInfo: ContractInfo,
 ): Promise<GetProposalVotesResult> {
   let votes: IAaveVoteResponse[] | ICompoundVoteResponse[] = [];
   if (contractInfo.type === ChainNetwork.Aave) {
     const votesArgs = await getAaveProposalVotes(
       contractInfo.address,
       provider,
-      +proposalId
+      +proposalId,
     );
     votes = votesArgs.map((vote) => formatAaveProposalVote(vote));
   } else if (contractInfo.type === ChainNetwork.Compound) {
@@ -41,12 +41,12 @@ export async function __getProposalVotes(
       contractInfo.address,
       provider,
       proposalId,
-      this.redisCache
+      this.redisCache,
     );
     votes = votesArgs.map((vote) => formatCompoundProposalVote(vote));
   } else {
     throw new ServerError(
-      `Proposal fetching not supported for chain ${communityId} on network ${contractInfo.type}`
+      `Proposal fetching not supported for community ${communityId} on network ${contractInfo.type}`,
     );
   }
 
