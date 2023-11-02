@@ -21,7 +21,7 @@ export type CreateThreadPollOptions = {
   threadId: number;
   prompt: string;
   options: string[];
-  customDuration?: number | null;
+  customDuration?: number;
 };
 export type CreateThreadPollResult = PollAttributes;
 
