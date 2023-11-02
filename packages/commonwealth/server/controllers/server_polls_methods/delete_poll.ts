@@ -6,7 +6,6 @@ import { validateOwner } from '../../util/validateOwner';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
-  InvalidChainComm: 'Invalid chain or community',
   NotLoggedIn: 'Not logged in',
   NotAuthor: 'Not the Author or Admin',
   NoThread: 'No thread provided',
@@ -24,7 +23,7 @@ export type DeletePollResult = void;
 
 export async function __deletePoll(
   this: ServerThreadsController,
-  { user, community, pollId }: DeletePollOptions
+  { user, community, pollId }: DeletePollOptions,
 ): Promise<DeletePollResult> {
   const poll = await this.models.Poll.findByPk(pollId);
   if (!poll) {

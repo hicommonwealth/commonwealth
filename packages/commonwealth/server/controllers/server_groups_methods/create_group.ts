@@ -14,7 +14,7 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 const MAX_GROUPS_PER_COMMUNITY = 20;
 
 const Errors = {
-  InvalidMetadata: 'Invalid requirements',
+  InvalidMetadata: 'Invalid metadata',
   InvalidRequirements: 'Invalid requirements',
   Unauthorized: 'Unauthorized',
   MaxGroups: 'Exceeded max number of groups',

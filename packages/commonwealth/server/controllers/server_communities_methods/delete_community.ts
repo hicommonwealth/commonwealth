@@ -7,9 +7,9 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 export const Errors = {
   NotLoggedIn: 'Not signed in',
   NotAdmin: 'Must be a site admin',
-  NeedChainId: 'Must provide chain id',
-  NoChain: 'Chain not found',
-  CannotDeleteChain: 'Cannot delete this protected chain',
+  NeedCommunityId: 'Must provide community id',
+  NoCommunity: 'Community not found',
+  CannotDeleteCommunity: 'Cannot delete this protected community',
   NotAcceptableAdmin: 'Not an Acceptable Admin',
   BadSecret: 'Must provide correct secret',
   AdminPresent:
@@ -24,14 +24,14 @@ export type DeleteCommunityResult = void;
 
 export async function __deleteCommunity(
   this: ServerCommunitiesController,
-  { user, communityId }: DeleteCommunityOptions
+  { user, communityId }: DeleteCommunityOptions,
 ): Promise<DeleteCommunityResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
   if (!communityId) {
-    throw new AppError(Errors.NeedChainId);
+    throw new AppError(Errors.NeedCommunityId);
   }
 
   const community = await this.models.Community.findOne({
@@ -40,7 +40,7 @@ export async function __deleteCommunity(
     },
   });
   if (!community) {
-    throw new AppError(Errors.NoChain);
+    throw new AppError(Errors.NoCommunity);
   }
 
   try {
@@ -57,7 +57,7 @@ export async function __deleteCommunity(
                 selected_chain_id: community.id,
               },
               transaction: t,
-            }
+            },
           );
 
           await this.models.Reaction.destroy({
@@ -70,7 +70,7 @@ export async function __deleteCommunity(
             `UPDATE "Comments" SET
                 created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id)
              WHERE chain = '${community.id}'`,
-            { transaction: t }
+            { transaction: t },
           );
 
           await this.models.Comment.destroy({
@@ -128,7 +128,7 @@ export async function __deleteCommunity(
             `UPDATE "Threads" SET
                 created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id)
              WHERE chain = '${community.id}'`,
-            { transaction: t }
+            { transaction: t },
           );
 
           await this.models.Thread.destroy({
@@ -175,6 +175,6 @@ export async function __deleteCommunity(
     });
   } catch (e) {
     console.log(e);
-    throw new AppError(Errors.CannotDeleteChain);
+    throw new AppError(Errors.CannotDeleteCommunity);
   }
 }
