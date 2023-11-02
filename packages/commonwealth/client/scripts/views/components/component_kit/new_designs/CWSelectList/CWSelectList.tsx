@@ -23,36 +23,46 @@ export const CWSelectList = <
 >(
   props: Props<Option, IsMulti, Group> & CustomCWSelectListProps,
 ) => {
+  const {
+    hookToForm,
+    name,
+    defaultValue,
+    label,
+    value,
+    className,
+    classNamePrefix,
+    isSearchable,
+    customError,
+  } = props;
   const formContext = useFormContext();
-  const formFieldContext = props.hookToForm
-    ? formContext.register(props.name)
+  const formFieldContext = hookToForm
+    ? formContext.register(name)
     : ({} as any);
   const formFieldErrorMessage =
-    props.hookToForm &&
-    (formContext?.formState?.errors?.[props.name]?.message as string);
-  const defaultFormContextValue = props.hookToForm
+    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
+  const defaultFormContextValue = hookToForm
     ? formContext?.getValues?.(props?.name)
     : null;
 
   useEffect(() => {
-    props.hookToForm &&
+    hookToForm &&
       formContext &&
-      props.name &&
-      props.defaultValue &&
-      formContext.setValue(props.name, props.defaultValue);
-  }, [props.hookToForm, props.name, props.defaultValue, formContext]);
+      name &&
+      defaultValue &&
+      formContext.setValue(name, defaultValue);
+  }, [hookToForm, name, defaultValue, formContext]);
 
   useEffect(() => {
-    props.hookToForm &&
+    hookToForm &&
       formContext &&
-      props.name &&
-      props.value &&
-      formContext.setValue(props.name, props.value);
-  }, [props.hookToForm, props.name, props.value, formContext]);
+      name &&
+      value &&
+      formContext.setValue(name, value);
+  }, [hookToForm, name, value, formContext]);
 
   return (
     <div className="CWSelectList">
-      {props.label && <MessageRow label={props.label} />}
+      {label && <MessageRow label={label} />}
       <Select
         {...props}
         {...formFieldContext}
@@ -65,9 +75,9 @@ export const CWSelectList = <
         }}
         onChange={(newValue: any, actionMeta) => {
           props?.onChange?.(newValue, actionMeta);
-          if (props.hookToForm) {
-            formContext.setValue(props.name, newValue);
-            newValue?.length && formContext.setError(props.name, null);
+          if (hookToForm) {
+            formContext.setValue(name, newValue);
+            newValue?.length && formContext.setError(name, null);
           }
         }}
         styles={{
@@ -94,20 +104,20 @@ export const CWSelectList = <
           searchable?: boolean;
         }>(
           {
-            className: props.className,
-            failure: !!formFieldErrorMessage || !!props.customError,
-            searchable: props.isSearchable,
+            className: className,
+            failure: !!formFieldErrorMessage || !!customError,
+            searchable: isSearchable,
           },
           ComponentType.SelectList,
         )}
-        classNamePrefix={props.classNamePrefix || 'cwsl'}
+        classNamePrefix={classNamePrefix || 'cwsl'}
       />
-      {(formFieldErrorMessage || props.customError) && (
+      {(formFieldErrorMessage || customError) && (
         <MessageRow
-          hasFeedback={!!formFieldErrorMessage || !!props.customError}
-          statusMessage={formFieldErrorMessage || props.customError}
+          hasFeedback={!!formFieldErrorMessage || !!customError}
+          statusMessage={formFieldErrorMessage || customError}
           validationStatus={
-            formFieldErrorMessage || props.customError ? 'failure' : undefined
+            formFieldErrorMessage || customError ? 'failure' : undefined
           }
         />
       )}
