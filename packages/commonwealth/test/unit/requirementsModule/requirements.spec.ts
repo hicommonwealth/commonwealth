@@ -8,10 +8,8 @@ import { ChainNetwork } from '../../../../common-common/src/types';
 
 describe('validateGroupMembership', () => {
   it('should return a valid response', async () => {
-    const userAddress: string = 'mockUserAddress';
-    const requirements: Requirement[] = [];
     it('should pass basic erc20 check', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'threshold',
@@ -30,14 +28,15 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
+          tokenId?: string
         ): Promise<string> {
           return '2000';
         },
       };
       const result: ValidateGroupMembershipResponse =
         await validateGroupMembership(
-          userAddress,
+          user,
           requirements,
           tbc as TokenBalanceCache
         );
@@ -45,7 +44,7 @@ describe('validateGroupMembership', () => {
       assert.equal(result.isValid, true);
     });
     it('should pass basic erc721 check', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'threshold',
@@ -64,14 +63,15 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
+          tokenId?: string
         ): Promise<string> {
           return '2';
         },
       };
       const result: ValidateGroupMembershipResponse =
         await validateGroupMembership(
-          userAddress,
+          user,
           requirements,
           tbc as TokenBalanceCache
         );
@@ -79,7 +79,7 @@ describe('validateGroupMembership', () => {
       assert.equal(result.isValid, true);
     });
     it('should pass basic 1155 check', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'threshold',
@@ -107,7 +107,7 @@ describe('validateGroupMembership', () => {
       };
       const result: ValidateGroupMembershipResponse =
         await validateGroupMembership(
-          userAddress,
+          user,
           requirements,
           tbc as TokenBalanceCache
         );
@@ -115,7 +115,7 @@ describe('validateGroupMembership', () => {
       assert.equal(result.isValid, true);
     });
     it('should pass basic ethNative check', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'threshold',
@@ -133,14 +133,15 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
+          tokenId?: string
         ): Promise<string> {
           return '2000';
         },
       };
       const result: ValidateGroupMembershipResponse =
         await validateGroupMembership(
-          userAddress,
+          user,
           requirements,
           tbc as TokenBalanceCache
         );
@@ -148,7 +149,7 @@ describe('validateGroupMembership', () => {
       assert.equal(result.isValid, true);
     });
     it('should fail basic eth_native check', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'threshold',
@@ -167,14 +168,15 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
+          tokenId?: string
         ): Promise<string> {
           return '1';
         },
       };
       const result: ValidateGroupMembershipResponse =
         await validateGroupMembership(
-          userAddress,
+          user,
           requirements,
           tbc as TokenBalanceCache
         );
@@ -183,7 +185,7 @@ describe('validateGroupMembership', () => {
       assert.equal(result.messages.length, 1);
     });
     it('should fail basic erc20 check', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'threshold',
@@ -202,14 +204,15 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
+          tokenId?: string
         ): Promise<string> {
           return '1000';
         },
       };
       const result: ValidateGroupMembershipResponse =
         await validateGroupMembership(
-          userAddress,
+          user,
           requirements,
           tbc as TokenBalanceCache
         );
@@ -218,7 +221,7 @@ describe('validateGroupMembership', () => {
       assert.equal(result.messages.length, 1);
     });
     it('should pass allowlist', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'allow',
@@ -228,12 +231,12 @@ describe('validateGroupMembership', () => {
         },
       ];
       const result: ValidateGroupMembershipResponse =
-        await validateGroupMembership(userAddress, requirements);
+        await validateGroupMembership(user, requirements);
 
       assert.equal(result.isValid, true);
     });
     it('should fail allowlist', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'allow',
@@ -243,13 +246,13 @@ describe('validateGroupMembership', () => {
         },
       ];
       const result: ValidateGroupMembershipResponse =
-        await validateGroupMembership(userAddress, requirements);
+        await validateGroupMembership(user, requirements);
 
       assert.equal(result.isValid, false);
       assert.equal(result.messages.length, 1);
     });
     it('should pass multi-requirement check', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'threshold',
@@ -295,7 +298,8 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
+          tokenId?: string
         ): Promise<string> {
           if (network == ChainNetwork.ERC20) {
             return '3000';
@@ -308,7 +312,7 @@ describe('validateGroupMembership', () => {
       };
       const result: ValidateGroupMembershipResponse =
         await validateGroupMembership(
-          userAddress,
+          user,
           requirements,
           tbc as TokenBalanceCache
         );
@@ -316,7 +320,7 @@ describe('validateGroupMembership', () => {
       assert.equal(result.isValid, true);
     });
     it('should fail multi-requirement check with 2 messages', async () => {
-      const userAddress: string = '0x123456';
+      const user: string = '0x123456'
       const requirements: Requirement[] = [
         {
           rule: 'threshold',
@@ -362,7 +366,8 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
+          tokenId?: string
         ): Promise<string> {
           if (network == ChainNetwork.ERC20) {
             return '3000';
@@ -375,7 +380,7 @@ describe('validateGroupMembership', () => {
       };
       const result: ValidateGroupMembershipResponse =
         await validateGroupMembership(
-          userAddress,
+          user,
           requirements,
           tbc as TokenBalanceCache
         );
