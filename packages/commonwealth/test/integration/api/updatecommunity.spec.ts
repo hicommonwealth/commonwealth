@@ -46,6 +46,8 @@ describe('Update Community/Chain Tests', () => {
       description: 'Tester community community',
       default_chain: chain,
     };
+
+    await modelUtils.createCommunity(communityArgs);
   });
 
   describe('/updateChain route tests', () => {
