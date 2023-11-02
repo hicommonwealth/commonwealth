@@ -74,7 +74,7 @@ async function startDiscordListener() {
       await handleThreadChannel(
         controller,
         newThread,
-        'thread-update',
+        'thread-title-update',
         oldThread,
       );
     },
@@ -87,7 +87,12 @@ async function startDiscordListener() {
   client.on(
     'messageUpdate',
     async (oldMessage: Message, newMessage: Message) => {
-      await handleMessage(controller, client, newMessage, 'update');
+      await handleMessage(
+        controller,
+        client,
+        newMessage,
+        newMessage.nonce ? 'comment-update' : 'thread-body-update',
+      );
     },
   );
 
@@ -99,7 +104,12 @@ async function startDiscordListener() {
     // Handling a name change from here would result in a new thread being created rather than updated on CW
     // since the id of the event is not the id of the actual post/thread.
     if (message.type === MessageType.Default) {
-      await handleMessage(controller, client, message, 'create');
+      await handleMessage(
+        controller,
+        client,
+        message,
+        message.nonce ? 'comment-create' : 'thread-create',
+      );
     }
   });
 

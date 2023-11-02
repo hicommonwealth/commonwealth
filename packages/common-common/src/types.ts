@@ -13,7 +13,7 @@ export enum NotificationCategories {
 }
 
 export type NotificationCategory =
-  typeof NotificationCategories[keyof typeof NotificationCategories];
+  (typeof NotificationCategories)[keyof typeof NotificationCategories];
 
 export enum ProposalType {
   Thread = 'discussion',
@@ -158,12 +158,16 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
-export type DiscordAction =
-  | 'create'
-  | 'update'
+export type ThreadDiscordActions =
   | 'thread-delete'
+  | 'thread-title-update'
+  | 'thread-body-update'
+  | 'thread-create';
+export type CommentDiscordActions =
   | 'comment-delete'
-  | 'thread-update';
+  | 'comment-update'
+  | 'comment-create';
+export type DiscordAction = ThreadDiscordActions | CommentDiscordActions;
 
 export interface IDiscordMessage {
   user?: {
@@ -182,11 +186,11 @@ export interface IDiscordMessage {
 
 export interface IDiscordMeta {
   user: {
-    id: string,
-    username: string,
-  },
-  channel_id: string,
-  message_id: string,
+    id: string;
+    username: string;
+  };
+  channel_id: string;
+  message_id: string;
 }
 
 export type HttpMethod =
