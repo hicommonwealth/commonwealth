@@ -1,9 +1,9 @@
+import type { Session } from '@canvas-js/interfaces';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
-import type { Session } from '@canvas-js/interfaces';
 
 import { ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -13,18 +13,18 @@ import {
   WalletId,
   WalletSsoSource,
 } from 'common-common/src/types';
+import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
 import { sequelize } from '../database';
 import { validateChain } from '../middleware/validateChain';
 import type { DB } from '../models';
 import { AddressAttributes, AddressInstance } from '../models/address';
-import { ChainInstance } from '../models/chain';
+import { CommunityInstance } from '../models/community';
 import type { ProfileAttributes, ProfileInstance } from '../models/profile';
 import { SsoTokenInstance } from '../models/sso_token';
 import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
 import { createRole } from '../util/roles';
-import { verify as verifyCanvas } from '../../shared/canvas/verify';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -57,7 +57,7 @@ async function createMagicAddressInstances(
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
         address,
-        chain,
+        community_id: chain,
         wallet_id: WalletId.Magic,
       },
       defaults: {
@@ -161,7 +161,7 @@ async function createNewMagicUser({
 
     // create token with provided user/address
     const canonicalAddressInstance = addressInstances.find(
-      (a) => a.chain === DEFAULT_ETH_CHAIN
+      (a) => a.community_id === DEFAULT_ETH_CHAIN
     );
     await models.SsoToken.create(
       {
@@ -262,7 +262,7 @@ async function loginExistingMagicUser({
     // once addresses have been created and/or located, we finalize the migration of malformed sso
     // tokens, or create a new one if absent entirely
     const canonicalAddressInstance = addressInstances.find(
-      (a) => a.chain === DEFAULT_ETH_CHAIN
+      (a) => a.community_id === DEFAULT_ETH_CHAIN
     );
     if (malformedSsoToken) {
       malformedSsoToken.address_id = canonicalAddressInstance.id;
@@ -336,7 +336,7 @@ async function addMagicToUser({
 
   // create new token with provided user/address. contract is each address owns an SsoToken.
   const canonicalAddressInstance = addressInstances.find(
-    (a) => a.chain === DEFAULT_ETH_CHAIN
+    (a) => a.community_id === DEFAULT_ETH_CHAIN
   );
   await models.SsoToken.create({
     issuer: decodedMagicToken.issuer,
@@ -366,7 +366,7 @@ async function magicLoginRoute(
   cb: DoneFunc
 ) {
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
-  let chainToJoin: ChainInstance, error, loggedInUser: UserInstance;
+  let chainToJoin: CommunityInstance, error, loggedInUser: UserInstance;
 
   const walletSsoSource = req.body.walletSsoSource;
   const generatedAddresses = [

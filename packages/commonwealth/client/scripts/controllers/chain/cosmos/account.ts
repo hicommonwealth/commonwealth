@@ -25,7 +25,7 @@ export default class CosmosAccount extends Account {
     Accounts: CosmosAccounts,
     address: string
   ) {
-    super({ chain: app.chain.meta, address });
+    super({ community: app.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

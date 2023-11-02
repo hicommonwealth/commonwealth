@@ -40,11 +40,11 @@ const getDiscordChannels = async (
   const { chain_id } = req.body;
 
   const [chain, error] = await validateChain(models, { chain_id });
-  if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
+  if (!chain || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   const configEntry = await models.DiscordBotConfig.findOne({
     where: {
-      chain_id,
+      community_id: chain_id,
     },
   });
 

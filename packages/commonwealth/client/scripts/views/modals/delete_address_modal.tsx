@@ -2,16 +2,23 @@ import React from 'react';
 import $ from 'jquery';
 import jdenticon from 'jdenticon';
 
-import 'modals/delete_address_modal.scss';
-
-import app from 'state';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import app from '../../state';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../controllers/app/notifications';
 import AddressInfo from '../../models/AddressInfo';
 import NewProfile from '../../models/NewProfile';
-import { CWButton } from '../components/component_kit/cw_button';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
+
+import '../../../styles/modals/delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
   profile: NewProfile;
@@ -46,11 +53,11 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
         jwt: app.user.jwt,
       });
       // remove deleted role from app.roles
-      const foundAddressInfo = addresses.find(a => a.address === address)
+      const foundAddressInfo = addresses.find((a) => a.address === address);
       app.roles.deleteRole({
         address: foundAddressInfo,
         chain: chain,
-      })
+      });
 
       if (response?.status === 'Success') {
         notifySuccess('Address has been successfully removed.');
@@ -68,13 +75,12 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
 
   return (
     <div className="DeleteAddressModal">
-      <div className="title">
-        <CWText type="h4" fontWeight="semiBold">
-          Delete Address
-        </CWText>
-        <CWIconButton iconName="close" onClick={closeModal} />
-      </div>
-      <div className="body">
+      <CWModalHeader
+        label="Delete Address"
+        icon="danger"
+        onModalClose={closeModal}
+      />
+      <CWModalBody>
         <CWText>
           Address will be removed from the following linked profile.
         </CWText>
@@ -94,19 +100,21 @@ export const DeleteAddressModal = (props: DeleteAddressModalAttrs) => {
           <CWText>Are you sure you want to remove this address?</CWText>
           <CWTruncatedAddress address={address} />
         </div>
-        <div className="actions">
-          <CWButton
-            label="Delete"
-            buttonType="secondary-red"
-            onClick={(e: React.MouseEvent) => onDeleteAddress(e, props)}
-          />
-          <CWButton
-            label="Cancel"
-            buttonType="primary-black"
-            onClick={closeModal}
-          />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          onClick={closeModal}
+          buttonHeight="sm"
+        />
+        <CWButton
+          label="Delete"
+          buttonType="destructive"
+          onClick={(e: React.MouseEvent) => onDeleteAddress(e, props)}
+          buttonHeight="sm"
+        />
+      </CWModalFooter>
     </div>
   );
 };

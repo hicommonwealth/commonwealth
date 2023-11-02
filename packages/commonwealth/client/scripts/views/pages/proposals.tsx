@@ -1,28 +1,21 @@
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import type Cosmos from 'controllers/chain/cosmos/adapter';
 import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
-import type Substrate from 'controllers/chain/substrate/adapter';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import 'pages/proposals.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
-import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { ProposalCard } from 'views/components/ProposalCard';
 import { PageNotFound } from 'views/pages/404';
-import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
-import type ProposalModule from '../../models/ProposalModule';
+import ErrorPage from 'views/pages/error';
 import { CardsCollection } from '../components/cards_collection';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 import { getStatusText } from '../components/ProposalCard/helpers';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 import { CWText } from '../components/component_kit/cw_text';
-import {
-  CompoundProposalStats,
-  SubstrateProposalStats,
-} from '../components/proposals/proposals_explainers';
+import { CompoundProposalStats } from '../components/proposals/proposals_explainers';
 import {
   useActiveCosmosProposalsQuery,
   useCompletedCosmosProposalsQuery,
@@ -38,30 +31,12 @@ import {
   useStakingParamsQuery,
 } from 'state/api/chainParams';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getModules(): ProposalModule<any, any, any>[] {
-  if (!app || !app.chain || !app.chain.loaded) {
-    throw new Error('secondary loading cmd called before chain load');
-  }
-  if (app.chain.base === ChainBase.Substrate) {
-    const chain = app.chain as Substrate;
-    return [chain.treasury, chain.democracyProposals, chain.democracy];
-  } else if (app.chain.base === ChainBase.CosmosSDK) {
-    const chain = app.chain as Cosmos;
-    return [chain.governance];
-  } else {
-    throw new Error('invalid chain');
-  }
-}
-
 const ProposalsPage = () => {
   const [isLoading, setLoading] = useState(
     !app.chain || !app.chain.loaded || !app.chain.apiInitialized
   );
-  const [isSubstrateLoading, setSubstrateLoading] = useState(false);
   useInitChainIfNeeded(app); // if chain is selected, but data not loaded, initialize it
 
-  const onSubstrate = app.chain?.base === ChainBase.Substrate;
   const onCompound = app.chain?.network === ChainNetwork.Compound;
   const onAave = app.chain?.network === ChainNetwork.Aave;
   const onSputnik = app.chain?.network === ChainNetwork.Sputnik;
@@ -90,17 +65,6 @@ const ProposalsPage = () => {
     };
   }, [setLoading]);
 
-  useEffect(() => {
-    app.chainModuleReady.on('ready', () => setSubstrateLoading(false));
-
-    return () => {
-      app.chainModuleReady.off('ready', () => {
-        setSubstrateLoading(false);
-        app.chainModuleReady.removeAllListeners();
-      });
-    };
-  }, [setSubstrateLoading]);
-
   useManageDocumentTitle('Proposals');
 
   // lazy load Cosmos chain params
@@ -127,13 +91,6 @@ const ProposalsPage = () => {
     onCosmos && isCosmosCompletedProposalsLoadingRQ;
 
   if (isLoading) {
-    if (
-      app.chain?.base === ChainBase.Substrate &&
-      (app.chain as Substrate).chain?.timedOut
-    ) {
-      return <ErrorPage message="Could not connect to chain" />;
-    }
-
     if (app.chain?.failed) {
       return (
         <PageNotFound
@@ -150,10 +107,6 @@ const ProposalsPage = () => {
     return <ErrorPage message="Could not connect to chain" />;
   }
 
-  const modLoading = loadSubstrateModules('Proposals', getModules);
-
-  if (isSubstrateLoading) return modLoading;
-
   let aaveProposals: AaveProposal[];
   if (onAave)
     aaveProposals =
@@ -166,12 +119,6 @@ const ProposalsPage = () => {
       (app.chain as Compound).governance.store.getAll();
 
   // active proposals
-  const activeDemocracyProposals =
-    onSubstrate &&
-    (app.chain as Substrate).democracyProposals.store
-      .getAll()
-      .filter((p) => !p.completed);
-
   const activeCompoundProposals =
     onCompound &&
     compoundProposals
@@ -190,10 +137,10 @@ const ProposalsPage = () => {
       .getAll()
       .filter((p) => !p.completed)
       .sort((p1, p2) => p2.data.id - p1.data.id);
+
   const activeProposalContent = isLoadingCosmosActiveProposals ? (
     <CWSpinner />
-  ) : !activeDemocracyProposals?.length &&
-    !activeCosmosProposals?.length &&
+  ) : !activeCosmosProposals?.length &&
     !activeCompoundProposals?.length &&
     !activeAaveProposals?.length &&
     !activeSputnikProposals?.length ? (
@@ -203,13 +150,10 @@ const ProposalsPage = () => {
       </div>,
     ]
   ) : (
-    (activeDemocracyProposals || [])
-      .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
-      .concat(
-        (activeCosmosProposals || []).map((proposal) => (
-          <ProposalCard key={proposal.identifier} proposal={proposal} />
-        ))
-      )
+    (activeCosmosProposals || [])
+      .map((proposal) => (
+        <ProposalCard key={proposal.identifier} proposal={proposal} />
+      ))
       .concat(
         (activeCompoundProposals || []).map((proposal, i) => (
           <ProposalCard key={i} proposal={proposal} />
@@ -236,13 +180,6 @@ const ProposalsPage = () => {
       )
   );
 
-  // inactive proposals
-  const inactiveDemocracyProposals =
-    onSubstrate &&
-    (app.chain as Substrate).democracyProposals.store
-      .getAll()
-      .filter((p) => p.completed);
-
   // lazy-loaded in useGetCompletedProposals
   const inactiveCosmosProposals = onCosmos && completedCosmosProposals;
 
@@ -267,8 +204,7 @@ const ProposalsPage = () => {
 
   const inactiveProposalContent = isLoadingCosmosCompletedProposals ? (
     <CWSpinner />
-  ) : !inactiveDemocracyProposals?.length &&
-    !inactiveCosmosProposals?.length &&
+  ) : !inactiveCosmosProposals?.length &&
     !inactiveCompoundProposals?.length &&
     !inactiveAaveProposals?.length &&
     !inactiveSputnikProposals?.length ? (
@@ -278,14 +214,11 @@ const ProposalsPage = () => {
       </div>,
     ]
   ) : (
-    (inactiveDemocracyProposals || [])
-      .map((proposal, i) => <ProposalCard key={i} proposal={proposal} />)
+    []
       .concat(
-        inactiveCosmosProposals?.length
-          ? inactiveCosmosProposals.map((proposal) => (
-              <ProposalCard key={proposal.identifier} proposal={proposal} />
-            ))
-          : []
+        (inactiveCosmosProposals || []).map((proposal) => (
+          <ProposalCard key={proposal.identifier} proposal={proposal} />
+        ))
       )
       .concat(
         (inactiveCompoundProposals || []).map((proposal, i) => (
@@ -320,13 +253,6 @@ const ProposalsPage = () => {
           Proposals
         </CWText>
       </div>
-      {onSubstrate && (
-        <SubstrateProposalStats
-          nextLaunchBlock={
-            (app.chain as Substrate).democracyProposals.nextLaunchBlock
-          }
-        />
-      )}
       {onCompound && <CompoundProposalStats chain={app.chain as Compound} />}
       <CardsCollection content={activeProposalContent} header="Active" />
       <CardsCollection content={inactiveProposalContent} header="Inactive" />

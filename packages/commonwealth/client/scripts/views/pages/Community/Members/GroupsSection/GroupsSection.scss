@@ -1,0 +1,41 @@
+@import '../../../../../../styles/shared';
+
+.GroupsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+
+  .empty-groups-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+
+    .members-icon {
+      fill: none;
+      font-size: 88px !important;
+    }
+
+    .header {
+      color: $neutral-500;
+    }
+
+    .description {
+      color: $neutral-400;
+    }
+
+    .cta-btn {
+      margin-top: 8px;
+    }
+  }
+
+  .list-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 24px;
+  }
+}

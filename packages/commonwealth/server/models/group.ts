@@ -1,13 +1,13 @@
 import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
-import { ChainAttributes } from './chain';
-import { ModelInstance, ModelStatic } from './types';
 import { Requirement } from '../util/requirementsModule/requirementsTypes';
+import { CommunityAttributes } from './community';
+import { ModelInstance, ModelStatic } from './types';
 
 export type GroupMetadata = {
   name: string;
   description: string;
-  required_requirements?: number; // NOT USED
+  required_requirements?: number;
   membership_ttl?: number; // NOT USED
 };
 
@@ -21,7 +21,7 @@ export type GroupAttributes = {
   updated_at?: Date;
 
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
 };
 
 export type GroupInstance = ModelInstance<GroupAttributes>;
@@ -53,7 +53,7 @@ export default (
   );
 
   Group.associate = (models) => {
-    models.Group.belongsTo(models.Chain, {
+    models.Group.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

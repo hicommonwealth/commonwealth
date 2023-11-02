@@ -1,3 +1,5 @@
+import { SupportedNetwork } from 'commonwealth/shared/chain/types/types';
+
 export enum NotificationCategories {
   NewComment = 'new-comment-creation',
   NewThread = 'new-thread-creation',
@@ -14,18 +16,11 @@ export type NotificationCategory =
   typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
-  SubstrateDemocracyReferendum = 'referendum',
-  SubstrateDemocracyProposal = 'democracyproposal',
-  SubstrateTreasuryTip = 'treasurytip',
-  SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
-  SubstrateTreasuryProposal = 'treasuryproposal',
   Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   CompoundProposal = 'compoundproposal',
   AaveProposal = 'onchainproposal',
   SputnikProposal = 'sputnikproposal',
-  SubstratePreimage = 'democracypreimage',
-  SubstrateImminentPreimage = 'democracyimminent',
 }
 
 export enum ChainBase {
@@ -192,3 +187,15 @@ export type HttpMethod =
   | 'patch'
   | 'options'
   | 'head';
+
+export type ChainEventAttributes = {
+  id: number;
+  block_number: number;
+  event_data: any;
+  queued: number;
+  entity_id?: number;
+  network: SupportedNetwork;
+  chain: string;
+  created_at?: Date;
+  updated_at?: Date;
+};

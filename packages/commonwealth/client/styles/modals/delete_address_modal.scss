@@ -1,15 +1,7 @@
 @import '../shared';
 
 .DeleteAddressModal {
-  width: 504px;
-  padding: 24px;
-
-  .title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
+  width: 100%;
 
   .profile {
     display: flex;
@@ -28,13 +20,5 @@
 
   .TruncatedAddress {
     margin-top: 16px;
-  }
-
-  .actions {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    gap: 16px;
-    margin-top: 24px;
   }
 }

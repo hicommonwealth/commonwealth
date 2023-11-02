@@ -52,7 +52,7 @@ export const ManageRoles = ({
   const handleDeleteRole = async (role: RoleInfo) => {
     const isSelf =
       role.Address.address === app.user.activeAccount?.address &&
-      role.chain_id === app.user.activeAccount?.chain.id;
+      role.chain_id === app.user.activeAccount?.community.id;
 
     const roleBelongsToUser = !!app.user.addresses.filter(
       (addr_) => addr_.id === (role.address_id || role.Address.id)
@@ -107,7 +107,8 @@ export const ManageRoles = ({
       buttons: [
         {
           label: 'Remove',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             await removeRole(role);
             if (isLosingAdminPermissions) {
@@ -117,7 +118,8 @@ export const ManageRoles = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });

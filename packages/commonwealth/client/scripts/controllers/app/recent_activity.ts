@@ -1,5 +1,3 @@
-import moment from 'moment';
-import AbridgedThread from '../../models/AbridgedThread';
 import MinimumProfile from '../../models/MinimumProfile';
 import type Topic from '../../models/Topic';
 
@@ -14,23 +12,6 @@ export interface IAbridgedThreadFromServer {
   pinned?: boolean;
   url?: string;
 }
-
-export const modelAbridgedThreadFromServer = (
-  thread: IAbridgedThreadFromServer
-): AbridgedThread => {
-  return new AbridgedThread(
-    thread.id,
-    thread.Address.id,
-    thread.Address.address,
-    thread.Address.chain,
-    decodeURIComponent(thread.title),
-    moment(thread.created_at),
-    thread.chain,
-    thread.topic,
-    thread.pinned,
-    thread.url
-  );
-};
 
 class RecentActivityController {
   // private _threadsStore = new ActiveThreadsStore();

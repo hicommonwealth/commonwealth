@@ -3,12 +3,10 @@ import React, { useState } from 'react';
 import 'pages/notifications/notification_row.scss';
 import AddressInfo from '../../../models/AddressInfo';
 import type { NotificationRowProps } from './notification_row';
-import {
-  IEventLabel,
-  Label as ChainEventLabel,
-  SupportedNetwork,
-} from 'chain-events/src';
-import type { CWEvent } from 'chain-events/src';
+import type { IEventLabel } from '../../../../../shared/chain/labelers/util';
+import { Label as ChainEventLabel } from '../../../../../shared/chain/labelers/util';
+import { SupportedNetwork } from '../../../../../shared/chain/types/types';
+import type { CWEvent } from '../../../../../shared/chain/types/types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useNavigate } from 'react-router';
@@ -96,7 +94,7 @@ export const ChainEventNotificationRow = (
       className={
         !notification.isRead ? 'NotificationRow unread' : 'NotificationRow'
       }
-      onClick={() => navigate(path)}
+      onClick={() => navigate(path, {}, null)}
     >
       <div className="comment-body">
         <div className="comment-body-top chain-event-notification-top">

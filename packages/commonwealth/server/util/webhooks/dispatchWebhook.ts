@@ -1,4 +1,4 @@
-import { NotificationDataAndCategory } from 'types';
+import { NotificationDataAndCategory } from '../../../shared/types';
 import { sendDiscordWebhook } from './destinations/discord';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -12,7 +12,7 @@ import { sendZapierWebhook } from './destinations/zapier';
 import { rollbar } from '../rollbar';
 import { StatsDController } from 'common-common/src/statsd';
 import models from '../../database';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -43,7 +43,7 @@ export async function dispatchWebhooks(
     chainId = notification.data.chain_id;
   }
 
-  const chain: ChainInstance | undefined = await models.Chain.findOne({
+  const chain: CommunityInstance | undefined = await models.Community.findOne({
     where: {
       id: chainId,
     },

@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 
-import 'modals/TemplateActionModal.scss';
-
 import app from 'state';
 import Thread, { Link, LinkDisplay, LinkSource } from '../../models/Thread';
 import { filterLinks, getAddedAndDeleted } from '../../helpers/threads';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { TemplateSelector } from '../components/TemplateActionSelector';
 import useAddThreadLinksMutation from 'state/api/threads/addThreadLinks';
 import useDeleteThreadLinksMutation from 'state/api/threads/deleteThreadLinks';
 import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from 'views/components/component_kit/new_designs/CWModal';
 
 type TemplateFormModalProps = {
   isOpen: boolean;
@@ -153,11 +155,8 @@ export const TemplateActionModal = ({
 
   return (
     <div className="TemplateActionModal">
-      <div className="compact-modal-title">
-        <h3>Add Templates</h3>
-        <CWIconButton iconName="close" onClick={() => onClose()} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader onModalClose={onClose} label="Add Templates" />
+      <CWModalBody>
         <TemplateSelector
           onSelect={handleTemplateSelect}
           tempTemplates={tempTemplates}
@@ -165,11 +164,20 @@ export const TemplateActionModal = ({
           thread={thread}
           isOpen={isOpen}
         />
-        <div className="buttons-row">
-          <CWButton label="Cancel" onClick={onClose} />
-          <CWButton label="Save changes" onClick={handleSaveChanges} />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          onClick={onClose}
+          buttonHeight="sm"
+          buttonType="secondary"
+        />
+        <CWButton
+          label="Save changes"
+          onClick={handleSaveChanges}
+          buttonHeight="sm"
+        />
+      </CWModalFooter>
     </div>
   );
 };

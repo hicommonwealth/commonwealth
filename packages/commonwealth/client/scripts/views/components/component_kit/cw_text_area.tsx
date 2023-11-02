@@ -13,6 +13,7 @@ import { useFormContext } from 'react-hook-form';
 type TextAreaStyleProps = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
+  instructionalMessage?: string;
   resizeWithText?: boolean;
 };
 
@@ -43,6 +44,7 @@ export const CWTextArea = (props: TextAreaProps) => {
     tabIndex,
     resizeWithText = false,
     hookToForm,
+    instructionalMessage,
   } = props;
 
   useEffect(() => {
@@ -72,7 +74,6 @@ export const CWTextArea = (props: TextAreaProps) => {
         />
       )}
       <textarea
-        {...formFieldContext}
         autoFocus={autoFocus}
         autoComplete={autoComplete}
         className={getClasses<TextAreaStyleProps & { isTyping: boolean }>({
@@ -88,6 +89,8 @@ export const CWTextArea = (props: TextAreaProps) => {
         name={name}
         placeholder={placeholder}
         ref={textareaRef}
+        value={value}
+        {...formFieldContext}
         onInput={(e) => {
           if (onInput) onInput(e);
 
@@ -127,8 +130,14 @@ export const CWTextArea = (props: TextAreaProps) => {
             }
           }
         }}
-        value={value}
       />
+      {label && (
+        <NewMessageRow
+          instructionalMessage={instructionalMessage}
+          statusMessage={validationProps.statusMessage}
+          validationStatus={validationProps.validationStatus}
+        />
+      )}
       {label && (
         <NewMessageRow
           hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}

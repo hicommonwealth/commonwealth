@@ -95,7 +95,6 @@ jobs:
           yarn --cwd packages/commonwealth e2e-start-server --forbid-only &
           yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-e2e --forbid-only
 
-
       - name: Archive test status
         uses: actions/upload-artifact@v3
         with:
@@ -285,6 +284,43 @@ jobs:
           name: code-coverage-report
           path: coverage
 
+  # Lint with recommendations
+  commonwealth-code-quality-recommendations:
+    strategy:
+      matrix:
+        node: [ 18 ]
+    name: Code Quality Recommendations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Add node-gyp
+        run: yarn global add node-gyp
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ matrix.node }}-${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn --ignore-engines
+
+      - name: Run linter
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: yarn lint-branch-warnings
+
   # Lint and Typecheck
   commonwealth-code-quality:
     strategy:
@@ -468,6 +504,9 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Init Db
+        run: cd packages/commonwealth && npx sequelize db:migrate
+
       ## EVM Section:
       - name: Start EVM Testnet
         run: |
@@ -478,6 +517,9 @@ jobs:
 
       - name: Run Token Balance Cache Unit Tests
         run: yarn --cwd packages/token-balance-cache test --forbid-only
+
+      - name: Run EVM Devnet tests
+        run: TEST_DIR=evm yarn --cwd packages/commonwealth test-devnet --forbid-only
 
       - name: Stop EVM Chain
         run: docker stop chain
@@ -494,7 +536,7 @@ jobs:
             packages/commonwealth/test/integration/cosmosGovNotifGenerator.spec.ts
             packages/commonwealth/server/util/cosmosProxy.ts
             packages/commonwealth/client/scripts/controllers/chain/cosmos/gov/**/*
-            packages/chain-events/cosmos-chain-testing/**/*
+            packages/commonwealth/test/util/cosmos-chain-testing/**/*
             packages/common-common/src/cosmos-ts/**/*
 
       - name: Run following steps if any file(s) in the Cosmos folders change
@@ -503,13 +545,9 @@ jobs:
           echo "One or more Cosmos Devnet-related files has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
 
-      - name: Init Db
-        if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: cd packages/commonwealth && npx sequelize db:migrate
-
       - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet --forbid-only)
+        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && TEST_DIR=cosmos yarn --cwd packages/commonwealth test-devnet --forbid-only)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true

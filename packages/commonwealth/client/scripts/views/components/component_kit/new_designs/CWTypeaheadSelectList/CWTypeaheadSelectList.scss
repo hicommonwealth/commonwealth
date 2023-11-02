@@ -1,0 +1,87 @@
+@import '../../../../../../styles/shared';
+
+.TypeaheadSelectList {
+  .SelectList {
+    @include inputStyles;
+    font-family: $font-family-neue-haas-unica;
+    border-radius: $border-radius-corners-wider;
+
+    &.disabled {
+      .tasl__control {
+        background-color: $neutral-50;
+        color: $neutral-400;
+
+        &.tasl__control--is-disabled {
+          pointer-events: auto;
+          cursor: not-allowed;
+        }
+
+        .tasl__indicators {
+          .tasl__indicator {
+            svg {
+              color: $neutral-400;
+            }
+          }
+        }
+      }
+    }
+
+    .tasl__control {
+      padding: 10px 16px;
+
+      .tasl__value-container {
+        padding: 0;
+
+        .tasl__single-value {
+          margin: 0;
+        }
+
+        .tasl__input-container {
+          margin: 0;
+          padding: 0;
+        }
+      }
+
+      .tasl__indicators {
+        .tasl__indicator {
+          padding: 0px;
+          color: $neutral-800;
+        }
+
+        .tasl__indicator-separator {
+          display: none;
+        }
+      }
+    }
+
+    .tasl__menu {
+      .tasl__menu-list {
+        @include scrollbarStyles;
+
+        .tasl__option {
+          padding: 0 8px;
+          background-color: #fff;
+
+          .text-container {
+            padding: 10px 12px;
+            border-radius: $border-radius-corners-wider;
+          }
+
+          &.tasl__option--is-focused {
+            .text-container {
+              background-color: $neutral-100;
+              color: $neutral-800;
+            }
+          }
+        }
+
+        .tasl__option--is-selected {
+          .text-container {
+            background-color: $neutral-50;
+            color: $neutral-800;
+          }
+        }
+      }
+    }
+  }
+}

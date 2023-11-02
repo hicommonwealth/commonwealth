@@ -1,9 +1,16 @@
+import 'SublayoutHeader.scss';
+import clsx from 'clsx';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import useSidebarStore from 'state/ui/sidebar';
-import 'SublayoutHeader.scss';
+import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { HelpMenuPopover } from 'views/menus/help_menu';
+import { FeedbackModal } from 'views/modals/feedback_modal';
+import { LoginModal } from 'views/modals/login_modal';
+import { featureFlags } from '../helpers/feature-flags';
 import app from '../state';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
@@ -11,18 +18,11 @@ import {
   isWindowMediumSmallInclusive,
   isWindowSmallInclusive,
 } from './components/component_kit/helpers';
+import { CWModal } from './components/component_kit/new_designs/CWModal';
+import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
+import { CWButton } from './components/component_kit/new_designs/cw_button';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
-import UserDropdown from 'views/components/Header/UserDropdown/UserDropdown';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { FeedbackModal } from 'views/modals/feedback_modal';
-import clsx from 'clsx';
-import { CWButton } from './components/component_kit/new_designs/cw_button';
-import { LoginModal } from 'views/modals/login_modal';
-import { CWSearchBar } from './components/component_kit/new_designs/CWSearchBar';
-import { featureFlags } from '../helpers/feature-flags';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { HelpMenuPopover } from 'views/menus/help_menu';
 
 type SublayoutHeaderProps = {
   onMobile: boolean;
@@ -93,7 +93,9 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
             />
           )}
         </div>
-        <CWSearchBar />
+        <div className="searchbar">
+          <CWSearchBar />
+        </div>
         <div className="header-right">
           <div className="MobileMenuContainer">
             <CWIconButton
@@ -142,14 +144,15 @@ export const SublayoutHeader = ({ onMobile }: SublayoutHeaderProps) => {
           )}
         </div>
       </div>
-      <Modal
+      <CWModal
+        size="small"
         content={
           <FeedbackModal onModalClose={() => setIsFeedbackModalOpen(false)} />
         }
         onClose={() => setIsFeedbackModalOpen(false)}
         open={isFeedbackModalOpen}
       />
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsLoginModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsLoginModalOpen(false)}

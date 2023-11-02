@@ -1,6 +1,8 @@
 @import '../../../../../../styles/shared.scss';
 
 .Table {
+  overflow-x: auto;
+
   table {
     @include b2;
     letter-spacing: 0.14px;
@@ -21,6 +23,10 @@
             gap: 4px;
             display: flex;
 
+            &.numeric {
+              justify-content: flex-end;
+            }
+
             .header-text {
               font-family: $font-family-neue-haas-unica;
               font-weight: 700;
@@ -35,7 +41,6 @@
               padding: 4px;
 
               .Icon {
-
                 &.arrow-up-blue,
                 &.arrow-down-blue {
                   fill: none;
@@ -62,6 +67,7 @@
         td {
           padding: 14px 16px;
           vertical-align: top;
+          word-break: break-word;
 
           .numeric {
             text-align: end;

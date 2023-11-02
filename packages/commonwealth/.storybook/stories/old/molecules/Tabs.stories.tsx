@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { CWTab, CWTabBar } from '../../../../client/scripts/views/components/component_kit/cw_tabs';
+import { CWTab, CWTabsRow } from '../../../../client/scripts/views/components/component_kit/new_designs/CWTabs';
 import { argsObj } from '../../helpers';
 
 const tabs = {
@@ -22,7 +22,7 @@ const Tabs: FC = (args) => {
   const [selectedTab, setSelectedTab] = useState<number>(1);
 
   return (
-    <CWTabBar>
+    <CWTabsRow>
       {Object.entries(args).map((label: any, i) => (
         <CWTab
           key={label+i}
@@ -31,7 +31,7 @@ const Tabs: FC = (args) => {
           isSelected={selectedTab === i+1}
         />
       ))}
-    </CWTabBar>
+    </CWTabsRow>
   )
 };
 

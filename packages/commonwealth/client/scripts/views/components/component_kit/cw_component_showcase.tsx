@@ -11,13 +11,9 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
-import { CWSelectList } from './new_designs/CWSelectList';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import { CWTable } from './new_designs/CWTable';
-import { makeData, createColumnInfo } from './showcase_helpers';
-import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -25,7 +21,7 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
-import { CWContentPageCard } from './CWContentPage';
+import { CWContentPageCard } from './CWContentPageCard';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -36,7 +32,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
-import { Modal } from './cw_modal';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
@@ -47,20 +42,27 @@ import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWSpinner } from './cw_spinner';
-import { CWTab, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
+import { CWForm } from './new_designs/CWForm';
+import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
+import { ModalSize } from './new_designs/CWModal/CWModal';
+import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import { CWSearchBar } from './new_designs/CWSearchBar';
+import { CWSelectList } from './new_designs/CWSelectList';
+import { CWTable } from './new_designs/CWTable';
+import { CWTab, CWTabsRow } from './new_designs/CWTabs';
+import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
+import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
 import { CWButton } from './new_designs/cw_button';
-import { CWForm } from './new_designs/CWForm';
-import { CWTag } from './new_designs/CWTag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
+import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -213,6 +215,15 @@ const chainValidationSchema = z.object({
     .nonempty({ message: 'Chains are required' }),
 });
 
+const tagsList = [
+  { label: 'First', id: 0 },
+  { label: 'Second is very long so it gets truncated at some point', id: 1 },
+  { label: 'Third is with New Tag', id: 2, showTag: true },
+  { label: 'Fourth - disabled', id: 3, disabled: true },
+  { label: 'Fifth - disabled with Tag', id: 4, disabled: true, showTag: true },
+  { label: 'Sixth', id: 5 },
+];
+
 export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
     number | undefined
@@ -223,7 +234,6 @@ export const ComponentShowcase = () => {
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
-  const [selectedTab, setSelectedTab] = useState<number>(1);
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
     useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
@@ -231,8 +241,8 @@ export const ComponentShowcase = () => {
     radioGroupOptions[2].value
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isFullScreenModalOpen, setIsFullScreenModalOpen] =
-    useState<boolean>(false);
+  const [modalSize, setModalSize] = useState<ModalSize>('small');
+  useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on'
   );
@@ -245,22 +255,79 @@ export const ComponentShowcase = () => {
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
   const allChains = app.config.chains.getAll();
   const [chainId, setChainId] = useState(allChains[1]);
+  const [currentTab, setCurrentTab] = useState(tagsList[0].id);
+
+  const renderModal = (size?: ModalSize) => {
+    return (
+      <CWModal
+        content={
+          <>
+            <CWModalHeader
+              label={`A ${size ? (size as string) : 'full screen'} modal`}
+              onModalClose={() => setIsModalOpen(false)}
+            />
+            <CWModalBody>
+              <CWText>hi</CWText>
+            </CWModalBody>
+          </>
+        }
+        onClose={() => setIsModalOpen(false)}
+        open={isModalOpen}
+        size={size}
+        isFullScreen={!size}
+      />
+    );
+  };
+
+  const setModal = (size?: ModalSize) => {
+    setModalSize(size);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="ComponentShowcase">
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
-      <CWButton label="Modal" onClick={() => setIsModalOpen(true)} />
-      <Modal
-        content={<div>hi</div>}
-        onClose={() => setIsModalOpen(false)}
-        open={isModalOpen}
+      <CWText type="h3">Modals</CWText>
+      <div className="modal-gallery">
+        <CWButton label="Small Modal" onClick={() => setModal('small')} />
+        <CWButton label="Medium Modal" onClick={() => setModal('medium')} />
+        <CWButton label="Large Modal" onClick={() => setModal('large')} />
+        <CWButton label="Full Screen Modal" onClick={() => setModal()} />
+      </div>
+      {renderModal(modalSize)}
+      <CWButton
+        label="Confirmation Modal"
+        onClick={() =>
+          openConfirmation({
+            title: 'Warning',
+            description: (
+              <>
+                Do you really want to <b>delete</b> this item?
+              </>
+            ),
+            buttons: [
+              {
+                label: 'Cancel',
+                buttonType: 'secondary',
+                buttonHeight: 'sm',
+                onClick: () => {
+                  console.log('cancelled');
+                },
+              },
+              {
+                label: 'Delete',
+                buttonType: 'primary',
+                buttonHeight: 'sm',
+                onClick: () => {
+                  notifySuccess('Deleted');
+                },
+              },
+            ],
+          })
+        }
       />
       <CWButton label="Toast" onClick={() => notifySuccess('message')} />
-      <CWButton
-        label="Full Screen Modal"
-        onClick={() => setIsFullScreenModalOpen(true)}
-      />
       <CWButton
         label="Confirmation Modal"
         onClick={() =>
@@ -274,14 +341,16 @@ export const ComponentShowcase = () => {
             buttons: [
               {
                 label: 'Delete',
-                buttonType: 'mini-black',
+                buttonType: 'primary',
+                buttonHeight: 'sm',
                 onClick: () => {
                   notifySuccess('Deleted');
                 },
               },
               {
                 label: 'Cancel',
-                buttonType: 'mini-white',
+                buttonType: 'secondary',
+                buttonHeight: 'sm',
                 onClick: () => {
                   console.log('cancelled');
                 },
@@ -289,21 +358,6 @@ export const ComponentShowcase = () => {
             ],
           })
         }
-      />
-
-      <Modal
-        content={
-          <div>
-            <CWText>hi</CWText>
-            <CWIconButton
-              iconName="close"
-              onClick={() => setIsFullScreenModalOpen(false)}
-            />
-          </div>
-        }
-        isFullScreen
-        onClose={() => setIsFullScreenModalOpen(false)}
-        open={isFullScreenModalOpen}
       />
       <div className="basic-gallery">
         <CWText type="h3">Popover Menu</CWText>
@@ -993,32 +1047,22 @@ export const ComponentShowcase = () => {
           voteCount={voteCount}
         />
       </div>
-      <div className="basic-gallery">
-        <CWText type="h3">Tabs</CWText>
-        <CWTabBar>
-          <CWTab
-            label="A tab"
-            onClick={() => {
-              setSelectedTab(1);
-            }}
-            isSelected={selectedTab === 1}
-          />
-          <CWTab
-            label="Another tab"
-            onClick={() => {
-              setSelectedTab(2);
-            }}
-            isSelected={selectedTab === 2}
-          />
-          <CWTab
-            label="Yet another tab"
-            onClick={() => {
-              setSelectedTab(3);
-            }}
-            isSelected={selectedTab === 3}
-          />
-        </CWTabBar>
+      <div className="new-tabs">
+        <CWText type="h3">New Tabs</CWText>
+        <CWTabsRow>
+          {tagsList.map((tab) => (
+            <CWTab
+              key={tab.id}
+              label={tab.label}
+              isDisabled={tab.disabled}
+              showTag={tab.showTag}
+              isSelected={currentTab === tab.id}
+              onClick={() => setCurrentTab(tab.id)}
+            />
+          ))}
+        </CWTabsRow>
       </div>
+
       <div className="progress-gallery">
         <CWText type="h3">Progress Bars</CWText>
         <CWProgressBar
@@ -1574,6 +1618,25 @@ export const ComponentShowcase = () => {
           })}
         </div>
       </div>
+      <div className="typeahead-gallery">
+        <CWText type="h3"> Typeahead Dropdown</CWText>
+        <div className="typeahead-row">
+          <CWTypeaheadSelectList
+            options={optionList}
+            defaultValue={optionList[0]}
+            placeholder="Select chain"
+            isDisabled={false}
+          />
+        </div>
+        <div className="typeahead-row">
+          <CWTypeaheadSelectList
+            options={optionList}
+            defaultValue={optionList[0]}
+            placeholder="Select chain"
+            isDisabled={true}
+          />
+        </div>
+      </div>
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
         <CWTooltip
@@ -1816,9 +1879,14 @@ export const ComponentShowcase = () => {
       <div className="community-card">
         <CWText type="h3"> Community Card </CWText>
         <CWRelatedCommunityCard
-          chain={app.config.chains.getById('basindao')}
-          memberCount={2623}
-          threadCount={437}
+          id="id"
+          communityName={app.config.chains.getById('basindao').name}
+          communityDescription={
+            app.config.chains.getById('basindao').description
+          }
+          communityIconUrl={app.config.chains.getById('basindao').iconUrl}
+          memberCount="2623"
+          threadCount="437"
           actions={
             <CWButton
               buttonType="primary"

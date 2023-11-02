@@ -10,7 +10,7 @@ interface EditTopicProps {
 }
 
 const editTopic = async ({ topic, featuredOrder }: EditTopicProps) => {
-  const response = await axios.post(`${app.serverUrl()}/editTopic`, {
+  const response = await axios.patch(`${app.serverUrl()}/topics/${topic.id}`, {
     id: topic.id,
     chain: topic.chainId,
     name: topic.name,
