@@ -9405,11 +9405,6 @@ async@^3.2.3, async@~3.2.3:
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.4.tgz#2d22e00f8cddeb5fde5dd33522b56d1cf569a81c"
   integrity sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==
 
-async@~1.2.1:
-  version "1.2.1"
-  resolved "https://registry.npmjs.org/async/-/async-1.2.1.tgz"
-  integrity sha1-pIFqF81f9RbfosdpikUzabl5DeA=
-
 asynciterator.prototype@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/asynciterator.prototype/-/asynciterator.prototype-1.0.0.tgz#8c5df0514936cdd133604dfcc9d3fb93f09b2b62"
@@ -10231,7 +10226,7 @@ buffer-from@^1.0.0:
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.2.tgz#2b146a6fd72e80b4f55d255f35ed59a3a9a41bd5"
   integrity sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==
 
-buffer-from@^1.1.0, buffer-from@~1.1.1:
+buffer-from@^1.1.0:
   version "1.1.1"
   resolved "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.1.tgz"
   integrity sha512-MQcXEUbCKtEo7bhqEs6560Hyd4XaovZlO/k9V3hjVUF/zwW7KBVdSK4gIt/bzwS9MbR5qob+F5jusZsb0YQK2A==
@@ -17389,11 +17384,6 @@ is@^3.2.1:
   resolved "https://registry.yarnpkg.com/is/-/is-3.3.0.tgz#61cff6dd3c4193db94a3d62582072b44e5645d79"
   integrity sha512-nW24QBoPcFGGHJGUwnfpI7Yc5CdqWNdsyHQszVE/z2pKHXzh7FZ5GWhJqSyaQ9wMkQnsTx+kAI8bHlCX4tKdbg==
 
-is_js@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.npmjs.org/is_js/-/is_js-0.9.0.tgz"
-  integrity sha1-CrlFQFArp6+iTIVqqYVWFmnpxS0=
-
 isarray@0.0.1:
   version "0.0.1"
   resolved "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
@@ -23711,13 +23701,6 @@ repeat-string@^1.6.1:
   resolved "https://registry.npmjs.org/repeat-string/-/repeat-string-1.6.1.tgz"
   integrity sha1-jcrkcOHIirwtYA//Sndihtp15jc=
 
-request-ip@~2.0.1:
-  version "2.0.2"
-  resolved "https://registry.npmjs.org/request-ip/-/request-ip-2.0.2.tgz"
-  integrity sha1-3urm1K8hdoSX24zQX6NxQ/jxJX4=
-  dependencies:
-    is_js "^0.9.0"
-
 request-ip@~3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/request-ip/-/request-ip-3.3.0.tgz#863451e8fec03847d44f223e30a5d63e369fa611"
@@ -23972,24 +23955,6 @@ rollbar@^2.26.2:
     lru-cache "~2.2.1"
     request-ip "~3.3.0"
     source-map "^0.5.7"
-  optionalDependencies:
-    decache "^3.0.5"
-
-rollbar@^2.6.1:
-  version "2.15.0"
-  resolved "https://registry.npmjs.org/rollbar/-/rollbar-2.15.0.tgz"
-  integrity sha512-imEL4FOng650XZq0ZoqAI8wCfWZ5UE+4rRJwwwxthyzTdKOeDAObz/trMohc/ULn1WCo9Cz3T6ozn9Awd5kGTg==
-  dependencies:
-    async "~1.2.1"
-    buffer-from "~1.1.1"
-    console-polyfill "0.3.0"
-    debug "2.6.9"
-    error-stack-parser "^2.0.4"
-    json-stringify-safe "~5.0.0"
-    lru-cache "~2.2.1"
-    request-ip "~2.0.1"
-    source-map "^0.5.7"
-    uuid "3.0.x"
   optionalDependencies:
     decache "^3.0.5"
 
@@ -27408,11 +27373,6 @@ utilx@0.0.5:
   dependencies:
     colorful "2.1.0"
     iconv-lite "0.2.11"
-
-uuid@3.0.x:
-  version "3.0.1"
-  resolved "https://registry.npmjs.org/uuid/-/uuid-3.0.1.tgz"
-  integrity sha1-ZUS7ot/ajBzxfmKaOjBeK7H+5sE=
 
 uuid@3.3.2:
   version "3.3.2"
