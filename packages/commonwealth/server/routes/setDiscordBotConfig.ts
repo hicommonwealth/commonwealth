@@ -32,13 +32,13 @@ const setDiscordBotConfig = async (
     req.body;
 
   const [chain, error] = await validateChain(models, { chain_id });
-  if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
+  if (!chain || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   if (snapshot_channel_id) {
     // An update that comes from CW, not the bot. Handle accordingly
     const configEntry = await models.DiscordBotConfig.findOne({
       where: {
-        chain_id,
+        community_id: chain_id,
       },
     });
     configEntry.snapshot_channel_id =
@@ -51,12 +51,12 @@ const setDiscordBotConfig = async (
 
   const configEntry = await models.DiscordBotConfig.findOne({
     where: {
-      chain_id,
+      community_id: chain_id,
       verification_token,
     },
   });
 
-  if (!configEntry || chain_id !== configEntry.chain_id) {
+  if (!configEntry || chain_id !== configEntry.community_id) {
     throw new AppError(SetDiscordBotConfigErrors.NotAdmin);
   }
 
@@ -82,7 +82,7 @@ const setDiscordBotConfig = async (
 
       await models.DiscordBotConfig.destroy({
         where: {
-          chain_id,
+          community_id: chain_id,
         },
       });
       console.log(
@@ -122,7 +122,7 @@ const setDiscordBotConfig = async (
   try {
     await configEntry.update(
       {
-        chain_id,
+        community_id: chain_id,
         guild_id,
         verification_token: null,
         token_expiration: null,

@@ -1,4 +1,5 @@
 **Contents**
+
 - [Rationale](#rationale)
   * [Current State](#current-state)
   * [Proposed Implementation Approaches](#proposed-implementation-approaches)
@@ -13,10 +14,12 @@ To enhance query performance, we can store certain frequently needed values, lik
 ## Current State
 
 So far, we have identified the following metrics:
+
 - "Threads" - `comment_count`, `reaction_count`, `max_not_id`
 - "Comments" - `reaction_count`
 
 These metrics are utilized in various ways:
+
 - "Threads", "Comments" - `comment_count`, `reaction_count` (Used in `bulkThreads`, `getThreads`, `activeThreads`)
 - "Threads" - `max_not_id` (Used to track the latest notification for a thread in various feeds like `viewUserActivity`, `viewGlobalActivity`)
 
@@ -31,12 +34,12 @@ We have two viable strategies to maintain the accuracy of these pre-aggregated m
 
 ## Current Implementation
 
-Presently, our implementation relies on Database triggers. For more detailed information, check the PR here https://github.com/hicommonwealth/commonwealth/pull/4200
+Presently, our implementation relies on Database triggers. For more detailed information, check the PR here <https://github.com/hicommonwealth/commonwealth/pull/4200>
 
 ## Consequences
 
 Integrating pre-aggregated metrics can greatly expedite route queries. This optimization can improve the efficiency of routes such as `viewUserActivity`, `globalUserActivity`, `getThreads`, `bulkThreads`, and `activeThreads`, thereby contributing to a more responsive application and an enhanced user experience.
 
-# Change Log
+## Change Log
 
 - 230713: Authored by Nakul Manchanda.

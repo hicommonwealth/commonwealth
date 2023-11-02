@@ -19,14 +19,15 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 import axios from 'axios';
-import { getFileSizeBytes } from 'server/util/getFilesSizeBytes';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import {
+  MAX_COMMUNITY_IMAGE_SIZE_BYTES,
+  checkUrlFileSize,
+} from '../util/checkUrlFileSize';
 import { RoleInstanceWithPermission } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-
-const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -62,8 +63,6 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  ImageDoesntExist: `Image url provided doesn't exist`,
-  ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
   UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
@@ -87,7 +86,7 @@ const createChain = async (
   models: DB,
   req: TypedRequestBody<CreateChainReq>,
   res: TypedResponse<CreateChainResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError('Not signed in'));
@@ -127,17 +126,11 @@ const createChain = async (
   }
 
   if (req.body.icon_url) {
-    const iconFileSize = await getFileSizeBytes(req.body.icon_url);
-    if (iconFileSize === 0) {
-      throw new AppError(Errors.ImageDoesntExist);
-    }
-    if (iconFileSize / 1024 > MAX_IMAGE_SIZE_KB) {
-      throw new AppError(Errors.ImageTooLarge);
-    }
+    await checkUrlFileSize(req.body.icon_url, MAX_COMMUNITY_IMAGE_SIZE_BYTES);
   }
 
   const validAdminAddresses = await models.Address.scope(
-    'withPrivateData'
+    'withPrivateData',
   ).findAll({
     where: { user_id: req.user.id, verified: { [Op.ne]: null } },
     include: [
@@ -192,21 +185,21 @@ const createChain = async (
       });
       if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
         return next(
-          new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`)
+          new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`),
         );
       }
     }
 
     const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
     const { data: chains } = await axios.get(
-      `${REGISTRY_API_URL}/api/v1/mainnet`
+      `${REGISTRY_API_URL}/api/v1/mainnet`,
     );
     const foundRegisteredChain = chains?.find(
-      (chain) => chain === cosmos_chain_id
+      (chain) => chain === cosmos_chain_id,
     );
     if (!foundRegisteredChain) {
       return next(
-        new AppError(`${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`)
+        new AppError(`${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`),
       );
     }
   }
@@ -468,7 +461,7 @@ const createChain = async (
       chain.id,
       'admin',
       0,
-      0
+      0,
     );
 
   await models.Subscription.findOrCreate({
@@ -488,7 +481,7 @@ const createChain = async (
       communityType: null,
       event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
     },
-    req
+    req,
   );
 
   return success(res, {
