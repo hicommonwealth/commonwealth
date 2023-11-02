@@ -34,7 +34,7 @@ export type CreateGroupResult = GroupAttributes;
 
 export async function __createGroup(
   this: ServerCommunitiesController,
-  { user, community, metadata, requirements, topics }: CreateGroupOptions
+  { user, community, metadata, requirements, topics }: CreateGroupOptions,
 ): Promise<CreateGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
@@ -56,16 +56,16 @@ export async function __createGroup(
   const requirementsValidationErr = validateRequirements(requirements);
   if (requirementsValidationErr) {
     throw new AppError(
-      `${Errors.InvalidRequirements}: ${requirementsValidationErr}`
+      `${Errors.InvalidRequirements}: ${requirementsValidationErr}`,
     );
   }
 
-  const numChainGroups = await this.models.Group.count({
+  const numCommunityGroups = await this.models.Group.count({
     where: {
       community_id: community.id,
     },
   });
-  if (numChainGroups >= MAX_GROUPS_PER_COMMUNITY) {
+  if (numCommunityGroups >= MAX_GROUPS_PER_COMMUNITY) {
     throw new AppError(Errors.MaxGroups);
   }
 
@@ -91,7 +91,7 @@ export async function __createGroup(
           metadata,
           requirements,
         },
-        { transaction }
+        { transaction },
       );
       if (topicsToAssociate.length > 0) {
         // add group to all specified topics
@@ -100,7 +100,7 @@ export async function __createGroup(
             group_ids: sequelize.fn(
               'array_append',
               sequelize.col('group_ids'),
-              group.id
+              group.id,
             ),
           },
           {
@@ -110,11 +110,11 @@ export async function __createGroup(
               },
             },
             transaction,
-          }
+          },
         );
       }
       return group.toJSON();
-    }
+    },
   );
 
   return newGroup;
