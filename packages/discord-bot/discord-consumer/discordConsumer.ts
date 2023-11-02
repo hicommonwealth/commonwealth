@@ -1,23 +1,24 @@
+import axios from 'axios';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   getRabbitMQConfig,
   RabbitMQController,
 } from 'common-common/src/rabbitmq';
-import { sequelize } from '../utils/database';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 import {
   RascalSubscriptions,
   TRmqMessages,
 } from 'common-common/src/rabbitmq/types';
-import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
-import { CW_BOT_KEY, RABBITMQ_URI, SERVER_URL } from '../utils/config';
-import axios from 'axios';
-import v8 from 'v8';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { StatsDController } from 'common-common/src/statsd';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 import {
   ServiceKey,
   startHealthCheckLoop,
 } from 'common-common/src/scripts/startHealthCheckLoop';
+import { StatsDController } from 'common-common/src/statsd';
+import { DiscordAction, IDiscordMessage } from 'common-common/src/types';
+import { rollbar } from 'discord-bot/utils/rollbar';
+import v8 from 'v8';
+import { CW_BOT_KEY, RABBITMQ_URI, SERVER_URL } from '../utils/config';
+import { sequelize } from '../utils/database';
 
 let isServiceHealthy = false;
 
@@ -34,15 +35,15 @@ const log = factory.getLogger(formatFilename(__filename));
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
-    v8.getHeapStatistics().heap_size_limit / 1000000000
-  )} GB`
+    v8.getHeapStatistics().heap_size_limit / 1000000000,
+  )} GB`,
 );
 
 /*
 NOTE: THIS IS ONLY WIP CURRENTLY AND WILL BE COMPLETED AS PART OF #4267
 */
 const controller = new RabbitMQController(
-  getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService)
+  getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
 );
 
 async function consumeMessages() {
@@ -53,7 +54,7 @@ async function consumeMessages() {
       const parsedMessage = data as IDiscordMessage;
       const topic: any = (
         await sequelize.query(
-          `Select * from "Topics" WHERE channel_id = '${parsedMessage.parent_channel_id}'`
+          `Select * from "Topics" WHERE channel_id = '${parsedMessage.parent_channel_id}'`,
         )
       )[0][0];
 
@@ -62,8 +63,25 @@ async function consumeMessages() {
       if (action === 'thread-delete') {
         await axios.delete(
           `${SERVER_URL}/api/bot/threads/${parsedMessage.message_id}`,
-          { data: { auth: CW_BOT_KEY, address: '0xdiscordbot' } }
+          { data: { auth: CW_BOT_KEY, address: '0xdiscordbot' } },
         );
+        return;
+      }
+
+      if (action === 'thread-update') {
+        await axios.patch(`${SERVER_URL}/api/bot/threads`, {
+          auth: CW_BOT_KEY,
+          discord_meta: {
+            message_id: parsedMessage.message_id,
+            channel_id: parsedMessage.parent_channel_id,
+            user: parsedMessage.user,
+          },
+          title: encodeURIComponent(parsedMessage.title),
+          author_chain: topic['chain_id'],
+          address: '0xdiscordbot',
+          chain: topic['chain_id'],
+        });
+
         return;
       }
 
@@ -80,7 +98,7 @@ async function consumeMessages() {
               parsedMessage.content +
               parsedMessage.imageUrls
                 .map((url) => `\n\n![image](${url})`)
-                .join('')
+                .join(''),
           ),
           stage: 'discussion',
           kind: 'discussion',
@@ -109,7 +127,7 @@ async function consumeMessages() {
       } else {
         const thread_id = (
           await sequelize.query(
-            `SELECT id FROM "Threads" WHERE discord_meta->>'message_id' = '${parsedMessage.channel_id}'`
+            `SELECT id FROM "Threads" WHERE discord_meta->>'message_id' = '${parsedMessage.channel_id}'`,
           )
         )[0][0]['id'];
 
@@ -133,7 +151,7 @@ async function consumeMessages() {
         if (action === 'create') {
           await axios.post(
             `${SERVER_URL}/api/bot/threads/${thread_id}/comments`,
-            comment
+            comment,
           );
         } else if (action === 'update') {
           await axios.patch(
@@ -145,7 +163,7 @@ async function consumeMessages() {
               address: '0xdiscordbot',
               chain: comment.chain,
               author_chain: comment.author_chain,
-            }
+            },
           );
         } else if (action === 'comment-delete') {
           await axios.delete(
@@ -157,7 +175,7 @@ async function consumeMessages() {
                 chain: comment.chain,
                 author_chain: comment.author_chain,
               },
-            }
+            },
           );
         }
 
@@ -166,12 +184,22 @@ async function consumeMessages() {
         });
       }
     } catch (error) {
-      log.error(`Failed to process Message:`, error);
+      // non 2XX response
+      if (error.response) {
+        const msg =
+          'Axios Error - Failed to process message:' +
+          `\n\tStatus: ${error.response.status}` +
+          `\n\tData: ${JSON.stringify(error.response.data)}`;
+        log.error(msg, new Error(error.response.data.error));
+        rollbar.error(msg, new Error(error.response.data.error));
+      } else {
+        log.error(`Failed to process Message:`, error);
+      }
     }
   };
   await controller.startSubscription(
     processMessage,
-    RascalSubscriptions.DiscordListener
+    RascalSubscriptions.DiscordListener,
   );
 
   isServiceHealthy = true;

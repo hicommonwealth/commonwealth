@@ -1,9 +1,9 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
+import { CW_BOT_KEY } from '../config';
 import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import { validateChain, validateChainWithTopics } from './validateChain';
-import { CW_BOT_KEY } from '../config';
 
 export const ALL_CHAINS = 'all_chains';
 
@@ -21,7 +21,7 @@ export default class DatabaseValidationService {
 
   private async validateChainByRequestMethod(
     req: Request,
-    validator: (models: DB, query: any) => Promise<[any, any]>
+    validator: (models: DB, query: any) => Promise<[any, any]>,
   ) {
     let chain = null;
     let error = null;
@@ -47,7 +47,7 @@ export default class DatabaseValidationService {
   public validateBotUser = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     //1. Check for bot token
     if (req.body.auth !== CW_BOT_KEY) {
@@ -66,16 +66,19 @@ export default class DatabaseValidationService {
   public validateAuthor = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     const [author, authorError] = await lookupAddressIsOwnedByUser(
       this.models,
-      req
+      req,
     );
+
+    if (authorError) return next(new AppError(authorError));
+
     if (!author) {
       return next(new AppError(Errors.InvalidUser));
     }
-    if (authorError) return next(new AppError(authorError));
+
     // If the author is valid, add it to the request object
     req.address = author;
     next();
@@ -84,11 +87,11 @@ export default class DatabaseValidationService {
   public validateChain = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     const [chain, error] = await this.validateChainByRequestMethod(
       req,
-      validateChain
+      validateChain,
     );
     if (error) return next(new AppError(error));
     if (req.query.chain !== ALL_CHAINS && !chain)
@@ -101,11 +104,11 @@ export default class DatabaseValidationService {
   public validateChainWithTopics = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     const [chain, error] = await this.validateChainByRequestMethod(
       req,
-      validateChainWithTopics
+      validateChainWithTopics,
     );
     if (error) return next(new AppError(error));
     if (!chain) return next(new AppError(Errors.InvalidCommunity));
