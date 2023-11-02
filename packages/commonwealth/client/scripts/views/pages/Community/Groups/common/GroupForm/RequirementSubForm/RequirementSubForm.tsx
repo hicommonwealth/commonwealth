@@ -8,7 +8,7 @@ import {
   TOKENS,
   chainTypes,
   conditionTypes,
-  requirementTypes,
+  requirementTypes
 } from '../../../../common/constants';
 import { RequirementSubFormType } from '../index.types';
 import './RequirementSubForm.scss';
@@ -18,7 +18,7 @@ const RequirementSubForm = ({
   defaultValues = {},
   onRemove = () => null,
   isRemoveable = true,
-  onChange = () => null,
+  onChange = () => null
 }: RequirementSubFormType) => {
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
@@ -41,17 +41,17 @@ const RequirementSubForm = ({
           label="Requirement type"
           placeholder="Requirement type"
           {...(defaultValues.requirementType && {
-            defaultValue: [defaultValues.requirementType],
+            defaultValue: [defaultValues.requirementType]
           })}
           options={requirementTypes.map((requirement) => ({
             label: requirement.label,
-            value: requirement.value,
+            value: requirement.value
           }))}
           onChange={(newValue) => {
             setRequirementType(newValue.value);
 
             onChange({
-              requirementType: newValue.value,
+              requirementType: newValue.value
             });
           }}
           className="w-350"
@@ -90,7 +90,7 @@ const RequirementSubForm = ({
             label="Chain"
             placeholder="Chain"
             {...(defaultValues.requirementChain && {
-              defaultValue: [defaultValues.requirementChain],
+              defaultValue: [defaultValues.requirementChain]
             })}
             options={chainTypes
               .filter(
@@ -99,11 +99,11 @@ const RequirementSubForm = ({
               )
               .map((chainType) => ({
                 label: chainType.label,
-                value: `${chainType.value}`,
+                value: `${chainType.value}`
               }))}
             onChange={(newValue) => {
               onChange({
-                requirementChain: newValue.value,
+                requirementChain: newValue.value
               });
             }}
             customError={errors.requirementChain}
@@ -118,11 +118,11 @@ const RequirementSubForm = ({
               fullWidth
               manualStatusMessage=""
               {...(defaultValues.requirementContractAddress && {
-                defaultValue: defaultValues.requirementContractAddress,
+                defaultValue: defaultValues.requirementContractAddress
               })}
               onInput={(e) => {
                 onChange({
-                  requirementContractAddress: (e.target as any).value,
+                  requirementContractAddress: (e.target as any).value
                 });
               }}
               customError={errors.requirementContractAddress}
@@ -134,15 +134,15 @@ const RequirementSubForm = ({
             label="Condition"
             placeholder="Condition"
             {...(defaultValues.requirementCondition && {
-              defaultValue: [defaultValues.requirementCondition],
+              defaultValue: [defaultValues.requirementCondition]
             })}
             options={conditionTypes.map((conditionType) => ({
               label: conditionType.label,
-              value: conditionType.value,
+              value: conditionType.value
             }))}
             onChange={(newValue) => {
               onChange({
-                requirementCondition: newValue.value,
+                requirementCondition: newValue.value
               });
             }}
             customError={errors.requirementCondition}
@@ -158,11 +158,11 @@ const RequirementSubForm = ({
             label="Amount"
             placeholder="Amount"
             {...(defaultValues.requirementAmount && {
-              defaultValue: defaultValues.requirementAmount,
+              defaultValue: defaultValues.requirementAmount
             })}
             onInput={(e) => {
               onChange({
-                requirementAmount: (e.target as any).value,
+                requirementAmount: (e.target as any).value
               });
             }}
             customError={errors.requirementAmount}

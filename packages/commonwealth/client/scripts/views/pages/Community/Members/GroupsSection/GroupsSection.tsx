@@ -18,7 +18,7 @@ type GroupSectionProps = {
 const GroupsSection = ({
   filteredGroups,
   canManageGroups,
-  hasNoGroups,
+  hasNoGroups
 }: GroupSectionProps) => {
   const navigate = useCommonNavigate();
 

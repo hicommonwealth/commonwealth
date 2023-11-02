@@ -62,7 +62,7 @@ export const CheckboxStory = {
 }
 ```
 
-# Change Log
+## Change Log
 
 - 230113: Flagged by Graham Johnson for consolidation or relocation.
 - 230530: Authored by Daniel Martins.

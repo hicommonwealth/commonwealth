@@ -1,10 +1,13 @@
 **Contents**
+
 - [Starting Chain-Events locally from scratch](#starting-chain-events-locally-from-scratch)
 - [Using a remote Chain-Events API](#using-a-remote-chain-events-api)
 - [Change Log](#change-log)
 
 # Starting Chain-Events locally from scratch
+
 Unless otherwise specified, commands should be run from `packages/chain-events`. If you encounter an error at any point check [here][3] for information on debugging.
+
 1. `yarn create-db`
 2. If you have a database dump run `yarn load-db` otherwise skip this step.
 3. `yarn migrate-db`
@@ -19,12 +22,11 @@ With this method, front-end events and proposals will load correctly but you wil
 1. Set the `ENTITIES_URL` to the chain-events app you want to use e.g. `https://chain-events-staging.herokuapp.com/api`
 2. Now you need to sync the chain-events app database with your local database. See [here][4] for instructions on how to do that.
 
-
 [1]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Overview#enforcing-chain-event-data-consistency
 [2]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Overview#migrating-eventsentities
 [3]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Service-Common-Errors
 [4]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Overview#enforcing-chain-event-data-consistency
 
-# Change Log
+## Change Log
 
 - 230127: Authored by Timothee Legros

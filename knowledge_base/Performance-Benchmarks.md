@@ -1,4 +1,5 @@
 **Contents**
+
 - [Core Web Performance Metrics](#core-web-performance-metrics)
 - [Essential Performance Tools](#essential-performance-tools)
   * [Browser Network Tab: Chrome/Firefox/Safari](#browser-network-tab--chrome-firefox-safari)
@@ -40,10 +41,9 @@ Check out this [Example Test Run](https://www.webpagetest.org/result/230620_AiDc
 
 <img width="1152" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/4791635/53611c67-1ee5-45fd-80ed-a83c0d33a464">
 
-
 ## Load Testing: Artillery
 
-Load testing assesses system behavior under certain loads in terms of concurrent users or transactions. It assists in identifying an application's maximum operating capacity, bottlenecks, and elements contributing to performance degradation. 
+Load testing assesses system behavior under certain loads in terms of concurrent users or transactions. It assists in identifying an application's maximum operating capacity, bottlenecks, and elements contributing to performance degradation.
 
 Artillery allows the creation of load tests, like simulating 5 new users every second for 10 seconds:
 
@@ -54,7 +54,7 @@ phases:
       arrivalRate: 5
 ```
 
-Artillery supports defining scenarios for both POST and GET endpoints and capturing responses for use in subsequent requests. It also accommodates various plugins for metrics export in different formats and direct event transmission to Datadog or local statsd servers. 
+Artillery supports defining scenarios for both POST and GET endpoints and capturing responses for use in subsequent requests. It also accommodates various plugins for metrics export in different formats and direct event transmission to Datadog or local statsd servers.
 
 For a practical example, see [this pull request](https://github.com/hicommonwealth/commonwealth/pull/4403). Instructions for running the load tests are as follows:
 
@@ -73,6 +73,7 @@ yarn test-load
 - This functionality is in-built in Artillery. Refer to the [Artillery documentation](https://www.artillery.io/docs/load-testing-at-scale/aws-lambda) for more details.
 
 Here's a sample call leveraging AWS Lambda to run the benchmark from Singapore:
+
 ```
 artillery run -o output_dir/report.json --environment frick app/scenarios/commonwealth-api-threads.yml --platform aws:lambda --platform-opt region ap-southeast-1
 ```
@@ -101,15 +102,15 @@ We've implemented two new performance dashboards to monitor and track improvemen
 
 From the dashboard, we observe that the `getAddressProfile` query count has substantially dropped from thousands to hundreds after a recent change that increased the batch size. This change can be found in [PR #3391](https://github.com/hicommonwealth/commonwealth/pull/3391).
 
-### Latency Dashboard 
+### Latency Dashboard
 
 - This dashboard presents the 95th percentile latency for the same endpoints as the QPS dashboard.
 - Here's an example screenshot for your reference:
 <img width="1323" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/4791635/44116673-4ed8-468d-b9e0-e0cd652ce46b">
 
-As seen, notable performance improvements have been achieved in `viewUserActivity` by a factor of 1/3rd as a result of this [PR #3974](https://github.com/hicommonwealth/commonwealth/pull/3974). 
+As seen, notable performance improvements have been achieved in `viewUserActivity` by a factor of 1/3rd as a result of this [PR #3974](https://github.com/hicommonwealth/commonwealth/pull/3974).
 
-Similarly, a tenfold performance enhancement has been achieved in the `status` call due to these PRs: [#3916](https://github.com/hicommonwealth/commonwealth/pull/3916) & [#4060](https://github.com/hicommonwealth/commonwealth/pull/4060). 
+Similarly, a tenfold performance enhancement has been achieved in the `status` call due to these PRs: [#3916](https://github.com/hicommonwealth/commonwealth/pull/3916) & [#4060](https://github.com/hicommonwealth/commonwealth/pull/4060).
 
 These improvements are discussed in detail [here](./Request-Handler-Optimization.md).
 
@@ -118,6 +119,6 @@ These improvements are discussed in detail [here](./Request-Handler-Optimization
 - We aim to extend the location TAG using `req.headers['cf-ipcountry']` - added by Cloudflare to each request. It can be included in the list of tags for the `express.response_time` metric reported to Datadog by the backend app available [here](https://github.com/hicommonwealth/commonwealth/blob/7e5c72252078ee2cfc237f99c43a1ad67e97dcf7/packages/commonwealth/server/scripts/setupExpressStats.ts#L29).
 - We plan to filter the entire dashboard using a Dashboard variable to view performance from just one geographic location.
 
-# Change Log
+## Change Log
 
 - 230724: Authored by Nakul Manchanda.
