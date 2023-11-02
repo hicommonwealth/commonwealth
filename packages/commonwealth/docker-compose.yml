@@ -35,6 +35,14 @@ services:
     networks:
       - cw-network
 
+  local-redis:
+    container_name: local-redis
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis-data:/data
+
 networks:
   cw-network:
     name: cw-network
