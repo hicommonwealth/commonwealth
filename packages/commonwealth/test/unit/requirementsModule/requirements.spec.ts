@@ -78,6 +78,42 @@ describe('validateGroupMembership', () => {
 
       assert.equal(result.isValid, true);
     });
+    it('should pass basic 1155 check', async () => {
+      const userAddress: string = '0x123456';
+      const requirements: Requirement[] = [
+        {
+          rule: 'threshold',
+          data: {
+            threshold: '1',
+            source: {
+              source_type: 'erc1155',
+              evm_chain_id: 1,
+              token_id: '1',
+              contract_address: '0x12345',
+            },
+          },
+        },
+      ];
+      const tbc = {
+        fetchUserBalanceWithChain: async function (
+          network,
+          userAddress: string,
+          chainId: string,
+          contractAddress?: string,
+          tokenId?: string
+        ): Promise<string> {
+          return '2';
+        },
+      };
+      const result: ValidateGroupMembershipResponse =
+        await validateGroupMembership(
+          userAddress,
+          requirements,
+          tbc as TokenBalanceCache
+        );
+
+      assert.equal(result.isValid, true);
+    });
     it('should pass basic ethNative check', async () => {
       const userAddress: string = '0x123456';
       const requirements: Requirement[] = [
