@@ -224,7 +224,8 @@ const GroupForm = ({
     };
     const key = Object.keys(val)[0];
     try {
-      // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
+      // HACK ALERT: this type of validation change should be done internally by zod,
+      // but we are doing this manually using javascript
       const schema = getRequirementSubFormSchema(
         allRequirements[index].values.requirementType,
       );
