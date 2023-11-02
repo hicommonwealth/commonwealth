@@ -1,3 +1,4 @@
+import axios from 'axios';
 import $ from 'jquery';
 import app from 'state';
 
@@ -55,12 +56,13 @@ class DiscordController {
     channelId: string | null
   ) {
     try {
-      await $.post(`${app.serverUrl()}/updateTopic`, {
-        chain_id: app.activeChainId(),
-        topic_id: topicId,
-        channel_id: channelId,
-        jwt: app.user.jwt,
-      });
+      await axios.patch(
+        `${app.serverUrl()}/topics/${topicId}/channels/${channelId}`,
+        {
+          chain: app.activeChainId(),
+          jwt: app.user.jwt,
+        }
+      );
     } catch (e) {
       console.log(e);
       throw new Error(e);

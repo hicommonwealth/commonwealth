@@ -1,4 +1,5 @@
 import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase } from 'common-common/src/types';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
@@ -6,9 +7,8 @@ import Sequelize from 'sequelize';
 import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import type { DB } from '../models';
-import { createRole, findOneRole } from '../util/roles';
-import { factory, formatFilename } from 'common-common/src/logging';
 import assertAddressOwnership from '../util/assertAddressOwnership';
+import { createRole, findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -49,7 +49,7 @@ const linkExistingAddressToChain = async (
   }
   const userId = req.user.id;
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain },
   });
 
@@ -79,7 +79,7 @@ const linkExistingAddressToChain = async (
     verificationTokenExpires && +verificationTokenExpires <= +new Date();
 
   if (!isOriginalTokenValid) {
-    const chains = await models.Chain.findAll({
+    const chains = await models.Community.findAll({
       where: { base: chain.base },
     });
 
@@ -97,7 +97,7 @@ const linkExistingAddressToChain = async (
         where: {
           user_id: originalAddress.user_id,
           address: req.body.address,
-          chain: { [Op.in]: chains.map((ch) => ch.id) },
+          community_id: { [Op.in]: chains.map((ch) => ch.id) },
         },
       }
     );
@@ -115,7 +115,7 @@ const linkExistingAddressToChain = async (
     const existingAddress = await models.Address.scope(
       'withPrivateData'
     ).findOne({
-      where: { chain: req.body.chain, address: encodedAddress },
+      where: { community_id: req.body.chain, address: encodedAddress },
     });
 
     let addressId: number;
@@ -141,7 +141,7 @@ const linkExistingAddressToChain = async (
         user_id: originalAddress.user_id,
         profile_id: originalAddress.profile_id,
         address: encodedAddress,
-        chain: req.body.chain,
+        community_id: req.body.chain,
         verification_token: verificationToken,
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,

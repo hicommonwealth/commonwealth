@@ -1,20 +1,27 @@
-**Contents**
+# Chain Events: Environmental Variables
+
+## Contents
+
 - [Local](#local)
-    + [Vultr Env](#vultr-env)
+  + [Vultr Env](#vultr-env)
 - [Heroku](#heroku)
 - [Both](#both)
 - [Change Log](#change-log)
 
-# Local
+## Local
+
 The environment variables listed here (including the VULTR Env var) should be set in `packages/chain-events/.env`
 
 - **PGPASSWORD**
   - Optional
   - The password of the chain-events database. Should be set to 'edgeware'. Having this set avoids having to manually input the database password when executing database commands such as `yarn reset-db` or `yarn load-db`.
+
 ### Vultr Env
+
 For more information on how to use or get these environment variables see [here][2].
 These environment variables are all optional if you are not using a Vultr instance of Redis or RabbitMQ.
 Those marked as required assume you are using a remote instance.
+
 - **VULTR_IP**
   - Required
   - The IP of the Vultr server containing the Redis and RabbitMQ Docker scripts.
@@ -37,9 +44,10 @@ Those marked as required assume you are using a remote instance.
   - Required
   - A unique ID that is generated to distinguish your remote docker containers from other users.
 
+## Heroku
 
-# Heroku
 These environment variables may be set locally but they will have unknown side-effects. Thus it is recommended not to have these set locally unless you know exactly what you are doing.
+
 - **CLOUDAMQP_URL**
   - Required in production
   - The URI of the RabbitMQ instance. This value is usually set automatically by Heroku when a CLOUDAMQP instance is attached to an app.
@@ -52,7 +60,7 @@ These environment variables may be set locally but they will have unknown side-e
 - **ROLLBAR_SERVER_TOKEN**
   - Required in production
   - The Rollbar token for the appropriate environment/app.
-- **CHAIN_SUBSCRIBER_INDEX** <a name="CHAIN_SUBSCRIBER_INDEX"></a>
+- **CHAIN_SUBSCRIBER_INDEX**
   - Required in production
   - This value indicates the index of the ChainSubscriber dyno. The index of a ChainSubscriber determines which chains it will listen to. See the [`getChainEventServiceData.ts` query][1] for more info.
 - **NUM_CHAIN_SUBSCRIBERS**
@@ -63,7 +71,7 @@ These environment variables may be set locally but they will have unknown side-e
   - The JWT secret that is used to generate all user JWTs. Should be set to the exact same JWT secret as the CW App.
 - **SERVER_URL**
   - Required in production
-  - The URL of the CW server associated with the current CE instance. For example for a chain-events staging environment this could be https://commonwealth-staging.herokuapp.com.
+  - The URL of the CW server associated with the current CE instance. For example for a chain-events staging environment this could be <https://commonwealth-staging.herokuapp.com>.
 - **CHAIN_EVENT_SERVICE_SECRET**
   - Required in production
   - A secret string which is used by the CE service to access private CW API routes.
@@ -74,7 +82,8 @@ These environment variables may be set locally but they will have unknown side-e
   - Required in production
   - Specifies the path from the root of the repo to the Procfile to use for the deployed app. Should be set to `packages/chain-events/Procfile`.
 
-# Both
+## Both
+
 - **REPEAT_TIME**
   - Defaults to 1 minute if not set.
   - Not required in production.
@@ -83,6 +92,6 @@ These environment variables may be set locally but they will have unknown side-e
 [1]: https://github.com/hicommonwealth/commonwealth/blob/master/packages/commonwealth/server/routes/getChainEventServiceData.ts#L71
 [2]: https://github.com/hicommonwealth/commonwealth/wiki/Chain-Events-Overview#vultr-scripts
 
-# Change Log
+## Change Log
 
 - 231012: Flagged by Graham Johnson to update links from footnote-style to inline.

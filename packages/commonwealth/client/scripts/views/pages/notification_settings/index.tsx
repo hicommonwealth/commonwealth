@@ -1,4 +1,5 @@
 import { NotificationCategories } from 'common-common/src/types';
+import { getMultipleSpacesById } from 'helpers/snapshot_utils';
 import useForceRerender from 'hooks/useForceRerender';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -22,7 +23,7 @@ import {
   SubscriptionRowMenu,
   SubscriptionRowTextContainer,
 } from './helper_components';
-import { bundleSubs } from './helpers';
+import { bundleSubs, extractSnapshotProposals } from './helpers';
 
 const emailIntervalFrequencyMap = {
   never: 'Never',
@@ -32,12 +33,22 @@ const emailIntervalFrequencyMap = {
   monthly: 'Once a month',
 };
 
+type SnapshotInfo = {
+  snapshotId: string;
+  space: {
+    avatar: string;
+    name: string;
+  };
+  subs: Array<NotificationSubscription>;
+};
+
 const NotificationSettingsPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
   const [email, setEmail] = useState('');
   const [emailValidated, setEmailValidated] = useState(false);
   const [sentEmail, setSentEmail] = useState(false);
+  const [snapshotsInfo, setSnapshotsInfo] = useState(null);
 
   const [currentFrequency, setCurrentFrequency] = useState(
     app.user.emailInterval
@@ -46,6 +57,33 @@ const NotificationSettingsPage = () => {
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
   }, [app?.user.notifications, app.user.emailInterval]);
+
+  useEffect(() => {
+    // bundled snapshot subscriptions
+    const bundledSnapshotSubs = extractSnapshotProposals(
+      app.user.notifications.discussionSubscriptions
+    );
+    const snapshotIds = Object.keys(bundledSnapshotSubs);
+
+    const getSpaces = async () => {
+      try {
+        const getSpaceById = await getMultipleSpacesById(snapshotIds);
+
+        const snapshotsInfoArr = snapshotIds.map((snapshotId) => ({
+          snapshotId,
+          space: getSpaceById.find((x: { id: string }) => x.id === snapshotId),
+          subs: bundledSnapshotSubs[snapshotId],
+        }));
+
+        setSnapshotsInfo(snapshotsInfoArr);
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+    };
+
+    getSpaces();
+  }, []);
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
@@ -87,6 +125,7 @@ const NotificationSettingsPage = () => {
   const bundledSubs = bundleSubs(
     app?.user.notifications.discussionSubscriptions
   );
+
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
     app?.user.notifications.chainEventSubscriptions
@@ -97,7 +136,7 @@ const NotificationSettingsPage = () => {
 
   // chains/communities the user has addresses for but does not have existing subscriptions for
   const relevantSubscribedChains = app?.user.addresses
-    .map((x) => x.chain)
+    .map((x) => x.community)
     .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
 
   return (
@@ -166,8 +205,8 @@ const NotificationSettingsPage = () => {
               <>
                 <CWText type="h5">Email Request</CWText>
                 <CWText type="b1">
-                  Mmm...seems like we don't have your email on file? Enter your
-                  email below so we can send you scheduled email digests.
+                  {`Mmm...seems like we don't have your email on file? Enter your
+                  email below so we can send you scheduled email digests.`}
                 </CWText>
                 <div className="email-input-row">
                   <CWTextInput
@@ -495,6 +534,84 @@ const NotificationSettingsPage = () => {
                   </div>
                 }
               />
+            </div>
+          );
+        })}
+      <div>
+        <CWText
+          type="h4"
+          fontWeight="semiBold"
+          className="chain-events-section-margin"
+        >
+          Snapshot Subscriptions
+        </CWText>
+        <div className="column-header-row">
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="column-header-text"
+          >
+            Community
+          </CWText>
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="column-header-text"
+          >
+            Email
+          </CWText>
+          <CWText
+            type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
+            fontWeight="medium"
+            className="last-column-header-text"
+          >
+            In-App
+          </CWText>
+        </div>
+      </div>
+      {snapshotsInfo &&
+        snapshotsInfo.map((snapshot: SnapshotInfo) => {
+          //destructuring snapshotInfo for readability
+          const { snapshotId, space, subs } = snapshot;
+          if (!snapshotId) return null; // handles incomplete loading case
+
+          //remove ipfs:// from avatar
+          const avatar = space.avatar.replace('ipfs://', '');
+
+          const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
+          const hasSomeInAppSubs = subs.some((s) => s.isActive);
+
+          return (
+            <div
+              className="notification-row chain-events-subscriptions-padding"
+              key={snapshotId}
+            >
+              <div className="notification-row-header">
+                <div className="left-content-container">
+                  <div className="avatar-and-name">
+                    <img
+                      className="snapshot-icon"
+                      src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`}
+                    />
+                    <CWText type="h5" fontWeight="medium">
+                      {space.name}
+                    </CWText>
+                  </div>
+                </div>
+                <CWCheckbox
+                  label="Receive Emails"
+                  checked={hasSomeEmailSubs}
+                  onChange={() => {
+                    handleEmailSubscriptions(hasSomeEmailSubs, subs);
+                  }}
+                />
+                <CWToggle
+                  checked={hasSomeInAppSubs}
+                  onChange={() => {
+                    handleSubscriptions(hasSomeInAppSubs, subs);
+                  }}
+                />
+              </div>
             </div>
           );
         })}

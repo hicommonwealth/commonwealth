@@ -13,7 +13,7 @@ Key:
 - 👁️ `/getThreads`
   - With thread IDs passed via query params, will return specified threads with related collaborator addresses, topic and reactions.
 - ✏️ `/editThread`
-  -   Updates thread and adds new body to thread version history, then creates new file attachments, emits notification to subscribers for the `ThreadEdit` event, then emits the `NewMention` event to newly mentioned users.
+  - Updates thread and adds new body to thread version history, then creates new file attachments, emits notification to subscribers for the `ThreadEdit` event, then emits the `NewMention` event to newly mentioned users.
   - Suggestions:
     - DB operations should be wrapped in a transaction.
     - There's a TODO item to update the author's `last_active` timestamp– should implement.
@@ -27,6 +27,7 @@ Key:
   - With a search term passed via query params, returns threads with matching search index data.
 
 ## Comments
+
 - 📄`/createComment`
   - With parent comment ID, thread ID and text passed via body, creates a comment and attachments, creates subscription between author and reactions/comments, emits `NewMention` notification to new mentions, then updates author `last_active` timestamp and thread `last_commented_on` timestamp.
 - 👁 `/viewComments`
@@ -34,7 +35,7 @@ Key:
   - Suggestion:
     - With some threads potentially having many comments, perhaps this should be paginated.
 - ✏️ `/editComment`
-  - Updates comment, adds attachments, emits `CommentEdit` notification 
+  - Updates comment, adds attachments, emits `CommentEdit` notification
 - ❌ `/deleteComment`
   - With comment ID, will delete comment subscription and comment.
 - 👁 `/bulkComments`
@@ -42,7 +43,7 @@ Key:
   - Suggestions:
     - This endpoint is not used by the frontend and can be removed.
 - 👁 `/searchComments`
-   - With a search term passed via query params, returns comments with matching search index data.
+  - With a search term passed via query params, returns comments with matching search index data.
 
 ## Reactions
 
@@ -62,6 +63,6 @@ Key:
 - Found a common pattern where the user's `last_active` column is updated when various actions are performed. Change into a middleware or helper utility function?
 - Found a common pattern where the text of a thread/comment is parsed for mentions and new mentions are notified. Move logic into helper utility function?
 
-# Change Log
+## Change Log
 
 - 230522: Authored by Ryan Bennett

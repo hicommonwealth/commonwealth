@@ -28,6 +28,7 @@ If you add a script to the package.json, you must add documentation here, descri
   - [lint](#lint)
   - [lint-all](#lint-all)
   - [lint-branch](#lint-branch)
+  - [lint-branch-warnings](#lint-branch-warnings)
   - [style-lint](#style-lint)
 - [Mobile](#mobile)
   - [build-android](#build-android)
@@ -85,7 +86,7 @@ Description: Builds project on Heroku, using `get-max-old-space-size.sh` to dyna
 
 Definition: `yarn global add node-gyp`
 
-Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs. 
+Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
 
 # CI Scripts
 
@@ -239,6 +240,12 @@ Description: Redundant with [lint](#lint) script, which uses 'git status' instea
 
 Considerations: Recommend eliminating either [lint](#lint) or [lint-branch](#lint-branch) scripts. Problematically, lint-branch only checks .ts files. **Flagged for possible removal.**
 
+## lint-branch-warnings
+
+Definition: `FAIL_WARNINGS=1 ./scripts/lint-branch.sh`
+
+Description: Used in the CI. Lints based on the target branch, fails on linter warnings
+
 ## style-lint
 
 Definition: `stylelint client/styles/*`
@@ -375,7 +382,7 @@ Open considerations:
 
 ## integration-test
 
-Definition: `nyc ts-mocha --project tsconfig.json ./test/integration/**/*.spec.ts`
+Definition: `nyc ts-mocha --project tsconfig.json './test/integration/**/*.spec.ts'`
 
 Description: Runs all tests in our integration folder and its subdirectories.
 
@@ -383,31 +390,31 @@ Considerations: This script breaks our more usual test script syntax, which typi
 
 ## test
 
-Definition: `nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts`
+Definition: `nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
 
 Description: Runs all tests in our /test directory.
 
 ## test-api
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/api/**/*.spec.ts`
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'`
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
 ## test-devnet
 
-Definition: `nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts`
+Definition: `nyc ts-mocha --project tsconfig.json './test/devnet/${TEST_DIR:-.}/**/*.spec.ts'`
 
 Description: Runs all tests in our `/devnet`` folder.
 
 ## test-emit-notif
 
-Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/emitNotifications.spec.ts`
+Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/emitNotifications.spec.ts'`
 
 Description: Runs only the `emitNotifications.spec.ts` test, of the three `/integration`` folder "utils."
 
 ## test-integration-util
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts`
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/*.spec.ts'`
 
 Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing).
 
@@ -423,7 +430,7 @@ Description: Append a path to run specific test files or folders.
 
 ## test-suite
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts`
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
 
 Description: Runs all tests in our /test directory.
 
@@ -453,9 +460,9 @@ Contributor: Ryan Bennett
 
 ## build-consumer
 
-Definition: `tsc --project ./tsconfig.consumer.json && tsc-alias --project ./tsconfig.consumer.json`
+Definition: `tsc --project tsconfig.worker.json && tsc-alias --project tsconfig.worker.json`
 
-Description: Runs a compilation based on tsconfig.consumer.json; does not emit files; replaces alias with relative paths post-compilation.
+Description: Runs a compilation based on tsconfig.worker.json; does not emit files; replaces alias with relative paths post-compilation.
 
 ## check-types
 
@@ -491,7 +498,7 @@ Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app ser
 
 ## start-consumer
 
-Definition: `ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script`
+Definition: `ts-node --project tsconfig.worker.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
 

@@ -5,7 +5,7 @@ import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
-import { post, del } from './external/appHook.spec';
+import { del, post } from './external/appHook.spec';
 import {
   testAddresses,
   testThreads,
@@ -24,8 +24,8 @@ const getThreadCommentCount = async (threadId) => {
 const createValidComment = async (threadId, text, jwtToken) => {
   const validRequest = {
     jwt: jwtToken,
-    author_chain: testAddresses[0].chain,
-    chain: testAddresses[0].chain,
+    author_chain: testAddresses[0].community_id,
+    chain: testAddresses[0].community_id,
     thread_id: threadId,
     address: testAddresses[0].address,
     text,
@@ -54,8 +54,8 @@ const getUniqueCommentText = async () => {
 const deleteComment = async (commentId, jwtToken) => {
   const validRequest = {
     jwt: jwtToken,
-    author_chain: testAddresses[0].chain,
-    chain: testAddresses[0].chain,
+    author_chain: testAddresses[0].community_id,
+    chain: testAddresses[0].community_id,
     address: testAddresses[0].address,
   };
 
@@ -82,8 +82,8 @@ describe('createComment Integration Tests', () => {
   it('should return an error response if no text is specified', async () => {
     const invalidRequest = {
       jwt: jwtTokenUser1,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
+      chain: testAddresses[0].community_id,
       address: testAddresses[0].address,
       thread_id: testThreads[0].id,
     };
@@ -102,8 +102,8 @@ describe('createComment Integration Tests', () => {
   it('should return an error response if an invalid parent id is specified', async () => {
     const invalidRequest = {
       jwt: jwtTokenUser1,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
+      chain: testAddresses[0].community_id,
       address: testAddresses[0].address,
       thread_id: testThreads[0].id,
       parent_id: -10,

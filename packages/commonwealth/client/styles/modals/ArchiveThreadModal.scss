@@ -1,0 +1,38 @@
+@import '../shared';
+
+.ArchiveThreadModal {
+  padding: 24px;
+  width: 480px;
+
+  .title {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 16px;
+  }
+
+  .body {
+    padding-top: 4px;
+    padding-bottom: 4px;
+
+    .warning-text {
+      font-size: 14px;
+
+      .Text {
+        line-height: 20px;
+      }
+
+      .Text.top,
+      .Text.middle {
+        margin-bottom: 20px;
+      }
+    }
+
+    .actions {
+      padding-top: 16px;
+      gap: 8px;
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+
+}

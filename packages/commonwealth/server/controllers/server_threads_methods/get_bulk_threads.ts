@@ -1,13 +1,13 @@
 import moment from 'moment';
-import { ChainInstance } from '../../models/chain';
-import { Link, ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { ServerThreadsController } from '../server_threads_controller';
 import { QueryTypes } from 'sequelize';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
+import { ServerError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { ThreadAttributes, ThreadInstance } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export type GetBulkThreadsOptions = {
-  chain?: ChainInstance;
+  chain?: CommunityInstance;
   stage: string;
   topicId: number;
   includePinnedThreads: boolean;
@@ -78,7 +78,7 @@ export async function __getBulkThreads(
     responseThreads = await this.models.sequelize.query(
       `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
-        addr.chain AS addr_chain, threads.thread_id, thread_title,
+        addr.community_id AS addr_chain, threads.thread_id, thread_title,
         threads.marked_as_spam_at,
         threads.archived_at,
         thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
@@ -106,7 +106,7 @@ export async function __getBulkThreads(
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
             CONCAT(
-              '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
+              '{ "address": "', editors.address, '", "chain": "', editors.community_id, '" }'
               )
             ) AS collaborators
         FROM "Threads" t
@@ -201,7 +201,7 @@ export async function __getBulkThreads(
       Address: {
         id: t.addr_id,
         address: t.addr_address,
-        chain: t.addr_chain,
+        community_id: t.addr_chain,
       },
       numberOfComments: t.threads_number_of_comments,
       reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],

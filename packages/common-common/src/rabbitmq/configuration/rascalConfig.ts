@@ -91,16 +91,8 @@ export function getAllRascalConfigs(
   };
 
   const allExchanges: Record<keyof OmittedRascalExchanges, ExchangeConfig> = {
-    [RascalExchanges.ChainEvents]: {
-      type: 'fanout',
-      ...exchangeConfig,
-    },
     [RascalExchanges.SnapshotListener]: {
       type: 'fanout',
-      ...exchangeConfig,
-    },
-    [RascalExchanges.CUD]: {
-      type: 'topic',
       ...exchangeConfig,
     },
     [RascalExchanges.Notifications]: {
@@ -114,18 +106,6 @@ export function getAllRascalConfigs(
   };
 
   const allQueues: Record<keyof OmittedRascalQueue, QueueConfig> = {
-    [RascalQueues.ChainEvents]: {
-      ...queueConfig,
-      options: {
-        arguments: queueOptions,
-      },
-    },
-    [RascalQueues.ChainEventNotificationsCUDMain]: {
-      ...queueConfig,
-      options: {
-        arguments: queueOptions,
-      },
-    },
     [RascalQueues.ChainEventNotifications]: {
       ...queueConfig,
       options: {
@@ -150,18 +130,6 @@ export function getAllRascalConfigs(
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
-    [RascalBindings.ChainEvents]: {
-      source: RascalExchanges.ChainEvents,
-      destination: RascalQueues.ChainEvents,
-      destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ChainEvents,
-    },
-    [RascalBindings.ChainEventNotificationsCUD]: {
-      source: RascalExchanges.CUD,
-      destination: RascalQueues.ChainEventNotificationsCUDMain,
-      destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.ChainEventNotificationsCUD,
-    },
     [RascalBindings.ChainEventNotifications]: {
       source: RascalExchanges.Notifications,
       destination: RascalQueues.ChainEventNotifications,
@@ -183,16 +151,6 @@ export function getAllRascalConfigs(
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
-    [RascalPublications.ChainEvents]: {
-      exchange: RascalExchanges.ChainEvents,
-      routingKey: RascalRoutingKeys.ChainEvents,
-      ...publicationConfig,
-    },
-    [RascalPublications.ChainEventNotificationsCUDMain]: {
-      exchange: RascalExchanges.CUD,
-      routingKey: RascalRoutingKeys.ChainEventNotificationsCUD,
-      ...publicationConfig,
-    },
     [RascalPublications.ChainEventNotifications]: {
       exchange: RascalExchanges.Notifications,
       routingKey: RascalRoutingKeys.ChainEventNotifications,
@@ -211,14 +169,6 @@ export function getAllRascalConfigs(
   };
 
   const allSubscriptions: Record<RascalSubscriptions, SubscriptionConfig> = {
-    [RascalSubscriptions.ChainEvents]: {
-      queue: RascalQueues.ChainEvents,
-      ...subscriptionConfig,
-    },
-    [RascalSubscriptions.ChainEventNotificationsCUDMain]: {
-      queue: RascalQueues.ChainEventNotificationsCUDMain,
-      ...subscriptionConfig,
-    },
     [RascalSubscriptions.ChainEventNotifications]: {
       queue: RascalQueues.ChainEventNotifications,
       ...subscriptionConfig,

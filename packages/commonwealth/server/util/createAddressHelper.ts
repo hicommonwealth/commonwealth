@@ -1,22 +1,22 @@
-import crypto from 'crypto';
+import { bech32 } from 'bech32';
+import { AppError } from 'common-common/src/errors';
 import {
   ChainBase,
   ChainNetwork,
   WalletId,
   WalletSsoSource,
 } from 'common-common/src/types';
-import { bech32 } from 'bech32';
+import crypto from 'crypto';
 import type { NextFunction } from 'express';
-import { AppError } from 'common-common/src/errors';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import { createRole, findOneRole } from './roles';
-import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import type { UserInstance } from '../models/user';
-import type { DB } from '../models';
-import { addressSwapper } from '../../shared/utils';
-import { Errors } from '../routes/createAddress';
 import { Op } from 'sequelize';
+import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
+import { addressSwapper } from '../../shared/utils';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+import type { DB } from '../models';
+import type { UserInstance } from '../models/user';
+import { Errors } from '../routes/createAddress';
+import { createRole, findOneRole } from './roles';
 
 type CreateAddressReq = {
   address: string;
@@ -54,7 +54,7 @@ export async function createAddressHelper(
     return next(new AppError('Cannot join with an injective address'));
   }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.chain },
   });
 
@@ -97,14 +97,14 @@ export async function createAddressHelper(
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { chain: req.chain, address: encodedAddress },
+      where: { community_id: req.chain, address: encodedAddress },
     }
   );
 
   const existingAddressOnOtherChain = await models.Address.scope(
     'withPrivateData'
   ).findOne({
-    where: { chain: { [Op.ne]: req.chain }, address: encodedAddress },
+    where: { community_id: { [Op.ne]: req.chain }, address: encodedAddress },
   });
 
   if (existingAddress) {
@@ -174,14 +174,14 @@ export async function createAddressHelper(
       if (user_id) {
         const profile = await models.Profile.findOne({
           attributes: ['id'],
-          where: { is_default: true, user_id },
+          where: { user_id },
         });
         profile_id = profile?.id;
       }
       const newObj = await models.Address.create({
         user_id,
         profile_id,
-        chain: req.chain,
+        community_id: req.chain,
         address: encodedAddress,
         verification_token,
         verification_token_expires,

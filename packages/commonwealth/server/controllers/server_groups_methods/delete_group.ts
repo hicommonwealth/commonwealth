@@ -1,5 +1,5 @@
-import { ChainInstance } from '../../models/chain';
-import { ServerChainsController } from '../server_chains_controller';
+import { ServerCommunitiesController } from '../server_communities_controller';
+import { CommunityInstance } from '../../models/community';
 import { AddressInstance } from '../../models/address';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
@@ -14,7 +14,7 @@ const Errors = {
 
 export type DeleteGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   address: AddressInstance;
   groupId: number;
 };
@@ -22,7 +22,7 @@ export type DeleteGroupOptions = {
 export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
-  this: ServerChainsController,
+  this: ServerCommunitiesController,
   { user, chain, groupId }: DeleteGroupOptions
 ): Promise<DeleteGroupResult> {
   const isAdmin = await validateOwner({

@@ -1,3 +1,5 @@
+# Heroku
+
 ## Production Database
 
 To download and restore the production database, run the following package scripts:
@@ -44,6 +46,6 @@ To copy the production database to the staging database for testing purposes, en
 
 SEND_EMAILS=true ts-node --project tsconfig.json server.ts at 1pm UTC / 6am PT / 9am ET / 3pm CEST
 
-# Change Log
+## Change Log
 
 - 231031: Split off by Graham Johnson from `commonwealth/README.md`. Flagged for overhaul.

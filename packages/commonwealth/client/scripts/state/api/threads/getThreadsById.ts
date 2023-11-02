@@ -23,9 +23,6 @@ const getThreadsById = async ({ chainId, ids }: GetThreadsByIdProps) => {
     }
   );
 
-  // TODO: this can be removed in future
-  app.chainEntities.getRawEntities(app.activeChainId());
-
   return response.data.result.map((t) => new Thread(t));
 };
 

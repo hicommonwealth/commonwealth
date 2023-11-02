@@ -47,7 +47,7 @@ ORDER BY seq.date DESC;`,
       }
     );
   };
-  const roles = await newObjectsQuery('"Addresses"', 'chain');
+  const roles = await newObjectsQuery('"Addresses"', 'community_id');
   const threads = await newObjectsQuery('"Threads"', 'chain');
   const comments = await newObjectsQuery('"Comments"', 'chain');
 
@@ -61,7 +61,7 @@ ORDER BY seq.date DESC;`,
       }
     );
   };
-  const totalRoles = await totalObjectsQuery('"Addresses"', 'chain');
+  const totalRoles = await totalObjectsQuery('"Addresses"', 'community_id');
   const totalThreads = await totalObjectsQuery('"Threads"', 'chain');
   const totalComments = await totalObjectsQuery('"Comments"', 'chain');
 

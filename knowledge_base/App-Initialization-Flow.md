@@ -1,3 +1,5 @@
+# App Initialization Flow
+
 The goal of this document is to describe the current state of the app initialization flow in as much detail as possible, so that we are better informed when engineering improvements.
 
 1. On `yarn start`, bundling begins with the `webpack.base.config.js`-defined entry point, currently set to the `client/scripts` file `index.tsx`.
@@ -15,7 +17,7 @@ The goal of this document is to describe the current state of the app initializa
     2. `getUserStatus`: Grabs user associations (e.g. selected chain instance, social accounts, addresses). Once addresses have been grabbed, various rows associated with those addresses (e.g. discussion drafts, roles) are requested in turn.
 6. Once the `/status` data is received on callback, `initAppState()` clears and repopulates app state.
     1. Relevant controllers (e.g. user, config) are cleared.
-    2. Nodes, recent activity, snapshot chains, roles, chain categories, notification categories, and notification category types are all repopulated. 
+    2. Nodes, recent activity, snapshot chains, roles, chain categories, notification categories, and notification category types are all repopulated.
     3. Active user and login state are updated.
         - The websocket connection is initialized or disconnected depending on whether the user is logged in or out, respectively.
         - Sets the users’ starred communities, selected chain, and display name
@@ -24,7 +26,7 @@ The goal of this document is to describe the current state of the app initializa
     1. All routes are configured in the `client/scripts/navigation` directory.
     2. `CommonDomainRoutes.tsx` and `CustomDomainRoutes.tsx` declare the routes to front-end pages, switched in `navigation/Router.tsx` based on results of the `/domain` call.
     3. "General routes," referring to pages like `/privacy` and `/terms`, are also loaded via `GeneralRoutes.tsx`.
-8. Most of these routes are set to return their relevant views wrapped inside our `LayoutWrapper` component, via the function `withLayout()`, imported from `client/scripts/views/Layout.tsx`. 
+8. Most of these routes are set to return their relevant views wrapped inside our `LayoutWrapper` component, via the function `withLayout()`, imported from `client/scripts/views/Layout.tsx`.
     1. The `LayoutWrapper` injects the page’s specific params into the page as child, and injects the `scope` argument into the `Layout` component.
     2. This `Layout` component includes a nested `Suspense` component (via the `react` library) and `ErrorBoundary` component (via the `react-error-boundary` library).
     3. The `LayoutComponent` operates as follows:
@@ -63,8 +65,8 @@ The goal of this document is to describe the current state of the app initializa
             - This call triggers chain-specific setup of governance data in particular. It will (generally, as part of chain-specific setup) also call `activeAddressHasToken` which hits `/tokenBalance` for the logged-in user. It also emits `ready` from the `chainModuleReady` event emitter.
         4. Emit `ready` from the `chainAdapterReady` event emitter, and print `CHAIN started.` from the console.
     8. If the user is logged in, his addresses for the initialized community are set as his current active addresses, and the `/selectChain` endpoint is hit, to update his last visited community.
-10. Nested within the `Layout` component, the `Sublayout` component renders the header, sidebar, banners, and similar sub-components, as well as wrapping any child content pages. 
+10. Nested within the `Layout` component, the `Sublayout` component renders the header, sidebar, banners, and similar sub-components, as well as wrapping any child content pages.
 
-# Change Log
+## Change Log
 
 - 230810: Authored by Graham Johnson (#4763).

@@ -7,9 +7,9 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
@@ -27,6 +27,8 @@ type CardProps = AdminActionsProps & {
   threadHref?: string;
   showSkeleton?: boolean;
   canReact?: boolean;
+  canComment?: boolean;
+  disabledActionsTooltipText?: string;
   onCommentBtnClick?: () => any;
 };
 
@@ -48,6 +50,8 @@ export const ThreadCard = ({
   threadHref,
   showSkeleton,
   canReact = true,
+  canComment = true,
+  disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
@@ -96,7 +100,12 @@ export const ThreadCard = ({
         key={thread.id}
       >
         {!isWindowSmallInclusive && (
-          <ReactionButton thread={thread} size="big" disabled={!canReact} />
+          <ReactionButton
+            thread={thread}
+            size="big"
+            disabled={!canReact}
+            tooltipText={disabledActionsTooltipText}
+          />
         )}
         <div className="content-wrapper">
           <div className="content-header">
@@ -113,6 +122,7 @@ export const ThreadCard = ({
                 lastUpdated: thread.updatedAt.toISOString(),
               })}
               discord_meta={thread.discord_meta}
+              archivedAt={thread.archivedAt}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -192,6 +202,8 @@ export const ThreadCard = ({
                 isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
               }
+              canReact={canReact}
+              canComment={canComment}
               onDelete={onDelete}
               onSpamToggle={onSpamToggle}
               onLockToggle={onLockToggle}
@@ -204,6 +216,7 @@ export const ThreadCard = ({
               onEditConfirm={onEditConfirm}
               hasPendingEdits={hasPendingEdits}
               onCommentBtnClick={onCommentBtnClick}
+              disabledActionTooltipText={disabledActionsTooltipText}
             />
           </div>
         </div>

@@ -69,6 +69,7 @@ type CWThreadActionProps = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   label?: string;
   selected?: boolean;
+  isThreadArchived?: boolean;
   tooltipText?: string;
 };
 
@@ -110,7 +111,11 @@ export const TooltipWrapper = ({
   );
 };
 
-const getTooltipCopy = (action: ActionType) => {
+const getTooltipCopy = (action: ActionType, isThreadArchived: boolean) => {
+  if (isThreadArchived) {
+    return 'Thread is archived';
+  }
+
   switch (action) {
     case 'upvote':
       return 'Join community to upvote';
@@ -133,6 +138,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   onClick,
   label,
   selected,
+  isThreadArchived,
   tooltipText,
 }) => {
   const handleClick = (e) => {
@@ -148,7 +154,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   return (
     <TooltipWrapper
       disabled={disabled}
-      text={tooltipText || getTooltipCopy(action)}
+      text={tooltipText || getTooltipCopy(action, isThreadArchived)}
     >
       <button
         onClick={handleClick}

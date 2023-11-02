@@ -1,11 +1,14 @@
-**Contents**
-  * [Overview](#overview)
-  * [Architecture Diagram](#architecture-diagram)
-  * [Deployments](#deployments)
-  * [Listener Setup](#listener-setup)
-  * [Consumer Setup](#consumer-setup)
-  * [Full setup](#full-setup)
-  * [Testing Locally](#testing-locally)
+# Discobot
+
+## Contents
+
+- [Overview](#overview)
+- [Architecture Diagram](#architecture-diagram)
+- [Deployments](#deployments)
+- [Listener Setup](#listener-setup)
+- [Consumer Setup](#consumer-setup)
+- [Full setup](#full-setup)
+- [Testing Locally](#testing-locally)
 - [Change Log](#change-log)
 
 ## Overview
@@ -15,9 +18,7 @@
 1. Discord Listener (`/packages/discord-bot/discord-listener/discordListener.ts`), an app that handles incoming events from the Discord API and pushes these events to a RabbitMQ queue.
 
 2. Discord Consumer (`/packages/discord-bot/discord-consumer/discordConsumer.ts`), an app that handles events from the RabbitMQ queue and hits the CW API endpoint to create Threads and Comments.
-
-3. RabbitMQ Instance: a queue has been set up called `discord-message` 
-
+3. RabbitMQ Instance: a queue has been set up called `discord-message`
 4. Commonwealth Manage Community Page (`/packages/commonwealth/…/chain_metadata_rows.tsx`), where admins are able to add a bot connection and connect Forum Channels (in a connected Discord Server) to Topics (in the CW forum).
 
 ## Architecture Diagram
@@ -32,11 +33,10 @@
 
 ## Listener Setup
 
-The discord listener is a self contained tsnode service. Follow these steps to set up: 
+The discord listener is a self contained tsnode service. Follow these steps to set up:
 
 1. run `yarn install` in the discord-bot directory
-
-2. Set up env variables 
+2. Set up env variables
     - Set `DISCORD_TOKEN` to bot's token
 
     - Set `DATABASE_URL` like other areas of app(not required for local)
@@ -47,7 +47,7 @@ The discord listener is a self contained tsnode service. Follow these steps to s
 
 4. Run `yarn start` from discord-bot directory
 
-## Consumer Setup 
+## Consumer Setup
 
 The discord consumer service is a rabbitmq subscriber which could be replicated with scale
 
@@ -57,9 +57,7 @@ The discord consumer service is a rabbitmq subscriber which could be replicated 
 
 3. Set up env variables
     - Set `DATABASE_URL` like other areas of app(not required for local)
-
-    - Set `SERVER_URL` to the Commonwealth URI 
-
+    - Set `SERVER_URL` to the Commonwealth URI
     - Set `CW_BOT_KEY` to key used in app
 
     - Set `RABBITMQ_URI` if running in a non-local environment
@@ -68,9 +66,9 @@ The discord consumer service is a rabbitmq subscriber which could be replicated 
 
 5. Run `yarn start-consumer`
 
-## Full setup 
+## Full setup
 
-The following would be an order of operations for a full setup with the granular steps abstracted 
+The following would be an order of operations for a full setup with the granular steps abstracted
 
 1. Run RabbitMQ
 
@@ -96,7 +94,9 @@ The following would be an order of operations for a full setup with the granular
 
 - Redirect back to discord-bot-ui page and see confirmation screen.
 
-# Change Log
+## Change Log
 
+- 231025: Flagged by Timothee Legros - local testing instructions do not work. Updates needed for discobot-staging
+and Frick setup instructions (e.g. Discord server must have community enabled).
 - 231006: Ownership transferred to Ian Rowan.
 - 230718: Authored by Alex Young.

@@ -1,4 +1,5 @@
 **Contents**
+
 - [Overview](#overview)
   * [Production](#production)
   * [Development](#development)
@@ -14,7 +15,7 @@
     + [Development](#development-3)
   * [Zapier](#zapier)
     + [Development](#development-4)
-    
+
 # Overview
 
 ## Production
@@ -37,7 +38,7 @@ yarn emit-webhook -c new-thread-creation -d discord
 
 ### Pattern
 
-The logic for each webhook destination should be contained in a single file in 
+The logic for each webhook destination should be contained in a single file in
 `packages/commonwealth/server/util/destinations/` where the name of the file is the name of the destination. Within the file, there should be 3 things:
 
 1. A type definition for the destination's webhook payload
@@ -51,6 +52,7 @@ Finally, the `dispatchWebhook.ts` file contains a function which given a Notific
 # Destinations
 
 ## Telegram
+
 In order for users to receive Telegram webhooks, they must add the production bot to their channel
 and then provide a Telegram API url to their Telegram channel.
 
@@ -64,7 +66,7 @@ by Dillon by interacting with [@BotFather](https://t.me/botfather) on Telegram.
 ### Development
 
 We have a Telegram bot that goes by the name `@CommonWebhooksDevBot`. The owner of this
-bot is also Dillon Chen. The token can be retrieved by Dillon by interacting with 
+bot is also Dillon Chen. The token can be retrieved by Dillon by interacting with
 [@BotFather](https://t.me/botfather) on Telegram. The token may also be found on Heroku apps as the
 `TELEGRAM_BOT_TOKEN_DEV` environment variable.
 
@@ -80,7 +82,7 @@ test Telegram webhooks.
 ### Development
 
 There is a webhook testing channel on the Common Protocol Discord server. Here is an
-invitation link to the server: https://discord.gg/commonwealth. To access the `webhook-testing`
+invitation link to the server: <https://discord.gg/commonwealth>. To access the `webhook-testing`
 channel, message one of the server moderators. The webhook for the channel can be found
 in the channel's 'integration' settings.
 
@@ -90,7 +92,7 @@ in the channel's 'integration' settings.
 
 ### Development
 
-There is a webhook testing channel named `#testing-webhooks` on the Common Slack workspace. Contact Timothee Legros for an invitation to the channel. The `#testing-webhooks` channel has a Slack app called `Common Webhooks Dev` installed in it. This app contains the webhook url used to send messages to the channel. This webhook url can be found here: https://api.slack.com/apps/A05UQUGRWGH/install-on-team.
+There is a webhook testing channel named `#testing-webhooks` on the Common Slack workspace. Contact Timothee Legros for an invitation to the channel. The `#testing-webhooks` channel has a Slack app called `Common Webhooks Dev` installed in it. This app contains the webhook url used to send messages to the channel. This webhook url can be found here: <https://api.slack.com/apps/A05UQUGRWGH/install-on-team>.
 
 `SLACK_WEBHOOK_URL_DEV` environment variable required to use the `emit-webhook` script to send Slack webhooks.
 
@@ -100,12 +102,12 @@ Zapier webhook payload format is found in `packages/commonwealth/server/util/web
 
 ### Development
 
-There is a Zapier Zap called Common Webhook Dev which is on the `ops@commonwealth.im` Zapier account. This Zap receives webhook payloads in step 1 and sends a formatted message to the `testing-webhooks` Slack channel in step 2. 
+There is a Zapier Zap called Common Webhook Dev which is on the `ops@commonwealth.im` Zapier account. This Zap receives webhook payloads in step 1 and sends a formatted message to the `testing-webhooks` Slack channel in step 2.
 
 The webhook url can be found by contacting Timothee or by viewing the Zap's settings [here](https://zapier.com/editor/209598943/published/209598943/setup) (requires Zapier account access).
 
 `ZAPIER_WEBHOOK_URL_DEV` environment variable required to use the `emit-webhook` script to send Zapier webhooks.
 
-# Change Log
+## Change Log
 
 - 231011: Authored by Timothee Legros.
