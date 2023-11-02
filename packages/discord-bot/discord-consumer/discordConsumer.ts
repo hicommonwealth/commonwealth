@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
-  getRabbitMQConfig,
   RabbitMQController,
+  getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
 import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 import {

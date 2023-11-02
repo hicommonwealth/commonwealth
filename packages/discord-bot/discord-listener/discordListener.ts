@@ -64,13 +64,21 @@ async function startDiscordListener() {
   // event types can be found here: https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584
 
   client.on('threadDelete', async (thread: ThreadChannel) => {
-    await handleMessage(
-      controller,
-      client,
-      { id: thread.id, channelId: thread.parentId } as Partial<Message>,
-      'thread-delete',
-    );
+    await handleThreadChannel(controller, thread, 'thread-delete');
   });
+
+  // only used for thread title updates - thread body are handled through the 'messageUpdate' event
+  client.on(
+    'threadUpdate',
+    async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
+      await handleThreadChannel(
+        controller,
+        newThread,
+        'thread-update',
+        oldThread,
+      );
+    },
+  );
 
   client.on('messageDelete', async (message: Message) => {
     await handleMessage(controller, client, message, 'comment-delete');
@@ -94,18 +102,6 @@ async function startDiscordListener() {
       await handleMessage(controller, client, message, 'create');
     }
   });
-
-  client.on(
-    'threadUpdate',
-    async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
-      await handleThreadChannel(
-        controller,
-        newThread,
-        'thread-update',
-        oldThread,
-      );
-    },
-  );
 
   await client.login(DISCORD_TOKEN);
 }
