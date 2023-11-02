@@ -120,7 +120,7 @@ const GroupForm = ({
         requirementCondition: AMOUNT_CONDITIONS.MORE,
         requirementContractAddress: '',
         requirementType: '',
-        requirementId: ''
+        requirementTokenId: ''
       },
       errors: {},
     },
@@ -142,7 +142,7 @@ const GroupForm = ({
             requirementCondition: AMOUNT_CONDITIONS.MORE,
             requirementContractAddress: x?.requirementContractAddress || '',
             requirementType: x?.requirementType?.value || '',
-            requirementId: x?.requirementId || ''
+            requirementTokenId: x?.requirementTokenId || ''
           },
           errors: {},
         }))
@@ -181,7 +181,7 @@ const GroupForm = ({
           requirementCondition: AMOUNT_CONDITIONS.MORE,
           requirementContractAddress: '',
           requirementType: '',
-          requirementId: ''
+          requirementTokenId: ''
         },
         errors: {},
       },

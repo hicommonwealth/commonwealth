@@ -2,7 +2,7 @@ type ContractSource = {
   source_type: 'erc20' | 'erc721' | 'erc1155';
   evm_chain_id: number;
   contract_address: string;
-  id?: string;
+  token_id?: string;
 };
 
 type NativeSource = {

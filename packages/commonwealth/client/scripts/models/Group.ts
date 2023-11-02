@@ -14,6 +14,7 @@ interface APIResponseFormat {
       cosmos_chain_id?: number;
       contract_address?: string;
       token_symbol?: string;
+      token_id?: string;
     };
   }[];
   topics: any[];

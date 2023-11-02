@@ -34,15 +34,6 @@ export class ERC721Token extends EthereumCoin {
   }
 }
 
-export class ERC1155Token extends EthereumCoin {
-  public readonly contractAddress: string;
-
-  constructor(contractAddress: string, n: number | BN) {
-    super(`ERC1155(${contractAddress.substr(0, 6)})`, n, false);
-    this.contractAddress = contractAddress;
-  }
-}
-
 export class MPond extends EthereumCoin {
   public readonly contractAddress: string;
 

@@ -9,7 +9,7 @@ type RequirementCardProps = {
   requirementContractAddress?: string;
   requirementCondition: string;
   requirementAmount: string;
-  requirementId?: string,
+  requirementTokenId?: string,
 };
 
 const RequirementCard = ({
@@ -18,7 +18,7 @@ const RequirementCard = ({
   requirementContractAddress,
   requirementCondition,
   requirementAmount,
-  requirementId,
+  requirementTokenId,
 }: RequirementCardProps) => {
   return (
     <div className="RequirementCard">
@@ -48,7 +48,7 @@ const RequirementCard = ({
           )}
           <InfoBlock label="Condition" value={requirementCondition} />
           <InfoBlock label="Amount" value={requirementAmount} />
-          <InfoBlock label="Id" value={requirementId} />
+          <InfoBlock label="Id" value={requirementTokenId} />
         </div>
       )}
     </div>

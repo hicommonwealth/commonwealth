@@ -58,7 +58,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               )?.label,
             },
             requirementAmount: x.data.threshold,
-            requirementId: x.data.source.id,
+            requirementTokenId: x.data.source.token_id,
             requirementChain: {
               value: `${
                 x.data.source.cosmos_chain_id || x.data.source.evm_chain_id || 0

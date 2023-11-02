@@ -143,12 +143,6 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
       )
     ).default;
     newChain = new ERC721(chain, app);
-  } else if (chain.network === ChainNetwork.ERC1155) {
-    const ERC1155 = (
-      await import (
-        '../controllers/chain/ethereum/NftAdapter'
-      )
-    )
   } else if (chain.network === ChainNetwork.SPL) {
     const SPL = (
       await import(

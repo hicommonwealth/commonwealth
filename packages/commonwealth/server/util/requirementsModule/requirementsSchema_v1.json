@@ -15,7 +15,7 @@
           "type": "string",
           "pattern": "^0x[a-fA-F0-9]{40}$"
         },
-        "id": {
+        "token_id": {
           "type": "string",
           "pattern": "^[0-9]+$"        
         }

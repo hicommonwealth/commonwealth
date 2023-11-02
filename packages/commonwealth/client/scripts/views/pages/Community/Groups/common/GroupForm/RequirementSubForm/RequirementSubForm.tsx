@@ -170,19 +170,19 @@ const RequirementSubForm = ({
           />
           {
             is1155Requirement && (<CWTextInput
-              key={defaultValues.requirementId}
-              name="requirementId"
+              key={defaultValues.requirementTokenId}
+              name="requirementTokenId"
               label="ID"
               placeholder="ID"
-              {...(defaultValues.requirementId && {
-                defaultValue: defaultValues.requirementId,
+              {...(defaultValues.requirementTokenId && {
+                defaultValue: defaultValues.requirementTokenId,
               })}
               onInput={(e) => {
                 onChange({
-                  requirementId: (e.target as any).value,
+                  requirementTokenId: (e.target as any).value,
                 });
               }}
-              customError={errors.requirementId}
+              customError={errors.requirementTokenId}
               fullWidth
             />
           )}
