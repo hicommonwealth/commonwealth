@@ -60,7 +60,8 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
+  UnegisteredCosmosChain: `Check https://cosmos.directory.
+  Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
 export type CreateCommunityOptions = {

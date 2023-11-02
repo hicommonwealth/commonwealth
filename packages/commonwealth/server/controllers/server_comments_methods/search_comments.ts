@@ -39,7 +39,7 @@ export async function __searchComments(
     page,
     orderBy,
     orderDirection,
-  }: SearchCommentsOptions
+  }: SearchCommentsOptions,
 ): Promise<SearchCommentsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {

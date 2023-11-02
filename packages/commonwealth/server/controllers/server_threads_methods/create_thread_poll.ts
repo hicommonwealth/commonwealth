@@ -1,6 +1,5 @@
 import moment from 'moment';
 import { AppError } from '../../../../common-common/src/errors';
-import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
@@ -16,7 +15,6 @@ export const Errors = {
 
 export type CreateThreadPollOptions = {
   user: UserInstance;
-  address: AddressInstance;
   community: CommunityInstance;
   threadId: number;
   prompt: string;

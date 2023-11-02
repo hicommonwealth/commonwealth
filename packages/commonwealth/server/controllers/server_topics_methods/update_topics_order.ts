@@ -8,7 +8,7 @@ import { ServerTopicsController } from '../server_topics_controller';
 const Errors = {
   NoUser: 'Not signed in',
   NoIds: 'Must supply ordered array of topic IDs',
-  NoChain: 'Must supply a chain ID',
+  NoCommunity: 'Must supply a community ID',
   NoPermission: `You do not have permission to order topics`,
   InvalidTopic:
     'Passed topics may not all be featured, or may include an invalid ID',
@@ -30,7 +30,7 @@ export async function __updateTopicsOrder(
     user,
     community,
     body: { orderedIds: newTopicOrder },
-  }: UpdateTopicsOrderOptions
+  }: UpdateTopicsOrderOptions,
 ): Promise<UpdateTopicsOrderResult> {
   if (!user) {
     throw new AppError(Errors.NoUser);
@@ -65,7 +65,7 @@ export async function __updateTopicsOrder(
         await topic.save();
         return topic;
       })();
-    })
+    }),
   );
 
   return topics.map((t) => t.toJSON());

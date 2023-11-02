@@ -5,12 +5,12 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type GetCommunitiesOptions = {};
 export type GetCommunitiesResult = {
-  chain: CommunityInstance;
+  community: CommunityInstance;
   snapshot: string[];
 }[];
 
 export async function __getCommunities(
-  this: ServerCommunitiesController
+  this: ServerCommunitiesController,
 ): Promise<GetCommunitiesResult> {
   const communities = await this.models.Community.findAll({
     where: { active: true },
@@ -32,13 +32,13 @@ export async function __getCommunities(
 
   const communitiesWithSnapshots = communities.map((community) => {
     const communitySnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.chain_id === community.id
+      (space) => space.chain_id === community.id,
     );
     const snapshotSpaceNames = communitySnapshotSpaces.map(
-      (space) => space.snapshot_space?.snapshot_space
+      (space) => space.snapshot_space?.snapshot_space,
     );
     return {
-      chain: community,
+      community,
       snapshot: snapshotSpaceNames.length > 0 ? snapshotSpaceNames : [],
     };
   });

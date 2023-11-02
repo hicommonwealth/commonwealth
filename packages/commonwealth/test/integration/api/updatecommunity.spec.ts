@@ -17,7 +17,6 @@ describe('Update Community/Chain Tests', () => {
   let jwtToken;
   let loggedInAddr;
   const chain = 'ethereum';
-  let offchainCommunity;
 
   before('reset database', async () => {
     await resetDatabase();
