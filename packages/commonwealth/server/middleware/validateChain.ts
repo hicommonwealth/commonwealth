@@ -11,9 +11,14 @@ export const ChainCommunityErrors = {
 export type ValidateChainParams = {
   chain?: string;
   chain_id?: string;
+  community_id?: string;
 };
 
-const getChainQuery = (chain_id: string, models: DB, includeTopics: boolean) => ({
+const getChainQuery = (
+  chain_id: string,
+  models: DB,
+  includeTopics: boolean,
+) => ({
   where: {
     id: chain_id,
   },
@@ -38,12 +43,12 @@ const getChainQuery = (chain_id: string, models: DB, includeTopics: boolean) => 
 export const validateChain = async (
   models: DB,
   params: ValidateChainParams,
-  includeTopics = false
+  includeTopics = false,
 ): Promise<[CommunityInstance, string]> => {
-  const chain_id = params.chain || params.chain_id;
+  const chain_id = params.chain || params.chain_id || params.community_id;
   if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
   const chain = await models.Community.findOne(
-    getChainQuery(chain_id, models, includeTopics)
+    getChainQuery(chain_id, models, includeTopics),
   );
   // searching for chain that doesn't exist
   if (chain_id && !chain) return [null, ChainCommunityErrors.ChainDNE];
@@ -52,7 +57,7 @@ export const validateChain = async (
 
 export const validateChainWithTopics = async (
   models: DB,
-  params: ValidateChainParams
+  params: ValidateChainParams,
 ): Promise<[CommunityInstance, string]> => {
   return validateChain(models, params, true);
 };
