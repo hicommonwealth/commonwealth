@@ -5,6 +5,13 @@ RED='\033[31m'
 YELLOW='\033[33m'
 NC='\033[0m' 
 
+# Prettier best practice for pre-commit hooks
+# Using option 5 until we decide to integrate eslint (and switch to option 1)
+# https://prettier.io/docs/en/precommit.html#option-5-shell-script
+# FILES=$(git diff --staged --name-only --diff-filter=d)
+
+# Getting diff from master as suggested by Timothy 
+# while we establish our formatting rules
 FILES=$(git diff --name-only master)
 
 if [ -n "$FILES" ]
