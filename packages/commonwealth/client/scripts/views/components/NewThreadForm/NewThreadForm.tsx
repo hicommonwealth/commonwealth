@@ -58,7 +58,6 @@ export const NewThreadForm = () => {
     threadTitle,
     setThreadTitle,
     threadKind,
-    setThreadKind,
     threadTopic,
     setThreadTopic,
     threadUrl,
