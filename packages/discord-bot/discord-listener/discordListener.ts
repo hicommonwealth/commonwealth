@@ -12,6 +12,7 @@ import {
   handleMessage,
   handleThreadChannel,
 } from 'discord-bot/discord-listener/handlers';
+import { rollbar } from 'discord-bot/utils/rollbar';
 import {
   Client,
   IntentsBitField,
@@ -21,7 +22,6 @@ import {
 } from 'discord.js';
 import v8 from 'v8';
 import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
-import {rollbar} from "discord-bot/utils/rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -38,13 +38,13 @@ startHealthCheckLoop({
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
-    v8.getHeapStatistics().heap_size_limit / 1000000000
-  )} GB`
+    v8.getHeapStatistics().heap_size_limit / 1000000000,
+  )} GB`,
 );
 
 async function startDiscordListener() {
   const controller = new RabbitMQController(
-    getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService)
+    getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
   );
   await controller.init();
 
@@ -68,7 +68,7 @@ async function startDiscordListener() {
       controller,
       client,
       { id: thread.id, channelId: thread.parentId } as Partial<Message>,
-      'thread-delete'
+      'thread-delete',
     );
   });
 
@@ -80,7 +80,7 @@ async function startDiscordListener() {
     'messageUpdate',
     async (oldMessage: Message, newMessage: Message) => {
       await handleMessage(controller, client, newMessage, 'update');
-    }
+    },
   );
 
   client.on('messageCreate', async (message: Message) => {
@@ -98,8 +98,13 @@ async function startDiscordListener() {
   client.on(
     'threadUpdate',
     async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
-      await handleThreadChannel(controller, newThread, 'thread-update', oldThread);
-    }
+      await handleThreadChannel(
+        controller,
+        newThread,
+        'thread-update',
+        oldThread,
+      );
+    },
   );
 
   await client.login(DISCORD_TOKEN);

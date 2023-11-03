@@ -6,8 +6,8 @@ import {
   getForumLinkedTopicId,
   getImageUrls,
 } from 'discord-bot/discord-listener/util';
+import { rollbar } from 'discord-bot/utils/rollbar';
 import { Client, Message, ThreadChannel } from 'discord.js';
-import {rollbar} from "discord-bot/utils/rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -15,7 +15,7 @@ export async function handleMessage(
   controller: RabbitMQController,
   client: Client,
   message: Partial<Message>,
-  action: DiscordAction
+  action: DiscordAction,
 ) {
   try {
     // 1. Filter for designated forum channels
@@ -51,14 +51,14 @@ export async function handleMessage(
     try {
       await controller.publish(new_message, RascalPublications.DiscordListener);
       log.info(
-        `Message published to RabbitMQ: ${JSON.stringify(message.content)}`
+        `Message published to RabbitMQ: ${JSON.stringify(message.content)}`,
       );
     } catch (error) {
       log.info(`Error publishing to rabbitMQ`, error);
     }
   } catch (error) {
     log.info(`Error Processing Discord Message`, error);
-    rollbar.error(`Error Processing Discord Message`, error)
+    rollbar.error(`Error Processing Discord Message`, error);
   }
 }
 
@@ -66,7 +66,7 @@ export async function handleThreadChannel(
   controller: RabbitMQController,
   thread: ThreadChannel,
   action: DiscordAction,
-  oldThread?: ThreadChannel
+  oldThread?: ThreadChannel,
 ) {
   try {
     // only handle public channels in the Discord forum
@@ -84,7 +84,7 @@ export async function handleThreadChannel(
           channel_id: thread.parentId,
           action,
         } as any,
-        RascalPublications.DiscordListener
+        RascalPublications.DiscordListener,
       );
     } else {
       if (!oldThread) return;
@@ -94,12 +94,12 @@ export async function handleThreadChannel(
           {
             action,
           } as any,
-          RascalPublications.DiscordListener
+          RascalPublications.DiscordListener,
         );
       }
     }
   } catch (e) {
     log.info(`Error Processing Discord Message`, e);
-    rollbar.error(`Error Processing Discord Message`, e)
+    rollbar.error(`Error Processing Discord Message`, e);
   }
 }

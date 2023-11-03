@@ -4,7 +4,7 @@ import * as process from 'process';
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
+import type { CommunityInstance } from '../../../../server/models/community';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { CollaborationAttributes } from 'server/models/collaboration';
 import type { CommentInstance } from 'server/models/comment';
@@ -21,7 +21,7 @@ export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
 export let testAddresses: AddressInstance[];
-export let testChains: ChainInstance[];
+export let testChains: CommunityInstance[];
 export let testCollaborations: CollaborationAttributes[];
 export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
@@ -56,7 +56,7 @@ export async function clearTestEntities() {
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
   });
-  await models.Chain.destroy({
+  await models.Community.destroy({
     where: { chain_node_id: { [Op.lt]: 0 } },
     force: true,
   });
@@ -127,7 +127,7 @@ export async function createTestEntities() {
   try {
     testChains = [
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest',
             chain_node_id: -1,
@@ -147,7 +147,7 @@ export async function createTestEntities() {
         })
       )[0],
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest2',
             chain_node_id: -2,

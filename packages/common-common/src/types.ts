@@ -182,11 +182,11 @@ export interface IDiscordMessage {
 
 export interface IDiscordMeta {
   user: {
-    id: string,
-    username: string,
-  },
-  channel_id: string,
-  message_id: string,
+    id: string;
+    username: string;
+  };
+  channel_id: string;
+  message_id: string;
 }
 
 export type HttpMethod =

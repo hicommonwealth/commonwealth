@@ -6,7 +6,7 @@ import {
 } from '../../../../common-common/src/types';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ReactionAttributes } from '../../models/reaction';
 import { UserInstance } from '../../models/user';
 import { findAllRoles } from '../../util/roles';
@@ -26,7 +26,7 @@ const Errors = {
 export type CreateCommentReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  chain: CommunityInstance;
   reaction: string;
   commentId: number;
   canvasAction?: any;

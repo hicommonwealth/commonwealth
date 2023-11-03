@@ -55,7 +55,7 @@ export default (
   );
 
   DiscordBotConfig.associate = (models) => {
-    models.DiscordBotConfig.belongsTo(models.Chain, {
+    models.DiscordBotConfig.belongsTo(models.Community, {
       foreignKey: 'community_id',
       targetKey: 'id',
       onDelete: 'CASCADE',

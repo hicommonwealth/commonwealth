@@ -15,8 +15,8 @@ const deleteGroup = async ({ groupId, chainId, address }: DeleteGroupProps) => {
       jwt: app.user.jwt,
       chain: chainId,
       author_chain: chainId,
-      address,
-    },
+      address
+    }
   });
 };
 
@@ -27,7 +27,7 @@ const useDeleteGroupMutation = ({ chainId }: { chainId: string }) => {
       const key = [ApiEndpoints.FETCH_GROUPS, chainId];
       queryClient.cancelQueries(key);
       queryClient.refetchQueries(key);
-    },
+    }
   });
 };
 

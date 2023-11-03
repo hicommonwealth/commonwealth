@@ -29,7 +29,7 @@ const TABS = [
 ];
 
 const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
-  'All',
+  'All groups',
   'In group',
   'Not in group',
 ];
@@ -45,7 +45,7 @@ const CommunityMembersPage = () => {
 
   const debouncedSearchTerm = useDebounce<string>(
     searchFilters.searchText,
-    500
+    500,
   );
 
   const {
@@ -72,7 +72,9 @@ const CommunityMembersPage = () => {
       return [];
     }
 
-    return members.pages
+    const clonedMembersPages = [...members.pages];
+
+    const results = clonedMembersPages
       .reduce((acc, page) => {
         return [...acc, ...page.results];
       }, [] as SearchProfilesResponse['results'])
@@ -84,24 +86,25 @@ const CommunityMembersPage = () => {
           (role) =>
             role.chain_id === app.activeChainId() &&
             [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
-              role.permission
-            )
+              role.permission,
+            ),
         )?.permission,
         groups: (groups || [])
           .filter((g) =>
             (g.members || []).find(
-              (x) => x?.address?.address === p.addresses?.[0]?.address
-            )
+              (x) => x?.address?.address === p.addresses?.[0]?.address,
+            ),
           )
+          .sort((a, b) => a.name.localeCompare(b.name))
           .map((x) => x.name),
       }))
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
-              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
             ) ||
             p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-          : true
+          : true,
       )
       .filter((p) => {
         if (searchFilters.category === GROUP_AND_MEMBER_FILTERS[0]) {
@@ -114,28 +117,36 @@ const CommunityMembersPage = () => {
 
         return p.groups.length === 0;
       });
+
+    return results;
   }, [members, groups, debouncedSearchTerm, searchFilters.category]);
 
   const filteredGroups = useMemo(() => {
-    return (groups || [])
+    const filteredGroupsArr = (groups || [])
       .filter((group) =>
         searchFilters.searchText
           ? group.name
               .toLowerCase()
               .includes(searchFilters.searchText.toLowerCase())
-          : true
+          : true,
       )
       .filter((group) =>
-        searchFilters.category === 'All'
+        searchFilters.category === 'All groups'
           ? true
           : searchFilters.category === 'In group'
           ? (group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address
+              (x) => x?.address?.address === app.user.activeAccount.address,
             )
           : !(group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address
-            )
+              (x) => x?.address?.address === app.user.activeAccount.address,
+            ),
       );
+
+    const clonedFilteredGroups = [...filteredGroupsArr];
+
+    clonedFilteredGroups.sort((a, b) => a.name.localeCompare(b.name));
+
+    return clonedFilteredGroups;
   }, [groups, searchFilters]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
@@ -146,7 +157,7 @@ const CommunityMembersPage = () => {
     history.pushState(
       null,
       '',
-      `${window.location.pathname}?${params.toString()}`
+      `${window.location.pathname}?${params.toString()}`,
     );
     setSelectedTab(activeTab);
   };
@@ -204,7 +215,7 @@ const CommunityMembersPage = () => {
               'cols-3': featureFlags.gatingEnabled && !isAdmin,
               'cols-4': featureFlags.gatingEnabled && isAdmin,
             },
-            'filters'
+            'filters',
           )}
         >
           <CWTextInput
@@ -221,7 +232,7 @@ const CommunityMembersPage = () => {
               }))
             }
           />
-          {featureFlags.gatingEnabled && (
+          {featureFlags.gatingEnabled && app.user.activeAccount && (
             <div className="select-dropdown-container">
               <CWText type="b2" fontWeight="bold" className="filter-text">
                 Filter

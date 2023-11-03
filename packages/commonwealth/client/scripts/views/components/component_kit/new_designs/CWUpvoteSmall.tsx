@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
+import { getClasses } from 'views/components/component_kit/helpers';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 interface CWUpvoteSmallProps {
@@ -12,6 +12,7 @@ interface CWUpvoteSmallProps {
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   tooltipContent: JSX.Element;
   isThreadArchived?: boolean;
+  tooltipText?: string;
 }
 
 const CWUpvoteSmall = ({
@@ -21,6 +22,7 @@ const CWUpvoteSmall = ({
   selected,
   disabled,
   tooltipContent,
+  tooltipText = '',
   isThreadArchived,
 }: CWUpvoteSmallProps) => {
   const handleClick = (e) => {
@@ -63,6 +65,7 @@ const CWUpvoteSmall = ({
             selected={selected}
             label={String(voteCount)}
             disabled={disabled}
+            tooltipText={tooltipText}
           />
         </>
       )}
