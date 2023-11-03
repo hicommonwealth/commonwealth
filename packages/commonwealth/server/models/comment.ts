@@ -1,5 +1,5 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 
 import { StatsDController } from 'common-common/src/statsd';
 import type { AddressAttributes } from './address';
