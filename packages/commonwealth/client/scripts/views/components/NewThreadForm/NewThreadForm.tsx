@@ -5,7 +5,6 @@ import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { capitalize } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
 import app from 'state';
@@ -14,7 +13,6 @@ import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
@@ -53,7 +51,7 @@ export const NewThreadForm = () => {
       }
       return acc;
     },
-    { enabledTopics: [], disabledTopics: [] }
+    { enabledTopics: [], disabledTopics: [] },
   );
 
   const {
@@ -120,7 +118,7 @@ export const NewThreadForm = () => {
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
       deltaString,
-      !!hasTopics
+      !!hasTopics,
     );
 
     setIsSaving(true);
@@ -159,7 +157,7 @@ export const NewThreadForm = () => {
     setThreadTitle('');
     setThreadTopic(
       topicsForSelector.enabledTopics.find((t) => t.name.includes('General')) ||
-        null
+        null,
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
@@ -171,17 +169,8 @@ export const NewThreadForm = () => {
       <div className="NewThreadForm">
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            Proposals
+            Create Discussion
           </CWText>
-        </div>
-        <div className="new-thread-header">
-          <CWTabsRow>
-            <CWTab
-              label={capitalize(ThreadKind.Discussion)}
-              isSelected={threadKind === ThreadKind.Discussion}
-              onClick={() => setThreadKind(ThreadKind.Discussion)}
-            />
-          </CWTabsRow>
         </div>
         <div className="new-thread-body">
           <div className="new-thread-form-inputs">
