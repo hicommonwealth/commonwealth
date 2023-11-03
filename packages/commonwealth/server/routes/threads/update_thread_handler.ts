@@ -1,8 +1,7 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
+import { IDiscordMeta } from 'common-common/src/types';
 import { ThreadAttributes } from '../../models/thread';
-import { AppError } from '../../../../common-common/src/errors';
-import {IDiscordMeta} from "common-common/src/types";
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 export const Errors = {
   InvalidThreadID: 'Invalid thread ID',
@@ -34,7 +33,7 @@ type UpdateThreadResponse = ThreadAttributes;
 export const updateThreadHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateThreadRequestBody, null, { id: string }>,
-  res: TypedResponse<UpdateThreadResponse>
+  res: TypedResponse<UpdateThreadResponse>,
 ) => {
   const { user, address, chain } = req;
   const { id } = req.params;

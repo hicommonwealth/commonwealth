@@ -29,7 +29,7 @@ const TABS = [
 ];
 
 const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
-  'All',
+  'All groups',
   'In group',
   'Not in group',
 ];
@@ -72,7 +72,9 @@ const CommunityMembersPage = () => {
       return [];
     }
 
-    return members.pages
+    const clonedMembersPages = [...members.pages];
+
+    const results = clonedMembersPages
       .reduce((acc, page) => {
         return [...acc, ...page.results];
       }, [] as SearchProfilesResponse['results'])
@@ -93,6 +95,7 @@ const CommunityMembersPage = () => {
               (x) => x?.address?.address === p.addresses?.[0]?.address,
             ),
           )
+          .sort((a, b) => a.name.localeCompare(b.name))
           .map((x) => x.name),
       }))
       .filter((p) =>
@@ -114,10 +117,12 @@ const CommunityMembersPage = () => {
 
         return p.groups.length === 0;
       });
+
+    return results;
   }, [members, groups, debouncedSearchTerm, searchFilters.category]);
 
   const filteredGroups = useMemo(() => {
-    return (groups || [])
+    const filteredGroupsArr = (groups || [])
       .filter((group) =>
         searchFilters.searchText
           ? group.name
@@ -126,7 +131,7 @@ const CommunityMembersPage = () => {
           : true,
       )
       .filter((group) =>
-        searchFilters.category === 'All'
+        searchFilters.category === 'All groups'
           ? true
           : searchFilters.category === 'In group'
           ? (group.members || []).find(
@@ -136,6 +141,12 @@ const CommunityMembersPage = () => {
               (x) => x?.address?.address === app.user.activeAccount.address,
             ),
       );
+
+    const clonedFilteredGroups = [...filteredGroupsArr];
+
+    clonedFilteredGroups.sort((a, b) => a.name.localeCompare(b.name));
+
+    return clonedFilteredGroups;
   }, [groups, searchFilters]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
@@ -221,7 +232,7 @@ const CommunityMembersPage = () => {
               }))
             }
           />
-          {featureFlags.gatingEnabled && (
+          {featureFlags.gatingEnabled && app.user.activeAccount && (
             <div className="select-dropdown-container">
               <CWText type="b2" fontWeight="bold" className="filter-text">
                 Filter

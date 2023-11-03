@@ -171,7 +171,9 @@ const GroupForm = ({
   }, []);
 
   const removeRequirementByIndex = (index: number) => {
-    setRequirementSubForms(requirementSubForms.splice(index, 1));
+    const updatedSubForms = [...requirementSubForms];
+    updatedSubForms.splice(index, 1);
+    setRequirementSubForms([...updatedSubForms]);
   };
 
   const addRequirementSubForm = () => {
@@ -222,7 +224,8 @@ const GroupForm = ({
     };
     const key = Object.keys(val)[0];
     try {
-      // HACK ALERT: this type of validation change should be done internally by zod, by we are doing this manually using javascript
+      // HACK ALERT: this type of validation change should be done internally by zod,
+      // but we are doing this manually using javascript
       const schema = getRequirementSubFormSchema(
         allRequirements[index].values.requirementType,
       );
@@ -429,18 +432,24 @@ const GroupForm = ({
                   onRemove={() => removeRequirementByIndex(index)}
                 />
               ))}
-
-              {requirementSubForms.length < MAX_REQUIREMENTS && (
-                <CWButton
-                  type="button"
-                  label="Add requirement"
-                  iconLeft="plus"
-                  buttonWidth="full"
-                  buttonType="secondary"
-                  buttonHeight="med"
-                  onClick={addRequirementSubForm}
-                />
-              )}
+              <CWButton
+                disabled={requirementSubForms.length === MAX_REQUIREMENTS}
+                type="button"
+                label={
+                  requirementSubForms.length === MAX_REQUIREMENTS
+                    ? 'Cannot add more than 10 requirements'
+                    : 'Add requirement'
+                }
+                iconLeft={
+                  requirementSubForms.length === MAX_REQUIREMENTS
+                    ? null
+                    : 'plus'
+                }
+                buttonWidth="full"
+                buttonType="secondary"
+                buttonHeight="med"
+                onClick={addRequirementSubForm}
+              />
 
               <CWText
                 type="h4"

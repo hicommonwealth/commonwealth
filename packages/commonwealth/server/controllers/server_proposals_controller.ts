@@ -4,14 +4,14 @@ import { ChainNetwork } from 'common-common/src/types';
 import { providers } from 'ethers';
 import { DB } from '../models';
 import {
-  __getProposalVotes,
   GetProposalVotesOptions,
   GetProposalVotesResult,
+  __getProposalVotes,
 } from './server_proposal_methods/get_proposal_votes';
 import {
-  __getProposals,
   GetProposalsOptions,
   GetProposalsResult,
+  __getProposals,
 } from './server_proposal_methods/get_proposals';
 
 export type SupportedProposalNetworks =

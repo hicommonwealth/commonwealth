@@ -1,8 +1,8 @@
+import { IDiscordMeta } from 'common-common/src/types';
+import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { verifyThread } from '../../../shared/canvas/serverVerify';
-import {IDiscordMeta} from "common-common/src/types";
 
 type CreateThreadRequestBody = {
   topic_id: string;
@@ -23,7 +23,7 @@ type CreateThreadResponse = ThreadAttributes;
 export const createThreadHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateThreadRequestBody>,
-  res: TypedResponse<CreateThreadResponse>
+  res: TypedResponse<CreateThreadResponse>,
 ) => {
   const { user, address, chain } = req;
   const {
