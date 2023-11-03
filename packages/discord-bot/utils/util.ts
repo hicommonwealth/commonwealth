@@ -10,7 +10,7 @@ export async function getForumLinkedTopic(
 ): Promise<TopicAttributes> {
   const result: TopicAttributes[] = await sequelize.query(
     `
-    SELECT * FROM "Topics" WHERE channel_id = :forumId LIMIT 1;
+    SELECT * FROM "Topics" WHERE channel_id = :forumId AND deleted_at IS NULL LIMIT 1;
   `,
     { type: QueryTypes.SELECT, raw: true, replacements: { forumId } },
   );
