@@ -20,7 +20,7 @@ const SidebarHeader = () => {
         }
       />
 
-      <CWText className="header" type={'h5'}>
+      <CWText className="header" type="h5">
         {app?.chain?.meta?.name || <Skeleton width="70%" />}
       </CWText>
     </div>

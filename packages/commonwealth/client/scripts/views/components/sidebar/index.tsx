@@ -28,7 +28,7 @@ export const Sidebar = ({
 
   useEffect(() => {
     setRecentlyUpdatedVisibility(false);
-  }, []);
+  }, [setRecentlyUpdatedVisibility]);
 
   const sidebarClass = useMemo(() => {
     return clsx('Sidebar', {
