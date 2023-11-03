@@ -21,7 +21,7 @@ import { success } from '../types';
 import axios from 'axios';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import { ALL_COMMUNITIES } from '../middleware/databaseValidationService';
 import {
   MAX_COMMUNITY_IMAGE_SIZE_BYTES,
   checkUrlFileSize,
@@ -104,7 +104,7 @@ const createChain = async (
   if (!req.body.id || !req.body.id.trim()) {
     return next(new AppError(Errors.NoId));
   }
-  if (req.body.id === ALL_CHAINS) {
+  if (req.body.id === ALL_COMMUNITIES) {
     return next(new AppError(Errors.ReservedId));
   }
   if (!req.body.name || !req.body.name.trim()) {

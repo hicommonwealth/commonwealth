@@ -17,7 +17,7 @@ import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
 import axios from 'axios';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
+import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { UserInstance } from '../../models/user';
 import {
   MAX_COMMUNITY_IMAGE_SIZE_BYTES,
@@ -102,7 +102,7 @@ export async function __createCommunity(
   if (!community.id || !community.id.trim()) {
     throw new AppError(Errors.NoId);
   }
-  if (community.id === ALL_CHAINS) {
+  if (community.id === ALL_COMMUNITIES) {
     throw new AppError(Errors.ReservedId);
   }
   if (!community.name || !community.name.trim()) {

@@ -14,7 +14,7 @@ const deleteGroup = async ({ groupId, chainId, address }: DeleteGroupProps) => {
     data: {
       jwt: app.user.jwt,
       community_id: chainId,
-      author_chain: chainId,
+      author_community_id: chainId,
       address,
     },
   });

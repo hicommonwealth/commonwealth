@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { AppError } from 'common-common/src/errors';
-import { validateChain } from '../middleware/validateChain';
+import { validateCommunity } from '../middleware/validateCommunity';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -35,11 +35,11 @@ type GetDiscordChannelsResp = {
 const getDiscordChannels = async (
   models: DB,
   req: TypedRequestBody<GetDiscordChannelsReq>,
-  res: TypedResponse<GetDiscordChannelsResp>
+  res: TypedResponse<GetDiscordChannelsResp>,
 ) => {
   const { chain_id } = req.body;
 
-  const [chain, error] = await validateChain(models, { chain_id });
+  const [chain, error] = await validateCommunity(models, { chain_id });
   if (!chain || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   const configEntry = await models.DiscordBotConfig.findOne({
@@ -85,7 +85,7 @@ const getDiscordChannels = async (
         selectedChannel: {
           id: configEntry.snapshot_channel_id,
           name: channels.find(
-            (channel) => channel.id === configEntry.snapshot_channel_id
+            (channel) => channel.id === configEntry.snapshot_channel_id,
           )?.name,
         },
       });

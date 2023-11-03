@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { UserInstance } from 'server/models/user';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
+import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import type { CommunityAttributes } from '../../models/community';
 import { findOneRole } from '../../util/roles';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -49,7 +49,7 @@ export async function __updateCommunity(
   if (!id) {
     throw new AppError(Errors.NoCommunityId);
   }
-  if (id === ALL_CHAINS) {
+  if (id === ALL_COMMUNITIES) {
     throw new AppError(Errors.ReservedId);
   }
   if (network) {

@@ -28,7 +28,7 @@ const refreshMembership = async ({
     {
       jwt: app.user.jwt,
       community_id: chainId,
-      author_chain: chainId,
+      author_community_id: chainId,
       address,
       ...(topicId && { topic_id: topicId }),
     },

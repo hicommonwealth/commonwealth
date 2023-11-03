@@ -27,7 +27,7 @@ const editGroup = async ({
   return await axios.put(`${app.serverUrl()}/groups/${groupId}`, {
     jwt: app.user.jwt,
     community_id: chainId,
-    author_chain: chainId,
+    author_community_id: chainId,
     address,
     metadata: {
       name: groupName,
