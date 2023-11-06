@@ -1,7 +1,7 @@
+import axios from 'axios';
+import { ChainCategoryType } from 'common-common/src/types';
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
-import { ChainCategoryType } from 'common-common/src/types';
-import axios from 'axios';
 
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
@@ -15,11 +15,11 @@ export const sortAdminsAndModsFirst = (a, b) => {
 
 export const setCommunityCategories = async (
   selected_tags: { [tag: string]: boolean },
-  chain_id: string
+  community_id: string,
 ) => {
   return new Promise<void>((resolve, reject) => {
     const params = {
-      chain_id,
+      community_id,
       selected_tags: selected_tags,
       auth: true,
       jwt: app.user.jwt,

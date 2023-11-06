@@ -1,38 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { isAddress } from 'web3-utils';
 import { providers } from 'ethers';
 import $ from 'jquery';
+import React, { useEffect, useState } from 'react';
+import { isAddress } from 'web3-utils';
 
 import 'pages/create_community.scss';
 
-import app from 'state';
-import { initAppState } from 'state';
 import { IERC20Metadata__factory } from 'common-common/src/eth/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
+import app, { initAppState } from 'state';
 import { slugify, slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import {
-  defaultCommunityRows,
   EthCommunityRows,
+  defaultCommunityRows,
   updateAdminOnCreateCommunity,
 } from './community_input_rows';
-import type { EthChainFormState } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCommunityFormIdFields,
   useCommunityFormDefaultFields,
+  useCommunityFormIdFields,
   useCommunityFormState,
   useEthCommunityFormFields,
 } from './hooks';
+import type { EthCommunityFormState } from './types';
 
 export const PolygonForm = ({
-  ethChainNames,
-  ethChains,
-}: EthChainFormState) => {
+  ethCommunityNames,
+  ethCommunities,
+}: EthCommunityFormState) => {
   const [, setDecimals] = useState(18);
 
   const { id, setId, name, setName, symbol, setSymbol } =
@@ -47,18 +46,15 @@ export const PolygonForm = ({
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!ethChainFormFields.chainString) {
-      ethChainFormFields.setChainString('Polygon Mainnet');
+    if (!ethChainFormFields.communityString) {
+      ethChainFormFields.setCommunityString('Polygon Mainnet');
     }
   }, [ethChainFormFields]);
 
   const validAddress = isAddress(ethChainFormFields.address);
 
   const updateTokenForum = async () => {
-    if (
-      !ethChainFormFields.address ||
-      !ethChainFormFields.ethChainId
-    ) {
+    if (!ethChainFormFields.address || !ethChainFormFields.ethCommunityId) {
       return;
     }
 
@@ -68,7 +64,7 @@ export const PolygonForm = ({
 
     const args = {
       address: ethChainFormFields.address,
-      chain_id: ethChainFormFields.ethChainId,
+      chain_id: ethChainFormFields.ethCommunityId,
       url: ethChainFormFields.nodeUrl,
     };
 
@@ -87,12 +83,12 @@ export const PolygonForm = ({
 
           if (communityFormDefaultFields.iconUrl.startsWith('/')) {
             communityFormDefaultFields.setIconUrl(
-              `https://commonwealth.im${communityFormDefaultFields.iconUrl}`
+              `https://commonwealth.im${communityFormDefaultFields.iconUrl}`,
             );
           }
 
           communityFormDefaultFields.setDescription(
-            res.token.description || ''
+            res.token.description || '',
           );
           communityFormDefaultFields.setWebsite(res.token.website || '');
           communityFormDefaultFields.setDiscord(res.token.discord || '');
@@ -116,7 +112,7 @@ export const PolygonForm = ({
 
             const contract = IERC20Metadata__factory.connect(
               args.address,
-              ethersProvider
+              ethersProvider,
             );
 
             const contractName = await contract.name();
@@ -135,7 +131,7 @@ export const PolygonForm = ({
             setSymbol('');
             communityFormState.setStatus('failure');
             communityFormState.setMessage(
-              'Verified token but could not load metadata.'
+              'Verified token but could not load metadata.',
             );
           }
 
@@ -154,13 +150,13 @@ export const PolygonForm = ({
       } else {
         communityFormState.setStatus('failure');
         communityFormState.setMessage(
-          res.message || 'Failed to load Token Information'
+          res.message || 'Failed to load Token Information',
         );
       }
     } catch (err) {
       communityFormState.setStatus('failure');
       communityFormState.setMessage(
-        err.responseJSON?.error || 'Failed to load Token Information'
+        err.responseJSON?.error || 'Failed to load Token Information',
       );
     }
     communityFormState.setLoading(false);
@@ -169,15 +165,15 @@ export const PolygonForm = ({
   return (
     <div className="CreateCommunityForm">
       {EthCommunityRows(
-        { ethChainNames, ethChains, disabled: true },
-        { ...ethChainFormFields, ...communityFormState }
+        { ethCommunityNames, ethCommunities, disabled: true },
+        { ...ethChainFormFields, ...communityFormState },
       )}
       <CWButton
         label="Populate fields"
         disabled={
           communityFormState.saving ||
           !validAddress ||
-          !ethChainFormFields.ethChainId||
+          !ethChainFormFields.ethCommunityId ||
           communityFormState.loading
         }
         onClick={async () => {
@@ -226,8 +222,8 @@ export const PolygonForm = ({
               id: id,
               name: name,
               address: ethChainFormFields.address,
-              chain_string: ethChainFormFields.chainString,
-              eth_chain_id: ethChainFormFields.ethChainId,
+              chain_string: ethChainFormFields.communityString,
+              eth_chain_id: ethChainFormFields.ethCommunityId,
               icon_url: communityFormDefaultFields.iconUrl,
               jwt: app.user.jwt,
               network: ChainNetwork.ERC20,
@@ -241,7 +237,7 @@ export const PolygonForm = ({
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
@@ -251,7 +247,7 @@ export const PolygonForm = ({
             navigate(`/${res.result.community?.id}`);
           } catch (err) {
             notifyError(
-              err.responseJSON?.error || 'Creating new ERC20 community failed'
+              err.responseJSON?.error || 'Creating new ERC20 community failed',
             );
           } finally {
             communityFormState.setSaving(false);

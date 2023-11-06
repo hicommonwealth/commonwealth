@@ -4,17 +4,17 @@ import 'pages/landing/index.scss';
 
 import CommunityInfo from '../../../models/ChainInfo';
 
+import useForceRerender from 'hooks/useForceRerender';
 import app, { LoginState } from 'state';
-import { Header } from './header';
+import { Footer } from '../../Footer';
+import { CWText } from '../../components/component_kit/cw_text';
+import UserDashboard from '../user_dashboard';
+import { Carousel } from './carousel';
 import { CommunitySearch } from './community_search';
 import { CreatorsGallery } from './creators_gallery';
-import { TokenHolders } from './token_holders';
 import { CrowdfundingGallery } from './crowdfunding_gallery';
-import UserDashboard from '../user_dashboard';
-import { Footer } from '../../Footer';
-import useForceRerender from 'hooks/useForceRerender';
-import { CWText } from '../../components/component_kit/cw_text';
-import { Carousel } from './carousel';
+import { Header } from './header';
+import { TokenHolders } from './token_holders';
 
 export type Community = {
   communityInfo: CommunityInfo;
@@ -41,11 +41,11 @@ const sortedCommunities: Array<Community> = app.config.chains
   });
 
 const sortedChainsAndCommunities = sortedCommunities.filter(
-  (c) => !c.communityInfo.collapsedOnHomepage
+  (c) => !c.communityInfo.collapsedOnHomepage,
 );
 
 const betaChainsAndCommunities = sortedCommunities.filter(
-  (c) => c.communityInfo.collapsedOnHomepage
+  (c) => c.communityInfo.collapsedOnHomepage,
 );
 
 const communities = [
@@ -61,8 +61,8 @@ const LandingPage = () => {
     return (
       <div className="LandingPage">
         <Header onLogin={forceRerender} />
-        <CommunitySearch chains={communities} />
-        <Carousel chains={communities} />
+        <CommunitySearch communities={communities} />
+        <Carousel communities={communities} />
         <CreatorsGallery />
         <TokenHolders />
         <CrowdfundingGallery />

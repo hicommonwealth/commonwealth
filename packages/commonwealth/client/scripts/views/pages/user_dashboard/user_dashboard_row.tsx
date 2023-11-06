@@ -41,7 +41,7 @@ export const UserDashboardRow = ({
         <UserDashboardRowBottom
           threadId=""
           commentId=""
-          chainId=""
+          communityId=""
           commentCount={0}
           commenters={[]}
           showSkeleton
@@ -66,7 +66,7 @@ export const UserDashboardRow = ({
   }
 
   const { chain_id, thread_id, root_type, comment_id } = JSON.parse(
-    notification.notificationData
+    notification.notificationData,
   );
 
   const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
@@ -75,7 +75,7 @@ export const UserDashboardRow = ({
     <Link
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!path },
-        'UserDashboardRow'
+        'UserDashboardRow',
       )}
       to={path}
     >
@@ -83,7 +83,7 @@ export const UserDashboardRow = ({
       <UserDashboardRowBottom
         threadId={threadId}
         commentId={comment_id}
-        chainId={chain_id}
+        communityId={chain_id}
         commentCount={commentCount}
         commenters={commenters}
       />

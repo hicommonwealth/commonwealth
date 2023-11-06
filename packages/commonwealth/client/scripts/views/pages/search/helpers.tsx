@@ -3,8 +3,8 @@ import React, { useMemo } from 'react';
 
 import 'pages/search/index.scss';
 
-import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import app from 'state';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import CommunityInfo from '../../../models/ChainInfo';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
@@ -17,7 +17,7 @@ import { User } from '../../components/user/user';
 
 export type ThreadResult = {
   id: number;
-  chain: string;
+  community: string;
   title: string;
   body: string;
   address_id: number;
@@ -44,10 +44,10 @@ const ThreadResultRow = ({
   }, [thread.title]);
 
   const handleClick = () => {
-    setRoute(`/discussion/${thread.id}`, {}, thread.chain);
+    setRoute(`/discussion/${thread.id}`, {}, thread.community);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== thread.chain) {
+  if (app.isCustomDomain() && app.customDomainId() !== thread.community) {
     return <></>;
   }
 
@@ -56,7 +56,7 @@ const ThreadResultRow = ({
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
-          {`discussion - ${thread.chain}`}
+          {`discussion - ${thread.community}`}
         </CWText>
         <CWText className="search-results-thread-title" fontWeight="medium">
           {renderTruncatedHighlights(searchTerm, title)}
@@ -87,7 +87,7 @@ const ThreadResultRow = ({
 export type ReplyResult = {
   id: number;
   proposalid: number;
-  chain: string;
+  community: string;
   title: string;
   text: string;
   address_id: number;
@@ -106,7 +106,7 @@ const ReplyResultRow = ({
   setRoute,
 }: ReplyResultRowProps) => {
   const proposalId = comment.proposalid;
-  const community = comment.chain;
+  const community = comment.community;
 
   const title = useMemo(() => {
     try {
@@ -129,7 +129,7 @@ const ReplyResultRow = ({
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontWeight="medium">{`comment - ${
-          comment.chain || comment.chain
+          comment.community || comment.community
         }`}</CWText>
         <CWText className="search-results-thread-title">
           {renderTruncatedHighlights(searchTerm, title)}
@@ -248,7 +248,7 @@ export const renderSearchResults = (
   results: any[],
   searchTerm: string,
   searchType: SearchScope,
-  setRoute: any
+  setRoute: any,
 ) => {
   if (!results || results.length === 0) {
     return [];

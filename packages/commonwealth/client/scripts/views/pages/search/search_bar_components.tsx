@@ -34,7 +34,7 @@ export const SearchChip = ({ isActive, label, onClick }: SearchChipProps) => {
         {
           isActive,
         },
-        'SearchChip'
+        'SearchChip',
       )}
       onClick={onClick}
     >
@@ -57,7 +57,7 @@ export const SearchBarThreadPreviewRow = ({
   const content = decodeURIComponent(searchResult.body);
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.id}`;
+    const path = `/${searchResult.community}/discussion/${searchResult.id}`;
     navigate(path, {}, null);
   };
 
@@ -94,7 +94,7 @@ type SearchBarCommentPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarCommentPreviewRow = (
-  props: SearchBarCommentPreviewRowProps
+  props: SearchBarCommentPreviewRowProps,
 ) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
@@ -103,7 +103,7 @@ export const SearchBarCommentPreviewRow = (
   const content = searchResult.text;
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
+    const path = `/${searchResult.community}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
     navigate(path, {}, null);
   };
 
@@ -128,12 +128,12 @@ export const SearchBarCommentPreviewRow = (
   );
 };
 
-type SearchBarChainPreviewRowProps = {
+type SearchBarCommunityPreviewRowProps = {
   searchResult: CommunityResult;
   searchTerm?: string;
 };
 export const SearchBarCommunityPreviewRow = (
-  props: SearchBarChainPreviewRowProps
+  props: SearchBarCommunityPreviewRowProps,
 ) => {
   const { searchResult } = props;
   const navigate = useCommonNavigate();
@@ -156,7 +156,7 @@ type SearchBarMemberPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarMemberPreviewRow = (
-  props: SearchBarMemberPreviewRowProps
+  props: SearchBarMemberPreviewRowProps,
 ) => {
   const { searchResult } = props;
   const community = searchResult.addresses[0].community;
