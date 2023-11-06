@@ -14,7 +14,7 @@ const MEMBERSHIP_TTL_SECONDS = 60 * 2;
 
 export type RefreshMembershipOptions = {
   user: UserInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   topicId: number;
 };
@@ -26,16 +26,18 @@ export type RefreshMembershipResult = {
 
 export async function __refreshMembership(
   this: ServerCommunitiesController,
-  { chain, address, topicId }: RefreshMembershipOptions
+  { community, address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
-  // get all groups across the chain topics
-  const chainTopics = await this.models.Topic.findAll({
+  // get all groups across the community topics
+  const communityTopics = await this.models.Topic.findAll({
     where: {
-      chain_id: chain.id,
+      chain_id: community.id,
       ...(topicId ? { id: topicId } : {}),
     },
   });
-  const groupIds = uniq(flatten(chainTopics.map(({ group_ids }) => group_ids)));
+  const groupIds = uniq(
+    flatten(communityTopics.map(({ group_ids }) => group_ids)),
+  );
   const groups = await this.models.Group.findAll({
     where: {
       id: { [Op.in]: groupIds },
@@ -68,7 +70,7 @@ export async function __refreshMembership(
       if (!created) {
         const expiresAt = moment(membership.last_checked).add(
           MEMBERSHIP_TTL_SECONDS,
-          'seconds'
+          'seconds',
         );
         if (moment().isBefore(expiresAt)) {
           // already exists and is fresh, don't recompute
@@ -78,13 +80,13 @@ export async function __refreshMembership(
 
       // is newly created or stale, recompute
       return recomputeMembership(membership, address, this.tokenBalanceCache);
-    })
+    }),
   );
 
   // transform memberships to result shape
   const results = updatedMemberships.map((membership) => {
-    const topic = chainTopics.find((t) =>
-      t.group_ids.includes(membership.group_id)
+    const topic = communityTopics.find((t) =>
+      t.group_ids.includes(membership.group_id),
     );
     return {
       groupId: membership.group_id,
@@ -107,7 +109,7 @@ export async function __refreshMembership(
 async function recomputeMembership(
   membership: MembershipInstance,
   address: AddressInstance,
-  tokenBalanceCache: TokenBalanceCache
+  tokenBalanceCache: TokenBalanceCache,
 ): Promise<MembershipInstance> {
   if (!membership.group) {
     throw new ServerError('membership Group is not populated');
@@ -117,7 +119,7 @@ async function recomputeMembership(
     address.address,
     requirements,
     tokenBalanceCache,
-    metadata.required_requirements || 0
+    metadata.required_requirements || 0,
   );
   return membership.update({
     reject_reason: isValid ? null : JSON.stringify(messages),

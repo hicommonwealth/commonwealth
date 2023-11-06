@@ -25,7 +25,7 @@ export const createThreadHandler = async (
   req: TypedRequestBody<CreateThreadRequestBody>,
   res: TypedResponse<CreateThreadResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const {
     topic_id: topicId,
     topic_name: topicName,
@@ -46,7 +46,7 @@ export const createThreadHandler = async (
       title,
       body,
       address: address.address,
-      community: chain.id,
+      community: community.id,
       topic: topicId ? parseInt(topicId, 10) : null,
     });
   }
@@ -55,7 +55,7 @@ export const createThreadHandler = async (
     await controllers.threads.createThread({
       user,
       address,
-      chain,
+      community,
       title,
       body,
       kind,

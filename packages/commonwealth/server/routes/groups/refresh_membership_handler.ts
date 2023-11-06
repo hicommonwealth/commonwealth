@@ -32,7 +32,7 @@ export const refreshMembershipHandler = async (
 
   const result = await controllers.groups.refreshMembership({
     user,
-    chain,
+    community: chain,
     address,
     topicId: topic_id,
   });

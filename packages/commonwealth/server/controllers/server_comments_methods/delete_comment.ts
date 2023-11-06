@@ -15,7 +15,7 @@ const Errors = {
 export type DeleteCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   commentId?: number;
   messageId?: string;
 };
@@ -24,7 +24,7 @@ export type DeleteCommentResult = void;
 
 export async function __deleteComment(
   this: ServerCommentsController,
-  { user, address, chain, commentId, messageId }: DeleteCommentOptions,
+  { user, address, community, commentId, messageId }: DeleteCommentOptions,
 ): Promise<DeleteCommentResult> {
   if (!commentId) {
     // Discord Bot Handling
@@ -45,7 +45,7 @@ export async function __deleteComment(
 
   // check if author can delete post
   const [canInteract, error] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {

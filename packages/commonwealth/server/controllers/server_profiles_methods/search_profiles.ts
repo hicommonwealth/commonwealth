@@ -14,7 +14,7 @@ import { ServerProfilesController } from '../server_profiles_controller';
 export const Errors = {};
 
 export type SearchProfilesOptions = {
-  chain: CommunityInstance;
+  community: CommunityInstance;
   search: string;
   includeRoles?: boolean;
   limit?: number;
@@ -38,14 +38,14 @@ export type SearchProfilesResult = TypedPaginatedResult<{
 export async function __searchProfiles(
   this: ServerProfilesController,
   {
-    chain,
+    community,
     search,
     includeRoles,
     limit,
     page,
     orderBy,
     orderDirection,
-  }: SearchProfilesOptions
+  }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
     limit: Math.min(limit, 100) || 10,
@@ -80,11 +80,13 @@ export async function __searchProfiles(
     searchTerm: `%${search}%`,
     ...paginationBind,
   };
-  if (chain) {
-    bind.chain = chain.id;
+  if (community) {
+    bind.community = community.id;
   }
 
-  const chainWhere = bind.chain ? `"Addresses".community_id = $chain AND` : '';
+  const communityWhere = bind.community
+    ? `"Addresses".community_id = $community AND`
+    : '';
 
   const sqlWithoutPagination = `
     SELECT
@@ -102,7 +104,7 @@ export async function __searchProfiles(
     JOIN
       "Addresses" on "Profiles".user_id = "Addresses".user_id
     WHERE
-      ${chainWhere}
+      ${communityWhere}
       (
         "Profiles".profile_name ILIKE '%' || $searchTerm || '%'
         OR
@@ -123,7 +125,7 @@ export async function __searchProfiles(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     ),
   ]);
 
@@ -159,8 +161,8 @@ export async function __searchProfiles(
           },
         },
       },
-      chain?.id,
-      ['member', 'moderator', 'admin']
+      community?.id,
+      ['member', 'moderator', 'admin'],
     );
 
     const addressIdRoles: Record<number, RoleInstanceWithPermission[]> = {};

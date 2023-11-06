@@ -1,15 +1,19 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
+import { CommunityInstance } from 'server/models/community';
 import { CW_BOT_KEY } from '../config';
 import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
-import { validateChain, validateChainWithTopics } from './validateChain';
+import {
+  validateCommunity,
+  validateCommunityWithTopics,
+} from './validateCommunity';
 
-export const ALL_CHAINS = 'all_chains';
+export const ALL_COMMUNITIES = 'all_communities';
 
 export const Errors = {
   InvalidUser: 'Invalid user',
-  InvalidCommunity: 'Invalid community or chain',
+  InvalidCommunity: 'Invalid community',
 };
 
 export default class DatabaseValidationService {
@@ -19,16 +23,16 @@ export default class DatabaseValidationService {
     this.models = models;
   }
 
-  private async validateChainByRequestMethod(
+  private async validateCommunityByRequestMethod(
     req: Request,
-    validator: (models: DB, query: any) => Promise<[any, any]>,
+    validator: (
+      models: DB,
+      query: any,
+    ) => Promise<[CommunityInstance, string, boolean]>,
   ) {
-    let chain = null;
-    let error = null;
-    if (req.query.chain === ALL_CHAINS) {
-      // If chain is all, don't set anything on request object
-      return [null, null];
-    }
+    let chain: CommunityInstance | null = null;
+    let error: any = null;
+    let bypass: boolean = false;
 
     if (
       req.method === 'GET' ||
@@ -38,10 +42,10 @@ export default class DatabaseValidationService {
       req.method === 'PATCH'
     ) {
       const source = req.method === 'GET' ? req.query : req.body;
-      [chain, error] = await validator(this.models, source);
+      [chain, error, bypass] = await validator(this.models, source);
     }
 
-    return [chain, error];
+    return [chain, error, bypass];
   }
 
   public validateBotUser = async (
@@ -84,36 +88,42 @@ export default class DatabaseValidationService {
     next();
   };
 
-  public validateChain = async (
+  public validateCommunity = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ) => {
-    const [chain, error] = await this.validateChainByRequestMethod(
-      req,
-      validateChain,
-    );
+    const [community, error, bypass] =
+      await this.validateCommunityByRequestMethod(req, validateCommunity);
+    if (bypass) {
+      next();
+      return;
+    }
     if (error) return next(new AppError(error));
-    if (req.query.chain !== ALL_CHAINS && !chain)
-      return next(new AppError(Errors.InvalidCommunity));
+    if (!community) return next(new AppError(Errors.InvalidCommunity));
     // If the chain is valid, add it to the request object
-    req.chain = chain;
+    req.chain = community;
     next();
   };
 
-  public validateChainWithTopics = async (
+  public validateCommunityWithTopics = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ) => {
-    const [chain, error] = await this.validateChainByRequestMethod(
-      req,
-      validateChainWithTopics,
-    );
+    const [community, error, bypass] =
+      await this.validateCommunityByRequestMethod(
+        req,
+        validateCommunityWithTopics,
+      );
+    if (bypass) {
+      next();
+      return;
+    }
     if (error) return next(new AppError(error));
-    if (!chain) return next(new AppError(Errors.InvalidCommunity));
+    if (!community) return next(new AppError(Errors.InvalidCommunity));
     // If the chain is valid, add it to the request object
-    req.chain = chain;
+    req.chain = community;
     next();
   };
 }

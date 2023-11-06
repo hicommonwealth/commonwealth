@@ -16,10 +16,10 @@ const fetchComments = async ({ chainId, threadId }: FetchCommentsProps) => {
     `${app.serverUrl()}${ApiEndpoints.FETCH_COMMENTS}`,
     {
       params: {
-        chain: chainId || app.activeChainId(),
+        community_id: chainId || app.activeChainId(),
         thread_id: threadId,
       },
-    }
+    },
   );
 
   // transform response

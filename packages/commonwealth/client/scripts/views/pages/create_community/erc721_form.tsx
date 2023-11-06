@@ -1,34 +1,33 @@
-import React, { useEffect } from 'react';
-import { isAddress } from 'web3-utils';
 import { providers } from 'ethers';
 import $ from 'jquery';
+import React, { useEffect } from 'react';
+import { isAddress } from 'web3-utils';
 
 import 'pages/create_community.scss';
 
-import app from 'state';
-import { initAppState } from 'state';
 import { IERC721Metadata__factory } from 'common-common/src/eth/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
+import app, { initAppState } from 'state';
 import { slugify, slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import {
-  defaultChainRows,
   EthChainRows,
+  defaultChainRows,
   updateAdminOnCreateCommunity,
 } from './chain_input_rows';
-import type { EthChainFormState } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
   useChainFormDefaultFields,
+  useChainFormIdFields,
   useChainFormState,
   useEthChainFormFields,
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
+import type { EthChainFormState } from './types';
 
 export const ERC721Form = (props: EthChainFormState) => {
   const { ethChainNames, ethChains } = props;
@@ -106,7 +105,7 @@ export const ERC721Form = (props: EthChainFormState) => {
 
             const contract = IERC721Metadata__factory.connect(
               args.address,
-              ethersProvider
+              ethersProvider,
             );
 
             const contractName = await contract.name();
@@ -123,7 +122,7 @@ export const ERC721Form = (props: EthChainFormState) => {
             setSymbol('');
             chainFormState.setStatus('failure');
             chainFormState.setMessage(
-              'Verified token but could not load metadata.'
+              'Verified token but could not load metadata.',
             );
           }
 
@@ -143,13 +142,13 @@ export const ERC721Form = (props: EthChainFormState) => {
       } else {
         chainFormState.setStatus('failure');
         chainFormState.setMessage(
-          res.message || 'Failed to load Token Information'
+          res.message || 'Failed to load Token Information',
         );
       }
     } catch (err) {
       chainFormState.setStatus('failure');
       chainFormState.setMessage(
-        err.responseJSON?.error || 'Failed to load Token Information'
+        err.responseJSON?.error || 'Failed to load Token Information',
       );
     }
     chainFormState.setLoading(false);
@@ -159,7 +158,7 @@ export const ERC721Form = (props: EthChainFormState) => {
     <div className="CreateCommunityForm">
       {EthChainRows(
         { ethChainNames, ethChains },
-        { ...ethChainFormFields, ...chainFormState }
+        { ...ethChainFormFields, ...chainFormState },
       )}
       <CWButton
         label="Populate fields"
@@ -229,17 +228,17 @@ export const ERC721Form = (props: EthChainFormState) => {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
             await initAppState(false);
             await updateAdminOnCreateCommunity(id);
 
-            navigate(`/${res.result.chain?.id}`);
+            navigate(`/${res.result.community?.id}`);
           } catch (err) {
             notifyError(
-              err.responseJSON?.error || 'Creating new ERC721 community failed'
+              err.responseJSON?.error || 'Creating new ERC721 community failed',
             );
           } finally {
             chainFormState.setSaving(false);
