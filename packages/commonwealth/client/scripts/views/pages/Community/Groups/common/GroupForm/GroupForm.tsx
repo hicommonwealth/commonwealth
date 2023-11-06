@@ -17,6 +17,7 @@ import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_rad
 import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
+  SPECIFICATIONS,
   TOKENS,
   conditionTypes,
 } from '../../../common/constants';
@@ -85,11 +86,16 @@ const getRequirementSubFormSchema = (
   requirementType: string,
 ): ZodObject<any> => {
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const is1155Requirement = requirementType === SPECIFICATIONS.ERC_1155;
+
   const schema = isTokenRequirement
     ? requirementSubFormValidationSchema.omit({
         requirementContractAddress: true,
+        requirementTokenId: true
       })
-    : requirementSubFormValidationSchema;
+    : !is1155Requirement ? requirementSubFormValidationSchema.omit({
+      requirementTokenId: true
+    }) :requirementSubFormValidationSchema;
   return schema;
 };
 
