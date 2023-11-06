@@ -1147,6 +1147,7 @@ function setupRouter(
     'post',
     '/getDiscordChannels',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateCommunity,
     getDiscordChannels.bind(this, models),
   );
 
