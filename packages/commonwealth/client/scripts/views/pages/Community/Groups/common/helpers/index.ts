@@ -38,6 +38,9 @@ export const makeGroupDataBaseAPIPayload = (
             ...(x.requirementType !== TOKENS.EVM_TOKEN && {
               contract_address: x.requirementContractAddress.trim(),
             }),
+            ...(x.requirementType === SPECIFICATIONS.ERC_1155 && {
+              token_id: x.requirementTokenId.trim(),
+            }),
           },
         },
       });
@@ -61,5 +64,7 @@ export const makeGroupDataBaseAPIPayload = (
     }
   });
 
+
+  console.log(payload)
   return payload;
 };
