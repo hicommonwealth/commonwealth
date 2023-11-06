@@ -92,7 +92,9 @@ const CommunityMembersPage = () => {
         groups: (groups || [])
           .filter((g) =>
             (g.members || []).find(
-              (x) => x?.address?.address === p.addresses?.[0]?.address,
+              (x) =>
+                x?.address?.address === p.addresses?.[0]?.address &&
+                !x.reject_reason,
             ),
           )
           .sort((a, b) => a.name.localeCompare(b.name))
@@ -135,10 +137,14 @@ const CommunityMembersPage = () => {
           ? true
           : searchFilters.category === 'In group'
           ? (group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address,
+              (x) =>
+                x?.address?.address === app.user.activeAccount.address &&
+                !x.reject_reason,
             )
           : !(group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address,
+              (x) =>
+                x?.address?.address === app.user.activeAccount.address &&
+                !x.reject_reason,
             ),
       );
 

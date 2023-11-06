@@ -52,7 +52,7 @@ const GroupsSection = ({
               groupDescription={group.description}
               requirements={group.requirements.map((r) => ({
                 requirementType: requirementTypes?.find(
-                  (x) => x.value === r?.data?.source?.source_type
+                  (x) => x.value === r?.data?.source?.source_type,
                 )?.label,
                 requirementChain:
                   chainTypes
@@ -63,7 +63,7 @@ const GroupsSection = ({
                           r?.data?.source?.evm_chain_id ||
                           r?.data?.source?.cosmos_chain_id ||
                           ''
-                        }`
+                        }`,
                     )
                     ?.label?.split('-')
                     ?.join(' ') || '',
@@ -80,7 +80,10 @@ const GroupsSection = ({
                 if (!app.user.activeAccount || app.user.activeAccount === null)
                   return;
 
-                return x?.address?.address === app.user.activeAccount.address;
+                return (
+                  x?.address?.address === app.user.activeAccount.address &&
+                  !x.reject_reason
+                );
               })}
               topics={group.topics.map((x) => ({ id: x.id, name: x.name }))}
               canEdit={canManageGroups}
