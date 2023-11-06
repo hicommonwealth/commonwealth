@@ -2,6 +2,7 @@ import React from 'react';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { InfoBlock } from './InfoBlock';
 import './RequirementCard.scss';
+import { SPECIFICATIONS, TOKENS } from '../../../../common/constants';
 
 type RequirementCardProps = {
   requirementType: string;
@@ -20,6 +21,9 @@ const RequirementCard = ({
   requirementAmount,
   requirementTokenId,
 }: RequirementCardProps) => {
+  const is1155Requirement = requirementType === SPECIFICATIONS.ERC_1155;
+  const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+
   return (
     <div className="RequirementCard">
       <div className="row-1">
@@ -31,12 +35,17 @@ const RequirementCard = ({
           className={getClasses<{
             'cols-3'?: boolean;
             'cols-4'?: boolean;
+            'cols-5'?: boolean;
+            'row-1': boolean;
+            'row-2': boolean;
           }>(
             {
-              'cols-3': !requirementContractAddress,
-              'cols-4': !!requirementContractAddress,
-            },
-            `row-2`
+              'cols-3': isTokenRequirement,
+              'cols-4': !isTokenRequirement && !is1155Requirement,
+              'cols-5': !isTokenRequirement && is1155Requirement,
+              'row-1': !isTokenRequirement && is1155Requirement,
+              'row-2': !(!isTokenRequirement && is1155Requirement)
+            }
           )}
         >
           <InfoBlock label="Chain" value={requirementChain} />
@@ -48,7 +57,7 @@ const RequirementCard = ({
           )}
           <InfoBlock label="Condition" value={requirementCondition} />
           <InfoBlock label="Amount" value={requirementAmount} />
-          <InfoBlock label="Id" value={requirementTokenId} />
+          {is1155Requirement && (<InfoBlock label="Id" value={requirementTokenId} />)}
         </div>
       )}
     </div>
