@@ -9405,10 +9405,10 @@ async@^3.2.3:
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.4.tgz#2d22e00f8cddeb5fde5dd33522b56d1cf569a81c"
   integrity sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==
 
-async@~3.2.3:
-  version "3.2.5"
-  resolved "https://registry.yarnpkg.com/async/-/async-3.2.5.tgz#ebd52a8fdaf7a2289a24df399f8d8485c8a46b66"
-  integrity sha512-baNZyqaaLhyLVKm/DlvdW051MSgO6b8eVfIezl9E5PqWxFgzLm/wQntEW4zOytVburDEr0JlALEpdOFwvErLsg==
+async@~1.2.1:
+  version "1.2.1"
+  resolved "https://registry.npmjs.org/async/-/async-1.2.1.tgz"
+  integrity sha1-pIFqF81f9RbfosdpikUzabl5DeA=
 
 asynciterator.prototype@^1.0.0:
   version "1.0.0"
@@ -10231,7 +10231,7 @@ buffer-from@^1.0.0:
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.2.tgz#2b146a6fd72e80b4f55d255f35ed59a3a9a41bd5"
   integrity sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==
 
-buffer-from@^1.1.0:
+buffer-from@^1.1.0, buffer-from@~1.1.1:
   version "1.1.1"
   resolved "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.1.tgz"
   integrity sha512-MQcXEUbCKtEo7bhqEs6560Hyd4XaovZlO/k9V3hjVUF/zwW7KBVdSK4gIt/bzwS9MbR5qob+F5jusZsb0YQK2A==
@@ -11284,7 +11284,7 @@ console-control-strings@^1.0.0, console-control-strings@^1.1.0:
 
 console-polyfill@0.3.0:
   version "0.3.0"
-  resolved "https://registry.yarnpkg.com/console-polyfill/-/console-polyfill-0.3.0.tgz#84900902a18c47a5eba932be75fa44d23e8af861"
+  resolved "https://registry.npmjs.org/console-polyfill/-/console-polyfill-0.3.0.tgz"
   integrity sha512-w+JSDZS7XML43Xnwo2x5O5vxB0ID7T5BdqDtyqT6uiCAX2kZAgcWxNaGqT97tZfSHzfOcvrfsDAodKcJ3UvnXQ==
 
 constants-browserify@^1.0.0:
@@ -12060,8 +12060,8 @@ debug@~4.3.1, debug@~4.3.2:
 
 decache@^3.0.5:
   version "3.1.0"
-  resolved "https://registry.yarnpkg.com/decache/-/decache-3.1.0.tgz#4f5036fbd6581fcc97237ac3954a244b9536c2da"
-  integrity sha512-p7D6wJ5EJFFq1CcF2lu1XeqKFLBob8jRQGNAvFLTsV3CbSKBl3VtliAVlUIGz2i9H6kEFnI2Amaft5ZopIG2Fw==
+  resolved "https://registry.npmjs.org/decache/-/decache-3.1.0.tgz"
+  integrity sha1-T1A2+9ZYH8yXI3rDlUokS5U2wto=
   dependencies:
     find "^0.2.4"
 
@@ -13099,7 +13099,14 @@ error-stack-parser@^1.3.6:
   dependencies:
     stackframe "^0.3.1"
 
-error-stack-parser@^2.0.4, error-stack-parser@^2.0.6:
+error-stack-parser@^2.0.4:
+  version "2.0.6"
+  resolved "https://registry.npmjs.org/error-stack-parser/-/error-stack-parser-2.0.6.tgz"
+  integrity sha512-d51brTeqC+BHlwF0BhPtcYgF5nlzf9ZZ0ZIUQNZpc9ZB9qw5IJ2diTrBY9jlCJkTLITYPjmiX6OWCwH+fuyNgQ==
+  dependencies:
+    stackframe "^1.1.1"
+
+error-stack-parser@^2.0.6:
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/error-stack-parser/-/error-stack-parser-2.1.4.tgz#229cb01cdbfa84440bfa91876285b94680188286"
   integrity sha512-Sk5V6wVazPhq5MhpO+AUxJn5x7XSXGl1R93Vn7i+zS15KDVxQijejNCrz8340/2bgLBjR9GtEG8ZVKONDjcqGQ==
@@ -14827,8 +14834,8 @@ find-up@^4.0.0, find-up@^4.1.0:
 
 find@^0.2.4:
   version "0.2.9"
-  resolved "https://registry.yarnpkg.com/find/-/find-0.2.9.tgz#4b73f1ff9e56ad91b76e716407fe5ffe6554bb8c"
-  integrity sha512-7a4/LCiInB9xYMnAUEjLilL9FKclwbwK7VlXw+h5jMvT2TDFeYFCHM24O1XdnC/on/hx8mxVO3FTQkyHZnOghQ==
+  resolved "https://registry.npmjs.org/find/-/find-0.2.9.tgz"
+  integrity sha1-S3Px/55WrZG3bnFkB/5f/mVUu4w=
   dependencies:
     traverse-chain "~0.1.0"
 
@@ -17363,6 +17370,11 @@ is@^3.2.1:
   resolved "https://registry.yarnpkg.com/is/-/is-3.3.0.tgz#61cff6dd3c4193db94a3d62582072b44e5645d79"
   integrity sha512-nW24QBoPcFGGHJGUwnfpI7Yc5CdqWNdsyHQszVE/z2pKHXzh7FZ5GWhJqSyaQ9wMkQnsTx+kAI8bHlCX4tKdbg==
 
+is_js@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.npmjs.org/is_js/-/is_js-0.9.0.tgz"
+  integrity sha1-CrlFQFArp6+iTIVqqYVWFmnpxS0=
+
 isarray@0.0.1:
   version "0.0.1"
   resolved "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
@@ -18968,8 +18980,8 @@ lru-cache@^7.10.1:
 
 lru-cache@~2.2.1:
   version "2.2.4"
-  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-2.2.4.tgz#6c658619becf14031d0d0b594b16042ce4dc063d"
-  integrity sha512-Q5pAgXs+WEAfoEdw2qKQhNFFhMoFMTYqRVKKUMnzuiR7oKFHS7fWo848cPcTKw+4j/IdN17NyzdhVKgabFV0EA==
+  resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-2.2.4.tgz"
+  integrity sha1-bGWGGb7PFAMdDQtZSxYELOTcBj0=
 
 lru-queue@0.1:
   version "0.1.0"
@@ -23675,10 +23687,12 @@ repeat-string@^1.6.1:
   resolved "https://registry.npmjs.org/repeat-string/-/repeat-string-1.6.1.tgz"
   integrity sha1-jcrkcOHIirwtYA//Sndihtp15jc=
 
-request-ip@~3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/request-ip/-/request-ip-3.3.0.tgz#863451e8fec03847d44f223e30a5d63e369fa611"
-  integrity sha512-cA6Xh6e0fDBBBwH77SLJaJPBmD3nWVAcF9/XAcsrIHdjhFzFiB5aNQFytdjCGPezU3ROwrR11IddKAM08vohxA==
+request-ip@~2.0.1:
+  version "2.0.2"
+  resolved "https://registry.npmjs.org/request-ip/-/request-ip-2.0.2.tgz"
+  integrity sha1-3urm1K8hdoSX24zQX6NxQ/jxJX4=
+  dependencies:
+    is_js "^0.9.0"
 
 request@^2.79.0, request@^2.88.0:
   version "2.88.2"
@@ -23902,17 +23916,20 @@ rlp@^2.2.4:
     bn.js "^4.11.1"
 
 rollbar@^2.6.1:
-  version "2.26.2"
-  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.26.2.tgz#58627dce65233e7433facb6366fd6e8817f396d3"
-  integrity sha512-7ASvrlal87ek2vhTmpu2LPvkdlcnala1qeMT2Ra76s0KjWkQ8d1fTl6dk7AqHx1Qa/puahg3tYw7EPB7wYx9RQ==
+  version "2.15.0"
+  resolved "https://registry.npmjs.org/rollbar/-/rollbar-2.15.0.tgz"
+  integrity sha512-imEL4FOng650XZq0ZoqAI8wCfWZ5UE+4rRJwwwxthyzTdKOeDAObz/trMohc/ULn1WCo9Cz3T6ozn9Awd5kGTg==
   dependencies:
-    async "~3.2.3"
+    async "~1.2.1"
+    buffer-from "~1.1.1"
     console-polyfill "0.3.0"
+    debug "2.6.9"
     error-stack-parser "^2.0.4"
     json-stringify-safe "~5.0.0"
     lru-cache "~2.2.1"
-    request-ip "~3.3.0"
+    request-ip "~2.0.1"
     source-map "^0.5.7"
+    uuid "3.0.x"
   optionalDependencies:
     decache "^3.0.5"
 
@@ -25094,7 +25111,7 @@ stackframe@^0.3.1, stackframe@~0.3:
   resolved "https://registry.npmjs.org/stackframe/-/stackframe-0.3.1.tgz"
   integrity sha1-M6qE8Rd6VUjIk1Uzy/6zQgl19aQ=
 
-stackframe@^1.0.2:
+stackframe@^1.0.2, stackframe@^1.1.1:
   version "1.1.1"
   resolved "https://registry.npmjs.org/stackframe/-/stackframe-1.1.1.tgz"
   integrity sha512-0PlYhdKh6AfFxRyK/v+6/k+/mMfyiEBbTM5L94D0ZytQnJ166wuwoTYLHFWGbs2dpA8Rgq763KGWmN1EQEYHRQ==
@@ -26325,8 +26342,8 @@ tracer@~0.7.3:
 
 traverse-chain@~0.1.0:
   version "0.1.0"
-  resolved "https://registry.yarnpkg.com/traverse-chain/-/traverse-chain-0.1.0.tgz#61dbc2d53b69ff6091a12a168fd7d433107e40f1"
-  integrity sha512-up6Yvai4PYKhpNp5PkYtx50m3KbwQrqDwbuZP/ItyL64YEWHAvH6Md83LFLV/GRSk/BoUVwwgUzX6SOQSbsfAg==
+  resolved "https://registry.npmjs.org/traverse-chain/-/traverse-chain-0.1.0.tgz"
+  integrity sha1-YdvC1Ttp/2CRoSoWj9fUMxB+QPE=
 
 tree-kill@^1.2.2:
   version "1.2.2"
@@ -27326,6 +27343,11 @@ utilx@0.0.5:
   dependencies:
     colorful "2.1.0"
     iconv-lite "0.2.11"
+
+uuid@3.0.x:
+  version "3.0.1"
+  resolved "https://registry.npmjs.org/uuid/-/uuid-3.0.1.tgz"
+  integrity sha1-ZUS7ot/ajBzxfmKaOjBeK7H+5sE=
 
 uuid@3.3.2:
   version "3.3.2"
