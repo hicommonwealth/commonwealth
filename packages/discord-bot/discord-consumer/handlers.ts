@@ -61,9 +61,12 @@ export async function handleCommentMessages(
   sharedReqData: Record<string, any>,
 ): Promise<void> {
   const threadId: { id: number } = (
-    await sequelize.query(
-      `SELECT id FROM "Threads" WHERE discord_meta->>'message_id' = '${message.channel_id}' LIMIT 1;`,
-    )
+    await sequelize.query(`
+        SELECT id FROM "Threads" 
+        WHERE discord_meta->>'message_id' = '${message.channel_id}'
+        AND deleted_at IS NULL
+        LIMIT 1;
+    `)
   )[0][0]['id'];
 
   switch (action) {
