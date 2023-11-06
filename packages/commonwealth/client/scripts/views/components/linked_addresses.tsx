@@ -54,7 +54,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
 
   return (
     <div className="LinkedAddresses">
-      {addresses.map((addr, i) => {
+      {addresses?.map((addr, i) => {
         return (
           <Address
             key={i}
