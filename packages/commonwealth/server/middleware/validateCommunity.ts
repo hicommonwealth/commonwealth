@@ -5,8 +5,8 @@ import type { DB } from '../models';
 import type { CommunityInstance } from '../models/community';
 import { ALL_COMMUNITIES } from './databaseValidationService';
 
-export const ChainCommunityErrors = {
-  ChainDNE: 'Chain does not exist',
+export const CommunityCommunityErrors = {
+  ChainDNE: 'Community does not exist',
 };
 
 export type ValidateCommunityParams = {
@@ -15,7 +15,7 @@ export type ValidateCommunityParams = {
   community_id?: string;
 };
 
-const getChainQuery = (
+const getCommunityQuery = (
   chain_id: string,
   models: DB,
   includeTopics: boolean,
@@ -52,19 +52,19 @@ export const validateCommunity = async (
     return [null, null, true];
   }
   if (!communityId) {
-    return [null, ChainCommunityErrors.ChainDNE, false];
+    return [null, CommunityCommunityErrors.ChainDNE, false];
   }
   const chain = await models.Community.findOne(
-    getChainQuery(communityId, models, includeTopics),
+    getCommunityQuery(communityId, models, includeTopics),
   );
   // searching for chain that doesn't exist
   if (!chain) {
-    return [null, ChainCommunityErrors.ChainDNE, false];
+    return [null, CommunityCommunityErrors.ChainDNE, false];
   }
   return [chain, null, false];
 };
 
-export const validateChainWithTopics = async (
+export const validateCommunityWithTopics = async (
   models: DB,
   params: ValidateCommunityParams,
 ): Promise<[CommunityInstance, string, boolean]> => {

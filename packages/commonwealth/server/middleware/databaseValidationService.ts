@@ -5,8 +5,8 @@ import { CW_BOT_KEY } from '../config';
 import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import {
-  validateChainWithTopics,
   validateCommunity,
+  validateCommunityWithTopics,
 } from './validateCommunity';
 
 export const ALL_COMMUNITIES = 'all_communities';
@@ -23,7 +23,7 @@ export default class DatabaseValidationService {
     this.models = models;
   }
 
-  private async validateChainByRequestMethod(
+  private async validateCommunityByRequestMethod(
     req: Request,
     validator: (
       models: DB,
@@ -90,10 +90,8 @@ export default class DatabaseValidationService {
     res: Response,
     next: NextFunction,
   ) => {
-    const [community, error, bypass] = await this.validateChainByRequestMethod(
-      req,
-      validateCommunity,
-    );
+    const [community, error, bypass] =
+      await this.validateCommunityByRequestMethod(req, validateCommunity);
     if (bypass) {
       next();
       return;
@@ -110,10 +108,11 @@ export default class DatabaseValidationService {
     res: Response,
     next: NextFunction,
   ) => {
-    const [community, error, bypass] = await this.validateChainByRequestMethod(
-      req,
-      validateChainWithTopics,
-    );
+    const [community, error, bypass] =
+      await this.validateCommunityByRequestMethod(
+        req,
+        validateCommunityWithTopics,
+      );
     if (bypass) {
       next();
       return;
