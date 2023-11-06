@@ -31,7 +31,7 @@ import {
 import { renderSearchResults } from './helpers';
 
 const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
-  (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope)
+  (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope),
 );
 
 // maps client-side sort options to server-side sort options
@@ -102,7 +102,7 @@ const SearchPage = () => {
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
-    chainId: app.activeChainId() || 'all_chains',
+    communityId: app.activeChainId() || 'all_chains',
     searchTerm: queryParams.q,
     limit: 20,
     orderBy,
@@ -294,7 +294,7 @@ const SearchPage = () => {
               </CWText>
               {VISIBLE_TABS.length > 0 &&
                 [SearchScope.Threads, SearchScope.Replies].includes(
-                  activeTab
+                  activeTab,
                 ) && (
                   <div className="search-results-filters">
                     <CWText type="h5">Sort By:</CWText>
@@ -317,7 +317,7 @@ const SearchPage = () => {
                   results as any,
                   queryParams.q,
                   activeTab,
-                  commonNavigate
+                  commonNavigate,
                 )}
                 <div ref={bottomRef}></div>
               </div>

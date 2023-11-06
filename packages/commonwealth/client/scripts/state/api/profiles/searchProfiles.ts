@@ -29,19 +29,18 @@ export type SearchProfilesResponse = {
 };
 
 interface SearchProfilesProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
   includeRoles: boolean;
-
   enabled?: boolean;
 }
 
 const searchProfiles = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -57,7 +56,7 @@ const searchProfiles = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        chain: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -65,13 +64,13 @@ const searchProfiles = async ({
         order_direction: orderDirection,
         include_roles: includeRoles,
       },
-    }
+    },
   );
   return result;
 };
 
 const useSearchProfilesQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -82,7 +81,7 @@ const useSearchProfilesQuery = ({
   const key = [
     ApiEndpoints.searchProfiles(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
       includeRoles,
@@ -93,7 +92,7 @@ const useSearchProfilesQuery = ({
     ({ pageParam }) =>
       searchProfiles({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,
@@ -110,7 +109,7 @@ const useSearchProfilesQuery = ({
       },
       staleTime: SEARCH_PROFILES_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

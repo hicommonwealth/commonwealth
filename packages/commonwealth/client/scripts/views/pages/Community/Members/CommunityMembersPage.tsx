@@ -53,7 +53,7 @@ const CommunityMembersPage = () => {
     fetchNextPage,
     isLoading: isLoadingMembers,
   } = useSearchProfilesQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: '',
     limit: 30,
     orderBy: APIOrderBy.LastActive,
@@ -62,7 +62,7 @@ const CommunityMembersPage = () => {
   });
 
   const { data: groups } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeMembers: true,
     includeTopics: true,
   });

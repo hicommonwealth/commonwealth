@@ -54,7 +54,7 @@ const ManageCommunityPage = () => {
   };
 
   const { data: searchResults, refetch } = useSearchProfilesQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
     limit: 20,
     orderBy: APIOrderBy.LastActive,
@@ -78,7 +78,7 @@ const ManageCommunityPage = () => {
 
   useEffect(() => {
     NewProfilesController.Instance.isFetched.on('redraw', () =>
-      forceRerender()
+      forceRerender(),
     );
 
     NewProfilesController.Instance.isFetched.off('redraw', forceRerender);
@@ -136,7 +136,7 @@ const ManageCommunityPage = () => {
         newRole.permission,
         newRole.allow,
         newRole.deny,
-        newRole.is_user_default
+        newRole.is_user_default,
       );
       adminsAndMods.push(roleInfo);
 
