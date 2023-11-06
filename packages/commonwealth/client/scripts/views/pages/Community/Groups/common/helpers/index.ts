@@ -64,7 +64,5 @@ export const makeGroupDataBaseAPIPayload = (
     }
   });
 
-
-  console.log(payload)
   return payload;
 };
