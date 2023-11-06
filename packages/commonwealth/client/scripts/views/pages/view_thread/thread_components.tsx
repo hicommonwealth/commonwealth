@@ -30,7 +30,7 @@ export const ThreadAuthor = ({ author, collaborators }: ThreadAuthorProps) => {
       <User
         avatarSize={24}
         userAddress={user.address}
-        userChainId={user.community?.id || user.profile?.chain}
+        userCommunityId={user.community?.id || user.profile?.chain}
         shouldShowPopover
         shouldLinkProfile
       />
@@ -52,7 +52,7 @@ export const ThreadAuthor = ({ author, collaborators }: ThreadAuthorProps) => {
                       <User
                         key={address}
                         shouldLinkProfile
-                        userChainId={community_id}
+                        userCommunityId={community_id}
                         userAddress={address}
                       />
                     );
@@ -91,7 +91,7 @@ export const ThreadStageComponent = ({ stage }: ThreadStageComponentProps) => {
               ? 'negative'
               : 'positive',
         },
-        'proposal-stage-text'
+        'proposal-stage-text',
       )}
       onClick={(e) => {
         e.preventDefault();

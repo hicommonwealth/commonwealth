@@ -55,7 +55,7 @@ export const ManageRoles = ({
       role.chain_id === app.user.activeAccount?.community.id;
 
     const roleBelongsToUser = !!app.user.addresses.filter(
-      (addr_) => addr_.id === (role.address_id || role.Address.id)
+      (addr_) => addr_.id === (role.address_id || role.Address.id),
     ).length;
 
     const res = await axios.get(`${app.serverUrl()}/roles`, {
@@ -68,7 +68,7 @@ export const ManageRoles = ({
 
     const userAdminsAndMods = adminsAndMods.filter((role_) => {
       const belongsToUser = !!app.user.addresses.filter(
-        (addr_) => addr_.id === role_.address_id
+        (addr_) => addr_.id === role_.address_id,
       ).length;
       return belongsToUser;
     });
@@ -83,7 +83,7 @@ export const ManageRoles = ({
 
     const onlyModsRemaining = () => {
       const modCount = userAdminsAndMods.filter(
-        (r) => r.permission === 'moderator'
+        (r) => r.permission === 'moderator',
       ).length;
 
       const remainingRoleCount = userAdminsAndMods.length - 1;
@@ -136,7 +136,7 @@ export const ManageRoles = ({
             <div className="role-row" key={addr.id}>
               <User
                 userAddress={addr.address}
-                userChainId={role.chain_id}
+                userCommunityId={role.chain_id}
                 shouldShowPopover
                 shouldLinkProfile
                 shouldHideAvatar

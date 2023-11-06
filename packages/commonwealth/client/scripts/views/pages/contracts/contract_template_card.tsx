@@ -32,7 +32,10 @@ type ContractTemplateCardProps = {
   handleShowModal: (
     templateId: number,
     cct_id: number,
-    template: Omit<ManageContractTemplateModalProps['template'], 'id' | 'title'>
+    template: Omit<
+      ManageContractTemplateModalProps['template'],
+      'id' | 'title'
+    >,
   ) => void;
 };
 
@@ -139,7 +142,7 @@ export const ContractTemplateCard = ({
                 <div className="enabledby-row">
                   <User
                     userAddress={enabler.address}
-                    userChainId={
+                    userCommunityId={
                       enabler.community?.id || enabler?.profile?.chain
                     }
                     shouldShowAddressWithDisplayName

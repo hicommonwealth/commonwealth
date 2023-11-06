@@ -99,7 +99,7 @@ export const TemplateDisplayTab = ({
                 <div className="table-column">
                   <User
                     userAddress={creator.address}
-                    userChainId={
+                    userCommunityId={
                       creator.community?.id || creator?.profile?.chain
                     }
                     shouldShowAddressWithDisplayName
@@ -109,7 +109,7 @@ export const TemplateDisplayTab = ({
                   <div className="IconGroup">
                     <CWCommunityAvatar
                       community={app.config.chains.getById(
-                        template.createdForCommunity
+                        template.createdForCommunity,
                       )}
                       size="small"
                     />

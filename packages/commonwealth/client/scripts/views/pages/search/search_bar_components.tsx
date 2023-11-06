@@ -36,7 +36,7 @@ export const SearchChip = (props: SearchChipProps) => {
         {
           isActive,
         },
-        'SearchChip'
+        'SearchChip',
       )}
       onClick={onClick}
     >
@@ -50,7 +50,7 @@ type SearchBarThreadPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarThreadPreviewRow = (
-  props: SearchBarThreadPreviewRowProps
+  props: SearchBarThreadPreviewRowProps,
 ) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
@@ -68,7 +68,7 @@ export const SearchBarThreadPreviewRow = (
       <div className="header-row">
         <User
           userAddress={searchResult.address}
-          userChainId={searchResult.address_chain}
+          userCommunityId={searchResult.address_chain}
         />
         <CWText className="last-updated-text">•</CWText>
         <CWText type="caption" className="last-updated-text">
@@ -96,7 +96,7 @@ type SearchBarCommentPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarCommentPreviewRow = (
-  props: SearchBarCommentPreviewRowProps
+  props: SearchBarCommentPreviewRowProps,
 ) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
@@ -135,7 +135,7 @@ type SearchBarChainPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarCommunityPreviewRow = (
-  props: SearchBarChainPreviewRowProps
+  props: SearchBarChainPreviewRowProps,
 ) => {
   const { searchResult } = props;
   const navigate = useCommonNavigate();
@@ -158,7 +158,7 @@ type SearchBarMemberPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarMemberPreviewRow = (
-  props: SearchBarMemberPreviewRowProps
+  props: SearchBarMemberPreviewRowProps,
 ) => {
   const { searchResult } = props;
   const chain = searchResult.addresses[0].chain;
@@ -172,7 +172,7 @@ export const SearchBarMemberPreviewRow = (
 
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
-      <User userAddress={address} userChainId={chain} shouldLinkProfile />
+      <User userAddress={address} userCommunityId={chain} shouldLinkProfile />
     </div>
   );
 };

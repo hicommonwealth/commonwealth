@@ -3,8 +3,8 @@ import React, { useMemo } from 'react';
 
 import 'pages/search/index.scss';
 
-import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import app from 'state';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import ChainInfo from '../../../models/ChainInfo';
 import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
@@ -64,7 +64,7 @@ const ThreadResultRow = ({
         <div className="search-results-thread-subtitle">
           <User
             userAddress={thread.address}
-            userChainId={thread.address_chain}
+            userCommunityId={thread.address_chain}
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -138,7 +138,7 @@ const ReplyResultRow = ({
         <div className="search-results-thread-subtitle">
           <User
             userAddress={comment.address}
-            userChainId={comment.address_chain}
+            userCommunityId={comment.address_chain}
           />
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}
@@ -235,7 +235,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
     <div key={address} className="member-result-row" onClick={handleClick}>
       <User
         userAddress={address}
-        userChainId={chain}
+        userCommunityId={chain}
         shouldShowRole
         shouldLinkProfile
         avatarSize={32}
@@ -249,7 +249,7 @@ export const renderSearchResults = (
   results: any[],
   searchTerm: string,
   searchType: SearchScope,
-  setRoute: any
+  setRoute: any,
 ) => {
   if (!results || results.length === 0) {
     return [];

@@ -18,7 +18,11 @@ import { getNotificationTypeText } from './helpers';
 
 const getTextRows = (
   subscription: NotificationSubscription,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string,
+  ) => void,
 ) => {
   if (subscription.Thread) {
     const threadUrl = getNotificationUrlPath(subscription);
@@ -72,7 +76,7 @@ const getTextRows = (
             <User
               shouldHideAvatar
               userAddress={subscription.Comment.author}
-              userChainId={subscription.Comment.chain}
+              userCommunityId={subscription.Comment.chain}
             />
             's
           </CWText>

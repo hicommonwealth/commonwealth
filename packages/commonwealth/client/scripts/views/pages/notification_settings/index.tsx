@@ -51,7 +51,7 @@ const NotificationSettingsPage = () => {
   const [snapshotsInfo, setSnapshotsInfo] = useState(null);
 
   const [currentFrequency, setCurrentFrequency] = useState(
-    app.user.emailInterval
+    app.user.emailInterval,
   );
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const NotificationSettingsPage = () => {
   useEffect(() => {
     // bundled snapshot subscriptions
     const bundledSnapshotSubs = extractSnapshotProposals(
-      app.user.notifications.discussionSubscriptions
+      app.user.notifications.discussionSubscriptions,
     );
     const snapshotIds = Object.keys(bundledSnapshotSubs);
 
@@ -87,7 +87,7 @@ const NotificationSettingsPage = () => {
 
   const handleSubscriptions = async (
     hasSomeInAppSubs: boolean,
-    subs: NotificationSubscription[]
+    subs: NotificationSubscription[],
   ) => {
     if (hasSomeInAppSubs) {
       await app.user.notifications.disableSubscriptions(subs);
@@ -99,7 +99,7 @@ const NotificationSettingsPage = () => {
 
   const handleEmailSubscriptions = async (
     hasSomeEmailSubs: boolean,
-    subs: NotificationSubscription[]
+    subs: NotificationSubscription[],
   ) => {
     if (hasSomeEmailSubs) {
       await app.user.notifications.disableImmediateEmails(subs);
@@ -123,12 +123,12 @@ const NotificationSettingsPage = () => {
 
   // bundled discussion subscriptions
   const bundledSubs = bundleSubs(
-    app?.user.notifications.discussionSubscriptions
+    app?.user.notifications.discussionSubscriptions,
   );
 
   // bundled chain-event subscriptions
   const chainEventSubs = bundleSubs(
-    app?.user.notifications.chainEventSubscriptions
+    app?.user.notifications.chainEventSubscriptions,
   );
 
   const subscribedChainIds =
@@ -461,14 +461,14 @@ const NotificationSettingsPage = () => {
                           return (
                             <User
                               userAddress={sub.Thread.author}
-                              userChainId={sub.Thread.chain}
+                              userCommunityId={sub.Thread.chain}
                             />
                           );
                         } else if (sub.Comment?.chain) {
                           return (
                             <User
                               userAddress={sub.Comment.author}
-                              userChainId={sub.Comment.chain}
+                              userCommunityId={sub.Comment.chain}
                             />
                           );
                         } else {

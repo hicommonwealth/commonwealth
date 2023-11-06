@@ -75,7 +75,7 @@ export const TopicSummaryRow = ({
         {threadsToDisplay.map((thread, idx) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
+            `${thread.identifier}-${slugify(thread.title)}`,
           );
 
           const user = app.chain.accounts.get(thread.author);
@@ -89,7 +89,7 @@ export const TopicSummaryRow = ({
               <div
                 className={getClasses<{ isPinned?: boolean }>(
                   { isPinned: thread.pinned },
-                  'recent-thread-row'
+                  'recent-thread-row',
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -100,7 +100,9 @@ export const TopicSummaryRow = ({
                   <div className="user-and-date-row">
                     <User
                       userAddress={user.address}
-                      userChainId={user.community?.id || user.profile?.chain}
+                      userCommunityId={
+                        user.community?.id || user.profile?.chain
+                      }
                       shouldShowAddressWithDisplayName
                       shouldLinkProfile
                       avatarSize={24}
