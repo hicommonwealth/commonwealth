@@ -18,10 +18,9 @@ type GroupSectionProps = {
 const GroupsSection = ({
   filteredGroups,
   canManageGroups,
-  hasNoGroups
+  hasNoGroups,
 }: GroupSectionProps) => {
   const navigate = useCommonNavigate();
-
   return (
     <section className="GroupsSection">
       {hasNoGroups && (
@@ -78,9 +77,12 @@ const GroupsSection = ({
                   ? 'ALL'
                   : group.requirementsToFulfill
               }
-              isJoined={(group.members || []).find(
-                (x) => x?.address?.address === app.user.activeAccount.address
-              )}
+              isJoined={(group.members || []).find((x) => {
+                if (!app.user.activeAccount || app.user.activeAccount === null)
+                  return;
+
+                return x?.address?.address === app.user.activeAccount.address;
+              })}
               topics={group.topics.map((x) => ({ id: x.id, name: x.name }))}
               canEdit={canManageGroups}
               onEditClick={() => navigate(`/members/groups/${group.id}/update`)}
