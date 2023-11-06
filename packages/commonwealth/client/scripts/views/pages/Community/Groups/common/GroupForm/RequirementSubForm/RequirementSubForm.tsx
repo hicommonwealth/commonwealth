@@ -169,7 +169,7 @@ const RequirementSubForm = ({
             fullWidth
           />
           {
-            is1155Requirement && (<CWTextInput
+            is1155Requirement ? (<CWTextInput
               key={defaultValues.requirementTokenId}
               name="requirementTokenId"
               label="ID"
@@ -185,7 +185,7 @@ const RequirementSubForm = ({
               customError={errors.requirementTokenId}
               fullWidth
             />
-          )}
+          ) : <></>}
         </div>
       )}
     </div>
