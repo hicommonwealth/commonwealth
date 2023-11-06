@@ -67,7 +67,7 @@ export const MessageRow = (props: MessageRowProps) => {
     <div
       className={getClasses<{ hasFeedback: boolean }>(
         { hasFeedback },
-        'MessageRow'
+        'MessageRow',
       )}
     >
       <CWLabel label={label} />
@@ -76,7 +76,7 @@ export const MessageRow = (props: MessageRowProps) => {
           type="caption"
           className={getClasses<{ status: ValidationStatus }>(
             { status: validationStatus },
-            'feedback-message-text'
+            'feedback-message-text',
           )}
         >
           {statusMessage}
@@ -137,6 +137,7 @@ export const CWTextInput = (props: TextInputProps) => {
     displayOnly,
     manualStatusMessage = '',
     manualValidationStatus = '',
+    validationStatus,
   } = props;
 
   return (
@@ -147,9 +148,9 @@ export const CWTextInput = (props: TextInputProps) => {
       }>(
         {
           containerClassName,
-          validationStatus: props.validationStatus,
+          validationStatus,
         },
-        ComponentType.OldTextInput
+        ComponentType.OldTextInput,
       )}
       onClick={onClick}
     >
@@ -198,12 +199,12 @@ export const CWTextInput = (props: TextInputProps) => {
               validationProps.setInputTimeout(
                 setTimeout(() => {
                   validationProps.setIsTyping(false);
-                  if (inputValidationFn && e.currentTarget.value?.length > 3) {
-                    const result = inputValidationFn(e.currentTarget.value);
+                  if (inputValidationFn && e.currentTarget?.value?.length > 3) {
+                    const result = inputValidationFn(e.currentTarget?.value);
                     validationProps.setValidationStatus(result[0]);
                     validationProps.setStatusMessage(result[1]);
                   }
-                }, timeout)
+                }, timeout),
               );
             }
           }}
@@ -225,7 +226,7 @@ export const CWTextInput = (props: TextInputProps) => {
               onenterkey(e);
             }
           }}
-          value={value}
+          value={value || ''}
           defaultValue={defaultValue}
         />
         {iconRightonClick && !!iconRight && !disabled ? (
