@@ -35,7 +35,8 @@ const useFetchGroupsQuery = ({
   chainId,
   includeMembers,
   includeTopics,
-}: FetchGroupsProps) => {
+  enabled = true,
+}: FetchGroupsProps & { enabled?: boolean }) => {
   return useQuery({
     queryKey: [
       ApiEndpoints.FETCH_GROUPS,
@@ -45,6 +46,7 @@ const useFetchGroupsQuery = ({
     ],
     queryFn: () => fetchGroups({ chainId, includeMembers, includeTopics }),
     staleTime: GROUPS_STALE_TIME,
+    enabled,
   });
 };
 

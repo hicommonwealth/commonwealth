@@ -3,7 +3,10 @@ import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
-import { useFetchGroupsQuery } from 'state/api/groups';
+import {
+  useFetchGroupsQuery,
+  useRefreshMembershipQuery,
+} from 'state/api/groups';
 import { useSearchProfilesQuery } from 'state/api/profiles';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import { useDebounce } from 'usehooks-ts';
@@ -43,6 +46,11 @@ const CommunityMembersPage = () => {
     category: GROUP_AND_MEMBER_FILTERS[0],
   });
 
+  const { data: memberships = null } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+  });
+
   const debouncedSearchTerm = useDebounce<string>(
     searchFilters.searchText,
     500,
@@ -59,12 +67,14 @@ const CommunityMembersPage = () => {
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
 
   const { data: groups } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
     includeMembers: true,
     includeTopics: true,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
 
   const formattedMembers = useMemo(() => {
