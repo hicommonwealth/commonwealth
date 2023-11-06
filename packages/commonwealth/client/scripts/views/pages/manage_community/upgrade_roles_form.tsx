@@ -38,7 +38,7 @@ export const UpgradeRolesForm = ({
   const nonAdminNames: string[] = nonAdmins.map((_role) => {
     const roletext = _role.permission === 'moderator' ? '(moderator)' : '';
     const fullText = `${(_role as any)?.displayName} - ${formatAddressShort(
-      _role.Address.address
+      _role.Address.address,
     )} ${roletext}`;
     return fullText;
   });
@@ -54,7 +54,7 @@ export const UpgradeRolesForm = ({
       <MembersSearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        chainName={app.activeChainId()}
+        communityName={app.activeChainId()}
       />
       <div className="members-container">
         <CWRadioGroup

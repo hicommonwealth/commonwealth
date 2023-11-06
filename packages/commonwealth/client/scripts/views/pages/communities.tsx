@@ -21,7 +21,7 @@ const chainToCategoriesMap = app.config.chainCategoryMap;
 // Handle mapping provided by ChainCategories table
 const chainCategories = Object.values(ChainCategoryType);
 const chainNetworks = Object.keys(ChainNetwork).filter(
-  (val) => val === 'ERC20'
+  (val) => val === 'ERC20',
 ); // We only are allowing ERC20 for now
 const chainBases = Object.keys(ChainBase);
 
@@ -33,7 +33,7 @@ const getInitialFilterMap = (): Record<string, unknown> => {
   const filterMapChainNetworks = chainNetworks.map((c) => ({ [c]: false }));
   const allArrays = filterMapChainCategories.concat(
     filterMapChainBases,
-    filterMapChainNetworks
+    filterMapChainNetworks,
   );
 
   return Object.assign({}, ...allArrays);
@@ -41,7 +41,7 @@ const getInitialFilterMap = (): Record<string, unknown> => {
 
 const CommunitiesPage = () => {
   const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
-    getInitialFilterMap()
+    getInitialFilterMap(),
   );
 
   const handleSetFilterMap = (key: string) => {
@@ -122,8 +122,8 @@ const CommunitiesPage = () => {
         const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
         return threadCountB - threadCountA;
       })
-      .map((chain: ChainInfo, i) => {
-        return <CommunityCard key={i} chain={chain} />;
+      .map((community: ChainInfo, i) => {
+        return <CommunityCard key={i} community={community} />;
       });
 
     return res;

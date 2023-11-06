@@ -44,13 +44,13 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     subThreadId: string,
     bothActive: boolean,
     commentSubscription: NotificationSubscription,
-    reactionSubscription: NotificationSubscription
+    reactionSubscription: NotificationSubscription,
   ) => {
     await subscribeToThread(
       subThreadId,
       bothActive,
       commentSubscription,
-      reactionSubscription
+      reactionSubscription,
     );
     forceRerender();
   };
@@ -82,7 +82,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
           </CWText>
         </div>
         <div>
-          <CWAvatarGroup profiles={commenters} chainId={chainId} />
+          <CWAvatarGroup profiles={commenters} communityId={chainId} />
         </div>
       </div>
       <div
@@ -100,7 +100,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
                   threadId,
                   bothActive,
                   commentSubscription,
-                  reactionSubscription
+                  reactionSubscription,
                 );
               },
               label: bothActive ? 'Unsubscribe' : 'Subscribe',
@@ -124,12 +124,12 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
               onClick: async () => {
                 if (commentId) {
                   await navigator.clipboard.writeText(
-                    `${domain}/${chainId}/discussion/${threadId}?comment=${commentId}`
+                    `${domain}/${chainId}/discussion/${threadId}?comment=${commentId}`,
                   );
                   return;
                 }
                 await navigator.clipboard.writeText(
-                  `${domain}/${chainId}/discussion/${threadId}`
+                  `${domain}/${chainId}/discussion/${threadId}`,
                 );
               },
             },
@@ -141,13 +141,13 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
                 if (commentId) {
                   await window.open(
                     `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}
-                      ?comment=${commentId}`
+                      ?comment=${commentId}`,
                   );
                   return;
                 }
                 await window.open(
                   `https://twitter.com/intent/tweet?text=${domain}/${chainId}/discussion/${threadId}`,
-                  '_blank'
+                  '_blank',
                 );
               },
             },

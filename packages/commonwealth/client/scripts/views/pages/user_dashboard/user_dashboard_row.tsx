@@ -70,7 +70,7 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
   }
 
   const { chain_id, thread_id, root_type, comment_id } = JSON.parse(
-    notification.notificationData
+    notification.notificationData,
   );
 
   const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
@@ -79,7 +79,7 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
     <Link
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!path },
-        'UserDashboardRow'
+        'UserDashboardRow',
       )}
       to={path}
     >
