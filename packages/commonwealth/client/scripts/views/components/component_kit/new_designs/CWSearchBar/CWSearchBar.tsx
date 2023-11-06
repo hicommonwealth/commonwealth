@@ -1,14 +1,14 @@
-import React, { FC, ChangeEvent, useState } from 'react';
 import { MagnifyingGlass } from '@phosphor-icons/react';
+import React, { ChangeEvent, FC, useState } from 'react';
 import type { NavigateOptions, To } from 'react-router';
 
-import app from '../../../../../state';
-import { ComponentType } from '../../types';
-import { getClasses } from '../../helpers';
-import SearchQuery from '../../../../../models/SearchQuery';
 import { notifyError } from '../../../../../controllers/app/notifications';
-import { useCommonNavigate } from '../../../../../navigation/helpers';
 import useSearchResults from '../../../../../hooks/useSearchResults';
+import SearchQuery from '../../../../../models/SearchQuery';
+import { useCommonNavigate } from '../../../../../navigation/helpers';
+import app from '../../../../../state';
+import { getClasses } from '../../helpers';
+import { ComponentType } from '../../types';
 import { CWTag } from '../CWTag';
 import { SearchBarDropdown } from './SearchBarDropdown';
 
@@ -30,7 +30,11 @@ let resetTimer = null;
 
 const goToSearchPage = (
   query: SearchQuery,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string,
+  ) => void,
 ) => {
   if (!query.searchTerm || !query.searchTerm.toString().trim()) {
     notifyError('Enter a valid search term');
@@ -48,13 +52,13 @@ export const CWSearchBar: FC<SearchBarProps> = ({
 }) => {
   const navigate = useCommonNavigate();
   const [showTag, setShowTag] = useState(true);
-  const chainId = app.activeChainId() || 'all_chains';
+  const chainId = app.activeChainId() || 'all_communities';
   const chain = app.config.chains.getById(chainId);
   const [searchTerm, setSearchTerm] = useState('');
   const { searchResults } = useSearchResults(searchTerm, [
     'threads',
     'replies',
-    chainId === 'all_chains' ? 'communities' : null,
+    chainId === 'all_communities' ? 'communities' : null,
     'members',
   ]);
 
@@ -91,7 +95,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const handleGoToSearchPage = () => {
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      chainScope: showTag ? chainId : 'all_chains',
+      chainScope: showTag ? chainId : 'all_communities',
     });
     goToSearchPage(searchQuery, navigate);
     resetSearchBar();
@@ -107,7 +111,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
           {
             disabled,
           },
-          ComponentType.Searchbar
+          ComponentType.Searchbar,
         )}
       >
         <MagnifyingGlass
@@ -127,7 +131,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
         <div
           className={getClasses(
             { inputElement: true },
-            ComponentType.Searchbar
+            ComponentType.Searchbar,
           )}
         >
           <input

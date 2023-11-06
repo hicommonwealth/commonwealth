@@ -52,7 +52,7 @@ export async function __deleteThread(
   if (address) {
     // check ban
     const [canInteract, banError] = await this.banCache.checkBan({
-      chain: thread.chain,
+      communityId: thread.chain,
       address: address.address,
     });
     if (!canInteract) {

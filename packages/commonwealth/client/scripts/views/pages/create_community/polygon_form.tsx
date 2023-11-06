@@ -1,33 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { isAddress } from 'web3-utils';
 import { providers } from 'ethers';
 import $ from 'jquery';
+import React, { useEffect, useState } from 'react';
+import { isAddress } from 'web3-utils';
 
 import 'pages/create_community.scss';
 
-import app from 'state';
-import { initAppState } from 'state';
 import { IERC20Metadata__factory } from 'common-common/src/eth/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
+import app, { initAppState } from 'state';
 import { slugify, slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import {
-  defaultChainRows,
   EthChainRows,
+  defaultChainRows,
   updateAdminOnCreateCommunity,
 } from './chain_input_rows';
-import type { EthChainFormState } from './types';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
   useChainFormDefaultFields,
+  useChainFormIdFields,
   useChainFormState,
   useEthChainFormFields,
 } from './hooks';
+import type { EthChainFormState } from './types';
 
 export const PolygonForm = (props: EthChainFormState) => {
   const { ethChainNames, ethChains } = props;
@@ -83,7 +82,7 @@ export const PolygonForm = (props: EthChainFormState) => {
 
           if (chainFormDefaultFields.iconUrl.startsWith('/')) {
             chainFormDefaultFields.setIconUrl(
-              `https://commonwealth.im${chainFormDefaultFields.iconUrl}`
+              `https://commonwealth.im${chainFormDefaultFields.iconUrl}`,
             );
           }
 
@@ -110,7 +109,7 @@ export const PolygonForm = (props: EthChainFormState) => {
 
             const contract = IERC20Metadata__factory.connect(
               args.address,
-              ethersProvider
+              ethersProvider,
             );
 
             const contractName = await contract.name();
@@ -129,7 +128,7 @@ export const PolygonForm = (props: EthChainFormState) => {
             setSymbol('');
             chainFormState.setStatus('failure');
             chainFormState.setMessage(
-              'Verified token but could not load metadata.'
+              'Verified token but could not load metadata.',
             );
           }
 
@@ -148,13 +147,13 @@ export const PolygonForm = (props: EthChainFormState) => {
       } else {
         chainFormState.setStatus('failure');
         chainFormState.setMessage(
-          res.message || 'Failed to load Token Information'
+          res.message || 'Failed to load Token Information',
         );
       }
     } catch (err) {
       chainFormState.setStatus('failure');
       chainFormState.setMessage(
-        err.responseJSON?.error || 'Failed to load Token Information'
+        err.responseJSON?.error || 'Failed to load Token Information',
       );
     }
     chainFormState.setLoading(false);
@@ -164,7 +163,7 @@ export const PolygonForm = (props: EthChainFormState) => {
     <div className="CreateCommunityForm">
       {EthChainRows(
         { ethChainNames, ethChains, disabled: true },
-        { ...ethChainFormFields, ...chainFormState }
+        { ...ethChainFormFields, ...chainFormState },
       )}
       <CWButton
         label="Populate fields"
@@ -235,17 +234,17 @@ export const PolygonForm = (props: EthChainFormState) => {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
             await initAppState(false);
             await updateAdminOnCreateCommunity(id);
 
-            navigate(`/${res.result.chain?.id}`);
+            navigate(`/${res.result.community?.id}`);
           } catch (err) {
             notifyError(
-              err.responseJSON?.error || 'Creating new ERC20 community failed'
+              err.responseJSON?.error || 'Creating new ERC20 community failed',
             );
           } finally {
             chainFormState.setSaving(false);

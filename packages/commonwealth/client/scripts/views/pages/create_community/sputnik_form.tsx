@@ -6,22 +6,21 @@ import $ from 'jquery';
 
 import 'pages/create_community.scss';
 
-import app from 'state';
-import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import app from 'state';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 // import { CommunityType } from '.';
+import { useCommonNavigate } from 'navigation/helpers';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import {
   defaultChainRows,
   updateAdminOnCreateCommunity,
 } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
   useChainFormDefaultFields,
+  useChainFormIdFields,
   useChainFormState,
 } from './hooks';
 
@@ -120,20 +119,20 @@ export const SputnikForm = () => {
             // POST object
             const res = await $.post(
               `${app.serverUrl()}/communities`,
-              createChainArgs
+              createChainArgs,
             );
 
             if (res.result.admin_address) {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
             await updateAdminOnCreateCommunity(_id);
 
-            navigate(`/${res.result.chain.id}`);
+            navigate(`/${res.result.community.id}`);
           } catch (err) {
             notifyError(err.responseJSON?.error || 'Adding DAO failed.');
             console.error(err.responseJSON?.error || err.message);
