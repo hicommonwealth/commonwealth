@@ -3,6 +3,7 @@ import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 import {
   useFetchGroupsQuery,
   useRefreshMembershipQuery,
@@ -179,6 +180,10 @@ const CommunityMembersPage = () => {
   };
 
   useEffect(() => {
+    // Invalidate group memberships cache
+    queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
+    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
+
     // Set the active tab based on URL
     const params = new URLSearchParams(window.location.search.toLowerCase());
     const activeTab = params.get('tab')?.toLowerCase();
