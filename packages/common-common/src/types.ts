@@ -13,7 +13,7 @@ export enum NotificationCategories {
 }
 
 export type NotificationCategory =
-  (typeof NotificationCategories)[keyof typeof NotificationCategories];
+  typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
   Thread = 'discussion',
