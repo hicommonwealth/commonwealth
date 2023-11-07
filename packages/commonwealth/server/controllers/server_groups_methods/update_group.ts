@@ -41,7 +41,7 @@ export async function __updateGroup(
     metadata,
     requirements,
     topics,
-  }: UpdateGroupOptions
+  }: UpdateGroupOptions,
 ): Promise<UpdateGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
@@ -66,7 +66,7 @@ export async function __updateGroup(
     const requirementsValidationErr = validateRequirements(requirements);
     if (requirementsValidationErr) {
       throw new AppError(
-        `${Errors.InvalidRequirements}: ${requirementsValidationErr}`
+        `${Errors.InvalidRequirements}: ${requirementsValidationErr}`,
       );
     }
   }
@@ -120,14 +120,14 @@ export async function __updateGroup(
     // update group
     await group.update(toUpdate, { transaction });
 
-    if (topicsToAssociate && topicsToAssociate.length > 0) {
+    if (topicsToAssociate) {
       // add group to all specified topics
       await this.models.Topic.update(
         {
           group_ids: sequelize.fn(
             'array_append',
             sequelize.col('group_ids'),
-            group.id
+            group.id,
           ),
         },
         {
@@ -142,7 +142,7 @@ export async function __updateGroup(
             },
           },
           transaction,
-        }
+        },
       );
 
       // remove group from existing group topics
@@ -151,7 +151,7 @@ export async function __updateGroup(
           group_ids: sequelize.fn(
             'array_remove',
             sequelize.col('group_ids'),
-            group.id
+            group.id,
           ),
         },
         {
@@ -164,7 +164,7 @@ export async function __updateGroup(
             },
           },
           transaction,
-        }
+        },
       );
     }
   });
