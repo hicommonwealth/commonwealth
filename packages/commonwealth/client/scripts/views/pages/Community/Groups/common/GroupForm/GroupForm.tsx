@@ -1,4 +1,5 @@
 /* eslint-disable react/no-multi-comp */
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -15,6 +16,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { ZodError, ZodObject } from 'zod';
+import { MixpanelPageViewEvent } from '../../../../../../../../shared/analytics/types';
 import {
   AMOUNT_CONDITIONS,
   TOKENS,
@@ -68,6 +70,10 @@ const CWRequirementsRadioButton = ({
       # of all requirements
     </span>
   );
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.GROUPS_CREATION_PAGE_VIEW },
+  });
 
   return (
     <CWRadioButton
