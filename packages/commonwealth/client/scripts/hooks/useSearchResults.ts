@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { useDebounce } from 'usehooks-ts';
 
-import app from '../state';
-import { useSearchThreadsQuery } from '../state/api/threads';
-import { useSearchCommentsQuery } from '../state/api/comments';
-import { useSearchChainsQuery } from '../state/api/chains';
-import { useSearchProfilesQuery } from '../state/api/profiles';
-import { SearchScope } from '../models/SearchQuery';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
+import { SearchScope } from '../models/SearchQuery';
+import app from '../state';
+import { useSearchChainsQuery } from '../state/api/chains';
+import { useSearchCommentsQuery } from '../state/api/comments';
+import { useSearchProfilesQuery } from '../state/api/profiles';
+import { useSearchThreadsQuery } from '../state/api/threads';
 
 const NUM_RESULTS_PER_SECTION = 2;
 
@@ -16,9 +16,9 @@ type Filter = 'threads' | 'replies' | 'communities' | 'members';
 const useSearchResults = (
   searchTerm: string,
   filters: Filter[],
-  resultsPerSection?: number
+  resultsPerSection?: number,
 ) => {
-  const chainId = app.activeChainId() || 'all_chains';
+  const chainId = app.activeChainId() || 'all_communities';
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {

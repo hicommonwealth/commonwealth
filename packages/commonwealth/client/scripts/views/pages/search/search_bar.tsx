@@ -3,9 +3,19 @@ import type { NavigateOptions, To } from 'react-router';
 
 import 'pages/search/search_bar.scss';
 
-import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import SearchQuery, { SearchScope } from 'models/SearchQuery';
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import { useDebounce } from 'usehooks-ts';
+import {
+  APIOrderBy,
+  APIOrderDirection,
+} from '../../../../scripts/helpers/constants';
+import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
+import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
+import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
+import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -16,16 +26,6 @@ import {
   SearchBarMemberPreviewRow,
   SearchBarThreadPreviewRow,
 } from './search_bar_components';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useDebounce } from 'usehooks-ts';
-import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
-import {
-  APIOrderBy,
-  APIOrderDirection,
-} from '../../../../scripts/helpers/constants';
-import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
-import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
-import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
 
 const NUM_RESULTS_PER_SECTION = 2;
 
@@ -33,7 +33,11 @@ let resetTimer = null;
 
 const goToSearchPage = (
   query: SearchQuery,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string,
+  ) => void,
 ) => {
   if (!query.searchTerm || !query.searchTerm.toString().trim()) {
     notifyError('Enter a valid search term');
@@ -47,7 +51,7 @@ const goToSearchPage = (
 
 export const SearchBar = () => {
   const navigate = useCommonNavigate();
-  const chainId = app.activeChainId() || 'all_chains';
+  const chainId = app.activeChainId() || 'all_communities';
 
   const [searchTerm, setSearchTerm] = useState('');
 

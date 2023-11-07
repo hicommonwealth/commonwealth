@@ -22,7 +22,7 @@ const Errors = {
 
 export type UpdateGroupOptions = {
   user: UserInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
   metadata?: GroupMetadata;
@@ -34,12 +34,19 @@ export type UpdateGroupResult = GroupAttributes;
 
 export async function __updateGroup(
   this: ServerCommunitiesController,
-  { user, chain, groupId, metadata, requirements, topics }: UpdateGroupOptions
+  {
+    user,
+    community,
+    groupId,
+    metadata,
+    requirements,
+    topics,
+  }: UpdateGroupOptions,
 ): Promise<UpdateGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -59,7 +66,7 @@ export async function __updateGroup(
     const requirementsValidationErr = validateRequirements(requirements);
     if (requirementsValidationErr) {
       throw new AppError(
-        `${Errors.InvalidRequirements}: ${requirementsValidationErr}`
+        `${Errors.InvalidRequirements}: ${requirementsValidationErr}`,
       );
     }
   }
@@ -71,7 +78,7 @@ export async function __updateGroup(
         id: {
           [Op.in]: topics || [],
         },
-        chain_id: chain.id,
+        chain_id: community.id,
       },
     });
     if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
@@ -83,7 +90,7 @@ export async function __updateGroup(
   const group = await this.models.Group.findOne({
     where: {
       id: groupId,
-      chain_id: chain.id,
+      community_id: community.id,
     },
   });
   if (!group) {
@@ -113,14 +120,14 @@ export async function __updateGroup(
     // update group
     await group.update(toUpdate, { transaction });
 
-    if (topicsToAssociate && topicsToAssociate.length > 0) {
+    if (topicsToAssociate) {
       // add group to all specified topics
       await this.models.Topic.update(
         {
           group_ids: sequelize.fn(
             'array_append',
             sequelize.col('group_ids'),
-            group.id
+            group.id,
           ),
         },
         {
@@ -135,7 +142,7 @@ export async function __updateGroup(
             },
           },
           transaction,
-        }
+        },
       );
 
       // remove group from existing group topics
@@ -144,7 +151,7 @@ export async function __updateGroup(
           group_ids: sequelize.fn(
             'array_remove',
             sequelize.col('group_ids'),
-            group.id
+            group.id,
           ),
         },
         {
@@ -157,7 +164,7 @@ export async function __updateGroup(
             },
           },
           transaction,
-        }
+        },
       );
     }
   });

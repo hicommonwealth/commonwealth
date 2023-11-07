@@ -32,7 +32,7 @@ export const getGroupsHandler = async (
   } = validationResult.data;
 
   const result = await controllers.groups.getGroups({
-    chain: req.chain,
+    community: req.chain,
     includeMembers: include_members,
     includeTopics: include_topics,
     addressId: address_id,

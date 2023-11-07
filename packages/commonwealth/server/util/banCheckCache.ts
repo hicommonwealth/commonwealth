@@ -21,13 +21,11 @@ export default class BanCache extends JobRunner<CacheT> {
   }
 
   public async checkBan(params: {
-    chain?: string;
-    chain_id?: string;
+    communityId?: string;
     address: string;
   }): Promise<[boolean, string?]> {
-    const chain_id = params.chain || params.chain_id;
-    const { address } = params;
-    const cacheKey = `${chain_id}-${address}`;
+    const { address, communityId } = params;
+    const cacheKey = `${communityId}-${address}`;
 
     // first, check cache for existing ban
     const isCachedBan = await this.access(async (c: CacheT) => {
@@ -68,7 +66,7 @@ export default class BanCache extends JobRunner<CacheT> {
 
     const ban = await this._models.Ban.findOne({
       where: {
-        chain_id,
+        chain_id: communityId,
         address,
       },
     });

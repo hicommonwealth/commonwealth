@@ -1,39 +1,19 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
-import { AddressAttributes, AddressInstance } from 'server/models/address';
-import { CommunityInstance } from '../../../server/models/community';
+import { AddressInstance } from 'server/models/address';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
 import { UserInstance } from 'server/models/user';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+import { CommunityInstance } from '../../../server/models/community';
 
-const VALID_REQUIREMENTS: Requirement[] = [
-  {
-    rule: 'threshold',
-    data: {
-      threshold: '1000',
-      source: {
-        source_type: 'erc20',
-        evm_chain_id: 1,
-        contract_address: '0x0000000000000000000000000000000000000000',
-      },
-    },
-  },
-  {
-    rule: 'allow',
-    data: {
-      allow: ['0x0000000000000000000000000000000000000000'],
-    },
-  },
-];
 const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 
 const createMockedGroupsController = () => {
   const groups: GroupAttributes[] = [
     {
       id: 1,
-      chain_id: 'ethereum',
+      community_id: 'ethereum',
       metadata: {
         name: 'hello',
         description: '123',
@@ -110,7 +90,7 @@ const createMockedGroupsController = () => {
       findAll: async () => [
         {
           toJSON: () => ({
-            chain_id: 'ethereum',
+            community_id: 'ethereum',
             name: 'member',
             allow: '0',
             deny: '0',
@@ -154,7 +134,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const results = await controller.refreshMembership({
       user,
-      chain,
+      community: chain,
       address,
       topicId: 1,
     });
@@ -167,12 +147,12 @@ describe('ServerGroupsController', () => {
     const controller = createMockedGroupsController();
     const { chain } = createMockParams();
     const result = await controller.getGroups({
-      chain,
+      community: chain,
       includeMembers: true,
     });
     expect(result).to.have.length(1);
     expect(result[0]).to.have.property('id');
-    expect(result[0]).to.have.property('chain_id');
+    expect(result[0]).to.have.property('community_id');
     expect(result[0]).to.have.property('metadata');
     expect(result[0]).to.have.property('requirements');
     expect(result[0]).to.have.property('memberships');
@@ -188,7 +168,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const result = await controller.createGroup({
       user,
-      chain,
+      community: chain,
       address,
       metadata: {
         name: 'blah',
@@ -198,7 +178,7 @@ describe('ServerGroupsController', () => {
       topics: [],
     });
     expect(result).to.have.property('id');
-    expect(result).to.have.property('chain_id');
+    expect(result).to.have.property('community_id');
     expect(result).to.have.property('metadata');
     expect(result).to.have.property('requirements');
   });
@@ -209,7 +189,7 @@ describe('ServerGroupsController', () => {
     expect(
       controller.createGroup({
         user,
-        chain,
+        community: chain,
         address,
         metadata: {
           name: 'blah',
@@ -226,7 +206,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const result = await controller.updateGroup({
       user,
-      chain,
+      community: chain,
       address,
       groupId: 1,
       metadata: {
@@ -236,7 +216,7 @@ describe('ServerGroupsController', () => {
       requirements: [],
     });
     expect(result).to.have.property('id');
-    expect(result).to.have.property('chain_id');
+    expect(result).to.have.property('community_id');
     expect(result).to.have.property('metadata');
     expect(result).to.have.property('requirements');
   });
@@ -247,7 +227,7 @@ describe('ServerGroupsController', () => {
     expect(
       controller.updateGroup({
         user,
-        chain,
+        community: chain,
         address,
         groupId: 1,
         metadata: {
@@ -264,7 +244,7 @@ describe('ServerGroupsController', () => {
     const { user, chain, address } = createMockParams();
     const result = await controller.deleteGroup({
       user,
-      chain,
+      community: chain,
       address,
       groupId: 1,
     });

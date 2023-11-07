@@ -52,13 +52,13 @@ export const CWSearchBar: FC<SearchBarProps> = ({
 }) => {
   const navigate = useCommonNavigate();
   const [showTag, setShowTag] = useState(true);
-  const communityId = app.activeChainId() || 'all_chains';
+  const communityId = app.activeChainId() || 'all_communities';
   const chain = app.config.chains.getById(communityId);
   const [searchTerm, setSearchTerm] = useState('');
   const { searchResults } = useSearchResults(searchTerm, [
     'threads',
     'replies',
-    communityId === 'all_chains' ? 'communities' : null,
+    communityId === 'all_communities' ? 'communities' : null,
     'members',
   ]);
 
@@ -95,7 +95,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const handleGoToSearchPage = () => {
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      chainScope: showTag ? communityId : 'all_chains',
+      chainScope: showTag ? communityId : 'all_communities',
     });
     goToSearchPage(searchQuery, navigate);
     resetSearchBar();

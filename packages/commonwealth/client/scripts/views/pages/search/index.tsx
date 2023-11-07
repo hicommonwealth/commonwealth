@@ -31,7 +31,7 @@ import {
 import { renderSearchResults } from './helpers';
 
 const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
-  (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope)
+  (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope),
 );
 
 // maps client-side sort options to server-side sort options
@@ -61,7 +61,8 @@ const SearchPage = () => {
     return Object.fromEntries(urlQueryParams.entries()) as SearchQueryParams;
   }, [urlQueryParams]);
 
-  const chain = queryParams.chainScope || app.activeChainId() || 'all_chains';
+  const chain =
+    queryParams.chainScope || app.activeChainId() || 'all_communities';
 
   const activeTab = useMemo(() => {
     if (VALID_SEARCH_SCOPES.includes(queryParams.tab as SearchScope)) {
@@ -81,7 +82,7 @@ const SearchPage = () => {
 
   const handleSearchAllCommunities = () => {
     const newQueryParams = new URLSearchParams(urlQueryParams.toString());
-    newQueryParams.set('chainScope', 'all_chains');
+    newQueryParams.set('chainScope', 'all_communities');
     navigate({
       pathname: location.pathname,
       search: `?${newQueryParams.toString()}`,
@@ -102,7 +103,7 @@ const SearchPage = () => {
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
-    chainId: app.activeChainId() || 'all_chains',
+    chainId: app.activeChainId() || 'all_communities',
     searchTerm: queryParams.q,
     limit: 20,
     orderBy,
@@ -194,7 +195,7 @@ const SearchPage = () => {
   const totalResultsText = pluralize(totalResults, activeTab.toLowerCase());
   const scopeText = useMemo(() => {
     if (chain) {
-      if (chain === 'all_chains') {
+      if (chain === 'all_communities') {
         return 'across all communities.';
       }
       return `in ${capitalize(chain)}.`;
@@ -282,7 +283,7 @@ const SearchPage = () => {
               <CWText className="search-results-caption">
                 {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
                 {scopeText}
-                {chain !== 'all_chains' && !app.isCustomDomain() && (
+                {chain !== 'all_communities' && !app.isCustomDomain() && (
                   <a
                     href="#"
                     className="search-all-communities"
@@ -294,7 +295,7 @@ const SearchPage = () => {
               </CWText>
               {VISIBLE_TABS.length > 0 &&
                 [SearchScope.Threads, SearchScope.Replies].includes(
-                  activeTab
+                  activeTab,
                 ) && (
                   <div className="search-results-filters">
                     <CWText type="h5">Sort By:</CWText>
@@ -317,7 +318,7 @@ const SearchPage = () => {
                   results as any,
                   queryParams.q,
                   activeTab,
-                  commonNavigate
+                  commonNavigate,
                 )}
                 <div ref={bottomRef}></div>
               </div>

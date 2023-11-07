@@ -5,7 +5,6 @@ import { parseCustomStages } from 'helpers';
 import { detectURL } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { capitalize } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
 import app from 'state';
@@ -21,7 +20,6 @@ import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationMod
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
@@ -60,7 +58,6 @@ export const NewThreadForm = () => {
     threadTitle,
     setThreadTitle,
     threadKind,
-    setThreadKind,
     threadTopic,
     setThreadTopic,
     threadUrl,
@@ -171,17 +168,8 @@ export const NewThreadForm = () => {
       <div className="NewThreadForm">
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            Proposals
+            Create Discussion
           </CWText>
-        </div>
-        <div className="new-thread-header">
-          <CWTabsRow>
-            <CWTab
-              label={capitalize(ThreadKind.Discussion)}
-              isSelected={threadKind === ThreadKind.Discussion}
-              onClick={() => setThreadKind(ThreadKind.Discussion)}
-            />
-          </CWTabsRow>
         </div>
         <div className="new-thread-body">
           <div className="new-thread-form-inputs">

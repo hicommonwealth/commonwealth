@@ -1,8 +1,7 @@
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import Topic from 'models/Topic';
-import { useQuery } from '@tanstack/react-query';
 
 const CHANNELS_STALE_TIME = 30 * 1_000; // 30 s
 
@@ -14,9 +13,9 @@ const fetchChannels = async ({ chainId }: FetchDiscordChannelsProps) => {
   const response = await axios.post(
     `${app.serverUrl()}${ApiEndpoints.DISCORD_CHANNELS}`,
     {
-      chain_id: chainId || app.activeChainId(),
+      community_id: chainId || app.activeChainId(),
       jwt: app.user.jwt,
-    }
+    },
   );
 
   return {

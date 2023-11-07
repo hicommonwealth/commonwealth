@@ -10,9 +10,9 @@ export const getTopicsHandler = async (
   req: Request,
   res: TypedResponse<GetTopicsResponse>
 ) => {
-  const { chain } = req;
+  const { chain: community } = req;
 
-  const topics = await controllers.topics.getTopics({ chain });
+  const topics = await controllers.topics.getTopics({ community });
 
   return success(res, topics);
 };
