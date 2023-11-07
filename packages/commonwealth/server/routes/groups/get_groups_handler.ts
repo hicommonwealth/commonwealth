@@ -26,11 +26,12 @@ export const getGroupsHandler = async (
     throw new AppError(JSON.stringify(validationResult.error));
   }
   const {
-    query: { include_topics },
+    query: { include_members, include_topics },
   } = validationResult.data;
 
   const result = await controllers.groups.getGroups({
     community: req.chain,
+    includeMembers: include_members,
     includeTopics: include_topics,
   });
   return success(res, result);

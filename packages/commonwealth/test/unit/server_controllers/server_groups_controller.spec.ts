@@ -256,20 +256,4 @@ describe('ServerGroupsController', () => {
     });
     expect(result).to.be.undefined;
   });
-
-  describe('#getGroupMembers', async () => {
-    const controller = createMockedGroupsController();
-    const { user, chain, address } = createMockParams();
-    const result = await controller.getGroupMembers({
-      community: chain,
-      groupId: 1,
-      limit: 10,
-      page: 1,
-    });
-    expect(result.results).to.have.length(3);
-    expect(result.limit).to.equal(10);
-    expect(result.page).to.equal(1);
-    expect(result.totalPages).to.equal(1);
-    expect(result.totalResults).to.equal(3);
-  });
 });

@@ -13,14 +13,14 @@ export type RefreshCommunityMembershipsResult = MembershipAttributes[];
 
 export async function __refreshCommunityMemberships(
   this: ServerGroupsController,
-  { community }: RefreshCommunityMembershipsOptions
+  { community }: RefreshCommunityMembershipsOptions,
 ): Promise<void> {
   const startedAt = Date.now();
 
   // get all groups across the community
   const groups = await this.models.Group.findAll({
     where: {
-      chain_id: community.id,
+      community_id: community.id,
     },
   });
 
@@ -42,10 +42,10 @@ export async function __refreshCommunityMemberships(
         this.models,
         this.tokenBalanceCache,
         address,
-        groups
+        groups,
       );
     },
-    { concurrency: 300 }
+    { concurrency: 300 },
   );
 
   const allMemberships = flatten(result);
@@ -55,6 +55,6 @@ export async function __refreshCommunityMemberships(
       groups.length
     } groups and ${addresses.length} addresses in ${community.id} within ${
       (Date.now() - startedAt) / 1000
-    }s`
+    }s`,
   );
 }

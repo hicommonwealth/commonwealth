@@ -12,11 +12,6 @@ import {
   __deleteGroup,
 } from './server_groups_methods/delete_group';
 import {
-  GetGroupMembersOptions,
-  GetGroupMembersResult,
-  __getGroupMembers,
-} from './server_groups_methods/get_group_members';
-import {
   GetGroupsOptions,
   GetGroupsResult,
   __getGroups,
@@ -44,17 +39,17 @@ export class ServerGroupsController {
   constructor(
     public models: DB,
     public tokenBalanceCache: TokenBalanceCache,
-    public banCache: BanCache
+    public banCache: BanCache,
   ) {}
 
   async refreshMembership(
-    options: RefreshMembershipOptions
+    options: RefreshMembershipOptions,
   ): Promise<RefreshMembershipResult> {
     return __refreshMembership.call(this, options);
   }
 
   async refreshCommunityMemberships(
-    options: RefreshCommunityMembershipsOptions
+    options: RefreshCommunityMembershipsOptions,
   ): Promise<RefreshCommunityMembershipsResult> {
     return __refreshCommunityMemberships.call(this, options);
   }
@@ -76,7 +71,7 @@ export class ServerGroupsController {
   }
 
   async getGroupMembers(
-    options: GetGroupMembersOptions
+    options: GetGroupMembersOptions,
   ): Promise<GetGroupMembersResult> {
     return __getGroupMembers.call(this, options);
   }

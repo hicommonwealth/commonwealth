@@ -163,7 +163,6 @@ import { updateCommunityHandler } from '../routes/communities/update_community_h
 import exportMembersList from '../routes/exportMembersList';
 import { createGroupHandler } from '../routes/groups/create_group_handler';
 import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
-import { getGroupMembersHandler } from '../routes/groups/get_group_members_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
 import { updateGroupHandler } from '../routes/groups/update_group_handler';
@@ -1394,14 +1393,6 @@ function setupRouter(
       databaseValidationService.validateAuthor,
       databaseValidationService.validateCommunity,
       deleteGroupHandler.bind(this, serverControllers),
-    );
-
-    registerRoute(
-      router,
-      'get',
-      '/groups/:groupId/members',
-      databaseValidationService.validateCommunity,
-      getGroupMembersHandler.bind(this, serverControllers),
     );
   } else {
     log.warn('GATING API DISABLED');
