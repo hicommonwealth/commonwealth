@@ -21,7 +21,7 @@ import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
 import {
   SubscriptionRowMenu,
-  SubscriptionRowTextContainer
+  SubscriptionRowTextContainer,
 } from './helper_components';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
 
@@ -30,7 +30,7 @@ const emailIntervalFrequencyMap = {
   weekly: 'Once a week',
   daily: 'Everyday',
   twoweeks: 'Every two weeks',
-  monthly: 'Once a month'
+  monthly: 'Once a month',
 };
 
 type SnapshotInfo = {
@@ -72,7 +72,7 @@ const NotificationSettingsPage = () => {
         const snapshotsInfoArr = snapshotIds.map((snapshotId) => ({
           snapshotId,
           space: getSpaceById.find((x: { id: string }) => x.id === snapshotId),
-          subs: bundledSnapshotSubs[snapshotId]
+          subs: bundledSnapshotSubs[snapshotId],
         }));
 
         setSnapshotsInfo(snapshotsInfoArr);
@@ -138,7 +138,7 @@ const NotificationSettingsPage = () => {
   const relevantSubscribedCommunities = app?.user.addresses
     .map((x) => x.community)
     .filter(
-      (x) => subscribedCommunityIds.includes(x.id) && !chainEventSubs[x.id]
+      (x) => subscribedCommunityIds.includes(x.id) && !chainEventSubs[x.id],
     );
 
   return (
@@ -175,7 +175,7 @@ const NotificationSettingsPage = () => {
                   app.user.updateEmailInterval('weekly');
                   setCurrentFrequency('weekly');
                   forceRerender();
-                }
+                },
               },
               {
                 label: 'Never',
@@ -183,8 +183,8 @@ const NotificationSettingsPage = () => {
                   app.user.updateEmailInterval('never');
                   setCurrentFrequency('never');
                   forceRerender();
-                }
-              }
+                },
+              },
             ]}
           />
         ) : (
@@ -221,7 +221,7 @@ const NotificationSettingsPage = () => {
                         setEmailValidated(false);
                         return [
                           'failure',
-                          'Please enter a valid email address'
+                          'Please enter a valid email address',
                         ];
                       } else {
                         setEmailValidated(true);
@@ -313,7 +313,7 @@ const NotificationSettingsPage = () => {
                     app.user.notifications
                       .subscribe({
                         categoryId: NotificationCategories.ChainEvent,
-                        options: { chainId: community.id }
+                        options: { chainId: community.id },
                       })
                       .then(() => {
                         forceRerender();

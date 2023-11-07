@@ -16,7 +16,7 @@ import {
   CommunityResult,
   MemberResult,
   ReplyResult,
-  ThreadResult
+  ThreadResult,
 } from './helpers';
 
 type SearchChipProps = {
@@ -32,9 +32,9 @@ export const SearchChip = ({ isActive, label, onClick }: SearchChipProps) => {
       fontWeight="medium"
       className={getClasses<{ isActive: boolean }>(
         {
-          isActive
+          isActive,
         },
-        'SearchChip'
+        'SearchChip',
       )}
       onClick={onClick}
     >
@@ -49,7 +49,7 @@ type SearchBarThreadPreviewRowProps = {
 };
 export const SearchBarThreadPreviewRow = ({
   searchResult,
-  searchTerm
+  searchTerm,
 }: SearchBarThreadPreviewRowProps) => {
   const navigate = useCommonNavigate();
 
@@ -94,7 +94,7 @@ type SearchBarCommentPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarCommentPreviewRow = (
-  props: SearchBarCommentPreviewRowProps
+  props: SearchBarCommentPreviewRowProps,
 ) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
@@ -133,7 +133,7 @@ type SearchBarCommunityPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarCommunityPreviewRow = (
-  props: SearchBarCommunityPreviewRowProps
+  props: SearchBarCommunityPreviewRowProps,
 ) => {
   const { searchResult } = props;
   const navigate = useCommonNavigate();
@@ -156,7 +156,7 @@ type SearchBarMemberPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarMemberPreviewRow = (
-  props: SearchBarMemberPreviewRowProps
+  props: SearchBarMemberPreviewRowProps,
 ) => {
   const { searchResult } = props;
   const community = searchResult.addresses[0].community;

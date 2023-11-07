@@ -1,7 +1,7 @@
 import {
   ChainBase,
   ChainCategoryType,
-  ChainNetwork
+  ChainNetwork,
 } from 'common-common/src/types';
 import numeral from 'numeral';
 import 'pages/communities.scss';
@@ -21,21 +21,21 @@ const communityToCategoriesMap = app.config.chainCategoryMap;
 // Handle mapping provided by ChainCategories table
 const communityCategories = Object.values(ChainCategoryType);
 const communityNetworks = Object.keys(ChainNetwork).filter(
-  (val) => val === 'ERC20'
+  (val) => val === 'ERC20',
 ); // We only are allowing ERC20 for now
 const communityBases = Object.keys(ChainBase);
 
 const getInitialFilterMap = (): Record<string, unknown> => {
   const filterMapCommunityCategories = communityCategories.map((c) => ({
-    [c]: false
+    [c]: false,
   }));
   const filterMapCommunityBases = communityBases.map((c) => ({ [c]: false }));
   const filterMapCommunityNetworks = communityNetworks.map((c) => ({
-    [c]: false
+    [c]: false,
   }));
   const allArrays = filterMapCommunityCategories.concat(
     filterMapCommunityBases,
-    filterMapCommunityNetworks
+    filterMapCommunityNetworks,
   );
 
   return Object.assign({}, ...allArrays);
@@ -43,7 +43,7 @@ const getInitialFilterMap = (): Record<string, unknown> => {
 
 const CommunitiesPage = () => {
   const [filterMap, setFilterMap] = React.useState<Record<string, unknown>>(
-    getInitialFilterMap()
+    getInitialFilterMap(),
   );
 
   const handleSetFilterMap = (key: string) => {
@@ -81,7 +81,7 @@ const CommunitiesPage = () => {
           filterMap[cat] &&
           (!communityToCategoriesMap[data.id] ||
             !communityToCategoriesMap[data.id].includes(
-              cat as ChainCategoryType
+              cat as ChainCategoryType,
             ))
         ) {
           return false;

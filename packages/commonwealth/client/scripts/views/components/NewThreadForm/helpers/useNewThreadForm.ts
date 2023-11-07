@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
 import type { DeltaStatic } from 'quill';
+import { useEffect, useMemo, useState } from 'react';
 
+import { useDraft } from 'hooks/useDraft';
+import { useSearchParams } from 'react-router-dom';
 import type Topic from '../../../../models/Topic';
 import { ThreadKind } from '../../../../models/types';
 import { getTextFromDelta } from '../../react_quill_editor';
-import { useDraft } from 'hooks/useDraft';
-import { useSearchParams } from 'react-router-dom';
 
 type NewThreadDraft = {
   topicId: number;
@@ -13,12 +13,12 @@ type NewThreadDraft = {
   body: DeltaStatic;
 };
 
-const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
+const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const [searchParams] = useSearchParams();
   const topicIdFromUrl: number = parseInt(searchParams.get('topic') || '0');
 
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
-    `new-thread-${chainId}-info`
+    `new-thread-${communityId}-info`
   );
 
   // get restored draft on init
@@ -74,7 +74,7 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
     const draft = {
       topicId: threadTopic?.id || 0,
       title: threadTitle,
-      body: threadContentDelta,
+      body: threadContentDelta
     };
     if (!draft.topicId && !draft.title && !draft.body) {
       return;
@@ -115,7 +115,7 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
     isSaving,
     setIsSaving,
     isDisabled,
-    clearDraft,
+    clearDraft
   };
 };
 

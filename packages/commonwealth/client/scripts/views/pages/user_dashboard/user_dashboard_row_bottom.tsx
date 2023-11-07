@@ -32,7 +32,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     commentId,
     communityId,
     commenters,
-    showSkeleton
+    showSkeleton,
   } = props;
   const forceRerender = useForceRerender();
 
@@ -44,13 +44,13 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     subThreadId: string,
     bothActive: boolean,
     commentSubscription: NotificationSubscription,
-    reactionSubscription: NotificationSubscription
+    reactionSubscription: NotificationSubscription,
   ) => {
     await subscribeToThread(
       subThreadId,
       bothActive,
       commentSubscription,
-      reactionSubscription
+      reactionSubscription,
     );
     forceRerender();
   };
@@ -58,13 +58,13 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
   const commentSubscription =
     app.user.notifications.findNotificationSubscription({
       categoryId: NotificationCategories.NewComment,
-      options: { threadId: Number(threadId) }
+      options: { threadId: Number(threadId) },
     });
 
   const reactionSubscription =
     app.user.notifications.findNotificationSubscription({
       categoryId: NotificationCategories.NewReaction,
-      options: { threadId: Number(threadId) }
+      options: { threadId: Number(threadId) },
     });
 
   const bothActive =
@@ -100,12 +100,12 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
                   threadId,
                   bothActive,
                   commentSubscription,
-                  reactionSubscription
+                  reactionSubscription,
                 );
               },
               label: bothActive ? 'Unsubscribe' : 'Subscribe',
-              iconLeft: bothActive ? 'unsubscribe' : 'bell'
-            }
+              iconLeft: bothActive ? 'unsubscribe' : 'bell',
+            },
           ]}
           renderTrigger={(onClick) => (
             <CWIconButton
@@ -124,14 +124,14 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
               onClick: async () => {
                 if (commentId) {
                   await navigator.clipboard.writeText(
-                    `${domain}/${communityId}/discussion/${threadId}?comment=${commentId}`
+                    `${domain}/${communityId}/discussion/${threadId}?comment=${commentId}`,
                   );
                   return;
                 }
                 await navigator.clipboard.writeText(
-                  `${domain}/${communityId}/discussion/${threadId}`
+                  `${domain}/${communityId}/discussion/${threadId}`,
                 );
-              }
+              },
             },
             {
               iconLeft: 'twitterOutline',
@@ -141,16 +141,16 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
                 if (commentId) {
                   await window.open(
                     `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${threadId}
-                      ?comment=${commentId}`
+                      ?comment=${commentId}`,
                   );
                   return;
                 }
                 await window.open(
                   `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${threadId}`,
-                  '_blank'
+                  '_blank',
                 );
-              }
-            }
+              },
+            },
           ]}
           renderTrigger={(onClick) => (
             <CWIconButton iconName="share" iconSize="small" onClick={onClick} />

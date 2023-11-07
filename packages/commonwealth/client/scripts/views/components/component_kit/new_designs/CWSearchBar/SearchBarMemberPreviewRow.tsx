@@ -12,7 +12,7 @@ interface SearchBarMemberPreviewRowProps {
 }
 
 export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
-  searchResult
+  searchResult,
 }) => {
   const community = searchResult.addresses[0].community;
   const address = searchResult.addresses[0].address;

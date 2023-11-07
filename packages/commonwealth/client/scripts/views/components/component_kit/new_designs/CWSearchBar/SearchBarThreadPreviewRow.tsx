@@ -17,7 +17,7 @@ interface SearchBarThreadPreviewRowProps {
 
 export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
   searchResult,
-  searchTerm
+  searchTerm,
 }) => {
   const navigate = useCommonNavigate();
 

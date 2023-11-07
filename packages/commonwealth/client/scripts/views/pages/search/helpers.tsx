@@ -33,7 +33,7 @@ type ThreadResultRowProps = {
 const ThreadResultRow = ({
   thread,
   searchTerm,
-  setRoute
+  setRoute,
 }: ThreadResultRowProps) => {
   const title = useMemo(() => {
     try {
@@ -103,7 +103,7 @@ type ReplyResultRowProps = {
 const ReplyResultRow = ({
   comment,
   searchTerm,
-  setRoute
+  setRoute,
 }: ReplyResultRowProps) => {
   const proposalId = comment.proposalid;
   const community = comment.community;
@@ -177,7 +177,7 @@ type CommunityResultRowProps = {
 };
 const CommunityResultRow = ({
   community,
-  setRoute
+  setRoute,
 }: CommunityResultRowProps) => {
   const handleClick = () => {
     setRoute(community.id ? `/${community.id}` : '/', {}, null);
@@ -218,7 +218,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
     profileChainIds: [community],
     profileAddresses: [address],
     currentChainId: app.activeChainId(),
-    apiCallEnabled: !!(community && address)
+    apiCallEnabled: !!(community && address),
   });
   const profile: MinimumProfile = users?.[0];
 
@@ -248,7 +248,7 @@ export const renderSearchResults = (
   results: any[],
   searchTerm: string,
   searchType: SearchScope,
-  setRoute: any
+  setRoute: any,
 ) => {
   if (!results || results.length === 0) {
     return [];
