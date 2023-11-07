@@ -3,6 +3,7 @@ import { TypedPaginatedResult } from 'server/types';
 
 import { uniq } from 'lodash';
 import { CommunityInstance } from 'server/models/community';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
@@ -21,6 +22,7 @@ export type SearchProfilesOptions = {
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
+  memberships?: string;
 };
 export type SearchProfilesResult = TypedPaginatedResult<{
   id: number;
@@ -45,6 +47,7 @@ export async function __searchProfiles(
     page,
     orderBy,
     orderDirection,
+    memberships,
   }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
@@ -81,12 +84,32 @@ export async function __searchProfiles(
     ...paginationBind,
   };
   if (community) {
-    bind.community = community.id;
+    bind.community_id = community.id;
   }
 
-  const communityWhere = bind.community
-    ? `"Addresses".community_id = $community AND`
+  const communityWhere = bind.community_id
+    ? `"Addresses".community_id = $community_id AND`
     : '';
+
+  let membershipsWhere = memberships
+    ? `SELECT 1 FROM "Memberships"
+    JOIN "Groups" ON "Groups".id = "Memberships".group_id
+    WHERE "Memberships".address_id = "Addresses".id
+    AND "Groups".community_id = $community_id`
+    : '';
+
+  if (memberships) {
+    switch (memberships) {
+      case 'in-group':
+        membershipsWhere = `AND EXISTS (${membershipsWhere})`;
+        break;
+      case 'not-in-group':
+        membershipsWhere = `AND NOT EXISTS (${membershipsWhere})`;
+        break;
+      default:
+        throw new AppError(`unsupported memberships param: ${memberships}`);
+    }
+  }
 
   const sqlWithoutPagination = `
     SELECT
@@ -110,6 +133,7 @@ export async function __searchProfiles(
         OR
         "Addresses".address ILIKE '%' || $searchTerm || '%'
       )
+      ${membershipsWhere}
     GROUP BY
       "Profiles".id
   `;
