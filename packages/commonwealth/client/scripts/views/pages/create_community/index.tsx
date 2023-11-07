@@ -142,7 +142,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
   }, [setEthChainNodes]);
 
   useNecessaryEffect(() => {
-    const fetchEthCommunityNames = async () => {
+    const fetchEthChainNames = async () => {
       const chains = await $.getJSON(
         'https://chainid.network/chains.json',
       );
@@ -150,17 +150,17 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       const newObject = {};
 
       for (const id of Object.keys(ethChainNodes)) {
-        const community = chains.find((c) => c.chainId === +id);
+        const chain = chains.find((c) => c.chainId === +id);
 
-        if (community) {
-          newObject[id] = community.name;
+        if (chain) {
+          newObject[id] = chain.name;
         }
       }
 
       setEthChainNodeNames(newObject);
     };
 
-    fetchEthCommunityNames();
+    fetchEthChainNames();
   }, [ethChainNodes]);
 
   const getCurrentForm = () => {
