@@ -72,7 +72,8 @@ module.exports = {
           }
         })()
         if (!source) {
-          throw new Error(`unsupported network for topic: ${JSON.stringify(topic)}`)
+          console.log(`skipped topic ${topic_id} due to unsupported network ${network}`)
+          continue
         }
         const metadata = {
           name: `${token_symbol} Holders`,
