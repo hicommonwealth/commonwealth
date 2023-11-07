@@ -389,7 +389,7 @@ const GroupForm = ({
               label="Group name"
               placeholder="Group name"
               fullWidth
-              instructionalMessage="Can be up to 40 characters long."
+              instructionalMessage="Can be up to 40 characters long"
               customError={isNameTaken ? 'Group name is already taken' : ''}
               onInput={(e) => {
                 setIsNameTaken(
@@ -402,7 +402,7 @@ const GroupForm = ({
               hookToForm
               label="Description"
               placeholder="Add a description for your group"
-              instructionalMessage="Can be up to 250 characters long."
+              instructionalMessage="Can be up to 250 characters long"
             />
           </section>
 
