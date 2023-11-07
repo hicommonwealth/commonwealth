@@ -38,21 +38,11 @@ export const conditionTypes = [
 ];
 
 // Get chain id's from the app.config.chains for all eth and cosmos chains
-const cosmosChains = app.config.chains
+export const chainTypes = app.config.nodes
   .getAll()
-  .filter((x) => x.base === 'cosmos');
-export const chainTypes = [
-  ...cosmosChains.map((chain) => ({
-    chainBase: chain.base,
-    value: 'cosmos',
+  .filter((chain) => chain.ethChainId || chain.cosmosChainId)
+  .map((chain) => ({
+    chainBase: chain.ethChainId ? 'ethereum' : 'cosmos',
+    value: chain.ethChainId || chain.cosmosChainId,
     label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
-  })),
-  ...app.config.nodes
-    .getAll()
-    .filter((ethChain) => ethChain.ethChainId)
-    .map((chain) => ({
-      chainBase: 'ethereum',
-      value: chain.ethChainId,
-      label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
-    })),
-];
+  }));
