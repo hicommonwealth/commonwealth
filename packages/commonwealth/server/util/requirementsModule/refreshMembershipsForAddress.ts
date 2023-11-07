@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
 import { Sequelize } from 'sequelize';
 import { DB } from 'server/models';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
@@ -26,7 +25,7 @@ export async function refreshMembershipsForAddress(
   // update membership for each group
   const updatedMemberships = await Promise.all(
     groups.map(async (group) => {
-      let membership = await models.Membership.findOne({
+      const membership = await models.Membership.findOne({
         where: {
           group_id: group.id,
           address_id: address.id,
@@ -50,18 +49,23 @@ export async function refreshMembershipsForAddress(
           return membership;
         }
         // membership is stale, recompute
-        return recomputeMembership(membership, address, tokenBalanceCache);
+        return recomputeMembership(
+          models,
+          membership,
+          group,
+          address,
+          tokenBalanceCache,
+        );
       }
 
       // membership does not exist, create it and recompute
-      membership = await models.Membership.create({
-        group_id: group.id,
-        address_id: address.id,
-        reject_reason: 'recompute pending',
-        last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
-      });
-      membership.group = group;
-      return recomputeMembership(membership, address, tokenBalanceCache);
+      return recomputeMembership(
+        models,
+        membership,
+        group,
+        address,
+        tokenBalanceCache,
+      );
     }),
   );
 
@@ -70,27 +74,33 @@ export async function refreshMembershipsForAddress(
 
 /**
  * recomputeMembership checks the membership against the requirements,
- * updates the membership status and returns it
+ * updates (or creates) the membership and returns it
  * @param membership The membership to recompute
+ * @param group The group of the membership
  * @param address The user address
  * @returns MembershipInstance
  */
 async function recomputeMembership(
-  membership: MembershipInstance,
+  models: DB,
+  membership: MembershipInstance | null,
+  group: GroupAttributes,
   address: AddressInstance,
   tokenBalanceCache: TokenBalanceCache,
 ): Promise<MembershipInstance> {
-  if (!membership.group) {
-    throw new ServerError('membership Group is not populated');
-  }
-  const { requirements } = membership.group;
+  const { requirements } = group;
   const { isValid, messages } = await validateGroupMembership(
     address.address,
     requirements,
     tokenBalanceCache,
   );
-  return membership.update({
+  const computedMembership = {
+    group_id: group.id,
+    address_id: address.id,
     reject_reason: isValid ? null : JSON.stringify(messages),
-    last_checked: Sequelize.literal('CURRENT_TIMESTAMP'),
-  });
+    last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
+  };
+  if (!membership) {
+    return models.Membership.create(computedMembership);
+  }
+  return membership.update(computedMembership);
 }
