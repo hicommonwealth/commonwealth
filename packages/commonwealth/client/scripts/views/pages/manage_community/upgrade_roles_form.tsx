@@ -43,7 +43,7 @@ export const UpgradeRolesForm = ({
     return fullText;
   });
 
-  const chainOrCommObj = { chain: app.activeChainId() };
+  const communityObj = { chain: app.activeChainId() };
 
   const options = useMemo(() => {
     return nonAdminNames.map((n) => ({ label: n, value: n }));
@@ -96,7 +96,7 @@ export const UpgradeRolesForm = ({
             $.post(`${app.serverUrl()}/upgradeMember`, {
               new_role: newRole,
               address: _user.Address.address,
-              ...chainOrCommObj,
+              ...communityObj,
               jwt: app.user.jwt,
             }).then((r) => {
               if (r.status === 'Success') {

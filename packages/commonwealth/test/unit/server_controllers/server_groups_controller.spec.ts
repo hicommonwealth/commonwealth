@@ -39,6 +39,18 @@ const createMockedGroupsController = () => {
       reject_reason: null,
       last_checked: new Date(),
     },
+    {
+      group_id: 1,
+      address_id: 1,
+      reject_reason: null,
+      last_checked: new Date(),
+    },
+    {
+      group_id: 1,
+      address_id: 1,
+      reject_reason: null,
+      last_checked: new Date(),
+    },
   ];
   const db: any = {
     Topic: {
@@ -76,14 +88,15 @@ const createMockedGroupsController = () => {
           update: async () => membership,
         }));
       },
-      findOrCreate: async () => {
+      findOne: async () => {
         const membership = {
           ...memberships[0],
           toJSON: () => memberships[0],
           update: async () => membership,
         };
-        return [membership, true];
+        return membership;
       },
+      count: async () => memberships.length,
       destroy: async () => {},
     },
     CommunityRole: {
@@ -111,7 +124,7 @@ const createMockedGroupsController = () => {
   const controller = new ServerGroupsController(
     db,
     tokenBalanceCache,
-    banCache
+    banCache,
   );
   return controller;
 };
@@ -148,19 +161,12 @@ describe('ServerGroupsController', () => {
     const { chain } = createMockParams();
     const result = await controller.getGroups({
       community: chain,
-      includeMembers: true,
     });
     expect(result).to.have.length(1);
     expect(result[0]).to.have.property('id');
     expect(result[0]).to.have.property('community_id');
     expect(result[0]).to.have.property('metadata');
     expect(result[0]).to.have.property('requirements');
-    expect(result[0]).to.have.property('memberships');
-    expect(result[0].memberships).to.have.length(1);
-    expect(result[0].memberships[0]).to.have.property('group_id');
-    expect(result[0].memberships[0]).to.have.property('address_id');
-    expect(result[0].memberships[0]).to.have.property('reject_reason');
-    expect(result[0].memberships[0]).to.have.property('last_checked');
   });
 
   describe('#createGroup', async () => {
@@ -197,7 +203,7 @@ describe('ServerGroupsController', () => {
         },
         requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
         topics: [],
-      })
+      }),
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 
@@ -235,7 +241,7 @@ describe('ServerGroupsController', () => {
           description: 'blah',
         },
         requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
-      })
+      }),
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 

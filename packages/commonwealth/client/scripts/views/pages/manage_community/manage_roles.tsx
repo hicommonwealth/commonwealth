@@ -26,12 +26,12 @@ export const ManageRoles = ({
 }: ManageRoleRowProps) => {
   const navigate = useCommonNavigate();
 
-  const chainOrCommObj = { chain: app.activeChainId() };
+  const communityObj = { chain: app.activeChainId() };
 
   const removeRole = async (role: RoleInfo) => {
     try {
       const res = await axios.post(`${app.serverUrl()}/upgradeMember`, {
-        ...chainOrCommObj,
+        ...communityObj,
         new_role: 'member',
         address: role.Address.address,
         jwt: app.user.jwt,

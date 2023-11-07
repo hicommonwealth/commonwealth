@@ -1,10 +1,10 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
-import { AppError } from '../../../../common-common/src/errors';
 import z from 'zod';
+import { AppError } from '../../../../common-common/src/errors';
+import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
 import { GroupMetadata } from '../../models/group';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type CreateGroupBody = {
   metadata: GroupMetadata;
@@ -16,7 +16,7 @@ type CreateGroupResponse = CreateGroupResult;
 export const createGroupHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateGroupBody>,
-  res: TypedResponse<CreateGroupResponse>
+  res: TypedResponse<CreateGroupResponse>,
 ) => {
   const { user, address, chain: community } = req;
 
@@ -47,5 +47,11 @@ export const createGroupHandler = async (
     requirements,
     topics,
   });
+
+  // refresh memberships in background
+  controllers.groups
+    .refreshCommunityMemberships({ community })
+    .catch(console.error);
+
   return success(res, result);
 };

@@ -144,11 +144,11 @@ export const NewSnapshotProposalForm = ({
         const currentPath = window.location.pathname;
         if (currentPath.includes('/discussion/')) {
           const domain = window.location.origin;
-          const chainId = app.activeChainId();
+          const communityId = app.activeChainId();
           const threadId = thread.id;
 
           const linkText = `\n\nThis conversation was started on Commonwealth. Any attached images have been removed. See more discussion: `;
-          const linkUrl = `\n${domain}/${chainId}/discussion/${threadId}`;
+          const linkUrl = `\n${domain}/${communityId}/discussion/${threadId}`;
 
           const linkMarkdown = `${linkText}[here](${linkUrl})`;
 

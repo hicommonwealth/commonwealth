@@ -9,7 +9,7 @@ import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
-import { ServerCommunitiesController } from '../server_communities_controller';
+import { ServerGroupsController } from '../server_groups_controller';
 
 const MAX_GROUPS_PER_COMMUNITY = 20;
 
@@ -33,7 +33,7 @@ export type CreateGroupOptions = {
 export type CreateGroupResult = GroupAttributes;
 
 export async function __createGroup(
-  this: ServerCommunitiesController,
+  this: ServerGroupsController,
   { user, community, metadata, requirements, topics }: CreateGroupOptions,
 ): Promise<CreateGroupResult> {
   const isAdmin = await validateOwner({

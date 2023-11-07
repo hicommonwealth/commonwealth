@@ -42,7 +42,7 @@ export const ChainEventNotificationRow = (
     data: notification.chainEvent.data,
   };
 
-  const chainName = app.config.chains.getById(chainId)?.name;
+  const communityName = app.config.chains.getById(chainId)?.name;
 
   let label: IEventLabel | undefined;
   try {
@@ -98,7 +98,7 @@ export const ChainEventNotificationRow = (
     >
       <div className="comment-body">
         <div className="comment-body-top chain-event-notification-top">
-          {label.heading} on {chainName}
+          {label.heading} on {communityName}
           {!onListPage && (
             <CWIconButton
               iconName="close"

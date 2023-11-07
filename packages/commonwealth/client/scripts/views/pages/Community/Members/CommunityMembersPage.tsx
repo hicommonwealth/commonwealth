@@ -3,7 +3,11 @@ import { featureFlags } from 'helpers/feature-flags';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
-import { useFetchGroupsQuery } from 'state/api/groups';
+import { ApiEndpoints, queryClient } from 'state/api/config';
+import {
+  useFetchGroupsQuery,
+  useRefreshMembershipQuery,
+} from 'state/api/groups';
 import { useSearchProfilesQuery } from 'state/api/profiles';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import { useDebounce } from 'usehooks-ts';
@@ -43,6 +47,11 @@ const CommunityMembersPage = () => {
     category: GROUP_AND_MEMBER_FILTERS[0],
   });
 
+  const { data: memberships = null } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+  });
+
   const debouncedSearchTerm = useDebounce<string>(
     searchFilters.searchText,
     500,
@@ -59,12 +68,14 @@ const CommunityMembersPage = () => {
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
 
   const { data: groups } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
     includeMembers: true,
     includeTopics: true,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
 
   const formattedMembers = useMemo(() => {
@@ -92,7 +103,9 @@ const CommunityMembersPage = () => {
         groups: (groups || [])
           .filter((g) =>
             (g.members || []).find(
-              (x) => x?.address?.address === p.addresses?.[0]?.address,
+              (x) =>
+                x?.address?.address === p.addresses?.[0]?.address &&
+                !x.reject_reason,
             ),
           )
           .sort((a, b) => a.name.localeCompare(b.name))
@@ -135,10 +148,14 @@ const CommunityMembersPage = () => {
           ? true
           : searchFilters.category === 'In group'
           ? (group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address,
+              (x) =>
+                x?.address?.address === app.user.activeAccount.address &&
+                !x.reject_reason,
             )
           : !(group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address,
+              (x) =>
+                x?.address?.address === app.user.activeAccount.address &&
+                !x.reject_reason,
             ),
       );
 
@@ -163,6 +180,10 @@ const CommunityMembersPage = () => {
   };
 
   useEffect(() => {
+    // Invalidate group memberships cache
+    queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
+    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
+
     // Set the active tab based on URL
     const params = new URLSearchParams(window.location.search.toLowerCase());
     const activeTab = params.get('tab')?.toLowerCase();
