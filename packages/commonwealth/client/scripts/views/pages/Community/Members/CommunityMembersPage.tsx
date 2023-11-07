@@ -1,5 +1,6 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { featureFlags } from 'helpers/feature-flags';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
@@ -22,6 +23,7 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { MixpanelPageViewEvent } from '../../../../../../shared/analytics/types';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
@@ -201,6 +203,10 @@ const CommunityMembersPage = () => {
   };
 
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.MEMBERS_PAGE_VIEW },
+  });
 
   return (
     <section className="CommunityMembersPage">
