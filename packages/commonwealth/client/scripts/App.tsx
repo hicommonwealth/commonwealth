@@ -2,7 +2,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import useInitApp from 'hooks/useInitApp';
 import router from 'navigation/Router';
-import React, { StrictMode } from 'react';
+import React, { StrictMode, useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
@@ -19,6 +19,17 @@ const Splash = () => {
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();
+
+  useEffect(() => {
+    const hex = localStorage.getItem('customization-bg-color');
+
+    if (hex) {
+      document.documentElement.style.setProperty(
+        '--customization-bg-color',
+        hex,
+      );
+    }
+  }, []);
 
   return (
     <StrictMode>

@@ -163,7 +163,7 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
 
 const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   (acc, el) => ({ ...acc, [el]: true }),
-  {} as { [K in BannerType]: boolean }
+  {} as { [K in BannerType]: boolean },
 );
 
 const rowData = makeData(25);
@@ -209,7 +209,7 @@ const chainValidationSchema = z.object({
       z.object({
         value: z.string().nonempty({ message: 'Invalid value' }),
         label: z.string().nonempty({ message: 'Invalid value' }),
-      })
+      }),
     )
     .min(1, { message: 'At least 1 chain is required' })
     .nonempty({ message: 'Chains are required' }),
@@ -238,17 +238,17 @@ export const ComponentShowcase = () => {
     useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
-    radioGroupOptions[2].value
+    radioGroupOptions[2].value,
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalSize, setModalSize] = useState<ModalSize>('small');
   useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on'
+    localStorage.getItem('dark-mode-state') === 'on',
   );
 
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
@@ -257,6 +257,19 @@ export const ComponentShowcase = () => {
   const [chainId, setChainId] = useState(allChains[1]);
   const [currentTab, setCurrentTab] = useState(tagsList[0].id);
 
+  const [backgroundColor, setBackgroundColor] = useState(
+    localStorage.getItem('customization-bg-color') || '',
+  );
+
+  const handleChangeBackgroundColor = (e) => {
+    const hexColor = e.target.value;
+    setBackgroundColor(hexColor);
+    localStorage.setItem('customization-bg-color', hexColor);
+    document.documentElement.style.setProperty(
+      '--customization-bg-color',
+      hexColor,
+    );
+  };
   const renderModal = (size?: ModalSize) => {
     return (
       <CWModal
@@ -286,6 +299,17 @@ export const ComponentShowcase = () => {
 
   return (
     <div className="ComponentShowcase">
+      <div>
+        <CWText type="h3">Customization</CWText>
+        <div>
+          <CWText type="h5">Background color</CWText>
+          <input
+            type="color"
+            value={backgroundColor}
+            onChange={handleChangeBackgroundColor}
+          />
+        </div>
+      </div>
       <AvatarUpload scope="community" />
       <AvatarUpload size="large" scope="community" />
       <CWText type="h3">Modals</CWText>
@@ -380,7 +404,7 @@ export const ComponentShowcase = () => {
               checkboxGroupSelected.push(itemValue);
             } else {
               setCheckboxGroupSelected(
-                checkboxGroupSelected.filter((item) => item !== itemValue)
+                checkboxGroupSelected.filter((item) => item !== itemValue),
               );
             }
           }}
