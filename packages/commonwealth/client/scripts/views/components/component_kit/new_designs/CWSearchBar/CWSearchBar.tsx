@@ -30,7 +30,11 @@ let resetTimer = null;
 
 const goToSearchPage = (
   query: SearchQuery,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string,
+  ) => void,
 ) => {
   if (!query.searchTerm || !query.searchTerm.toString().trim()) {
     notifyError('Enter a valid search term');
@@ -44,7 +48,7 @@ const goToSearchPage = (
 
 export const CWSearchBar: FC<SearchBarProps> = ({
   disabled,
-  placeholder = 'Search Common'
+  placeholder = 'Search Common',
 }) => {
   const navigate = useCommonNavigate();
   const [showTag, setShowTag] = useState(true);
@@ -55,7 +59,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
     'threads',
     'replies',
     communityId === 'all_communities' ? 'communities' : null,
-    'members'
+    'members',
   ]);
 
   const resetSearchBar = () => setSearchTerm('');
@@ -91,7 +95,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   const handleGoToSearchPage = () => {
     const searchQuery = new SearchQuery(searchTerm, {
       isSearchPreview: false,
-      chainScope: showTag ? communityId : 'all_communities'
+      chainScope: showTag ? communityId : 'all_communities',
     });
     goToSearchPage(searchQuery, navigate);
     resetSearchBar();
@@ -105,9 +109,9 @@ export const CWSearchBar: FC<SearchBarProps> = ({
       <div
         className={getClasses<InputStyleProps>(
           {
-            disabled
+            disabled,
           },
-          ComponentType.Searchbar
+          ComponentType.Searchbar,
         )}
       >
         <MagnifyingGlass
@@ -127,7 +131,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
         <div
           className={getClasses(
             { inputElement: true },
-            ComponentType.Searchbar
+            ComponentType.Searchbar,
           )}
         >
           <input
