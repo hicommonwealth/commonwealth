@@ -47,8 +47,8 @@ const ethAndCosmosChains = app.config.chains
       ? true
       : false,
   );
-export const chainTypes = ethAndCosmosChains.map((x) => ({
-  chainBase: x.base,
-  value: x.base === 'cosmos' ? 'cosmos' : x?.ChainNode?.ethChainId,
-  label: x.name.replace(/\b\w/g, (l) => l.toUpperCase()),
+export const chainTypes = ethAndCosmosChains.map((chain) => ({
+  chainBase: chain.base,
+  value: chain.base === 'cosmos' ? 'cosmos' : chain?.ChainNode?.ethChainId,
+  label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
 }));
