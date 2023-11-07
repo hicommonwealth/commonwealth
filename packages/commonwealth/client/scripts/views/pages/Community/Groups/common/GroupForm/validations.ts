@@ -26,7 +26,7 @@ export const requirementSubFormValidationSchema = z.object({
       (value) => {
         return !isNaN(Number(value));
       },
-      { message: VALIDATION_MESSAGES.INVALID_VALUE }
+      { message: VALIDATION_MESSAGES.INVALID_VALUE },
     ),
 });
 
@@ -43,17 +43,19 @@ export const groupValidationSchema = z.object({
   requirementsToFulfill: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-  topics: z
-    .array(
-      z.object({
-        value: z.any().default(-1),
-        label: z.string().nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-      }),
-      {
-        invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-        required_error: VALIDATION_MESSAGES.NO_INPUT,
-      }
-    )
-    .min(1, { message: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+  topics: z.union([
+    z
+      .array(
+        z.object({
+          value: z.any().default(-1).optional(),
+          label: z.string().default('').optional(),
+        }),
+        {
+          invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
+          required_error: VALIDATION_MESSAGES.NO_INPUT,
+        },
+      )
+      .optional(),
+    z.literal('').transform(() => []),
+  ]),
 });
