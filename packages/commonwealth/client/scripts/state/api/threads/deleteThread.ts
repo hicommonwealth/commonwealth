@@ -26,8 +26,8 @@ const deleteThread = async ({
 
   return await axios.delete(`${app.serverUrl()}/threads/${threadId}`, {
     data: {
-      author_chain: chainId,
-      chain: chainId,
+      author_community_id: chainId,
+      community_id: chainId,
       address: address,
       jwt: app.user.jwt,
       canvas_action: action,
@@ -59,7 +59,7 @@ const useDeleteThreadMutation = ({
             currentStage === ThreadStage.Voting
               ? totalThreadsInCommunityForVoting - 1
               : totalThreadsInCommunityForVoting,
-        })
+        }),
       );
       removeThreadFromAllCaches(chainId, threadId);
       return response.data;

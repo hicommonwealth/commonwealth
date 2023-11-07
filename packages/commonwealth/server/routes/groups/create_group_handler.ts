@@ -16,7 +16,7 @@ type CreateGroupResponse = CreateGroupResult;
 export const createGroupHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateGroupBody>,
-  res: TypedResponse<CreateGroupResponse>
+  res: TypedResponse<CreateGroupResponse>,
 ) => {
   const { user, address, chain: community } = req;
 

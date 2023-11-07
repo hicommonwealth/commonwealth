@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
 import type * as solanaWeb3 from '@solana/web3.js';
 import $ from 'jquery';
+import React, { useState } from 'react';
 
 import 'pages/create_community.scss';
 
-import app from 'state';
-import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
+import app, { initAppState } from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
@@ -18,10 +18,9 @@ import {
   defaultChainRows,
   updateAdminOnCreateCommunity,
 } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
   useChainFormDefaultFields,
+  useChainFormIdFields,
   useChainFormState,
 } from './hooks';
 
@@ -75,7 +74,7 @@ export const SplTokenForm = () => {
     } catch (err) {
       chainFormState.setStatus('failure');
       chainFormState.setMessage(
-        `Error: ${err.message}` || 'Failed to load token'
+        `Error: ${err.message}` || 'Failed to load token',
       );
     }
 
@@ -171,17 +170,17 @@ export const SplTokenForm = () => {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
             await initAppState(false);
             await updateAdminOnCreateCommunity(id);
 
-            navigate(`/${res.result.chain?.id}`);
+            navigate(`/${res.result.community?.id}`);
           } catch (err) {
             notifyError(
-              err.responseJSON?.error || 'Creating new SPL community failed'
+              err.responseJSON?.error || 'Creating new SPL community failed',
             );
           } finally {
             chainFormState.setSaving(false);

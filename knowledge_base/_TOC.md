@@ -46,16 +46,6 @@
 - [Template Parser](examples/Template-Parser.md)
 - [Contract Components Kit](Contract-Components-Kit.md)
 
-## Chain Events
-
-- [Overview](Chain-Events-Overview.md)
-- [Environment Variables](Chain-Events-Environment-Variables.md)
-- [Chain Events Service](Chain-Events-Service.md)
-- [Common Scenarios](Chain-Events-Service-Common-Scenarios.md)
-- [Testing](Chain-Events-Testing.md)
-- [FAQ](Chain-Events-Service-FAQ.md)
-- [Common Errors](Chain-Events-Service-Common-Errors.md)
-
 ## Chain Testing
 
 - [EVM Overview and Docs](Chain-Testing-Overview.md)

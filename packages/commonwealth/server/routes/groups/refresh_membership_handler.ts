@@ -12,7 +12,7 @@ type RefreshMembershipResponse = RefreshMembershipResult;
 export const refreshMembershipHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<RefreshMembershipBody>,
-  res: TypedResponse<RefreshMembershipResponse>
+  res: TypedResponse<RefreshMembershipResponse>,
 ) => {
   const { user, address, chain: community } = req;
 

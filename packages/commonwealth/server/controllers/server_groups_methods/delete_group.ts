@@ -5,7 +5,7 @@ import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
-import { ServerGroupsController } from '../server_groups_controller';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 const Errors = {
   Unauthorized: 'Unauthorized',
@@ -22,13 +22,13 @@ export type DeleteGroupOptions = {
 export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
-  this: ServerGroupsController,
-  { user, community, groupId }: DeleteGroupOptions
+  this: ServerCommunitiesController,
+  { user, community, groupId }: DeleteGroupOptions,
 ): Promise<DeleteGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: community.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -40,7 +40,7 @@ export async function __deleteGroup(
   const group = await this.models.Group.findOne({
     where: {
       id: groupId,
-      chain_id: community.id,
+      community_id: community.id,
     },
   });
   if (!group) {
@@ -54,7 +54,7 @@ export async function __deleteGroup(
         group_ids: sequelize.fn(
           'array_remove',
           sequelize.col('group_ids'),
-          group.id
+          group.id,
         ),
       },
       {
@@ -64,13 +64,14 @@ export async function __deleteGroup(
           },
         },
         transaction,
-      }
+      },
     );
     // delete all memberships of group
     await this.models.Membership.destroy({
       where: {
         group_id: group.id,
       },
+      transaction,
     });
     // delete group
     await this.models.Group.destroy({

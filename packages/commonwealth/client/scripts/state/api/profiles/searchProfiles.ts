@@ -57,7 +57,7 @@ const searchProfiles = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: chainId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -65,7 +65,7 @@ const searchProfiles = async ({
         order_direction: orderDirection,
         include_roles: includeRoles,
       },
-    }
+    },
   );
   return result;
 };
@@ -110,7 +110,7 @@ const useSearchProfilesQuery = ({
       },
       staleTime: SEARCH_PROFILES_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

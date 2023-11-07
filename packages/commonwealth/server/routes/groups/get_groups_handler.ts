@@ -12,7 +12,7 @@ type GetGroupsResponse = GetGroupsResult;
 export const getGroupsHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<GetGroupsQueryQuery>,
-  res: TypedResponse<GetGroupsResponse>
+  res: TypedResponse<GetGroupsResponse>,
 ) => {
   const schema = z.object({
     query: z.object({

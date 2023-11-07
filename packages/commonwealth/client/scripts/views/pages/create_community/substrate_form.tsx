@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
 import $ from 'jquery';
+import React, { useState } from 'react';
 
 import 'pages/create_community.scss';
 
-import app from 'state';
-import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { slugify } from 'utils';
 import { InputRow } from 'views/components/metadata_rows';
@@ -16,10 +16,9 @@ import {
   defaultChainRows,
   updateAdminOnCreateCommunity,
 } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
   useChainFormDefaultFields,
+  useChainFormIdFields,
   useChainFormState,
   useEthChainFormFields,
 } from './hooks';
@@ -104,7 +103,7 @@ export const SubstrateForm = () => {
           // create new API
           const provider = new polkadot.WsProvider(
             constructSubstrateUrl(ethChainFormFields.nodeUrl),
-            false
+            false,
           );
           try {
             await provider.connect();
@@ -152,15 +151,15 @@ export const SubstrateForm = () => {
                 await linkExistingAddressToChainOrCommunity(
                   res.result.admin_address,
                   res.result.role.chain_id,
-                  res.result.role.chain_id
+                  res.result.role.chain_id,
                 );
               }
               await updateAdminOnCreateCommunity(slugify(name));
-              navigate(`/${res.result.chain.id}`);
+              navigate(`/${res.result.community.id}`);
             })
             .catch((err: any) => {
               notifyError(
-                err.responseJSON?.error || 'Creating new community failed'
+                err.responseJSON?.error || 'Creating new community failed',
               );
             })
             .always(() => {

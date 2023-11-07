@@ -1,7 +1,6 @@
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { ThreadAttributes } from '../../models/thread';
-import { AppError } from '../../../../common-common/src/errors';
 
 export const Errors = {
   InvalidThreadID: 'Invalid thread ID',
@@ -35,7 +34,7 @@ export const updateThreadHandler = async (
   req: TypedRequest<UpdateThreadRequestBody, null, { id: string }>,
   res: TypedResponse<UpdateThreadResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const { id } = req.params;
   const {
     title,
@@ -63,7 +62,7 @@ export const updateThreadHandler = async (
     await controllers.threads.updateThread({
       user,
       address,
-      chain,
+      community,
       threadId,
       title,
       body,

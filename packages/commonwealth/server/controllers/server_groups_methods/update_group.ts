@@ -46,7 +46,7 @@ export async function __updateGroup(
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: community.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -90,7 +90,7 @@ export async function __updateGroup(
   const group = await this.models.Group.findOne({
     where: {
       id: groupId,
-      chain_id: community.id,
+      community_id: community.id,
     },
   });
   if (!group) {

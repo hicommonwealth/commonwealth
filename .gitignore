@@ -1,5 +1,3 @@
-.postgres
-.rabbitmq
 docker-compose.yaml
 stellar
 node_modules/
@@ -11,3 +9,5 @@ node_modules/
 */build/
 .idea
 .vscode
+*.postgres
+*.rabbitmq

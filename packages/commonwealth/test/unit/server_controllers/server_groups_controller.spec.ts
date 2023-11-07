@@ -1,39 +1,19 @@
 import { expect } from 'chai';
 import { ServerGroupsController } from 'server/controllers/server_groups_controller';
 import { AddressInstance } from 'server/models/address';
-import { CommunityInstance } from 'server/models/community';
 import { GroupAttributes } from 'server/models/group';
 import { MembershipAttributes } from 'server/models/membership';
 import { TopicAttributes } from 'server/models/topic';
 import { UserInstance } from 'server/models/user';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+import { CommunityInstance } from '../../../server/models/community';
 
-const VALID_REQUIREMENTS: Requirement[] = [
-  {
-    rule: 'threshold',
-    data: {
-      threshold: '1000',
-      source: {
-        source_type: 'erc20',
-        evm_chain_id: 1,
-        contract_address: '0x0000000000000000000000000000000000000000',
-      },
-    },
-  },
-  {
-    rule: 'allow',
-    data: {
-      allow: ['0x0000000000000000000000000000000000000000'],
-    },
-  },
-];
 const INVALID_REQUIREMENTS_NOT_ARRAY = 'no an array' as unknown as [];
 
 const createMockedGroupsController = () => {
   const groups: GroupAttributes[] = [
     {
       id: 1,
-      chain_id: 'ethereum',
+      community_id: 'ethereum',
       metadata: {
         name: 'hello',
         description: '123',
@@ -123,7 +103,7 @@ const createMockedGroupsController = () => {
       findAll: async () => [
         {
           toJSON: () => ({
-            chain_id: 'ethereum',
+            community_id: 'ethereum',
             name: 'member',
             allow: '0',
             deny: '0',
@@ -144,7 +124,7 @@ const createMockedGroupsController = () => {
   const controller = new ServerGroupsController(
     db,
     tokenBalanceCache,
-    banCache
+    banCache,
   );
   return controller;
 };
@@ -184,7 +164,7 @@ describe('ServerGroupsController', () => {
     });
     expect(result).to.have.length(1);
     expect(result[0]).to.have.property('id');
-    expect(result[0]).to.have.property('chain_id');
+    expect(result[0]).to.have.property('community_id');
     expect(result[0]).to.have.property('metadata');
     expect(result[0]).to.have.property('requirements');
   });
@@ -204,7 +184,7 @@ describe('ServerGroupsController', () => {
       topics: [],
     });
     expect(result).to.have.property('id');
-    expect(result).to.have.property('chain_id');
+    expect(result).to.have.property('community_id');
     expect(result).to.have.property('metadata');
     expect(result).to.have.property('requirements');
   });
@@ -223,7 +203,7 @@ describe('ServerGroupsController', () => {
         },
         requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
         topics: [],
-      })
+      }),
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 
@@ -242,7 +222,7 @@ describe('ServerGroupsController', () => {
       requirements: [],
     });
     expect(result).to.have.property('id');
-    expect(result).to.have.property('chain_id');
+    expect(result).to.have.property('community_id');
     expect(result).to.have.property('metadata');
     expect(result).to.have.property('requirements');
   });
@@ -261,7 +241,7 @@ describe('ServerGroupsController', () => {
           description: 'blah',
         },
         requirements: INVALID_REQUIREMENTS_NOT_ARRAY,
-      })
+      }),
     ).to.eventually.be.rejectedWith('Invalid requirements');
   });
 

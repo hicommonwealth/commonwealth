@@ -19,11 +19,11 @@ export type GetGroupsResult = GroupWithExtras[];
 
 export async function __getGroups(
   this: ServerGroupsController,
-  { community, includeTopics }: GetGroupsOptions
+  { community, includeTopics }: GetGroupsOptions,
 ): Promise<GetGroupsResult> {
   const groups = await this.models.Group.findAll({
     where: {
-      chain_id: community.id,
+      community_id: community.id,
     },
   });
 

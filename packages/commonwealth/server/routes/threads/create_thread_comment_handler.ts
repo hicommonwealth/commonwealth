@@ -34,7 +34,7 @@ export const createThreadCommentHandler = async (
   req: TypedRequest<CreateThreadCommentRequestBody, null, { id: string }>,
   res: TypedResponse<CreateThreadCommentResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const { id: threadId } = req.params;
   const {
     parent_id: parentId,
@@ -57,7 +57,7 @@ export const createThreadCommentHandler = async (
       thread_id: parseInt(threadId, 10),
       text,
       address: address.address,
-      chain: chain.id,
+      chain: community.id,
       parent_comment_id: parentId,
     });
   }
@@ -66,7 +66,7 @@ export const createThreadCommentHandler = async (
     await controllers.threads.createThreadComment({
       user,
       address,
-      chain,
+      community,
       parentId,
       threadId: parseInt(threadId, 10),
       text,
