@@ -42,6 +42,8 @@ services:
       - 6379:6379
     volumes:
       - ./redis-data:/data
+    networks:
+      - cw-network
 
 networks:
   cw-network:
