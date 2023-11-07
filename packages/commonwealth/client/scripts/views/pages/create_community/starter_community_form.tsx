@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
 import $ from 'jquery';
+import React, { useState } from 'react';
 
-import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { initAppState } from 'state';
 
 import 'pages/create_community.scss';
 
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
@@ -16,13 +17,12 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import {
   defaultCommunityRows,
-  updateAdminOnCreateCommunity,
+  updateAdminOnCreateCommunity
 } from './community_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
   useCommunityFormDefaultFields,
   useCommunityFormIdFields,
-  useCommunityFormState,
+  useCommunityFormState
 } from './hooks';
 
 export const StarterCommunityForm = () => {
@@ -61,7 +61,7 @@ export const StarterCommunityForm = () => {
         options={[
           { label: 'cosmos', value: 'cosmos' },
           { label: 'ethereum', value: 'ethereum' },
-          { label: 'near', value: 'near' },
+          { label: 'near', value: 'near' }
         ]}
         initialValue={{ label: 'ethereum', value: 'ethereum' }}
         onSelect={(o) => {
@@ -136,7 +136,7 @@ export const StarterCommunityForm = () => {
               github: communityFormDefaultFields.github,
               telegram: communityFormDefaultFields.telegram,
               website: communityFormDefaultFields.website,
-              ...additionalArgs,
+              ...additionalArgs
             });
 
             if (res.result.admin_address) {
@@ -150,7 +150,7 @@ export const StarterCommunityForm = () => {
             await initAppState(false);
             await updateAdminOnCreateCommunity(id);
 
-            navigate(`/${res.result.chain?.id}`);
+            navigate(`/${res.result.community?.id}`);
           } catch (err) {
             console.log(err);
 

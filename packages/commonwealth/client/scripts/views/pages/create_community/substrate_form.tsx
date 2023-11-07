@@ -1,27 +1,26 @@
-import React, { useState } from 'react';
 import $ from 'jquery';
+import React, { useState } from 'react';
 
 import 'pages/create_community.scss';
 
-import app from 'state';
-import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { slugify } from 'utils';
 import { InputRow } from 'views/components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import {
   defaultCommunityRows,
-  updateAdminOnCreateCommunity,
+  updateAdminOnCreateCommunity
 } from './community_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCommunityFormIdFields,
   useCommunityFormDefaultFields,
+  useCommunityFormIdFields,
   useCommunityFormState,
-  useEthCommunityFormFields,
+  useEthCommunityFormFields
 } from './hooks';
 
 const defaultSubstrateSpec = `{"types": {"Address": "MultiAddress", "ChainId": "u8",
@@ -111,7 +110,7 @@ export const SubstrateForm = () => {
             const api = await polkadot.ApiPromise.create({
               throwOnConnect: true,
               provider,
-              ...JSON.parse(substrateSpec),
+              ...JSON.parse(substrateSpec)
             });
             await api.disconnect();
             notifySuccess('Test has passed');
@@ -144,7 +143,7 @@ export const SubstrateForm = () => {
             node_url: ethCommunityFormFields.nodeUrl,
             substrate_spec: substrateSpec,
             type: ChainType.Chain,
-            default_symbol: symbol,
+            default_symbol: symbol
             // ...form, <-- not typed so I don't know what's needed
           })
             .then(async (res) => {
@@ -156,7 +155,7 @@ export const SubstrateForm = () => {
                 );
               }
               await updateAdminOnCreateCommunity(slugify(name));
-              navigate(`/${res.result.chain.id}`);
+              navigate(`/${res.result.community.id}`);
             })
             .catch((err: any) => {
               notifyError(

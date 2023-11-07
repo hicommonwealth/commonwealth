@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
 import type * as solanaWeb3 from '@solana/web3.js';
 import $ from 'jquery';
+import React, { useState } from 'react';
 
 import 'pages/create_community.scss';
 
-import app from 'state';
-import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
+import app, { initAppState } from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
@@ -16,13 +16,12 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import {
   defaultCommunityRows,
-  updateAdminOnCreateCommunity,
+  updateAdminOnCreateCommunity
 } from './community_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useCommunityFormIdFields,
   useCommunityFormDefaultFields,
-  useCommunityFormState,
+  useCommunityFormIdFields,
+  useCommunityFormState
 } from './hooks';
 
 export const SplTokenForm = () => {
@@ -89,7 +88,7 @@ export const SplTokenForm = () => {
         options={[
           { label: 'mainnet-beta', value: 'mainnet-beta' },
           { label: 'testnet', value: 'testnet' },
-          { label: 'devnet', value: 'devnet' },
+          { label: 'devnet', value: 'devnet' }
         ]}
         onSelect={(o) => {
           setCluster(o.value as solanaWeb3.Cluster);
@@ -163,7 +162,7 @@ export const SplTokenForm = () => {
               network: ChainNetwork.SPL,
               node_url: cluster,
               type: ChainType.Token,
-              default_symbol: symbol,
+              default_symbol: symbol
               // ...form, <-- not typed so I don't know what's needed
             });
 

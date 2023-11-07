@@ -27,11 +27,11 @@ const refreshMembership = async ({
     `${app.serverUrl()}/refresh-membership`,
     {
       jwt: app.user.jwt,
-      chain: chainId,
-      author_chain: chainId,
+      community_id: chainId,
+      author_community_id: chainId,
       address,
       ...(topicId && { topic_id: topicId }),
-    }
+    },
   );
 
   return response?.data?.result?.map((r) => ({

@@ -21,11 +21,11 @@ const fetchGroups = async ({
     `${app.serverUrl()}${ApiEndpoints.FETCH_GROUPS}`,
     {
       params: {
-        chain_id: chainId,
+        community_id: chainId,
         include_members: includeMembers,
         include_topics: includeTopics,
       },
-    }
+    },
   );
 
   return response.data.result.map((t) => new Group(t));
@@ -37,7 +37,12 @@ const useFetchGroupsQuery = ({
   includeTopics,
 }: FetchGroupsProps) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_GROUPS, chainId, includeMembers, includeTopics],
+    queryKey: [
+      ApiEndpoints.FETCH_GROUPS,
+      chainId,
+      includeMembers,
+      includeTopics,
+    ],
     queryFn: () => fetchGroups({ chainId, includeMembers, includeTopics }),
     staleTime: GROUPS_STALE_TIME,
   });

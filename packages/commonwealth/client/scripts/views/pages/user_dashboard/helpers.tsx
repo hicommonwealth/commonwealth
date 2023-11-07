@@ -84,6 +84,16 @@ export const fetchActivity = async (requestType: DashboardViews) => {
   } else if (requestType === DashboardViews.Global) {
     activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);
   }
+
+  if (activity.result) {
+    const uniqueActivity: number[] = [];
+    activity.result = activity?.result?.filter(
+      (x) =>
+        !uniqueActivity.includes(x?.thread_id) &&
+        uniqueActivity.push(x?.thread_id),
+    );
+  }
+
   return activity;
 };
 

@@ -18,19 +18,19 @@ import { CWValidationText } from '../../components/component_kit/cw_validation_t
 import {
   EthCommunityRows,
   defaultCommunityRows,
-  updateAdminOnCreateCommunity,
+  updateAdminOnCreateCommunity
 } from './community_input_rows';
 import {
   useCommunityFormDefaultFields,
   useCommunityFormIdFields,
   useCommunityFormState,
-  useEthCommunityFormFields,
+  useEthCommunityFormFields
 } from './hooks';
 import type { EthCommunityFormState } from './types';
 
 export const PolygonForm = ({
   ethCommunityNames,
-  ethCommunities,
+  ethCommunities
 }: EthCommunityFormState) => {
   const [, setDecimals] = useState(18);
 
@@ -65,7 +65,7 @@ export const PolygonForm = ({
     const args = {
       address: ethChainFormFields.address,
       chain_id: ethChainFormFields.ethCommunityId,
-      url: ethChainFormFields.nodeUrl,
+      url: ethChainFormFields.nodeUrl
     };
 
     try {
@@ -83,12 +83,12 @@ export const PolygonForm = ({
 
           if (communityFormDefaultFields.iconUrl.startsWith('/')) {
             communityFormDefaultFields.setIconUrl(
-              `https://commonwealth.im${communityFormDefaultFields.iconUrl}`,
+              `https://commonwealth.im${communityFormDefaultFields.iconUrl}`
             );
           }
 
           communityFormDefaultFields.setDescription(
-            res.token.description || '',
+            res.token.description || ''
           );
           communityFormDefaultFields.setWebsite(res.token.website || '');
           communityFormDefaultFields.setDiscord(res.token.discord || '');
@@ -112,7 +112,7 @@ export const PolygonForm = ({
 
             const contract = IERC20Metadata__factory.connect(
               args.address,
-              ethersProvider,
+              ethersProvider
             );
 
             const contractName = await contract.name();
@@ -131,7 +131,7 @@ export const PolygonForm = ({
             setSymbol('');
             communityFormState.setStatus('failure');
             communityFormState.setMessage(
-              'Verified token but could not load metadata.',
+              'Verified token but could not load metadata.'
             );
           }
 
@@ -150,13 +150,13 @@ export const PolygonForm = ({
       } else {
         communityFormState.setStatus('failure');
         communityFormState.setMessage(
-          res.message || 'Failed to load Token Information',
+          res.message || 'Failed to load Token Information'
         );
       }
     } catch (err) {
       communityFormState.setStatus('failure');
       communityFormState.setMessage(
-        err.responseJSON?.error || 'Failed to load Token Information',
+        err.responseJSON?.error || 'Failed to load Token Information'
       );
     }
     communityFormState.setLoading(false);
@@ -166,7 +166,7 @@ export const PolygonForm = ({
     <div className="CreateCommunityForm">
       {EthCommunityRows(
         { ethCommunityNames, ethCommunities, disabled: true },
-        { ...ethChainFormFields, ...communityFormState },
+        { ...ethChainFormFields, ...communityFormState }
       )}
       <CWButton
         label="Populate fields"
@@ -229,7 +229,7 @@ export const PolygonForm = ({
               network: ChainNetwork.ERC20,
               node_url: ethChainFormFields.nodeUrl,
               type: validAddress ? ChainType.Token : ChainType.Offchain,
-              default_symbol: symbol,
+              default_symbol: symbol
               // ...form, <-- not typed so I don't know what's needed
             });
 
@@ -237,7 +237,7 @@ export const PolygonForm = ({
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id,
+                res.result.role.chain_id
               );
             }
 
@@ -247,7 +247,7 @@ export const PolygonForm = ({
             navigate(`/${res.result.community?.id}`);
           } catch (err) {
             notifyError(
-              err.responseJSON?.error || 'Creating new ERC20 community failed',
+              err.responseJSON?.error || 'Creating new ERC20 community failed'
             );
           } finally {
             communityFormState.setSaving(false);
