@@ -16,7 +16,6 @@ const unleashConfig = {
   appName: 'commonwealth-web',
 };
 
-
 const App = () => {
   const { customDomain, isLoading } = useInitApp();
 
