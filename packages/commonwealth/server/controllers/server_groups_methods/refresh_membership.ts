@@ -1,16 +1,10 @@
 import { flatten, uniq } from 'lodash';
-import moment from 'moment';
-import { Op, Sequelize } from 'sequelize';
-import { ServerError } from '../../../../common-common/src/errors';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
+import { Op } from 'sequelize';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
-import { MembershipInstance } from '../../models/membership';
 import { UserInstance } from '../../models/user';
-import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
-import { ServerCommunitiesController } from '../server_communities_controller';
-
-const MEMBERSHIP_TTL_SECONDS = 60 * 2;
+import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
+import { ServerGroupsController } from '../server_groups_controller';
 
 export type RefreshMembershipOptions = {
   user: UserInstance;
@@ -25,7 +19,7 @@ export type RefreshMembershipResult = {
 }[];
 
 export async function __refreshMembership(
-  this: ServerCommunitiesController,
+  this: ServerGroupsController,
   { community, address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
   // get all groups across the community topics
@@ -44,47 +38,15 @@ export async function __refreshMembership(
     },
   });
 
-  // update membership for each group
-  const updatedMemberships = await Promise.all(
-    groups.map(async (group) => {
-      const [membership, created] = await this.models.Membership.findOrCreate({
-        where: {
-          group_id: group.id,
-          address_id: address.id,
-        },
-        defaults: {
-          group_id: group.id,
-          address_id: address.id,
-          reject_reason: null,
-          last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
-        },
-        include: [
-          {
-            model: this.models.Group,
-            as: 'group',
-          },
-        ],
-      });
-      membership.group = group;
-
-      if (!created) {
-        const expiresAt = moment(membership.last_checked).add(
-          MEMBERSHIP_TTL_SECONDS,
-          'seconds',
-        );
-        if (moment().isBefore(expiresAt)) {
-          // already exists and is fresh, don't recompute
-          return membership;
-        }
-      }
-
-      // is newly created or stale, recompute
-      return recomputeMembership(membership, address, this.tokenBalanceCache);
-    }),
+  const memberships = await refreshMembershipsForAddress(
+    this.models,
+    this.tokenBalanceCache,
+    address,
+    groups,
   );
 
   // transform memberships to result shape
-  const results = updatedMemberships.map((membership) => {
+  const results = memberships.map((membership) => {
     const topic = communityTopics.find((t) =>
       t.group_ids.includes(membership.group_id),
     );
@@ -97,32 +59,4 @@ export async function __refreshMembership(
   });
 
   return results;
-}
-
-/**
- * recomputeMembership checks the membership against the requirements,
- * updates the membership status and returns it
- * @param membership The membership to recompute
- * @param address The user address
- * @returns MembershipInstance
- */
-async function recomputeMembership(
-  membership: MembershipInstance,
-  address: AddressInstance,
-  tokenBalanceCache: TokenBalanceCache,
-): Promise<MembershipInstance> {
-  if (!membership.group) {
-    throw new ServerError('membership Group is not populated');
-  }
-  const { metadata, requirements } = membership.group;
-  const { isValid, messages } = await validateGroupMembership(
-    address.address,
-    requirements,
-    tokenBalanceCache,
-    metadata.required_requirements || 0,
-  );
-  return membership.update({
-    reject_reason: isValid ? null : JSON.stringify(messages),
-    last_checked: Sequelize.literal('CURRENT_TIMESTAMP'),
-  });
 }

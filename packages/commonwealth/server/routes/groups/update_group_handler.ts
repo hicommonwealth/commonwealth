@@ -55,5 +55,11 @@ export const updateGroupHandler = async (
     requirements,
     topics,
   });
+
+  // refresh memberships in background
+  controllers.groups
+    .refreshCommunityMemberships({ community })
+    .catch(console.error);
+
   return success(res, result);
 };

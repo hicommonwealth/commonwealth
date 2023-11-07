@@ -1,20 +1,21 @@
 // contains types for external api
 
-import type { ThreadAttributes } from 'commonwealth/server/models/thread';
 import type { CommentAttributes } from 'commonwealth/server/models/comment';
-import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
-import type { CommunityAttributes } from '../../../commonwealth/server/models/community';
 import type { ProfileAttributes } from 'commonwealth/server/models/profile';
+import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
+import type { RoleAttributes } from 'commonwealth/server/models/role';
+import type { ThreadAttributes } from 'commonwealth/server/models/thread';
+import type { TopicAttributes } from 'commonwealth/server/models/topic';
 import type {
   BalanceProviderResp,
   ChainNodeResp,
 } from 'token-balance-cache/src';
-import type { TopicAttributes } from 'commonwealth/server/models/topic';
-import type { RoleAttributes } from 'commonwealth/server/models/role';
+import type { CommunityAttributes } from '../../../commonwealth/server/models/community';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
   CREATED = 'created_at',
+  LAST_CHECKED = 'last_checked',
 }
 
 export type IPagination = {

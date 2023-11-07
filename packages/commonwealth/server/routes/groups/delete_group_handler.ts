@@ -1,6 +1,6 @@
-import { TypedRequestParams, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
 import { DeleteGroupResult } from '../../controllers/server_groups_methods/delete_group';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestParams, TypedResponse, success } from '../../types';
 
 type DeleteGroupParams = {
   id: string;

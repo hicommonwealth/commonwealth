@@ -80,7 +80,10 @@ const GroupsSection = ({
                 if (!app.user.activeAccount || app.user.activeAccount === null)
                   return;
 
-                return x?.address?.address === app.user.activeAccount.address;
+                return (
+                  x?.address?.address === app.user.activeAccount.address &&
+                  !x.reject_reason
+                );
               })}
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,

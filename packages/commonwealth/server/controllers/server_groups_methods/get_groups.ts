@@ -9,7 +9,6 @@ export type GetGroupsOptions = {
   community: CommunityInstance;
   includeMembers?: boolean;
   includeTopics?: boolean;
-  addressId?: number;
 };
 
 type GroupWithExtras = GroupAttributes & {
@@ -20,7 +19,7 @@ export type GetGroupsResult = GroupWithExtras[];
 
 export async function __getGroups(
   this: ServerGroupsController,
-  { community, addressId, includeMembers, includeTopics }: GetGroupsOptions
+  { community, includeMembers, includeTopics }: GetGroupsOptions,
 ): Promise<GetGroupsResult> {
   const groups = await this.models.Group.findAll({
     where: {
@@ -37,10 +36,6 @@ export async function __getGroups(
         [Op.in]: groupsResult.map(({ id }) => id),
       },
     };
-    if (addressId) {
-      // optionally filter by specified address ID
-      where.address_id = addressId;
-    }
     const members = await this.models.Membership.findAll({
       where,
       include: [
