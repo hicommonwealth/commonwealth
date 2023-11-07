@@ -20,7 +20,7 @@ import { slugifyPreserveDashes } from 'utils';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
-import type { EthCommunityFormState } from 'views/pages/create_community/types';
+import type { EthChainNodeFormState } from 'views/pages/create_community/types';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import {
   EthCommunityRows,
@@ -36,9 +36,9 @@ import {
 import { ETHEREUM_MAINNET } from './index';
 
 export const EthDaoForm = ({
-  ethCommunityNames,
-  ethCommunities
-}: EthCommunityFormState) => {
+  ethChainNodeNames,
+  ethChainNodes
+}: EthChainNodeFormState) => {
   const [network, setNetwork] = useState<
     ChainNetwork.Aave | ChainNetwork.Compound
   >(ChainNetwork.Compound);
@@ -56,8 +56,8 @@ export const EthDaoForm = ({
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!ethCommunityFormFields.communityString) {
-      ethCommunityFormFields.setCommunityString(ETHEREUM_MAINNET);
+    if (!ethCommunityFormFields.chainName) {
+      ethCommunityFormFields.setChainName(ETHEREUM_MAINNET);
     }
   }, [ethCommunityFormFields]);
 
@@ -67,7 +67,7 @@ export const EthDaoForm = ({
   const updateDAO = async () => {
     if (
       !ethCommunityFormFields.address ||
-      !ethCommunityFormFields.ethCommunityId ||
+      !ethCommunityFormFields.ethChainId ||
       ethCommunityFormFields.nodeUrl
     ) {
       return;
@@ -142,7 +142,7 @@ export const EthDaoForm = ({
   return (
     <div className="CreateCommunityForm">
       {EthCommunityRows(
-        { ethCommunityNames, ethCommunities },
+        { ethChainNodeNames, ethChainNodes },
         { ...ethCommunityFormFields, ...communityFormState }
       )}
       <CWDropdown
@@ -171,7 +171,7 @@ export const EthDaoForm = ({
         disabled={
           communityFormState.saving ||
           !validAddress ||
-          !ethCommunityFormFields.ethCommunityId ||
+          !ethCommunityFormFields.ethChainId ||
           communityFormState.loading
         }
         onClick={async () => {
@@ -220,8 +220,8 @@ export const EthDaoForm = ({
               id: id,
               name: name,
               address: ethCommunityFormFields.address,
-              chain_string: ethCommunityFormFields.communityString,
-              eth_community_id: ethCommunityFormFields.ethCommunityId,
+              chain_string: ethCommunityFormFields.chainName,
+              eth_community_id: ethCommunityFormFields.ethChainId,
               jwt: app.user.jwt,
               node_url: ethCommunityFormFields.nodeUrl,
               icon_url: communityFormDefaultFields.iconUrl,

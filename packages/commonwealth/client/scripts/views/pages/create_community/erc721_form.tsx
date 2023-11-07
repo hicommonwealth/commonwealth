@@ -27,12 +27,12 @@ import {
   useEthCommunityFormFields
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
-import type { EthCommunityFormState } from './types';
+import type { EthChainNodeFormState } from './types';
 
 export const ERC721Form = ({
-  ethCommunityNames,
-  ethCommunities
-}: EthCommunityFormState) => {
+  ethChainNodeNames,
+  ethChainNodes
+}: EthChainNodeFormState) => {
   const { id, setId, name, setName, symbol, setSymbol } =
     useCommunityFormIdFields();
 
@@ -45,8 +45,8 @@ export const ERC721Form = ({
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!ethCommunityFormFields.communityString) {
-      ethCommunityFormFields.setCommunityString(ETHEREUM_MAINNET);
+    if (!ethCommunityFormFields.chainName) {
+      ethCommunityFormFields.setChainName(ETHEREUM_MAINNET);
     }
   }, [ethCommunityFormFields]);
 
@@ -56,7 +56,7 @@ export const ERC721Form = ({
   const updateTokenForum = async () => {
     if (
       !ethCommunityFormFields.address ||
-      !ethCommunityFormFields.ethCommunityId
+      !ethCommunityFormFields.ethChainId
     )
       return;
 
@@ -66,7 +66,7 @@ export const ERC721Form = ({
 
     const args = {
       address: ethCommunityFormFields.address,
-      chain_id: ethCommunityFormFields.ethCommunityId,
+      chain_id: ethCommunityFormFields.ethChainId,
       url: ethCommunityFormFields.nodeUrl
     };
 
@@ -164,7 +164,7 @@ export const ERC721Form = ({
   return (
     <div className="CreateCommunityForm">
       {EthCommunityRows(
-        { ethCommunityNames, ethCommunities },
+        { ethChainNodeNames, ethChainNodes },
         { ...ethCommunityFormFields, ...communityFormState }
       )}
       <CWButton
@@ -172,7 +172,7 @@ export const ERC721Form = ({
         disabled={
           communityFormState.saving ||
           !validAddress ||
-          !ethCommunityFormFields.ethCommunityId ||
+          !ethCommunityFormFields.ethChainId ||
           communityFormState.loading
         }
         onClick={async () => {
@@ -222,8 +222,8 @@ export const ERC721Form = ({
               name: name,
               address: ethCommunityFormFields.address,
               base: ChainBase.Ethereum,
-              chain_string: ethCommunityFormFields.communityString,
-              eth_chain_id: ethCommunityFormFields.ethCommunityId,
+              chain_string: ethCommunityFormFields.chainName,
+              eth_chain_id: ethCommunityFormFields.ethChainId,
               jwt: app.user.jwt,
               icon_url: communityFormDefaultFields.iconUrl,
               network: ChainNetwork.ERC721,

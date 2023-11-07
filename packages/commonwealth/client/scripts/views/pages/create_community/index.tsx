@@ -16,7 +16,7 @@ import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
 import { EthDaoForm } from './eth_dao_form';
-import { useEthCommunityFormState } from './hooks';
+import { useEthChainFormState } from './hooks';
 import { PolygonForm } from './polygon_form';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
@@ -115,11 +115,11 @@ const CreateCommunity = (props: CreateCommunityProps) => {
     getFormType(type),
   );
   const {
-    ethCommunities,
-    setEthCommunities,
-    ethCommunityNames,
-    setEthCommunityNames,
-  } = useEthCommunityFormState();
+    ethChainNodes,
+    setEthChainNodes,
+    ethChainNodeNames,
+    setEthChainNodeNames,
+  } = useEthChainFormState();
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -128,40 +128,40 @@ const CreateCommunity = (props: CreateCommunityProps) => {
   });
 
   useEffect(() => {
-    const fetchEthCommunities = async () => {
+    const fetchEthChainNodes = async () => {
       await $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(
         (res) => {
           if (res.status === 'Success') {
-            setEthCommunities(res.result);
+            setEthChainNodes(res.result);
           }
         },
       );
     };
 
-    fetchEthCommunities();
-  }, [setEthCommunities]);
+    fetchEthChainNodes();
+  }, [setEthChainNodes]);
 
   useNecessaryEffect(() => {
     const fetchEthCommunityNames = async () => {
-      const communities = await $.getJSON(
+      const chains = await $.getJSON(
         'https://chainid.network/chains.json',
       );
 
       const newObject = {};
 
-      for (const id of Object.keys(ethCommunities)) {
-        const community = communities.find((c) => c.chainId === +id);
+      for (const id of Object.keys(ethChainNodes)) {
+        const community = chains.find((c) => c.chainId === +id);
 
         if (community) {
           newObject[id] = community.name;
         }
       }
 
-      setEthCommunityNames(newObject);
+      setEthChainNodeNames(newObject);
     };
 
     fetchEthCommunityNames();
-  }, [ethCommunities]);
+  }, [ethChainNodes]);
 
   const getCurrentForm = () => {
     switch (type) {
@@ -170,15 +170,15 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       case 'erc20':
         return (
           <ERC20Form
-            ethCommunities={ethCommunities}
-            ethCommunityNames={ethCommunityNames}
+            ethChainNodes={ethChainNodes}
+            ethChainNodeNames={ethChainNodeNames}
           />
         );
       case 'erc721':
         return (
           <ERC721Form
-            ethCommunities={ethCommunities}
-            ethCommunityNames={ethCommunityNames}
+            ethChainNodes={ethChainNodes}
+            ethChainNodeNames={ethChainNodeNames}
           />
         );
       case 'sputnik':
@@ -190,15 +190,15 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       case 'ethdao':
         return (
           <EthDaoForm
-            ethCommunities={ethCommunities}
-            ethCommunityNames={ethCommunityNames}
+            ethChainNodes={ethChainNodes}
+            ethChainNodeNames={ethChainNodeNames}
           />
         );
       case 'polygon':
         return (
           <PolygonForm
-            ethCommunities={ethCommunities}
-            ethCommunityNames={ethCommunityNames}
+            ethChainNodes={ethChainNodes}
+            ethChainNodeNames={ethChainNodeNames}
           />
         );
       case 'solana':
@@ -237,7 +237,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
             })}
         </CWTabsRow>
       </div>
-      {Object.keys(ethCommunityNames).length !== 0 ? (
+      {Object.keys(ethChainNodeNames).length !== 0 ? (
         getCurrentForm()
       ) : (
         <div className="SpinnerContainer">

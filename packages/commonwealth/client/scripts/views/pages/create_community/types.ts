@@ -65,52 +65,43 @@ export type CommunityFormStateSetters = {
 export type UseCommunityFormStateHookType = CommunityFormState &
   CommunityFormStateSetters;
 
-export type EthCommunityType = {
+export type EthChainNodeType = {
   [id: number]: { url: string; alt_wallet_url: string };
 };
 
-export type EthCommunityNamesType = { [id: number]: string };
+export type EthChainNodeNamesType = { [id: number]: string };
 
-export type EthCommunityFormState = {
-  ethCommunities: EthCommunityType;
-  ethCommunityNames: EthCommunityNamesType;
+export type EthChainNodeFormState = {
+  ethChainNodes: EthChainNodeType;
+  ethChainNodeNames: EthChainNodeNamesType;
   disabled?: boolean;
 };
 
-export type EthCommunityFormStateSetters = {
-  setEthCommunities: React.Dispatch<React.SetStateAction<EthCommunityType>>;
-  setEthCommunityNames: React.Dispatch<
-    React.SetStateAction<EthCommunityNamesType>
+export type EthChainNodeFormStateSetters = {
+  setEthChainNodes: React.Dispatch<React.SetStateAction<EthChainNodeType>>;
+  setEthChainNodeNames: React.Dispatch<
+    React.SetStateAction<EthChainNodeNamesType>
   >;
 };
 
-export type UseEthCommunityFormStateHookType = EthCommunityFormState &
-  EthCommunityFormStateSetters;
+export type UseEthChainNodeFormStateHookType = EthChainNodeFormState &
+  EthChainNodeFormStateSetters;
 
 export type EthFormFields = {
   address: string;
   altWalletUrl: string;
-  communityString: string;
-  ethCommunityId: string | number;
+  chainName: string;
+  ethChainId: string | number;
   nodeUrl: string;
 };
 
 export type EthFormFieldSetters = {
   setAddress: React.Dispatch<React.SetStateAction<string>>;
   setAltWalletUrl: React.Dispatch<React.SetStateAction<string>>;
-  setCommunityString: React.Dispatch<React.SetStateAction<string>>;
-  setEthCommunityId: React.Dispatch<React.SetStateAction<string | number>>;
+  setChainName: React.Dispatch<React.SetStateAction<string>>;
+  setEthChainId: React.Dispatch<React.SetStateAction<string | number>>;
   setNodeUrl: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export type UseEthCommunityFormFieldsHookType = EthFormFields &
   EthFormFieldSetters;
-
-// export type EthDaoFormFields = {
-//   network: ChainNetwork.Ethereum;
-//   tokenName: string;
-// };
-
-// export type CreateFactoryEthDaoForm = CommunityFormFields &
-//   EthFormFields &
-//   EthDaoFormFields;

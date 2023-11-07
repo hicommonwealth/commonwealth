@@ -26,12 +26,12 @@ import {
   useCommunityFormState,
   useEthCommunityFormFields
 } from './hooks';
-import type { EthCommunityFormState } from './types';
+import type { EthChainNodeFormState } from './types';
 
 export const PolygonForm = ({
-  ethCommunityNames,
-  ethCommunities
-}: EthCommunityFormState) => {
+  ethChainNodeNames,
+  ethChainNodes
+}: EthChainNodeFormState) => {
   const [, setDecimals] = useState(18);
 
   const { id, setId, name, setName, symbol, setSymbol } =
@@ -46,15 +46,15 @@ export const PolygonForm = ({
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!ethChainFormFields.communityString) {
-      ethChainFormFields.setCommunityString('Polygon Mainnet');
+    if (!ethChainFormFields.chainName) {
+      ethChainFormFields.setChainName('Polygon Mainnet');
     }
   }, [ethChainFormFields]);
 
   const validAddress = isAddress(ethChainFormFields.address);
 
   const updateTokenForum = async () => {
-    if (!ethChainFormFields.address || !ethChainFormFields.ethCommunityId) {
+    if (!ethChainFormFields.address || !ethChainFormFields.ethChainId) {
       return;
     }
 
@@ -64,7 +64,7 @@ export const PolygonForm = ({
 
     const args = {
       address: ethChainFormFields.address,
-      chain_id: ethChainFormFields.ethCommunityId,
+      chain_id: ethChainFormFields.ethChainId,
       url: ethChainFormFields.nodeUrl
     };
 
@@ -165,7 +165,7 @@ export const PolygonForm = ({
   return (
     <div className="CreateCommunityForm">
       {EthCommunityRows(
-        { ethCommunityNames, ethCommunities, disabled: true },
+        { ethChainNodeNames, ethChainNodes, disabled: true },
         { ...ethChainFormFields, ...communityFormState }
       )}
       <CWButton
@@ -173,7 +173,7 @@ export const PolygonForm = ({
         disabled={
           communityFormState.saving ||
           !validAddress ||
-          !ethChainFormFields.ethCommunityId ||
+          !ethChainFormFields.ethChainId ||
           communityFormState.loading
         }
         onClick={async () => {
@@ -222,8 +222,8 @@ export const PolygonForm = ({
               id: id,
               name: name,
               address: ethChainFormFields.address,
-              chain_string: ethChainFormFields.communityString,
-              eth_chain_id: ethChainFormFields.ethCommunityId,
+              chain_string: ethChainFormFields.chainName,
+              eth_chain_id: ethChainFormFields.ethChainId,
               icon_url: communityFormDefaultFields.iconUrl,
               jwt: app.user.jwt,
               network: ChainNetwork.ERC20,

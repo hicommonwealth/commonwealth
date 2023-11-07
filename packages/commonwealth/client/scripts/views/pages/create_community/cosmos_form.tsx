@@ -44,7 +44,7 @@ export const CosmosForm = () => {
 
   const { message, saving, setMessage, setSaving } = useCommunityFormState();
 
-  const { altWalletUrl, communityString, ethCommunityId, nodeUrl, setNodeUrl } =
+  const { altWalletUrl, chainName, ethChainId, nodeUrl, setNodeUrl } =
     useEthCommunityFormFields();
 
   const navigate = useCommonNavigate();
@@ -130,8 +130,8 @@ export const CosmosForm = () => {
               cosmos_chain_id: communityName,
               base: ChainBase.CosmosSDK,
               bech32_prefix: bech32Prefix,
-              chain_string: communityString,
-              eth_chain_id: ethCommunityId,
+              chain_string: chainName,
+              eth_chain_id: ethChainId,
               jwt: app.user.jwt,
               network: id,
               node_url: nodeUrl,

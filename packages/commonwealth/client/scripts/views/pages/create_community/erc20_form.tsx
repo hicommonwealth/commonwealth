@@ -27,12 +27,12 @@ import {
   useEthCommunityFormFields
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
-import type { EthCommunityFormState } from './types';
+import type { EthChainNodeFormState } from './types';
 
 export const ERC20Form = ({
-  ethCommunityNames,
-  ethCommunities
-}: EthCommunityFormState) => {
+  ethChainNodeNames,
+  ethChainNodes
+}: EthChainNodeFormState) => {
   const [, setDecimals] = useState(18);
 
   const { id, setId, name, setName, symbol, setSymbol } =
@@ -47,8 +47,8 @@ export const ERC20Form = ({
   const navigate = useCommonNavigate();
 
   useEffect(() => {
-    if (!ethChainFormFields.communityString) {
-      ethChainFormFields.setCommunityString(ETHEREUM_MAINNET);
+    if (!ethChainFormFields.chainName) {
+      ethChainFormFields.setChainName(ETHEREUM_MAINNET);
     }
   }, [ethChainFormFields]);
 
@@ -56,7 +56,7 @@ export const ERC20Form = ({
   const disableField = !validAddress || !communityFormState.loaded;
 
   const updateTokenForum = async () => {
-    if (!ethChainFormFields.address || !ethChainFormFields.ethCommunityId) {
+    if (!ethChainFormFields.address || !ethChainFormFields.ethChainId) {
       return;
     }
 
@@ -66,7 +66,7 @@ export const ERC20Form = ({
 
     const args = {
       address: ethChainFormFields.address,
-      chain_id: ethChainFormFields.ethCommunityId,
+      chain_id: ethChainFormFields.ethChainId,
       url: ethChainFormFields.nodeUrl
     };
 
@@ -167,7 +167,7 @@ export const ERC20Form = ({
   return (
     <div className="CreateCommunityForm">
       {EthCommunityRows(
-        { ethCommunityNames, ethCommunities },
+        { ethChainNodeNames, ethChainNodes },
         { ...ethChainFormFields, ...communityFormState }
       )}
       <CWButton
@@ -175,7 +175,7 @@ export const ERC20Form = ({
         disabled={
           communityFormState.saving ||
           !validAddress ||
-          !ethChainFormFields.ethCommunityId ||
+          !ethChainFormFields.ethChainId ||
           communityFormState.loading
         }
         onClick={async () => {
@@ -225,8 +225,8 @@ export const ERC20Form = ({
               id: id,
               name: name,
               address: ethChainFormFields.address,
-              chain_string: ethChainFormFields.communityString,
-              eth_chain_id: ethChainFormFields.ethCommunityId,
+              chain_string: ethChainFormFields.chainName,
+              eth_chain_id: ethChainFormFields.ethChainId,
               icon_url: communityFormDefaultFields.iconUrl,
               jwt: app.user.jwt,
               network: ChainNetwork.ERC20,

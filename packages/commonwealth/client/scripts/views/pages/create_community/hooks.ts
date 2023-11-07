@@ -2,13 +2,13 @@ import { useState } from 'react';
 
 import type { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import type {
-  EthCommunityNamesType,
-  EthCommunityType,
+  EthChainNodeNamesType,
+  EthChainNodeType,
   UseCommunityFormDefaultFieldsHookType,
   UseCommunityFormIdFieldsHookType,
   UseCommunityFormStateHookType,
   UseEthCommunityFormFieldsHookType,
-  UseEthCommunityFormStateHookType,
+  UseEthChainNodeFormStateHookType,
 } from './types';
 
 export const useCommunityFormIdFields =
@@ -82,17 +82,17 @@ export const useCommunityFormState = (): UseCommunityFormStateHookType => {
   };
 };
 
-export const useEthCommunityFormState =
-  (): UseEthCommunityFormStateHookType => {
-    const [ethCommunities, setEthCommunities] = useState<EthCommunityType>({});
-    const [ethCommunityNames, setEthCommunityNames] =
-      useState<EthCommunityNamesType>({});
+export const useEthChainFormState =
+  (): UseEthChainNodeFormStateHookType => {
+    const [ethChainNodes, setEthChainNodes] = useState<EthChainNodeType>({});
+    const [ethChainNodeNames, setEthChainNodeNames] =
+      useState<EthChainNodeNamesType>({});
 
     return {
-      ethCommunities,
-      setEthCommunities,
-      ethCommunityNames,
-      setEthCommunityNames,
+      ethChainNodes,
+      setEthChainNodes,
+      ethChainNodeNames,
+      setEthChainNodeNames,
     };
   };
 
@@ -101,19 +101,19 @@ export const useEthCommunityFormFields =
     const [address, setAddress] = useState('');
     const [altWalletUrl, setAltWalletUrl] = useState('');
     const [communityString, setCommunityString] = useState('');
-    const [ethCommunityId, setEthCommunityId] = useState('');
+    const [ethChainId, setEthChainId] = useState('');
     const [nodeUrl, setNodeUrl] = useState('');
 
     return {
       address,
       altWalletUrl,
-      communityString,
-      ethCommunityId,
+      chainName: communityString,
+      ethChainId,
       nodeUrl,
       setAddress,
       setAltWalletUrl,
-      setCommunityString,
-      setEthCommunityId,
+      setChainName: setCommunityString,
+      setEthChainId: setEthChainId,
       setNodeUrl,
     };
   };

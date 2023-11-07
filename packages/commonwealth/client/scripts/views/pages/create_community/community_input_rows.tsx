@@ -10,7 +10,7 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import type {
   CommunityFormDefaultFields,
-  EthCommunityFormState,
+  EthChainNodeFormState,
   UseCommunityFormDefaultFieldsHookType,
   UseCommunityFormStateHookType,
   UseEthCommunityFormFieldsHookType,
@@ -142,7 +142,7 @@ type EthChainState = UseEthCommunityFormFieldsHookType &
   UseCommunityFormStateHookType;
 
 export const EthCommunityRows = (
-  props: EthCommunityFormState,
+  props: EthChainNodeFormState,
   state: EthChainState,
 ) => {
   const [defaultCommunityNode, setDefaultCommunityNode] =
@@ -150,51 +150,51 @@ export const EthCommunityRows = (
   const options = useMemo(
     () =>
       [
-        ...Object.keys(props.ethCommunities).map(
+        ...Object.keys(props.ethChainNodes).map(
           (c) =>
             ({
-              label: props.ethCommunityNames[c],
-              value: props.ethCommunityNames[c],
+              label: props.ethChainNodeNames[c],
+              value: props.ethChainNodeNames[c],
             } || { label: c, value: c }),
         ),
         app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
       ] as Array<DropdownItemType>,
-    [props.ethCommunities, props.ethCommunityNames],
+    [props.ethChainNodes, props.ethChainNodeNames],
   );
 
   const onSelectHandler = useCallback(
     (o) => {
       if (!o?.value) return;
-      state.setCommunityString(o.value);
+      state.setChainName(o.value);
 
       if (o.value !== 'Custom') {
         const [id] =
-          Object.entries(props.ethCommunityNames).find(
+          Object.entries(props.ethChainNodeNames).find(
             ([, name]) => name === o.value,
           ) ||
-          Object.keys(props.ethCommunities).find((cId) => `${cId}` === o.value);
+          Object.keys(props.ethChainNodes).find((cId) => `${cId}` === o.value);
 
-        state.setEthCommunityId(id);
-        state.setNodeUrl(props.ethCommunities[id].url);
-        state.setAltWalletUrl(props.ethCommunities[id].alt_wallet_url);
+        state.setEthChainId(id);
+        state.setNodeUrl(props.ethChainNodes[id].url);
+        state.setAltWalletUrl(props.ethChainNodes[id].alt_wallet_url);
       } else {
-        state.setEthCommunityId('');
+        state.setEthChainId('');
         state.setNodeUrl('');
         state.setAltWalletUrl('');
       }
     },
-    [state, props.ethCommunities, props.ethCommunityNames],
+    [state, props.ethChainNodes, props.ethChainNodeNames],
   );
 
   // communityString is the key we use to set all the other fields:
   useEffect(() => {
-    if (state?.communityString && options?.length > 0) {
+    if (state?.chainName && options?.length > 0) {
       const foundCommunityNode = options.find(
-        (o) => o.label === state.communityString,
+        (o) => o.label === state.chainName,
       );
       setDefaultCommunityNode(foundCommunityNode || options[0]);
     }
-  }, [state?.communityString, options]);
+  }, [state?.chainName, options]);
 
   // when we know the defaultCommunityNode, we can set the other fields:
   useEffect(() => {
@@ -216,18 +216,18 @@ export const EthCommunityRows = (
       ) : (
         <Skeleton height="62px" />
       )}
-      {state.communityString === 'Custom' && (
+      {state.chainName === 'Custom' && (
         <InputRow
           title="Community ID"
-          value={state.ethCommunityId}
+          value={state.ethChainId}
           placeholder="1"
           onChangeHandler={async (v) => {
-            state.setEthCommunityId(v);
+            state.setEthChainId(v);
             state.setLoaded(false);
           }}
         />
       )}
-      {state.communityString === 'Custom' && (
+      {state.chainName === 'Custom' && (
         <InputRow
           title="Websocket URL"
           value={state.nodeUrl}
@@ -238,7 +238,7 @@ export const EthCommunityRows = (
           }}
         />
       )}
-      {state.communityString === 'Custom' && (
+      {state.chainName === 'Custom' && (
         <InputRow
           title="HTTP URL"
           value={state.altWalletUrl}
