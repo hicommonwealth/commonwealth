@@ -69,10 +69,4 @@ export class ServerGroupsController {
   async deleteGroup(options: DeleteGroupOptions): Promise<DeleteGroupResult> {
     return __deleteGroup.call(this, options);
   }
-
-  async getGroupMembers(
-    options: GetGroupMembersOptions,
-  ): Promise<GetGroupMembersResult> {
-    return __getGroupMembers.call(this, options);
-  }
 }
