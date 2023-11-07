@@ -1,5 +1,6 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { featureFlags } from 'helpers/feature-flags';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
@@ -39,6 +40,7 @@ const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
 ];
 
 const CommunityMembersPage = () => {
+  useUserActiveAccount();
   const navigate = useCommonNavigate();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
