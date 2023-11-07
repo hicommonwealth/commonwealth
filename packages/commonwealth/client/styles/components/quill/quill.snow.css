@@ -225,7 +225,7 @@
 }
 
 .ql-snow .ql-editor h1 {
-  font-size: 2em;
+  font-size: 24px;
 }
 
 .ql-snow .ql-editor h2 {
@@ -557,7 +557,7 @@
 .ql-toolbar.ql-snow {
   border: 1px solid #ccc;
   box-sizing: border-box;
-  font-family: helvetica neue, helvetica, arial, sans-serif;
+  font-family: times, helvetica neue, helvetica, arial, sans-serif;
   padding: 8px;
 }
 
