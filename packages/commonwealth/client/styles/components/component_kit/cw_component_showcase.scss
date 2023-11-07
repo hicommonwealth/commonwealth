@@ -242,4 +242,10 @@ $width: 360px;
     width: max(100%, 300px);
     overflow-x: auto;
   }
+
+  .customization-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
 }

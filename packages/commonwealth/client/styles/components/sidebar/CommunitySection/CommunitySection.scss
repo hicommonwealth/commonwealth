@@ -9,6 +9,8 @@
   overflow-y: auto;
   width: $sidebar-width;
 
+  background-color: var(--customization-sidebar-color);
+
   @include smallInclusive {
     width: calc(100vw - $quick-switcher-width);
   }

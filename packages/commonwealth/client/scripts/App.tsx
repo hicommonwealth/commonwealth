@@ -21,12 +21,22 @@ const App = () => {
   const { customDomain, isLoading } = useInitApp();
 
   useEffect(() => {
-    const hex = localStorage.getItem('customization-bg-color');
+    const customizationBgColor = localStorage.getItem('customization-bg-color');
+    const customizationSidebarColor = localStorage.getItem(
+      'customization-sidebar-color',
+    );
 
-    if (hex) {
+    if (customizationBgColor) {
       document.documentElement.style.setProperty(
         '--customization-bg-color',
-        hex,
+        customizationBgColor,
+      );
+    }
+
+    if (customizationSidebarColor) {
+      document.documentElement.style.setProperty(
+        '--customization-sidebar-color',
+        customizationSidebarColor,
       );
     }
   }, []);

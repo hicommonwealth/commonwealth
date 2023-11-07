@@ -260,7 +260,9 @@ export const ComponentShowcase = () => {
   const [backgroundColor, setBackgroundColor] = useState(
     localStorage.getItem('customization-bg-color') || '',
   );
-
+  const [sidebarColor, setSidebarColor] = useState(
+    localStorage.getItem('customization-sidebar-color') || '',
+  );
   const handleChangeBackgroundColor = (e) => {
     const hexColor = e.target.value;
     setBackgroundColor(hexColor);
@@ -269,6 +271,28 @@ export const ComponentShowcase = () => {
       '--customization-bg-color',
       hexColor,
     );
+  };
+
+  const handleChangeSidebarColor = (e) => {
+    const hexColor = e.target.value;
+    setSidebarColor(hexColor);
+    localStorage.setItem('customization-sidebar-color', hexColor);
+    document.documentElement.style.setProperty(
+      '--customization-sidebar-color',
+      hexColor,
+    );
+  };
+
+  const handleResetColorToDefault = (id: string) => {
+    if (id === 'customization-bg-color') {
+      setBackgroundColor('#000000');
+    }
+
+    if (id === 'customization-sidebar-color') {
+      setSidebarColor('#000000');
+    }
+    localStorage.removeItem(id);
+    document.documentElement.style.setProperty(`--${id}`, 'unset');
   };
   const renderModal = (size?: ModalSize) => {
     return (
@@ -301,12 +325,34 @@ export const ComponentShowcase = () => {
     <div className="ComponentShowcase">
       <div>
         <CWText type="h3">Customization</CWText>
-        <div>
+        <div className="customization-row">
           <CWText type="h5">Background color</CWText>
           <input
             type="color"
             value={backgroundColor}
             onChange={handleChangeBackgroundColor}
+          />
+          <CWButton
+            label="Reset to default"
+            buttonHeight="sm"
+            buttonType="secondary"
+            onClick={() => handleResetColorToDefault('customization-bg-color')}
+          />
+        </div>
+        <div className="customization-row">
+          <CWText type="h5">Sidebar color</CWText>
+          <input
+            type="color"
+            value={sidebarColor}
+            onChange={handleChangeSidebarColor}
+          />
+          <CWButton
+            label="Reset to default"
+            buttonHeight="sm"
+            buttonType="secondary"
+            onClick={() =>
+              handleResetColorToDefault('customization-sidebar-color')
+            }
           />
         </div>
       </div>

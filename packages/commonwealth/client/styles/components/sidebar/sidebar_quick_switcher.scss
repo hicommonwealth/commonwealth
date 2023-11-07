@@ -10,6 +10,8 @@
   overflow: hidden;
   width: $quick-switcher-width;
 
+  background-color: var(--customization-sidebar-color);
+
   .community-nav-bar {
     align-items: center;
     display: flex;
