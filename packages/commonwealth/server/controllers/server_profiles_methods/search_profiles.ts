@@ -101,10 +101,10 @@ export async function __searchProfiles(
   if (memberships) {
     switch (memberships) {
       case 'in-group':
-        membershipsWhere = `AND EXISTS (${membershipsWhere})`;
+        membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
         break;
       case 'not-in-group':
-        membershipsWhere = `AND NOT EXISTS (${membershipsWhere})`;
+        membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NOT NULL)`;
         break;
       default:
         throw new AppError(`unsupported memberships param: ${memberships}`);
