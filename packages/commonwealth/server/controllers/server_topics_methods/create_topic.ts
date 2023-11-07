@@ -1,9 +1,11 @@
-import { TopicAttributes } from '../../models/topic';
-import { CommunityInstance } from '../../models/community';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { CommunityInstance } from '../../models/community';
+import { TopicAttributes } from '../../models/topic';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { ServerTopicsController } from '../server_topics_controller';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -20,11 +22,11 @@ export type CreateTopicOptions = {
   body: Partial<TopicAttributes>;
 };
 
-export type CreateTopicResult = TopicAttributes;
+export type CreateTopicResult = [TopicAttributes, TrackOptions];
 
 export async function __createTopic(
   this: ServerTopicsController,
-  { user, chain, body }: CreateTopicOptions
+  { user, chain, body }: CreateTopicOptions,
 ): Promise<CreateTopicResult> {
   if (!user) {
     throw new AppError(Errors.NotLoggedIn);
@@ -81,5 +83,12 @@ export async function __createTopic(
     defaults: options,
   });
 
-  return newTopic.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.CREATE_TOPIC,
+    community: chain.id,
+    userId: user.id,
+    isCustomDomain: null,
+  };
+
+  return [newTopic.toJSON(), analyticsOptions];
 }

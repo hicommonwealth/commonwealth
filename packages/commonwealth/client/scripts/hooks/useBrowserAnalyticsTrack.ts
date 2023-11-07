@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
+import app from 'state';
 import { clientAnalyticsTrack } from '../../../shared/analytics/client-track';
 import { AnalyticsPayload } from '../../../shared/analytics/types';
-import app from 'state';
 
 /**
  * Hook to capture analytics events on the browser
@@ -46,7 +46,7 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
         }
       }
     },
-    [onAction]
+    [onAction],
   );
 
   return { trackAnalytics };
