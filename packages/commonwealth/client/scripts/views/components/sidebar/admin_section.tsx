@@ -173,7 +173,7 @@ const AdminSectionComponent = () => {
         setIsOrderTopicsModalOpen(true);
       },
     },
-    ...(featureFlags.gatingEnabled
+    ...(!featureFlags.gatingEnabled
       ? [
           {
             title: 'Edit topic thresholds',
