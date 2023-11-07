@@ -15,7 +15,7 @@ describe('get roles Integration Tests', () => {
   beforeEach(() => {
     jwtToken = jwt.sign(
       { id: testUsers[0].id, email: testUsers[0].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -28,7 +28,7 @@ describe('get roles Integration Tests', () => {
     const response = await get('/api/roles', invalidRequest, true, app);
 
     response.should.have.status(400);
-    chai.assert.equal(response.error, 'Chain does not exist');
+    chai.assert.equal(response.error, 'Community does not exist');
   });
 
   it('should return an error response if an invalid permission is specified', async () => {

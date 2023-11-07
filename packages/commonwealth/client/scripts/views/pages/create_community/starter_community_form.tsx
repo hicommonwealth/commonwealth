@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
 import $ from 'jquery';
+import React, { useState } from 'react';
 
-import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { initAppState } from 'state';
 
 import 'pages/create_community.scss';
 
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
@@ -15,25 +16,24 @@ import { baseToNetwork } from '../../../helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import {
-  defaultChainRows,
+  defaultCommunityRows,
   updateAdminOnCreateCommunity,
-} from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
+} from './community_input_rows';
 import {
-  useChainFormDefaultFields,
-  useChainFormIdFields,
-  useChainFormState,
+  useCommunityFormDefaultFields,
+  useCommunityFormIdFields,
+  useCommunityFormState,
 } from './hooks';
 
 export const StarterCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const chainFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const { saving, setSaving } = useChainFormState();
+  const { saving, setSaving } = useCommunityFormState();
 
   const navigate = useCommonNavigate();
 
@@ -68,7 +68,7 @@ export const StarterCommunityForm = () => {
           setBase(o.value as ChainBase);
         }}
       />
-      {defaultChainRows(chainFormDefaultFields)}
+      {defaultCommunityRows(communityFormDefaultFields)}
       <CWButton
         label="Save changes"
         disabled={saving || id.length < 1}
@@ -125,17 +125,17 @@ export const StarterCommunityForm = () => {
               address: '',
               type: ChainType.Offchain,
               network: baseToNetwork(base),
-              icon_url: chainFormDefaultFields.iconUrl,
+              icon_url: communityFormDefaultFields.iconUrl,
               id,
               name,
               default_symbol: symbol,
               base,
-              description: chainFormDefaultFields.description,
-              discord: chainFormDefaultFields.discord,
-              element: chainFormDefaultFields.element,
-              github: chainFormDefaultFields.github,
-              telegram: chainFormDefaultFields.telegram,
-              website: chainFormDefaultFields.website,
+              description: communityFormDefaultFields.description,
+              discord: communityFormDefaultFields.discord,
+              element: communityFormDefaultFields.element,
+              github: communityFormDefaultFields.github,
+              telegram: communityFormDefaultFields.telegram,
+              website: communityFormDefaultFields.website,
               ...additionalArgs,
             });
 
@@ -143,19 +143,20 @@ export const StarterCommunityForm = () => {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
             await initAppState(false);
             await updateAdminOnCreateCommunity(id);
 
-            navigate(`/${res.result.chain?.id}`);
+            navigate(`/${res.result.community?.id}`);
           } catch (err) {
             console.log(err);
 
             notifyError(
-              err.responseJSON?.error || 'Creating new starter community failed'
+              err.responseJSON?.error ||
+                'Creating new starter community failed',
             );
           } finally {
             setSaving(false);

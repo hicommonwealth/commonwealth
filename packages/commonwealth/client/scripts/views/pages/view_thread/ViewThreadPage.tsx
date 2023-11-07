@@ -172,6 +172,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       },
       isWindowMediumSmallInclusive,
     );
+    // Note: Disabling lint rule since we only want to run it once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // find if the current topic is gated
@@ -179,7 +181,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (thread?.topic) {
       return (
         Array.isArray(x.topics) &&
-        x.topics.find((y) => y.id === thread.topic.id)
+        x?.topics?.find((y) => y.id === thread.topic.id)
       );
     }
   });

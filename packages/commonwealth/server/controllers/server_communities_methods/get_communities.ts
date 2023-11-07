@@ -1,30 +1,27 @@
 import { Op } from 'sequelize';
-import { ServerCommunitiesController } from '../server_communities_controller';
 import { CommunityInstance } from '../../models/community';
 import { CommunitySnapshotSpaceWithSpaceAttached } from '../../models/community_snapshot_spaces';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 export type GetCommunitiesOptions = {};
 export type GetCommunitiesResult = {
-  chain: CommunityInstance;
+  community: CommunityInstance;
   snapshot: string[];
 }[];
 
 export async function __getCommunities(
   this: ServerCommunitiesController,
-  options: GetCommunitiesOptions
 ): Promise<GetCommunitiesResult> {
-  const [chains] = await Promise.all([
-    this.models.Community.findAll({
-      where: { active: true },
-    }),
-  ]);
+  const communities = await this.models.Community.findAll({
+    where: { active: true },
+  });
 
-  const chainsIds = chains.map((chain) => chain.id);
+  const communityIds = communities.map((community) => community.id);
   const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
     await this.models.CommunitySnapshotSpaces.findAll({
       where: {
         chain_id: {
-          [Op.in]: chainsIds,
+          [Op.in]: communityIds,
         },
       },
       include: {
@@ -33,18 +30,18 @@ export async function __getCommunities(
       },
     });
 
-  const chainsWithSnapshots = chains.map((chain) => {
-    const chainSnapshotSpaces = snapshotSpaces.filter(
-      (space) => space.chain_id === chain.id
+  const communitiesWithSnapshots = communities.map((community) => {
+    const communitySnapshotSpaces = snapshotSpaces.filter(
+      (space) => space.chain_id === community.id,
     );
-    const snapshotSpaceNames = chainSnapshotSpaces.map(
-      (space) => space.snapshot_space?.snapshot_space
+    const snapshotSpaceNames = communitySnapshotSpaces.map(
+      (space) => space.snapshot_space?.snapshot_space,
     );
     return {
-      chain,
+      community,
       snapshot: snapshotSpaceNames.length > 0 ? snapshotSpaceNames : [],
     };
   });
 
-  return chainsWithSnapshots;
+  return communitiesWithSnapshots;
 }

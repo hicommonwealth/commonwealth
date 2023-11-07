@@ -14,6 +14,12 @@ export const RABBITMQ_URI = (() => {
 
 export const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
-export const SERVER_URL = process.env.SERVER_URL;
+export const SERVER_URL = process.env.SERVER_URL || 'http://localhost:8080';
 
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
+
+export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
+
+export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
+
+export const DISCOBOT_ADDRESS = '0xdiscordbot';

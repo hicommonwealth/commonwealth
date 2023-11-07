@@ -18,7 +18,7 @@ const useSearchResults = (
   filters: Filter[],
   resultsPerSection?: number,
 ) => {
-  const communityId = app.activeChainId() || 'all_chains';
+  const communityId = app.activeChainId() || 'all_communities';
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {

@@ -16,7 +16,7 @@ import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
 import ErrorPage from '../error';
 import { AdminPanelTabs } from './admin_panel_tabs';
-import { ChainMetadataRows } from './chain_metadata_rows';
+import { CommunityMetadataRows } from './community_metadata_rows';
 
 const ManageCommunityPage = () => {
   const forceRerender = useForceRerender();
@@ -156,9 +156,9 @@ const ManageCommunityPage = () => {
       <CWText type="h2" fontWeight="medium">
         Manage Community
       </CWText>
-      <ChainMetadataRows
+      <CommunityMetadataRows
         admins={admins}
-        chain={app.config.chains.getById(app.activeChainId())}
+        community={app.config.chains.getById(app.activeChainId())}
         mods={mods}
         onRoleUpdate={handleRoleUpdate}
         onSave={() => forceRerender()}

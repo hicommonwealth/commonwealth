@@ -1,7 +1,8 @@
-import NodeInfo from 'models/NodeInfo';
-import ChainInfo from 'models/ChainInfo';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
+import CommunityInfo from 'models/ChainInfo';
+import NodeInfo from 'models/NodeInfo';
+import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import app from 'state';
 import { BalanceType } from '../../../../../../common-common/src/types';
@@ -9,15 +10,14 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { createChainNode } from './utils';
-import 'pages/AdminPanel.scss';
-import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 const RPCEndpointTask = () => {
   const [rpcEndpointChainValue, setRpcEndpointChainValue] =
     useState<string>('');
-  const [rpcEndpointChain, setRpcEndpointChain] = useState<ChainInfo>(null);
+  const [rpcEndpointChain, setRpcEndpointChain] = useState<CommunityInfo>(null);
   const [rpcEndpoint, setRpcEndpoint] = useState<string>('');
   const [rpcEndpointChainValueValidated, setRpcEndpointChainValueValidated] =
     useState<boolean>(false);
@@ -28,7 +28,7 @@ const RPCEndpointTask = () => {
   const [rpcName, setRpcName] = useState<string>('');
   const [bech32, setBech32] = useState<string>('');
   const [balanceType, setBalanceType] = useState<BalanceType>(
-    BalanceType.Ethereum
+    BalanceType.Ethereum,
   );
   const [chainNodeNotCreated, setChainNodeNotCreated] =
     useState<boolean>(false);
@@ -45,7 +45,7 @@ const RPCEndpointTask = () => {
   };
 
   const RPCEndpointValidationFn = (
-    value: string
+    value: string,
   ): [ValidationStatus, string] | [] => {
     if (
       !detectURL(value) &&
@@ -69,12 +69,12 @@ const RPCEndpointTask = () => {
   };
 
   const idValidationFn = (value: string): [ValidationStatus, string] | [] => {
-    const chainInfo = app.config.chains.getById(value);
-    if (!chainInfo) {
+    const communityInfo = app.config.chains.getById(value);
+    if (!communityInfo) {
       setRpcEndpointChainValueValidated(false);
       return ['failure', 'Community not found'];
     }
-    setRpcEndpointChain(chainInfo);
+    setRpcEndpointChain(communityInfo);
     setRpcEndpointChainValueValidated(true);
     return [];
   };
@@ -134,8 +134,8 @@ const RPCEndpointTask = () => {
     <div className="TaskGroup">
       <CWText type="h4">Switch/Add RPC Endpoint</CWText>
       <CWText type="caption">
-        Changes the RPC endpoint for a specific chain, or adds an endpoint if it
-        doesn't yet exist.
+        {`Changes the RPC endpoint for a specific chain, or adds an endpoint if it
+        doesn't yet exist.`}
       </CWText>
       <div className="MultiRow">
         <div className="TaskRow">

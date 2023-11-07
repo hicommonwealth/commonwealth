@@ -1,8 +1,8 @@
+import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
 import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
-import z from 'zod';
 
 const Errors = {
   ValidationError: 'Validation error',
@@ -22,7 +22,7 @@ export const updateTopicHandler = async (
 ) => {
   const {
     user,
-    chain,
+    chain: community,
     params: { topicId },
     body,
   } = req;
@@ -52,7 +52,7 @@ export const updateTopicHandler = async (
 
   const topic = await controllers.topics.updateTopic({
     user,
-    chain,
+    community,
     body: validationResult.data,
   });
 

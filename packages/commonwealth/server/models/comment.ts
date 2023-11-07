@@ -1,12 +1,13 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 
+import { StatsDController } from 'common-common/src/statsd';
 import type { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
-import { StatsDController } from 'common-common/src/statsd';
 
 import { factory, formatFilename } from 'common-common/src/logging';
+import { IDiscordMeta } from 'common-common/src/types';
 const log = factory.getLogger(formatFilename(__filename));
 
 export type CommentAttributes = {
@@ -27,7 +28,7 @@ export type CommentAttributes = {
   updated_at?: Date;
   deleted_at?: Date;
   marked_as_spam_at?: Date;
-  discord_meta?: any;
+  discord_meta?: IDiscordMeta;
 
   // associations
   Chain?: CommunityAttributes;
@@ -43,7 +44,7 @@ export type CommentModelStatic = ModelStatic<CommentInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommentModelStatic => {
   const Comment = <CommentModelStatic>sequelize.define(
     'Comment',
@@ -103,7 +104,7 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`
+              `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`,
             );
           }
         },
@@ -122,7 +123,7 @@ export default (
             }
           } catch (error) {
             log.error(
-              `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`
+              `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`,
             );
             StatsDController.get().increment('cw.hook.comment-count-error', {
               thread_id,
@@ -146,7 +147,7 @@ export default (
         { fields: ['thread_id'] },
         { fields: ['canvas_hash'] },
       ],
-    }
+    },
   );
 
   Comment.associate = (models) => {

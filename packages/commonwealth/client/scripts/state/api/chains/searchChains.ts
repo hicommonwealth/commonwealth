@@ -50,7 +50,7 @@ const searchChains = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: communityId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
