@@ -18,7 +18,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const topicIdFromUrl: number = parseInt(searchParams.get('topic') || '0');
 
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
-    `new-thread-${communityId}-info`
+    `new-thread-${communityId}-info`,
   );
 
   // get restored draft on init
@@ -34,7 +34,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
       topicsForSelector.find(
         (t) =>
           t.id === restoredDraft?.topicId ||
-          (topicIdFromUrl && t.id === topicIdFromUrl)
+          (topicIdFromUrl && t.id === topicIdFromUrl),
       ) ||
       topicsForSelector.find((t) => t.name.includes('General')) ||
       null
@@ -42,13 +42,13 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   }, [restoredDraft, topicsForSelector]);
 
   const [threadKind, setThreadKind] = useState<ThreadKind>(
-    ThreadKind.Discussion
+    ThreadKind.Discussion,
   );
   const [threadUrl, setThreadUrl] = useState('');
   const [threadTopic, setThreadTopic] = useState<Topic>(defaultTopic);
   const [threadTitle, setThreadTitle] = useState(restoredDraft?.title || '');
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    restoredDraft?.body
+    restoredDraft?.body,
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -74,7 +74,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     const draft = {
       topicId: threadTopic?.id || 0,
       title: threadTitle,
-      body: threadContentDelta
+      body: threadContentDelta,
     };
     if (!draft.topicId && !draft.title && !draft.body) {
       return;
@@ -92,7 +92,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     if (threadTopic?.defaultOffchainTemplate) {
       try {
         const template = JSON.parse(
-          threadTopic.defaultOffchainTemplate
+          threadTopic.defaultOffchainTemplate,
         ) as DeltaStatic;
         setThreadContentDelta(template);
       } catch (e) {
@@ -115,7 +115,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     isSaving,
     setIsSaving,
     isDisabled,
-    clearDraft
+    clearDraft,
   };
 };
 
