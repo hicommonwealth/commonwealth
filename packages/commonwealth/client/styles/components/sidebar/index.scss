@@ -58,7 +58,6 @@
 
     animation: slidein 0.2s ease-in-out;
 
-    background-color: $neutral-25;
     border-right: 1px solid $neutral-200;
     height: calc(
       100vh - (#{$global-header-height} + #{$global-sidebar-header-height})
@@ -76,7 +75,7 @@
       left: -100%;
     }
 
-    background-color: var(--customization-sidebar-color);
+    background-color: var(--customization-sidebar-color, $neutral-25);
   }
 
   @keyframes slidein {

@@ -1,15 +1,15 @@
+import 'Sublayout.scss';
+import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
-import 'Sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
 import { AppMobileMenus } from './AppMobileMenus';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
-import clsx from 'clsx';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -67,6 +67,20 @@ const Sublayout = ({
     };
   }, [isWindowSmallInclusive, menuVisible, mobileMenuName, setMenu]);
 
+  useEffect(() => {
+    window.addEventListener(
+      'customization-background-image-enabled',
+      forceRerender,
+    );
+
+    return () => {
+      window.removeEventListener(
+        'customization-background-image-enabled',
+        forceRerender,
+      );
+    };
+  }, [forceRerender]);
+
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;
   const banner = app.chain ? chain.communityBanner : null;
@@ -88,7 +102,7 @@ const Sublayout = ({
                   menuName === 'createContent' ||
                   hasCommunitySidebar,
               },
-              resizing
+              resizing,
             )}
           >
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />
@@ -96,7 +110,14 @@ const Sublayout = ({
             {isWindowSmallInclusive && mobileMenuName ? (
               <AppMobileMenus />
             ) : (
-              <div className="Body">
+              <div
+                className={clsx('Body', {
+                  customBgImage:
+                    localStorage.getItem(
+                      'customization-background-image-enabled',
+                    ) === 'true',
+                })}
+              >
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>

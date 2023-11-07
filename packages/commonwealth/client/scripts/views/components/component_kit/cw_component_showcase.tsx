@@ -263,6 +263,11 @@ export const ComponentShowcase = () => {
   const [sidebarColor, setSidebarColor] = useState(
     localStorage.getItem('customization-sidebar-color') || '',
   );
+
+  const [backgroundImageEnabled, setBackgroundImageEnabled] = useState(
+    localStorage.getItem('customization-background-image-enabled') === 'true' ||
+      false,
+  );
   const handleChangeBackgroundColor = (e) => {
     const hexColor = e.target.value;
     setBackgroundColor(hexColor);
@@ -292,8 +297,20 @@ export const ComponentShowcase = () => {
       setSidebarColor('#000000');
     }
     localStorage.removeItem(id);
-    document.documentElement.style.setProperty(`--${id}`, 'unset');
+    document.documentElement.style.removeProperty(`--${id}`);
   };
+  const handleToggleBackgroundImage = (e) => {
+    const enabled = e.target.checked;
+    setBackgroundImageEnabled(enabled);
+    if (enabled) {
+      window.dispatchEvent(new Event('customization-background-image-enabled'));
+      localStorage.setItem('customization-background-image-enabled', enabled);
+    } else {
+      window.dispatchEvent(new Event('customization-background-image-enabled'));
+      localStorage.removeItem('customization-background-image-enabled');
+    }
+  };
+
   const renderModal = (size?: ModalSize) => {
     return (
       <CWModal
@@ -353,6 +370,14 @@ export const ComponentShowcase = () => {
             onClick={() =>
               handleResetColorToDefault('customization-sidebar-color')
             }
+          />
+        </div>
+        <div className="customization-row">
+          <CWText type="h5">Background image</CWText>
+          <CWToggle
+            checked={backgroundImageEnabled}
+            size="small"
+            onChange={handleToggleBackgroundImage}
           />
         </div>
       </div>
