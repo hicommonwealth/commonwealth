@@ -21,7 +21,7 @@ import { User } from '../../components/user/user';
 import { PageLoading } from '../loading';
 import {
   SubscriptionRowMenu,
-  SubscriptionRowTextContainer,
+  SubscriptionRowTextContainer
 } from './helper_components';
 import { bundleSubs, extractSnapshotProposals } from './helpers';
 
@@ -30,7 +30,7 @@ const emailIntervalFrequencyMap = {
   weekly: 'Once a week',
   daily: 'Everyday',
   twoweeks: 'Every two weeks',
-  monthly: 'Once a month',
+  monthly: 'Once a month'
 };
 
 type SnapshotInfo = {
@@ -72,7 +72,7 @@ const NotificationSettingsPage = () => {
         const snapshotsInfoArr = snapshotIds.map((snapshotId) => ({
           snapshotId,
           space: getSpaceById.find((x: { id: string }) => x.id === snapshotId),
-          subs: bundledSnapshotSubs[snapshotId],
+          subs: bundledSnapshotSubs[snapshotId]
         }));
 
         setSnapshotsInfo(snapshotsInfoArr);
@@ -131,13 +131,15 @@ const NotificationSettingsPage = () => {
     app?.user.notifications.chainEventSubscriptions
   );
 
-  const subscribedChainIds =
+  const subscribedCommunityIds =
     app?.user.notifications.chainEventSubscribedChainIds;
 
-  // chains/communities the user has addresses for but does not have existing subscriptions for
-  const relevantSubscribedChains = app?.user.addresses
+  // communities the user has addresses for but does not have existing subscriptions for
+  const relevantSubscribedCommunities = app?.user.addresses
     .map((x) => x.community)
-    .filter((x) => subscribedChainIds.includes(x.id) && !chainEventSubs[x.id]);
+    .filter(
+      (x) => subscribedCommunityIds.includes(x.id) && !chainEventSubs[x.id]
+    );
 
   return (
     <div className="NotificationSettingsPage">
@@ -173,7 +175,7 @@ const NotificationSettingsPage = () => {
                   app.user.updateEmailInterval('weekly');
                   setCurrentFrequency('weekly');
                   forceRerender();
-                },
+                }
               },
               {
                 label: 'Never',
@@ -181,8 +183,8 @@ const NotificationSettingsPage = () => {
                   app.user.updateEmailInterval('never');
                   setCurrentFrequency('never');
                   forceRerender();
-                },
-              },
+                }
+              }
             ]}
           />
         ) : (
@@ -219,7 +221,7 @@ const NotificationSettingsPage = () => {
                         setEmailValidated(false);
                         return [
                           'failure',
-                          'Please enter a valid email address',
+                          'Please enter a valid email address'
                         ];
                       } else {
                         setEmailValidated(true);
@@ -280,20 +282,20 @@ const NotificationSettingsPage = () => {
           In-App
         </CWText>
       </div>
-      {relevantSubscribedChains
+      {relevantSubscribedCommunities
         .sort((x, y) => x.name.localeCompare(y.name))
-        .map((chain) => {
+        .map((community) => {
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
-              key={chain.id}
+              key={community.id}
             >
               <div className="notification-row-header">
                 <div className="left-content-container">
                   <div className="avatar-and-name">
-                    <CWCommunityAvatar size="medium" community={chain} />
+                    <CWCommunityAvatar size="medium" community={community} />
                     <CWText type="h5" fontWeight="medium">
-                      {chain.name}
+                      {community.name}
                     </CWText>
                   </div>
                 </div>
@@ -311,7 +313,7 @@ const NotificationSettingsPage = () => {
                     app.user.notifications
                       .subscribe({
                         categoryId: NotificationCategories.ChainEvent,
-                        options: { chainId: chain.id },
+                        options: { chainId: community.id }
                       })
                       .then(() => {
                         forceRerender();
@@ -325,21 +327,24 @@ const NotificationSettingsPage = () => {
 
       {Object.entries(chainEventSubs)
         .sort((x, y) => x[0].localeCompare(y[0]))
-        .map(([chainName, subs]) => {
-          const chainInfo = app.config.chains.getById(chainName);
+        .map(([communityName, subs]) => {
+          const communityInfo = app.config.chains.getById(communityName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
-              key={chainName}
+              key={communityInfo?.id}
             >
               <div className="notification-row-header">
                 <div className="left-content-container">
                   <div className="avatar-and-name">
-                    <CWCommunityAvatar size="medium" community={chainInfo} />
+                    <CWCommunityAvatar
+                      size="medium"
+                      community={communityInfo}
+                    />
                     <CWText type="h5" fontWeight="medium">
-                      {chainInfo?.name}
+                      {communityInfo?.name}
                     </CWText>
                   </div>
                 </div>
@@ -392,15 +397,15 @@ const NotificationSettingsPage = () => {
       </div>
       {Object.entries(bundledSubs)
         .sort((x, y) => x[0].localeCompare(y[0]))
-        .map(([chainName, subs]) => {
-          const chainInfo = app?.config.chains.getById(chainName);
+        .map(([communityName, subs]) => {
+          const communityInfo = app?.config.chains.getById(communityName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
-          if (!chainInfo?.id) return null; // handles incomplete loading case
+          if (!communityInfo?.id) return null; // handles incomplete loading case
 
           return (
-            <div key={chainInfo?.id} className="notification-row">
+            <div key={communityInfo?.id} className="notification-row">
               <CWCollapsible
                 headerContent={
                   <div className="notification-row-header">
@@ -408,10 +413,10 @@ const NotificationSettingsPage = () => {
                       <div className="avatar-and-name">
                         <CWCommunityAvatar
                           size="medium"
-                          community={chainInfo}
+                          community={communityInfo}
                         />
                         <CWText type="h5" fontWeight="medium">
-                          {chainInfo?.name}
+                          {communityInfo?.name}
                         </CWText>
                       </div>
                       <CWText type="b2" className="subscriptions-count-text">
