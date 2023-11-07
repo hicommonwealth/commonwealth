@@ -88,13 +88,13 @@ const createMockedGroupsController = () => {
           update: async () => membership,
         }));
       },
-      findOrCreate: async () => {
+      findOne: async () => {
         const membership = {
           ...memberships[0],
           toJSON: () => memberships[0],
           update: async () => membership,
         };
-        return [membership, true];
+        return membership;
       },
       count: async () => memberships.length,
       destroy: async () => {},
