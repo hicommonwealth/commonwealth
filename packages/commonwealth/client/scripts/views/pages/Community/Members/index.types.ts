@@ -4,3 +4,5 @@ export type SearchFilters = {
   searchText?: string;
   category?: GroupCategory;
 };
+
+export type MembershipFilter = 'in-group' | 'not-in-group';
