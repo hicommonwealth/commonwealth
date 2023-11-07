@@ -76,10 +76,13 @@ export default class DatabaseValidationService {
       this.models,
       req,
     );
+
+    if (authorError) return next(new AppError(authorError));
+
     if (!author) {
       return next(new AppError(Errors.InvalidUser));
     }
-    if (authorError) return next(new AppError(authorError));
+
     // If the author is valid, add it to the request object
     req.address = author;
     next();

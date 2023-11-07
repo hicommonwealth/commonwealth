@@ -24,13 +24,15 @@ export type DeleteCommentResult = void;
 
 export async function __deleteComment(
   this: ServerCommentsController,
-  { user, address, community, commentId, messageId }: DeleteCommentOptions
+  { user, address, community, commentId, messageId }: DeleteCommentOptions,
 ): Promise<DeleteCommentResult> {
   if (!commentId) {
     // Discord Bot Handling
     const existingComment = await this.models.Comment.findOne({
       where: {
-        discord_meta: { [Op.contains]: { message_id: messageId } },
+        discord_meta: {
+          message_id: messageId,
+        },
       },
     });
 
@@ -78,7 +80,7 @@ export async function __deleteComment(
       this.models,
       { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
       comment?.Chain?.id,
-      ['admin', 'moderator']
+      ['admin', 'moderator'],
     );
 
     if (!requesterIsAdminOrMod && !user.isAdmin) {

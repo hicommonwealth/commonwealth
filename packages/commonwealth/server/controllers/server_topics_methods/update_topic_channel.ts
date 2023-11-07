@@ -22,7 +22,7 @@ export type UpdateTopicChannelResult = void;
 
 export async function __updateTopicChannel(
   this: ServerTopicsController,
-  { user, community, topicId, channelId }: UpdateTopicChannelOptions
+  { user, community, topicId, channelId }: UpdateTopicChannelOptions,
 ): Promise<UpdateTopicChannelResult> {
   const isAdmin = await validateOwner({
     models: this.models,
@@ -78,7 +78,7 @@ export async function __updateTopicChannel(
             [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
           },
         },
-      }
+      },
     );
 
     // Remove channel_id from old topic
@@ -91,7 +91,7 @@ export async function __updateTopicChannel(
         chain: community.id,
         // discord meta is not null
         discord_meta: {
-          [Op.contains]: { channel_id: channelId },
+          channel_id: channelId,
         },
       },
     });
@@ -107,7 +107,7 @@ export async function __updateTopicChannel(
             [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
           },
         },
-      }
+      },
     );
   }
 
