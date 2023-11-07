@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
 import $ from 'jquery';
+import React, { useState } from 'react';
 
-import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { initAppState } from 'state';
 
 import 'pages/create_community.scss';
 
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
@@ -18,7 +19,6 @@ import {
   defaultChainRows,
   updateAdminOnCreateCommunity,
 } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
   useChainFormDefaultFields,
   useChainFormIdFields,
@@ -143,19 +143,20 @@ export const StarterCommunityForm = () => {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
             await initAppState(false);
             await updateAdminOnCreateCommunity(id);
 
-            navigate(`/${res.result.chain?.id}`);
+            navigate(`/${res.result.community?.id}`);
           } catch (err) {
             console.log(err);
 
             notifyError(
-              err.responseJSON?.error || 'Creating new starter community failed'
+              err.responseJSON?.error ||
+                'Creating new starter community failed',
             );
           } finally {
             setSaving(false);

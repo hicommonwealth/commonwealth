@@ -21,7 +21,7 @@ export const updatePollVoteHandler = async (
   const vote = await controllers.polls.updatePollVote({
     user: req.user,
     address: req.address,
-    chain: req.chain,
+    community: req.chain,
     pollId: parseInt(pollId, 10),
     option,
   });

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
 import $ from 'jquery';
+import React, { useState } from 'react';
 
 import 'pages/create_community.scss';
 
-import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import app from 'state';
+import { useCommonNavigate } from 'navigation/helpers';
+import app, { initAppState } from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import {
@@ -18,10 +18,9 @@ import {
   defaultChainRows,
   updateAdminOnCreateCommunity,
 } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
   useChainFormDefaultFields,
+  useChainFormIdFields,
   useChainFormState,
   useEthChainFormFields,
 } from './hooks';
@@ -51,7 +50,7 @@ export const CosmosForm = () => {
   const navigate = useCommonNavigate();
 
   const chainNameValidationFn = (
-    value: string
+    value: string,
   ): [ValidationStatus, string] | [] => {
     const validChainNameRegex = /^[a-z0-9]+$/;
 
@@ -146,17 +145,17 @@ export const CosmosForm = () => {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
             await initAppState(false);
             await updateAdminOnCreateCommunity(id);
 
-            navigate(`/${res.result.chain?.id}`);
+            navigate(`/${res.result.community?.id}`);
           } catch (err) {
             setMessage(
-              err.responseJSON?.error || 'Creating new Cosmos community failed'
+              err.responseJSON?.error || 'Creating new Cosmos community failed',
             );
           } finally {
             setSaving(false);

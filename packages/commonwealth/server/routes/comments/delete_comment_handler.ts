@@ -12,13 +12,13 @@ export const deleteCommentHandler = async (
   req: TypedRequestParams<DeleteCommentRequestParams>,
   res: TypedResponse<DeleteCommentResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const { id: commentId } = req.params;
 
   await controllers.comments.deleteComment({
     user,
     address,
-    chain,
+    community,
     commentId: parseInt(commentId, 10),
   });
 

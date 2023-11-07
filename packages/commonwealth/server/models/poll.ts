@@ -6,7 +6,7 @@ import type { ModelInstance, ModelStatic } from './types';
 
 export type PollAttributes = {
   id: number;
-  chain_id: string;
+  community_id: string;
   thread_id: number;
   prompt: string;
   options: string;
@@ -33,7 +33,7 @@ export default (
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: dataTypes.INTEGER, allowNull: false },
-      chain_id: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
 
       prompt: { type: dataTypes.TEXT, allowNull: false },
       options: { type: dataTypes.STRING, allowNull: true },
@@ -48,7 +48,7 @@ export default (
       updatedAt: 'updated_at',
       underscored: true,
       tableName: 'Polls',
-      indexes: [{ fields: ['thread_id'] }, { fields: ['chain_id'] }],
+      indexes: [{ fields: ['thread_id'] }, { fields: ['community_id'] }],
     }
   );
 
@@ -58,7 +58,7 @@ export default (
       targetKey: 'id',
     });
     models.Poll.belongsTo(models.Community, {
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Poll.hasMany(models.Vote, {

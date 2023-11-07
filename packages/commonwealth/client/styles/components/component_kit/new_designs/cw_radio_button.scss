@@ -14,19 +14,19 @@
     cursor: pointer;
     accent-color: $neutral-400;
     z-index: 1;
-  
+
     &:hover {
       accent-color: $primary-600;
     }
-  
+
     &:checked {
       accent-color: $primary-500;
     }
-  
+
     &:checked:hover {
       accent-color: $primary-600;
     }
-  
+
     &.disabled {
       pointer-events: none;
       box-shadow: inset 0 0 0 1px $neutral-200;

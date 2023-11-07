@@ -76,9 +76,9 @@ const editThread = async ({
 
   const response = await axios.patch(`${app.serverUrl()}/threads/${threadId}`, {
     // common payload
-    author_chain: chainId,
+    author_community_id: chainId,
     address: address,
-    chain: chainId,
+    community_id: chainId,
     jwt: app.user.jwt,
     // for edit profile
     ...(url && { url }),
@@ -134,7 +134,7 @@ const useEditThreadMutation = ({
           chainId,
           threadId,
           updatedThread.topic,
-          currentTopicId
+          currentTopicId,
         );
       }
 

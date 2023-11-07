@@ -4,7 +4,7 @@ import { UserInstance } from 'server/models/user';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
-  ChainExists: 'Chain Node already exists',
+  ChainNodeExists: 'Chain Node already exists',
   NotAdmin: 'Not an admin',
 };
 
@@ -19,7 +19,7 @@ export type CreateChainNodeResult = { node_id: number };
 
 export async function __createChainNode(
   this: ServerCommunitiesController,
-  { user, url, name, bech32, balanceType }: CreateChainNodeOptions
+  { user, url, name, bech32, balanceType }: CreateChainNodeOptions,
 ): Promise<CreateChainNodeResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
@@ -30,7 +30,7 @@ export async function __createChainNode(
   });
 
   if (chainNode) {
-    throw new AppError(Errors.ChainExists);
+    throw new AppError(Errors.ChainNodeExists);
   }
 
   const newChainNode = await this.models.ChainNode.create({

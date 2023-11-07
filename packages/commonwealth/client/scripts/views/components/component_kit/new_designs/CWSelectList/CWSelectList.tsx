@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { GroupBase, Props } from 'react-select';
 import Select from 'react-select';
@@ -40,9 +40,17 @@ export const CWSelectList = <
     : ({} as any);
   const formFieldErrorMessage =
     hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
-  const defaultFormContextValue = hookToForm
-    ? formContext?.getValues?.(props?.name)
-    : null;
+  const [defaultFormContextValue, setDefaultFormContextValue] = useState(
+    hookToForm ? formContext?.getValues?.(props?.name) : null,
+  );
+
+  useEffect(() => {
+    if (defaultFormContextValue) {
+      setTimeout(() => {
+        setDefaultFormContextValue(null);
+      });
+    }
+  }, [defaultFormContextValue]);
 
   useEffect(() => {
     hookToForm &&
