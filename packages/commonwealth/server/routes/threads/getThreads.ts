@@ -27,7 +27,7 @@ export const getThreadsValidation = [
 export const getThreads = async (
   models: DB,
   req: TypedRequestQuery<GetThreadsReq>,
-  res: TypedResponse<GetThreadsResp>
+  res: TypedResponse<GetThreadsResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -47,7 +47,7 @@ export const getThreads = async (
   const pagination = formatPagination(req.query);
 
   // if address is included, find which thread_ids they correspond to.
-  const where: WhereOptions<ThreadAttributes> = { chain: community_id };
+  const where: WhereOptions<ThreadAttributes> = { community_id: community_id };
   if (addresses) {
     const addressIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },

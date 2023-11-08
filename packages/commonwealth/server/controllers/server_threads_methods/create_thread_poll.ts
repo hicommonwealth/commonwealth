@@ -69,7 +69,7 @@ export async function __createThreadPoll(
   }
 
   // check if admin_only flag is set
-  if (thread.Chain?.admin_only_polling) {
+  if (community.admin_only_polling) {
     const isAdmin = await validateOwner({
       models: this.models,
       user,
@@ -87,7 +87,7 @@ export async function __createThreadPoll(
     return this.models.Poll.create(
       {
         thread_id: thread.id,
-        community_id: thread.chain,
+        community_id: thread.community_id,
         prompt,
         options: JSON.stringify(options),
         ends_at,

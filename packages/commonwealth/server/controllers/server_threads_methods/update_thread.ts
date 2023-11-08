@@ -273,7 +273,7 @@ export async function __updateThread(
         thread_id: +finalThread.id,
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
-        chain_id: finalThread.chain,
+        chain_id: finalThread.community_id,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.community_id,
       },
@@ -337,7 +337,7 @@ export async function __updateThread(
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
-            chain_id: finalThread.chain,
+            chain_id: finalThread.community_id,
             author_address: finalThread.Address.address,
             author_chain: finalThread.Address.community_id,
           },
@@ -621,7 +621,7 @@ async function setThreadTopic(
       const [topic] = await models.Topic.findOrCreate({
         where: {
           name: topicName,
-          chain_id: thread.chain,
+          chain_id: thread.community_id,
         },
       });
       toUpdate.topic_id = topic.id;
@@ -665,7 +665,7 @@ async function updateThreadCollaborators(
     if (toAddUnique.length > 0) {
       const collaboratorAddresses = await models.Address.findAll({
         where: {
-          community_id: thread.chain,
+          community_id: thread.community_id,
           id: {
             [Op.in]: toAddUnique,
           },

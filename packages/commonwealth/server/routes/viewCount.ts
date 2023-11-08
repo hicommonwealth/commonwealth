@@ -15,7 +15,7 @@ const viewCount = async (
   cache: ViewCountCache,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.object_id) {
     return next(new AppError(Errors.NoObjectId));
@@ -33,7 +33,7 @@ const viewCount = async (
   // verify count exists before querying
   let count = await models.Thread.findOne({
     where: {
-      chain: req.body.chain,
+      community_id: req.body.chain,
       id: req.body.object_id,
     },
   });

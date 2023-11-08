@@ -52,7 +52,7 @@ export type CreateThreadOptions = {
 export type CreateThreadResult = [
   ThreadAttributes,
   EmitOptions[],
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThread(
@@ -73,7 +73,7 @@ export async function __createThread(
     canvasSession,
     canvasHash,
     discordMeta,
-  }: CreateThreadOptions
+  }: CreateThreadOptions,
 ): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
@@ -123,7 +123,7 @@ export async function __createThread(
   const version_history: string[] = [JSON.stringify(firstVersion)];
 
   const threadContent: Partial<ThreadAttributes> = {
-    chain: community.id,
+    community_id: community.id,
     address_id: address.id,
     title,
     body,
@@ -158,7 +158,7 @@ export async function __createThread(
       } else {
         if (community.topics?.length) {
           throw new AppError(
-            'Must pass a topic_name string and/or a numeric topic_id'
+            'Must pass a topic_name string and/or a numeric topic_id',
           );
         }
       }
@@ -182,7 +182,7 @@ export async function __createThread(
             this.tokenBalanceCache,
             topicId,
             community,
-            address
+            address,
           );
           if (!isValid) {
             throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
@@ -199,7 +199,7 @@ export async function __createThread(
 
       return thread.id;
       // end of transaction
-    }
+    },
   );
 
   const finalThread = await this.models.Thread.findOne({
@@ -222,14 +222,14 @@ export async function __createThread(
     subscriber_id: user.id,
     category_id: NotificationCategories.NewComment,
     thread_id: finalThread.id,
-    chain_id: finalThread.chain,
+    chain_id: finalThread.community_id,
     is_active: true,
   });
   await this.models.Subscription.create({
     subscriber_id: user.id,
     category_id: NotificationCategories.NewReaction,
     thread_id: finalThread.id,
-    chain_id: finalThread.chain,
+    chain_id: finalThread.community_id,
     is_active: true,
   });
 
@@ -248,7 +248,7 @@ export async function __createThread(
             },
             include: [this.models.User],
           });
-        })
+        }),
       );
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -272,7 +272,7 @@ export async function __createThread(
         root_type: ProposalType.Thread,
         root_title: finalThread.title,
         comment_text: finalThread.body,
-        chain_id: finalThread.chain,
+        chain_id: finalThread.community_id,
         author_address: finalThread.Address.address,
         author_chain: finalThread.Address.community_id,
       },
@@ -296,7 +296,7 @@ export async function __createThread(
             root_type: ProposalType.Thread,
             root_title: finalThread.title,
             comment_text: finalThread.body,
-            chain_id: finalThread.chain,
+            chain_id: finalThread.community_id,
             author_address: finalThread.Address.address,
             author_chain: finalThread.Address.community_id,
           },

@@ -24,7 +24,7 @@ export type GetCommunityStatsResult = {
 
 export async function __getCommunityStats(
   this: ServerCommunitiesController,
-  { user, communityId }: GetCommunityStatsOptions
+  { user, communityId }: GetCommunityStatsOptions,
 ): Promise<GetCommunityStatsResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
@@ -55,7 +55,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: communityId,
+      community_id: communityId,
     },
   });
 

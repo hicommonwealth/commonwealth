@@ -1,8 +1,8 @@
-import { SupportedNetwork } from '../../shared/chain/types/types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory, WebhookCategory } from 'types';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
+import { SupportedNetwork } from '../../shared/chain/types/types';
 import models from '../database';
 import { WebhookInstance } from '../models/webhook';
 import { dispatchWebhooks } from '../util/webhooks/dispatchWebhook';
@@ -43,7 +43,7 @@ async function main() {
     .check((args) => {
       if (!args.url && !args.destination) {
         throw new Error(
-          'Must provide either a webhook url or a destination flag.'
+          'Must provide either a webhook url or a destination flag.',
         );
       }
       return true;
@@ -58,7 +58,7 @@ async function main() {
   ) {
     throw new Error(
       'Must have DISCORD_WEBHOOK_URL_DEV, SLACK_WEBHOOK_URL_DEV, ' +
-        'ZAPIER_WEBHOOK_URL_DEV, and TELEGRAM_BOT_TOKEN_DEV set in .env'
+        'ZAPIER_WEBHOOK_URL_DEV, and TELEGRAM_BOT_TOKEN_DEV set in .env',
     );
   }
 
@@ -101,7 +101,7 @@ async function main() {
       models.Webhook.build({
         url: process.env.ZAPIER_WEBHOOK_URL_DEV,
         ...genericWebhookOptions,
-      })
+      }),
     );
   } else {
     throw new Error(`Invalid webhook destination: ${argv.destination}`);
@@ -112,7 +112,7 @@ async function main() {
       models.Webhook.build({
         url,
         ...genericWebhookOptions,
-      })
+      }),
     );
   }
 
@@ -132,7 +132,7 @@ async function main() {
   } else {
     const thread = await models.Thread.findOne({
       where: {
-        chain: chain.id,
+        community_id: chain.id,
       },
       include: {
         model: models.Address,
@@ -146,7 +146,7 @@ async function main() {
       thread_id: thread.id,
       root_title: thread.title,
       root_type: ProposalType.Thread,
-      chain_id: thread.chain,
+      chain_id: thread.community_id,
       author_address: thread.Address.address,
       author_chain: thread.Address.community_id,
     };

@@ -1,11 +1,11 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import app, { resetDatabase } from '../../../server-test';
-import * as modelUtils from '../../util/modelUtils';
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
-import { Op } from 'sequelize';
+import * as modelUtils from '../../util/modelUtils';
 import { JoinCommunityArgs, ThreadArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
@@ -231,7 +231,7 @@ describe('User Dashboard API', () => {
           },
           raw: true,
         })
-      ).map((x) => x.chain);
+      ).map((x) => x.community_id);
       expect(chains.includes(threadOne.chainId)).to.be.false;
     });
   });

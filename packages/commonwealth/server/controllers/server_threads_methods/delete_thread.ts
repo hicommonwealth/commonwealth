@@ -52,7 +52,7 @@ export async function __deleteThread(
   if (address) {
     // check ban
     const [canInteract, banError] = await this.banCache.checkBan({
-      communityId: thread.chain,
+      communityId: thread.community_id,
       address: address.address,
     });
     if (!canInteract) {
@@ -70,7 +70,7 @@ export async function __deleteThread(
   const isAdminOrMod = await findOneRole(
     this.models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    thread.chain,
+    thread.community_id,
     ['admin', 'moderator'],
   );
   if (!isAuthor && !isAdminOrMod) {

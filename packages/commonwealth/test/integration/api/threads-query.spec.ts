@@ -28,7 +28,7 @@ describe('Thread queries', () => {
     const thread = (
       await models.Thread.findOrCreate({
         where: {
-          chain: chain.id,
+          community_id: chain.id,
           address_id: address.id,
           title: 'title',
           kind: 'kind',
