@@ -519,8 +519,9 @@ const GroupForm = ({
             </section>
           </section>
 
-          {formType === 'create' ||
-            (formType === 'edit' && <TopicGatingHelpMessage />)}
+          {(formType === 'create' || formType === 'edit') && (
+            <TopicGatingHelpMessage />
+          )}
 
           {/* Form action buttons */}
           <div className="action-buttons">
