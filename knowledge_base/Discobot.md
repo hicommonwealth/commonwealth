@@ -5,7 +5,7 @@
 1. Discord Listener (`/packages/discord-bot/discord-listener/discordListener.ts`), an app that handles incoming events from the Discord API and pushes these events to a RabbitMQ queue.
 2. Discord Consumer (`/packages/discord-bot/discord-consumer/discordConsumer.ts`), an app that handles events from the RabbitMQ queue and hits the CW API endpoint to create Threads and Comments.
 3. RabbitMQ Instance: a queue has been set up called `discord-message`
-4. Commonwealth Manage Community Page (`/packages/commonwealth/…/chain_metadata_rows.tsx`), where admins are able to add a bot connection and connect Forum Channels (in a connected Discord Server) to Topics (in the CW forum).
+4. Commonwealth Manage Community Page (`/packages/commonwealth/…/community_metadata_rows.tsx`), where admins are able to add a bot connection and connect Forum Channels (in a connected Discord Server) to Topics (in the CW forum).
 
 The basic flow here:
 ![image (4)](https://github.com/hicommonwealth/commonwealth/assets/31940965/aaf5719a-4ea1-46be-bbbf-3cce55ba7528)

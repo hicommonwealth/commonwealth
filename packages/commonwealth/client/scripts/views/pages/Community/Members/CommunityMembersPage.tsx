@@ -1,5 +1,6 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { featureFlags } from 'helpers/feature-flags';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
@@ -25,7 +26,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
-import { GroupCategory, SearchFilters } from './index.types';
+import { GroupCategory, MembershipFilter, SearchFilters } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
@@ -39,6 +40,7 @@ const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
 ];
 
 const CommunityMembersPage = () => {
+  useUserActiveAccount();
   const navigate = useCommonNavigate();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
@@ -69,6 +71,12 @@ const CommunityMembersPage = () => {
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
     enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    ...(searchFilters.category !== 'All groups' && {
+      includeMembershipTypes: searchFilters.category
+        .split(' ')
+        .join('-')
+        .toLowerCase() as MembershipFilter,
+    }),
   });
 
   const { data: groups } = useFetchGroupsQuery({
@@ -118,21 +126,10 @@ const CommunityMembersPage = () => {
             ) ||
             p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
           : true,
-      )
-      .filter((p) => {
-        if (searchFilters.category === GROUP_AND_MEMBER_FILTERS[0]) {
-          return true;
-        }
-
-        if (searchFilters.category === GROUP_AND_MEMBER_FILTERS[1]) {
-          return p.groups.length > 0;
-        }
-
-        return p.groups.length === 0;
-      });
+      );
 
     return results;
-  }, [members, groups, debouncedSearchTerm, searchFilters.category]);
+  }, [members, groups, debouncedSearchTerm]);
 
   const filteredGroups = useMemo(() => {
     const filteredGroupsArr = (groups || [])
