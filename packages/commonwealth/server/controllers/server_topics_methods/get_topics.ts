@@ -12,7 +12,7 @@ export type GetTopicsResult = TopicWithTotalThreads[];
 
 export async function __getTopics(
   this: ServerTopicsController,
-  { community }: GetTopicsOptions
+  { community }: GetTopicsOptions,
 ): Promise<GetTopicsResult> {
   const topics = await this.models.sequelize.query<TopicWithTotalThreads>(
     `SELECT
@@ -25,7 +25,7 @@ export async function __getTopics(
     {
       replacements: { community_id: community.id },
       type: QueryTypes.SELECT,
-    }
+    },
   );
   return topics;
 }

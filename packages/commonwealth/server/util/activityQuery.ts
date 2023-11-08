@@ -67,7 +67,7 @@ export async function getActivityFeed(models: DB, id = 0) {
 
   const notificationsWithProfiles = notifications.map((notification) => {
     const filteredComments = comments.filter(
-      (c) => c.thread_id === notification.thread_id
+      (c) => c.thread_id === notification.thread_id,
     );
     const notificationProfiles = filteredComments.map((c) => {
       const filteredAddress = addresses.find((a) => a.id === c.address_id);

@@ -31,7 +31,7 @@ export type GetRelatedCommunitiesResult = {
 
 export async function __getRelatedCommunities(
   this: ServerCommunitiesController,
-  { chainNodeId }: GetRelatedCommunitiesQuery
+  { chainNodeId }: GetRelatedCommunitiesQuery,
 ): Promise<GetRelatedCommunitiesResult> {
   // Although this subquery is not necessary as is currently, We should keep it because in the future if we want to
   // paginate, then we will need to paginate through the subquery.
@@ -59,6 +59,6 @@ export async function __getRelatedCommunities(
     {
       type: QueryTypes.SELECT,
       replacements: { chainNodeId },
-    }
+    },
   );
 }

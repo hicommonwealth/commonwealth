@@ -34,7 +34,7 @@ export async function __searchThreads(
     page,
     orderBy,
     orderDirection,
-  }: SearchThreadsOptions
+  }: SearchThreadsOptions,
 ): Promise<SearchThreadsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {

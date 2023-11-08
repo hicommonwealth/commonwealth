@@ -1,11 +1,11 @@
+import { ThreadStage } from 'models/types';
 import moment from 'moment';
-import {Op, QueryTypes} from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
 import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
+import { ThreadAttributes } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
 import { ServerThreadsController } from '../server_threads_controller';
-import {ThreadStage} from "models/types";
 
 export type GetBulkThreadsOptions = {
   community?: CommunityInstance;
@@ -40,7 +40,7 @@ export async function __getBulkThreads(
     fromDate,
     toDate,
     archived,
-  }: GetBulkThreadsOptions
+  }: GetBulkThreadsOptions,
 ): Promise<GetBulkThreadsResult> {
   // query params that bind to sql query
   const bind = (() => {
@@ -165,7 +165,7 @@ export async function __getBulkThreads(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     );
   } catch (e) {
     console.error(e);
@@ -231,7 +231,7 @@ export async function __getBulkThreads(
     where: {
       community_id: community?.id,
       stage: ThreadStage.Voting,
-    }
+    },
   });
 
   threads = await Promise.all(threads);

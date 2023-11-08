@@ -1,9 +1,8 @@
-import { Page, expect as pwexpect } from '@playwright/test';
+import { expect as pwexpect } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { testChains, testThreads } from '../hooks/e2eDbEntityHooks.spec';
-import { addAddressIfNone, login, testDb } from '../utils/e2eUtils';
-import { PORT } from '../../../server/config';
+import { testThreads } from '../hooks/e2eDbEntityHooks.spec';
+import { login } from '../utils/e2eUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -27,13 +26,13 @@ export const discussionTests = (test) => {
       await pwexpect(async () => {
         const numberOfThreads = await page.$$eval(
           'div[data-test-id] > div',
-          (divs) => divs.length
+          (divs) => divs.length,
         );
         expect(numberOfThreads).to.be.gte(testThreads.length - 1);
       }).toPass();
 
       const firstThread = await page.$(
-        'div[data-test-id="virtuoso-item-list"] > div:first-child'
+        'div[data-test-id="virtuoso-item-list"] > div:first-child',
       );
 
       // navigate to first link
@@ -84,7 +83,7 @@ export const discussionTests = (test) => {
       await pwexpect(async () => {
         reactionsCountDivs = await page.locator('.reactions-count');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
-          expectedNewReactionCount
+          expectedNewReactionCount,
         );
       }).toPass({ timeout: 5_000 });
 
@@ -98,7 +97,7 @@ export const discussionTests = (test) => {
       await pwexpect(async () => {
         reactionsCountDivs = await page.locator('.reactions-count');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
-          firstThreadReactionCount
+          firstThreadReactionCount,
         );
       }).toPass({ timeout: 5_000 });
     });

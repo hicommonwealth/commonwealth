@@ -23,7 +23,7 @@ const exportMembersList = async (
   models: DB,
   req: TypedRequestBody<exportMembersListReq>,
   res: TypedResponse<exportMembersListResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user.isAdmin) {
     return next(new AppError(Errors.NotAdmin));
@@ -67,7 +67,7 @@ const exportMembersList = async (
     `,
       {
         replacements: { chainId },
-      }
+      },
     );
 
     return success(res, { data });

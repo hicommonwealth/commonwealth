@@ -22,7 +22,7 @@ export type DeleteTopicResult = void;
 
 export async function __deleteTopic(
   this: ServerTopicsController,
-  { user, community, topicId }: DeleteTopicOptions
+  { user, community, topicId }: DeleteTopicOptions,
 ): Promise<DeleteTopicResult> {
   const isAdmin = validateOwner({
     models: this.models,
@@ -52,7 +52,7 @@ export async function __deleteTopic(
           topic_id: topicId,
           community_id: community.id,
         },
-        transaction
+        transaction,
       },
     );
     await topic.destroy({ transaction });
