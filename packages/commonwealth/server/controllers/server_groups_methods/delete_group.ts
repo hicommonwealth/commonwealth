@@ -23,7 +23,7 @@ export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
   this: ServerCommunitiesController,
-  { user, community, groupId }: DeleteGroupOptions
+  { user, community, groupId }: DeleteGroupOptions,
 ): Promise<DeleteGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
@@ -54,7 +54,7 @@ export async function __deleteGroup(
         group_ids: sequelize.fn(
           'array_remove',
           sequelize.col('group_ids'),
-          group.id
+          group.id,
         ),
       },
       {
@@ -64,13 +64,14 @@ export async function __deleteGroup(
           },
         },
         transaction,
-      }
+      },
     );
     // delete all memberships of group
     await this.models.Membership.destroy({
       where: {
         group_id: group.id,
       },
+      transaction,
     });
     // delete group
     await this.models.Group.destroy({

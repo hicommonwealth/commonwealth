@@ -10,7 +10,7 @@ import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
-import { ServerCommunitiesController } from '../server_communities_controller';
+import { ServerGroupsController } from '../server_groups_controller';
 
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
@@ -33,7 +33,7 @@ export type UpdateGroupOptions = {
 export type UpdateGroupResult = GroupAttributes;
 
 export async function __updateGroup(
-  this: ServerCommunitiesController,
+  this: ServerGroupsController,
   {
     user,
     community,
