@@ -17,6 +17,7 @@ export const enum MixpanelCommunityInteractionEvent {
   LINKED_PROPOSAL = 'Linked Proposal',
   LINKED_THREAD = 'Linked Thread',
   UPDATE_STAGE = 'Update Stage',
+  UPDATE_GROUP = 'Update Group',
 }
 
 export const enum MixpanelLoginEvent {
