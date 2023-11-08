@@ -10,10 +10,6 @@ const log = factory.getLogger(formatFilename(__filename));
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
 
-function cleanMalformedUrl(str: string) {
-  return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
-}
-
 const decodeTitle = (title: string) => {
   try {
     return decodeURIComponent(title);
@@ -76,8 +72,15 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     const metadataHtml: string = $tmpl.html();
     const twitterSafeHtml = metadataHtml.replace(
       /<meta name="twitter:image:src" content="(.*?)">/g,
-      '<meta name="twitter:image" content="$1">'
+      '<meta name="twitter:image" content="$1">',
     );
+
+    // Don't cache initial html for too long on CDN so that we do not run into cache invalidation issues
+    res.setHeader(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, max-age=0',
+    );
+    res.setHeader('CDN-Cache-Control', 'max-age=10');
 
     res.send(twitterSafeHtml);
   };
@@ -157,7 +160,7 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
     scope: string,
     req,
     res,
-    chain?: CommunityInstance
+    chain?: CommunityInstance,
   ) => {
     // Retrieve title, description, and author from the database
     chain = chain || (await getChain(req, scope));
@@ -237,7 +240,9 @@ const setupAppRoutes = (app, models: DB, templateFile, sendFile) => {
   async function getChain(req, scope: string) {
     return scope
       ? await models.Community.findOne({ where: { id: scope } })
-      : await models.Community.findOne({ where: { custom_domain: req.hostname } });
+      : await models.Community.findOne({
+          where: { custom_domain: req.hostname },
+        });
   }
 
   app.get('/:scope?', renderGeneralPage);
