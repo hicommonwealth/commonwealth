@@ -1,3 +1,4 @@
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -5,6 +6,8 @@ import app from 'state';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
+
 import {
   SPECIFICATIONS,
   TOKENS,
@@ -26,6 +29,11 @@ const GroupsSection = ({
   hasNoGroups,
 }: GroupSectionProps) => {
   const navigate = useCommonNavigate();
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.GROUPS_PAGE_VIEW },
+  });
+
   return (
     <section className="GroupsSection">
       {hasNoGroups && (
