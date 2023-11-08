@@ -400,7 +400,7 @@ const GroupForm = ({
             <CWTextArea
               name="groupDescription"
               hookToForm
-              label="Description"
+              label="Description (optional)"
               placeholder="Add a description for your group"
               instructionalMessage="Can be up to 250 characters long"
             />
