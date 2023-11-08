@@ -61,7 +61,7 @@ const useEditCommentMutation = ({
 }: UseEditCommentMutationProps) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    chainId: communityId,
+    communityId,
     threadId,
   });
 

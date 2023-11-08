@@ -1,18 +1,18 @@
 import React from 'react';
 
-import app from '../../state';
+import { useBanProfileByAddressMutation } from 'state/api/profiles';
+import { CWText } from 'views/components/component_kit/cw_text';
 import {
   notifyError,
   notifySuccess,
 } from '../../controllers/app/notifications';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import app from '../../state';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { useBanProfileByAddressMutation } from 'state/api/profiles';
-import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
 
 type BanUserModalAttrs = {
   onModalClose: () => void;
@@ -20,10 +20,7 @@ type BanUserModalAttrs = {
 };
 
 export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
-  const { mutateAsync: banUser } = useBanProfileByAddressMutation({
-    chainId: app.activeChainId(),
-    address: address,
-  });
+  const { mutateAsync: banUser } = useBanProfileByAddressMutation();
 
   const onBanConfirmation = async () => {
     // ZAK TODO: Update Banned User Table with userProfile
@@ -35,7 +32,7 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
     try {
       await banUser({
         address,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
       });
       onModalClose();
       notifySuccess('Banned Address');

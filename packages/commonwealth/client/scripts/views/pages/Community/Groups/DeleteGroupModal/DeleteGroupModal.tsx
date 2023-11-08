@@ -8,7 +8,7 @@ import {
   CWModal,
   CWModalBody,
   CWModalFooter,
-  CWModalHeader
+  CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './DeleteGroupModal.scss';
@@ -26,18 +26,18 @@ export const DeleteGroupModal = ({
   groupName,
   gatedTopics,
   isOpen,
-  onClose = () => {}
+  onClose = () => {},
 }: DeleteGroupModalAttrs) => {
   const navigate = useCommonNavigate();
   const { mutateAsync: deleteGroup } = useDeleteGroupMutation({
-    chainId: app.activeChainId()
+    communityId: app.activeChainId(),
   });
 
   const handleDelete = async () => {
     await deleteGroup({
       address: app.user.activeAccount.address,
-      chainId: app.activeChainId(),
-      groupId: groupId
+      communityId: app.activeChainId(),
+      groupId: groupId,
     })
       .then(() => {
         notifySuccess('Group deleted');

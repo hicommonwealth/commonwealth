@@ -117,7 +117,7 @@ export const CWContentPage = ({
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
   });
 

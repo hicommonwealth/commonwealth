@@ -42,7 +42,7 @@ const useToggleCommentSpamStatusMutation = ({
 }: UseToggleCommentSpamStatusMutationProps) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    chainId: communityId,
+    communityId,
     threadId,
   });
 

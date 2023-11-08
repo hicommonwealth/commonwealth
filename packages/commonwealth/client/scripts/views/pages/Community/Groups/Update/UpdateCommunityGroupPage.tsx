@@ -23,10 +23,10 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { mutateAsync: editGroup } = useEditGroupMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
   const foundGroup: Group = groups.find((x) => x.id === parseInt(`${groupId}`));

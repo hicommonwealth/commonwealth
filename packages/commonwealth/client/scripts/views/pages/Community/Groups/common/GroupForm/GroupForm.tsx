@@ -101,11 +101,11 @@ const GroupForm = ({
 }: GroupFormProps) => {
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const takenGroupNames = groups.map(({ name }) => name.toLowerCase());

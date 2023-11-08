@@ -51,7 +51,7 @@ const useCreateCommentReactionMutation = ({
 }: Partial<CreateReactionProps>) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    chainId: communityId,
+    communityId,
     threadId,
   });
 

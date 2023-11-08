@@ -18,11 +18,11 @@ const useSearchResults = (
   filters: Filter[],
   resultsPerSection?: number,
 ) => {
-  const chainId = app.activeChainId() || 'all_communities';
+  const communityId = app.activeChainId() || 'all_communities';
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {
-    chainId,
+    communityId,
     searchTerm: debouncedSearchTerm,
     limit: resultsPerSection ? resultsPerSection : NUM_RESULTS_PER_SECTION,
     orderBy: APIOrderBy.Rank,
