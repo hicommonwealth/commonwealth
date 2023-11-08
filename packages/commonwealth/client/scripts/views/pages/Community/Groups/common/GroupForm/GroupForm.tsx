@@ -570,7 +570,7 @@ const GroupForm = ({
             <section className="form-section">
               <div className="header-row">
                 <CWText type="h4" fontWeight="semiBold" className="header-text">
-                  Gated topic(s)
+                  Gate topics
                 </CWText>
                 <CWText type="b2">
                   Add topics to gate to auto-lock it for group members who
@@ -593,7 +593,9 @@ const GroupForm = ({
             </section>
           </section>
 
-          {formType === 'create' && <TopicGatingHelpMessage />}
+          {(formType === 'create' || formType === 'edit') && (
+            <TopicGatingHelpMessage />
+          )}
 
           {/* Form action buttons */}
           <div className="action-buttons">
