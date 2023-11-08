@@ -12,6 +12,7 @@ export const enum MixpanelCommunityInteractionEvent {
   CREATE_THREAD = 'Create New Thread',
   CREATE_COMMENT = 'Create New Comment',
   CREATE_REACTION = 'Create New Reaction',
+  CREATE_GROUP = 'Create New Group',
   LINKED_PROPOSAL = 'Linked Proposal',
   LINKED_THREAD = 'Linked Thread',
   UPDATE_STAGE = 'Update Stage',
@@ -68,6 +69,7 @@ export interface BaseMixpanelPayload extends AnalyticsPayload {
   userAddress?: string;
   community?: string;
   communityType?: string;
+  userId?: number;
 }
 
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {
