@@ -1,3 +1,4 @@
+import { SessionKeyError } from 'controllers/server/sessions';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
@@ -5,13 +6,14 @@ import {
   useDeleteThreadMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
 import {
   notifyError,
   notifySuccess,
@@ -22,8 +24,6 @@ import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -76,7 +76,7 @@ export const AdminActions = ({
     reset: resetDeleteThreadMutation,
     error: deleteThreadError,
   } = useDeleteThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
   });
@@ -87,7 +87,7 @@ export const AdminActions = ({
   });
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -106,7 +106,7 @@ export const AdminActions = ({
             try {
               await deleteThread({
                 threadId: thread.id,
-                chainId: app.activeChainId(),
+                communityId: app.activeChainId(),
                 address: app.user.activeAccount.address,
               });
               onDelete?.();
@@ -175,7 +175,7 @@ export const AdminActions = ({
             const isSpam = !thread.markedAsSpamAt;
             try {
               await editThread({
-                chainId: app.activeChainId(),
+                communityId: app.activeChainId(),
                 threadId: thread.id,
                 spam: isSpam,
                 address: app.user?.activeAccount?.address,
@@ -183,7 +183,7 @@ export const AdminActions = ({
                 .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
                 .catch(() => {
                   notifyError(
-                    `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`
+                    `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`,
                   );
                 });
             } catch (err) {
@@ -200,7 +200,7 @@ export const AdminActions = ({
       address: app.user.activeAccount.address,
       threadId: thread.id,
       readOnly: !thread.readOnly,
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
     })
       .then(() => {
         notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
@@ -215,7 +215,7 @@ export const AdminActions = ({
     editThread({
       address: app.user.activeAccount.address,
       threadId: thread.id,
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       pinned: !thread.pinned,
     })
       .then(() => {
@@ -262,7 +262,7 @@ export const AdminActions = ({
     navigate(
       snapshotSpaces.length > 1
         ? '/multiple-snapshots'
-        : `/snapshot/${snapshotSpaces}`
+        : `/snapshot/${snapshotSpaces}`,
     );
   };
 
@@ -272,18 +272,20 @@ export const AdminActions = ({
     } else {
       editThread({
         threadId: thread.id,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         archived: !thread.archivedAt,
         address: app.user?.activeAccount?.address,
       })
         .then(() => {
           notifySuccess(
-            `Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`
+            `Thread has been ${
+              thread?.archivedAt ? 'unarchived' : 'archived'
+            }!`,
           );
         })
         .catch(() => {
           notifyError(
-            `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`
+            `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`,
           );
         });
     }
@@ -382,7 +384,7 @@ export const AdminActions = ({
                             navigate(
                               snapshotSpaces.length > 1
                                 ? '/multiple-snapshots'
-                                : `/snapshot/${snapshotSpaces}`
+                                : `/snapshot/${snapshotSpaces}`,
                             );
                           },
                         },

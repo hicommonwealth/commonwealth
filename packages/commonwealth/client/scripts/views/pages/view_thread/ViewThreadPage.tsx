@@ -112,7 +112,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeMembers: true,
     includeTopics: true,
   });
@@ -122,7 +122,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     error: fetchThreadError,
     isLoading,
   } = useGetThreadsByIdQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     ids: [+threadId].filter(Boolean),
     apiCallEnabled: !!threadId, // only call the api if we have thread id
   });
@@ -131,17 +131,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       threadId: parseInt(`${threadId}`),
     });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: parseInt(threadId),
   });
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
   });
   const restrictedTopicIds = (memberships || [])
@@ -333,7 +333,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (toAdd.length > 0) {
       try {
         await addThreadLinks({
-          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd,
         });

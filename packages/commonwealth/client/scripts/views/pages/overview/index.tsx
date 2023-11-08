@@ -24,7 +24,7 @@ const OverviewPage = () => {
 
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     topicsPerThread: 3,
     // TODO: ask for a pinned thread prop here to show pinned threads
   });
@@ -38,7 +38,7 @@ const OverviewPage = () => {
   }, [forceRerender]);
 
   const { data: topics = [] } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
@@ -62,7 +62,7 @@ const OverviewPage = () => {
         thread.topic?.id &&
         topic.id === thread.topic.id &&
         thread.archivedAt === null &&
-        !thread.markedAsSpamAt
+        !thread.markedAsSpamAt,
     );
 
     return {

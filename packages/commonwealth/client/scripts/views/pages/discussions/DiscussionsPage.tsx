@@ -38,19 +38,19 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
-    'featured'
+    'featured',
   ) as ThreadFeaturedFilterTypes;
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
-    'dateRange'
+    'dateRange',
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
   });
 
@@ -69,7 +69,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
     useFetchThreadsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       queryType: 'bulk',
       page: 1,
       limit: 20,
@@ -105,7 +105,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
+            `${thread.identifier}-${slugify(thread.title)}`,
           );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
