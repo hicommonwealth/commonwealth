@@ -44,6 +44,7 @@ type InputStyleProps = {
   fullWidth?: boolean;
   validationStatus?: ValidationStatus;
   displayOnly?: boolean;
+  alignLabelToRight?: boolean;
 };
 
 type InputInternalStyleProps = {
@@ -97,6 +98,7 @@ const CWTextInput = (props: TextInputProps) => {
     customError,
     inputRef,
     validationStatus,
+    alignLabelToRight,
   } = props;
 
   const formContext = useFormContext();
@@ -122,6 +124,7 @@ const CWTextInput = (props: TextInputProps) => {
     >
       {label && (
         <MessageRow
+          rightAlign={alignLabelToRight}
           label={label}
           statusMessage={manualStatusMessage || validationProps.statusMessage}
           validationStatus={validationProps.validationStatus}

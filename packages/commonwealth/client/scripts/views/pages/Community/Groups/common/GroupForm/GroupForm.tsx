@@ -506,7 +506,10 @@ const GroupForm = ({
                 buttonWidth="full"
                 buttonType="secondary"
                 buttonHeight="med"
-                onClick={addRequirementSubForm}
+                onClick={(e) => {
+                  (e?.target as HTMLButtonElement)?.blur();
+                  addRequirementSubForm();
+                }}
               />
 
               <CWText

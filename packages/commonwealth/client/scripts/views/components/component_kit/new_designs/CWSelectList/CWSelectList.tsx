@@ -56,14 +56,21 @@ export const CWSelectList = <
       formContext.setValue(props.name, props.value);
   }, [props.hookToForm, props.name, props.value, formContext]);
 
+  const isDisabled = props?.isDisabled || formFieldContext?.disabled;
+
   return (
-    <div className="CWSelectList">
+    <div
+      className={getClasses<{ disabled?: boolean }>(
+        { disabled: isDisabled },
+        'CWSelectList',
+      )}
+    >
       {props.label && <MessageRow label={props.label} />}
       <Select
         {...props}
         {...formFieldContext}
         {...(defaultFormContextValue && { value: defaultFormContextValue })}
-        isDisabled={props?.isDisabled || formFieldContext?.disabled}
+        isDisabled={isDisabled}
         required={props?.required || formFieldContext?.required}
         onBlur={(e) => {
           props?.onBlur?.(e);
@@ -122,10 +129,12 @@ export const CWSelectList = <
         className={getClasses<{
           className?: string;
           failure?: boolean;
+          disabled?: boolean;
         }>(
           {
             className: props.className,
             failure: !!formFieldErrorMessage || !!props.customError,
+            disabled: isDisabled,
           },
           ComponentType.SelectList,
         )}

@@ -1,6 +1,9 @@
 @import '../../../../../../styles/shared.scss';
-
 .CWSelectList {
+  &.disabled {
+    cursor: not-allowed !important;
+  }
+
   .SelectList {
     @include inputStyles;
     font-size: 14px;
@@ -10,7 +13,7 @@
     min-height: 40px;
     max-height: 40px;
     padding: 10px 16px;
-  
+
     .cwsl__control {
       gap: 8px;
       letter-spacing: 0.02em;
@@ -18,42 +21,46 @@
       flex-wrap: wrap;
       align-items: flex-start !important;
       cursor: text !important;
-  
+
       .cwsl__value-container {
         padding: 0 !important;
         max-height: 24px;
         line-height: 14px;
-  
+
+        .cwsl__single-value {
+          line-height: 18px;
+        }
+
         .cwsl__multi-value {
           padding: 2px 8px;
           border-radius: 6px;
           margin: 0px !important;
           margin-right: 8px !important;
           background-color: $neutral-100;
-  
+
           .cwsl__multi-value__label {
             font-size: 14px;
             margin-right: 16px;
             padding: 0px !important;
           }
-  
+
           .cwsl__multi-value__remove {
             padding: 0;
             cursor: pointer;
             color: $neutral-500;
             font-size: 16px !important;
-  
+
             &:hover {
               background-color: inherit;
               color: $neutral-600;
             }
-  
+
             svg {
               font-size: 16px !important;
             }
           }
         }
-  
+
         .cwsl__input-container {
           margin: 0;
           padding-top: 0;
@@ -61,15 +68,15 @@
         }
       }
     }
-  
+
     .cwsl__indicators {
       cursor: pointer;
-  
+
       .cwsl__indicator-separator {
         display: none;
       }
     }
-  
+
     .cwsl__menu {
       left: 0;
       margin-top: 8px;
@@ -78,11 +85,11 @@
       width: 100%;
       background-color: $white;
       box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
-  
+
       .cwsl__menu-list {
         overflow: scroll;
         padding: 8px;
-  
+
         .cwsl__option {
           border: 0;
           outline: 0;
@@ -93,11 +100,14 @@
           text-align: left;
           cursor: pointer;
           margin-bottom: 4px;
-  
-          &:hover, &:focus, &:focus-visible, &:focus-within {
+
+          &:hover,
+          &:focus,
+          &:focus-visible,
+          &:focus-within {
             background-color: $neutral-100;
           }
-  
+
           &:active {
             background-color: transparent;
           }
