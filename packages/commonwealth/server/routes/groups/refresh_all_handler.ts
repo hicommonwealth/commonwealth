@@ -12,7 +12,9 @@ export const refreshAllHandler = async (
     throw new AppError('must be super admin');
   }
 
-  const communitiesResult = await controllers.communities.getCommunities({});
+  const communitiesResult = await controllers.communities.getCommunities({
+    hasGroups: true,
+  });
 
   // refresh in background
   Bluebird.map(
