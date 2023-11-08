@@ -7,9 +7,9 @@
   .SelectList {
     @include inputStyles;
     font-size: 14px;
-    line-height: 14px !important;
+    line-height: 20px;
     border: 1px solid $neutral-200 !important;
-    border-radius: 6px !important;
+    border-radius: $border-radius-corners-wider;
     min-height: 40px;
     max-height: 40px;
     padding: 10px 16px;
@@ -69,8 +69,14 @@
       }
     }
 
-    .cwsl__indicators {
-      cursor: pointer;
+  .cwsl__indicators {
+    cursor: pointer;
+    
+    &.searchable {
+      [class$='-control'] {
+        cursor: text !important;
+      }
+    }
 
       .cwsl__indicator-separator {
         display: none;
@@ -87,7 +93,8 @@
       box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 
       .cwsl__menu-list {
-        overflow: scroll;
+        @include scrollbarStyles;
+        overflow: auto;
         padding: 8px;
 
         .cwsl__option {
@@ -96,7 +103,7 @@
           border-radius: 6px;
           padding: 10px 12px;
           width: 100%;
-          font-size: 16px;
+          font-size: 14px;
           text-align: left;
           cursor: pointer;
           margin-bottom: 4px;
@@ -110,6 +117,26 @@
 
           &:active {
             background-color: transparent;
+          }
+
+          &[class*='__option--is-selected'] {
+            background-color: $neutral-50;
+            color: $neutral-800;
+
+            .text-container {
+              background-color: $neutral-50;
+              color: $neutral-800;
+            }
+          }
+
+          &[class*='__option--is-focused'] {
+            background-color: $neutral-100;
+            color: $neutral-800;
+
+            .text-container {
+              background-color: $neutral-100;
+              color: $neutral-800;
+            }
           }
         }
       }
