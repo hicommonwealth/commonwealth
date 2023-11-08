@@ -40,7 +40,7 @@ const useSearchResults = (
     enabled: queryEnabled && filters.includes('replies'),
   });
 
-  const { data: chainsData } = useSearchChainsQuery({
+  const { data: communityData } = useSearchChainsQuery({
     ...sharedQueryOptions,
     enabled: queryEnabled && filters.includes('communities'),
   });
@@ -55,10 +55,10 @@ const useSearchResults = (
     return {
       [SearchScope.Threads]: threadsData?.pages?.[0]?.results || [],
       [SearchScope.Replies]: commentsData?.pages?.[0]?.results || [],
-      [SearchScope.Communities]: chainsData?.pages?.[0]?.results || [],
+      [SearchScope.Communities]: communityData?.pages?.[0]?.results || [],
       [SearchScope.Members]: profilesData?.pages?.[0]?.results || [],
     };
-  }, [threadsData, chainsData, profilesData, commentsData]);
+  }, [threadsData, communityData, profilesData, commentsData]);
 
   return { searchResults };
 };
