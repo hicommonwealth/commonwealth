@@ -18,7 +18,11 @@ import { getNotificationTypeText } from './helpers';
 
 const getTextRows = (
   subscription: NotificationSubscription,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string,
+  ) => void,
 ) => {
   if (subscription.Thread) {
     const threadUrl = getNotificationUrlPath(subscription);
@@ -122,7 +126,7 @@ type SubscriptionRowProps = {
 };
 
 export const SubscriptionRowTextContainer = ({
-  subscription
+  subscription,
 }: SubscriptionRowProps) => {
   const navigate = useCommonNavigate();
 
@@ -150,7 +154,7 @@ type SubscriptionRowMenuProps = {
 
 export const SubscriptionRowMenu = ({
   subscription,
-  onUnsubscribe
+  onUnsubscribe,
 }: SubscriptionRowMenuProps) => {
   return (
     <div className="trigger-wrapper">
@@ -163,8 +167,8 @@ export const SubscriptionRowMenu = ({
             label: 'Unsubscribe',
             iconLeft: 'close',
             isSecondary: true,
-            onClick: () => onUnsubscribe(subscription)
-          }
+            onClick: () => onUnsubscribe(subscription),
+          },
         ]}
       />
     </div>

@@ -28,12 +28,12 @@ const LinkAccountItem = ({
   walletNetwork,
   walletChain,
   onSelect,
-  idx
+  idx,
 }: LinkAccountItemProps) => {
   const address = app.chain
     ? addressSwapper({
         address: account.address,
-        currentPrefix: parseInt((app.chain as Substrate)?.meta.ss58Prefix, 10)
+        currentPrefix: parseInt((app.chain as Substrate)?.meta.ss58Prefix, 10),
       })
     : account.address;
 
@@ -128,11 +128,11 @@ type WalletsListProps = {
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onSocialLogin: (
     type: WalletSsoSource,
-    useSessionKeyRevalidationFlow: boolean
+    useSessionKeyRevalidationFlow: boolean,
   ) => Promise<void>;
   onWalletAddressSelect: (
     wallet: IWebWallet<any>,
-    address: string
+    address: string,
   ) => Promise<void>;
 };
 
@@ -148,7 +148,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
     onWalletSelect,
     onWalletAddressSelect,
     onSocialLogin,
-    hideSocialLogins
+    hideSocialLogins,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -159,7 +159,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
         <div
           className={getClasses<{ darkMode?: boolean }>(
             { darkMode },
-            'wallets'
+            'wallets',
           )}
         >
           {wallets.map((wallet: IWebWallet<any>, index) => (
@@ -189,8 +189,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
                             address: wallet.accounts[accountIndex].address,
                             currentPrefix: parseInt(
                               (app.chain as Substrate).meta.ss58Prefix,
-                              10
-                            )
+                              10,
+                            ),
                           });
                         }
                         return wallet.accounts[accountIndex].address;
@@ -222,7 +222,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 onClick={async () =>
                   onSocialLogin(
                     WalletSsoSource.Google,
-                    useSessionKeyRevalidationFlow
+                    useSessionKeyRevalidationFlow,
                   )
                 }
               />
@@ -231,7 +231,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 type="b2"
                 className={getClasses<{ darkMode?: boolean }>(
                   { darkMode },
-                  'connect-another-way-link'
+                  'connect-another-way-link',
                 )}
               >
                 <a onClick={onConnectAnotherWay}>
@@ -256,7 +256,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={async () =>
               onSocialLogin(
                 WalletSsoSource.Discord,
-                useSessionKeyRevalidationFlow
+                useSessionKeyRevalidationFlow,
               )
             }
             className="DiscordAuthButton"
@@ -268,7 +268,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={() =>
               onSocialLogin(
                 WalletSsoSource.Github,
-                useSessionKeyRevalidationFlow
+                useSessionKeyRevalidationFlow,
               )
             }
           />
@@ -279,7 +279,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={() =>
               onSocialLogin(
                 WalletSsoSource.Twitter,
-                useSessionKeyRevalidationFlow
+                useSessionKeyRevalidationFlow,
               )
             }
           />
@@ -290,7 +290,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
               type="caption"
               className={getClasses<{ darkMode?: boolean }>(
                 { darkMode },
-                'reset-wc-link'
+                'reset-wc-link',
               )}
             >
               <a
@@ -326,7 +326,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                   type="caption"
                   className={getClasses<{ darkMode?: boolean }>(
                     { darkMode },
-                    'no-wallet-link'
+                    'no-wallet-link',
                   )}
                 >
                   {`Don't see your wallet?`}
