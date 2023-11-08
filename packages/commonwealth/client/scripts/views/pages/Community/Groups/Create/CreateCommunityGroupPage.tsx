@@ -13,7 +13,7 @@ import './CreateCommunityGroupPage.scss';
 const CreateCommunityGroupPage = () => {
   const navigate = useCommonNavigate();
   const { mutateAsync: createGroup } = useCreateGroupMutation({
-    chainId: app.activeChainId()
+    chainId: app.activeChainId(),
   });
 
   if (
@@ -27,6 +27,9 @@ const CreateCommunityGroupPage = () => {
   return (
     <GroupForm
       formType="create"
+      initialValues={{
+        requirementsToFulfill: 'ALL',
+      }}
       onSubmit={(values) => {
         const payload = makeGroupDataBaseAPIPayload(values);
 
