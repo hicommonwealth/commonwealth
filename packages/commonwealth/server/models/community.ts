@@ -93,7 +93,7 @@ export type CommunityModelStatic = ModelStatic<CommunityInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommunityModelStatic => {
   const Community = <CommunityModelStatic>sequelize.define(
     // Leave this as is for now so that we don't need to alias and models can join
@@ -151,8 +151,16 @@ export default (
         type: dataTypes.BOOLEAN,
         defaultValue: false,
       },
-      directory_page_enabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-      directory_page_chain_node_id: { type: dataTypes.INTEGER, allowNull: true, defaultValue: null },
+      directory_page_enabled: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      directory_page_chain_node_id: {
+        type: dataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null,
+      },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
@@ -162,18 +170,20 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: false,
-    }
+    },
   );
 
   Community.associate = (models) => {
-    models.Community.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id' });
+    models.Community.belongsTo(models.ChainNode, {
+      foreignKey: 'chain_node_id',
+    });
     models.Community.hasMany(models.Address, { foreignKey: 'community_id' });
     models.Community.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Community.hasMany(models.Topic, {
       as: 'topics',
       foreignKey: 'chain_id',
     });
-    models.Community.hasMany(models.Thread, { foreignKey: 'chain' });
+    models.Community.hasMany(models.Thread, { foreignKey: 'community_id' });
     models.Community.hasMany(models.Comment, { foreignKey: 'chain' });
     models.Community.hasMany(models.StarredCommunity, { foreignKey: 'chain' });
     models.Community.belongsToMany(models.Contract, {
