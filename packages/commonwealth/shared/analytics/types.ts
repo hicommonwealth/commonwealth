@@ -34,6 +34,10 @@ export const enum MixpanelErrorCaptureEvent {
   ERROR_CAPTURED = 'Error Event Captured',
 }
 
+export const enum MixpanelClickthroughEvent {
+  VIEW_THREAD_TO_MEMBERS_PAGE = 'Clickthrough: View Thread to Members Page -> Groups Tab',
+}
+
 export const enum MixpanelCommunityCreationEvent {
   CREATE_BUTTON_PRESSED = 'Create Community Button Pressed',
   COMMUNITY_TYPE_CHOSEN = 'Create Community Type Chosen',
@@ -58,7 +62,8 @@ export type MixpanelEvents =
   | MixpanelPageViewEvent
   | MixpanelCommunityInteractionEvent
   | MixpanelSnapshotEvents
-  | MixpanelErrorCaptureEvent;
+  | MixpanelErrorCaptureEvent
+  | MixpanelClickthroughEvent;
 
 export type AnalyticsEvent = MixpanelEvents; // add other providers events here
 
@@ -80,5 +85,7 @@ export interface MixpanelLoginPayload extends BaseMixpanelPayload {
   loginPageLocation: string;
   isMobile: boolean;
 }
+
+export type MixpanelClickthroughPayload = BaseMixpanelPayload;
 
 export const providers = ['mixpanel']; // add other providers here
