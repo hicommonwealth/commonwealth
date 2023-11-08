@@ -16,7 +16,7 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
  * 1- for /threads?bulk=true -> we have this array key
  * [
  *   ApiEndpoints.FETCH_THREADS,
- *   props.chainId,
+ *   props.communityId,
  *   props.queryType,
  *   props.topicId,
  *   props.stage,
@@ -32,7 +32,7 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
  * 2- for /threads?active=true -> we have this array key
  *  [
  *    ApiEndpoints.FETCH_THREADS,
- *    props.chainId,
+ *    props.communityId,
  *    props.queryType,
  *    props.topicsPerThread,
  *  ]
@@ -42,7 +42,7 @@ import { ApiEndpoints, queryClient } from 'state/api/config';
  * 3- for /threads?thread_ids=[] -> we have this array key
  * [
  *   ApiEndpoints.FETCH_THREADS,
- *   chainId,
+ *   communityId,
  *   'single',
  *   ...ids,
  * ]
@@ -88,7 +88,7 @@ type IArrayManipulationMode =
   | 'replaceArray';
 
 interface CacheUpdater {
-  chainId: string;
+  communityId: string;
   threadId: number;
   updateBody?: Partial<Thread>;
   method: 'update' | 'remove';
@@ -224,7 +224,7 @@ const updateCacheForSingleAndActiveThreads = ({
 };
 
 const cacheUpdater = ({
-  chainId,
+  communityId,
   threadId,
   updateBody,
   method,
@@ -240,7 +240,7 @@ const cacheUpdater = ({
 
   // get all query keys for threads
   const keysForThreads = queryKeys.filter(
-    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId
+    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
   );
 
   keysForThreads.map((cacheKey: any[]) => {
@@ -301,13 +301,13 @@ const cacheUpdater = ({
 };
 
 const updateThreadInAllCaches = (
-  chainId: string,
+  communityId: string,
   threadId: number,
   updateBody: Partial<Thread>,
-  arrayManipulationMode?: IArrayManipulationMode
+  arrayManipulationMode?: IArrayManipulationMode,
 ) => {
   cacheUpdater({
-    chainId,
+    communityId,
     threadId,
     method: 'update',
     updateBody,
@@ -315,20 +315,20 @@ const updateThreadInAllCaches = (
   });
 };
 
-const removeThreadFromAllCaches = (chainId: string, threadId: number) => {
-  cacheUpdater({ chainId, threadId, method: 'remove' });
+const removeThreadFromAllCaches = (communityId: string, threadId: number) => {
+  cacheUpdater({ communityId, threadId, method: 'remove' });
 };
 
 const updateThreadTopicInAllCaches = (
-  chainId: string,
+  communityId: string,
   threadId: number,
   newTopic: Topic,
-  oldTopicId: number
+  oldTopicId: number,
 ) => {
   const queryCache = queryClient.getQueryCache();
   const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
   const keysForThreads = queryKeys.filter(
-    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId
+    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
   );
 
   keysForThreads.map((k) => {
@@ -343,7 +343,7 @@ const updateThreadTopicInAllCaches = (
       const existingData: IExistingThreadState = queryClient.getQueryData(k);
       const updatedThreads = [...existingData]; // threads array
       const foundThreadIndex = updatedThreads.findIndex(
-        (x) => x.id === threadId
+        (x) => x.id === threadId,
       );
       if (foundThreadIndex > -1) {
         updatedThreads[foundThreadIndex] = {
@@ -389,12 +389,12 @@ const updateThreadTopicInAllCaches = (
   });
 };
 
-const addThreadInAllCaches = (chainId: string, newThread: Thread) => {
+const addThreadInAllCaches = (communityId: string, newThread: Thread) => {
   // refetch all caches for the thread topic and also the general cache
   const queryCache = queryClient.getQueryCache();
   const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
   const keysForThreads = queryKeys.filter(
-    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === chainId
+    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
   );
 
   keysForThreads.map((k) => {

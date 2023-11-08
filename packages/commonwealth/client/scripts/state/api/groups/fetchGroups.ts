@@ -7,13 +7,13 @@ import { ApiEndpoints } from 'state/api/config';
 const GROUPS_STALE_TIME = 5000; // 5 seconds
 
 interface FetchGroupsProps {
-  chainId: string;
+  communityId: string;
   includeTopics?: boolean;
   includeMembers?: boolean;
 }
 
 const fetchGroups = async ({
-  chainId,
+  communityId,
   includeMembers = false,
   includeTopics = false,
 }: FetchGroupsProps): Promise<Group[]> => {
@@ -21,7 +21,7 @@ const fetchGroups = async ({
     `${app.serverUrl()}${ApiEndpoints.FETCH_GROUPS}`,
     {
       params: {
-        community_id: chainId,
+        community_id: communityId,
         include_members: includeMembers,
         include_topics: includeTopics,
       },
@@ -32,7 +32,7 @@ const fetchGroups = async ({
 };
 
 const useFetchGroupsQuery = ({
-  chainId,
+  communityId,
   includeMembers,
   includeTopics,
   enabled = true,
@@ -40,11 +40,11 @@ const useFetchGroupsQuery = ({
   return useQuery({
     queryKey: [
       ApiEndpoints.FETCH_GROUPS,
-      chainId,
+      communityId,
       includeMembers,
       includeTopics,
     ],
-    queryFn: () => fetchGroups({ chainId, includeMembers, includeTopics }),
+    queryFn: () => fetchGroups({ communityId, includeMembers, includeTopics }),
     staleTime: GROUPS_STALE_TIME,
     enabled,
   });

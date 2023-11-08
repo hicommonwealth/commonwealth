@@ -5,41 +5,36 @@ import app from 'state';
 import { updateThreadInAllCaches } from './helpers/cache';
 
 interface AddThreadLinksProps {
-  chainId: string;
   threadId: number;
   links: Link[];
 }
 
-const addThreadLinks = async ({
-  chainId,
-  threadId,
-  links,
-}: AddThreadLinksProps) => {
+const addThreadLinks = async ({ threadId, links }: AddThreadLinksProps) => {
   const response = await axios.post(
     `${app.serverUrl()}/linking/addThreadLinks`,
     {
       thread_id: threadId,
       links,
       jwt: app.user.jwt,
-    }
+    },
   );
 
   return new Thread(response.data.result);
 };
 
 interface UseAddThreadLinksMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
 }
 
 const useAddThreadLinksMutation = ({
-  chainId,
+  communityId,
   threadId,
 }: UseAddThreadLinksMutationProps) => {
   return useMutation({
     mutationFn: addThreadLinks,
     onSuccess: async (updatedThread) => {
-      updateThreadInAllCaches(chainId, threadId, updatedThread);
+      updateThreadInAllCaches(communityId, threadId, updatedThread);
       return updatedThread;
     },
   });

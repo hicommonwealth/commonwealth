@@ -7,9 +7,9 @@ import {
 import app from 'state';
 import { ApiEndpoints } from '../config';
 
-const SEARCH_CHAINS_STALE_TIME = 2 * 60 * 60 * 1_000; // 2 h
+const SEARCH_COMMUNITIES_STALE_TIME = 2 * 60 * 60 * 1_000; // 2 h
 
-export type SearchChainsResponse = {
+export type SearchCommunitiesResponse = {
   results: {
     id: string;
     name: string;
@@ -24,8 +24,8 @@ export type SearchChainsResponse = {
   totalResults: number;
 };
 
-interface SearchChainsProps {
-  chainId: string;
+interface SearchCommunitiesProps {
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
@@ -33,24 +33,24 @@ interface SearchChainsProps {
   enabled?: boolean;
 }
 
-const searchChains = async ({
+const searchCommunities = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
-}: SearchChainsProps & { pageParam: number }) => {
+}: SearchCommunitiesProps & { pageParam: number }) => {
   const {
     data: { result },
-  } = await axios.get<{ result: SearchChainsResponse }>(
+  } = await axios.get<{ result: SearchCommunitiesResponse }>(
     `${app.serverUrl()}/communities`,
     {
       headers: {
         'Content-Type': 'application/json',
       },
       params: {
-        community_id: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -62,18 +62,18 @@ const searchChains = async ({
   return result;
 };
 
-const useSearchChainsQuery = ({
-  chainId,
+const useSearchCommunitiesQuery = ({
+  communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
   enabled = true,
-}: SearchChainsProps) => {
+}: SearchCommunitiesProps) => {
   const key = [
-    ApiEndpoints.searchChains(searchTerm),
+    ApiEndpoints.searchCommunities(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
     },
@@ -81,9 +81,9 @@ const useSearchChainsQuery = ({
   return useInfiniteQuery(
     key,
     ({ pageParam }) =>
-      searchChains({
+      searchCommunities({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,
@@ -97,10 +97,10 @@ const useSearchChainsQuery = ({
         }
         return undefined;
       },
-      staleTime: SEARCH_CHAINS_STALE_TIME,
+      staleTime: SEARCH_COMMUNITIES_STALE_TIME,
       enabled,
     },
   );
 };
 
-export default useSearchChainsQuery;
+export default useSearchCommunitiesQuery;

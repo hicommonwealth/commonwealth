@@ -229,7 +229,7 @@ const app: IApp = {
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
 export async function initAppState(
-  updateSelectedChain = true,
+  updateSelectedCommunity = true,
   shouldRedraw = true,
 ): Promise<void> {
   try {
@@ -257,16 +257,18 @@ export async function initAppState(
       });
 
     communitiesWithSnapshotsRes.result
-      .filter((chainsWithSnapshots) => chainsWithSnapshots.community.active)
-      .forEach((chainsWithSnapshots) => {
-        delete chainsWithSnapshots.community.ChainNode;
+      .filter(
+        (communitiesWithSnapshots) => communitiesWithSnapshots.community.active,
+      )
+      .forEach((communitiesWithSnapshots) => {
+        delete communitiesWithSnapshots.community.ChainNode;
         app.config.chains.add(
           ChainInfo.fromJSON({
             ChainNode: app.config.nodes.getById(
-              chainsWithSnapshots.community.chain_node_id,
+              communitiesWithSnapshots.community.chain_node_id,
             ),
-            snapshot: chainsWithSnapshots.snapshot,
-            ...chainsWithSnapshots.community,
+            snapshot: communitiesWithSnapshots.snapshot,
+            ...communitiesWithSnapshots.community,
           }),
         );
       });
@@ -280,8 +282,8 @@ export async function initAppState(
 
     // add recentActivity
     const { recentThreads } = statusRes.result;
-    recentThreads.forEach(({ chain, count }) => {
-      app.recentActivity.setCommunityThreadCounts(chain, count);
+    recentThreads.forEach(({ chain: community, count }) => {
+      app.recentActivity.setCommunityThreadCounts(community, count);
     });
 
     // update the login status
@@ -315,7 +317,7 @@ export async function initAppState(
     // update the selectedChain, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
     if (
-      updateSelectedChain &&
+      updateSelectedCommunity &&
       statusRes.result.user &&
       statusRes.result.user.selectedChain
     ) {

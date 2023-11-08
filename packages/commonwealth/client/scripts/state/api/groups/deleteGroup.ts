@@ -5,26 +5,30 @@ import { ApiEndpoints, queryClient } from '../config';
 
 interface DeleteGroupProps {
   groupId: number;
-  chainId: string;
+  communityId: string;
   address: string;
 }
 
-const deleteGroup = async ({ groupId, chainId, address }: DeleteGroupProps) => {
+const deleteGroup = async ({
+  groupId,
+  communityId,
+  address,
+}: DeleteGroupProps) => {
   return await axios.delete(`${app.serverUrl()}/groups/${groupId}`, {
     data: {
       jwt: app.user.jwt,
-      community_id: chainId,
-      author_community_id: chainId,
+      community_id: communityId,
+      author_community_id: communityId,
       address,
     },
   });
 };
 
-const useDeleteGroupMutation = ({ chainId }: { chainId: string }) => {
+const useDeleteGroupMutation = ({ communityId }: { communityId: string }) => {
   return useMutation({
     mutationFn: deleteGroup,
     onSuccess: async () => {
-      const key = [ApiEndpoints.FETCH_GROUPS, chainId];
+      const key = [ApiEndpoints.FETCH_GROUPS, communityId];
       queryClient.cancelQueries(key);
       queryClient.refetchQueries(key);
     },
