@@ -1,11 +1,13 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
 import {
@@ -30,6 +32,10 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     includeTopics: true,
   });
   const foundGroup: Group = groups.find((x) => x.id === parseInt(`${groupId}`));
+
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW },
+  });
 
   if (
     !featureFlags.gatingEnabled ||
