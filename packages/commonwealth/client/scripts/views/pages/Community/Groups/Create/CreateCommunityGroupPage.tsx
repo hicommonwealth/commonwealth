@@ -13,7 +13,7 @@ import './CreateCommunityGroupPage.scss';
 const CreateCommunityGroupPage = () => {
   const navigate = useCommonNavigate();
   const { mutateAsync: createGroup } = useCreateGroupMutation({
-    chainId: app.activeChainId()
+    communityId: app.activeChainId(),
   });
 
   if (
