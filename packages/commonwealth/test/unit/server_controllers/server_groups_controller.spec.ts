@@ -172,7 +172,7 @@ describe('ServerGroupsController', () => {
   describe('#createGroup', async () => {
     const controller = createMockedGroupsController();
     const { user, chain, address } = createMockParams();
-    const result = await controller.createGroup({
+    const [result] = await controller.createGroup({
       user,
       community: chain,
       address,
@@ -210,7 +210,7 @@ describe('ServerGroupsController', () => {
   describe('#updateGroup', async () => {
     const controller = createMockedGroupsController();
     const { user, chain, address } = createMockParams();
-    const result = await controller.updateGroup({
+    const [result] = await controller.updateGroup({
       user,
       community: chain,
       address,
