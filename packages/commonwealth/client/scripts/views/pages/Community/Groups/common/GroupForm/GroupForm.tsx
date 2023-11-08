@@ -350,7 +350,7 @@ const GroupForm = ({
       ) {
         setCwRequiremenetsLabelInputField((prevVal) => ({
           ...prevVal,
-          error: VALIDATION_MESSAGES.INVALID_VALUE,
+          error: VALIDATION_MESSAGES.INVALID_INPUT,
         }));
         return false;
       }
