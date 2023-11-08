@@ -1,11 +1,11 @@
 import React from 'react';
 
+import { useFormContext } from 'react-hook-form';
 import type { ValidationStatus } from '../../cw_validation_text';
-import { MessageRow } from './MessageRow';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
+import { MessageRow } from './MessageRow';
 import { useTextInputWithValidation } from './useTextInputWithValidation';
-import { useFormContext } from 'react-hook-form';
 
 import './CWTextInput.scss';
 
@@ -33,6 +33,7 @@ export type BaseTextInputProps = {
   tabIndex?: number;
   instructionalMessage?: string;
   manualStatusMessage?: string;
+  inputRef?: any;
 };
 
 type InputStyleProps = {
@@ -94,6 +95,7 @@ const CWTextInput = (props: TextInputProps) => {
     instructionalMessage,
     hookToForm,
     customError,
+    inputRef,
   } = props;
 
   const formContext = useFormContext();
@@ -113,7 +115,7 @@ const CWTextInput = (props: TextInputProps) => {
           containerClassName,
           validationStatus: props.validationStatus,
         },
-        ComponentType.TextInput
+        ComponentType.TextInput,
       )}
       onClick={onClick}
     >
@@ -131,6 +133,7 @@ const CWTextInput = (props: TextInputProps) => {
           <div className="text-input-left-icon">{iconLeft}</div>
         ) : null}
         <input
+          ref={inputRef}
           {...formFieldContext}
           autoFocus={autoFocus}
           autoComplete={autoComplete}
@@ -168,7 +171,7 @@ const CWTextInput = (props: TextInputProps) => {
                     validationProps.setValidationStatus(result[0]);
                     validationProps.setStatusMessage(result[1]);
                   }
-                }, timeout)
+                }, timeout),
               );
             }
           }}
