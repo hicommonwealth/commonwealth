@@ -18,10 +18,12 @@ type GetCommunitiesRequestQuery = {
   search?: string;
 } & PaginationQueryParams;
 
+type GetCommunitiesResponse = GetCommunitiesResult | SearchCommunitiesResult
+
 export const getCommunitiesHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<GetCommunitiesRequestQuery>,
-  res: TypedResponse<GetCommunitiesResult | SearchCommunitiesResult>
+  res: TypedResponse<GetCommunitiesResponse>
 ) => {
   const options = req.query;
 

@@ -1,7 +1,7 @@
-import axios from 'axios';
-import app from 'state';
-import Topic from 'models/Topic';
 import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import Topic from 'models/Topic';
+import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface CreateTopicProps {
@@ -32,7 +32,7 @@ const createTopic = async ({
     token_threshold: tokenThreshold || '0',
     default_offchain_template: defaultOffchainTemplate,
     jwt: app.user.jwt,
-    chain: app.activeChainId(),
+    community_id: app.activeChainId(),
   });
 
   return new Topic(response.data.result);

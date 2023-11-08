@@ -22,7 +22,7 @@ export const createChainNode = async ({
   });
 };
 
-export const deleteChain = async ({ id }: { id: string }) => {
+export const deleteCommunity = async ({ id }: { id: string }) => {
   await axios.delete(`${app.serverUrl()}/communities/${id}`, {
     data: {
       jwt: app.user.jwt,

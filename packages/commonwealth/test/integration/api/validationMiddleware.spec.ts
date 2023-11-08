@@ -67,7 +67,7 @@ describe('DatabaseValidationService Tests', () => {
       expect(
         databaseValidationService.validateAuthor(models, request, null, () => {
           return null;
-        })
+        }),
       ).to.not.throw;
     });
 
@@ -110,7 +110,7 @@ describe('DatabaseValidationService Tests', () => {
     });
   });
 
-  describe('validateChain', () => {
+  describe('validateCommunity', () => {
     it('should successfully validate chain id if chain exists', async () => {
       const request = new MockExpressRequest();
 
@@ -126,9 +126,14 @@ describe('DatabaseValidationService Tests', () => {
       request.body = resBody;
       request.user = { id: userId };
       expect(
-        databaseValidationService.validateChain(models, request, null, () => {
-          return null;
-        })
+        databaseValidationService.validateCommunity(
+          models,
+          request,
+          null,
+          () => {
+            return null;
+          },
+        ),
       ).to.not.throw;
     });
 
@@ -145,9 +150,14 @@ describe('DatabaseValidationService Tests', () => {
       };
       request.body = resBody;
       request.user = { id: userId };
-      databaseValidationService.validateChain(models, request, resBody, () => {
-        return null;
-      });
+      databaseValidationService.validateCommunity(
+        models,
+        request,
+        resBody,
+        () => {
+          return null;
+        },
+      );
       expect(request.chain).to.be.undefined;
     });
   });

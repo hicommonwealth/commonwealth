@@ -1,10 +1,10 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
+import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
 import {
   CreateCommunityOptions,
   CreateCommunityResult,
 } from '../../controllers/server_communities_methods/create_community';
-import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type CreateCommunityRequestBody = CreateCommunityOptions['community'];
 type CreateCommunityResponse = CreateCommunityResult;
@@ -12,7 +12,7 @@ type CreateCommunityResponse = CreateCommunityResult;
 export const createCommunityHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateCommunityRequestBody>,
-  res: TypedResponse<CreateCommunityResponse>
+  res: TypedResponse<CreateCommunityResponse>,
 ) => {
   const community = await controllers.communities.createCommunity({
     user: req.user,
@@ -21,12 +21,12 @@ export const createCommunityHandler = async (
 
   controllers.analytics.track(
     {
-      chainBase: community.chain.base,
+      chainBase: community.community.base,
       isCustomDomain: null,
       communityType: null,
       event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
     },
-    req
+    req,
   );
 
   return success(res, community);

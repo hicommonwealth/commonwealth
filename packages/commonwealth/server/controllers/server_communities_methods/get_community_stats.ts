@@ -5,12 +5,12 @@ import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
   NotAdmin: 'Must be a site admin',
-  ChainNotFound: 'Chain not found',
+  CommunityNotFound: 'Community not found',
 };
 
 export type GetCommunityStatsOptions = {
   user: UserInstance;
-  chainId: string;
+  communityId: string;
 };
 
 export type GetCommunityStatsResult = {
@@ -24,15 +24,15 @@ export type GetCommunityStatsResult = {
 
 export async function __getCommunityStats(
   this: ServerCommunitiesController,
-  { user, chainId }: GetCommunityStatsOptions
+  { user, communityId }: GetCommunityStatsOptions
 ): Promise<GetCommunityStatsResult> {
   if (!user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
 
-  const chain = await this.models.Community.findByPk(chainId);
-  if (!chain) {
-    throw new AppError(Errors.ChainNotFound);
+  const community = await this.models.Community.findByPk(communityId);
+  if (!community) {
+    throw new AppError(Errors.CommunityNotFound);
   }
 
   // Community Stats
@@ -45,7 +45,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: chainId,
+      chain: communityId,
     },
   });
 
@@ -55,7 +55,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: chainId,
+      chain: communityId,
     },
   });
 
@@ -65,7 +65,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain: chainId,
+      chain: communityId,
     },
   });
 
@@ -75,7 +75,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      community_id: chainId,
+      community_id: communityId,
     },
   });
 
@@ -85,7 +85,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      chain_id: chainId,
+      community_id: communityId,
     },
   });
 
@@ -94,7 +94,7 @@ export async function __getCommunityStats(
       created_at: {
         [Op.gte]: oneMonthAgo,
       },
-      community_id: chainId,
+      community_id: community.id,
     },
   });
 
