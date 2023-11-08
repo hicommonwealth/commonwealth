@@ -25,6 +25,7 @@ const App = () => {
     const customizationSidebarColor = localStorage.getItem(
       'customization-sidebar-color',
     );
+    const customizationFont = localStorage.getItem('customization-font');
 
     if (customizationBgColor) {
       document.documentElement.style.setProperty(
@@ -37,6 +38,13 @@ const App = () => {
       document.documentElement.style.setProperty(
         '--customization-sidebar-color',
         customizationSidebarColor,
+      );
+    }
+
+    if (customizationFont) {
+      document.documentElement.style.setProperty(
+        '--customization-font',
+        customizationFont,
       );
     }
   }, []);

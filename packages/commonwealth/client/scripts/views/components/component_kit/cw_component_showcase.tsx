@@ -268,6 +268,11 @@ export const ComponentShowcase = () => {
     localStorage.getItem('customization-background-image-enabled') === 'true' ||
       false,
   );
+
+  const [font, setFont] = useState(
+    localStorage.getItem('customization-font') || 'default',
+  );
+
   const handleChangeBackgroundColor = (e) => {
     const hexColor = e.target.value;
     setBackgroundColor(hexColor);
@@ -310,6 +315,32 @@ export const ComponentShowcase = () => {
       localStorage.removeItem('customization-background-image-enabled');
     }
   };
+
+  const handleChangeFont = ({ value: fontValue }) => {
+    if (fontValue === 'default') {
+      localStorage.removeItem('customization-font');
+      setFont('default');
+      document.documentElement.style.removeProperty('--customization-font');
+
+      return;
+    }
+
+    localStorage.setItem('customization-font', fontValue);
+    setFont(fontValue);
+    document.documentElement.style.setProperty(
+      '--customization-font',
+      fontValue,
+    );
+  };
+
+  const fontOptions = [
+    { value: 'default', label: 'Default' },
+    { value: 'Times New Roman', label: 'Times New Roman' },
+    { value: 'Comic Sans MS', label: 'Comic Sans MS' },
+    { value: 'Chalkduster', label: 'Chalkduster' },
+  ];
+
+  const fontValue = fontOptions.find((el) => el.value === font);
 
   const renderModal = (size?: ModalSize) => {
     return (
@@ -378,6 +409,15 @@ export const ComponentShowcase = () => {
             checked={backgroundImageEnabled}
             size="small"
             onChange={handleToggleBackgroundImage}
+          />
+        </div>
+        <div className="customization-row">
+          <CWText type="h5">Font</CWText>
+          <CWSelectList
+            onChange={handleChangeFont}
+            placeholder="Select custom font"
+            value={fontValue}
+            options={fontOptions}
           />
         </div>
       </div>
