@@ -1,12 +1,12 @@
 import moment from 'moment';
 
 import { UserInstance } from 'server/models/user';
-import { ServerThreadsController } from '../server_threads_controller';
-import { VoteAttributes } from '../../models/vote';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { VoteAttributes } from '../../models/vote';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -22,7 +22,7 @@ export const Errors = {
 export type UpdatePollVoteOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   pollId: number;
   option: string;
 };
@@ -31,10 +31,10 @@ export type UpdatePollVoteResult = VoteAttributes;
 
 export async function __updatePollVote(
   this: ServerThreadsController,
-  { user, address, chain, pollId, option }: UpdatePollVoteOptions
+  { address, community, pollId, option }: UpdatePollVoteOptions
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
-    where: { id: pollId, chain_id: chain.id },
+    where: { id: pollId, community_id: community.id },
   });
   if (!poll) {
     throw new AppError(Errors.NoPoll);
@@ -83,8 +83,8 @@ export async function __updatePollVote(
     const voteData: Partial<VoteAttributes> = {
       poll_id: poll.id,
       address: address.address,
-      author_chain: address.chain,
-      chain_id: chain.id,
+      author_community_id: address.community_id,
+      community_id: community.id,
     };
     // delete existing votes
     await this.models.Vote.destroy({

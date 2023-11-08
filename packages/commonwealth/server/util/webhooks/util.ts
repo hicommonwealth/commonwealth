@@ -9,7 +9,7 @@ import {
 } from '../../../shared/utils';
 import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL } from '../../config';
 import models from '../../database';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ProfileAttributes } from '../../models/profile';
 import { WebhookInstance } from '../../models/webhook';
 import { WebhookDestinations } from './types';
@@ -28,7 +28,7 @@ export async function fetchWebhooks(
   notifDataCategory: Exclude<
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
-  >
+  >,
 ): Promise<WebhookInstance[]> {
   let chainId: string;
   if (notifDataCategory.categoryId === NotificationCategories.ChainEvent) {
@@ -39,7 +39,7 @@ export async function fetchWebhooks(
 
   return await models.Webhook.findAll({
     where: {
-      chain_id: chainId,
+      community_id: chainId,
       categories: {
         [Op.contains]: [notifDataCategory.categoryId],
       },
@@ -55,7 +55,7 @@ export async function getActorProfile(
   notif: Exclude<
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
-  >
+  >,
 ): Promise<ProfileAttributes | null> {
   if (notif.categoryId === NotificationCategories.ChainEvent) {
     return null;
@@ -64,7 +64,7 @@ export async function getActorProfile(
   const address = await models.Address.findOne({
     where: {
       address: notif.data.author_address,
-      chain: notif.data.chain_id,
+      community_id: notif.data.chain_id,
     },
     include: [models.Profile],
   });
@@ -72,7 +72,7 @@ export async function getActorProfile(
   if (!address) {
     // TODO: rollbar
     log.error(
-      `Could not find address for notification ${JSON.stringify(notif)}`
+      `Could not find address for notification ${JSON.stringify(notif)}`,
     );
     return null;
   }
@@ -91,7 +91,7 @@ export async function getPreviewImageUrl(
     NotificationDataAndCategory,
     { categoryId: NotificationCategories.SnapshotProposal }
   >,
-  chain?: ChainInstance
+  chain?: CommunityInstance,
 ): Promise<{ previewImageUrl: string; previewAltText: string }> {
   // case 1: embedded imaged in thread body
   if (
@@ -129,7 +129,7 @@ export function getThreadUrlFromNotification(
     | { categoryId: NotificationCategories.SnapshotProposal }
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
-  >
+  >,
 ): string {
   let commentId = '';
   if (notification.categoryId === NotificationCategories.NewComment) {
@@ -138,7 +138,7 @@ export function getThreadUrlFromNotification(
 
   const data = notification.data;
   return `${SERVER_URL}/${data.chain_id}/discussion/${data.thread_id}-${slugify(
-    data.root_title
+    data.root_title,
   )}${commentId}`;
 }
 
@@ -163,7 +163,7 @@ export function getThreadSummaryFromNotification(
     | { categoryId: NotificationCategories.SnapshotProposal }
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
-  >
+  >,
 ) {
   let objectSummary: string;
   const bodytext = decodeURIComponent(notification.data.comment_text);

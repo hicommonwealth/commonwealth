@@ -1,4 +1,3 @@
-import type { IChainEntityKind } from 'chain-events/src';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
 import type { ProposalStore } from 'stores';
 import { slugify } from 'utils';
@@ -95,38 +94,34 @@ export const idToProposal = (slug: string, id: string | number) => {
   }
 };
 
-export const chainEntityTypeToProposalSlug = (
-  t: IChainEntityKind
-): ProposalType => {
-  if (t === 'proposal') {
-    if (app.chain.network === ChainNetwork.Sputnik) {
-      return ProposalType.SputnikProposal;
-    }
-    if (app.chain.network === ChainNetwork.Compound) {
-      return ProposalType.CompoundProposal;
-    }
-    if (app.chain.network === ChainNetwork.Aave) {
-      return ProposalType.AaveProposal;
-    }
-    if (app.chain.base === ChainBase.CosmosSDK) {
-      return ProposalType.CosmosProposal;
-    }
+export const chainEntityTypeToProposalSlug = (): ProposalType => {
+  if (app.chain.network === ChainNetwork.Sputnik) {
+    return ProposalType.SputnikProposal;
   }
+  if (app.chain.network === ChainNetwork.Compound) {
+    return ProposalType.CompoundProposal;
+  }
+  if (app.chain.network === ChainNetwork.Aave) {
+    return ProposalType.AaveProposal;
+  }
+  if (app.chain.base === ChainBase.CosmosSDK) {
+    return ProposalType.CosmosProposal;
+  }
+  return '' as ProposalType;
 };
 
-export const chainEntityTypeToProposalName = (t: IChainEntityKind): string => {
-  if (t === 'proposal') {
-    if (app.chain.network === ChainNetwork.Sputnik) {
-      return 'Sputnik Proposal';
-    }
-    if (app.chain.network === ChainNetwork.Compound) {
-      return 'On-Chain Proposal';
-    }
-    if (app.chain.network === ChainNetwork.Aave) {
-      return 'On-Chain Proposal';
-    }
-    if (app.chain.base === ChainBase.CosmosSDK) {
-      return 'Proposal';
-    }
+export const chainEntityTypeToProposalName = (): string => {
+  if (app.chain.network === ChainNetwork.Sputnik) {
+    return 'Sputnik Proposal';
   }
+  if (app.chain.network === ChainNetwork.Compound) {
+    return 'On-Chain Proposal';
+  }
+  if (app.chain.network === ChainNetwork.Aave) {
+    return 'On-Chain Proposal';
+  }
+  if (app.chain.base === ChainBase.CosmosSDK) {
+    return 'Proposal';
+  }
+  return '';
 };

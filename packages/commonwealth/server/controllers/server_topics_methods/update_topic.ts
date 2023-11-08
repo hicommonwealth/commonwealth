@@ -1,9 +1,9 @@
-import { TopicAttributes } from '../../models/topic';
-import { ChainInstance } from '../../models/chain';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { TopicAttributes } from '../../models/topic';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -18,7 +18,7 @@ export const Errors = {
 
 export type UpdateTopicOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   body: Partial<TopicAttributes>;
 };
 
@@ -26,31 +26,16 @@ export type UpdateTopicResult = TopicAttributes;
 
 export async function __updateTopic(
   this: ServerTopicsController,
-  { user, chain, body }: UpdateTopicOptions
+  { user, community, body }: UpdateTopicOptions,
 ): Promise<UpdateTopicResult> {
   if (!body.id) {
     throw new AppError(Errors.NoTopicId);
   }
 
-  const name = body.name.trim();
-  if (!name) {
-    throw new AppError(Errors.TopicRequired);
-  }
-  if (body.name.match(/["<>%{}|\\/^`]/g)) {
-    throw new AppError(Errors.InvalidTopicName);
-  }
-
-  const featured_in_sidebar = body.featured_in_sidebar;
-  const featured_in_new_post = body.featured_in_new_post;
-  const default_offchain_template = body.default_offchain_template?.trim();
-  if (featured_in_new_post && !default_offchain_template) {
-    throw new AppError(Errors.DefaultTemplateRequired);
-  }
-
   const isAdmin = await validateOwner({
     models: this.models,
     user: user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -59,15 +44,49 @@ export async function __updateTopic(
     throw new AppError(Errors.NotAdmin);
   }
 
-  const { id, description, telegram } = body;
+  const {
+    id,
+    name,
+    description,
+    telegram,
+    group_ids,
+    featured_in_sidebar,
+    featured_in_new_post,
+  } = body;
+
+  const default_community_template = body.default_offchain_template?.trim();
+  if (featured_in_new_post && !default_community_template) {
+    throw new AppError(Errors.DefaultTemplateRequired);
+  }
+
   const topic = await this.models.Topic.findOne({ where: { id } });
-  if (!topic) throw new AppError(Errors.TopicNotFound);
-  if (name) topic.name = name;
-  if (name || description) topic.description = description || '';
-  if (name || telegram) topic.telegram = telegram || '';
-  topic.featured_in_sidebar = featured_in_sidebar;
-  topic.featured_in_new_post = featured_in_new_post;
-  topic.default_offchain_template = default_offchain_template || '';
+  if (!topic) {
+    throw new AppError(Errors.TopicNotFound);
+  }
+  if (typeof name !== 'undefined') {
+    if (name.match(/["<>%{}|\\/^`]/g)) {
+      throw new AppError(Errors.InvalidTopicName);
+    }
+    topic.name = name.trim() || '';
+  }
+  if (typeof description !== 'undefined') {
+    topic.description = description || '';
+  }
+  if (typeof telegram !== 'undefined') {
+    topic.telegram = telegram || '';
+  }
+  if (Array.isArray(group_ids)) {
+    topic.group_ids = group_ids;
+  }
+  if (typeof featured_in_sidebar !== 'undefined') {
+    topic.featured_in_sidebar = featured_in_sidebar || false;
+  }
+  if (typeof featured_in_new_post !== 'undefined') {
+    topic.featured_in_new_post = featured_in_new_post || false;
+  }
+  if (typeof default_community_template !== 'undefined') {
+    topic.default_offchain_template = default_community_template || '';
+  }
   await topic.save();
 
   return topic.toJSON();

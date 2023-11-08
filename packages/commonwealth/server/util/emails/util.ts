@@ -20,7 +20,7 @@ export async function sendEmails(emailObject: MailDataRequired) {
   } catch (e) {
     log.error(
       'Failed to send immediate notification email',
-      e?.response?.body?.errors
+      e?.response?.body?.errors,
     );
   }
 }

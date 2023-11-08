@@ -1,4 +1,5 @@
 **Contents**
+
 - [Prerequisites](#prerequisites)
   * [Subscriptions](#subscriptions)
   * [Notifications](#notifications)
@@ -28,6 +29,7 @@
 
 - Be logged in on a new account with MetaMask that has no pre-existing joined communities.
 - Should have the `Networks` tab of Chrome Dev Tools open.
+
 ## Notifications
 
 - Be logged in on 2 new accounts both with MetaMask. This is most easily done by using Chrome and Firefox with different MetaMask accounts but you can also simply logout and log back in with a different account on the same browser.
@@ -119,6 +121,7 @@ Due to [known bug #4657][9] you cannot manage your mention subscription from the
 Due to [known bug #4657][9] you cannot manage your collaboration subscription from the notification settings page.
 
 ## Notifications
+
 ### New Threads
 
 1. With your viewer account navigate to any MetaMask-compatible community (preferably an unpopular one since notifications will be emitted faster e.g. alex-test-2). If you have not yet joined this community, join it now.
@@ -132,6 +135,7 @@ Due to [known bug #4657][9] you cannot manage your collaboration subscription fr
 ### New Comments
 
 This section picks up exactly where the previous New Threads section left off (from the viewer account on the threads page).
+
 1. With your viewer account subscribe to comments and reactions on the thread using the `subscribe` button below the thread body.
 2. From your producer account, create a comment on the thread you created.
 3. With your viewer account navigate away from the thread (to anywhere e.g. community landing page).
@@ -143,6 +147,7 @@ This section picks up exactly where the previous New Threads section left off (f
 ### New Reactions
 
 This section picks up exactly where the previous New Comments section left off (from the comment on the threads page).
+
 1. On your viewer account navigate back to the community discussion page.
 2. On your producer account upvote your own thread.
 3. On your viewer account, refresh the page (again, may need to refresh multiple times after waiting for some time).
@@ -155,6 +160,7 @@ This section picks up exactly where the previous New Comments section left off (
 **As of 230803, not working due to [known bug #4690][11]**
 
 This section picks up exactly where the previous New Reactions section left off (from the threads page).
+
 1. With your viewer account, unsubscribe from the thread.
 2. With your viewer account, navigate back to the community discussion page.
 3. With your producer account, create a new comment and this time tag your viewer account.
@@ -166,6 +172,7 @@ This section picks up exactly where the previous New Reactions section left off 
 ### New Collaboration
 
 This section picks up exactly where the previous New Mention section left off (from the threads page).
+
 1. With your viewer account, navigate back to the community discussion page.
 2. With your producer account, add the viewer account as a collaborator on the thread you created.
 3. With your viewer account, refresh the page.
@@ -174,6 +181,7 @@ This section picks up exactly where the previous New Mention section left off (f
     - You should be taken to the thread that you are now a collaborator of.
 
 # Snapshot
+
 ## Subscriptions
 
 1. Navigate to the snapshot page of a community that has an associated snapshot space like dYdX i.e. [https://commonwealth.im/dydx/snapshot/dydxgov.eth][6]
@@ -190,6 +198,7 @@ This section picks up exactly where the previous New Mention section left off (f
 Cannot QA Snapshot notifications until [#4667][10] is completed.
 
 # Chain Event
+
 ## Subscriptions
 
 1. Navigate to your [notifications settings page][2].
@@ -224,7 +233,7 @@ Cannot QA chain-event notifications until [#4667][10] is completed.
 [10]: https://github.com/hicommonwealth/commonwealth/issues/4667
 [11]: https://github.com/hicommonwealth/commonwealth/issues/4690
 
-# Change Log
+## Change Log
 
 - 231012: Flagged by Graham Johnson to update links from footnote-style to inline.
 - 230803: Authored by Timothee Legros.

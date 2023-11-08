@@ -1,9 +1,9 @@
-import { Label as chainEventLabel } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
+import { Label as chainEventLabel } from '../../../shared/chain/labelers/util';
 import { NotificationDataAndCategory } from '../../../shared/types';
 import { SERVER_URL } from '../../config';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ChainEventWebhookData, ForumWebhookData } from './types';
 import {
   getActorProfile,
@@ -19,7 +19,7 @@ export async function getWebhookData(
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
   >,
-  chain?: ChainInstance
+  chain?: CommunityInstance,
 ): Promise<ForumWebhookData | ChainEventWebhookData> {
   if (notification.categoryId === NotificationCategories.ChainEvent) {
     const event = {

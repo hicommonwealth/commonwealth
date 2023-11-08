@@ -9,24 +9,25 @@ import {
   NotificationCategories,
 } from 'common-common/src/types';
 import type { NextFunction } from 'express';
-import fetch from 'node-fetch';
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
-import type { ChainAttributes } from '../models/chain';
 import type { ChainNodeAttributes } from '../models/chain_node';
+import type { CommunityAttributes } from '../models/community';
 import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-import { RoleInstanceWithPermission } from '../util/roles';
-import testSubstrateSpec from '../util/testSubstrateSpec';
-import { ALL_CHAINS } from '../middleware/databaseValidationService';
+import axios from 'axios';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import axios from 'axios';
-
-const MAX_IMAGE_SIZE_KB = 500;
+import { ALL_COMMUNITIES } from '../middleware/databaseValidationService';
+import {
+  MAX_COMMUNITY_IMAGE_SIZE_BYTES,
+  checkUrlFileSize,
+} from '../util/checkUrlFileSize';
+import { RoleInstanceWithPermission } from '../util/roles';
+import testSubstrateSpec from '../util/testSubstrateSpec';
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -62,12 +63,11 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  ImageDoesntExist: `Image url provided doesn't exist`,
-  ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
-  UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
+  UnegisteredCosmosChain: `Check https://cosmos.directory.
+  Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
-export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
+export type CreateChainReq = Omit<CommunityAttributes, 'substrate_spec'> &
   Omit<ChainNodeAttributes, 'id'> & {
     id: string;
     node_url: string;
@@ -77,27 +77,17 @@ export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
   };
 
 type CreateChainResp = {
-  chain: ChainAttributes;
+  chain: CommunityAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
   admin_address: string;
 };
 
-export async function getFileSizeBytes(url: string): Promise<number> {
-  try {
-    // Range header is to prevent it from reading any bytes from the GET request because we only want the headers.
-    const resp = await fetch(url, { headers: { Range: 'bytes=0-0' } });
-    return parseInt(resp.headers.get('content-range').split('/')[1], 10);
-  } catch (e) {
-    throw new AppError(Errors.ImageDoesntExist);
-  }
-}
-
 const createChain = async (
   models: DB,
   req: TypedRequestBody<CreateChainReq>,
   res: TypedResponse<CreateChainResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError('Not signed in'));
@@ -114,7 +104,7 @@ const createChain = async (
   if (!req.body.id || !req.body.id.trim()) {
     return next(new AppError(Errors.NoId));
   }
-  if (req.body.id === ALL_CHAINS) {
+  if (req.body.id === ALL_COMMUNITIES) {
     return next(new AppError(Errors.ReservedId));
   }
   if (!req.body.name || !req.body.name.trim()) {
@@ -136,20 +126,17 @@ const createChain = async (
     return next(new AppError(Errors.NoBase));
   }
 
-  if (
-    req.body.icon_url &&
-    (await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB
-  ) {
-    throw new AppError(Errors.ImageTooLarge);
+  if (req.body.icon_url) {
+    await checkUrlFileSize(req.body.icon_url, MAX_COMMUNITY_IMAGE_SIZE_BYTES);
   }
 
   const validAdminAddresses = await models.Address.scope(
-    'withPrivateData'
+    'withPrivateData',
   ).findAll({
     where: { user_id: req.user.id, verified: { [Op.ne]: null } },
     include: [
       {
-        model: models.Chain,
+        model: models.Community,
         where: { base: req.body.base },
         attributes: ['id'],
       },
@@ -199,21 +186,21 @@ const createChain = async (
       });
       if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
         return next(
-          new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`)
+          new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`),
         );
       }
     }
 
     const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
     const { data: chains } = await axios.get(
-      `${REGISTRY_API_URL}/api/v1/mainnet`
+      `${REGISTRY_API_URL}/api/v1/mainnet`,
     );
     const foundRegisteredChain = chains?.find(
-      (chain) => chain === cosmos_chain_id
+      (chain) => chain === cosmos_chain_id,
     );
     if (!foundRegisteredChain) {
       return next(
-        new AppError(`${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`)
+        new AppError(`${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`),
       );
     }
   }
@@ -354,7 +341,7 @@ const createChain = async (
     return next(new AppError(Errors.InvalidIconUrl));
   }
 
-  const oldChain = await models.Chain.findOne({
+  const oldChain = await models.Community.findOne({
     where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
   });
   if (oldChain && oldChain.id === req.body.id) {
@@ -390,7 +377,7 @@ const createChain = async (
     },
   });
 
-  const chain = await models.Chain.create({
+  const chain = await models.Community.create({
     id,
     name,
     default_symbol,
@@ -458,7 +445,7 @@ const createChain = async (
     user_id: req.user.id,
     profile_id: addressToBeAdmin.profile_id,
     address: addressToBeAdmin.address,
-    chain: chain.id,
+    community_id: chain.id,
     verification_token: addressToBeAdmin.verification_token,
     verification_token_expires: addressToBeAdmin.verification_token_expires,
     verified: addressToBeAdmin.verified,
@@ -475,7 +462,7 @@ const createChain = async (
       chain.id,
       'admin',
       0,
-      0
+      0,
     );
 
   await models.Subscription.findOrCreate({
@@ -495,7 +482,7 @@ const createChain = async (
       communityType: null,
       event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
     },
-    req
+    req,
   );
 
   return success(res, {

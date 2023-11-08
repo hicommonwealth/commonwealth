@@ -91,7 +91,8 @@ module.exports = {
     'react/function-component-definition': [1, { "namedComponents": "arrow-function" }],
     'react/no-multi-comp': [1, { "ignoreStateless": false }],
     'react/jsx-curly-brace-presence': [1, { props: "never", children: "never" }],
-    '@typescript-eslint/no-unused-vars': '1',
+    '@typescript-eslint/no-unused-vars': 1,
+    'react/jsx-key': 1
   },
   ignorePatterns: ['server/scripts/setupPrerenderService.ts'],
   extends: [

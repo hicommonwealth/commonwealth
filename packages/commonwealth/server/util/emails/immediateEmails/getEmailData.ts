@@ -38,7 +38,7 @@ export async function getEmailData(
     | { categoryId: NotificationCategories.SnapshotProposal }
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
-  >
+  >,
 ): Promise<ChainEventEmailData | ForumEmailData> {
   if (notification.categoryId === NotificationCategories.ChainEvent) {
     const event = {
@@ -51,7 +51,7 @@ export async function getEmailData(
 
     return {
       emailSubject: `${eventLabel.heading} on ${capitalize(
-        notification.data.chain
+        notification.data.chain,
       )}`,
       community_id: notification.data.chain,
       blockNumber: notification.data.block_number,
@@ -92,7 +92,7 @@ export async function getEmailData(
       profileName = formatAddressShort(
         notification.data.author_address,
         notification.data.author_chain,
-        true
+        true,
       );
     }
 

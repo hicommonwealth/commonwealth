@@ -1,9 +1,9 @@
 import { Op } from 'sequelize';
-import { ChainInstance } from '../../models/chain';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 const Errors = {
   MissingTopic: 'Invalid topic ID',
@@ -13,7 +13,7 @@ const Errors = {
 
 export type UpdateTopicChannelOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   topicId: number;
   channelId: string;
 };
@@ -22,12 +22,12 @@ export type UpdateTopicChannelResult = void;
 
 export async function __updateTopicChannel(
   this: ServerTopicsController,
-  { user, chain, topicId, channelId }: UpdateTopicChannelOptions
+  { user, community, topicId, channelId }: UpdateTopicChannelOptions,
 ): Promise<UpdateTopicChannelResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user: user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -78,7 +78,7 @@ export async function __updateTopicChannel(
             [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
           },
         },
-      }
+      },
     );
 
     // Remove channel_id from old topic
@@ -88,10 +88,10 @@ export async function __updateTopicChannel(
     // No previous topic associated with channel. Set all threads with channel id to new topic
     const threadsOnTopicFromDiscordBot = await this.models.Thread.findAll({
       where: {
-        chain: chain.id,
+        chain: community.id,
         // discord meta is not null
         discord_meta: {
-          [Op.contains]: { channel_id: channelId },
+          channel_id: channelId,
         },
       },
     });
@@ -107,7 +107,7 @@ export async function __updateTopicChannel(
             [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
           },
         },
-      }
+      },
     );
   }
 

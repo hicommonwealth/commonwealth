@@ -43,7 +43,7 @@ async function main() {
 
   if (!user) {
     throw new Error(
-      `The provided email (${argv.email}) is not associated with an existing user.`
+      `The provided email (${argv.email}) is not associated with an existing user.`,
     );
   }
 

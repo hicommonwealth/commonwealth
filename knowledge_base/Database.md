@@ -1,15 +1,16 @@
 ## Heroku
 
 ## Current Data Plans & Tiers
+
 **Heroku Database plans**
-https://devcenter.heroku.com/articles/heroku-postgres-plans
+<https://devcenter.heroku.com/articles/heroku-postgres-plans>
 
 **Our Current Plan**
-https://data.heroku.com/.  
+<https://data.heroku.com/>.  
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/4791635/229220173-867abd05-ba40-456a-93a5-3e910e4ffe2b.png">
 
-
 ### Scenario: Add follower DB
+
 - provision new database using `heroku addons:create` use `--follow` flag to indicate master & specify target environment for new database using `-a`
 - Database provisioning will take 3-5 minutes and additional 10-15 minutes to catch up to master
 
@@ -28,24 +29,23 @@ heroku pg:info -a commonwealth-beta
 ```
 
 ## Scenario: Change DB Plan Heroku
-https://devcenter.heroku.com/articles/updating-heroku-postgres-databases
+<https://devcenter.heroku.com/articles/updating-heroku-postgres-databases>
 Need small maintenance downtime
 
-
 ## Scenario: Destroy / Delete a Database
-https://devcenter.heroku.com/articles/heroku-postgresql#removing-the-add-on
+<https://devcenter.heroku.com/articles/heroku-postgresql#removing-the-add-on>
 <img width="771" alt="image" src="https://user-images.githubusercontent.com/4791635/229538904-f4a1f169-453f-4c64-8ff1-231d480ebacf.png">
 
 ## Backups & Schedule
-https://devcenter.heroku.com/articles/heroku-postgres-backups
+<https://devcenter.heroku.com/articles/heroku-postgres-backups>
 
 ## HEROKU DATADOG DATABASE MONITORING HEROKU GUIDE
-https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle
+<https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle>
 
 ## HEROKU BUILD AGENT CONF VARIABLES
-https://docs.datadoghq.com/agent/basic_agent_usage/heroku/#configuration
+<https://docs.datadoghq.com/agent/basic_agent_usage/heroku/#configuration>
 
-# Change Log
+## Change Log
 
-- 230331: Authored by Nakul Manchanda. 
+- 230331: Authored by Nakul Manchanda.
 - 230516: Updated by Nakul Manchanda.

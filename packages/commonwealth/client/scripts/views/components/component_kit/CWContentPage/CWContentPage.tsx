@@ -1,20 +1,24 @@
-import { IThreadCollaborator } from 'client/scripts/models/Thread';
-import 'components/component_kit/CWContentPage.scss';
+import { getThreadActionTooltipText } from 'helpers/threads';
+import { truncate } from 'helpers/truncate';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
-import type Account from '../../../../models/Account';
+import app from 'state';
+import { useRefreshMembershipQuery } from 'state/api/groups';
+import { isHot } from 'views/pages/discussions/helpers';
+import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
 import { Thread } from '../../../../models/Thread';
 import { ThreadStage } from '../../../../models/types';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { ThreadOptions } from '../../../pages/discussions/ThreadCard/ThreadOptions';
-import { CWCard } from '../cw_card';
-import { CWTab, CWTabBar } from '../cw_tabs';
-import { CWText } from '../cw_text';
+import { CWTab, CWTabsRow } from '../new_designs/CWTabs';
 import { ComponentType } from '../types';
+import './CWContentPage.scss';
 import { CWContentPageSkeleton } from './CWContentPageSkeleton';
 
 export type ContentPageSidebarItem = {
@@ -26,7 +30,7 @@ export type ContentPageSidebarItem = {
 export type SidebarComponents = [
   item?: ContentPageSidebarItem,
   item?: ContentPageSidebarItem,
-  item?: ContentPageSidebarItem
+  item?: ContentPageSidebarItem,
 ];
 
 type ContentPageProps = {
@@ -110,6 +114,16 @@ export const CWContentPage = ({
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+  });
+
+  const restrictedTopicIds = (memberships || [])
+    .filter((x) => x.rejectReason)
+    .map((x) => parseInt(`${x.topicId}`));
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
@@ -138,6 +152,13 @@ export const CWContentPage = ({
 
   const createdOrEditedDate = lastEdited ? lastEdited : createdAt;
 
+  let authorCommunityId: string;
+  if (author instanceof MinimumProfile) {
+    authorCommunityId = author?.chain;
+  } else if (author instanceof Account) {
+    authorCommunityId = author.community.id;
+  }
+
   const authorAndPublishInfoRow = (
     <div className="header-info-row">
       <AuthorAndPublishInfo
@@ -151,9 +172,7 @@ export const CWContentPage = ({
           lastUpdated: thread.updatedAt.toISOString(),
         })}
         authorAddress={author?.address}
-        authorChainId={
-          typeof author?.chain === 'string' ? author?.chain : author?.chain?.id
-        }
+        authorChainId={authorCommunityId}
         collaboratorsInfo={collaborators}
         publishDate={moment(createdOrEditedDate)}
         viewsCount={viewCount}
@@ -161,14 +180,27 @@ export const CWContentPage = ({
         showEditedLabelWithDate={!!lastEdited}
         isSpamThread={isSpamThread}
         threadStage={stageLabel}
+        archivedAt={thread?.archivedAt}
+        isHot={isHot(thread)}
       />
     </div>
   );
 
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!hasJoinedCommunity,
+    isThreadArchived: !!thread?.archivedAt,
+    isThreadLocked: !!thread?.lockedAt,
+    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+  });
+
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
-        {typeof title === 'string' ? <h1 className="title">{title}</h1> : title}
+        {typeof title === 'string' ? (
+          <h1 className="title">{truncate(title)}</h1>
+        ) : (
+          title
+        )}
         {!isEditing ? authorAndPublishInfoRow : <></>}
       </div>
       {subHeader}
@@ -192,9 +224,12 @@ export const CWContentPage = ({
             onEditStart={onEditStart}
             canUpdateThread={canUpdateThread}
             hasPendingEdits={hasPendingEdits}
+            canReact={!disabledActionsTooltipText}
+            canComment={!disabledActionsTooltipText}
             onProposalStageChange={onProposalStageChange}
+            disabledActionTooltipText={disabledActionsTooltipText}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-          />
+          />,
         )}
 
       {subBody}
@@ -217,25 +252,27 @@ export const CWContentPage = ({
         </div>
       ) : (
         <div className="tabs-view">
-          <CWTabBar>
-            <CWTab
-              label={contentBodyLabel}
-              onClick={() => {
-                setTabSelected(0);
-              }}
-              isSelected={tabSelected === 0}
-            />
-            {sidebarComponents?.map((item, i) => (
+          <div className="cw-tabs-row-container">
+            <CWTabsRow>
               <CWTab
-                key={item.label}
-                label={item.label}
+                label={contentBodyLabel}
                 onClick={() => {
-                  setTabSelected(i + 1);
+                  setTabSelected(0);
                 }}
-                isSelected={tabSelected === i + 1}
+                isSelected={tabSelected === 0}
               />
-            ))}
-          </CWTabBar>
+              {sidebarComponents?.map((item, i) => (
+                <CWTab
+                  key={item.label}
+                  label={item.label}
+                  onClick={() => {
+                    setTabSelected(i + 1);
+                  }}
+                  isSelected={tabSelected === i + 1}
+                />
+              ))}
+            </CWTabsRow>
+          </div>
           {tabSelected === 0 && mainBody}
           {sidebarComponents?.length >= 1 &&
             tabSelected === 1 &&
@@ -249,25 +286,5 @@ export const CWContentPage = ({
         </div>
       )}
     </div>
-  );
-};
-
-type ContentPageCardProps = {
-  content: ReactNode;
-  header: string;
-};
-
-export const CWContentPageCard = (props: ContentPageCardProps) => {
-  const { content, header } = props;
-
-  return (
-    <CWCard className="ContentPageCard">
-      <div className="header-container">
-        <CWText type="h5" fontWeight="semiBold">
-          {header}
-        </CWText>
-      </div>
-      {content}
-    </CWCard>
   );
 };

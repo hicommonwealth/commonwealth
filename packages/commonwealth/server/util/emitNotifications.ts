@@ -23,7 +23,7 @@ export default async function emitNotifications(
   models: DB,
   notification_data_and_category: NotificationDataAndCategory,
   excludeAddresses?: string[],
-  includeAddresses?: string[]
+  includeAddresses?: string[],
 ): Promise<NotificationInstance> {
   const notification_data = notification_data_and_category.data;
   const category_id = notification_data_and_category.categoryId;
@@ -35,7 +35,7 @@ export default async function emitNotifications(
   });
 
   const uniqueOptions = mapNotificationsDataToSubscriptions(
-    notification_data_and_category
+    notification_data_and_category,
   );
   const findOptions: any = {
     [Op.and]: [{ category_id }, { ...uniqueOptions }, { is_active: true }],
@@ -51,7 +51,7 @@ export default async function emitNotifications(
 
   // retrieve distinct user ids given a set of addresses
   const fetchUsersFromAddresses = async (
-    addresses: string[]
+    addresses: string[],
   ): Promise<number[]> => {
     // fetch user ids from address models
     const addressModels = await models.Address.findAll({
@@ -66,7 +66,7 @@ export default async function emitNotifications(
 
       // remove duplicates and null user_ids
       const userIdsDedup = userIds.filter(
-        (a, b) => userIds.indexOf(a) === b && a !== null
+        (a, b) => userIds.indexOf(a) === b && a !== null,
       );
       return userIdsDedup;
     } else {
@@ -117,7 +117,6 @@ export default async function emitNotifications(
         chain_event_id: chainEvent.id,
         category_id: 'chain-event',
         chain_id: chainEvent.chain,
-        entity_id: chainEvent.entity_id,
       });
     } else {
       notification = await models.Notification.create({
@@ -147,14 +146,14 @@ export default async function emitNotifications(
         notification.id,
         subscription.id,
         false,
-        subscription.subscriber_id
+        subscription.subscriber_id,
       );
     } else {
       // TODO: rollbar reported issue originates from here
       log.info(
         `Subscription: ${JSON.stringify(
-          subscription.toJSON()
-        )}\nNotification_data: ${JSON.stringify(notification_data)}`
+          subscription.toJSON(),
+        )}\nNotification_data: ${JSON.stringify(notification_data)}`,
       );
     }
   }
@@ -169,7 +168,7 @@ export default async function emitNotifications(
   if (SEND_WEBHOOKS_EMAILS) {
     await dispatchImmediateEmails(
       notification_data_and_category,
-      subscriptions
+      subscriptions,
     );
 
     // webhooks

@@ -21,9 +21,9 @@ import app, { initAppState } from 'state';
 import { PageNotFound } from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { CWText } from '../components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import { CWModal } from '../components/component_kit/new_designs/CWModal';
 import { LoginModal } from '../modals/login_modal';
 
 // TODO:
@@ -76,9 +76,9 @@ const FinishNearLogin = () => {
   const validate = async (wallet: WalletConnection) => {
     try {
       // TODO: do we need to do this every time, or only on first connect?
-      const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
+      const acct = app.chain.accounts.get(wallet.getAccountId()) as NearAccount;
 
-      const chain =
+      const community =
         app.user.selectedChain ||
         app.config.chains.getById(app.activeChainId());
 
@@ -87,7 +87,7 @@ const FinishNearLogin = () => {
       const sessionPublicAddress = await app.sessions.getOrCreateAddress(
         ChainBase.NEAR,
         chainId,
-        acct.address
+        acct.address,
       );
 
       // We do not add blockInfo for NEAR
@@ -95,9 +95,9 @@ const FinishNearLogin = () => {
         acct.address,
         WalletId.NearWallet,
         null, // no wallet sso source
-        chain.id,
+        community.id,
         sessionPublicAddress,
-        null
+        null,
       );
 
       const canvasSessionPayload = createCanvasSessionPayload(
@@ -106,7 +106,7 @@ const FinishNearLogin = () => {
         acct.address,
         sessionPublicAddress,
         +new Date(),
-        null // no blockhash
+        null, // no blockhash
       );
 
       setIsNewAccount(newAcct.newlyCreated);
@@ -119,13 +119,13 @@ const FinishNearLogin = () => {
 
       const canvas = await import('@canvas-js/interfaces');
       const signature = await acct.signMessage(
-        canvas.serializeSessionPayload(canvasSessionPayload)
+        canvas.serializeSessionPayload(canvasSessionPayload),
       );
 
       await acct.validate(
         signature,
         canvasSessionPayload.sessionIssued,
-        chainId
+        chainId,
       );
 
       app.sessions
@@ -134,7 +134,7 @@ const FinishNearLogin = () => {
 
       if (!app.isLoggedIn()) {
         await initAppState();
-        await updateActiveAddresses({ chain });
+        await updateActiveAddresses({ chain: community });
       }
 
       await setActiveAccount(acct);
@@ -142,7 +142,7 @@ const FinishNearLogin = () => {
       setValidatedAccount(acct);
     } catch (err) {
       setValidationError(
-        err.responseJSON ? err.responseJSON.error : err.message
+        err.responseJSON ? err.responseJSON.error : err.message,
       );
       return;
     }
@@ -204,8 +204,8 @@ const FinishNearLogin = () => {
         const chainCreateArgs = JSON.parse(chainCreateArgString);
 
         const res = await $.post(
-          `${app.serverUrl()}/createChain`,
-          chainCreateArgs
+          `${app.serverUrl()}/communities`,
+          chainCreateArgs,
         );
 
         await initAppState(false);
@@ -278,7 +278,7 @@ const FinishNearLogin = () => {
 
     const wallet = new WalletAccount(
       (app.chain as Near).chain.api,
-      'commonwealth_near'
+      'commonwealth_near',
     );
 
     if (wallet.isSignedIn()) {

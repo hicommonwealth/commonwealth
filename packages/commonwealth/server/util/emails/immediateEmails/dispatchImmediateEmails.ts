@@ -17,7 +17,7 @@ const log = factory.getLogger(formatFilename(__filename));
  */
 export async function dispatchImmediateEmails(
   notification: NotificationDataAndCategory,
-  subscriptions: SubscriptionInstance[]
+  subscriptions: SubscriptionInstance[],
 ) {
   if (
     notification.categoryId === NotificationCategories.SnapshotProposal ||
@@ -43,7 +43,7 @@ export async function dispatchImmediateEmails(
     StatsDController.get().increment('emails.immediate.sent');
   } catch (e) {
     const msg = `Failed to send emails for the following notification ${JSON.stringify(
-      notification
+      notification,
     )}`;
     log.error(msg, e);
     rollbar.error(msg, e);

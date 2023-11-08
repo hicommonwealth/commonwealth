@@ -18,7 +18,7 @@ export async function createEmailObject(
     | { categoryId: NotificationCategories.ThreadEdit }
     | { categoryId: NotificationCategories.CommentEdit }
   >,
-  emailSubscriptions: SubscriptionInstance[]
+  emailSubscriptions: SubscriptionInstance[],
 ): Promise<MailDataRequired> {
   const from = 'Commonwealth <no-reply@commonwealth.im>';
   const to = emailSubscriptions.map((s) => s.User.email);

@@ -1,9 +1,9 @@
-import { AllowlistData, Requirement, ThresholdData } from './requirementsTypes';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import { ChainNetwork } from 'common-common/src/types';
 import { toBN } from 'web3-utils';
+import { TokenBalanceCache } from '../../../../token-balance-cache/src';
+import { AllowlistData, Requirement, ThresholdData } from './requirementsTypes';
 
-export type validateGroupMembershipResponse = {
+export type ValidateGroupMembershipResponse = {
   isValid: boolean;
   messages?: {
     requirement: Requirement;
@@ -16,17 +16,20 @@ export type validateGroupMembershipResponse = {
  * @param userAddress address of user
  * @param requirements An array of requirement types to be validated against
  * @param tbc initialized Token Balance Cache instance
- * @returns validateGroupMembershipResponse validity and messages on requirements that failed
+ * @returns ValidateGroupMembershipResponse validity and messages on requirements that failed
  */
 export default async function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
-  tbc?: TokenBalanceCache
-): Promise<validateGroupMembershipResponse> {
-  const response: validateGroupMembershipResponse = {
+  tbc?: TokenBalanceCache,
+  numRequiredRequirements: number = 0
+): Promise<ValidateGroupMembershipResponse> {
+  const response: ValidateGroupMembershipResponse = {
     isValid: true,
     messages: [],
   };
+  let allowListOverride = false;
+  let numRequirementsMet = 0;
   const checks = requirements.map(async (requirement) => {
     let checkResult: { result: boolean; message: string };
     switch (requirement.rule) {
@@ -39,16 +42,21 @@ export default async function validateGroupMembership(
           userAddress,
           requirement.data as AllowlistData
         );
+        if (checkResult.result) {
+          allowListOverride = true;
+        }
         break;
       }
       default:
         checkResult = {
           result: false,
-          message: 'Invalid Requirment',
+          message: 'Invalid Requirement',
         };
         break;
     }
-    if (!checkResult.result) {
+    if (checkResult.result) {
+      numRequirementsMet++;
+    } else {
       response.isValid = false;
       response.messages.push({
         requirement,
@@ -57,6 +65,17 @@ export default async function validateGroupMembership(
     }
   });
   await Promise.all(checks);
+  if (allowListOverride) {
+    // allow if address is whitelisted
+    return { isValid: true };
+  }
+  if (
+    numRequiredRequirements &&
+    numRequirementsMet >= numRequiredRequirements
+  ) {
+    // allow if minimum number of requirements met
+    return { isValid: true };
+  }
   return response;
 }
 

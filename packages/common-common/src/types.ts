@@ -1,3 +1,5 @@
+import { SupportedNetwork } from 'commonwealth/shared/chain/types/types';
+
 export enum NotificationCategories {
   NewComment = 'new-comment-creation',
   NewThread = 'new-thread-creation',
@@ -156,11 +158,16 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
-export type DiscordAction =
-  | 'create'
-  | 'update'
+export type ThreadDiscordActions =
   | 'thread-delete'
-  | 'comment-delete';
+  | 'thread-title-update'
+  | 'thread-body-update'
+  | 'thread-create';
+export type CommentDiscordActions =
+  | 'comment-delete'
+  | 'comment-update'
+  | 'comment-create';
+export type DiscordAction = ThreadDiscordActions | CommentDiscordActions;
 
 export interface IDiscordMessage {
   user?: {
@@ -177,6 +184,15 @@ export interface IDiscordMessage {
   action: DiscordAction;
 }
 
+export interface IDiscordMeta {
+  user: {
+    id: string;
+    username: string;
+  };
+  channel_id: string;
+  message_id: string;
+}
+
 export type HttpMethod =
   | 'get'
   | 'post'
@@ -185,3 +201,15 @@ export type HttpMethod =
   | 'patch'
   | 'options'
   | 'head';
+
+export type ChainEventAttributes = {
+  id: number;
+  block_number: number;
+  event_data: any;
+  queued: number;
+  entity_id?: number;
+  network: SupportedNetwork;
+  chain: string;
+  created_at?: Date;
+  updated_at?: Date;
+};

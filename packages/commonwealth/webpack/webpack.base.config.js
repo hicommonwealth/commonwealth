@@ -24,27 +24,28 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env.MIXPANEL_PROD_TOKEN': JSON.stringify(
-        process.env.MIXPANEL_PROD_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900'
+        process.env.MIXPANEL_PROD_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.MIXPANEL_DEV_TOKEN': JSON.stringify(
-        process.env.MIXPANEL_DEV_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900'
+        process.env.MIXPANEL_DEV_TOKEN || '312b6c5fadb9a88d98dc1fb38de5d900',
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.MAGIC_PUBLISHABLE_KEY': JSON.stringify(
-        process.env.MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4'
+        process.env.MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4',
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.DISCORD_CLIENT_ID': JSON.stringify(
-        process.env.DISCORD_CLIENT_ID || '1034502265664454776'
+        // TODO: @Timothee can we remove the default/hardcoded value here?
+        process.env.DISCORD_CLIENT_ID || '1034502265664454776',
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.DISCORD_UI_URL': JSON.stringify(
-        process.env.DISCORD_UI_URL || 'http://localhost:3000'
+        process.env.DISCORD_UI_URL || 'http://localhost:3000',
       ),
     }),
     new webpack.DefinePlugin({
@@ -52,21 +53,24 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.FLAG_COMMUNITY_HOMEPAGE': JSON.stringify(
-        process.env.FLAG_COMMUNITY_HOMEPAGE
+        process.env.FLAG_COMMUNITY_HOMEPAGE,
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.FLAG_SIDEBAR_TOGGLE': JSON.stringify(
-        process.env.FLAG_SIDEBAR_TOGGLE
+        process.env.FLAG_SIDEBAR_TOGGLE,
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
-        process.env.FLAG_PROPOSAL_TEMPLATES
+        process.env.FLAG_PROPOSAL_TEMPLATES,
       ),
     }),
     new webpack.DefinePlugin({
       'process.env.ETH_RPC': JSON.stringify(process.env.ETH_RPC),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.GATING_API_ENABLED': process.env.GATING_API_ENABLED,
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
@@ -162,7 +166,7 @@ module.exports = {
       'chain-events': path.resolve(__dirname, '../../chain-events'),
       'token-balance-cache': path.resolve(
         __dirname,
-        '../../token-balance-cache'
+        '../../token-balance-cache',
       ),
     },
     fallback: {

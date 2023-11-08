@@ -22,9 +22,8 @@
     "lint-branch": "./scripts/lint-branch.sh",
     "lint-branch-warnings": "FAIL_WARNINGS=1 ./scripts/lint-branch.sh",
     "stylelint": "stylelint packages/commonwealth/client/styles/*",
-    "add-prettier-precommit": "grep -q -s 'prettier --write' ./.git/hooks/pre-commit || cat ./scripts/prettier-new-work.sh >> ./.git/hooks/pre-commit",
-    "setup-git-hooks": "yarn add-prettier-precommit && chmod +x ./.git/hooks/pre-commit",
-    "chromatic": "chromatic --exit-zero-on-changes"
+    "chromatic": "chromatic --exit-zero-on-changes",
+    "prepare": "husky install"
   },
   "engines": {
     "node": "18.x"
@@ -36,7 +35,6 @@
   "keywords": [],
   "workspaces": [
     "packages/common-common",
-    "packages/chain-events",
     "packages/token-balance-cache",
     "packages/commonwealth",
     "packages/discord-bot"
@@ -74,7 +72,8 @@
     "prettier-plugin-organize-imports": "^3.2.3",
     "stylelint": "^14.14.1",
     "stylelint-config-prettier": "^9.0.4",
-    "stylelint-config-standard": "^29.0.0"
+    "stylelint-config-standard": "^29.0.0",
+    "husky": "^8.0.0"
   },
   "resolutions": {
     "quill": "^1.3.6",

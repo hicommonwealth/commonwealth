@@ -27,7 +27,7 @@ const deleteReaction = async ({
   return await axios
     .delete(`${app.serverUrl()}/reactions/${reactionId}`, {
       data: {
-        author_chain: chainId,
+        author_community_id: chainId,
         address: address,
         jwt: app.user.jwt,
         canvas_action: action,

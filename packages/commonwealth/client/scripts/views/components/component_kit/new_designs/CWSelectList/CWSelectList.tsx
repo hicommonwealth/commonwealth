@@ -1,24 +1,25 @@
-import './CWSelectList.scss';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import type { GroupBase, Props } from 'react-select';
 import Select, { components } from 'react-select';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 import { MessageRow } from '../CWTextInput/MessageRow';
-import { useFormContext } from 'react-hook-form';
+import './CWSelectList.scss';
 
 type CustomCWSelectListProps = {
   label?: string;
   hookToForm?: boolean;
+  customError?: string;
 };
 
 export const CWSelectList = <
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >(
-  props: Props<Option, IsMulti, Group> & CustomCWSelectListProps
+  props: Props<Option, IsMulti, Group> & CustomCWSelectListProps,
 ) => {
   const formContext = useFormContext();
   const formFieldContext = props.hookToForm
@@ -27,6 +28,17 @@ export const CWSelectList = <
   const formFieldErrorMessage =
     props.hookToForm &&
     (formContext?.formState?.errors?.[props.name]?.message as string);
+  const [defaultFormContextValue, setDefaultFormContextValue] = useState(
+    props.hookToForm ? formContext?.getValues?.(props?.name) : null,
+  );
+
+  useEffect(() => {
+    if (defaultFormContextValue) {
+      setTimeout(() => {
+        setDefaultFormContextValue(null);
+      });
+    }
+  }, [defaultFormContextValue]);
 
   useEffect(() => {
     props.hookToForm &&
@@ -50,6 +62,7 @@ export const CWSelectList = <
       <Select
         {...props}
         {...formFieldContext}
+        {...(defaultFormContextValue && { value: defaultFormContextValue })}
         isDisabled={props?.isDisabled || formFieldContext?.disabled}
         required={props?.required || formFieldContext?.required}
         onBlur={(e) => {
@@ -105,22 +118,25 @@ export const CWSelectList = <
             </components.MultiValueRemove>
           ),
         }}
+        classNamePrefix="cwsl"
         className={getClasses<{
           className?: string;
           failure?: boolean;
         }>(
           {
             className: props.className,
-            failure: !!formFieldErrorMessage,
+            failure: !!formFieldErrorMessage || !!props.customError,
           },
-          ComponentType.SelectList
+          ComponentType.SelectList,
         )}
       />
-      {formFieldErrorMessage && (
+      {(formFieldErrorMessage || props.customError) && (
         <MessageRow
-          hasFeedback={!!formFieldErrorMessage}
-          statusMessage={formFieldErrorMessage}
-          validationStatus={formFieldErrorMessage ? 'failure' : undefined}
+          hasFeedback={!!formFieldErrorMessage || !!props.customError}
+          statusMessage={formFieldErrorMessage || props.customError}
+          validationStatus={
+            formFieldErrorMessage || props.customError ? 'failure' : undefined
+          }
         />
       )}
     </div>

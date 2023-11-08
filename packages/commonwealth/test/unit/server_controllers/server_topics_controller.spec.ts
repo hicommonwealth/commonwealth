@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from '../../../server/models/community';
 import { UserInstance } from 'server/models/user';
 
 const createMockedTopicsController = (isAdmin: boolean = false) => {
@@ -68,7 +68,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
     getAddresses: async () => [],
     isAdmin,
   } as UserInstance;
-  const chain = {} as ChainInstance;
+  const chain = {} as CommunityInstance;
   return { controller, user, chain };
 };
 
@@ -77,7 +77,7 @@ describe('ServerTopicsController', () => {
     const { controller, user, chain } = createMockedTopicsController();
     const result = await controller.createTopic({
       user,
-      chain,
+      community: chain,
       body: {
         name: 'hhh',
         description: 'ddd',
@@ -96,14 +96,14 @@ describe('ServerTopicsController', () => {
     const { controller, user, chain } = createMockedTopicsController();
     await controller.deleteTopic({
       user,
-      chain,
+      community: chain,
       topicId: 1,
     });
   });
   describe('#getTopics', async () => {
     const { controller, chain } = createMockedTopicsController();
     const topics = await controller.getTopics({
-      chain,
+      community: chain,
     });
     expect(topics).to.have.length(1);
   });
@@ -111,7 +111,7 @@ describe('ServerTopicsController', () => {
     const { controller, user, chain } = createMockedTopicsController(true);
     await controller.updateTopicChannel({
       user,
-      chain,
+      community: chain,
       topicId: 1,
       channelId: 'ccc',
     });
@@ -120,7 +120,7 @@ describe('ServerTopicsController', () => {
     const { controller, user, chain } = createMockedTopicsController(true);
     await controller.updateTopic({
       user,
-      chain,
+      community: chain,
       body: {
         id: 1,
         name: 'ddd',
@@ -131,7 +131,7 @@ describe('ServerTopicsController', () => {
     const { controller, user, chain } = createMockedTopicsController(true);
     await controller.updateTopicsOrder({
       user,
-      chain,
+      community: chain,
       body: {
         orderedIds: ['1', '2'],
       },

@@ -47,7 +47,7 @@ const createThread = async ({
 
   const response = await axios.post(`${app.serverUrl()}/threads`, {
     author_chain: chainId,
-    chain: chainId,
+    community_id: chainId,
     address,
     author: JSON.stringify(authorProfile),
     title: encodeURIComponent(title),
@@ -80,7 +80,7 @@ const useCreateThreadMutation = ({ chainId }: Partial<CreateThreadProps>) => {
             newThread.stage === ThreadStage.Voting
               ? totalThreadsInCommunityForVoting + 1
               : totalThreadsInCommunityForVoting,
-        })
+        }),
       );
       return newThread;
     },
