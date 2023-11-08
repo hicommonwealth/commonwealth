@@ -18,11 +18,7 @@ import { getNotificationTypeText } from './helpers';
 
 const getTextRows = (
   subscription: NotificationSubscription,
-  setRoute: (
-    url: To,
-    options?: NavigateOptions,
-    prefix?: null | string,
-  ) => void,
+  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
 ) => {
   if (subscription.Thread) {
     const threadUrl = getNotificationUrlPath(subscription);
@@ -78,7 +74,7 @@ const getTextRows = (
               userAddress={subscription.Comment.author}
               userCommunityId={subscription.Comment.chain}
             />
-            's
+            {`'s`}
           </CWText>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -126,7 +122,7 @@ type SubscriptionRowProps = {
 };
 
 export const SubscriptionRowTextContainer = ({
-  subscription,
+  subscription
 }: SubscriptionRowProps) => {
   const navigate = useCommonNavigate();
 
@@ -154,7 +150,7 @@ type SubscriptionRowMenuProps = {
 
 export const SubscriptionRowMenu = ({
   subscription,
-  onUnsubscribe,
+  onUnsubscribe
 }: SubscriptionRowMenuProps) => {
   return (
     <div className="trigger-wrapper">
@@ -167,8 +163,8 @@ export const SubscriptionRowMenu = ({
             label: 'Unsubscribe',
             iconLeft: 'close',
             isSecondary: true,
-            onClick: () => onUnsubscribe(subscription),
-          },
+            onClick: () => onUnsubscribe(subscription)
+          }
         ]}
       />
     </div>
