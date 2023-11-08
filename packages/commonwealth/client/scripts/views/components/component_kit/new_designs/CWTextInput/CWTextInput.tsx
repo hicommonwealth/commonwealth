@@ -96,6 +96,7 @@ const CWTextInput = (props: TextInputProps) => {
     hookToForm,
     customError,
     inputRef,
+    validationStatus,
   } = props;
 
   const formContext = useFormContext();
@@ -113,7 +114,7 @@ const CWTextInput = (props: TextInputProps) => {
       }>(
         {
           containerClassName,
-          validationStatus: props.validationStatus,
+          validationStatus: validationStatus,
         },
         ComponentType.TextInput,
       )}
