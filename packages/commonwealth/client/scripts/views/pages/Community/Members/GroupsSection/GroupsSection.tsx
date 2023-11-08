@@ -7,7 +7,13 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
-import { chainTypes, requirementTypes } from '../../common/constants';
+
+import {
+  SPECIFICATIONS,
+  TOKENS,
+  chainTypes,
+  requirementTypes,
+} from '../../common/constants';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
 
@@ -34,10 +40,11 @@ const GroupsSection = ({
         <div className="empty-groups-container">
           <CWIcon iconName="members" iconSize="xxl" className="members-icon" />
           <CWText type="h4" className="header">
-            {app.activeChainId()} does not have any groups
+            <span className="capitalize">{app.activeChainId()}</span>&nbsp;does
+            not have any groups
           </CWText>
           <CWText type="b1" className="description">
-            Create a group to gate discussion topics
+            Admins can create groups to gate discussion topics
           </CWText>
           {canManageGroups && (
             <CWButton
@@ -75,7 +82,12 @@ const GroupsSection = ({
                     ?.label?.split('-')
                     ?.join(' ') || '',
                 requirementContractAddress: r.data.source.contract_address,
-                requirementAmount: r.data.threshold,
+                requirementAmount: [
+                  TOKENS.EVM_TOKEN,
+                  SPECIFICATIONS.ERC_20,
+                ].includes(r?.data?.source?.source_type)
+                  ? (parseInt(r.data.threshold) * 10 ** -18).toFixed(18)
+                  : r.data.threshold,
                 requirementCondition: 'More than', // hardcoded in api
               }))}
               requirementsToFulfill={

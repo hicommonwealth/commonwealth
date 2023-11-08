@@ -33,6 +33,9 @@ const CreateCommunityGroupPage = () => {
   return (
     <GroupForm
       formType="create"
+      initialValues={{
+        requirementsToFulfill: 'ALL',
+      }}
       onSubmit={(values) => {
         const payload = makeGroupDataBaseAPIPayload(values);
 

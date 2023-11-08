@@ -232,9 +232,18 @@ $width: 360px;
     @include gallery-grid(8px, column);
   }
 
-  .typeahead-gallery {
-    .typeahead-row {
-      margin-bottom: 20px;
+  .dropdowns {
+    .dropdown-type {
+      margin-bottom: 25px;
+    }
+
+    .multi-select,
+    .typeahead {
+
+      .multi-select-row,
+      .typeahead-row {
+        margin-bottom: 15px;
+      }
     }
   }
 

@@ -25,6 +25,10 @@ const RequirementSubForm = ({
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
   const isCosmosRequirement = requirementType === TOKENS.COSMOS_TOKEN;
+  const isERC20orEVMRequirement = [
+    TOKENS.EVM_TOKEN,
+    SPECIFICATIONS.ERC_20,
+  ].includes(requirementType);
 
   useEffect(() => {
     defaultValues?.requirementType?.value &&
@@ -159,8 +163,14 @@ const RequirementSubForm = ({
           <CWTextInput
             key={defaultValues.requirementAmount}
             name="requirementAmount"
+            alignLabelToRight
             label="Amount"
-            placeholder="Amount"
+            instructionalMessage={
+              isERC20orEVMRequirement
+                ? 'Integer will be converted to decimal'
+                : ''
+            }
+            placeholder="Enter an integer"
             {...(defaultValues.requirementAmount && {
               defaultValue: defaultValues.requirementAmount,
             })}

@@ -3,7 +3,9 @@ import { CommunityInstance } from '../../models/community';
 import { CommunitySnapshotSpaceWithSpaceAttached } from '../../models/community_snapshot_spaces';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
-export type GetCommunitiesOptions = {};
+export type GetCommunitiesOptions = {
+  hasGroups?: boolean; // only return communities with associated groups
+};
 export type GetCommunitiesResult = {
   community: CommunityInstance;
   snapshot: string[];
@@ -11,9 +13,19 @@ export type GetCommunitiesResult = {
 
 export async function __getCommunities(
   this: ServerCommunitiesController,
+  { hasGroups }: GetCommunitiesOptions,
 ): Promise<GetCommunitiesResult> {
+  const communitiesInclude = [];
+  if (hasGroups) {
+    communitiesInclude.push({
+      model: this.models.Group,
+      required: true,
+    });
+  }
+
   const communities = await this.models.Community.findAll({
     where: { active: true },
+    include: communitiesInclude,
   });
 
   const communityIds = communities.map((community) => community.id);
