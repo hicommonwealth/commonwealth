@@ -14,7 +14,7 @@ test.describe('Discussion Page Tests', () => {
   test.beforeEach(async ({ page }) => {
     threadId = (
       await testDb.query(`
-        INSERT INTO "Threads" (address_id, title, body, chain, topic_id, kind, created_at, updated_at)
+        INSERT INTO "Threads" (address_id, title, body, community_id, topic_id, kind, created_at, updated_at)
         VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         RETURNING id;
     `)

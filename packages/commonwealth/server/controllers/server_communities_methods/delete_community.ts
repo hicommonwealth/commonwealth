@@ -127,8 +127,8 @@ export async function __deleteCommunity(
           await sequelize.query(
             `UPDATE "Threads" SET
                 created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id)
-             WHERE chain = '${community.id}'`,
-            { transaction: t },
+             WHERE community_id = :community_id`,
+            { transaction: t, replacements: { community_id: community.id } },
           );
 
           await this.models.Thread.destroy({

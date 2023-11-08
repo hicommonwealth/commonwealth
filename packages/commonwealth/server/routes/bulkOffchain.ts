@@ -22,8 +22,8 @@ export const Errors = {};
 const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;
   // globally shared SQL replacements
-  const communityOptions = 'chain = :chain';
-  const replacements = { chain: chain.id };
+  const communityOptions = 'community_id = :community_id';
+  const replacements = { community_id: chain.id };
 
   // parallelized queries
   const [
@@ -65,17 +65,19 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           (new Date() as any) - 1000 * 24 * 60 * 60 * 30
         );
         const activeUsers = {};
-        const where = {
-          updated_at: { [Op.gt]: thirtyDaysAgo },
-          chain: chain.id,
-        };
 
         const monthlyComments = await models.Comment.findAll({
-          where,
+          where: {
+            updated_at: { [Op.gt]: thirtyDaysAgo },
+            chain: chain.id,
+          },
           include: [models.Address],
         });
         const monthlyThreads = await models.Thread.findAll({
-          where,
+          where: {
+            updated_at: { [Op.gt]: thirtyDaysAgo },
+            community_id: chain.id
+          },
           attributes: { exclude: ['version_history'] },
           include: [{ model: models.Address, as: 'Address' }],
         });
@@ -122,7 +124,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
             "Threads" t 
           WHERE 
             t.deleted_at IS NULL 
-            AND t.chain = $chain 
+            AND t.community_id = $community_id 
             AND (
               t.pinned = true 
               OR (
@@ -136,7 +138,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
         LEFT JOIN "Topics" topics ON threads.topic_id = topics.id
       `,
       {
-        bind: { chain: chain.id, created_at: new Date().toISOString() },
+        bind: { community_id: chain.id, created_at: new Date().toISOString() },
         type: QueryTypes.SELECT,
       }
     ),

@@ -69,12 +69,11 @@ const getChainStatus = async (models: DB) => {
   const threadCountQueryData: ThreadCountQueryData[] =
     await models.sequelize.query(
       `
-      SELECT "Threads".chain, COUNT("Threads".id)
+      SELECT "Threads".community_id as chain, COUNT("Threads".id)
       FROM "Threads"
       WHERE "Threads".created_at > :thirtyDaysAgo
       AND "Threads".deleted_at IS NULL
-      AND "Threads".chain IS NOT NULL
-      GROUP BY "Threads".chain;
+      GROUP BY "Threads".community_id;
       `,
       { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
     );
@@ -151,7 +150,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     // add the chain and timestamp to replacements so that we can safely populate the query with dynamic parameters
     replacements.push(name, time.getTime());
     // append the SELECT query
-    query += `SELECT id, chain FROM "Threads" WHERE
+    query += `SELECT id, community_id FROM "Threads" WHERE
 (kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
     if (i === commsAndChains.length - 1) query += ';';
   }

@@ -73,7 +73,7 @@ export async function __searchThreads(
   }
 
   const communityWhere = bind.community
-    ? '"Threads".chain = $community AND'
+    ? '"Threads".community_id = $community AND'
     : '';
 
   let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
@@ -92,7 +92,7 @@ export async function __searchThreads(
       "Addresses".address,
       "Addresses".community_id as address_chain,
       "Threads".created_at,
-      "Threads".chain,
+      "Threads".community_id as chain,
       ts_rank_cd("Threads"._search, query) as rank
     FROM "Threads"
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,

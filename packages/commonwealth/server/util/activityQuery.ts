@@ -6,15 +6,15 @@ export async function getActivityFeed(models: DB, id = 0) {
    * Last 50 updated threads
    */
 
-  const filterByChainForUsers = id
-    ? 'JOIN "Addresses" a on a.community_id=t.chain and a.user_id = ?'
+  const filterByCommunityForUsers = id
+    ? 'JOIN "Addresses" a on a.community_id=t.community_id and a.user_id = ?'
     : '';
 
   const query = `
   WITH ranked_thread_notifs as (SELECT t.id AS thread_id,
                                   t.max_notif_id
                                 FROM "Threads" t 
-                                ${filterByChainForUsers}
+                                ${filterByCommunityForUsers}
                                 WHERE t.max_notif_id IS NOT NULL AND deleted_at IS NULL
                                 ORDER BY t.max_notif_id DESC
                                 LIMIT 50
