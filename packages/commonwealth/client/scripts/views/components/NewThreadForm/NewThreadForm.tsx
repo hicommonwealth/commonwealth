@@ -7,6 +7,7 @@ import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
@@ -30,7 +31,9 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
-  const { data: topics } = useFetchTopicsQuery({
+  const location = useLocation();
+
+  const { data: topics = [] } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
 
@@ -45,9 +48,9 @@ export const NewThreadForm = () => {
         t.tokenThreshold.isZero() ||
         !app.chain.isGatedTopic(t.id)
       ) {
-        acc.enabledTopics.push(t);
+        acc?.enabledTopics?.push(t);
       } else {
-        acc.disabledTopics.push(t);
+        acc?.disabledTopics?.push(t);
       }
       return acc;
     },
@@ -78,10 +81,6 @@ export const NewThreadForm = () => {
     address: app?.user?.activeAccount?.address,
   });
 
-  const restrictedTopicIds = memberships
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
-
   const {
     mutateAsync: createThread,
     error: createThreadError,
@@ -102,7 +101,16 @@ export const NewThreadForm = () => {
   }, [threadContentDelta, threadTitle]);
 
   const handleNewThreadCreation = async () => {
-    if (restrictedTopicIds.includes(threadTopic.id)) {
+    const isTopicGated = !!(memberships || []).find((membership) =>
+      membership.topicIds.includes(threadTopic?.id),
+    );
+    const isActionAllowedInGatedTopic = !!(memberships || []).find(
+      (membership) =>
+        membership.topicIds.includes(threadTopic?.id) && membership.isAllowed,
+    );
+    const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+
+    if (isRestrictedMembership) {
       notifyError('Topic is gated!');
       return;
     }
@@ -155,8 +163,9 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      topicsForSelector.enabledTopics.find((t) => t.name.includes('General')) ||
-        null,
+      topicsForSelector?.enabledTopics?.find((t) =>
+        t?.name?.includes('General'),
+      ) || null,
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
@@ -178,7 +187,7 @@ export const NewThreadForm = () => {
                 <TopicSelector
                   enabledTopics={topicsForSelector.enabledTopics}
                   disabledTopics={topicsForSelector.disabledTopics}
-                  value={threadTopic}
+                  value={!!location.search && threadTopic}
                   onChange={setThreadTopic}
                 />
               )}

@@ -5,18 +5,13 @@ import app from 'state';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-
-import {
-  SPECIFICATIONS,
-  TOKENS,
-  chainTypes,
-  requirementTypes,
-} from '../../common/constants';
+import { chainTypes, requirementTypes } from '../../common/constants';
+import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import GroupCard from './GroupCard';
 import './GroupsSection.scss';
 
 type GroupSectionProps = {
-  filteredGroups: Group[];
+  filteredGroups: (Group & { isJoined?: boolean })[];
   canManageGroups?: boolean;
   hasNoGroups?: boolean;
 };
@@ -76,12 +71,10 @@ const GroupsSection = ({
                     ?.label?.split('-')
                     ?.join(' ') || '',
                 requirementContractAddress: r.data.source.contract_address,
-                requirementAmount: [
-                  TOKENS.EVM_TOKEN,
-                  SPECIFICATIONS.ERC_20,
-                ].includes(r?.data?.source?.source_type)
-                  ? (parseInt(r.data.threshold) * 10 ** -18).toFixed(18)
-                  : r.data.threshold,
+                requirementAmount: `${convertRequirementAmountFromWeiToTokens(
+                  r?.data?.source?.source_type,
+                  r.data.threshold,
+                )}`,
                 requirementCondition: 'More than', // hardcoded in api
               }))}
               requirementsToFulfill={
@@ -89,15 +82,7 @@ const GroupsSection = ({
                   ? 'ALL'
                   : group.requirementsToFulfill
               }
-              isJoined={(group.members || []).find((x) => {
-                if (!app.user.activeAccount || app.user.activeAccount === null)
-                  return;
-
-                return (
-                  x?.address?.address === app.user.activeAccount.address &&
-                  !x.reject_reason
-                );
-              })}
+              isJoined={group.isJoined}
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,
                 name: x.name,
