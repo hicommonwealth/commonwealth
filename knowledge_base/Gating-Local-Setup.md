@@ -16,4 +16,4 @@ FEATURE_FLAG_GROUP_CHECK_ENABLED=true
 
 – In the app, navigate to a community, on the sidebar go to `Governance -> Members`
 
-– Now you can see all members and their membership status within the commmunity, and you can manage groups
+– Now you can see all members and their membership status within the community, and you can manage groups
