@@ -3,10 +3,10 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
+import { LinkSource, ThreadAttributes } from 'server/models/thread';
 import { Errors } from 'server/util/linkingValidationHelper';
-import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
-import { Link, LinkSource, ThreadInstance } from 'server/models/thread';
+import { resetDatabase } from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -30,8 +30,8 @@ describe('Linking Tests', () => {
   let userAddress;
   let userAddressId;
   let userSession;
-  let thread1: ThreadInstance;
-  let thread2: ThreadInstance;
+  let thread1: ThreadAttributes;
+  let thread2: ThreadAttributes;
   const link1 = {
     source: LinkSource.Snapshot,
     identifier: '0x1234567',
@@ -229,10 +229,10 @@ describe('Linking Tests', () => {
       expect(result.result).to.not.be.null;
       expect(result.result.threads.length).to.equal(2);
       expect(result.result.threads.map((item) => item.id)).to.contain(
-        thread1.id
+        thread1.id,
       );
       expect(result.result.threads.map((item) => item.id)).to.contain(
-        thread2.id
+        thread2.id,
       );
     });
   });

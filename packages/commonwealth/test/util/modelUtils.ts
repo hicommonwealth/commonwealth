@@ -1,8 +1,14 @@
 /* eslint-disable no-unused-expressions */
+import type {
+  Action,
+  ActionPayload,
+  Session,
+  SessionPayload,
+} from '@canvas-js/interfaces';
 import {
+  SignTypedDataVersion,
   personalSign,
   signTypedData,
-  SignTypedDataVersion,
 } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
@@ -12,15 +18,9 @@ import 'chai/register-should';
 import { BalanceType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
-import * as siwe from 'siwe';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import { createRole, findOneRole } from 'server/util/roles';
-import type {
-  Action,
-  Session,
-  ActionPayload,
-  SessionPayload,
-} from '@canvas-js/interfaces';
+import * as siwe from 'siwe';
 
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
@@ -33,13 +33,13 @@ import app from '../../server-test';
 import models from '../../server/database';
 import type { Role } from '../../server/models/role';
 
+import { Link, LinkSource, ThreadAttributes } from 'server/models/thread';
 import {
-  getEIP712SignableAction,
-  TEST_BLOCK_INFO_STRING,
   TEST_BLOCK_INFO_BLOCKHASH,
+  TEST_BLOCK_INFO_STRING,
   createSiweMessage,
+  getEIP712SignableAction,
 } from '../../shared/adapters/chain/ethereum/keys';
-import { Link, LinkSource } from 'server/models/thread';
 
 const sortedStringify = configureStableStringify({
   bigint: false,
@@ -75,7 +75,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       address,
       sessionWallet.address,
       timestamp,
-      TEST_BLOCK_INFO_BLOCKHASH
+      TEST_BLOCK_INFO_BLOCKHASH,
     );
     const nonce = siwe.generateNonce();
     const domain = 'https://commonwealth.test';
@@ -142,7 +142,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const sessionWallet = sessionKeyring.addFromUri(
       mnemonicGenerate(),
       {},
-      'ed25519'
+      'ed25519',
     );
     const chain_id = ChainNetwork.Edgeware;
     const timestamp = 1665083987891;
@@ -152,10 +152,10 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       address,
       sessionWallet.address,
       timestamp,
-      TEST_BLOCK_INFO_BLOCKHASH
+      TEST_BLOCK_INFO_BLOCKHASH,
     );
     const signature = keyPair.sign(
-      stringToU8a(sortedStringify(sessionPayload))
+      stringToU8a(sortedStringify(sessionPayload)),
     );
     const session: Session = {
       type: 'session',
@@ -180,7 +180,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       sessionSigner: keyPair,
       sign: (actionPayload: ActionPayload) => {
         const signatureBytes = sessionWallet.sign(
-          stringToU8a(sortedStringify(actionPayload))
+          stringToU8a(sortedStringify(actionPayload)),
         );
         const signature = new Buffer(signatureBytes).toString('hex');
         return signature;
@@ -221,7 +221,9 @@ export interface ThreadArgs {
   sign: (actionPayload: ActionPayload) => string;
 }
 
-export const createThread = async (args: ThreadArgs) => {
+export const createThread = async (
+  args: ThreadArgs,
+): Promise<{ status: string; result?: ThreadAttributes; error?: Error }> => {
   const {
     chainId,
     address,
@@ -600,7 +602,7 @@ export const updateRole = async (args: AssignRoleArgs) => {
   const currentRole = await findOneRole(
     models,
     { where: { address_id: args.address_id } },
-    args.chainOrCommObj.chain_id
+    args.chainOrCommObj.chain_id,
   );
   let role;
   // Can only be a promotion
@@ -609,7 +611,7 @@ export const updateRole = async (args: AssignRoleArgs) => {
       models,
       args.address_id,
       args.chainOrCommObj.chain_id,
-      args.role
+      args.role,
     );
   }
   // Can be demoted or promoted
@@ -629,7 +631,7 @@ export const updateRole = async (args: AssignRoleArgs) => {
         models,
         args.address_id,
         args.chainOrCommObj.chain_id,
-        args.role
+        args.role,
       );
     }
   }
@@ -698,7 +700,7 @@ export class MockTokenBalanceProvider extends BalanceProvider<
 
   public async getExternalProvider(
     node: IChainNode,
-    opts: { tokenAddress: string; contractType: string }
+    opts: { tokenAddress: string; contractType: string },
   ): Promise<any> {
     return;
   }
@@ -706,7 +708,7 @@ export class MockTokenBalanceProvider extends BalanceProvider<
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: { tokenAddress: string; contractType: string }
+    opts: { tokenAddress: string; contractType: string },
   ): Promise<string> {
     if (this.balanceFn) {
       const bal = await this.balanceFn(opts.tokenAddress, address);
@@ -724,6 +726,7 @@ export interface JoinCommunityArgs {
   chain: string;
   originChain: string;
 }
+
 export const joinCommunity = async (args: JoinCommunityArgs) => {
   const { jwt, address, chain, originChain, address_id } = args;
   try {

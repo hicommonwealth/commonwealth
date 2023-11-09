@@ -3,8 +3,8 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
-import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
+import app, { resetDatabase } from '../../../server-test';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -33,7 +33,7 @@ describe('Thread Patch Update', () => {
       adminAddressId = adminRes.address_id;
       adminJWT = jwt.sign(
         { id: adminRes.user_id, email: adminRes.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       const isAdmin = await modelUtils.updateRole({
         address_id: adminRes.address_id,
@@ -53,7 +53,7 @@ describe('Thread Patch Update', () => {
       userAddressId = userRes.address_id;
       userJWT = jwt.sign(
         { id: userRes.user_id, email: userRes.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       userSession = { session: userRes.session, sign: userRes.sign };
       expect(userAddress).to.not.be.null;
@@ -82,8 +82,8 @@ describe('Thread Patch Update', () => {
         .patch(`/api/threads/${thread.id}`)
         .set('Accept', 'application/json')
         .send({
-          author_chain: thread.chain,
-          chain: thread.chain,
+          author_chain: thread.community_id,
+          chain: thread.community_id,
           address: userAddress,
           jwt: userJWT,
           title: 'newTitle',
@@ -97,7 +97,7 @@ describe('Thread Patch Update', () => {
       expect(res.status).to.equal(200);
       expect(res.body.result).to.contain({
         id: thread.id,
-        chain: 'ethereum',
+        community_id: 'ethereum',
         title: 'newTitle',
         body: 'newBody',
         stage: 'voting',
@@ -128,8 +128,8 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: userAddress,
             jwt: userJWT,
             pinned: true,
@@ -143,8 +143,8 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: userAddress,
             jwt: userJWT,
             spam: true,
@@ -176,8 +176,8 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,
             pinned: true,
@@ -193,8 +193,8 @@ describe('Thread Patch Update', () => {
           .patch(`/api/threads/${thread.id}`)
           .set('Accept', 'application/json')
           .send({
-            author_chain: thread.chain,
-            chain: thread.chain,
+            author_chain: thread.community_id,
+            chain: thread.community_id,
             address: adminAddress,
             jwt: adminJWT,
             spam: true,
