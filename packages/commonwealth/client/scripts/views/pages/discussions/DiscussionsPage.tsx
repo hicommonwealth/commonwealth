@@ -38,10 +38,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
-    'featured'
+    'featured',
   ) as ThreadFeaturedFilterTypes;
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
-    'dateRange'
+    'dateRange',
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
@@ -53,10 +53,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
   });
-
-  const restrictedTopicIds = (memberships || [])
-    .filter((x) => x.rejectReason)
-    .map((x) => x.topicId);
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
@@ -105,14 +101,24 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
+            `${thread.identifier}-${slugify(thread.title)}`,
+          );
+
+          const isTopicGated = !!(memberships || []).find((membership) =>
+            membership.topicIds.includes(thread.topic.id),
+          );
+
+          const isActionAllowedInGatedTopic = !!(memberships || []).find(
+            (membership) =>
+              membership.topicIds.includes(thread.topic.id) &&
+              membership.isAllowed,
           );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: !!hasJoinedCommunity,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: restrictedTopicIds.includes(topicId),
+            isThreadTopicGated: isTopicGated && !isActionAllowedInGatedTopic,
           });
 
           return (

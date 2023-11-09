@@ -70,6 +70,7 @@ const CommunityMembersPage = () => {
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
+    includeGroupIds: true,
     enabled: app?.user?.activeAccount?.address ? !!memberships : true,
     ...(searchFilters.category !== 'All groups' && {
       includeMembershipTypes: searchFilters.category
@@ -81,7 +82,6 @@ const CommunityMembersPage = () => {
 
   const { data: groups } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
-    includeMembers: true,
     includeTopics: true,
     enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
@@ -108,16 +108,13 @@ const CommunityMembersPage = () => {
               role.permission,
             ),
         )?.permission,
-        groups: (groups || [])
-          .filter((g) =>
-            (g.members || []).find(
-              (x) =>
-                x?.address?.address === p.addresses?.[0]?.address &&
-                !x.reject_reason,
-            ),
+        groups: (p.group_ids || [])
+          .map(
+            (groupId) =>
+              (groups || []).find((group) => group.id === groupId)?.name,
           )
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((x) => x.name),
+          .filter(Boolean)
+          .sort((a, b) => a.localeCompare(b)),
       }))
       .filter((p) =>
         debouncedSearchTerm
@@ -132,7 +129,15 @@ const CommunityMembersPage = () => {
   }, [members, groups, debouncedSearchTerm]);
 
   const filteredGroups = useMemo(() => {
-    const filteredGroupsArr = (groups || [])
+    const modifiedGroupsArr = (groups || []).map((group) => ({
+      ...group,
+      // add is group joined flag based on membership
+      isJoined: (memberships || []).find(
+        (membership) => membership.groupId === group.id,
+      )?.isAllowed,
+    }));
+
+    const filteredGroupsArr = (modifiedGroupsArr || [])
       .filter((group) =>
         searchFilters.searchText
           ? group.name
@@ -144,16 +149,8 @@ const CommunityMembersPage = () => {
         searchFilters.category === 'All groups'
           ? true
           : searchFilters.category === 'In group'
-          ? (group.members || []).find(
-              (x) =>
-                x?.address?.address === app.user.activeAccount.address &&
-                !x.reject_reason,
-            )
-          : !(group.members || []).find(
-              (x) =>
-                x?.address?.address === app.user.activeAccount.address &&
-                !x.reject_reason,
-            ),
+          ? group.isJoined
+          : !group.isJoined,
       );
 
     const clonedFilteredGroups = [...filteredGroupsArr];
@@ -161,7 +158,7 @@ const CommunityMembersPage = () => {
     clonedFilteredGroups.sort((a, b) => a.name.localeCompare(b.name));
 
     return clonedFilteredGroups;
-  }, [groups, searchFilters]);
+  }, [groups, searchFilters, memberships]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
 
