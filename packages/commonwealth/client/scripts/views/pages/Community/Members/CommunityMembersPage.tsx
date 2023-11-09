@@ -70,6 +70,7 @@ const CommunityMembersPage = () => {
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
+    includeGroupIds: true,
     enabled: app?.user?.activeAccount?.address ? !!memberships : true,
     ...(searchFilters.category !== 'All groups' && {
       includeMembershipTypes: searchFilters.category
@@ -108,16 +109,13 @@ const CommunityMembersPage = () => {
               role.permission,
             ),
         )?.permission,
-        groups: (groups || [])
-          .filter((g) =>
-            (g.members || []).find(
-              (x) =>
-                x?.address?.address === p.addresses?.[0]?.address &&
-                !x.reject_reason,
-            ),
+        groups: (p.group_ids || [])
+          .map(
+            (groupId) =>
+              (groups || []).find((group) => group.id === groupId)?.name,
           )
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((x) => x.name),
+          .filter(Boolean)
+          .sort((a, b) => a.localeCompare(b)),
       }))
       .filter((p) =>
         debouncedSearchTerm
