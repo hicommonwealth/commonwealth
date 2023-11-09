@@ -8,19 +8,19 @@ import { getProposalUrlPath } from 'identifiers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type ProposalHeaderLinkProps = {
-  threads: any[];
+  threads: { id: number; title: string }[];
   community: string;
 };
 
 // "Go to discussion"
 const threadLinkButton = (
-  threadId: string,
+  threadId: number,
   title: string,
   community: string,
 ) => {
   const path = getProposalUrlPath(
     ProposalType.Thread,
-    `${threadId}`,
+    threadId,
     false,
     community,
   );
@@ -43,7 +43,7 @@ export const ThreadLink = ({ threads, community }: ProposalHeaderLinkProps) => {
 };
 
 type SnapshotThreadLinkProps = {
-  thread: { id: string; title: string };
+  thread: { id: number; title: string };
 };
 
 export const SnapshotThreadLink = ({ thread }: SnapshotThreadLinkProps) => {

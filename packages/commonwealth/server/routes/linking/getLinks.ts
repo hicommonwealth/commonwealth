@@ -28,7 +28,7 @@ const getLinks = async (
 ) => {
   const { thread_id, linkType, link } = req.body;
   let links;
-  let threads;
+  let threads: Array<{ id: number, title: string }>;
   if (!link && !thread_id) {
     return next(new AppError(Errors.InvalidParameter));
   }

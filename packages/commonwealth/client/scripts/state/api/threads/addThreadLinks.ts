@@ -11,10 +11,9 @@ interface AddThreadLinksProps {
 }
 
 const addThreadLinks = async ({
-  chainId,
   threadId,
   links,
-}: AddThreadLinksProps) => {
+}: AddThreadLinksProps): Promise<Thread> => {
   const response = await axios.post(
     `${app.serverUrl()}/linking/addThreadLinks`,
     {

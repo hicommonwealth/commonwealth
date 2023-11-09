@@ -61,7 +61,7 @@ const editThread = async ({
   topicId,
   // for editing thread collaborators
   collaborators,
-}: EditThreadProps) => {
+}: EditThreadProps): Promise<Thread> => {
   const {
     action = null,
     session = null,

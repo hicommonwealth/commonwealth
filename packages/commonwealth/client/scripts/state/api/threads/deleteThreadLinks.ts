@@ -11,10 +11,9 @@ interface DeleteThreadLinksProps {
 }
 
 const deleteThreadLinks = async ({
-  chainId,
   threadId,
   links,
-}: DeleteThreadLinksProps) => {
+}: DeleteThreadLinksProps): Promise<Thread> => {
   const response = await axios.delete(
     `${app.serverUrl()}/linking/deleteLinks`,
     {
