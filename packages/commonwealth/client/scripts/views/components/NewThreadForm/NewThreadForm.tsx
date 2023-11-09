@@ -70,7 +70,6 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
-    topicId,
   } = useNewThreadForm(chainId, topicsForSelector.enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
