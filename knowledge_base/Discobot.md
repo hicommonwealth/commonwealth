@@ -1,5 +1,20 @@
 # Discobot
 
+## Contents
+
+- [Discobot](#discobot)
+  * [Overview](#overview)
+  * [Deployments](#deployments)
+    + [Production](#production)
+    + [Staging](#staging)
+  * [Discord Apps (Bots)](#discord-apps-bots)
+    + [Configuration](#configuration)
+  * [Local Setup](#local-setup)
+    + [Environment Variables (Local)](#environment-variables-local)
+  * [Staging and Production Setup](#staging-and-production-setup)
+  * [Testing](#testing)
+  * [Change Log](#change-log)
+
 ## Overview
 
 “Discobot” refers to the set of entities and interactions that power the Commonwealth <> Discord integration. In particular, this is 3 things:
