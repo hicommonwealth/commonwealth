@@ -38,7 +38,7 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -204,7 +204,7 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             archived_at: Date.now(),
           }),
         },
@@ -273,7 +273,7 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
           }),
         },
       };
@@ -341,7 +341,7 @@ describe('ServerThreadsController', () => {
           findOne: sandbox.stub().resolves({
             id: 4,
             title: 'Big Thread!',
-            chain: 'ethereum',
+            community_id: 'ethereum',
             topic_id: 77,
           }),
         },
@@ -1020,7 +1020,7 @@ describe('ServerThreadsController', () => {
         Thread: {
           findOne: async () => ({
             id: 1,
-            chain: 'ethereum',
+            community_id: 'ethereum',
             Address: {
               id: 1,
               address: '0x123',
