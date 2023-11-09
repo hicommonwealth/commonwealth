@@ -4,7 +4,6 @@ import type { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
-  AddressTooltip = 'AddressTooltip',
   Avatar = 'Avatar',
   AvatarUpload = 'AvatarUpload',
   Banner = 'Banner',
