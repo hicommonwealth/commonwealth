@@ -45,7 +45,9 @@ const searchThreads = async ({
   orderBy,
   orderDirection,
   threadTitleOnly,
-}: SearchThreadsProps & { pageParam: number }): Promise<SearchThreadsResponse> => {
+}: SearchThreadsProps & {
+  pageParam: number;
+}): Promise<SearchThreadsResponse> => {
   const {
     data: { result },
   } = await axios.get<{ result: SearchThreadsResponse }>(

@@ -22,7 +22,7 @@ const deleteThreadLinks = async ({
         links,
         jwt: app.user.jwt,
       },
-    }
+    },
   );
 
   return new Thread(response.data.result);

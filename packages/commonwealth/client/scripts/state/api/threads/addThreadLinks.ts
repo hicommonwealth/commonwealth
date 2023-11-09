@@ -20,7 +20,7 @@ const addThreadLinks = async ({
       thread_id: threadId,
       links,
       jwt: app.user.jwt,
-    }
+    },
   );
 
   return new Thread(response.data.result);
