@@ -8,6 +8,7 @@ import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import app from 'state';
 import {
   useFetchGroupsQuery,
@@ -36,13 +37,14 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
+  const location = useLocation();
+
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
 
   const { data: groups = [] } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
-    includeMembers: true,
     includeTopics: true,
   });
 
@@ -94,11 +96,13 @@ export const NewThreadForm = () => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
-  const [showGatingBanner, setShowGatingBanner] = useState(false);
-
   const restrictedTopicIds = memberships
     .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
+    .map((x) => parseInt(`${x.topicIds}`));
+
+  const [showGatingBanner, setShowGatingBanner] = useState(
+    restrictedTopicIds.includes(threadTopic.id) || !!gatedGroupsMatchingTopic,
+  );
 
   const {
     mutateAsync: createThread,
@@ -120,7 +124,16 @@ export const NewThreadForm = () => {
   }, [threadContentDelta, threadTitle]);
 
   const handleNewThreadCreation = async () => {
-    if (restrictedTopicIds.includes(threadTopic.id)) {
+    const isTopicGated = !!(memberships || []).find((membership) =>
+      membership.topicIds.includes(threadTopic?.id),
+    );
+    const isActionAllowedInGatedTopic = !!(memberships || []).find(
+      (membership) =>
+        membership.topicIds.includes(threadTopic?.id) && membership.isAllowed,
+    );
+    const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+
+    if (isRestrictedMembership) {
       notifyError('Topic is gated!');
       return;
     }
@@ -201,13 +214,15 @@ export const NewThreadForm = () => {
                 <TopicSelector
                   enabledTopics={topicsForSelector.enabledTopics}
                   disabledTopics={topicsForSelector.disabledTopics}
-                  value={threadTopic}
                   onChange={(e) => {
                     setThreadTopic(e);
                     if (restrictedTopicIds.includes(e.id)) {
                       setShowGatingBanner(true);
+                    } else {
+                      setShowGatingBanner(false);
                     }
                   }}
+                  value={!!location.search && threadTopic}
                 />
               )}
               <CWTextInput
@@ -268,30 +283,32 @@ export const NewThreadForm = () => {
             )}
           </div>
         </div>
-        {featureFlags.gatingEnabled && showGatingBanner && (
-          <div className="gatingBanner">
-            <CWBanner
-              title="This topic is gated"
-              body="Only members within the following group(s) can interact with this topic:"
-              type="info"
-              footer={
-                <div className="gating-tags">
-                  {gatedGroupsMatchingTopic.map((t) => (
-                    <CWTag key={t.id} label={t.name} type="referendum" />
-                  ))}
-                </div>
-              }
-              buttons={[
-                {
-                  label: 'See all groups',
-                  onClick: () => navigate('/members?tab=groups'),
-                },
-                { label: 'Learn more about gating' },
-              ]}
-              onClose={() => setShowGatingBanner(false)}
-            />
-          </div>
-        )}
+        {featureFlags.gatingEnabled &&
+          showGatingBanner &&
+          restrictedTopicIds.includes(threadTopic.id) && (
+            <div className="gatingBanner">
+              <CWBanner
+                title="This topic is gated"
+                body="Only members within the following group(s) can interact with this topic:"
+                type="info"
+                footer={
+                  <div className="gating-tags">
+                    {gatedGroupsMatchingTopic.map((t) => (
+                      <CWTag key={t.id} label={t.name} type="referendum" />
+                    ))}
+                  </div>
+                }
+                buttons={[
+                  {
+                    label: 'See all groups',
+                    onClick: () => navigate('/members?tab=groups'),
+                  },
+                  { label: 'Learn more about gating' },
+                ]}
+                onClose={() => setShowGatingBanner(false)}
+              />
+            </div>
+          )}
       </div>
       {JoinCommunityModals}
       {RevalidationModal}

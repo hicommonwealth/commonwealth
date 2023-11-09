@@ -20,8 +20,17 @@
   .row-1 {
     display: flex;
 
+    .CWSelectList {
+      width: 100%;
+    }
+
     .w-350 {
-      min-width: 350px;
+      max-width: 350px;
+
+      @include mediumSmallInclusive {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
     }
   }
 

@@ -32,7 +32,11 @@ import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import {
+  MixpanelClickthroughEvent,
+  MixpanelClickthroughPayload,
+  MixpanelPageViewEvent,
+} from '../../../../../shared/analytics/types';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
@@ -113,7 +117,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: groups = [] } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
-    includeMembers: true,
     includeTopics: true,
   });
 
@@ -144,9 +147,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
   });
-  const restrictedTopicIds = (memberships || [])
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
+
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(thread?.topic?.id),
+  );
+
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+  );
+
+  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -186,8 +197,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   });
 
+  const { trackAnalytics } =
+    useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
+      onAction: true,
+    });
+
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+    payload: {
+      event: MixpanelPageViewEvent.THREAD_PAGE_VIEW,
+    },
   });
 
   useEffect(() => {
@@ -309,8 +327,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const isRestrictedMembership = restrictedTopicIds.includes(thread?.topic?.id);
-
   const canComment =
     (!!hasJoinedCommunity ||
       (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id))) &&
@@ -380,7 +396,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isCommunityMember: !!hasJoinedCommunity,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+    isThreadTopicGated: isRestrictedMembership,
   });
 
   return (
@@ -546,7 +562,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           buttons={[
                             {
                               label: 'See all groups',
-                              onClick: () => navigate('/members?tab=groups'),
+                              onClick: () => {
+                                trackAnalytics({
+                                  event:
+                                    MixpanelClickthroughEvent.VIEW_THREAD_TO_MEMBERS_PAGE,
+                                });
+                                navigate('/members?tab=groups');
+                              },
                             },
                             { label: 'Learn more about gating' },
                           ]}
