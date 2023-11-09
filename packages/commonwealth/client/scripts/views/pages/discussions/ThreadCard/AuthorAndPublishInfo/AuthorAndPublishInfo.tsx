@@ -3,6 +3,8 @@ import { threadStageToLabel } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
 import moment from 'moment';
 import React, { useRef } from 'react';
+import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
+import { LockWithTooltip } from 'views/components/LockWithTooltip';
 import {
   Popover,
   usePopover,
@@ -11,12 +13,10 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { LockWithTooltip } from 'views/components/lock_with_tooltip';
 import { User } from 'views/components/user/user';
 import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { NewThreadTag } from '../../NewThreadTag';
-import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import './AuthorAndPublishInfo.scss';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
 
@@ -189,7 +189,7 @@ export const AuthorAndPublishInfo = ({
                 stage:
                   threadStage === ThreadStage.Failed ? 'negative' : 'positive',
               },
-              'proposal-stage-text'
+              'proposal-stage-text',
             )}
             onClick={async () => await onThreadStageLabelClick(threadStage)}
           >
