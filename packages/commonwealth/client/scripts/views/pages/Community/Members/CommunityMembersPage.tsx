@@ -1,5 +1,6 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { featureFlags } from 'helpers/feature-flags';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -23,6 +24,10 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import {
+  MixpanelPageViewEvent,
+  MixpanelPageViewEventPayload,
+} from '../../../../../../shared/analytics/types';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
@@ -48,6 +53,11 @@ const CommunityMembersPage = () => {
     searchText: '',
     category: GROUP_AND_MEMBER_FILTERS[0],
   });
+
+  const { trackAnalytics } =
+    useBrowserAnalyticsTrack<MixpanelPageViewEventPayload>({
+      onAction: true,
+    });
 
   const { data: memberships = null } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
@@ -174,6 +184,17 @@ const CommunityMembersPage = () => {
       `${window.location.pathname}?${params.toString()}`,
     );
     setSelectedTab(activeTab);
+
+    let eventType;
+    if (activeTab === TABS[0].value) {
+      eventType = MixpanelPageViewEvent.MEMBERS_PAGE_VIEW;
+    } else {
+      eventType = MixpanelPageViewEvent.GROUPS_PAGE_VIEW;
+    }
+
+    trackAnalytics({
+      event: eventType,
+    });
   };
 
   useEffect(() => {
