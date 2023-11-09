@@ -30,7 +30,7 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
-  const { data: topics } = useFetchTopicsQuery({
+  const { data: topics = [] } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
 
@@ -45,9 +45,9 @@ export const NewThreadForm = () => {
         t.tokenThreshold.isZero() ||
         !app.chain.isGatedTopic(t.id)
       ) {
-        acc.enabledTopics.push(t);
+        acc?.enabledTopics?.push(t);
       } else {
-        acc.disabledTopics.push(t);
+        acc?.disabledTopics?.push(t);
       }
       return acc;
     },
@@ -160,8 +160,9 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      topicsForSelector.enabledTopics.find((t) => t.name.includes('General')) ||
-        null,
+      topicsForSelector?.enabledTopics?.find((t) =>
+        t?.name?.includes('General'),
+      ) || null,
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
