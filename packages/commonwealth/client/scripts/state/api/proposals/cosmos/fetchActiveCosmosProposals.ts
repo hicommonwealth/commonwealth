@@ -1,11 +1,11 @@
-import app from 'state';
 import { useQuery } from '@tanstack/react-query';
+import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { getActiveProposals } from 'controllers/chain/cosmos/gov/utils';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { ChainBase } from 'common-common/src/types';
+import app from 'state';
 
-const ACTIVE_PROPOSALS_STALE_TIME = 1000 * 30;
+const ACTIVE_PROPOSALS_STALE_TIME = 1000 * 10;
 
 const fetchActiveProposals = async (): Promise<CosmosProposal[]> => {
   return getActiveProposals(app.chain as Cosmos);
