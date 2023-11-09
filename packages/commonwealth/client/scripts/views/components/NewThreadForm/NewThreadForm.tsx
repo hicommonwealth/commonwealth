@@ -7,6 +7,7 @@ import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
@@ -30,6 +31,8 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
+  const location = useLocation();
+
   const { data: topics = [] } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
@@ -184,7 +187,7 @@ export const NewThreadForm = () => {
                 <TopicSelector
                   enabledTopics={topicsForSelector.enabledTopics}
                   disabledTopics={topicsForSelector.disabledTopics}
-                  value={threadTopic}
+                  value={!!location.search && threadTopic}
                   onChange={setThreadTopic}
                 />
               )}
