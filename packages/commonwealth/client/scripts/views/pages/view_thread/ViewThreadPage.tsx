@@ -32,7 +32,11 @@ import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
-import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import {
+  MixpanelClickthroughEvent,
+  MixpanelClickthroughPayload,
+  MixpanelPageViewEvent,
+} from '../../../../../shared/analytics/types';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
@@ -186,8 +190,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   });
 
+  const { trackAnalytics } =
+    useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
+      onAction: true,
+    });
+
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+    payload: {
+      event: MixpanelPageViewEvent.THREAD_PAGE_VIEW,
+    },
   });
 
   useEffect(() => {
@@ -546,7 +557,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           buttons={[
                             {
                               label: 'See all groups',
-                              onClick: () => navigate('/members?tab=groups'),
+                              onClick: () => {
+                                trackAnalytics({
+                                  event:
+                                    MixpanelClickthroughEvent.VIEW_THREAD_TO_MEMBERS_PAGE,
+                                });
+                                navigate('/members?tab=groups');
+                              },
                             },
                             { label: 'Learn more about gating' },
                           ]}

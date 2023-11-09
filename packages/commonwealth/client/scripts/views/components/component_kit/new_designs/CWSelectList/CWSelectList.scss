@@ -1,6 +1,9 @@
 @import '../../../../../../styles/shared.scss';
-
 .CWSelectList {
+  &.disabled {
+    cursor: not-allowed !important;
+  }
+
   .SelectList {
     @include inputStyles;
     font-size: 14px;
@@ -11,32 +14,37 @@
     max-height: 40px;
     padding: 10px 16px;
 
-    [class$='-control'] {
+    .cwsl__control {
       gap: 8px;
       letter-spacing: 0.02em;
       width: 100%;
       flex-wrap: wrap;
       align-items: flex-start !important;
+      cursor: text !important;
 
-      [class$='-ValueContainer'] {
+      .cwsl__value-container {
         padding: 0 !important;
         max-height: 24px;
         line-height: 14px;
 
-        [class$='-multiValue'] {
+        .cwsl__single-value {
+          line-height: 18px;
+        }
+
+        .cwsl__multi-value {
           padding: 2px 8px;
           border-radius: 6px;
           margin: 0px !important;
           margin-right: 8px !important;
           background-color: $neutral-100;
 
-          [class$='-MultiValueGeneric'] {
+          .cwsl__multi-value__label {
             font-size: 14px;
             margin-right: 16px;
             padding: 0px !important;
           }
 
-          [class$='-MultiValueRemove'] {
+          .cwsl__multi-value__remove {
             padding: 0;
             cursor: pointer;
             color: $neutral-500;
@@ -53,7 +61,7 @@
           }
         }
 
-        [class$='-Input'] {
+        .cwsl__input-container {
           margin: 0;
           padding-top: 0;
           padding-bottom: 0;
@@ -61,21 +69,21 @@
       }
     }
 
+  .cwsl__indicators {
+    cursor: pointer;
+    
     &.searchable {
       [class$='-control'] {
         cursor: text !important;
       }
     }
 
-    [class$='-IndicatorsContainer'] {
-      cursor: pointer;
-
-      [class$='-indicatorSeparator'] {
+      .cwsl__indicator-separator {
         display: none;
       }
     }
 
-    [class$='-menu'] {
+    .cwsl__menu {
       left: 0;
       margin-top: 8px;
       border-radius: 6px;
@@ -84,12 +92,12 @@
       background-color: $white;
       box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 
-      [class$='-MenuList'] {
+      .cwsl__menu-list {
         @include scrollbarStyles;
         overflow: auto;
         padding: 8px;
 
-        [class$='-option'] {
+        .cwsl__option {
           border: 0;
           outline: 0;
           border-radius: 6px;
@@ -98,6 +106,7 @@
           font-size: 14px;
           text-align: left;
           cursor: pointer;
+          margin-bottom: 4px;
 
           &:hover,
           &:focus,
