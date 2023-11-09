@@ -60,23 +60,25 @@
       color: $neutral-400;
     }
 
-    .filter-text {
-      display: flex;
-      text-align: center;
-      justify-content: center;
-      align-items: center;
-      margin: auto;
-
-      @include extraSmall {
-        margin-left: 0;
-      }
-    }
-
     .select-dropdown-container {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       width: 100%;
+
+      .filter-text {
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        margin-left: auto;
+        margin-right: 16px;
+        width: fit-content;
+  
+        @include extraSmall {
+          margin-left: 0;
+        }
+      }
     }
 
     .select-dropdown {
