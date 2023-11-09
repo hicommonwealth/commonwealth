@@ -44,7 +44,7 @@ export const TopicSelector = ({
       options={allOptions}
       className="TopicSelector"
       onChange={handleOnChange}
-      value={value.id ? topicToOption(value, false) : undefined}
+      value={value ? topicToOption(value, false) : undefined}
     />
   );
 };
