@@ -31,10 +31,8 @@ import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
-import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
-import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
 import { CWProgressBar } from './cw_progress_bar';
 import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
@@ -339,51 +337,6 @@ export const ComponentShowcase = () => {
             <CWIconButton iconName="plusCircle" onClick={onclick} />
           )}
         />
-      </div>
-      <div className="tooltip-gallery">
-        <CWText type="h3">Tooltips</CWText>
-        <div className="tooltip-row">
-          <CWText>Default</CWText>
-          <CWTooltipOld
-            content={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-            renderTrigger={(handleInteraction) => (
-              <CWIcon
-                iconName="infoEmpty"
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              />
-            )}
-          />
-        </div>
-        <div className="tooltip-row">
-          <CWText>Solid background</CWText>
-          <CWTooltipOld
-            content={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-            hasBackground
-            renderTrigger={(handleInteraction) => (
-              <CWIcon
-                iconName="infoEmpty"
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              />
-            )}
-          />
-        </div>
-        <div className="tooltip-row">
-          <CWText>Address tooltip</CWText>
-          <CWAddressTooltip
-            address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
-            renderTrigger={(handleInteraction) => (
-              <CWIconButton iconName="infoEmpty" onClick={handleInteraction} />
-            )}
-          />
-        </div>
       </div>
       <div className="icon-gallery">
         <CWText type="h3">Icons</CWText>
