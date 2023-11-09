@@ -98,7 +98,7 @@ export const AuthorAndPublishInfo = ({
             <b>{discord_meta?.user?.username}</b>
           </CWText>
           {dotIndicator}
-          <CWTag label={'Discord'} type={'login'} iconName="discord" />
+          <CWTag label="Discord" type="login" iconName="discord" />
           {dotIndicator}
           <CWText type="caption" className="discord-author">
             Bridged from Discord
