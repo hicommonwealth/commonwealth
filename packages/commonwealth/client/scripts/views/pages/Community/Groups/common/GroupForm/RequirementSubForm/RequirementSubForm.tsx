@@ -25,10 +25,12 @@ const RequirementSubForm = ({
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
   const isCosmosRequirement = requirementType === TOKENS.COSMOS_TOKEN;
-  const isERC20orEVMRequirement = [
-    TOKENS.EVM_TOKEN,
-    SPECIFICATIONS.ERC_20,
-  ].includes(requirementType);
+  const helperTextForAmount = {
+    [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
+    [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
+    [SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
+    [SPECIFICATIONS.ERC_721]: '',
+  };
 
   useEffect(() => {
     defaultValues?.requirementType?.value &&
@@ -165,11 +167,7 @@ const RequirementSubForm = ({
             name="requirementAmount"
             alignLabelToRight
             label="Amount"
-            instructionalMessage={
-              isERC20orEVMRequirement
-                ? 'Integer will be converted to decimal'
-                : ''
-            }
+            instructionalMessage={helperTextForAmount[requirementType]}
             placeholder="Enter an integer"
             {...(defaultValues.requirementAmount && {
               defaultValue: defaultValues.requirementAmount,
