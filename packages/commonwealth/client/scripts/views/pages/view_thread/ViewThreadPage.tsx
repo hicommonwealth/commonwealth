@@ -117,7 +117,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: groups = [] } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
-    includeMembers: true,
     includeTopics: true,
   });
 

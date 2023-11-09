@@ -18,7 +18,7 @@ import GroupCard from './GroupCard';
 import './GroupsSection.scss';
 
 type GroupSectionProps = {
-  filteredGroups: Group[];
+  filteredGroups: (Group & { isJoined?: boolean })[];
   canManageGroups?: boolean;
   hasNoGroups?: boolean;
 };
@@ -95,15 +95,7 @@ const GroupsSection = ({
                   ? 'ALL'
                   : group.requirementsToFulfill
               }
-              isJoined={(group.members || []).find((x) => {
-                if (!app.user.activeAccount || app.user.activeAccount === null)
-                  return;
-
-                return (
-                  x?.address?.address === app.user.activeAccount.address &&
-                  !x.reject_reason
-                );
-              })}
+              isJoined={group.isJoined}
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,
                 name: x.name,

@@ -82,7 +82,6 @@ const CommunityMembersPage = () => {
 
   const { data: groups } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
-    includeMembers: true,
     includeTopics: true,
     enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
@@ -130,7 +129,15 @@ const CommunityMembersPage = () => {
   }, [members, groups, debouncedSearchTerm]);
 
   const filteredGroups = useMemo(() => {
-    const filteredGroupsArr = (groups || [])
+    const modifiedGroupsArr = (groups || []).map((group) => ({
+      ...group,
+      // add is group joined flag based on membership
+      isJoined: (memberships || []).find(
+        (membership) => membership.groupId === group.id,
+      )?.isAllowed,
+    }));
+
+    const filteredGroupsArr = (modifiedGroupsArr || [])
       .filter((group) =>
         searchFilters.searchText
           ? group.name
@@ -142,16 +149,8 @@ const CommunityMembersPage = () => {
         searchFilters.category === 'All groups'
           ? true
           : searchFilters.category === 'In group'
-          ? (group.members || []).find(
-              (x) =>
-                x?.address?.address === app.user.activeAccount.address &&
-                !x.reject_reason,
-            )
-          : !(group.members || []).find(
-              (x) =>
-                x?.address?.address === app.user.activeAccount.address &&
-                !x.reject_reason,
-            ),
+          ? group.isJoined
+          : !group.isJoined,
       );
 
     const clonedFilteredGroups = [...filteredGroupsArr];
@@ -159,7 +158,7 @@ const CommunityMembersPage = () => {
     clonedFilteredGroups.sort((a, b) => a.name.localeCompare(b.name));
 
     return clonedFilteredGroups;
-  }, [groups, searchFilters]);
+  }, [groups, searchFilters, memberships]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
 
