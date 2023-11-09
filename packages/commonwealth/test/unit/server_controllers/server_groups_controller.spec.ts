@@ -57,6 +57,7 @@ const createMockedGroupsController = () => {
       findAll: async (): Promise<TopicAttributes[]> => {
         return topics;
       },
+      findByPk: async (id: number) => topics.find((t) => t.id === id),
       update: async () => {},
     },
     Group: {
@@ -151,7 +152,8 @@ describe('ServerGroupsController', () => {
       address,
       topicId: 1,
     });
-    expect(results[0]).to.have.property('topicId');
+    expect(results[0]).to.have.property('groupId');
+    expect(results[0]).to.have.property('topicIds');
     expect(results[0]).to.have.property('allowed');
     expect(results[0]).to.have.property('rejectReason', null);
   });
