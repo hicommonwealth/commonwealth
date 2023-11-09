@@ -22,7 +22,7 @@ type ProfileActivityRowProps = {
 
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
-  const { chain, createdAt, author, title, id, body } = activity;
+  const { community_id: chain, createdAt, author, title, id, body } = activity;
   const isThread = !!(activity as Thread).kind;
   const comment = activity as CommentWithAssociatedThread;
   const { iconUrl } = app.config.chains.getById(chain);

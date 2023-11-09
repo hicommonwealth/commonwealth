@@ -151,7 +151,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     replacements.push(name, time.getTime());
     // append the SELECT query
     query += `SELECT id, community_id FROM "Threads" WHERE
-(kind IN ('discussion', 'link') OR chain = ?) AND created_at > TO_TIMESTAMP(?)`;
+(kind IN ('discussion', 'link') OR community_id = ?) AND created_at > TO_TIMESTAMP(?)`;
     if (i === commsAndChains.length - 1) query += ';';
   }
 

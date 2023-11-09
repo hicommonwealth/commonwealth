@@ -28,7 +28,7 @@ const LinkedProposal = ({ thread, title, identifier }: LinkedProposalProps) => {
   const slug = chainEntityTypeToProposalSlug();
 
   const threadLink = `${
-    app.isCustomDomain() ? '' : `/${thread.chain}`
+    app.isCustomDomain() ? '' : `/${thread.community_id}`
   }${getProposalUrlPath(slug, identifier, true)}`;
 
   return (
@@ -69,7 +69,7 @@ export const LinkedProposalsCard = ({
       const proposal = initialSnapshotLinks[0];
       if (proposal.identifier.includes('/')) {
         setSnapshotUrl(
-          `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+          `${app.isCustomDomain() ? '' : `/${thread.community_id}`}/snapshot/${
             proposal.identifier
           }`
         );
@@ -82,7 +82,7 @@ export const LinkedProposalsCard = ({
             if (matchingSnapshot) {
               setSnapshotTitle(matchingSnapshot.title);
               setSnapshotUrl(
-                `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
+                `${app.isCustomDomain() ? '' : `/${thread.community_id}`}/snapshot/${
                   _space.id
                 }/${matchingSnapshot.id}`
               );

@@ -462,11 +462,11 @@ const NotificationSettingsPage = () => {
                     </div>
                     {subs.map((sub) => {
                       const getUser = () => {
-                        if (sub.Thread?.chain) {
+                        if (sub.Thread?.community_id) {
                           return (
                             <User
                               userAddress={sub.Thread.author}
-                              userChainId={sub.Thread.chain}
+                              userChainId={sub.Thread.community_id}
                             />
                           );
                         } else if (sub.Comment?.chain) {

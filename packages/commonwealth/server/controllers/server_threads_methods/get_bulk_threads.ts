@@ -1,4 +1,3 @@
-import { ThreadStage } from 'models/types';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
@@ -230,7 +229,7 @@ export async function __getBulkThreads(
   const numVotingThreads = await this.models.Thread.count({
     where: {
       community_id: community?.id,
-      stage: ThreadStage.Voting,
+      stage: 'voting',
     },
   });
 
