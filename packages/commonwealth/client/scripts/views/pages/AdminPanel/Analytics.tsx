@@ -23,10 +23,10 @@ const Analytics = () => {
     numProposalVotesLastMonth: number;
     numMembersLastMonth: number;
   }>();
-  const [chainLookupValue, setChainLookupValue] = useState<string>('');
-  const [chainLookupValidated, setChainLookupValidated] =
+  const [communityLookupValue, setCommunityLookupValue] = useState<string>('');
+  const [communityLookupValidated, setCommunityLookupValidated] =
     useState<boolean>(false);
-  const [chainLookupCompleted, setChainLookupCompleted] =
+  const [communityLookupCompleted, setCommunityLookupCompleted] =
     useState<boolean>(false);
   const [communityAnalytics, setCommunityAnalytics] = useState<{
     numCommentsLastMonth: number;
@@ -37,16 +37,16 @@ const Analytics = () => {
     numMembersLastMonth: number;
   }>();
 
-  const getCommunityAnalytics = async (chainId: string) => {
+  const getCommunityAnalytics = async (communityId: string) => {
     axios
-      .get(`${app.serverUrl()}/communities/${chainId}/stats`, {
+      .get(`${app.serverUrl()}/communities/${communityId}/stats`, {
         params: {
           auth: true,
-          jwt: app.user.jwt
-        }
+          jwt: app.user.jwt,
+        },
       })
       .then((response) => {
-        setChainLookupCompleted(true);
+        setCommunityLookupCompleted(true);
         setCommunityAnalytics(response.data.result);
       })
       .catch((error) => {
@@ -66,7 +66,7 @@ const Analytics = () => {
         })
         .then((response) => {
           setLastMonthNewCommunities(
-            response.data.result.lastMonthNewCommunities
+            response.data.result.lastMonthNewCommunities,
           );
           setGlobalStats(response.data.result.totalStats);
         })
@@ -84,19 +84,19 @@ const Analytics = () => {
 
   const validationFn = (value: string): [ValidationStatus, string] | [] => {
     if (!value || !app.config.chains.getById(value)) {
-      setChainLookupCompleted(false);
-      setChainLookupValidated(false);
+      setCommunityLookupCompleted(false);
+      setCommunityLookupValidated(false);
       return ['failure', 'Community not found'];
     }
-    setChainLookupValidated(true);
+    setCommunityLookupValidated(true);
     return [];
   };
 
   const onInput = (e) => {
-    setChainLookupValue(e.target.value);
+    setCommunityLookupValue(e.target.value);
     if (e.target.value.length === 0) {
-      setChainLookupValidated(false);
-      setChainLookupCompleted(false);
+      setCommunityLookupValidated(false);
+      setCommunityLookupCompleted(false);
     }
   };
 
@@ -158,7 +158,7 @@ const Analytics = () => {
             </CWText>
             <div className="Row">
               <CWTextInput
-                value={chainLookupValue}
+                value={communityLookupValue}
                 onInput={onInput}
                 inputValidationFn={validationFn}
                 placeholder="Enter a community id"
@@ -166,13 +166,13 @@ const Analytics = () => {
               <CWButton
                 label="Search"
                 className="TaskButton"
-                disabled={!chainLookupValidated}
+                disabled={!communityLookupValidated}
                 onClick={async () => {
-                  await getCommunityAnalytics(chainLookupValue);
+                  await getCommunityAnalytics(communityLookupValue);
                 }}
               />
             </div>
-            {chainLookupValidated && chainLookupCompleted && (
+            {communityLookupValidated && communityLookupCompleted && (
               <div className="Stats">
                 <div className="Stat">
                   <CWText fontWeight="medium">Total Threads</CWText>

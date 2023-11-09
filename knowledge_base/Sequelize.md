@@ -1,6 +1,9 @@
+# Sequelize
+
 _For database migration best practices, see [Database-Migrations](./Database-Migrations.md)._
 
-**Contents**
+## Contents
+
 - [Overview](#overview)
 - [Overall Structure](#overall-structure)
   * [Database Initialization](#database-initialization)
@@ -14,7 +17,6 @@ _For database migration best practices, see [Database-Migrations](./Database-Mig
     + [Associations](#associations)
 - [Change Log](#change-log)
 
-
 ## Overview
 
 We currently use sequelize as an ORM for managing our relationship with our postgres backend. This page aims to collect information regarding the current structure and best practices around sequelize.
@@ -26,6 +28,7 @@ For a deeper dive into sequelize itself, see the [v6 docs](https://sequelize.org
 ### Database Initialization
 
 The [database.ts](../blob/master/packages/commonwealth/server/database.ts) file contains several important initialization items:
+
 1. the `sequelize` variable initializes a connection to the database on server startup, via the `DATABASE_URI` environment variable. On Heroku, this is set automatically to the database connected to the deployment. See [environment variables](https://github.com/hicommonwealth/commonwealth/wiki/Environment-Variables) for more details.
 2. The `models` variable is a record of Model factories, used to generate Sequelize `Models`, which represent tables in the database. Any reference to e.g. `models.Address.create()` is invoking a function on the `Address` model, representing the underlying `Addresses` table (note the automatic pluralization applied by sequelize -- for more information, see [model definition](#model-definition)). This variable must match the type `Models` declared in [models.ts](../blob/master/packages/commonwealth/server/models.ts).
 3. The `db` variable is the top-level export for accessing the database. It must match the type `DB` declared in [models.ts](../blob/master/packages/commonwealth/server/models.ts).
@@ -62,6 +65,7 @@ In our model files, we expose a factory function, which defines the model. Model
 #### Attributes
 
 `Attributes` define the columns of the Table as an object `{ column_name: { configuration } }`. The following configuration keys are commonly used:
+
 - `type`: a mandatory field defining the type of the column. This should map onto the type defined in the `Attributes` object earlier in the file. Commonly used types: `INTEGER`, `STRING`, `DATE`, `BOOLEAN`, `JSONB` (binary-encoded JSON blob). [Sequelize docs for more info](https://sequelize.org/docs/v6/core-concepts/model-basics/#data-types).
 - `primaryKey`: true if the field is the primary key.
 - `autoIncrement`: used with `primaryKey` to rely on an integer sequence for automatically defining row primary keys. Note that the primary key will need to be optional in the `Attributes` type if `autoIncrement` is true (as it cannot be passed into the `create()` call).
@@ -71,13 +75,16 @@ In our model files, we expose a factory function, which defines the model. Model
 #### Options
 
 The `ModelOptions` type in Sequelize defines the possible options, but we tend to use the following settings:
+
 - `tableName` allows for specifying the table name in the database, which should be the pluralized model name (e.g. `Address` becomes `Addresses`).
 - `timestamps: true` means the database will maintain creation and update times in the columns specified in the `createdAt` and `updatedAt` (and `deletedAt` if `paranoid: true`) options.
 - `createdAt: 'created_at'` and `updatedAt: 'updated_at'` tracks the creation and update times. Define the attributes as follows:
-    ```
+
+    ```js
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     ```
+
 - `underscored: true` converts camelCased column names to underscored in the database.
 - `indexes` defines an array of indexes e.g. `[ { fields: ['address', 'chain'], unique: true } ... ]`.
 - `defaultScope: { attributes: { exclude: ['verification_token', ...] } }` excludes the list of columns from the data returned by sequelize queries. This is used to hide private data such as identifying information.
@@ -91,7 +98,7 @@ Sequelize supports four different types of associations (see [docs](https://sequ
 
 Example of an explicit association:
 
-```
+```js
 models.Address.belongsTo(models.User, {
   foreignKey: 'user_id',
   targetKey: 'id',
@@ -100,7 +107,7 @@ models.Address.belongsTo(models.User, {
 
 Sequelize supports many-to-many associations via "through tables", where a third table stores many-to-many relationship mappings between two tables. Sequelize supports this directly via the `through` syntax, e.g.:
 
-```
+```js
 models.Address.belongsToMany(models.Thread, {
   through: models.Collaboration,
   as: 'collaboration',
@@ -109,6 +116,6 @@ models.Address.belongsToMany(models.Thread, {
 
 **The use of new through tables for many-to-many associations is discouraged. Documentation here is for legacy purposes.**
 
-# Change Log
+## Change Log
 
 - 230320: Authored by Jake Naviasky.

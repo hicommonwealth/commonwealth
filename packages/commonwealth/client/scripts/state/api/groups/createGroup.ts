@@ -24,8 +24,8 @@ const createGroup = async ({
 }: CreateGroupProps) => {
   return await axios.post(`${app.serverUrl()}/groups`, {
     jwt: app.user.jwt,
-    chain: chainId,
-    author_chain: chainId,
+    community_id: chainId,
+    author_community_id: chainId,
     address,
     metadata: {
       name: groupName,

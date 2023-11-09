@@ -52,7 +52,7 @@ export async function createCommunityContractTemplateAndMetadata(
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain_id,
+    communityId: chain_id,
     allowAdmin: true,
     allowGodMode: true,
   });
@@ -197,7 +197,7 @@ export async function updateCommunityContractTemplate(
     const isAdmin = await validateOwner({
       models: models,
       user: req.user,
-      chainId: chain_id,
+      communityId: chain_id,
       allowAdmin: true,
       allowGodMode: true,
     });
@@ -269,7 +269,7 @@ export async function deleteCommunityContractTemplate(
     const isAdmin = await validateOwner({
       models: models,
       user: req.user,
-      chainId: chain_id,
+      communityId: chain_id,
       allowAdmin: true,
       allowGodMode: true,
     });
@@ -412,7 +412,7 @@ export async function updateCommunityContractTemplateMetadata(
     const isAdmin = await validateOwner({
       models: models,
       user: req.user,
-      chainId: req.body.chain_id,
+      communityId: req.body.chain_id,
       allowAdmin: true,
       allowGodMode: true,
     });
@@ -473,7 +473,7 @@ export async function deleteCommunityContractTemplateMetadata(
     const isAdmin = await validateOwner({
       models: models,
       user: req.user,
-      chainId: req.body.chain_id,
+      communityId: req.body.chain_id,
       allowAdmin: true,
       allowGodMode: true,
     });

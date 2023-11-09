@@ -21,11 +21,11 @@ const fetchGroups = async ({
     `${app.serverUrl()}${ApiEndpoints.FETCH_GROUPS}`,
     {
       params: {
-        chain_id: chainId,
+        community_id: chainId,
         include_members: includeMembers,
         include_topics: includeTopics,
       },
-    }
+    },
   );
 
   return response.data.result.map((t) => new Group(t));
@@ -35,12 +35,18 @@ const useFetchGroupsQuery = ({
   chainId,
   includeMembers,
   includeTopics,
-}: FetchGroupsProps) => {
+  enabled = true,
+}: FetchGroupsProps & { enabled?: boolean }) => {
   return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [ApiEndpoints.FETCH_GROUPS, chainId],
+    queryKey: [
+      ApiEndpoints.FETCH_GROUPS,
+      chainId,
+      includeMembers,
+      includeTopics,
+    ],
     queryFn: () => fetchGroups({ chainId, includeMembers, includeTopics }),
     staleTime: GROUPS_STALE_TIME,
+    enabled,
   });
 };
 

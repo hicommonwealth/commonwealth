@@ -6,9 +6,14 @@ module.exports = {
       await queryInterface.renameColumn('Tokens', 'chain_id', 'eth_chain_id', {
         transaction,
       });
-      await queryInterface.renameColumn('CommunitySnapshotSpaces', 'chain_id', 'community_id', {
-        transaction,
-      });
+      await queryInterface.renameColumn(
+        'CommunitySnapshotSpaces',
+        'chain_id',
+        'community_id',
+        {
+          transaction,
+        },
+      );
     });
   },
 
@@ -17,9 +22,14 @@ module.exports = {
       await queryInterface.renameColumn('Tokens', 'eth_chain_id', 'chain_id', {
         transaction,
       });
-      await queryInterface.renameColumn('CommunitySnapshotSpaces', 'community_id', 'chain_id',{
-        transaction,
-      });
+      await queryInterface.renameColumn(
+        'CommunitySnapshotSpaces',
+        'community_id',
+        'chain_id',
+        {
+          transaction,
+        },
+      );
     });
-  }
+  },
 };

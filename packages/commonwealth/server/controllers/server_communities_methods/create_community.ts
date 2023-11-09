@@ -12,19 +12,20 @@ import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import type { AddressInstance } from '../../models/address';
-import type { CommunityAttributes } from '../../models/community';
 import type { ChainNodeAttributes } from '../../models/chain_node';
+import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
 import axios from 'axios';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
+import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { UserInstance } from '../../models/user';
-import { getFileSizeBytes } from '../../util/getFilesSizeBytes';
+import {
+  MAX_COMMUNITY_IMAGE_SIZE_BYTES,
+  checkUrlFileSize,
+} from '../../util/checkUrlFileSize';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
-
-const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -41,13 +42,13 @@ export const Errors = {
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
-  InvalidChainIdOrUrl:
-    'Could not determine a valid endpoint for provided chain',
-  ChainAddressExists: 'The address already exists',
-  ChainIDExists:
-    'The id for this chain already exists, please choose another id',
-  ChainNameExists:
-    'The name for this chain already exists, please choose another name',
+  InvalidCommunityIdOrUrl:
+    'Could not determine a valid endpoint for provided community',
+  CommunityAddressExists: 'The address already exists',
+  CommunityIDExists:
+    'The id for this community already exists, please choose another id',
+  CommunityNameExists:
+    'The name for this community already exists, please choose another name',
   ChainNodeIdExists: 'The chain node with this id already exists',
   CosmosChainNameRequired:
     'cosmos_chain_id is a required field. It should be the chain name as registered in the Cosmos Chain Registry.',
@@ -59,9 +60,8 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  ImageDoesntExist: `Image url provided doesn't exist`,
-  ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
-  UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
+  UnegisteredCosmosChain: `Check https://cosmos.directory.
+  Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
 export type CreateCommunityOptions = {
@@ -77,7 +77,7 @@ export type CreateCommunityOptions = {
 };
 
 export type CreateCommunityResult = {
-  chain: CommunityAttributes;
+  community: CommunityAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
   admin_address: string;
@@ -85,7 +85,7 @@ export type CreateCommunityResult = {
 
 export async function __createCommunity(
   this: ServerCommunitiesController,
-  { user, community }: CreateCommunityOptions
+  { user, community }: CreateCommunityOptions,
 ): Promise<CreateCommunityResult> {
   if (!user) {
     throw new AppError('Not signed in');
@@ -102,7 +102,7 @@ export async function __createCommunity(
   if (!community.id || !community.id.trim()) {
     throw new AppError(Errors.NoId);
   }
-  if (community.id === ALL_CHAINS) {
+  if (community.id === ALL_COMMUNITIES) {
     throw new AppError(Errors.ReservedId);
   }
   if (!community.name || !community.name.trim()) {
@@ -124,17 +124,13 @@ export async function __createCommunity(
     throw new AppError(Errors.NoBase);
   }
 
-  if (
-    community.icon_url &&
-    (await getFileSizeBytes(community.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB
-  ) {
-    throw new AppError(Errors.ImageTooLarge);
+  if (community.icon_url) {
+    await checkUrlFileSize(community.icon_url, MAX_COMMUNITY_IMAGE_SIZE_BYTES);
   }
-
-  const existingBaseChain = await this.models.Community.findOne({
+  const existingBaseCommunity = await this.models.Community.findOne({
     where: { base: community.base },
   });
-  if (!existingBaseChain) {
+  if (!existingBaseCommunity) {
     throw new AppError(Errors.InvalidBase);
   }
 
@@ -179,14 +175,14 @@ export async function __createCommunity(
 
     const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
     const { data: chains } = await axios.get(
-      `${REGISTRY_API_URL}/api/v1/mainnet`
+      `${REGISTRY_API_URL}/api/v1/mainnet`,
     );
     const foundRegisteredChain = chains?.find(
-      (chain) => chain === cosmos_chain_id
+      (chain) => chain === cosmos_chain_id,
     );
     if (!foundRegisteredChain) {
       throw new AppError(
-        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`
+        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
       );
     }
   }
@@ -213,7 +209,7 @@ export async function __createCommunity(
     }
     if (!node && !url) {
       // must provide at least url to create a new node
-      throw new AppError(Errors.InvalidChainIdOrUrl);
+      throw new AppError(Errors.InvalidCommunityIdOrUrl);
     }
     if (node) {
       url = node.url;
@@ -327,18 +323,18 @@ export async function __createCommunity(
     throw new AppError(Errors.InvalidIconUrl);
   }
 
-  const oldChain = await this.models.Community.findOne({
+  const oldCommunity = await this.models.Community.findOne({
     where: { [Op.or]: [{ name: community.name }, { id: community.id }] },
   });
-  if (oldChain && oldChain.id === community.id) {
-    throw new AppError(Errors.ChainIDExists);
+  if (oldCommunity && oldCommunity.id === community.id) {
+    throw new AppError(Errors.CommunityIDExists);
   }
-  if (oldChain && oldChain.name === community.name) {
-    throw new AppError(Errors.ChainNameExists);
+  if (oldCommunity && oldCommunity.name === community.name) {
+    throw new AppError(Errors.CommunityNameExists);
   }
 
   const [node] = await this.models.ChainNode.scope(
-    'withPrivateData'
+    'withPrivateData',
   ).findOrCreate({
     where: { [Op.or]: [{ url }, { eth_chain_id }] },
     defaults: {
@@ -365,7 +361,7 @@ export async function __createCommunity(
     },
   });
 
-  const chain = await this.models.Community.create({
+  const createdCommunity = await this.models.Community.create({
     id,
     name,
     default_symbol,
@@ -405,26 +401,26 @@ export async function __createCommunity(
         address: community.address,
         chain_node_id: node.id,
         decimals: community.decimals,
-        token_name: chain.token_name,
-        symbol: chain.default_symbol,
-        type: chain.network,
-        abi_id: chain.network === 'erc20' ? erc20Abi?.id : null,
+        token_name: createdCommunity.token_name,
+        symbol: createdCommunity.default_symbol,
+        type: createdCommunity.network,
+        abi_id: createdCommunity.network === 'erc20' ? erc20Abi?.id : null,
       },
     });
 
     await this.models.CommunityContract.create({
-      chain_id: chain.id,
+      chain_id: createdCommunity.id,
       contract_id: contract.id,
     });
 
-    chain.Contract = contract;
+    createdCommunity.Contract = contract;
   }
 
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
   await this.models.Topic.create({
-    chain_id: chain.id,
+    chain_id: createdCommunity.id,
     name: 'General',
     featured_in_sidebar: true,
   });
@@ -434,9 +430,9 @@ export async function __createCommunity(
   let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
 
-  if (chain.base === ChainBase.Ethereum) {
+  if (createdCommunity.base === ChainBase.Ethereum) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -447,14 +443,14 @@ export async function __createCommunity(
       include: [
         {
           model: this.models.Community,
-          where: { base: chain.base },
+          where: { base: createdCommunity.base },
           required: true,
         },
       ],
     });
-  } else if (chain.base === ChainBase.NEAR) {
+  } else if (createdCommunity.base === ChainBase.NEAR) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -465,14 +461,14 @@ export async function __createCommunity(
       include: [
         {
           model: this.models.Community,
-          where: { base: chain.base },
+          where: { base: createdCommunity.base },
           required: true,
         },
       ],
     });
-  } else if (chain.base === ChainBase.Solana) {
+  } else if (createdCommunity.base === ChainBase.Solana) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -484,7 +480,7 @@ export async function __createCommunity(
       include: [
         {
           model: this.models.Community,
-          where: { base: chain.base },
+          where: { base: createdCommunity.base },
           required: true,
         },
       ],
@@ -496,7 +492,7 @@ export async function __createCommunity(
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
-      community_id: chain.id,
+      community_id: createdCommunity.id,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,
@@ -509,24 +505,24 @@ export async function __createCommunity(
 
     role = new RoleInstanceWithPermission(
       { community_role_id: 0, address_id: newAddress.id },
-      chain.id,
+      createdCommunity.id,
       'admin',
       0,
-      0
+      0,
     );
 
     await this.models.Subscription.findOrCreate({
       where: {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewThread,
-        chain_id: chain.id,
+        chain_id: createdCommunity.id,
         is_active: true,
       },
     });
   }
 
   return {
-    chain: chain.toJSON(),
+    community: createdCommunity.toJSON(),
     node: nodeJSON,
     role: role?.toJSON(),
     admin_address: addressToBeAdmin?.address,

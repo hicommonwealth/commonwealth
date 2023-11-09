@@ -1,11 +1,13 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
+import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import { PageNotFound } from '../../../404';
 import { PageLoading } from '../../../loading';
 import {
@@ -31,6 +33,10 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   });
   const foundGroup: Group = groups.find((x) => x.id === parseInt(`${groupId}`));
 
+  useBrowserAnalyticsTrack({
+    payload: { event: MixpanelPageViewEvent.GROUPS_EDIT_PAGE_VIEW },
+  });
+
   if (
     !featureFlags.gatingEnabled ||
     !app.isLoggedIn() ||
@@ -54,7 +60,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
             requirementType: {
               value: x.data.source.source_type,
               label: requirementTypes.find(
-                (y) => y.value === x.data.source.source_type
+                (y) => y.value === x.data.source.source_type,
               )?.label,
             },
             requirementAmount: x.data.threshold,
@@ -64,14 +70,14 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
               }`,
               label: chainTypes.find(
                 (c) =>
-                  c.value == x.data.source.cosmos_chain_id ||
-                  x.data.source.evm_chain_id
+                  c.value ==
+                  (x.data.source.cosmos_chain_id || x.data.source.evm_chain_id),
               )?.label,
             },
             requirementContractAddress: x.data.source.contract_address || '',
             // API doesn't return this, api internally uses the "more than" option, so we set it here explicitly
             requirementCondition: conditionTypes.find(
-              (y) => y.value === AMOUNT_CONDITIONS.MORE
+              (y) => y.value === AMOUNT_CONDITIONS.MORE,
             ),
           })),
           requirementsToFulfill:

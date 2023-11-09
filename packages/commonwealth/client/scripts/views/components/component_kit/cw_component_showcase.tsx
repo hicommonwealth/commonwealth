@@ -163,7 +163,7 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
 
 const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   (acc, el) => ({ ...acc, [el]: true }),
-  {} as { [K in BannerType]: boolean }
+  {} as { [K in BannerType]: boolean },
 );
 
 const rowData = makeData(25);
@@ -209,7 +209,7 @@ const chainValidationSchema = z.object({
       z.object({
         value: z.string().nonempty({ message: 'Invalid value' }),
         label: z.string().nonempty({ message: 'Invalid value' }),
-      })
+      }),
     )
     .min(1, { message: 'At least 1 chain is required' })
     .nonempty({ message: 'Chains are required' }),
@@ -238,17 +238,17 @@ export const ComponentShowcase = () => {
     useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
-    radioGroupOptions[2].value
+    radioGroupOptions[2].value,
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalSize, setModalSize] = useState<ModalSize>('small');
   useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on'
+    localStorage.getItem('dark-mode-state') === 'on',
   );
 
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
@@ -380,7 +380,7 @@ export const ComponentShowcase = () => {
               checkboxGroupSelected.push(itemValue);
             } else {
               setCheckboxGroupSelected(
-                checkboxGroupSelected.filter((item) => item !== itemValue)
+                checkboxGroupSelected.filter((item) => item !== itemValue),
               );
             }
           }}
@@ -924,7 +924,7 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div className="form-gallery">
-        <CWText type="h4">Dropdown</CWText>
+        <CWText type="h4">Old Dropdown</CWText>
         <CWDropdown
           label="Dropdown"
           options={[
@@ -1618,25 +1618,6 @@ export const ComponentShowcase = () => {
           })}
         </div>
       </div>
-      <div className="typeahead-gallery">
-        <CWText type="h3"> Typeahead Dropdown</CWText>
-        <div className="typeahead-row">
-          <CWTypeaheadSelectList
-            options={optionList}
-            defaultValue={optionList[0]}
-            placeholder="Select chain"
-            isDisabled={false}
-          />
-        </div>
-        <div className="typeahead-row">
-          <CWTypeaheadSelectList
-            options={optionList}
-            defaultValue={optionList[0]}
-            placeholder="Select chain"
-            isDisabled={true}
-          />
-        </div>
-      </div>
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
         <CWTooltip
@@ -1834,18 +1815,15 @@ export const ComponentShowcase = () => {
           )}
         </CWForm>
         {/* With tag input */}
-        <CWForm
-          className="w-full"
-          validationSchema={chainValidationSchema}
-          onSubmit={(values) => console.log('values => ', values)}
-        >
+      </div>
+      <div className="dropdowns">
+        <CWText type="h3">Dropdowns</CWText>
+        <div className="dropdown-type basic">
+          <CWText type="h4">Basic</CWText>
           <CWSelectList
-            label="Chain"
-            name="chain"
             placeholder="Add or select a chain"
-            isMulti
             isClearable={false}
-            defaultValue={[{ value: 'solana', label: 'Solana' }]}
+            isSearchable={false}
             options={[
               { value: 'solana', label: 'Solana' },
               { value: 'polkadot', label: 'Polkadot' },
@@ -1853,24 +1831,93 @@ export const ComponentShowcase = () => {
               { value: 'substrate', label: 'Substrate' },
               { value: 'binance', label: 'Binance' },
             ]}
-            hookToForm
+            onChange={(newValue) => {
+              console.log('selected value is: ', newValue.label);
+            }}
           />
-          <CWButton label="Submit" type="submit" />
-        </CWForm>
-        <CWText type="h3">Multi select list</CWText>
-        <CWSelectList
-          placeholder="Add or select a chain"
-          isMulti
-          isClearable={false}
-          defaultValue={[{ value: 'solana', label: 'Solana' }]}
-          options={[
-            { value: 'solana', label: 'Solana' },
-            { value: 'polkadot', label: 'Polkadot' },
-            { value: 'ethereum', label: 'Ethereum' },
-            { value: 'substrate', label: 'Substrate' },
-            { value: 'binance', label: 'Binance' },
-          ]}
-        />
+
+          <CWText type="h4">Basic With Option Selection Override</CWText>
+          <CWSelectList
+            placeholder="Add or select a chain"
+            isClearable={false}
+            isSearchable={false}
+            options={[
+              { value: 'solana', label: 'Solana' },
+              { value: 'polkadot', label: 'Polkadot' },
+              { value: 'ethereum', label: 'Ethereum' },
+              { value: 'substrate', label: 'Substrate' },
+              { value: 'binance', label: 'Binance' },
+            ]}
+            isOptionSelected={(option) => {
+              return option.value === 'ethereum';
+            }}
+          />
+        </div>
+        <div className="dropdown-type typeahead">
+          <CWText type="h4">Typeahead</CWText>
+          <div className="typeahead-row">
+            <CWTypeaheadSelectList
+              options={optionList}
+              defaultValue={optionList[0]}
+              placeholder="Select chain"
+              isDisabled={false}
+            />
+          </div>
+          <div className="typeahead-row">
+            <CWTypeaheadSelectList
+              options={optionList}
+              defaultValue={optionList[0]}
+              placeholder="Select chain"
+              isDisabled={true}
+            />
+          </div>
+        </div>
+        <div className="dropdown-type multi-select">
+          <CWText type="h4">Multi-select</CWText>
+          <div className="multi-select-row">
+            <CWForm
+              className="w-full"
+              validationSchema={chainValidationSchema}
+              onSubmit={(values) => console.log('values => ', values)}
+            >
+              <CWSelectList
+                label="Chain"
+                name="chain"
+                placeholder="Add or select a chain"
+                isMulti
+                isClearable={false}
+                isSearchable={true}
+                defaultValue={[{ value: 'solana', label: 'Solana' }]}
+                options={[
+                  { value: 'solana', label: 'Solana' },
+                  { value: 'polkadot', label: 'Polkadot' },
+                  { value: 'ethereum', label: 'Ethereum' },
+                  { value: 'substrate', label: 'Substrate' },
+                  { value: 'binance', label: 'Binance' },
+                ]}
+                hookToForm
+              />
+              <CWButton label="Submit" type="submit" />
+            </CWForm>
+          </div>
+
+          <div className="multi-select-row">
+            <CWSelectList
+              placeholder="Add or select a chain"
+              isMulti
+              isClearable={false}
+              isSearchable={true}
+              defaultValue={[{ value: 'solana', label: 'Solana' }]}
+              options={[
+                { value: 'solana', label: 'Solana' },
+                { value: 'polkadot', label: 'Polkadot' },
+                { value: 'ethereum', label: 'Ethereum' },
+                { value: 'substrate', label: 'Substrate' },
+                { value: 'binance', label: 'Binance' },
+              ]}
+            />
+          </div>
+        </div>
       </div>
       <div className="table">
         <CWText type="h3">Table</CWText>

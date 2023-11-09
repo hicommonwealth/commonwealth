@@ -1,4 +1,5 @@
 **Contents**
+
 - [API Diagrams](#api-diagrams)
   * [Membership Check](#membership-check)
   * [User Performs Mutation Action](#user-performs-mutation-action)
@@ -106,6 +107,6 @@ sequenceDiagram
   end
 ```
 
-# Change Log
+## Change Log
 
 - 231023: Authored by Graham Johnson with initial API diagrams.
