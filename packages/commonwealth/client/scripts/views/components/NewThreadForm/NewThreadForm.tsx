@@ -7,7 +7,7 @@ import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import app from 'state';
 import {
   useFetchGroupsQuery,
@@ -94,6 +94,8 @@ export const NewThreadForm = () => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
+  const [showGatingBanner, setShowGatingBanner] = useState(false);
+
   const restrictedTopicIds = memberships
     .filter((x) => x.rejectReason)
     .map((x) => parseInt(`${x.topicId}`));
@@ -116,18 +118,6 @@ export const NewThreadForm = () => {
   const isPopulated = useMemo(() => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
   }, [threadContentDelta, threadTitle]);
-
-  const showGatingBanner = useMemo(() => {
-    if (!memberships) return;
-
-    const memberFilter = memberships.filter(
-      (x) => Number(x.topicId) === threadTopic.id,
-    );
-
-    const isMember = memberFilter.some((member) => member.isAllowed);
-
-    return memberFilter.length > 0 && !isMember;
-  }, [memberships, threadTopic.id]);
 
   const handleNewThreadCreation = async () => {
     if (restrictedTopicIds.includes(threadTopic.id)) {
@@ -212,7 +202,12 @@ export const NewThreadForm = () => {
                   enabledTopics={topicsForSelector.enabledTopics}
                   disabledTopics={topicsForSelector.disabledTopics}
                   value={threadTopic}
-                  onChange={setThreadTopic}
+                  onChange={(e) => {
+                    setThreadTopic(e);
+                    if (restrictedTopicIds.includes(e.id)) {
+                      setShowGatingBanner(true);
+                    }
+                  }}
                 />
               )}
               <CWTextInput
@@ -241,7 +236,9 @@ export const NewThreadForm = () => {
                 !hasJoinedCommunity
               }
               tooltipLabel={
-                disabledActionsTooltipText || 'Join community to submit'
+                (restrictedTopicIds.includes(threadTopic.id) &&
+                  disabledActionsTooltipText) ||
+                'Join community to submit'
               }
             />
 
@@ -291,7 +288,7 @@ export const NewThreadForm = () => {
                 },
                 { label: 'Learn more about gating' },
               ]}
-              onClose={() => !!showGatingBanner}
+              onClose={() => setShowGatingBanner(false)}
             />
           </div>
         )}
