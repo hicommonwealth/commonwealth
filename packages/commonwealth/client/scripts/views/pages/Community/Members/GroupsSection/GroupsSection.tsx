@@ -1,3 +1,4 @@
+import { weiToTokens } from 'helpers';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -7,7 +8,6 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
-
 import {
   SPECIFICATIONS,
   TOKENS,
@@ -21,6 +21,24 @@ type GroupSectionProps = {
   filteredGroups: (Group & { isJoined?: boolean })[];
   canManageGroups?: boolean;
   hasNoGroups?: boolean;
+};
+
+const convertRequirementAmountToDecimalPrecision = (
+  requirementType: string,
+  amount: string,
+) => {
+  if (requirementType === TOKENS.COSMOS_TOKEN) {
+    return weiToTokens(amount, 6);
+  }
+
+  if (
+    requirementType === TOKENS.EVM_TOKEN ||
+    requirementType === SPECIFICATIONS.ERC_20
+  ) {
+    return weiToTokens(amount, 18);
+  }
+
+  return amount;
 };
 
 const GroupsSection = ({
@@ -82,12 +100,10 @@ const GroupsSection = ({
                     ?.label?.split('-')
                     ?.join(' ') || '',
                 requirementContractAddress: r.data.source.contract_address,
-                requirementAmount: [
-                  TOKENS.EVM_TOKEN,
-                  SPECIFICATIONS.ERC_20,
-                ].includes(r?.data?.source?.source_type)
-                  ? (parseInt(r.data.threshold) * 10 ** -18).toFixed(18)
-                  : r.data.threshold,
+                requirementAmount: `${convertRequirementAmountToDecimalPrecision(
+                  r?.data?.source?.source_type,
+                  r.data.threshold,
+                )}`,
                 requirementCondition: 'More than', // hardcoded in api
               }))}
               requirementsToFulfill={
