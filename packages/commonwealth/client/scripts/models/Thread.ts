@@ -43,7 +43,7 @@ function processAssociatedReactions(
   reactions: any[],
   reactionIds: any[],
   reactionType: any[],
-  addressesReacted: any[]
+  addressesReacted: any[],
 ) {
   const temp = [];
   const tempReactionIds =
@@ -259,7 +259,7 @@ export class Thread implements IUniqueId {
       reactions,
       reactionIds,
       reactionType,
-      addressesReacted
+      addressesReacted,
     );
     this.latestActivity = last_commented_on
       ? moment(last_commented_on)
