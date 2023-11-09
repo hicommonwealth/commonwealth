@@ -2,12 +2,12 @@ import React from 'react';
 
 import 'components/component_kit/cw_popover/cw_tooltip.scss';
 
-import { Popover, usePopover } from './cw_popover';
-import type { PopoverTriggerProps } from './cw_popover';
-import { CWText } from '../cw_text';
-import { ComponentType } from '../types';
-import { getClasses } from '../helpers';
 import { Placement } from '@popperjs/core/lib';
+import { CWText } from '../cw_text';
+import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
+import type { PopoverTriggerProps } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
 
 type TooltipProps = {
   content: string | React.ReactNode;
@@ -16,6 +16,7 @@ type TooltipProps = {
   disablePortal?: boolean;
 } & PopoverTriggerProps;
 
+// TODO remove or make it CWPopover
 export const CWTooltip = ({
   content,
   hasBackground,
@@ -40,7 +41,7 @@ export const CWTooltip = ({
             <div
               className={getClasses<{ hasBackground?: boolean }>(
                 { hasBackground },
-                ComponentType.OldTooltip
+                ComponentType.OldTooltip,
               )}
             >
               <CWText type="caption">{content}</CWText>
@@ -49,7 +50,7 @@ export const CWTooltip = ({
             <div
               className={getClasses<{ hasBackground?: boolean }>(
                 { hasBackground },
-                ComponentType.OldTooltip
+                ComponentType.OldTooltip,
               )}
             >
               {content}

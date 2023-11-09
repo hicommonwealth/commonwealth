@@ -37,7 +37,7 @@ export const ReactionButton = ({
   const reactors = thread?.associatedReactions?.map((t) => t.address);
   const activeAddress = app.user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
-    (r) => r.address === activeAddress
+    (r) => r.address === activeAddress,
   );
   const hasReacted = thisUserReaction?.length !== 0;
   const reactedId =
@@ -140,6 +140,7 @@ export const ReactionButton = ({
           />
         </TooltipWrapper>
       ) : (
+        // TODO swap it to be popover instead of tooltip
         <CWTooltip
           content={
             reactors.length > 0

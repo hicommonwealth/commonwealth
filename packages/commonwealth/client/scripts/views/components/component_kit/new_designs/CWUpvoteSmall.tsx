@@ -40,6 +40,7 @@ const CWUpvoteSmall = ({
       onClick={handleClick}
     >
       {voteCount > 0 && !disabled ? (
+        // TODO swap it to be popover instead of tooltip
         <CWTooltip
           content={tooltipContent}
           renderTrigger={(handleInteraction) => (
