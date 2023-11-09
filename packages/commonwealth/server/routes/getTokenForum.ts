@@ -1,7 +1,7 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import type { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

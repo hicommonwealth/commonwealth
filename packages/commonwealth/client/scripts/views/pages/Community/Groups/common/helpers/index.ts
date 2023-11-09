@@ -4,7 +4,7 @@ import { GroupResponseValuesType } from '../GroupForm/index.types';
 
 // Makes create/edit group api payload from provided form submit values
 export const makeGroupDataBaseAPIPayload = (
-  formSubmitValues: GroupResponseValuesType
+  formSubmitValues: GroupResponseValuesType,
 ) => {
   const payload = {
     chainId: app.activeChainId(),

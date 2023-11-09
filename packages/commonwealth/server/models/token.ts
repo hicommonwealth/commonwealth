@@ -16,7 +16,7 @@ export type TokenModelStatic = ModelStatic<TokenInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof Sequelize.DataTypes
+  dataTypes: typeof Sequelize.DataTypes,
 ): TokenModelStatic => {
   const Token = <TokenModelStatic>sequelize.define<
     TokenInstance,
@@ -37,7 +37,7 @@ export default (
       timestamps: false,
       underscored: true,
       // TODO: indexes
-    }
+    },
   );
 
   return Token;
