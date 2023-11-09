@@ -16,6 +16,7 @@ import {
   conditionTypes,
   requirementTypes,
 } from '../../common/constants';
+import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import { DeleteGroupModal } from '../DeleteGroupModal';
 import { GroupForm } from '../common/GroupForm';
 import { makeGroupDataBaseAPIPayload } from '../common/helpers';
@@ -63,7 +64,10 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                 (y) => y.value === x.data.source.source_type,
               )?.label,
             },
-            requirementAmount: x.data.threshold,
+            requirementAmount: convertRequirementAmountFromWeiToTokens(
+              x.data.source.source_type,
+              x.data.threshold.trim(),
+            ),
             requirementChain: {
               value: `${
                 x.data.source.cosmos_chain_id || x.data.source.evm_chain_id || 0
