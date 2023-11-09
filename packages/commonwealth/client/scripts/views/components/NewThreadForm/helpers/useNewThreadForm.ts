@@ -23,7 +23,7 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
 
   // get restored draft on init
   const restoredDraft: NewThreadDraft | null = useMemo(() => {
-    if (!topicsForSelector.length) {
+    if (!topicsForSelector.length || topicIdFromUrl === 0) {
       return null;
     }
     return restoreDraft();

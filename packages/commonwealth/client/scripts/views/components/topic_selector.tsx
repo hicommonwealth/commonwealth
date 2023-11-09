@@ -1,5 +1,5 @@
 import React from 'react';
-import type Topic from '../../models/Topic';
+import Topic from '../../models/Topic';
 
 import 'components/topic_selector.scss';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
@@ -44,7 +44,7 @@ export const TopicSelector = ({
       options={allOptions}
       className="TopicSelector"
       onChange={handleOnChange}
-      value={topicToOption(value, false)}
+      value={value.id ? topicToOption(value, false) : undefined}
     />
   );
 };
