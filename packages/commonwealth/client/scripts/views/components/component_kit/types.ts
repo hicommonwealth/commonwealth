@@ -1,6 +1,6 @@
+import { IconSize } from 'views/components/component_kit/cw_icons/types';
 import type ChainInfo from '../../../models/ChainInfo';
 import type { IconName } from './cw_icons/cw_icon_lookup';
-import { IconSize } from 'views/components/component_kit/cw_icons/types';
 
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
@@ -10,7 +10,6 @@ export enum ComponentType {
   Banner = 'Banner',
   Breadcrumbs = 'Breadcrumbs',
   Button = 'Button',
-  ButtonGroup = 'ButtonGroup',
   Card = 'Card',
   Checkbox = 'Checkbox',
   Collapsible = 'Collapsible',
@@ -20,8 +19,6 @@ export enum ComponentType {
   Divider = 'Divider',
   Form = 'Form',
   FormSection = 'FormSection',
-  FilterMenu = 'FilterMenu',
-  GradientButton = 'GradientButton',
   Growl = 'Growl',
   Icon = 'Icon',
   IconButton = 'IconButton',
@@ -42,8 +39,6 @@ export enum ComponentType {
   Socials = 'Socials',
   Spinner = 'Spinner',
   Tab = 'Tab',
-  TabDeprecated = 'TabDeprecated',
-  TabBar = 'TabBar',
   Table = 'Table',
   Tag = 'Tag',
   Text = 'Text',

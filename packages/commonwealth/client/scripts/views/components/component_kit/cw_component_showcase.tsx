@@ -23,7 +23,6 @@ import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
 import { CWContentPageCard } from './CWContentPageCard';
 import { CWCard } from './cw_card';
-import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
@@ -33,7 +32,6 @@ import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
-import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
@@ -81,29 +79,6 @@ const radioGroupOptions: Array<RadioButtonType> = [
   { label: 'A', value: 'A' },
   { label: 'Radio', value: 'Radio' },
   { label: 'Group', value: 'Group' },
-];
-
-const checkboxGroupOptions: Array<CheckboxType> = [
-  {
-    label: 'Discussion',
-    value: 'discussion',
-  },
-  {
-    label: 'Pre Voting',
-    value: 'preVoting',
-  },
-  {
-    label: 'In Voting',
-    value: 'inVoting',
-  },
-  {
-    label: 'Passed',
-    value: 'passed',
-  },
-  {
-    label: 'Failed',
-    value: 'failed',
-  },
 ];
 
 const bannerTypes: BannerType[] = [
@@ -228,9 +203,6 @@ export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
     number | undefined
   >(undefined);
-  const [checkboxGroupSelected, setCheckboxGroupSelected] = useState<
-    Array<string>
-  >([]);
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
@@ -366,24 +338,6 @@ export const ComponentShowcase = () => {
           renderTrigger={(onclick) => (
             <CWIconButton iconName="plusCircle" onClick={onclick} />
           )}
-        />
-      </div>
-      <div className="basic-gallery">
-        <CWText type="h3">Filter Menu</CWText>
-        <CWFilterMenu
-          header="Stages"
-          filterMenuItems={checkboxGroupOptions}
-          selectedItems={checkboxGroupSelected}
-          onChange={(e) => {
-            const itemValue = e.target.value;
-            if (checkboxGroupSelected.indexOf(itemValue) === -1) {
-              checkboxGroupSelected.push(itemValue);
-            } else {
-              setCheckboxGroupSelected(
-                checkboxGroupSelected.filter((item) => item !== itemValue),
-              );
-            }
-          }}
         />
       </div>
       <div className="tooltip-gallery">
