@@ -222,6 +222,7 @@ export async function __searchProfiles(
         address_id: {
           [Op.in]: addressIds,
         },
+        reject_reason: null,
       },
     });
     // add group IDs to profiles
