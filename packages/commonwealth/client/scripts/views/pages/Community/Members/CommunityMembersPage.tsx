@@ -239,6 +239,8 @@ const CommunityMembersPage = () => {
             placeholder={`Search ${
               selectedTab === TABS[0].value ? 'members' : 'groups'
             }`}
+            containerClassName="search-input-container"
+            inputClassName="search-input"
             iconLeft={<CWIcon iconName="search" className="search-icon" />}
             onInput={(e) =>
               setSearchFilters((g) => ({
