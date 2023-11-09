@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { sequelize } from '../../database';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
@@ -9,6 +10,7 @@ import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const MAX_GROUPS_PER_COMMUNITY = 20;
@@ -30,7 +32,7 @@ export type CreateGroupOptions = {
   topics?: number[];
 };
 
-export type CreateGroupResult = GroupAttributes;
+export type CreateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __createGroup(
   this: ServerGroupsController,
@@ -117,5 +119,12 @@ export async function __createGroup(
     },
   );
 
-  return newGroup;
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.CREATE_GROUP,
+    community: community.id,
+    isCustomDomain: null,
+    userId: user.id,
+  };
+
+  return [newGroup, analyticsOptions];
 }

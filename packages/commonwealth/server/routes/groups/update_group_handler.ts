@@ -1,7 +1,6 @@
-import { GroupMetadata } from 'server/models/group';
+import { GroupAttributes, GroupMetadata } from 'server/models/group';
 import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
-import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
@@ -12,12 +11,12 @@ type UpdateGroupBody = {
   requirements: Requirement[];
   topics?: number[];
 };
-type UpdateGroupResponse = UpdateGroupResult;
+type UpdateGroupResponse = GroupAttributes;
 
 export const updateGroupHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
-  res: TypedResponse<UpdateGroupResponse>
+  res: TypedResponse<UpdateGroupResponse>,
 ) => {
   const { user, address, chain: community } = req;
 
@@ -46,7 +45,7 @@ export const updateGroupHandler = async (
     body: { metadata, requirements, topics },
   } = validationResult.data;
 
-  const result = await controllers.groups.updateGroup({
+  const [group, analyticsOptions] = await controllers.groups.updateGroup({
     user,
     community,
     address,
@@ -61,5 +60,7 @@ export const updateGroupHandler = async (
     .refreshCommunityMemberships({ community })
     .catch(console.error);
 
-  return success(res, result);
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
+
+  return success(res, group);
 };

@@ -3,7 +3,7 @@ import z from 'zod';
 export const VALIDATION_MESSAGES = {
   NO_INPUT: 'No input',
   MAX_CHAR_LIMIT_REACHED: 'Max character limit reached',
-  INVALID_VALUE: 'Invalid value',
+  INVALID_INPUT: 'Invalid input',
 };
 
 export const requirementSubFormValidationSchema = z.object({
@@ -26,7 +26,7 @@ export const requirementSubFormValidationSchema = z.object({
       (value) => {
         return !isNaN(Number(value));
       },
-      { message: VALIDATION_MESSAGES.INVALID_VALUE },
+      { message: VALIDATION_MESSAGES.INVALID_INPUT },
     ),
 });
 
