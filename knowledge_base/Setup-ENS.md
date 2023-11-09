@@ -1,8 +1,10 @@
 ### Prerequisites
+
 - You must have some ETH in your Ethereum-based wallet
 
 ### Setup
-1. Go to https://app.ens.domains/ and connect your wallet (you must be on mainnet)
+
+1. Go to <https://app.ens.domains/> and connect your wallet (you must be on mainnet)
 2. Search an ENS name and click on your payment method, and then click next
 
 <img width="419" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/b730934d-1e91-477f-964c-74c15e96aaee">
@@ -19,7 +21,6 @@
 
 wait for it to complete and then wait another 60 seconds to perform the 2nd transaction
 
-
 <img width="419" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/f4d699b4-4096-48da-b105-72e526e72f10">
 
 <img width="419" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/429e30a0-fd47-4504-b965-c14f28ba8cd6">
@@ -28,11 +29,11 @@ wait for it to complete and then wait another 60 seconds to perform the 2nd tran
 
 <img width="452" alt="image" src="https://github.com/hicommonwealth/commonwealth/assets/51641047/e07c399a-2e96-4422-8bef-8003b0bea3df">
 
-
 ### Next steps
+
 - [See how to use this ENS for setting up a snapshot space](https://github.com/hicommonwealth/commonwealth/wiki/Setup-snapshot-space)
 
-# Change Log
+## Change Log
 
 - 231012: Flagged by Graham Johnson for asset transfer.
 - 230712: Authored by Malik Zulqurnain.

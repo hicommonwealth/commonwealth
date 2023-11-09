@@ -1,24 +1,24 @@
 import moment from 'moment';
 
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
-import { ThreadAttributes } from '../../models/thread';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { AppError } from '../../../../common-common/src/errors';
-import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { ServerThreadsController } from '../server_threads_controller';
-import { validateOwner } from '../../util/validateOwner';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { ThreadAttributes } from '../../models/thread';
+import { UserInstance } from '../../models/user';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -34,7 +34,7 @@ export const Errors = {
 export type CreateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   title: string;
   body: string;
   kind: string;
@@ -60,7 +60,7 @@ export async function __createThread(
   {
     user,
     address,
-    chain,
+    community,
     title,
     body,
     kind,
@@ -97,7 +97,7 @@ export async function __createThread(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -123,7 +123,7 @@ export async function __createThread(
   const version_history: string[] = [JSON.stringify(firstVersion)];
 
   const threadContent: Partial<ThreadAttributes> = {
-    chain: chain.id,
+    chain: community.id,
     address_id: address.id,
     title,
     body,
@@ -149,14 +149,14 @@ export async function __createThread(
         const [topic] = await this.models.Topic.findOrCreate({
           where: {
             name: topicName,
-            chain_id: chain?.id || null,
+            chain_id: community?.id || null,
           },
           transaction,
         });
         threadContent.topic_id = topic.id;
         topicId = topic.id;
       } else {
-        if (chain.topics?.length) {
+        if (community.topics?.length) {
           throw new AppError(
             'Must pass a topic_name string and/or a numeric topic_id'
           );
@@ -164,15 +164,15 @@ export async function __createThread(
       }
 
       if (
-        chain &&
-        (chain.type === ChainType.Token ||
-          chain.network === ChainNetwork.Ethereum)
+        community &&
+        (community.type === ChainType.Token ||
+          community.network === ChainNetwork.Ethereum)
       ) {
         // skip check for admins
         const isAdmin = await validateOwner({
           models: this.models,
           user,
-          chainId: chain.id,
+          communityId: community.id,
           allowAdmin: true,
           allowGodMode: true,
         });
@@ -181,7 +181,7 @@ export async function __createThread(
             this.models,
             this.tokenBalanceCache,
             topicId,
-            chain,
+            community,
             address
           );
           if (!isValid) {
@@ -307,7 +307,7 @@ export async function __createThread(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
-    community: chain.id,
+    community: community.id,
     isCustomDomain: null,
   };
 

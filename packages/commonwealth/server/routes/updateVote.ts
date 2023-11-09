@@ -42,7 +42,7 @@ const updateVote = async (
   const { poll_id, address, author_chain, option } = req.body;
 
   const poll = await models.Poll.findOne({
-    where: { id: poll_id, chain_id: chain.id },
+    where: { id: poll_id, community_id: chain.id },
   });
   if (!poll) return next(new AppError(Errors.NoPoll));
   if (!poll.ends_at && moment(poll.ends_at).utc().isBefore(moment().utc())) {

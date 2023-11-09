@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import app from 'state';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { ChainBase } from '../../../../../../../../../../common-common/src/types';
 import {
+  SPECIFICATIONS,
   TOKENS,
   chainTypes,
   conditionTypes,
@@ -21,6 +24,11 @@ const RequirementSubForm = ({
 }: RequirementSubFormType) => {
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const isCosmosRequirement = requirementType === TOKENS.COSMOS_TOKEN;
+  const isERC20orEVMRequirement = [
+    TOKENS.EVM_TOKEN,
+    SPECIFICATIONS.ERC_20,
+  ].includes(requirementType);
 
   useEffect(() => {
     defaultValues?.requirementType?.value &&
@@ -40,10 +48,18 @@ const RequirementSubForm = ({
           {...(defaultValues.requirementType && {
             defaultValue: [defaultValues.requirementType],
           })}
-          options={requirementTypes.map((requirement) => ({
-            label: requirement.label,
-            value: requirement.value,
-          }))}
+          options={requirementTypes
+            .filter((x) =>
+              app.chain.base === ChainBase.CosmosSDK
+                ? x.value === TOKENS.COSMOS_TOKEN
+                : [TOKENS.EVM_TOKEN, ...Object.values(SPECIFICATIONS)].includes(
+                    x.value,
+                  ),
+            )
+            .map((requirement) => ({
+              label: requirement.label,
+              value: requirement.value,
+            }))}
           onChange={(newValue) => {
             setRequirementType(newValue.value);
 
@@ -73,7 +89,7 @@ const RequirementSubForm = ({
               'cols-3': isTokenRequirement,
               'cols-4': !isTokenRequirement,
             },
-            `row-2`
+            `row-2`,
           )}
         >
           <CWSelectList
@@ -84,10 +100,15 @@ const RequirementSubForm = ({
             {...(defaultValues.requirementChain && {
               defaultValue: [defaultValues.requirementChain],
             })}
-            options={chainTypes.map((chainType) => ({
-              label: chainType.label,
-              value: `${chainType.value}`,
-            }))}
+            options={chainTypes
+              .filter(
+                (x) =>
+                  x.chainBase === (isCosmosRequirement ? 'cosmos' : 'ethereum'),
+              )
+              .map((chainType) => ({
+                label: chainType.label,
+                value: `${chainType.value}`,
+              }))}
             onChange={(newValue) => {
               onChange({
                 requirementChain: newValue.value,
@@ -142,8 +163,14 @@ const RequirementSubForm = ({
           <CWTextInput
             key={defaultValues.requirementAmount}
             name="requirementAmount"
+            alignLabelToRight
             label="Amount"
-            placeholder="Amount"
+            instructionalMessage={
+              isERC20orEVMRequirement
+                ? 'Integer will be converted to decimal'
+                : ''
+            }
+            placeholder="Enter an integer"
             {...(defaultValues.requirementAmount && {
               defaultValue: defaultValues.requirementAmount,
             })}
@@ -153,6 +180,7 @@ const RequirementSubForm = ({
               });
             }}
             customError={errors.requirementAmount}
+            fullWidth
           />
         </div>
       )}

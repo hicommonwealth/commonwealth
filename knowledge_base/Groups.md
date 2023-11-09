@@ -1,15 +1,17 @@
-**Contents**
+# Groups
+
+## Contents
 
 - [Introduction to Groups](#introduction-to-groups)
 - [API Diagrams](#api-diagrams)
-  - [Membership Check](#membership-check)
-  - [User Performs Mutation Action](#user-performs-mutation-action)
-  - [Create Group](#create-group)
-  - [View Group Memberships](#view-group-memberships)
-  - [Update/delete Group](#updatedelete-group)
+  + [Membership Check](#membership-check)
+  + [User Performs Mutation Action](#user-performs-mutation-action)
+  + [Create Group](#create-group)
+  + [View Group Memberships](#view-group-memberships)
+  + [Update/delete Group](#updatedelete-group)
 - [Change Log](#change-log)
 
-# Introduction to Groups
+## Introduction to Groups
 
 `Groups` are used by community admins to handle permissioning across the forum, using associated `Membership` objects that link `Addresses` to Groups.
 
@@ -19,9 +21,9 @@ Groups are defined by sets of `Requirements`. A Requirement is a rule or logical
 
 From a database perspective, Groups consist of a metadata object, an associated Community (chain), an associated Membership, and an array of Requirements. Requirement objects consist of a `rule` string (e.g. "threshold") and a data object (e.g. `ThresholdData`). Requirement objects must conform to the latest JSON schema; as of 231109, that is [v1](../packages/commonwealth/server/util/requirementsModule/requirementsSchema_v1.json). Membership validation checks, and requirement types can be found in the `/server/util/requirementsModule` directory.
 
-# API Diagrams
+## API Diagrams
 
-## Membership Check
+### Membership Check
 
 ```mermaid
 sequenceDiagram
@@ -117,7 +119,7 @@ sequenceDiagram
   end
 ```
 
-# Change Log
+## Change Log
 
-- 231031: Updated by Graham Johnson with an introduction.
+- 231109: Updated by Graham Johnson with an introduction (#5517).
 - 231023: Authored by Graham Johnson with initial API diagrams.

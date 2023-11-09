@@ -13,7 +13,7 @@ const viewChainIcons = async (
   }
   const chains = JSON.parse(req.body.chains);
 
-  const iconUrls = await models.Chain.findAll({
+  const iconUrls = await models.Community.findAll({
     attributes: ['id', 'icon_url'],
     where: {
       id: chains,

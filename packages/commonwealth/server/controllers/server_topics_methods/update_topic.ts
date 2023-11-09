@@ -1,9 +1,9 @@
-import { TopicAttributes } from '../../models/topic';
-import { ChainInstance } from '../../models/chain';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
 import { AppError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { TopicAttributes } from '../../models/topic';
+import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -18,7 +18,7 @@ export const Errors = {
 
 export type UpdateTopicOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   body: Partial<TopicAttributes>;
 };
 
@@ -26,7 +26,7 @@ export type UpdateTopicResult = TopicAttributes;
 
 export async function __updateTopic(
   this: ServerTopicsController,
-  { user, chain, body }: UpdateTopicOptions
+  { user, community, body }: UpdateTopicOptions,
 ): Promise<UpdateTopicResult> {
   if (!body.id) {
     throw new AppError(Errors.NoTopicId);
@@ -35,7 +35,7 @@ export async function __updateTopic(
   const isAdmin = await validateOwner({
     models: this.models,
     user: user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -54,8 +54,8 @@ export async function __updateTopic(
     featured_in_new_post,
   } = body;
 
-  const default_offchain_template = body.default_offchain_template?.trim();
-  if (featured_in_new_post && !default_offchain_template) {
+  const default_community_template = body.default_offchain_template?.trim();
+  if (featured_in_new_post && !default_community_template) {
     throw new AppError(Errors.DefaultTemplateRequired);
   }
 
@@ -84,8 +84,8 @@ export async function __updateTopic(
   if (typeof featured_in_new_post !== 'undefined') {
     topic.featured_in_new_post = featured_in_new_post || false;
   }
-  if (typeof default_offchain_template !== 'undefined') {
-    topic.default_offchain_template = default_offchain_template || '';
+  if (typeof default_community_template !== 'undefined') {
+    topic.default_offchain_template = default_community_template || '';
   }
   await topic.save();
 

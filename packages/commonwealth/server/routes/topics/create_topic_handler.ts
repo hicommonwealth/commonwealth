@@ -17,7 +17,7 @@ export const createTopicHandler = async (
   req: TypedRequestBody<CreateTopicRequestBody>,
   res: TypedResponse<CreateTopicResponse>
 ) => {
-  const { user, chain, body } = req;
+  const { user, chain: community, body } = req;
 
   const validationSchema = z.object({
     name: z.string().optional(),
@@ -38,7 +38,7 @@ export const createTopicHandler = async (
 
   const topic = await controllers.topics.createTopic({
     user,
-    chain,
+    community,
     body: validationResult.data,
   });
 

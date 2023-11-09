@@ -2,12 +2,12 @@ import { assert } from 'chai';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import models from '../../../server/database';
-import { ChainAttributes } from '../../../server/models/chain';
+import { CommunityAttributes } from '../../../server/models/community';
 import { UserInstance } from '../../../server/models/user';
 import { buildUser } from '../../unit/unitHelpers';
 import { resetDatabase } from '../../util/resetDatabase';
 
-const baseRequest: ChainAttributes = {
+const baseRequest: CommunityAttributes = {
   id: 'edgeware',
   name: 'Edgeware',
   chain_node_id: 1,

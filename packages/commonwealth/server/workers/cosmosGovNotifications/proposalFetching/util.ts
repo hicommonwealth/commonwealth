@@ -1,4 +1,4 @@
-import { ChainInstance } from '../../../models/chain';
+import { CommunityInstance } from '../../../models/community';
 import { ProposalSDKType } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
 import { Proposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { AllCosmosProposals } from './types';
@@ -33,7 +33,7 @@ export function numberToUint8ArrayBE(num, byteLength = 8) {
   return bytes;
 }
 
-export function filterV1GovChains(chains: ChainInstance[]) {
+export function filterV1GovChains(chains: CommunityInstance[]) {
   const v1Chains = [];
   const v1Beta1Chains = [];
 
@@ -49,8 +49,8 @@ export function filterV1GovChains(chains: ChainInstance[]) {
 }
 
 export function mapChainsToProposals(
-  v1Chains: ChainInstance[],
-  v1Beta1Chains: ChainInstance[],
+  v1Chains: CommunityInstance[],
+  v1Beta1Chains: CommunityInstance[],
   v1Proposals: ProposalSDKType[][],
   v1Beta1Proposals: Proposal[][]
 ): AllCosmosProposals {

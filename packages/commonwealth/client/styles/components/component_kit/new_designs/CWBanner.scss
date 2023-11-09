@@ -60,6 +60,15 @@
     }
   }
 
+  .gating-tags {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    padding-top: 8px;
+  }
+
   .actions-row {
     display: flex;
     margin-top: 24px;

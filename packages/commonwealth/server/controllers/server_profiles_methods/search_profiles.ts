@@ -2,7 +2,8 @@ import { Op, QueryTypes } from 'sequelize';
 import { TypedPaginatedResult } from 'server/types';
 
 import { uniq } from 'lodash';
-import { ChainInstance } from 'server/models/chain';
+import { CommunityInstance } from 'server/models/community';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   PaginationSqlOptions,
   buildPaginatedResponse,
@@ -14,13 +15,14 @@ import { ServerProfilesController } from '../server_profiles_controller';
 export const Errors = {};
 
 export type SearchProfilesOptions = {
-  chain: ChainInstance;
+  community: CommunityInstance;
   search: string;
   includeRoles?: boolean;
   limit?: number;
   page?: number;
   orderBy?: string;
   orderDirection?: 'ASC' | 'DESC';
+  memberships?: string;
 };
 export type SearchProfilesResult = TypedPaginatedResult<{
   id: number;
@@ -38,14 +40,15 @@ export type SearchProfilesResult = TypedPaginatedResult<{
 export async function __searchProfiles(
   this: ServerProfilesController,
   {
-    chain,
+    community,
     search,
     includeRoles,
     limit,
     page,
     orderBy,
     orderDirection,
-  }: SearchProfilesOptions
+    memberships,
+  }: SearchProfilesOptions,
 ): Promise<SearchProfilesResult> {
   let sortOptions: PaginationSqlOptions = {
     limit: Math.min(limit, 100) || 10,
@@ -80,11 +83,33 @@ export async function __searchProfiles(
     searchTerm: `%${search}%`,
     ...paginationBind,
   };
-  if (chain) {
-    bind.chain = chain.id;
+  if (community) {
+    bind.community_id = community.id;
   }
 
-  const chainWhere = bind.chain ? `"Addresses".community_id = $chain AND` : '';
+  const communityWhere = bind.community_id
+    ? `"Addresses".community_id = $community_id AND`
+    : '';
+
+  let membershipsWhere = memberships
+    ? `SELECT 1 FROM "Memberships"
+    JOIN "Groups" ON "Groups".id = "Memberships".group_id
+    WHERE "Memberships".address_id = "Addresses".id
+    AND "Groups".community_id = $community_id`
+    : '';
+
+  if (memberships) {
+    switch (memberships) {
+      case 'in-group':
+        membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NULL)`;
+        break;
+      case 'not-in-group':
+        membershipsWhere = `AND EXISTS (${membershipsWhere} AND "Memberships".reject_reason IS NOT NULL)`;
+        break;
+      default:
+        throw new AppError(`unsupported memberships param: ${memberships}`);
+    }
+  }
 
   const sqlWithoutPagination = `
     SELECT
@@ -102,12 +127,13 @@ export async function __searchProfiles(
     JOIN
       "Addresses" on "Profiles".user_id = "Addresses".user_id
     WHERE
-      ${chainWhere}
+      ${communityWhere}
       (
         "Profiles".profile_name ILIKE '%' || $searchTerm || '%'
         OR
         "Addresses".address ILIKE '%' || $searchTerm || '%'
       )
+      ${membershipsWhere}
     GROUP BY
       "Profiles".id
   `;
@@ -123,7 +149,7 @@ export async function __searchProfiles(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     ),
   ]);
 
@@ -159,8 +185,8 @@ export async function __searchProfiles(
           },
         },
       },
-      chain?.id,
-      ['member', 'moderator', 'admin']
+      community?.id,
+      ['member', 'moderator', 'admin'],
     );
 
     const addressIdRoles: Record<number, RoleInstanceWithPermission[]> = {};

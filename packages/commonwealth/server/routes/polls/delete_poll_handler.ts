@@ -16,7 +16,7 @@ export const deletePollHandler = async (
   await controllers.polls.deletePoll({
     user: req.user,
     address: req.address,
-    chain: req.chain,
+    community: req.chain,
     pollId: parseInt(pollId, 10),
   });
 

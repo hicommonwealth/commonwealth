@@ -1,15 +1,15 @@
-import { UserInstance } from 'server/models/user';
-import { findAllRoles } from './roles';
 import { Op } from 'sequelize';
 import { DB } from 'server/models';
-import { ThreadAttributes } from 'server/models/thread';
 import { CommentAttributes } from 'server/models/comment';
 import { Role } from 'server/models/role';
+import { ThreadAttributes } from 'server/models/thread';
+import { UserInstance } from 'server/models/user';
+import { findAllRoles } from './roles';
 
 type ValidateOwnerOptions = {
   models: DB;
   user: UserInstance;
-  chainId: string;
+  communityId: string;
   entity?: ThreadAttributes | CommentAttributes;
   allowMod?: boolean;
   allowAdmin?: boolean;
@@ -19,7 +19,7 @@ type ValidateOwnerOptions = {
 export const validateOwner = async ({
   models,
   user,
-  chainId,
+  communityId,
   entity,
   allowMod,
   allowAdmin,
@@ -40,7 +40,7 @@ export const validateOwner = async ({
     return true;
   }
 
-  // check if user is mod or admin of chain
+  // check if user is mod or admin of community
   const requiredRoles: Role[] = [];
   if (allowMod) {
     requiredRoles.push('moderator');
@@ -51,11 +51,11 @@ export const validateOwner = async ({
   const roles = await findAllRoles(
     models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    chainId,
+    communityId,
     requiredRoles
   );
   const role = roles.find((r) => {
-    return r.chain_id === chainId && requiredRoles.includes(r.permission);
+    return r.chain_id === communityId && requiredRoles.includes(r.permission);
   });
   if (role) {
     return true;

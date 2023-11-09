@@ -1,7 +1,8 @@
+import { IDiscordMeta } from 'common-common/src/types';
+import { verifyThread } from '../../../shared/canvas/serverVerify';
 import { ThreadAttributes } from '../../models/thread';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { verifyThread } from '../../../shared/canvas/serverVerify';
 
 type CreateThreadRequestBody = {
   topic_id: string;
@@ -15,16 +16,16 @@ type CreateThreadRequestBody = {
   canvas_action?: any;
   canvas_session?: any;
   canvas_hash?: any;
-  discord_meta?: any;
+  discord_meta?: IDiscordMeta;
 };
 type CreateThreadResponse = ThreadAttributes;
 
 export const createThreadHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateThreadRequestBody>,
-  res: TypedResponse<CreateThreadResponse>
+  res: TypedResponse<CreateThreadResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const {
     topic_id: topicId,
     topic_name: topicName,
@@ -45,7 +46,7 @@ export const createThreadHandler = async (
       title,
       body,
       address: address.address,
-      community: chain.id,
+      community: community.id,
       topic: topicId ? parseInt(topicId, 10) : null,
     });
   }
@@ -54,7 +55,7 @@ export const createThreadHandler = async (
     await controllers.threads.createThread({
       user,
       address,
-      chain,
+      community,
       title,
       body,
       kind,

@@ -1,3 +1,5 @@
+docker-compose.yaml
+stellar
 node_modules/
 */build
 */dist
@@ -7,3 +9,5 @@ node_modules/
 */build/
 .idea
 .vscode
+*.postgres
+*.rabbitmq

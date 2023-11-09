@@ -1,4 +1,6 @@
-```
+# Shadow DOM
+
+```ts
 class ShadowSubtreeComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -16,6 +18,6 @@ class ShadowSubtreeComponent extends React.Component {
 }
 ```
 
-# Change Log
+## Change Log
 
 - 230216: Authored by Forest Mars.

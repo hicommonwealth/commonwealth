@@ -54,14 +54,14 @@ const searchComments = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: chainId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
       },
-    }
+    },
   );
   return result;
 };
@@ -103,7 +103,7 @@ const useSearchCommentsQuery = ({
       },
       staleTime: SEARCH_COMMENTS_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

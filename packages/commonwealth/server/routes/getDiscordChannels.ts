@@ -1,12 +1,9 @@
 import axios from 'axios';
-import { AppError } from 'common-common/src/errors';
-import { validateChain } from '../middleware/validateChain';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 enum SetDiscordBotConfigErrors {
-  NoChain = 'Must supply a chain ID',
   NotAdmin = 'Not an admin',
   CommonbotConnected = 'Discord is already connected to another Commonwealth community',
   Error = 'Could not get discord bot config',
@@ -35,16 +32,13 @@ type GetDiscordChannelsResp = {
 const getDiscordChannels = async (
   models: DB,
   req: TypedRequestBody<GetDiscordChannelsReq>,
-  res: TypedResponse<GetDiscordChannelsResp>
+  res: TypedResponse<GetDiscordChannelsResp>,
 ) => {
-  const { chain_id } = req.body;
-
-  const [chain, error] = await validateChain(models, { chain_id });
-  if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
+  const { chain: community } = req;
 
   const configEntry = await models.DiscordBotConfig.findOne({
     where: {
-      chain_id,
+      community_id: community.id,
     },
   });
 
@@ -85,7 +79,7 @@ const getDiscordChannels = async (
         selectedChannel: {
           id: configEntry.snapshot_channel_id,
           name: channels.find(
-            (channel) => channel.id === configEntry.snapshot_channel_id
+            (channel) => channel.id === configEntry.snapshot_channel_id,
           )?.name,
         },
       });

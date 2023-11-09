@@ -7,7 +7,7 @@ interface CreateGroupProps {
   chainId: string;
   address: string;
   groupName: string;
-  topicIds: string[];
+  topicIds: number[];
   groupDescription?: string;
   requirementsToFulfill: number | undefined;
   requirements?: any[];
@@ -24,8 +24,8 @@ const createGroup = async ({
 }: CreateGroupProps) => {
   return await axios.post(`${app.serverUrl()}/groups`, {
     jwt: app.user.jwt,
-    chain: chainId,
-    author_chain: chainId,
+    community_id: chainId,
+    author_community_id: chainId,
     address,
     metadata: {
       name: groupName,

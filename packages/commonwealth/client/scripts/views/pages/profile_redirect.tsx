@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 
 import $ from 'jquery';
 
-import app from 'state';
 import { useCommonNavigate } from 'navigation/helpers';
-import { PageLoading } from './loading';
+import app from 'state';
 import { PageNotFound } from './404';
+import { PageLoading } from './loading';
 
 type ProfileRedirectProps = {
   address: string;
@@ -18,12 +18,12 @@ const ProfileRedirect = (props: ProfileRedirectProps) => {
   const [error, setError] = useState<boolean>(false);
   const navigate = useCommonNavigate();
 
-  const getProfileId = async (address, chain) => {
+  const getProfileId = async (address, community) => {
     setLoading(true);
     try {
       const res = await $.post(`${app.serverUrl()}/getAddressProfile`, {
         address,
-        chain,
+        community,
       });
       if (res.status === 'Success' && res.result) {
         setProfileId(res.result.profileId);

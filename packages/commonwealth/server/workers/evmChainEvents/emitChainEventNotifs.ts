@@ -1,5 +1,5 @@
 import { RawEvmEvent } from './types';
-import { ChainAttributes } from '../../models/chain';
+import { CommunityAttributes } from '../../models/community';
 import { ContractAttributes } from '../../models/contract';
 import models from '../../database';
 import { QueryTypes } from 'sequelize';
@@ -27,8 +27,8 @@ export async function emitChainEventNotifs(
   ]);
 
   const chainData: {
-    chain_id: ChainAttributes['id'];
-    chain_network: ChainAttributes['network'];
+    chain_id: CommunityAttributes['id'];
+    chain_network: CommunityAttributes['network'];
     contract_address: ContractAttributes['address'];
     chain_node_id: ContractAttributes['chain_node_id'];
   }[] = await models.sequelize.query(
@@ -36,7 +36,7 @@ export async function emitChainEventNotifs(
     SELECT CH.id as chain_id, CH.network as chain_network, C.address as contract_address, C.chain_node_id
     FROM "Contracts" C
              JOIN "CommunityContracts" CC on C.id = CC.contract_id
-             JOIN "Chains" CH ON CC.chain_id = CH.id
+             JOIN "Communities" CH ON CC.chain_id = CH.id
     WHERE (C.address, C.chain_node_id) IN (?);
   `,
     { type: QueryTypes.SELECT, raw: true, replacements: [queryFilter] }

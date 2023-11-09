@@ -1,9 +1,10 @@
 interface APIResponseFormat {
   id: number;
-  chain_id: string;
+  community_id: string;
   metadata: {
     name: string;
     description?: string;
+    required_requirements?: number;
   };
   requirements: {
     rule: 'threshold';
@@ -31,10 +32,11 @@ class Group {
   public requirements: any[];
   public topics: any[];
   public members: any[];
+  public requirementsToFulfill: number;
 
   constructor({
     id,
-    chain_id,
+    community_id,
     created_at,
     updated_at,
     metadata,
@@ -43,7 +45,7 @@ class Group {
     memberships,
   }: APIResponseFormat) {
     this.id = id;
-    this.communityId = chain_id;
+    this.communityId = community_id;
     this.createdAt = created_at;
     this.updatedAt = updated_at;
     this.name = metadata.name;
@@ -51,6 +53,7 @@ class Group {
     this.requirements = requirements;
     this.topics = topics;
     this.members = memberships;
+    this.requirementsToFulfill = metadata.required_requirements;
   }
 }
 
