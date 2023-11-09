@@ -78,10 +78,6 @@ export const NewThreadForm = () => {
     address: app?.user?.activeAccount?.address,
   });
 
-  const restrictedTopicIds = memberships
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
-
   const {
     mutateAsync: createThread,
     error: createThreadError,
@@ -102,7 +98,16 @@ export const NewThreadForm = () => {
   }, [threadContentDelta, threadTitle]);
 
   const handleNewThreadCreation = async () => {
-    if (restrictedTopicIds.includes(threadTopic.id)) {
+    const isTopicGated = !!(memberships || []).find((membership) =>
+      membership.topicIds.includes(threadTopic?.id),
+    );
+    const isActionAllowedInGatedTopic = !!(memberships || []).find(
+      (membership) =>
+        membership.topicIds.includes(threadTopic?.id) && membership.isAllowed,
+    );
+    const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+
+    if (isRestrictedMembership) {
       notifyError('Topic is gated!');
       return;
     }

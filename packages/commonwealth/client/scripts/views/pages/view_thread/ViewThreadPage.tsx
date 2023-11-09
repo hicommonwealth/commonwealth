@@ -148,9 +148,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
   });
-  const restrictedTopicIds = (memberships || [])
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
+
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(thread?.topic?.id),
+  );
+
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+  );
+
+  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -320,8 +328,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const isRestrictedMembership = restrictedTopicIds.includes(thread?.topic?.id);
-
   const canComment =
     (!!hasJoinedCommunity ||
       (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id))) &&
@@ -391,7 +397,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isCommunityMember: !!hasJoinedCommunity,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+    isThreadTopicGated: isRestrictedMembership,
   });
 
   return (
