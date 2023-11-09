@@ -303,7 +303,12 @@ export const NewThreadForm = () => {
                     label: 'See all groups',
                     onClick: () => navigate('/members?tab=groups'),
                   },
-                  { label: 'Learn more about gating' },
+                  {
+                    label: 'Learn more about gating',
+                    onClick: () =>
+                      (window.location.href =
+                        'https://blog.commonwealth.im/introducing-common-groups/'),
+                  },
                 ]}
                 onClose={() => setShowGatingBanner(false)}
               />

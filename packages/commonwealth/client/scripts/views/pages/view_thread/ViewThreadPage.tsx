@@ -570,7 +570,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                                 navigate('/members?tab=groups');
                               },
                             },
-                            { label: 'Learn more about gating' },
+                            {
+                              label: 'Learn more about gating',
+                              onClick: () =>
+                                (window.location.href =
+                                  'https://blog.commonwealth.im/introducing-common-groups/'),
+                            },
                           ]}
                           onClose={() => setHideGatingBanner(true)}
                         />
