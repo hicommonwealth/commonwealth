@@ -1,8 +1,8 @@
 import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
-import { ModelInstance, ModelStatic } from './types';
-import { GroupAttributes } from './group';
 import { AddressAttributes } from './address';
+import { GroupAttributes } from './group';
+import { ModelInstance, ModelStatic } from './types';
 
 export type MembershipAttributes = {
   group_id: number;
@@ -33,23 +33,27 @@ export default (
     {
       underscored: true,
       timestamps: false,
+      createdAt: false,
+      updatedAt: false,
       tableName: 'Memberships',
       indexes: [{ fields: ['group_id'] }],
     }
   );
 
   Membership.removeAttribute('id');
+  Membership.removeAttribute('created_at');
+  Membership.removeAttribute('updated_at');
 
   Membership.associate = (models) => {
     models.Membership.belongsTo(models.Group, {
       foreignKey: 'group_id',
       targetKey: 'id',
-      as: 'group'
+      as: 'group',
     });
     models.Membership.belongsTo(models.Address, {
       foreignKey: 'address_id',
       targetKey: 'id',
-      as: 'address'
+      as: 'address',
     });
   };
 

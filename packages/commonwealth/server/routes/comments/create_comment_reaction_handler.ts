@@ -27,7 +27,7 @@ export const createCommentReactionHandler = async (
   >,
   res: TypedResponse<CreateCommentReactionResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const {
     reaction,
     canvas_action: canvasAction,
@@ -48,7 +48,7 @@ export const createCommentReactionHandler = async (
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       comment_id: commentId,
       address: address.address,
-      chain: chain.id,
+      chain: community.id,
       value: reaction,
     });
   }
@@ -58,7 +58,7 @@ export const createCommentReactionHandler = async (
     await controllers.comments.createCommentReaction({
       user,
       address,
-      chain,
+      community,
       reaction,
       commentId,
       canvasAction,

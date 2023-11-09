@@ -35,7 +35,7 @@ interface SearchProfilesProps {
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
   includeRoles: boolean;
-
+  includeMembershipTypes?: 'in-group' | 'not-in-group';
   enabled?: boolean;
 }
 
@@ -46,6 +46,7 @@ const searchProfiles = async ({
   limit,
   orderBy,
   orderDirection,
+  includeMembershipTypes,
   includeRoles,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
@@ -57,15 +58,16 @@ const searchProfiles = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: chainId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
         include_roles: includeRoles,
+        ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
       },
-    }
+    },
   );
   return result;
 };
@@ -77,6 +79,7 @@ const useSearchProfilesQuery = ({
   orderBy,
   orderDirection,
   includeRoles,
+  includeMembershipTypes,
   enabled = true,
 }: SearchProfilesProps) => {
   const key = [
@@ -86,6 +89,7 @@ const useSearchProfilesQuery = ({
       orderBy,
       orderDirection,
       includeRoles,
+      includeMembershipTypes,
     },
   ];
   return useInfiniteQuery(
@@ -98,6 +102,7 @@ const useSearchProfilesQuery = ({
         limit,
         orderBy,
         orderDirection,
+        includeMembershipTypes,
         includeRoles,
       }),
     {
@@ -110,7 +115,7 @@ const useSearchProfilesQuery = ({
       },
       staleTime: SEARCH_PROFILES_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

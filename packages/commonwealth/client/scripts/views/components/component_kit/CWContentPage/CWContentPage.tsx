@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
@@ -29,7 +30,7 @@ export type ContentPageSidebarItem = {
 export type SidebarComponents = [
   item?: ContentPageSidebarItem,
   item?: ContentPageSidebarItem,
-  item?: ContentPageSidebarItem
+  item?: ContentPageSidebarItem,
 ];
 
 type ContentPageProps = {
@@ -180,6 +181,7 @@ export const CWContentPage = ({
         isSpamThread={isSpamThread}
         threadStage={stageLabel}
         archivedAt={thread?.archivedAt}
+        isHot={isHot(thread)}
       />
     </div>
   );
@@ -227,7 +229,7 @@ export const CWContentPage = ({
             onProposalStageChange={onProposalStageChange}
             disabledActionTooltipText={disabledActionsTooltipText}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-          />
+          />,
         )}
 
       {subBody}

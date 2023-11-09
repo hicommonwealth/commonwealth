@@ -1,6 +1,6 @@
-import { TypedRequestParams, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
 import { DeleteGroupResult } from '../../controllers/server_groups_methods/delete_group';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestParams, TypedResponse, success } from '../../types';
 
 type DeleteGroupParams = {
   id: string;
@@ -12,12 +12,12 @@ export const deleteGroupHandler = async (
   req: TypedRequestParams<DeleteGroupParams>,
   res: TypedResponse<DeleteGroupResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
 
   const { id } = req.params;
   const result = await controllers.groups.deleteGroup({
     user,
-    chain,
+    community,
     address,
     groupId: parseInt(id, 10),
   });

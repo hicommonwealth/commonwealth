@@ -17,7 +17,6 @@ describe('Update Community/Chain Tests', () => {
   let jwtToken;
   let loggedInAddr;
   const chain = 'ethereum';
-  let offchainCommunity;
 
   before('reset database', async () => {
     await resetDatabase();
@@ -26,7 +25,7 @@ describe('Update Community/Chain Tests', () => {
     loggedInAddr = result.address;
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     const isAdmin = await modelUtils.updateRole({
       address_id: result.address_id,
@@ -48,7 +47,7 @@ describe('Update Community/Chain Tests', () => {
       default_chain: chain,
     };
 
-    offchainCommunity = await modelUtils.createCommunity(communityArgs);
+    await modelUtils.createCommunity(communityArgs);
   });
 
   describe('/updateChain route tests', () => {
@@ -201,7 +200,7 @@ describe('Update Community/Chain Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, name });
       expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(ChainError.NoChainId);
+      expect(res.body.error).to.be.equal(ChainError.NoCommunityId);
     });
 
     it('should fail if no chain found', async () => {
@@ -212,7 +211,7 @@ describe('Update Community/Chain Tests', () => {
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id });
       expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(ChainError.NoChainFound);
+      expect(res.body.error).to.be.equal(ChainError.NoCommunityFound);
     });
 
     it('should fail if not admin ', async () => {
@@ -220,7 +219,7 @@ describe('Update Community/Chain Tests', () => {
       const result = await modelUtils.createAndVerifyAddress({ chain });
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       const res = await chai
         .request(app)
