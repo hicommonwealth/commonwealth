@@ -202,6 +202,8 @@ export const AuthorAndPublishInfo = ({
 
       {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
 
+      {isSpamThread && <CWTag label="SPAM" type="disabled" />}
+
       {isLocked && lockedAt && lastUpdated && (
         <LockWithTooltip
           lockedAt={moment(lockedAt)}
