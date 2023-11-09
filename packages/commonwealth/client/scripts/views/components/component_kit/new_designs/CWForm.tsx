@@ -29,6 +29,7 @@ const CWForm = ({
   const formMethods: UseFormReturn = useForm({
     resolver: zodResolver(validationSchema),
     defaultValues: initialValues,
+    mode: 'all',
   });
 
   const handleFormSubmit = async (event) => {

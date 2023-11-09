@@ -25,7 +25,7 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
   const content = decodeURIComponent(searchResult.body);
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.id}`;
+    const path = `/${searchResult.community}/discussion/${searchResult.id}`;
     navigate(path, {}, null);
   };
 
@@ -33,7 +33,7 @@ export const SearchBarThreadPreviewRow: FC<SearchBarThreadPreviewRowProps> = ({
     <div className="SearchBarThreadPreviewRow" onClick={handleClick}>
       <div className="header-row">
         <User
-          userChainId={searchResult.chain}
+          userChainId={searchResult.community}
           userAddress={searchResult.address}
         />
         <CWText className="last-updated-text">•</CWText>

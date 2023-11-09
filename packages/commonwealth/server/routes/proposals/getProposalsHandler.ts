@@ -17,7 +17,7 @@ export const getProposalsHandler = async (
   const { chainId } = req.query;
 
   const proposals = await controllers.proposals.getProposals({
-    chainId,
+    communityId: chainId,
   });
 
   return success(res, {

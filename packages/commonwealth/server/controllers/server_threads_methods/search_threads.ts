@@ -11,7 +11,7 @@ import {
 import { ServerThreadsController } from '../server_threads_controller';
 
 export type SearchThreadsOptions = {
-  chain: CommunityInstance;
+  community: CommunityInstance;
   searchTerm: string;
   threadTitleOnly: boolean;
   limit?: number;
@@ -27,7 +27,7 @@ export type SearchThreadsResult =
 export async function __searchThreads(
   this: ServerThreadsController,
   {
-    chain,
+    community,
     searchTerm,
     threadTitleOnly,
     limit,
@@ -62,17 +62,19 @@ export async function __searchThreads(
     buildPaginationSql(sortOptions);
 
   const bind: PaginationSqlBind & {
-    chain?: string;
+    community?: string;
     searchTerm?: string;
   } = {
     searchTerm: searchTerm,
     ...paginationBind,
   };
-  if (chain) {
-    bind.chain = chain.id;
+  if (community) {
+    bind.community = community.id;
   }
 
-  const chainWhere = bind.chain ? '"Threads".chain = $chain AND' : '';
+  const communityWhere = bind.community
+    ? '"Threads".chain = $community AND'
+    : '';
 
   let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
   if (!threadTitleOnly) {
@@ -96,7 +98,7 @@ export async function __searchThreads(
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
     websearch_to_tsquery('english', $searchTerm) as query
     WHERE
-      ${chainWhere}
+      ${communityWhere}
       "Threads".deleted_at IS NULL AND
       ${searchWhere}
     ${paginationSort}
@@ -109,7 +111,7 @@ export async function __searchThreads(
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
     websearch_to_tsquery('english', $searchTerm) as query
     WHERE
-      ${chainWhere}
+      ${communityWhere}
       "Threads".deleted_at IS NULL AND
       ${searchWhere}
   `;

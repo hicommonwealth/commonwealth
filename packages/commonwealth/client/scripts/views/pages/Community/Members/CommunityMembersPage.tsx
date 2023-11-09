@@ -1,9 +1,14 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { featureFlags } from 'helpers/feature-flags';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
-import { useFetchGroupsQuery } from 'state/api/groups';
+import { ApiEndpoints, queryClient } from 'state/api/config';
+import {
+  useFetchGroupsQuery,
+  useRefreshMembershipQuery,
+} from 'state/api/groups';
 import { useSearchProfilesQuery } from 'state/api/profiles';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import { useDebounce } from 'usehooks-ts';
@@ -14,57 +19,71 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import {
   CWTab,
-  CWTabsRow
+  CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
-import { GroupCategory, SearchFilters } from './index.types';
+import { GroupCategory, MembershipFilter, SearchFilters } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
-  ...(featureFlags.gatingEnabled ? [{ value: 'groups', label: 'Groups' }] : [])
+  ...(featureFlags.gatingEnabled ? [{ value: 'groups', label: 'Groups' }] : []),
 ];
 
 const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
-  'All',
+  'All groups',
   'In group',
-  'Not in group'
+  'Not in group',
 ];
 
 const CommunityMembersPage = () => {
+  useUserActiveAccount();
   const navigate = useCommonNavigate();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
-    category: GROUP_AND_MEMBER_FILTERS[0]
+    category: GROUP_AND_MEMBER_FILTERS[0],
+  });
+
+  const { data: memberships = null } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
   });
 
   const debouncedSearchTerm = useDebounce<string>(
     searchFilters.searchText,
-    500
+    500,
   );
 
   const {
     data: members,
     fetchNextPage,
-    isLoading: isLoadingMembers
+    isLoading: isLoadingMembers,
   } = useSearchProfilesQuery({
     chainId: app.activeChainId(),
     searchTerm: '',
     limit: 30,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
-    includeRoles: true
+    includeRoles: true,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    ...(searchFilters.category !== 'All groups' && {
+      includeMembershipTypes: searchFilters.category
+        .split(' ')
+        .join('-')
+        .toLowerCase() as MembershipFilter,
+    }),
   });
 
   const { data: groups } = useFetchGroupsQuery({
     chainId: app.activeChainId(),
     includeMembers: true,
-    includeTopics: true
+    includeTopics: true,
+    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
   });
 
   const formattedMembers = useMemo(() => {
@@ -72,13 +91,12 @@ const CommunityMembersPage = () => {
       return [];
     }
 
-    return members.pages
-      .reduce(
-        (acc, page) => {
-          return [...acc, ...page.results];
-        },
-        [] as SearchProfilesResponse['results']
-      )
+    const clonedMembersPages = [...members.pages];
+
+    const results = clonedMembersPages
+      .reduce((acc, page) => {
+        return [...acc, ...page.results];
+      }, [] as SearchProfilesResponse['results'])
       .map((p) => ({
         id: p.id,
         avatarUrl: p.avatar_url,
@@ -87,58 +105,62 @@ const CommunityMembersPage = () => {
           (role) =>
             role.chain_id === app.activeChainId() &&
             [Permissions.ROLES.ADMIN, Permissions.ROLES.MODERATOR].includes(
-              role.permission
-            )
+              role.permission,
+            ),
         )?.permission,
         groups: (groups || [])
           .filter((g) =>
             (g.members || []).find(
-              (x) => x?.address?.address === p.addresses?.[0]?.address
-            )
+              (x) =>
+                x?.address?.address === p.addresses?.[0]?.address &&
+                !x.reject_reason,
+            ),
           )
-          .map((x) => x.name)
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((x) => x.name),
       }))
       .filter((p) =>
         debouncedSearchTerm
           ? p.groups.find((g) =>
-              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+              g.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
             ) ||
             p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-          : true
-      )
-      .filter((p) => {
-        if (searchFilters.category === GROUP_AND_MEMBER_FILTERS[0]) {
-          return true;
-        }
+          : true,
+      );
 
-        if (searchFilters.category === GROUP_AND_MEMBER_FILTERS[1]) {
-          return p.groups.length > 0;
-        }
-
-        return p.groups.length === 0;
-      });
-  }, [members, groups, debouncedSearchTerm, searchFilters.category]);
+    return results;
+  }, [members, groups, debouncedSearchTerm]);
 
   const filteredGroups = useMemo(() => {
-    return (groups || [])
+    const filteredGroupsArr = (groups || [])
       .filter((group) =>
         searchFilters.searchText
           ? group.name
               .toLowerCase()
               .includes(searchFilters.searchText.toLowerCase())
-          : true
+          : true,
       )
       .filter((group) =>
-        searchFilters.category === 'All'
+        searchFilters.category === 'All groups'
           ? true
           : searchFilters.category === 'In group'
           ? (group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address
+              (x) =>
+                x?.address?.address === app.user.activeAccount.address &&
+                !x.reject_reason,
             )
           : !(group.members || []).find(
-              (x) => x?.address?.address === app.user.activeAccount.address
-            )
+              (x) =>
+                x?.address?.address === app.user.activeAccount.address &&
+                !x.reject_reason,
+            ),
       );
+
+    const clonedFilteredGroups = [...filteredGroupsArr];
+
+    clonedFilteredGroups.sort((a, b) => a.name.localeCompare(b.name));
+
+    return clonedFilteredGroups;
   }, [groups, searchFilters]);
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
@@ -149,12 +171,16 @@ const CommunityMembersPage = () => {
     history.pushState(
       null,
       '',
-      `${window.location.pathname}?${params.toString()}`
+      `${window.location.pathname}?${params.toString()}`,
     );
     setSelectedTab(activeTab);
   };
 
   useEffect(() => {
+    // Invalidate group memberships cache
+    queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
+    queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
+
     // Set the active tab based on URL
     const params = new URLSearchParams(window.location.search.toLowerCase());
     const activeTab = params.get('tab')?.toLowerCase();
@@ -205,9 +231,9 @@ const CommunityMembersPage = () => {
           }>(
             {
               'cols-3': featureFlags.gatingEnabled && !isAdmin,
-              'cols-4': featureFlags.gatingEnabled && isAdmin
+              'cols-4': featureFlags.gatingEnabled && isAdmin,
             },
-            'filters'
+            'filters',
           )}
         >
           <CWTextInput
@@ -220,11 +246,11 @@ const CommunityMembersPage = () => {
             onInput={(e) =>
               setSearchFilters((g) => ({
                 ...g,
-                searchText: e.target.value?.trim()
+                searchText: e.target.value?.trim(),
               }))
             }
           />
-          {featureFlags.gatingEnabled && (
+          {featureFlags.gatingEnabled && app.user.activeAccount && (
             <div className="select-dropdown-container">
               <CWText type="b2" fontWeight="bold" className="filter-text">
                 Filter
@@ -234,7 +260,7 @@ const CommunityMembersPage = () => {
                 options={GROUP_AND_MEMBER_FILTERS.map((x) => ({
                   id: x,
                   label: x,
-                  value: x
+                  value: x,
                 }))}
                 selected={searchFilters.category}
                 dropdownPosition="bottom-end"

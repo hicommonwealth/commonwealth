@@ -14,7 +14,7 @@ const banProfileByAddress = async ({
   return await axios.post('/api/banAddress', {
     jwt: app.user.jwt,
     address: address,
-    chain_id: chainId,
+    community_id: chainId,
   });
 };
 

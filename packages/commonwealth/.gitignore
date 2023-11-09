@@ -23,6 +23,7 @@ cache/
 stats.json
 serviceAccountKey.json
 
+
 # Database downloads
 latest.dump
 latest.dump.*

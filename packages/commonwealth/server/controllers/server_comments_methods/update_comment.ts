@@ -6,10 +6,10 @@ import {
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { renderQuillDeltaToText } from '../../../shared/utils';
 import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
 import { CommentAttributes } from '../../models/comment';
+import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { parseUserMentions } from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
@@ -25,7 +25,7 @@ const Errors = {
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   commentId?: number;
   commentBody: string;
   discordMeta?: any;
@@ -38,7 +38,7 @@ export async function __updateComment(
   {
     user,
     address,
-    chain,
+    community,
     commentId,
     commentBody,
     discordMeta,
@@ -61,7 +61,7 @@ export async function __updateComment(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -117,7 +117,6 @@ export async function __updateComment(
     include: [this.models.Address],
   });
 
-  const cwUrl = getThreadUrl(thread, comment?.id);
   const root_title = thread.title || '';
 
   const allNotificationOptions: EmitOptions[] = [];

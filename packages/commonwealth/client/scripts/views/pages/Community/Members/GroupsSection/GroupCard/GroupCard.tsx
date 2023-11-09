@@ -71,12 +71,16 @@ const GroupCard = ({
       ))}
 
       {/* Gated topics */}
-      <CWText type="h5">Gated Topics</CWText>
-      <div className="gating-tags">
-        {topics.map((t, index) => (
-          <CWTag key={index} label={t.name} type="referendum" />
-        ))}
-      </div>
+      {topics.length > 0 && (
+        <>
+          <CWText type="h5">Gated Topics</CWText>
+          <div className="gating-tags">
+            {topics.map((t, index) => (
+              <CWTag key={index} label={t.name} type="referendum" />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 };

@@ -153,5 +153,6 @@ CI community (ephemeral spin-up for automated tests):
 ## Change Log
 
 - 231031: Flagged by Timothee Legros as needing EVM documentation similar to current CSDK info.
+- 231031: Flagged by Graham Johnson; `chain-events` package references are obsolete.
 - 230727: Updated with Cosmos SDK info by Mark Hagelberg.
 - 230418: Authored by Mark Hagelberg.
