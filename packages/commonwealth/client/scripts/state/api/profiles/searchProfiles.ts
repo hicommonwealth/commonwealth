@@ -69,7 +69,7 @@ const searchProfiles = async ({
         order_direction: orderDirection,
         include_roles: includeRoles,
         ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
-        ...(includeGroupIds && { includeGroupIds: includeGroupIds }),
+        ...(includeGroupIds && { include_group_ids: includeGroupIds }),
       },
     },
   );
@@ -83,6 +83,7 @@ const useSearchProfilesQuery = ({
   orderBy,
   orderDirection,
   includeRoles,
+  includeGroupIds,
   includeMembershipTypes,
   enabled = true,
 }: SearchProfilesProps) => {
@@ -93,6 +94,7 @@ const useSearchProfilesQuery = ({
       orderBy,
       orderDirection,
       includeRoles,
+      includeGroupIds,
       includeMembershipTypes,
     },
   ];
@@ -107,6 +109,7 @@ const useSearchProfilesQuery = ({
         orderBy,
         orderDirection,
         includeMembershipTypes,
+        includeGroupIds,
         includeRoles,
       }),
     {
