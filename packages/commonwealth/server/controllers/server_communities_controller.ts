@@ -23,6 +23,7 @@ import {
 } from './server_communities_methods/get_chain_nodes';
 import {
   __getCommunities,
+  GetCommunitiesOptions,
   GetCommunitiesResult,
 } from './server_communities_methods/get_communities';
 import {
@@ -62,8 +63,10 @@ export class ServerCommunitiesController {
     return __searchCommunities.call(this, options);
   }
 
-  async getCommunities(): Promise<GetCommunitiesResult> {
-    return __getCommunities.call(this);
+  async getCommunities(
+    options: GetCommunitiesOptions,
+  ): Promise<GetCommunitiesResult> {
+    return __getCommunities.call(this, options);
   }
 
   async createCommunity(

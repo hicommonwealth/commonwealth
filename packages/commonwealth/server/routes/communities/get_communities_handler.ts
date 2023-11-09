@@ -29,7 +29,7 @@ export const getCommunitiesHandler = async (
 
   // get chains, with snapshots
   if (options.snapshots === 'true') {
-    const results = await controllers.communities.getCommunities();
+    const results = await controllers.communities.getCommunities({});
     return success(res, results);
   }
 
