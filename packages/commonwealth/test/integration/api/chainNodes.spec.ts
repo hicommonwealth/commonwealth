@@ -1,7 +1,7 @@
-import { expect, assert } from 'chai';
-import models from 'server/database';
+import { assert, expect } from 'chai';
 import { BalanceType } from 'common-common/src/types';
 import { resetDatabase } from 'server-test';
+import models from 'server/database';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { UserInstance } from '../../../server/models/user';
 import { buildUser } from '../../unit/unitHelpers';
@@ -13,13 +13,21 @@ describe('ChainNode Tests', () => {
 
   it('Creates new ChainNode when', async () => {
     const controller = new ServerCommunitiesController(models, null, null);
-    const user: UserInstance =
-      buildUser({ models, userAttributes: { email: '', id: 1, isAdmin: true } }) as UserInstance;
-    const resp = await controller.createChainNode(
-      { user, url: 'wss://', name: 'asd', balanceType: 'ethereum', eth_chain_id: 123 }
-    );
+    const user: UserInstance = buildUser({
+      models,
+      userAttributes: { email: '', id: 1, isAdmin: true },
+    }) as UserInstance;
+    const resp = await controller.createChainNode({
+      user,
+      url: 'wss://',
+      name: 'asd',
+      balanceType: 'ethereum',
+      eth_chain_id: 123,
+    });
 
-    const createdNode = await models.ChainNode.findOne({ where: {id: resp.node_id} });
+    const createdNode = await models.ChainNode.findOne({
+      where: { id: resp.node_id },
+    });
     assert.equal(createdNode.url, 'wss://');
     assert.equal(createdNode.name, 'asd');
     assert.equal(createdNode.balance_type, 'ethereum');
@@ -31,7 +39,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { eth_chain_id: 123 },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -46,7 +54,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { eth_chain_id: 123 },
       }),
-      1
+      1,
     );
   });
 
@@ -56,7 +64,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { eth_chain_id: ethChainId },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -92,7 +100,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -108,7 +116,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      1
+      1,
     );
   });
 
@@ -118,7 +126,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -151,7 +159,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      1
+      1,
     );
   });
 });

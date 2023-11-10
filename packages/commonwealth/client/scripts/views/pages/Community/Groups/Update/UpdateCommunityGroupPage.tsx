@@ -1,6 +1,7 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { featureFlags } from 'helpers/feature-flags';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import _ from 'lodash';
 import Group from 'models/Group';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -105,17 +106,29 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         }}
         onSubmit={(values) => {
           const payload = makeGroupDataBaseAPIPayload(values);
-
-          editGroup({
+          const finalPayload = {
             ...payload,
             groupId: groupId,
-          })
+          };
+
+          // if requirements are equal, then don't send them to api
+          const isRequirementsEqual = _.isEqual(
+            foundGroup.requirements,
+            payload.requirements,
+          );
+          if (isRequirementsEqual) {
+            delete finalPayload.requirements;
+          }
+
+          editGroup(finalPayload)
             .then(() => {
               notifySuccess('Group Updated');
-              setShouldShowGroupMutationBannerForCommunity(
-                app.activeChainId(),
-                true,
-              );
+              if (!isRequirementsEqual) {
+                setShouldShowGroupMutationBannerForCommunity(
+                  app.activeChainId(),
+                  true,
+                );
+              }
               navigate(`/members?tab=groups`);
             })
             .catch(() => {

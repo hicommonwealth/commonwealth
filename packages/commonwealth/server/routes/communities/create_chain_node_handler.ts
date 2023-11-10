@@ -1,6 +1,6 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
 import { CreateChainNodeResult } from '../../controllers/server_communities_methods/create_chain_node';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type CreateChainNodeRequestBody = {
   url: string;
@@ -14,7 +14,7 @@ type CreateChainNodeResponse = CreateChainNodeResult;
 export const createChainNodeHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateChainNodeRequestBody>,
-  res: TypedResponse<CreateChainNodeResponse>
+  res: TypedResponse<CreateChainNodeResponse>,
 ) => {
   const results = await controllers.communities.createChainNode({
     user: req.user,
