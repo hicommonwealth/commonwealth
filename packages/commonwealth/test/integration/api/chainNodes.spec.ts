@@ -1,7 +1,7 @@
-import { expect, assert } from 'chai';
-import models from 'server/database';
+import { assert, expect } from 'chai';
 import { BalanceType } from 'common-common/src/types';
 import { resetDatabase } from 'server-test';
+import models from 'server/database';
 
 describe('ChainNode Tests', () => {
   before(async () => {
@@ -13,7 +13,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { eth_chain_id: 123 },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -28,7 +28,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { eth_chain_id: 123 },
       }),
-      1
+      1,
     );
   });
 
@@ -38,7 +38,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { eth_chain_id: ethChainId },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -74,7 +74,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -90,7 +90,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      1
+      1,
     );
   });
 
@@ -100,7 +100,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      0
+      0,
     );
 
     await models.ChainNode.findOrCreate({
@@ -133,7 +133,7 @@ describe('ChainNode Tests', () => {
       await models.ChainNode.count({
         where: { cosmos_chain_id: cosmosChainId },
       }),
-      1
+      1,
     );
   });
 });

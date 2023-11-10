@@ -1,7 +1,8 @@
-import NodeInfo from 'models/NodeInfo';
-import CommunityInfo from 'models/ChainInfo';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
+import CommunityInfo from 'models/ChainInfo';
+import NodeInfo from 'models/NodeInfo';
+import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import app from 'state';
 import { BalanceType } from '../../../../../../common-common/src/types';
@@ -9,10 +10,9 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import { createChainNode } from './utils';
-import 'pages/AdminPanel.scss';
-import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 
 const RPCEndpointTask = () => {
   const [rpcEndpointChainValue, setRpcEndpointChainValue] =
@@ -28,7 +28,7 @@ const RPCEndpointTask = () => {
   const [rpcName, setRpcName] = useState<string>('');
   const [bech32, setBech32] = useState<string>('');
   const [balanceType, setBalanceType] = useState<BalanceType>(
-    BalanceType.Ethereum
+    BalanceType.Ethereum,
   );
   const [chainNodeNotCreated, setChainNodeNotCreated] =
     useState<boolean>(false);
@@ -45,7 +45,7 @@ const RPCEndpointTask = () => {
   };
 
   const RPCEndpointValidationFn = (
-    value: string
+    value: string,
   ): [ValidationStatus, string] | [] => {
     if (
       !detectURL(value) &&
