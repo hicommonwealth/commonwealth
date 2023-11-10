@@ -32,10 +32,7 @@ import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
-import {
-  MixpanelClickthroughPayload,
-  MixpanelPageViewEvent,
-} from '../../../../../shared/analytics/types';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
@@ -194,11 +191,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       );
     }
   });
-
-  const { trackAnalytics } =
-    useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
-      onAction: true,
-    });
 
   useBrowserAnalyticsTrack({
     payload: {
