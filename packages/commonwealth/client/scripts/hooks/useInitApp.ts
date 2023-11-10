@@ -24,6 +24,7 @@ const useInitApp = () => {
       })
       .catch((err) => console.log('Failed fetching custom domain', err))
       .finally(() => setIsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { isLoading, customDomain };
