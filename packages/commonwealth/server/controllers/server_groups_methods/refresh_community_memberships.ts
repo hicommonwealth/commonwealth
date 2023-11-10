@@ -4,7 +4,10 @@ import { Op, Sequelize } from 'sequelize';
 import { GroupAttributes } from 'server/models/group';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
-import { MembershipAttributes } from '../../models/membership';
+import {
+  MembershipAttributes,
+  MembershipInstance,
+} from '../../models/membership';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -46,7 +49,7 @@ export async function __refreshCommunityMemberships(
   });
 
   const toCreate = [];
-  const toUpdate = [];
+  const toUpdate: [MembershipInstance, MembershipAttributes][] = [];
 
   const processMembership = async (
     address: AddressAttributes,
@@ -70,7 +73,10 @@ export async function __refreshCommunityMemberships(
         address,
         currentGroup,
       );
-      toUpdate.push(computedMembership);
+      toUpdate.push([
+        existingMembership as MembershipInstance,
+        computedMembership,
+      ]);
       return;
     }
 
@@ -121,46 +127,21 @@ export async function __refreshCommunityMemberships(
     { concurrency: 20 },
   );
 
-  console.log(`Done checking. Starting create...`);
+  console.log(`Done checking. Starting ${toCreate.length} creates...`);
 
   // first create new rows
   await this.models.Membership.bulkCreate(toCreate);
 
-  console.log(`Starting update...`);
-
-  // TODO: test this query out!!!
-  if (toUpdate.length > 0) {
-    // then, perform single insert query to update all rows
-    const group_ids = toUpdate.map((membership) => membership.groupId);
-    const address_ids = toUpdate.map((membership) => membership.addressId);
-    const reject_reasons = toUpdate.map(
-      (membership) => membership.rejectReason,
-    );
-
-    const query = `
-        UPDATE "Memberships"
-        SET
-            "reject_reason" = new_values."reject_reason",
-            "last_checked" = CURRENT_TIMESTAMP
-        FROM (
-            SELECT
-                unnest(ARRAY[:group_ids])::integer as "group_id",
-                unnest(ARRAY[:address_ids])::integer as "address_id",
-                unnest(ARRAY[:reject_reasons])::jsonb as "reject_reason"
-        ) AS new_values
-        WHERE
-            "Memberships"."group_id" = new_values."group_id" AND
-            "Memberships"."address_id" = new_values."address_id";
-        `;
-
-    await this.models.sequelize.query(query, {
-      replacements: {
-        group_ids,
-        address_ids,
-        reject_reasons,
-      },
-    });
-  }
+  console.log(`Done creating. Starting ${toUpdate.length} updates...`);
+  await Bluebird.map(
+    toUpdate,
+    async ([existingMembership, { reject_reason, last_checked }]) => {
+      return existingMembership.update({ reject_reason, last_checked });
+    },
+    {
+      concurrency: 5,
+    },
+  );
 
   console.log(
     `Created ${toCreate.length} and updated ${toUpdate.length} memberships in ${

@@ -35,7 +35,7 @@ const resetWalletConnectSession = async () => {
    * Imp to reset wc session on logout as otherwise, subsequent login attempts will fail
    */
   const walletConnectWallet = WebWalletController.Instance.getByName(
-    WalletId.WalletConnect
+    WalletId.WalletConnect,
   );
   await walletConnectWallet.reset();
 };
@@ -57,7 +57,7 @@ const UserDropdown = () => {
   const navigate = useCommonNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on'
+    localStorage.getItem('dark-mode-state') === 'on',
   );
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [revalidationModalData, setRevalidationModalData] = useState<{
@@ -77,7 +77,7 @@ const UserDropdown = () => {
       const signed = authenticatedAddresses[account.address];
       const isActive = app.user.activeAccount?.address === account.address;
       const walletSsoSource = app.user.addresses.find(
-        (address) => address.address === account.address
+        (address) => address.address === account.address,
       )?.walletSsoSource;
 
       return {
@@ -100,7 +100,7 @@ const UserDropdown = () => {
           });
         },
       };
-    }
+    },
   );
 
   return (
