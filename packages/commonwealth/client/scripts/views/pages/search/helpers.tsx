@@ -250,8 +250,6 @@ export const renderSearchResults = (
   searchType: SearchScope,
   setRoute: any,
 ) => {
-  console.log('>>>>>>>>>>>>>>>>>>>>>> RESULTS', results);
-
   if (!results || results.length === 0) {
     return [];
   }
