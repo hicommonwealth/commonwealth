@@ -121,44 +121,14 @@ export async function __refreshCommunityMemberships(
     { concurrency: 20 },
   );
 
-  console.log(`Done checking. Starting ${toCreate.length} creates...`);
+  console.log(
+    `Done checking. Starting ${toCreate.length} creates and ${toUpdate.length} updates...`,
+  );
 
   // first create new rows
-  await this.models.Membership.bulkCreate(toCreate);
-
-  console.log(`Done creating. Starting ${toUpdate.length} updates...`);
-  if (toUpdate.length > 0) {
-    // then, perform single insert query to update all rows
-    const group_ids = toUpdate.map((membership) => membership.groupId);
-    const address_ids = toUpdate.map((membership) => membership.addressId);
-    const reject_reasons = toUpdate.map(
-      (membership) => membership.rejectReason,
-    );
-
-    const query = `
-        UPDATE "Memberships"
-        SET
-            "reject_reason" = new_values."reject_reason",
-            "last_checked" = CURRENT_TIMESTAMP
-        FROM (
-            SELECT
-                unnest(ARRAY[:group_ids])::integer as "group_id",
-                unnest(ARRAY[:address_ids])::integer as "address_id",
-                unnest(ARRAY[:reject_reasons])::jsonb as "reject_reason"
-        ) AS new_values
-        WHERE
-            "Memberships"."group_id" = new_values."group_id" AND
-            "Memberships"."address_id" = new_values."address_id";
-        `;
-
-    await this.models.sequelize.query(query, {
-      replacements: {
-        group_ids,
-        address_ids,
-        reject_reasons,
-      },
-    });
-  }
+  await this.models.Membership.bulkCreate([...toCreate, ...toUpdate], {
+    updateOnDuplicate: ['reject_reason', 'last_checked'],
+  });
 
   console.log(
     `Created ${toCreate.length} and updated ${toUpdate.length} memberships in ${
