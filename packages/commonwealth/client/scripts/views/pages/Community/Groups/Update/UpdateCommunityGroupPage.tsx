@@ -6,6 +6,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
 import { useEditGroupMutation, useFetchGroupsQuery } from 'state/api/groups';
+import useGroupMutationBannerStore from 'state/ui/group';
 import Permissions from 'utils/Permissions';
 import { MixpanelPageViewEvent } from '../../../../../../../shared/analytics/types';
 import { PageNotFound } from '../../../404';
@@ -24,6 +25,8 @@ import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
+  const { setShouldShowGroupMutationBannerForCommunity } =
+    useGroupMutationBannerStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { mutateAsync: editGroup } = useEditGroupMutation({
     chainId: app.activeChainId(),
@@ -109,6 +112,10 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           })
             .then(() => {
               notifySuccess('Group Updated');
+              setShouldShowGroupMutationBannerForCommunity(
+                app.activeChainId(),
+                true,
+              );
               navigate(`/members?tab=groups`);
             })
             .catch(() => {
