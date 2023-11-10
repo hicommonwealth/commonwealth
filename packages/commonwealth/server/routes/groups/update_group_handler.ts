@@ -45,6 +45,7 @@ export const updateGroupHandler = async (
     body: { metadata, requirements, topics },
   } = validationResult.data;
 
+  // TODO: requirements here will never be null, according to app logic! How/where can we detect duplicates?
   const [group, analyticsOptions] = await controllers.groups.updateGroup({
     user,
     community,
@@ -56,8 +57,9 @@ export const updateGroupHandler = async (
   });
 
   // refresh memberships in background
+  // TODO: only refresh if requirements updated, not just metadata
   controllers.groups
-    .refreshCommunityMemberships({ community })
+    .refreshCommunityMemberships({ community, group })
     .catch(console.error);
 
   controllers.analytics.track(analyticsOptions, req).catch(console.error);
