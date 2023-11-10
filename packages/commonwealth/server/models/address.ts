@@ -2,6 +2,7 @@ import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { CommunityAttributes, CommunityInstance } from './community';
+import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
@@ -34,6 +35,7 @@ export type AddressAttributes = {
   Profile?: ProfileAttributes;
   User?: UserAttributes;
   SsoToken?: SsoTokenAttributes;
+  Memberships: MembershipAttributes[];
 };
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
@@ -47,7 +49,7 @@ export type AddressModelStatic = ModelStatic<AddressInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): AddressModelStatic => {
   const Address: AddressModelStatic = <AddressModelStatic>sequelize.define(
     'Address',
@@ -117,7 +119,7 @@ export default (
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   Address.associate = (models) => {
@@ -143,6 +145,10 @@ export default (
       as: 'collaboration',
     });
     models.Address.hasMany(models.Collaboration);
+    models.Address.hasMany(models.Membership, {
+      foreignKey: 'address_id',
+      as: 'Memberships',
+    });
   };
 
   return Address;
