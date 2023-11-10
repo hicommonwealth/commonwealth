@@ -242,7 +242,7 @@ const CommunityMembersPage = () => {
       </CWTabsRow>
 
       {/* Gating group post-mutation banner */}
-      {shouldShowGroupMutationBanner && (
+      {shouldShowGroupMutationBanner && selectedTab === TABS[0].value && (
         <section>
           <CWBanner
             type="info"
