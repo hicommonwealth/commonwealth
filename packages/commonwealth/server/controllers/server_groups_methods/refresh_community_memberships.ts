@@ -139,7 +139,7 @@ export async function __refreshCommunityMemberships(
       return existingMembership.update({ reject_reason, last_checked });
     },
     {
-      concurrency: 5,
+      concurrency: 1,
     },
   );
 
