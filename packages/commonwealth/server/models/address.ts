@@ -35,7 +35,7 @@ export type AddressAttributes = {
   Profile?: ProfileAttributes;
   User?: UserAttributes;
   SsoToken?: SsoTokenAttributes;
-  Memberships: MembershipAttributes[];
+  Memberships?: MembershipAttributes[];
 };
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
