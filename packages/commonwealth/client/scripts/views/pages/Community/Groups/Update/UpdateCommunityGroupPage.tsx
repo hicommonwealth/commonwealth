@@ -25,7 +25,8 @@ import './UpdateCommunityGroupPage.scss';
 
 const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const navigate = useCommonNavigate();
-  const { setShouldShowGroupMutationBanner } = useGroupMutationBannerStore();
+  const { setShouldShowGroupMutationBannerForCommunity } =
+    useGroupMutationBannerStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { mutateAsync: editGroup } = useEditGroupMutation({
     chainId: app.activeChainId(),
@@ -111,7 +112,10 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           })
             .then(() => {
               notifySuccess('Group Updated');
-              setShouldShowGroupMutationBanner(true);
+              setShouldShowGroupMutationBannerForCommunity(
+                app.activeChainId(),
+                true,
+              );
               navigate(`/members?tab=groups`);
             })
             .catch(() => {

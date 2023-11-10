@@ -15,7 +15,8 @@ import './CreateCommunityGroupPage.scss';
 
 const CreateCommunityGroupPage = () => {
   const navigate = useCommonNavigate();
-  const { setShouldShowGroupMutationBanner } = useGroupMutationBannerStore();
+  const { setShouldShowGroupMutationBannerForCommunity } =
+    useGroupMutationBannerStore();
   const { mutateAsync: createGroup } = useCreateGroupMutation({
     chainId: app.activeChainId(),
   });
@@ -44,7 +45,10 @@ const CreateCommunityGroupPage = () => {
         createGroup(payload)
           .then(() => {
             notifySuccess('Group Created');
-            setShouldShowGroupMutationBanner(true);
+            setShouldShowGroupMutationBannerForCommunity(
+              app.activeChainId(),
+              true,
+            );
             navigate(`/members?tab=groups`);
           })
           .catch(() => {

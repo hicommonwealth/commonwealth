@@ -55,8 +55,10 @@ const CommunityMembersPage = () => {
     searchText: '',
     category: GROUP_AND_MEMBER_FILTERS[0],
   });
-  const { shouldShowGroupMutationBanner, setShouldShowGroupMutationBanner } =
-    useGroupMutationBannerStore();
+  const {
+    shouldShowGroupMutationBannerForCommunities,
+    setShouldShowGroupMutationBannerForCommunity,
+  } = useGroupMutationBannerStore();
 
   const { trackAnalytics } =
     useBrowserAnalyticsTrack<MixpanelPageViewEventPayload>({
@@ -242,19 +244,27 @@ const CommunityMembersPage = () => {
       </CWTabsRow>
 
       {/* Gating group post-mutation banner */}
-      {shouldShowGroupMutationBanner && selectedTab === TABS[0].value && (
-        <section>
-          <CWBanner
-            type="info"
-            title="Don't see your group right away?"
-            body={`
+      {shouldShowGroupMutationBannerForCommunities.includes(
+        app.activeChainId(),
+      ) &&
+        selectedTab === TABS[0].value && (
+          <section>
+            <CWBanner
+              type="info"
+              title="Don't see your group right away?"
+              body={`
             Our app is crunching numbers, which takes some time. 
             Give it a few minutes and refresh to see your group.
           `}
-            onClose={() => setShouldShowGroupMutationBanner(false)}
-          />
-        </section>
-      )}
+              onClose={() =>
+                setShouldShowGroupMutationBannerForCommunity(
+                  app.activeChainId(),
+                  false,
+                )
+              }
+            />
+          </section>
+        )}
 
       {/* Filter section */}
       {featureFlags.gatingEnabled &&
