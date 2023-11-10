@@ -7,6 +7,7 @@ type CreateChainNodeRequestBody = {
   name?: string;
   bech32?: string;
   balance_type?: string;
+  eth_chain_id?: number;
 };
 type CreateChainNodeResponse = CreateChainNodeResult;
 
@@ -21,6 +22,7 @@ export const createChainNodeHandler = async (
     name: req.body.name,
     bech32: req.body.bech32,
     balanceType: req.body.balance_type,
+    eth_chain_id: req.body.eth_chain_id,
   });
   return success(res, results);
 };
