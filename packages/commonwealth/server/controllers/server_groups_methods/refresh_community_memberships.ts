@@ -4,10 +4,7 @@ import { Op, Sequelize } from 'sequelize';
 import { GroupAttributes } from 'server/models/group';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
-import {
-  MembershipAttributes,
-  MembershipInstance,
-} from '../../models/membership';
+import { MembershipAttributes } from '../../models/membership';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -49,7 +46,7 @@ export async function __refreshCommunityMemberships(
   });
 
   const toCreate = [];
-  const toUpdate: [MembershipInstance, MembershipAttributes][] = [];
+  const toUpdate = [];
 
   const processMembership = async (
     address: AddressAttributes,
@@ -73,10 +70,7 @@ export async function __refreshCommunityMemberships(
         address,
         currentGroup,
       );
-      toUpdate.push([
-        existingMembership as MembershipInstance,
-        computedMembership,
-      ]);
+      toUpdate.push(computedMembership);
       return;
     }
 
@@ -127,21 +121,14 @@ export async function __refreshCommunityMemberships(
     { concurrency: 20 },
   );
 
-  console.log(`Done checking. Starting ${toCreate.length} creates...`);
-
-  // first create new rows
-  await this.models.Membership.bulkCreate(toCreate);
-
-  console.log(`Done creating. Starting ${toUpdate.length} updates...`);
-  await Bluebird.map(
-    toUpdate,
-    async ([existingMembership, { reject_reason, last_checked }]) => {
-      return existingMembership.update({ reject_reason, last_checked });
-    },
-    {
-      concurrency: 5,
-    },
+  console.log(
+    `Done checking. Starting ${toCreate.length} creates and ${toUpdate.length} updates...`,
   );
+
+  // perform creates and updates
+  await this.models.Membership.bulkCreate([...toCreate, ...toUpdate], {
+    updateOnDuplicate: ['reject_reason', 'last_checked'],
+  });
 
   console.log(
     `Created ${toCreate.length} and updated ${toUpdate.length} memberships in ${

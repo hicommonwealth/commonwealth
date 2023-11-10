@@ -58,7 +58,7 @@ export const updateGroupHandler = async (
   // refresh memberships in background if requirements updated
   if (requirements?.length > 0) {
     controllers.groups
-      .refreshCommunityMemberships({ community })
+      .refreshCommunityMemberships({ community, group })
       .catch(console.error);
   }
 
