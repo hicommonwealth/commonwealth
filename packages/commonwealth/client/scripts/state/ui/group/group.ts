@@ -9,6 +9,7 @@ interface GroupMutationBannerStore {
     shouldShow: boolean,
   ) => void;
   readFromStorageAndSetGatingGroupBannerForCommunities: () => void;
+  clearSetGatingGroupBannerForCommunities: () => void;
 }
 
 const STORAGE_KEY = 'groupMutationForCommunities';
@@ -49,6 +50,15 @@ export const GroupMutationBannerStore = createStore<GroupMutationBannerStore>()(
         return {
           ...state,
           shouldShowGroupMutationBannerForCommunities: communities,
+        };
+      });
+    },
+    clearSetGatingGroupBannerForCommunities: () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+      set((state) => {
+        return {
+          ...state,
+          shouldShowGroupMutationBannerForCommunities: [],
         };
       });
     },
