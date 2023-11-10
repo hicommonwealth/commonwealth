@@ -20,6 +20,7 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
     `new-thread-${chainId}-info`,
   );
+  const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
 
   // get restored draft on init
   const restoredDraft: NewThreadDraft | null = useMemo(() => {
@@ -116,6 +117,8 @@ const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
     setIsSaving,
     isDisabled,
     clearDraft,
+    canShowGatingBanner,
+    setCanShowGatingBanner,
   };
 };
 
