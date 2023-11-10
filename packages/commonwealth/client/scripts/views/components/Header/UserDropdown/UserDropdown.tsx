@@ -29,6 +29,7 @@ import { WalletId } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { setDarkMode } from 'helpers/darkMode';
+import useGroupMutationBannerStore from 'state/ui/group';
 
 const resetWalletConnectSession = async () => {
   /**
@@ -64,6 +65,8 @@ const UserDropdown = () => {
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
   }>(null);
+  const { clearSetGatingGroupBannerForCommunities } =
+    useGroupMutationBannerStore();
 
   const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
     recheck: isOpen,
@@ -158,7 +161,10 @@ const UserDropdown = () => {
           {
             type: 'default',
             label: 'Sign out',
-            onClick: () => handleLogout(),
+            onClick: () => {
+              clearSetGatingGroupBannerForCommunities();
+              handleLogout();
+            },
           },
         ]}
         onOpenChange={(open) => setIsOpen(open)}

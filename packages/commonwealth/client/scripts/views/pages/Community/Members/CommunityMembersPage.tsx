@@ -12,12 +12,14 @@ import {
 } from 'state/api/groups';
 import { useSearchProfilesQuery } from 'state/api/profiles';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
+import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { Select } from 'views/components/Select';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import {
   CWTab,
   CWTabsRow,
@@ -53,6 +55,10 @@ const CommunityMembersPage = () => {
     searchText: '',
     category: GROUP_AND_MEMBER_FILTERS[0],
   });
+  const {
+    shouldShowGroupMutationBannerForCommunities,
+    setShouldShowGroupMutationBannerForCommunity,
+  } = useGroupMutationBannerStore();
 
   const { trackAnalytics } =
     useBrowserAnalyticsTrack<MixpanelPageViewEventPayload>({
@@ -209,6 +215,7 @@ const CommunityMembersPage = () => {
     }
 
     featureFlags.gatingEnabled && updateActiveTab(TABS[1].value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navigateToCreateGroupPage = () => {
@@ -235,6 +242,29 @@ const CommunityMembersPage = () => {
           />
         ))}
       </CWTabsRow>
+
+      {/* Gating group post-mutation banner */}
+      {shouldShowGroupMutationBannerForCommunities.includes(
+        app.activeChainId(),
+      ) &&
+        selectedTab === TABS[0].value && (
+          <section>
+            <CWBanner
+              type="info"
+              title="Don't see your group right away?"
+              body={`
+            Our app is crunching numbers, which takes some time. 
+            Give it a few minutes and refresh to see your group.
+          `}
+              onClose={() =>
+                setShouldShowGroupMutationBannerForCommunity(
+                  app.activeChainId(),
+                  false,
+                )
+              }
+            />
+          </section>
+        )}
 
       {/* Filter section */}
       {featureFlags.gatingEnabled &&
