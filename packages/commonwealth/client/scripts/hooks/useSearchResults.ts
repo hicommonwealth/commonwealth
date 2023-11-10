@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import { useDebounce } from 'usehooks-ts';
 
+import { SearchChainsResponse } from 'state/api/chains/searchChains';
+import { SearchCommentsResponse } from 'state/api/comments/searchComments';
+import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
+import { SearchThreadsResponse } from 'state/api/threads/searchThreads';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 import { SearchScope } from '../models/SearchQuery';
 import app from '../state';
@@ -13,11 +17,20 @@ const NUM_RESULTS_PER_SECTION = 2;
 
 type Filter = 'threads' | 'replies' | 'communities' | 'members';
 
+export type SearchResults = {
+  [SearchScope.Threads]: SearchThreadsResponse['results'];
+  [SearchScope.Replies]: SearchCommentsResponse['results'];
+  [SearchScope.Communities]: SearchChainsResponse['results'];
+  [SearchScope.Members]: SearchProfilesResponse['results'];
+};
+
 const useSearchResults = (
   searchTerm: string,
   filters: Filter[],
   resultsPerSection?: number,
-) => {
+): {
+  searchResults: SearchResults;
+} => {
   const chainId = app.activeChainId() || 'all_communities';
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 

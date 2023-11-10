@@ -12,7 +12,7 @@ const SEARCH_THREADS_STALE_TIME = 10 * 1_000; // 10 s
 export type SearchThreadsResponse = {
   results: {
     id: number;
-    chain: string;
+    community_id: string;
     title: string;
     body: string;
     address_id: number;
