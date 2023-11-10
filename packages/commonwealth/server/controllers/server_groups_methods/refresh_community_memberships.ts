@@ -4,10 +4,7 @@ import { Op, Sequelize } from 'sequelize';
 import { GroupAttributes } from 'server/models/group';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
-import {
-  MembershipAttributes,
-  MembershipInstance,
-} from '../../models/membership';
+import { MembershipAttributes } from '../../models/membership';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -49,7 +46,7 @@ export async function __refreshCommunityMemberships(
   });
 
   const toCreate = [];
-  const toUpdate: [MembershipInstance, MembershipAttributes][] = [];
+  const toUpdate = [];
 
   const processMembership = async (
     address: AddressAttributes,
@@ -73,13 +70,15 @@ export async function __refreshCommunityMemberships(
         address,
         currentGroup,
       );
-      toUpdate.push([
-        existingMembership as MembershipInstance,
-        computedMembership,
-      ]);
+      toUpdate.push(computedMembership);
       return;
     }
 
+    console.log(
+      currentGroup.id,
+      address.id,
+      address.Memberships.map(({ group_id }) => group_id),
+    );
     // membership does not exist, create
     const computedMembership = await refreshAndQueueOperation(
       address,
@@ -133,15 +132,38 @@ export async function __refreshCommunityMemberships(
   await this.models.Membership.bulkCreate(toCreate);
 
   console.log(`Done creating. Starting ${toUpdate.length} updates...`);
-  await Bluebird.map(
-    toUpdate,
-    async ([existingMembership, { reject_reason, last_checked }]) => {
-      return existingMembership.update({ reject_reason, last_checked });
-    },
-    {
-      concurrency: 1,
-    },
-  );
+  if (toUpdate.length > 0) {
+    // then, perform single insert query to update all rows
+    const group_ids = toUpdate.map((membership) => membership.groupId);
+    const address_ids = toUpdate.map((membership) => membership.addressId);
+    const reject_reasons = toUpdate.map(
+      (membership) => membership.rejectReason,
+    );
+
+    const query = `
+        UPDATE "Memberships"
+        SET
+            "reject_reason" = new_values."reject_reason",
+            "last_checked" = CURRENT_TIMESTAMP
+        FROM (
+            SELECT
+                unnest(ARRAY[:group_ids])::integer as "group_id",
+                unnest(ARRAY[:address_ids])::integer as "address_id",
+                unnest(ARRAY[:reject_reasons])::jsonb as "reject_reason"
+        ) AS new_values
+        WHERE
+            "Memberships"."group_id" = new_values."group_id" AND
+            "Memberships"."address_id" = new_values."address_id";
+        `;
+
+    await this.models.sequelize.query(query, {
+      replacements: {
+        group_ids,
+        address_ids,
+        reject_reasons,
+      },
+    });
+  }
 
   console.log(
     `Created ${toCreate.length} and updated ${toUpdate.length} memberships in ${
