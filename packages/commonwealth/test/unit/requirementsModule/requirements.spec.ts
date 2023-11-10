@@ -1,10 +1,10 @@
 import { assert } from 'chai';
+import { ChainNetwork } from '../../../../common-common/src/types';
+import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import { Requirement } from '../../../server/util/requirementsModule/requirementsTypes';
 import validateGroupMembership, {
   ValidateGroupMembershipResponse,
 } from '../../../server/util/requirementsModule/validateGroupMembership';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import { ChainNetwork } from '../../../../common-common/src/types';
 
 describe('validateGroupMembership', () => {
   it('should return a valid response', async () => {
@@ -30,7 +30,7 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
         ): Promise<string> {
           return '2000';
         },
@@ -39,7 +39,7 @@ describe('validateGroupMembership', () => {
         await validateGroupMembership(
           userAddress,
           requirements,
-          tbc as TokenBalanceCache
+          tbc as TokenBalanceCache,
         );
 
       assert.equal(result.isValid, true);
@@ -64,7 +64,7 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
         ): Promise<string> {
           return '2';
         },
@@ -73,7 +73,7 @@ describe('validateGroupMembership', () => {
         await validateGroupMembership(
           userAddress,
           requirements,
-          tbc as TokenBalanceCache
+          tbc as TokenBalanceCache,
         );
 
       assert.equal(result.isValid, true);
@@ -97,7 +97,7 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
         ): Promise<string> {
           return '2000';
         },
@@ -106,7 +106,7 @@ describe('validateGroupMembership', () => {
         await validateGroupMembership(
           userAddress,
           requirements,
-          tbc as TokenBalanceCache
+          tbc as TokenBalanceCache,
         );
 
       assert.equal(result.isValid, true);
@@ -131,7 +131,7 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
         ): Promise<string> {
           return '1';
         },
@@ -140,7 +140,7 @@ describe('validateGroupMembership', () => {
         await validateGroupMembership(
           userAddress,
           requirements,
-          tbc as TokenBalanceCache
+          tbc as TokenBalanceCache,
         );
 
       assert.equal(result.isValid, false);
@@ -166,7 +166,7 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
         ): Promise<string> {
           return '1000';
         },
@@ -175,7 +175,7 @@ describe('validateGroupMembership', () => {
         await validateGroupMembership(
           userAddress,
           requirements,
-          tbc as TokenBalanceCache
+          tbc as TokenBalanceCache,
         );
 
       assert.equal(result.isValid, false);
@@ -259,7 +259,7 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
         ): Promise<string> {
           if (network == ChainNetwork.ERC20) {
             return '3000';
@@ -274,7 +274,7 @@ describe('validateGroupMembership', () => {
         await validateGroupMembership(
           userAddress,
           requirements,
-          tbc as TokenBalanceCache
+          tbc as TokenBalanceCache,
         );
 
       assert.equal(result.isValid, true);
@@ -326,7 +326,7 @@ describe('validateGroupMembership', () => {
           network,
           userAddress: string,
           chainId: string,
-          contractAddress?: string
+          contractAddress?: string,
         ): Promise<string> {
           if (network == ChainNetwork.ERC20) {
             return '3000';
@@ -341,7 +341,7 @@ describe('validateGroupMembership', () => {
         await validateGroupMembership(
           userAddress,
           requirements,
-          tbc as TokenBalanceCache
+          tbc as TokenBalanceCache,
         );
 
       assert.equal(result.isValid, false);

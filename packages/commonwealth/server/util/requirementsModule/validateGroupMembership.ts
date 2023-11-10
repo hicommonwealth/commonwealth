@@ -22,7 +22,7 @@ export default async function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
   tbc?: TokenBalanceCache,
-  numRequiredRequirements: number = 0
+  numRequiredRequirements: number = 0,
 ): Promise<ValidateGroupMembershipResponse> {
   const response: ValidateGroupMembershipResponse = {
     isValid: true,
@@ -40,7 +40,7 @@ export default async function validateGroupMembership(
       case 'allow': {
         checkResult = await _allowlistCheck(
           userAddress,
-          requirement.data as AllowlistData
+          requirement.data as AllowlistData,
         );
         if (checkResult.result) {
           allowListOverride = true;
@@ -82,7 +82,7 @@ export default async function validateGroupMembership(
 async function _thresholdCheck(
   userAddress: string,
   thresholdData: ThresholdData,
-  tbc: TokenBalanceCache
+  tbc: TokenBalanceCache,
 ): Promise<{ result: boolean; message: string }> {
   try {
     let chainNetwork: ChainNetwork;
@@ -119,7 +119,7 @@ async function _thresholdCheck(
       chainNetwork,
       userAddress,
       chainId,
-      contractAddress
+      contractAddress,
     );
 
     const result = toBN(balance).gt(toBN(thresholdData.threshold));
@@ -139,7 +139,7 @@ async function _thresholdCheck(
 
 async function _allowlistCheck(
   userAddress: string,
-  allowlistData: AllowlistData
+  allowlistData: AllowlistData,
 ): Promise<{ result: boolean; message: string }> {
   try {
     const result = allowlistData.allow.includes(userAddress);

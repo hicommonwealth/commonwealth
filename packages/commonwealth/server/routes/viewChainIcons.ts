@@ -6,7 +6,7 @@ const viewChainIcons = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.chains) {
     return next(new AppError('Must provide a list of chains'));
