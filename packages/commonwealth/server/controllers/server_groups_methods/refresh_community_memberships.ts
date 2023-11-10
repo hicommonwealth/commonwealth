@@ -74,11 +74,6 @@ export async function __refreshCommunityMemberships(
       return;
     }
 
-    console.log(
-      currentGroup.id,
-      address.id,
-      address.Memberships.map(({ group_id }) => group_id),
-    );
     // membership does not exist, create
     const computedMembership = await refreshAndQueueOperation(
       address,
