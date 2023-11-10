@@ -125,7 +125,7 @@ export async function __refreshCommunityMemberships(
     `Done checking. Starting ${toCreate.length} creates and ${toUpdate.length} updates...`,
   );
 
-  // first create new rows
+  // perform creates and updates
   await this.models.Membership.bulkCreate([...toCreate, ...toUpdate], {
     updateOnDuplicate: ['reject_reason', 'last_checked'],
   });
