@@ -9,6 +9,7 @@ async function main() {
   const models = db;
   const tokenBalanceCache = new TokenBalanceCache();
   await tokenBalanceCache.initBalanceProviders();
+  await tokenBalanceCache.start();
   const banCache = new BanCache(models);
 
   const communitiesController = new ServerCommunitiesController(
@@ -34,7 +35,7 @@ async function main() {
         community,
       });
     },
-    { concurrency: 10 }, // limit concurrency
+    { concurrency: 1 }, // limit concurrency
   );
 
   console.log(`done- refreshed ${communitiesResult.length} communities`);
