@@ -213,6 +213,7 @@ const CommunityMembersPage = () => {
     }
 
     featureFlags.gatingEnabled && updateActiveTab(TABS[1].value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navigateToCreateGroupPage = () => {
