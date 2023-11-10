@@ -31,6 +31,7 @@ export const isNewThread = (threadCreatedAt: moment.Moment) => {
 };
 
 export const getLastUpdate = (thread: Thread): number => {
+  if (!thread) return 0;
   const lastComment = thread.lastCommentedOn?.unix() || 0;
   const createdAt = thread.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);
