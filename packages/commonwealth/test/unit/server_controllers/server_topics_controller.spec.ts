@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
-import { CommunityInstance } from '../../../server/models/community';
 import { UserInstance } from 'server/models/user';
+import { CommunityInstance } from '../../../server/models/community';
 
 const createMockedTopicsController = (isAdmin: boolean = false) => {
   const db: any = {
@@ -62,7 +62,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
   const controller = new ServerTopicsController(
     db,
     tokenBalanceCache,
-    banCache
+    banCache,
   );
   const user = {
     getAddresses: async () => [],
@@ -75,7 +75,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 describe('ServerTopicsController', () => {
   describe('#createTopic', async () => {
     const { controller, user, chain } = createMockedTopicsController();
-    const result = await controller.createTopic({
+    const [result] = await controller.createTopic({
       user,
       community: chain,
       body: {
