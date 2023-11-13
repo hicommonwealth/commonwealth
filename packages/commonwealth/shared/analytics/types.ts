@@ -79,6 +79,7 @@ export interface BaseMixpanelPayload extends AnalyticsPayload {
   community?: string;
   communityType?: string;
   userId?: number;
+  proposalType?: string;
 }
 
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {
