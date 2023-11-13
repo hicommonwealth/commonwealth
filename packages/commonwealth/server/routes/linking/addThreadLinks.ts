@@ -1,6 +1,9 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import {
+  MixpanelCommunityInteractionEvent,
+  MixpanelErrorCaptureEvent,
+} from '../../../shared/analytics/types';
 import { ServerAnalyticsController } from '../../controllers/server_analytics_controller';
 import type { DB } from '../../models';
 import { Link, LinkSource, ThreadInstance } from '../../models/thread';
@@ -13,6 +16,22 @@ type AddThreadLinkReq = {
 };
 
 type AddThreadLinkRes = ThreadInstance;
+
+const getMixpanelEvent = (source: LinkSource) => {
+  switch (source) {
+    case LinkSource.Snapshot:
+    case LinkSource.Proposal:
+      return MixpanelCommunityInteractionEvent.LINKED_PROPOSAL;
+    case LinkSource.Thread:
+      return MixpanelCommunityInteractionEvent.LINKED_THREAD;
+    case LinkSource.Web:
+      return MixpanelCommunityInteractionEvent.LINKED_URL;
+    case LinkSource.Template:
+      return MixpanelCommunityInteractionEvent.LINKED_TEMPLATE;
+    default:
+      return MixpanelErrorCaptureEvent.UNKNOWN_EVENT;
+  }
+};
 
 const addThreadLink = async (
   models: DB,
@@ -74,13 +93,16 @@ const addThreadLink = async (
     ],
   });
 
+  const source = thread.links[thread.links.length - 1].source;
+  const event = getMixpanelEvent(source);
+
   const serverAnalyticsController = new ServerAnalyticsController();
   serverAnalyticsController.track(
     {
-      event: MixpanelCommunityInteractionEvent.LINKED_PROPOSAL,
+      event: event,
       userId: req.user.id,
       community: thread.chain,
-      proposalType: thread.links[thread.links.length - 1].source,
+      proposalType: source,
     },
     req,
   );

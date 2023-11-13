@@ -17,7 +17,10 @@ export const enum MixpanelCommunityInteractionEvent {
   UPDATE_TOPIC = 'Update Topic',
   CREATE_GROUP = 'Create New Group',
   LINKED_PROPOSAL = 'Linked Proposal',
+  LINKED_TEMPLATE = 'Linked Template',
   LINKED_THREAD = 'Linked Thread',
+  LINKED_URL = 'Linked URL',
+  LINK_PROPOSAL_BUTTON_PRESSED = 'Link Proposal Button Pressed',
   UPDATE_STAGE = 'Update Stage',
   UPDATE_GROUP = 'Update Group',
 }
@@ -34,6 +37,7 @@ export const enum MixpanelUserSignupEvent {
 
 export const enum MixpanelErrorCaptureEvent {
   ERROR_CAPTURED = 'Error Event Captured',
+  UNKNOWN_EVENT = 'Unknown Event',
 }
 
 export const enum MixpanelClickthroughEvent {
@@ -91,5 +95,6 @@ export interface MixpanelLoginPayload extends BaseMixpanelPayload {
 
 export type MixpanelClickthroughPayload = BaseMixpanelPayload;
 export type MixpanelPageViewEventPayload = BaseMixpanelPayload;
+export type MixpanelCommunityInteractionEventPayload = BaseMixpanelPayload;
 
 export const providers = ['mixpanel']; // add other providers here
