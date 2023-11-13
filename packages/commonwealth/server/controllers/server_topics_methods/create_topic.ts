@@ -18,7 +18,7 @@ export const Errors = {
 
 export type CreateTopicOptions = {
   user: UserInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   body: Partial<TopicAttributes>;
 };
 
@@ -26,7 +26,7 @@ export type CreateTopicResult = [TopicAttributes, TrackOptions];
 
 export async function __createTopic(
   this: ServerTopicsController,
-  { user, chain, body }: CreateTopicOptions,
+  { user, community, body }: CreateTopicOptions,
 ): Promise<CreateTopicResult> {
   if (!user) {
     throw new AppError(Errors.NotLoggedIn);
@@ -50,7 +50,7 @@ export async function __createTopic(
   const isAdmin = validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -72,20 +72,20 @@ export async function __createTopic(
     featured_in_sidebar,
     featured_in_new_post,
     default_offchain_template: default_offchain_template || '',
-    chain_id: chain.id,
+    chain_id: community.id,
   };
 
   const [newTopic] = await this.models.Topic.findOrCreate({
     where: {
       name,
-      chain_id: chain.id,
+      chain_id: community.id,
     },
     defaults: options,
   });
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_TOPIC,
-    community: chain.id,
+    community: community.id,
     userId: user.id,
     isCustomDomain: null,
   };

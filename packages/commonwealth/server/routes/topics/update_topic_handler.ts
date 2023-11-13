@@ -22,7 +22,7 @@ export const updateTopicHandler = async (
 ) => {
   const {
     user,
-    chain,
+    chain: community,
     params: { topicId },
     body,
   } = req;
@@ -52,7 +52,7 @@ export const updateTopicHandler = async (
 
   const [topic, analyticsOptions] = await controllers.topics.updateTopic({
     user,
-    chain,
+    community,
     body: validationResult.data,
   });
 

@@ -3,6 +3,10 @@ export const enum MixpanelPageViewEvent {
   COMMUNITY_CREATION_PAGE_VIEW = 'Create Community Page Viewed',
   THREAD_PAGE_VIEW = 'Thread Page Viewed',
   DASHBOARD_VIEW = 'Dashbboard Page Viewed',
+  MEMBERS_PAGE_VIEW = 'Members Page Viewed',
+  GROUPS_PAGE_VIEW = 'Groups Page Viewed',
+  GROUPS_CREATION_PAGE_VIEW = 'Create Group Page Viewed',
+  GROUPS_EDIT_PAGE_VIEW = 'Edit Group Page Viewed',
 }
 
 export const enum MixpanelCommunityInteractionEvent {
@@ -11,9 +15,11 @@ export const enum MixpanelCommunityInteractionEvent {
   CREATE_REACTION = 'Create New Reaction',
   CREATE_TOPIC = 'Create New Topic',
   UPDATE_TOPIC = 'Update Topic',
+  CREATE_GROUP = 'Create New Group',
   LINKED_PROPOSAL = 'Linked Proposal',
   LINKED_THREAD = 'Linked Thread',
   UPDATE_STAGE = 'Update Stage',
+  UPDATE_GROUP = 'Update Group',
 }
 
 export const enum MixpanelLoginEvent {
@@ -28,6 +34,10 @@ export const enum MixpanelUserSignupEvent {
 
 export const enum MixpanelErrorCaptureEvent {
   ERROR_CAPTURED = 'Error Event Captured',
+}
+
+export const enum MixpanelClickthroughEvent {
+  VIEW_THREAD_TO_MEMBERS_PAGE = 'Clickthrough: View Thread to Members Page -> Groups Tab',
 }
 
 export const enum MixpanelCommunityCreationEvent {
@@ -54,7 +64,8 @@ export type MixpanelEvents =
   | MixpanelPageViewEvent
   | MixpanelCommunityInteractionEvent
   | MixpanelSnapshotEvents
-  | MixpanelErrorCaptureEvent;
+  | MixpanelErrorCaptureEvent
+  | MixpanelClickthroughEvent;
 
 export type AnalyticsEvent = MixpanelEvents; // add other providers events here
 
@@ -76,5 +87,8 @@ export interface MixpanelLoginPayload extends BaseMixpanelPayload {
   loginPageLocation: string;
   isMobile: boolean;
 }
+
+export type MixpanelClickthroughPayload = BaseMixpanelPayload;
+export type MixpanelPageViewEventPayload = BaseMixpanelPayload;
 
 export const providers = ['mixpanel']; // add other providers here

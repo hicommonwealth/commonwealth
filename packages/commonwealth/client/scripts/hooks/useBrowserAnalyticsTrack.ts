@@ -25,6 +25,7 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
         clientAnalyticsTrack({
           ...payload,
           userAddress: app.user?.activeAccount?.address ?? null,
+          community: app.activeChainId(),
         });
         hasFiredRef.current = true;
       } catch (e) {
@@ -40,6 +41,8 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
         try {
           clientAnalyticsTrack({
             ...actionPayload,
+            userAddress: app.user?.activeAccount?.address ?? null,
+            community: app.activeChainId(),
           });
         } catch (e) {
           console.log('Failed to track event:', e.message);

@@ -20,22 +20,22 @@ const createGroup = async ({
   groupDescription,
   topicIds,
   requirementsToFulfill,
-  requirements = []
+  requirements = [],
 }: CreateGroupProps) => {
   return await axios.post(`${app.serverUrl()}/groups`, {
     jwt: app.user.jwt,
-    chain: chainId,
-    author_chain: chainId,
+    community_id: chainId,
+    author_community_id: chainId,
     address,
     metadata: {
       name: groupName,
       description: groupDescription,
       ...(requirementsToFulfill && {
-        required_requirements: requirementsToFulfill
-      })
+        required_requirements: requirementsToFulfill,
+      }),
     },
     requirements,
-    topics: topicIds
+    topics: topicIds,
   });
 };
 
@@ -46,7 +46,7 @@ const useCreateGroupMutation = ({ chainId }: { chainId: string }) => {
       const key = [ApiEndpoints.FETCH_GROUPS, chainId];
       queryClient.cancelQueries(key);
       queryClient.refetchQueries(key);
-    }
+    },
   });
 };
 

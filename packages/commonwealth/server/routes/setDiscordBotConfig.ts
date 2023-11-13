@@ -1,5 +1,5 @@
 import { AppError } from 'common-common/src/errors';
-import { validateChain } from '../middleware/validateChain';
+import { validateCommunity } from '../middleware/validateCommunity';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -26,12 +26,12 @@ type SetDiscordBotConfigResp = {
 const setDiscordBotConfig = async (
   models: DB,
   req: TypedRequestBody<SetDiscordBotConfigReq>,
-  res: TypedResponse<SetDiscordBotConfigResp>
+  res: TypedResponse<SetDiscordBotConfigResp>,
 ) => {
   const { chain_id, guild_id, verification_token, snapshot_channel_id } =
     req.body;
 
-  const [chain, error] = await validateChain(models, { chain_id });
+  const [chain, error] = await validateCommunity(models, { chain_id });
   if (!chain || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   if (snapshot_channel_id) {
@@ -86,7 +86,7 @@ const setDiscordBotConfig = async (
         },
       });
       console.log(
-        'Attempted to add a guild that was already connected to another CW community.'
+        'Attempted to add a guild that was already connected to another CW community.',
       );
     } catch (e) {
       console.log(e);
@@ -132,7 +132,7 @@ const setDiscordBotConfig = async (
         where: {
           guild_id,
         },
-      }
+      },
     );
 
     return success(res, {

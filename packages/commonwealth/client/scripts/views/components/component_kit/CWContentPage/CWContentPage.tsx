@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
 import AddressInfo from '../../../../models/AddressInfo';
 import MinimumProfile from '../../../../models/MinimumProfile';
@@ -29,7 +30,7 @@ export type ContentPageSidebarItem = {
 export type SidebarComponents = [
   item?: ContentPageSidebarItem,
   item?: ContentPageSidebarItem,
-  item?: ContentPageSidebarItem
+  item?: ContentPageSidebarItem,
 ];
 
 type ContentPageProps = {
@@ -120,9 +121,16 @@ export const CWContentPage = ({
     address: app?.user?.activeAccount?.address,
   });
 
-  const restrictedTopicIds = (memberships || [])
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(thread?.topic?.id),
+  );
+
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+  );
+
+  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
@@ -180,6 +188,7 @@ export const CWContentPage = ({
         isSpamThread={isSpamThread}
         threadStage={stageLabel}
         archivedAt={thread?.archivedAt}
+        isHot={isHot(thread)}
       />
     </div>
   );
@@ -188,7 +197,7 @@ export const CWContentPage = ({
     isCommunityMember: !!hasJoinedCommunity,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+    isThreadTopicGated: isRestrictedMembership,
   });
 
   const mainBody = (
@@ -227,7 +236,7 @@ export const CWContentPage = ({
             onProposalStageChange={onProposalStageChange}
             disabledActionTooltipText={disabledActionsTooltipText}
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-          />
+          />,
         )}
 
       {subBody}
