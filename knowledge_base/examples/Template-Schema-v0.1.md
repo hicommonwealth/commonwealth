@@ -1,3 +1,5 @@
+# Template Schema v0.1
+
 ```json
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
@@ -66,7 +68,7 @@
 }
 ```
 
-# Change Log
+## Change Log
 
-- 231013: Flagged by Graham Johnson for certification. 
+- 231013: Flagged by Graham Johnson for certification.
 - 230204: Authored by Forest Mars.

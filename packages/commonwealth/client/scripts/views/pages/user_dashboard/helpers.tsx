@@ -12,7 +12,7 @@ export const subscribeToThread = async (
   threadId: string,
   bothActive: boolean,
   commentSubscription: NotificationSubscription,
-  reactionSubscription: NotificationSubscription
+  reactionSubscription: NotificationSubscription,
 ) => {
   if (bothActive) {
     await app.user.notifications.disableSubscriptions([
@@ -60,21 +60,21 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       return { status: 'Failure', result: [] };
     }
 
-    const chains: any = new Set();
+    const communities: any = new Set();
     for (const event of events) {
-      chains.add(event.chain);
+      communities.add(event.chain);
     }
 
     const res: {
       result: { id: string; icon_url: string }[];
       status: boolean;
     } = await $.post(`${app.serverUrl()}/viewChainIcons`, {
-      chains: JSON.stringify(Array.from(chains)),
+      communities: JSON.stringify(Array.from(communities)),
     });
 
-    const chainIconUrls = {};
+    const communityIconUrls = {};
     for (const item of res.result) {
-      chainIconUrls[item.id] = item.icon_url;
+      communityIconUrls[item.id] = item.icon_url;
     }
 
     activity = {
@@ -84,6 +84,16 @@ export const fetchActivity = async (requestType: DashboardViews) => {
   } else if (requestType === DashboardViews.Global) {
     activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);
   }
+
+  if (activity.result) {
+    const uniqueActivity: number[] = [];
+    activity.result = activity?.result?.filter(
+      (x) =>
+        !uniqueActivity.includes(x?.thread_id) &&
+        uniqueActivity.push(x?.thread_id),
+    );
+  }
+
   return activity;
 };
 

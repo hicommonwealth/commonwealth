@@ -13,8 +13,8 @@ const deleteGroup = async ({ groupId, chainId, address }: DeleteGroupProps) => {
   return await axios.delete(`${app.serverUrl()}/groups/${groupId}`, {
     data: {
       jwt: app.user.jwt,
-      chain: chainId,
-      author_chain: chainId,
+      community_id: chainId,
+      author_community_id: chainId,
       address,
     },
   });

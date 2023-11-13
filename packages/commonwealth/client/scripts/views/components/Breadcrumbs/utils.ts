@@ -5,7 +5,7 @@ export const generateBreadcrumbs = (
   locationPath: string,
   breadcrumbData: typeof breadCrumbURLS,
   profileId: number,
-  navigate: (val: To) => void
+  navigate: (val: To) => void,
 ) => {
   let threadName: string | undefined;
   let link: string;
@@ -65,7 +65,7 @@ export const generateBreadcrumbs = (
 
     const removedThreadId = decodeURIComponent(pathSegments[index]).replace(
       /^\d+-/,
-      ''
+      '',
     );
 
     // Create the breadcrumb object.

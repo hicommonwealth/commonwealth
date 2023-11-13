@@ -21,7 +21,7 @@ const ContractsPage = () => {
   const navigate = useCommonNavigate();
 
   const [contracts, setContracts] = useState<Contract[]>(
-    app.contracts.store.getCommunityContracts()
+    app.contracts.store.getCommunityContracts(),
   );
 
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -43,7 +43,7 @@ const ContractsPage = () => {
       setTemplates(
         fetchedTemplates.map((template) => {
           return Template.fromJSON(template);
-        })
+        }),
       );
     }
   };

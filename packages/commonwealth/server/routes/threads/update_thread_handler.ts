@@ -1,7 +1,7 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
+import { IDiscordMeta } from 'common-common/src/types';
 import { ThreadAttributes } from '../../models/thread';
-import { AppError } from '../../../../common-common/src/errors';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 export const Errors = {
   InvalidThreadID: 'Invalid thread ID',
@@ -26,16 +26,16 @@ type UpdateThreadRequestBody = {
   canvasSession?: any;
   canvasAction?: any;
   canvasHash?: any;
-  discord_meta?: any; // Only comes from the discord bot
+  discord_meta?: IDiscordMeta; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;
 
 export const updateThreadHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateThreadRequestBody, null, { id: string }>,
-  res: TypedResponse<UpdateThreadResponse>
+  res: TypedResponse<UpdateThreadResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const { id } = req.params;
   const {
     title,
@@ -63,7 +63,7 @@ export const updateThreadHandler = async (
     await controllers.threads.updateThread({
       user,
       address,
-      chain,
+      community,
       threadId,
       title,
       body,

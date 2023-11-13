@@ -1,16 +1,16 @@
+import 'Sublayout.scss';
+import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
-import 'Sublayout.scss';
 import { Sidebar } from 'views/components/sidebar';
 import { AppMobileMenus } from './AppMobileMenus';
 import { Footer } from './Footer';
 import { SublayoutBanners } from './SublayoutBanners';
 import { SublayoutHeader } from './SublayoutHeader';
 import { Breadcrumbs } from './components/Breadcrumbs';
-import clsx from 'clsx';
 
 type SublayoutProps = {
   hideFooter?: boolean;
@@ -26,7 +26,7 @@ const Sublayout = ({
   const [toggleMobileView, setToggleMobileView] = useState(
     (location.pathname.includes('discussions') ||
       location.pathname.includes('search')) &&
-      window.innerWidth <= 425
+      window.innerWidth <= 425,
   );
 
   const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
@@ -49,7 +49,7 @@ const Sublayout = ({
     setToggleMobileView(
       (location.pathname.includes('discussions') ||
         location.pathname.includes('search')) &&
-        window.innerWidth <= 425
+        window.innerWidth <= 425,
     );
   }, [isWindowSmallInclusive, setMenu]);
 
@@ -73,7 +73,7 @@ const Sublayout = ({
       setToggleMobileView(
         (location.pathname.includes('discussions') ||
           location.pathname.includes('search')) &&
-          window.innerWidth <= 425
+          window.innerWidth <= 425,
       );
     };
 
@@ -105,7 +105,7 @@ const Sublayout = ({
                   menuName === 'createContent' ||
                   hasCommunitySidebar,
               },
-              resizing
+              resizing,
             )}
           >
             <SublayoutBanners banner={banner} chain={chain} terms={terms} />

@@ -1,11 +1,11 @@
-import { ServerCommunitiesController } from '../server_communities_controller';
-import { ChainInstance } from '../../models/chain';
-import { AddressInstance } from '../../models/address';
-import { UserInstance } from '../../models/user';
-import { validateOwner } from '../../util/validateOwner';
+import { Op } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
 import { sequelize } from '../../database';
-import { Op } from 'sequelize';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerCommunitiesController } from '../server_communities_controller';
 
 const Errors = {
   Unauthorized: 'Unauthorized',
@@ -14,7 +14,7 @@ const Errors = {
 
 export type DeleteGroupOptions = {
   user: UserInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
 };
@@ -23,12 +23,12 @@ export type DeleteGroupResult = void;
 
 export async function __deleteGroup(
   this: ServerCommunitiesController,
-  { user, chain, groupId }: DeleteGroupOptions
+  { user, community, groupId }: DeleteGroupOptions,
 ): Promise<DeleteGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -40,7 +40,7 @@ export async function __deleteGroup(
   const group = await this.models.Group.findOne({
     where: {
       id: groupId,
-      chain_id: chain.id,
+      community_id: community.id,
     },
   });
   if (!group) {
@@ -54,7 +54,7 @@ export async function __deleteGroup(
         group_ids: sequelize.fn(
           'array_remove',
           sequelize.col('group_ids'),
-          group.id
+          group.id,
         ),
       },
       {
@@ -64,13 +64,14 @@ export async function __deleteGroup(
           },
         },
         transaction,
-      }
+      },
     );
     // delete all memberships of group
     await this.models.Membership.destroy({
       where: {
         group_id: group.id,
       },
+      transaction,
     });
     // delete group
     await this.models.Group.destroy({

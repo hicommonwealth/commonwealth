@@ -1,10 +1,10 @@
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { UserInstance } from '../../models/user';
-import { ServerCommentsController } from '../server_comments_controller';
 import { Op } from 'sequelize';
-import { findOneRole } from '../../util/roles';
 import { AppError } from '../../../../common-common/src/errors';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { findOneRole } from '../../util/roles';
+import { ServerCommentsController } from '../server_comments_controller';
 
 const Errors = {
   CommentNotFound: 'Comment not found',
@@ -15,7 +15,7 @@ const Errors = {
 export type DeleteCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   commentId?: number;
   messageId?: string;
 };
@@ -24,13 +24,15 @@ export type DeleteCommentResult = void;
 
 export async function __deleteComment(
   this: ServerCommentsController,
-  { user, address, chain, commentId, messageId }: DeleteCommentOptions
+  { user, address, community, commentId, messageId }: DeleteCommentOptions,
 ): Promise<DeleteCommentResult> {
   if (!commentId) {
     // Discord Bot Handling
     const existingComment = await this.models.Comment.findOne({
       where: {
-        discord_meta: { [Op.contains]: { message_id: messageId } },
+        discord_meta: {
+          message_id: messageId,
+        },
       },
     });
 
@@ -43,7 +45,7 @@ export async function __deleteComment(
 
   // check if author can delete post
   const [canInteract, error] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -69,7 +71,7 @@ export async function __deleteComment(
       where: {
         id: commentId,
       },
-      include: [this.models.Chain],
+      include: [this.models.Community],
     });
     if (!comment) {
       throw new AppError(Errors.CommentNotFound);
@@ -78,7 +80,7 @@ export async function __deleteComment(
       this.models,
       { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
       comment?.Chain?.id,
-      ['admin', 'moderator']
+      ['admin', 'moderator'],
     );
 
     if (!requesterIsAdminOrMod && !user.isAdmin) {

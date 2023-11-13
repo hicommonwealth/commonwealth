@@ -13,7 +13,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   ThreadFeaturedFilterTypes,
-  ThreadTimelineFilterTypes
+  ThreadTimelineFilterTypes,
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
@@ -22,7 +22,9 @@ import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
+import { getThreadActionTooltipText } from 'helpers/threads';
 import 'pages/discussions/index.scss';
+import { useRefreshMembershipQuery } from 'state/api/groups';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -37,18 +39,26 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   const stageName: string = searchParams.get('stage');
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
-    'featured'
+    'featured',
   ) as ThreadFeaturedFilterTypes;
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
-    'dateRange'
+    'dateRange',
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId()
+    chainId: app.activeChainId(),
   });
+
+  const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
+
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+  });
+
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { dateCursor } = useDateCursor({
-    dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes
+    dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
 
   const isOnArchivePage =
@@ -60,13 +70,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       queryType: 'bulk',
       page: 1,
       limit: 20,
-      topicId: (topics || []).find(({ name }) => name === topicName)?.id,
+      topicId,
       stage: stageName,
       includePinnedThreads: true,
       orderBy: featuredFilter,
       toDate: dateCursor.toDate,
       fromDate: dateCursor.fromDate,
-      isOnArchivePage: isOnArchivePage
+      isOnArchivePage: isOnArchivePage,
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -87,13 +97,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   const [toggleMobileView, setToggleMobileView] = useState(
-    location.pathname.includes('discussions') && window.innerWidth <= 425
+    location.pathname.includes('discussions') && window.innerWidth <= 425,
   );
 
   useEffect(() => {
     const handleResize = () => {
       setToggleMobileView(
-        location.pathname.includes('discussions') && window.innerWidth <= 425
+        location.pathname.includes('discussions') && window.innerWidth <= 425,
       );
     };
 
@@ -113,16 +123,32 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         itemContent={(i, thread) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
+            `${thread.identifier}-${slugify(thread.title)}`,
           );
 
-          const canReact =
-            hasJoinedCommunity && !thread.lockedAt && !thread.archivedAt;
+          const isTopicGated = !!(memberships || []).find((membership) =>
+            membership.topicIds.includes(thread.topic.id),
+          );
+
+          const isActionAllowedInGatedTopic = !!(memberships || []).find(
+            (membership) =>
+              membership.topicIds.includes(thread.topic.id) &&
+              membership.isAllowed,
+          );
+
+          const disabledActionsTooltipText = getThreadActionTooltipText({
+            isCommunityMember: !!hasJoinedCommunity,
+            isThreadArchived: !!thread?.archivedAt,
+            isThreadLocked: !!thread?.lockedAt,
+            isThreadTopicGated: isTopicGated && !isActionAllowedInGatedTopic,
+          });
+
           return (
             <ThreadCard
               key={thread.id + '-' + thread.readOnly}
               thread={thread}
-              canReact={canReact}
+              canReact={!disabledActionsTooltipText}
+              canComment={!disabledActionsTooltipText}
               onEditStart={() => navigate(`${discussionLink}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
@@ -137,6 +163,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onCommentBtnClick={() =>
                 navigate(`${discussionLink}?focusEditor=true`)
               }
+              disabledActionsTooltipText={disabledActionsTooltipText}
             />
           );
         }}
@@ -190,7 +217,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 />
               </>
             );
-          }
+          },
         }}
       />
     </div>

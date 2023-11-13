@@ -39,7 +39,7 @@ export const Breadcrumbs = () => {
     location.pathname,
     breadCrumbURLS,
     profileId,
-    navigate
+    navigate,
   );
 
   //Determines the style based on the current page.
@@ -76,12 +76,12 @@ export const Breadcrumbs = () => {
 
     const isAdmin = breadCrumbURLS.find(
       (breadcrumbItem) =>
-        breadcrumbItem.url === lastPathSegment && breadcrumbItem.isAdmin
+        breadcrumbItem.url === lastPathSegment && breadcrumbItem.isAdmin,
     );
 
     const isGovernance = breadCrumbURLS.find(
       (breadcrumbItem) =>
-        breadcrumbItem.url === lastPathSegment && breadcrumbItem.isGovernance
+        breadcrumbItem.url === lastPathSegment && breadcrumbItem.isGovernance,
     );
 
     if (isAdmin) {

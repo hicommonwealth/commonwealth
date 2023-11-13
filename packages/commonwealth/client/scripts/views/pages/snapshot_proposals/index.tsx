@@ -5,16 +5,16 @@ import moment from 'moment';
 import 'pages/snapshot_proposals.scss';
 import app from 'state';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { CWText } from '../../components/component_kit/cw_text';
 import { SnapshotProposalCard } from './SnapshotProposalCard';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 
 type SnapshotProposalsPageProps = {
   topic?: string;
@@ -36,13 +36,13 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
     () =>
       app.user.notifications.findNotificationSubscription({
         categoryId: NotificationCategories.SnapshotProposal,
-        options: { snapshotId }
+        options: { snapshotId },
       }),
-    [snapshotId]
+    [snapshotId],
   );
 
   const [hasSubscription, setHasSubscription] = useState<boolean>(
-    spaceSubscription !== undefined
+    spaceSubscription !== undefined,
   );
 
   useManageDocumentTitle('Snapshots');
@@ -55,14 +55,14 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
       if (app.snapshot.initialized) {
         const tempProposals = {
           active: [],
-          ended: []
+          ended: [],
         };
 
         // filter active and ended proposals
         app.snapshot.proposals.filter((proposal: SnapshotProposal) =>
           moment(+proposal.end * 1000) >= moment()
             ? tempProposals.active.push(proposal)
-            : tempProposals.ended.push(proposal)
+            : tempProposals.ended.push(proposal),
         );
 
         setProposals(tempProposals);
@@ -82,7 +82,7 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
       app.user.notifications
         .subscribe({
           categoryId: NotificationCategories.SnapshotProposal,
-          options: { snapshotId }
+          options: { snapshotId },
         })
         .then(() => {
           setHasSubscription(true);

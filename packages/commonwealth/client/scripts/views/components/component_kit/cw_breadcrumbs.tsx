@@ -1,6 +1,6 @@
+import clsx from 'clsx';
 import React from 'react';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
-import clsx from 'clsx';
 
 import 'components/component_kit/cw_breadcrumbs.scss';
 import { CWText } from './cw_text';
