@@ -73,7 +73,7 @@ const ViewProposalPage = ({
     setProposal(cosmosProposal);
     setTitle(cosmosProposal?.title);
     setDescription(cosmosProposal?.description);
-  }, [cosmosProposal, app.chain.apiInitialized]);
+  }, [cosmosProposal]);
 
   useEffect(() => {
     if (_.isEmpty(metadata)) return;
@@ -134,7 +134,17 @@ const ViewProposalPage = ({
       );
       setProposal(foundProposal);
     }
-  }, [cachedAaveProposals, cachedCompoundProposals, isAdapterLoaded]);
+  }, [
+    cachedAaveProposals,
+    cachedCompoundProposals,
+    isAdapterLoaded,
+    aaveProposalsLoading,
+    compoundProposalsLoading,
+    fetchAaveData,
+    fetchCompoundData,
+    proposal,
+    proposalId,
+  ]);
 
   useNecessaryEffect(() => {
     const afterAdapterLoaded = async () => {

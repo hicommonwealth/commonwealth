@@ -32,11 +32,7 @@ import ExternalLink from 'views/components/ExternalLink';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
-import {
-  MixpanelClickthroughEvent,
-  MixpanelClickthroughPayload,
-  MixpanelPageViewEvent,
-} from '../../../../../shared/analytics/types';
+import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
 import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
@@ -46,6 +42,7 @@ import { CreateComment } from '../../components/Comments/CreateComment';
 import { Select } from '../../components/Select';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import { CWGatedTopicBanner } from '../../components/component_kit/CWGatedTopicBanner';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -54,8 +51,6 @@ import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
-import CWBanner from '../../components/component_kit/new_designs/CWBanner';
-import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
@@ -117,7 +112,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: groups = [] } = useFetchGroupsQuery({
     communityId: app.activeChainId(),
-    includeMembers: true,
     includeTopics: true,
   });
 
@@ -148,9 +142,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
   });
-  const restrictedTopicIds = (memberships || [])
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
+
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(thread?.topic?.id),
+  );
+
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+  );
+
+  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -189,11 +191,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       );
     }
   });
-
-  const { trackAnalytics } =
-    useBrowserAnalyticsTrack<MixpanelClickthroughPayload>({
-      onAction: true,
-    });
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -320,8 +317,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const isRestrictedMembership = restrictedTopicIds.includes(thread?.topic?.id);
-
   const canComment =
     (!!hasJoinedCommunity ||
       (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id))) &&
@@ -390,7 +385,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isCommunityMember: !!hasJoinedCommunity,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+    isThreadTopicGated: isRestrictedMembership,
   });
 
   return (
@@ -538,34 +533,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     {featureFlags.gatingEnabled &&
                       foundGatedTopic &&
                       !hideGatingBanner && (
-                        <CWBanner
-                          title="This topic is gated"
-                          body="Only members within the following group(s) can interact with this topic:"
-                          type="info"
-                          footer={
-                            <div className="gating-tags">
-                              {gatedGroupsMatchingTopic.map((t) => (
-                                <CWTag
-                                  key={t.id}
-                                  label={t.name}
-                                  type="referendum"
-                                />
-                              ))}
-                            </div>
-                          }
-                          buttons={[
-                            {
-                              label: 'See all groups',
-                              onClick: () => {
-                                trackAnalytics({
-                                  event:
-                                    MixpanelClickthroughEvent.VIEW_THREAD_TO_MEMBERS_PAGE,
-                                });
-                                navigate('/members?tab=groups');
-                              },
-                            },
-                            { label: 'Learn more about gating' },
-                          ]}
+                        <CWGatedTopicBanner
+                          groupNames={gatedGroupsMatchingTopic.map(
+                            (g) => g.name,
+                          )}
                           onClose={() => setHideGatingBanner(true)}
                         />
                       )}

@@ -11,6 +11,7 @@ import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
 import { ChainNetwork } from 'common-common/src/types';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
 import {
@@ -99,7 +100,7 @@ export const VotingResults = (props: VotingResultsProps) => {
     );
   } else if (
     proposal.votingType === VotingType.SimpleYesApprovalVoting &&
-    proposal instanceof CosmosProposal
+    (proposal instanceof CosmosProposal || proposal instanceof CosmosProposalV1)
   ) {
     // special case for cosmos proposals in deposit stage
     return (

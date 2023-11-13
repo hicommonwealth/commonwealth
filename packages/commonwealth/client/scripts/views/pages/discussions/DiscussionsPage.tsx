@@ -54,10 +54,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     address: app?.user?.activeAccount?.address,
   });
 
-  const restrictedTopicIds = (memberships || [])
-    .filter((x) => x.rejectReason)
-    .map((x) => x.topicId);
-
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { dateCursor } = useDateCursor({
@@ -108,11 +104,21 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             `${thread.identifier}-${slugify(thread.title)}`,
           );
 
+          const isTopicGated = !!(memberships || []).find((membership) =>
+            membership.topicIds.includes(thread.topic.id),
+          );
+
+          const isActionAllowedInGatedTopic = !!(memberships || []).find(
+            (membership) =>
+              membership.topicIds.includes(thread.topic.id) &&
+              membership.isAllowed,
+          );
+
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: !!hasJoinedCommunity,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: restrictedTopicIds.includes(topicId),
+            isThreadTopicGated: isTopicGated && !isActionAllowedInGatedTopic,
           });
 
           return (

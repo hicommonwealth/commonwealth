@@ -6,7 +6,7 @@ import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1
 import app from 'state';
 
 const PROPOSAL_CACHE_TIME = 1000 * 60 * 60;
-const PROPOSAL_STALE_TIME = 1000 * 60 * 60;
+const PROPOSAL_STALE_TIME = 1000 * 10;
 
 const fetchCosmosProposal = async (
   proposalId: string,

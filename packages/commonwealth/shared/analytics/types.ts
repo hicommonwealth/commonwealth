@@ -87,5 +87,6 @@ export interface MixpanelLoginPayload extends BaseMixpanelPayload {
 }
 
 export type MixpanelClickthroughPayload = BaseMixpanelPayload;
+export type MixpanelPageViewEventPayload = BaseMixpanelPayload;
 
 export const providers = ['mixpanel']; // add other providers here

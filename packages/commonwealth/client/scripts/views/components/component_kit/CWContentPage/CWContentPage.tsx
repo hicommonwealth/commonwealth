@@ -121,9 +121,16 @@ export const CWContentPage = ({
     address: app?.user?.activeAccount?.address,
   });
 
-  const restrictedTopicIds = (memberships || [])
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(thread?.topic?.id),
+  );
+
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+  );
+
+  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
@@ -190,7 +197,7 @@ export const CWContentPage = ({
     isCommunityMember: !!hasJoinedCommunity,
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
-    isThreadTopicGated: restrictedTopicIds.includes(thread?.topic?.id),
+    isThreadTopicGated: isRestrictedMembership,
   });
 
   const mainBody = (
