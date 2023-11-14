@@ -1,4 +1,4 @@
-import { isDefaultStage, pluralize, threadStageToLabel } from 'helpers';
+import { pluralize, threadStageToLabel } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -7,6 +7,7 @@ import React from 'react';
 import app from 'state';
 import { slugify } from 'utils';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { isDefaultStage } from '../../../helpers/threads';
 import type Thread from '../../../models/Thread';
 import type Topic from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
@@ -75,7 +76,7 @@ export const TopicSummaryRow = ({
         {threadsToDisplay.map((thread, idx) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
+            `${thread.identifier}-${slugify(thread.title)}`,
           );
 
           const user = app.chain.accounts.get(thread.author);
@@ -89,7 +90,7 @@ export const TopicSummaryRow = ({
               <div
                 className={getClasses<{ isPinned?: boolean }>(
                   { isPinned: thread.pinned },
-                  'recent-thread-row'
+                  'recent-thread-row',
                 )}
                 onClick={(e) => {
                   e.stopPropagation();

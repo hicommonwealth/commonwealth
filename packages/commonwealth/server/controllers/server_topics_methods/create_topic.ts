@@ -24,7 +24,7 @@ export type CreateTopicResult = TopicAttributes;
 
 export async function __createTopic(
   this: ServerTopicsController,
-  { user, community, body }: CreateTopicOptions
+  { user, community, body }: CreateTopicOptions,
 ): Promise<CreateTopicResult> {
   if (!user) {
     throw new AppError(Errors.NotLoggedIn);

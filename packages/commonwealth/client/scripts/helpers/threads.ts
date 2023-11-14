@@ -1,5 +1,8 @@
 import { re_weburl } from 'lib/url-validation';
 import { Link, LinkSource } from 'models/Thread';
+import { ThreadStage } from '../models/types';
+import app from '../state/index';
+import { parseCustomStages } from './index';
 
 export function detectURL(str: string) {
   if (str.slice(0, 4) !== 'http') str = `http://${str}`; // no https required because this is only used for regex match
@@ -13,7 +16,7 @@ export const filterLinks = (links: Link[] = [], source: LinkSource) => {
 export const getAddedAndDeleted = <T>(
   finalArr: T[],
   initialArr: T[],
-  key: keyof T = 'id' as keyof T
+  key: keyof T = 'id' as keyof T,
 ) => {
   const toAdd = finalArr.reduce((acc, curr) => {
     const wasSelected = initialArr.find((obj) => obj[key] === curr[key]);
@@ -55,3 +58,10 @@ export const getThreadActionTooltipText = ({
   if (isThreadTopicGated) return 'Topic is gated';
   return '';
 };
+
+export function isDefaultStage(stage: string) {
+  return (
+    stage === ThreadStage.Discussion ||
+    stage === parseCustomStages(app.chain.meta.customStages)[0]
+  );
+}

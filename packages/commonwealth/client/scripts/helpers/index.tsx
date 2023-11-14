@@ -3,7 +3,6 @@ import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import moment from 'moment';
 import React from 'react';
-import app from 'state';
 import Account from '../models/Account';
 import IChainAdapter from '../models/IChainAdapter';
 import { ThreadStage } from '../models/types';
@@ -26,13 +25,6 @@ export function threadStageToLabel(stage: ThreadStage) {
   } else {
     return stage;
   }
-}
-
-export function isDefaultStage(stage: string) {
-  return (
-    stage === ThreadStage.Discussion ||
-    stage === parseCustomStages(app.chain.meta.customStages)[0]
-  );
 }
 
 export function parseCustomStages(str) {
@@ -191,7 +183,7 @@ export function formatPercent(num: number, digits: number) {
 
 export function formatDuration(
   duration: moment.Duration,
-  includeSeconds = true
+  includeSeconds = true,
 ) {
   const days = Math.floor(duration.asDays());
   return [
@@ -210,11 +202,11 @@ export function formatProposalHashShort(hash: string) {
 export function formatAddressShort(
   address: string,
   numberOfVisibleCharacters = 5,
-  numberOfVisibleCharactersTail = 4
+  numberOfVisibleCharactersTail = 4,
 ) {
   if (address.length < 10) return address;
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
-    -numberOfVisibleCharactersTail
+    -numberOfVisibleCharactersTail,
   )}`;
 }
 
@@ -225,27 +217,6 @@ export function renderMultilineText(text: string) {
     .map((p) => p.trim())
     .filter((p) => p !== '');
   return paragraphs.map((p, index) => <p key={index}>{p}</p>);
-}
-
-/*
- * blocknum helpers
- */
-
-export function blocknumToTime(blocknum: number): moment.Moment {
-  const currentBlocknum = app.chain.block.height;
-  const blocktime = app.chain.block.duration;
-  const lastBlockTime: moment.Moment = app.chain.block.lastTime.clone();
-  return lastBlockTime.add((blocknum - currentBlocknum) * blocktime, 'seconds');
-}
-
-export function blocknumToDuration(blocknum: number) {
-  return moment
-    .duration(blocknumToTime(blocknum).diff(moment()))
-    .asMilliseconds();
-}
-
-export function blockperiodToDuration(blocknum: number) {
-  return moment.duration(blocknum * app.chain.block.duration, 'seconds');
 }
 
 // loads remote scripts from a URI, e.g. Twitter widgets
@@ -285,7 +256,7 @@ export const weiToTokens = (input: string, decimals: number) => {
 };
 
 export const isCommandClick = (
-  e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 ) => {
   return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
 };
@@ -296,7 +267,7 @@ export const handleRedirectClicks = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
-  callback: () => any
+  callback: () => any,
 ) => {
   if (isCommandClick(e)) {
     if (activeChainId) {

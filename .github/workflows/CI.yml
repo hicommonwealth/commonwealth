@@ -378,7 +378,7 @@ jobs:
         node: [ 18 ]
     name: Commonwealth Unit And Integration Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     services:
       postgres:

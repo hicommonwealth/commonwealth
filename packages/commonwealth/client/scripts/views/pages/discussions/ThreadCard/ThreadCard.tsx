@@ -1,5 +1,5 @@
-import { isDefaultStage, threadStageToLabel } from 'helpers';
-import { filterLinks } from 'helpers/threads';
+import { threadStageToLabel } from 'helpers';
+import { filterLinks, isDefaultStage } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
@@ -80,7 +80,7 @@ export const ThreadCard = ({
 
   const discussionLink = getProposalUrlPath(
     thread.slug,
-    `${thread.identifier}-${slugify(thread.title)}`
+    `${thread.identifier}-${slugify(thread.title)}`,
   );
 
   const isStageDefault = isDefaultStage(thread.stage);
@@ -94,7 +94,7 @@ export const ThreadCard = ({
         to={threadHref}
         className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
-          'ThreadCard'
+          'ThreadCard',
         )}
         onClick={() => onBodyClick && onBodyClick()}
         key={thread.id}

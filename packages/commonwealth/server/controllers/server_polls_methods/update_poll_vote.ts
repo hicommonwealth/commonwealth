@@ -31,7 +31,7 @@ export type UpdatePollVoteResult = VoteAttributes;
 
 export async function __updatePollVote(
   this: ServerThreadsController,
-  { address, community, pollId, option }: UpdatePollVoteOptions
+  { address, community, pollId, option }: UpdatePollVoteOptions,
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
     where: { id: pollId, community_id: community.id },
@@ -70,7 +70,7 @@ export async function __updatePollVote(
       this.tokenBalanceCache,
       this.models,
       thread.topic_id,
-      address.address
+      address.address,
     );
     if (!canVote) {
       throw new AppError(Errors.InsufficientTokenBalance);
@@ -97,7 +97,7 @@ export async function __updatePollVote(
         ...voteData,
         option: selectedOption,
       },
-      { transaction }
+      { transaction },
     );
   });
 

@@ -1,9 +1,13 @@
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
-import { extractDomain, isDefaultStage } from 'helpers';
+import { extractDomain } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
 import { featureFlags } from 'helpers/feature-flags';
-import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
+import {
+  filterLinks,
+  getThreadActionTooltipText,
+  isDefaultStage,
+} from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';

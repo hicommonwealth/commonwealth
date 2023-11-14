@@ -7,12 +7,13 @@ import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
-import { blocknumToDuration, formatNumberLong } from 'helpers';
+import { formatNumberLong } from 'helpers';
+import moment from 'moment';
 import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus } from '../../../models/types';
-import moment from 'moment';
 
 import { Countdown } from 'views/components/countdown';
+import app from '../../../state/index';
 
 export const getStatusClass = (proposal: AnyProposal, isLoading?: boolean) => {
   if (isLoading) return '';
@@ -26,6 +27,19 @@ export const getStatusClass = (proposal: AnyProposal, isLoading?: boolean) => {
     ? 'fail'
     : '';
 };
+
+export function blocknumToTime(blocknum: number): moment.Moment {
+  const currentBlocknum = app.chain.block.height;
+  const blocktime = app.chain.block.duration;
+  const lastBlockTime: moment.Moment = app.chain.block.lastTime.clone();
+  return lastBlockTime.add((blocknum - currentBlocknum) * blocktime, 'seconds');
+}
+
+export function blocknumToDuration(blocknum: number) {
+  return moment
+    .duration(blocknumToTime(blocknum).diff(moment()))
+    .asMilliseconds();
+}
 
 export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
   if (isLoading) return 'loading...';
@@ -62,7 +76,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
             duration={blocknumToDuration(proposal.endTime.blocknum)}
           />,
           ` left (ends on block ${formatNumberLong(
-            proposal.endTime.blocknum
+            proposal.endTime.blocknum,
           )})`,
         ]
       : proposal.endTime.kind === 'dynamic'
@@ -71,7 +85,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
             duration={blocknumToDuration(proposal.endTime.getBlocknum())}
           />,
           ` left (ends on block ${formatNumberLong(
-            proposal.endTime.getBlocknum()
+            proposal.endTime.getBlocknum(),
           )})`,
         ]
       : proposal.endTime.kind === 'threshold'

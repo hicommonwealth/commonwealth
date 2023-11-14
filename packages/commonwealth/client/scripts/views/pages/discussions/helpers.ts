@@ -1,12 +1,12 @@
+import { NotificationCategories } from 'common-common/src/types';
 import { notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import { Dispatch, SetStateAction } from 'react';
+import app from 'state';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 import type Thread from '../../../models/Thread';
-import { NotificationCategories } from 'common-common/src/types';
-import app from 'state';
-import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { ThreadFeaturedFilterTypes } from '../../../models/types';
+import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export const getLastUpdated = (thread: Thread) => {
   const { lastCommentedOn } = thread;
@@ -26,7 +26,7 @@ export const isHot = (thread: Thread) => {
 export const isNewThread = (threadCreatedAt: moment.Moment) => {
   const diffInMs = moment().diff(threadCreatedAt);
   return moment.duration(diffInMs).asHours() < 48;
-}
+};
 
 export const getLastUpdate = (thread: Thread): number => {
   const lastComment = thread.lastCommentedOn?.unix() || 0;
@@ -49,7 +49,7 @@ export const handleToggleSubscription = async (
   commentSubscription: NotificationSubscription,
   reactionSubscription: NotificationSubscription,
   isSubscribed: boolean,
-  setIsSubscribed?: Dispatch<SetStateAction<boolean>>
+  setIsSubscribed?: Dispatch<SetStateAction<boolean>>,
 ) => {
   if (!commentSubscription || !reactionSubscription) {
     await Promise.all([
@@ -100,7 +100,7 @@ export const getReactionSubscription = (thread: Thread) => {
 export const getThreadSubScriptionMenuItem = (
   thread: Thread,
   setIsSubscribed: Dispatch<SetStateAction<boolean>>,
-  archivedAt: moment.Moment | null
+  archivedAt: moment.Moment | null,
 ): PopoverMenuItem => {
   const commentSubscription = getCommentSubscription(thread);
   const reactionSubscription = getReactionSubscription(thread);
@@ -115,12 +115,12 @@ export const getThreadSubScriptionMenuItem = (
         getCommentSubscription(thread),
         getReactionSubscription(thread),
         isSubscribed,
-        setIsSubscribed
+        setIsSubscribed,
       );
     },
     label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
     iconLeft: isSubscribed ? 'unsubscribe' : 'bell',
-    disabled: archivedAt ? true : false
+    disabled: archivedAt ? true : false,
   };
 };
 
@@ -151,13 +151,13 @@ export const sortByFeaturedFilter = (t: Thread[], featuredFilter) => {
 
   if (featuredFilter === ThreadFeaturedFilterTypes.MostLikes) {
     return [...t].sort(
-      (a, b) => b.associatedReactions.length - a.associatedReactions.length
+      (a, b) => b.associatedReactions.length - a.associatedReactions.length,
     );
   }
 
   if (featuredFilter === ThreadFeaturedFilterTypes.LatestActivity) {
     return [...t].sort((a, b) =>
-      moment(b.latestActivity).diff(moment(a.latestActivity))
+      moment(b.latestActivity).diff(moment(a.latestActivity)),
     );
   }
 

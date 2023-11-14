@@ -6,13 +6,12 @@ import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
 import bs58 from 'bs58';
-import { ProposalState } from '../../../../../../shared/chain/types/aave';
 import { ProposalType } from 'common-common/src/types';
 import { EventEmitter } from 'events';
-import { blocknumToTime } from 'helpers';
 import $ from 'jquery';
 import moment from 'moment';
 import Web3 from 'web3-utils';
+import { ProposalState } from '../../../../../../shared/chain/types/aave';
 import type ChainEvent from '../../../../models/ChainEvent';
 import Proposal from '../../../../models/Proposal';
 import type { ITXModalData, IVote } from '../../../../models/interfaces';
@@ -22,6 +21,7 @@ import {
   VotingType,
   VotingUnit,
 } from '../../../../models/types';
+import app from '../../../../state/index';
 import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
@@ -64,6 +64,13 @@ interface AipIpfsObject {
   basename: string;
   description: string;
   updated: string;
+}
+
+export function blocknumToTime(blocknum: number): moment.Moment {
+  const currentBlocknum = app.chain.block.height;
+  const blocktime = app.chain.block.duration;
+  const lastBlockTime: moment.Moment = app.chain.block.lastTime.clone();
+  return lastBlockTime.add((blocknum - currentBlocknum) * blocktime, 'seconds');
 }
 
 export default class AaveProposal extends Proposal<
@@ -251,7 +258,7 @@ export default class AaveProposal extends Proposal<
         this.ipfsDataReady.emit('ready');
       })
       .catch(() =>
-        console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`)
+        console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`),
       );
 
     this._initialized = true;
@@ -266,7 +273,7 @@ export default class AaveProposal extends Proposal<
           chainId: meta.id,
           proposalId: proposalId,
         },
-      }
+      },
     );
 
     const votes: IAaveVoteResponse[] = res.data.result.votes;
@@ -281,7 +288,7 @@ export default class AaveProposal extends Proposal<
       const aaveVote = new AaveProposalVote(
         accounts.get(vote.voter),
         vote.support,
-        power
+        power,
       );
       proposalInstance.addOrUpdateVote(aaveVote);
     }
@@ -292,7 +299,7 @@ export default class AaveProposal extends Proposal<
   constructor(
     Accounts: EthereumAccounts,
     Gov: AaveGovernance,
-    data: IAaveProposalResponse
+    data: IAaveProposalResponse,
   ) {
     super(ProposalType.AaveProposal, data);
     this._completed = data.completed;
@@ -303,7 +310,7 @@ export default class AaveProposal extends Proposal<
     this._Gov.store.add(this);
     // insert Qm prefix via hex
     this._ipfsAddress = bs58.encode(
-      Buffer.from(`1220${this.data.ipfsHash.slice(2)}`, 'hex')
+      Buffer.from(`1220${this.data.ipfsHash.slice(2)}`, 'hex'),
     );
   }
 
@@ -345,7 +352,7 @@ export default class AaveProposal extends Proposal<
     // the guardian can always cancel, but any user can cancel if creator has lost
     // sufficient proposition power
     const executor = await this._Gov.api.getDeployedExecutor(
-      this.data.executor
+      this.data.executor,
     );
     if (!executor) {
       throw new Error('executor not found');
@@ -354,7 +361,7 @@ export default class AaveProposal extends Proposal<
     const isCancellable = await executor.validateProposalCancellation(
       this._Gov.api.Governance.address,
       this.data.proposer,
-      blockNumber - 1
+      blockNumber - 1,
     );
     if (!isCancellable) {
       const guardian = await this._Gov.api.Governance.getGuardian();
@@ -365,7 +372,7 @@ export default class AaveProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
+      this._Gov.api.Governance,
     );
     const tx = await contract.cancel(this.data.identifier, {
       gasLimit: this._Gov.api.gasLimit,
@@ -386,7 +393,7 @@ export default class AaveProposal extends Proposal<
     // no user validation needed
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
+      this._Gov.api.Governance,
     );
     const tx = await contract.queue(this.data.id);
     const txReceipt = await tx.wait();
@@ -412,7 +419,7 @@ export default class AaveProposal extends Proposal<
     // no user validation needed
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
+      this._Gov.api.Governance,
     );
     const tx = await contract.execute(this.data.id);
     const txReceipt = await tx.wait();
@@ -433,7 +440,7 @@ export default class AaveProposal extends Proposal<
     // ensure user hasn't voted
     const previousVote = await this._Gov.api.Governance.getVoteOnProposal(
       this.data.id,
-      address
+      address,
     );
     if (previousVote && !previousVote.votingPower.isZero()) {
       throw new Error('user has already voted on this proposal');
@@ -441,7 +448,7 @@ export default class AaveProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
+      this._Gov.api.Governance,
     );
     const tx = await contract.submitVote(this.data.id, vote.choice);
     const txReceipt = await tx.wait();
