@@ -39,6 +39,7 @@ export const enum MixpanelErrorCaptureEvent {
 
 export const enum MixpanelClickthroughEvent {
   VIEW_THREAD_TO_MEMBERS_PAGE = 'Clickthrough: View Thread to Members Page -> Groups Tab',
+  DIRECTORY_TO_COMMUNITY_PAGE = 'Clickthrough: Directory to Community Page',
 }
 
 export const enum MixpanelCommunityCreationEvent {
