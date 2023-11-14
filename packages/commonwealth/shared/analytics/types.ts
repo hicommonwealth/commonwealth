@@ -18,6 +18,8 @@ export const enum MixpanelCommunityInteractionEvent {
   LINKED_THREAD = 'Linked Thread',
   UPDATE_STAGE = 'Update Stage',
   UPDATE_GROUP = 'Update Group',
+  DIRECTORY_PAGE_ENABLED = 'Directory Page Enabled',
+  DIRECTORY_PAGE_DISABLED = 'Directory Page Disabled',
 }
 
 export const enum MixpanelLoginEvent {
@@ -77,6 +79,7 @@ export interface BaseMixpanelPayload extends AnalyticsPayload {
   community?: string;
   communityType?: string;
   userId?: number;
+  communitySelected?: string;
 }
 
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {
