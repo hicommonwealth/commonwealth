@@ -7,11 +7,12 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import faker from 'faker';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import Errors from '../../../server/routes/webhooks/errors';
 import * as modelUtils from '../../util/modelUtils';
+import { resetDatabase } from '../../util/resetDatabase';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -49,7 +50,7 @@ describe('Webhook Tests', () => {
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     await modelUtils.updateRole({
       address_id: result.address_id,
@@ -64,7 +65,7 @@ describe('Webhook Tests', () => {
     loggedInNotAdminAddr = result.address;
     notAdminJWT = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
@@ -208,7 +209,7 @@ describe('Webhook Tests', () => {
             .set('Accept', 'application/json')
             .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
           return webhookUrl;
-        })
+        }),
       );
       expect(urls).to.have.length(5);
       const res = await chai.request
@@ -229,7 +230,7 @@ describe('Webhook Tests', () => {
             .set('Accept', 'application/json')
             .send({ chain, webhookUrl, auth: true, jwt: jwtToken });
           return webhookUrl;
-        })
+        }),
       );
       expect(urls).to.have.length(5);
       const errorRes = await chai.request

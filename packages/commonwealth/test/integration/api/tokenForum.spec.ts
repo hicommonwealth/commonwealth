@@ -9,11 +9,11 @@ import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import {
   getMockBalanceProvider,
   getTokenBalanceCache,
-  resetDatabase,
 } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 import * as modelUtils from '../../util/modelUtils';
+import { resetDatabase } from '../../util/resetDatabase';
 
 chai.use(chaiHttp);
 const { expect } = chai;

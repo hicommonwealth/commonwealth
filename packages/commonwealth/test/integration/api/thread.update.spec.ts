@@ -3,8 +3,9 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from 'server/config';
-import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
+import app from '../../../server-test';
+import { resetDatabase } from '../../util/resetDatabase';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -33,7 +34,7 @@ describe('Thread Patch Update', () => {
       adminAddressId = adminRes.address_id;
       adminJWT = jwt.sign(
         { id: adminRes.user_id, email: adminRes.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       const isAdmin = await modelUtils.updateRole({
         address_id: adminRes.address_id,
@@ -53,7 +54,7 @@ describe('Thread Patch Update', () => {
       userAddressId = userRes.address_id;
       userJWT = jwt.sign(
         { id: userRes.user_id, email: userRes.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       userSession = { session: userRes.session, sign: userRes.sign };
       expect(userAddress).to.not.be.null;

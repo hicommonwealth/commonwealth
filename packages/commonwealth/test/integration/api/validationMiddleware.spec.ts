@@ -5,11 +5,11 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import MockExpressRequest from 'mock-express-request';
-import { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import DatabaseValidationService from '../../../server/middleware/databaseValidationService';
 import * as modelUtils from '../../util/modelUtils';
+import { resetDatabase } from '../../util/resetDatabase';
 
 chai.use(chaiHttp);
 const { expect } = chai;

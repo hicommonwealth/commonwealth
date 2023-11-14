@@ -1,24 +1,23 @@
-import { addressSwapper } from 'commonwealth/shared/utils';
-
-import { createCanvasSessionPayload, chainBaseToCanvasChainId } from 'canvas';
-import { createSiweMessage } from 'adapters/chain/ethereum/keys';
-import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
 import type { ActionArgument, SessionPayload } from '@canvas-js/interfaces';
+import { getADR036SignableSession } from 'adapters/chain/cosmos/keys';
+import { createSiweMessage } from 'adapters/chain/ethereum/keys';
+import { chainBaseToCanvasChainId, createCanvasSessionPayload } from 'canvas';
 
 import app from 'state';
 import {
   ChainBase,
   WalletSsoSource,
 } from '../../../../../common-common/src/types';
+import { addressSwapper } from '../../../../shared/cryptoUtils';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
 import {
-  ISessionController,
-  EthereumSessionController,
-  SubstrateSessionController,
   CosmosSDKSessionController,
-  SolanaSessionController,
+  EthereumSessionController,
+  ISessionController,
   NEARSessionController,
+  SolanaSessionController,
+  SubstrateSessionController,
 } from './sessionSigners';
 
 export class SessionKeyError extends Error {
@@ -36,7 +35,7 @@ export class SessionKeyError extends Error {
 export async function signSessionWithAccount<T extends { address: string }>(
   wallet: IWebWallet<T>,
   account: Account,
-  timestamp: number
+  timestamp: number,
 ) {
   // Try to infer Chain ID from the currently active chain.
   // `chainBaseToCanvasChainId` will replace idOrPrefix with the
@@ -51,7 +50,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
   const sessionPublicAddress = await app.sessions.getOrCreateAddress(
     wallet.chain,
     canvasChainId,
-    account.address
+    account.address,
   );
 
   const sessionPayload = createCanvasSessionPayload(
@@ -67,7 +66,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
     timestamp,
     account.validationBlockInfo
       ? JSON.parse(account.validationBlockInfo).hash
-      : null
+      : null,
   );
 
   const signature = await wallet.signCanvasMessage(account, sessionPayload);
@@ -84,7 +83,7 @@ export async function signSessionWithMagic(
   signer,
   signerAddress,
   timestamp: number,
-  blockhash = ''
+  blockhash = '',
 ) {
   const idOrPrefix =
     walletChain === ChainBase.CosmosSDK
@@ -94,7 +93,7 @@ export async function signSessionWithMagic(
   const sessionPublicAddress = await app.sessions.getOrCreateAddress(
     walletChain,
     canvasChainId,
-    signerAddress
+    signerAddress,
   );
 
   const sessionPayload = createCanvasSessionPayload(
@@ -108,7 +107,7 @@ export async function signSessionWithMagic(
       : signerAddress,
     sessionPublicAddress,
     timestamp,
-    blockhash
+    blockhash,
   );
 
   // skip wallet.signCanvasMessage(), do the logic here instead
@@ -116,7 +115,7 @@ export async function signSessionWithMagic(
     const canvas = await import('@canvas-js/interfaces');
     const { msgs, fee } = await getADR036SignableSession(
       Buffer.from(canvas.serializeSessionPayload(sessionPayload)),
-      signerAddress
+      signerAddress,
     );
     const signature = await signer.signMessage(msgs, fee); // this is a cosmos tx
     return { signature, sessionPayload };
@@ -158,11 +157,11 @@ class SessionsController {
   public getOrCreateAddress(
     chainBase: ChainBase,
     chainId: string,
-    fromAddress: string
+    fromAddress: string,
   ): Promise<string> {
     return this.getSessionController(chainBase).getOrCreateAddress(
       chainId,
-      fromAddress
+      fromAddress,
     );
   }
 
@@ -172,13 +171,13 @@ class SessionsController {
     chainId: string,
     fromAddress: string,
     payload: SessionPayload,
-    signature: string
+    signature: string,
   ) {
     return this.getSessionController(chainBase).authSession(
       chainId,
       fromAddress,
       payload,
-      signature
+      signature,
     );
   }
 
@@ -190,7 +189,7 @@ class SessionsController {
   private async sign(
     address: string,
     call: string,
-    args: Record<string, ActionArgument>
+    args: Record<string, ActionArgument>,
   ): Promise<{ session: string; action: string; hash: string }> {
     const chainBase = app.chain?.base;
 
@@ -209,13 +208,13 @@ class SessionsController {
     // Load any past session
     const hasAuthenticatedSession = await controller.hasAuthenticatedSession(
       canvasChainId,
-      address
+      address,
     );
 
     // Get a new session signature.
     if (app.config.enforceSessionKeys && !hasAuthenticatedSession) {
       const matchingAccount = app.user.addresses.find(
-        (a) => a.address === address
+        (a) => a.address === address,
       );
 
       throw new SessionKeyError({
@@ -234,7 +233,7 @@ class SessionsController {
       canvasChainId,
       address,
       call,
-      args
+      args,
     );
 
     return {
@@ -247,7 +246,7 @@ class SessionsController {
   // Public signer methods
   public async signThread(
     address: string,
-    { community, title, body, link, topic }
+    { community, title, body, link, topic },
   ) {
     const { session, action, hash } = await this.sign(address, 'thread', {
       community: community || '',
@@ -268,7 +267,7 @@ class SessionsController {
 
   public async signComment(
     address: string,
-    { thread_id, body, parent_comment_id }
+    { thread_id, body, parent_comment_id },
   ) {
     const { session, action, hash } = await this.sign(address, 'comment', {
       thread_id,
@@ -284,7 +283,7 @@ class SessionsController {
       'deleteComment',
       {
         comment_id,
-      }
+      },
     );
     return { session, action, hash };
   }
@@ -304,7 +303,7 @@ class SessionsController {
       'unreactThread',
       {
         thread_id,
-      }
+      },
     );
     return { session, action, hash };
   }
@@ -324,7 +323,7 @@ class SessionsController {
       'unreactComment',
       {
         comment_id,
-      }
+      },
     );
     return { session, action, hash };
   }

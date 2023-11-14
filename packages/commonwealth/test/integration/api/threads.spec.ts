@@ -6,18 +6,17 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
-import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
+import { JWT_SECRET } from 'server/config';
 import { Errors as CreateThreadErrors } from 'server/controllers/server_threads_methods/create_thread';
 import { Errors as EditThreadErrors } from 'server/controllers/server_threads_methods/update_thread';
+import { Errors as CreateCommentErrors } from 'server/routes/threads/create_thread_comment_handler';
 import { Errors as EditThreadHandlerErrors } from 'server/routes/threads/update_thread_handler';
-import { Errors as updateThreadPinnedErrors } from 'server/routes/threads/update_thread_handler';
-import { Errors as updateThreadPrivacyErrors } from 'server/routes/threads/update_thread_handler';
 import { Errors as ViewCountErrors } from 'server/routes/viewCount';
 import sleep from 'sleep-promise';
-import app, { resetDatabase } from '../../../server-test';
-import { JWT_SECRET } from 'server/config';
 import * as modelUtils from 'test/util/modelUtils';
+import app from '../../../server-test';
 import { markdownComment } from '../../util/fixtures/markdownComment';
+import { resetDatabase } from '../../util/resetDatabase';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -130,7 +129,7 @@ describe('Thread Tests', () => {
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
         expect(tRes.error).to.be.equal(
-          CreateThreadErrors.DiscussionMissingTitle
+          CreateThreadErrors.DiscussionMissingTitle,
         );
       });
 
@@ -152,7 +151,7 @@ describe('Thread Tests', () => {
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
         expect(tRes.error).to.be.equal(
-          CreateThreadErrors.LinkMissingTitleOrUrl
+          CreateThreadErrors.LinkMissingTitleOrUrl,
         );
       });
 
@@ -174,7 +173,7 @@ describe('Thread Tests', () => {
         expect(tRes).to.not.be.null;
         expect(tRes.error).to.not.be.null;
         expect(tRes.error).to.be.equal(
-          CreateThreadErrors.LinkMissingTitleOrUrl
+          CreateThreadErrors.LinkMissingTitleOrUrl,
         );
       });
 
@@ -565,7 +564,7 @@ describe('Thread Tests', () => {
         expect(res.body.error).to.not.be.null;
         expect(res.status).to.be.equal(400);
         expect(res.body.error).to.be.equal(
-          EditThreadHandlerErrors.InvalidThreadID
+          EditThreadHandlerErrors.InvalidThreadID,
         );
       });
 
@@ -685,7 +684,7 @@ describe('Thread Tests', () => {
         const res = await modelUtils.createAndVerifyAddress({ chain });
         const newUserJWT = jwt.sign(
           { id: res.user_id, email: res.email },
-          JWT_SECRET
+          JWT_SECRET,
         );
         // try to comment and fail
         const cRes = await modelUtils.createComment({
@@ -699,7 +698,7 @@ describe('Thread Tests', () => {
         });
         expect(cRes.result).to.be.undefined;
         expect(cRes.error).to.be.equal(
-          CreateCommentErrors.CantCommentOnReadOnly
+          CreateCommentErrors.CantCommentOnReadOnly,
         );
       });
 

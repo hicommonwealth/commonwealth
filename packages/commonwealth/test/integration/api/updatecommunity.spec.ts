@@ -4,11 +4,12 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 
 import { Errors as ChainError } from '../../../server/controllers/server_communities_methods/update_community';
 import * as modelUtils from '../../util/modelUtils';
+import { resetDatabase } from '../../util/resetDatabase';
 
 chai.use(chaiHttp);
 const { expect } = chai;

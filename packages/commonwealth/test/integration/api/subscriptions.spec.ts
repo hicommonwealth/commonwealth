@@ -6,18 +6,25 @@ import 'chai/register-should';
 import { NotificationCategories } from 'common-common/src/types';
 import jwt from 'jsonwebtoken';
 import type NotificationSubscription from '../../../client/scripts/models/NotificationSubscription';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
+import { SubscriptionValidationErrors } from '../../../server/models/subscription';
 import Errors from '../../../server/routes/subscription/errors';
 import * as modelUtils from '../../util/modelUtils';
-import { SubscriptionValidationErrors } from '../../../server/models/subscription';
+import { resetDatabase } from '../../util/resetDatabase';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Subscriptions Tests', () => {
-  let jwtToken, loggedInAddr, loggedInAddrId, loggedInSession, thread, comment, userId: number;
+  let jwtToken,
+    loggedInAddr,
+    loggedInAddrId,
+    loggedInSession,
+    thread,
+    comment,
+    userId: number;
   const chain = 'ethereum';
 
   before('reset database', async () => {
@@ -29,7 +36,7 @@ describe('Subscriptions Tests', () => {
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     userId = result.user_id;
 
@@ -268,7 +275,7 @@ describe('Subscriptions Tests', () => {
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
-          'Cannot find thread model for new subscription'
+          'Cannot find thread model for new subscription',
         );
       });
 
@@ -288,7 +295,7 @@ describe('Subscriptions Tests', () => {
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
-          'Cannot find comment model for new subscription'
+          'Cannot find comment model for new subscription',
         );
       });
     });
@@ -426,7 +433,7 @@ describe('Subscriptions Tests', () => {
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
-          'Cannot find thread model for new subscription'
+          'Cannot find thread model for new subscription',
         );
       });
 
@@ -446,7 +453,7 @@ describe('Subscriptions Tests', () => {
         expect(res.status).to.equal(400);
         expect(res.body).to.not.be.null;
         expect(res.body.error).to.equal(
-          'Cannot find comment model for new subscription'
+          'Cannot find comment model for new subscription',
         );
       });
     });
@@ -694,10 +701,10 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.length).to.be.equal(2);
 
       const threadSubRes = res.body.result.find(
-        (sub: NotificationSubscription) => sub.id === threadSub.id
+        (sub: NotificationSubscription) => sub.id === threadSub.id,
       );
       const ceSubRes = res.body.result.find(
-        (sub: NotificationSubscription) => sub.id === chainEventSub.id
+        (sub: NotificationSubscription) => sub.id === chainEventSub.id,
       );
       expect(threadSubRes).to.not.be.undefined;
       expect(ceSubRes).to.not.be.undefined;
@@ -710,7 +717,7 @@ describe('Subscriptions Tests', () => {
       const result = await modelUtils.createAndVerifyAddress({ chain });
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
 
       const newThreadSub = await modelUtils.createSubscription({
@@ -731,10 +738,10 @@ describe('Subscriptions Tests', () => {
       expect(res.body.result.length).to.be.equal(2);
 
       const threadSubRes = res.body.result.find(
-        (sub: NotificationSubscription) => sub.id === threadSub.id
+        (sub: NotificationSubscription) => sub.id === threadSub.id,
       );
       const ceSubRes = res.body.result.find(
-        (sub: NotificationSubscription) => sub.id === chainEventSub.id
+        (sub: NotificationSubscription) => sub.id === chainEventSub.id,
       );
       expect(threadSubRes).to.not.be.undefined;
       expect(ceSubRes).to.not.be.undefined;
@@ -811,11 +818,11 @@ describe('Subscriptions Tests', () => {
             is_active: true,
             category: category,
             chain_id: chain,
-          })
+          }),
         );
       }
       const subscriptionIds = (await Promise.all(subscriptions)).map(
-        (s) => s.id
+        (s) => s.id,
       );
       let res = await chai
         .request(app)
@@ -838,7 +845,7 @@ describe('Subscriptions Tests', () => {
       const result = await modelUtils.createAndVerifyAddress({ chain });
       const newJWT = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       let res = await chai
         .request(app)
@@ -955,7 +962,7 @@ describe('Subscriptions Tests', () => {
       const result = await modelUtils.createAndVerifyAddress({ chain });
       const newJwt = jwt.sign(
         { id: result.user_id, email: result.email },
-        JWT_SECRET
+        JWT_SECRET,
       );
       expect(subscription).to.not.be.null;
       let res = await chai
@@ -1031,7 +1038,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`,
         );
       }
 
@@ -1044,7 +1051,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`,
         );
       }
 
@@ -1057,7 +1064,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.UnsupportedCategory}`,
         );
       }
     });
@@ -1072,7 +1079,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
         );
       }
     });
@@ -1087,7 +1094,7 @@ describe('Subscriptions Tests', () => {
         expect.fail(subscriptionCreateErrMsg);
       } catch (e) {
         expect(e.message).to.be.equal(
-          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+          `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
         );
       }
     });
@@ -1103,7 +1110,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
           );
         }
       });
@@ -1121,7 +1128,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`,
           );
         }
       });
@@ -1137,7 +1144,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`,
           );
         }
       });
@@ -1154,7 +1161,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoChainId}`,
           );
         }
       });
@@ -1172,7 +1179,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NotBothThreadAndComment}`,
           );
         }
       });
@@ -1188,7 +1195,7 @@ describe('Subscriptions Tests', () => {
           expect.fail(subscriptionCreateErrMsg);
         } catch (e) {
           expect(e.message).to.be.equal(
-            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`
+            `${sequelizeErrMsg}${SubscriptionValidationErrors.NoThreadOrComment}`,
           );
         }
       });

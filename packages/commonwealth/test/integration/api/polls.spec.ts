@@ -1,11 +1,12 @@
+import { ActionArgument } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../../../server/config';
-import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
-import { ActionArgument } from '@canvas-js/interfaces';
+import app from '../../../server-test';
+import { JWT_SECRET } from '../../../server/config';
+import { resetDatabase } from '../../util/resetDatabase';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -31,7 +32,7 @@ describe('Polls', () => {
     userAddressId = userRes.address_id;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -160,7 +161,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionA');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress
+      userAddress,
     );
   });
 
@@ -200,7 +201,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionB');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress
+      userAddress,
     );
   });
 

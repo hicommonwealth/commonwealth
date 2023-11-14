@@ -1,20 +1,21 @@
 require('dotenv').config();
 import chai from 'chai';
-import 'chai/register-should';
 import chaiHttp from 'chai-http';
+import 'chai/register-should';
 chai.use(chaiHttp);
 const expect = chai.expect;
 
+import { cacheDecorator } from 'common-common/src/cacheDecorator';
 import { RedisCache } from 'common-common/src/redisCache';
 import { RedisNamespaces } from 'common-common/src/types';
-import { cacheDecorator } from 'common-common/src/cacheDecorator';
-import app, { resetDatabase } from '../../../server-test';
-import { connectToRedis } from '../../util/redisUtils';
 import {
   cosmosLCDDuration,
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
+import app from '../../../server-test';
+import { connectToRedis } from '../../util/redisUtils';
+import { resetDatabase } from '../../util/resetDatabase';
 
 const v1beta1ChainId = 'csdk-beta';
 const v1ChainId = 'csdk';
@@ -56,7 +57,7 @@ describe('Cosmos Cache', () => {
       headers = {
         'content-type': 'text/plain;charset=UTF-8',
         'accept-language': 'en-US,en;q=0.9',
-      }
+      },
     ) {
       return chai.request(app).post(path).set(headers).send(body);
     }
@@ -81,7 +82,7 @@ describe('Cosmos Cache', () => {
 
     const rpcProposalsCacheExpectedTest = async (
       proposalStatus: string,
-      expectedDuration: number
+      expectedDuration: number,
     ) => {
       const request = {
         originalUrl: `/cosmosAPI/${v1beta1ChainId}`,
@@ -199,7 +200,7 @@ describe('Cosmos Cache', () => {
       };
       const bodyString = JSON.stringify(body);
       const expectedKey = `/cosmosAPI/${v1beta1ChainId}_${JSON.stringify(
-        params
+        params,
       )}`;
 
       rpcTestKeyAndDuration(body, expectedKey, 60 * 60 * 24 * 5);
@@ -255,7 +256,7 @@ describe('Cosmos Cache', () => {
   describe('cosmosLCD', () => {
     const lcdProposalsCacheExpectedTest = async (
       proposalStatus: string,
-      expectedDuration: number
+      expectedDuration: number,
     ) => {
       const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/proposals?proposal_status=${proposalStatus}&voter=&depositor=`;
       lcdTestDuration(expectedDuration, url, {
@@ -266,7 +267,7 @@ describe('Cosmos Cache', () => {
 
     const lcdParamsCacheExpectedTest = async (
       param: string,
-      expectedDuration: number
+      expectedDuration: number,
     ) => {
       const url = `/cosmosLCD/${v1ChainId}/cosmos/gov/v1/params/${param}`;
       lcdTestDuration(expectedDuration, url);
@@ -284,7 +285,7 @@ describe('Cosmos Cache', () => {
     function lcdTestDuration(
       expectedDuration: number,
       url: string,
-      query?: any
+      query?: any,
     ) {
       const request = {
         originalUrl: url,

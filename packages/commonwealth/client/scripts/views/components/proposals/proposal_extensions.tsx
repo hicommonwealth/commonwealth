@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import 'components/proposals/proposal_extensions.scss';
+import { minimalToNaturalDenom } from '../../../../../shared/cryptoUtils';
 import type { AnyProposal } from '../../../models/types';
 
 import app from 'state';
@@ -12,7 +13,6 @@ import {
   useDepositParamsQuery,
   useStakingParamsQuery,
 } from 'state/api/chainParams';
-import { minimalToNaturalDenom } from '../../../../../shared/utils';
 import { CWText } from '../component_kit/cw_text';
 import { CWTextInput } from '../component_kit/cw_text_input';
 
@@ -44,7 +44,7 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
     const cosmos = app.chain as Cosmos;
     const meta = cosmos.meta;
     const minDeposit = parseFloat(
-      minimalToNaturalDenom(+cosmosDepositParams?.minDeposit, meta?.decimals)
+      minimalToNaturalDenom(+cosmosDepositParams?.minDeposit, meta?.decimals),
     );
 
     if (!setCosmosDepositAmount) return <CWText>Misconfigured</CWText>;

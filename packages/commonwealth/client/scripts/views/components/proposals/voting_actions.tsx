@@ -24,12 +24,12 @@ import {
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
+import { naturalDenomToMinimal } from '../../../../../shared/cryptoUtils';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
 import app from 'state';
 
-import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
@@ -103,7 +103,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         const chain = app.chain as Cosmos;
         const depositAmountInMinimalDenom = parseInt(
           naturalDenomToMinimal(amount, chain.meta?.decimals),
-          10
+          10,
         );
 
         proposal
@@ -129,7 +129,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     } else if (proposal instanceof NearSputnikProposal) {
       proposal
         .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Approve)
+          new NearSputnikVote(user, NearSputnikVoteString.Approve),
         )
         .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
@@ -164,7 +164,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     } else if (proposal instanceof NearSputnikProposal) {
       proposal
         .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Reject)
+          new NearSputnikVote(user, NearSputnikVoteString.Reject),
         )
         .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
@@ -225,7 +225,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     if (proposal instanceof NearSputnikProposal) {
       proposal
         .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Remove)
+          new NearSputnikVote(user, NearSputnikVoteString.Remove),
         )
         .then(() => {
           onModalClose();

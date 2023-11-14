@@ -1,13 +1,3 @@
-import { isHex, isU8a } from '@polkadot/util';
-import {
-  checkAddress,
-  decodeAddress,
-  encodeAddress,
-} from '@polkadot/util-crypto';
-import { Dec, IntPretty } from '@keplr-wallet/unit';
-import { AccessLevel } from './permissions';
-import type { RoleObject } from './types';
-
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
   // space, and then replace any sequence of spaces with dashes.
@@ -44,7 +34,7 @@ export const getThreadUrl = (
     id?: string | number;
     title?: string;
   },
-  comment?: string | number
+  comment?: string | number,
 ): string => {
   const aId = thread.chain;
   const tId = thread.type_id || thread.id;
@@ -59,7 +49,7 @@ export const getThreadUrl = (
 export const getThreadUrlWithoutObject = (
   proposalCommunity,
   proposalId,
-  comment?
+  comment?,
 ) => {
   const aId = proposalCommunity;
   const tId = proposalId;
@@ -94,7 +84,7 @@ export const validURL = (str) => {
       '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
       '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$',
-    'i'
+    'i',
   ); // fragment locator
   return !!pattern.test(str);
 };
@@ -188,7 +178,7 @@ export function formatAddressShort(
   chain?: string,
   includeEllipsis?: boolean,
   maxCharLength?: number,
-  prefix?: string
+  prefix?: string,
 ) {
   if (!address) return;
   if (chain === 'near') {
@@ -198,114 +188,11 @@ export function formatAddressShort(
     const totalLength = address.length;
     return `${address.slice(0, prefix.length + 3)}...${address.slice(
       totalLength - 4,
-      totalLength
+      totalLength,
     )}`;
   } else {
     return `${address.slice(0, maxCharLength || 5)}${
       includeEllipsis ? '…' : ''
     }`;
   }
-}
-
-export const addressSwapper = (options: {
-  address: string;
-  currentPrefix: number;
-}): string => {
-  if (!options.address) throw new Error('No address provided to swap');
-
-  if (!options.currentPrefix) return options.address;
-
-  if (isU8a(options.address) || isHex(options.address)) {
-    throw new Error('address not in SS58 format');
-  }
-
-  // check if it is valid as an address
-  let decodedAddress: Uint8Array;
-
-  try {
-    decodedAddress = decodeAddress(options.address);
-  } catch (e) {
-    throw new Error('failed to decode address');
-  }
-
-  // check if it is valid with the current prefix & reencode if needed
-  const [valid, errorMsg] = checkAddress(
-    options.address,
-    options.currentPrefix
-  );
-
-  if (!valid) {
-    try {
-      return encodeAddress(decodedAddress, options.currentPrefix);
-    } catch (e) {
-      throw new Error('failed to reencode address');
-    }
-  } else {
-    return options.address;
-  }
-};
-
-export function aggregatePermissions(
-  roles: RoleObject[],
-  chain_permissions: { allow: number; deny: number }
-) {
-  const ORDER: AccessLevel[] = [
-    AccessLevel.Member,
-    AccessLevel.Moderator,
-    AccessLevel.Admin,
-  ];
-
-  function compare(o1: RoleObject, o2: RoleObject) {
-    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
-  }
-
-  roles = roles.sort(compare);
-
-  const permissionsAllowDeny: Array<{
-    allow: number;
-    deny: number;
-  }> = roles.map(({ allow, deny }) => ({ allow, deny }));
-
-  // add chain default permissions to beginning of permissions array
-  permissionsAllowDeny.unshift(chain_permissions);
-
-  // compute permissions
-  return BigInt(0); //bandaid fix. always allow permissions due to removing functionality.
-}
-
-/**
- * Convert Cosmos-style minimal denom amount to readable full-denom amount
- * Example 7000000 uosmo -> 7 OSMO
- * Example 8000000000000000000 aevmos -> 8 EVMOS
- */
-export function minimalToNaturalDenom(
-  amount?: string | number,
-  decimals?: number
-): string {
-  if (!amount || !decimals) return '0';
-  const intPretty = new IntPretty(
-    new Dec(amount.toString())
-  ).moveDecimalPointLeft(decimals);
-
-  // return full decimal precision and let the UI handle rounding
-  return intPretty.toDec().toString(decimals);
-}
-
-/**
- * Convert readable full-denom amount to minimal denom amount (BigInt)
- * Example 8 OSMO -> 8000000 uosmo
- * Example 8 EVMOS -> 8000000000000000000 aevmos
- * Intended for Cosmos use (decimals usually 6 or 18)
- */
-export function naturalDenomToMinimal(
-  naturalAmount?: string | number,
-  decimals?: number
-): string {
-  if (!naturalAmount || !decimals) return '0';
-  const intPretty = new IntPretty(
-    new Dec(naturalAmount.toString())
-  ).moveDecimalPointRight(decimals);
-
-  // 0 decimal places because this is max precision for the chain
-  return intPretty.toDec().toString(0);
 }

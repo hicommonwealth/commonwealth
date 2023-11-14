@@ -7,7 +7,7 @@ import wallet from 'ethereumjs-wallet';
 import { ethers } from 'ethers';
 import * as siwe from 'siwe';
 import { ChainBase } from '../../../../common-common/src/types';
-import app, { resetDatabase } from '../../../server-test';
+import app from '../../../server-test';
 import {
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,
@@ -15,6 +15,7 @@ import {
 } from '../../../shared/adapters/chain/ethereum/keys';
 import { createCanvasSessionPayload } from '../../../shared/canvas';
 import * as modelUtils from '../../util/modelUtils';
+import { resetDatabase } from '../../util/resetDatabase';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -80,7 +81,7 @@ describe('API Tests', () => {
         address,
         sessionWallet.address,
         timestamp,
-        TEST_BLOCK_INFO_BLOCKHASH
+        TEST_BLOCK_INFO_BLOCKHASH,
       );
       createSiweMessage;
       // const data = getEIP712SignableSession(message);

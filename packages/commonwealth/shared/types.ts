@@ -1,10 +1,9 @@
-import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
-import type { AccessLevel } from './permissions';
 import {
   ChainEventAttributes,
   NotificationCategories,
   NotificationCategory,
 } from 'common-common/src/types';
+import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
 import type { SupportedNetwork } from '../shared/chain/types/types';
 
 export enum WebsocketMessageNames {
@@ -209,12 +208,6 @@ export const DynamicTemplate = {
   UpdateEmail: 'd-a0c28546fecc49fb80a3ba9e535bff48',
   VerifyAddress: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
   EmailDigest: 'd-a4f27421ce5a41d29dca7625d2136cc3',
-};
-
-export type RoleObject = {
-  permission: AccessLevel;
-  allow: number;
-  deny: number;
 };
 
 export type AbiType = Record<string, unknown>[];
