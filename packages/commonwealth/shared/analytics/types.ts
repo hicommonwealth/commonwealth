@@ -7,6 +7,7 @@ export const enum MixpanelPageViewEvent {
   GROUPS_PAGE_VIEW = 'Groups Page Viewed',
   GROUPS_CREATION_PAGE_VIEW = 'Create Group Page Viewed',
   GROUPS_EDIT_PAGE_VIEW = 'Edit Group Page Viewed',
+  DIRECTORY_PAGE_VIEW = 'Directory Page Viewed',
 }
 
 export const enum MixpanelCommunityInteractionEvent {
