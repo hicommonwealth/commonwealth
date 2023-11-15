@@ -9,7 +9,6 @@ import { useFetchThreadsQuery } from 'state/api/threads';
 import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
-import { CWText } from 'views/components/component_kit/cw_text';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   ThreadFeaturedFilterTypes,
@@ -24,6 +23,7 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -148,38 +148,28 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         endReached={() => hasNextPage && fetchNextPage()}
         overscan={200}
         components={{
-          EmptyPlaceholder: () =>
-            isInitialLoading ? (
-              <div className="threads-wrapper">
-                {Array(3)
-                  .fill({})
-                  .map((x, i) => (
-                    <ThreadCard key={i} showSkeleton thread={{} as any} />
-                  ))}
-              </div>
-            ) : (
-              <CWText type="b1" className="no-threads-text">
-                {isOnArchivePage
-                  ? 'There are no archived threads matching your filter.'
-                  : 'There are no threads matching your filter.'}
-              </CWText>
-            ),
-          Header: () => {
-            return (
-              <HeaderWithFilters
-                topic={topicName}
-                stage={stageName}
-                featuredFilter={featuredFilter}
-                dateRange={dateRange}
-                totalThreadCount={threads ? totalThreadsInCommunity : 0}
-                isIncludingSpamThreads={includeSpamThreads}
-                onIncludeSpamThreads={setIncludeSpamThreads}
-                isIncludingArchivedThreads={includeArchivedThreads}
-                onIncludeArchivedThreads={setIncludeArchivedThreads}
-                isOnArchivePage={isOnArchivePage}
-              />
-            );
-          },
+          // eslint-disable-next-line react/no-multi-comp
+          EmptyPlaceholder: () => (
+            <EmptyThreadsPlaceholder
+              isInitialLoading={isInitialLoading}
+              isOnArchivePage={isOnArchivePage}
+            />
+          ),
+          // eslint-disable-next-line react/no-multi-comp
+          Header: () => (
+            <HeaderWithFilters
+              topic={topicName}
+              stage={stageName}
+              featuredFilter={featuredFilter}
+              dateRange={dateRange}
+              totalThreadCount={threads ? totalThreadsInCommunity : 0}
+              isIncludingSpamThreads={includeSpamThreads}
+              onIncludeSpamThreads={setIncludeSpamThreads}
+              isIncludingArchivedThreads={includeArchivedThreads}
+              onIncludeArchivedThreads={setIncludeArchivedThreads}
+              isOnArchivePage={isOnArchivePage}
+            />
+          ),
         }}
       />
     </div>
