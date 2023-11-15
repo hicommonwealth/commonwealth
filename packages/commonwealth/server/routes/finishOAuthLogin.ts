@@ -1,9 +1,9 @@
 import { NotificationCategories } from 'common-common/src/types';
 import type { Request, Response } from 'express';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { DB } from '../models';
 import { redirectWithLoginError } from './finishEmailLogin';
-import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
   const token = req.query.token;
@@ -33,7 +33,7 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
   const hostname = req.headers['x-forwarded-host'] || req.hostname;
   if (tokenObj.domain !== hostname) {
     return res.redirect(
-      `https://${tokenObj.domain}/api/finishOAuthLogin?token=${token}`
+      `https://${tokenObj.domain}/api/finishOAuthLogin?token=${token}`,
     );
   }
 
@@ -60,7 +60,7 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
             event: MixpanelLoginEvent.LOGIN_FAILED,
             isCustomDomain: null,
           },
-          req
+          req,
         );
         return redirectWithLoginError(res, 'Could not sign in with OAuth user');
       }
@@ -68,8 +68,9 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
           isCustomDomain: null,
+          userId: existingUser.id,
         },
-        req
+        req,
       );
 
       return res.redirect('/?loggedin=true&confirmation=success');
@@ -100,7 +101,7 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
             event: MixpanelLoginEvent.LOGIN_FAILED,
             isCustomDomain: null,
           },
-          req
+          req,
         );
         return redirectWithLoginError(res, 'Could not sign in with OAuth user');
       }
@@ -108,8 +109,9 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
           isCustomDomain: null,
+          userId: newUser.id,
         },
-        req
+        req,
       );
 
       return res.redirect('/?loggedin=true&confirmation=success');
