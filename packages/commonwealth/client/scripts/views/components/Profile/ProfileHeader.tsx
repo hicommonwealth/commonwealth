@@ -25,7 +25,14 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const { bio, name } = profile;
 
   const isCurrentUser = isLoggedIn && isOwner;
-  const hasBio = renderQuillDeltaToText(JSON.parse(decodeURIComponent(bio)));
+  const hasBio = () => {
+    try {
+      if (bio.trim().length === 0) return false;
+      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(bio)));
+    } catch {
+      return true;
+    }
+  };
 
   return (
     <div className="ProfileHeader">
@@ -55,7 +62,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
           {name || 'Anonymous user'}
         </CWText>
         <SocialAccounts profile={profile} />
-        {hasBio && (
+        {hasBio() && (
           <div>
             <CWText type="h4">Bio</CWText>
             <CWText className="bio">{<QuillRenderer doc={bio} />}</CWText>
