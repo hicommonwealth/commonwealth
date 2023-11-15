@@ -9,12 +9,12 @@ const GROUPS_STALE_TIME = 5000; // 5 seconds
 interface FetchGroupsProps {
   communityId: string;
   includeTopics?: boolean;
-  includeMembers?: boolean;
+  // includeMembers?: boolean;
 }
 
 const fetchGroups = async ({
   communityId,
-  includeMembers = false,
+  // includeMembers = false,
   includeTopics = false,
 }: FetchGroupsProps): Promise<Group[]> => {
   const response = await axios.get(
@@ -22,8 +22,8 @@ const fetchGroups = async ({
     {
       params: {
         community_id: communityId,
-        include_members: includeMembers,
-        include_topics: includeTopics,
+        // include_members: includeMembers,
+        ...(includeTopics && { include_topics: includeTopics }),
       },
     },
   );
@@ -33,7 +33,7 @@ const fetchGroups = async ({
 
 const useFetchGroupsQuery = ({
   communityId,
-  includeMembers,
+  // includeMembers,
   includeTopics,
   enabled = true,
 }: FetchGroupsProps & { enabled?: boolean }) => {
@@ -41,10 +41,15 @@ const useFetchGroupsQuery = ({
     queryKey: [
       ApiEndpoints.FETCH_GROUPS,
       communityId,
-      includeMembers,
       includeTopics,
+      // includeMembers,
     ],
-    queryFn: () => fetchGroups({ communityId, includeMembers, includeTopics }),
+    queryFn: () =>
+      fetchGroups({
+        communityId,
+        // includeMembers,
+        includeTopics,
+      }),
     staleTime: GROUPS_STALE_TIME,
     enabled,
   });

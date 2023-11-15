@@ -1,10 +1,14 @@
-import { flatten, uniq } from 'lodash';
 import { Op } from 'sequelize';
+import { AppError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
+
+const Errors = {
+  TopicNotFound: 'Topic not found',
+};
 
 export type RefreshMembershipOptions = {
   user: UserInstance;
@@ -22,21 +26,21 @@ export async function __refreshMembership(
   this: ServerGroupsController,
   { community, address, topicId }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
-  // get all groups across the community topics
-  const communityTopics = await this.models.Topic.findAll({
+  // get all groups in the chain
+  let groups = await this.models.Group.findAll({
     where: {
-      chain_id: community.id,
-      ...(topicId ? { id: topicId } : {}),
+      community_id: community.id,
     },
   });
-  const groupIds = uniq(
-    flatten(communityTopics.map(({ group_ids }) => group_ids)),
-  );
-  const groups = await this.models.Group.findAll({
-    where: {
-      id: { [Op.in]: groupIds },
-    },
-  });
+
+  // optionally filter to only groups associated with topic
+  if (topicId) {
+    const topic = await this.models.Topic.findByPk(topicId);
+    if (!topic) {
+      throw new AppError(Errors.TopicNotFound);
+    }
+    groups = groups.filter((g) => topic.group_ids.includes(g.id));
+  }
 
   const memberships = await refreshMembershipsForAddress(
     this.models,
@@ -45,18 +49,24 @@ export async function __refreshMembership(
     groups,
   );
 
-  // transform memberships to result shape
-  const results = memberships.map((membership) => {
-    const topic = communityTopics.find((t) =>
-      t.group_ids.includes(membership.group_id),
-    );
-    return {
-      groupId: membership.group_id,
-      topicId: topic.id,
-      allowed: !membership.reject_reason,
-      rejectReason: membership.reject_reason,
-    };
+  const topics = await this.models.Topic.findAll({
+    where: {
+      group_ids: {
+        [Op.overlap]: groups.map((g) => g.id),
+      },
+    },
+    attributes: ['id', 'group_ids'],
   });
+
+  // transform memberships to result shape
+  const results = memberships.map((membership) => ({
+    groupId: membership.group_id,
+    topicIds: topics
+      .filter((t) => t.group_ids.includes(membership.group_id))
+      .map((t) => t.id),
+    allowed: !membership.reject_reason,
+    rejectReason: membership.reject_reason,
+  }));
 
   return results;
 }
