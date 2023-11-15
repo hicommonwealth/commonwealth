@@ -49,7 +49,7 @@ const useDirectoryPageData = ({
       }
       navigateToCommunity({ navigate, path: '', chain: communityId });
     },
-    [navigate],
+    [navigate, trackAnalytics],
   );
 
   const relatedCommunitiesData = useMemo(
