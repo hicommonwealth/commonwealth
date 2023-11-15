@@ -25,6 +25,7 @@ export const createCommunityHandler = async (
       isCustomDomain: null,
       communityType: null,
       event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
+      userId: req.user.id,
     },
     req,
   );
