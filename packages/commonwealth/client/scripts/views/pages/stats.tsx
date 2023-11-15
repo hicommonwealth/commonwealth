@@ -123,13 +123,13 @@ const StatsPage = () => {
             roles,
             threads,
             activeAccounts,
-          })
+          }),
         );
       } catch (err) {
-        if (err.responseJSON?.error) {
-          setError(err.responseJSON.error);
-        } else if (err.responseText) {
-          setError(err.responseText);
+        if (err.response.data.error || err.responseJSON?.error) {
+          setError(err.response.data.error);
+        } else if (err.response.data.error || err.responseText) {
+          setError(err.response.data.error || err.responseText);
         } else {
           setError('Error loading analytics');
         }
