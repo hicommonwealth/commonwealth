@@ -12,12 +12,16 @@ import {
 const Errors = {
   InvalidCommunityId: 'Invalid community ID',
   NoCommunity: 'No community resolved to execute search',
+  NoCommunityForMemberships:
+    'Must specify community ID when filtering by membership status',
 };
 
 type SearchCommentsRequestParams = {
   search: string;
   community_id?: string;
   include_roles?: string;
+  memberships?: string;
+  include_group_ids?: string;
 } & PaginationQueryParams;
 
 type SearchCommentsResponse = SearchProfilesResult;
@@ -33,6 +37,10 @@ export const searchProfilesHandler = async (
     throw new AppError(Errors.NoCommunity);
   }
 
+  if (options.memberships && !req.chain) {
+    throw new AppError(Errors.NoCommunityForMemberships);
+  }
+
   const profileSearchResults = await controllers.profiles.searchProfiles({
     community: req.chain,
     search: options.search,
@@ -41,6 +49,8 @@ export const searchProfilesHandler = async (
     page: parseInt(options.page, 10) || 0,
     orderBy: options.order_by,
     orderDirection: options.order_direction as any,
+    memberships: options.memberships,
+    includeGroupIds: options.include_group_ids === 'true',
   });
 
   return success(res, profileSearchResults);

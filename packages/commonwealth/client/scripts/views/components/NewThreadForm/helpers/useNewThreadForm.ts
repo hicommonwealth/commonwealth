@@ -20,10 +20,11 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
     `new-thread-${communityId}-info`,
   );
+  const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
 
   // get restored draft on init
   const restoredDraft: NewThreadDraft | null = useMemo(() => {
-    if (!topicsForSelector.length) {
+    if (!topicsForSelector.length || topicIdFromUrl === 0) {
       return null;
     }
     return restoreDraft();
@@ -116,6 +117,8 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     setIsSaving,
     isDisabled,
     clearDraft,
+    canShowGatingBanner,
+    setCanShowGatingBanner,
   };
 };
 

@@ -7,7 +7,7 @@ export type TokenAttributes = {
   name: string;
   address: string;
   symbol: string;
-  chain_id: number;
+  eth_chain_id: number;
   icon_url?: string;
 };
 
@@ -16,7 +16,7 @@ export type TokenModelStatic = ModelStatic<TokenInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof Sequelize.DataTypes
+  dataTypes: typeof Sequelize.DataTypes,
 ): TokenModelStatic => {
   const Token = <TokenModelStatic>sequelize.define<
     TokenInstance,
@@ -29,7 +29,11 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       address: { type: dataTypes.STRING, allowNull: false },
       symbol: { type: dataTypes.STRING, allowNull: false },
-      chain_id: { type: dataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+      eth_chain_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+      },
       icon_url: { type: dataTypes.STRING(1024), allowNull: true },
     },
     {
@@ -37,7 +41,7 @@ export default (
       timestamps: false,
       underscored: true,
       // TODO: indexes
-    }
+    },
   );
 
   return Token;
