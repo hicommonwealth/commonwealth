@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
 
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
@@ -46,6 +47,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
+  });
+  const [resizing, setResizing] = useState(false);
+  const { isWindowSmallInclusive } = useBrowserWindow({
+    onResize: () => setResizing(true),
+    resizeListenerUpdateDeps: [resizing],
   });
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
@@ -95,24 +101,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   useManageDocumentTitle('Discussions');
-
-  const [toggleMobileView, setToggleMobileView] = useState(
-    location.pathname.includes('discussions') && window.innerWidth <= 425,
-  );
-
-  useEffect(() => {
-    const handleResize = () => {
-      setToggleMobileView(
-        location.pathname.includes('discussions') && window.innerWidth <= 425,
-      );
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   return (
     <div className="DiscussionsPage">
@@ -189,20 +177,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           Header: () => {
             return (
               <>
-                {toggleMobileView && (
+                {isWindowSmallInclusive && (
                   <div className="mobileBreadcrumbs">
                     <Breadcrumbs />
                   </div>
                 )}
-                <HeaderWithFilters
-                  topic={topicName}
-                  stage={stageName}
-                  featuredFilter={featuredFilter}
-                  dateRange={dateRange}
-                  totalThreadCount={threads ? totalThreadsInCommunity : 0}
-                  isIncludingSpamThreads={includeSpamThreads}
-                  onIncludeSpamThreads={setIncludeSpamThreads}
-                />
                 <HeaderWithFilters
                   topic={topicName}
                   stage={stageName}

@@ -2,6 +2,7 @@ import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
+import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
@@ -23,17 +24,15 @@ const Sublayout = ({
   hasCommunitySidebar,
 }: SublayoutProps) => {
   const forceRerender = useForceRerender();
-  const [toggleMobileView, setToggleMobileView] = useState(
-    (location.pathname.includes('discussions') ||
-      location.pathname.includes('search')) &&
-      window.innerWidth <= 425,
-  );
-
   const { menuVisible, mobileMenuName, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const { isWindowSmallInclusive } = useBrowserWindow({
     onResize: () => setResizing(true),
     resizeListenerUpdateDeps: [resizing],
+  });
+
+  const { toggleMobileView } = useWindowResize({
+    setMenu,
   });
 
   useEffect(() => {
@@ -43,15 +42,6 @@ const Sublayout = ({
       app.sidebarRedraw.off('redraw', forceRerender);
     };
   }, [forceRerender]);
-
-  useEffect(() => {
-    setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
-    setToggleMobileView(
-      (location.pathname.includes('discussions') ||
-        location.pathname.includes('search')) &&
-        window.innerWidth <= 425,
-    );
-  }, [isWindowSmallInclusive, setMenu]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -66,23 +56,6 @@ const Sublayout = ({
       clearTimeout(timer);
     };
   }, [resizing]);
-
-  useEffect(() => {
-    const onResize = () => {
-      setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
-      setToggleMobileView(
-        (location.pathname.includes('discussions') ||
-          location.pathname.includes('search')) &&
-          window.innerWidth <= 425,
-      );
-    };
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    };
-  }, [isWindowSmallInclusive, menuVisible, mobileMenuName, setMenu]);
 
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain.terms : null;

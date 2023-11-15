@@ -19,7 +19,7 @@ export const Breadcrumbs = () => {
   /**
    * An array of paths that are considered standalone pages.
    */
-  const standalonePaths: Array<string> = [
+  const standalonePaths = [
     'explore',
     'dashboard',
     'notifications',
