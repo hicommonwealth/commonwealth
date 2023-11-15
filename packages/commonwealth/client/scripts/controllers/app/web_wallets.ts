@@ -32,7 +32,7 @@ export default class WebWalletController {
     const specificChain = app.chain?.meta?.id;
     if (app.chain?.meta?.id) {
       const specificWallets = this._wallets.filter(
-        (w) => !!w.specificChains?.includes(specificChain)
+        (w) => !!w.specificChains?.includes(specificChain),
       );
       if (specificWallets.length > 0)
         return specificWallets.filter((w) => w.available);
@@ -43,7 +43,7 @@ export default class WebWalletController {
       (w) =>
         w.available &&
         !w.specificChains && // omit chain-specific wallets unless on correct chain
-        (!chain || w.chain === chain)
+        (!chain || w.chain === chain),
     );
   }
 
@@ -54,7 +54,7 @@ export default class WebWalletController {
   // sets a WalletId on the backend for an account whose walletId has not already been set
   private async _setWalletId(
     account: Account,
-    wallet: WalletId
+    wallet: WalletId,
   ): Promise<void> {
     if (app.user.activeAccount.address !== account.address) {
       console.error('account must be active to set wallet id');
@@ -76,7 +76,7 @@ export default class WebWalletController {
 
   public async locateWallet(
     account: Account,
-    chain?: ChainBase
+    chain?: ChainBase,
   ): Promise<IWebWallet<any>> {
     if (chain && account.community.base !== chain) {
       throw new Error('account on wrong chain base');

@@ -77,7 +77,7 @@ export class RolesController {
    */
   public getRoleInCommunity(options: {
     account?: Account;
-    chain?: string;
+    community?: string;
   }): RoleInfo {
     const account = options.account || this.User.activeAccount;
     if (!account) return;
@@ -90,7 +90,7 @@ export class RolesController {
 
     return this.roles.find((r) => {
       const addressMatches = r.address_id === address_id;
-      const communityMatches = r.chain_id === options.chain;
+      const communityMatches = r.chain_id === options.community;
       return addressMatches && communityMatches;
     });
   }
@@ -115,7 +115,7 @@ export class RolesController {
     return this.roles.find((r) => {
       const permission = r.permission === options.role;
       const referencedAddress = this.User.addresses.find(
-        (address) => address.id === r.address_id
+        (address) => address.id === r.address_id,
       );
       if (!referencedAddress) return;
       const isSame =
@@ -165,14 +165,14 @@ export class RolesController {
     const activeAccountsByRole = this.User.activeAccounts.map((account) => {
       const role = this.getRoleInCommunity({
         account,
-        chain: app.activeChainId(),
+        community: app.activeChainId(),
       });
       return [account, role];
     });
     const filteredActiveAccountsByRole = activeAccountsByRole.reduce(
       (arr: [Account, RoleInfo][], current: [Account, RoleInfo]) => {
         const index = arr.findIndex(
-          (item) => item[0].address === current[0].address
+          (item) => item[0].address === current[0].address,
         );
         if (index < 0) {
           return [...arr, current];
@@ -185,18 +185,18 @@ export class RolesController {
         }
         return arr;
       },
-      []
+      [],
     );
 
     return filteredActiveAccountsByRole;
   }
 
   /**
-   * Given a chain/community ID, determines if the
+   * Given a community ID, determines if the
    * active account is an admin of the specified community.
-   * @param options A chain or a community ID
+   * @param options A community or a community ID
    */
-  public isAdminOfEntity(options: { chain?: string }): boolean {
+  public isAdminOfEntity(options: { community?: string }): boolean {
     if (!this.User.activeAccount) return false;
     if (app.user.isSiteAdmin) return true;
 
@@ -204,8 +204,8 @@ export class RolesController {
       return (
         role.address === this.User.activeAccount.address &&
         role.permission === AccessLevel.Admin &&
-        options.chain &&
-        role.chain_id === options.chain
+        options.community &&
+        role.chain_id === options.community
       );
     });
 
@@ -215,26 +215,26 @@ export class RolesController {
   /**
    * Checks membership in a community
    * @param address Address being checked for membership
-   * @param options A chain or community ID
+   * @param options A community ID
    * TODO: Should we default to this.activeAccount if address is null?
    */
   public isMember(options: {
     account: AddressInfo | Account | undefined;
-    chain?: string;
+    community?: string;
   }): boolean {
     const addressinfo: AddressInfo | undefined =
       options.account instanceof Account
         ? this.User.addresses.find(
             (a) =>
               options.account.address === a.address &&
-              options.account.community.id === a.community.id
+              options.account.community.id === a.community.id,
           )
         : options.account;
     const roles = this.roles.filter((role) =>
-      addressinfo ? role.address_id === addressinfo.id : true
+      addressinfo ? role.address_id === addressinfo.id : true,
     );
-    if (options.chain) {
-      return roles.map((r) => r.chain_id).indexOf(options.chain) !== -1;
+    if (options.community) {
+      return roles.map((r) => r.chain_id).indexOf(options.community) !== -1;
     } else {
       return false;
     }
