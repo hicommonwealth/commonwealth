@@ -18,7 +18,6 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
 }) {
   const hasFiredRef = useRef(false);
 
-  console.log(app.user);
   // Fire once on component mount
   useEffect(() => {
     if (!onAction && payload && !hasFiredRef.current) {
