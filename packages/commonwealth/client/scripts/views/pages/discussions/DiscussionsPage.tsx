@@ -162,7 +162,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               stage={stageName}
               featuredFilter={featuredFilter}
               dateRange={dateRange}
-              totalThreadCount={threads ? totalThreadsInCommunity : 0}
+              totalThreadCount={
+                isOnArchivePage
+                  ? filteredThreads.length || 0
+                  : threads
+                  ? totalThreadsInCommunity
+                  : 0
+              }
               isIncludingSpamThreads={includeSpamThreads}
               onIncludeSpamThreads={setIncludeSpamThreads}
               isIncludingArchivedThreads={includeArchivedThreads}
