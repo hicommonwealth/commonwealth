@@ -18,13 +18,18 @@ export function useBrowserAnalyticsTrack<T extends AnalyticsPayload>({
 }) {
   const hasFiredRef = useRef(false);
 
+  console.log(app.user);
   // Fire once on component mount
   useEffect(() => {
     if (!onAction && payload && !hasFiredRef.current) {
       try {
         clientAnalyticsTrack({
           ...payload,
-          userAddress: app.user?.activeAccount?.address ?? null,
+          // use active account if available; otherwise, use one of user's addresses
+          userAddress:
+            (app.user?.activeAccount?.address ||
+              app.user?.addresses[0].address) ??
+            null,
           community: app.activeChainId(),
         });
         hasFiredRef.current = true;
