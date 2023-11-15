@@ -1,7 +1,9 @@
 import { expect } from 'chai';
-import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
+import { NotificationCategories } from 'common-common/src/types';
 import sinon from 'sinon';
 import models from '../../../../server/database';
+import { ContractInstance } from '../../../../server/models/contract';
+import { startEvmPolling } from '../../../../server/workers/evmChainEvents/startEvmPolling';
 import {
   getTestAbi,
   getTestCommunityContract,
@@ -11,8 +13,6 @@ import {
   testChainId,
 } from '../../../integration/evmChainEvents/util';
 import { getEvmSecondsAndBlocks, sdk } from './util';
-import { NotificationCategories } from 'common-common/src/types';
-import { ContractInstance } from '../../../../server/models/contract';
 
 async function verifyNumNotifications(num: number) {
   const notifications = await models.Notification.findAll();
@@ -21,7 +21,7 @@ async function verifyNumNotifications(num: number) {
 
 async function verifyBlockNumber(
   chainNodeId: number,
-  blockNumber: null | number
+  blockNumber: null | number,
 ) {
   const lastBlock = await models.LastProcessedEvmBlock.findOne({
     where: {
@@ -49,7 +49,7 @@ async function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe('EVM Chain Events End to End Tests', () => {
+describe.only('EVM Chain Events End to End Tests', () => {
   const sandbox = sinon.createSandbox();
   let clock: sinon.SinonFakeTimers;
   let propCreatedResult: { block: number; proposalId: string };
@@ -102,7 +102,7 @@ describe('EVM Chain Events End to End Tests', () => {
     await sdk.getVotingPower(1, '400000', 'aave');
     propCreatedResult = await sdk.createProposal(1, 'aave');
     console.log(
-      `Proposal created at block ${propCreatedResult.block} with id ${propCreatedResult.proposalId}`
+      `Proposal created at block ${propCreatedResult.block} with id ${propCreatedResult.proposalId}`,
     );
 
     await verifyNumNotifications(0);
@@ -122,20 +122,20 @@ describe('EVM Chain Events End to End Tests', () => {
     expect(notification).to.have.own.property('chain_id', testChainId);
     expect(notification).to.have.own.property(
       'category_id',
-      NotificationCategories.ChainEvent
+      NotificationCategories.ChainEvent,
     );
     expect(notification).to.have.own.property(
       'category_id',
-      NotificationCategories.ChainEvent
+      NotificationCategories.ChainEvent,
     );
     expect(notification).to.have.own.property('notification_data');
     expect(JSON.parse(notification.notification_data)).to.have.property(
       'block_number',
-      propCreatedResult.block
+      propCreatedResult.block,
     );
     expect(JSON.parse(notification.notification_data)).to.have.nested.property(
       'event_data.id',
-      propCreatedResult.proposalId
+      propCreatedResult.proposalId,
     );
   }).timeout(80_000);
 
@@ -160,7 +160,7 @@ describe('EVM Chain Events End to End Tests', () => {
       await sdk.advanceTime(String(res.secs), res.blocks);
       const propQueuedResult = await sdk.queueProposal(
         propCreatedResult.proposalId,
-        'aave'
+        'aave',
       );
 
       await clock.tickAsync(10_000);
@@ -169,6 +169,6 @@ describe('EVM Chain Events End to End Tests', () => {
 
       await sleep(5000);
       await verifyNumNotifications(0);
-    }
+    },
   ).timeout(100_000);
 });

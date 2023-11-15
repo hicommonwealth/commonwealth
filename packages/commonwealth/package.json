@@ -48,7 +48,7 @@
     "stylelint": "stylelint client/styles/*",
     "test": "nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
     "test-api": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'",
-    "test-devnet": "nyc ts-mocha --project tsconfig.json './test/devnet/${TEST_DIR:-.}/**/*.spec.ts'",
+    "test-devnet": "chmod +x ./scripts/devnet-test.sh && ./scripts/devnet-test.sh",
     "test-e2e": "TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/e2eRegular/*",
     "test-e2e-mature": "TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/mature/*",
     "test-e2e-serial": "TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*",
