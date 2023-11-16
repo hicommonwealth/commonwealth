@@ -69,7 +69,7 @@ export const LinkedProposalsCard = ({
       }
       setSnapshotProposalsLoaded(true);
     }
-  }, [initialSnapshotLinks]);
+  }, [initialSnapshotLinks, thread.chain]);
 
   const showSnapshot =
     initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
