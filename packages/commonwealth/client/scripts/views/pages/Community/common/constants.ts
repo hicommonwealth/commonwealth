@@ -33,23 +33,18 @@ export const requirementTypes = [
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
 ];
 
-// Get eth chain id from the app.config.chains for these chains
-export const cosmosBaseChainIds = ['cosmos', 'injective'];
-export const ethBaseChainIds = ['axie-infinity', 'ethereum', 'polygon'];
-const chainIdsToFind = [...cosmosBaseChainIds, ...ethBaseChainIds];
-const foundChains = app.config.chains
-  .getAll()
-  .filter((x) => chainIdsToFind.includes(x.id.toLowerCase()));
-export const chainTypes = chainIdsToFind.map((x) => ({
-  chainBase: cosmosBaseChainIds.includes(x) ? 'cosmos' : 'ethereum',
-  value: cosmosBaseChainIds.includes(x)
-    ? 'cosmos' // cosmos and injective have 'cosmos' id
-    : foundChains.find((y) => y.id.toLowerCase() === x)?.ChainNode?.ethChainId,
-  label: x.replace(/\b\w/g, (l) => l.toUpperCase()),
-}));
-
 export const conditionTypes = [
   { value: AMOUNT_CONDITIONS.MORE, label: 'More than' },
   { value: AMOUNT_CONDITIONS.EQUAL, label: 'Equal to' },
   { value: AMOUNT_CONDITIONS.LESS, label: 'Less than' },
 ];
+
+// Get chain id's from the app.config.chains for all eth and cosmos chains
+export const chainTypes = app.config.nodes
+  .getAll()
+  .filter((chain) => chain.ethChainId || chain.cosmosChainId)
+  .map((chain) => ({
+    chainBase: chain.ethChainId ? 'ethereum' : 'cosmos',
+    value: chain.ethChainId || chain.cosmosChainId,
+    label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
+  }));

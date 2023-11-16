@@ -31,9 +31,10 @@ export const formatPagination = (query: IPagination): PaginationResult => {
   else if (limit) pagination = limitBy(limit);
 
   pagination.order = [[OrderByOptions.CREATED, 'DESC']];
-  if (query.sort === OrderByOptions.UPDATED)
-    pagination.order = [[OrderByOptions.UPDATED, 'DESC']];
-
+  if (
+    [OrderByOptions.UPDATED, OrderByOptions.LAST_CHECKED].includes(query.sort)
+  )
+    pagination.order = [[query.sort, 'DESC']];
   return pagination;
 };
 

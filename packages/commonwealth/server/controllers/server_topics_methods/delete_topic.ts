@@ -1,9 +1,9 @@
-import { CommunityInstance } from '../../models/community';
-import { ServerTopicsController } from '../server_topics_controller';
-import { UserInstance } from '../../models/user';
-import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from '../../util/validateOwner';
 import { QueryTypes } from 'sequelize';
+import { AppError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerTopicsController } from '../server_topics_controller';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -15,7 +15,7 @@ export const Errors = {
 
 export type DeleteTopicOptions = {
   user: UserInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   topicId: number;
 };
 
@@ -23,12 +23,12 @@ export type DeleteTopicResult = void;
 
 export async function __deleteTopic(
   this: ServerTopicsController,
-  { user, chain, topicId }: DeleteTopicOptions
+  { user, community, topicId }: DeleteTopicOptions
 ): Promise<DeleteTopicResult> {
   const isAdmin = validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -49,7 +49,7 @@ export async function __deleteTopic(
       {
         bind: {
           id: topicId,
-          chain: chain.id,
+          chain: community.id,
         },
         type: QueryTypes.UPDATE,
         transaction,

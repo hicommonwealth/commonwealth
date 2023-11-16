@@ -1,23 +1,23 @@
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { openConfirmation } from '../../modals/confirmation_modal';
-import { deleteChain } from './utils';
-import 'pages/AdminPanel.scss';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
+import { openConfirmation } from '../../modals/confirmation_modal';
+import { deleteCommunity } from './utils';
 
-const DeleteChainTask = () => {
-  const [deleteChainValue, setDeleteChainValue] = useState<string>('');
-  const [deleteChainValueValidated, setDeleteChainValueValidated] =
+const DeleteCommunityTask = () => {
+  const [deleteCommunityValue, setDeleteCommunityValue] = useState<string>('');
+  const [deleteCommunityValueValidated, setDeleteCommunityValueValidated] =
     useState<boolean>(false);
 
   const openConfirmationModal = () => {
     openConfirmation({
       title: 'Delete Community',
-      description: `Are you sure you want to delete ${deleteChainValue}? This action cannot be reversed. Note that this will NOT work if there is an admin in the community.`,
+      description: `Are you sure you want to delete ${deleteCommunityValue}? This action cannot be reversed. Note that this will NOT work if there is an admin in the community.`,
       buttons: [
         {
           label: 'Delete',
@@ -25,8 +25,8 @@ const DeleteChainTask = () => {
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await deleteChain({ id: deleteChainValue });
-              setDeleteChainValue('');
+              await deleteCommunity({ id: deleteCommunityValue });
+              setDeleteCommunityValue('');
               notifySuccess('Community deleted');
             } catch (e) {
               notifyError('Error deleting community');
@@ -45,16 +45,16 @@ const DeleteChainTask = () => {
   };
 
   const onInput = (e) => {
-    setDeleteChainValue(e.target.value);
-    if (e.target.value.length === 0) setDeleteChainValueValidated(false);
+    setDeleteCommunityValue(e.target.value);
+    if (e.target.value.length === 0) setDeleteCommunityValueValidated(false);
   };
 
   const validationFn = (value: string): [ValidationStatus, string] | [] => {
     if (!app.config.chains.getById(value)) {
-      setDeleteChainValueValidated(false);
+      setDeleteCommunityValueValidated(false);
       return ['failure', 'Community not found'];
     }
-    setDeleteChainValueValidated(true);
+    setDeleteCommunityValueValidated(true);
     return [];
   };
 
@@ -67,7 +67,7 @@ const DeleteChainTask = () => {
       </CWText>
       <div className="TaskRow">
         <CWTextInput
-          value={deleteChainValue}
+          value={deleteCommunityValue}
           onInput={onInput}
           inputValidationFn={validationFn}
           placeholder="Enter a community id"
@@ -75,7 +75,7 @@ const DeleteChainTask = () => {
         <CWButton
           label="Delete"
           className="TaskButton"
-          disabled={!deleteChainValueValidated}
+          disabled={!deleteCommunityValueValidated}
           onClick={openConfirmationModal}
         />
       </div>
@@ -83,4 +83,4 @@ const DeleteChainTask = () => {
   );
 };
 
-export default DeleteChainTask;
+export default DeleteCommunityTask;
