@@ -1,6 +1,5 @@
 import React, { FC, useState } from 'react';
 
-import { CWButton } from './component_kit/new_designs/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWCheckbox } from './component_kit/cw_checkbox';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
@@ -15,6 +14,7 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from './component_kit/new_designs/CWModal';
+import { CWButton } from './component_kit/new_designs/cw_button';
 
 import 'components/poll_card.scss';
 
@@ -147,7 +147,7 @@ export const VoteDisplay = ({
   isSnapshot,
 }: VoteDisplayProps) => {
   const topResponse = voteInformation.sort(
-    (option1, option2) => option2.voteCount - option1.voteCount
+    (option1, option2) => option2.voteCount - option1.voteCount,
   )[0].label;
 
   return (
