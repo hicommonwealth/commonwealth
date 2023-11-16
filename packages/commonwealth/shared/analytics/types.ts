@@ -14,6 +14,7 @@ export const enum MixpanelCommunityInteractionEvent {
   CREATE_COMMENT = 'Create New Comment',
   CREATE_REACTION = 'Create New Reaction',
   CREATE_GROUP = 'Create New Group',
+  JOIN_COMMUNITY = 'Join Community',
   LINKED_PROPOSAL = 'Linked Proposal',
   LINKED_THREAD = 'Linked Thread',
   UPDATE_STAGE = 'Update Stage',
