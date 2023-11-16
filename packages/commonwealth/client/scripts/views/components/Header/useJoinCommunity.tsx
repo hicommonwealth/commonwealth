@@ -54,7 +54,7 @@ const useJoinCommunity = () => {
               address: a.address,
               currentPrefix: 42,
             })
-          : prev.address === a.address)
+          : prev.address === a.address),
     );
 
     if (addressExists) {
@@ -80,7 +80,7 @@ const useJoinCommunity = () => {
         return true;
       }
       return false;
-    }
+    },
   );
 
   const performJoinCommunityLinking = async () => {
@@ -112,7 +112,7 @@ const useJoinCommunity = () => {
         const res = await linkExistingAddressToChainOrCommunity(
           address,
           targetChain,
-          originAddressInfo.community.id
+          originAddressInfo.community.id,
         );
 
         if (res && res.result) {
@@ -126,16 +126,16 @@ const useJoinCommunity = () => {
                 keytype: a.keytype,
                 walletId: a.wallet_id,
               });
-            })
+            }),
           );
           const addressInfo = app.user.addresses.find(
             (a) =>
-              a.address === encodedAddress && a.community.id === targetChain
+              a.address === encodedAddress && a.community.id === targetChain,
           );
 
           const account = app.chain.accounts.get(
             encodedAddress,
-            addressInfo.keytype
+            addressInfo.keytype,
           );
           if (app.chain) {
             account.setValidationToken(verification_token);
@@ -145,12 +145,12 @@ const useJoinCommunity = () => {
             activeChainId &&
             !app.roles.getRoleInCommunity({
               account,
-              chain: activeChainId,
+              community: activeChainId,
             })
           ) {
             await app.roles.createRole({
               address: addressInfo,
-              chain: activeChainId,
+              community: activeChainId,
             });
           }
           await setActiveAccount(account);
@@ -159,7 +159,7 @@ const useJoinCommunity = () => {
               .length === 0
           ) {
             app.user.setActiveAccounts(
-              app.user.activeAccounts.concat([account])
+              app.user.activeAccounts.concat([account]),
             );
           }
         } else {

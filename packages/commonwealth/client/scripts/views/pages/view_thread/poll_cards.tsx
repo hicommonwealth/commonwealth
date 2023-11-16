@@ -90,20 +90,20 @@ export const ThreadPollCard = ({
           app.user.activeAccount &&
           !!poll.getUserVote(
             app.user.activeAccount?.community?.id,
-            app.user.activeAccount?.address
+            app.user.activeAccount?.address,
           )
         }
         disableVoteButton={!app.user.activeAccount}
         votedFor={
           poll.getUserVote(
             app.user.activeAccount?.community?.id,
-            app.user.activeAccount?.address
+            app.user.activeAccount?.address,
           )?.option
         }
         proposalTitle={poll.prompt}
         timeRemaining={getPollTimestamp(
           poll,
-          poll.endsAt && poll.endsAt?.isBefore(moment().utc())
+          poll.endsAt && poll.endsAt?.isBefore(moment().utc()),
         )}
         totalVoteCount={poll.votes?.length}
         voteInformation={poll.options.map((option) => {
@@ -136,7 +136,7 @@ export const ThreadPollCard = ({
               threadId: poll.threadId,
               pollId: poll.id,
               address: app.user.activeAccount.address,
-              authorChain: app.user.activeAccount.community.id,
+              authorCommunity: app.user.activeAccount.community.id,
             });
             if (onDelete) onDelete();
             notifySuccess('Poll deleted');

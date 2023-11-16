@@ -4,10 +4,9 @@ import 'components/sidebar/explore_sidebar.scss';
 import ChainInfo from '../../../models/ChainInfo';
 
 import app from 'state';
+import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import type { MenuItem } from '../component_kit/types';
-import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
-import { isWindowSmallInclusive } from '../component_kit/helpers';
 
 export const ExploreCommunitiesSidebar = () => {
   const { setMenu } = useSidebarStore();
@@ -22,7 +21,9 @@ export const ExploreCommunitiesSidebar = () => {
 
   const isInCommunity = (item) => {
     if (item instanceof ChainInfo) {
-      return app.roles.getAllRolesInCommunity({ chain: item.id }).length > 0;
+      return (
+        app.roles.getAllRolesInCommunity({ community: item.id }).length > 0
+      );
     } else {
       return false;
     }
@@ -33,7 +34,7 @@ export const ExploreCommunitiesSidebar = () => {
   });
 
   const joinedCommunities = allCommunities.filter(
-    (c) => isInCommunity(c) && !app.user.isCommunityStarred(c.id)
+    (c) => isInCommunity(c) && !app.user.isCommunityStarred(c.id),
   );
 
   const communityList: MenuItem[] = [

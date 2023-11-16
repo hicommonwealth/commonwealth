@@ -36,7 +36,7 @@ export async function setActiveAccount(
   shouldRedraw = true,
 ): Promise<void> {
   const community = app.activeChainId();
-  const role = app.roles.getRoleInCommunity({ account, chain: community });
+  const role = app.roles.getRoleInCommunity({ account, community });
 
   if (!role) {
     app.user.ephemerallySetActiveAccount(account);
@@ -72,7 +72,7 @@ export async function setActiveAccount(
       auth: true,
     });
 
-    app.roles.getAllRolesInCommunity({ chain: community }).forEach((r) => {
+    app.roles.getAllRolesInCommunity({ community }).forEach((r) => {
       r.is_user_default = false;
     });
     role.is_user_default = true;
@@ -122,12 +122,12 @@ export async function completeClientLogin(account: Account) {
         if (
           !app.roles.getRoleInCommunity({
             account,
-            chain: app.activeChainId(),
+            community: app.activeChainId(),
           })
         ) {
           await app.roles.createRole({
             address: addressInfo,
-            chain: app.activeChainId(),
+            community: app.activeChainId(),
           });
         }
       } catch (e) {
@@ -170,7 +170,7 @@ export async function updateActiveAddresses({
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.roles.isMember({ chain: chain.id, account });
+    return app.roles.isMember({ community: chain.id, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -180,7 +180,7 @@ export async function updateActiveAddresses({
     // no addresses - preview the community
   } else {
     const existingAddress = app.roles.getDefaultAddressInCommunity({
-      chain: chain.id,
+      community: chain.id,
     });
 
     if (existingAddress) {
