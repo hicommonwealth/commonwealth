@@ -1,3 +1,5 @@
+import { TRPCError } from '@trpc/server';
+
 const Errors = {
   NotAdmin: 'Not an admin of chain or community',
   NotLoggedIn: 'Not signed in',
@@ -21,4 +23,69 @@ const Errors = {
   BothThreadAndComment: 'Must provide thread or comment id, not both',
 };
 
+export const TrpcError: Record<string, TRPCError> = {
+  NotAdmin: new TRPCError({ code: 'BAD_REQUEST', message: Errors.NotAdmin }),
+  NotLoggedIn: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.NotLoggedIn,
+  }),
+  NoCategory: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.NoCategory,
+  }),
+  InvalidNotificationCategory: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.InvalidNotificationCategory,
+  }),
+  InvalidSubscriptionCategory: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.InvalidSubscriptionCategory,
+  }),
+  NoSubscriptionId: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.NoSubscriptionId,
+  }),
+  NoSubscription: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.NoSubscription,
+  }),
+  NotUsersSubscription: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.NotUsersSubscription,
+  }),
+  NoMentions: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.NoMentions,
+  }),
+  NoCollaborations: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.NoCollaborations,
+  }),
+  NoComment: new TRPCError({ code: 'BAD_REQUEST', message: Errors.NoComment }),
+  NoThread: new TRPCError({ code: 'BAD_REQUEST', message: Errors.NoThread }),
+  InvalidChain: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.InvalidChain,
+  }),
+  InvalidChainEventId: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.InvalidChainEventId,
+  }),
+  InvalidSnapshotSpace: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.InvalidSnapshotSpace,
+  }),
+  NoMentionDelete: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.NoMentionDelete,
+  }),
+  NoThreadOrComment: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.NoThreadOrComment,
+  }),
+  BothThreadAndComment: new TRPCError({
+    code: 'BAD_REQUEST',
+    message: Errors.BothThreadAndComment,
+  }),
+};
 export default Errors;

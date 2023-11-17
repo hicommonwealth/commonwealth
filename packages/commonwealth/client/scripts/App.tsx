@@ -1,36 +1,50 @@
-import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { httpBatchLink } from '@trpc/client';
 import useInitApp from 'hooks/useInitApp';
 import router from 'navigation/Router';
-import React, { StrictMode } from 'react';
+import React, { StrictMode, useState } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { queryClient } from 'state/api/config';
+import superjson from 'superjson';
+import app from './state/index';
+import { trpc } from './utils/trpc';
 import { CWIcon } from './views/components/component_kit/cw_icons/cw_icon';
-
-const Splash = () => {
-  return (
-    <div className="Splash">
-      {/* This can be a moving bobber, atm it is still */}
-      <CWIcon iconName="cow" iconSize="xxl" />
-    </div>
-  );
-};
 
 const App = () => {
   const { customDomain, isLoading } = useInitApp();
+  const [queryClient] = useState(() => new QueryClient());
+  const [trpcClient] = useState(() =>
+    trpc.createClient({
+      transformer: superjson,
+      links: [
+        httpBatchLink({
+          url: '/trpc',
+          async headers() {
+            return {
+              authorization: app.user.jwt,
+            };
+          },
+        }),
+      ],
+    }),
+  );
 
   return (
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        {isLoading ? (
-          <Splash />
-        ) : (
-          <RouterProvider router={router(customDomain)} />
-        )}
-        <ToastContainer />
-        <ReactQueryDevtools />
-      </QueryClientProvider>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          {isLoading ? (
+            <div className="Splash">
+              <CWIcon iconName="cow" iconSize="xxl" />
+            </div>
+          ) : (
+            <RouterProvider router={router(customDomain)} />
+          )}
+          <ToastContainer />
+          <ReactQueryDevtools />
+        </QueryClientProvider>
+      </trpc.Provider>
     </StrictMode>
   );
 };

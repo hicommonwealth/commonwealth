@@ -1,8 +1,8 @@
 import { generateOpenApiDocument } from 'trpc-openapi';
-import { todoRootRouter } from './routers/todo';
+import { subscriptionRouter } from './resources/subscription/subscriptionRouter';
 import { mergeRouters } from './trpc';
 
-export const appRouter = mergeRouters(todoRootRouter);
+export const appRouter = mergeRouters(subscriptionRouter);
 
 export const openApiDocument = generateOpenApiDocument(appRouter, {
   title: 'Commonwealth OpenAPI',
@@ -10,5 +10,4 @@ export const openApiDocument = generateOpenApiDocument(appRouter, {
   baseUrl: 'http://localhost:8080/trpc',
 });
 
-// export type definition of API
 export type AppRouter = typeof appRouter;

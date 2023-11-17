@@ -2,8 +2,8 @@ import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import bodyParser from 'body-parser';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
-  getRabbitMQConfig,
   RabbitMQController,
+  getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
 import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
 import { RedisCache } from 'common-common/src/redisCache';
@@ -49,7 +49,8 @@ import setupAppRoutes from './server/scripts/setupAppRoutes';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
-import { appRouter, openApiDocument } from './server/trpc/root';
+import { appRouter, openApiDocument } from './server/trpc/rootRouter';
+import { createContext } from './server/trpc/trpc';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
@@ -279,8 +280,14 @@ async function main() {
     new DatabaseValidationService(models);
 
   try {
-    app.use('/trpc', createExpressMiddleware({ router: appRouter }));
-    app.use('/trpc', createOpenApiExpressMiddleware({ router: appRouter }));
+    app.use(
+      '/trpc',
+      createExpressMiddleware({ router: appRouter, createContext }),
+    );
+    app.use(
+      '/trpc',
+      createOpenApiExpressMiddleware({ router: appRouter, createContext }),
+    );
 
     app.use('/docs', swaggerUi.serve);
     app.get('/docs', swaggerUi.setup(openApiDocument));

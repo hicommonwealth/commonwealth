@@ -1,4 +1,5 @@
 import { SupportedNetwork } from 'commonwealth/shared/chain/types/types';
+import z from 'zod';
 
 export enum NotificationCategories {
   NewComment = 'new-comment-creation',
@@ -192,6 +193,17 @@ export interface IDiscordMeta {
   channel_id: string;
   message_id: string;
 }
+
+export const DiscordUserSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+});
+
+export const DiscordMetaSchema = z.object({
+  user: DiscordUserSchema,
+  channel_id: z.string(),
+  message_id: z.string(),
+});
 
 export type HttpMethod =
   | 'get'
