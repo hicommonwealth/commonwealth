@@ -90,7 +90,7 @@ export class RolesController {
 
     return this.roles.find((r) => {
       const addressMatches = r.address_id === address_id;
-      const communityMatches = r.chain_id === options.chain;
+      const communityMatches = r.community_id === options.chain;
       return addressMatches && communityMatches;
     });
   }
@@ -115,12 +115,12 @@ export class RolesController {
     return this.roles.find((r) => {
       const permission = r.permission === options.role;
       const referencedAddress = this.User.addresses.find(
-        (address) => address.id === r.address_id
+        (address) => address.id === r.address_id,
       );
       if (!referencedAddress) return;
       const isSame =
         this.User.activeAccount.address === referencedAddress.address;
-      const ofCommunity = r.chain_id === options.chain;
+      const ofCommunity = r.community_id === options.chain;
       return permission && referencedAddress && isSame && ofCommunity;
     });
   }
@@ -144,7 +144,7 @@ export class RolesController {
    */
   public getAllRolesInCommunity(options: { chain?: string }) {
     return this.roles.filter((r) => {
-      return r.chain_id === options.chain;
+      return r.community_id === options.chain;
     });
   }
 
@@ -172,7 +172,7 @@ export class RolesController {
     const filteredActiveAccountsByRole = activeAccountsByRole.reduce(
       (arr: [Account, RoleInfo][], current: [Account, RoleInfo]) => {
         const index = arr.findIndex(
-          (item) => item[0].address === current[0].address
+          (item) => item[0].address === current[0].address,
         );
         if (index < 0) {
           return [...arr, current];
@@ -185,7 +185,7 @@ export class RolesController {
         }
         return arr;
       },
-      []
+      [],
     );
 
     return filteredActiveAccountsByRole;
@@ -205,7 +205,7 @@ export class RolesController {
         role.address === this.User.activeAccount.address &&
         role.permission === AccessLevel.Admin &&
         options.chain &&
-        role.chain_id === options.chain
+        role.community_id === options.chain
       );
     });
 
@@ -227,14 +227,14 @@ export class RolesController {
         ? this.User.addresses.find(
             (a) =>
               options.account.address === a.address &&
-              options.account.community.id === a.community.id
+              options.account.community.id === a.community.id,
           )
         : options.account;
     const roles = this.roles.filter((role) =>
-      addressinfo ? role.address_id === addressinfo.id : true
+      addressinfo ? role.address_id === addressinfo.id : true,
     );
     if (options.chain) {
-      return roles.map((r) => r.chain_id).indexOf(options.chain) !== -1;
+      return roles.map((r) => r.community_id).indexOf(options.chain) !== -1;
     } else {
       return false;
     }
@@ -245,7 +245,7 @@ export class RolesController {
     community?: string;
   }) {
     const role = this.roles.find((r) => {
-      const communityMatches = r.chain_id === options.chain;
+      const communityMatches = r.community_id === options.chain;
       return communityMatches && r.is_user_default;
     });
 

@@ -43,7 +43,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
       <div
         className={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
           { disabled, isSecondary },
-          'SidebarMenuItem default'
+          'SidebarMenuItem default',
         )}
         onClick={(e) => {
           if (onClick) onClick(e);
@@ -69,7 +69,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
       <div
         className={getClasses<{ isSelected: boolean }>(
           { isSelected: app.activeChainId() === item.id },
-          'SidebarMenuItem community'
+          'SidebarMenuItem community',
         )}
         onClick={(e) => {
           e.preventDefault();
@@ -90,7 +90,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               avatarSize={18}
               shouldShowAvatarOnly
               userAddress={roles[0].address}
-              userChainId={roles[0].address_chain || roles[0].chain_id}
+              userChainId={roles[0].address_chain || roles[0].community_id}
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
@@ -125,7 +125,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
     <div
       className={getClasses<{ className: string }>(
         { className },
-        ComponentType.SidebarMenu
+        ComponentType.SidebarMenu,
       )}
     >
       <div className="sidebar-top">
