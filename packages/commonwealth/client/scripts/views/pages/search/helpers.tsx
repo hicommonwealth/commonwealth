@@ -213,7 +213,7 @@ type MemberResultRowProps = {
   setRoute: any;
 };
 const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
-  const { community, address } = addr.addresses[0];
+  const { chain: community, address } = addr.addresses[0] as any;
   const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [community],
     profileAddresses: [address],
