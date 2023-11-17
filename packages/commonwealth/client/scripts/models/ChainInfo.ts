@@ -7,7 +7,7 @@ import app from 'state';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 
-class ChainInfo {
+class CommunityInfo {
   public readonly id: string;
   public readonly ChainNode: NodeInfo;
   public readonly tokenName: string;
@@ -188,7 +188,7 @@ class ChainInfo {
     const v1Chains = process.env.COSMOS_GOV_V1?.split(',');
     const cosmos_governance_version = v1Chains?.includes(id) ? 'v1' : 'v1beta1';
 
-    return new ChainInfo({
+    return new CommunityInfo({
       id,
       network,
       default_symbol,
@@ -241,8 +241,8 @@ class ChainInfo {
           r.permission,
           r.allow,
           r.deny,
-          r.is_user_default
-        )
+          r.is_user_default,
+        ),
       );
     });
   }
@@ -323,28 +323,30 @@ class ChainInfo {
       directory_page_chain_node_id,
       jwt: app.user.jwt,
     });
-    const updatedChain = r.data.result;
-    this.name = updatedChain.name;
-    this.description = updatedChain.description;
-    this.website = updatedChain.website;
-    this.discord = updatedChain.discord;
-    this.element = updatedChain.element;
-    this.telegram = updatedChain.telegram;
-    this.github = updatedChain.github;
-    this.stagesEnabled = updatedChain.stages_enabled;
-    this.customStages = updatedChain.custom_stages;
-    this.customDomain = updatedChain.custom_domain;
-    this.snapshot = updatedChain.snapshot;
-    this.terms = updatedChain.terms;
-    this.iconUrl = updatedChain.icon_url;
-    this.defaultOverview = updatedChain.default_summary_view;
-    this.defaultPage = updatedChain.default_page;
-    this.hasHomepage = updatedChain.has_homepage;
-    this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
-    this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
-    this.directoryPageEnabled = updatedChain.directory_page_enabled;
-    this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
+    const updatedCommunity = r.data.result;
+    this.name = updatedCommunity.name;
+    this.description = updatedCommunity.description;
+    this.website = updatedCommunity.website;
+    this.discord = updatedCommunity.discord;
+    this.element = updatedCommunity.element;
+    this.telegram = updatedCommunity.telegram;
+    this.github = updatedCommunity.github;
+    this.stagesEnabled = updatedCommunity.stages_enabled;
+    this.customStages = updatedCommunity.custom_stages;
+    this.customDomain = updatedCommunity.custom_domain;
+    this.snapshot = updatedCommunity.snapshot;
+    this.terms = updatedCommunity.terms;
+    this.iconUrl = updatedCommunity.icon_url;
+    this.defaultOverview = updatedCommunity.default_summary_view;
+    this.defaultPage = updatedCommunity.default_page;
+    this.hasHomepage = updatedCommunity.has_homepage;
+    this.cosmosGovernanceVersion = updatedCommunity.cosmos_governance_version;
+    this.discordBotWebhooksEnabled =
+      updatedCommunity.discord_bot_webhooks_enabled;
+    this.directoryPageEnabled = updatedCommunity.directory_page_enabled;
+    this.directoryPageChainNodeId =
+      updatedCommunity.directory_page_chain_node_id;
   }
 }
 
-export default ChainInfo;
+export default CommunityInfo;

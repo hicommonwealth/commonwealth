@@ -87,7 +87,7 @@ class Account {
       // remove this discouraged method
       DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
         community?.id,
-        address
+        address,
       ).then((res) => {
         const data = res[0];
         if (!data) {
@@ -95,7 +95,7 @@ class Account {
             'No profile data found for address',
             address,
             'on chain',
-            community?.id
+            community?.id,
           );
         } else {
           updatedProfile.initialize(
@@ -104,7 +104,7 @@ class Account {
             data?.avatarUrl,
             data.id,
             updatedProfile.chain,
-            data?.lastActive
+            data?.lastActive,
           );
         }
         // manually trigger an update signal when data is fetched
@@ -174,7 +174,7 @@ class Account {
     signature: string,
     timestamp: number,
     chainId: string | number,
-    shouldRedraw = true
+    shouldRedraw = true,
   ) {
     if (!signature) {
       throw new Error('signature required for validation');
@@ -192,7 +192,7 @@ class Account {
       session_public_address: await app.sessions.getOrCreateAddress(
         this.community.base,
         chainId.toString(),
-        this.address
+        this.address,
       ),
       session_timestamp: timestamp,
       session_block_data: this.validationBlockInfo,
@@ -204,19 +204,21 @@ class Account {
         ({ address, ghostAddress, community }) =>
           ghostAddress &&
           this.community.id === community.id &&
-          app.user.activeAccounts.some((account) => account.address === address)
+          app.user.activeAccounts.some(
+            (account) => account.address === address,
+          ),
       );
       if (hasGhostAddress) {
         const { success, ghostAddressId } = await $.post(
           `${app.serverUrl()}/updateAddress`,
-          params
+          params,
         );
         if (success && ghostAddressId) {
           // remove ghost address from addresses
           app.user.setAddresses(
             app.user.addresses.filter(({ ghostAddress }) => {
               return !ghostAddress;
-            })
+            }),
           );
           app.user.setActiveAccounts([], shouldRedraw);
         }
