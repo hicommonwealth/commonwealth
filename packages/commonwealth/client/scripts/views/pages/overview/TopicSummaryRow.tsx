@@ -75,7 +75,7 @@ export const TopicSummaryRow = ({
         {threadsToDisplay.map((thread, idx) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`
+            `${thread.identifier}-${slugify(thread.title)}`,
           );
 
           const user = app.chain.accounts.get(thread.author);
@@ -89,7 +89,7 @@ export const TopicSummaryRow = ({
               <div
                 className={getClasses<{ isPinned?: boolean }>(
                   { isPinned: thread.pinned },
-                  'recent-thread-row'
+                  'recent-thread-row',
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -114,7 +114,7 @@ export const TopicSummaryRow = ({
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
                     {isNewThread(thread.createdAt) && (
-                      <CWTag label={'New'} type={'new'} iconName={'newStar'} />
+                      <CWTag label="New" type="new" iconName="newStar" />
                     )}
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
@@ -153,6 +153,7 @@ export const TopicSummaryRow = ({
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        navigate(`${discussionLink}?focusEditor=true`);
                       }}
                     />
                   </div>
