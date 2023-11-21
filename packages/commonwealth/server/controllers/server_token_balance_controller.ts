@@ -7,7 +7,7 @@ import { __getErc20Balances } from './server_token_balance_methods/get_erc20_bal
 import { __getErc721Balances } from './server_token_balance_methods/get_erc721_balances';
 import { __getEthBalances } from './server_token_balance_methods/get_eth_balances';
 
-export type GetCosmosBalanceOptions = {
+type GetCosmosBalanceOptions = {
   balanceSourceType: BalanceSourceType.CosmosNative;
   addresses: string[];
   sourceOptions: {
@@ -48,7 +48,7 @@ type GetEthNativeBalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ETHNative;
 };
 
-export type GetEvmBalancesOptions =
+type GetEvmBalancesOptions =
   | GetEthNativeBalanceOptions
   | GetErc20BalanceOptions
   | GetErc721BalanceOptions
