@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { getFileSizeBytes } from '../../server/util/getFilesSizeBytes';
 
-describe.only('ChainIconSizeLimit tests', () => {
+describe('ChainIconSizeLimit tests', () => {
   it("should return zero if url provided doesn't exist", async () => {
     const fileSizeBytes = await getFileSizeBytes('badUrl');
     expect(fileSizeBytes).to.equal(0);

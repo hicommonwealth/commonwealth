@@ -1,9 +1,9 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
   ConnectionTimeoutError,
-  createClient,
   ReconnectStrategyError,
   SocketClosedUnexpectedlyError,
+  createClient,
 } from 'redis';
 import type Rollbar from 'rollbar';
 import type { RedisNamespaces } from './types';
