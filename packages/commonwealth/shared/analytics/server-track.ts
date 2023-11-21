@@ -1,5 +1,5 @@
-import { AnalyticsPayload, BaseMixpanelPayload, providers } from './types';
 import Mixpanel from 'mixpanel';
+import { AnalyticsPayload, BaseMixpanelPayload, providers } from './types';
 
 let mixpanelNode;
 
