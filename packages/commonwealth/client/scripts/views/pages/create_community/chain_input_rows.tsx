@@ -144,59 +144,79 @@ export const EthChainRows = (
 ) => {
   const [defaultChainNode, setDefaultChainNode] = useState<DropdownItemType>();
   const [customInputs, setCustomInputs] = useState(false);
+  const { ethChainNames, ethChains, disabled } = props;
+  const {
+    setAddress,
+    setChainString,
+    setEthChainId,
+    setNodeUrl,
+    setAltWalletUrl,
+    setLoaded,
+    address,
+    altWalletUrl,
+    chainString,
+    ethChainId,
+    nodeUrl,
+  } = state;
   const options = useMemo(
     () =>
       [
-        ...Object.keys(props.ethChains).map(
+        ...Object.keys(ethChains).map(
           (c) =>
             ({
-              label: props.ethChainNames[c],
-              value: props.ethChainNames[c],
+              label: ethChainNames[c],
+              value: ethChainNames[c],
             } || { label: c, value: c })
         ),
         app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
       ] as Array<DropdownItemType>,
-    [props.ethChains, props.ethChainNames]
+    [ethChains, ethChainNames]
   );
 
   const onSelectHandler = useCallback(
     (o) => {
       if (!o?.value) return;
-      state.setChainString(o.value);
+      setChainString(o.value);
 
       if (o.value !== 'Custom') {
         const [id] =
-          Object.entries(props.ethChainNames).find(
-            ([, name]) => name === o.value
-          ) || Object.keys(props.ethChains).find((cId) => `${cId}` === o.value);
+          Object.entries(ethChainNames).find(([, name]) => name === o.value) ||
+          Object.keys(ethChains).find((cId) => `${cId}` === o.value);
 
-        state.setEthChainId(id);
-        state.setNodeUrl(props.ethChains[id].url);
-        state.setAltWalletUrl(props.ethChains[id].alt_wallet_url);
+        setEthChainId(id);
+        setNodeUrl(ethChains[id].url);
+        setAltWalletUrl(ethChains[id].alt_wallet_url);
       } else {
-        state.setEthChainId('');
-        state.setNodeUrl('');
-        state.setAltWalletUrl('');
+        setEthChainId('');
+        setNodeUrl('');
+        setAltWalletUrl('');
         setCustomInputs(true);
       }
     },
-    [state, props.ethChains, props.ethChainNames]
+    [
+      setChainString,
+      ethChainNames,
+      ethChains,
+      setEthChainId,
+      setNodeUrl,
+      setAltWalletUrl,
+    ]
   );
 
   // chainString is the key we use to set all the other fields:
   useEffect(() => {
-    if (state?.chainString && options?.length > 0) {
-      const foundChainNode = options.find((o) => o.label === state.chainString);
+    if (chainString && options?.length > 0) {
+      const foundChainNode = options.find((o) => o.label === chainString);
       setDefaultChainNode(foundChainNode || options[0]);
     }
-  }, [state?.chainString, options]);
+  }, [chainString, options]);
 
   // when we know the defaultChainNode, we can set the other fields:
   useEffect(() => {
-    if (defaultChainNode && !state.nodeUrl) {
+    if (defaultChainNode && !nodeUrl) {
       onSelectHandler(defaultChainNode);
     }
-  }, [defaultChainNode, state?.nodeUrl, onSelectHandler]);
+  }, [defaultChainNode, nodeUrl, onSelectHandler]);
 
   return (
     <>
@@ -206,7 +226,7 @@ export const EthChainRows = (
           options={options}
           initialValue={defaultChainNode}
           onSelect={(o) => onSelectHandler(o)}
-          disabled={!!props.disabled}
+          disabled={!!disabled}
         />
       ) : (
         <Skeleton height="62px" />
@@ -215,40 +235,40 @@ export const EthChainRows = (
         <>
           <InputRow
             title="Chain ID"
-            value={state.ethChainId}
+            value={ethChainId}
             placeholder="1"
             onChangeHandler={async (v) => {
-              state.setEthChainId(v);
-              state.setLoaded(false);
+              setEthChainId(v);
+              setLoaded(false);
             }}
           />
           <InputRow
             title="Websocket URL"
-            value={state.nodeUrl}
+            value={nodeUrl}
             placeholder="wss://... (leave empty for default)"
             onChangeHandler={async (v) => {
-              state.setNodeUrl(v);
-              state.setLoaded(false);
+              setNodeUrl(v);
+              setLoaded(false);
             }}
           />
           <InputRow
             title="HTTP URL"
-            value={state.altWalletUrl}
+            value={altWalletUrl}
             placeholder="https://...  (leave empty for default)"
             onChangeHandler={async (v) => {
-              state.setAltWalletUrl(v);
-              state.setLoaded(false);
+              setAltWalletUrl(v);
+              setLoaded(false);
             }}
           />
         </>
       )}
       <InputRow
         title="Token Contract Address"
-        value={state.address}
+        value={address}
         placeholder="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
         onChangeHandler={(v) => {
-          state.setAddress(v);
-          state.setLoaded(false);
+          setAddress(v);
+          setLoaded(false);
         }}
       />
     </>
