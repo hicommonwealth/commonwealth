@@ -139,13 +139,8 @@ export const defaultChainRows = <T extends UseChainFormDefaultFieldsHookType>(
 type EthChainState = UseEthChainFormFieldsHookType & UseChainFormStateHookType;
 
 export const EthChainRows = (
-  props: EthChainFormState,
-  state: EthChainState
-) => {
-  const [defaultChainNode, setDefaultChainNode] = useState<DropdownItemType>();
-  const [customInputs, setCustomInputs] = useState(false);
-  const { ethChainNames, ethChains, disabled } = props;
-  const {
+  { ethChainNames, ethChains, disabled }: EthChainFormState,
+  {
     setAddress,
     setChainString,
     setEthChainId,
@@ -157,7 +152,10 @@ export const EthChainRows = (
     chainString,
     ethChainId,
     nodeUrl,
-  } = state;
+  }: EthChainState
+) => {
+  const [defaultChainNode, setDefaultChainNode] = useState<DropdownItemType>();
+  const [customInputs, setCustomInputs] = useState(false);
   const options = useMemo(
     () =>
       [
