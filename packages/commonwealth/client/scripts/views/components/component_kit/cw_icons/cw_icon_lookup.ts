@@ -122,6 +122,7 @@ export const iconLookup = {
   imageUpload: Icons.CWImageUpload,
   infoEmpty: Icons.CWInfoEmpty,
   infoFilled: Icons.CWInfoFilled,
+  ios: Icons.CWIos,
   jar: Icons.CWJar,
   link: Icons.CWLink,
   linkPhosphor: withPhosphorIcon(Link),
