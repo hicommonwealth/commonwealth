@@ -16,7 +16,7 @@ function setupIpfsProxy(app: Express) {
     async function (req, res) {
       try {
         const hash = req.query.hash;
-        const isImageRequest = req.query.image === 'true';
+        const isImageRequest = req.query?.image === 'true';
         const response = await axios.get(
           `https://cloudflare-ipfs.com/ipfs/${hash}#x-ipfs-companion-no-redirect`,
           {
