@@ -18,13 +18,15 @@ export const updatePollVoteHandler = async (
   const { id: pollId } = req.params;
   const { option } = req.body;
 
-  const vote = await controllers.polls.updatePollVote({
+  const [vote, analyticsOptions] = await controllers.polls.updatePollVote({
     user: req.user,
     address: req.address,
     community: req.chain,
     pollId: parseInt(pollId, 10),
     option,
   });
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, vote);
 };

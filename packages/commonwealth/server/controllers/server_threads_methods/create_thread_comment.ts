@@ -339,6 +339,7 @@ export async function __createThreadComment(
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
     community: community.id,
+    userId: user.id,
     isCustomDomain: null,
   };
 

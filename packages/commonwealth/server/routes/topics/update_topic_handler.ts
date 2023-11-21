@@ -50,11 +50,13 @@ export const updateTopicHandler = async (
     );
   }
 
-  const topic = await controllers.topics.updateTopic({
+  const [topic, analyticsOptions] = await controllers.topics.updateTopic({
     user,
     community,
     body: validationResult.data,
   });
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, topic);
 };

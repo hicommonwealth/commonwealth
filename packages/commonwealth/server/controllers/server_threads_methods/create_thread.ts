@@ -308,6 +308,7 @@ export async function __createThread(
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
     community: community.id,
+    userId: user.id,
     isCustomDomain: null,
   };
 
