@@ -8,6 +8,7 @@ import {
 } from 'models/SearchQuery';
 import 'pages/search/index.scss';
 
+import { useSearchCommunitiesQuery } from 'client/scripts/state/api/communities';
 import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -17,7 +18,6 @@ import {
   APIOrderBy,
   APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
-import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
 import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
 import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
@@ -135,7 +135,7 @@ const SearchPage = () => {
     error: communityError,
     fetchNextPage: chainsFetchNextPage,
     isLoading: communityIsLoading,
-  } = useSearchChainsQuery({
+  } = useSearchCommunitiesQuery({
     ...sharedQueryOptions,
     enabled: activeTab === SearchScope.Communities,
   });

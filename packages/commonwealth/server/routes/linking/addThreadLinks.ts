@@ -1,11 +1,11 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { Link, LinkSource, ThreadInstance } from '../../models/thread';
-import type { DB } from '../../models';
-import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { ServerAnalyticsController } from '../../controllers/server_analytics_controller';
+import type { DB } from '../../models';
+import { Link, LinkSource, ThreadInstance } from '../../models/thread';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { Errors, isAuthorOrAdmin } from '../../util/linkingValidationHelper';
 
 type AddThreadLinkReq = {
   thread_id: number;
@@ -18,7 +18,7 @@ const addThreadLink = async (
   models: DB,
   req: TypedRequestBody<AddThreadLinkReq>,
   res: TypedResponse<AddThreadLinkRes>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { thread_id, links } = req.body;
 
@@ -34,7 +34,7 @@ const addThreadLink = async (
     models,
     await req.user.getAddresses(),
     thread.address_id,
-    thread.chain
+    thread.chain,
   );
   if (!isAuth && !req.user.isAdmin)
     return next(new AppError(Errors.NotAdminOrOwner));
@@ -44,7 +44,7 @@ const addThreadLink = async (
       return !thread.links.some(
         (newLinks) =>
           newLinks.source === link.source &&
-          newLinks.identifier === link.identifier
+          newLinks.identifier === link.identifier,
       );
     });
     if (filteredLinks.length === 0)
@@ -79,7 +79,7 @@ const addThreadLink = async (
     {
       event: MixpanelCommunityInteractionEvent.LINKED_PROPOSAL,
     },
-    req
+    req,
   );
 
   return success(res, finalThread.toJSON());

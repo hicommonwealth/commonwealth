@@ -4,8 +4,8 @@ import { useDebounce } from 'usehooks-ts';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 import { SearchScope } from '../models/SearchQuery';
 import app from '../state';
-import { useSearchChainsQuery } from '../state/api/chains';
 import { useSearchCommentsQuery } from '../state/api/comments';
+import { useSearchCommunitiesQuery } from '../state/api/communities';
 import { useSearchProfilesQuery } from '../state/api/profiles';
 import { useSearchThreadsQuery } from '../state/api/threads';
 
@@ -40,7 +40,7 @@ const useSearchResults = (
     enabled: queryEnabled && filters.includes('replies'),
   });
 
-  const { data: chainsData } = useSearchChainsQuery({
+  const { data: chainsData } = useSearchCommunitiesQuery({
     ...sharedQueryOptions,
     enabled: queryEnabled && filters.includes('communities'),
   });

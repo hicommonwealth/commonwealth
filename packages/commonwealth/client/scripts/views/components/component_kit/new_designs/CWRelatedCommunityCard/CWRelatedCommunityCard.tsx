@@ -43,7 +43,7 @@ export const CWRelatedCommunityCard = ({
       }
       navigateToCommunity({ navigate, path: '', chain: communityId });
     },
-    [navigate]
+    [navigate],
   );
 
   return (

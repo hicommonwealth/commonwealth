@@ -13,7 +13,7 @@ type UpdatePollVoteResponse = VoteAttributes;
 export const updatePollVoteHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdatePollBody, null, UpdatePollVoteParams>,
-  res: TypedResponse<UpdatePollVoteResponse>
+  res: TypedResponse<UpdatePollVoteResponse>,
 ) => {
   const { id: pollId } = req.params;
   const { option } = req.body;

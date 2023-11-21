@@ -18,7 +18,7 @@ type UpdateTopicResponse = TopicAttributes;
 export const updateTopicHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateTopicRequestBody, null, UpdateTopicRequestParams>,
-  res: TypedResponse<UpdateTopicResponse>
+  res: TypedResponse<UpdateTopicResponse>,
 ) => {
   const {
     user,
@@ -46,7 +46,7 @@ export const updateTopicHandler = async (
   });
   if (validationResult.success === false) {
     throw new AppError(
-      `${Errors.ValidationError}: ${validationResult.error.message}`
+      `${Errors.ValidationError}: ${validationResult.error.message}`,
     );
   }
 
