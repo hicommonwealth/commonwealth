@@ -9,6 +9,8 @@ import { ThreadFeaturedFilterTypes } from '../../../models/types';
 import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export const getLastUpdated = (thread: Thread) => {
+  if (!thread) return;
+
   const { lastCommentedOn } = thread;
   const lastComment = lastCommentedOn ? Number(lastCommentedOn.utc()) : 0;
   const createdAt = Number(thread.createdAt.utc());

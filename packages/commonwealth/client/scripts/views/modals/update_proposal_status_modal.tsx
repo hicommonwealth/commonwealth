@@ -15,6 +15,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { Link, LinkSource } from 'models/Thread';
 import app from 'state';
 import {
@@ -22,6 +23,10 @@ import {
   useDeleteThreadLinksMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
+import {
+  MixpanelCommunityInteractionEvent,
+  MixpanelCommunityInteractionEventPayload,
+} from '../../../../shared/analytics/types';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
 import { ProposalSelector } from '../components/ProposalSelector';
 import {
@@ -109,6 +114,11 @@ export const UpdateProposalStatusModal = ({
     communityId: app.activeChainId(),
     threadId: thread.id,
   });
+
+  const { trackAnalytics } =
+    useBrowserAnalyticsTrack<MixpanelCommunityInteractionEventPayload>({
+      onAction: true,
+    });
 
   const handleSaveChanges = async () => {
     // set stage
@@ -257,6 +267,10 @@ export const UpdateProposalStatusModal = ({
       console.log(err);
       throw new Error('Failed to update linked proposals');
     }
+
+    trackAnalytics({
+      event: MixpanelCommunityInteractionEvent.LINK_PROPOSAL_BUTTON_PRESSED,
+    });
 
     onChangeHandler?.(tempStage, links);
     onModalClose();

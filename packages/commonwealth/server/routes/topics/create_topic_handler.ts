@@ -36,11 +36,13 @@ export const createTopicHandler = async (
     );
   }
 
-  const topic = await controllers.topics.createTopic({
+  const [topic, analyticsOptions] = await controllers.topics.createTopic({
     user,
     community,
     body: validationResult.data,
   });
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, topic);
 };

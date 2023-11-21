@@ -75,22 +75,25 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 describe('ServerTopicsController', () => {
   describe('#createTopic', async () => {
     const { controller, user, chain } = createMockedTopicsController();
-    const result = await controller.createTopic({
-      user,
-      community: chain,
-      body: {
-        name: 'hhh',
-        description: 'ddd',
-        featured_in_new_post: false,
-        featured_in_sidebar: false,
-        token_threshold: '0',
-      },
-    });
-    expect(result.name).to.equal('hhh');
-    expect(result.description).to.equal('ddd');
-    expect(result.featured_in_new_post).to.equal(false);
-    expect(result.featured_in_sidebar).to.equal(false);
-    expect(result.token_threshold).to.equal('0');
+    const [topic] = await Promise.all(
+      await controller.createTopic({
+        user,
+        community: chain,
+        body: {
+          name: 'hhh',
+          description: 'ddd',
+          featured_in_new_post: false,
+          featured_in_sidebar: false,
+          token_threshold: '0',
+        },
+      }),
+    );
+
+    expect(topic.name).to.equal('hhh');
+    expect(topic.description).to.equal('ddd');
+    expect(topic.featured_in_new_post).to.equal(false);
+    expect(topic.featured_in_sidebar).to.equal(false);
+    expect(topic.token_threshold).to.equal('0');
   });
   describe('#deleteTopic', async () => {
     const { controller, user, chain } = createMockedTopicsController();
