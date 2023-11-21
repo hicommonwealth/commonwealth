@@ -219,6 +219,7 @@ export class RedisCache {
     return true;
   }
 
+  // eslint-disable-next-line
   public async getKeys(namespace: RedisNamespaces, keys: string[]) {
     return {};
   }
