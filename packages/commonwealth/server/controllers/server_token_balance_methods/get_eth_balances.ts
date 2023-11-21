@@ -11,7 +11,6 @@ export async function __getEthBalances(options: GetEthBalancesOptions) {}
 async function getOnChainBatchEthBalances(
   ethChainId: number,
   rpcEndpoint: string,
-  contractAddress: string,
   addresses: string[],
 ): Promise<Balances> {
   return {};
@@ -19,7 +18,6 @@ async function getOnChainBatchEthBalances(
 
 async function getOffChainBatchEthBalances(
   rpcEndpoint: string,
-  contractAddress: string,
   addresses: string[],
 ): Promise<Balances> {
   return {};
@@ -27,7 +25,6 @@ async function getOffChainBatchEthBalances(
 
 async function getEthBalance(
   rpcEndpoint: string,
-  contractAddress: string,
   address: string,
 ): Promise<Balances> {
   return {};

@@ -14,7 +14,6 @@ export async function __getCosmosNativeBalances(
 
 async function getOffChainBatchCosmosBalances(
   rpcEndpoint: string,
-  contractAddress: string,
   addresses: string[],
 ): Promise<Balances> {
   return {};
@@ -22,7 +21,6 @@ async function getOffChainBatchCosmosBalances(
 
 async function getCosmosBalance(
   rpcEndpoint: string,
-  contractAddress: string,
   address: string,
 ): Promise<Balances> {
   return {};

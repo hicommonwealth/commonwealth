@@ -16,6 +16,7 @@ async function getOffChainBatchErc1155Balances(
   rpcEndpoint: string,
   contractAddress: string,
   addresses: string[],
+  tokenId: string,
 ): Promise<Balances> {
   return {};
 }
