@@ -59,7 +59,7 @@ export const CommentReactionButton = ({
 
   const activeAddress = app.user.activeAccount?.address;
   const hasReacted = !!(comment.reactions || []).find(
-    (x) => x?.author === activeAddress
+    (x) => x?.author === activeAddress,
   );
   const likes = (comment.reactions || []).length;
 
@@ -117,9 +117,8 @@ export const CommentReactionButton = ({
         voteCount={likes}
         disabled={!hasJoinedCommunity || disabled}
         selected={hasReacted}
-        onMouseEnter={() => undefined}
         onClick={handleVoteClick}
-        tooltipContent={getDisplayedReactorsForPopup({
+        popoverContent={getDisplayedReactorsForPopup({
           reactors: (comment.reactions || []).map((r) => r.author),
         })}
         tooltipText={tooltipText}
