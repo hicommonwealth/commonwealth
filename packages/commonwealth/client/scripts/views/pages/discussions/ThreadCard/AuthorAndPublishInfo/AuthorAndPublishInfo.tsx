@@ -5,12 +5,11 @@ import moment from 'moment';
 import React, { useRef } from 'react';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
-import {
-  Popover,
-  usePopover,
-} from 'views/components/component_kit/cw_popover/cw_popover';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { User } from 'views/components/user/user';
@@ -118,7 +117,7 @@ export const AuthorAndPublishInfo = ({
             {`${collaboratorsInfo.length} other${
               collaboratorsInfo.length > 1 ? 's' : ''
             }`}
-            <Popover
+            <CWPopover
               content={
                 <div className="collaborators">
                   {collaboratorsInfo.map(({ address, community_id }) => {
