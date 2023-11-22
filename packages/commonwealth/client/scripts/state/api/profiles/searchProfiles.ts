@@ -15,6 +15,7 @@ export type SearchProfilesResponse = {
     user_id: string;
     profile_name: string;
     avatar_url: string;
+    group_ids?: [];
     addresses: {
       id: number;
       chain: string;
@@ -36,6 +37,7 @@ interface SearchProfilesProps {
   orderDirection: APIOrderDirection;
   includeRoles: boolean;
   includeMembershipTypes?: 'in-group' | 'not-in-group';
+  includeGroupIds?: boolean;
   enabled?: boolean;
 }
 
@@ -47,6 +49,7 @@ const searchProfiles = async ({
   orderBy,
   orderDirection,
   includeMembershipTypes,
+  includeGroupIds,
   includeRoles,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
@@ -66,6 +69,7 @@ const searchProfiles = async ({
         order_direction: orderDirection,
         include_roles: includeRoles,
         ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
+        ...(includeGroupIds && { include_group_ids: includeGroupIds }),
       },
     },
   );
@@ -79,6 +83,7 @@ const useSearchProfilesQuery = ({
   orderBy,
   orderDirection,
   includeRoles,
+  includeGroupIds,
   includeMembershipTypes,
   enabled = true,
 }: SearchProfilesProps) => {
@@ -89,6 +94,7 @@ const useSearchProfilesQuery = ({
       orderBy,
       orderDirection,
       includeRoles,
+      includeGroupIds,
       includeMembershipTypes,
     },
   ];
@@ -103,6 +109,7 @@ const useSearchProfilesQuery = ({
         orderBy,
         orderDirection,
         includeMembershipTypes,
+        includeGroupIds,
         includeRoles,
       }),
     {

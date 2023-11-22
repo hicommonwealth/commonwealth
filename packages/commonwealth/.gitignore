@@ -33,6 +33,11 @@ redacted.dump
 redacted.dump.*
 *.dat
 
+# Docker volumes
+.rabbitmq
+.postgres
+.redis-data
+
 # Bundle analyzer
 out.png
 
