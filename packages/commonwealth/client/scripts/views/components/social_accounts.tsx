@@ -17,7 +17,13 @@ type SocialAccountsProps = {
 
 const SocialAccount = (props: SocialAccountProps) => {
   const { iconName, link } = props;
-  const formattedLink = link.includes('http') ? link : `https://${link}`;
+
+  let formattedLink;
+  if (link.includes('@')) {
+    formattedLink = link;
+  } else {
+    formattedLink = link.includes('http') ? link : `https://${link}`;
+  }
 
   return (
     <a href={formattedLink} target="_blank">
