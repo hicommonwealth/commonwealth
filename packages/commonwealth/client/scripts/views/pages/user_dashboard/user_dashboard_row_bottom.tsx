@@ -6,12 +6,12 @@ import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
 import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 import type { ProfileWithAddress } from '../../components/component_kit/cw_avatar_group';
 import { CWAvatarGroup } from '../../components/component_kit/cw_avatar_group';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UserDashboardRowBottomSkeleton } from './UserDashboardRowBottomSkeleton';
 import { subscribeToThread } from './helpers';

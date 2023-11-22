@@ -11,6 +11,8 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
+import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
@@ -31,8 +33,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
-import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWProgressBar } from './cw_progress_bar';
 import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';

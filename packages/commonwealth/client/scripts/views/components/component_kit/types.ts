@@ -27,6 +27,7 @@ export enum ComponentType {
   Modal = 'CWModal',
   OldTextInput = 'OldTextInput',
   PopoverMenu = 'PopoverMenu',
+  Popover = 'Popover',
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',

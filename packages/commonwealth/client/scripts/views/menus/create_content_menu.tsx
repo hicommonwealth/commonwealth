@@ -1,24 +1,24 @@
-import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import { isMobile } from 'react-device-detect';
 import app from 'state';
-import { uuidv4 } from 'lib/util';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import Permissions from '../../utils/Permissions';
+import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   handleIconClick,
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
-import { isMobile } from 'react-device-detect';
+import Permissions from '../../utils/Permissions';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
+import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 
 const resetSidebarState = () => {
   //Bouncer pattern -- I have found isMobile does not always detect screen
@@ -171,7 +171,7 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
                     !isCustomDomain
                       ? window.location.origin
                       : 'https://commonwealth.im'
-                  }`
+                  }`,
                 )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
                   JSON.stringify({
                     cw_chain_id: app.activeChainId(),
@@ -179,9 +179,9 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
                     redirect_domain: isCustomDomain
                       ? window.location.origin
                       : undefined,
-                  })
+                  }),
                 )}`,
-                '_parent'
+                '_parent',
               );
             } catch (err) {
               console.log(err);
@@ -235,7 +235,7 @@ export const CreateContentSidebar = () => {
         label: 'Create',
         onClick: async () => {
           const sidebar = document.getElementsByClassName(
-            'CreateContentSidebar'
+            'CreateContentSidebar',
           );
           sidebar[0].classList.add('onremove');
           setTimeout(() => {

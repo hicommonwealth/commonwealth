@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { PopperOwnProps, PopperPlacementType } from '@mui/base/Popper';
 
-import 'components/component_kit/cw_popover/cw_popover_menu.scss';
+import './CWPopoverMenu.scss';
 
 import CWPopover, {
   PopoverTriggerProps,

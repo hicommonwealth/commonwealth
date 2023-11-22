@@ -5,6 +5,7 @@ import PopperUnstyled, {
 import React from 'react';
 
 import { uuidv4 } from 'lib/util';
+import { ComponentType } from 'views/components/component_kit/types';
 
 export type AnchorType = HTMLElement | SVGSVGElement;
 
@@ -60,6 +61,7 @@ const CWPopover = ({
 }: CWPopoverProps) => {
   return (
     <PopperUnstyled
+      className={ComponentType.Popover}
       id={id}
       open={open}
       anchorEl={anchorEl}
@@ -81,10 +83,3 @@ const CWPopover = ({
 };
 
 export default CWPopover;
-
-// TODO
-
-// 1. look for <Popover in the code
-// 2. Try to use <CWPopover instead of <Popover in all those places
-// 3. remove old <Popover from codebase and storybook
-// 4. remove old usePopover and use new one
