@@ -16,6 +16,9 @@ import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -227,6 +230,9 @@ export const ComponentShowcase = () => {
   const [chainId, setChainId] = useState(allChains[1]);
   const [currentTab, setCurrentTab] = useState(tagsList[0].id);
 
+  const unstyledPopoverProps = usePopover();
+  const styledPopoverProps = usePopover();
+
   const renderModal = (size?: ModalSize) => {
     return (
       <CWModal
@@ -329,6 +335,43 @@ export const ComponentShowcase = () => {
           })
         }
       />
+      <div className="basic-gallery">
+        <CWText type="h3">Popover</CWText>
+
+        <div className="item-row">
+          <CWText>Unstyled Popover</CWText>
+
+          <CWIconButton
+            iconName="infoEmpty"
+            onMouseEnter={unstyledPopoverProps.handleInteraction}
+            onMouseLeave={unstyledPopoverProps.handleInteraction}
+          />
+          <CWPopover
+            content={
+              <div>
+                This is for unstyled content. You can add class to the container
+                and style it for your need.
+              </div>
+            }
+            {...unstyledPopoverProps}
+          />
+        </div>
+
+        <div className="item-row">
+          <CWText>Styled by default Popover</CWText>
+
+          <CWIconButton
+            iconName="infoEmpty"
+            onMouseEnter={styledPopoverProps.handleInteraction}
+            onMouseLeave={styledPopoverProps.handleInteraction}
+          />
+          <CWPopover
+            title="Title"
+            body={<div>This is body in styled popover</div>}
+            {...styledPopoverProps}
+          />
+        </div>
+      </div>
       <div className="basic-gallery">
         <CWText type="h3">Popover Menu</CWText>
         <PopoverMenu
