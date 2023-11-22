@@ -27,15 +27,19 @@ type GetErc1155BalanceOptions = GetEvmBalancesBase & {
     tokenId: string;
   };
 };
-type GetEthNativeBalanceOptions = GetEvmBalancesBase & {
+
+export type GetEthNativeBalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ETHNative;
 };
 
-export type GetEvmBalancesOptions =
-  | GetEthNativeBalanceOptions
+export type GetErcBalanceOptions =
   | GetErc20BalanceOptions
   | GetErc721BalanceOptions
   | GetErc1155BalanceOptions;
+
+export type GetEvmBalancesOptions =
+  | GetErcBalanceOptions
+  | GetEthNativeBalanceOptions;
 
 export type GetCosmosBalancesOptions = {
   balanceSourceType: BalanceSourceType.CosmosNative;

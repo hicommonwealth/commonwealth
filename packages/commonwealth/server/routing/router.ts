@@ -4,7 +4,8 @@ import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 
-import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache as NewTokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {
   methodNotAllowedMiddleware,
@@ -218,6 +219,9 @@ function setupRouter(
 ) {
   // controllers
 
+  // TODO: replace old TBC with new
+  const newTokenBalanceCache = new NewTokenBalanceCache(models, redisCache);
+
   const serverControllers: ServerControllers = {
     threads: new ServerThreadsController(models, tokenBalanceCache, banCache),
     comments: new ServerCommentsController(models, tokenBalanceCache, banCache),
@@ -232,7 +236,7 @@ function setupRouter(
     ),
     polls: new ServerPollsController(models, tokenBalanceCache),
     proposals: new ServerProposalsController(models, redisCache),
-    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
+    groups: new ServerGroupsController(models, newTokenBalanceCache, banCache),
     topics: new ServerTopicsController(models, tokenBalanceCache, banCache),
   };
 

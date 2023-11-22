@@ -1,6 +1,6 @@
 import { ChainNetwork } from 'common-common/src/types';
 import { toBN } from 'web3-utils';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
+import { Balances } from '../tokenBalanceCache/types';
 import { AllowlistData, Requirement, ThresholdData } from './requirementsTypes';
 
 export type ValidateGroupMembershipResponse = {
@@ -22,7 +22,7 @@ export type ValidateGroupMembershipResponse = {
 export default async function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
-  tbc?: TokenBalanceCache,
+  balances: Balances,
   numRequiredRequirements: number = 0,
 ): Promise<ValidateGroupMembershipResponse> {
   const response: ValidateGroupMembershipResponse = {
@@ -36,7 +36,11 @@ export default async function validateGroupMembership(
     let checkResult: { result: boolean; message: string };
     switch (requirement.rule) {
       case 'threshold': {
-        checkResult = await _thresholdCheck(userAddress, requirement.data, tbc);
+        checkResult = await _thresholdCheck(
+          userAddress,
+          requirement.data,
+          balances,
+        );
         break;
       }
       case 'allow': {
@@ -89,7 +93,7 @@ export default async function validateGroupMembership(
 async function _thresholdCheck(
   userAddress: string,
   thresholdData: ThresholdData,
-  tbc: TokenBalanceCache,
+  balances: Balances,
 ): Promise<{ result: boolean; message: string }> {
   try {
     let chainNetwork: ChainNetwork;
@@ -122,12 +126,10 @@ async function _thresholdCheck(
       default:
         break;
     }
-    const balance = await tbc.fetchUserBalanceWithChain(
-      chainNetwork,
-      userAddress,
-      chainId,
-      contractAddress,
-    );
+    const balance = balances[userAddress];
+    if (typeof balance !== 'string') {
+      throw new Error(`Failed to get balance for address`);
+    }
 
     const result = toBN(balance).gt(toBN(thresholdData.threshold));
     return {

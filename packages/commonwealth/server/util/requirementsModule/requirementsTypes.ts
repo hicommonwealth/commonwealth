@@ -1,15 +1,15 @@
-type ContractSource = {
+export type ContractSource = {
   source_type: BalanceSourceType.ERC20 | BalanceSourceType.ERC721;
   evm_chain_id: number;
   contract_address: string;
 };
 
-type NativeSource = {
+export type NativeSource = {
   source_type: BalanceSourceType.ETHNative;
   evm_chain_id: number;
 };
 
-type CosmosSource = {
+export type CosmosSource = {
   source_type: BalanceSourceType.CosmosNative;
   cosmos_chain_id: string;
   token_symbol: string;
