@@ -197,7 +197,7 @@ export const NewThreadForm = () => {
       <div className="NewThreadForm">
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            Create Discussion
+            Create thread
           </CWText>
         </div>
         <div className="new-thread-body">
