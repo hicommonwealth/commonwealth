@@ -53,9 +53,13 @@ export class TokenBalanceCache {
     const addressMap: { [encodedAddress: string]: string } = {};
     for (const address of options.addresses) {
       // TODO: handle non-addresses e.g. 0xdiscobot
-      const { data } = fromBech32(address);
-      const encodedAddress = toBech32(chainNode.bech32, data);
-      addressMap[encodedAddress] = address;
+      try {
+        const { data } = fromBech32(address);
+        const encodedAddress = toBech32(chainNode.bech32, data);
+        addressMap[encodedAddress] = address;
+      } catch (e) {
+        console.error(`Skipping address: ${address}`, e);
+      }
     }
 
     // fetch from cache
@@ -70,8 +74,8 @@ export class TokenBalanceCache {
 
     // map to decoded addresses rather than the generated encoded addresses
     const balances: Balances = {};
-    for (const [address, balance] of result) {
-      balances[addressMap[address]] = balance;
+    for (const [address, balance] of Object.entries(result)) {
+      balances[addressMap[address]] = balance as string;
     }
 
     return balances;
