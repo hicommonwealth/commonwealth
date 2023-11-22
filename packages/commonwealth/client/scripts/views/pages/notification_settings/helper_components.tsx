@@ -78,7 +78,7 @@ const getTextRows = (
               userAddress={subscription.Comment.author}
               userChainId={subscription.Comment.chain}
             />
-            's
+            &apos;
           </CWText>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
