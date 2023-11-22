@@ -1,3 +1,4 @@
+import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { RedisCache } from 'common-common/src/redisCache';
 import { DB } from '../../models';
 import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
@@ -47,10 +48,33 @@ export class TokenBalanceCache {
       },
     });
 
-    return await __getCosmosNativeBalances.call(this, {
+    // maps an encoded address to a decoded address to avoid having to decode
+    // all addresses twice before returning
+    const addressMap: { [encodedAddress: string]: string } = {};
+    for (const address of options.addresses) {
+      // TODO: handle non-addresses e.g. 0xdiscobot
+      const { data } = fromBech32(address);
+      const encodedAddress = toBech32(chainNode.bech32, data);
+      addressMap[encodedAddress] = address;
+    }
+
+    // fetch from cache
+
+    // fetch missing from cache
+    const result = await __getCosmosNativeBalances.call(this, {
       chainNode,
-      addresses: options.addresses,
+      addresses: Object.keys(addressMap),
     });
+
+    // update cache
+
+    // map to decoded addresses rather than the generated encoded addresses
+    const balances: Balances = {};
+    for (const [address, balance] of result) {
+      balances[addressMap[address]] = balance;
+    }
+
+    return balances;
   }
 
   private async getEvmBalances(options: GetEvmBalancesOptions) {
