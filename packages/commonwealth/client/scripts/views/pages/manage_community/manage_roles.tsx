@@ -44,7 +44,7 @@ export const ManageRoles = ({
       const newRole = res.data.result;
       onRoleUpdate(role, newRole);
     } catch (err) {
-      const errMsg = err.responseJSON?.error || 'Failed to alter role.';
+      const errMsg = err.response?.data?.error || 'Failed to alter role.';
       notifyError(errMsg);
     }
   };

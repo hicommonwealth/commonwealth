@@ -169,7 +169,7 @@ export const NewThreadForm = () => {
       if (err instanceof SessionKeyError) {
         return;
       }
-      console.error(err?.responseJSON?.error || err?.message);
+      console.error(err.response.data.error || err?.message);
       notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
