@@ -26,8 +26,6 @@ export enum ComponentType {
   MobileMenu = 'MobileMenu',
   Modal = 'CWModal',
   OldTextInput = 'OldTextInput',
-  OldTooltip = 'OldTooltip',
-  Popover = 'Popover',
   PopoverMenu = 'PopoverMenu',
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',

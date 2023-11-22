@@ -1,11 +1,5 @@
-@import '../../../../../../styles/components/component_kit/cw_popover/cw_tooltip';
-
 .ThreadOptions {
   align-items: center;
   display: flex;
   gap: 1px;
-
-  .OldTooltip {
-    @include newTempBlackTooltip;
-  }
 }
