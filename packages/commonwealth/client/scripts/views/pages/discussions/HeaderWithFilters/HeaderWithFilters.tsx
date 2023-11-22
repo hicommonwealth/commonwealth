@@ -8,14 +8,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import { Select } from 'views/components/Select';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-//component_kit/new_designs/cw_button
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
+import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import type Topic from '../../../../models/Topic';
 import {

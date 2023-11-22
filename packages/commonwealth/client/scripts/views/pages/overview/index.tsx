@@ -104,6 +104,7 @@ const OverviewPage = () => {
         ) : (
           <CWButton
             buttonType="primary"
+            buttonHeight="sm"
             label="Create thread"
             iconLeft="plus"
             onClick={() => {
