@@ -1,15 +1,19 @@
-import { ChainNodeInstance } from '../../models/chain_node';
-import { Balances } from '../server_token_balance_controller';
+import { ChainNodeInstance } from '../../../models/chain_node';
+import { Balances } from '../types';
 
-export type GetErc721BalancesOptions = {
+export type GetErc20BalancesOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
   contractAddress: string;
 };
 
-export async function __getErc721Balances(options: GetErc721BalancesOptions) {}
+export async function __getErc20Balances(
+  options: GetErc20BalancesOptions,
+): Promise<Balances> {
+  return {};
+}
 
-async function getOnChainBatchErc721Balances(
+async function getOnChainBatchErc20Balances(
   ethChainId: number,
   rpcEndpoint: string,
   contractAddress: string,
@@ -18,7 +22,7 @@ async function getOnChainBatchErc721Balances(
   return {};
 }
 
-async function getOffChainBatchErc721Balances(
+async function getOffChainBatchErc20Balances(
   rpcEndpoint: string,
   contractAddress: string,
   addresses: string[],
@@ -26,7 +30,7 @@ async function getOffChainBatchErc721Balances(
   return {};
 }
 
-async function getErc721Balance(
+async function getErc20Balance(
   rpcEndpoint: string,
   contractAddress: string,
   address: string,

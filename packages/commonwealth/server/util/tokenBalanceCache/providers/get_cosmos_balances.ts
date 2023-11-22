@@ -1,5 +1,5 @@
-import { ChainNodeInstance } from '../../models/chain_node';
-import { Balances } from '../server_token_balance_controller';
+import { ChainNodeInstance } from '../../../models/chain_node';
+import { Balances } from '../types';
 
 export type GetCosmosBalanceOptions = {
   chainNode: ChainNodeInstance;
