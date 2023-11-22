@@ -1,7 +1,10 @@
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
+import { StatsDController } from 'common-common/src/statsd';
 import { DB } from '../../models';
 import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
+import { rollbar } from '../rollbar';
 import { __getCosmosNativeBalances } from './providers/get_cosmos_balances';
 import { __getErc1155Balances } from './providers/get_erc1155_balances';
 import { __getErc20Balances } from './providers/get_erc20_balances';
@@ -13,6 +16,8 @@ import {
   GetCosmosBalancesOptions,
   GetEvmBalancesOptions,
 } from './types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export class TokenBalanceCache {
   constructor(public models: DB, public redis: RedisCache) {}
@@ -36,6 +41,13 @@ export class TokenBalanceCache {
     // update cache
 
     // return
+    StatsDController.get().increment(
+      'tbc.successful.balance.fetch',
+      Object.keys(balances).length,
+      {
+        balance_source_type: options.balanceSourceType,
+      },
+    );
     return balances;
   }
 
@@ -52,13 +64,15 @@ export class TokenBalanceCache {
     // all addresses twice before returning
     const addressMap: { [encodedAddress: string]: string } = {};
     for (const address of options.addresses) {
-      // TODO: handle non-addresses e.g. 0xdiscobot
       try {
         const { data } = fromBech32(address);
         const encodedAddress = toBech32(chainNode.bech32, data);
         addressMap[encodedAddress] = address;
       } catch (e) {
-        console.error(`Skipping address: ${address}`, e);
+        if (address != '0xdiscordbot') {
+          log.error(`Skipping address: ${address}`, e);
+          rollbar.error(`Skipping address: ${address}`, e);
+        }
       }
     }
 
