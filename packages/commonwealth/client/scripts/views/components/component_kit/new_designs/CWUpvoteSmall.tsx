@@ -35,25 +35,25 @@ const CWUpvoteSmall = ({
   };
 
   return (
-    <div
-      className={getClasses<{ disabled?: boolean }>({ disabled })}
-      onClick={handleClick}
-      onMouseEnter={popoverProps.handleInteraction}
-      onMouseLeave={popoverProps.handleInteraction}
-    >
-      {voteCount > 0 && !disabled ? (
-        <>
-          <CWThreadAction
-            action="upvote"
-            isThreadArchived={isThreadArchived}
-            selected={selected}
-            label={String(voteCount)}
-            disabled={disabled}
-          />
-          <CWPopover content={popoverContent} {...popoverProps} />
-        </>
-      ) : (
-        <>
+    <>
+      <div
+        className={getClasses<{ disabled?: boolean }>({ disabled })}
+        onMouseEnter={popoverProps.handleInteraction}
+        onMouseLeave={popoverProps.handleInteraction}
+      >
+        {voteCount > 0 && !disabled ? (
+          <>
+            <CWThreadAction
+              action="upvote"
+              isThreadArchived={isThreadArchived}
+              selected={selected}
+              label={String(voteCount)}
+              disabled={disabled}
+              onClick={handleClick}
+            />
+            <CWPopover body={popoverContent} {...popoverProps} />
+          </>
+        ) : (
           <CWThreadAction
             action="upvote"
             isThreadArchived={isThreadArchived}
@@ -61,10 +61,11 @@ const CWUpvoteSmall = ({
             label={String(voteCount)}
             disabled={disabled}
             tooltipText={tooltipText}
+            onClick={handleClick}
           />
-        </>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

@@ -128,7 +128,7 @@ export const ReactionButton = ({
           selected={hasReacted}
           onClick={handleVoteClick}
           popoverContent={getDisplayedReactorsForPopup({
-            reactors: reactors,
+            reactors,
           })}
           tooltipText={tooltipText}
         />
@@ -142,27 +142,26 @@ export const ReactionButton = ({
           />
         </TooltipWrapper>
       ) : (
-        <>
+        <div
+          onMouseEnter={popoverProps.handleInteraction}
+          onMouseLeave={popoverProps.handleInteraction}
+        >
           <CWUpvote
             onClick={handleVoteClick}
             voteCount={reactors.length}
             disabled={disabled}
             active={hasReacted}
-            onMouseEnter={popoverProps.handleInteraction}
-            onMouseLeave={popoverProps.handleInteraction}
           />
 
-          <CWPopover
-            content={
-              reactors.length > 0
-                ? getDisplayedReactorsForPopup({
-                    reactors,
-                  })
-                : null
-            }
-            {...popoverProps}
-          />
-        </>
+          {reactors.length > 0 && (
+            <CWPopover
+              body={getDisplayedReactorsForPopup({
+                reactors,
+              })}
+              {...popoverProps}
+            />
+          )}
+        </div>
       )}
       <CWModal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
