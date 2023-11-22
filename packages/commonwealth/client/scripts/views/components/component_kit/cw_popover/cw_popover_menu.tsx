@@ -6,6 +6,7 @@ import { PopperOwnProps, PopperPlacementType } from '@mui/base/Popper';
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
 import CWPopover, {
+  PopoverTriggerProps,
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWIcon } from '../cw_icons/cw_icon';
@@ -17,7 +18,6 @@ import type {
   HeaderMenuItem,
 } from '../types';
 import { ComponentType } from '../types';
-import type { PopoverTriggerProps } from './cw_popover';
 
 export type PopoverMenuItem =
   | DividerMenuItem

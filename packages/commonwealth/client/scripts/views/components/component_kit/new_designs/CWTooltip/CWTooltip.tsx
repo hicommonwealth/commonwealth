@@ -4,9 +4,9 @@ import 'components/component_kit/new_designs/CWTooltip.scss';
 
 import { Placement } from '@popperjs/core/lib';
 import CWPopover, {
+  PopoverTriggerProps,
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
-import type { PopoverTriggerProps } from '../../cw_popover/cw_popover';
 import { CWText } from '../../cw_text';
 import { TooltipContainer } from './TooltipContainer';
 
