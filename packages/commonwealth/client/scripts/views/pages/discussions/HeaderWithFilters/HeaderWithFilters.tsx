@@ -8,12 +8,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { Select } from 'views/components/Select';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import type Topic from '../../../../models/Topic';
 import {
@@ -22,7 +23,6 @@ import {
   ThreadTimelineFilterTypes,
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
-import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 
 type HeaderWithFiltersProps = {
   stage: string;
@@ -63,7 +63,7 @@ export const HeaderWithFilters = ({
   const onFilterResize = () => {
     if (filterRowRef.current) {
       setRightFiltersDropdownPosition(
-        filterRowRef.current.clientHeight > 40 ? 'bottom-start' : 'bottom-end'
+        filterRowRef.current.clientHeight > 40 ? 'bottom-start' : 'bottom-end',
       );
     }
   };
@@ -118,12 +118,12 @@ export const HeaderWithFilters = ({
 
   const matchesDiscussionsTopicRoute = matchRoutes(
     [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
-    location
+    location,
   );
 
   const matchesArchivedRoute = matchRoutes(
     [{ path: '/archived' }, { path: ':scope/archived' }],
-    location
+    location,
   );
 
   const onFilterSelect = ({
@@ -132,7 +132,7 @@ export const HeaderWithFilters = ({
     filterVal = '',
   }) => {
     const urlParams = Object.fromEntries(
-      new URLSearchParams(window.location.search)
+      new URLSearchParams(window.location.search),
     );
     urlParams[filterKey] = filterVal;
 
@@ -145,14 +145,14 @@ export const HeaderWithFilters = ({
         `/archived?` +
           Object.keys(urlParams)
             .map((x) => `${x}=${urlParams[x]}`)
-            .join('&')
+            .join('&'),
       );
     } else {
       navigate(
         `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
           Object.keys(urlParams)
             .map((x) => `${x}=${urlParams[x]}`)
-            .join('&')
+            .join('&'),
       );
     }
   };
@@ -191,7 +191,9 @@ export const HeaderWithFilters = ({
               iconLeft="plus"
               onClick={() => {
                 navigate(
-                  `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''}`
+                  `/new/discussion${
+                    topic ? `?topic=${selectedTopic?.id}` : ''
+                  }`,
                 );
               }}
               disabled={!hasJoinedCommunity}
@@ -292,8 +294,8 @@ export const HeaderWithFilters = ({
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
                       [...featuredTopics, ...otherTopics].find(
-                        (x) => x.id === item.id
-                      )
+                        (x) => x.id === item.id,
+                      ),
                     )
                   }
                 />

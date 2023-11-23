@@ -26,7 +26,7 @@ const SocialAccount = (props: SocialAccountProps) => {
   }
 
   return (
-    <a href={formattedLink} target="_blank">
+    <a href={formattedLink} target="_blank" rel="noopener">
       <CWIcon iconName={iconName} className="social-icon" />
     </a>
   );

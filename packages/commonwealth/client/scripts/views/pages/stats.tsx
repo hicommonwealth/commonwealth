@@ -123,7 +123,7 @@ const StatsPage = () => {
             roles,
             threads,
             activeAccounts,
-          })
+          }),
         );
       } catch (err) {
         if (err.responseJSON?.error) {

@@ -93,7 +93,7 @@ const EditProfileComponent = () => {
             console.error(`Could not return AddressInfo: "${err}"`);
             return null;
           }
-        })
+        }),
       );
     } catch (err) {
       if (
@@ -124,7 +124,7 @@ const EditProfileComponent = () => {
 
     if (!_.isEqual(backgroundImageRef, profile?.backgroundImage))
       profileUpdate.backgroundImage = JSON.stringify(
-        backgroundImageRef.current
+        backgroundImageRef.current,
       );
 
     if (Object.keys(profileUpdate)?.length > 0) {
@@ -172,7 +172,7 @@ const EditProfileComponent = () => {
     if (addresses?.length > 0) {
       const oldProfile = new MinimumProfile(
         addresses[0].community.name,
-        addresses[0].address
+        addresses[0].address,
       );
 
       oldProfile.initialize(
@@ -181,7 +181,7 @@ const EditProfileComponent = () => {
         avatarUrl,
         profile.id,
         addresses[0].community.name,
-        null
+        null,
       );
 
       setAccount(
@@ -190,7 +190,7 @@ const EditProfileComponent = () => {
           address: addresses[0].address,
           profile: oldProfile,
           ignoreProfile: false,
-        })
+        }),
       );
     } else {
       setAccount(null);
@@ -343,7 +343,7 @@ const EditProfileComponent = () => {
             <CWCoverImageUploader
               uploadCompleteCallback={(
                 url: string,
-                imageBehavior: ImageBehavior
+                imageBehavior: ImageBehavior,
               ) => {
                 backgroundImageRef.current = {
                   url,
@@ -352,7 +352,7 @@ const EditProfileComponent = () => {
               }}
               generatedImageCallback={(
                 url: string,
-                imageBehavior: ImageBehavior
+                imageBehavior: ImageBehavior,
               ) => {
                 backgroundImageRef.current = {
                   url,
@@ -374,7 +374,7 @@ const EditProfileComponent = () => {
               refreshProfiles={(address: string) => {
                 getProfile();
                 app.user.removeAddress(
-                  addresses.find((a) => a.address === address)
+                  addresses.find((a) => a.address === address),
                 );
               }}
             />

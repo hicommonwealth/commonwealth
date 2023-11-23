@@ -59,7 +59,7 @@ export const CommentReactionButton = ({
 
   const activeAddress = app.user.activeAccount?.address;
   const hasReacted = !!(comment.reactions || []).find(
-    (x) => x?.author === activeAddress
+    (x) => x?.author === activeAddress,
   );
   const likes = (comment.reactions || []).length;
 
