@@ -30,7 +30,7 @@ const OrderTopics = async (
   const isAdminOrMod = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain.id,
+    communityId: chain.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,

@@ -62,7 +62,7 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
             <User
               userAddress={proposal.author.address}
               userChainId={
-                proposal.author.chain?.id || proposal.author.profile?.chain
+                proposal.author.community?.id || proposal.author.profile?.chain
               }
               shouldHideAvatar
               shouldLinkProfile

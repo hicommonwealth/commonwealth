@@ -1,11 +1,9 @@
-import React from 'react';
-import Select, { components } from 'react-select';
-import { ComponentType } from '../../types';
-import './CWTypeaheadSelectList.scss';
-import { CWIcon } from '../../cw_icons/cw_icon';
 import clsx from 'clsx';
-
-type SelectListOption = {
+import React from 'react';
+import { ComponentType } from '../../types';
+import { CWSelectList } from '../CWSelectList';
+import './CWTypeaheadSelectList.scss';
+export type SelectListOption = {
   value: string;
   label: string;
 };
@@ -15,28 +13,7 @@ type TypeaheadSelectListProps = {
   defaultValue: SelectListOption;
   placeholder: string;
   isDisabled?: boolean;
-};
-
-const DropdownIndicator = (props) => {
-  const isMenuOpen = props.selectProps.menuIsOpen;
-
-  return (
-    <components.DropdownIndicator {...props}>
-      {isMenuOpen ? (
-        <CWIcon iconName="chevronUp" iconSize="small" />
-      ) : (
-        <CWIcon iconName="chevronDown" iconSize="small" />
-      )}
-    </components.DropdownIndicator>
-  );
-};
-
-const Option = (props) => {
-  return (
-    <components.Option {...props}>
-      <div className="text-container">{props.label}</div>
-    </components.Option>
-  );
+  onChange?: (newOption: SelectListOption) => void;
 };
 
 export const CWTypeaheadSelectList = ({
@@ -44,24 +21,11 @@ export const CWTypeaheadSelectList = ({
   defaultValue,
   placeholder,
   isDisabled = false,
+  onChange,
 }: TypeaheadSelectListProps) => {
   return (
     <div className={ComponentType.TypeaheadSelectList}>
-      <Select
-        styles={{
-          control: (baseStyles) => ({
-            ...baseStyles,
-            // removes unnecessary styles
-            border: 0,
-            boxShadow: 'none',
-            minHeight: 'unset',
-          }),
-          menu: (baseStyles) => ({
-            ...baseStyles,
-            maxHeight: '300px',
-          }),
-        }}
-        components={{ DropdownIndicator, Option }}
+      <CWSelectList
         defaultValue={defaultValue}
         options={options}
         isSearchable={true}
@@ -70,7 +34,8 @@ export const CWTypeaheadSelectList = ({
         placeholder={placeholder}
         noOptionsMessage={() => 'No matches found.'}
         isDisabled={isDisabled}
-        className={clsx(`SelectList`, isDisabled && 'disabled')}
+        className={clsx(isDisabled && 'disabled')}
+        onChange={onChange}
       />
     </div>
   );

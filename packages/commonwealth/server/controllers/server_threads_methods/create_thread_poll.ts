@@ -1,11 +1,12 @@
 import moment from 'moment';
 import { AppError } from '../../../../common-common/src/errors';
-import { ServerThreadsController } from '../server_threads_controller';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { CommunityInstance } from '../../models/community';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -16,43 +17,38 @@ export const Errors = {
 
 export type CreateThreadPollOptions = {
   user: UserInstance;
-  address: AddressInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   threadId: number;
   prompt: string;
   options: string[];
-  customDuration?: string;
+  customDuration?: number;
 };
-export type CreateThreadPollResult = PollAttributes;
+export type CreateThreadPollResult = [PollAttributes, TrackOptions];
 
 export async function __createThreadPoll(
   this: ServerThreadsController,
   {
     user,
-    address,
-    chain,
+    community,
     threadId,
     prompt,
     options,
     customDuration,
-  }: CreateThreadPollOptions
+  }: CreateThreadPollOptions,
 ): Promise<CreateThreadPollResult> {
-  let finalCustomDuration: string | number = '';
-  if (customDuration && customDuration !== 'Infinite') {
-    finalCustomDuration = Number(finalCustomDuration);
+  if (customDuration) {
     if (
-      !Number.isInteger(finalCustomDuration) ||
-      finalCustomDuration < 0 ||
-      finalCustomDuration > 31
+      customDuration !== Infinity &&
+      (customDuration < 0 || customDuration > 31)
     ) {
       throw new AppError(Errors.InvalidDuration);
     }
   }
   const ends_at =
-    finalCustomDuration === 'Infinite'
+    customDuration === Infinity
       ? null
-      : finalCustomDuration
-      ? moment().add(finalCustomDuration, 'days').toDate()
+      : customDuration
+      ? moment().add(customDuration, 'days').toDate()
       : moment().add(5, 'days').toDate();
 
   const thread = await this.models.Thread.findOne({
@@ -67,7 +63,7 @@ export async function __createThreadPoll(
   const isThreadOwner = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     entity: thread,
   });
   if (!isThreadOwner) {
@@ -79,7 +75,7 @@ export async function __createThreadPoll(
     const isAdmin = await validateOwner({
       models: this.models,
       user,
-      chainId: chain.id,
+      communityId: community.id,
       allowAdmin: true,
     });
     if (!isAdmin) {
@@ -93,14 +89,21 @@ export async function __createThreadPoll(
     return this.models.Poll.create(
       {
         thread_id: thread.id,
-        chain_id: thread.chain,
+        community_id: thread.chain,
         prompt,
         options: JSON.stringify(options),
         ends_at,
       },
-      { transaction }
+      { transaction },
     );
   });
 
-  return poll.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.CREATE_POLL,
+    community: community.id,
+    userId: user.id,
+    isCustomDomain: null,
+  };
+
+  return [poll.toJSON(), analyticsOptions];
 }

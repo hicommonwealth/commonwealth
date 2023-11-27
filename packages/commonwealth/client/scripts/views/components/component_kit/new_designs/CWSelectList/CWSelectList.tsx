@@ -1,56 +1,88 @@
-import './CWSelectList.scss';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import type { GroupBase, Props } from 'react-select';
-import Select, { components } from 'react-select';
-import { CWIcon } from '../../cw_icons/cw_icon';
+import Select from 'react-select';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
 import { MessageRow } from '../CWTextInput/MessageRow';
-import { useFormContext } from 'react-hook-form';
+import './CWSelectList.scss';
+import { DropdownIndicator } from './DropdownIndicator';
+import { MultiValueRemove } from './MultiValueRemove';
+import { Option } from './Option';
 
 type CustomCWSelectListProps = {
   label?: string;
   hookToForm?: boolean;
+  customError?: string;
 };
 
 export const CWSelectList = <
   Option,
   IsMulti extends boolean = false,
-  Group extends GroupBase<Option> = GroupBase<Option>
+  Group extends GroupBase<Option> = GroupBase<Option>,
 >(
-  props: Props<Option, IsMulti, Group> & CustomCWSelectListProps
+  props: Props<Option, IsMulti, Group> & CustomCWSelectListProps,
 ) => {
+  const {
+    hookToForm,
+    name,
+    defaultValue,
+    label,
+    value,
+    className,
+    classNamePrefix,
+    isSearchable,
+    customError,
+  } = props;
   const formContext = useFormContext();
-  const formFieldContext = props.hookToForm
-    ? formContext.register(props.name)
+  const formFieldContext = hookToForm
+    ? formContext.register(name)
     : ({} as any);
   const formFieldErrorMessage =
-    props.hookToForm &&
-    (formContext?.formState?.errors?.[props.name]?.message as string);
+    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
+  const [defaultFormContextValue, setDefaultFormContextValue] = useState(
+    hookToForm ? formContext?.getValues?.(props?.name) : null,
+  );
 
   useEffect(() => {
-    props.hookToForm &&
-      formContext &&
-      props.name &&
-      props.defaultValue &&
-      formContext.setValue(props.name, props.defaultValue);
-  }, [props.hookToForm, props.name, props.defaultValue, formContext]);
+    if (defaultFormContextValue) {
+      setTimeout(() => {
+        setDefaultFormContextValue(null);
+      });
+    }
+  }, [defaultFormContextValue]);
 
   useEffect(() => {
-    props.hookToForm &&
+    hookToForm &&
       formContext &&
-      props.name &&
-      props.value &&
-      formContext.setValue(props.name, props.value);
-  }, [props.hookToForm, props.name, props.value, formContext]);
+      name &&
+      defaultValue &&
+      formContext.setValue(name, defaultValue);
+  }, [hookToForm, name, defaultValue, formContext]);
+
+  useEffect(() => {
+    hookToForm &&
+      formContext &&
+      name &&
+      value &&
+      formContext.setValue(name, value);
+  }, [hookToForm, name, value, formContext]);
+
+  const isDisabled = props?.isDisabled || formFieldContext?.disabled;
 
   return (
-    <div className="CWSelectList">
-      {props.label && <MessageRow label={props.label} />}
+    <div
+      className={getClasses<{ disabled?: boolean }>(
+        { disabled: isDisabled },
+        'CWSelectList',
+      )}
+    >
+      {label && <MessageRow label={label} />}
       <Select
         {...props}
         {...formFieldContext}
-        isDisabled={props?.isDisabled || formFieldContext?.disabled}
+        {...(defaultFormContextValue && { value: defaultFormContextValue })}
+        isDisabled={isDisabled}
         required={props?.required || formFieldContext?.required}
         onBlur={(e) => {
           props?.onBlur?.(e);
@@ -58,9 +90,9 @@ export const CWSelectList = <
         }}
         onChange={(newValue: any, actionMeta) => {
           props?.onChange?.(newValue, actionMeta);
-          if (props.hookToForm) {
-            formContext.setValue(props.name, newValue);
-            newValue?.length && formContext.setError(props.name, null);
+          if (hookToForm) {
+            formContext.setValue(name, newValue);
+            newValue?.length && formContext.setError(name, null);
           }
         }}
         styles={{
@@ -75,52 +107,35 @@ export const CWSelectList = <
             ...baseStyles,
             maxHeight: '300px',
           }),
-          option: (baseStyles, state) => {
-            const base = { ...baseStyles };
-
-            if (state.isSelected) {
-              base.backgroundColor = '#F0EFF0 !important';
-              base.color = 'inherit';
-            }
-
-            if (state.isFocused) {
-              base.backgroundColor = '#F0EFF0 !important';
-              base.color = 'inherit';
-            }
-
-            return base;
-          },
         }}
         components={{
-          DropdownIndicator: () => (
-            <CWIcon
-              className="caret-icon"
-              iconName="caretDown"
-              iconSize="small"
-            />
-          ),
-          MultiValueRemove: (removeProps) => (
-            <components.MultiValueRemove {...removeProps}>
-              <CWIcon iconName="close" className="close-btn" />
-            </components.MultiValueRemove>
-          ),
+          DropdownIndicator,
+          MultiValueRemove,
+          Option,
         }}
         className={getClasses<{
           className?: string;
           failure?: boolean;
+          disabled?: boolean;
+          searchable?: boolean;
         }>(
           {
-            className: props.className,
-            failure: !!formFieldErrorMessage,
+            className: className,
+            failure: !!formFieldErrorMessage || !!customError,
+            searchable: isSearchable,
+            disabled: isDisabled,
           },
-          ComponentType.SelectList
+          ComponentType.SelectList,
         )}
+        classNamePrefix={classNamePrefix || 'cwsl'}
       />
-      {formFieldErrorMessage && (
+      {(formFieldErrorMessage || customError) && (
         <MessageRow
-          hasFeedback={!!formFieldErrorMessage}
-          statusMessage={formFieldErrorMessage}
-          validationStatus={formFieldErrorMessage ? 'failure' : undefined}
+          hasFeedback={!!formFieldErrorMessage || !!customError}
+          statusMessage={formFieldErrorMessage || customError}
+          validationStatus={
+            formFieldErrorMessage || customError ? 'failure' : undefined
+          }
         />
       )}
     </div>

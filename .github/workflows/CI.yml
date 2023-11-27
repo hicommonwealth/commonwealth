@@ -365,8 +365,11 @@ jobs:
           GITHUB_BASE_REF: ${{ github.base_ref }}
         run: yarn lint-branch
 
-      - name: Typecheck
+      - name: Commonwealth Typecheck
         run: yarn --cwd packages/commonwealth check-types
+
+      - name: Dicsord-Bot Typecheck
+        run: yarn --cwd packages/discord-bot check-types
 
   # These tests run quickly, so run them in a separate job
   commonwealth-unit-integration:
@@ -504,6 +507,9 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Init Db
+        run: cd packages/commonwealth && npx sequelize db:migrate
+
       ## EVM Section:
       - name: Start EVM Testnet
         run: |
@@ -514,6 +520,9 @@ jobs:
 
       - name: Run Token Balance Cache Unit Tests
         run: yarn --cwd packages/token-balance-cache test --forbid-only
+
+      - name: Run EVM Devnet tests
+        run: TEST_DIR=evm yarn --cwd packages/commonwealth test-devnet --forbid-only
 
       - name: Stop EVM Chain
         run: docker stop chain
@@ -530,7 +539,7 @@ jobs:
             packages/commonwealth/test/integration/cosmosGovNotifGenerator.spec.ts
             packages/commonwealth/server/util/cosmosProxy.ts
             packages/commonwealth/client/scripts/controllers/chain/cosmos/gov/**/*
-            packages/chain-events/cosmos-chain-testing/**/*
+            packages/commonwealth/test/util/cosmos-chain-testing/**/*
             packages/common-common/src/cosmos-ts/**/*
 
       - name: Run following steps if any file(s) in the Cosmos folders change
@@ -539,13 +548,9 @@ jobs:
           echo "One or more Cosmos Devnet-related files has changed."
           echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
 
-      - name: Init Db
-        if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: cd packages/commonwealth && npx sequelize db:migrate
-
       - name: Run Cosmos Devnet tests
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && yarn --cwd packages/commonwealth test-devnet --forbid-only)
+        run: yarn --cwd packages/commonwealth start & (yarn --cwd packages/commonwealth wait-server && TEST_DIR=cosmos yarn --cwd packages/commonwealth test-devnet --forbid-only)
         env:
           PORT: 8080
           USES_DOCKER_PGSQL: true

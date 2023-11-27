@@ -1,10 +1,10 @@
-import React, { FC } from 'react';
 import { CheckCircle, Warning } from '@phosphor-icons/react';
+import React, { FC } from 'react';
 
-import { ValidationStatus } from '../../cw_validation_text';
-import { getClasses } from '../../helpers';
 import { CWLabel } from '../../cw_label';
 import { CWText } from '../../cw_text';
+import { ValidationStatus } from '../../cw_validation_text';
+import { getClasses } from '../../helpers';
 
 import './MessageRow.scss';
 
@@ -14,6 +14,7 @@ interface MessageRowProps {
   statusMessage?: string;
   validationStatus?: ValidationStatus;
   instructionalMessage?: string;
+  rightAlign?: boolean;
 }
 
 export const MessageRow: FC<MessageRowProps> = ({
@@ -22,8 +23,16 @@ export const MessageRow: FC<MessageRowProps> = ({
   statusMessage,
   validationStatus,
   instructionalMessage,
+  rightAlign,
 }) => (
-  <div className={getClasses({}, 'MessageRow')}>
+  <div
+    className={getClasses(
+      {
+        'ml-auto': rightAlign,
+      },
+      'MessageRow',
+    )}
+  >
     {label && <CWLabel label={label} />}
     {instructionalMessage && <CWLabel label={instructionalMessage} />}
     {hasFeedback && (
@@ -36,7 +45,7 @@ export const MessageRow: FC<MessageRowProps> = ({
           type="caption"
           className={getClasses<{ status: ValidationStatus }>(
             { status: validationStatus },
-            'feedback-message-text'
+            'feedback-message-text',
           )}
         >
           {statusMessage}

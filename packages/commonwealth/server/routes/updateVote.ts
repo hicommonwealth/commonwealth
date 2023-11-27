@@ -39,12 +39,10 @@ const updateVote = async (
 ) => {
   const chain = req.chain;
 
-  const author = req.address;
-
   const { poll_id, address, author_chain, option } = req.body;
 
   const poll = await models.Poll.findOne({
-    where: { id: poll_id, chain_id: chain.id },
+    where: { id: poll_id, community_id: chain.id },
   });
   if (!poll) return next(new AppError(Errors.NoPoll));
   if (!poll.ends_at && moment(poll.ends_at).utc().isBefore(moment().utc())) {
@@ -88,8 +86,8 @@ const updateVote = async (
       where: {
         poll_id: poll.id,
         address,
-        author_chain,
-        chain_id: chain.id,
+        author_community_id: author_chain,
+        community_id: chain.id,
       },
       transaction: t,
     });
@@ -98,8 +96,8 @@ const updateVote = async (
       {
         poll_id: poll.id,
         address,
-        author_chain,
-        chain_id: chain.id,
+        author_community_id: author_chain,
+        community_id: chain.id,
         option: selected_option,
       },
       { transaction: t }

@@ -29,8 +29,8 @@ export class ServerProposalsController {
   public async getProposals(
     options: GetProposalsOptions
   ): Promise<GetProposalsResult> {
-    const contractInfo = await this.getContractInfo(options.chainId);
-    const provider = await this.createEvmProvider(options.chainId);
+    const contractInfo = await this.getContractInfo(options.communityId);
+    const provider = await this.createEvmProvider(options.communityId);
     return __getProposals.call(
       this,
       options,
@@ -43,8 +43,8 @@ export class ServerProposalsController {
   public async getProposalVotes(
     options: GetProposalVotesOptions
   ): Promise<GetProposalVotesResult> {
-    const contractInfo = await this.getContractInfo(options.chainId);
-    const provider = await this.createEvmProvider(options.chainId);
+    const contractInfo = await this.getContractInfo(options.communityId);
+    const provider = await this.createEvmProvider(options.communityId);
     return __getProposalVotes.call(this, options, provider, contractInfo);
   }
 
@@ -105,7 +105,7 @@ export class ServerProposalsController {
   }
 
   private async getRPCUrl(chainId: string): Promise<string> {
-    const chain = await this.models.Chain.findOne({
+    const chain = await this.models.Community.findOne({
       where: {
         id: chainId,
       },

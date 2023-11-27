@@ -7,7 +7,10 @@ import React, { useEffect } from 'react';
 import app, { LoginState } from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { Feed } from '../../components/feed';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
@@ -73,7 +76,7 @@ const UserDashboard = (props: UserDashboardProps) => {
           <CWText type="h2" fontWeight="medium">
             Home
           </CWText>
-          <CWTabBar>
+          <CWTabsRow>
             <CWTab
               label={DashboardViews.ForYou}
               isSelected={activePage === DashboardViews.ForYou}
@@ -101,7 +104,7 @@ const UserDashboard = (props: UserDashboardProps) => {
                 navigate('/dashboard/chain-events');
               }}
             />
-          </CWTabBar>
+          </CWTabsRow>
         </div>
         <>
           {/* TODO: add filter functionality */}

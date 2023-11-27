@@ -1,5 +1,5 @@
 .ml-auto {
-  margin-left: auto;
+  margin-left: auto !important;
 }
 
 .mt-16 {
@@ -12,4 +12,8 @@
 
 .w-full {
   width: 100% !important;
+}
+
+.capitalize {
+  text-transform: capitalize;
 }

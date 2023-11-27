@@ -1,15 +1,12 @@
 import { assert } from 'chai';
+import { ChainNetwork } from '../../../../common-common/src/types';
+import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import { Requirement } from '../../../server/util/requirementsModule/requirementsTypes';
 import validateGroupMembership, {
-  validateGroupMembershipResponse,
+  ValidateGroupMembershipResponse,
 } from '../../../server/util/requirementsModule/validateGroupMembership';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import { ChainNetwork } from '../../../../common-common/src/types';
 
 describe('validateGroupMembership', () => {
-  it('should return a valid response', async () => {
-    const userAddress: string = 'mockUserAddress';
-    const requirements: Requirement[] = [];
   it('should pass basic erc20 check', async () => {
     const userAddress: string = '0x123456';
     const requirements: Requirement[] = [
@@ -30,16 +27,16 @@ describe('validateGroupMembership', () => {
         network,
         userAddress: string,
         chainId: string,
-        contractAddress?: string
+        contractAddress?: string,
       ): Promise<string> {
         return '2000';
       },
     };
-    const result: validateGroupMembershipResponse =
+    const result: ValidateGroupMembershipResponse =
       await validateGroupMembership(
         userAddress,
         requirements,
-        tbc as TokenBalanceCache
+        tbc as TokenBalanceCache,
       );
 
     assert.equal(result.isValid, true);
@@ -64,16 +61,16 @@ describe('validateGroupMembership', () => {
         network,
         userAddress: string,
         chainId: string,
-        contractAddress?: string
+        contractAddress?: string,
       ): Promise<string> {
         return '2';
       },
     };
-    const result: validateGroupMembershipResponse =
+    const result: ValidateGroupMembershipResponse =
       await validateGroupMembership(
         userAddress,
         requirements,
-        tbc as TokenBalanceCache
+        tbc as TokenBalanceCache,
       );
 
     assert.equal(result.isValid, true);
@@ -97,16 +94,16 @@ describe('validateGroupMembership', () => {
         network,
         userAddress: string,
         chainId: string,
-        contractAddress?: string
+        contractAddress?: string,
       ): Promise<string> {
         return '2000';
       },
     };
-    const result: validateGroupMembershipResponse =
+    const result: ValidateGroupMembershipResponse =
       await validateGroupMembership(
         userAddress,
         requirements,
-        tbc as TokenBalanceCache
+        tbc as TokenBalanceCache,
       );
 
     assert.equal(result.isValid, true);
@@ -131,16 +128,16 @@ describe('validateGroupMembership', () => {
         network,
         userAddress: string,
         chainId: string,
-        contractAddress?: string
+        contractAddress?: string,
       ): Promise<string> {
         return '1';
       },
     };
-    const result: validateGroupMembershipResponse =
+    const result: ValidateGroupMembershipResponse =
       await validateGroupMembership(
         userAddress,
         requirements,
-        tbc as TokenBalanceCache
+        tbc as TokenBalanceCache,
       );
 
     assert.equal(result.isValid, false);
@@ -166,16 +163,16 @@ describe('validateGroupMembership', () => {
         network,
         userAddress: string,
         chainId: string,
-        contractAddress?: string
+        contractAddress?: string,
       ): Promise<string> {
         return '1000';
       },
     };
-    const result: validateGroupMembershipResponse =
+    const result: ValidateGroupMembershipResponse =
       await validateGroupMembership(
         userAddress,
         requirements,
-        tbc as TokenBalanceCache
+        tbc as TokenBalanceCache,
       );
 
     assert.equal(result.isValid, false);
@@ -191,7 +188,7 @@ describe('validateGroupMembership', () => {
         },
       },
     ];
-    const result: validateGroupMembershipResponse =
+    const result: ValidateGroupMembershipResponse =
       await validateGroupMembership(userAddress, requirements);
 
     assert.equal(result.isValid, true);
@@ -206,7 +203,7 @@ describe('validateGroupMembership', () => {
         },
       },
     ];
-    const result: validateGroupMembershipResponse =
+    const result: ValidateGroupMembershipResponse =
       await validateGroupMembership(userAddress, requirements);
 
     assert.equal(result.isValid, false);
@@ -259,7 +256,7 @@ describe('validateGroupMembership', () => {
         network,
         userAddress: string,
         chainId: string,
-        contractAddress?: string
+        contractAddress?: string,
       ): Promise<string> {
         if (network == ChainNetwork.ERC20) {
           return '3000';
@@ -270,11 +267,11 @@ describe('validateGroupMembership', () => {
         }
       },
     };
-    const result: validateGroupMembershipResponse =
+    const result: ValidateGroupMembershipResponse =
       await validateGroupMembership(
         userAddress,
         requirements,
-        tbc as TokenBalanceCache
+        tbc as TokenBalanceCache,
       );
 
     assert.equal(result.isValid, true);
@@ -326,7 +323,7 @@ describe('validateGroupMembership', () => {
         network,
         userAddress: string,
         chainId: string,
-        contractAddress?: string
+        contractAddress?: string,
       ): Promise<string> {
         if (network == ChainNetwork.ERC20) {
           return '3000';
@@ -337,15 +334,14 @@ describe('validateGroupMembership', () => {
         }
       },
     };
-    const result: validateGroupMembershipResponse =
+    const result: ValidateGroupMembershipResponse =
       await validateGroupMembership(
         userAddress,
         requirements,
-        tbc as TokenBalanceCache
+        tbc as TokenBalanceCache,
       );
 
     assert.equal(result.isValid, false);
     assert.equal(result.messages.length, 2);
   });
-})
-})
+});

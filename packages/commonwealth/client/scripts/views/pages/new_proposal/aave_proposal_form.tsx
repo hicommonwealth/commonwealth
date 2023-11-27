@@ -14,7 +14,10 @@ import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import type { AaveProposalState } from './types';
@@ -41,7 +44,7 @@ export const AaveProposalForm = () => {
     };
 
     getExecutors();
-  }, []);
+  }, [aave.governance.api]);
 
   const updateAaveProposalState = <K extends keyof AaveProposalState>(
     index: number,
@@ -59,7 +62,7 @@ export const AaveProposalForm = () => {
         <CWLabel label="Proposer (you)" />
         <User
           userAddress={author.address}
-          userChainId={author.chain?.id || author.profile?.chain}
+          userChainId={author.community?.id || author.profile?.chain}
           shouldLinkProfile
           shouldShowPopover
           shouldShowAddressWithDisplayName
@@ -102,7 +105,7 @@ export const AaveProposalForm = () => {
         </div>
       </div>
       <div className="tab-selector">
-        <CWTabBar>
+        <CWTabsRow>
           {aaveProposalState.map((_, index) => (
             <CWTab
               key={`Call ${index + 1}`}
@@ -113,7 +116,7 @@ export const AaveProposalForm = () => {
               }}
             />
           ))}
-        </CWTabBar>
+        </CWTabsRow>
         <PopoverMenu
           menuItems={[
             {

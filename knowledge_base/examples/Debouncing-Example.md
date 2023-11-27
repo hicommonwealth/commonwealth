@@ -1,4 +1,6 @@
-```Typescript
+# Debouncing Example
+
+```ts
 import React, { useState, useEffect } from 'react';
 
 const Debouncer = () => {
@@ -27,7 +29,7 @@ const Debouncer = () => {
 export default Debouncer;
 ```
 
-# Change Log
+## Change Log
 
 - 230209: Updated by, and ownership transferred to, Timothee Legros.
 - 230206: Authored by Forest Mars.

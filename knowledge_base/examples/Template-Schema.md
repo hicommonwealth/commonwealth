@@ -1,3 +1,5 @@
+# Template Schema
+
 ```json
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
@@ -8,12 +10,12 @@
     "form_fields": {
       "type": "array",
       "items": { 
-	"oneOf": [
-	  { "$ref": "#/$defs/divider" },
-	  { "$ref": "#/$defs/text" },
-	  { "$ref": "#/$defs/input" },
-	  { "$ref": "#/$defs/dropdown" }
-	]
+ "oneOf": [
+   { "$ref": "#/$defs/divider" },
+   { "$ref": "#/$defs/text" },
+   { "$ref": "#/$defs/input" },
+   { "$ref": "#/$defs/dropdown" }
+ ]
       }
     },
     "tx_template": {
@@ -154,7 +156,7 @@
 }
 ```
 
-# Change Log
+## Change Log
 
-- 231013: Flagged by Graham Johnson for certification (see also `Template-Schema.v0.1`) 
+- 231013: Flagged by Graham Johnson for certification (see also `Template-Schema.v0.1`)
 - 230204: Authored by Forest Mars.

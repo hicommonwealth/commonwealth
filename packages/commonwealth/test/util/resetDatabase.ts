@@ -1,4 +1,4 @@
-import models from '../../server/database';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   BalanceType,
   ChainBase,
@@ -6,7 +6,7 @@ import {
   ChainType,
   NotificationCategories,
 } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
+import models from '../../server/database';
 import { ChainNodeAttributes } from '../../server/models/chain_node';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -74,7 +74,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
       ] = await models.ChainNode.bulkCreate(Object.values(nodes));
 
       // Initialize different chain + node URLs
-      await models.Chain.create({
+      await models.Community.create({
         id: 'edgeware',
         network: ChainNetwork.Edgeware,
         default_symbol: 'EDG',
@@ -87,7 +87,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: edgewareNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
@@ -99,7 +99,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: mainnetNode.id,
       });
-      const alex = await models.Chain.create({
+      const alex = await models.Community.create({
         id: 'alex',
         network: ChainNetwork.ERC20,
         default_symbol: 'ALEX',
@@ -111,7 +111,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: testnetNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'osmosis',
         network: ChainNetwork.Osmosis,
         default_symbol: 'OSMO',
@@ -123,7 +123,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: osmosisNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'csdk-beta',
         network: ChainNetwork.Osmosis,
         default_symbol: 'STAKE',
@@ -135,7 +135,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: csdkBetaNode.id,
       });
-      await models.Chain.create({
+      await models.Community.create({
         id: 'csdk',
         network: ChainNetwork.Osmosis,
         default_symbol: 'STAKE',
@@ -158,7 +158,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_id: alex.id,
         contract_id: alexContract.id,
       });
-      const yearn = await models.Chain.create({
+      const yearn = await models.Community.create({
         id: 'yearn',
         network: ChainNetwork.ERC20,
         default_symbol: 'YFI',
@@ -181,13 +181,14 @@ export const resetDatabase = (debug = false): Promise<void> => {
         chain_id: yearn.id,
         contract_id: yearnContract.id,
       });
-      const sushi = await models.Chain.create({
+      const sushi = await models.Community.create({
         id: 'sushi',
         network: ChainNetwork.ERC20,
         default_symbol: 'SUSHI',
         name: 'Sushi',
         icon_url: '/static/img/protocols/eth.png',
         active: true,
+        description: 'sushi community description',
         type: ChainType.Token,
         base: ChainBase.Ethereum,
         has_chain_events_listener: false,
@@ -210,7 +211,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         {
           user_id: 1,
           address: '0x34C3A5ea06a3A67229fb21a7043243B0eB3e853f',
-          chain: 'ethereum',
+          community_id: 'ethereum',
           // selected: true,
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
@@ -218,7 +219,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         },
         {
           address: '5DJA5ZCobDS3GVn8D2E5YRiotDqGkR2FN1bg6LtfNUmuadwX',
-          chain: 'edgeware',
+          community_id: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -226,7 +227,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         },
         {
           address: 'ik52qFh92pboSctWPSFKtQwGEpypzz2m6D5ZRP8AYxqjHpM',
-          chain: 'edgeware',
+          community_id: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),
@@ -234,7 +235,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         },
         {
           address: 'js4NB7G3bqEsSYq4ruj9Lq24QHcoKaqauw6YDPD7hMr1Roj',
-          chain: 'edgeware',
+          community_id: 'edgeware',
           verification_token: 'PLACEHOLDER',
           verification_token_expires: null,
           verified: new Date(),

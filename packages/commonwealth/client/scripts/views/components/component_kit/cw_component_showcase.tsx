@@ -11,13 +11,9 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
-import { CWSelectList } from './new_designs/CWSelectList';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import { CWTable } from './new_designs/CWTable';
-import { makeData, createColumnInfo } from './showcase_helpers';
-import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -25,7 +21,7 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
-import { CWContentPageCard } from './CWContentPage';
+import { CWContentPageCard } from './CWContentPageCard';
 import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
@@ -36,7 +32,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
-import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
 import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
@@ -47,24 +42,27 @@ import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWSpinner } from './cw_spinner';
-import { CWTab as CWTabOld, CWTabBar } from './cw_tabs';
 import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
+import { CWForm } from './new_designs/CWForm';
+import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
+import { ModalSize } from './new_designs/CWModal/CWModal';
+import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
 import { CWSearchBar } from './new_designs/CWSearchBar';
+import { CWSelectList } from './new_designs/CWSelectList';
+import { CWTable } from './new_designs/CWTable';
+import { CWTab, CWTabsRow } from './new_designs/CWTabs';
+import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
+import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
 import { CWButton } from './new_designs/cw_button';
-import { CWForm } from './new_designs/CWForm';
-import { CWTag } from './new_designs/CWTag';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
-import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
-import { optionList } from './showcase_helpers';
-import { ModalSize } from './new_designs/CWModal/CWModal';
-import { CWTabsRow, CWTab } from './new_designs/CWTabs';
+import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k], i) => {
@@ -165,7 +163,7 @@ const popoverMenuOptions = (): Array<PopoverMenuItem> => {
 
 const initialBannersState: { [K in BannerType]: boolean } = bannerTypes.reduce(
   (acc, el) => ({ ...acc, [el]: true }),
-  {} as { [K in BannerType]: boolean }
+  {} as { [K in BannerType]: boolean },
 );
 
 const rowData = makeData(25);
@@ -211,7 +209,7 @@ const chainValidationSchema = z.object({
       z.object({
         value: z.string().nonempty({ message: 'Invalid value' }),
         label: z.string().nonempty({ message: 'Invalid value' }),
-      })
+      }),
     )
     .min(1, { message: 'At least 1 chain is required' })
     .nonempty({ message: 'Chains are required' }),
@@ -236,22 +234,21 @@ export const ComponentShowcase = () => {
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
-  const [selectedTab, setSelectedTab] = useState<number>(1);
   const [isRadioButtonChecked, setIsRadioButtonChecked] =
     useState<boolean>(false);
   const [isCheckboxChecked, setIsCheckboxChecked] = useState<boolean>(false);
   const [radioGroupSelection, setRadioGroupSelection] = useState<string>(
-    radioGroupOptions[2].value
+    radioGroupOptions[2].value,
   );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalSize, setModalSize] = useState<ModalSize>('small');
   useState<boolean>(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on'
+    localStorage.getItem('dark-mode-state') === 'on',
   );
 
   const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(
-    createDeltaFromText('')
+    createDeltaFromText(''),
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
@@ -383,7 +380,7 @@ export const ComponentShowcase = () => {
               checkboxGroupSelected.push(itemValue);
             } else {
               setCheckboxGroupSelected(
-                checkboxGroupSelected.filter((item) => item !== itemValue)
+                checkboxGroupSelected.filter((item) => item !== itemValue),
               );
             }
           }}
@@ -927,7 +924,7 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div className="form-gallery">
-        <CWText type="h4">Dropdown</CWText>
+        <CWText type="h4">Old Dropdown</CWText>
         <CWDropdown
           label="Dropdown"
           options={[
@@ -1050,33 +1047,6 @@ export const ComponentShowcase = () => {
           voteCount={voteCount}
         />
       </div>
-      <div className="basic-gallery">
-        <CWText type="h3">Old Tabs</CWText>
-        <CWTabBar>
-          <CWTabOld
-            label="A tab"
-            onClick={() => {
-              setSelectedTab(1);
-            }}
-            isSelected={selectedTab === 1}
-          />
-          <CWTabOld
-            label="Another tab"
-            onClick={() => {
-              setSelectedTab(2);
-            }}
-            isSelected={selectedTab === 2}
-          />
-          <CWTabOld
-            label="Yet another tab"
-            onClick={() => {
-              setSelectedTab(3);
-            }}
-            isSelected={selectedTab === 3}
-          />
-        </CWTabBar>
-      </div>
-
       <div className="new-tabs">
         <CWText type="h3">New Tabs</CWText>
         <CWTabsRow>
@@ -1648,25 +1618,6 @@ export const ComponentShowcase = () => {
           })}
         </div>
       </div>
-      <div className="typeahead-gallery">
-        <CWText type="h3"> Typeahead Dropdown</CWText>
-        <div className="typeahead-row">
-          <CWTypeaheadSelectList
-            options={optionList}
-            defaultValue={optionList[0]}
-            placeholder="Select chain"
-            isDisabled={false}
-          />
-        </div>
-        <div className="typeahead-row">
-          <CWTypeaheadSelectList
-            options={optionList}
-            defaultValue={optionList[0]}
-            placeholder="Select chain"
-            isDisabled={true}
-          />
-        </div>
-      </div>
       <CWText type="h3">Tooltip</CWText>
       <div className="tooltip">
         <CWTooltip
@@ -1864,18 +1815,15 @@ export const ComponentShowcase = () => {
           )}
         </CWForm>
         {/* With tag input */}
-        <CWForm
-          className="w-full"
-          validationSchema={chainValidationSchema}
-          onSubmit={(values) => console.log('values => ', values)}
-        >
+      </div>
+      <div className="dropdowns">
+        <CWText type="h3">Dropdowns</CWText>
+        <div className="dropdown-type basic">
+          <CWText type="h4">Basic</CWText>
           <CWSelectList
-            label="Chain"
-            name="chain"
             placeholder="Add or select a chain"
-            isMulti
             isClearable={false}
-            defaultValue={[{ value: 'solana', label: 'Solana' }]}
+            isSearchable={false}
             options={[
               { value: 'solana', label: 'Solana' },
               { value: 'polkadot', label: 'Polkadot' },
@@ -1883,24 +1831,93 @@ export const ComponentShowcase = () => {
               { value: 'substrate', label: 'Substrate' },
               { value: 'binance', label: 'Binance' },
             ]}
-            hookToForm
+            onChange={(newValue) => {
+              console.log('selected value is: ', newValue.label);
+            }}
           />
-          <CWButton label="Submit" type="submit" />
-        </CWForm>
-        <CWText type="h3">Multi select list</CWText>
-        <CWSelectList
-          placeholder="Add or select a chain"
-          isMulti
-          isClearable={false}
-          defaultValue={[{ value: 'solana', label: 'Solana' }]}
-          options={[
-            { value: 'solana', label: 'Solana' },
-            { value: 'polkadot', label: 'Polkadot' },
-            { value: 'ethereum', label: 'Ethereum' },
-            { value: 'substrate', label: 'Substrate' },
-            { value: 'binance', label: 'Binance' },
-          ]}
-        />
+
+          <CWText type="h4">Basic With Option Selection Override</CWText>
+          <CWSelectList
+            placeholder="Add or select a chain"
+            isClearable={false}
+            isSearchable={false}
+            options={[
+              { value: 'solana', label: 'Solana' },
+              { value: 'polkadot', label: 'Polkadot' },
+              { value: 'ethereum', label: 'Ethereum' },
+              { value: 'substrate', label: 'Substrate' },
+              { value: 'binance', label: 'Binance' },
+            ]}
+            isOptionSelected={(option) => {
+              return option.value === 'ethereum';
+            }}
+          />
+        </div>
+        <div className="dropdown-type typeahead">
+          <CWText type="h4">Typeahead</CWText>
+          <div className="typeahead-row">
+            <CWTypeaheadSelectList
+              options={optionList}
+              defaultValue={optionList[0]}
+              placeholder="Select chain"
+              isDisabled={false}
+            />
+          </div>
+          <div className="typeahead-row">
+            <CWTypeaheadSelectList
+              options={optionList}
+              defaultValue={optionList[0]}
+              placeholder="Select chain"
+              isDisabled={true}
+            />
+          </div>
+        </div>
+        <div className="dropdown-type multi-select">
+          <CWText type="h4">Multi-select</CWText>
+          <div className="multi-select-row">
+            <CWForm
+              className="w-full"
+              validationSchema={chainValidationSchema}
+              onSubmit={(values) => console.log('values => ', values)}
+            >
+              <CWSelectList
+                label="Chain"
+                name="chain"
+                placeholder="Add or select a chain"
+                isMulti
+                isClearable={false}
+                isSearchable={true}
+                defaultValue={[{ value: 'solana', label: 'Solana' }]}
+                options={[
+                  { value: 'solana', label: 'Solana' },
+                  { value: 'polkadot', label: 'Polkadot' },
+                  { value: 'ethereum', label: 'Ethereum' },
+                  { value: 'substrate', label: 'Substrate' },
+                  { value: 'binance', label: 'Binance' },
+                ]}
+                hookToForm
+              />
+              <CWButton label="Submit" type="submit" />
+            </CWForm>
+          </div>
+
+          <div className="multi-select-row">
+            <CWSelectList
+              placeholder="Add or select a chain"
+              isMulti
+              isClearable={false}
+              isSearchable={true}
+              defaultValue={[{ value: 'solana', label: 'Solana' }]}
+              options={[
+                { value: 'solana', label: 'Solana' },
+                { value: 'polkadot', label: 'Polkadot' },
+                { value: 'ethereum', label: 'Ethereum' },
+                { value: 'substrate', label: 'Substrate' },
+                { value: 'binance', label: 'Binance' },
+              ]}
+            />
+          </div>
+        </div>
       </div>
       <div className="table">
         <CWText type="h3">Table</CWText>
@@ -1909,9 +1926,14 @@ export const ComponentShowcase = () => {
       <div className="community-card">
         <CWText type="h3"> Community Card </CWText>
         <CWRelatedCommunityCard
-          chain={app.config.chains.getById('basindao')}
-          memberCount={2623}
-          threadCount={437}
+          id="id"
+          communityName={app.config.chains.getById('basindao').name}
+          communityDescription={
+            app.config.chains.getById('basindao').description
+          }
+          communityIconUrl={app.config.chains.getById('basindao').iconUrl}
+          memberCount="2623"
+          threadCount="437"
           actions={
             <CWButton
               buttonType="primary"

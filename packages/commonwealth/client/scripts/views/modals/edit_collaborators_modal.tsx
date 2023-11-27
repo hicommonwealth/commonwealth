@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
 import { isEqual } from 'lodash';
+import React, { useState } from 'react';
+import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { useDebounce } from 'usehooks-ts';
-import type Thread from '../../models/Thread';
-import type { IThreadCollaborator } from '../../models/Thread';
-import app from '../../state';
 import {
   notifyError,
   notifySuccess,
 } from '../../controllers/app/notifications';
 import useNecessaryEffect from '../../hooks/useNecessaryEffect';
+import type Thread from '../../models/Thread';
+import type { IThreadCollaborator } from '../../models/Thread';
+import app from '../../state';
 import { useEditThreadMutation } from '../../state/api/threads';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { User } from '../components/user/user';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { User } from '../components/user/user';
 
 import '../../../styles/modals/edit_collaborators_modal.scss';
 
@@ -65,7 +65,7 @@ export const EditCollaboratorsModal = ({
           app.activeChainId(),
           30,
           1,
-          true
+          true,
         );
 
         const results: Array<RoleInstanceWithPermissionAttributes> =
@@ -75,7 +75,8 @@ export const EditCollaboratorsModal = ({
               Address: profile.addresses[0],
             }))
             .filter(
-              (role) => role.Address.address !== app.user.activeAccount?.address
+              (role) =>
+                role.Address.address !== app.user.activeAccount?.address,
             );
 
         setSearchResults(results);
@@ -123,7 +124,7 @@ export const EditCollaboratorsModal = ({
                     handleUpdateCollaborators({
                       id: c.Address.id,
                       address: c.Address.address,
-                      chain: c.Address.chain,
+                      community_id: c.Address.community_id,
                     })
                   }
                 >
@@ -148,7 +149,7 @@ export const EditCollaboratorsModal = ({
             <div className="collaborator-rows-container">
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
-                  <User userAddress={c.address} userChainId={c.chain} />
+                  <User userAddress={c.address} userChainId={c.community_id} />
                   <CWIconButton
                     iconName="close"
                     iconSize="small"
@@ -181,10 +182,10 @@ export const EditCollaboratorsModal = ({
           onClick={async () => {
             const newCollaborators = collaborators.filter(
               (c1) =>
-                !thread.collaborators.some((c2) => c1.address === c2.address)
+                !thread.collaborators.some((c2) => c1.address === c2.address),
             );
             const removedCollaborators = (thread.collaborators as any).filter(
-              (c1) => !collaborators.some((c2) => c1.address === c2.address)
+              (c1) => !collaborators.some((c2) => c1.address === c2.address),
             );
 
             if (
@@ -210,7 +211,8 @@ export const EditCollaboratorsModal = ({
                   onCollaboratorsUpdated(updatedThread.collaborators);
               } catch (err) {
                 const error =
-                  err?.responseJSON?.error || 'Failed to update collaborators';
+                  err?.response?.data?.error ||
+                  'Failed to update collaborators';
                 notifyError(error);
               }
             }

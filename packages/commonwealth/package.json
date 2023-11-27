@@ -48,7 +48,7 @@
     "stylelint": "stylelint client/styles/*",
     "test": "nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
     "test-api": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'",
-    "test-devnet": "nyc ts-mocha --project tsconfig.json './test/devnet/**/*.spec.ts'",
+    "test-devnet": "nyc ts-mocha --project tsconfig.json './test/devnet/${TEST_DIR:-.}/**/*.spec.ts'",
     "test-e2e": "TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/e2eRegular/*",
     "test-e2e-mature": "TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/mature/*",
     "test-e2e-serial": "TEST_ENV=playwright npx playwright test --workers 1 ./test/e2e/e2eSerial/*",
@@ -57,7 +57,8 @@
     "test-suite": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
     "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'",
     "unit-test:watch": "NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'",
-    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
+    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
+    "refresh-all-memberships": "npx ts-node -T ./scripts/refresh-all-memberships.ts"
   },
   "engines": {
     "node": "18.x"

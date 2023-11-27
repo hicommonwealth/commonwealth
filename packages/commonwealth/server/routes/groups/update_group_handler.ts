@@ -1,24 +1,24 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
-import { GroupMetadata } from 'server/models/group';
+import { GroupAttributes, GroupMetadata } from 'server/models/group';
 import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type UpdateGroupParams = { id: string };
 type UpdateGroupBody = {
   metadata: GroupMetadata;
   requirements: Requirement[];
+  topics?: number[];
 };
-type UpdateGroupResponse = UpdateGroupResult;
+type UpdateGroupResponse = GroupAttributes;
 
 export const updateGroupHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
-  res: TypedResponse<UpdateGroupResponse>
+  res: TypedResponse<UpdateGroupResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
 
   const schema = z.object({
     params: z.object({
@@ -33,6 +33,7 @@ export const updateGroupHandler = async (
         })
         .optional(),
       requirements: z.array(z.any()).optional(), // validated in controller
+      topics: z.array(z.number()).optional(),
     }),
   });
   const validationResult = schema.safeParse(req);
@@ -41,16 +42,27 @@ export const updateGroupHandler = async (
   }
   const {
     params: { id: groupId },
-    body: { metadata, requirements },
+    body: { metadata, requirements, topics },
   } = validationResult.data;
 
-  const result = await controllers.groups.updateGroup({
+  const [group, analyticsOptions] = await controllers.groups.updateGroup({
     user,
-    chain,
+    community,
     address,
     groupId,
     metadata: metadata as Required<typeof metadata>,
     requirements,
+    topics,
   });
-  return success(res, result);
+
+  // refresh memberships in background if requirements updated
+  if (requirements?.length > 0) {
+    controllers.groups
+      .refreshCommunityMemberships({ community, group })
+      .catch(console.error);
+  }
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
+
+  return success(res, group);
 };

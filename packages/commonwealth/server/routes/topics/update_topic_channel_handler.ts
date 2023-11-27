@@ -1,7 +1,7 @@
+import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestParams, TypedResponse, success } from '../../types';
-import z from 'zod';
 
 const Errors = {
   ValidationError: 'Validation error',
@@ -19,14 +19,17 @@ export const updateTopicChannelHandler = async (
   req: TypedRequestParams<UpdateTopicChannelRequestParams>,
   res: TypedResponse<UpdateTopicChannelResponse>
 ) => {
-  const { user, chain } = req;
+  const { user, chain: community } = req;
   const { topicId, channelId } = req.params;
 
   const validationSchema = z.object({
     topicId: z.coerce.number(),
     channelId: z.string().optional(),
   });
-  const validationResult = validationSchema.safeParse(topicId);
+  const validationResult = validationSchema.safeParse({
+    topicId,
+    channelId,
+  });
   if (validationResult.success === false) {
     throw new AppError(
       `${Errors.ValidationError}: ${validationResult.error.message}`
@@ -35,7 +38,7 @@ export const updateTopicChannelHandler = async (
 
   await controllers.topics.updateTopicChannel({
     user,
-    chain,
+    community,
     topicId: parseInt(topicId, 10),
     channelId,
   });

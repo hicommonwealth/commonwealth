@@ -55,7 +55,7 @@ const searchThreads = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: chainId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -63,7 +63,7 @@ const searchThreads = async ({
         order_direction: orderDirection,
         thread_title_only: threadTitleOnly,
       },
-    }
+    },
   );
   return result;
 };
@@ -75,7 +75,6 @@ const useSearchThreadsQuery = ({
   orderBy,
   orderDirection,
   threadTitleOnly,
-
   enabled = true,
 }: SearchThreadsProps) => {
   const key = [
@@ -108,7 +107,7 @@ const useSearchThreadsQuery = ({
       },
       staleTime: SEARCH_THREADS_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 
