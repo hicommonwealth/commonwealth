@@ -40,12 +40,12 @@ const DirectoryPageSection = ({
     label: chain.name,
   }));
   const chainNodeOptionsSorted = chainNodeOptions.sort((a, b) =>
-    a.label.localeCompare(b.label)
+    a.label.localeCompare(b.label),
   );
   const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
   const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
   const defaultOption = chainNodeOptionsSorted.find(
-    (option) => option.value === String(defaultChainNodeId)
+    (option) => option.value === String(defaultChainNodeId),
   );
 
   const handleSelectChange = (newOption: SelectListOption) => {

@@ -1,6 +1,6 @@
 interface APIResponseFormat {
   id: number;
-  chain_id: string;
+  community_id: string;
   metadata: {
     name: string;
     description?: string;
@@ -36,7 +36,7 @@ class Group {
 
   constructor({
     id,
-    chain_id,
+    community_id,
     created_at,
     updated_at,
     metadata,
@@ -45,7 +45,7 @@ class Group {
     memberships,
   }: APIResponseFormat) {
     this.id = id;
-    this.communityId = chain_id;
+    this.communityId = community_id;
     this.createdAt = created_at;
     this.updatedAt = updated_at;
     this.name = metadata.name;

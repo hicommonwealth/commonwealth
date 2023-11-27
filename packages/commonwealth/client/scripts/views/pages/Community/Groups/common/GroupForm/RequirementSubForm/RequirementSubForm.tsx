@@ -25,6 +25,12 @@ const RequirementSubForm = ({
   const [requirementType, setRequirementType] = useState('');
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
   const isCosmosRequirement = requirementType === TOKENS.COSMOS_TOKEN;
+  const helperTextForAmount = {
+    [TOKENS.EVM_TOKEN]: 'Using 18 decimal precision',
+    [TOKENS.COSMOS_TOKEN]: 'Using 6 decimal precision',
+    [SPECIFICATIONS.ERC_20]: 'Using 18 decimal precision',
+    [SPECIFICATIONS.ERC_721]: '',
+  };
 
   useEffect(() => {
     defaultValues?.requirementType?.value &&
@@ -159,8 +165,10 @@ const RequirementSubForm = ({
           <CWTextInput
             key={defaultValues.requirementAmount}
             name="requirementAmount"
+            alignLabelToRight
             label="Amount"
-            placeholder="Amount"
+            instructionalMessage={helperTextForAmount[requirementType]}
+            placeholder="Enter an integer"
             {...(defaultValues.requirementAmount && {
               defaultValue: defaultValues.requirementAmount,
             })}
