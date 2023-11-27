@@ -29,9 +29,9 @@ module.exports = {
 
         DELETE FROM "Communities" WHERE id = 'umee';
 
-        INSERT INTO "Communities" (id, name, default_symbol, icon_url, active, network, description, type, website, discord, telegram, github, collapsed_on_homepage, base, custom_domain, custom_stages, stages_enabled, terms, has_chain_events_listener, default_summary_view, chain_node_id, has_homepage, created_at, updated_at, category, discord_bot_webhooks_enabled, directory_page_enabled)
+        INSERT INTO "Communities" (id, chain_node_id, name, default_symbol, icon_url, active, network, description, type, website, discord, telegram, github, collapsed_on_homepage, base, custom_domain, custom_stages, stages_enabled, terms, has_chain_events_listener, default_summary_view, has_homepage, created_at, updated_at, category, discord_bot_webhooks_enabled, directory_page_enabled)
         SELECT
-          'apebond', name, default_symbol, icon_url, active, network, description, type, website, discord, telegram, github, collapsed_on_homepage, base, custom_domain, custom_stages, stages_enabled, terms, has_chain_events_listener, default_summary_view, chain_node_id, has_homepage, created_at, updated_at, category, discord_bot_webhooks_enabled, directory_page_enabled
+          'apebond', '37', name, default_symbol, icon_url, active, network, description, type, website, discord, telegram, github, collapsed_on_homepage, base, custom_domain, custom_stages, stages_enabled, terms, has_chain_events_listener, default_summary_view, has_homepage, created_at, updated_at, category, discord_bot_webhooks_enabled, directory_page_enabled
         FROM
           "Communities"
         WHERE
@@ -88,9 +88,9 @@ module.exports = {
 
         DELETE FROM "Communities" WHERE id = 'ux';
 
-        INSERT INTO "Communities" (id, name, default_symbol, icon_url, active, network, description, type, website, discord, telegram, github, collapsed_on_homepage, base, custom_domain, custom_stages, stages_enabled, terms, has_chain_events_listener, default_summary_view, chain_node_id, has_homepage, created_at, updated_at, category, discord_bot_webhooks_enabled, directory_page_enabled)
+        INSERT INTO "Communities" (id, chain_node_id, name, default_symbol, icon_url, active, network, description, type, website, discord, telegram, github, collapsed_on_homepage, base, custom_domain, custom_stages, stages_enabled, terms, has_chain_events_listener, default_summary_view, has_homepage, created_at, updated_at, category, discord_bot_webhooks_enabled, directory_page_enabled)
         SELECT
-          'apeswap', name, default_symbol, icon_url, active, network, description, type, website, discord, telegram, github, collapsed_on_homepage, base, custom_domain, custom_stages, stages_enabled, terms, has_chain_events_listener, default_summary_view, chain_node_id, has_homepage, created_at, updated_at, category, discord_bot_webhooks_enabled, directory_page_enabled
+          'apeswap', '38', name, default_symbol, icon_url, active, network, description, type, website, discord, telegram, github, collapsed_on_homepage, base, custom_domain, custom_stages, stages_enabled, terms, has_chain_events_listener, default_summary_view, has_homepage, created_at, updated_at, category, discord_bot_webhooks_enabled, directory_page_enabled
         FROM
           "Communities"
         WHERE
