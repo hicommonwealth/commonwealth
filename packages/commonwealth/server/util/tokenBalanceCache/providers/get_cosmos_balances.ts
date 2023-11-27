@@ -7,8 +7,12 @@ import {
   setupStakingExtension,
 } from '@cosmjs/stargate';
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainNodeInstance } from '../../../models/chain_node';
+import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export type GetCosmosBalanceOptions = {
   chainNode: ChainNodeInstance;
@@ -44,6 +48,9 @@ export async function __getCosmosNativeBalances(
   const denom = params?.bondDenom;
 
   if (!denom) {
+    const msg = `Could not query staking params for cosmos chain id: ${options.chainNode.cosmos_chain_id}`;
+    rollbar.critical(msg);
+    log.error(msg);
     throw new Error('Could not query staking params');
   }
 
@@ -74,7 +81,11 @@ async function getOffChainBatchCosmosBalances(
   addresses.forEach((a, i) => {
     const balanceResult = promiseResults[i];
     if (balanceResult.status === 'rejected') {
-      console.error(balanceResult.reason);
+      log.error(`Failed to get balance for address ${a}`, balanceResult.reason);
+      rollbar.error(
+        `Failed to get balance for address ${a}`,
+        balanceResult.reason,
+      );
     } else {
       result[a] = balanceResult.value.amount;
     }
@@ -87,8 +98,14 @@ async function getCosmosBalance(
   address: string,
   denom: string,
 ): Promise<Balances> {
-  const result = await api.bank.balance(address, denom);
-  return {
-    [address]: result.amount,
-  };
+  try {
+    const result = await api.bank.balance(address, denom);
+    return {
+      [address]: result.amount,
+    };
+  } catch (e) {
+    log.error(`Failed to get balance for address ${address}`, e);
+    rollbar.error(`Failed to get balance for address ${address}`, e);
+    return {};
+  }
 }
