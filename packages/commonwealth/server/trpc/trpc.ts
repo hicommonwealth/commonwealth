@@ -1,25 +1,11 @@
 import { inferAsyncReturnType, initTRPC, TRPCError } from '@trpc/server';
 import { CreateExpressContextOptions } from '@trpc/server/dist/adapters/express';
-import passport from 'passport';
 import { OpenApiMeta } from 'trpc-openapi';
 import models from '../database';
-import { UserAttributes } from '../models/user';
-
-async function decodeJwtToken(req): Promise<UserAttributes | null> {
-  return new Promise<UserAttributes | null>((resolve) => {
-    passport.authenticate('jwt', { session: false }, (err, user) => {
-      if (err || !user) {
-        return resolve(null);
-      }
-      resolve(user);
-    })(req);
-  });
-}
 
 export async function createContext({ req }: CreateExpressContextOptions) {
-  const user = await decodeJwtToken(req);
   return {
-    user,
+    user: req.user,
     models,
   };
 }

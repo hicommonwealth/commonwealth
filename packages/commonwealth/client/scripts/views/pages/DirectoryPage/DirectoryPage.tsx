@@ -24,11 +24,11 @@ const DirectoryPage = () => {
   const communitySearchDebounced = useDebounce<string>(communitySearch, 500);
 
   const directoryPageEnabled = app.config.chains.getById(
-    app.activeChainId()
+    app.activeChainId(),
   )?.directoryPageEnabled;
   const communityDefaultChainNodeId = app.chain.meta.ChainNode.id;
   const selectedChainNodeId = app.config.chains.getById(
-    app.activeChainId()
+    app.activeChainId(),
   )?.directoryPageChainNodeId;
   const defaultChainNodeId = selectedChainNodeId ?? communityDefaultChainNodeId;
   const baseChain = app.config.nodes.getById(defaultChainNodeId);

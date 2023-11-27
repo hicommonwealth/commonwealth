@@ -1,11 +1,7 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import {
-  UpdateCommunityOptions,
-  UpdateCommunityResult,
-} from 'server/controllers/server_communities_methods/update_community';
-import { MixpanelCommunityCreationEvent } from 'shared/analytics/types';
+import { UpdateCommunityResult } from 'server/controllers/server_communities_methods/update_community';
 import { CommunityAttributes } from '../../models/community';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
 
 type UpdateCommunityRequestBody = CommunityAttributes & {
   id: string;
@@ -17,7 +13,7 @@ type UpdateCommunityResponse = UpdateCommunityResult;
 export const updateCommunityHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<UpdateCommunityRequestBody>,
-  res: TypedResponse<UpdateCommunityResponse>
+  res: TypedResponse<UpdateCommunityResponse>,
 ) => {
   const {
     'featured_topics[]': featuredTopics,

@@ -282,11 +282,23 @@ async function main() {
   try {
     app.use(
       '/trpc',
-      createExpressMiddleware({ router: appRouter, createContext }),
+      createExpressMiddleware({
+        router: appRouter,
+        request: {
+          superjson: true,
+        },
+        createContext,
+      }),
     );
     app.use(
       '/trpc',
-      createOpenApiExpressMiddleware({ router: appRouter, createContext }),
+      createOpenApiExpressMiddleware({
+        router: appRouter,
+        request: {
+          superjson: true,
+        },
+        createContext,
+      }),
     );
 
     app.use('/docs', swaggerUi.serve);

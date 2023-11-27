@@ -2,7 +2,7 @@ import {
   createSubscriptionInputSchema,
   createSubscriptionOutputSchema,
 } from 'common-common/src/schemas/subscription/createSubscriptionSchema';
-import { NotificationCategories } from 'common-common/src/schemas/subscription/subscriptionTypes';
+import { NotificationCategories } from 'common-common/src/types';
 import { WhereOptions } from 'sequelize';
 import { CommentInstance } from '../../../../models/comment';
 import { CommunityInstance } from '../../../../models/community';

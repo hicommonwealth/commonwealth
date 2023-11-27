@@ -36,7 +36,7 @@ const useDirectoryPageData = ({
       }
       navigateToCommunity({ navigate, path: '', chain: communityId });
     },
-    [navigate]
+    [navigate],
   );
 
   const relatedCommunitiesData = useMemo(
@@ -50,13 +50,13 @@ const useDirectoryPageData = ({
         iconUrl: c.icon_url,
         id: c.id,
       })),
-    [relatedCommunities]
+    [relatedCommunities],
   );
 
   const filteredRelatedCommunitiesData = useMemo(
     () =>
       relatedCommunitiesData.filter((c) => c.nameLower.includes(searchTerm)),
-    [searchTerm, relatedCommunitiesData]
+    [searchTerm, relatedCommunitiesData],
   );
 
   const tableData = useMemo(() => {
