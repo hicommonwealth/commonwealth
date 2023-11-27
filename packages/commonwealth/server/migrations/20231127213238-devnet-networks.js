@@ -2,8 +2,9 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.sequelize.query(
-      `
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.sequelize.query(
+        `
       UPDATE "Communities" SET network = 'csdk-beta' where id = 'csdk-beta';
       UPDATE "Communities" SET network = 'csdk-v1' where id = 'csdk-v1';
       UPDATE "Communities" SET network = 'csdk' where id = 'csdk';
@@ -11,13 +12,15 @@ module.exports = {
       UPDATE "Communities" SET network = 'evmos-dev' where id = 'evmos-dev';
       UPDATE "Communities" SET network = 'evmos-dev-ci' where id = 'evmos-dev-ci';
       `,
-      { raw: true },
-    );
+        { raw: true, transaction },
+      );
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.sequelize.query(
-      `
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.sequelize.query(
+        `
       UPDATE "Communities" SET network = 'cosmos' where id = 'csdk-beta';
       UPDATE "Communities" SET network = 'cosmos' where id = 'csdk-v1';
       UPDATE "Communities" SET network = 'cosmos' where id = 'csdk';
@@ -25,7 +28,8 @@ module.exports = {
       UPDATE "Communities" SET network = 'cosmos' where id = 'evmos-dev';
       UPDATE "Communities" SET network = 'cosmos' where id = 'evmos-dev-ci';
       `,
-      { raw: true },
-    );
+        { raw: true, transaction },
+      );
+    });
   },
 };
