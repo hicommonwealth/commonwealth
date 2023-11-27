@@ -1,4 +1,6 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
+import Web3 from 'web3';
 import { DB } from '../../models';
 import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
 import { __getCosmosNativeBalances } from './providers/get_cosmos_balances';
@@ -13,6 +15,8 @@ import {
   GetEvmBalancesOptions,
 } from './types';
 
+const log = factory.getLogger(formatFilename(__filename));
+
 export class TokenBalanceCache {
   constructor(public models: DB, public redis: RedisCache) {}
 
@@ -21,6 +25,8 @@ export class TokenBalanceCache {
    * This function supports all balance sources and is fully compatible with Redis caching.
    */
   public async getBalances(options: GetBalancesOptions): Promise<Balances> {
+    if (options.addresses.length === 0) return {};
+
     let balances: Balances;
 
     // fetch from cache
@@ -54,6 +60,17 @@ export class TokenBalanceCache {
   }
 
   private async getEvmBalances(options: GetEvmBalancesOptions) {
+    const validatedAddress: string[] = [];
+    for (const address of options.addresses) {
+      if (Web3.utils.isAddress(address)) {
+        validatedAddress.push(address);
+      } else {
+        log.info(`Skipping non-address ${address}`);
+      }
+    }
+
+    if (validatedAddress.length === 0) return {};
+
     const chainNode = await this.models.ChainNode.scope(
       'withPrivateData',
     ).findOne({
@@ -66,24 +83,24 @@ export class TokenBalanceCache {
       case BalanceSourceType.ETHNative:
         return await __getEthBalances.call(this, {
           chainNode,
-          addresses: options.addresses,
+          addresses: validatedAddress,
         });
       case BalanceSourceType.ERC20:
         return await __getErc20Balances.call(this, {
           chainNode,
-          addresses: options.addresses,
+          addresses: validatedAddress,
           contractAddress: options.sourceOptions.contractAddress,
         });
       case BalanceSourceType.ERC721:
         return await __getErc721Balances.call(this, {
           chainNode,
-          addresses: options.addresses,
+          addresses: validatedAddress,
           contractAddress: options.sourceOptions.contractAddress,
         });
       case BalanceSourceType.ERC1155:
         return await __getErc1155Balances.call(this, {
           chainNode,
-          addresses: options.addresses,
+          addresses: validatedAddress,
           contractAddress: options.sourceOptions.contractAddress,
           tokenId: options.sourceOptions.tokenId,
         });

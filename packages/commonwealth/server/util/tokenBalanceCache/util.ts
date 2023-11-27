@@ -58,7 +58,6 @@ export async function evmOffChainRpcBatching(
       idAddressMap[id] = address;
       ++id;
     }
-    console.log(rpcRequests);
 
     batchRequestPromises.push(
       fetch(source.url, {
@@ -92,12 +91,15 @@ export async function evmOffChainRpcBatching(
     }
   });
 
-  // TODO: handling failed single RPC request?
   const datas = (await Promise.all(jsonPromises)).flat();
   const balances = {};
   for (const data of datas) {
-    const address = idAddressMap[data.id];
-    balances[address] = web3.eth.abi.decodeParameter('uint256', data.result);
+    if (data.error) {
+      failedAddresses.push(idAddressMap[data.id]);
+    } else {
+      const address = idAddressMap[data.id];
+      balances[address] = web3.eth.abi.decodeParameter('uint256', data.result);
+    }
   }
 
   return { balances, failedAddresses };
@@ -178,7 +180,7 @@ export async function evmBalanceFetcherBatching(
     log.error(msg, datas.error);
     return { balances: {}, failedAddresses: addresses };
   } else {
-    for (const [index, data] of datas.entries()) {
+    for (const data of datas) {
       const balances = web3.eth.abi.decodeParameter('uint256[]', data.result);
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
