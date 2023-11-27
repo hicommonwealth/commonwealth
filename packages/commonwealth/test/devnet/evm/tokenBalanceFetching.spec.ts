@@ -33,6 +33,7 @@ describe('Token Balance Cache EVM Tests', () => {
     });
   });
 
+  // TODO: map the custom eth chain id to the on-chain contract to test out on-chain batching
   describe('ERC20', () => {
     before('Transfer balance to addressOne', async () => {
       originalAddressOneBalance = await sdk.getBalance(
