@@ -6,13 +6,13 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'ChainNodes',
         {
-          url: 'https://rpc-stargaze.pupmos.network',
-          alt_wallet_url: 'https://api-stargaze.pupmos.network',
+          url: 'https://stargaze-rpc.publicnode.com:443',
+          alt_wallet_url: 'https://stargaze-rest.publicnode.com',
         },
         {
           url: 'https://rpc.stargaze-apis.com/',
         },
-        { transaction: t },
+        { transaction },
       );
     });
   },
@@ -26,9 +26,9 @@ module.exports = {
           alt_wallet_url: 'https://rest.stargaze-apis.com/',
         },
         {
-          url: 'https://rpc-stargaze.pupmos.network',
+          url: 'https://stargaze-rpc.publicnode.com:443',
         },
-        { transaction: t },
+        { transaction },
       );
     });
   },
