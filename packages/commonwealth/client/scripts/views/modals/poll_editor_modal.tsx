@@ -25,7 +25,7 @@ import '../../../styles/modals/poll_editor_modal.scss';
 
 const getPollDurationCopy = (
   customDuration: string,
-  customDurationEnabled: boolean
+  customDurationEnabled: boolean,
 ) => {
   if (customDurationEnabled && customDuration === 'Infinite') {
     return 'This poll will never expire.';

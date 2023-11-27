@@ -5,6 +5,7 @@ import { GroupAttributes } from './group';
 import { ModelInstance, ModelStatic } from './types';
 
 export type MembershipAttributes = {
+  id?: number;
   group_id: number;
   address_id: number;
   reject_reason?: string;
@@ -20,11 +21,12 @@ export type MembershipModelStatic = ModelStatic<MembershipInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): MembershipModelStatic => {
   const Membership = <MembershipModelStatic>sequelize.define(
     'Membership',
     {
+      id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       group_id: { type: dataTypes.INTEGER, allowNull: false },
       address_id: { type: dataTypes.INTEGER, allowNull: false },
       reject_reason: { type: dataTypes.STRING, allowNull: true },
@@ -36,11 +38,13 @@ export default (
       createdAt: false,
       updatedAt: false,
       tableName: 'Memberships',
-      indexes: [{ fields: ['group_id'] }],
-    }
+      indexes: [
+        { fields: ['group_id'] },
+        { fields: ['address_id', 'group_id'], unique: true },
+      ],
+    },
   );
 
-  Membership.removeAttribute('id');
   Membership.removeAttribute('created_at');
   Membership.removeAttribute('updated_at');
 

@@ -12,7 +12,7 @@ NC='\033[0m'
 
 # Getting diff from master as suggested by Timothy 
 # while we establish our formatting rules
-FILES=$(git diff --name-only master)
+FILES=$(git diff --name-only --diff-filter=d master)
 
 if [ -n "$FILES" ]
 then

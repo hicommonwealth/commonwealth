@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 
+import Permissions from 'utils/Permissions';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
 import app from '../../state';
 import { useEditThreadMutation } from '../../state/api/threads';
 import { useFetchTopicsQuery } from '../../state/api/topics';
-import { CWButton } from '../components/component_kit/new_designs/cw_button';
-import { TopicSelector } from '../components/topic_selector';
 import {
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import Permissions from 'utils/Permissions';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import { TopicSelector } from '../components/topic_selector';
 
 type ChangeThreadTopicModalProps = {
   onModalClose: () => void;
@@ -42,7 +42,7 @@ export const ChangeThreadTopicModal = ({
       }
       return acc;
     },
-    { enabledTopics: [], disabledTopics: [] }
+    { enabledTopics: [], disabledTopics: [] },
   );
 
   const { mutateAsync: editThread } = useEditThreadMutation({
@@ -63,7 +63,8 @@ export const ChangeThreadTopicModal = ({
 
       onModalClose && onModalClose();
     } catch (err) {
-      const error = err?.responseJSON?.error || 'Failed to update thread topic';
+      const error =
+        err?.response?.data?.error || 'Failed to update thread topic';
       console.log(error);
       throw new Error(error);
     }

@@ -18,20 +18,20 @@ import { CWValidationText } from '../../components/component_kit/cw_validation_t
 import {
   EthCommunityRows,
   defaultCommunityRows,
-  updateAdminOnCreateCommunity
+  updateAdminOnCreateCommunity,
 } from './community_input_rows';
 import {
   useCommunityFormDefaultFields,
   useCommunityFormIdFields,
   useCommunityFormState,
-  useEthCommunityFormFields
+  useEthCommunityFormFields,
 } from './hooks';
 import { ETHEREUM_MAINNET } from './index';
 import type { EthChainNodeFormState } from './types';
 
 export const ERC721Form = ({
   ethChainNodeNames,
-  ethChainNodes
+  ethChainNodes,
 }: EthChainNodeFormState) => {
   const { id, setId, name, setName, symbol, setSymbol } =
     useCommunityFormIdFields();
@@ -54,10 +54,7 @@ export const ERC721Form = ({
   const disableField = !validAddress || !communityFormState.loaded;
 
   const updateTokenForum = async () => {
-    if (
-      !ethCommunityFormFields.address ||
-      !ethCommunityFormFields.ethChainId
-    )
+    if (!ethCommunityFormFields.address || !ethCommunityFormFields.ethChainId)
       return;
 
     communityFormState.setStatus(undefined);
@@ -66,8 +63,8 @@ export const ERC721Form = ({
 
     const args = {
       address: ethCommunityFormFields.address,
-      chain_id: ethCommunityFormFields.ethChainId,
-      url: ethCommunityFormFields.nodeUrl
+      eth_chain_id: ethCommunityFormFields.ethChainId,
+      url: ethCommunityFormFields.nodeUrl,
     };
 
     try {
@@ -87,7 +84,7 @@ export const ERC721Form = ({
           }
 
           communityFormDefaultFields.setDescription(
-            res.token.description || ''
+            res.token.description || '',
           );
           communityFormDefaultFields.setWebsite(res.token.website || '');
           communityFormDefaultFields.setDiscord(res.token.discord || '');
@@ -112,7 +109,7 @@ export const ERC721Form = ({
 
             const contract = IERC721Metadata__factory.connect(
               args.address,
-              ethersProvider
+              ethersProvider,
             );
 
             const contractName = await contract.name();
@@ -129,7 +126,7 @@ export const ERC721Form = ({
             setSymbol('');
             communityFormState.setStatus('failure');
             communityFormState.setMessage(
-              'Verified token but could not load metadata.'
+              'Verified token but could not load metadata.',
             );
           }
 
@@ -149,13 +146,13 @@ export const ERC721Form = ({
       } else {
         communityFormState.setStatus('failure');
         communityFormState.setMessage(
-          res.message || 'Failed to load Token Information'
+          res.message || 'Failed to load Token Information',
         );
       }
     } catch (err) {
       communityFormState.setStatus('failure');
       communityFormState.setMessage(
-        err.responseJSON?.error || 'Failed to load Token Information'
+        err.responseJSON?.error || 'Failed to load Token Information',
       );
     }
     communityFormState.setLoading(false);
@@ -165,7 +162,7 @@ export const ERC721Form = ({
     <div className="CreateCommunityForm">
       {EthCommunityRows(
         { ethChainNodeNames, ethChainNodes },
-        { ...ethCommunityFormFields, ...communityFormState }
+        { ...ethCommunityFormFields, ...communityFormState },
       )}
       <CWButton
         label="Populate fields"
@@ -229,7 +226,7 @@ export const ERC721Form = ({
               network: ChainNetwork.ERC721,
               node_url: ethCommunityFormFields.nodeUrl,
               type: ChainType.Token,
-              default_symbol: symbol
+              default_symbol: symbol,
               // ...form, <-- not typed so I don't know what's needed
             });
 
@@ -237,7 +234,7 @@ export const ERC721Form = ({
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
@@ -247,7 +244,7 @@ export const ERC721Form = ({
             navigate(`/${res.result.community?.id}`);
           } catch (err) {
             notifyError(
-              err.responseJSON?.error || 'Creating new ERC721 community failed'
+              err.responseJSON?.error || 'Creating new ERC721 community failed',
             );
           } finally {
             communityFormState.setSaving(false);
