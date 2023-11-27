@@ -13,7 +13,7 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
-import { LinkedProposal } from './linked_proposal';
+import { LinkedProposal } from './LinkedProposal';
 
 
 type LinkedProposalsCardProps = {
