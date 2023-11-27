@@ -51,7 +51,7 @@ export type CreateThreadCommentOptions = {
 export type CreateThreadCommentResult = [
   CommentAttributes,
   EmitOptions[],
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThreadComment(
@@ -67,7 +67,7 @@ export async function __createThreadComment(
     canvasSession,
     canvasHash,
     discordMeta,
-  }: CreateThreadCommentOptions
+  }: CreateThreadCommentOptions,
 ): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
@@ -114,7 +114,7 @@ export async function __createThreadComment(
     const [commentDepthExceeded] = await getCommentDepth(
       this.models,
       parentComment,
-      MAX_COMMENT_DEPTH
+      MAX_COMMENT_DEPTH,
     );
     if (commentDepthExceeded) {
       throw new AppError(Errors.NestingTooDeep);
@@ -141,7 +141,7 @@ export async function __createThreadComment(
         this.tokenBalanceCache,
         thread.topic_id,
         community,
-        address
+        address,
       );
       if (!isValid) {
         throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
@@ -200,7 +200,7 @@ export async function __createThreadComment(
         comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
     await this.models.Subscription.create(
       {
@@ -210,7 +210,7 @@ export async function __createThreadComment(
         comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
 
     await transaction.commit();
@@ -236,7 +236,7 @@ export async function __createThreadComment(
             include: [this.models.User],
           });
           return mentionedUser;
-        })
+        }),
       );
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
@@ -339,6 +339,7 @@ export async function __createThreadComment(
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
     community: community.id,
+    userId: user.id,
     isCustomDomain: null,
   };
 

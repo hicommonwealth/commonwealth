@@ -1,5 +1,6 @@
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import { featureFlags } from 'helpers/feature-flags';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -11,18 +12,24 @@ import {
 } from 'state/api/groups';
 import { useSearchProfilesQuery } from 'state/api/profiles';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
+import useGroupMutationBannerStore from 'state/ui/group';
 import { useDebounce } from 'usehooks-ts';
 import Permissions from 'utils/Permissions';
 import { Select } from 'views/components/Select';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import {
+  MixpanelPageViewEvent,
+  MixpanelPageViewEventPayload,
+} from '../../../../../../shared/analytics/types';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import MembersSection from './MembersSection';
@@ -48,6 +55,15 @@ const CommunityMembersPage = () => {
     searchText: '',
     category: GROUP_AND_MEMBER_FILTERS[0],
   });
+  const {
+    shouldShowGroupMutationBannerForCommunities,
+    setShouldShowGroupMutationBannerForCommunity,
+  } = useGroupMutationBannerStore();
+
+  const { trackAnalytics } =
+    useBrowserAnalyticsTrack<MixpanelPageViewEventPayload>({
+      onAction: true,
+    });
 
   const { data: memberships = null } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
@@ -171,6 +187,17 @@ const CommunityMembersPage = () => {
       `${window.location.pathname}?${params.toString()}`,
     );
     setSelectedTab(activeTab);
+
+    let eventType;
+    if (activeTab === TABS[0].value) {
+      eventType = MixpanelPageViewEvent.MEMBERS_PAGE_VIEW;
+    } else {
+      eventType = MixpanelPageViewEvent.GROUPS_PAGE_VIEW;
+    }
+
+    trackAnalytics({
+      event: eventType,
+    });
   };
 
   useEffect(() => {
@@ -188,6 +215,7 @@ const CommunityMembersPage = () => {
     }
 
     featureFlags.gatingEnabled && updateActiveTab(TABS[1].value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navigateToCreateGroupPage = () => {
@@ -215,6 +243,29 @@ const CommunityMembersPage = () => {
         ))}
       </CWTabsRow>
 
+      {/* Gating group post-mutation banner */}
+      {shouldShowGroupMutationBannerForCommunities.includes(
+        app.activeChainId(),
+      ) &&
+        selectedTab === TABS[0].value && (
+          <section>
+            <CWBanner
+              type="info"
+              title="Don't see your group right away?"
+              body={`
+            Our app is crunching numbers, which takes some time. 
+            Give it a few minutes and refresh to see your group.
+          `}
+              onClose={() =>
+                setShouldShowGroupMutationBannerForCommunity(
+                  app.activeChainId(),
+                  false,
+                )
+              }
+            />
+          </section>
+        )}
+
       {/* Filter section */}
       {featureFlags.gatingEnabled &&
       selectedTab === TABS[1].value &&
@@ -239,6 +290,8 @@ const CommunityMembersPage = () => {
             placeholder={`Search ${
               selectedTab === TABS[0].value ? 'members' : 'groups'
             }`}
+            containerClassName="search-input-container"
+            inputClassName="search-input"
             iconLeft={<CWIcon iconName="search" className="search-icon" />}
             onInput={(e) =>
               setSearchFilters((g) => ({
