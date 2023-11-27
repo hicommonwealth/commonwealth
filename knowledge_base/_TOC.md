@@ -66,16 +66,3 @@
 
 - [Debouncing in Pure React](./examples/Debouncing-in-Pure-React.md)
 - [Shadow DOM](./examples/Shadow-DOM.md)
-
-## Storybook
-
-- [Introduction](Storybook-Introduction.md)
-- [Stories](Storybook-Stories.md)
-- [Component Story Format](Storybook-Component-Story-Format.md)
-- [Writing stories](Storybook-Writing-Stories.md)
-- [Args](Storybook-Args.md)
-- [ArgTypes](Storybook-ArgTypes.md)
-- [Parameters](Storybook-Parameters.md)
-- [Custom components](Storybook-Custom-components.md)
-- [Controls](Storybook-Controls.md)
-- [State change](State-Change.md)
