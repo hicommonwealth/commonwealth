@@ -62,8 +62,8 @@ import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
-import { ThreadPollCard } from './thread_poll_card';
-import { ThreadPollEditorCard } from './thread_poll_editor_card';
+import { ThreadPollCard } from './ThreadPollCard';
+import { ThreadPollEditorCard } from './ThreadPollEditorCard';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 
 export type ThreadPrefetch = {
