@@ -1,35 +1,10 @@
-import React from 'react';
-
 import 'components/social_accounts.scss';
-
+import React from 'react';
 import type NewProfile from '../../models/NewProfile';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import type { IconName } from './component_kit/cw_icons/cw_icon_lookup';
-
-type SocialAccountProps = {
-  iconName: IconName;
-  link: string;
-};
+import { SocialAccount } from './social_account';
 
 type SocialAccountsProps = {
   profile: NewProfile;
-};
-
-const SocialAccount = (props: SocialAccountProps) => {
-  const { iconName, link } = props;
-
-  let formattedLink;
-  if (link.includes('@')) {
-    formattedLink = link;
-  } else {
-    formattedLink = link.includes('http') ? link : `https://${link}`;
-  }
-
-  return (
-    <a href={formattedLink} target="_blank" rel="noreferrer">
-      <CWIcon iconName={iconName} className="social-icon" />
-    </a>
-  );
 };
 
 export const SocialAccounts = (props: SocialAccountsProps) => {
