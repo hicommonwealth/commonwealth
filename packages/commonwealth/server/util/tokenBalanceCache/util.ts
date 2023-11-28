@@ -1,5 +1,5 @@
 import { factory, formatFilename } from 'common-common/src/logging';
-import Web3 from 'web3';
+import AbiCoder from 'web3-eth-abi';
 import { toBN } from 'web3-utils';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { rollbar } from '../rollbar';
@@ -21,7 +21,7 @@ export async function evmOffChainRpcBatching(
   rpc: {
     method: 'eth_call' | 'eth_getBalance';
     getParams: (
-      web3: Web3,
+      abiCoder: typeof AbiCoder,
       address: string,
       contractAddress?: string,
     ) => string | Record<string, string>;
@@ -31,7 +31,6 @@ export async function evmOffChainRpcBatching(
 ): Promise<{ balances: Balances; failedAddresses: string[] }> {
   if (!rpc.batchSize) rpc.batchSize = 500;
 
-  const web3 = new Web3();
   const batchRequestPromises = [];
   // maps an RPC request id to an address
   const idAddressMap = {};
@@ -50,7 +49,7 @@ export async function evmOffChainRpcBatching(
       rpcRequests.push({
         method: rpc.method,
         params: [
-          rpc.getParams(web3, address, source.contractAddress),
+          rpc.getParams(AbiCoder, address, source.contractAddress),
           'latest',
         ],
         id,
@@ -100,7 +99,7 @@ export async function evmOffChainRpcBatching(
     } else {
       const address = idAddressMap[data.id];
       balances[address] = source.contractAddress
-        ? web3.eth.abi.decodeParameter('uint256', data.result)
+        ? AbiCoder.decodeParameter('uint256', data.result)
         : toBN(data.result).toString(10);
     }
   }
@@ -131,7 +130,6 @@ export async function evmBalanceFetcherBatching(
   if (!source.contractAddress)
     source.contractAddress = '0x0000000000000000000000000000000000000000';
 
-  const web3 = new Web3();
   const rpcRequests = [];
 
   for (
@@ -144,12 +142,10 @@ export async function evmBalanceFetcherBatching(
 
     const calldata =
       '0xf0002ea9' +
-      web3.eth.abi
-        .encodeParameters(
-          ['address[]', 'address[]'],
-          [batchAddresses, [source.contractAddress]],
-        )
-        .substring(2);
+      AbiCoder.encodeParameters(
+        ['address[]', 'address[]'],
+        [batchAddresses, [source.contractAddress]],
+      ).substring(2);
 
     rpcRequests.push({
       method: 'eth_call',
@@ -184,7 +180,7 @@ export async function evmBalanceFetcherBatching(
     return { balances: {}, failedAddresses: addresses };
   } else {
     for (const data of datas) {
-      const balances = web3.eth.abi.decodeParameter('uint256[]', data.result);
+      const balances = AbiCoder.decodeParameter('uint256[]', data.result);
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
       const endIndex = Math.min(data.id + rpc.batchSize, addresses.length);

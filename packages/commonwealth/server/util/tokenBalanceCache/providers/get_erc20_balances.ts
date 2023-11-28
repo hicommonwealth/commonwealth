@@ -1,5 +1,5 @@
 import { factory, formatFilename } from 'common-common/src/logging';
-import Web3 from 'web3';
+import AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
@@ -90,10 +90,10 @@ async function getOffChainBatchErc20Balances(
     },
     {
       method: 'eth_call',
-      getParams: (web3, address, contractAddress) => {
+      getParams: (abiCoder, address, contractAddress) => {
         const calldata =
           '0x70a08231' +
-          web3.eth.abi.encodeParameters(['address'], [address]).substring(2);
+          abiCoder.encodeParameters(['address'], [address]).substring(2);
         return {
           to: contractAddress,
           data: calldata,
@@ -112,10 +112,9 @@ async function getErc20Balance(
   contractAddress: string,
   address: string,
 ): Promise<Balances> {
-  const web3 = new Web3();
   const calldata =
     '0x70a08231' +
-    web3.eth.abi.encodeParameters(['address'], [address]).substring(2);
+    AbiCoder.encodeParameters(['address'], [address]).substring(2);
   const requestBody = {
     method: 'eth_call',
     params: [
@@ -145,7 +144,7 @@ async function getErc20Balance(
     return {};
   } else {
     return {
-      [address]: web3.eth.abi.decodeParameter(
+      [address]: AbiCoder.decodeParameter(
         'uint256',
         data.result,
       ) as unknown as string,
