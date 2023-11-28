@@ -20,7 +20,7 @@ export type ValidateGroupMembershipResponse = {
  * Validates if a given user address passes a set of requirements and grants access to group
  * @param userAddress address of user
  * @param requirements An array of requirement types to be validated against
- * @param tbc initialized Token Balance Cache instance
+ * @param balances address balances
  * @returns ValidateGroupMembershipResponse validity and messages on requirements that failed
  */
 export default async function validateGroupMembership(

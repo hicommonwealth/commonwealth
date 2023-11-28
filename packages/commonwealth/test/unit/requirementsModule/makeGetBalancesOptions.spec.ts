@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { makeGetBalancesOptions } from 'server/controllers/server_groups_methods/refresh_community_memberships';
 import { AddressAttributes } from 'server/models/address';
 import { GroupAttributes } from 'server/models/group';
+import { makeGetBalancesOptions } from 'server/util/requirementsModule/makeGetBalancesOptions';
 import { BalanceSourceType } from 'server/util/requirementsModule/requirementsTypes';
 import { GetBalancesOptions } from 'server/util/tokenBalanceCache/types';
 
