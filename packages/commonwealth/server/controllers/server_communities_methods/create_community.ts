@@ -11,6 +11,7 @@ import {
 import { Op } from 'sequelize';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 
+import { COSMOS_REGISTRY_API } from '../../config';
 import type { AddressInstance } from '../../models/address';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { CommunityAttributes } from '../../models/community';
@@ -61,7 +62,7 @@ export const Errors = {
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
   UnegisteredCosmosChain: `Check https://cosmos.directory.
-  Provided chain_name is not registered in the Cosmos Chain Registry`,
+   Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
 export type CreateCommunityOptions = {
@@ -151,42 +152,6 @@ export async function __createCommunity(
     eth_chain_id = +community.eth_chain_id;
   }
 
-  // cosmos_chain_id is the canonical identifier for a cosmos chain.
-  if (community.base === ChainBase.CosmosSDK) {
-    // Our convention is to follow the "chain_name" standard established by the
-    // Cosmos Chain Registry:
-    // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
-    // This community-led registry seeks to track chain info for all Cosmos chains.
-    // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
-    // It is a lowercase alphanumeric name, like 'osmosis'.
-    // See: https://github.com/hicommonwealth/commonwealth/issues/4951
-    cosmos_chain_id = community.cosmos_chain_id;
-
-    if (!cosmos_chain_id) {
-      throw new AppError(Errors.CosmosChainNameRequired);
-    } else {
-      const oldChainNode = await this.models.ChainNode.findOne({
-        where: { cosmos_chain_id },
-      });
-      if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
-        throw new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`);
-      }
-    }
-
-    const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
-    const { data: chains } = await axios.get(
-      `${REGISTRY_API_URL}/api/v1/mainnet`,
-    );
-    const foundRegisteredChain = chains?.find(
-      (chain) => chain === cosmos_chain_id,
-    );
-    if (!foundRegisteredChain) {
-      throw new AppError(
-        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
-      );
-    }
-  }
-
   // if not offchain, also validate the address
   if (
     community.base === ChainBase.Ethereum &&
@@ -258,6 +223,39 @@ export async function __createCommunity(
     community.base === ChainBase.CosmosSDK &&
     community.type !== ChainType.Offchain
   ) {
+    // cosmos_chain_id is the canonical identifier for a cosmos chain.
+    // Our convention is to follow the "chain_name" standard established by the
+    // Cosmos Chain Registry:
+    // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
+    // This community-led registry seeks to track chain info for all Cosmos chains.
+    // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
+    // It is a lowercase alphanumeric name, like 'osmosis'.
+    // See: https://github.com/hicommonwealth/commonwealth/issues/4951
+    cosmos_chain_id = community.cosmos_chain_id || null;
+
+    if (!cosmos_chain_id) {
+      throw new AppError(Errors.CosmosChainNameRequired);
+    } else {
+      const oldChainNode = await this.models.ChainNode.findOne({
+        where: { cosmos_chain_id },
+      });
+      if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
+        throw new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`);
+      }
+    }
+
+    const { data: chains } = await axios.get(
+      `${COSMOS_REGISTRY_API}/api/v1/mainnet`,
+    );
+    const foundRegisteredChain = chains?.find(
+      (chain) => chain === cosmos_chain_id,
+    );
+    if (!foundRegisteredChain) {
+      throw new AppError(
+        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
+      );
+    }
+
     // test cosmos endpoint validity -- must be http(s)
     if (!urlHasValidHTTPPrefix(url)) {
       throw new AppError(Errors.InvalidNodeUrl);
@@ -336,7 +334,7 @@ export async function __createCommunity(
   const [node] = await this.models.ChainNode.scope(
     'withPrivateData',
   ).findOrCreate({
-    where: { [Op.or]: [{ url }, { eth_chain_id }] },
+    where: { url },
     defaults: {
       url,
       eth_chain_id,
@@ -476,6 +474,27 @@ export async function __createCommunity(
           // This is the regex formatting for solana addresses per their website
           [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}',
         },
+      },
+      include: [
+        {
+          model: this.models.Community,
+          where: { base: createdCommunity.base },
+          required: true,
+        },
+      ],
+    });
+  } else if (
+    createdCommunity.base === ChainBase.CosmosSDK &&
+    // Onchain community can be created by Admin only,
+    // but we allow offchain cmty to have any creator as admin:
+    community.type === ChainType.Offchain
+  ) {
+    // if signed in with Keplr or Magic:
+    addressToBeAdmin = await this.models.Address.scope(
+      'withPrivateData',
+    ).findOne({
+      where: {
+        user_id: user.id,
       },
       include: [
         {
