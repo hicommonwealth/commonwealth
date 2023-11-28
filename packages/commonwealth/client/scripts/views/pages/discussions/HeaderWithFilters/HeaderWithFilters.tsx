@@ -243,8 +243,8 @@ export const HeaderWithFilters = ({
                 {
                   id: 3,
                   value: ThreadFeaturedFilterTypes.MostLikes,
-                  label: 'Likes',
-                  iconLeft: 'heart',
+                  label: 'Upvotes',
+                  iconLeft: 'upvote',
                 },
                 {
                   id: 4,

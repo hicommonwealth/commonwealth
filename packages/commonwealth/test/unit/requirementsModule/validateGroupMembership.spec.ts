@@ -1,5 +1,8 @@
 import { expect } from 'chai';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+import {
+  BalanceSourceType,
+  Requirement,
+} from 'server/util/requirementsModule/requirementsTypes';
 import validateGroupMembership, {
   ValidateGroupMembershipResponse,
 } from 'server/util/requirementsModule/validateGroupMembership';
@@ -13,7 +16,7 @@ function createMockRequirements(thresholds: string[]): Requirement[] {
       data: {
         threshold: thresholds[0] || '0',
         source: {
-          source_type: 'erc20',
+          source_type: BalanceSourceType.ERC20,
           evm_chain_id: 1,
           contract_address: '0x12345',
         },
@@ -24,7 +27,7 @@ function createMockRequirements(thresholds: string[]): Requirement[] {
       data: {
         threshold: thresholds[1] || '0',
         source: {
-          source_type: 'erc721',
+          source_type: BalanceSourceType.ERC721,
           evm_chain_id: 1,
           contract_address: '0x12345',
         },
@@ -35,7 +38,7 @@ function createMockRequirements(thresholds: string[]): Requirement[] {
       data: {
         threshold: thresholds[2] || '0',
         source: {
-          source_type: 'eth_native',
+          source_type: BalanceSourceType.ETHNative,
           evm_chain_id: 1,
         },
       },
