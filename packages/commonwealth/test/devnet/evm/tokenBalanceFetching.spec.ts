@@ -8,7 +8,8 @@ import { BalanceSourceType } from '../../../server/util/requirementsModule/requi
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 
-describe('Token Balance Cache EVM Tests', () => {
+describe('Token Balance Cache EVM Tests', function () {
+  this.timeout(40000);
   let tbc: TokenBalanceCache;
   const addressOne = '0xCEB3C3D4B78d5d10bd18930DC0757ddB588A862a';
   const addressTwo = '0xD54f2E2173D0a5eA8e0862Aed18b270aFF08389e';
@@ -17,19 +18,23 @@ describe('Token Balance Cache EVM Tests', () => {
   let originalAddressOneBalance: string, originalAddressTwoBalance: string;
   let finalAddressOneBalance: string, finalAddressTwoBalance: string;
   const sdk = new ChainTesting('http://127.0.0.1:3000');
-  const ethChainId = 1864339501;
+  // ganache chain id
+  const ethChainId = 1337;
   const transferAmount = '76';
 
   before(async () => {
     const redisCache = new RedisCache();
     tbc = new TokenBalanceCache(models, redisCache);
-    await models.ChainNode.findOrCreate({
+    await models.ChainNode.destroy({
       where: {
         url: 'http://localhost:8545',
-        eth_chain_id: ethChainId,
-        balance_type: BalanceType.Ethereum,
-        name: 'Local EVM Chain',
       },
+    });
+    await models.ChainNode.create({
+      url: 'http://localhost:8545',
+      eth_chain_id: ethChainId,
+      balance_type: BalanceType.Ethereum,
+      name: 'Local EVM Chain',
     });
   });
 
@@ -55,61 +60,125 @@ describe('Token Balance Cache EVM Tests', () => {
         .toString(10);
     });
 
-    it('should not fail if no address is given', async () => {
-      const balance = await tbc.getBalances({
-        balanceSourceType: BalanceSourceType.ERC20,
-        addresses: [],
-        sourceOptions: {
-          evmChainId: ethChainId,
-          contractAddress: chainLinkAddress,
-        },
+    describe('Single address', () => {
+      it('should not fail if no address is given', async () => {
+        const balance = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: chainLinkAddress,
+          },
+        });
+
+        expect(Object.keys(balance).length).to.equal(0);
       });
 
-      expect(Object.keys(balance).length).to.equal(0);
+      it('should not fail if a single invalid address is given', async () => {
+        const balance = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [discobotAddress],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: chainLinkAddress,
+          },
+        });
+
+        expect(Object.keys(balance).length).to.equal(0);
+      });
+
+      it('should return a single balance', async () => {
+        const balance = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [addressOne],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: chainLinkAddress,
+          },
+        });
+
+        expect(Object.keys(balance).length).to.equal(1);
+        expect(balance[addressOne]).to.equal(finalAddressOneBalance);
+      });
     });
 
-    it('should return a single balance', async () => {
-      const balance = await tbc.getBalances({
-        balanceSourceType: BalanceSourceType.ERC20,
-        addresses: [addressOne],
-        sourceOptions: {
-          evmChainId: ethChainId,
-          contractAddress: chainLinkAddress,
-        },
+    describe('on-chain batching', () => {
+      it('should return many balances', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [addressOne, addressTwo],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: chainLinkAddress,
+          },
+        });
+
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne]).to.equal(finalAddressOneBalance);
+        expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
 
-      expect(Object.keys(balance).length).to.equal(1);
-      expect(balance[addressOne]).to.equal(finalAddressOneBalance);
+      it('should not throw if a single address fails', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [addressOne, discobotAddress, addressTwo],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: chainLinkAddress,
+          },
+        });
+
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne]).to.equal(finalAddressOneBalance);
+        expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
+      });
     });
 
-    it('should return many balances', async () => {
-      const balances = await tbc.getBalances({
-        balanceSourceType: BalanceSourceType.ERC20,
-        addresses: [addressOne, addressTwo],
-        sourceOptions: {
-          evmChainId: ethChainId,
-          contractAddress: chainLinkAddress,
-        },
+    describe('off-chain batching', () => {
+      let newEthChainId = 1864339501;
+      before('Update ChainNodes.eth_chain_id', async () => {
+        // set eth_chain_id to some random value that is NOT
+        // defined in mapNodeToBalanceFetcherContract. This
+        // forces an off-chain batching strategy
+        await models.ChainNode.update(
+          { eth_chain_id: newEthChainId },
+          {
+            where: {
+              eth_chain_id: ethChainId,
+            },
+          },
+        );
       });
 
-      expect(Object.keys(balances).length).to.equal(2);
-      expect(balances[addressOne]).to.equal(finalAddressOneBalance);
-      expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
-    });
+      it('should return many balances', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [addressOne, addressTwo],
+          sourceOptions: {
+            evmChainId: newEthChainId,
+            contractAddress: chainLinkAddress,
+          },
+        });
 
-    it('should not throw if a single address fails', async () => {
-      const balances = await tbc.getBalances({
-        balanceSourceType: BalanceSourceType.ERC20,
-        addresses: [addressOne, discobotAddress, addressTwo],
-        sourceOptions: {
-          evmChainId: ethChainId,
-          contractAddress: chainLinkAddress,
-        },
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne]).to.equal(finalAddressOneBalance);
+        expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
       });
 
-      expect(Object.keys(balances).length).to.equal(2);
-      expect(balances[addressOne]).to.equal(finalAddressOneBalance);
-      expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
+      it('should not throw if a single address fails', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [addressOne, discobotAddress, addressTwo],
+          sourceOptions: {
+            evmChainId: newEthChainId,
+            contractAddress: chainLinkAddress,
+          },
+        });
+
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne]).to.equal(finalAddressOneBalance);
+        expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
+      });
     });
   });
-}).timeout(40000);
+});

@@ -205,6 +205,7 @@ export function mapNodeToBalanceFetcherContract(
 ) {
   switch (ethChainId) {
     case 1: // Ethereum Mainnet
+    case 1337: // Local Ganache - assuming fork of mainnet
       return '0xb1f8e55c7f64d203c1400b9d8555d050f94adf39';
     case 3: // Ropsten
       return '0x8D9708f3F514206486D7E988533f770a16d074a7';
