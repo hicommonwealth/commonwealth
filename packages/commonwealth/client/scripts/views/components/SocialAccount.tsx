@@ -7,9 +7,7 @@ type SocialAccountProps = {
   link: string;
 };
 
-export const SocialAccount = (props: SocialAccountProps) => {
-  const { iconName, link } = props;
-
+export const SocialAccount = ({ iconName, link }: SocialAccountProps) => {
   let formattedLink;
   if (link.includes('@')) {
     formattedLink = link;
