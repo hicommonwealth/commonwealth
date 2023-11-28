@@ -11,11 +11,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
 import type Thread from '../../../models/Thread';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
-import { CWModal } from '../../components/component_kit/new_designs/CWModal';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
 type LinkedProposalProps = {
@@ -56,12 +56,12 @@ export const LinkedProposalsCard = ({
 
   const initialSnapshotLinks = useMemo(
     () => filterLinks(thread.links, LinkSource.Snapshot),
-    [thread.links]
+    [thread.links],
   );
 
   const initialProposalLinks = useMemo(
     () => filterLinks(thread.links, LinkSource.Proposal),
-    [thread.links]
+    [thread.links],
   );
 
   useEffect(() => {
@@ -71,20 +71,20 @@ export const LinkedProposalsCard = ({
         setSnapshotUrl(
           `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
             proposal.identifier
-          }`
+          }`,
         );
       } else {
         loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
           for (const { space: _space, proposals } of data) {
             const matchingSnapshot = proposals.find(
-              (sn) => sn.id === proposal.identifier
+              (sn) => sn.id === proposal.identifier,
             );
             if (matchingSnapshot) {
               setSnapshotTitle(matchingSnapshot.title);
               setSnapshotUrl(
                 `${app.isCustomDomain() ? '' : `/${thread.chain}`}/snapshot/${
                   _space.id
-                }/${matchingSnapshot.id}`
+                }/${matchingSnapshot.id}`,
               );
               break;
             }

@@ -1,10 +1,10 @@
 import 'components/component_kit/CWSidebarHeader/CWSidebarHeader.scss';
 import React from 'react';
 
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { CWCommunityAvatar } from '../../component_kit/cw_community_avatar';
 import { CWText } from '../../component_kit/cw_text';
-import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 
 const SidebarHeader = () => {
   const navigate = useCommonNavigate();
