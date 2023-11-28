@@ -70,4 +70,23 @@ export const namespaceFactoryAbi = [
     type: 'function',
     name: 'configureCommunityStakeId',
   },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    name: 'getNamespace',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+  },
 ];
