@@ -49,8 +49,12 @@ export const Sidebar = ({
         {isInsideCommunity && (
           <CommunitySection showSkeleton={!app.activeChainId()} />
         )}
-        {menuName === 'createContent' && <CreateContentSidebar />}
-        {menuName === 'exploreCommunities' && <ExploreCommunitiesSidebar />}
+        {menuName === 'createContent' && (
+          <CreateContentSidebar isInsideCommunity={isInsideCommunity} />
+        )}
+        {menuName === 'exploreCommunities' && (
+          <ExploreCommunitiesSidebar isInsideCommunity={isInsideCommunity} />
+        )}
       </div>
     </div>
   );
