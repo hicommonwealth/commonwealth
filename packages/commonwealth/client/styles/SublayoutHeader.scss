@@ -70,6 +70,10 @@ html.todesktop .SublayoutHeader {
       @include extraSmall {
         display: flex;
       }
+
+      @include smallInclusive {
+        display: flex;
+      }
     }
 
     .DesktopMenuContainer {
