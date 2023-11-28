@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import 'components/Profile/ProfileHeader.scss';
 
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { renderQuillDeltaToText } from '../../../../../shared/utils';
 import type NewProfile from '../../../models/NewProfile';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
@@ -24,6 +25,14 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const { bio, name } = profile;
 
   const isCurrentUser = isLoggedIn && isOwner;
+  const hasBio = () => {
+    try {
+      if (bio.trim().length === 0) return false;
+      return renderQuillDeltaToText(JSON.parse(decodeURIComponent(bio)));
+    } catch {
+      return true;
+    }
+  };
 
   return (
     <div className="ProfileHeader">
@@ -53,7 +62,7 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
           {name || 'Anonymous user'}
         </CWText>
         <SocialAccounts profile={profile} />
-        {bio && (
+        {hasBio() && (
           <div>
             <CWText type="h4">Bio</CWText>
             <CWText className="bio">{<QuillRenderer doc={bio} />}</CWText>
