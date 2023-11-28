@@ -1,12 +1,12 @@
 import moment from 'moment';
 
-import { UserInstance } from 'server/models/user';
 import { AppError, ServerError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
 import { VoteAttributes } from '../../models/vote';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -68,13 +68,14 @@ export async function __updatePollVote(
 
   try {
     // check token balance threshold if needed
-    const canVote = await validateTopicThreshold(
-      this.tokenBalanceCache,
+    const { isValid } = await validateTopicGroupsMembership(
       this.models,
+      this.tokenBalanceCache,
       thread.topic_id,
-      address.address,
+      community,
+      address,
     );
-    if (!canVote) {
+    if (!isValid) {
       throw new AppError(Errors.InsufficientTokenBalance);
     }
   } catch (e) {

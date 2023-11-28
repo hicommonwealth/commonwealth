@@ -1,14 +1,14 @@
 import { AppError, ServerError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
 import moment from 'moment';
-import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { VoteAttributes, VoteInstance } from '../models/vote';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
-import validateTopicThreshold from '../util/validateTopicThreshold';
+import { validateTopicGroupsMembership } from '../util/requirementsModule/validateTopicGroupsMembership';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -35,14 +35,14 @@ const updateVote = async (
   tokenBalanceCache: TokenBalanceCache,
   req: TypedRequestBody<UpdateVoteReq>,
   res: TypedResponse<UpdateVoteResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  const chain = req.chain;
+  const community = req.chain;
 
   const { poll_id, address, author_chain, option } = req.body;
 
   const poll = await models.Poll.findOne({
-    where: { id: poll_id, community_id: chain.id },
+    where: { id: poll_id, community_id: community.id },
   });
   if (!poll) return next(new AppError(Errors.NoPoll));
   if (!poll.ends_at && moment(poll.ends_at).utc().isBefore(moment().utc())) {
@@ -66,13 +66,14 @@ const updateVote = async (
 
   try {
     // check token balance threshold if needed
-    const canVote = await validateTopicThreshold(
-      tokenBalanceCache,
+    const { isValid } = await validateTopicGroupsMembership(
       models,
+      tokenBalanceCache,
       thread.topic_id,
-      address
+      community,
+      req.address,
     );
-    if (!canVote) {
+    if (!isValid) {
       return next(new AppError(Errors.InsufficientTokenBalance));
     }
   } catch (e) {
@@ -87,7 +88,7 @@ const updateVote = async (
         poll_id: poll.id,
         address,
         author_community_id: author_chain,
-        community_id: chain.id,
+        community_id: community.id,
       },
       transaction: t,
     });
@@ -97,10 +98,10 @@ const updateVote = async (
         poll_id: poll.id,
         address,
         author_community_id: author_chain,
-        community_id: chain.id,
+        community_id: community.id,
         option: selected_option,
       },
-      { transaction: t }
+      { transaction: t },
     );
   });
 

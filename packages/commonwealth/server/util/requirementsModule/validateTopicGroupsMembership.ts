@@ -1,10 +1,10 @@
 import { Op } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
 import { DB } from '../../models';
-import { AddressInstance } from '../../models/address';
+import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
+import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import validateTopicThreshold from '../validateTopicThreshold';
 import { makeGetBalancesOptions } from './makeGetBalancesOptions';
 import validateGroupMembership from './validateGroupMembership';
@@ -30,7 +30,7 @@ export async function validateTopicGroupsMembership(
   tokenBalanceCache: TokenBalanceCache,
   topicId: number,
   chain: CommunityInstance,
-  address: AddressInstance,
+  address: AddressAttributes,
 ): Promise<{ isValid: boolean; message?: string }> {
   if (FEATURE_FLAG_GROUP_CHECK_ENABLED) {
     // check via groups
@@ -57,7 +57,7 @@ export async function validateTopicGroupsMembership(
       getBalancesOptions.map(async (options) => {
         return {
           options,
-          balances: await this.tokenBalanceCache.getBalances(options),
+          balances: await tokenBalanceCache.getBalances(options),
         };
       }),
     );

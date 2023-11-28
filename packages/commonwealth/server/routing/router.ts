@@ -219,12 +219,19 @@ function setupRouter(
 ) {
   // controllers
 
-  // TODO: replace old TBC with new
   const newTokenBalanceCache = new NewTokenBalanceCache(models, redisCache);
 
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, tokenBalanceCache, banCache),
-    comments: new ServerCommentsController(models, tokenBalanceCache, banCache),
+    threads: new ServerThreadsController(
+      models,
+      newTokenBalanceCache,
+      banCache,
+    ),
+    comments: new ServerCommentsController(
+      models,
+      newTokenBalanceCache,
+      banCache,
+    ),
     reactions: new ServerReactionsController(models, banCache),
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
