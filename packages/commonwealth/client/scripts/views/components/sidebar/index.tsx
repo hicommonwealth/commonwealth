@@ -39,7 +39,7 @@ export const Sidebar = ({
 
   return (
     <div className={sidebarClass}>
-      {app.chain && (
+      {isInsideCommunity && (
         <div className="sidebar-header-wrapper">
           <SidebarHeader />
         </div>
