@@ -36,15 +36,6 @@ export async function __getErc721Balances(options: GetErc721BalancesOptions) {
   }
 }
 
-async function getOnChainBatchErc721Balances(
-  ethChainId: number,
-  rpcEndpoint: string,
-  contractAddress: string,
-  addresses: string[],
-): Promise<Balances> {
-  return {};
-}
-
 async function getOffChainBatchErc721Balances(
   evmChainId: number,
   rpcEndpoint: string,
