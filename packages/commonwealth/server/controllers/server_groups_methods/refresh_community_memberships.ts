@@ -13,11 +13,11 @@ import {
 } from '../../util/requirementsModule/requirementsTypes';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import {
-  Balances,
   GetBalancesOptions,
   GetCosmosBalancesOptions,
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
+  OptionsWithBalances,
 } from '../../util/tokenBalanceCache/types';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -65,16 +65,16 @@ export async function __refreshCommunityMemberships(
     groupsToUpdate,
     addresses,
   );
-  const allBalances: Balances = await Bluebird.reduce(
+  const allBalances: OptionsWithBalances[] = await Bluebird.reduce(
     getBalancesOptions,
     async (acc, options) => {
-      const balances = await this.tokenBalanceCache.getBalances(options);
-      return {
-        ...acc,
-        ...balances,
+      const result = {
+        options,
+        balances: await this.tokenBalanceCache.getBalances(options),
       };
+      return [...acc, result];
     },
-    {},
+    [],
   );
 
   const toCreate = [];
@@ -150,10 +150,10 @@ export async function __refreshCommunityMemberships(
   );
 }
 
-async function makeGetBalancesOptions(
+export function makeGetBalancesOptions(
   groups: GroupAttributes[],
   addresses: AddressAttributes[],
-): Promise<GetBalancesOptions[]> {
+): GetBalancesOptions[] {
   const allOptions: GetBalancesOptions[] = [];
 
   for (const address of addresses) {
@@ -177,7 +177,9 @@ async function makeGetBalancesOptions(
                 );
               });
               if (existingOptions) {
-                existingOptions.addresses.push(address.address);
+                if (!existingOptions.addresses.includes(address.address)) {
+                  existingOptions.addresses.push(address.address);
+                }
               } else {
                 allOptions.push({
                   balanceSourceType: castedSource.source_type,
@@ -202,7 +204,9 @@ async function makeGetBalancesOptions(
                 );
               });
               if (existingOptions) {
-                existingOptions.addresses.push(address.address);
+                if (!existingOptions.addresses.includes(address.address)) {
+                  existingOptions.addresses.push(address.address);
+                }
               } else {
                 allOptions.push({
                   balanceSourceType: BalanceSourceType.ETHNative,
@@ -227,7 +231,9 @@ async function makeGetBalancesOptions(
                 );
               });
               if (existingOptions) {
-                existingOptions.addresses.push(address.address);
+                if (!existingOptions.addresses.includes(address.address)) {
+                  existingOptions.addresses.push(address.address);
+                }
               } else {
                 allOptions.push({
                   balanceSourceType: BalanceSourceType.CosmosNative,

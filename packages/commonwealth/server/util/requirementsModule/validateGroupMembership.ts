@@ -1,7 +1,11 @@
-import { ChainNetwork } from 'common-common/src/types';
 import { toBN } from 'web3-utils';
-import { Balances } from '../tokenBalanceCache/types';
-import { AllowlistData, Requirement, ThresholdData } from './requirementsTypes';
+import { OptionsWithBalances } from '../tokenBalanceCache/types';
+import {
+  AllowlistData,
+  BalanceSourceType,
+  Requirement,
+  ThresholdData,
+} from './requirementsTypes';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -22,7 +26,7 @@ export type ValidateGroupMembershipResponse = {
 export default async function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
-  balances: Balances,
+  balances: OptionsWithBalances[],
   numRequiredRequirements: number = 0,
 ): Promise<ValidateGroupMembershipResponse> {
   const response: ValidateGroupMembershipResponse = {
@@ -93,40 +97,59 @@ export default async function validateGroupMembership(
 async function _thresholdCheck(
   userAddress: string,
   thresholdData: ThresholdData,
-  balances: Balances,
+  balances: OptionsWithBalances[],
 ): Promise<{ result: boolean; message: string }> {
   try {
-    let chainNetwork: ChainNetwork;
+    let balanceSourceType: BalanceSourceType;
     let contractAddress: string;
     let chainId: string;
     switch (thresholdData.source.source_type) {
       case 'erc20': {
-        chainNetwork = ChainNetwork.ERC20;
+        balanceSourceType = BalanceSourceType.ERC20;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'erc721': {
-        chainNetwork = ChainNetwork.ERC721;
+        balanceSourceType = BalanceSourceType.ERC721;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'eth_native': {
-        chainNetwork = ChainNetwork.Ethereum;
+        balanceSourceType = BalanceSourceType.ETHNative;
         chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'cosmos_native': {
-        //chainNetwork not used downstream by tbc other than EVM contracts, Osmosis works for all cosmos chains
-        chainNetwork = ChainNetwork.Osmosis;
+        //balanceSourceType not used downstream by tbc other than EVM contracts, Osmosis works for all cosmos chains
+        balanceSourceType = BalanceSourceType.CosmosNative;
         chainId = thresholdData.source.cosmos_chain_id;
         break;
       }
       default:
         break;
     }
-    const balance = balances[userAddress];
+
+    const balance = balances
+      .filter((b) => b.options.balanceSourceType === balanceSourceType)
+      .find((b) => {
+        switch (b.options.balanceSourceType) {
+          case BalanceSourceType.ERC20:
+          case BalanceSourceType.ERC721:
+            return (
+              b.options.sourceOptions.contractAddress == contractAddress &&
+              b.options.sourceOptions.evmChainId.toString() === chainId
+            );
+          case BalanceSourceType.ETHNative:
+            return b.options.sourceOptions.evmChainId.toString() === chainId;
+          case BalanceSourceType.CosmosNative:
+            return b.options.sourceOptions.cosmosChainId.toString() === chainId;
+          default:
+            return null;
+        }
+      })?.balances[userAddress];
+
     if (typeof balance !== 'string') {
       throw new Error(`Failed to get balance for address`);
     }

@@ -1,7 +1,7 @@
 import Bluebird from 'bluebird';
-import { REDIS_URL, VULTR_IP } from 'server/config';
 import { RedisCache } from '../../common-common/src/redisCache';
 import { TokenBalanceCache } from '../../token-balance-cache/src';
+import { REDIS_URL, VULTR_IP } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import db from '../server/database';

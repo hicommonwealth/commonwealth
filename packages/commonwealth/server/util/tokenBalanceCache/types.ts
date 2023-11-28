@@ -2,6 +2,11 @@ import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
 
 export type Balances = { [address: string]: string };
 
+export type OptionsWithBalances = {
+  options: GetBalancesOptions;
+  balances: Balances;
+};
+
 type GetEvmBalancesBase = {
   addresses: string[];
   sourceOptions: {
