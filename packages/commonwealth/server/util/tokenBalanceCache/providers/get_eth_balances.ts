@@ -1,11 +1,15 @@
-import Web3 from 'web3';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { toBN } from 'web3-utils';
 import { ChainNodeInstance } from '../../../models/chain_node';
+import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
   evmOffChainRpcBatching,
   mapNodeToBalanceFetcherContract,
 } from '../util';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export type GetEthBalancesOptions = {
   chainNode: ChainNodeInstance;
@@ -19,7 +23,11 @@ export async function __getEthBalances(options: GetEthBalancesOptions) {
 
   const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
   if (options.addresses.length === 1) {
-    return await getEthBalance(rpcEndpoint, options.addresses[0]);
+    return await getEthBalance(
+      options.chainNode.eth_chain_id,
+      rpcEndpoint,
+      options.addresses[0],
+    );
   }
 
   const balanceFetcherContract = mapNodeToBalanceFetcherContract(
@@ -82,10 +90,10 @@ async function getOffChainBatchEthBalances(
 }
 
 async function getEthBalance(
+  evmChainId: number,
   rpcEndpoint: string,
   address: string,
 ): Promise<Balances> {
-  const web3 = new Web3();
   const requestBody = {
     method: 'eth_getBalance',
     params: [address, 'latest'],
@@ -100,10 +108,16 @@ async function getEthBalance(
   });
   const data = await response.json();
 
-  return {
-    [address]: web3.eth.abi.decodeParameter(
-      'uint256',
-      data.result,
-    ) as unknown as string,
-  };
+  if (data.error) {
+    const msg =
+      `Eth balance fetch failed for address ${address} ` +
+      `on evm chain id ${evmChainId}`;
+    rollbar.error(msg, data.error);
+    log.error(msg, data.error);
+    return {};
+  } else {
+    return {
+      [address]: toBN(data.result).toString(10),
+    };
+  }
 }

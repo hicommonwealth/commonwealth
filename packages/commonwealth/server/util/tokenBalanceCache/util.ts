@@ -1,5 +1,6 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import Web3 from 'web3';
+import { toBN } from 'web3-utils';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { rollbar } from '../rollbar';
 import { Balances } from './types';
@@ -98,7 +99,9 @@ export async function evmOffChainRpcBatching(
       failedAddresses.push(idAddressMap[data.id]);
     } else {
       const address = idAddressMap[data.id];
-      balances[address] = web3.eth.abi.decodeParameter('uint256', data.result);
+      balances[address] = source.contractAddress
+        ? web3.eth.abi.decodeParameter('uint256', data.result)
+        : toBN(data.result).toString(10);
     }
   }
 

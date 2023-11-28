@@ -1,11 +1,15 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import Web3 from 'web3';
 import { ChainNodeInstance } from '../../../models/chain_node';
+import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
   evmOffChainRpcBatching,
   mapNodeToBalanceFetcherContract,
 } from '../util';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export type GetErc20BalancesOptions = {
   chainNode: ChainNodeInstance;
@@ -23,6 +27,7 @@ export async function __getErc20Balances(
   const rpcEndpoint = options.chainNode.private_url || options.chainNode.url;
   if (options.addresses.length === 1) {
     return await getErc20Balance(
+      options.chainNode.eth_chain_id,
       rpcEndpoint,
       options.contractAddress,
       options.addresses[0],
@@ -102,6 +107,7 @@ async function getOffChainBatchErc20Balances(
 }
 
 async function getErc20Balance(
+  evmChainId: number,
   rpcEndpoint: string,
   contractAddress: string,
   address: string,
@@ -130,10 +136,19 @@ async function getErc20Balance(
   });
   const data = await response.json();
 
-  return {
-    [address]: web3.eth.abi.decodeParameter(
-      'uint256',
-      data.result,
-    ) as unknown as string,
-  };
+  if (data.error) {
+    const msg =
+      `ERC20 balance fetch failed for address ${address} ` +
+      `on evm chain id ${evmChainId}`;
+    rollbar.error(msg, data.error);
+    log.error(msg, data.error);
+    return {};
+  } else {
+    return {
+      [address]: web3.eth.abi.decodeParameter(
+        'uint256',
+        data.result,
+      ) as unknown as string,
+    };
+  }
 }
