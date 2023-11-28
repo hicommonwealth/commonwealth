@@ -97,7 +97,7 @@ export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
-  ','
+  ',',
 ) as ChainBase[]) || [ChainBase.Ethereum];
 export const MAGIC_DEFAULT_CHAIN =
   process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
@@ -116,6 +116,9 @@ export const ETH_RPC = process.env.ETH_RPC || 'prod';
 export const COSMOS_GOV_V1_CHAIN_IDS = process.env.COSMOS_GOV_V1
   ? process.env.COSMOS_GOV_V1.split(',')
   : [];
+
+export const COSMOS_REGISTRY_API =
+  process.env.COSMOS_REGISTRY_API || 'https://cosmoschains.thesilverfox.pro';
 
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
 // Don't set default value so if env var is not set the database cleaner will not run
