@@ -48,10 +48,7 @@ export async function __refreshCommunityMemberships(
   console.log(
     `Checking ${addresses.length} addresses in ${groupsToUpdate.length} groups in ${community.id}...`,
   );
-  const getBalancesOptions = await makeGetBalancesOptions(
-    groupsToUpdate,
-    addresses,
-  );
+  const getBalancesOptions = makeGetBalancesOptions(groupsToUpdate, addresses);
   const allBalances = await Promise.all(
     getBalancesOptions.map(async (options) => {
       return {

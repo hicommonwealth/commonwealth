@@ -6,6 +6,7 @@ import { DB } from '../../models';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import validateTopicThreshold from '../validateTopicThreshold';
+import { makeGetBalancesOptions } from './makeGetBalancesOptions';
 import validateGroupMembership from './validateGroupMembership';
 
 export const Errors = {
@@ -29,7 +30,7 @@ export async function validateTopicGroupsMembership(
   tokenBalanceCache: TokenBalanceCache,
   topicId: number,
   chain: CommunityInstance,
-  address: AddressInstance
+  address: AddressInstance,
 ): Promise<{ isValid: boolean; message?: string }> {
   if (FEATURE_FLAG_GROUP_CHECK_ENABLED) {
     // check via groups
@@ -51,12 +52,22 @@ export async function validateTopicGroupsMembership(
     let numValidGroups = 0;
     const allErrorMessages: string[] = [];
 
+    const getBalancesOptions = makeGetBalancesOptions(groups, [address]);
+    const balances = await Promise.all(
+      getBalancesOptions.map(async (options) => {
+        return {
+          options,
+          balances: await this.tokenBalanceCache.getBalances(options),
+        };
+      }),
+    );
+
     for (const { metadata, requirements } of groups) {
       const { isValid, messages } = await validateGroupMembership(
         address.address,
         requirements,
-        tokenBalanceCache,
-        metadata.required_requirements || 0
+        balances,
+        metadata.required_requirements || 0,
       );
       if (isValid) {
         numValidGroups++;
@@ -80,7 +91,7 @@ export async function validateTopicGroupsMembership(
       tokenBalanceCache,
       models,
       topicId,
-      address.address
+      address.address,
     );
     if (!canReact) {
       return { isValid: false, message: Errors.InsufficientTokenBalance };
