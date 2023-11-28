@@ -17,12 +17,12 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import {
   defaultCommunityRows,
-  updateAdminOnCreateCommunity
+  updateAdminOnCreateCommunity,
 } from './community_input_rows';
 import {
   useCommunityFormDefaultFields,
   useCommunityFormIdFields,
-  useCommunityFormState
+  useCommunityFormState,
 } from './hooks';
 
 export const StarterCommunityForm = () => {
@@ -61,7 +61,7 @@ export const StarterCommunityForm = () => {
         options={[
           { label: 'cosmos', value: 'cosmos' },
           { label: 'ethereum', value: 'ethereum' },
-          { label: 'near', value: 'near' }
+          { label: 'near', value: 'near' },
         ]}
         initialValue={{ label: 'ethereum', value: 'ethereum' }}
         onSelect={(o) => {
@@ -136,14 +136,14 @@ export const StarterCommunityForm = () => {
               github: communityFormDefaultFields.github,
               telegram: communityFormDefaultFields.telegram,
               website: communityFormDefaultFields.website,
-              ...additionalArgs
+              ...additionalArgs,
             });
 
             if (res.result.admin_address) {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
@@ -155,7 +155,8 @@ export const StarterCommunityForm = () => {
             console.log(err);
 
             notifyError(
-              err.responseJSON?.error || 'Creating new starter community failed'
+              err.responseJSON?.error ||
+                'Creating new starter community failed',
             );
           } finally {
             setSaving(false);

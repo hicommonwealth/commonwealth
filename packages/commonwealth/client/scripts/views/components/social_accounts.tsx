@@ -1,7 +1,7 @@
 import 'components/social_accounts.scss';
 import React from 'react';
 import type NewProfile from '../../models/NewProfile';
-import { SocialAccount } from './social_account';
+import { SocialAccount } from './SocialAccount';
 
 type SocialAccountsProps = {
   profile: NewProfile;

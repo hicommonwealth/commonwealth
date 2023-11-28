@@ -73,7 +73,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasSessionPayload: SessionPayload
+    canvasSessionPayload: SessionPayload,
   ): Promise<string> {
     const keplr = await import('@keplr-wallet/types');
     const canvas = await import('@canvas-js/interfaces');
@@ -81,7 +81,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
       this._chainId,
       account.address,
       canvas.serializeSessionPayload(canvasSessionPayload),
-      keplr.EthSignType.MESSAGE
+      keplr.EthSignType.MESSAGE,
     );
     return `0x${Buffer.from(signature).toString('hex')}`;
   }
@@ -110,7 +110,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
         await window.keplr.enable(this._chainId);
       } catch (err) {
         console.log(
-          `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`
+          `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`,
         );
 
         const bech32Prefix = app.chain.meta.bech32Prefix?.toLowerCase();
