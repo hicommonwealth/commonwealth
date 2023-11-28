@@ -63,7 +63,7 @@ export const HeaderWithFilters = ({
   const onFilterResize = () => {
     if (filterRowRef.current) {
       setRightFiltersDropdownPosition(
-        filterRowRef.current.clientHeight > 40 ? 'bottom-start' : 'bottom-end'
+        filterRowRef.current.clientHeight > 40 ? 'bottom-start' : 'bottom-end',
       );
     }
   };
@@ -118,12 +118,12 @@ export const HeaderWithFilters = ({
 
   const matchesDiscussionsTopicRoute = matchRoutes(
     [{ path: '/discussions/:topic' }, { path: ':scope/discussions/:topic' }],
-    location
+    location,
   );
 
   const matchesArchivedRoute = matchRoutes(
     [{ path: '/archived' }, { path: ':scope/archived' }],
-    location
+    location,
   );
 
   const onFilterSelect = ({
@@ -132,7 +132,7 @@ export const HeaderWithFilters = ({
     filterVal = '',
   }) => {
     const urlParams = Object.fromEntries(
-      new URLSearchParams(window.location.search)
+      new URLSearchParams(window.location.search),
     );
     urlParams[filterKey] = filterVal;
 
@@ -145,14 +145,14 @@ export const HeaderWithFilters = ({
         `/archived?` +
           Object.keys(urlParams)
             .map((x) => `${x}=${urlParams[x]}`)
-            .join('&')
+            .join('&'),
       );
     } else {
       navigate(
         `/discussions${pickedTopic ? `/${pickedTopic}` : ''}?` +
           Object.keys(urlParams)
             .map((x) => `${x}=${urlParams[x]}`)
-            .join('&')
+            .join('&'),
       );
     }
   };
@@ -191,7 +191,9 @@ export const HeaderWithFilters = ({
               iconLeft="plus"
               onClick={() => {
                 navigate(
-                  `/new/discussion${topic ? `?topic=${selectedTopic?.id}` : ''}`
+                  `/new/discussion${
+                    topic ? `?topic=${selectedTopic?.id}` : ''
+                  }`,
                 );
               }}
               disabled={!hasJoinedCommunity}
@@ -292,8 +294,8 @@ export const HeaderWithFilters = ({
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
                       [...featuredTopics, ...otherTopics].find(
-                        (x) => x.id === item.id
-                      )
+                        (x) => x.id === item.id,
+                      ),
                     )
                   }
                 />
