@@ -101,7 +101,7 @@ export const ReactionButton = ({
         if (e instanceof SessionKeyError) {
           return;
         }
-        console.error(e?.responseJSON?.error || e?.message);
+        console.error(e.response.data.error || e?.message);
       });
     } else {
       createThreadReaction({
@@ -113,7 +113,7 @@ export const ReactionButton = ({
         if (e instanceof SessionKeyError) {
           return;
         }
-        console.error(e?.responseJSON?.error || e?.message);
+        console.error(e.response.data.error || e?.message);
       });
     }
   };

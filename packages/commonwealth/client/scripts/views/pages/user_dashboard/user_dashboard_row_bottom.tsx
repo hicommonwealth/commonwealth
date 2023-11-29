@@ -76,7 +76,7 @@ export const UserDashboardRowBottom = (props: UserDashboardRowBottomProps) => {
     <div className="UserDashboardRowBottom">
       <div className="comments">
         <div className="count">
-          <CWIcon iconName="feedback" iconSize="small" className="icon" />
+          <CWIcon iconName="comment" iconSize="small" />
           <CWText type="caption" className="text">
             {commentCount} {commentCount == 1 ? 'Comment' : 'Comments'}
           </CWText>

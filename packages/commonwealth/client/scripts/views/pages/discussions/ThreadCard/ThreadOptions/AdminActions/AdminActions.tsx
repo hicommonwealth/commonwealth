@@ -90,7 +90,7 @@ export const AdminActions = ({
     chainId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic?.id,
   });
 
   const handleDeleteThread = () => {
@@ -451,7 +451,6 @@ export const AdminActions = ({
         }
         onClose={() => setIsUpdateProposalStatusModalOpen(false)}
         open={isUpdateProposalStatusModalOpen}
-        visibleOverflow
       />
 
       <CWModal

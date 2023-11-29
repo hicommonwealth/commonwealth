@@ -19,6 +19,7 @@ import Permissions from '../../utils/Permissions';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
+import { getClasses } from '../components/component_kit/helpers';
 
 const resetSidebarState = () => {
   //Bouncer pattern -- I have found isMobile does not always detect screen
@@ -45,10 +46,6 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
     (app.chain?.base === ChainBase.Ethereum &&
       app.chain?.network === ChainNetwork.Aave) ||
     app.chain?.network === ChainNetwork.Compound;
-
-  const showSubstrateProposalItems =
-    app.chain?.base === ChainBase.Substrate &&
-    app.chain?.network !== ChainNetwork.Plasm;
 
   const getTemplateItems = (): PopoverMenuItem[] => {
     const contracts = app.contracts.getCommunityContracts();
@@ -224,13 +221,24 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   ];
 };
 
-export const CreateContentSidebar = () => {
+export const CreateContentSidebar = ({
+  isInsideCommunity,
+}: {
+  isInsideCommunity: boolean;
+}) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
 
   return (
     <CWSidebarMenu
-      className="CreateContentSidebar"
+      className={getClasses<{
+        heightInsideCommunity: boolean;
+      }>(
+        {
+          heightInsideCommunity: isInsideCommunity,
+        },
+        'CreateContentSidebar',
+      )}
       menuHeader={{
         label: 'Create',
         onClick: async () => {
