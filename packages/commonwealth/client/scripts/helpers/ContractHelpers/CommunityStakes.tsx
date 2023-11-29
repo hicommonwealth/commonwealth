@@ -137,6 +137,24 @@ class CommunityStakes extends ContractBase {
   }
 
   /**
+   * get total supply of an Id
+   * @param name namespace name
+   * @param id id of the token
+   * @returns total supply
+   */
+  async getUserIdSupply(name: string, id: number): Promise<string> {
+    const namespaceAddress = await this.getNamespaceAddress(name);
+    const calldata = `0x5a9807be${this.web3.eth.abi
+      .encodeParameters(['uint256'], [this.wallet.accounts[0], id])
+      .substring(2)}`;
+    const result = await this.web3.eth.call({
+      to: namespaceAddress,
+      data: calldata,
+    });
+    return this.web3.eth.abi.decodeParameter('uint256', result).toString();
+  }
+
+  /**
    * gets address for a namespace name, caches until next new name
    * @param name namespace name
    * @returns
