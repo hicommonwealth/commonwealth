@@ -7,8 +7,9 @@ import type { VoteAttributes, VoteInstance } from '../models/vote';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
+import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../token-balance-cache/src';
 import { validateTopicGroupsMembership } from '../util/requirementsModule/validateTopicGroupsMembership';
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache as TokenBalanceCacheV2 } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -32,7 +33,8 @@ type UpdateVoteResp = VoteAttributes;
 
 const updateVote = async (
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
+  tokenBalanceCacheV1: TokenBalanceCacheV1,
+  tokenBalanceCacheV2: TokenBalanceCacheV2,
   req: TypedRequestBody<UpdateVoteReq>,
   res: TypedResponse<UpdateVoteResp>,
   next: NextFunction,
@@ -68,7 +70,8 @@ const updateVote = async (
     // check token balance threshold if needed
     const { isValid } = await validateTopicGroupsMembership(
       models,
-      tokenBalanceCache,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
       thread.topic_id,
       community,
       req.address,

@@ -1,6 +1,7 @@
+import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../token-balance-cache/src';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache as TokenBalanceCacheV2 } from '../util/tokenBalanceCache/tokenBalanceCache';
 import {
   CreateGroupOptions,
   CreateGroupResult,
@@ -38,7 +39,8 @@ import {
 export class ServerGroupsController {
   constructor(
     public models: DB,
-    public tokenBalanceCache: TokenBalanceCache,
+    public tokenBalanceCacheV1: TokenBalanceCacheV1,
+    public tokenBalanceCacheV2: TokenBalanceCacheV2,
     public banCache: BanCache,
   ) {}
 

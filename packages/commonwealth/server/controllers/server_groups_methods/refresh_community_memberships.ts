@@ -53,7 +53,7 @@ export async function __refreshCommunityMemberships(
     getBalancesOptions.map(async (options) => {
       return {
         options,
-        balances: await this.tokenBalanceCache.getBalances(options),
+        balances: await this.tokenBalanceCacheV2.getBalances(options),
       };
     }),
   );

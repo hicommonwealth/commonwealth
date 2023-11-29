@@ -69,7 +69,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       const [newReaction, allNotificationOptions, allAnalyticsOptions] =
@@ -91,7 +92,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newReaction).to.be.ok;
@@ -100,7 +101,7 @@ describe('ServerCommentsController', () => {
       const { notification } = allNotificationOptions[0];
       expect(notification).to.have.property(
         'categoryId',
-        NotificationCategories.NewReaction
+        NotificationCategories.NewReaction,
       );
 
       expect(notification.data).to.have.property('created_at');
@@ -183,7 +184,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       expect(
@@ -193,7 +195,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId: 123,
-        })
+        }),
       ).to.be.rejectedWith('Comment not found: 123');
     });
 
@@ -252,7 +254,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       expect(
@@ -262,7 +265,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId: 123,
-        })
+        }),
       ).to.be.rejectedWith('Thread not found for comment: 123');
     });
 
@@ -326,7 +329,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       expect(
@@ -336,7 +340,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
@@ -424,7 +428,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       expect(
@@ -434,7 +439,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           reaction: reaction as any,
           commentId,
-        })
+        }),
       ).to.be.rejectedWith('Insufficient token balance');
     });
   });
@@ -459,7 +464,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       const community = { id: 'ethereum' };
@@ -472,7 +478,7 @@ describe('ServerCommentsController', () => {
         orderDirection: 'DESC',
       };
       const comments = await serverCommentsController.searchComments(
-        searchOptions
+        searchOptions,
       );
       expect(comments.results).to.have.length(5);
       expect(comments.results[0].id).to.equal(1);
@@ -520,7 +526,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       const user = {
@@ -556,7 +563,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           commentId,
           commentBody,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(updatedComment).to.include({
@@ -621,7 +628,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       const user = {
@@ -645,7 +653,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           commentId,
           commentBody,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
     });
 
@@ -681,7 +689,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       const user = {
@@ -705,7 +714,7 @@ describe('ServerCommentsController', () => {
           community: community as any,
           commentId,
           commentBody,
-        })
+        }),
       ).to.be.rejectedWith('Thread not found for comment');
     });
   });
@@ -731,7 +740,8 @@ describe('ServerCommentsController', () => {
       const serverCommentsController = new ServerCommentsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        tokenBalanceCache as any,
+        banCache as any,
       );
 
       const user = {
@@ -759,7 +769,7 @@ describe('ServerCommentsController', () => {
           },
           community: community as any,
           commentId,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
     });
   });

@@ -211,7 +211,7 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  tokenBalanceCache: TokenBalanceCache,
+  tokenBalanceCacheV1: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
@@ -219,17 +219,19 @@ function setupRouter(
 ) {
   // controllers
 
-  const newTokenBalanceCache = new NewTokenBalanceCache(models, redisCache);
+  const tokenBalanceCacheV2 = new NewTokenBalanceCache(models, redisCache);
 
   const serverControllers: ServerControllers = {
     threads: new ServerThreadsController(
       models,
-      newTokenBalanceCache,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
       banCache,
     ),
     comments: new ServerCommentsController(
       models,
-      newTokenBalanceCache,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
       banCache,
     ),
     reactions: new ServerReactionsController(models, banCache),
@@ -238,13 +240,18 @@ function setupRouter(
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(
       models,
-      tokenBalanceCache,
+      tokenBalanceCacheV1,
       banCache,
     ),
-    polls: new ServerPollsController(models, tokenBalanceCache),
+    polls: new ServerPollsController(models, tokenBalanceCacheV1),
     proposals: new ServerProposalsController(models, redisCache),
-    groups: new ServerGroupsController(models, newTokenBalanceCache, banCache),
-    topics: new ServerTopicsController(models, tokenBalanceCache, banCache),
+    groups: new ServerGroupsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+      banCache,
+    ),
+    topics: new ServerTopicsController(models, tokenBalanceCacheV1, banCache),
   };
 
   // ---
@@ -432,13 +439,13 @@ function setupRouter(
     'post',
     '/tokenBalance',
     databaseValidationService.validateCommunity,
-    tokenBalance.bind(this, models, tokenBalanceCache),
+    tokenBalance.bind(this, models, tokenBalanceCacheV1),
   );
   registerRoute(
     router,
     'post',
     '/bulkBalances',
-    bulkBalances.bind(this, models, tokenBalanceCache),
+    bulkBalances.bind(this, models, tokenBalanceCacheV1),
   );
   registerRoute(
     router,

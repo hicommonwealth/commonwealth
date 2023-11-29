@@ -1,12 +1,12 @@
 import Bluebird from 'bluebird';
 import { RedisCache } from '../../common-common/src/redisCache';
-import { TokenBalanceCache } from '../../token-balance-cache/src';
+import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../token-balance-cache/src';
 import { REDIS_URL, VULTR_IP } from '../server/config';
 import { ServerCommunitiesController } from '../server/controllers/server_communities_controller';
 import { ServerGroupsController } from '../server/controllers/server_groups_controller';
 import db from '../server/database';
 import BanCache from '../server/util/banCheckCache';
-import { TokenBalanceCache as NewTokenBalanceCache } from '../server/util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache as TokenBalanceCacheV2 } from '../server/util/tokenBalanceCache/tokenBalanceCache';
 
 async function main() {
   const models = db;
@@ -14,21 +14,22 @@ async function main() {
   await redisCache.init(REDIS_URL, VULTR_IP);
   const banCache = new BanCache(models);
 
-  const tokenBalanceCache = new TokenBalanceCache();
-  await tokenBalanceCache.initBalanceProviders();
-  await tokenBalanceCache.start();
+  const tokenBalanceCacheV1 = new TokenBalanceCacheV1();
+  await tokenBalanceCacheV1.initBalanceProviders();
+  await tokenBalanceCacheV1.start();
 
-  const newTokenBalanceCache = new NewTokenBalanceCache(models, redisCache);
+  const tokenBalanceCacheV2 = new TokenBalanceCacheV2(models, redisCache);
 
   const communitiesController = new ServerCommunitiesController(
     models,
-    tokenBalanceCache,
+    tokenBalanceCacheV1,
     banCache,
   );
 
   const groupsController = new ServerGroupsController(
     models,
-    newTokenBalanceCache,
+    tokenBalanceCacheV1,
+    tokenBalanceCacheV2,
     banCache,
   );
 

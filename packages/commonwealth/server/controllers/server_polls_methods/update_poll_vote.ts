@@ -70,7 +70,8 @@ export async function __updatePollVote(
     // check token balance threshold if needed
     const { isValid } = await validateTopicGroupsMembership(
       this.models,
-      this.tokenBalanceCache,
+      this.tokenBalanceCacheV1,
+      this.tokenBalanceCacheV2,
       thread.topic_id,
       community,
       address,

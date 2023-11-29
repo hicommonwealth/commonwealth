@@ -1,10 +1,12 @@
 import { Op } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
+
+import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../../token-balance-cache/src';
 import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
 import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
-import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache as TokenBalanceCacheV2 } from '../tokenBalanceCache/tokenBalanceCache';
 import validateTopicThreshold from '../validateTopicThreshold';
 import { makeGetBalancesOptions } from './makeGetBalancesOptions';
 import validateGroupMembership from './validateGroupMembership';
@@ -19,7 +21,8 @@ export const Errors = {
  * all groups of the given topic. Depending on the FEATURE_FLAG_GROUP_CHECK_ENABLED
  * feature flag, may use Gating API implementation or original TBC implementation.
  * @param models DB handle
- * @param tokenBalanceCache Token balance cache handle
+ * @param tokenBalanceCacheV1 Token balance cache handle (old implementation)
+ * @param tokenBalanceCacheV2 Token balance cache handle (new implementation)
  * @param topicId ID of the topic
  * @param chain Chain of the groups
  * @param address Address to check against requirements
@@ -27,13 +30,14 @@ export const Errors = {
  */
 export async function validateTopicGroupsMembership(
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
+  tokenBalanceCacheV1: TokenBalanceCacheV1,
+  tokenBalanceCacheV2: TokenBalanceCacheV2,
   topicId: number,
   chain: CommunityInstance,
   address: AddressAttributes,
 ): Promise<{ isValid: boolean; message?: string }> {
   if (FEATURE_FLAG_GROUP_CHECK_ENABLED) {
-    // check via groups
+    // check via new TBC with groups
 
     // get all groups of topic
     const topic = await models.Topic.findOne({
@@ -57,7 +61,7 @@ export async function validateTopicGroupsMembership(
       getBalancesOptions.map(async (options) => {
         return {
           options,
-          balances: await tokenBalanceCache.getBalances(options),
+          balances: await tokenBalanceCacheV2.getBalances(options),
         };
       }),
     );
@@ -85,10 +89,10 @@ export async function validateTopicGroupsMembership(
     return { isValid: true };
   }
 
-  // check via TBC
+  // check via old TBC without groups
   try {
     const canReact = await validateTopicThreshold(
-      tokenBalanceCache,
+      tokenBalanceCacheV1,
       models,
       topicId,
       address.address,

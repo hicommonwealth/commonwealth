@@ -1,11 +1,10 @@
 import BN from 'bn.js';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
+import {
+  FetchTokenBalanceErrors,
+  TokenBalanceCache,
+} from 'token-balance-cache/src/index';
 
 import type { DB } from '../models';
-import { TokenBalanceCache } from './tokenBalanceCache/tokenBalanceCache';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const validateTopicThreshold = async (
   tbc: TokenBalanceCache,

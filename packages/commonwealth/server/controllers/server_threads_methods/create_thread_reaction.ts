@@ -38,7 +38,7 @@ export type CreateThreadReactionOptions = {
 export type CreateThreadReactionResult = [
   ReactionAttributes,
   EmitOptions,
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThreadReaction(
@@ -52,7 +52,7 @@ export async function __createThreadReaction(
     canvasAction,
     canvasSession,
     canvasHash,
-  }: CreateThreadReactionOptions
+  }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
   const thread = await this.models.Thread.findOne({
     where: { id: threadId },
@@ -95,10 +95,11 @@ export async function __createThreadReaction(
     if (!isAdmin) {
       const { isValid, message } = await validateTopicGroupsMembership(
         this.models,
-        this.tokenBalanceCache,
+        this.tokenBalanceCacheV1,
+        this.tokenBalanceCacheV2,
         thread.topic_id,
         community,
-        address
+        address,
       );
       if (!isValid) {
         throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
