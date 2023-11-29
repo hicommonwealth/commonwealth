@@ -91,6 +91,8 @@ export const Breadcrumbs = () => {
     }
   };
 
+  console.log('path', pathnames);
+
   return (
     <nav className="Breadcrumbs">
       <div className={`${getStyle() ?? 'commonPadding'}`}>

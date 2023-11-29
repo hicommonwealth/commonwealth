@@ -68,19 +68,42 @@ export const generateBreadcrumbs = (
       '',
     );
 
+    const label =
+      index === pathSegments.length - 1 && !!threadName
+        ? threadName
+        : matchedBreadcrumb
+        ? matchedBreadcrumb.breadcrumb
+        : removedThreadId;
+
     // Create the breadcrumb object.
     return {
-      label:
-        index === pathSegments.length - 1 && !!threadName
-          ? threadName
-          : matchedBreadcrumb
-          ? matchedBreadcrumb.breadcrumb
-          : removedThreadId,
+      label,
       path: link ? `/${link}` : locationPath,
       navigate: (val: To) => navigate(val),
-      isParent: pathSegments[0] === splitLinks[index],
+      isParent:
+        matchedBreadcrumb?.isParent || pathSegments[0] === splitLinks[index],
     };
   });
+
+  const discussionsIndex = pathSegments.indexOf('discussions');
+  if (discussionsIndex !== -1) {
+    breadcrumbs.sort((a, b) => {
+      if (
+        a.label.toLowerCase() === 'discussions' ||
+        a.label.toLowerCase() === 'discussion'
+      ) {
+        return -1;
+      } else if (
+        b.label.toLowerCase() === 'discussions' ||
+        b.label.toLowerCase() === 'discussion'
+      ) {
+        return 1;
+      }
+      return 0;
+    });
+
+    console.log('bread', breadcrumbs);
+  }
 
   return breadcrumbs.filter((val) => val !== undefined);
 };

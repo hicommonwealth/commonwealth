@@ -1,7 +1,10 @@
 import { assert } from 'chai';
 import { ChainNetwork } from '../../../../common-common/src/types';
 import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import { Requirement } from '../../../server/util/requirementsModule/requirementsTypes';
+import {
+  BalanceSourceType,
+  Requirement,
+} from '../../../server/util/requirementsModule/requirementsTypes';
 import validateGroupMembership, {
   ValidateGroupMembershipResponse,
 } from '../../../server/util/requirementsModule/validateGroupMembership';
@@ -15,7 +18,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'erc20',
+            source_type: BalanceSourceType.ERC20,
             evm_chain_id: 1,
             contract_address: '0x12345',
           },
@@ -49,7 +52,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '1',
           source: {
-            source_type: 'erc721',
+            source_type: BalanceSourceType.ERC721,
             evm_chain_id: 1,
             contract_address: '0x12345',
           },
@@ -83,7 +86,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'eth_native',
+            source_type: BalanceSourceType.ETHNative,
             evm_chain_id: 1,
           },
         },
@@ -116,7 +119,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '2000',
           source: {
-            source_type: 'erc20',
+            source_type: BalanceSourceType.ERC20,
             evm_chain_id: 1,
             contract_address: '0x12345',
           },
@@ -151,7 +154,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '2000',
           source: {
-            source_type: 'erc20',
+            source_type: BalanceSourceType.ERC20,
             evm_chain_id: 1,
             contract_address: '0x12345',
           },
@@ -217,7 +220,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '2000',
           source: {
-            source_type: 'erc20',
+            source_type: BalanceSourceType.ERC20,
             evm_chain_id: 1,
             contract_address: '0x12345',
           },
@@ -228,7 +231,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '1',
           source: {
-            source_type: 'erc721',
+            source_type: BalanceSourceType.ERC721,
             evm_chain_id: 1,
             contract_address: '0x12345',
           },
@@ -239,7 +242,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'eth_native',
+            source_type: BalanceSourceType.ETHNative,
             evm_chain_id: 1,
           },
         },
@@ -284,7 +287,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '2000',
           source: {
-            source_type: 'erc20',
+            source_type: BalanceSourceType.ERC20,
             evm_chain_id: 1,
             contract_address: '0x12345',
           },
@@ -295,7 +298,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '5',
           source: {
-            source_type: 'erc721',
+            source_type: BalanceSourceType.ERC721,
             evm_chain_id: 1,
             contract_address: '0x12345',
           },
@@ -306,7 +309,7 @@ describe('validateGroupMembership', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'eth_native',
+            source_type: BalanceSourceType.ETHNative,
             evm_chain_id: 1,
           },
         },

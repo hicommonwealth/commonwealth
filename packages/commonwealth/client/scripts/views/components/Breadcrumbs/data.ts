@@ -75,6 +75,7 @@ export const breadCrumbURLS = [
     url: 'discussions',
     className: 'discussions',
     breadcrumb: 'Discussions',
+    isParent: true,
   },
   {
     url: 'notification-settings',
