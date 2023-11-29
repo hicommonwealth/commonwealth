@@ -4,6 +4,8 @@ import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction } from 'sequelize';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 
 import { ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -53,6 +55,8 @@ async function createMagicAddressInstances(
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
   const profile_id = (user.Profiles[0] as ProfileAttributes).id;
+  const serverAnalyticsController = new ServerAnalyticsController();
+
   for (const { chain, address } of generatedAddresses) {
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
@@ -84,6 +88,13 @@ async function createMagicAddressInstances(
     // xx: ?
     if (created) {
       await createRole(models, addressInstance.id, chain, 'member', false, t);
+
+      serverAnalyticsController.track({
+        isCustomDomain: null,
+        community: chain,
+        userId: user_id,
+        event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+      });
     } else if (
       addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
       // set wallet_sso_source if it was unknown before
