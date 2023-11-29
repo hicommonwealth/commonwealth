@@ -28,7 +28,9 @@ export const createCommunityHandler = async (
 
   if (validationResult.success === false) {
     throw new AppError(
-      JSON.stringify(validationResult.error.flatten().fieldErrors),
+      validationResult.error.issues
+        .map(({ path, message }) => `${path.join(': ')}: ${message}`)
+        .join(', '),
     );
   }
 

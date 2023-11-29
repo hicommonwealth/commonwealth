@@ -19,7 +19,7 @@ async function checkIconSize(val, ctx) {
       message: "Image url provided doesn't exist",
     });
   }
-  if (fileSizeBytes <= MAX_COMMUNITY_IMAGE_SIZE_KB * 1024) {
+  if (fileSizeBytes >= MAX_COMMUNITY_IMAGE_SIZE_KB * 1024) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `Image must be smaller than ${MAX_COMMUNITY_IMAGE_SIZE_KB}kb`,
