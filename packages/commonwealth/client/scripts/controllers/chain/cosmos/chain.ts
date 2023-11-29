@@ -22,7 +22,7 @@ import {
   ITXData,
   ITXModalData,
 } from '../../../models/interfaces';
-import { ETHERMINT_CHAINS } from '../../app/webWallets/keplr_ethereum_web_wallet';
+import { COSMOS_EVM_CHAINS } from '../../app/webWallets/keplr_ethereum_web_wallet';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import LeapWebWalletController from '../../app/webWallets/leap_web_wallet';
 import WebWalletController from '../../app/web_wallets';
@@ -201,7 +201,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     let client;
 
     // TODO: To check if ethermint, we can get slip44 cointype from Cosmos Chain Directory instead of hardcoding
-    if (ETHERMINT_CHAINS.some((c) => c === dbId)) {
+    if (COSMOS_EVM_CHAINS.some((c) => c === dbId)) {
       const chainId = wallet.getChainId();
 
       client = await EthSigningClient(
