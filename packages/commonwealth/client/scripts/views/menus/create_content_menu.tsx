@@ -1,6 +1,6 @@
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
+import { featureFlags } from 'helpers/feature-flags';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -20,6 +20,7 @@ import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
+import { getClasses } from '../components/component_kit/helpers';
 
 const resetSidebarState = () => {
   //Bouncer pattern -- I have found isMobile does not always detect screen
@@ -220,13 +221,24 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
   ];
 };
 
-export const CreateContentSidebar = () => {
+export const CreateContentSidebar = ({
+  isInsideCommunity,
+}: {
+  isInsideCommunity: boolean;
+}) => {
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
 
   return (
     <CWSidebarMenu
-      className="CreateContentSidebar"
+      className={getClasses<{
+        heightInsideCommunity: boolean;
+      }>(
+        {
+          heightInsideCommunity: isInsideCommunity,
+        },
+        'CreateContentSidebar',
+      )}
       menuHeader={{
         label: 'Create',
         onClick: async () => {
