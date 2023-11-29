@@ -251,7 +251,7 @@ function setupRouter(
       tokenBalanceCacheV2,
       banCache,
     ),
-    topics: new ServerTopicsController(models, tokenBalanceCacheV1, banCache),
+    topics: new ServerTopicsController(models, banCache),
   };
 
   // ---
