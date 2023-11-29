@@ -11,23 +11,21 @@ type LockWithTooltip = {
 
 export const LockWithTooltip = ({ lockedAt, updatedAt }: LockWithTooltip) => {
   return (
-    <>
-      <CWTooltip
-        content={
-          lockedAt
-            ? `Locked on ${lockedAt.format('MM/DD/YYYY')}`
-            : `Locked prior to ${updatedAt?.format('MM/DD/YYYY') || 'N/A'}`
-        }
-        placement="top"
-        renderTrigger={(handleInteraction) => (
-          <CWIcon
-            iconSize="small"
-            iconName="keyLockClosed"
-            onMouseEnter={handleInteraction}
-            onMouseLeave={handleInteraction}
-          />
-        )}
-      />
-    </>
+    <CWTooltip
+      content={
+        lockedAt
+          ? `Locked on ${lockedAt.format('MM/DD/YYYY')}`
+          : `Locked prior to ${updatedAt?.format('MM/DD/YYYY') || 'N/A'}`
+      }
+      placement="top"
+      renderTrigger={(handleInteraction) => (
+        <CWIcon
+          iconSize="small"
+          iconName="keyLockClosed"
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+        />
+      )}
+    />
   );
 };
