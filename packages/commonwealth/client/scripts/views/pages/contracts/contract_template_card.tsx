@@ -32,7 +32,10 @@ type ContractTemplateCardProps = {
   handleShowModal: (
     templateId: number,
     cct_id: number,
-    template: Omit<ManageContractTemplateModalProps['template'], 'id' | 'title'>
+    template: Omit<
+      ManageContractTemplateModalProps['template'],
+      'id' | 'title'
+    >,
   ) => void;
 };
 

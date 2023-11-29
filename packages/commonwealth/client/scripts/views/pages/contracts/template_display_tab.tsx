@@ -109,7 +109,7 @@ export const TemplateDisplayTab = ({
                   <div className="IconGroup">
                     <CWCommunityAvatar
                       community={app.config.chains.getById(
-                        template.createdForCommunity
+                        template.createdForCommunity,
                       )}
                       size="small"
                     />

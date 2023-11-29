@@ -1,4 +1,6 @@
+import { AppError } from 'common-common/src/errors';
 import { MixpanelCommunityCreationEvent } from '../../../shared/analytics/types';
+import { createCommunitySchema } from '../../../shared/schemas/createCommunitySchema';
 import {
   CreateCommunityOptions,
   CreateCommunityResult,
@@ -14,9 +16,25 @@ export const createCommunityHandler = async (
   req: TypedRequestBody<CreateCommunityRequestBody>,
   res: TypedResponse<CreateCommunityResponse>,
 ) => {
+  for (const key in req.body) {
+    if (req.body[key] === '' || req.body[key] === null) {
+      delete req.body[key];
+    }
+  }
+
+  const validationResult = await createCommunitySchema().safeParseAsync(
+    req.body,
+  );
+
+  if (validationResult.success === false) {
+    throw new AppError(
+      JSON.stringify(validationResult.error.flatten().fieldErrors),
+    );
+  }
+
   const community = await controllers.communities.createCommunity({
     user: req.user,
-    community: req.body,
+    community: validationResult.data,
   });
 
   controllers.analytics.track(

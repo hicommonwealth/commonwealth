@@ -91,7 +91,7 @@ export const ThreadStageComponent = ({ stage }: ThreadStageComponentProps) => {
               ? 'negative'
               : 'positive',
         },
-        'proposal-stage-text'
+        'proposal-stage-text',
       )}
       onClick={(e) => {
         e.preventDefault();

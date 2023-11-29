@@ -1,8 +1,8 @@
-import React from 'react';
 import PopperUnstyled, {
-  PopperPlacementType,
   PopperOwnProps,
+  PopperPlacementType,
 } from '@mui/base/Popper';
+import React from 'react';
 
 import { uuidv4 } from 'lib/util';
 
@@ -26,7 +26,7 @@ type PopoverProps = {
 export type PopoverTriggerProps = {
   renderTrigger: (
     handleInteraction: (e: React.MouseEvent<AnchorType>) => void,
-    isOpen?: boolean
+    isOpen?: boolean,
   ) => React.ReactNode;
 };
 

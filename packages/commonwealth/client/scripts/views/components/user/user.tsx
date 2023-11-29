@@ -9,9 +9,9 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
-import { CWModal } from '../component_kit/new_designs/CWModal';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
 import type { UserAttrsWithSkeletonProp } from './user.types';
 
@@ -58,7 +58,7 @@ export const User = ({
     userChainId,
     true,
     undefined,
-    app.chain?.meta?.bech32Prefix
+    app.chain?.meta?.bech32Prefix,
   );
 
   const showAvatar = profile ? !shouldHideAvatar : false;
@@ -67,12 +67,12 @@ export const User = ({
   const friendlyChainName = app.config.chains.getById(userChainId)?.name;
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
   const isGhostAddress = app.user.addresses.some(
-    ({ address, ghostAddress }) => userAddress === address && ghostAddress
+    ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
   const roleInCommunity =
     role ||
     adminsAndMods.find(
-      (r) => r.address === userAddress && r.address_chain === userChainId
+      (r) => r.address === userAddress && r.address_chain === userChainId,
     );
 
   const roleTags = (

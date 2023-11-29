@@ -1,7 +1,7 @@
-import React from 'react';
-import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 import moment from 'moment';
+import React from 'react';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
+import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 
 type LockWithTooltip = {
   lockedAt: moment.Moment;

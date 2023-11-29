@@ -1,21 +1,21 @@
 import React, { useEffect } from 'react';
 
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-import { PopperPlacementType, PopperOwnProps } from '@mui/base/Popper';
+import { PopperOwnProps, PopperPlacementType } from '@mui/base/Popper';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
-import { ComponentType } from '../types';
+import { CWIcon } from '../cw_icons/cw_icon';
+import { CWText } from '../cw_text';
+import { getClasses } from '../helpers';
 import type {
   DefaultMenuItem,
   DividerMenuItem,
   HeaderMenuItem,
 } from '../types';
-import { getClasses } from '../helpers';
-import { CWIcon } from '../cw_icons/cw_icon';
-import { CWText } from '../cw_text';
-import { Popover, usePopover } from './cw_popover';
+import { ComponentType } from '../types';
 import type { PopoverTriggerProps } from './cw_popover';
+import { Popover, usePopover } from './cw_popover';
 
 export type PopoverMenuItem =
   | DividerMenuItem
@@ -90,7 +90,7 @@ export const PopoverMenu = ({
                         isSecondary?: boolean;
                       }>(
                         { disabled, isSecondary },
-                        `PopoverMenuItem ${item.className}`
+                        `PopoverMenuItem ${item.className}`,
                       )}
                       onClick={(e) => {
                         e.stopPropagation();
