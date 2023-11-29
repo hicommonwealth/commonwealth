@@ -8,12 +8,12 @@ import {
 } from '@phosphor-icons/react';
 import React, { FC } from 'react';
 
+import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
-import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 
 export type ActionType =
   | 'upvote'

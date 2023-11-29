@@ -9,8 +9,8 @@ import withRouter, {
   useCommonNavigate,
 } from 'navigation/helpers';
 import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/new_designs/CWTag';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';

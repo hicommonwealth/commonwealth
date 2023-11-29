@@ -1,10 +1,6 @@
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { filterLinks } from 'helpers/threads';
-import {
-  chainEntityTypeToProposalName,
-  chainEntityTypeToProposalSlug,
-  getProposalUrlPath,
-} from 'identifiers';
+
 import { LinkSource } from 'models/Thread';
 import 'pages/view_thread/linked_proposals_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -17,28 +13,8 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
+import { LinkedProposal } from './LinkedProposal';
 
-type LinkedProposalProps = {
-  thread: Thread;
-  title: string;
-  identifier: string;
-};
-
-const LinkedProposal = ({ thread, title, identifier }: LinkedProposalProps) => {
-  const slug = chainEntityTypeToProposalSlug();
-
-  const threadLink = `${
-    app.isCustomDomain() ? '' : `/${thread.chain}`
-  }${getProposalUrlPath(slug, identifier, true)}`;
-
-  return (
-    <ReactRouterLink to={threadLink}>
-      {`${
-        title ?? chainEntityTypeToProposalName() ?? 'Proposal'
-      } #${identifier}`}
-    </ReactRouterLink>
-  );
-};
 
 type LinkedProposalsCardProps = {
   showAddProposalButton: boolean;
@@ -93,7 +69,7 @@ export const LinkedProposalsCard = ({
       }
       setSnapshotProposalsLoaded(true);
     }
-  }, [initialSnapshotLinks]);
+  }, [initialSnapshotLinks, thread.chain]);
 
   const showSnapshot =
     initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;

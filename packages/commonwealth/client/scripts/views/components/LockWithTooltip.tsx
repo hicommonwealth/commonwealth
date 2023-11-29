@@ -1,7 +1,8 @@
 import moment from 'moment';
 import React from 'react';
+
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import { CWTooltip } from './component_kit/cw_popover/cw_tooltip';
 
 type LockWithTooltip = {
   lockedAt: moment.Moment;
@@ -11,17 +12,16 @@ type LockWithTooltip = {
 export const LockWithTooltip = ({ lockedAt, updatedAt }: LockWithTooltip) => {
   return (
     <CWTooltip
-      hasBackground={true}
-      placement="top"
       content={
         lockedAt
           ? `Locked on ${lockedAt.format('MM/DD/YYYY')}`
           : `Locked prior to ${updatedAt?.format('MM/DD/YYYY') || 'N/A'}`
       }
+      placement="top"
       renderTrigger={(handleInteraction) => (
         <CWIcon
-          iconName="keyLockClosed"
           iconSize="small"
+          iconName="keyLockClosed"
           onMouseEnter={handleInteraction}
           onMouseLeave={handleInteraction}
         />

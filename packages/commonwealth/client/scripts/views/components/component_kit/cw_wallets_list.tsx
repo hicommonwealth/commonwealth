@@ -8,10 +8,10 @@ import IWebWallet from '../../../models/IWebWallet';
 import { User } from '../user/user';
 import { CWAuthButton, CWNoAuthMethodsAvailable } from './cw_auth_button';
 import { CWDivider } from './cw_divider';
-import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
+import { CWTooltip } from './new_designs/CWTooltip';
 
 import 'components/component_kit/cw_wallets_list.scss';
 
@@ -164,9 +164,6 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 darkMode={darkMode}
                 onClick={async () => {
                   await onWalletSelect(wallet);
-                  if (wallet.chain === 'substrate') {
-                    // setIsModalOpen(true);
-                  }
                 }}
               />
               <CWModal
@@ -191,7 +188,6 @@ export const CWWalletsList = (props: WalletsListProps) => {
                       })();
 
                       await onWalletAddressSelect(wallet, selectedAddress);
-                      // setIsModalOpen(false);
                     }}
                     onModalClose={() => setIsModalOpen(false)}
                   />
@@ -236,13 +232,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
           )}
 
           <CWDivider className="wallets-divider" />
-          {/* <CWAuthButton
-            type="email"
-            label="Email"
-            darkMode={darkMode}
-            onClick={onConnectAnotherWay}
-            className="CustomIcon large email-auth-btn"
-          /> */}
+
           <CWAuthButton
             type="discord"
             label="Discord"
@@ -300,19 +290,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
           )}
           {hasNoWalletsLink && (
             <CWTooltip
-              content={
-                <>
-                  <CWText type="caption">
-                    If you don’t see your wallet then make sure:
-                  </CWText>
-                  <CWText type="caption">
-                    • Your wallet chrome extension installed?
-                  </CWText>
-                  <CWText type="caption">
-                    • Your wallet chrome extension active?
-                  </CWText>
-                </>
-              }
+              content="Make sure that your wallet browser extension is installed and active."
+              placement="top"
               renderTrigger={(handleInteraction) => (
                 <CWText
                   onMouseEnter={handleInteraction}
@@ -323,7 +302,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                     'no-wallet-link',
                   )}
                 >
-                  Don't see your wallet?
+                  Don&apos;t see your wallet?
                 </CWText>
               )}
             />

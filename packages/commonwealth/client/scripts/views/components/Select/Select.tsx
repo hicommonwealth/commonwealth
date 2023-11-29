@@ -1,10 +1,12 @@
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import type { Placement } from '@popperjs/core/lib';
 import React from 'react';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
-import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { Option } from './Option';
 import './Select.scss';
@@ -80,7 +82,7 @@ export const Select = ({
             onOpen && (await onOpen());
           }}
         />
-        <Popover
+        <CWPopover
           content={
             <div className="Select-Options-Wrapper">
               {options.map((option, i) => {

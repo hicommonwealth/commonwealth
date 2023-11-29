@@ -6,7 +6,7 @@ import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 
 import 'components/component_kit/new_designs/cw_upvote.scss';
-import { AnchorType } from 'views/components/component_kit/cw_popover/cw_popover';
+import { AnchorType } from 'views/components/component_kit/new_designs/CWPopover';
 import { ComponentType } from '../types';
 
 type CWUpvoteProps = {

@@ -107,53 +107,6 @@ const UserDashboard = (props: UserDashboardProps) => {
           </CWTabsRow>
         </div>
         <>
-          {/* TODO: add filter functionality */}
-          {/* <CWPopover
-              trigger={
-                <CWButton
-                  buttonType="mini-white"
-                  label="Filter"
-                  iconRight="chevronDown"
-                />
-              }
-              content={
-                <CWCard className="dashboard-filter-items">
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Threads"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Polls"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Proposals"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Crowdfunds"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                </CWCard>
-              }
-            />
-            <CWDivider /> */}
           {activePage === DashboardViews.ForYou && (
             <Feed
               fetchData={() => fetchActivity(activePage)}

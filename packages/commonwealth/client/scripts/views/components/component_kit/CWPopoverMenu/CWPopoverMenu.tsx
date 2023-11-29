@@ -3,8 +3,12 @@ import React, { useEffect } from 'react';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { PopperOwnProps, PopperPlacementType } from '@mui/base/Popper';
 
-import 'components/component_kit/cw_popover/cw_popover_menu.scss';
+import './CWPopoverMenu.scss';
 
+import CWPopover, {
+  PopoverTriggerProps,
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
@@ -14,8 +18,6 @@ import type {
   HeaderMenuItem,
 } from '../types';
 import { ComponentType } from '../types';
-import type { PopoverTriggerProps } from './cw_popover';
-import { Popover, usePopover } from './cw_popover';
 
 export type PopoverMenuItem =
   | DividerMenuItem
@@ -50,7 +52,7 @@ export const PopoverMenu = ({
       {/* needs to be div instead of fragment so listener can work */}
       <div className="popover-container">
         {renderTrigger(handleInteraction, open)}
-        <Popover
+        <CWPopover
           modifiers={modifiers}
           placement={placement}
           content={
