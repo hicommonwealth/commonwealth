@@ -144,7 +144,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('off-chain batching', () => {
-      let newEthChainId = 1864339501;
+      const newEthChainId = 1864339501;
       before('Update ChainNodes.eth_chain_id', async () => {
         // set eth_chain_id to some random value that is NOT
         // defined in mapNodeToBalanceFetcherContract. This
@@ -294,7 +294,7 @@ describe('Token Balance Cache EVM Tests', function () {
     });
 
     describe('off-chain batching', () => {
-      let newEthChainId = 1864339501;
+      const newEthChainId = 1864339501;
       before('Update ChainNodes.eth_chain_id', async () => {
         // set eth_chain_id to some random value that is NOT
         // defined in mapNodeToBalanceFetcherContract. This

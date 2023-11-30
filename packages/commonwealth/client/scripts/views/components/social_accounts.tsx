@@ -1,29 +1,10 @@
-import React from 'react';
-
 import 'components/social_accounts.scss';
-
+import React from 'react';
 import type NewProfile from '../../models/NewProfile';
-import { CWIcon } from './component_kit/cw_icons/cw_icon';
-import type { IconName } from './component_kit/cw_icons/cw_icon_lookup';
-
-type SocialAccountProps = {
-  iconName: IconName;
-  link: string;
-};
+import { SocialAccount } from './SocialAccount';
 
 type SocialAccountsProps = {
   profile: NewProfile;
-};
-
-const SocialAccount = (props: SocialAccountProps) => {
-  const { iconName, link } = props;
-  const formattedLink = link.includes('http') ? link : `https://${link}`;
-
-  return (
-    <a href={formattedLink} target="_blank">
-      <CWIcon iconName={iconName} className="social-icon" />
-    </a>
-  );
 };
 
 export const SocialAccounts = (props: SocialAccountsProps) => {
