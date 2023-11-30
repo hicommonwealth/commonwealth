@@ -61,7 +61,7 @@ async function getOnChainBatchErc1155Balances(
       AbiCoder.encodeParameters(
         ['address[]', 'uint256[]'],
         [batchAddresses, Array(batchAddresses.length).fill(tokenId)],
-      );
+      ).substring(2);
 
     rpcRequests.push({
       method: 'eth_call',
@@ -90,14 +90,14 @@ async function getOnChainBatchErc1155Balances(
   if (datas.error) {
     const msg =
       `On-chain batch request failed ` +
-      `with batch size ${BATCH_SIZE} on evm chain id ${evmChainId}.`;
+      `with batch size ${BATCH_SIZE} on evm chain id ${evmChainId} for contract ${contractAddress}.`;
     rollbar.error(msg, datas.error);
     log.error(msg, datas.error);
     return {};
   } else {
     for (const data of datas) {
       if (data.error) {
-        const msg = `Balance Fetcher Contract request failed on EVM chain id: ${evmChainId}`;
+        const msg = `balanceOfBatch request failed on EVM chain id: ${evmChainId} for contract ${contractAddress}`;
         rollbar.error(msg, data.error);
         log.error(msg, data.error);
         continue;

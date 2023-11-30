@@ -481,6 +481,53 @@ describe('Token Balance Cache EVM Tests', function () {
 
         expect(Object.keys(balance).length).to.equal(1);
         expect(balance[addressOne]).to.equal('10');
+
+        const balanceTwo = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: [addressTwo],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+        });
+
+        expect(Object.keys(balanceTwo).length).to.equal(1);
+        expect(balanceTwo[addressTwo]).to.equal('20');
+      });
+    });
+
+    describe('on-chain batching', () => {
+      it('should return many balances', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: [addressOne, addressTwo],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+        });
+
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne]).to.equal('10');
+        expect(balances[addressTwo]).to.equal('20');
+      });
+
+      it('should not throw if a single address fails', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: [addressOne, discobotAddress, addressTwo],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+        });
+
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne]).to.equal('10');
+        expect(balances[addressTwo]).to.equal('20');
       });
     });
   });

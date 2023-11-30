@@ -83,7 +83,9 @@ export async function evmOffChainRpcBatching(
 
       const msg =
         `RPC batch request failed for method '${rpc.method}' ` +
-        `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}.`;
+        `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
+          source.contractAddress ? `for token ${source.contractAddress}` : ''
+        }.`;
       rollbar.error(msg, res.reason);
       log.error(msg, res.reason);
     } else {
@@ -96,12 +98,18 @@ export async function evmOffChainRpcBatching(
   for (const data of datas) {
     if (data.error) {
       failedAddresses.push(idAddressMap[data.id]);
-    } else {
-      const address = idAddressMap[data.id];
-      balances[address] = source.contractAddress
-        ? AbiCoder.decodeParameter('uint256', data.result)
-        : toBN(data.result).toString(10);
+      const msg = `RPC request failed on EVM chain id ${source.evmChainId}${
+        source.contractAddress ? `for token ${source.contractAddress}` : ''
+      }.`;
+      rollbar.error(msg, data.error);
+      log.error(msg, data.error);
+      continue;
     }
+
+    const address = idAddressMap[data.id];
+    balances[address] = source.contractAddress
+      ? AbiCoder.decodeParameter('uint256', data.result)
+      : toBN(data.result).toString(10);
   }
 
   return { balances, failedAddresses };
@@ -175,7 +183,9 @@ export async function evmBalanceFetcherBatching(
   if (datas.error) {
     const msg =
       `On-chain batch request failed ` +
-      `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}.`;
+      `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
+        source.contractAddress ? `for token ${source.contractAddress}` : ''
+      }.`;
     rollbar.error(msg, datas.error);
     log.error(msg, datas.error);
     return { balances: {}, failedAddresses: addresses };
@@ -188,7 +198,11 @@ export async function evmBalanceFetcherBatching(
 
       if (data.error) {
         failedAddresses = [...failedAddresses, ...relevantAddresses];
-        const msg = `Balance Fetcher Contract request failed on EVM chain id: ${source.evmChainId}`;
+        const msg =
+          'Balance Fetcher Contract request failed on EVM ' +
+          `chain id: ${source.evmChainId}${
+            source.contractAddress ? `for token ${source.contractAddress}` : ''
+          }.`;
         rollbar.error(msg, data.error);
         log.error(msg, data.error);
         continue;

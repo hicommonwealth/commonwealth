@@ -99,7 +99,7 @@ async function getErc721Balance(
   if (data.error) {
     const msg =
       `ERC20 balance fetch failed for address ${address} ` +
-      `on evm chain id ${evmChainId}`;
+      `on evm chain id ${evmChainId} for contract ${contractAddress}.`;
     rollbar.error(msg, data.error);
     log.error(msg, data.error);
     return {};
