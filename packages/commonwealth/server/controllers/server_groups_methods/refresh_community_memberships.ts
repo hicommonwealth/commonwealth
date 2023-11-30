@@ -8,7 +8,10 @@ import { GroupAttributes } from '../../models/group';
 import { MembershipAttributes } from '../../models/membership';
 import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
-import { OptionsWithBalances } from '../../util/tokenBalanceCache/types';
+import {
+  Balances,
+  OptionsWithBalances,
+} from '../../util/tokenBalanceCache/types';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const MEMBERSHIP_TTL_SECONDS = 60 * 2;
@@ -55,9 +58,15 @@ export async function __refreshCommunityMemberships(
       );
       const balances = await Promise.all(
         getBalancesOptions.map(async (options) => {
+          let result: Balances = {};
+          try {
+            result = await this.tokenBalanceCacheV2.getBalances(options);
+          } catch (err) {
+            console.error(err);
+          }
           return {
             options,
-            balances: await this.tokenBalanceCacheV2.getBalances(options),
+            balances: result,
           };
         }),
       );
