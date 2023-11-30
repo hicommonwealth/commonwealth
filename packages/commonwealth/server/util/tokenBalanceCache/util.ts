@@ -170,6 +170,7 @@ export async function evmBalanceFetcherBatching(
 
   const datas = await response.json();
   const addressBalanceMap = {};
+  let failedAddresses: string[] = [];
 
   if (datas.error) {
     const msg =
@@ -180,18 +181,27 @@ export async function evmBalanceFetcherBatching(
     return { balances: {}, failedAddresses: addresses };
   } else {
     for (const data of datas) {
-      const balances = AbiCoder.decodeParameter('uint256[]', data.result);
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
       const endIndex = Math.min(data.id + rpc.batchSize, addresses.length);
       const relevantAddresses = addresses.splice(data.id, endIndex);
+
+      if (data.error) {
+        failedAddresses = [...failedAddresses, ...relevantAddresses];
+        const msg = `Balance Fetcher Contract request failed on EVM chain id: ${source.evmChainId}`;
+        rollbar.error(msg, data.error);
+        log.error(msg, data.error);
+        continue;
+      }
+
+      const balances = AbiCoder.decodeParameter('uint256[]', data.result);
       relevantAddresses.forEach(
         (key, i) => (addressBalanceMap[key] = balances[i]),
       );
     }
   }
 
-  return { balances: addressBalanceMap, failedAddresses: [] };
+  return { balances: addressBalanceMap, failedAddresses };
 }
 
 /**
