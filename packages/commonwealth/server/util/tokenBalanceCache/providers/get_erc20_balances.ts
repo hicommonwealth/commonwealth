@@ -85,12 +85,12 @@ async function getOffChainBatchErc20Balances(
     },
     {
       method: 'eth_call',
-      getParams: (web3, address, contractAddress) => {
+      getParams: (web3, address, tokenAddress) => {
         const calldata =
           '0x70a08231' +
           web3.eth.abi.encodeParameters(['address'], [address]).substring(2);
         return {
-          to: contractAddress,
+          to: tokenAddress,
           data: calldata,
         };
       },
