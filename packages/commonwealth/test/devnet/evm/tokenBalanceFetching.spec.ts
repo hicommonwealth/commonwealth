@@ -79,6 +79,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: chainLinkAddress,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(0);
@@ -92,6 +93,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: chainLinkAddress,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(0);
@@ -105,6 +107,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: chainLinkAddress,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(1);
@@ -121,6 +124,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: chainLinkAddress,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -136,6 +140,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: chainLinkAddress,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -168,6 +173,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: newEthChainId,
             contractAddress: chainLinkAddress,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -183,6 +189,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: newEthChainId,
             contractAddress: chainLinkAddress,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -233,6 +240,7 @@ describe('Token Balance Cache EVM Tests', function () {
           sourceOptions: {
             evmChainId: ethChainId,
           },
+          cacheRefresh: true,
         });
         expect(Object.keys(balance).length).to.equal(0);
       });
@@ -244,6 +252,7 @@ describe('Token Balance Cache EVM Tests', function () {
           sourceOptions: {
             evmChainId: ethChainId,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(0);
@@ -256,6 +265,7 @@ describe('Token Balance Cache EVM Tests', function () {
           sourceOptions: {
             evmChainId: ethChainId,
           },
+          cacheRefresh: true,
         });
 
         console.log('Balances:', balance);
@@ -272,6 +282,7 @@ describe('Token Balance Cache EVM Tests', function () {
           sourceOptions: {
             evmChainId: ethChainId,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -286,6 +297,7 @@ describe('Token Balance Cache EVM Tests', function () {
           sourceOptions: {
             evmChainId: ethChainId,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -317,6 +329,7 @@ describe('Token Balance Cache EVM Tests', function () {
           sourceOptions: {
             evmChainId: newEthChainId,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -331,6 +344,7 @@ describe('Token Balance Cache EVM Tests', function () {
           sourceOptions: {
             evmChainId: newEthChainId,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -362,6 +376,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: nft.address,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(0);
@@ -375,6 +390,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: nft.address,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(0);
@@ -388,6 +404,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: nft.address,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(1);
@@ -404,6 +421,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: nft.address,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -419,6 +437,7 @@ describe('Token Balance Cache EVM Tests', function () {
             evmChainId: ethChainId,
             contractAddress: nft.address,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -449,6 +468,7 @@ describe('Token Balance Cache EVM Tests', function () {
             contractAddress: erc1155.address,
             tokenId: 1,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(0);
@@ -463,6 +483,7 @@ describe('Token Balance Cache EVM Tests', function () {
             contractAddress: erc1155.address,
             tokenId: 1,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(0);
@@ -477,6 +498,7 @@ describe('Token Balance Cache EVM Tests', function () {
             contractAddress: erc1155.address,
             tokenId: 1,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balance).length).to.equal(1);
@@ -490,6 +512,7 @@ describe('Token Balance Cache EVM Tests', function () {
             contractAddress: erc1155.address,
             tokenId: 1,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balanceTwo).length).to.equal(1);
@@ -507,6 +530,7 @@ describe('Token Balance Cache EVM Tests', function () {
             contractAddress: erc1155.address,
             tokenId: 1,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
@@ -523,6 +547,7 @@ describe('Token Balance Cache EVM Tests', function () {
             contractAddress: erc1155.address,
             tokenId: 1,
           },
+          cacheRefresh: true,
         });
 
         expect(Object.keys(balances).length).to.equal(2);
