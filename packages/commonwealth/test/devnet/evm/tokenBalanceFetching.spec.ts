@@ -8,6 +8,7 @@ import models from '../../../server/database';
 import { BalanceSourceType } from '../../../server/util/requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
+import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
 
 async function resetChainNode(ethChainId: number) {
   await models.ChainNode.destroy({
@@ -334,6 +335,94 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balances).length).to.equal(2);
         expect(balances[addressOne]).to.equal(finalAddressOneBalance);
         expect(balances[addressTwo]).to.equal(finalAddressTwoBalance);
+      });
+    });
+  });
+
+  describe('ERC721', () => {
+    let nft: ERC721;
+    let addressOne721: string, addressTwo721: string;
+    before('Deploy/transfer NFT and reset ChainNode', async () => {
+      await resetChainNode(ethChainId);
+      nft = await sdk.deployNFT();
+      await nft.mint('1', 1);
+      await nft.mint('2', 2);
+      const addresses = await sdk.getAccounts();
+      addressOne721 = addresses[1];
+      addressTwo721 = addresses[2];
+    });
+
+    describe('Single address', () => {
+      it('should not fail if no address is given', async () => {
+        const balance = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC721,
+          addresses: [],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: nft.address,
+          },
+        });
+
+        expect(Object.keys(balance).length).to.equal(0);
+      });
+
+      it('should not fail if a single invalid address is given', async () => {
+        const balance = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC721,
+          addresses: [discobotAddress],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: nft.address,
+          },
+        });
+
+        expect(Object.keys(balance).length).to.equal(0);
+      });
+
+      it('should return a single balance', async () => {
+        const balance = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC721,
+          addresses: [addressOne721],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: nft.address,
+          },
+        });
+
+        expect(Object.keys(balance).length).to.equal(1);
+        expect(balance[addressOne721]).to.equal('1');
+      });
+    });
+
+    describe('off-chain batching', () => {
+      it('should return many balances', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC721,
+          addresses: [addressOne721, addressTwo721],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: nft.address,
+          },
+        });
+
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne721]).to.equal('1');
+        expect(balances[addressTwo721]).to.equal('1');
+      });
+
+      it('should not throw if a single address fails', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC721,
+          addresses: [addressOne721, discobotAddress, addressTwo721],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: nft.address,
+          },
+        });
+
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne721]).to.equal('1');
+        expect(balances[addressTwo721]).to.equal('1');
       });
     });
   });
