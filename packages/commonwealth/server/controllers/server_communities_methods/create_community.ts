@@ -64,11 +64,9 @@ export const Errors = {
    Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
-const communitySchema = createCommunitySchema();
-
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: z.infer<typeof communitySchema>;
+  community: z.infer<typeof createCommunitySchema>;
 };
 
 export type CreateCommunityResult = {
