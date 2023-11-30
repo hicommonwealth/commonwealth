@@ -36,13 +36,12 @@ export const createCommunitySchema = (provider?: EnsProvider) =>
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
       }),
-    community_url: z.string().url().optional(),
     namespace: z
       .string()
       .refine(async (val) => {
         if (!provider) return true;
-        return await provider.resolveName(val);
-      }, 'ENS not found')
+        return !(await provider.resolveName(val));
+      }, 'ENS already taken')
       .or(z.string().max(0))
       .optional(),
     description: z.string().optional(),
@@ -78,6 +77,6 @@ export const createCommunitySchema = (provider?: EnsProvider) =>
     website: z.string().url().optional(),
     github: z.string().url().startsWith('https://github.com/').optional(),
     telegram: z.string().url().startsWith('https://t.me/').optional(),
-    element: z.string().url().startsWith('https://t.me/').optional(),
-    discord: z.string().url().startsWith('https://t.me/').optional(),
+    element: z.string().url().startsWith('https://matrix.to/').optional(),
+    discord: z.string().url().startsWith('https://discord.com/').optional(),
   });

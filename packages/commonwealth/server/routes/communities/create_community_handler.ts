@@ -7,6 +7,7 @@ import {
 } from '../../controllers/server_communities_methods/create_community';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { formatErrorPretty } from '../../util/errorFormat';
 
 type CreateCommunityRequestBody = CreateCommunityOptions['community'];
 type CreateCommunityResponse = CreateCommunityResult;
@@ -27,11 +28,7 @@ export const createCommunityHandler = async (
   );
 
   if (validationResult.success === false) {
-    throw new AppError(
-      validationResult.error.issues
-        .map(({ path, message }) => `${path.join(': ')}: ${message}`)
-        .join(', '),
-    );
+    throw new AppError(formatErrorPretty(validationResult));
   }
 
   const community = await controllers.communities.createCommunity({
