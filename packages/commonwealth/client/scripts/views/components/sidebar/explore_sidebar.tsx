@@ -1,14 +1,17 @@
-import React from 'react';
-
 import 'components/sidebar/explore_sidebar.scss';
-import ChainInfo from '../../../models/ChainInfo';
-
+import React from 'react';
 import app from 'state';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import ChainInfo from '../../../models/ChainInfo';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
+import { getClasses } from '../component_kit/helpers';
 import type { MenuItem } from '../component_kit/types';
 
-export const ExploreCommunitiesSidebar = () => {
+export const ExploreCommunitiesSidebar = ({
+  isInsideCommunity,
+}: {
+  isInsideCommunity: boolean;
+}) => {
   const { setMenu } = useSidebarStore();
 
   const allCommunities = app.config.chains
@@ -62,7 +65,14 @@ export const ExploreCommunitiesSidebar = () => {
 
   return (
     <CWSidebarMenu
-      className="ExploreCommunitiesSidebar"
+      className={getClasses<{
+        heightInsideCommunity: boolean;
+      }>(
+        {
+          heightInsideCommunity: isInsideCommunity,
+        },
+        'ExploreCommunitiesSidebar',
+      )}
       menuHeader={{
         label: 'Explore',
         onClick: async () => {

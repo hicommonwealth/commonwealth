@@ -1,10 +1,14 @@
-import React from 'react';
 import PopperUnstyled, {
-  PopperPlacementType,
   PopperOwnProps,
+  PopperPlacementType,
 } from '@mui/base/Popper';
+import React from 'react';
 
 import { uuidv4 } from 'lib/util';
+import { ComponentType } from 'views/components/component_kit/types';
+
+import { CWText } from 'views/components/component_kit/cw_text';
+import './CWPopover.scss';
 
 export type AnchorType = HTMLElement | SVGSVGElement;
 
@@ -16,17 +20,33 @@ type UsePopoverProps = {
   handleInteraction: (e: React.MouseEvent<AnchorType>) => void;
 };
 
-type PopoverProps = {
-  content: React.ReactNode;
+// Developer can pass either:
+// - content => results in unstyled popover (content is React Element that has to be styled)
+// OR
+// - title (optional) & body => styled popover by default
+type ComponentInteriorProps =
+  | {
+      content: React.ReactNode;
+      title?: never;
+      body?: never;
+    }
+  | {
+      content?: never;
+      title?: string;
+      body: React.ReactNode;
+    };
+
+type CWPopoverProps = {
   placement?: PopperPlacementType;
   disablePortal?: boolean;
   modifiers?: PopperOwnProps['modifiers'];
-} & UsePopoverProps;
+} & UsePopoverProps &
+  ComponentInteriorProps;
 
 export type PopoverTriggerProps = {
   renderTrigger: (
     handleInteraction: (e: React.MouseEvent<AnchorType>) => void,
-    isOpen?: boolean
+    isOpen?: boolean,
   ) => React.ReactNode;
 };
 
@@ -49,7 +69,7 @@ export const usePopover = (): UsePopoverProps => {
   };
 };
 
-export const Popover = ({
+const CWPopover = ({
   anchorEl,
   content,
   id,
@@ -57,7 +77,20 @@ export const Popover = ({
   placement,
   disablePortal,
   modifiers = [],
-}: PopoverProps) => {
+  title,
+  body,
+}: CWPopoverProps) => {
+  const popoverContent = content || (
+    <div className={ComponentType.Popover}>
+      {title && (
+        <CWText type="caption" fontWeight="medium" className="popover-title">
+          {title}
+        </CWText>
+      )}
+      {body}
+    </div>
+  );
+
   return (
     <PopperUnstyled
       id={id}
@@ -75,7 +108,9 @@ export const Popover = ({
         ...modifiers,
       ]}
     >
-      {content}
+      {popoverContent}
     </PopperUnstyled>
   );
 };
+
+export default CWPopover;

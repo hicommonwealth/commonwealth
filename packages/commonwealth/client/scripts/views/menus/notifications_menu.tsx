@@ -1,29 +1,28 @@
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 import 'menus/notifications_menu.scss';
 
-import app from 'state';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWButton } from '../components/component_kit/cw_button';
-import {
-  Popover,
-  usePopover,
-} from '../components/component_kit/cw_popover/cw_popover';
-import { CWDivider } from '../components/component_kit/cw_divider';
-import { CWText } from '../components/component_kit/cw_text';
-import { useCommonNavigate } from 'navigation/helpers';
-import { NotificationRow } from '../pages/notifications/notification_row';
-import { isWindowSmallInclusive } from '../components/component_kit/helpers';
-import { byDescendingCreationDate } from 'helpers';
 import clsx from 'clsx';
+import { byDescendingCreationDate } from 'helpers';
+import { useCommonNavigate } from 'navigation/helpers';
+import app from 'state';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   handleIconClick,
   handleMouseEnter,
   handleMouseLeave,
 } from 'views/menus/utils';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWText } from '../components/component_kit/cw_text';
+import { isWindowSmallInclusive } from '../components/component_kit/helpers';
+import { NotificationRow } from '../pages/notifications/notification_row';
 
 export const NotificationsMenu = () => {
   const navigate = useCommonNavigate();
@@ -126,7 +125,7 @@ export const NotificationsMenuPopover = () => {
             </div>
           )}
         />
-        <Popover content={<NotificationsMenu />} {...popoverProps} />
+        <CWPopover content={<NotificationsMenu />} {...popoverProps} />
       </div>
     </ClickAwayListener>
   );
