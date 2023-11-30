@@ -7,7 +7,7 @@ import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenB
 
 chaiUse(chaiAsPromised);
 
-describe.only('Token Balance Cache Cosmos Tests', () => {
+describe('Token Balance Cache Cosmos Tests', () => {
   let tbc: TokenBalanceCache;
   // mnemonic + token allocation can be found in cosmos-chain-test/[version]/bootstrap.sh files
   const addressOne = 'cosmos1zf45elxg5alxxeewvumpprfqtxmy2ufhzvetgx';
