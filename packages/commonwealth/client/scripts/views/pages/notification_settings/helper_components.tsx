@@ -18,7 +18,11 @@ import { getNotificationTypeText } from './helpers';
 
 const getTextRows = (
   subscription: NotificationSubscription,
-  setRoute: (url: To, options?: NavigateOptions, prefix?: null | string) => void
+  setRoute: (
+    url: To,
+    options?: NavigateOptions,
+    prefix?: null | string,
+  ) => void,
 ) => {
   if (subscription.Thread) {
     const threadUrl = getNotificationUrlPath(subscription);

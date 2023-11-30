@@ -1,12 +1,12 @@
-import React, { FC } from 'react';
 import {
   ArrowBendUpRight,
+  ArrowFatUp,
   BellSimple,
   BellSimpleSlash,
-  DotsThree,
   ChatCenteredDots,
-  ArrowFatUp,
+  DotsThree,
 } from '@phosphor-icons/react';
+import React, { FC } from 'react';
 
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
@@ -35,7 +35,7 @@ const commonProps = (disabled: boolean) => {
 const renderPhosphorIcon = (
   action: ActionType,
   disabled: boolean,
-  selected: boolean
+  selected: boolean,
 ) => {
   switch (action) {
     case 'upvote':
@@ -163,7 +163,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
             disabled,
             upvoteSelected,
           },
-          ComponentType.ThreadAction
+          ComponentType.ThreadAction,
         )}
       >
         {renderPhosphorIcon(action, disabled, selected)}

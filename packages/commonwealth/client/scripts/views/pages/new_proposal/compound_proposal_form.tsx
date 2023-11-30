@@ -12,12 +12,12 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWTextArea } from '../../components/component_kit/cw_text_area';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { CWTextArea } from '../../components/component_kit/cw_text_area';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
 
@@ -97,7 +97,7 @@ export const CompoundProposalForm = () => {
                 setActiveTabIndex(tabCount - 1);
 
                 const newAaveProposalState = aaveProposalState.filter(
-                  (_, i) => i !== aaveProposalState.length - 1
+                  (_, i) => i !== aaveProposalState.length - 1,
                 );
 
                 setAaveProposalState(newAaveProposalState);
@@ -182,7 +182,7 @@ export const CompoundProposalForm = () => {
               JSON.stringify({
                 description,
                 title,
-              })
+              }),
             );
           }
 

@@ -3,6 +3,7 @@ import { threadStageToLabel } from 'helpers';
 import { getRelativeTimestamp } from 'helpers/dates';
 import moment from 'moment';
 import React, { useRef } from 'react';
+import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import {
   Popover,
   usePopover,
@@ -16,7 +17,6 @@ import { User } from 'views/components/user/user';
 import { IThreadCollaborator } from '../../../../../models/Thread';
 import { ThreadStage } from '../../../../../models/types';
 import { NewThreadTag } from '../../NewThreadTag';
-import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import './AuthorAndPublishInfo.scss';
 import useAuthorMetadataCustomWrap from './useAuthorMetadataCustomWrap';
 
@@ -189,7 +189,7 @@ export const AuthorAndPublishInfo = ({
                 stage:
                   threadStage === ThreadStage.Failed ? 'negative' : 'positive',
               },
-              'proposal-stage-text'
+              'proposal-stage-text',
             )}
             onClick={async () => await onThreadStageLabelClick(threadStage)}
           >

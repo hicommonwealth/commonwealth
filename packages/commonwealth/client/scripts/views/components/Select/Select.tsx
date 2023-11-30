@@ -5,9 +5,9 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { IconName } from '../component_kit/cw_icons/cw_icon_lookup';
 import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
+import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { Option } from './Option';
 import './Select.scss';
-import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 
 export type SelectProps = {
   size?: 'default' | 'compact';
@@ -17,7 +17,7 @@ export type SelectProps = {
   onSelect?: (
     v:
       | string
-      | { id: string | number; value: any; label: string; iconLeft?: IconName }
+      | { id: string | number; value: any; label: string; iconLeft?: IconName },
   ) => any;
   onOpen?: () => {};
   onClose?: () => {};
@@ -26,7 +26,7 @@ export type SelectProps = {
     | { id: string | number; value: any; label: string; iconLeft?: IconName }[];
   canEditOption?: boolean;
   onOptionEdit?: (
-    v: string | { id: string | number; value: any; label: string }
+    v: string | { id: string | number; value: any; label: string },
   ) => any;
   dropdownPosition?: Placement;
   containerClassname?: string;
@@ -49,7 +49,7 @@ export const Select = ({
   const popoverProps = usePopover();
 
   const selectedOption = (options as any).find(
-    (o: any) => o.value === selected || o === selected
+    (o: any) => o.value === selected || o === selected,
   );
 
   return (
@@ -115,10 +115,7 @@ export const Select = ({
                     })}
                     {...(option.value === 'Archived' && {
                       iconRight: (
-                        <CWIconButton
-                          iconName="archiveTray"
-                          iconSize="small"
-                        />
+                        <CWIconButton iconName="archiveTray" iconSize="small" />
                       ),
                     })}
                   />

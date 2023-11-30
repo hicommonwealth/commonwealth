@@ -51,13 +51,13 @@ export class ChainTesting {
   public async getBalance(
     tokenAddress: string,
     address: string,
-    convert?: boolean
+    convert?: boolean,
   ) {
     const request: erc20BalanceReq = { tokenAddress, address, convert };
     const response = await axios.post(
       `${this.host}/erc20/balance`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response['data']['balance'];
   }
@@ -75,7 +75,7 @@ export class ChainTesting {
     to: string,
     amount: string,
     from?: string,
-    accountIndex?: number
+    accountIndex?: number,
   ) {
     const request: erc20Transfer = {
       tokenAddress,
@@ -87,7 +87,7 @@ export class ChainTesting {
     const response = await axios.post(
       `${this.host}/erc20/transfer`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -103,7 +103,7 @@ export class ChainTesting {
     tokenAddress: string,
     spender: string,
     amount: string,
-    accountIndex?: number
+    accountIndex?: number,
   ): Promise<{ block: number }> {
     const request: erc20Approve = {
       tokenAddress,
@@ -114,7 +114,7 @@ export class ChainTesting {
     const response = await axios.post(
       `${this.host}/erc20/approve`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -128,14 +128,14 @@ export class ChainTesting {
   public async getErc20(
     tokenAddress: string,
     to: string,
-    amount: string
+    amount: string,
   ): Promise<{ block: number }> {
     const fromBank = true;
     const request: erc20Transfer = { tokenAddress, to, amount, fromBank };
     const response = await axios.post(
       `${this.host}/erc20/transfer`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -150,13 +150,13 @@ export class ChainTesting {
   public async getVotingPower(
     accountIndex: number,
     numberOfVotes: string,
-    govType = 'compound'
+    govType = 'compound',
   ) {
     const request: govCompGetVotes = { accountIndex, numberOfVotes };
     const response = await axios.post(
       `${this.host}/gov/${govType}/getVotes`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -169,13 +169,13 @@ export class ChainTesting {
    */
   public async createProposal(
     accountIndex: number,
-    govType = 'compound'
+    govType = 'compound',
   ): Promise<any> {
     const request: govCompCreate = { accountIndex };
     const response = await axios.post(
       `${this.host}/gov/${govType}/createProposal`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -188,13 +188,13 @@ export class ChainTesting {
    */
   public async cancelProposal(
     proposalId: string,
-    govType = 'compound'
+    govType = 'compound',
   ): Promise<any> {
     const request: govCompProposalId = { proposalId };
     const response = await axios.post(
       `${this.host}/gov/${govType}/cancelProposal`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -210,13 +210,13 @@ export class ChainTesting {
     proposalId: string,
     accountIndex: number,
     forAgainst: boolean,
-    govType = 'compound'
+    govType = 'compound',
   ) {
     const request: govCompVote = { proposalId, accountIndex, forAgainst };
     const response = await axios.post(
       `${this.host}/gov/${govType}/castVote`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -231,7 +231,7 @@ export class ChainTesting {
     const response = await axios.post(
       `${this.host}/gov/${govType}/queue`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -246,7 +246,7 @@ export class ChainTesting {
     const response = await axios.post(
       `${this.host}/gov/${govType}/execute`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -270,7 +270,7 @@ export class ChainTesting {
     const response = await axios.post(
       `${this.host}/gov/${govType}/proposalDetails`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -305,7 +305,7 @@ export class ChainTesting {
   public async safeAdvanceTime(
     desiredBlockNum: number,
     minBlockNum?: number,
-    maxNumTries = 10
+    maxNumTries = 10,
   ): Promise<void> {
     let numTries = 0;
     /* eslint-disable */
@@ -315,7 +315,7 @@ export class ChainTesting {
       const currentBlock = (await this.getBlock()).number;
       const numBlocksToAdvance = desiredBlockNum - currentBlock;
       console.log(
-        `Current block: ${currentBlock}... waiting for ${desiredBlockNum}`
+        `Current block: ${currentBlock}... waiting for ${desiredBlockNum}`,
       );
       if (currentBlock >= (minBlockNum || desiredBlockNum)) return;
 
@@ -337,7 +337,7 @@ export class ChainTesting {
     const response = await axios.post(
       `${this.host}/chain/advanceTime`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
     return response.data;
   }
@@ -352,7 +352,7 @@ export class ChainTesting {
     await axios.post(
       `${this.host}/chain/getEth`,
       JSON.stringify(request),
-      this.header
+      this.header,
     );
   }
 

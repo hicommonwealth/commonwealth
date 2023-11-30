@@ -7,11 +7,11 @@ import React, { useEffect } from 'react';
 import app, { LoginState } from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { CWText } from '../../components/component_kit/cw_text';
 import { Feed } from '../../components/feed';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
@@ -31,7 +31,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
-    DashboardViews.Global
+    DashboardViews.Global,
   );
 
   useBrowserAnalyticsTrack({
@@ -83,7 +83,7 @@ const UserDashboard = (props: UserDashboardProps) => {
               onClick={() => {
                 if (!loggedIn) {
                   notifyInfo(
-                    'Sign in or create an account for custom activity feed'
+                    'Sign in or create an account for custom activity feed',
                   );
                   return;
                 }
