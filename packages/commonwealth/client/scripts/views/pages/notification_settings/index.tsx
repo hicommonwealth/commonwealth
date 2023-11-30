@@ -331,6 +331,7 @@ const NotificationSettingsPage = () => {
           const communityInfo = app.config.chains.getById(communityName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
+
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
@@ -399,8 +400,11 @@ const NotificationSettingsPage = () => {
         .sort((x, y) => x[0].localeCompare(y[0]))
         .map(([communityName, subs]) => {
           const communityInfo = app?.config.chains.getById(communityName);
-          const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
-          const hasSomeInAppSubs = subs.some((s) => s.isActive);
+          const sortedSubs = subs.sort((a, b) =>
+            a.category.localeCompare(b.category),
+          );
+          const hasSomeEmailSubs = sortedSubs.some((s) => s.immediateEmail);
+          const hasSomeInAppSubs = sortedSubs.some((s) => s.isActive);
 
           if (!communityInfo?.id) return null; // handles incomplete loading case
 
