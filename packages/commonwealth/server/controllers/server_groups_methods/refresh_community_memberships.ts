@@ -83,7 +83,7 @@ export async function __refreshCommunityMemberships(
   );
 
   console.log(
-    `Created ${totalNumCreated} and updated ${totalNumCreated} total memberships in ${
+    `Created ${totalNumCreated} and updated ${totalNumUpdated} total memberships in ${
       community.id
     } across ${totalNumAddresses} addresses in ${
       (Date.now() - communityStartedAt) / 1000
