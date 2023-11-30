@@ -36,6 +36,7 @@ export const createCommunitySchema = (provider?: EnsProvider) =>
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
       }),
+    chain_node_id: z.number().optional(), // corresponds to the chain field
     namespace: z
       .string()
       .refine(async (val) => {
@@ -59,8 +60,6 @@ export const createCommunitySchema = (provider?: EnsProvider) =>
 
     // hidden required params
     id: z.string(),
-    node_url: z.string().url(),
-    network: z.nativeEnum(ChainNetwork),
 
     // hidden optional params
     alt_wallet_url: z.string().url().optional(),
@@ -73,6 +72,8 @@ export const createCommunitySchema = (provider?: EnsProvider) =>
     token_name: z.string().optional(),
 
     // deprecated params to be removed
+    node_url: z.string().url(),
+    network: z.nativeEnum(ChainNetwork),
     default_symbol: z.string().max(9),
     website: z.string().url().optional(),
     github: z.string().url().startsWith('https://github.com/').optional(),
