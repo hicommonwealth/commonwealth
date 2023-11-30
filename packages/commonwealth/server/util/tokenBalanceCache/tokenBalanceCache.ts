@@ -19,7 +19,11 @@ import {
 const log = factory.getLogger(formatFilename(__filename));
 
 export class TokenBalanceCache {
-  constructor(public models: DB, public redis: RedisCache) {}
+  constructor(
+    public models: DB,
+    public redis: RedisCache,
+    public balanceTTL = 300,
+  ) {}
 
   /**
    * This is the main function through which all balances should be fetched.
@@ -76,7 +80,8 @@ export class TokenBalanceCache {
         ),
       );
       if (result !== false) {
-        for (const [address, balance] of Object.entries(result)) {
+        for (const [key, balance] of Object.entries(result)) {
+          const address = this.getAddressFromCacheKey(key);
           balances[address] = balance as string;
           const addressIndex = validatedAddresses.indexOf(address);
           validatedAddresses[addressIndex] =
@@ -140,7 +145,7 @@ export class TokenBalanceCache {
           result[transformedKey] = balances[address];
           return result;
         }, {}),
-        120,
+        this.balanceTTL,
         false,
       );
     }
@@ -165,5 +170,9 @@ export class TokenBalanceCache {
       case BalanceSourceType.CosmosNative:
         return `${options.sourceOptions.cosmosChainId}_${address}`;
     }
+  }
+
+  private getAddressFromCacheKey(key: string): string {
+    return key.substring(key.lastIndexOf('_') + 1);
   }
 }

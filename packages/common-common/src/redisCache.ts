@@ -224,7 +224,7 @@ export class RedisCache {
       // a multi-exec to process many SET commands
       const multi = this._client.multi();
       for (const key of Object.keys(transformedData)) {
-        multi.set(key, transformedData[key]);
+        multi.set(key, transformedData[key], { EX: duration });
       }
 
       try {
@@ -263,11 +263,18 @@ export class RedisCache {
       return false;
     }
 
+    const transformedKeys = keys.map((k) =>
+      RedisCache.getNamespaceKey(namespace, k),
+    );
     let result: Record<string, unknown>;
     try {
-      result = await this._client.MGET(
-        keys.map((k) => RedisCache.getNamespaceKey(namespace, k)),
-      );
+      const values = await this._client.MGET(transformedKeys);
+      result = transformedKeys.reduce((obj, key, index) => {
+        if (values[index] !== null) {
+          obj[key] = values[index];
+        }
+        return obj;
+      }, {});
     } catch (e) {
       const msg = 'An error occurred while getting many keys';
       log.error(msg, e);
