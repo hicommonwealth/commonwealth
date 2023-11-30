@@ -1,13 +1,14 @@
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
-import { DB } from 'server/models';
-import { OptionsWithBalances } from 'server/util/tokenBalanceCache/types';
+import { MEMBERSHIP_REFRESH_BATCH_SIZE } from '../../config';
+import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { GroupAttributes } from '../../models/group';
 import { MembershipAttributes } from '../../models/membership';
 import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
+import { OptionsWithBalances } from '../../util/tokenBalanceCache/types';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const MEMBERSHIP_TTL_SECONDS = 60 * 2;
@@ -44,7 +45,7 @@ export async function __refreshCommunityMemberships(
     this.models,
     community.id,
     1,
-    1_000,
+    MEMBERSHIP_REFRESH_BATCH_SIZE,
     async (addresses, page) => {
       const pageStartedAt = Date.now();
 
