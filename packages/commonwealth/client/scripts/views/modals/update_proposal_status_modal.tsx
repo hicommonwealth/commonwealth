@@ -131,7 +131,7 @@ export const UpdateProposalStatusModal = ({
       });
     } catch (err) {
       const error =
-        err?.responseJSON?.error ||
+        err.response.data.error ||
         'Failed to update stage. Make sure one is selected.';
       notifyError(error);
       throw new Error(error);

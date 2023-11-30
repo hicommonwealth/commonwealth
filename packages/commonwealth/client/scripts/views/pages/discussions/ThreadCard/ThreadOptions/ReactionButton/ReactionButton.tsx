@@ -8,9 +8,11 @@ import {
 } from 'state/api/threads';
 import Permissions from 'utils/Permissions';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
-import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
 import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
@@ -42,6 +44,7 @@ export const ReactionButton = ({
   const hasReacted = thisUserReaction?.length !== 0;
   const reactedId =
     thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
+  const popoverProps = usePopover();
 
   const {
     mutateAsync: createThreadReaction,
@@ -98,7 +101,7 @@ export const ReactionButton = ({
         if (e instanceof SessionKeyError) {
           return;
         }
-        console.error(e?.responseJSON?.error || e?.message);
+        console.error(e.response.data.error || e?.message);
       });
     } else {
       createThreadReaction({
@@ -110,7 +113,7 @@ export const ReactionButton = ({
         if (e instanceof SessionKeyError) {
           return;
         }
-        console.error(e?.responseJSON?.error || e?.message);
+        console.error(e.response.data.error || e?.message);
       });
     }
   };
@@ -123,10 +126,9 @@ export const ReactionButton = ({
           disabled={isUserForbidden || disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
-          onMouseEnter={() => undefined}
           onClick={handleVoteClick}
-          tooltipContent={getDisplayedReactorsForPopup({
-            reactors: reactors,
+          popoverContent={getDisplayedReactorsForPopup({
+            reactors,
           })}
           tooltipText={tooltipText}
         />
@@ -140,25 +142,26 @@ export const ReactionButton = ({
           />
         </TooltipWrapper>
       ) : (
-        <CWTooltip
-          content={
-            reactors.length > 0
-              ? getDisplayedReactorsForPopup({
-                  reactors,
-                })
-              : null
-          }
-          renderTrigger={(handleInteraction) => (
-            <CWUpvote
-              onClick={handleVoteClick}
-              voteCount={reactors.length}
-              disabled={disabled}
-              active={hasReacted}
-              onMouseEnter={handleInteraction}
-              onMouseLeave={handleInteraction}
+        <div
+          onMouseEnter={popoverProps.handleInteraction}
+          onMouseLeave={popoverProps.handleInteraction}
+        >
+          <CWUpvote
+            onClick={handleVoteClick}
+            voteCount={reactors.length}
+            disabled={disabled}
+            active={hasReacted}
+          />
+
+          {reactors.length > 0 && (
+            <CWPopover
+              body={getDisplayedReactorsForPopup({
+                reactors,
+              })}
+              {...popoverProps}
             />
           )}
-        />
+        </div>
       )}
       <CWModal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}

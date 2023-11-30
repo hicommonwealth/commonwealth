@@ -105,12 +105,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           );
 
           const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread.topic.id),
+            membership.topicIds.includes(thread?.topic?.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
-              membership.topicIds.includes(thread.topic.id) &&
+              membership.topicIds.includes(thread?.topic?.id) &&
               membership.isAllowed,
           );
 
@@ -123,7 +123,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
           return (
             <ThreadCard
-              key={thread.id + '-' + thread.readOnly}
+              key={thread?.id + '-' + thread.readOnly}
               thread={thread}
               canReact={!disabledActionsTooltipText}
               canComment={!disabledActionsTooltipText}

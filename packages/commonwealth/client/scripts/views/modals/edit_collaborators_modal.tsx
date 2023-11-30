@@ -211,7 +211,8 @@ export const EditCollaboratorsModal = ({
                   onCollaboratorsUpdated(updatedThread.collaborators);
               } catch (err) {
                 const error =
-                  err?.responseJSON?.error || 'Failed to update collaborators';
+                  err?.response?.data?.error ||
+                  'Failed to update collaborators';
                 notifyError(error);
               }
             }

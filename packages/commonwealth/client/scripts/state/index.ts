@@ -327,7 +327,7 @@ export async function initAppState(
     }
   } catch (err) {
     app.loadingError =
-      err.responseJSON?.error || 'Error loading application state';
+      err.response?.data?.error || 'Error loading application state';
     throw err;
   }
 }

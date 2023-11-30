@@ -6,7 +6,7 @@ import {
   useDeleteThreadMutation,
   useEditThreadMutation,
 } from 'state/api/threads';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
@@ -90,7 +90,7 @@ export const AdminActions = ({
     communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic?.id,
   });
 
   const handleDeleteThread = () => {
@@ -451,7 +451,6 @@ export const AdminActions = ({
         }
         onClose={() => setIsUpdateProposalStatusModalOpen(false)}
         open={isUpdateProposalStatusModalOpen}
-        visibleOverflow
       />
 
       <CWModal
