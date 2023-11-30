@@ -1,22 +1,23 @@
+import { AppError } from '../../../../common-common/src/errors';
+import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
+import { ServerControllers } from '../../routing/router';
 import {
   PaginationQueryParams,
   TypedRequestQuery,
   TypedResponse,
   success,
 } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { AppError } from '../../../../common-common/src/errors';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
 
 const Errors = {
   UnexpectedError: 'Unexpected error',
   InvalidRequest: 'Invalid request',
   InvalidThreadId: 'Invalid thread ID',
-  NoChains: 'No chains resolved to execute search',
+  InvalidCommunityId: 'Invalid community ID',
+  NoCommunity: 'No community resolved to execute search',
 };
 
 type GetThreadsRequestQuery = {
-  chain: string;
+  community_id: string;
   thread_ids?: string[];
   bulk?: string;
   active?: string;
@@ -38,6 +39,7 @@ type BulkThreadsRequestQuery = {
   orderBy?: string;
   from_date?: string;
   to_date?: string;
+  archived?: string;
 };
 type GetThreadsResponse = any;
 
@@ -51,10 +53,10 @@ export const getThreadsHandler = async (
         | BulkThreadsRequestQuery
       )
   >,
-  res: TypedResponse<GetThreadsResponse>
+  res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const { chain } = req;
-  const { thread_ids, bulk, active, search } = req.query;
+  const { chain: community } = req;
+  const { thread_ids, bulk, active, search, community_id } = req.query;
 
   // get threads by IDs
   if (thread_ids) {
@@ -79,10 +81,11 @@ export const getThreadsHandler = async (
       orderBy,
       from_date,
       to_date,
+      archived,
     } = req.query as BulkThreadsRequestQuery;
 
     const bulkThreads = await controllers.threads.getBulkThreads({
-      chain,
+      community,
       stage,
       topicId: parseInt(topic_id, 10),
       includePinnedThreads: includePinnedThreads === 'true',
@@ -91,6 +94,7 @@ export const getThreadsHandler = async (
       orderBy,
       fromDate: from_date,
       toDate: to_date,
+      archived: archived === 'true',
     });
     return success(res, bulkThreads);
   }
@@ -100,7 +104,7 @@ export const getThreadsHandler = async (
     const { threads_per_topic } = req.query as ActiveThreadsRequestQuery;
 
     const activeThreads = await controllers.threads.getActiveThreads({
-      chain,
+      community,
       threadsPerTopic: parseInt(threads_per_topic, 10),
     });
     return success(res, activeThreads);
@@ -110,13 +114,14 @@ export const getThreadsHandler = async (
   if (search) {
     const { thread_title_only, limit, page, order_by, order_direction } =
       req.query as SearchThreadsRequestQuery;
-    if (!req.chain && req.query.chain !== ALL_CHAINS) {
+
+    if (!req.chain && community_id !== ALL_COMMUNITIES) {
       // if no chain resolved, ensure that client explicitly requested all chains
-      throw new AppError(Errors.NoChains);
+      throw new AppError(Errors.NoCommunity);
     }
 
     const searchResults = await controllers.threads.searchThreads({
-      chain,
+      community,
       searchTerm: search,
       threadTitleOnly: thread_title_only === 'true',
       limit: parseInt(limit, 10) || 0,

@@ -44,20 +44,20 @@ const searchChains = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchChainsResponse }>(
-    `${app.serverUrl()}/chains`,
+    `${app.serverUrl()}/communities`,
     {
       headers: {
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: chainId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
       },
-    }
+    },
   );
   return result;
 };
@@ -68,7 +68,6 @@ const useSearchChainsQuery = ({
   limit,
   orderBy,
   orderDirection,
-
   enabled = true,
 }: SearchChainsProps) => {
   const key = [
@@ -100,7 +99,7 @@ const useSearchChainsQuery = ({
       },
       staleTime: SEARCH_CHAINS_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

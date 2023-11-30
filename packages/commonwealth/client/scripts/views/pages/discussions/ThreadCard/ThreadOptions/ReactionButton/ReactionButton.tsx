@@ -1,66 +1,120 @@
+import { SessionKeyError } from 'controllers/server/sessions';
+import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
-import { Skeleton } from 'views/components/Skeleton';
-import type Thread from '../../../../../../models/Thread';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { Modal } from 'views/components/component_kit/cw_modal';
-import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
-import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import {
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from 'views/components/ReactionButton/helpers';
-import { LoginModal } from '../../../../../modals/login_modal';
-import './ReactionButton.scss';
-import { useReactionButton } from './useReactionButton';
+  useCreateThreadReactionMutation,
+  useDeleteThreadReactionMutation,
+} from 'state/api/threads';
+import Permissions from 'utils/Permissions';
+import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
+import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { LoginModal } from '../../../../../modals/login_modal';
+import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
 
 type ReactionButtonProps = {
   thread: Thread;
   size: 'small' | 'big';
-  showSkeleton?: boolean
+  showSkeleton?: boolean;
   disabled: boolean;
+  tooltipText?: string;
 };
-
-const ReactionButtonSkeleton = () => {
-  return <button
-    onClick={async (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-    }}
-    className={`ThreadReactionButton showSkeleton`}
-  >
-    <Skeleton height={52} width={40} />
-  </button>
-}
 
 export const ReactionButton = ({
   thread,
   size,
   disabled,
-  showSkeleton
+  showSkeleton,
+  tooltipText,
 }: ReactionButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [reactors, setReactors] = useState<Array<any>>([]);
+  const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const activeAddress = app.user.activeAccount?.address;
+  const thisUserReaction = thread?.associatedReactions?.filter(
+    (r) => r.address === activeAddress,
+  );
+  const hasReacted = thisUserReaction?.length !== 0;
+  const reactedId =
+    thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
+  const popoverProps = usePopover();
 
-  const { dislike, hasReacted, isLoading, isUserForbidden, like } =
-    useReactionButton(thread, setReactors);
+  const {
+    mutateAsync: createThreadReaction,
+    isLoading: isAddingReaction,
+    error: createThreadReactionError,
+    reset: resetCreateThreadReactionMutation,
+  } = useCreateThreadReactionMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+  const {
+    mutateAsync: deleteThreadReaction,
+    isLoading: isDeletingReaction,
+    error: deleteThreadReactionError,
+    reset: resetDeleteThreadReactionMutation,
+  } = useDeleteThreadReactionMutation({
+    chainId: app.activeChainId(),
+    address: app.user.activeAccount?.address,
+    threadId: thread.id,
+  });
 
+  const resetSessionRevalidationModal = createThreadReactionError
+    ? resetCreateThreadReactionMutation
+    : resetDeleteThreadReactionMutation;
 
-  if (showSkeleton) return <ReactionButtonSkeleton />
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetSessionRevalidationModal,
+    error: createThreadReactionError || deleteThreadReactionError,
+  });
 
-  const handleSmallVoteClick = async (e) => {
-    e.stopPropagation();
-    e.preventDefault();
+  if (showSkeleton) return <ReactionButtonSkeleton />;
+  const isLoading = isAddingReaction || isDeletingReaction;
+
+  // token balance check if needed
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+  const isUserForbidden = !isAdmin && app.chain.isGatedTopic(thread.topic?.id);
+
+  const handleVoteClick = async (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    if (isLoading || disabled) return;
+
     if (!app.isLoggedIn() || !app.user.activeAccount) {
       setIsModalOpen(true);
-    } else {
-      onReactionClick(e, hasReacted, dislike, like);
+      return;
     }
-  };
-  const handleSmallVoteMouseEnter = async () => {
-    if (reactors.length === 0) {
-      setReactors(thread.associatedReactions.map((addr) => addr));
+    if (hasReacted) {
+      deleteThreadReaction({
+        chainId: app.activeChainId(),
+        address: app.user.activeAccount?.address,
+        threadId: thread.id,
+        reactionId: reactedId as number,
+      }).catch((e) => {
+        if (e instanceof SessionKeyError) {
+          return;
+        }
+        console.error(e.response.data.error || e?.message);
+      });
+    } else {
+      createThreadReaction({
+        chainId: app.activeChainId(),
+        address: activeAddress,
+        threadId: thread.id,
+        reactionType: 'like',
+      }).catch((e) => {
+        if (e instanceof SessionKeyError) {
+          return;
+        }
+        console.error(e.response.data.error || e?.message);
+      });
     }
   };
 
@@ -70,78 +124,52 @@ export const ReactionButton = ({
         <CWUpvoteSmall
           voteCount={reactors.length}
           disabled={isUserForbidden || disabled}
+          isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
-          onMouseEnter={handleSmallVoteMouseEnter}
-          onClick={handleSmallVoteClick}
-          tooltipContent={getDisplayedReactorsForPopup({
-            reactors: reactors,
+          onClick={handleVoteClick}
+          popoverContent={getDisplayedReactorsForPopup({
+            reactors,
           })}
+          tooltipText={tooltipText}
         />
+      ) : tooltipText ? (
+        <TooltipWrapper disabled={disabled} text={tooltipText}>
+          <CWUpvote
+            onClick={handleVoteClick}
+            voteCount={reactors.length}
+            disabled={disabled}
+            active={hasReacted}
+          />
+        </TooltipWrapper>
       ) : (
-        <button
-          onMouseEnter={async () => {
-            if (reactors.length === 0) {
-              setReactors(thread.associatedReactions.map((a) => a.address));
-            }
-          }}
-          onClick={async (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-
-            if (!app.isLoggedIn() || !app.user.activeAccount) {
-              setIsModalOpen(true);
-            } else {
-              onReactionClick(e, hasReacted, dislike, like);
-            }
-          }}
-          className={`ThreadReactionButton ${isLoading || isUserForbidden ? ' disabled' : ''
-            }${hasReacted ? ' has-reacted' : ''}`}
+        <div
+          onMouseEnter={popoverProps.handleInteraction}
+          onMouseLeave={popoverProps.handleInteraction}
         >
-          {reactors.length > 0 ? (
-            <CWTooltip
-              content={getDisplayedReactorsForPopup({
+          <CWUpvote
+            onClick={handleVoteClick}
+            voteCount={reactors.length}
+            disabled={disabled}
+            active={hasReacted}
+          />
+
+          {reactors.length > 0 && (
+            <CWPopover
+              body={getDisplayedReactorsForPopup({
                 reactors,
               })}
-              renderTrigger={(handleInteraction) => (
-                <div
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                >
-                  <div className="reactions-container">
-                    <CWIcon
-                      iconName="upvote"
-                      iconSize="small"
-                      {...(hasReacted && { weight: 'fill' })}
-                    />
-                    <div
-                      className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                        }`}
-                    >
-                      {reactors.length}
-                    </div>
-                  </div>
-                </div>
-              )}
+              {...popoverProps}
             />
-          ) : (
-            <div className="reactions-container">
-              <CWIcon iconName="upvote" iconSize="small" />
-              <div
-                className={`reactions-count ${hasReacted ? ' has-reacted' : ''
-                  }`}
-              >
-                {reactors.length}
-              </div>
-            </div>
           )}
-        </button>
+        </div>
       )}
-      <Modal
+      <CWModal
         content={<LoginModal onModalClose={() => setIsModalOpen(false)} />}
         isFullScreen={isWindowMediumSmallInclusive(window.innerWidth)}
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
       />
+      {RevalidationModal}
     </>
   );
 };

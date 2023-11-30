@@ -359,3 +359,11 @@
   margin-bottom: 30px;
   position: relative;
 }
+
+.line-with-link {
+  display: inline;
+
+  div {
+    display: inherit;
+  }
+}

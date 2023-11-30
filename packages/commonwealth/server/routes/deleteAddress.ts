@@ -4,7 +4,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NeedAddress: 'Must provide address',
   NeedChain: 'Must provide chain',
   AddressNotFound: 'Address not found',
@@ -28,7 +28,7 @@ const deleteAddress = async (
   }
 
   const addressObj = await models.Address.findOne({
-    where: { chain: req.body.chain, address: req.body.address },
+    where: { community_id: req.body.chain, address: req.body.address },
   });
   if (!addressObj || addressObj.user_id !== req.user.id) {
     return next(new AppError(Errors.AddressNotFound));

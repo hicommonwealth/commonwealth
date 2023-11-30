@@ -2,21 +2,22 @@ import type { Coin } from 'adapters/currency';
 import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 
+import BN from 'bn.js';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
+import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
+import ProposalModule from './ProposalModule';
 import type {
   IAccountsModule,
   IBlockInfo,
   IChainModule,
   IGatedTopic,
 } from './interfaces';
-import ProposalModule from './ProposalModule';
-import BN from 'bn.js';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -38,7 +39,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   }
 
   public abstract chain: IChainModule<C, A>;
-  public abstract accounts: IAccountsModule<C, A>;
+  public abstract accounts: IAccountsModule<A>;
   public readonly communityBanner?: string;
 
   protected _serverLoaded: boolean;
@@ -50,7 +51,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
     const [response] = await Promise.all([
-      // this.app.chainEntities.refresh(this.meta.id),
       $.get(`${this.app.serverUrl()}/bulkOffchain`, {
         chain: this.id,
         community: null,
@@ -66,37 +66,26 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     }
 
     const {
-      pinnedThreads,
       admins,
-      activeUsers,
+      // activeUsers,
+      // pinned and active threads must not be returned from api
       numVotingThreads,
       numTotalThreads,
       communityBanner,
       contractsWithTemplatesData,
       gateStrategies,
     } = response.result;
-    this.app.threads.initialize(
-      pinnedThreads,
-      numVotingThreads,
-      numTotalThreads,
-      true
-    );
+    // Update community level thread counters variables (Store in state instead of react query here is an
+    // exception case, view the threadCountersStore code for more details)
+    EXCEPTION_CASE_threadCountersStore.setState({
+      totalThreadsInCommunity: numTotalThreads,
+      totalThreadsInCommunityForVoting: numVotingThreads,
+    });
     this.meta.setAdmins(admins);
-    this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
     if (gateStrategies.length > 0) {
       this.gatedTopics = gateStrategies;
-    }
-
-    await this.app.recentActivity.getRecentTopicActivity(this.id);
-
-    if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
-      this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
-        threads: this.app.threads.listingStore.getPinnedThreads(),
-        chain: this.meta.id,
-        pinned: true,
-      });
     }
 
     this._serverLoaded = true;
@@ -105,11 +94,10 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public deinitServer() {
     this._serverLoaded = false;
-    this.app.threads.deinit();
-    if (this.app.chainEntities) {
-      this.app.chainEntities.deinit();
-    }
-    this.app.threadUniqueAddressesCount.deinit();
+    EXCEPTION_CASE_threadCountersStore.setState({
+      totalThreadsInCommunity: 0,
+      totalThreadsInCommunityForVoting: 0,
+    });
     console.log(`${this.meta.name} stopped`);
   }
 
@@ -184,15 +172,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public abstract base: ChainBase;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
-  public networkError: string;
 
   public readonly meta: ChainInfo;
   public readonly block: IBlockInfo;
 
   public app: IApp;
-  public version: string;
-  public name: string;
-  public runtimeName: string;
   public gatedTopics: IGatedTopic[];
 
   constructor(meta: ChainInfo, app: IApp) {

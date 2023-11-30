@@ -1,24 +1,23 @@
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { CommentAttributes, CommentInstance } from '../../models/comment';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { getCommentDepth } from '../../util/getCommentDepth';
+import moment from 'moment';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
-import { AppError } from '../../../../common-common/src/errors';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
-import moment from 'moment';
-import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
+import { CommentAttributes } from '../../models/comment';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { getCommentDepth } from '../../util/getCommentDepth';
+import { parseUserMentions } from '../../util/parseUserMentions';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
@@ -31,6 +30,7 @@ const Errors = {
   BalanceCheckFailed: 'Could not verify user token balance',
   ThreadArchived: 'Thread is archived',
   ParseMentionsFailed: 'Failed to parse mentions',
+  FailedCreateComment: 'Failed to create comment',
 };
 
 const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
@@ -38,20 +38,20 @@ const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 export type CreateThreadCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   parentId: number;
   threadId: number;
   text: string;
   canvasAction?: any;
   canvasSession?: any;
   canvasHash?: any;
-  discord_meta?: any;
+  discordMeta?: any;
 };
 
 export type CreateThreadCommentResult = [
   CommentAttributes,
   EmitOptions[],
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThreadComment(
@@ -59,19 +59,19 @@ export async function __createThreadComment(
   {
     user,
     address,
-    chain,
+    community,
     parentId,
     threadId,
     text,
     canvasAction,
     canvasSession,
     canvasHash,
-    discord_meta,
-  }: CreateThreadCommentOptions
+    discordMeta,
+  }: CreateThreadCommentOptions,
 ): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -103,8 +103,9 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        chain: chain.id,
+        chain: community.id,
       },
+      include: [this.models.Address],
     });
     if (!parentComment) {
       throw new AppError(Errors.InvalidParent);
@@ -113,7 +114,7 @@ export async function __createThreadComment(
     const [commentDepthExceeded] = await getCommentDepth(
       this.models,
       parentComment,
-      MAX_COMMENT_DEPTH
+      MAX_COMMENT_DEPTH,
     );
     if (commentDepthExceeded) {
       throw new AppError(Errors.NestingTooDeep);
@@ -122,32 +123,28 @@ export async function __createThreadComment(
 
   // check balance (bypass for admin)
   if (
-    chain &&
-    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+    community &&
+    (community.type === ChainType.Token ||
+      community.network === ChainNetwork.Ethereum)
   ) {
-    const addressAdminRoles = await findAllRoles(
-      this.models,
-      { where: { address_id: address.id } },
-      chain.id,
-      ['admin']
-    );
-    const isGodMode = user.isAdmin;
-    const hasAdminRole = addressAdminRoles.length > 0;
-    if (!isGodMode && !hasAdminRole) {
-      let canReact;
-      try {
-        canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
-      } catch (e) {
-        throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
-      }
-
-      if (!canReact) {
-        throw new AppError(Errors.InsufficientTokenBalance);
+    const isAdmin = await validateOwner({
+      models: this.models,
+      user,
+      communityId: community.id,
+      entity: thread,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      const { isValid, message } = await validateTopicGroupsMembership(
+        this.models,
+        this.tokenBalanceCache,
+        thread.topic_id,
+        community,
+        address,
+      );
+      if (!isValid) {
+        throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
       }
     }
   }
@@ -173,12 +170,12 @@ export async function __createThreadComment(
     plaintext,
     version_history,
     address_id: address.id,
-    chain: chain.id,
+    chain: community.id,
     parent_id: null,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
     canvas_hash: canvasHash,
-    discord_meta,
+    discord_meta: discordMeta,
   };
   if (parentId) {
     Object.assign(commentContent, { parent_id: parentId });
@@ -199,23 +196,21 @@ export async function __createThreadComment(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewReaction,
-        object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
+        comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
     await this.models.Subscription.create(
       {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewComment,
-        object_id: `comment-${finalComment.id}`,
         chain_id: finalComment.chain || null,
-        offchain_comment_id: finalComment.id,
+        comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
 
     await transaction.commit();
@@ -235,13 +230,13 @@ export async function __createThreadComment(
         mentions.map(async (mention) => {
           const mentionedUser = await this.models.Address.findOne({
             where: {
-              chain: mention[0] || null,
+              community_id: mention[0] || null,
               address: mention[1],
             },
             include: [this.models.User],
           });
           return mentionedUser;
-        })
+        }),
       );
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
@@ -252,56 +247,53 @@ export async function __createThreadComment(
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
   excludedAddrs.push(finalComment.Address.address);
 
-  const cwUrl = getThreadUrl(thread, finalComment.id);
+  const rootNotifExcludeAddresses = [...excludedAddrs];
+  if (parentComment && parentComment.Address) {
+    rootNotifExcludeAddresses.push(parentComment.Address.address);
+  }
+
   const root_title = thread.title || '';
 
   const allNotificationOptions: EmitOptions[] = [];
 
   // build notification for root thread
   allNotificationOptions.push({
-    categoryId: NotificationCategories.NewComment,
-    objectId: `discussion_${threadId}`,
-    notificationData: {
-      created_at: new Date(),
-      thread_id: threadId,
-      root_title,
-      root_type: ProposalType.Thread,
-      comment_id: +finalComment.id,
-      comment_text: finalComment.text,
-      chain_id: finalComment.chain,
-      author_address: finalComment.Address.address,
-      author_chain: finalComment.Address.chain,
+    notification: {
+      categoryId: NotificationCategories.NewComment,
+      data: {
+        created_at: new Date(),
+        thread_id: threadId,
+        root_title,
+        root_type: ProposalType.Thread,
+        comment_id: +finalComment.id,
+        comment_text: finalComment.text,
+        chain_id: finalComment.chain,
+        author_address: finalComment.Address.address,
+        author_chain: finalComment.Address.community_id,
+      },
     },
-    webhookData: {
-      user: finalComment.Address.address,
-      author_chain: finalComment.Address.chain,
-      url: cwUrl,
-      title: root_title,
-      chain: finalComment.chain,
-      body: finalComment.text,
-    },
-    excludeAddresses: excludedAddrs,
+    excludeAddresses: rootNotifExcludeAddresses,
   });
 
   // if child comment, build notification for parent author
   if (parentId && parentComment) {
     allNotificationOptions.push({
-      categoryId: NotificationCategories.NewComment,
-      objectId: `comment-${parentId}`,
-      notificationData: {
-        created_at: new Date(),
-        thread_id: +threadId,
-        root_title,
-        root_type: ProposalType.Thread,
-        comment_id: +finalComment.id,
-        comment_text: finalComment.text,
-        parent_comment_id: +parentId,
-        parent_comment_text: parentComment.text,
-        chain_id: finalComment.chain,
-        author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+      notification: {
+        categoryId: NotificationCategories.NewComment,
+        data: {
+          created_at: new Date(),
+          thread_id: +threadId,
+          root_title,
+          root_type: ProposalType.Thread,
+          comment_id: +finalComment.id,
+          comment_text: finalComment.text,
+          parent_comment_id: +parentId,
+          parent_comment_text: parentComment.text,
+          chain_id: finalComment.chain,
+          author_address: finalComment.Address.address,
+          author_chain: finalComment.Address.community_id,
+        },
       },
-      webhookData: null,
       excludeAddresses: excludedAddrs,
     });
 
@@ -314,20 +306,21 @@ export async function __createThreadComment(
         const shouldNotifyMentionedUser = true;
         if (shouldNotifyMentionedUser) {
           allNotificationOptions.push({
-            categoryId: NotificationCategories.NewMention,
-            objectId: `user-${mentionedAddress.User.id}`,
-            notificationData: {
-              created_at: new Date(),
-              thread_id: +threadId,
-              root_title,
-              root_type: ProposalType.Thread,
-              comment_id: +finalComment.id,
-              comment_text: finalComment.text,
-              chain_id: finalComment.chain,
-              author_address: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
+            notification: {
+              categoryId: NotificationCategories.NewMention,
+              data: {
+                mentioned_user_id: mentionedAddress.User.id,
+                created_at: new Date(),
+                thread_id: +threadId,
+                root_title,
+                root_type: ProposalType.Thread,
+                comment_id: +finalComment.id,
+                comment_text: finalComment.text,
+                chain_id: finalComment.chain,
+                author_address: finalComment.Address.address,
+                author_chain: finalComment.Address.community_id,
+              },
             },
-            webhookData: null,
             excludeAddresses: [finalComment.Address.address],
           });
         }
@@ -345,7 +338,8 @@ export async function __createThreadComment(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-    community: chain.id,
+    community: community.id,
+    userId: user.id,
     isCustomDomain: null,
   };
 

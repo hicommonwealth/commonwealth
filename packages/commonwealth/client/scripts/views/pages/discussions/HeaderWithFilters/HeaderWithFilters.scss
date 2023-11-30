@@ -48,6 +48,12 @@
     width: 34px;
   }
 
+  .checkboxes {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+  }
+
   @include smallInclusive {
     .filter-row {
       flex-direction: column;
@@ -63,7 +69,7 @@
     }
 
     .filter-section-top {
-      align-items: flex-start
+      align-items: flex-start;
     }
 
     .filter-label {

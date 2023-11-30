@@ -1,28 +1,24 @@
 @import '../shared';
 
 .ManageContractTemplateModal {
-  width: 720px;
-  padding: 24px;
-  height: 95vh;
-  max-height: 820px;
+  width: 100%;
   overflow-y: auto;
 
   @include smallInclusive {
     width: auto;
   }
 
-  .disabled-dropdown {
-    pointer-events: none;
+  .compact-modal-title {
+    padding: 0 0 70px 0;
   }
 
-  .subtitle {
-    margin-top: 16px;
+  .disabled-dropdown {
+    pointer-events: none;
   }
 
   .form {
     display: flex;
     flex-direction: column;
-    margin-top: 4px;
 
     .dropdown-options-display {
       margin-top: -20px;
@@ -51,14 +47,6 @@
     .input-label {
       color: $neutral-600;
       margin-bottom: 4px;
-      margin-top: 12px;
     }
-  }
-
-  .footer {
-    display: flex;
-    gap: 16px;
-    justify-content: end;
-    margin-top: 40px;
   }
 }

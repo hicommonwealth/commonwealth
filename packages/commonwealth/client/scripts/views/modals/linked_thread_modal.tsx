@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 
-import 'modals/linked_thread_modal.scss';
-
 import type Thread from '../../models/Thread';
-import { ThreadSelector } from 'views/components/thread_selector';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
-import { LinkSource } from 'models/Thread';
-import { getAddedAndDeleted } from 'helpers/threads';
+import app from '../../state';
+import { notifyError } from '../../controllers/app/notifications';
+import { getAddedAndDeleted } from '../../helpers/threads';
+import { LinkSource } from '../../models/Thread';
+import {
+  useAddThreadLinksMutation,
+  useDeleteThreadLinksMutation,
+} from '../../state/api/threads';
+import { ThreadSelector } from '../components/thread_selector';
+import { CWButton } from '../components/component_kit/new_designs/cw_button';
+import {
+  CWModalBody,
+  CWModalFooter,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 
 type LinkedThreadModalProps = {
   linkedThreads: Thread[];
@@ -27,17 +33,26 @@ export const LinkedThreadModal = ({
   const [tempLinkedThreads, setTempLinkedThreads] =
     useState<Array<Thread>>(initialLinkedThreads);
 
+  const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+
+  const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+  });
+
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
       tempLinkedThreads,
       initialLinkedThreads
     );
-
     let links: Thread['links'];
-
     try {
       if (toAdd.length) {
-        const updatedThread = await app.threads.addLinks({
+        const updatedThread = await addThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toAdd.map((el) => ({
             source: LinkSource.Thread,
@@ -45,25 +60,21 @@ export const LinkedThreadModal = ({
             title: el.title,
           })),
         });
-
         links = updatedThread.links;
       }
-
       if (toDelete.length) {
-        const updatedThread = await app.threads.deleteLinks({
+        const updatedThread = await deleteThreadLinks({
+          chainId: app.activeChainId(),
           threadId: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Thread,
             identifier: String(el.id),
           })),
         });
-
         links = updatedThread.links;
       }
-
       onModalClose();
-
-      if (links) {
+      if (links && onSave) {
         onSave(links);
       }
     } catch (err) {
@@ -77,35 +88,38 @@ export const LinkedThreadModal = ({
     const isSelected = tempLinkedThreads.find(
       ({ id }) => selectedThread.id === id
     );
-
     const updatedLinkedThreads = isSelected
       ? tempLinkedThreads.filter(({ id }) => selectedThread.id !== id)
       : [...tempLinkedThreads, selectedThread];
-
     setTempLinkedThreads(updatedLinkedThreads);
   };
 
   return (
     <div className="LinkedThreadModal">
-      <div className="compact-modal-title">
-        <h3>Link to Existing Threads</h3>
-        <CWIconButton iconName="close" onClick={onModalClose} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader
+        label="Link to Existing Threads"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody>
         <ThreadSelector
           linkedThreadsToSet={tempLinkedThreads}
           onSelect={handleSelectThread}
         />
-
-        <div className="buttons-row">
-          <CWButton
-            label="Cancel"
-            buttonType="secondary-blue"
-            onClick={onModalClose}
-          />
-          <CWButton label="Save changes" onClick={handleSaveChanges} />
-        </div>
-      </div>
+      </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          label="Cancel"
+          buttonType="secondary"
+          buttonHeight="sm"
+          onClick={onModalClose}
+        />
+        <CWButton
+          label="Save changes"
+          buttonType="primary"
+          buttonHeight="sm"
+          onClick={handleSaveChanges}
+        />
+      </CWModalFooter>
     </div>
   );
 };

@@ -1,4 +1,8 @@
+import clsx from 'clsx';
+import { SessionKeyError } from 'controllers/server/sessions';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -6,26 +10,25 @@ import {
   useDeleteCommentMutation,
   useEditCommentMutation,
   useFetchCommentsQuery,
-  useToggleCommentSpamStatusMutation
+  useToggleCommentSpamStatusMutation,
 } from 'state/api/comments';
 import { ContentType } from 'types';
+import { CreateComment } from 'views/components/Comments/CreateComment';
+import {
+  deserializeDelta,
+  serializeDelta,
+} from 'views/components/react_quill_editor/utils';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { notifyError } from '../../../../controllers/app/notifications';
 import type { Comment as CommentType } from '../../../../models/Comment';
 import Thread from '../../../../models/Thread';
 import Permissions from '../../../../utils/Permissions';
-import { CreateComment } from 'views/components/Comments/CreateComment';
-import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
-import {
-  deserializeDelta,
-  serializeDelta,
-} from 'views/components/react_quill_editor/utils';
 import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
-import { jumpHighlightComment } from './helpers';
 import './CommentTree.scss';
-
-const MAX_THREAD_LEVEL = 8;
+import { jumpHighlightComment } from './helpers';
+import usePrepareCommentsList from './usePrepareCommentsList';
 
 type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;
@@ -37,7 +40,11 @@ type CommentsTreeAttrs = {
   parentCommentId: number;
   setParentCommentId: (id: number) => void;
   fromDiscordBot?: boolean;
+  canReact?: boolean;
+  canReply?: boolean;
   canComment: boolean;
+  commentSortType: CommentsFeaturedFilterTypes;
+  disabledActionsTooltipText?: string;
 };
 
 export const CommentTree = ({
@@ -50,30 +57,55 @@ export const CommentTree = ({
   setIsReplying,
   parentCommentId,
   setParentCommentId,
+  canReact = true,
+  canReply = true,
   canComment,
+  commentSortType,
+  disabledActionsTooltipText,
 }: CommentsTreeAttrs) => {
-  const [commentError] = useState(null);
   const [highlightedComment, setHighlightedComment] = useState(false);
 
   const { data: allComments = [] } = useFetchCommentsQuery({
     chainId: app.activeChainId(),
-    threadId: parseInt(`${thread.id}`)
-  })
+    threadId: parseInt(`${thread.id}`),
+  });
 
-  const { mutateAsync: deleteComment } = useDeleteCommentMutation({
+  const {
+    mutateAsync: deleteComment,
+    reset: resetDeleteCommentMutation,
+    error: deleteCommentError,
+  } = useDeleteCommentMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+    existingNumberOfComments: thread.numberOfComments,
+  });
 
-  const { mutateAsync: editComment } = useEditCommentMutation({
+  const {
+    mutateAsync: editComment,
+    reset: resetEditCommentMutation,
+    error: editCommentError,
+  } = useEditCommentMutation({
     chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+    threadId: thread.id,
+  });
 
-  const { mutateAsync: toggleCommentSpamStatus } = useToggleCommentSpamStatusMutation({
-    chainId: app.activeChainId(),
-    threadId: thread.id
-  })
+  const resetSessionRevalidationModal = deleteCommentError
+    ? resetDeleteCommentMutation
+    : resetEditCommentMutation;
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetSessionRevalidationModal,
+    error: deleteCommentError || editCommentError,
+  });
+
+  const { mutateAsync: toggleCommentSpamStatus } =
+    useToggleCommentSpamStatusMutation({
+      chainId: app.activeChainId(),
+      threadId: thread.id,
+    });
+
+  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const [edits, setEdits] = useState<{
     [commentId: number]: {
@@ -91,8 +123,7 @@ export const CommentTree = ({
     Permissions.isCommunityAdmin() ||
     Permissions.isCommunityModerator();
 
-  const isLocked =
-    fromDiscordBot || !!(thread instanceof Thread && thread.readOnly);
+  const isLocked = !!(thread instanceof Thread && thread.readOnly);
 
   useEffect(() => {
     if (comments?.length > 0 && !highlightedComment) {
@@ -106,6 +137,17 @@ export const CommentTree = ({
     }
   }, [comments?.length, highlightedComment]);
 
+  const commentsList = usePrepareCommentsList({
+    levelZeroComments: comments,
+    allComments,
+    threadId: thread.id,
+    includeSpams,
+    commentSortType,
+    isLocked,
+    fromDiscordBot,
+    isLoggedIn,
+  });
+
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
     if (isReplying) {
@@ -117,40 +159,6 @@ export const CommentTree = ({
     }
   };
 
-  const isLivingCommentTree = (comment, children) => {
-    if (!comment.deleted) {
-      return true;
-    } else if (!children.length) {
-      return false;
-    } else {
-      let survivingDescendents = false;
-
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-
-        if (!child.deleted) {
-          survivingDescendents = true;
-          break;
-        }
-
-        const grandchildren = allComments.filter(c => c.threadId === thread.id && c.parentComment === comment.id)
-
-        for (let j = 0; j < grandchildren.length; j++) {
-          const grandchild = grandchildren[j];
-
-          if (!grandchild.deleted) {
-            survivingDescendents = true;
-            break;
-          }
-        }
-
-        if (survivingDescendents) break;
-      }
-
-      return survivingDescendents;
-    }
-  };
-
   const handleDeleteComment = (comment: CommentType<any>) => {
     openConfirmation({
       title: 'Delete Comment',
@@ -158,24 +166,30 @@ export const CommentTree = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await deleteComment({
                 commentId: comment.id,
                 canvasHash: comment.canvas_hash,
                 chainId: app.activeChainId(),
-                address: app.user.activeAccount.address
-              })
-            } catch (e) {
-              console.log(e);
-              notifyError('Failed to delete comment.');
+                address: app.user.activeAccount.address,
+                existingNumberOfComments: thread.numberOfComments,
+              });
+            } catch (err) {
+              if (err instanceof SessionKeyError) {
+                return;
+              }
+              console.error(err.response.data.error || err?.message);
+              notifyError('Failed to delete comment');
             }
           },
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -183,7 +197,7 @@ export const CommentTree = ({
 
   const handleEditCancel = (
     comment: CommentType<any>,
-    hasContentChanged: boolean
+    hasContentChanged: boolean,
   ) => {
     if (hasContentChanged) {
       openConfirmation({
@@ -192,7 +206,8 @@ export const CommentTree = ({
         buttons: [
           {
             label: 'Yes',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: () => {
               setEdits((p) => ({
                 ...p,
@@ -208,7 +223,8 @@ export const CommentTree = ({
           },
           {
             label: 'No',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
           },
         ],
       });
@@ -227,7 +243,7 @@ export const CommentTree = ({
 
   const handleEditStart = (comment: CommentType<any>) => {
     const editDraft = localStorage.getItem(
-      `${app.activeChainId()}-edit-comment-${comment.id}-storedText`
+      `${app.activeChainId()}-edit-comment-${comment.id}-storedText`,
     );
     if (editDraft) {
       clearEditingLocalStorage(comment.id, ContentType.Comment);
@@ -239,7 +255,8 @@ export const CommentTree = ({
         buttons: [
           {
             label: 'Restore',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: () => {
               setEdits((p) => ({
                 ...p,
@@ -255,7 +272,8 @@ export const CommentTree = ({
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
             onClick: () => {
               setEdits((p) => ({
                 ...p,
@@ -287,7 +305,7 @@ export const CommentTree = ({
 
   const handleEditConfirm = async (
     comment: CommentType<any>,
-    newDelta: DeltaStatic
+    newDelta: DeltaStatic,
   ) => {
     {
       setEdits((p) => ({
@@ -305,8 +323,8 @@ export const CommentTree = ({
           threadId: thread.id,
           parentCommentId: comment.parentComment,
           chainId: app.activeChainId(),
-          address: app.user.activeAccount.address
-        })
+          address: app.user.activeAccount.address,
+        });
         setEdits((p) => ({
           ...p,
           [comment.id]: {
@@ -317,7 +335,11 @@ export const CommentTree = ({
         setIsGloballyEditing(false);
         clearEditingLocalStorage(comment.id, ContentType.Comment);
       } catch (err) {
-        console.error(err);
+        if (err instanceof SessionKeyError) {
+          return;
+        }
+        console.error(err?.responseJSON?.error || err?.message);
+        notifyError('Failed to edit comment');
       } finally {
         setEdits((p) => ({
           ...p,
@@ -341,10 +363,10 @@ export const CommentTree = ({
           <br />
           <p>
             Flagging as spam will help filter out unwanted content. Comments
-            flagged as spam are hidden from the main feed and can't be
+            flagged as spam are hidden from the main feed and can&apos;t be
             interacted with. For transparency, spam can still be viewed by
-            community members if they choose to "Include comments flagged as
-            spam."
+            community members if they choose to &quot;Include comments flagged
+            as spam.&quot;
           </p>
           <br />
           <p>Note that you can always unflag a comment as spam.</p>
@@ -358,7 +380,7 @@ export const CommentTree = ({
           <br />
           <p>
             For transparency, spam can still be viewed by community members if
-            they choose to “Include comments flagged as spam.”
+            they choose to &quot;Include comments flagged as spam.&quot;
             <br />
           </p>
         </>
@@ -366,18 +388,21 @@ export const CommentTree = ({
       buttons: [
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
         {
           label: !comment.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await toggleCommentSpamStatus({
                 commentId: comment.id,
-                isSpam: !!comment.markedAsSpamAt,
+                isSpam: !comment.markedAsSpamAt,
                 chainId: app.activeChainId(),
-              })
+                address: app.user.activeAccount.address,
+              });
             } catch (err) {
               console.log(err);
             }
@@ -387,49 +412,53 @@ export const CommentTree = ({
     });
   };
 
-  const recursivelyGatherComments = (
-    comments_: CommentType<any>[],
-    parentComment: CommentType<any>,
-    threadLevel: number
-  ) => {
-    const canContinueThreading = threadLevel <= MAX_THREAD_LEVEL;
-
-    return comments_
-      .filter((x) => (includeSpams ? true : !x.markedAsSpamAt))
-      .map((comment: CommentType<any>) => {
-        const children = allComments.filter(c => c.threadId === thread.id && c.parentComment === comment.id)
-
-        if (isLivingCommentTree(comment, children)) {
-          const isCommentAuthor =
-            comment.author === app.user.activeAccount?.address;
-
-          const isLast = threadLevel === 8;
-
-          const replyBtnVisible = !!(!isLast && !isLocked && isLoggedIn);
+  return (
+    <>
+      <div className="CommentsTree">
+        {commentsList.map((comment, index) => {
+          const nextComment = commentsList[index + 1];
+          const nextCommentThreadLevel = nextComment?.threadLevel;
 
           return (
             <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
               <div className={`Comment comment-${comment.id}`}>
-                {threadLevel > 0 && (
+                {comment.threadLevel > 0 && (
                   <div className="thread-connectors-container">
-                    {Array(threadLevel)
+                    {Array(comment.threadLevel)
                       .fill(undefined)
                       .map((_, i) => (
                         <div
                           key={i}
-                          className={`thread-connector ${
-                            isReplying &&
-                            i === threadLevel - 1 &&
-                            parentCommentId === comment.id
-                            ? 'replying'
-                            : ''
-                            }`}
+                          className={clsx('thread-connector', {
+                            replying:
+                              isReplying &&
+                              i === comment.threadLevel - 1 &&
+                              parentCommentId === comment.id,
+                            // vertical line is shorter when the thread is finished
+                            smaller:
+                              i >= nextCommentThreadLevel || !nextComment,
+                          })}
                         />
                       ))}
                   </div>
                 )}
                 <CommentCard
-                  canEdit={!isLocked && (isCommentAuthor || isAdminOrMod)}
+                  disabledActionsTooltipText={disabledActionsTooltipText}
+                  isThreadArchived={!!thread.archivedAt}
+                  canReply={
+                    !!hasJoinedCommunity && !thread.archivedAt && canReply
+                  }
+                  maxReplyLimitReached={comment.maxReplyLimitReached}
+                  canReact={
+                    !thread.archivedAt &&
+                    (!!hasJoinedCommunity ||
+                      isAdmin ||
+                      !app.chain.isGatedTopic(thread?.topic?.id)) &&
+                    canReact
+                  }
+                  canEdit={
+                    !isLocked && (comment.isCommentAuthor || isAdminOrMod)
+                  }
                   editDraft={edits?.[comment.id]?.editDraft || ''}
                   onEditStart={async () => await handleEditStart(comment)}
                   onEditCancel={async (hasContentChanged: boolean) =>
@@ -440,8 +469,10 @@ export const CommentTree = ({
                   }
                   isSavingEdit={edits?.[comment.id]?.isSavingEdit || false}
                   isEditing={edits?.[comment.id]?.isEditing || false}
-                  canDelete={!isLocked && (isCommentAuthor || isAdminOrMod)}
-                  replyBtnVisible={replyBtnVisible}
+                  canDelete={
+                    !isLocked && (comment.isCommentAuthor || isAdminOrMod)
+                  }
+                  replyBtnVisible={comment.replyBtnVisible}
                   onReply={() => {
                     setParentCommentId(comment.id);
                     setIsReplying(true);
@@ -449,7 +480,9 @@ export const CommentTree = ({
                   onDelete={async () => await handleDeleteComment(comment)}
                   isSpam={!!comment.markedAsSpamAt}
                   onSpamToggle={async () => await handleFlagMarkAsSpam(comment)}
-                  canToggleSpam={!isLocked && (isCommentAuthor || isAdminOrMod)}
+                  canToggleSpam={
+                    !isLocked && (comment.isCommentAuthor || isAdminOrMod)
+                  }
                   comment={comment}
                 />
               </div>
@@ -461,23 +494,11 @@ export const CommentTree = ({
                   canComment={canComment}
                 />
               )}
-              {!!children.length &&
-                canContinueThreading &&
-                recursivelyGatherComments(children, comment, threadLevel + 1)}
             </React.Fragment>
           );
-        } else {
-          return null;
-        }
-      });
-  };
-
-  return (
-    <div className="CommentsTree">
-      {comments && recursivelyGatherComments(comments, comments[0], 0)}
-      {commentError && (
-        <CWValidationText message={commentError} status="failure" />
-      )}
-    </div>
+        })}
+      </div>
+      {RevalidationModal}
+    </>
   );
 };

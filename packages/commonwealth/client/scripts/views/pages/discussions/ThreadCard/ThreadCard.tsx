@@ -1,59 +1,36 @@
-import { IChainEntityKind } from 'chain-events/src';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import {
-  chainEntityTypeToProposalShortName,
-  getProposalUrlPath,
-} from 'identifiers';
+import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
-import moment from 'moment';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
-import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import useBrowserWindow from '../../../../hooks/useBrowserWindow';
-import AddressInfo from '../../../../models/AddressInfo';
-import { ThreadStage } from '../../../../models/types';
-import Permissions from '../../../../utils/Permissions';
-import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
-import { isNewThread } from '../NewThreadTag';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import useBrowserWindow from '../../../../hooks/useBrowserWindow';
+import { ThreadStage } from '../../../../models/types';
+import Permissions from '../../../../utils/Permissions';
 import { isHot } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
+import './ThreadCard.scss';
+import { CardSkeleton } from './ThreadCardSkeleton';
 import { ThreadOptions } from './ThreadOptions';
 import { AdminActionsProps } from './ThreadOptions/AdminActions';
 import { ReactionButton } from './ThreadOptions/ReactionButton';
-import './ThreadCard.scss';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type CardProps = AdminActionsProps & {
   onBodyClick?: () => any;
   onStageTagClick?: (stage: ThreadStage) => any;
   threadHref?: string;
   showSkeleton?: boolean;
+  canReact?: boolean;
+  canComment?: boolean;
+  disabledActionsTooltipText?: string;
+  onCommentBtnClick?: () => any;
 };
-
-
-const CardSkeleton = ({ isWindowSmallInclusive, thread, disabled }) => {
-  return <div className={'ThreadCard showSkeleton'}>
-    {!isWindowSmallInclusive && (
-      <ReactionButton thread={thread} size="big" showSkeleton disabled={disabled} />
-    )}
-    <div className="content-wrapper">
-      <div>
-        <Skeleton count={1} className='content-header-skeleton' />
-        <div> <Skeleton className='content-header-icons-skeleton' /> </div>
-      </div>
-      <div className="content-body-wrapper">
-        <Skeleton count={3} />
-      </div>
-    </div>
-    <div className="content-footer"><Skeleton /></div>
-  </div>
-}
 
 export const ThreadCard = ({
   thread,
@@ -61,7 +38,6 @@ export const ThreadCard = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -72,11 +48,14 @@ export const ThreadCard = ({
   onBodyClick,
   onStageTagClick,
   threadHref,
-  showSkeleton
+  showSkeleton,
+  canReact = true,
+  canComment = true,
+  disabledActionsTooltipText = '',
+  onCommentBtnClick = () => null,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -84,7 +63,10 @@ export const ThreadCard = ({
     }
   }, []);
 
-  if (showSkeleton) return <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
+  if (showSkeleton)
+    return (
+      <CardSkeleton disabled={true} thread isWindowSmallInclusive={false} />
+    );
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -104,6 +86,7 @@ export const ThreadCard = ({
   const isStageDefault = isDefaultStage(thread.stage);
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals.length > 0;
+  const stageLabel = threadStageToLabel(thread.stage);
 
   return (
     <>
@@ -120,17 +103,16 @@ export const ThreadCard = ({
           <ReactionButton
             thread={thread}
             size="big"
-            disabled={!hasJoinedCommunity}
+            disabled={!canReact}
+            tooltipText={disabledActionsTooltipText}
           />
         )}
         <div className="content-wrapper">
           <div className="content-header">
             <AuthorAndPublishInfo
-              authorInfo={
-                new AddressInfo(null, thread.author, thread.authorChain, null)
-              }
-              publishDate={moment(thread.createdAt).format('l')}
-              isNew={isNewThread(thread.createdAt)}
+              authorAddress={thread.author}
+              authorChainId={thread.authorChain}
+              publishDate={thread.createdAt}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {
@@ -140,6 +122,7 @@ export const ThreadCard = ({
                 lastUpdated: thread.updatedAt.toISOString(),
               })}
               discord_meta={thread.discord_meta}
+              archivedAt={thread.archivedAt}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -152,7 +135,7 @@ export const ThreadCard = ({
                 {thread.title}
               </CWText>
             </div>
-            <div className='content-top-tags'>
+            <div className="content-top-tags">
               {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
               {linkedSnapshots.length > 0 && (
@@ -175,7 +158,8 @@ export const ThreadCard = ({
             <div className="content-tags">
               {thread.stage && !isStageDefault && (
                 <CWTag
-                  label={threadStageToLabel(thread.stage)}
+                  label={stageLabel}
+                  classNames={stageLabel}
                   trimAt={20}
                   type="stage"
                   onClick={async (e) => {
@@ -191,9 +175,7 @@ export const ThreadCard = ({
                   <CWTag
                     key={`${link.source}-${link.identifier}`}
                     type="proposal"
-                    label={`${chainEntityTypeToProposalShortName(
-                      'proposal' as IChainEntityKind
-                    )} 
+                    label={`Prop 
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''
@@ -220,11 +202,12 @@ export const ThreadCard = ({
                 isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
               }
+              canReact={canReact}
+              canComment={canComment}
               onDelete={onDelete}
               onSpamToggle={onSpamToggle}
               onLockToggle={onLockToggle}
               onPinToggle={onPinToggle}
-              onTopicChange={onTopicChange}
               onProposalStageChange={onProposalStageChange}
               onSnapshotProposalFromThread={onSnapshotProposalFromThread}
               onCollaboratorsEdit={onCollaboratorsEdit}
@@ -232,6 +215,8 @@ export const ThreadCard = ({
               onEditCancel={onEditCancel}
               onEditConfirm={onEditConfirm}
               hasPendingEdits={hasPendingEdits}
+              onCommentBtnClick={onCommentBtnClick}
+              disabledActionTooltipText={disabledActionsTooltipText}
             />
           </div>
         </div>

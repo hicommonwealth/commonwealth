@@ -1,17 +1,11 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
+import { IDiscordMeta } from 'common-common/src/types';
 import { CommentAttributes } from 'server/models/comment';
-import { AppError } from '../../../../common-common/src/errors';
-
-const Errors = {
-  NoId: 'Must provide id',
-  NoBody: 'Must provide text body',
-  NotAddrOwner: 'Address not owned by this user',
-  NoProposal: 'No matching proposal found',
-};
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 type UpdateCommentRequestBody = {
   body: string;
+  discord_meta?: IDiscordMeta;
 };
 type UpdateCommentRequestParams = {
   id: number;
@@ -22,25 +16,20 @@ type UpdateCommentResponse = CommentAttributes;
 export const updateCommentHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateCommentRequestBody, {}, UpdateCommentRequestParams>,
-  res: TypedResponse<UpdateCommentResponse>
+  res: TypedResponse<UpdateCommentResponse>,
 ) => {
-  const { user, chain, address } = req;
+  const { user, chain: community, address } = req;
   const { id: commentId } = req.params;
-  const { body: commentBody } = req.body;
-  if (!commentId) {
-    throw new AppError(Errors.NoId);
-  }
-  if (!commentBody) {
-    throw new AppError(Errors.NoBody);
-  }
+  const { body: commentBody, discord_meta: discordMeta } = req.body;
 
   const [updatedComment, notificationOptions] =
     await controllers.comments.updateComment({
       user,
       address,
-      chain,
+      community,
       commentId,
       commentBody,
+      discordMeta,
     });
 
   // emit notifications

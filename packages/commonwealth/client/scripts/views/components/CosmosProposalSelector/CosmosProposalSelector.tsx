@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import 'components/ChainEntitiesSelector.scss';
+import 'components/ProposalSelector.scss';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 
 import app, { ApiStatus } from 'state';
@@ -29,13 +29,11 @@ export const CosmosProposalSelector = ({
     useState(false);
   const [loadingActive, setActiveLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const { activeCosmosProposals, completedCosmosProposals } =
+  const { activeCosmosProposals = [], completedCosmosProposals = [] } =
     useGetAllCosmosProposals({
       app,
       setIsLoadingActiveProposals: setActiveLoading,
       setIsLoadingCompletedProposals: setCompletedProposalsLoading,
-      isLoadingActiveProposals: loadingActive,
-      isLoadingCompletedProposals: loadingCompletedProposals,
       needToInitAPI:
         !app.chain.apiInitialized &&
         app.chain.networkStatus !== ApiStatus.Connecting,
@@ -83,7 +81,7 @@ export const CosmosProposalSelector = ({
   }
 
   return (
-    <div className="ChainEntitiesSelector">
+    <div className="ProposalSelector">
       <CWTextInput
         placeholder="Search for an existing proposal..."
         iconRightonClick={handleClearButtonClick}

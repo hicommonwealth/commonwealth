@@ -22,7 +22,7 @@ const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
     if (error instanceof ServerError) {
       console.trace(error);
       // if the original error is given when creating the ServerError instance then pass its message to Rollbar
-      if (error.error.message) {
+      if (error.error?.message) {
         rollbar.error(error, req, { OriginalError: error.error.message });
       } else rollbar.error(error, req);
       res.status(error.status).send({

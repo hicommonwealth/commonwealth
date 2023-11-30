@@ -32,6 +32,7 @@ interface SearchThreadsProps {
   limit: number;
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
+  threadTitleOnly?: boolean;
 
   enabled?: boolean;
 }
@@ -43,6 +44,7 @@ const searchThreads = async ({
   limit,
   orderBy,
   orderDirection,
+  threadTitleOnly,
 }: SearchThreadsProps & { pageParam: number }) => {
   const {
     data: { result },
@@ -53,14 +55,15 @@ const searchThreads = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: chainId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
+        thread_title_only: threadTitleOnly,
       },
-    }
+    },
   );
   return result;
 };
@@ -71,7 +74,7 @@ const useSearchThreadsQuery = ({
   limit,
   orderBy,
   orderDirection,
-
+  threadTitleOnly,
   enabled = true,
 }: SearchThreadsProps) => {
   const key = [
@@ -92,6 +95,7 @@ const useSearchThreadsQuery = ({
         limit,
         orderBy,
         orderDirection,
+        threadTitleOnly,
       }),
     {
       getNextPageParam: (lastPage) => {
@@ -103,7 +107,7 @@ const useSearchThreadsQuery = ({
       },
       staleTime: SEARCH_THREADS_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

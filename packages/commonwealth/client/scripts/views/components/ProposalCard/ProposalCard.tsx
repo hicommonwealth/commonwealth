@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 
 import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
 import { isNotNil } from 'helpers/typeGuards';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
@@ -13,16 +11,13 @@ import { slugify } from 'utils';
 import { CWCard } from '../component_kit/cw_card';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';
-import {
-  getPrimaryTagText,
-  getSecondaryTagText,
-  getStatusClass,
-  getStatusText,
-} from './helpers';
+import { getPrimaryTagText, getStatusClass, getStatusText } from './helpers';
 import { ProposalTag } from './ProposalTag';
 import { useCommonNavigate } from 'navigation/helpers';
-import { useProposalMetadata } from 'hooks/cosmos/useProposalMetadata';
-import useForceRerender from 'hooks/useForceRerender';
+import {
+  useCosmosProposalTallyQuery,
+  useCosmosProposalMetadataQuery,
+} from 'state/api/proposals';
 
 type ProposalCardProps = {
   injectedContent?: React.ReactNode;
@@ -34,15 +29,15 @@ export const ProposalCard = ({
   injectedContent,
 }: ProposalCardProps) => {
   const navigate = useCommonNavigate();
-  const [title, setTitle] = useState(proposal.title);
-  const { metadata } = useProposalMetadata({ app, proposal });
-  const forceRerender = useForceRerender();
-
-  const secondaryTagText = getSecondaryTagText(proposal);
+  const [title, setTitle] = useState(
+    proposal.title || `Proposal ${proposal.identifier}`
+  );
+  const { data: metadata } = useCosmosProposalMetadataQuery(proposal);
+  const { isFetching: isFetchingTally } = useCosmosProposalTallyQuery(proposal);
 
   useEffect(() => {
     if (metadata?.title) setTitle(metadata?.title);
-  }, [metadata?.title]);
+  }, [metadata]);
 
   useEffect(() => {
     if (proposal instanceof AaveProposal) {
@@ -54,12 +49,13 @@ export const ProposalCard = ({
   }, [proposal]);
 
   useEffect(() => {
-    proposal?.isFetched.once('redraw', forceRerender);
-
-    return () => {
-      proposal?.isFetched.removeAllListeners();
-    };
-  }, [proposal, forceRerender]);
+    if (proposal instanceof AaveProposal) {
+      proposal.ipfsDataReady.once('ready', () => {
+        // triggers render of shortDescription too
+        setTitle(proposal?.ipfsData.title);
+      });
+    }
+  }, [proposal]);
 
   return (
     <CWCard
@@ -85,21 +81,10 @@ export const ProposalCard = ({
       <div className="proposal-card-metadata">
         <div className="tag-row">
           <ProposalTag label={getPrimaryTagText(proposal)} />
-          {isNotNil(secondaryTagText) && (
-            <ProposalTag label={secondaryTagText} />
-          )}
         </div>
         <CWText title={title} fontWeight="semiBold" noWrap>
           {title}
         </CWText>
-        {proposal instanceof SubstrateTreasuryProposal && (
-          <CWText className="proposal-amount-text">
-            {proposal.value?.format(true)}
-          </CWText>
-        )}
-        {proposal instanceof SubstrateDemocracyReferendum && (
-          <CWText className="proposal-amount-text">{proposal.threshold}</CWText>
-        )}
         {proposal instanceof AaveProposal &&
           proposal.ipfsData?.shortDescription && (
             <CWText type="caption">
@@ -115,9 +100,12 @@ export const ProposalCard = ({
       ) : proposal.isPassing !== 'none' ? (
         <CWText
           fontWeight="medium"
-          className={`proposal-status-text ${getStatusClass(proposal)}`}
+          className={`proposal-status-text ${getStatusClass(
+            proposal,
+            isFetchingTally
+          )}`}
         >
-          {getStatusText(proposal)}
+          {getStatusText(proposal, isFetchingTally)}
         </CWText>
       ) : null}
     </CWCard>

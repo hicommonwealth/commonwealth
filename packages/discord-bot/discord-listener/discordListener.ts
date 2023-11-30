@@ -1,100 +1,121 @@
-import { Client, Message, IntentsBitField } from 'discord.js';
-import { sequelize } from '../utils/database';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
   getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
-import { RascalPublications } from 'common-common/src/rabbitmq/types';
-import { IDiscordMessage } from 'common-common/src/types';
-import { RABBITMQ_URI, DISCORD_TOKEN } from '../utils/config';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
+import {
+  handleMessage,
+  handleThreadChannel,
+} from 'discord-bot/discord-listener/handlers';
+import { rollbar } from 'discord-bot/utils/rollbar';
+import {
+  Client,
+  IntentsBitField,
+  Message,
+  MessageType,
+  ThreadChannel,
+} from 'discord.js';
 import v8 from 'v8';
+import { DISCORD_TOKEN, RABBITMQ_URI } from '../utils/config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+let isServiceHealthy = false;
+
+startHealthCheckLoop({
+  service: ServiceKey.DiscordBotListener,
+  checkFn: async () => {
+    if (!isServiceHealthy) {
+      throw new Error('service not healthy');
+    }
+  },
+});
+
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
-    v8.getHeapStatistics().heap_size_limit / 1000000000
-  )} GB`
+    v8.getHeapStatistics().heap_size_limit / 1000000000,
+  )} GB`,
 );
 
-const getImageUrls = (message: Message) => {
-  const attachments = [...message.attachments.values()];
+async function startDiscordListener() {
+  const controller = new RabbitMQController(
+    getRabbitMQConfig(RABBITMQ_URI, RascalConfigServices.DiscobotService),
+  );
+  await controller.init();
 
-  return attachments
-    .filter((attachment) => {
-      return attachment.contentType.startsWith('image');
-    })
-    .map((attachment) => {
-      return attachment.url;
-    });
-};
+  const client = new Client({
+    intents: [
+      IntentsBitField.Flags.Guilds,
+      IntentsBitField.Flags.MessageContent,
+      IntentsBitField.Flags.GuildMessages,
+    ],
+  });
 
-const client = new Client({
-  intents: [
-    IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.MessageContent,
-    IntentsBitField.Flags.GuildMessages,
-  ],
-});
+  client.on('ready', () => {
+    log.info('Discord bot is ready.');
+    isServiceHealthy = true;
+  });
 
-const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
-const initPromise = controller.init();
+  // event types can be found here: https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584
 
-client.on('ready', () => {
-  log.info('Discord bot is ready.');
-});
+  client.on('threadDelete', async (thread: ThreadChannel) => {
+    await handleThreadChannel(controller, thread, 'thread-delete');
+  });
 
-client.on('messageCreate', async (message: Message) => {
-  try {
-    // 1. Filter for designated forum channels
-    const channel = client.channels.cache.get(message.channelId);
-    if (channel?.type !== 11) return; // must be thread channel(all forum posts are Threads)
-    const parent_id = channel.parentId ?? '0';
-    // Only process messages from relevant channels
-    const relevantChannels = (
-      await sequelize.query(
-        'SELECT channel_id FROM "Topics" WHERE channel_id is not null'
-      )
-    )[0];
-    if (relevantChannels.length === 0) return;
-    if (
-      !relevantChannels
-        .map((topic: any) => topic['channel_id'])
-        .includes(parent_id)
-    )
-      return;
-
-    // 2. Figure out if message is comment or thread
-    const new_message: IDiscordMessage = {
-      user: {
-        id: message.author.id,
-        username: message.author.username,
-      },
-      // If title is nothing == comment. channel_id will correspond to the thread channel id.
-      content: message.content,
-      message_id: message.id,
-      channel_id: message.channelId,
-      parent_channel_id: parent_id,
-      guild_id: message.guildId,
-      imageUrls: getImageUrls(message),
-    };
-
-    if (!message.nonce) new_message.title = channel.name;
-
-    // 3. Publish the message to RabbitMQ queue
-    try {
-      await initPromise;
-      await controller.publish(new_message, RascalPublications.DiscordListener);
-      log.info(
-        `Message published to RabbitMQ: ${JSON.stringify(message.content)}`
+  // only used for thread title updates - thread body are handled through the 'messageUpdate' event
+  client.on(
+    'threadUpdate',
+    async (oldThread: ThreadChannel, newThread: ThreadChannel) => {
+      await handleThreadChannel(
+        controller,
+        newThread,
+        'thread-title-update',
+        oldThread,
       );
-    } catch (error) {
-      log.info(`Error publishing to rabbitMQ`, error);
-    }
-  } catch (error) {
-    log.info(`Error Processing Discord Message`, error);
-  }
-});
+    },
+  );
 
-client.login(DISCORD_TOKEN);
+  client.on('messageDelete', async (message: Message) => {
+    await handleMessage(controller, client, message, 'comment-delete');
+  });
+
+  client.on(
+    'messageUpdate',
+    async (oldMessage: Message, newMessage: Message) => {
+      await handleMessage(
+        controller,
+        client,
+        newMessage,
+        newMessage.nonce ? 'comment-update' : 'thread-body-update',
+      );
+    },
+  );
+
+  client.on('messageCreate', async (message: Message) => {
+    // this conditional prevents handling of messages like ChannelNameChanged which
+    // are emitted inside a thread but which we do not want to replicate in the CW thread.
+    // Thread/channel name changes are handled in threadUpdate since the that event comes
+    // from the root thread/channel and thus contains the correct id.
+    // Handling a name change from here would result in a new thread being created rather than updated on CW
+    // since the id of the event is not the id of the actual post/thread.
+    if (message.type === MessageType.Default) {
+      await handleMessage(
+        controller,
+        client,
+        message,
+        message.nonce ? 'comment-create' : 'thread-create',
+      );
+    }
+  });
+
+  await client.login(DISCORD_TOKEN);
+}
+
+startDiscordListener().catch((e) => {
+  rollbar.critical(e);
+});

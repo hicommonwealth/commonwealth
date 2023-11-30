@@ -1,14 +1,13 @@
-import React, { useMemo, useState } from 'react';
 import $ from 'jquery';
+import React, { useMemo, useState } from 'react';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
 
-import app from 'state';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from 'helpers';
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import type RoleInfo from '../../../models/RoleInfo';
+import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import type RoleInfo from '../../../models/RoleInfo';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { MembersSearchBar } from '../../components/members_search_bar';
@@ -37,24 +36,14 @@ export const UpgradeRolesForm = ({
   });
 
   const nonAdminNames: string[] = nonAdmins.map((_role) => {
-    // @TODO: @Profiles upgrade, clean this up
-    const chainId = _role.chain_id ? _role.chain_id : _role.Address?.chain?.id;
-
-    const displayName = NewProfilesController.Instance.getProfile(
-      chainId as string,
-      _role.Address.address
-    ).name;
-
     const roletext = _role.permission === 'moderator' ? '(moderator)' : '';
-
-    const fullText = `${displayName} - ${formatAddressShort(
-      _role.Address.address
+    const fullText = `${(_role as any)?.displayName} - ${formatAddressShort(
+      _role.Address.address,
     )} ${roletext}`;
-
     return fullText;
   });
 
-  const chainOrCommObj = { chain: app.activeChainId() };
+  const communityObj = { chain: app.activeChainId() };
 
   const options = useMemo(() => {
     return nonAdminNames.map((n) => ({ label: n, value: n }));
@@ -107,7 +96,7 @@ export const UpgradeRolesForm = ({
             $.post(`${app.serverUrl()}/upgradeMember`, {
               new_role: newRole,
               address: _user.Address.address,
-              ...chainOrCommObj,
+              ...communityObj,
               jwt: app.user.jwt,
             }).then((r) => {
               if (r.status === 'Success') {

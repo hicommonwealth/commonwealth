@@ -1,7 +1,7 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
+import { IDiscordMeta } from 'common-common/src/types';
 import { ThreadAttributes } from '../../models/thread';
-import { AppError } from '../../../../common-common/src/errors';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 export const Errors = {
   InvalidThreadID: 'Invalid thread ID',
@@ -9,46 +9,85 @@ export const Errors = {
 };
 
 type UpdateThreadRequestBody = {
-  body?: string;
   title?: string;
-  kind?: string;
+  body?: string;
   stage?: string;
   url?: string;
+  locked?: boolean;
+  pinned?: boolean;
+  archived?: boolean;
+  spam?: boolean;
+  topicId?: number;
+  topicName?: string;
+  collaborators?: {
+    toAdd?: number[];
+    toRemove?: number[];
+  };
+  canvasSession?: any;
+  canvasAction?: any;
+  canvasHash?: any;
+  discord_meta?: IDiscordMeta; // Only comes from the discord bot
 };
 type UpdateThreadResponse = ThreadAttributes;
 
 export const updateThreadHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateThreadRequestBody, null, { id: string }>,
-  res: TypedResponse<UpdateThreadResponse>
+  res: TypedResponse<UpdateThreadResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const { id } = req.params;
-  const { body, title, stage, url } = req.body;
+  const {
+    title,
+    body,
+    stage,
+    url,
+    locked,
+    pinned,
+    archived,
+    spam,
+    topicId,
+    topicName,
+    collaborators,
+    canvasSession,
+    canvasAction,
+    canvasHash,
+    discord_meta: discordMeta,
+  } = req.body;
 
-  const threadId = parseInt(id, 10) || 0;
-  if (!threadId) {
-    throw new AppError(Errors.InvalidThreadID);
-  }
+  const threadId = parseInt(id, 10) || null;
 
-  if (!body || !body.trim()) {
-    throw new AppError(Errors.MissingText);
-  }
-
-  const [updatedThread, notificationOptions] =
+  // this is a patch update, so properties should be
+  // `undefined` if they are not intended to be updated
+  const [updatedThread, notificationOptions, analyticsOptions] =
     await controllers.threads.updateThread({
       user,
       address,
-      chain,
+      community,
       threadId,
       title,
       body,
       stage,
       url,
+      locked,
+      pinned,
+      archived,
+      spam,
+      topicId,
+      topicName,
+      collaborators,
+      canvasSession,
+      canvasAction,
+      canvasHash,
+      discordMeta,
     });
 
   for (const n of notificationOptions) {
     controllers.notifications.emit(n).catch(console.error);
+  }
+
+  for (const a of analyticsOptions) {
+    controllers.analytics.track(a).catch(console.error);
   }
 
   return success(res, updatedThread);

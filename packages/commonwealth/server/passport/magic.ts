@@ -1,4 +1,5 @@
-import { Magic, MagicUserMetadata, WalletType } from '@magic-sdk/admin';
+import type { Session } from '@canvas-js/interfaces';
+import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
@@ -10,17 +11,20 @@ import {
   ChainBase,
   NotificationCategories,
   WalletId,
+  WalletSsoSource,
 } from 'common-common/src/types';
+import { verify as verifyCanvas } from '../../shared/canvas/verify';
 import { JWT_SECRET, MAGIC_API_KEY } from '../config';
 import { sequelize } from '../database';
-import { validateChain } from '../middleware/validateChain';
+import { validateCommunity } from '../middleware/validateCommunity';
 import type { DB } from '../models';
 import { AddressAttributes, AddressInstance } from '../models/address';
-import { ChainInstance } from '../models/chain';
+import { CommunityInstance } from '../models/community';
 import type { ProfileAttributes, ProfileInstance } from '../models/profile';
 import { SsoTokenInstance } from '../models/sso_token';
 import { UserAttributes, UserInstance } from '../models/user';
 import { TypedRequestBody } from '../types';
+import { createRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -32,6 +36,7 @@ type MagicLoginContext = {
   existingUserInstance?: UserInstance;
   loggedInUser?: UserInstance;
   profileMetadata?: { username?: string; avatarUrl?: string };
+  walletSsoSource: WalletSsoSource;
 };
 
 const DEFAULT_ETH_CHAIN = 'ethereum';
@@ -42,7 +47,8 @@ async function createMagicAddressInstances(
   models: DB,
   generatedAddresses: Array<{ address: string; chain: string }>,
   user: UserAttributes,
-  t?: Transaction
+  walletSsoSource: WalletSsoSource,
+  t?: Transaction,
 ): Promise<AddressInstance[]> {
   const addressInstances: AddressInstance[] = [];
   const user_id = user.id;
@@ -51,7 +57,7 @@ async function createMagicAddressInstances(
     const [addressInstance, created] = await models.Address.findOrCreate({
       where: {
         address,
-        chain,
+        community_id: chain,
         wallet_id: WalletId.Magic,
       },
       defaults: {
@@ -70,11 +76,23 @@ async function createMagicAddressInstances(
     // invalid state (we may have failed to identify the logged in user correctly?)
     if (!created && addressInstance.user_id !== user_id) {
       log.error(
-        `Address ${address} owned by ${user_id} found on user ${addressInstance.user_id}!`
+        `Address ${address} owned by ${user_id} found on user ${addressInstance.user_id}!`,
       );
       throw new ServerError('Address owned by somebody else!');
     }
 
+    // xx: ?
+    if (created) {
+      await createRole(models, addressInstance.id, chain, 'member', false, t);
+    } else if (
+      addressInstance.wallet_sso_source === WalletSsoSource.Unknown ||
+      // set wallet_sso_source if it was unknown before
+      addressInstance.wallet_sso_source === undefined ||
+      addressInstance.wallet_sso_source === null
+    ) {
+      addressInstance.wallet_sso_source = walletSsoSource;
+      addressInstance.save({ transaction: t });
+    }
     addressInstances.push(addressInstance);
   }
   return addressInstances;
@@ -87,6 +105,7 @@ async function createNewMagicUser({
   magicUserMetadata,
   generatedAddresses,
   profileMetadata,
+  walletSsoSource,
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
@@ -96,7 +115,7 @@ async function createNewMagicUser({
         email: magicUserMetadata.email || null,
         emailVerified: true,
       },
-      { transaction }
+      { transaction },
     );
 
     // update profile with metadata if exists
@@ -116,7 +135,8 @@ async function createNewMagicUser({
         models,
         generatedAddresses,
         newUser,
-        transaction
+        walletSsoSource,
+        transaction,
       );
 
     // Automatically create subscription to their own mentions
@@ -124,10 +144,9 @@ async function createNewMagicUser({
       {
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewMention,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
 
     // Automatically create a subscription to collaborations
@@ -135,15 +154,14 @@ async function createNewMagicUser({
       {
         subscriber_id: newUser.id,
         category_id: NotificationCategories.NewCollaboration,
-        object_id: `user-${newUser.id}`,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
 
     // create token with provided user/address
     const canonicalAddressInstance = addressInstances.find(
-      (a) => a.chain === DEFAULT_ETH_CHAIN
+      (a) => a.community_id === DEFAULT_ETH_CHAIN,
     );
     await models.SsoToken.create(
       {
@@ -153,7 +171,7 @@ async function createNewMagicUser({
         created_at: new Date(),
         updated_at: new Date(),
       },
-      { transaction }
+      { transaction },
     );
 
     return newUser;
@@ -166,9 +184,10 @@ async function loginExistingMagicUser({
   existingUserInstance,
   decodedMagicToken,
   generatedAddresses,
+  walletSsoSource,
 }: MagicLoginContext): Promise<UserInstance> {
   if (!existingUserInstance) {
-    throw new Error('No user provided to log in');
+    throw new Error('No user provided to sign in');
   }
 
   return sequelize.transaction(async (transaction) => {
@@ -193,7 +212,7 @@ async function loginExistingMagicUser({
       if (decodedMagicToken.claim.iat <= ssoToken.issued_at) {
         log.warn('Replay attack detected.');
         throw new Error(
-          `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`
+          `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
         );
       }
       ssoToken.issued_at = decodedMagicToken.claim.iat;
@@ -206,7 +225,7 @@ async function loginExistingMagicUser({
       // we will locate an existing SsoToken by profile_id, and migrate it to use addresses instead.
       // if none exists, we will create it
       malformedSsoToken = await models.SsoToken.scope(
-        'withPrivateData'
+        'withPrivateData',
       ).findOne({
         where: {
           profile_id: existingUserInstance.Profiles[0].id,
@@ -218,7 +237,7 @@ async function loginExistingMagicUser({
         if (decodedMagicToken.claim.iat <= malformedSsoToken.issued_at) {
           log.warn('Replay attack detected.');
           throw new Error(
-            `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`
+            `Replay attack detected for user ${decodedMagicToken.publicAddress}}.`,
           );
         }
         malformedSsoToken.profile_id = null;
@@ -236,19 +255,20 @@ async function loginExistingMagicUser({
       models,
       generatedAddresses,
       existingUserInstance,
-      transaction
+      walletSsoSource,
+      transaction,
     );
 
     // once addresses have been created and/or located, we finalize the migration of malformed sso
     // tokens, or create a new one if absent entirely
     const canonicalAddressInstance = addressInstances.find(
-      (a) => a.chain === DEFAULT_ETH_CHAIN
+      (a) => a.community_id === DEFAULT_ETH_CHAIN,
     );
     if (malformedSsoToken) {
       malformedSsoToken.address_id = canonicalAddressInstance.id;
       await malformedSsoToken.save({ transaction });
       log.info(
-        `Finished migration of SsoToken for user ${existingUserInstance.id}!`
+        `Finished migration of SsoToken for user ${existingUserInstance.id}!`,
       );
     } else if (!ssoToken && !malformedSsoToken) {
       await models.SsoToken.create(
@@ -259,10 +279,10 @@ async function loginExistingMagicUser({
           created_at: new Date(),
           updated_at: new Date(),
         },
-        { transaction }
+        { transaction },
       );
       log.info(
-        `Created SsoToken for invalid state user ${existingUserInstance.id}`
+        `Created SsoToken for invalid state user ${existingUserInstance.id}`,
       );
     }
 
@@ -289,7 +309,7 @@ async function mergeLogins(ctx: MagicLoginContext): Promise<UserInstance> {
         wallet_id: WalletId.Magic,
         user_id: existingUserInstance.id,
       },
-    }
+    },
   );
 
   // TODO: send move email
@@ -304,17 +324,19 @@ async function addMagicToUser({
   generatedAddresses,
   loggedInUser,
   decodedMagicToken,
+  walletSsoSource,
 }: MagicLoginContext): Promise<UserInstance> {
   // create new address on logged-in user
   const addressInstances = await createMagicAddressInstances(
     models,
     generatedAddresses,
-    loggedInUser
+    loggedInUser,
+    walletSsoSource,
   );
 
   // create new token with provided user/address. contract is each address owns an SsoToken.
   const canonicalAddressInstance = addressInstances.find(
-    (a) => a.chain === DEFAULT_ETH_CHAIN
+    (a) => a.community_id === DEFAULT_ETH_CHAIN,
   );
   await models.SsoToken.create({
     issuer: decodedMagicToken.issuer,
@@ -335,13 +357,18 @@ async function magicLoginRoute(
     jwt?: string;
     username?: string;
     avatarUrl?: string;
+    signature: string;
+    sessionPayload?: string; // optional because session keys are feature-flagged
+    magicAddress?: string; // optional because session keys are feature-flagged
+    walletSsoSource: WalletSsoSource;
   }>,
   decodedMagicToken: MagicUser,
-  cb: DoneFunc
+  cb: DoneFunc,
 ) {
   log.trace(`MAGIC TOKEN: ${JSON.stringify(decodedMagicToken, null, 2)}`);
-  let chainToJoin: ChainInstance, error, loggedInUser: UserInstance;
+  let chainToJoin: CommunityInstance, error, loggedInUser: UserInstance;
 
+  const walletSsoSource = req.body.walletSsoSource;
   const generatedAddresses = [
     {
       address: decodedMagicToken.publicAddress,
@@ -354,7 +381,7 @@ async function magicLoginRoute(
 
   // validate chain if provided (i.e. logging in on community page)
   if (req.body.chain) {
-    [chainToJoin, error] = await validateChain(models, req.body);
+    [chainToJoin, error] = await validateCommunity(models, req.body);
     if (error) return cb(error);
   }
 
@@ -374,7 +401,7 @@ async function magicLoginRoute(
         ],
       });
       log.trace(
-        `DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`
+        `DECODED LOGGED IN USER: ${JSON.stringify(loggedInUser, null, 2)}`,
       );
       if (!loggedInUser) {
         throw new Error('User not found');
@@ -384,56 +411,63 @@ async function magicLoginRoute(
     }
   }
 
-  // fetch user data from magic backend
-  let magicUserMetadata: MagicUserMetadata;
+  const magicUserMetadata = await magic.users.getMetadataByIssuer(
+    decodedMagicToken.issuer,
+  );
+  log.trace(
+    `MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`,
+  );
+
+  // the user should have signed a sessionPayload with the client-side
+  // magic address. validate the signature and add that address
   try {
-    // grab cosmos address for registration
-    magicUserMetadata = await magic.users.getMetadataByIssuerAndWallet(
-      decodedMagicToken.issuer,
-      WalletType.COSMOS
-    );
-    log.trace(
-      `MAGIC USER METADATA: ${JSON.stringify(magicUserMetadata, null, 2)}`
-    );
-
-    const cosmosAddress = (magicUserMetadata?.wallets[0] as any)
-      ?.public_address;
-    if (!cosmosAddress) {
-      throw new Error('No cosmos address found!');
+    const session: Session = {
+      type: 'session',
+      signature: req.body.signature,
+      payload: JSON.parse(req.body.sessionPayload),
+    };
+    if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+      if (req.body.magicAddress !== session.payload.from) {
+        throw new Error(
+          'sessionPayload address did not match user-provided magicAddress',
+        );
+      }
+      const valid = await verifyCanvas({ session });
+      if (!valid) {
+        throw new Error('sessionPayload signed with invalid signature');
+      }
     }
-    generatedAddresses.push({
-      address: cosmosAddress,
-      chain: DEFAULT_COSMOS_CHAIN,
-    });
-
-    // if joining a new chain (by logging in on a community), add to list of addresses
     if (chainToJoin) {
-      if (chainToJoin.base === ChainBase.CosmosSDK) {
+      if (
+        chainToJoin.base === ChainBase.CosmosSDK &&
+        session.payload.chain.startsWith('cosmos:')
+      ) {
         generatedAddresses.push({
-          address: cosmosAddress,
+          address: req.body.magicAddress,
           chain: chainToJoin.id,
         });
-      } else if (chainToJoin.base === ChainBase.Ethereum) {
+      } else if (
+        chainToJoin.base === ChainBase.Ethereum &&
+        session.payload.chain.startsWith('eip155:')
+      ) {
         generatedAddresses.push({
-          address: canonicalAddress,
+          address: req.body.magicAddress,
           chain: chainToJoin.id,
         });
       } else {
         // ignore invalid chain base
         log.warn(
-          `Cannot create magic account on chain ${chainToJoin.id}. Ignoring.`
+          `Cannot create magic account on chain ${chainToJoin.id}. Ignoring.`,
         );
       }
     }
-  } catch (e) {
-    return cb(
-      new ServerError(
-        `Magic fetch failed: ${e.message} - ${JSON.stringify(e.data)}`
-      )
+  } catch (err) {
+    log.warn(
+      `Could not set up a valid client-side magic address ${req.body.magicAddress}`,
     );
   }
 
-  // first, attempt to locate an existing magic user by canonical address.
+  // attempt to locate an existing magic user by canonical address.
   // this is the properly modern method of identifying users, as it conforms to
   // the DID standard.
   let existingUserInstance = await models.User.scope('withPrivateData').findOne(
@@ -452,7 +486,7 @@ async function magicLoginRoute(
           model: models.Profile,
         },
       ],
-    }
+    },
   );
   if (!existingUserInstance && magicUserMetadata.email) {
     // if unable to locate a magic user by address, attempt to locate by email.
@@ -468,12 +502,19 @@ async function magicLoginRoute(
     });
   }
   log.trace(
-    `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`
+    `EXISTING USER INSTANCE: ${JSON.stringify(existingUserInstance, null, 2)}`,
   );
 
   if (loggedInUser && existingUserInstance?.id === loggedInUser?.id) {
-    // already logged in as existing user, do nothing
+    // already logged in as existing user, just ensure generated addresses are all linked
+    // we don't need to setup a canonical address/SsoToken, that should already be done
     log.trace('CASE 0: LOGGING IN USER SAME AS EXISTING USER');
+    await createMagicAddressInstances(
+      models,
+      generatedAddresses,
+      loggedInUser,
+      walletSsoSource,
+    );
     return cb(null, existingUserInstance);
   }
 
@@ -489,6 +530,7 @@ async function magicLoginRoute(
       username: req.body.username,
       avatarUrl: req.body.avatarUrl,
     },
+    walletSsoSource,
   };
   try {
     if (loggedInUser && existingUserInstance) {
@@ -510,7 +552,7 @@ async function magicLoginRoute(
       finalUser = await createNewMagicUser(magicContext);
     }
   } catch (e) {
-    log.error(`Failed to log in user ${JSON.stringify(e, null, 2)}`);
+    log.error(`Failed to sign in user ${JSON.stringify(e, null, 2)}`);
     return cb(e);
   }
 
@@ -526,7 +568,7 @@ export function initMagicAuth(models: DB) {
     passport.use(
       new MagicStrategy({ passReqToCallback: true }, async (req, user, cb) => {
         return magicLoginRoute(magic, models, req, user, cb);
-      })
+      }),
     );
   }
 }

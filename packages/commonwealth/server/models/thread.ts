@@ -1,16 +1,18 @@
+import { IDiscordMeta } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './community';
+import { NotificationAttributes } from './notification';
 import type { TopicAttributes } from './topic';
 import type { ModelInstance, ModelStatic } from './types';
-import { NotificationAttributes } from './notification';
 
 export enum LinkSource {
   Snapshot = 'snapshot',
   Proposal = 'proposal',
   Thread = 'thread',
   Web = 'web',
+  Template = 'template',
 }
 
 export type Link = {
@@ -51,14 +53,21 @@ export type ThreadAttributes = {
   marked_as_spam_at?: Date;
   archived_at?: Date;
   locked_at?: Date;
-  discord_meta?: any;
+  discord_meta?: IDiscordMeta;
 
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Address?: AddressAttributes;
   collaborators?: AddressAttributes[];
   topic?: TopicAttributes;
   Notifications?: NotificationAttributes[];
+
+  //counts
+  reaction_count: number;
+  comment_count: number;
+
+  //notifications
+  max_notif_id: number;
 };
 
 export type ThreadInstance = ModelInstance<ThreadAttributes> & {
@@ -69,7 +78,7 @@ export type ThreadModelStatic = ModelStatic<ThreadInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): ThreadModelStatic => {
   const Thread = <ThreadModelStatic>sequelize.define(
     'Thread',
@@ -129,6 +138,25 @@ export default (
         type: dataTypes.DATE,
         allowNull: true,
       },
+
+      //counts
+      reaction_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      comment_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+
+      //notifications
+      max_notif_id: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
       timestamps: true,
@@ -147,11 +175,11 @@ export default (
         { fields: ['chain', 'has_poll'] },
         { fields: ['canvas_hash'] },
       ],
-    }
+    },
   );
 
   Thread.associate = (models) => {
-    models.Thread.belongsTo(models.Chain, {
+    models.Thread.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });
@@ -182,9 +210,6 @@ export default (
     });
     models.Thread.hasMany(models.Notification, {
       foreignKey: 'thread_id',
-    });
-    models.Thread.hasOne(models.ChainEntityMeta, {
-      foreignKey: 'id',
     });
   };
 

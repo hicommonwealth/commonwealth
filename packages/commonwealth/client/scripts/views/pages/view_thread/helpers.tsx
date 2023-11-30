@@ -1,22 +1,22 @@
-import type Poll from '../../../models/Poll';
 import moment from 'moment';
+import type Poll from '../../../models/Poll';
 
-import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
-import { openConfirmation } from 'views/modals/confirmation_modal';
 import React from 'react';
+import app from 'state';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 export const handlePollVote = async (
   poll: Poll,
   option: string,
   isSelected: boolean,
-  callback: () => any
+  callback: () => any,
 ) => {
   const { activeAccount } = app.user;
 
   if (!app.isLoggedIn() || !activeAccount || isSelected) return;
 
-  const userInfo = [activeAccount.chain.id, activeAccount.address] as const;
+  const userInfo = [activeAccount.community.id, activeAccount.address] as const;
 
   const confirmationText = poll.getUserVote(...userInfo)
     ? `Change your vote to '${option}'?`
@@ -28,7 +28,8 @@ export const handlePollVote = async (
     buttons: [
       {
         label: 'Submit',
-        buttonType: 'mini-black',
+        buttonType: 'primary',
+        buttonHeight: 'sm',
         onClick: () => {
           poll
             .submitVote(...userInfo, option)
@@ -37,14 +38,15 @@ export const handlePollVote = async (
             })
             .catch(() => {
               notifyError(
-                'Error submitting vote. Maybe the poll has already ended?'
+                'Error submitting vote. Maybe the poll has already ended?',
               );
             });
         },
       },
       {
         label: 'Cancel',
-        buttonType: 'mini-white',
+        buttonType: 'secondary',
+        buttonHeight: 'sm',
       },
     ],
   });

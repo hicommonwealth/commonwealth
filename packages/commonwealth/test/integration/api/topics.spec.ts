@@ -53,6 +53,7 @@ describe('Topic Tests', () => {
     before(async () => {
       const res = await modelUtils.createAndVerifyAddress({ chain });
       adminAddress = res.address;
+
       adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
       const isAdmin = await modelUtils.updateRole({
         address_id: res.address_id,
@@ -72,6 +73,8 @@ describe('Topic Tests', () => {
         topicId,
         kind,
         stage,
+        session: res.session,
+        sign: res.sign,
       });
       expect(res2.status).to.be.equal('Success');
       expect(res2.result).to.not.be.null;
@@ -93,92 +96,6 @@ describe('Topic Tests', () => {
       expect(res.body.status).to.be.equal('Success');
       expect(res.body.result).to.not.be.null;
       expect(res.body.result.length).to.be.equal(1);
-    });
-  });
-
-  describe('Update Topics', () => {
-    let thread;
-
-    before(async () => {
-      const res = await modelUtils.createAndVerifyAddress({ chain });
-      adminAddress = res.address;
-      adminJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-      const isAdmin = await modelUtils.updateRole({
-        address_id: res.address_id,
-        chainOrCommObj: { chain_id: chain },
-        role: 'admin',
-      });
-      expect(adminAddress).to.not.be.null;
-      expect(adminJWT).to.not.be.null;
-      expect(isAdmin).to.not.be.null;
-
-      const res2 = await modelUtils.createAndVerifyAddress({ chain });
-      userAddress = res2.address;
-      userJWT = jwt.sign({ id: res2.user_id, email: res2.email }, JWT_SECRET);
-      expect(userAddress).to.not.be.null;
-      expect(userJWT).to.not.be.null;
-
-      const res3 = await modelUtils.createThread({
-        chainId: chain,
-        address: adminAddress,
-        jwt: adminJWT,
-        title,
-        body,
-        topicName,
-        topicId,
-        kind,
-        stage,
-      });
-      thread = res3.result;
-    });
-
-    it('Should fail to update thread without a topic name', async () => {
-      const res = await chai
-        .request(app)
-        .post('/api/updateThreadTopic')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: adminJWT,
-          thread_id: thread.id,
-          address: adminAddress,
-          topic_name: undefined,
-        });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.not.be.equal('Success');
-      expect(res.body.result).to.not.be.null;
-    });
-
-    it('Should successfully add topic to thread with admin account', async () => {
-      const res = await chai
-        .request(app)
-        .post('/api/updateThreadTopic')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: adminJWT,
-          thread_id: thread.id,
-          address: adminAddress,
-          topic_name: topicName,
-        });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result).to.not.be.null;
-      expect(res.body.result.name).to.be.equal(topicName);
-    });
-
-    it('Should fail to add topic to thread with non-admin account', async () => {
-      const res = await chai
-        .request(app)
-        .post('/api/updateThreadTopic')
-        .set('Accept', 'application/json')
-        .send({
-          jwt: userJWT,
-          thread_id: thread.id,
-          address: userAddress,
-          topic_name: topicName,
-        });
-      expect(res.body).to.not.be.null;
-      expect(res.body.status).to.not.be.equal('Success');
-      expect(res.body.result).to.not.be.null;
     });
   });
 });

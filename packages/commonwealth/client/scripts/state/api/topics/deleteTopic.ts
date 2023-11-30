@@ -1,6 +1,6 @@
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
-import { useMutation } from '@tanstack/react-query';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface DeleteTopicProps {
@@ -10,10 +10,11 @@ interface DeleteTopicProps {
 }
 
 const deleteTopic = async ({ topicId, chainId }: DeleteTopicProps) => {
-  await axios.post(`${app.serverUrl()}/deleteTopic`, {
-    id: topicId,
-    chain: chainId,
-    jwt: app.user.jwt,
+  await axios.delete(`${app.serverUrl()}/topics/${topicId}`, {
+    data: {
+      community_id: chainId,
+      jwt: app.user.jwt,
+    },
   });
 };
 
@@ -24,7 +25,8 @@ const useDeleteTopicMutation = () => {
       await queryClient.invalidateQueries({
         queryKey: [ApiEndpoints.BULK_TOPICS, variables.chainId],
       });
-      await app.threads.listingStore.removeTopic(variables.topicName);
+      // TODO: add a new method in thread cache to deal with this
+      // await app.threads.listingStore.removeTopic(variables.topicName);
     },
   });
 };

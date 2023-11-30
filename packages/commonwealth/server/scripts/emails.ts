@@ -1,16 +1,14 @@
-import type { CWEvent } from 'chain-events/src';
-import { Label as ChainEventLabel } from 'chain-events/src';
+import type { CWEvent } from '../../shared/chain/types/types';
+import { Label as ChainEventLabel } from '../../shared/chain/labelers/util';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import { capitalize } from 'lodash';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import type {
-  IPostNotificationData,
   IChainEventNotificationData,
-  ICommunityNotificationData,
-  SnapshotEventType,
-  SnapshotNotification,
+  IForumNotificationData,
+  ISnapshotNotificationData,
 } from '../../shared/types';
 import {
   formatAddressShort,
@@ -21,8 +19,9 @@ import {
 
 import { DynamicTemplate } from '../../shared/types';
 import { SENDGRID_API_KEY } from '../config';
-import type { UserAttributes } from '../models/user';
 import { DB } from '../models';
+import { AddressAttributes } from '../models/address';
+import type { UserAttributes } from '../models/user';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -30,10 +29,9 @@ const log = factory.getLogger(formatFilename(__filename));
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-
 const getForumNotificationCopy = async (
   models: DB,
-  notification_data: IPostNotificationData,
+  notification_data: IForumNotificationData,
   category_id
 ) => {
   // unpack notification_data
@@ -63,11 +61,15 @@ const getForumNotificationCopy = async (
       : 'New activity on Commonwealth';
 
   // author
+  const addressWhere: WhereOptions<AddressAttributes> = {
+    address: author_address,
+    community_id: author_chain || null,
+  };
   const authorProfile = await models.Profile.findOne({
     include: [
       {
         model: models.Address,
-        where: { address: author_address, chain: author_chain || null },
+        where: addressWhere,
         required: true,
       },
     ],
@@ -103,7 +105,7 @@ const getForumNotificationCopy = async (
     ? 'created a new thread'
     : null;
   const objectCopy = decodeURIComponent(root_title).trim();
-  const communityObject = await models.Chain.findOne({
+  const communityObject = await models.Community.findOne({
     where: { id: chain_id },
   });
   const communityCopy = communityObject ? `in ${communityObject.name}` : '';
@@ -127,10 +129,7 @@ const getForumNotificationCopy = async (
     title: root_title,
     chain: chain_id,
   };
-  const proposalPath = getThreadUrl(
-    pseudoProposal,
-    comment_id,
-  );
+  const proposalPath = getThreadUrl(pseudoProposal, comment_id);
   return [
     emailSubjectLine,
     authorName,
@@ -145,17 +144,13 @@ const getForumNotificationCopy = async (
 
 export const createImmediateNotificationEmailObject = async (
   notification_data:
-    | IPostNotificationData
-    | ICommunityNotificationData
+    | IForumNotificationData
     | IChainEventNotificationData
-    | (SnapshotNotification & { eventType: SnapshotEventType }),
+    | ISnapshotNotificationData,
   category_id,
   models
 ) => {
-  if (
-    (<IChainEventNotificationData>notification_data).block_number &&
-    (<IChainEventNotificationData>notification_data).event_data
-  ) {
+  if (category_id === NotificationCategories.ChainEvent) {
     const ceInstance = <IChainEventNotificationData>notification_data;
     // construct compatible CW event from DB by inserting network from type
     const evt: CWEvent = {
@@ -206,7 +201,7 @@ export const createImmediateNotificationEmailObject = async (
       authorPath,
     ] = await getForumNotificationCopy(
       models,
-      notification_data as IPostNotificationData,
+      notification_data as IForumNotificationData,
       category_id
     );
     return {

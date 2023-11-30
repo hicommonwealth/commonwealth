@@ -1,9 +1,14 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 
+import { StatsDController } from 'common-common/src/statsd';
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './community';
 import type { ModelInstance, ModelStatic } from './types';
+
+import { factory, formatFilename } from 'common-common/src/logging';
+import { IDiscordMeta } from 'common-common/src/types';
+const log = factory.getLogger(formatFilename(__filename));
 
 export type CommentAttributes = {
   thread_id: string;
@@ -23,11 +28,14 @@ export type CommentAttributes = {
   updated_at?: Date;
   deleted_at?: Date;
   marked_as_spam_at?: Date;
-  discord_meta?: any;
+  discord_meta?: IDiscordMeta;
 
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Address?: AddressAttributes;
+
+  //counts
+  reaction_count: number;
 };
 
 export type CommentInstance = ModelInstance<CommentAttributes>;
@@ -36,7 +44,7 @@ export type CommentModelStatic = ModelStatic<CommentInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommentModelStatic => {
   const Comment = <CommentModelStatic>sequelize.define(
     'Comment',
@@ -71,8 +79,58 @@ export default (
       deleted_at: { type: dataTypes.DATE, allowNull: true },
       marked_as_spam_at: { type: dataTypes.DATE, allowNull: true },
       discord_meta: { type: dataTypes.JSONB, allowNull: true },
+
+      //counts
+      reaction_count: {
+        type: dataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
+      hooks: {
+        afterCreate: async (comment: CommentInstance) => {
+          const { Thread } = sequelize.models;
+          const thread_id = comment.thread_id;
+          try {
+            const thread = await Thread.findOne({
+              where: { id: thread_id },
+            });
+            if (thread) {
+              thread.increment('comment_count');
+              StatsDController.get().increment('cw.hook.comment-count', {
+                thread_id,
+              });
+            }
+          } catch (error) {
+            log.error(
+              `incrementing comment count error for thread ${thread_id} afterCreate: ${error}`,
+            );
+          }
+        },
+        afterDestroy: async (comment: CommentInstance) => {
+          const { Thread } = sequelize.models;
+          const thread_id = comment.thread_id;
+          try {
+            const thread = await Thread.findOne({
+              where: { id: thread_id },
+            });
+            if (thread) {
+              thread.decrement('comment_count');
+              StatsDController.get().decrement('cw.hook.comment-count', {
+                thread_id,
+              });
+            }
+          } catch (error) {
+            log.error(
+              `incrementing comment count error for thread ${thread_id} afterDestroy: ${error}`,
+            );
+            StatsDController.get().increment('cw.hook.comment-count-error', {
+              thread_id,
+            });
+          }
+        },
+      },
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
@@ -89,11 +147,11 @@ export default (
         { fields: ['thread_id'] },
         { fields: ['canvas_hash'] },
       ],
-    }
+    },
   );
 
   Comment.associate = (models) => {
-    models.Comment.belongsTo(models.Chain, {
+    models.Comment.belongsTo(models.Community, {
       foreignKey: 'chain',
       targetKey: 'id',
     });

@@ -1,8 +1,13 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { OfflineSigner } from '@cosmjs/proto-signing';
-import { SigningStargateClient } from '@cosmjs/stargate';
+import {
+  AminoTypes,
+  SigningStargateClient,
+  createDefaultAminoConverters,
+} from '@cosmjs/stargate';
 import { CosmosApiType } from './chain';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import { LCD } from '../../../../../shared/chain/types/cosmos';
+import { createAltGovAminoConverters } from './gov/aminomessages';
 
 export const getTMClient = async (
   rpcUrl: string
@@ -38,5 +43,12 @@ export const getSigningClient = async (
   url: string,
   signer: OfflineSigner
 ): Promise<SigningStargateClient> => {
-  return await SigningStargateClient.connectWithSigner(url, signer);
+  const aminoTypes = new AminoTypes({
+    ...createDefaultAminoConverters(),
+    ...createAltGovAminoConverters(),
+  });
+
+  return await SigningStargateClient.connectWithSigner(url, signer, {
+    aminoTypes,
+  });
 };

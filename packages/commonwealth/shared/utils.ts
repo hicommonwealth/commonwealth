@@ -4,7 +4,7 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { ProposalType } from 'common-common/src/types';
+import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { AccessLevel } from './permissions';
 import type { RoleObject } from './types';
 
@@ -34,16 +34,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .replace(/(\s|-)+/g, '-')
     .replace(/^-|-$/g, '')
     .toLowerCase();
-};
-
-export const requiresTypeSlug = (type: ProposalType): boolean => {
-  return (
-    type === ProposalType.SubstrateDemocracyReferendum ||
-    type === ProposalType.SubstrateDemocracyProposal ||
-    type === ProposalType.SubstrateTreasuryTip ||
-    type === ProposalType.SubstrateTechnicalCommitteeMotion ||
-    type === ProposalType.SubstrateTreasuryProposal
-  );
 };
 
 /* eslint-disable */
@@ -281,4 +271,41 @@ export function aggregatePermissions(
 
   // compute permissions
   return BigInt(0); //bandaid fix. always allow permissions due to removing functionality.
+}
+
+/**
+ * Convert Cosmos-style minimal denom amount to readable full-denom amount
+ * Example 7000000 uosmo -> 7 OSMO
+ * Example 8000000000000000000 aevmos -> 8 EVMOS
+ */
+export function minimalToNaturalDenom(
+  amount?: string | number,
+  decimals?: number
+): string {
+  if (!amount || !decimals) return '0';
+  const intPretty = new IntPretty(
+    new Dec(amount.toString())
+  ).moveDecimalPointLeft(decimals);
+
+  // return full decimal precision and let the UI handle rounding
+  return intPretty.toDec().toString(decimals);
+}
+
+/**
+ * Convert readable full-denom amount to minimal denom amount (BigInt)
+ * Example 8 OSMO -> 8000000 uosmo
+ * Example 8 EVMOS -> 8000000000000000000 aevmos
+ * Intended for Cosmos use (decimals usually 6 or 18)
+ */
+export function naturalDenomToMinimal(
+  naturalAmount?: string | number,
+  decimals?: number
+): string {
+  if (!naturalAmount || !decimals) return '0';
+  const intPretty = new IntPretty(
+    new Dec(naturalAmount.toString())
+  ).moveDecimalPointRight(decimals);
+
+  // 0 decimal places because this is max precision for the chain
+  return intPretty.toDec().toString(0);
 }

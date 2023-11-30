@@ -1,9 +1,10 @@
+import jwt from 'jsonwebtoken';
 import moment from 'moment';
 import * as process from 'process';
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
+import type { CommunityInstance } from '../../../../server/models/community';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { CollaborationAttributes } from 'server/models/collaboration';
 import type { CommentInstance } from 'server/models/comment';
@@ -11,6 +12,7 @@ import type { ReactionAttributes } from 'server/models/reaction';
 import type { ThreadInstance } from 'server/models/thread';
 import type { TopicAttributes } from 'server/models/topic';
 import type { UserInstance } from 'server/models/user';
+import { JWT_SECRET } from '../../../../server/config';
 import type { ProfileAttributes } from '../../../../server/models/profile';
 
 const Op = Sequelize.Op;
@@ -19,16 +21,22 @@ export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
 export let testAddresses: AddressInstance[];
-export let testChains: ChainInstance[];
+export let testChains: CommunityInstance[];
 export let testCollaborations: CollaborationAttributes[];
 export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
+export let testJwtToken: string;
 
 export async function clearTestEntities() {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Reaction.destroy({
+    where: {
+      [Op.or]: [{ id: { [Op.lt]: 0 } }, { address_id: { [Op.lt]: 0 } }],
+    },
+    force: true,
+  });
   await models.Collaboration.destroy({
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
@@ -48,7 +56,7 @@ export async function clearTestEntities() {
     where: { thread_id: { [Op.lt]: 0 } },
     force: true,
   });
-  await models.Chain.destroy({
+  await models.Community.destroy({
     where: { chain_node_id: { [Op.lt]: 0 } },
     force: true,
   });
@@ -70,7 +78,6 @@ export async function createTestEntities() {
               email: `test${i - 1}@gmail.com`,
               emailVerified: true,
               isAdmin: true,
-              lastVisited: '{}',
             },
           })
         )[0]
@@ -120,7 +127,7 @@ export async function createTestEntities() {
   try {
     testChains = [
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest',
             chain_node_id: -1,
@@ -140,7 +147,7 @@ export async function createTestEntities() {
         })
       )[0],
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest2',
             chain_node_id: -2,
@@ -189,7 +196,7 @@ export async function createTestEntities() {
               id: -i - 1,
               user_id: -i - 1,
               address: `testAddress${-i - 1}`,
-              chain: 'cmntest',
+              community_id: 'cmntest',
               verification_token: '',
               profile_id: i < 2 ? -1 : -2,
               verified: moment.now(),
@@ -325,6 +332,11 @@ export async function createTestEntities() {
           )[0]
       )
     ))
+  );
+
+  testJwtToken = jwt.sign(
+    { id: testUsers[0].id, email: testUsers[0].email },
+    JWT_SECRET
   );
 }
 

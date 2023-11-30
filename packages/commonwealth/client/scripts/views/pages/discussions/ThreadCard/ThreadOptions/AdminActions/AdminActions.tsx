@@ -1,20 +1,29 @@
+import { SessionKeyError } from 'controllers/server/sessions';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import app from 'state';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import {
+  useDeleteThreadMutation,
+  useEditThreadMutation,
+} from 'state/api/threads';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { ArchiveThreadModal } from 'views/modals/ArchiveThreadModal';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { ChangeThreadTopicModal } from 'views/modals/change_thread_topic_modal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { UpdateProposalStatusModal } from 'views/modals/update_proposal_status_modal';
-import { notifySuccess } from '../../../../../../controllers/app/notifications';
+import {
+  notifyError,
+  notifySuccess,
+} from '../../../../../../controllers/app/notifications';
 import type Thread from '../../../../../../models/Thread';
 import type { IThreadCollaborator } from '../../../../../../models/Thread';
-import Topic from '../../../../../../models/Topic';
 import { ThreadStage } from '../../../../../../models/types';
 import Permissions from '../../../../../../utils/Permissions';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { EditCollaboratorsModal } from '../../../../../modals/edit_collaborators_modal';
 import './AdminActions.scss';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 export type AdminActionsProps = {
   thread: Thread;
@@ -22,7 +31,6 @@ export type AdminActionsProps = {
   onSpamToggle?: (thread: Thread) => any;
   onLockToggle?: (isLocked: boolean) => any;
   onPinToggle?: (isPinned: boolean) => any;
-  onTopicChange?: (newTopic: Topic) => any;
   onProposalStageChange?: (newStage: ThreadStage) => any;
   onSnapshotProposalFromThread?: () => any;
   onCollaboratorsEdit?: (collaborators: IThreadCollaborator[]) => any;
@@ -38,7 +46,6 @@ export const AdminActions = ({
   onSpamToggle,
   onLockToggle,
   onPinToggle,
-  onTopicChange,
   onProposalStageChange,
   onSnapshotProposalFromThread,
   onCollaboratorsEdit,
@@ -53,6 +60,8 @@ export const AdminActions = ({
   const [isChangeTopicModalOpen, setIsChangeTopicModalOpen] = useState(false);
   const [isUpdateProposalStatusModalOpen, setIsUpdateProposalStatusModalOpen] =
     useState(false);
+  const [isArchiveThreadModalOpen, setIsArchiveThreadModalOpen] =
+    useState(false);
 
   const hasAdminPermissions =
     Permissions.isSiteAdmin() ||
@@ -62,6 +71,28 @@ export const AdminActions = ({
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
 
+  const {
+    mutateAsync: deleteThread,
+    reset: resetDeleteThreadMutation,
+    error: deleteThreadError,
+  } = useDeleteThreadMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+    currentStage: thread.stage,
+  });
+
+  const { RevalidationModal } = useSessionRevalidationModal({
+    handleClose: resetDeleteThreadMutation,
+    error: deleteThreadError,
+  });
+
+  const { mutateAsync: editThread } = useEditThreadMutation({
+    chainId: app.activeChainId(),
+    threadId: thread.id,
+    currentStage: thread.stage,
+    currentTopicId: thread.topic?.id,
+  });
+
   const handleDeleteThread = () => {
     openConfirmation({
       title: 'Delete Thread',
@@ -69,18 +100,29 @@ export const AdminActions = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
-              app.threads.delete(thread).then(() => onDelete && onDelete());
+              await deleteThread({
+                threadId: thread.id,
+                chainId: app.activeChainId(),
+                address: app.user.activeAccount.address,
+              });
+              onDelete?.();
             } catch (err) {
-              console.log(err);
+              if (err instanceof SessionKeyError) {
+                return;
+              }
+              console.error(err?.responseJSON?.error || err?.message);
+              notifyError('Failed to delete thread');
             }
           },
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -97,9 +139,10 @@ export const AdminActions = ({
           <br />
           <p>
             Flagging as spam will help filter out unwanted content. Posts
-            flagged as spam are hidden from the main feed and can't be
+            flagged as spam are hidden from the main feed and can&apos;t be
             interacted with. For transparency, spam can still be viewed by
-            community members if they choose to "Include posts flagged as spam."
+            community members if they choose to &quot;Include posts flagged as
+            spam.&quot;
           </p>
           <br />
           <p>Note that you can always unflag a post as spam.</p>
@@ -113,7 +156,7 @@ export const AdminActions = ({
           <br />
           <p>
             For transparency, spam can still be viewed by community members if
-            they choose to “Include posts flagged as spam.”
+            they choose to &quot;Include posts flagged as spam.&quot;
             <br />
           </p>
         </>
@@ -121,17 +164,27 @@ export const AdminActions = ({
       buttons: [
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
         {
           label: !thread.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
+            const isSpam = !thread.markedAsSpamAt;
             try {
-              app.threads
-                .toggleSpam(thread.id, !!thread.markedAsSpamAt)
-                .then((t: Thread) => {
-                  onSpamToggle && onSpamToggle(t);
+              await editThread({
+                chainId: app.activeChainId(),
+                threadId: thread.id,
+                spam: isSpam,
+                address: app.user?.activeAccount?.address,
+              })
+                .then((t: Thread | any) => onSpamToggle && onSpamToggle(t))
+                .catch(() => {
+                  notifyError(
+                    `Could not ${!isSpam ? 'mark' : 'unmark'} thread as spam`,
+                  );
                 });
             } catch (err) {
               console.log(err);
@@ -143,21 +196,35 @@ export const AdminActions = ({
   };
 
   const handleThreadLockToggle = () => {
-    app.threads
-      .setPrivacy({
-        threadId: thread.id,
-        readOnly: !thread.readOnly,
-      })
+    editThread({
+      address: app.user.activeAccount.address,
+      threadId: thread.id,
+      readOnly: !thread.readOnly,
+      chainId: app.activeChainId(),
+    })
       .then(() => {
-        notifySuccess(thread.readOnly ? 'Unlocked!' : 'Locked!');
-        onLockToggle(!thread.readOnly);
+        notifySuccess(thread?.readOnly ? 'Unlocked!' : 'Locked!');
+        onLockToggle(!thread?.readOnly);
+      })
+      .catch(() => {
+        notifyError('Could not update thread read_only');
       });
   };
 
   const handleThreadPinToggle = () => {
-    app.threads
-      .pin({ proposal: thread })
-      .then(() => onPinToggle && onPinToggle(!thread.pinned));
+    editThread({
+      address: app.user.activeAccount.address,
+      threadId: thread.id,
+      chainId: app.activeChainId(),
+      pinned: !thread.pinned,
+    })
+      .then(() => {
+        notifySuccess(thread?.pinned ? 'Unpinned!' : 'Pinned!');
+        onPinToggle && onPinToggle(!thread.pinned);
+      })
+      .catch(() => {
+        notifyError('Could not update pinned state');
+      });
   };
 
   const handleEditThread = async (e) => {
@@ -171,12 +238,14 @@ export const AdminActions = ({
         buttons: [
           {
             label: 'Restore',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: onEditConfirm,
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
             onClick: onEditCancel,
           },
         ],
@@ -193,8 +262,33 @@ export const AdminActions = ({
     navigate(
       snapshotSpaces.length > 1
         ? '/multiple-snapshots'
-        : `/snapshot/${snapshotSpaces}`
+        : `/snapshot/${snapshotSpaces}`,
     );
+  };
+
+  const handleArchiveThread = () => {
+    if (thread.archivedAt === null) {
+      setIsArchiveThreadModalOpen(true);
+    } else {
+      editThread({
+        threadId: thread.id,
+        chainId: app.activeChainId(),
+        archived: !thread.archivedAt,
+        address: app.user?.activeAccount?.address,
+      })
+        .then(() => {
+          notifySuccess(
+            `Thread has been ${
+              thread?.archivedAt ? 'unarchived' : 'archived'
+            }!`,
+          );
+        })
+        .catch(() => {
+          notifyError(
+            `Could not ${thread?.archivedAt ? 'unarchive' : 'archive'} thread.`,
+          );
+        });
+    }
   };
 
   return (
@@ -206,11 +300,12 @@ export const AdminActions = ({
         }}
       >
         <PopoverMenu
-          className="AdminActions"
+          className="AdminActions compact"
           menuItems={[
-            ...(hasAdminPermissions ||
-            isThreadAuthor ||
-            (isThreadCollaborator && !thread.readOnly)
+            ...(thread.archivedAt === null &&
+            (hasAdminPermissions ||
+              isThreadAuthor ||
+              (isThreadCollaborator && !thread.readOnly))
               ? [
                   {
                     label: 'Edit',
@@ -230,25 +325,38 @@ export const AdminActions = ({
               : []),
             ...(hasAdminPermissions
               ? [
+                  ...(thread.archivedAt === null
+                    ? [
+                        {
+                          onClick: handleThreadPinToggle,
+                          label: thread.pinned ? 'Unpin' : 'Pin',
+                          iconLeft: 'pin' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        {
+                          onClick: handleThreadLockToggle,
+                          label: thread.readOnly ? 'Unlock' : 'Lock',
+                          iconLeft: thread.readOnly
+                            ? ('keyLockOpened' as const)
+                            : ('keyLockClosed' as const),
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        {
+                          onClick: () => setIsChangeTopicModalOpen(true),
+                          label: 'Change topic',
+                          iconLeft: 'filter' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                      ]
+                    : []),
                   {
-                    onClick: handleThreadPinToggle,
-                    label: thread.pinned ? 'Unpin' : 'Pin',
-                    iconLeft: 'pin' as const,
+                    label: thread.archivedAt === null ? 'Archive' : 'Unarchive',
+                    iconLeft:
+                      thread.archivedAt === null
+                        ? ('archiveTray' as const)
+                        : ('archiveTrayFilled' as const),
                     iconLeftWeight: 'bold' as const,
-                  },
-                  {
-                    onClick: handleThreadLockToggle,
-                    label: thread.readOnly ? 'Unlock' : 'Lock',
-                    iconLeft: thread.readOnly
-                      ? ('keyLockOpened' as const)
-                      : ('keyLockClosed' as const),
-                    iconLeftWeight: 'bold' as const,
-                  },
-                  {
-                    onClick: () => setIsChangeTopicModalOpen(true),
-                    label: 'Change topic',
-                    iconLeft: 'filter' as const,
-                    iconLeftWeight: 'bold' as const,
+                    onClick: handleArchiveThread,
                   },
                 ]
               : []),
@@ -276,26 +384,31 @@ export const AdminActions = ({
                             navigate(
                               snapshotSpaces.length > 1
                                 ? '/multiple-snapshots'
-                                : `/snapshot/${snapshotSpaces}`
+                                : `/snapshot/${snapshotSpaces}`,
                             );
                           },
                         },
                       ]
                     : []),
-                  {
-                    onClick: () => setIsUpdateProposalStatusModalOpen(true),
-                    label: 'Update status',
-                    iconLeft: 'democraticProposal' as const,
-                    iconLeftWeight: 'bold' as const,
-                  },
-                  {
-                    onClick: handleFlagMarkAsSpam,
-                    label: !thread.markedAsSpamAt
-                      ? 'Flag as spam'
-                      : 'Unflag as spam',
-                    iconLeft: 'flag' as const,
-                    iconLeftWeight: 'bold' as const,
-                  },
+                  ...(thread.archivedAt === null
+                    ? [
+                        {
+                          onClick: () =>
+                            setIsUpdateProposalStatusModalOpen(true),
+                          label: 'Update status',
+                          iconLeft: 'democraticProposal' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        {
+                          onClick: handleFlagMarkAsSpam,
+                          label: !thread.markedAsSpamAt
+                            ? 'Flag as spam'
+                            : 'Unflag as spam',
+                          iconLeft: 'flag' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                      ]
+                    : []),
                   {
                     onClick: handleDeleteThread,
                     label: 'Delete',
@@ -312,10 +425,11 @@ export const AdminActions = ({
         />
       </span>
 
-      <Modal
+      <CWModal
+        size="small"
+        visibleOverflow
         content={
           <ChangeThreadTopicModal
-            onChangeHandler={onTopicChange}
             thread={thread}
             onModalClose={() => setIsChangeTopicModalOpen(false)}
           />
@@ -324,7 +438,8 @@ export const AdminActions = ({
         open={isChangeTopicModalOpen}
       />
 
-      <Modal
+      <CWModal
+        size="medium"
         content={
           <UpdateProposalStatusModal
             onChangeHandler={(s) =>
@@ -338,7 +453,8 @@ export const AdminActions = ({
         open={isUpdateProposalStatusModalOpen}
       />
 
-      <Modal
+      <CWModal
+        size="small"
         content={
           <EditCollaboratorsModal
             onModalClose={() => setIsEditCollaboratorsModalOpen(false)}
@@ -349,6 +465,18 @@ export const AdminActions = ({
         onClose={() => setIsEditCollaboratorsModalOpen(false)}
         open={isEditCollaboratorsModalOpen}
       />
+
+      <CWModal
+        content={
+          <ArchiveThreadModal
+            thread={thread}
+            onModalClose={() => setIsArchiveThreadModalOpen(false)}
+          />
+        }
+        onClose={() => setIsArchiveThreadModalOpen(false)}
+        open={isArchiveThreadModalOpen}
+      />
+      {RevalidationModal}
     </>
   );
 };

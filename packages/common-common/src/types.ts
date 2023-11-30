@@ -1,36 +1,26 @@
-// This is a const and not an enum because of a weird webpack error.
-// It has the same syntax, though, so it should be OK, as long as we don't
-// modify any of the values.
-// eslint-disable-next-line
-export const NotificationCategories = {
-  NewComment: 'new-comment-creation',
-  NewThread: 'new-thread-creation',
-  NewCommunity: 'new-community-creation',
-  NewRoleCreation: 'new-role-creation',
-  NewMention: 'new-mention',
-  NewReaction: 'new-reaction',
-  NewCollaboration: 'new-collaboration',
-  ThreadEdit: 'thread-edit',
-  CommentEdit: 'comment-edit',
-  ChainEvent: 'chain-event',
-  EntityEvent: 'entity-event',
-  NewSnapshot: 'new-snapshot',
-  SnapshotProposal: 'snapshot-proposal',
-};
+import { SupportedNetwork } from 'commonwealth/shared/chain/types/types';
+
+export enum NotificationCategories {
+  NewComment = 'new-comment-creation',
+  NewThread = 'new-thread-creation',
+  NewMention = 'new-mention',
+  NewReaction = 'new-reaction',
+  NewCollaboration = 'new-collaboration',
+  ThreadEdit = 'thread-edit',
+  CommentEdit = 'comment-edit',
+  ChainEvent = 'chain-event',
+  SnapshotProposal = 'snapshot-proposal',
+}
+
+export type NotificationCategory =
+  typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
-  SubstrateDemocracyReferendum = 'referendum',
-  SubstrateDemocracyProposal = 'democracyproposal',
-  SubstrateTreasuryTip = 'treasurytip',
-  SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
-  SubstrateTreasuryProposal = 'treasuryproposal',
   Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   CompoundProposal = 'compoundproposal',
   AaveProposal = 'onchainproposal',
   SputnikProposal = 'sputnikproposal',
-  SubstratePreimage = 'democracypreimage',
-  SubstrateImminentPreimage = 'democracyimminent',
 }
 
 export enum ChainBase {
@@ -71,6 +61,16 @@ export enum WalletId {
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Ronin = 'ronin',
+}
+
+// 'google', 'github', 'discord', and 'twitter' are passed to magic login directly
+export enum WalletSsoSource {
+  Google = 'google',
+  Github = 'github',
+  Discord = 'discord',
+  Twitter = 'twitter',
+  Email = 'email',
+  Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 
 export enum ChainCategoryType {
@@ -119,6 +119,7 @@ export enum ChainNetwork {
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
   Kava = 'kava',
+  Kyve = 'kyve',
 }
 
 export enum BalanceType {
@@ -137,6 +138,8 @@ export enum RedisNamespaces {
   Global_Response = 'global_response',
   Test_Redis = 'test_redis',
   Database_Cleaner = 'database_cleaner',
+  Compound_Gov_Version = 'compound_gov_version',
+  Token_Balance = 'token_balance',
 }
 
 export interface ISnapshotNotification {
@@ -156,19 +159,41 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
+export type ThreadDiscordActions =
+  | 'thread-delete'
+  | 'thread-title-update'
+  | 'thread-body-update'
+  | 'thread-create';
+export type CommentDiscordActions =
+  | 'comment-delete'
+  | 'comment-update'
+  | 'comment-create';
+export type DiscordAction = ThreadDiscordActions | CommentDiscordActions;
+
 export interface IDiscordMessage {
-  user: {
+  user?: {
     id: string;
     username: string;
   };
   title?: string;
   content: string;
   message_id: string;
-  channel_id: string;
-  parent_channel_id: string;
-  guild_id: string;
+  channel_id?: string;
+  parent_channel_id?: string;
+  guild_id?: string;
   imageUrls?: string[];
+  action: DiscordAction;
 }
+
+export interface IDiscordMeta {
+  user: {
+    id: string;
+    username: string;
+  };
+  channel_id: string;
+  message_id: string;
+}
+
 export type HttpMethod =
   | 'get'
   | 'post'
@@ -177,3 +202,15 @@ export type HttpMethod =
   | 'patch'
   | 'options'
   | 'head';
+
+export type ChainEventAttributes = {
+  id: number;
+  block_number: number;
+  event_data: any;
+  queued: number;
+  entity_id?: number;
+  network: SupportedNetwork;
+  chain: string;
+  created_at?: Date;
+  updated_at?: Date;
+};

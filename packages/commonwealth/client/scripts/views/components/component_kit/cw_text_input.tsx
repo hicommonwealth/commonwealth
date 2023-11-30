@@ -149,7 +149,7 @@ export const CWTextInput = (props: TextInputProps) => {
           containerClassName,
           validationStatus: props.validationStatus,
         },
-        ComponentType.TextInput
+        ComponentType.OldTextInput
       )}
       onClick={onClick}
     >
@@ -165,6 +165,7 @@ export const CWTextInput = (props: TextInputProps) => {
       )}
       <div className="input-and-icon-container">
         <input
+          id={label + 'Input'}
           autoFocus={autoFocus}
           autoComplete={autoComplete}
           className={getClasses<InputStyleProps & InputInternalStyleProps>({

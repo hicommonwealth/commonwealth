@@ -1,20 +1,20 @@
 import React from 'react';
 
-import moment from 'moment';
 import 'components/Profile/ProfileActivityRow.scss';
+import moment from 'moment';
 
-import app from 'state';
 import type Thread from 'models/Thread';
 import withRouter, {
   navigateToCommunity,
   useCommonNavigate,
 } from 'navigation/helpers';
-import { CWText } from '../component_kit/cw_text';
-import { CWTag } from '../component_kit/cw_tag';
-import type { CommentWithAssociatedThread } from './ProfileActivity';
-import { PopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
+import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWText } from '../component_kit/cw_text';
+import { CWTag } from '../component_kit/new_designs/CWTag';
 import { QuillRenderer } from '../react_quill_editor/quill_renderer';
+import type { CommentWithAssociatedThread } from './ProfileActivity';
 
 type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
@@ -43,12 +43,12 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
         decodedTitle = decodeURIComponent(encodeURIComponent(title));
       } else {
         decodedTitle = decodeURIComponent(
-          encodeURIComponent(comment.thread?.title)
+          encodeURIComponent(comment.thread?.title),
         );
       }
     } catch (e) {
       console.error(
-        `Could not decode title: "${title ? title : comment.thread?.title}"`
+        `Could not decode title: "${title ? title : comment.thread?.title}"`,
       );
       decodedTitle = title;
     }
@@ -74,7 +74,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
           </a>
         </CWText>
         <div className="dot">.</div>
-        <CWTag label={author.slice(0, 5)} />
+        <CWTag label={author.slice(0, 5)} type="disabled" />
         <div className="dot">.</div>
         <div className="date">
           <CWText type="caption" fontWeight="medium">
@@ -128,35 +128,37 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
             renderTrigger={renderTrigger}
             menuItems={[
               {
-                iconLeft: 'copy',
-                label: 'Copy URL',
+                iconLeft: 'linkPhosphor',
+                iconLeftSize: 'regular',
+                label: 'Copy link',
                 onClick: async () => {
                   if (isThread) {
                     await navigator.clipboard.writeText(
-                      `${domain}/${chain}/discussion/${id}`
+                      `${domain}/${chain}/discussion/${id}`,
                     );
                     return;
                   }
                   await navigator.clipboard.writeText(
-                    `${domain}/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`
+                    `${domain}/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`,
                   );
                 },
               },
               {
-                iconLeft: 'twitter',
+                iconLeft: 'twitterOutline',
+                iconLeftSize: 'regular',
                 label: 'Share on Twitter',
                 onClick: async () => {
                   if (isThread) {
                     await window.open(
                       `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${id}`,
-                      '_blank'
+                      '_blank',
                     );
                     return;
                   }
                   await window.open(
                     `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${comment.thread?.id}
                       ?comment=${comment.id}`,
-                    '_blank'
+                    '_blank',
                   );
                 },
               },

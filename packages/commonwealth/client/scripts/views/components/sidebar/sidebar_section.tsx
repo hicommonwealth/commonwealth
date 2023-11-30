@@ -1,9 +1,9 @@
 import React from 'react';
+import clsx from 'clsx';
 
 import 'components/sidebar/sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
-import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import type {
@@ -49,7 +49,7 @@ const SubSection = (props: SubSectionAttrs) => {
   );
 };
 
-const SubSectionGroup = (props: SectionGroupAttrs) => {
+export const SubSectionGroup = (props: SectionGroupAttrs) => {
   const {
     containsChildren,
     displayData,
@@ -60,6 +60,7 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
     onClick,
     rightIcon,
     title,
+    className,
   } = props;
 
   const { setMenu, menuName, menuVisible } = useSidebarStore();
@@ -120,7 +121,7 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
 
   return (
     <div
-      className="SubSectionGroup"
+      className={clsx('SubSectionGroup', className)}
       onMouseEnter={(e) => mouseEnterHandler(e)}
       onMouseLeave={() => mouseLeaveHandler()}
     >
@@ -138,7 +139,7 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
         <CWText type="b2" className={`title-text ${titleTextClass}`}>
           {title}
         </CWText>
-        {rightIcon && <div className="right-icon">{rightIcon}</div>}
+        <div className="right-icon">{rightIcon}</div>
       </div>
       {containsChildren && toggled && (
         <div className="subsections">
@@ -211,7 +212,6 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
       >
         {carat}
         <CWText>{title}</CWText>
-        {/* rightIcon && <div className="right-icon">{rightIcon}</div> */}
       </div>
       {toggled && (
         <div className="sections-container">

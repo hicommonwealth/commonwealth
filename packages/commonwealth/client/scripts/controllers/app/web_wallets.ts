@@ -19,7 +19,7 @@ export default class WebWalletController {
   private _wallets: IWebWallet<any>[];
   private static _instance: WebWalletController;
 
-  public static get Instance(): WebWalletController{
+  public static get Instance(): WebWalletController {
     return this._instance || (this._instance = new this());
   }
 
@@ -64,8 +64,9 @@ export default class WebWalletController {
     try {
       await $.post(`${app.serverUrl()}/setAddressWallet`, {
         address: account.address,
-        author_chain: account.chain.id,
+        author_chain: account.community.id,
         wallet_id: wallet,
+        wallet_sso_source: null,
         jwt: app.user.jwt,
       });
     } catch (e) {
@@ -77,7 +78,7 @@ export default class WebWalletController {
     account: Account,
     chain?: ChainBase
   ): Promise<IWebWallet<any>> {
-    if (chain && account.chain.base !== chain) {
+    if (chain && account.community.base !== chain) {
       throw new Error('account on wrong chain base');
     }
     if (account.walletId) {

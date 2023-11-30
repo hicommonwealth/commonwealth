@@ -1,5 +1,8 @@
+import { pluralize } from 'helpers';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import Thread from 'models/Thread';
 import React, { useState } from 'react';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopover } from 'views/components/share_popover';
 import {
   getCommentSubscription,
@@ -9,9 +12,6 @@ import {
 import { AdminActions, AdminActionsProps } from './AdminActions';
 import { ReactionButton } from './ReactionButton';
 import './ThreadOptions.scss';
-import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { pluralize } from 'helpers';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 
 type OptionsProps = AdminActionsProps & {
   thread?: Thread;
@@ -19,7 +19,11 @@ type OptionsProps = AdminActionsProps & {
   commentBtnVisible?: boolean;
   shareEndpoint?: string;
   canUpdateThread?: boolean;
+  canReact?: boolean;
+  canComment?: boolean;
   totalComments?: number;
+  disabledActionTooltipText?: string;
+  onCommentBtnClick?: () => any;
 };
 
 export const ThreadOptions = ({
@@ -28,9 +32,10 @@ export const ThreadOptions = ({
   commentBtnVisible = true,
   shareEndpoint,
   canUpdateThread,
+  canReact = true,
+  canComment = true,
   totalComments,
   onLockToggle,
-  onTopicChange,
   onCollaboratorsEdit,
   onDelete,
   onEditStart,
@@ -41,6 +46,8 @@ export const ThreadOptions = ({
   onSnapshotProposalFromThread,
   onSpamToggle,
   hasPendingEdits,
+  disabledActionTooltipText = '',
+  onCommentBtnClick = () => null,
 }: OptionsProps) => {
   const [isSubscribed, setIsSubscribed] = useState(
     thread &&
@@ -80,7 +87,8 @@ export const ThreadOptions = ({
           <ReactionButton
             thread={thread}
             size="small"
-            disabled={!hasJoinedCommunity}
+            disabled={!canReact}
+            tooltipText={disabledActionTooltipText}
           />
         )}
 
@@ -88,7 +96,9 @@ export const ThreadOptions = ({
           <CWThreadAction
             label={`${pluralize(totalComments, 'Comment')}`}
             action="comment"
-            disabled={!hasJoinedCommunity}
+            disabled={!canComment}
+            onClick={onCommentBtnClick}
+            tooltipText={disabledActionTooltipText}
           />
         )}
 
@@ -109,7 +119,6 @@ export const ThreadOptions = ({
           <AdminActions
             thread={thread}
             onLockToggle={onLockToggle}
-            onTopicChange={onTopicChange}
             onCollaboratorsEdit={onCollaboratorsEdit}
             onDelete={onDelete}
             onEditStart={onEditStart}

@@ -1,13 +1,12 @@
-import getThreadsWithCommentCount from '../../util/getThreadCommentsCount';
-import { ServerThreadsController } from '../server_threads_controller';
-import { ChainInstance } from '../../models/chain';
+import { CommunityInstance } from '../../models/community';
 import { ThreadAttributes } from '../../models/thread';
+import { ServerThreadsController } from '../server_threads_controller';
 
 const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
 
 export type GetActiveThreadsOptions = {
-  chain: ChainInstance;
+  community: CommunityInstance;
   threadsPerTopic: number;
 };
 
@@ -15,7 +14,7 @@ export type GetActiveThreadsResult = ThreadAttributes[];
 
 export async function __getActiveThreads(
   this: ServerThreadsController,
-  { chain, threadsPerTopic }: GetActiveThreadsOptions
+  { community, threadsPerTopic }: GetActiveThreadsOptions
 ): Promise<GetActiveThreadsResult> {
   const allThreads = [];
   if (
@@ -27,7 +26,7 @@ export async function __getActiveThreads(
     threadsPerTopic = 3;
   }
 
-  const communityWhere = { chain_id: chain.id };
+  const communityWhere = { chain_id: community.id };
   const communityTopics = await this.models.Topic.findAll({
     where: communityWhere,
   });
@@ -57,18 +56,14 @@ export async function __getActiveThreads(
 
   allRecentTopicThreadsRaw = allRecentTopicThreadsRaw.flat();
 
-  const allRecentTopicThreads = allRecentTopicThreadsRaw.map((t) => {
-    return t.toJSON();
-  });
-
-  const allThreadsWithCommentsCount = await getThreadsWithCommentCount({
-    threads: allRecentTopicThreads,
-    models: this.models,
-    chainId: chain.id,
+  const allRecentTopicThreads = allRecentTopicThreadsRaw.map((thread) => {
+    const t = thread.toJSON();
+    t.numberOfComments = t.comment_count || 0;
+    return t;
   });
 
   communityTopics.forEach((topic) => {
-    const threadsWithCommentsCount = allThreadsWithCommentsCount.filter(
+    const threadsWithCommentsCount = allRecentTopicThreads.filter(
       (thread) => thread.topic_id === topic.id
     );
     allThreads.push(...(threadsWithCommentsCount || []));

@@ -4,8 +4,7 @@ import { DATABASE_URI } from './config';
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import BanFactory from './models/ban';
-import ChainFactory from './models/chain';
-import ChainEntityMetaFactory from './models/chain_entity_meta';
+import ChainFactory from './models/community';
 import ChainNodeFactory from './models/chain_node';
 import CollaborationFactory from './models/collaboration';
 import CommentFactory from './models/comment';
@@ -15,11 +14,15 @@ import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscordBotConfigFactory from './models/discord_bot_config';
+import EvmEventSourceFactory from './models/evmEventSource';
+import LastProcessedEvmBlockFactory from './models/lastProcessedEvmBlock';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
 import NotificationCategoryFactory from './models/notification_category';
 import NotificationsReadFactory from './models/notifications_read';
 import PollFactory from './models/poll';
+import GroupFactory from './models/group';
+import MembershipFactory from './models/membership';
 import ProfileFactory from './models/profile';
 import ReactionFactory from './models/reaction';
 import SnapshotProposalFactory from './models/snapshot_proposal';
@@ -52,7 +55,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
           log.trace(msg);
         },
   dialectOptions:
-    process.env.NODE_ENV !== 'production'
+    process.env.NODE_ENV !== 'production' || process.env.NO_SSL
       ? { requestTimeout: 40000 }
       : DATABASE_URI ===
         'postgresql://commonwealth:edgeware@localhost/commonwealth'
@@ -69,9 +72,8 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),
-  Chain: ChainFactory(sequelize, DataTypes),
+  Community: ChainFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
-  ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
   ContractAbi: ContractAbiFactory(sequelize, DataTypes),
@@ -88,12 +90,16 @@ const models: Models = {
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
+  EvmEventSource: EvmEventSourceFactory(sequelize, DataTypes),
+  LastProcessedEvmBlock: LastProcessedEvmBlockFactory(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
   NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
   NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
   Comment: CommentFactory(sequelize, DataTypes),
   Poll: PollFactory(sequelize, DataTypes),
+  Group: GroupFactory(sequelize, DataTypes),
+  Membership: MembershipFactory(sequelize, DataTypes),
   Reaction: ReactionFactory(sequelize, DataTypes),
   Thread: ThreadFactory(sequelize, DataTypes),
   Topic: TopicFactory(sequelize, DataTypes),

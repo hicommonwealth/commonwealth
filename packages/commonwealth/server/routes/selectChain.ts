@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NoChain: 'Must provide chain',
   ChainNF: 'Chain not found',
 };
@@ -21,7 +21,7 @@ const selectChain = async (
     return next(new AppError(Errors.NoChain));
   }
 
-  const chain = await models.Chain.findOne({ where: { id: req.body.chain } });
+  const chain = await models.Community.findOne({ where: { id: req.body.chain } });
   if (!chain) {
     return next(new AppError(Errors.ChainNF));
   }

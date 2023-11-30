@@ -6,30 +6,32 @@ import $ from 'jquery';
 
 import 'pages/create_community.scss';
 
-import app from 'state';
-import { initAppState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import app from 'state';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 // import { CommunityType } from '.';
+import { useCommonNavigate } from 'navigation/helpers';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { defaultChainRows } from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
 import {
-  useChainFormIdFields,
-  useChainFormDefaultFields,
-  useChainFormState,
+  defaultCommunityRows,
+  updateAdminOnCreateCommunity
+} from './community_input_rows';
+import {
+  useCommunityFormDefaultFields,
+  useCommunityFormIdFields,
+  useCommunityFormState
 } from './hooks';
 
 export const SputnikForm = () => {
   const [isMainnet, setIsMainnet] = useState(true);
 
-  const { name, setName } = useChainFormIdFields();
+  const { name, setName } = useCommunityFormIdFields();
 
-  const chainFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const { saving, setSaving } = useChainFormState();
+  const { saving, setSaving } = useCommunityFormState();
 
   const navigate = useCommonNavigate();
 
@@ -57,7 +59,7 @@ export const SputnikForm = () => {
         }}
       />
       {/* TODO: add divider to distinguish on-chain data */}
-      {defaultChainRows(chainFormDefaultFields)}
+      {defaultCommunityRows(communityFormDefaultFields)}
       <CWButton
         label="Save changes"
         disabled={saving}
@@ -79,16 +81,16 @@ export const SputnikForm = () => {
             ? 'https://rpc.mainnet.near.org'
             : 'https://rpc.testnet.near.org';
 
-          const createChainArgs = {
+          const createCommunityArgs = {
             base: ChainBase.NEAR,
-            icon_url: chainFormDefaultFields.iconUrl,
+            icon_url: communityFormDefaultFields.iconUrl,
             id: _id,
             jwt: app.user.jwt,
             name: _id,
             network: ChainNetwork.Sputnik,
             node_url: url,
             default_symbol: isMainnet ? 'NEAR' : 'tNEAR',
-            type: ChainType.DAO,
+            type: ChainType.DAO
             // ...form, <-- not typed so I don't know what's needed
           };
 
@@ -116,8 +118,8 @@ export const SputnikForm = () => {
 
             // POST object
             const res = await $.post(
-              `${app.serverUrl()}/createChain`,
-              createChainArgs
+              `${app.serverUrl()}/communities`,
+              createCommunityArgs
             );
 
             if (res.result.admin_address) {
@@ -128,9 +130,9 @@ export const SputnikForm = () => {
               );
             }
 
-            await initAppState(false);
+            await updateAdminOnCreateCommunity(_id);
 
-            navigate(`/${res.result.chain.id}`);
+            navigate(`/${res.result.community.id}`);
           } catch (err) {
             notifyError(err.responseJSON?.error || 'Adding DAO failed.');
             console.error(err.responseJSON?.error || err.message);
