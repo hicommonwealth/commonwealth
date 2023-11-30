@@ -9,10 +9,7 @@ import {
 import crypto from 'crypto';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import {
-  MixpanelCommunityInteractionEvent,
-  MixpanelUserSignupEvent,
-} from '../../shared/analytics/types';
+import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -153,6 +150,8 @@ export async function createAddressHelper(
 
     // even if this is the existing address, there is a case to login to community through this address's chain
     // if community is valid, then we should create a role between this community vs address
+
+    let isRole = true;
     if (req.community) {
       const role = await findOneRole(
         models,
@@ -161,19 +160,14 @@ export async function createAddressHelper(
       );
       if (!role) {
         await createRole(models, updatedObj.id, req.community, 'member');
-
-        serverAnalyticsController.track(
-          {
-            event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
-            community: req.chain,
-            userId: user.id,
-            isCustomDomain: null,
-          },
-          req,
-        );
+        isRole = false;
       }
     }
-    return { ...updatedObj.toJSON(), newly_created: false };
+    return {
+      ...updatedObj.toJSON(),
+      newly_created: false,
+      joined_community: !isRole,
+    };
   } else {
     // address doesn't exist, add it to the database
     try {
@@ -215,16 +209,6 @@ export async function createAddressHelper(
 
       serverAnalyticsController.track(
         {
-          event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
-          community: req.chain,
-          userId: user.id,
-          isCustomDomain: null,
-        },
-        req,
-      );
-
-      serverAnalyticsController.track(
-        {
           event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
           chain: req.chain,
           isCustomDomain: null,
@@ -235,6 +219,7 @@ export async function createAddressHelper(
       return {
         ...newObj.toJSON(),
         newly_created: !existingAddressOnOtherChain,
+        joined_community: !!user,
       };
     } catch (e) {
       return next(e);
