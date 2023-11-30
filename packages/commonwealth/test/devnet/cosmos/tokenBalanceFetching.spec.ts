@@ -22,7 +22,6 @@ describe('Token Balance Cache Cosmos Tests', () => {
     tbc = new TokenBalanceCache(models, redisCache);
   });
 
-  // it('should fail if a bech32 prefix is not provided');
   it('should return a single balance', async () => {
     const balance = await tbc.getBalances({
       balanceSourceType: BalanceSourceType.CosmosNative,
