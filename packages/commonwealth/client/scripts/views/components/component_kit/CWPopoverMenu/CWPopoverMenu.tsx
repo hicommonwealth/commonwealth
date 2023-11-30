@@ -1,21 +1,23 @@
 import React, { useEffect } from 'react';
 
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-import { PopperPlacementType, PopperOwnProps } from '@mui/base/Popper';
+import { PopperOwnProps, PopperPlacementType } from '@mui/base/Popper';
 
-import 'components/component_kit/cw_popover/cw_popover_menu.scss';
+import './CWPopoverMenu.scss';
 
-import { ComponentType } from '../types';
+import CWPopover, {
+  PopoverTriggerProps,
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
+import { CWIcon } from '../cw_icons/cw_icon';
+import { CWText } from '../cw_text';
+import { getClasses } from '../helpers';
 import type {
   DefaultMenuItem,
   DividerMenuItem,
   HeaderMenuItem,
 } from '../types';
-import { getClasses } from '../helpers';
-import { CWIcon } from '../cw_icons/cw_icon';
-import { CWText } from '../cw_text';
-import { Popover, usePopover } from './cw_popover';
-import type { PopoverTriggerProps } from './cw_popover';
+import { ComponentType } from '../types';
 
 export type PopoverMenuItem =
   | DividerMenuItem
@@ -50,7 +52,7 @@ export const PopoverMenu = ({
       {/* needs to be div instead of fragment so listener can work */}
       <div className="popover-container">
         {renderTrigger(handleInteraction, open)}
-        <Popover
+        <CWPopover
           modifiers={modifiers}
           placement={placement}
           content={
@@ -90,7 +92,7 @@ export const PopoverMenu = ({
                         isSecondary?: boolean;
                       }>(
                         { disabled, isSecondary },
-                        `PopoverMenuItem ${item.className}`
+                        `PopoverMenuItem ${item.className}`,
                       )}
                       onClick={(e) => {
                         e.stopPropagation();

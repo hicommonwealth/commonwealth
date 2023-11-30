@@ -1,16 +1,14 @@
+import { IconSize } from 'views/components/component_kit/cw_icons/types';
 import type ChainInfo from '../../../models/ChainInfo';
 import type { IconName } from './cw_icons/cw_icon_lookup';
-import { IconSize } from 'views/components/component_kit/cw_icons/types';
 
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
-  AddressTooltip = 'AddressTooltip',
   Avatar = 'Avatar',
   AvatarUpload = 'AvatarUpload',
   Banner = 'Banner',
   Breadcrumbs = 'Breadcrumbs',
   Button = 'Button',
-  ButtonGroup = 'ButtonGroup',
   Card = 'Card',
   Checkbox = 'Checkbox',
   Collapsible = 'Collapsible',
@@ -20,8 +18,6 @@ export enum ComponentType {
   Divider = 'Divider',
   Form = 'Form',
   FormSection = 'FormSection',
-  FilterMenu = 'FilterMenu',
-  GradientButton = 'GradientButton',
   Growl = 'Growl',
   Icon = 'Icon',
   IconButton = 'IconButton',
@@ -30,9 +26,8 @@ export enum ComponentType {
   MobileMenu = 'MobileMenu',
   Modal = 'CWModal',
   OldTextInput = 'OldTextInput',
-  OldTooltip = 'OldTooltip',
-  Popover = 'Popover',
   PopoverMenu = 'PopoverMenu',
+  Popover = 'Popover',
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
@@ -42,8 +37,6 @@ export enum ComponentType {
   Socials = 'Socials',
   Spinner = 'Spinner',
   Tab = 'Tab',
-  TabDeprecated = 'TabDeprecated',
-  TabBar = 'TabBar',
   Table = 'Table',
   Tag = 'Tag',
   Text = 'Text',
