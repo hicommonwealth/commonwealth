@@ -1,10 +1,6 @@
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { filterLinks } from 'helpers/threads';
-import {
-  chainEntityTypeToProposalName,
-  chainEntityTypeToProposalSlug,
-  getProposalUrlPath,
-} from 'identifiers';
+
 import { LinkSource } from 'models/Thread';
 import 'pages/view_thread/linked_proposals_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -17,6 +13,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
+import { LinkedProposal } from './LinkedProposal';
 
 type ThreadLinkProps = {
   threadChain: string;
@@ -167,7 +164,6 @@ export const LinkedProposalsCard = ({
         }
         onClose={() => setIsModalOpen(false)}
         open={isModalOpen}
-        visibleOverflow
       />
     </>
   );

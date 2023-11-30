@@ -117,9 +117,8 @@ export const CommentReactionButton = ({
         voteCount={likes}
         disabled={!hasJoinedCommunity || disabled}
         selected={hasReacted}
-        onMouseEnter={() => undefined}
         onClick={handleVoteClick}
-        tooltipContent={getDisplayedReactorsForPopup({
+        popoverContent={getDisplayedReactorsForPopup({
           reactors: (comment.reactions || []).map((r) => r.author),
         })}
         tooltipText={tooltipText}
