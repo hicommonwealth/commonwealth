@@ -33,13 +33,9 @@ async function main() {
     banCache,
   );
 
-  let communitiesResult = await communitiesController.getCommunities({
+  const communitiesResult = await communitiesController.getCommunities({
     hasGroups: true,
   });
-
-  communitiesResult = communitiesResult.filter(
-    (c) => c.community.id === 'stargatetoken',
-  );
 
   await Bluebird.map(
     communitiesResult,
