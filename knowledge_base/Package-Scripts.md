@@ -68,8 +68,8 @@ If you add a script to the package.json, you must add documentation here, descri
   - [start-consumer](#start-consumer)
   - [start-evm-ce](#start-evm-ce)
 - [Devnets](#devnets)
-  - [cosmos:build](#comsos:build)
-  - [cosmos:start](#comsos:start)
+  - [cosmos:build](#cosmos:build)
+  - [cosmos:start](#cosmos:start)
   - [cosmos:stop](#cosmos:stop)
 
 # Build Scripts
