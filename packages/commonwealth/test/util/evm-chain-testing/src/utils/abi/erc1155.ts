@@ -1,5 +1,16 @@
 /**
- * Raw OZ ERC1155 implementation with a public mint function
+ * Raw OZ ERC1155 implementation with a public mint function:
+ *
+ * pragma solidity ^0.8.20;
+ * import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC1155/ERC1155.sol";
+ *
+ * contract TestErc1155 is ERC1155 {
+ *   constructor() ERC1155('uri') {}
+ *
+ *   function mint(address to, uint256 id, uint256 value) external {
+ *     _mint(to, id, value, "");
+ *   }
+ * }
  */
 const erc1155 = [
   {
@@ -315,11 +326,6 @@ const erc1155 = [
         internalType: 'uint256',
         name: 'value',
         type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
       },
     ],
     name: 'mint',

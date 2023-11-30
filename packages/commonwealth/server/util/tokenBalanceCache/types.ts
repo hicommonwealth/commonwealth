@@ -24,7 +24,7 @@ type GetErc1155BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC1155;
   sourceOptions: {
     contractAddress: string;
-    tokenId: string;
+    tokenId: number;
   };
 };
 type GetEthNativeBalanceOptions = GetEvmBalancesBase & {

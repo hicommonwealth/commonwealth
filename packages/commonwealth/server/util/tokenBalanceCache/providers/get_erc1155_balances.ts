@@ -57,7 +57,7 @@ async function getOnChainBatchErc1155Balances(
     const batchAddresses = addresses.slice(startIndex, endIndex);
 
     const calldata =
-      '0x070f547d' +
+      '0x4e1273f4' +
       AbiCoder.encodeParameters(
         ['address[]', 'uint256[]'],
         [batchAddresses, Array(batchAddresses.length).fill(tokenId)],
@@ -124,7 +124,7 @@ async function getErc1155Balance(
   address: string,
 ): Promise<Balances> {
   const calldata =
-    '0x8f32d59b' +
+    '0x00fdd58e' +
     AbiCoder.encodeParameters(
       ['address', 'uint256'],
       [address, tokenId],
@@ -151,7 +151,7 @@ async function getErc1155Balance(
   if (data.error) {
     const msg =
       `ERC1155 balance fetch failed for address ${address} ` +
-      `on evm chain id ${evmChainId}`;
+      `on evm chain id ${evmChainId} on contract ${contractAddress}.`;
     rollbar.error(msg, data.error);
     log.error(msg, data.error);
     return {};

@@ -64,7 +64,7 @@ function setupRouter(): Router {
   router.get('/erc721/deploy', deploy721);
   router.post('/erc721/mintBurn', mintBurn721);
 
-  router.post('/erc1155/deploy', deploy1155);
+  router.get('/erc1155/deploy', deploy1155);
   router.post('/erc1155/mint', mint1155);
 
   return router;
