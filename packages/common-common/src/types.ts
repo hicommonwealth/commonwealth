@@ -139,6 +139,7 @@ export enum RedisNamespaces {
   Test_Redis = 'test_redis',
   Database_Cleaner = 'database_cleaner',
   Compound_Gov_Version = 'compound_gov_version',
+  Token_Balance = 'token_balance',
 }
 
 export interface ISnapshotNotification {
@@ -158,11 +159,16 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
-export type DiscordAction =
-  | 'create'
-  | 'update'
+export type ThreadDiscordActions =
   | 'thread-delete'
-  | 'comment-delete';
+  | 'thread-title-update'
+  | 'thread-body-update'
+  | 'thread-create';
+export type CommentDiscordActions =
+  | 'comment-delete'
+  | 'comment-update'
+  | 'comment-create';
+export type DiscordAction = ThreadDiscordActions | CommentDiscordActions;
 
 export interface IDiscordMessage {
   user?: {
@@ -177,6 +183,15 @@ export interface IDiscordMessage {
   guild_id?: string;
   imageUrls?: string[];
   action: DiscordAction;
+}
+
+export interface IDiscordMeta {
+  user: {
+    id: string;
+    username: string;
+  };
+  channel_id: string;
+  message_id: string;
 }
 
 export type HttpMethod =

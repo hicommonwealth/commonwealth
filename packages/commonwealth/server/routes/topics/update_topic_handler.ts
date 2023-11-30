@@ -1,8 +1,8 @@
+import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
 import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequest, TypedResponse, success } from '../../types';
-import z from 'zod';
 
 const Errors = {
   ValidationError: 'Validation error',
@@ -18,11 +18,11 @@ type UpdateTopicResponse = TopicAttributes;
 export const updateTopicHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateTopicRequestBody, null, UpdateTopicRequestParams>,
-  res: TypedResponse<UpdateTopicResponse>
+  res: TypedResponse<UpdateTopicResponse>,
 ) => {
   const {
     user,
-    chain,
+    chain: community,
     params: { topicId },
     body,
   } = req;
@@ -46,15 +46,17 @@ export const updateTopicHandler = async (
   });
   if (validationResult.success === false) {
     throw new AppError(
-      `${Errors.ValidationError}: ${validationResult.error.message}`
+      `${Errors.ValidationError}: ${validationResult.error.message}`,
     );
   }
 
-  const topic = await controllers.topics.updateTopic({
+  const [topic, analyticsOptions] = await controllers.topics.updateTopic({
     user,
-    chain,
+    community,
     body: validationResult.data,
   });
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, topic);
 };

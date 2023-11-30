@@ -1,10 +1,11 @@
 import moment from 'moment';
 import { AppError } from '../../../../common-common/src/errors';
-import { AddressInstance } from '../../models/address';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { CommunityInstance } from '../../models/community';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -16,21 +17,19 @@ export const Errors = {
 
 export type CreateThreadPollOptions = {
   user: UserInstance;
-  address: AddressInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   threadId: number;
   prompt: string;
   options: string[];
   customDuration?: number;
 };
-export type CreateThreadPollResult = PollAttributes;
+export type CreateThreadPollResult = [PollAttributes, TrackOptions];
 
 export async function __createThreadPoll(
   this: ServerThreadsController,
   {
     user,
-    address,
-    chain,
+    community,
     threadId,
     prompt,
     options,
@@ -64,7 +63,7 @@ export async function __createThreadPoll(
   const isThreadOwner = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     entity: thread,
   });
   if (!isThreadOwner) {
@@ -76,7 +75,7 @@ export async function __createThreadPoll(
     const isAdmin = await validateOwner({
       models: this.models,
       user,
-      chainId: chain.id,
+      communityId: community.id,
       allowAdmin: true,
     });
     if (!isAdmin) {
@@ -90,7 +89,7 @@ export async function __createThreadPoll(
     return this.models.Poll.create(
       {
         thread_id: thread.id,
-        chain_id: thread.chain,
+        community_id: thread.chain,
         prompt,
         options: JSON.stringify(options),
         ends_at,
@@ -99,5 +98,12 @@ export async function __createThreadPoll(
     );
   });
 
-  return poll.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.CREATE_POLL,
+    community: community.id,
+    userId: user.id,
+    isCustomDomain: null,
+  };
+
+  return [poll.toJSON(), analyticsOptions];
 }

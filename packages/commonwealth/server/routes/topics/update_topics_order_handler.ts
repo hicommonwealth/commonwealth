@@ -13,11 +13,11 @@ export const updateTopicsOrderHandler = async (
   req: TypedRequestBody<UpdateTopicsOrderRequestBody>,
   res: TypedResponse<UpdateTopicsOrderResponse>
 ) => {
-  const { user, chain, body } = req;
+  const { user, chain: community, body } = req;
 
   const topics = await controllers.topics.updateTopicsOrder({
     user,
-    chain,
+    community,
     body,
   });
 

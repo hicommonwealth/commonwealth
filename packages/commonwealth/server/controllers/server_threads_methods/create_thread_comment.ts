@@ -1,24 +1,24 @@
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { CommentAttributes } from '../../models/comment';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { getCommentDepth } from '../../util/getCommentDepth';
+import moment from 'moment';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { AppError } from '../../../../common-common/src/errors';
-import { renderQuillDeltaToText } from '../../../shared/utils';
-import moment from 'moment';
-import { parseUserMentions } from '../../util/parseUserMentions';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { ServerThreadsController } from '../server_threads_controller';
-import { validateOwner } from '../../util/validateOwner';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
+import { CommentAttributes } from '../../models/comment';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { getCommentDepth } from '../../util/getCommentDepth';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -38,7 +38,7 @@ const MAX_COMMENT_DEPTH = 8; // Sets the maximum depth of comments
 export type CreateThreadCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   parentId: number;
   threadId: number;
   text: string;
@@ -51,7 +51,7 @@ export type CreateThreadCommentOptions = {
 export type CreateThreadCommentResult = [
   CommentAttributes,
   EmitOptions[],
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThreadComment(
@@ -59,7 +59,7 @@ export async function __createThreadComment(
   {
     user,
     address,
-    chain,
+    community,
     parentId,
     threadId,
     text,
@@ -67,11 +67,11 @@ export async function __createThreadComment(
     canvasSession,
     canvasHash,
     discordMeta,
-  }: CreateThreadCommentOptions
+  }: CreateThreadCommentOptions,
 ): Promise<CreateThreadCommentResult> {
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -103,7 +103,7 @@ export async function __createThreadComment(
     parentComment = await this.models.Comment.findOne({
       where: {
         id: parentId,
-        chain: chain.id,
+        chain: community.id,
       },
       include: [this.models.Address],
     });
@@ -114,7 +114,7 @@ export async function __createThreadComment(
     const [commentDepthExceeded] = await getCommentDepth(
       this.models,
       parentComment,
-      MAX_COMMENT_DEPTH
+      MAX_COMMENT_DEPTH,
     );
     if (commentDepthExceeded) {
       throw new AppError(Errors.NestingTooDeep);
@@ -123,13 +123,14 @@ export async function __createThreadComment(
 
   // check balance (bypass for admin)
   if (
-    chain &&
-    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+    community &&
+    (community.type === ChainType.Token ||
+      community.network === ChainNetwork.Ethereum)
   ) {
     const isAdmin = await validateOwner({
       models: this.models,
       user,
-      chainId: chain.id,
+      communityId: community.id,
       entity: thread,
       allowAdmin: true,
       allowGodMode: true,
@@ -139,8 +140,8 @@ export async function __createThreadComment(
         this.models,
         this.tokenBalanceCache,
         thread.topic_id,
-        chain,
-        address
+        community,
+        address,
       );
       if (!isValid) {
         throw new AppError(`${Errors.FailedCreateComment}: ${message}`);
@@ -169,7 +170,7 @@ export async function __createThreadComment(
     plaintext,
     version_history,
     address_id: address.id,
-    chain: chain.id,
+    chain: community.id,
     parent_id: null,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -199,7 +200,7 @@ export async function __createThreadComment(
         comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
     await this.models.Subscription.create(
       {
@@ -209,7 +210,7 @@ export async function __createThreadComment(
         comment_id: finalComment.id,
         is_active: true,
       },
-      { transaction }
+      { transaction },
     );
 
     await transaction.commit();
@@ -235,7 +236,7 @@ export async function __createThreadComment(
             include: [this.models.User],
           });
           return mentionedUser;
-        })
+        }),
       );
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
@@ -337,7 +338,8 @@ export async function __createThreadComment(
 
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
-    community: chain.id,
+    community: community.id,
+    userId: user.id,
     isCustomDomain: null,
   };
 

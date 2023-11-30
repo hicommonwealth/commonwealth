@@ -26,7 +26,7 @@ const Errors = {
 export type CreateCommentReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   reaction: string;
   commentId: number;
   canvasAction?: any;
@@ -37,7 +37,7 @@ export type CreateCommentReactionOptions = {
 export type CreateCommentReactionResult = [
   ReactionAttributes,
   EmitOptions[],
-  TrackOptions[]
+  TrackOptions[],
 ];
 
 export async function __createCommentReaction(
@@ -45,13 +45,13 @@ export async function __createCommentReaction(
   {
     user,
     address,
-    chain,
+    community,
     reaction,
     commentId,
     canvasAction,
     canvasSession,
     canvasHash,
-  }: CreateCommentReactionOptions
+  }: CreateCommentReactionOptions,
 ): Promise<CreateCommentReactionResult> {
   const comment = await this.models.Comment.findOne({
     where: { id: commentId },
@@ -68,9 +68,9 @@ export async function __createCommentReaction(
   }
 
   // check address ban
-  if (chain) {
+  if (community) {
     const [canInteract, banError] = await this.banCache.checkBan({
-      chain: chain.id,
+      communityId: community.id,
       address: address.address,
     });
     if (!canInteract) {
@@ -80,14 +80,15 @@ export async function __createCommentReaction(
 
   // check balance (bypass for admin)
   if (
-    chain &&
-    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+    community &&
+    (community.type === ChainType.Token ||
+      community.network === ChainNetwork.Ethereum)
   ) {
     const addressAdminRoles = await findAllRoles(
       this.models,
       { where: { address_id: address.id } },
-      chain.id,
-      ['admin']
+      community.id,
+      ['admin'],
     );
     const isGodMode = user.isAdmin;
     const hasAdminRole = addressAdminRoles.length > 0;
@@ -98,7 +99,7 @@ export async function __createCommentReaction(
           this.tokenBalanceCache,
           this.models,
           thread.topic_id,
-          address.address
+          address.address,
         );
       } catch (e) {
         throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
@@ -113,7 +114,7 @@ export async function __createCommentReaction(
   const reactionData: ReactionAttributes = {
     reaction,
     address_id: address.id,
-    chain: chain.id,
+    chain: community.id,
     comment_id: comment.id,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -159,7 +160,8 @@ export async function __createCommentReaction(
 
   allAnalyticsOptions.push({
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
-    community: chain.id,
+    community: community.id,
+    userId: user.id,
     isCustomDomain: null,
   });
 

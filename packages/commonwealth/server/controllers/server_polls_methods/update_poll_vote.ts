@@ -2,10 +2,12 @@ import moment from 'moment';
 
 import { UserInstance } from 'server/models/user';
 import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { VoteAttributes } from '../../models/vote';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
+import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -22,19 +24,19 @@ export const Errors = {
 export type UpdatePollVoteOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   pollId: number;
   option: string;
 };
 
-export type UpdatePollVoteResult = VoteAttributes;
+export type UpdatePollVoteResult = [VoteAttributes, TrackOptions];
 
 export async function __updatePollVote(
   this: ServerThreadsController,
-  { address, chain, pollId, option }: UpdatePollVoteOptions
+  { user, address, community, pollId, option }: UpdatePollVoteOptions,
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
-    where: { id: pollId, chain_id: chain.id },
+    where: { id: pollId, community_id: community.id },
   });
   if (!poll) {
     throw new AppError(Errors.NoPoll);
@@ -70,7 +72,7 @@ export async function __updatePollVote(
       this.tokenBalanceCache,
       this.models,
       thread.topic_id,
-      address.address
+      address.address,
     );
     if (!canVote) {
       throw new AppError(Errors.InsufficientTokenBalance);
@@ -84,7 +86,7 @@ export async function __updatePollVote(
       poll_id: poll.id,
       address: address.address,
       author_community_id: address.community_id,
-      community_id: chain.id,
+      community_id: community.id,
     };
     // delete existing votes
     await this.models.Vote.destroy({
@@ -97,9 +99,16 @@ export async function __updatePollVote(
         ...voteData,
         option: selectedOption,
       },
-      { transaction }
+      { transaction },
     );
   });
 
-  return vote.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.SUBMIT_VOTE,
+    community: community.id,
+    userId: user.id,
+    isCustomDomain: null,
+  };
+
+  return [vote.toJSON(), analyticsOptions];
 }

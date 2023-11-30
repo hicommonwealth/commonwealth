@@ -2,19 +2,22 @@ import 'components/NewThreadForm.scss';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
-import { detectURL } from 'helpers/threads';
+import { featureFlags } from 'helpers/feature-flags';
+import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { capitalize } from 'lodash';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import app from 'state';
-import { useRefreshMembershipQuery } from 'state/api/groups';
+import {
+  useFetchGroupsQuery,
+  useRefreshMembershipQuery,
+} from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { TopicSelector } from 'views/components/topic_selector';
@@ -22,6 +25,7 @@ import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationMod
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
   createDeltaFromText,
@@ -32,7 +36,9 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
-  const { data: topics } = useFetchTopicsQuery({
+  const location = useLocation();
+
+  const { data: topics = [] } = useFetchTopicsQuery({
     chainId: app.activeChainId(),
   });
 
@@ -47,20 +53,19 @@ export const NewThreadForm = () => {
         t.tokenThreshold.isZero() ||
         !app.chain.isGatedTopic(t.id)
       ) {
-        acc.enabledTopics.push(t);
+        acc?.enabledTopics?.push(t);
       } else {
-        acc.disabledTopics.push(t);
+        acc?.disabledTopics?.push(t);
       }
       return acc;
     },
-    { enabledTopics: [], disabledTopics: [] }
+    { enabledTopics: [], disabledTopics: [] },
   );
 
   const {
     threadTitle,
     setThreadTitle,
     threadKind,
-    setThreadKind,
     threadTopic,
     setThreadTopic,
     threadUrl,
@@ -70,20 +75,22 @@ export const NewThreadForm = () => {
     setIsSaving,
     isDisabled,
     clearDraft,
+    canShowGatingBanner,
+    setCanShowGatingBanner,
   } = useNewThreadForm(chainId, topicsForSelector.enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
+  const { data: groups = [] } = useFetchGroupsQuery({
+    chainId: app.activeChainId(),
+    includeTopics: true,
+  });
   const { data: memberships = [] } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
   });
-
-  const restrictedTopicIds = memberships
-    .filter((x) => x.rejectReason)
-    .map((x) => parseInt(`${x.topicId}`));
 
   const {
     mutateAsync: createThread,
@@ -104,8 +111,22 @@ export const NewThreadForm = () => {
     return threadTitle || getTextFromDelta(threadContentDelta).length > 0;
   }, [threadContentDelta, threadTitle]);
 
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(threadTopic?.id),
+  );
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(threadTopic?.id) && membership.isAllowed,
+  );
+  const gatedGroupNames = groups
+    .filter((group) =>
+      group.topics.find((topic) => topic.id === threadTopic?.id),
+    )
+    .map((group) => group.name);
+  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+
   const handleNewThreadCreation = async () => {
-    if (restrictedTopicIds.includes(threadTopic.id)) {
+    if (isRestrictedMembership) {
       notifyError('Topic is gated!');
       return;
     }
@@ -120,7 +141,7 @@ export const NewThreadForm = () => {
     checkNewThreadErrors(
       { threadKind, threadUrl, threadTitle, threadTopic },
       deltaString,
-      !!hasTopics
+      !!hasTopics,
     );
 
     setIsSaving(true);
@@ -148,7 +169,7 @@ export const NewThreadForm = () => {
       if (err instanceof SessionKeyError) {
         return;
       }
-      console.error(err?.responseJSON?.error || err?.message);
+      console.error(err.response.data.error || err?.message);
       notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
@@ -158,30 +179,26 @@ export const NewThreadForm = () => {
   const handleCancel = () => {
     setThreadTitle('');
     setThreadTopic(
-      topicsForSelector.enabledTopics.find((t) => t.name.includes('General')) ||
-        null
+      topicsForSelector?.enabledTopics?.find((t) =>
+        t?.name?.includes('General'),
+      ) || null,
     );
     setThreadContentDelta(createDeltaFromText(''));
   };
 
   const showBanner = !hasJoinedCommunity && isBannerVisible;
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!hasJoinedCommunity,
+    isThreadTopicGated: isRestrictedMembership,
+  });
 
   return (
     <>
       <div className="NewThreadForm">
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            Proposals
+            Create thread
           </CWText>
-        </div>
-        <div className="new-thread-header">
-          <CWTabsRow>
-            <CWTab
-              label={capitalize(ThreadKind.Discussion)}
-              isSelected={threadKind === ThreadKind.Discussion}
-              onClick={() => setThreadKind(ThreadKind.Discussion)}
-            />
-          </CWTabsRow>
         </div>
         <div className="new-thread-body">
           <div className="new-thread-form-inputs">
@@ -190,8 +207,11 @@ export const NewThreadForm = () => {
                 <TopicSelector
                   enabledTopics={topicsForSelector.enabledTopics}
                   disabledTopics={topicsForSelector.disabledTopics}
-                  value={threadTopic}
-                  onChange={setThreadTopic}
+                  value={!!location.search && threadTopic}
+                  onChange={(topic) => {
+                    setCanShowGatingBanner(true);
+                    setThreadTopic(topic);
+                  }}
                 />
               )}
               <CWTextInput
@@ -215,8 +235,12 @@ export const NewThreadForm = () => {
             <ReactQuillEditor
               contentDelta={threadContentDelta}
               setContentDelta={setThreadContentDelta}
-              isDisabled={!hasJoinedCommunity}
-              tooltipLabel="Join community to submit"
+              isDisabled={isRestrictedMembership || !hasJoinedCommunity}
+              tooltipLabel={
+                !hasJoinedCommunity
+                  ? 'Join community to submit'
+                  : disabledActionsTooltipText
+              }
             />
 
             <div className="buttons-row">
@@ -243,6 +267,17 @@ export const NewThreadForm = () => {
                 onJoin={handleJoinCommunity}
               />
             )}
+
+            {featureFlags.gatingEnabled &&
+              isRestrictedMembership &&
+              canShowGatingBanner && (
+                <div>
+                  <CWGatedTopicBanner
+                    groupNames={gatedGroupNames}
+                    onClose={() => setCanShowGatingBanner(false)}
+                  />
+                </div>
+              )}
           </div>
         </div>
       </div>

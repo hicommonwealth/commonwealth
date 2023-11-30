@@ -181,7 +181,7 @@ export const CommentTree = ({
               if (err instanceof SessionKeyError) {
                 return;
               }
-              console.error(err?.responseJSON?.error || err?.message);
+              console.error(err.response.data.error || err?.message);
               notifyError('Failed to delete comment');
             }
           },
@@ -197,7 +197,7 @@ export const CommentTree = ({
 
   const handleEditCancel = (
     comment: CommentType<any>,
-    hasContentChanged: boolean
+    hasContentChanged: boolean,
   ) => {
     if (hasContentChanged) {
       openConfirmation({
@@ -243,7 +243,7 @@ export const CommentTree = ({
 
   const handleEditStart = (comment: CommentType<any>) => {
     const editDraft = localStorage.getItem(
-      `${app.activeChainId()}-edit-comment-${comment.id}-storedText`
+      `${app.activeChainId()}-edit-comment-${comment.id}-storedText`,
     );
     if (editDraft) {
       clearEditingLocalStorage(comment.id, ContentType.Comment);
@@ -305,7 +305,7 @@ export const CommentTree = ({
 
   const handleEditConfirm = async (
     comment: CommentType<any>,
-    newDelta: DeltaStatic
+    newDelta: DeltaStatic,
   ) => {
     {
       setEdits((p) => ({
@@ -453,7 +453,7 @@ export const CommentTree = ({
                     !thread.archivedAt &&
                     (!!hasJoinedCommunity ||
                       isAdmin ||
-                      !app.chain.isGatedTopic(thread.topic.id)) &&
+                      !app.chain.isGatedTopic(thread?.topic?.id)) &&
                     canReact
                   }
                   canEdit={

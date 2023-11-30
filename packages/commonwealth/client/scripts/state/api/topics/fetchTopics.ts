@@ -1,8 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import Topic from 'models/Topic';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import Topic from 'models/Topic';
-import { useQuery } from '@tanstack/react-query';
 
 const TOPICS_STALE_TIME = 30 * 1_000; // 30 s
 
@@ -15,9 +15,9 @@ const fetchTopics = async ({ chainId }: FetchTopicsProps) => {
     `${app.serverUrl()}${ApiEndpoints.BULK_TOPICS}`,
     {
       params: {
-        chain: chainId || app.activeChainId(),
+        community_id: chainId || app.activeChainId(),
       },
-    }
+    },
   );
 
   return response.data.result.map((t) => new Topic(t));

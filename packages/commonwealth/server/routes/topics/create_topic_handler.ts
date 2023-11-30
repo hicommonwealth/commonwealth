@@ -1,8 +1,8 @@
+import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
 import { TopicAttributes } from '../../models/topic';
 import { ServerControllers } from '../../routing/router';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-import z from 'zod';
 
 const Errors = {
   ValidationError: 'Validation error',
@@ -15,9 +15,9 @@ type CreateTopicResponse = TopicAttributes;
 export const createTopicHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateTopicRequestBody>,
-  res: TypedResponse<CreateTopicResponse>
+  res: TypedResponse<CreateTopicResponse>,
 ) => {
-  const { user, chain, body } = req;
+  const { user, chain: community, body } = req;
 
   const validationSchema = z.object({
     name: z.string().optional(),
@@ -32,15 +32,17 @@ export const createTopicHandler = async (
   const validationResult = validationSchema.safeParse(body);
   if (validationResult.success === false) {
     throw new AppError(
-      `${Errors.ValidationError}: ${validationResult.error.message}`
+      `${Errors.ValidationError}: ${validationResult.error.message}`,
     );
   }
 
-  const topic = await controllers.topics.createTopic({
+  const [topic, analyticsOptions] = await controllers.topics.createTopic({
     user,
-    chain,
+    community,
     body: validationResult.data,
   });
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, topic);
 };
