@@ -8,6 +8,7 @@ import models from '../../../server/database';
 import { BalanceSourceType } from '../../../server/util/requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
+import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
 
 async function resetChainNode(ethChainId: number) {
@@ -423,6 +424,110 @@ describe('Token Balance Cache EVM Tests', function () {
         expect(Object.keys(balances).length).to.equal(2);
         expect(balances[addressOne721]).to.equal('1');
         expect(balances[addressTwo721]).to.equal('1');
+      });
+    });
+  });
+
+  describe.only('ERC1155', () => {
+    let erc1155: ERC1155;
+    before('Deploy/mint ERC1155 and reset ChainNode', async () => {
+      await resetChainNode(ethChainId);
+      erc1155 = await sdk.deployErc1155();
+      await erc1155.mint('1', 10, addressOne);
+      await erc1155.mint('1', 20, addressTwo);
+      await erc1155.mint('2', 1, addressOne);
+      await erc1155.mint('3', 1, addressTwo);
+    });
+
+    describe('Single address', () => {
+      it('should not fail if no address is given', async () => {
+        const balance = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: [],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+        });
+
+        expect(Object.keys(balance).length).to.equal(0);
+      });
+
+      it('should not fail if a single invalid address is given', async () => {
+        const balance = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: [discobotAddress],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+        });
+
+        expect(Object.keys(balance).length).to.equal(0);
+      });
+
+      it('should return a single balance', async () => {
+        const balance = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: [addressOne],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+        });
+
+        expect(Object.keys(balance).length).to.equal(1);
+        expect(balance[addressOne]).to.equal('10');
+
+        const balanceTwo = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: [addressTwo],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+        });
+
+        expect(Object.keys(balanceTwo).length).to.equal(1);
+        expect(balanceTwo[addressTwo]).to.equal('20');
+      });
+    });
+
+    describe('on-chain batching', () => {
+      it('should return many balances', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: [addressOne, addressTwo],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+        });
+
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne]).to.equal('10');
+        expect(balances[addressTwo]).to.equal('20');
+      });
+
+      it('should not throw if a single address fails', async () => {
+        const balances = await tbc.getBalances({
+          balanceSourceType: BalanceSourceType.ERC1155,
+          addresses: [addressOne, discobotAddress, addressTwo],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: erc1155.address,
+            tokenId: 1,
+          },
+        });
+
+        expect(Object.keys(balances).length).to.equal(2);
+        expect(balances[addressOne]).to.equal('10');
+        expect(balances[addressTwo]).to.equal('20');
       });
     });
   });
