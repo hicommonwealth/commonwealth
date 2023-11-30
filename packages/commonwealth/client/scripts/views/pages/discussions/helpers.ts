@@ -3,10 +3,10 @@ import { notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
 import { Dispatch, SetStateAction } from 'react';
 import app from 'state';
+import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 import type Thread from '../../../models/Thread';
 import { ThreadFeaturedFilterTypes } from '../../../models/types';
-import { PopoverMenuItem } from '../../components/component_kit/cw_popover/cw_popover_menu';
 
 export const getLastUpdated = (thread: Thread) => {
   if (!thread) return;
@@ -31,6 +31,7 @@ export const isNewThread = (threadCreatedAt: moment.Moment) => {
 };
 
 export const getLastUpdate = (thread: Thread): number => {
+  if (!thread) return 0;
   const lastComment = thread.lastCommentedOn?.unix() || 0;
   const createdAt = thread.createdAt?.unix() || 0;
   const lastUpdate = Math.max(createdAt, lastComment);
