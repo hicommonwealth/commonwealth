@@ -119,6 +119,16 @@ const ReactQuillEditor = ({
       ...newContent,
       ___isMarkdown: isMarkdownEnabled,
     } as SerializableDeltaStatic);
+
+    // sets the correct cursor position after pasting content
+    if (editorRef?.current?.getEditor?.()?.getSelection?.()) {
+      const selection = editorRef.current.getEditor().getSelection();
+      setTimeout(() => {
+        editorRef.current
+          .getEditor()
+          .setSelection(selection.index, selection.length);
+      });
+    }
   };
 
   const handleToggleMarkdown = () => {
