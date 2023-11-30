@@ -110,35 +110,33 @@ export const useTextInputWithValidation = () => {
   };
 };
 
-export const CWTextInput = (props: TextInputProps) => {
+export const CWTextInput = ({
+  autoComplete = 'off',
+  autoFocus,
+  containerClassName,
+  darkMode,
+  defaultValue,
+  value,
+  disabled,
+  iconRight,
+  iconRightonClick,
+  inputClassName,
+  inputValidationFn,
+  label,
+  maxLength,
+  name,
+  onInput,
+  onenterkey,
+  onClick,
+  placeholder,
+  size = 'large',
+  tabIndex,
+  displayOnly,
+  manualStatusMessage = '',
+  manualValidationStatus,
+  validationStatus,
+}: TextInputProps) => {
   const validationProps = useTextInputWithValidation();
-
-  const {
-    autoComplete = 'off',
-    autoFocus,
-    containerClassName,
-    darkMode,
-    defaultValue,
-    value,
-    disabled,
-    iconRight,
-    iconRightonClick,
-    inputClassName,
-    inputValidationFn,
-    label,
-    maxLength,
-    name,
-    onInput,
-    onenterkey,
-    onClick,
-    placeholder,
-    size = 'large',
-    tabIndex,
-    displayOnly,
-    manualStatusMessage = '',
-    manualValidationStatus = '',
-    validationStatus,
-  } = props;
 
   return (
     <div
