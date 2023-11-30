@@ -4,8 +4,8 @@ import moment from 'moment';
 import app from 'state';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import {
   displayOptions,
   ManageContractTemplateModalProps,

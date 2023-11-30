@@ -63,7 +63,8 @@ export const ChangeThreadTopicModal = ({
 
       onModalClose && onModalClose();
     } catch (err) {
-      const error = err?.responseJSON?.error || 'Failed to update thread topic';
+      const error =
+        err?.response?.data?.error || 'Failed to update thread topic';
       console.log(error);
       throw new Error(error);
     }

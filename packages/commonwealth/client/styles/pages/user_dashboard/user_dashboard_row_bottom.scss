@@ -14,7 +14,11 @@
     .count {
       display: flex;
       align-items: center;
-      width: 120px;
+      gap: 4px;
+      align-items: center;
+      width: fit-content;
+      color: $neutral-500;
+      border: 0;
     }
 
     .icon,

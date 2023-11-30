@@ -116,7 +116,7 @@ export const TopicSummaryRow = ({
                       {moment(getLastUpdated(thread)).format('l')}
                     </CWText>
                     {isNewThread(thread.createdAt) && (
-                      <CWTag label={'New'} type={'new'} iconName={'newStar'} />
+                      <CWTag label="New" type="new" iconName="newStar" />
                     )}
                     {thread.readOnly && (
                       <CWIcon iconName="lock" iconSize="small" />
@@ -155,6 +155,7 @@ export const TopicSummaryRow = ({
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        navigate(`${discussionLink}?focusEditor=true`);
                       }}
                     />
                   </div>

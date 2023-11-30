@@ -1,5 +1,4 @@
 @import '../../../../../styles/shared';
-@import '../../../../../styles/components/component_kit/cw_popover/cw_tooltip';
 
 .thread-connectors-container {
   display: flex;
@@ -37,7 +36,6 @@
 
 .Comment {
   display: flex;
-  //border: 1px solid red;
 
   &.highlighted {
     background-color: $yellow-200;
@@ -111,10 +109,6 @@
       align-items: center;
       gap: 1px;
       flex-wrap: wrap;
-
-      .OldTooltip {
-        @include newTempBlackTooltip;
-      }
     }
   }
 }

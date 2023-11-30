@@ -97,8 +97,8 @@ const EditProfileComponent = () => {
       );
     } catch (err) {
       if (
-        err.status === 500 &&
-        err.responseJSON?.error === NoProfileFoundError
+        err.response?.data?.status === 500 &&
+        err.response?.data?.error === NoProfileFoundError
       ) {
         setError(EditProfileError.NoProfileFound);
       }
@@ -138,7 +138,7 @@ const EditProfileComponent = () => {
           navigate(`/profile/id/${profile.id}`);
         })
         .catch((err) => {
-          notifyError(err?.responseJSON?.error || 'Something went wrong.');
+          notifyError(err?.response?.data?.error || 'Something went wrong.');
         });
     } else {
       setTimeout(() => {
