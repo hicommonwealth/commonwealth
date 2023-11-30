@@ -15,6 +15,7 @@ import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
 import CWCommunitySelector from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -1976,6 +1977,17 @@ export const ComponentShowcase = () => {
           onClick={(type) => console.log('Selected: ', type)}
           description="Solana is a rapidly growing technology due to its speed and scale.
           Our integration with Solana allows you to create a community for your project with just a click! "
+        />
+      </div>
+
+      <div className="FormStepContainer">
+        <CWText type="h3">Form Steps</CWText>
+        <CWFormSteps
+          steps={[
+            { label: 'First Step', state: 'completed' },
+            { label: 'Second Step', state: 'active' },
+            { label: 'Third Step', state: 'inactive' },
+          ]}
         />
       </div>
     </div>

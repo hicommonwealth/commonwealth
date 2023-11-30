@@ -20,6 +20,7 @@ export enum ComponentType {
   Divider = 'Divider',
   Form = 'Form',
   FormSection = 'FormSection',
+  FormSteps = 'FormSteps',
   FilterMenu = 'FilterMenu',
   Growl = 'Growl',
   Icon = 'Icon',
