@@ -74,6 +74,12 @@ export type CreateCommunityOptions = {
       substrate_spec: string;
       address?: string;
       decimals: number;
+      // below are deprecated, will be removed in create community v2
+      website: string;
+      discord: string;
+      telegram: string;
+      github: string;
+      element: string;
     };
 };
 

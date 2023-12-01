@@ -19,11 +19,7 @@ export const Errors = {
   CantChangeNetwork: 'Cannot change chain network',
   NotAdmin: 'Not an admin',
   NoCommunityFound: 'Community not found',
-  InvalidWebsite: 'Website must begin with https://',
-  InvalidDiscord: 'Discord must begin with https://',
-  InvalidElement: 'Element must begin with https://',
-  InvalidTelegram: 'Telegram must begin with https://t.me/',
-  InvalidGithub: 'Github must begin with https://github.com/',
+  InvalidSocialLink: 'Social Link must begin with http(s)://',
   InvalidCustomDomain: 'Custom domain may not include "commonwealth"',
   InvalidSnapshot: 'Snapshot must fit the naming pattern of *.eth or *.xyz',
   SnapshotOnlyOnEthereum:
@@ -84,11 +80,7 @@ export async function __updateCommunity(
     type,
     name,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    social_links,
     hide_projects,
     stages_enabled,
     custom_stages,
@@ -110,16 +102,11 @@ export async function __updateCommunity(
     snapshot = [];
   }
 
-  if (website && !urlHasValidHTTPPrefix(website)) {
-    throw new AppError(Errors.InvalidWebsite);
-  } else if (discord && !urlHasValidHTTPPrefix(discord)) {
-    throw new AppError(Errors.InvalidDiscord);
-  } else if (element && !urlHasValidHTTPPrefix(element)) {
-    throw new AppError(Errors.InvalidElement);
-  } else if (telegram && !telegram.startsWith('https://t.me/')) {
-    throw new AppError(Errors.InvalidTelegram);
-  } else if (github && !github.startsWith('https://github.com/')) {
-    throw new AppError(Errors.InvalidGithub);
+  const invalidSocialLinks = social_links.filter(
+    (s) => !urlHasValidHTTPPrefix(s),
+  );
+  if (social_links && invalidSocialLinks.length > 0) {
+    throw new AppError(`${invalidSocialLinks[0]}: ${Errors.InvalidSocialLink}`);
   } else if (custom_domain && custom_domain.includes('commonwealth')) {
     throw new AppError(Errors.InvalidCustomDomain);
   } else if (
@@ -188,11 +175,7 @@ export async function __updateCommunity(
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
-  if (website !== null) chain.website = website;
-  if (discord !== null) chain.discord = discord;
-  if (element) chain.element = element;
-  if (telegram !== null) chain.telegram = telegram;
-  if (github !== null) chain.github = github;
+  if (social_links !== null) chain.social_links = social_links;
   if (hide_projects) chain.hide_projects = hide_projects;
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;
