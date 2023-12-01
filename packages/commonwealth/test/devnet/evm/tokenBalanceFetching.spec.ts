@@ -7,6 +7,7 @@ import { toWei } from 'web3-utils';
 import models from '../../../server/database';
 import { BalanceSourceType } from '../../../server/util/requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
+import { delay } from '../../util/delayUtils';
 import { ChainTesting } from '../../util/evm-chain-testing/sdk/chainTesting';
 import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
@@ -23,10 +24,6 @@ async function resetChainNode(ethChainId: number) {
     balance_type: BalanceType.Ethereum,
     name: 'Local EVM Chain',
   });
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 describe('Token Balance Cache EVM Tests', function () {
@@ -561,9 +558,12 @@ describe('Token Balance Cache EVM Tests', function () {
     });
   });
 
-  describe.only('Caching', () => {
+  describe('Caching', () => {
     // the TTL of balances in TBC in seconds
     const balanceTTL = 20;
+    const chainLinkAddress = '0x514910771AF9Ca656af840dff83E8264EcF986CA';
+    const transferAmount = '76';
+
     before('Set TBC caching TTL and reset chain node', async () => {
       await resetChainNode(ethChainId);
       tbc = new TokenBalanceCache(models, redisCache, balanceTTL);
@@ -571,61 +571,55 @@ describe('Token Balance Cache EVM Tests', function () {
       await redisCache.client.flushAll();
     });
 
-    describe('Cosmos', () => {});
-    describe('EVM', () => {
-      const chainLinkAddress = '0x514910771AF9Ca656af840dff83E8264EcF986CA';
-      const transferAmount = '76';
+    it('should cache for TTL but not longer', async () => {
+      const originalAddressOneBalance = await sdk.getBalance(
+        chainLinkAddress,
+        addressOne,
+      );
 
-      it('should cache for TTL but not longer', async () => {
-        const originalAddressOneBalance = await sdk.getBalance(
-          chainLinkAddress,
-          addressOne,
-        );
-
-        const balance = await tbc.getBalances({
-          balanceSourceType: BalanceSourceType.ERC20,
-          addresses: [addressOne],
-          sourceOptions: {
-            evmChainId: ethChainId,
-            contractAddress: chainLinkAddress,
-          },
-          cacheRefresh: true,
-        });
-        expect(Object.keys(balance).length).to.equal(1);
-        expect(balance[addressOne]).to.equal(originalAddressOneBalance);
-
-        // this must complete in under balanceTTL time or the test fails
-        await sdk.getErc20(chainLinkAddress, addressOne, transferAmount);
-
-        const balanceTwo = await tbc.getBalances({
-          balanceSourceType: BalanceSourceType.ERC20,
-          addresses: [addressOne],
-          sourceOptions: {
-            evmChainId: ethChainId,
-            contractAddress: chainLinkAddress,
-          },
-        });
-        expect(Object.keys(balanceTwo).length).to.equal(1);
-        expect(balanceTwo[addressOne]).to.equal(originalAddressOneBalance);
-
-        await sleep(20000);
-
-        const transferAmountBN = new BN(toWei(transferAmount));
-        const finalAddressOneBalance = new BN(originalAddressOneBalance)
-          .add(transferAmountBN)
-          .toString(10);
-
-        const balanceThree = await tbc.getBalances({
-          balanceSourceType: BalanceSourceType.ERC20,
-          addresses: [addressOne],
-          sourceOptions: {
-            evmChainId: ethChainId,
-            contractAddress: chainLinkAddress,
-          },
-        });
-        expect(Object.keys(balanceThree).length).to.equal(1);
-        expect(balanceThree[addressOne]).to.equal(finalAddressOneBalance);
+      const balance = await tbc.getBalances({
+        balanceSourceType: BalanceSourceType.ERC20,
+        addresses: [addressOne],
+        sourceOptions: {
+          evmChainId: ethChainId,
+          contractAddress: chainLinkAddress,
+        },
+        cacheRefresh: true,
       });
+      expect(Object.keys(balance).length).to.equal(1);
+      expect(balance[addressOne]).to.equal(originalAddressOneBalance);
+
+      // this must complete in under balanceTTL time or the test fails
+      await sdk.getErc20(chainLinkAddress, addressOne, transferAmount);
+
+      const balanceTwo = await tbc.getBalances({
+        balanceSourceType: BalanceSourceType.ERC20,
+        addresses: [addressOne],
+        sourceOptions: {
+          evmChainId: ethChainId,
+          contractAddress: chainLinkAddress,
+        },
+      });
+      expect(Object.keys(balanceTwo).length).to.equal(1);
+      expect(balanceTwo[addressOne]).to.equal(originalAddressOneBalance);
+
+      await delay(20000);
+
+      const transferAmountBN = new BN(toWei(transferAmount));
+      const finalAddressOneBalance = new BN(originalAddressOneBalance)
+        .add(transferAmountBN)
+        .toString(10);
+
+      const balanceThree = await tbc.getBalances({
+        balanceSourceType: BalanceSourceType.ERC20,
+        addresses: [addressOne],
+        sourceOptions: {
+          evmChainId: ethChainId,
+          contractAddress: chainLinkAddress,
+        },
+      });
+      expect(Object.keys(balanceThree).length).to.equal(1);
+      expect(balanceThree[addressOne]).to.equal(finalAddressOneBalance);
     });
   });
 });

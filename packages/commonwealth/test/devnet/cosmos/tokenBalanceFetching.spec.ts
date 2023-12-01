@@ -1,13 +1,30 @@
+import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
+import {
+  QueryClient,
+  SigningStargateClient,
+  coins,
+  setupBankExtension,
+  setupStakingExtension,
+} from '@cosmjs/stargate';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { RedisCache } from 'common-common/src/redisCache';
 import models from '../../../server/database';
 import { BalanceSourceType } from '../../../server/util/requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../../../server/util/tokenBalanceCache/tokenBalanceCache';
+import { delay } from '../../util/delayUtils';
 
 chaiUse(chaiAsPromised);
 
-describe('Token Balance Cache Cosmos Tests', () => {
+// same mnemonic as defined in cosmos-chain-testing bootstrap files
+const addressOneMnemonic =
+  'jewel disease neglect feel mother dry hire yellow minute main tray famous';
+const addressTwoMnemonic =
+  'wild science ski despair vault sure check car donate slush way window';
+
+describe('Token Balance Cache Cosmos Tests', function () {
+  this.timeout(80_000);
   let tbc: TokenBalanceCache;
   // mnemonic + token allocation can be found in cosmos-chain-test/[version]/bootstrap.sh files
   const addressOne = 'cosmos1zf45elxg5alxxeewvumpprfqtxmy2ufhzvetgx';
@@ -16,9 +33,11 @@ describe('Token Balance Cache Cosmos Tests', () => {
   const cosmosChainId = 'csdkv1ci';
   const addressOneBalance = '50000000000';
   const addressTwoBalance = '30000000000';
+  let redisCache: RedisCache;
 
   before(async () => {
-    const redisCache = new RedisCache();
+    redisCache = new RedisCache();
+    await redisCache.init('redis://localhost:6379');
     tbc = new TokenBalanceCache(models, redisCache);
   });
 
@@ -29,6 +48,7 @@ describe('Token Balance Cache Cosmos Tests', () => {
       sourceOptions: {
         cosmosChainId,
       },
+      cacheRefresh: true,
     });
 
     console.log(balance);
@@ -43,6 +63,7 @@ describe('Token Balance Cache Cosmos Tests', () => {
       sourceOptions: {
         cosmosChainId,
       },
+      cacheRefresh: true,
     });
 
     expect(Object.keys(balance).length).to.equal(1);
@@ -56,6 +77,7 @@ describe('Token Balance Cache Cosmos Tests', () => {
       sourceOptions: {
         cosmosChainId,
       },
+      cacheRefresh: true,
     });
 
     expect(Object.keys(balances).length).to.equal(1);
@@ -69,10 +91,95 @@ describe('Token Balance Cache Cosmos Tests', () => {
       sourceOptions: {
         cosmosChainId,
       },
+      cacheRefresh: true,
     });
 
     expect(Object.keys(balances).length).to.equal(2);
     expect(balances[addressOne]).to.equal(addressOneBalance);
     expect(balances[addressTwo]).to.equal(addressTwoBalance);
+  });
+
+  describe.only('Caching', () => {
+    const balanceTTL = 20;
+
+    before('Set TBC caching TTL and reset Redis', async () => {
+      tbc = new TokenBalanceCache(models, redisCache, balanceTTL);
+      await redisCache.client.flushAll();
+    });
+
+    it('should cache for TTL but not longer', async () => {
+      const chainNode = await models.ChainNode.findOne({
+        where: {
+          cosmos_chain_id: cosmosChainId,
+        },
+      });
+      const rpcEndpoint = chainNode.private_url || chainNode.url;
+      const tmClient = await Tendermint34Client.connect(rpcEndpoint);
+      const api = QueryClient.withExtensions(
+        tmClient,
+        setupBankExtension,
+        setupStakingExtension,
+      );
+      const { params } = await api.staking.params();
+      const denom = params?.bondDenom;
+      const { amount } = await api.bank.balance(addressOne, denom);
+      const originalAddressOneBalance = amount;
+      console.log('Original Balance', amount);
+
+      const balance = await tbc.getBalances({
+        balanceSourceType: BalanceSourceType.CosmosNative,
+        addresses: [addressOne],
+        sourceOptions: {
+          cosmosChainId,
+        },
+        cacheRefresh: true,
+      });
+      console.log('Balance One:', balance);
+      expect(Object.keys(balance).length).to.equal(1);
+      expect(balance[addressOne]).to.equal(originalAddressOneBalance);
+
+      // transfer tokens
+      const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
+        addressOneMnemonic,
+      );
+      const client = await SigningStargateClient.connectWithSigner(
+        rpcEndpoint,
+        wallet,
+      );
+      const transferAmount = coins(76, denom);
+      const result = await client.sendTokens(
+        addressOne,
+        addressTwo,
+        transferAmount,
+        {
+          amount: coins(500, denom),
+          gas: '200000',
+        },
+      );
+      console.log('Transfer TXN:', result);
+
+      const balanceTwo = await tbc.getBalances({
+        balanceSourceType: BalanceSourceType.CosmosNative,
+        addresses: [addressOne],
+        sourceOptions: {
+          cosmosChainId,
+        },
+      });
+      console.log('Balance Two:', balanceTwo);
+      expect(Object.keys(balanceTwo).length).to.equal(1);
+      expect(balanceTwo[addressOne]).to.equal(originalAddressOneBalance);
+      await delay(20000);
+
+      const balanceThree = await tbc.getBalances({
+        balanceSourceType: BalanceSourceType.CosmosNative,
+        addresses: [addressOne],
+        sourceOptions: {
+          cosmosChainId,
+        },
+      });
+      console.log('Balance Three:', balanceThree);
+      expect(Object.keys(balanceThree).length).to.equal(1);
+      expect(balanceThree[addressOne]).to.equal('20');
+    });
   });
 });
