@@ -2,10 +2,12 @@ import moment from 'moment';
 
 import { UserInstance } from 'server/models/user';
 import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { VoteAttributes } from '../../models/vote';
 import validateTopicThreshold from '../../util/validateTopicThreshold';
+import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -27,11 +29,11 @@ export type UpdatePollVoteOptions = {
   option: string;
 };
 
-export type UpdatePollVoteResult = VoteAttributes;
+export type UpdatePollVoteResult = [VoteAttributes, TrackOptions];
 
 export async function __updatePollVote(
   this: ServerThreadsController,
-  { address, community, pollId, option }: UpdatePollVoteOptions
+  { user, address, community, pollId, option }: UpdatePollVoteOptions,
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({
     where: { id: pollId, community_id: community.id },
@@ -70,7 +72,7 @@ export async function __updatePollVote(
       this.tokenBalanceCache,
       this.models,
       thread.topic_id,
-      address.address
+      address.address,
     );
     if (!canVote) {
       throw new AppError(Errors.InsufficientTokenBalance);
@@ -97,9 +99,15 @@ export async function __updatePollVote(
         ...voteData,
         option: selectedOption,
       },
-      { transaction }
+      { transaction },
     );
   });
 
-  return vote.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.SUBMIT_VOTE,
+    community: community.id,
+    userId: user.id,
+  };
+
+  return [vote.toJSON(), analyticsOptions];
 }

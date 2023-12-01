@@ -9,11 +9,12 @@ interface APIResponseFormat {
   requirements: {
     rule: 'threshold';
     source: {
-      source_type: 'erc20' | 'erc721' | 'cosmos_native' | 'eth_native';
+      source_type: 'erc20' | 'erc721' | 'erc1155' | 'cosmos_native' | 'eth_native';
       evm_chain_id?: number;
       cosmos_chain_id?: number;
       contract_address?: string;
       token_symbol?: string;
+      token_id?: string;
     };
   }[];
   topics: any[];

@@ -9,6 +9,7 @@ import { useFetchThreadsQuery } from 'state/api/threads';
 import { useDateCursor } from 'state/api/threads/fetchThreads';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { slugify } from 'utils';
+import useBrowserWindow from '../../../hooks/useBrowserWindow';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import {
   ThreadFeaturedFilterTypes,
@@ -16,6 +17,7 @@ import {
 } from '../../../models/types';
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
@@ -55,6 +57,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   });
 
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
+  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
@@ -105,12 +108,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           );
 
           const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread.topic.id),
+            membership.topicIds.includes(thread?.topic?.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
-              membership.topicIds.includes(thread.topic.id) &&
+              membership.topicIds.includes(thread?.topic?.id) &&
               membership.isAllowed,
           );
 
@@ -123,7 +126,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
           return (
             <ThreadCard
-              key={thread.id + '-' + thread.readOnly}
+              key={thread?.id + '-' + thread.readOnly}
               thread={thread}
               canReact={!disabledActionsTooltipText}
               canComment={!disabledActionsTooltipText}
@@ -178,6 +181,19 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           ),
         }}
       />
+      {isWindowSmallInclusive && (
+        <div className="floating-mobile-button">
+          <CWIconButton
+            iconName="plusCircle"
+            iconButtonTheme="black"
+            iconSize="xl"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!hasJoinedCommunity}
+          />
+        </div>
+      )}
     </div>
   );
 };

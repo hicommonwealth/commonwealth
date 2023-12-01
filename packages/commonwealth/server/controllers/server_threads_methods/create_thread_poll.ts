@@ -1,9 +1,11 @@
 import moment from 'moment';
 import { AppError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { CommunityInstance } from '../../models/community';
 import { PollAttributes } from '../../models/poll';
 import { UserInstance } from '../../models/user';
 import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -21,7 +23,7 @@ export type CreateThreadPollOptions = {
   options: string[];
   customDuration?: number;
 };
-export type CreateThreadPollResult = PollAttributes;
+export type CreateThreadPollResult = [PollAttributes, TrackOptions];
 
 export async function __createThreadPoll(
   this: ServerThreadsController,
@@ -96,5 +98,11 @@ export async function __createThreadPoll(
     );
   });
 
-  return poll.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.CREATE_POLL,
+    community: community.id,
+    userId: user.id,
+  };
+
+  return [poll.toJSON(), analyticsOptions];
 }

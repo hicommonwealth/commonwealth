@@ -20,6 +20,7 @@ import { success } from '../types';
 
 import axios from 'axios';
 import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { COSMOS_REGISTRY_API } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import { ALL_COMMUNITIES } from '../middleware/databaseValidationService';
 import {
@@ -63,7 +64,7 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  UnegisteredCosmosChain: `Check https://cosmos.directory.
+  UnegisteredCosmosChain: `Check https://cosmos.directory. 
   Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
@@ -191,9 +192,8 @@ const createChain = async (
       }
     }
 
-    const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
     const { data: chains } = await axios.get(
-      `${REGISTRY_API_URL}/api/v1/mainnet`,
+      `${COSMOS_REGISTRY_API}/api/v1/mainnet`,
     );
     const foundRegisteredChain = chains?.find(
       (chain) => chain === cosmos_chain_id,
@@ -352,7 +352,7 @@ const createChain = async (
   }
 
   const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
-    where: { [Op.or]: [{ url }, { eth_chain_id }] },
+    where: { url },
     defaults: {
       url,
       eth_chain_id,
@@ -478,7 +478,6 @@ const createChain = async (
   serverAnalyticsController.track(
     {
       chainBase: req.body.base,
-      isCustomDomain: null,
       communityType: null,
       event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
     },
