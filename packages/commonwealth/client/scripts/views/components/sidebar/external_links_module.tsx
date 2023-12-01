@@ -8,9 +8,10 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 export const ExternalLinksModule = () => {
   if (!app.chain) return;
   const meta = app.chain.meta;
-  const { website, discord, element, telegram, github } = meta;
+  const { remainingLinks, discord, element, telegram, github } =
+    meta.categorizeSocialLinks();
 
-  if (!website && !discord && !telegram && !github) return;
+  if (!remainingLinks && !discord && !telegram && !github) return;
 
   return (
     <div className="ExternalLinksModule">
@@ -42,13 +43,14 @@ export const ExternalLinksModule = () => {
           onClick={() => window.open(github)}
         />
       )}
-      {website && (
+      {remainingLinks.map((link) => (
         <CWIcon
+          key={link}
           iconName="website"
           className="website-link"
-          onClick={() => window.open(website)}
+          onClick={() => window.open(link)}
         />
-      )}
+      ))}
     </div>
   );
 };

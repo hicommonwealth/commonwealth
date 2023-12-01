@@ -171,13 +171,21 @@ export const CommunityMetadataRows = ({
     chainId: app.activeChainId(),
   });
 
+  const {
+    discord: initialDiscord,
+    element: initialElement,
+    telegram: initialTelegram,
+    github: initialGithub,
+    remainingLinks,
+  } = community.categorizeSocialLinks();
+
   const [name, setName] = useState(community.name);
   const [description, setDescription] = useState(community.description);
-  const [website, setWebsite] = useState(community.website);
-  const [discord, setDiscord] = useState(community.discord);
-  const [element, setElement] = useState(community.element);
-  const [telegram, setTelegram] = useState(community.telegram);
-  const [github, setGithub] = useState(community.github);
+  const [website, setWebsite] = useState(remainingLinks[0]);
+  const [discord, setDiscord] = useState(initialDiscord);
+  const [element, setElement] = useState(initialElement);
+  const [telegram, setTelegram] = useState(initialTelegram);
+  const [github, setGithub] = useState(initialGithub);
   const [stagesEnabled, setStagesEnabled] = useState(community.stagesEnabled);
   const [customStages, setCustomStages] = useState(community.customStages);
   const [customDomain, setCustomDomain] = useState(community.customDomain);
@@ -280,15 +288,12 @@ export const CommunityMetadataRows = ({
     } catch (err) {
       console.log(err);
     }
+    const socialLinks: string[] = [website, discord, element, telegram, github];
     try {
       await community.updateChainData({
         name,
         description,
-        website,
-        discord,
-        element,
-        telegram,
-        github,
+        socialLinks,
         stagesEnabled,
         customStages,
         customDomain,

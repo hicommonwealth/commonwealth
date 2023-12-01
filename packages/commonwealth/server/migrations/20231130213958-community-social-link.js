@@ -22,13 +22,17 @@ module.exports = {
             NULLIF(discord, ''),
             NULLIF(website, ''),
             NULLIF(telegram, ''),
-            NULLIF(github, '')
+            NULLIF(github, ''),
+            NULLIF(element, '')
           ], NULL)
       `,
         { transaction },
       );
 
       await queryInterface.removeColumn('Communities', 'discord', {
+        transaction,
+      });
+      await queryInterface.removeColumn('Communities', 'element', {
         transaction,
       });
       await queryInterface.removeColumn('Communities', 'website', {
@@ -75,6 +79,15 @@ module.exports = {
       await queryInterface.addColumn(
         'Communities',
         'github',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
+      await queryInterface.addColumn(
+        'Communities',
+        'element',
         {
           type: Sequelize.STRING,
           allowNull: true,

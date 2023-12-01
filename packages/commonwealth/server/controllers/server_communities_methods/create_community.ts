@@ -359,6 +359,8 @@ export async function __createCommunity(
     },
   });
 
+  const social_links = [website, telegram, discord, element, github];
+
   const createdCommunity = await this.models.Community.create({
     id,
     name,
@@ -367,11 +369,7 @@ export async function __createCommunity(
     description,
     network,
     type,
-    website,
-    discord,
-    telegram,
-    github,
-    element,
+    social_links,
     base,
     bech32_prefix,
     active: true,

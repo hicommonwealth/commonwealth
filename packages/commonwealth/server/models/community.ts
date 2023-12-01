@@ -28,11 +28,7 @@ export type CommunityAttributes = {
   type: ChainType;
   id?: string;
   description?: string;
-  discord?: string;
-  element?: string;
-  website?: string;
-  telegram?: string;
-  github?: string;
+  social_links: string[];
   ss58_prefix?: number;
   stages_enabled?: boolean;
   custom_stages?: string;
@@ -108,11 +104,10 @@ export default (
       discord_config_id: { type: dataTypes.INTEGER, allowNull: true }, // null if no bot enabled
       description: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
-      website: { type: dataTypes.STRING, allowNull: true },
-      discord: { type: dataTypes.STRING, allowNull: true },
-      element: { type: dataTypes.STRING, allowNull: true },
-      telegram: { type: dataTypes.STRING, allowNull: true },
-      github: { type: dataTypes.STRING, allowNull: true },
+      social_links: {
+        type: dataTypes.ARRAY(dataTypes.STRING),
+        allowNull: false,
+      },
       default_symbol: { type: dataTypes.STRING, allowNull: false },
       network: { type: dataTypes.STRING, allowNull: false },
       base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
