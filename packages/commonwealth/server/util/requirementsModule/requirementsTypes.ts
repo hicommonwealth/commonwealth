@@ -1,7 +1,11 @@
-export type ContractSource = {
-  source_type: BalanceSourceType.ERC20 | BalanceSourceType.ERC721;
+type ContractSource = {
+  source_type:
+    | BalanceSourceType.ERC20
+    | BalanceSourceType.ERC721
+    | BalanceSourceType.ERC1155;
   evm_chain_id: number;
   contract_address: string;
+  token_id?: string;
 };
 
 export type NativeSource = {

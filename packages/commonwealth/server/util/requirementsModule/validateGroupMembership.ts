@@ -103,6 +103,7 @@ async function _thresholdCheck(
     let balanceSourceType: BalanceSourceType;
     let contractAddress: string;
     let chainId: string;
+    let tokenId: string;
     switch (thresholdData.source.source_type) {
       case 'erc20': {
         balanceSourceType = BalanceSourceType.ERC20;
@@ -114,6 +115,13 @@ async function _thresholdCheck(
         balanceSourceType = BalanceSourceType.ERC721;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.evm_chain_id.toString();
+        break;
+      }
+      case 'erc1155': {
+        balanceSourceType = BalanceSourceType.ERC1155;
+        contractAddress = thresholdData.source.contract_address;
+        chainId = thresholdData.source.evm_chain_id.toString();
+        tokenId = thresholdData.source.token_id.toString();
         break;
       }
       case 'eth_native': {
@@ -140,6 +148,12 @@ async function _thresholdCheck(
             return (
               b.options.sourceOptions.contractAddress == contractAddress &&
               b.options.sourceOptions.evmChainId.toString() === chainId
+            );
+          case BalanceSourceType.ERC1155:
+            return (
+              b.options.sourceOptions.contractAddress == contractAddress &&
+              b.options.sourceOptions.evmChainId.toString() === chainId &&
+              b.options.sourceOptions.tokenId.toString() === tokenId
             );
           case BalanceSourceType.ETHNative:
             return b.options.sourceOptions.evmChainId.toString() === chainId;
