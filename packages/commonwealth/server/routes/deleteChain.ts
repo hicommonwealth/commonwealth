@@ -5,10 +5,9 @@ import { sequelize } from '../database';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { findAllRoles } from '../util/roles';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NotAdmin: 'Must be a site admin',
   NeedChainId: 'Must provide chain id',
   NoChain: 'Chain not found',
@@ -47,7 +46,7 @@ const deleteChain = async (
   //   return next(new AppError(Errors.CannotDeleteChain));
   // }
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id,
       has_chain_events_listener: false, // make sure no chain events
@@ -81,7 +80,12 @@ const deleteChain = async (
 
           // Add the created by field to comments for redundancy
           await sequelize.query(
-            `UPDATE "Comments" SET created_by = (SELECT address FROM "Addresses" WHERE "Comments".address_id = "Addresses".id) WHERE chain = '${chain.id}'`,
+            `UPDATE "Comments"
+                 SET created_by = (
+                    SELECT address
+                    FROM "Addresses"
+                    WHERE "Comments".address_id = "Addresses".id)
+                 WHERE chain = '${chain.id}'`,
             { transaction: t }
           );
 
@@ -108,7 +112,7 @@ const deleteChain = async (
           });
 
           await models.Webhook.destroy({
-            where: { chain_id: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 
@@ -125,18 +129,23 @@ const deleteChain = async (
           });
 
           await models.Vote.destroy({
-            where: { chain_id: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 
           await models.Poll.destroy({
-            where: { chain_id: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 
           // Add the created by field to threads for redundancy
           await sequelize.query(
-            `UPDATE "Threads" SET created_by = (SELECT address FROM "Addresses" WHERE "Threads".address_id = "Addresses".id) WHERE chain = '${chain.id}'`,
+            `UPDATE "Threads"
+                 SET created_by = (
+                    SELECT address
+                    FROM "Addresses"
+                    WHERE "Threads".address_id = "Addresses".id)
+                 WHERE chain = '${chain.id}'`,
             { transaction: t }
           );
 
@@ -148,10 +157,6 @@ const deleteChain = async (
           await models.StarredCommunity.destroy({
             where: { chain: chain.id },
             transaction: t,
-          });
-
-          const addresses = await models.Address.findAll({
-            where: { chain: chain.id },
           });
 
           await models.CommunityBanner.destroy({
@@ -166,11 +171,11 @@ const deleteChain = async (
           });
 
           await models.Address.destroy({
-            where: { chain: chain.id },
+            where: { community_id: chain.id },
             transaction: t,
           });
 
-          await models.Chain.destroy({
+          await models.Community.destroy({
             where: { id: chain.id },
             transaction: t,
           });

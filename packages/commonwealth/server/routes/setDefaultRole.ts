@@ -4,7 +4,7 @@ import Sequelize from 'sequelize';
 import type { DB } from '../models';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   InvalidAddress: 'Invalid address',
   RoleDNE: 'Role does not exist',
 };
@@ -22,7 +22,7 @@ const setDefaultRole = async (
   const validAddress = await models.Address.findOne({
     where: {
       address: req.body.address,
-      chain: req.body.author_chain,
+      community_id: req.body.author_chain,
       user_id: req.user.id,
       verified: { [Sequelize.Op.ne]: null },
     },
@@ -38,7 +38,7 @@ const setDefaultRole = async (
     {
       where: {
         address: { [Sequelize.Op.ne]: req.body.address },
-        chain: req.body.author_chain,
+        community_id: req.body.author_chain,
         user_id: req.user.id,
         verified: { [Sequelize.Op.ne]: null },
       },

@@ -13,13 +13,13 @@ export const deleteBotCommentHandler = async (
   req: TypedRequestParams<DeleteBotCommentRequestParams>,
   res: TypedResponse<DeleteCommentResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const { message_id } = req.params;
 
   await controllers.comments.deleteComment({
     user,
     address,
-    chain,
+    community,
     messageId: message_id, // Discord bot only
   });
 

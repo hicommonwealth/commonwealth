@@ -1,24 +1,23 @@
-import React, { useMemo } from 'react';
 import moment from 'moment';
+import React, { useMemo } from 'react';
 
 import 'pages/search/index.scss';
 
-import NewProfilesController from '../../../controllers/server/newProfiles';
-import type MinimumProfile from '../../../models/MinimumProfile';
 import app from 'state';
+import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
+import CommunityInfo from '../../../models/ChainInfo';
+import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
-import AddressInfo from '../../../models/AddressInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import { User } from '../../components/user/user';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
-import ChainInfo from '../../../models/ChainInfo';
+import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
+import { User } from '../../components/user/user';
 
 export type ThreadResult = {
   id: number;
-  chain: string;
+  community: string;
   title: string;
   body: string;
   address_id: number;
@@ -36,19 +35,20 @@ const ThreadResultRow = ({
   searchTerm,
   setRoute,
 }: ThreadResultRowProps) => {
-  let title = '';
-  try {
-    title = decodeURIComponent(thread.title);
-  } catch (err) {
-    title = thread.title;
-  }
+  const title = useMemo(() => {
+    try {
+      return decodeURIComponent(thread.title);
+    } catch (error) {
+      return thread.title;
+    }
+  }, [thread.title]);
 
   const handleClick = () => {
-    setRoute(`/discussion/${thread.id}`, {}, thread.chain);
+    setRoute(`/discussion/${thread.id}`, {}, thread.community);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== thread.chain) {
-    return;
+  if (app.isCustomDomain() && app.customDomainId() !== thread.community) {
+    return <></>;
   }
 
   return (
@@ -56,21 +56,15 @@ const ThreadResultRow = ({
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
-          {`discussion - ${thread.chain}`}
+          {`discussion - ${thread.community}`}
         </CWText>
         <CWText className="search-results-thread-title" fontWeight="medium">
           {renderTruncatedHighlights(searchTerm, title)}
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
-            user={
-              new AddressInfo(
-                thread.address_id,
-                thread.address,
-                thread.address_chain,
-                null
-              )
-            }
+            userAddress={thread.address}
+            userChainId={thread.address_chain}
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -82,6 +76,7 @@ const ThreadResultRow = ({
             hideFormatting={true}
             doc={thread.body}
             searchTerm={searchTerm}
+            markdownCutoffLength={400}
           />
         </CWText>
       </div>
@@ -92,7 +87,6 @@ const ThreadResultRow = ({
 export type ReplyResult = {
   id: number;
   proposalid: number;
-  chain: string;
   community: string;
   title: string;
   text: string;
@@ -112,7 +106,7 @@ const ReplyResultRow = ({
   setRoute,
 }: ReplyResultRowProps) => {
   const proposalId = comment.proposalid;
-  const chain = comment.chain;
+  const community = comment.community;
 
   const title = useMemo(() => {
     try {
@@ -123,10 +117,10 @@ const ReplyResultRow = ({
   }, [comment.title]);
 
   const handleClick = () => {
-    setRoute(`/discussion/${proposalId}?comment=${comment.id}`, {}, chain);
+    setRoute(`/discussion/${proposalId}?comment=${comment.id}`, {}, community);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== chain) {
+  if (app.isCustomDomain() && app.customDomainId() !== community) {
     return <></>;
   }
 
@@ -135,21 +129,15 @@ const ReplyResultRow = ({
       <CWIcon iconName="feedback" />
       <div className="inner-container">
         <CWText fontWeight="medium">{`comment - ${
-          comment.chain || comment.community
+          comment.community || comment.community
         }`}</CWText>
         <CWText className="search-results-thread-title">
           {renderTruncatedHighlights(searchTerm, title)}
         </CWText>
         <div className="search-results-thread-subtitle">
           <User
-            user={
-              new AddressInfo(
-                comment.address_id,
-                comment.address,
-                comment.address_chain,
-                null
-              )
-            }
+            userAddress={comment.address}
+            userChainId={comment.address_chain}
           />
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}
@@ -195,7 +183,7 @@ const CommunityResultRow = ({
     setRoute(community.id ? `/${community.id}` : '/', {}, null);
   };
 
-  const chainInfo = ChainInfo.fromJSON(community as any);
+  const communityInfo = CommunityInfo.fromJSON(community as any);
 
   return (
     <div
@@ -203,7 +191,7 @@ const CommunityResultRow = ({
       className="community-result-row"
       onClick={handleClick}
     >
-      <CommunityLabel community={chainInfo} />
+      <CommunityLabel community={communityInfo} />
     </div>
   );
 };
@@ -215,7 +203,7 @@ export type MemberResult = {
   avatar_url: string;
   addresses: {
     id: number;
-    chain: string;
+    community: string;
     address: string;
   }[];
   roles?: any[];
@@ -225,29 +213,32 @@ type MemberResultRowProps = {
   setRoute: any;
 };
 const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
-  const chain = addr.addresses[0].chain;
-  const address = addr.addresses[0].address;
-  const profile: MinimumProfile = NewProfilesController.Instance.getProfile(
-    chain,
-    address
-  );
+  const { community, address } = addr.addresses[0];
+  const { data: users } = useFetchProfilesByAddressesQuery({
+    profileChainIds: [community],
+    profileAddresses: [address],
+    currentChainId: app.activeChainId(),
+    apiCallEnabled: !!(community && address),
+  });
+  const profile: MinimumProfile = users?.[0];
 
   const handleClick = () => {
-    setRoute(`/profile/id/${profile.id}`, {}, null);
+    setRoute(`/profile/id/${profile?.id}`, {}, null);
   };
 
-  if (app.isCustomDomain() && app.customDomainId() !== chain) {
+  if (app.isCustomDomain() && app.customDomainId() !== community) {
     return null;
   }
 
   return (
     <div key={address} className="member-result-row" onClick={handleClick}>
       <User
-        user={profile}
-        showRole
-        linkify
+        userAddress={address}
+        userChainId={community}
+        shouldShowRole
+        shouldLinkProfile
         avatarSize={32}
-        showAddressWithDisplayName
+        shouldShowAddressWithDisplayName
       />
     </div>
   );
@@ -257,7 +248,7 @@ export const renderSearchResults = (
   results: any[],
   searchTerm: string,
   searchType: SearchScope,
-  setRoute: any
+  setRoute: any,
 ) => {
   if (!results || results.length === 0) {
     return [];

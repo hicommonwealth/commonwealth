@@ -1,6 +1,6 @@
-import type { IPagination } from 'common-common/src/api/extApiTypes';
-import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 import { TypedPaginatedResult } from 'server/types';
+import type { IPagination } from '../api/extApiTypes';
+import { OrderByOptions } from '../api/extApiTypes';
 
 /*
 These methods are for generating the sequelize formatting for
@@ -31,9 +31,10 @@ export const formatPagination = (query: IPagination): PaginationResult => {
   else if (limit) pagination = limitBy(limit);
 
   pagination.order = [[OrderByOptions.CREATED, 'DESC']];
-  if (query.sort === OrderByOptions.UPDATED)
-    pagination.order = [[OrderByOptions.UPDATED, 'DESC']];
-
+  if (
+    [OrderByOptions.UPDATED, OrderByOptions.LAST_CHECKED].includes(query.sort)
+  )
+    pagination.order = [[query.sort, 'DESC']];
   return pagination;
 };
 
@@ -77,7 +78,7 @@ export type PaginationSqlBind = PaginationSqlResult['bind'];
 
 export const validateOrderDirection = (
   orderDirection: string,
-  allowEmpty?: boolean
+  allowEmpty?: boolean,
 ): boolean => {
   if (allowEmpty && !orderDirection) {
     return true;
@@ -86,7 +87,7 @@ export const validateOrderDirection = (
 };
 
 export const buildPaginationSql = (
-  options: PaginationSqlOptions
+  options: PaginationSqlOptions,
 ): PaginationSqlResult => {
   const {
     limit,
@@ -133,7 +134,7 @@ export const buildPaginationSql = (
 export function buildPaginatedResponse<T>(
   items: T[],
   totalResults: number,
-  bind: PaginationSqlBind
+  bind: PaginationSqlBind,
 ): TypedPaginatedResult<T> {
   return {
     results: items,

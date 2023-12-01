@@ -2,7 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
 };
 
 export default async (
@@ -32,7 +32,7 @@ export default async (
       include: [models.Address],
     },
     {
-      model: models.Chain,
+      model: models.Community,
       as: 'Chain',
       required: false,
       where: { active: true },

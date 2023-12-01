@@ -1,7 +1,8 @@
-import type { WalletId } from 'common-common/src/types';
+import type { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { CommunityAttributes, CommunityInstance } from './community';
+import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
 import { Role } from './role';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
@@ -10,7 +11,7 @@ import type { UserAttributes, UserInstance } from './user';
 
 export type AddressAttributes = {
   address: string;
-  chain: string;
+  community_id: string;
   verification_token: string;
   role: Role;
   is_user_default: boolean;
@@ -28,15 +29,17 @@ export type AddressAttributes = {
   ghost_address?: boolean;
   profile_id?: number;
   wallet_id?: WalletId;
+  wallet_sso_source?: WalletSsoSource;
   // associations
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Profile?: ProfileAttributes;
   User?: UserAttributes;
   SsoToken?: SsoTokenAttributes;
+  Memberships?: MembershipAttributes[];
 };
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
-  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
   getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
@@ -46,14 +49,14 @@ export type AddressModelStatic = ModelStatic<AddressInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): AddressModelStatic => {
   const Address: AddressModelStatic = <AddressModelStatic>sequelize.define(
     'Address',
     {
       id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       address: { type: dataTypes.STRING, allowNull: false },
-      chain: { type: dataTypes.STRING, allowNull: false },
+      community_id: { type: dataTypes.STRING, allowNull: false },
       role: {
         type: dataTypes.ENUM('member', 'moderator', 'admin'),
         defaultValue: 'member',
@@ -89,6 +92,7 @@ export default (
       },
       profile_id: { type: dataTypes.INTEGER, allowNull: true },
       wallet_id: { type: dataTypes.STRING, allowNull: true },
+      wallet_sso_source: { type: dataTypes.STRING, allowNull: true },
       block_info: { type: dataTypes.STRING, allowNull: true },
     },
     {
@@ -98,7 +102,7 @@ export default (
       underscored: true,
       tableName: 'Addresses',
       indexes: [
-        { fields: ['address', 'chain'], unique: true },
+        { fields: ['address', 'community_id'], unique: true },
         { fields: ['user_id'] },
       ],
       defaultScope: {
@@ -115,12 +119,12 @@ export default (
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   Address.associate = (models) => {
-    models.Address.belongsTo(models.Chain, {
-      foreignKey: 'chain',
+    models.Address.belongsTo(models.Community, {
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
     models.Address.belongsTo(models.Profile, {
@@ -141,6 +145,10 @@ export default (
       as: 'collaboration',
     });
     models.Address.hasMany(models.Collaboration);
+    models.Address.hasMany(models.Membership, {
+      foreignKey: 'address_id',
+      as: 'Memberships',
+    });
   };
 
   return Address;

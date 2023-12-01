@@ -26,7 +26,7 @@ const createComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signComment({
+  } = await app.sessions.signComment(address, {
     thread_id: threadId,
     body: unescapedText,
     parent_comment_id: parentCommentId,
@@ -35,8 +35,8 @@ const createComment = async ({
   const response = await axios.post(
     `${app.serverUrl()}/threads/${threadId}/comments`,
     {
-      author_chain: chainId,
-      chain: chainId,
+      author_community_id: chainId,
+      community_id: chainId,
       address: address,
       parent_id: parentCommentId,
       text: encodeURIComponent(unescapedText),
@@ -44,7 +44,7 @@ const createComment = async ({
       canvas_action: action,
       canvas_session: session,
       canvas_hash: hash,
-    }
+    },
   );
 
   return new Comment(response.data.result);

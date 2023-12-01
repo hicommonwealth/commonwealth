@@ -184,6 +184,7 @@ export const renderQuillDelta = (
           if (child.insert?.image) {
             return <img key={ii} src={child.insert?.image} alt="image" />;
           }
+
           // handle video
           if (child.insert?.video) {
             return (
@@ -198,6 +199,7 @@ export const renderQuillDelta = (
               </div>
             );
           }
+
           // handle tweets
           if (child.insert?.twitter) {
             const id = child.insert.twitter.id;
@@ -221,6 +223,7 @@ export const renderQuillDelta = (
               </blockquote>
             );
           }
+
           // handle text nodes
           let result;
           if (child.insert?.mention) {
@@ -260,14 +263,15 @@ export const renderQuillDelta = (
           } else {
             result = <span key={ii}>{child.insert}</span>;
           }
+
           Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if (k !== 'color' && k !== 'background' && v !== true) return;
             switch (k) {
               case 'bold':
-                result = <strong key={ii}>{result}</strong>;
+                result = <b key={ii}>{result}</b>;
                 return;
               case 'italic':
-                result = <em key={ii}>{result}</em>;
+                result = <i key={ii}>{result}</i>;
                 return;
               case 'strike':
                 result = <s key={ii}>{result}</s>;
@@ -296,8 +300,10 @@ export const renderQuillDelta = (
                 result = <span key={ii}>{result}</span>;
             }
           });
+
           return result;
         };
+
         const renderParent = (parent, ii) => {
           // render empty parent nodes as .between-paragraphs
           if (
@@ -307,6 +313,7 @@ export const renderQuillDelta = (
           ) {
             return <div className="between-paragraphs" key={ii} />;
           }
+
           // render normal parent nodes with content
           const Tag = parent.attributes?.blockquote
             ? 'blockquote'
@@ -347,6 +354,7 @@ export const renderQuillDelta = (
             </Tag>
           );
         };
+
         // special handler for lists, which need to be un-flattened and turned into a tree
         const renderListGroup = (_group, ii) => {
           const [GroupTag, groupTagClass] = getGroupTag(_group, collapse);

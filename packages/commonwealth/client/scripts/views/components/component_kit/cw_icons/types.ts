@@ -9,6 +9,7 @@ export type IconSize =
   | 'xxs'
   | 'xs'
   | 'small'
+  | 'regular'
   | 'medium'
   | 'large'
   | 'xl'
@@ -25,12 +26,12 @@ export type IconStyleProps = {
 export type IconProps = IconStyleProps & {
   componentType?: ComponentType;
   onClick?: (e?: React.MouseEvent<HTMLElement | SVGSVGElement>) => void;
-  weight?: 'fill' | 'bold';
+  weight?: 'fill' | 'bold' | 'light';
 } & React.SVGProps<SVGSVGElement>;
 
 export type IconComponentProps = IconProps & {
   iconName: IconName;
-  weight?: 'fill' | 'bold';
+  weight?: 'fill' | 'bold' | 'light';
 };
 
 export type CustomIconStyleProps = {

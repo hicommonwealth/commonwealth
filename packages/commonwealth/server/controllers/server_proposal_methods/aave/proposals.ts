@@ -1,8 +1,8 @@
-import { ProposalState } from 'chain-events/src/chains/aave/types';
+import { ProposalState } from '../../../../shared/chain/types/aave';
 import { IGovernanceV2Helper } from 'common-common/src/eth/types/IGovernanceV2Helper';
 import { ethers, providers } from 'ethers';
 import { IGovernanceV2Helper__factory } from 'common-common/src/eth/types/factories/IGovernanceV2Helper__factory';
-import { IAaveProposalResponse } from 'shared/adapters/chain/aave/types';
+import { IAaveProposalResponse } from '../../../../shared/adapters/chain/aave/types';
 
 type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 

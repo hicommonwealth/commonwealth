@@ -6,7 +6,7 @@ import {
 } from './server_proposal_methods/get_proposals';
 import { RedisCache } from 'common-common/src/redisCache';
 import { providers } from 'ethers';
-import { ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { ChainNetwork } from 'common-common/src/types';
 import {
   __getProposalVotes,
@@ -29,16 +29,22 @@ export class ServerProposalsController {
   public async getProposals(
     options: GetProposalsOptions
   ): Promise<GetProposalsResult> {
-    const contractInfo = await this.getContractInfo(options.chainId);
-    const provider = await this.createEvmProvider(options.chainId);
-    return __getProposals.call(this, options, provider, contractInfo);
+    const contractInfo = await this.getContractInfo(options.communityId);
+    const provider = await this.createEvmProvider(options.communityId);
+    return __getProposals.call(
+      this,
+      options,
+      provider,
+      contractInfo,
+      this.models
+    );
   }
 
   public async getProposalVotes(
     options: GetProposalVotesOptions
   ): Promise<GetProposalVotesResult> {
-    const contractInfo = await this.getContractInfo(options.chainId);
-    const provider = await this.createEvmProvider(options.chainId);
+    const contractInfo = await this.getContractInfo(options.communityId);
+    const provider = await this.createEvmProvider(options.communityId);
     return __getProposalVotes.call(this, options, provider, contractInfo);
   }
 
@@ -66,12 +72,15 @@ export class ServerProposalsController {
       (contract.Contract.type !== ChainNetwork.Aave &&
         contract.Contract.type !== ChainNetwork.Compound)
     ) {
-      throw new ServerError(
+      throw new AppError(
         `Proposal fetching not supported for chain ${chainId}`
       );
     }
 
-    return { address: contract.Contract.address, type: contract.Contract.type };
+    return {
+      address: contract.Contract.address,
+      type: contract.Contract.type,
+    };
   }
 
   private async createEvmProvider(
@@ -96,34 +105,39 @@ export class ServerProposalsController {
   }
 
   private async getRPCUrl(chainId: string): Promise<string> {
-    const chain = await this.models.Chain.findOne({
+    const chain = await this.models.Community.findOne({
       where: {
         id: chainId,
       },
       attributes: ['network', 'base'],
       include: [
         {
-          model: this.models.ChainNode,
+          model: this.models.ChainNode.scope('withPrivateData'),
           required: true,
-          attributes: ['private_url'],
         },
       ],
     });
 
-    if (!chain.ChainNode.private_url) {
+    if (!chain.ChainNode.private_url && !chain.ChainNode.url) {
       throw new ServerError(`No RPC URL found for chain ${chainId}`);
     }
 
+    // only Aave and Compound contracts on Ethereum are supported
+    // Celo and Fantom public nodes are extremely slow/rate limited
+    // so, it is not feasible to fetch proposals from them without
+    // a private node, indexing the chain, or using an existing
+    // indexer like TheGraph or SubQuery
     if (
-      chain.network !== ChainNetwork.Aave &&
-      chain.network !== ChainNetwork.Compound &&
-      chain.base !== 'ethereum'
+      chain.ChainNode.name !== 'Ethereum (Mainnet)' ||
+      (chain.network !== ChainNetwork.Aave &&
+        chain.network !== ChainNetwork.Compound &&
+        chain.base !== 'ethereum')
     ) {
-      throw new ServerError(
+      throw new AppError(
         `Proposal fetching not supported for chain ${chainId}`
       );
     }
 
-    return chain.ChainNode.private_url;
+    return chain.ChainNode.private_url || chain.ChainNode.url;
   }
 }

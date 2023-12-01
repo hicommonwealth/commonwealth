@@ -1,27 +1,31 @@
-import React, { useState } from 'react';
 import type { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
+import React, { useState } from 'react';
 
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
 import {
   encodeCommunitySpend,
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 import {
   useDepositParamsQuery,
   useStakingParamsQuery,
 } from 'state/api/chainParams';
 
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
+import {
+  minimalToNaturalDenom,
+  naturalDenomToMinimal,
+} from '../../../../../shared/utils';
+import { Skeleton } from '../../components/Skeleton';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { useCommonNavigate } from 'navigation/helpers';
-import { Skeleton } from '../../components/Skeleton';
 
 export const CosmosProposalForm = () => {
   const [cosmosProposalType, setCosmosProposalType] = useState<
@@ -37,10 +41,15 @@ export const CosmosProposalForm = () => {
 
   const author = app.user.activeAccount as CosmosAccount;
   const cosmos = app.chain as Cosmos;
+  const meta = cosmos.meta;
 
-  useStakingParamsQuery();
-  const { data, isLoading } = useDepositParamsQuery();
-  const minDeposit = data?.minDeposit;
+  const { data: stakingDenom } = useStakingParamsQuery();
+  const { data: depositParams, isLoading: isLoadingDepositParams } =
+    useDepositParamsQuery(stakingDenom);
+
+  const minDeposit = parseFloat(
+    minimalToNaturalDenom(+depositParams?.minDeposit, meta?.decimals)
+  );
 
   return (
     <>
@@ -70,14 +79,16 @@ export const CosmosProposalForm = () => {
         onInput={(e) => {
           setDescription(e.target.value);
         }}
+        value={description}
+        resizeWithText
       />
-      {isLoading ? (
+      {isLoadingDepositParams ? (
         <Skeleton className="TextInput" style={{ height: 62 }} />
       ) : (
         <CWTextInput
-          label={`Deposit (${minDeposit?.denom})`}
-          placeholder={`Min: ${+minDeposit}`}
-          defaultValue={+minDeposit}
+          label={`Deposit (${meta?.default_symbol})`}
+          placeholder={`Min: ${minDeposit}`}
+          defaultValue={minDeposit}
           onInput={(e) => {
             setDeposit(+e.target.value);
           }}
@@ -93,9 +104,9 @@ export const CosmosProposalForm = () => {
           }}
         />
       )}
-      {cosmosProposalType !== 'textProposal' && (
+      {cosmosProposalType === 'communitySpend' && (
         <CWTextInput
-          label={`Amount (${minDeposit?.denom})`}
+          label={`Amount (${meta?.default_symbol})`}
           placeholder="12345"
           defaultValue=""
           onInput={(e) => {
@@ -110,19 +121,32 @@ export const CosmosProposalForm = () => {
 
           let prop: ProtobufAny;
 
+          const depositInMinimalDenom = naturalDenomToMinimal(
+            deposit,
+            meta?.decimals
+          );
+
           const _deposit = deposit
-            ? new CosmosToken(minDeposit?.denom, deposit, false)
-            : minDeposit;
+            ? new CosmosToken(
+                depositParams?.minDeposit?.denom,
+                depositInMinimalDenom,
+                false
+              )
+            : depositParams?.minDeposit;
 
           if (cosmosProposalType === 'textProposal') {
             prop = encodeTextProposal(title, description);
           } else if (cosmosProposalType === 'communitySpend') {
+            const spendAmountInMinimalDenom = naturalDenomToMinimal(
+              payoutAmount,
+              meta?.decimals
+            );
             prop = encodeCommunitySpend(
               title,
               description,
               recipient,
-              payoutAmount.toString(),
-              minDeposit?.denom
+              spendAmountInMinimalDenom,
+              depositParams?.minDeposit?.denom
             );
           } else {
             throw new Error('Unknown Cosmos proposal type.');

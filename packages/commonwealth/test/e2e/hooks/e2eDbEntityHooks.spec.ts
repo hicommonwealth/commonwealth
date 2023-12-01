@@ -1,8 +1,7 @@
-import * as process from 'process';
 import Sequelize from 'sequelize';
 import models from 'server/database';
 import type { AddressInstance } from 'server/models/address';
-import type { ChainInstance } from 'server/models/chain';
+import type { CommunityInstance } from '../../../server/models/community';
 import type { ChainNodeAttributes } from 'server/models/chain_node';
 import type { CollaborationAttributes } from 'server/models/collaboration';
 import type { CommentInstance } from 'server/models/comment';
@@ -19,7 +18,7 @@ export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
 export let testAddresses: AddressInstance[];
-export let testChains: ChainInstance[];
+export let testChains: CommunityInstance[];
 export let testCollaborations: CollaborationAttributes[];
 export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
@@ -64,7 +63,7 @@ export async function clearTestEntities() {
       },
     });
 
-    const chainsToDelete = await models.Chain.findAll({
+    const chainsToDelete = await models.Community.findAll({
       where: { chain_node_id: { [Op.lt]: 0 } },
     });
 
@@ -107,7 +106,7 @@ export async function clearTestEntities() {
         [Op.or]: [
           { id: { [Op.lt]: 0 } },
           { user_id: { [Op.in]: usersToDelete.map((u) => u['id']) } },
-          { chain: { [Op.in]: ['cmntest', 'cmntest2'] } },
+          { community_id: { [Op.in]: ['cmntest', 'cmntest2'] } },
         ],
       },
       force: true,
@@ -133,7 +132,7 @@ export async function clearTestEntities() {
       },
       force: true,
     });
-    await models.Chain.destroy({
+    await models.Community.destroy({
       where: { id: { [Op.in]: chainsToDelete.map((c) => c['id']) } },
       force: true,
     });
@@ -190,9 +189,9 @@ export async function createTestEntities() {
         await models.ChainNode.findOrCreate({
           where: {
             id: -1,
-            eth_chain_id: 1,
+            eth_chain_id: -1,
             url: 'test1',
-            balance_type: 'cmntest',
+            balance_type: 'ethereum',
             name: 'TestName1',
           },
         })
@@ -201,9 +200,9 @@ export async function createTestEntities() {
         await models.ChainNode.findOrCreate({
           where: {
             id: -2,
-            eth_chain_id: 1,
+            eth_chain_id: -2,
             url: 'test2',
-            balance_type: 'cmntest',
+            balance_type: 'ethereum',
             name: 'TestName2',
           },
         })
@@ -212,7 +211,7 @@ export async function createTestEntities() {
 
     testChains = [
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest',
             chain_node_id: -1,
@@ -233,7 +232,7 @@ export async function createTestEntities() {
         })
       )[0],
       (
-        await models.Chain.findOrCreate({
+        await models.Community.findOrCreate({
           where: {
             id: 'cmntest2',
             chain_node_id: -2,
@@ -287,7 +286,7 @@ export async function createTestEntities() {
                 id: -i - 1,
                 user_id: -i - 1,
                 address: addresses[i],
-                chain: 'cmntest',
+                community_id: 'cmntest',
                 verification_token: '',
                 profile_id: i < 2 ? -1 : -2,
               },

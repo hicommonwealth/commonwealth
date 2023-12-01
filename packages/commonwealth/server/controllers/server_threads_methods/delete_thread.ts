@@ -1,10 +1,10 @@
+import { Op } from 'sequelize';
+import { AddressInstance } from 'server/models/address';
+import { AppError } from '../../../../common-common/src/errors';
 import { UserInstance } from '../../models/user';
+import deleteThreadFromDb from '../../util/deleteThread';
 import { findOneRole } from '../../util/roles';
 import { ServerThreadsController } from '../server_threads_controller';
-import { Op } from 'sequelize';
-import deleteThreadFromDb from '../../util/deleteThread';
-import { AppError } from '../../../../common-common/src/errors';
-import { AddressInstance } from 'server/models/address';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -22,13 +22,13 @@ export type DeleteThreadResult = void;
 
 export async function __deleteThread(
   this: ServerThreadsController,
-  { user, address, threadId, messageId }: DeleteThreadOptions
+  { user, address, threadId, messageId }: DeleteThreadOptions,
 ): Promise<DeleteThreadResult> {
   if (!threadId) {
     // Special handling for discobot threads
     const existingThread = await this.models.Thread.findOne({
       where: {
-        discord_meta: { [Op.contains]: { message_id: messageId } },
+        discord_meta: { message_id: messageId },
       },
     });
     if (existingThread) {
@@ -49,13 +49,15 @@ export async function __deleteThread(
     throw new AppError(`${Errors.ThreadNotFound}: ${threadId}`);
   }
 
-  // check ban
-  const [canInteract, banError] = await this.banCache.checkBan({
-    chain: thread.chain,
-    address: address.address,
-  });
-  if (!canInteract) {
-    throw new AppError(`Ban error: ${banError}`);
+  if (address) {
+    // check ban
+    const [canInteract, banError] = await this.banCache.checkBan({
+      communityId: thread.chain,
+      address: address.address,
+    });
+    if (!canInteract) {
+      throw new AppError(`Ban error: ${banError}`);
+    }
   }
 
   // check ownership (bypass if admin)
@@ -69,7 +71,7 @@ export async function __deleteThread(
     this.models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
     thread.chain,
-    ['admin', 'moderator']
+    ['admin', 'moderator'],
   );
   if (!isAuthor && !isAdminOrMod) {
     throw new AppError(Errors.NotOwned);

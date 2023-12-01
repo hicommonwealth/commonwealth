@@ -9,7 +9,7 @@ import emitNotifications from '../../server/util/emitNotifications';
 import models from '../../server/database';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { NotificationDataAndCategory, SnapshotEventType } from 'types';
-import { SupportedNetwork } from 'chain-events/src';
+import { SupportedNetwork } from '../../shared/chain/types/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -389,17 +389,14 @@ describe('emitNotifications tests', () => {
         },
       };
 
-      await emitNotifications(models, notififcation_data, {
-        notificationCategory: eventType,
-        body: snapshotNotificationData.body,
-        title: snapshotNotificationData.title,
-      });
+      await emitNotifications(models, notififcation_data);
 
       const notif = await models.Notification.findOne({
         where: {
           category_id: NotificationCategories.SnapshotProposal,
         },
       });
+
       expect(notif).to.exist;
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -409,6 +406,7 @@ describe('emitNotifications tests', () => {
           user_id: userId,
         },
       });
+
       expect(notifRead).to.exist;
     });
   });

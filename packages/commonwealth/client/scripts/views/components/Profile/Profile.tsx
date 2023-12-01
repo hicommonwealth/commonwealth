@@ -6,6 +6,7 @@ import AddressInfo from '../../../models/AddressInfo';
 import Comment from '../../../models/Comment';
 import NewProfile from '../../../models/NewProfile';
 import Thread from '../../../models/Thread';
+import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../../pages/404';
 import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
 import { CWSpinner } from '../component_kit/cw_spinner';
@@ -43,9 +44,7 @@ const Profile = ({ profileId }: ProfileProps) => {
 
       setProfile(new NewProfile(result.profile));
       setThreads(result.threads.map((t) => new Thread(t)));
-      const responseComments = result.comments.map((c) =>
-        new Comment(c)
-      );
+      const responseComments = result.comments.map((c) => new Comment(c));
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = result.commentThreads.find(
           (t) => t.id === parseInt(c.threadId, 10)
@@ -56,14 +55,15 @@ const Profile = ({ profileId }: ProfileProps) => {
       setAddresses(
         result.addresses.map((a) => {
           try {
-            return new AddressInfo(
-              a.id,
-              a.address,
-              a.chain,
-              a.keytype,
-              a.wallet_id,
-              a.ghost_address
-            );
+            return new AddressInfo({
+              id: a.id,
+              address: a.address,
+              chainId: a.community_id,
+              keytype: a.keytype,
+              walletId: a.wallet_id,
+              walletSsoSource: a.wallet_sso_source,
+              ghostAddress: a.ghost_address,
+            });
           } catch (err) {
             console.error(`Could not return AddressInfo: "${err}"`);
             return null;
@@ -116,24 +116,30 @@ const Profile = ({ profileId }: ProfileProps) => {
         style={
           profile.backgroundImage
             ? {
-              backgroundImage: `url(${backgroundUrl})`,
-              backgroundRepeat: `${backgroundImageBehavior === ImageBehavior.Fill
-                  ? 'no-repeat'
-                  : 'repeat'
+                backgroundImage: `url(${backgroundUrl})`,
+                backgroundRepeat: `${
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'no-repeat'
+                    : 'repeat'
                 }`,
-              backgroundSize:
-                backgroundImageBehavior === ImageBehavior.Fill
-                  ? 'cover'
-                  : '100px',
-              backgroundPosition:
-                backgroundImageBehavior === ImageBehavior.Fill
-                  ? 'center'
-                  : '56px 56px',
-              backgroundAttachment: 'fixed',
-            }
+                backgroundSize:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'cover'
+                    : '100px',
+                backgroundPosition:
+                  backgroundImageBehavior === ImageBehavior.Fill
+                    ? 'center'
+                    : '56px 56px',
+                backgroundAttachment: 'fixed',
+              }
             : {}
         }
       >
+        <div className="header">
+          <CWText type="h2" fontWeight="medium">
+            {`${profile.name}'s Profile`}
+          </CWText>
+        </div>
         <div
           className={
             profile.backgroundImage

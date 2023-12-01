@@ -1,19 +1,19 @@
-import React, { FC } from 'react';
 import {
   ArrowBendUpRight,
+  ArrowFatUp,
   BellSimple,
   BellSimpleSlash,
-  DotsThree,
   ChatCenteredDots,
-  ArrowFatUp,
+  DotsThree,
 } from '@phosphor-icons/react';
+import React, { FC } from 'react';
 
+import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
-import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 
 export type ActionType =
   | 'upvote'
@@ -35,7 +35,7 @@ const commonProps = (disabled: boolean) => {
 const renderPhosphorIcon = (
   action: ActionType,
   disabled: boolean,
-  selected: boolean
+  selected: boolean,
 ) => {
   switch (action) {
     case 'upvote':
@@ -69,6 +69,8 @@ type CWThreadActionProps = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   label?: string;
   selected?: boolean;
+  isThreadArchived?: boolean;
+  tooltipText?: string;
 };
 
 interface TooltipWrapperProps {
@@ -78,7 +80,11 @@ interface TooltipWrapperProps {
 }
 
 // Tooltip should only wrap the ThreadAction when the button is disabled
-const TooltipWrapper = ({ children, disabled, text }: TooltipWrapperProps) => {
+export const TooltipWrapper = ({
+  children,
+  disabled,
+  text,
+}: TooltipWrapperProps) => {
   if (!disabled) {
     return <>{children}</>;
   }
@@ -89,7 +95,15 @@ const TooltipWrapper = ({ children, disabled, text }: TooltipWrapperProps) => {
       content={text}
       placement="top"
       renderTrigger={(handleInteraction) => (
-        <div onMouseEnter={handleInteraction} onMouseLeave={handleInteraction}>
+        <div
+          style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
+          onClick={(e) => {
+            e.preventDefault();
+            if (disabled) return;
+          }}
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+        >
           {children}
         </div>
       )}
@@ -97,7 +111,11 @@ const TooltipWrapper = ({ children, disabled, text }: TooltipWrapperProps) => {
   );
 };
 
-const getTooltipCopy = (action: ActionType) => {
+const getTooltipCopy = (action: ActionType, isThreadArchived: boolean) => {
+  if (isThreadArchived) {
+    return 'Thread is archived';
+  }
+
   switch (action) {
     case 'upvote':
       return 'Join community to upvote';
@@ -120,6 +138,8 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   onClick,
   label,
   selected,
+  isThreadArchived,
+  tooltipText,
 }) => {
   const handleClick = (e) => {
     if (disabled) {
@@ -132,7 +152,10 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   const upvoteSelected = action === 'upvote' && selected;
 
   return (
-    <TooltipWrapper disabled={disabled} text={getTooltipCopy(action)}>
+    <TooltipWrapper
+      disabled={disabled}
+      text={tooltipText || getTooltipCopy(action, isThreadArchived)}
+    >
       <button
         onClick={handleClick}
         className={getClasses(
@@ -140,7 +163,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
             disabled,
             upvoteSelected,
           },
-          ComponentType.ThreadAction
+          ComponentType.ThreadAction,
         )}
       >
         {renderPhosphorIcon(action, disabled, selected)}

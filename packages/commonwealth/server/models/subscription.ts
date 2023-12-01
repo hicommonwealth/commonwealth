@@ -1,16 +1,9 @@
 import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
-import type {
-  IChainEventNotificationData,
-  IForumNotificationData,
-  ISnapshotNotificationData,
-} from '../../shared/types';
-import type { DB } from '../models';
-import type { WebhookContent } from '../webhookNotifier';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './community';
 import type { CommentAttributes } from './comment';
-import type { NotificationInstance } from './notification';
 import type { NotificationCategoryAttributes } from './notification_category';
+import emitNotifications from '../util/emitNotifications';
 import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
@@ -44,7 +37,7 @@ export type SubscriptionAttributes = {
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   NotificationsRead?: NotificationsReadAttributes[];
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
 };
@@ -54,17 +47,7 @@ export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
 };
 
 export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
-  emitNotifications?: (
-    models: DB,
-    category_id: string,
-    notification_data:
-      | IForumNotificationData
-      | IChainEventNotificationData
-      | ISnapshotNotificationData,
-    webhook_data?: Partial<WebhookContent>,
-    excludeAddresses?: string[],
-    includeAddresses?: string[]
-  ) => Promise<NotificationInstance>;
+  emitNotification?: typeof emitNotifications;
 };
 
 export default (
@@ -154,7 +137,7 @@ export default (
       foreignKey: 'subscription_id',
       onDelete: 'cascade',
     });
-    models.Subscription.belongsTo(models.Chain, {
+    models.Subscription.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

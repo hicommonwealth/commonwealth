@@ -23,7 +23,7 @@ const deleteComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signDeleteComment({
+  } = await app.sessions.signDeleteComment(app.user.activeAccount.address, {
     comment_id: canvasHash,
   });
 
@@ -31,8 +31,8 @@ const deleteComment = async ({
     data: {
       jwt: app.user.jwt,
       address: address,
-      chain: chainId,
-      author_chain: chainId,
+      community_id: chainId,
+      author_community_id: chainId,
     },
   });
 
@@ -75,13 +75,13 @@ const useDeleteCommentMutation = ({
     onSuccess: async (response) => {
       // find the existing comment index
       const foundCommentIndex = comments.findIndex(
-        (x) => x.id === response.softDeleted.id
+        (x) => x.id === response.softDeleted.id,
       );
 
       if (foundCommentIndex > -1) {
         const softDeletedComment = Object.assign(
           { ...comments[foundCommentIndex] },
-          { ...response.softDeleted }
+          { ...response.softDeleted },
         );
 
         // update fetch comments query state

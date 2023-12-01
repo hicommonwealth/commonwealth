@@ -45,7 +45,10 @@ export async function addAlchemyKey() {
 
   // If chainNode for eth doesn't exist, add it and add key.
   const ethChainNodeExists = await testDb.query(
-    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1'
+    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1 OR id = 37'
+  );
+  const polygonChainNodeExists = await testDb.query(
+    'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 137 OR id = 56'
   );
   if (ethChainNodeExists[0].length === 0) {
     try {
@@ -55,7 +58,19 @@ export async function addAlchemyKey() {
          'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4', 'ethereum', 'Ethereum (Mainnet)');
     `);
     } catch (e) {
-      console.log(e);
+      console.log('ethChainNodeExists ERROR: ', e);
+    }
+
+    if (polygonChainNodeExists[0].length === 0) {
+      try {
+        await testDb.query(`
+        INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name)
+        VALUES (56, 'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 137,
+        'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 'ethereum', 'Polygon');
+    `);
+      } catch (e) {
+        console.log('polygonChainNodeExists ERROR: ', e);
+      }
     }
 
     return;
@@ -116,7 +131,7 @@ export async function createAddress(chain, profileId, userId) {
   await testDb.query(`
     INSERT INTO "Addresses" (
       address,
-      chain,
+      community_id,
       created_at,
       updated_at,
       user_id,
@@ -154,7 +169,7 @@ export async function createAddress(chain, profileId, userId) {
 
 export async function createInitialUser() {
   const userExists = await testDb.query(
-    `select 1 from "Addresses" where address = '${testAddress}' and chain = 'ethereum'`
+    `select 1 from "Addresses" where address = '${testAddress}' and community_id = 'ethereum'`
   );
 
   if (userExists[0].length > 0) return;
@@ -187,14 +202,12 @@ export async function createInitialUser() {
         created_at,
         updated_at,
         profile_name,
-        is_default,
         socials
       ) VALUES (
         ${userId[0][0]['id']},
         '2023-07-14 13:03:56.203-07',
         '2023-07-14 13:03:56.415-07',
         'TestAddress',
-        false,
         '{}'
       ) RETURNING id
     `)

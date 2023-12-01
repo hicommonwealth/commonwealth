@@ -1,22 +1,16 @@
-import { IChainEntityKind } from 'chain-events/src';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import { filterLinks } from 'helpers/threads';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
-import {
-  chainEntityTypeToProposalShortName,
-  getProposalUrlPath,
-} from 'identifiers';
+import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
-import moment from 'moment';
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { slugify } from 'utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
-import { CWTag } from 'views/components/component_kit/cw_tag';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
+import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
-import AddressInfo from '../../../../models/AddressInfo';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
 import { isHot } from '../helpers';
@@ -33,6 +27,8 @@ type CardProps = AdminActionsProps & {
   threadHref?: string;
   showSkeleton?: boolean;
   canReact?: boolean;
+  canComment?: boolean;
+  disabledActionsTooltipText?: string;
   onCommentBtnClick?: () => any;
 };
 
@@ -54,6 +50,8 @@ export const ThreadCard = ({
   threadHref,
   showSkeleton,
   canReact = true,
+  canComment = true,
+  disabledActionsTooltipText = '',
   onCommentBtnClick = () => null,
 }: CardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
@@ -88,6 +86,7 @@ export const ThreadCard = ({
   const isStageDefault = isDefaultStage(thread.stage);
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals.length > 0;
+  const stageLabel = threadStageToLabel(thread.stage);
 
   return (
     <>
@@ -101,15 +100,19 @@ export const ThreadCard = ({
         key={thread.id}
       >
         {!isWindowSmallInclusive && (
-          <ReactionButton thread={thread} size="big" disabled={!canReact} />
+          <ReactionButton
+            thread={thread}
+            size="big"
+            disabled={!canReact}
+            tooltipText={disabledActionsTooltipText}
+          />
         )}
         <div className="content-wrapper">
           <div className="content-header">
             <AuthorAndPublishInfo
-              authorInfo={
-                new AddressInfo(null, thread.author, thread.authorChain, null)
-              }
-              publishDate={moment(thread.createdAt).format('l')}
+              authorAddress={thread.author}
+              authorChainId={thread.authorChain}
+              publishDate={thread.createdAt}
               isHot={isHot(thread)}
               isLocked={thread.readOnly}
               {...(thread.lockedAt && {
@@ -119,6 +122,7 @@ export const ThreadCard = ({
                 lastUpdated: thread.updatedAt.toISOString(),
               })}
               discord_meta={thread.discord_meta}
+              archivedAt={thread.archivedAt}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -154,7 +158,8 @@ export const ThreadCard = ({
             <div className="content-tags">
               {thread.stage && !isStageDefault && (
                 <CWTag
-                  label={threadStageToLabel(thread.stage)}
+                  label={stageLabel}
+                  classNames={stageLabel}
                   trimAt={20}
                   type="stage"
                   onClick={async (e) => {
@@ -170,9 +175,7 @@ export const ThreadCard = ({
                   <CWTag
                     key={`${link.source}-${link.identifier}`}
                     type="proposal"
-                    label={`${chainEntityTypeToProposalShortName(
-                      'proposal' as IChainEntityKind
-                    )} 
+                    label={`Prop 
                         ${
                           Number.isNaN(parseInt(link.identifier, 10))
                             ? ''
@@ -199,6 +202,8 @@ export const ThreadCard = ({
                 isLoggedIn &&
                 (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
               }
+              canReact={canReact}
+              canComment={canComment}
               onDelete={onDelete}
               onSpamToggle={onSpamToggle}
               onLockToggle={onLockToggle}
@@ -211,6 +216,7 @@ export const ThreadCard = ({
               onEditConfirm={onEditConfirm}
               hasPendingEdits={hasPendingEdits}
               onCommentBtnClick={onCommentBtnClick}
+              disabledActionTooltipText={disabledActionsTooltipText}
             />
           </div>
         </div>

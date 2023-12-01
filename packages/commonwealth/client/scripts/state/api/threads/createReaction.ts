@@ -22,15 +22,15 @@ const createReaction = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signThreadReaction({
+  } = await app.sessions.signThreadReaction(address, {
     thread_id: threadId,
     like: reactionType === 'like',
   });
 
   return await axios.post(`${app.serverUrl()}/threads/${threadId}/reactions`, {
-    author_chain: app.user.activeAccount.chain.id,
+    author_community_id: app.user.activeAccount.community.id,
     thread_id: threadId,
-    chain: app.chain.id,
+    community_id: app.chain.id,
     address,
     reaction: reactionType,
     jwt: app.user.jwt,
@@ -56,7 +56,7 @@ const useCreateThreadReactionMutation = ({
         chainId,
         threadId,
         { associatedReactions: [reaction] },
-        'combineAndRemoveDups'
+        'combineAndRemoveDups',
       );
     },
   });

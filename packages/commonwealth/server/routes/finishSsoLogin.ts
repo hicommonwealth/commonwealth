@@ -1,8 +1,8 @@
 import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories, WalletId } from 'common-common/src/types';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { DynamicTemplate } from '../../shared/types';
 import { AXIE_SHARED_SECRET } from '../config';
@@ -16,8 +16,8 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { createRole } from '../util/roles';
 
-import { redirectWithLoginError } from './finishEmailLogin';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
+import { redirectWithLoginError } from './finishEmailLogin';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -57,7 +57,7 @@ const Errors = {
   TokenBadIssuer: 'Invalid token issuer',
   TokenExpired: 'Token expired',
   TokenBadAddress: 'Invalid token address',
-  AlreadyLoggedIn: 'User is already logged in',
+  AlreadyLoggedIn: 'User is already signed in',
   ReplayAttack: 'Invalid token. Try again',
   AccountCreationFailed: 'Failed to create account',
 };
@@ -138,7 +138,7 @@ const finishSsoLogin = async (
     {
       where: {
         address: checksumAddress,
-        chain: 'axie-infinity',
+        community_id: 'axie-infinity',
       },
       include: [
         {
@@ -253,7 +253,7 @@ const finishSsoLogin = async (
           if (err)
             return redirectWithLoginError(
               res,
-              `Could not log in with ronin wallet`
+              `Could not sign in with ronin wallet`
             );
           serverAnalyticsController.track(
             {
@@ -282,7 +282,7 @@ const finishSsoLogin = async (
             );
             return redirectWithLoginError(
               res,
-              `Could not log in with ronin wallet`
+              `Could not sign in with ronin wallet`
             );
           }
 
@@ -325,7 +325,7 @@ const finishSsoLogin = async (
       const newAddress = await models.Address.create(
         {
           address: checksumAddress,
-          chain: AXIE_INFINITY_CHAIN_ID,
+          community_id: AXIE_INFINITY_CHAIN_ID,
           verification_token: 'SSO',
           verification_token_expires: null,
           verified: new Date(), // trust addresses from magic
@@ -333,6 +333,7 @@ const finishSsoLogin = async (
           user_id: user.id,
           profile_id: profile.id,
           wallet_id: WalletId.Ronin,
+          // wallet_sso_source: null,
         },
         { transaction: t }
       );
@@ -401,7 +402,7 @@ const finishSsoLogin = async (
         if (err)
           return redirectWithLoginError(
             res,
-            `Could not log in with ronin wallet`
+            `Could not sign in with ronin wallet`
           );
         serverAnalyticsController.track(
           {

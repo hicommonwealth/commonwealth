@@ -1,26 +1,25 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
-import { RangeStatic } from 'quill';
-import MagicUrl from 'quill-magic-url';
-import ImageUploader from 'quill-image-uploader';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import clsx from 'clsx';
+import { RangeStatic } from 'quill';
+import ImageUploader from 'quill-image-uploader';
+import MagicUrl from 'quill-magic-url';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import ReactQuill, { Quill } from 'react-quill';
 
-import { SerializableDeltaStatic } from './utils';
-import { getTextFromDelta } from './utils';
-import { PreviewModal } from '../../modals/preview_modal';
-import { Modal } from '../component_kit/cw_modal';
 import { nextTick } from 'process';
 import { openConfirmation } from '../../modals/confirmation_modal';
+import { PreviewModal } from '../../modals/preview_modal';
+import { CWModal } from '../component_kit/new_designs/CWModal';
+import QuillTooltip from './QuillTooltip';
 import { LoadingIndicator } from './loading_indicator';
-import { useMention } from './use_mention';
+import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
+import { convertTwitterLinksToEmbeds } from './twitter_embed';
 import { useClipboardMatchers } from './use_clipboard_matchers';
 import { useImageDropAndPaste } from './use_image_drop_and_paste';
-import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
-import { useMarkdownShortcuts } from './use_markdown_shortcuts';
 import { useImageUploader } from './use_image_uploader';
-import { convertTwitterLinksToEmbeds } from './twitter_embed';
-import QuillTooltip from './QuillTooltip';
+import { useMarkdownShortcuts } from './use_markdown_shortcuts';
+import { useMention } from './use_mention';
+import { SerializableDeltaStatic, getTextFromDelta } from './utils';
 
 import 'components/react_quill/react_quill_editor.scss';
 import 'react-quill/dist/quill.snow.css';
@@ -120,6 +119,16 @@ const ReactQuillEditor = ({
       ...newContent,
       ___isMarkdown: isMarkdownEnabled,
     } as SerializableDeltaStatic);
+
+    // sets the correct cursor position after pasting content
+    if (editorRef?.current?.getEditor?.()?.getSelection?.()) {
+      const selection = editorRef.current.getEditor().getSelection();
+      setTimeout(() => {
+        editorRef.current
+          .getEditor()
+          .setSelection(selection.index, selection.length);
+      });
+    }
   };
 
   const handleToggleMarkdown = () => {
@@ -142,7 +151,8 @@ const ReactQuillEditor = ({
           buttons: [
             {
               label: 'Yes',
-              buttonType: 'mini-red',
+              buttonType: 'destructive',
+              buttonHeight: 'sm',
               onClick: () => {
                 editor.removeFormat(0, editor.getLength());
                 setIsMarkdownEnabled(newMarkdownEnabled);
@@ -154,7 +164,8 @@ const ReactQuillEditor = ({
             },
             {
               label: 'No',
-              buttonType: 'mini-white',
+              buttonType: 'secondary',
+              buttonHeight: 'sm',
             },
           ],
         });
@@ -188,11 +199,18 @@ const ReactQuillEditor = ({
     if (!editorRef.current) {
       return;
     }
-    setIsMarkdownEnabled(!!contentDelta?.___isMarkdown);
-    // sometimes a force refresh is needed to render the editor
-    setTimeout(() => {
-      refreshQuillComponent();
-    }, 100);
+    // since we only want to focus on setting setIsMarkdownEnabled if
+    // 1- the editor is present
+    // 2- the initial contentDelta?.___isMarkdown is true
+    // 3- the initial isMarkdownEnabled is false
+    // so we dont have to include them in the dependency array
+    if (isMarkdownEnabled !== !!contentDelta?.___isMarkdown) {
+      setIsMarkdownEnabled(!!contentDelta?.___isMarkdown);
+      // sometimes a force refresh is needed to render the editor
+      setTimeout(() => {
+        refreshQuillComponent();
+      }, 100);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorRef]);
 
@@ -208,7 +226,7 @@ const ReactQuillEditor = ({
       editorRef && editorRef.current && editorRef.current.focus();
       setTimeout(
         () => editorRef && editorRef.current && editorRef.current.focus(),
-        200
+        200,
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -231,7 +249,8 @@ const ReactQuillEditor = ({
       >
         {showTooltip && <QuillTooltip label={tooltipLabel} />}
         {isUploading && <LoadingIndicator />}
-        <Modal
+        <CWModal
+          size="medium"
           content={
             <PreviewModal
               doc={
@@ -273,6 +292,7 @@ const ReactQuillEditor = ({
                         className={clsx('QuillEditor', className, {
                           markdownEnabled: isMarkdownEnabled,
                         })}
+                        scrollingContainer="html"
                         placeholder={placeholder}
                         tabIndex={tabIndex}
                         theme="snow"

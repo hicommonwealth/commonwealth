@@ -123,13 +123,13 @@ const StatsPage = () => {
             roles,
             threads,
             activeAccounts,
-          })
+          }),
         );
       } catch (err) {
-        if (err.responseJSON?.error) {
-          setError(err.responseJSON.error);
-        } else if (err.responseText) {
-          setError(err.responseText);
+        if (err.response.data.error || err.responseJSON?.error) {
+          setError(err.response.data.error);
+        } else if (err.response.data.error || err.responseText) {
+          setError(err.response.data.error || err.responseText);
         } else {
           setError('Error loading analytics');
         }
@@ -156,6 +156,11 @@ const StatsPage = () => {
 
   return (
     <div className="StatsPage">
+      <div className="header">
+        <CWText type="h2" fontWeight="medium">
+          Analytics
+        </CWText>
+      </div>
       <div className="stat-row dark top">
         <CWText fontWeight="medium">Duration</CWText>
         <CWText fontWeight="medium">New Addresses</CWText>

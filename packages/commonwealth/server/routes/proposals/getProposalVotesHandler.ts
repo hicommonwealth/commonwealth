@@ -15,11 +15,11 @@ export const getProposalVotesHandler = async (
   req: TypedRequestQuery<GetProposalVotesRequestParams>,
   res: TypedResponse<GetProposalVotesResponse>
 ) => {
-  const { chainId, proposalId } = req.query;
+  const { chainId: communityId, proposalId } = req.query;
 
   const votes = await controllers.proposals.getProposalVotes({
-    chainId,
-    proposalId: +proposalId,
+    communityId,
+    proposalId,
   });
 
   return success(res, {

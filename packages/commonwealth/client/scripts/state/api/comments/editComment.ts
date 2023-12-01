@@ -26,7 +26,7 @@ const editComment = async ({
     session = null,
     action = null,
     hash = null,
-  } = await app.sessions.signComment({
+  } = await app.sessions.signComment(app.user.activeAccount.address, {
     thread_id: threadId,
     body: updatedBody,
     parent_comment_id: parentCommentId,
@@ -36,15 +36,15 @@ const editComment = async ({
     `${app.serverUrl()}/comments/${commentId}`,
     {
       address: address,
-      author_chain: chainId,
+      author_community_id: chainId,
       id: commentId,
-      chain: chainId,
+      community_id: chainId,
       body: encodeURIComponent(updatedBody),
       jwt: app.user.jwt,
       canvas_action: action,
       canvas_session: session,
       canvas_hash: hash,
-    }
+    },
   );
 
   return new Comment(response.data.result);
@@ -74,7 +74,7 @@ const useEditCommentMutation = ({
       queryClient.setQueryData([...key], () => {
         // find the existing comment index, and return updated comment in its place
         return comments.map((x) =>
-          x.id === updatedComment.id ? updatedComment : x
+          x.id === updatedComment.id ? updatedComment : x,
         );
       });
 

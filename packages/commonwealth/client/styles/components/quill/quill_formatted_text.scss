@@ -1,7 +1,7 @@
 @import '../../shared';
 
 @mixin formatted-text {
-  @include b2;
+  @include b1;
   // 1. block styles
   // 2. list styles
   // 3. inline styles
@@ -20,6 +20,10 @@
     font-family: $fonts;
     font-weight: 600;
     margin: 1.5em 0 0.47em;
+  }
+
+  hr {
+    margin: 16px 0;
   }
 
   > h1:first-child,
@@ -81,7 +85,7 @@
 
   pre {
     font-family: $monospace-fonts;
-    font-size: 0.725em;
+    font-size: 16px;
     white-space: pre-wrap;
     margin: 22px 0;
     padding: 12px 16px 14px;
@@ -211,6 +215,18 @@
     position: relative;
     top: 2px;
     margin-right: 5px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #999;
+    border-radius: 2px;
+    background-color: #fff;
+    z-index: 1000;
+    color: #338fff !important;
+
+    &:disabled:checked,
+    &:disabled {
+      color: #338fff !important;
+    }
   }
 
   p:first-child {
@@ -358,4 +374,12 @@
   margin-top: -50px;
   margin-bottom: 30px;
   position: relative;
+}
+
+.line-with-link {
+  display: inline;
+
+  div {
+    display: inherit;
+  }
 }

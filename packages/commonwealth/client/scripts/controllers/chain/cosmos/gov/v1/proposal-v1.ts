@@ -1,7 +1,6 @@
 import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
-import BN from 'bn.js';
-import moment from 'moment';
 import { longify } from '@cosmjs/stargate/build/queryclient';
+import BN from 'bn.js';
 import {
   QueryDepositsResponseSDKType,
   QueryTallyResultResponseSDKType,
@@ -14,7 +13,9 @@ import type {
   CosmosVoteChoice,
   ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
+import moment from 'moment';
 
+import Proposal from 'models/Proposal';
 import { ITXModalData } from 'models/interfaces';
 import {
   ProposalEndTime,
@@ -23,15 +24,14 @@ import {
   VotingUnit,
 } from 'models/types';
 import { DepositVote } from 'models/votes';
-import Proposal from 'models/Proposal';
 import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
 import type { CosmosApiType } from '../../chain';
-import { marshalTallyV1 } from './utils-v1';
-import type CosmosGovernanceV1 from './governance-v1';
 import { CosmosVote } from '../v1beta1/proposal-v1beta1';
 import { encodeMsgVote } from '../v1beta1/utils-v1beta1';
+import type CosmosGovernanceV1 from './governance-v1';
+import { marshalTallyV1 } from './utils-v1';
 
 const voteToEnumV1 = (voteOption: number | string): CosmosVoteChoice => {
   switch (voteOption) {
@@ -230,7 +230,7 @@ export class CosmosProposalV1 extends Proposal<
 
   get turnout() {
     if (this.status === 'DepositPeriod') {
-      if (this.data.state.totalDeposit.eqn(0)) {
+      if (this.data.state.totalDeposit.eqn(0) || !this._Chain.staked) {
         return 0;
       } else {
         const ratioInPpm = +this.data.state.totalDeposit
@@ -287,9 +287,11 @@ export class CosmosProposalV1 extends Proposal<
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':
-        return this.data.state.totalDeposit.gte(this._Governance.minDeposit)
-          ? ProposalStatus.Passing
-          : ProposalStatus.Failing;
+        return this._Governance.minDeposit
+          ? this.data.state.totalDeposit.gte(this._Governance.minDeposit)
+            ? ProposalStatus.Passing
+            : ProposalStatus.Failing
+          : ProposalStatus.None;
       default:
         return ProposalStatus.None;
     }

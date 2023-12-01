@@ -10,7 +10,14 @@ import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
 
+import { ChainNetwork } from 'common-common/src/types';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
+import useForceRerender from 'hooks/useForceRerender';
 import app from 'state';
+import {
+  useAaveProposalVotesQuery,
+  useCompoundProposalVotesQuery,
+} from 'state/api/proposals';
 import Web3 from 'web3-utils';
 import {
   AaveVotingResult,
@@ -20,9 +27,6 @@ import {
   YesNoAbstainVetoVotingResult,
   YesNoRejectVotingResult,
 } from './voting_result_components';
-import useForceRerender from 'hooks/useForceRerender';
-import { useAaveProposalVotesQuery } from 'state/api/proposals';
-import { ChainNetwork } from 'common-common/src/types';
 
 type VotingResultsProps = { proposal: AnyProposal };
 
@@ -50,13 +54,20 @@ export const VotingResults = (props: VotingResultsProps) => {
     };
   }, [forceRerender]);
 
-  const { data } = useAaveProposalVotesQuery({
+  const { data: aaveVotes } = useAaveProposalVotesQuery({
     moduleReady: app.chain?.network === ChainNetwork.Aave && !isLoading,
     chainId: app.chain?.id,
     proposalId: proposal.identifier,
   });
 
-  const votes = data || proposal.getVotes();
+  const { data: compoundVotes } = useCompoundProposalVotesQuery({
+    moduleReady: app.chain?.network === ChainNetwork.Compound && !isLoading,
+    chainId: app.chain?.id,
+    proposalId: proposal.data.id,
+    proposalIdentifier: proposal.identifier,
+  });
+
+  const votes = aaveVotes || compoundVotes || proposal.getVotes();
 
   // TODO: fix up this function for cosmos votes
   if (
@@ -89,7 +100,7 @@ export const VotingResults = (props: VotingResultsProps) => {
     );
   } else if (
     proposal.votingType === VotingType.SimpleYesApprovalVoting &&
-    proposal instanceof CosmosProposal
+    (proposal instanceof CosmosProposal || proposal instanceof CosmosProposalV1)
   ) {
     // special case for cosmos proposals in deposit stage
     return (

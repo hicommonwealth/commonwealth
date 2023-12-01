@@ -55,8 +55,8 @@ export const LoginDesktopSidebar = ({
             <LoginText
               headerText={
                 wallets.length > 0
-                  ? 'Login to Commonwealth'
-                  : 'Please Install a Wallet to Login'
+                  ? 'Sign in to Commonwealth'
+                  : 'Please Install a Wallet to sign in'
               }
               bodyText="Many communities require different wallets based
             on the chain they are built on and the types of tokens members hold."
@@ -70,7 +70,7 @@ export const LoginDesktopSidebar = ({
           <div className="sidebar-content">
             <LoginText
               headerText="Enter your email"
-              bodyText="Follow the instructions provided to login to Commonwealth with your email."
+              bodyText="Follow the instructions provided to sign in to Commonwealth with your email."
             />
           </div>
         </div>

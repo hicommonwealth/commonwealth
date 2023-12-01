@@ -1,5 +1,4 @@
-import type { CWEvent } from 'chain-events/src';
-import { Label as ChainEventLabel } from 'chain-events/src';
+import type { IEventLabel } from 'chain/labelers/util';
 import { getProposalUrlPath } from 'identifiers';
 import 'pages/user_dashboard/user_dashboard_row.scss';
 import React from 'react';
@@ -15,17 +14,21 @@ type UserDashboardRowProps = {
   notification?: DashboardActivityNotification;
   showSkeleton?: boolean;
   isChainEventsRow?: boolean;
+  label?: IEventLabel;
 };
 
-export const UserDashboardRow = (props: UserDashboardRowProps) => {
-  const { notification, showSkeleton, isChainEventsRow } = props;
-
+export const UserDashboardRow = ({
+  notification,
+  showSkeleton,
+  isChainEventsRow,
+  label,
+}: UserDashboardRowProps) => {
   if (showSkeleton) {
     if (isChainEventsRow) {
       return (
         <UserDashboardChainEventRow
           blockNumber={0}
-          chain={{} as any}
+          community={{} as any}
           label={{} as any}
           showSkeleton
         />
@@ -38,7 +41,7 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
         <UserDashboardRowBottom
           threadId=""
           commentId=""
-          chainId=""
+          communityId=""
           commentCount={0}
           commenters={[]}
           showSkeleton
@@ -47,37 +50,23 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
     );
   }
 
-  const {
-    commentCount,
-    categoryId,
-    threadId,
-    blockNumber,
-    eventNetwork,
-    chain,
-    commenters,
-  } = notification;
+  const { commentCount, categoryId, threadId, blockNumber, chain, commenters } =
+    notification;
 
   if (categoryId === 'chain-event') {
-    const chainEvent = {
-      network: eventNetwork,
-      data: notification.eventData,
-    };
-
-    const label = ChainEventLabel(chain, chainEvent);
-
-    const chainInfo = app.config.chains.getById(chain);
+    const communityInfo = app.config.chains.getById(chain);
 
     return (
       <UserDashboardChainEventRow
         blockNumber={blockNumber}
-        chain={chainInfo}
+        community={communityInfo}
         label={label}
       />
     );
   }
 
   const { chain_id, thread_id, root_type, comment_id } = JSON.parse(
-    notification.notificationData
+    notification.notificationData,
   );
 
   const path = getProposalUrlPath(root_type, thread_id, false, chain_id);
@@ -86,7 +75,7 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
     <Link
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!path },
-        'UserDashboardRow'
+        'UserDashboardRow',
       )}
       to={path}
     >
@@ -94,7 +83,7 @@ export const UserDashboardRow = (props: UserDashboardRowProps) => {
       <UserDashboardRowBottom
         threadId={threadId}
         commentId={comment_id}
-        chainId={chain_id}
+        communityId={chain_id}
         commentCount={commentCount}
         commenters={commenters}
       />

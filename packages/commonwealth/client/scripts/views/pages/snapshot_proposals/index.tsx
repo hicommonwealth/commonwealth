@@ -8,7 +8,10 @@ import { NotificationCategories } from '../../../../../../common-common/src/type
 import useNecessaryEffect from '../../../hooks/useNecessaryEffect';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { SnapshotProposalCard } from './SnapshotProposalCard';
 import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
@@ -31,12 +34,10 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   const spaceSubscription = useMemo(
     () =>
-      app.user.notifications.findNotificationSubscription(
-        {
-          categoryId: NotificationCategories.SnapshotProposal,
-          options: { snapshotId },
-        }
-      ),
+      app.user.notifications.findNotificationSubscription({
+        categoryId: NotificationCategories.SnapshotProposal,
+        options: { snapshotId },
+      }),
     [snapshotId]
   );
 
@@ -91,16 +92,20 @@ const SnapshotProposalsPage = ({ snapshotId }: SnapshotProposalsPageProps) => {
 
   return (
     <div className="SnapshotProposalsPage">
+      <CWText type="h2" fontWeight="medium">
+        Snapshots
+      </CWText>
       <div className="top-bar">
-        <CWTabBar>
+        <CWTabsRow>
           {['Active', 'Ended'].map((tabName, index) => (
             <CWTab
+              key={index}
               label={tabName}
               isSelected={activeTab === index + 1}
               onClick={() => setActiveTab(index + 1)}
             />
           ))}
-        </CWTabBar>
+        </CWTabsRow>
         <div>
           <CWButton
             label={

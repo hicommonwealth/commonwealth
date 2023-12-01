@@ -1,7 +1,7 @@
+import axios from 'axios';
+import { ChainCategoryType } from 'common-common/src/types';
 import app from 'state';
 import { AccessLevel } from '../../../../../shared/permissions';
-import { ChainCategoryType } from 'common-common/src/types';
-import axios from 'axios';
 
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
@@ -13,13 +13,13 @@ export const sortAdminsAndModsFirst = (a, b) => {
   return a.Address.address.localeCompare(b.Address.address);
 };
 
-export const setChainCategories = async (
+export const setCommunityCategories = async (
   selected_tags: { [tag: string]: boolean },
-  chain_id: string
+  community_id: string,
 ) => {
   return new Promise<void>((resolve, reject) => {
     const params = {
-      chain_id,
+      community_id,
       selected_tags: selected_tags,
       auth: true,
       jwt: app.user.jwt,
@@ -39,9 +39,9 @@ export const setChainCategories = async (
   });
 };
 
-export const setSelectedTags = (chain: string) => {
+export const setSelectedTags = (community: string) => {
   const chainToCategoriesMap: {
-    [chain: string]: ChainCategoryType[];
+    [community: string]: ChainCategoryType[];
   } = app.config.chainCategoryMap;
 
   const types = Object.keys(ChainCategoryType);
@@ -51,8 +51,8 @@ export const setSelectedTags = (chain: string) => {
     selectedTags[type] = false;
   }
 
-  if (chainToCategoriesMap[chain]) {
-    for (const tag of chainToCategoriesMap[chain]) {
+  if (chainToCategoriesMap[community]) {
+    for (const tag of chainToCategoriesMap[community]) {
       selectedTags[tag] = true;
     }
   }

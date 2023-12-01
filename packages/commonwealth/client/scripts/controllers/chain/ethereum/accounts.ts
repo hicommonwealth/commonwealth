@@ -7,9 +7,7 @@ import type EthereumChain from './chain';
 
 // NOTE: this is just a boilerplate class; not verified to work yet.
 // TODO: hook this up to rest of the application and verify that it works
-class EthereumAccounts
-  implements IAccountsModule<EthereumCoin, EthereumAccount>
-{
+class EthereumAccounts implements IAccountsModule<EthereumAccount> {
   private _initialized = false;
   public get initialized() {
     return this._initialized;

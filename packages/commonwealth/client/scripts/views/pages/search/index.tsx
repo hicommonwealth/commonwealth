@@ -4,28 +4,31 @@ import { capitalize } from 'lodash';
 import {
   SearchScope,
   SearchSort,
-  VALID_SEARCH_SCOPES,
+  VALID_SEARCH_SCOPES
 } from 'models/SearchQuery';
 import 'pages/search/index.scss';
 
 import React, { useEffect, useMemo } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { PageLoading } from 'views/pages/loading';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { CWText } from '../../components/component_kit/cw_text';
-import { renderSearchResults } from './helpers';
-import { useInView } from 'react-intersection-observer';
-import { useCommonNavigate } from '../../../navigation/helpers';
-import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
-import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
-import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
-import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import {
   APIOrderBy,
-  APIOrderDirection,
+  APIOrderDirection
 } from '../../../../scripts/helpers/constants';
+import { useSearchChainsQuery } from '../../../../scripts/state/api/chains';
+import { useSearchCommentsQuery } from '../../../../scripts/state/api/comments';
+import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
+import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
+import { useCommonNavigate } from '../../../navigation/helpers';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWText } from '../../components/component_kit/cw_text';
+import {
+  CWTab,
+  CWTabsRow
+} from '../../components/component_kit/new_designs/CWTabs';
+import { renderSearchResults } from './helpers';
 
 const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
   (scope) => ![SearchScope.All, SearchScope.Proposals].includes(scope)
@@ -35,13 +38,13 @@ const VISIBLE_TABS = VALID_SEARCH_SCOPES.filter(
 const SORT_MAP: Record<string, [APIOrderBy, APIOrderDirection]> = {
   Best: [APIOrderBy.Rank, APIOrderDirection.Desc],
   Newest: [APIOrderBy.CreatedAt, APIOrderDirection.Desc],
-  Oldest: [APIOrderBy.CreatedAt, APIOrderDirection.Asc],
+  Oldest: [APIOrderBy.CreatedAt, APIOrderDirection.Asc]
 };
 const DEFAULT_SORT_OPTIONS = SORT_MAP.Best;
 
 type SearchQueryParams = {
   q?: string;
-  chainScope?: string;
+  communityScope?: string;
   sort?: string;
   tab?: string;
 };
@@ -58,7 +61,8 @@ const SearchPage = () => {
     return Object.fromEntries(urlQueryParams.entries()) as SearchQueryParams;
   }, [urlQueryParams]);
 
-  const chain = queryParams.chainScope || app.activeChainId() || 'all_chains';
+  const community =
+    queryParams.communityScope || app.activeChainId() || 'all_communities';
 
   const activeTab = useMemo(() => {
     if (VALID_SEARCH_SCOPES.includes(queryParams.tab as SearchScope)) {
@@ -72,16 +76,16 @@ const SearchPage = () => {
     newQueryParams.set('tab', newTab);
     navigate({
       pathname: location.pathname,
-      search: `?${newQueryParams.toString()}`,
+      search: `?${newQueryParams.toString()}`
     });
   };
 
   const handleSearchAllCommunities = () => {
     const newQueryParams = new URLSearchParams(urlQueryParams.toString());
-    newQueryParams.set('chainScope', 'all_chains');
+    newQueryParams.set('communityScope', 'all_communities');
     navigate({
       pathname: location.pathname,
-      search: `?${newQueryParams.toString()}`,
+      search: `?${newQueryParams.toString()}`
     });
   };
 
@@ -91,7 +95,7 @@ const SearchPage = () => {
     newQueryParams.set('sort', sort);
     navigate({
       pathname: location.pathname,
-      search: `?${newQueryParams.toString()}`,
+      search: `?${newQueryParams.toString()}`
     });
   };
 
@@ -99,52 +103,52 @@ const SearchPage = () => {
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
-    chainId: app.activeChainId() || 'all_chains',
+    chainId: app.activeChainId() || 'all_communities',
     searchTerm: queryParams.q,
     limit: 20,
     orderBy,
-    orderDirection,
+    orderDirection
   };
 
   const {
     data: threadsData,
     error: threadsError,
     fetchNextPage: threadsFetchNextPage,
-    isLoading: threadsIsLoading,
+    isLoading: threadsIsLoading
   } = useSearchThreadsQuery({
     ...sharedQueryOptions,
-    enabled: activeTab === SearchScope.Threads,
+    enabled: activeTab === SearchScope.Threads
   });
 
   const {
     data: commentsData,
     error: commentsError,
     fetchNextPage: commentsFetchNextPage,
-    isLoading: commentsIsLoading,
+    isLoading: commentsIsLoading
   } = useSearchCommentsQuery({
     ...sharedQueryOptions,
-    enabled: activeTab === SearchScope.Replies,
+    enabled: activeTab === SearchScope.Replies
   });
 
   const {
-    data: chainsData,
-    error: chainsError,
+    data: communityData,
+    error: communityError,
     fetchNextPage: chainsFetchNextPage,
-    isLoading: chainsIsLoading,
+    isLoading: communityIsLoading
   } = useSearchChainsQuery({
     ...sharedQueryOptions,
-    enabled: activeTab === SearchScope.Communities,
+    enabled: activeTab === SearchScope.Communities
   });
 
   const {
     data: profilesData,
     error: profilesError,
     fetchNextPage: profilesFetchNextPage,
-    isLoading: profilesIsLoading,
+    isLoading: profilesIsLoading
   } = useSearchProfilesQuery({
     ...sharedQueryOptions,
     includeRoles: true,
-    enabled: activeTab === SearchScope.Members,
+    enabled: activeTab === SearchScope.Members
   });
 
   const results = useMemo(() => {
@@ -161,7 +165,8 @@ const SearchPage = () => {
         );
       case SearchScope.Communities:
         return (
-          chainsData?.pages.reduce((acc, p) => [...acc, ...p.results], []) || []
+          communityData?.pages.reduce((acc, p) => [...acc, ...p.results], []) ||
+          []
         );
       case SearchScope.Members:
         return (
@@ -171,7 +176,7 @@ const SearchPage = () => {
       default:
         return [];
     }
-  }, [activeTab, chainsData, commentsData, profilesData, threadsData]);
+  }, [activeTab, communityData, commentsData, profilesData, threadsData]);
 
   const totalResults = useMemo(() => {
     switch (activeTab) {
@@ -180,34 +185,35 @@ const SearchPage = () => {
       case SearchScope.Replies:
         return commentsData?.pages?.[0]?.totalResults || 0;
       case SearchScope.Communities:
-        return chainsData?.pages?.[0]?.totalResults || 0;
+        return communityData?.pages?.[0]?.totalResults || 0;
       case SearchScope.Members:
         return profilesData?.pages?.[0]?.totalResults || 0;
       default:
         return 0;
     }
-  }, [activeTab, chainsData, commentsData, profilesData, threadsData]);
+  }, [activeTab, communityData, commentsData, profilesData, threadsData]);
 
   const totalResultsText = pluralize(totalResults, activeTab.toLowerCase());
   const scopeText = useMemo(() => {
-    if (chain) {
-      if (chain === 'all_chains') {
+    if (community) {
+      if (community === 'all_communities') {
         return 'across all communities.';
       }
-      return `in ${capitalize(chain)}.`;
+      return `in ${capitalize(community)}.`;
     } else {
       // also applies when app.isCustomDomain() is true
       return '';
     }
-  }, [chain]);
+  }, [community]);
 
   // when error, notify
   useEffect(() => {
-    const err = threadsError || commentsError || chainsError || profilesError;
+    const err =
+      threadsError || commentsError || communityError || profilesError;
     if (err) {
       notifyError((err as Error).message);
     }
-  }, [chainsError, commentsError, profilesError, threadsError]);
+  }, [communityError, commentsError, profilesError, threadsError]);
 
   // when scroll to bottom, fetch next page
   useEffect(() => {
@@ -227,7 +233,14 @@ const SearchPage = () => {
           break;
       }
     }
-  }, [activeTab, bottomInView]);
+  }, [
+    activeTab,
+    bottomInView,
+    threadsFetchNextPage,
+    commentsFetchNextPage,
+    chainsFetchNextPage,
+    profilesFetchNextPage
+  ]);
 
   const isLoading = useMemo(() => {
     switch (activeTab) {
@@ -236,7 +249,7 @@ const SearchPage = () => {
       case SearchScope.Replies:
         return commentsIsLoading;
       case SearchScope.Communities:
-        return chainsIsLoading;
+        return communityIsLoading;
       case SearchScope.Members:
         return profilesIsLoading;
       default:
@@ -244,78 +257,77 @@ const SearchPage = () => {
     }
   }, [
     activeTab,
-    chainsIsLoading,
+    communityIsLoading,
     commentsIsLoading,
     profilesIsLoading,
-    threadsIsLoading,
+    threadsIsLoading
   ]);
 
   return (
     <div className="SearchPage">
-      {
+      <div className="search-results">
+        <div className="cw-tabs-row-container">
+          <CWTabsRow>
+            {VISIBLE_TABS.map((s, i) => (
+              <CWTab
+                key={i}
+                label={s}
+                isSelected={activeTab === s}
+                onClick={() => setActiveTab(s)}
+              />
+            ))}
+          </CWTabsRow>
+        </div>
         <>
-          <div className="search-results">
-            <CWTabBar>
-              {VISIBLE_TABS.map((s, i) => (
-                <CWTab
-                  key={i}
-                  label={s}
-                  isSelected={activeTab === s}
-                  onClick={() => setActiveTab(s)}
-                />
-              ))}
-            </CWTabBar>
+          {isLoading && <PageLoading />}
+          {!isLoading && (
             <>
-              {isLoading && <PageLoading />}
-              {!isLoading && (
-                <>
-                  <CWText isCentered className="search-results-caption">
-                    {totalResultsText} matching '{queryParams.q}' {scopeText}
-                    {chain !== 'all_chains' && !app.isCustomDomain() && (
-                      <a
-                        href="#"
-                        className="search-all-communities"
-                        onClick={handleSearchAllCommunities}
-                      >
-                        Search all communities?
-                      </a>
-                    )}
-                  </CWText>
-                  {VISIBLE_TABS.length > 0 &&
-                    [SearchScope.Threads, SearchScope.Replies].includes(
-                      activeTab
-                    ) && (
-                      <div className="search-results-filters">
-                        <CWText type="h5">Sort By:</CWText>
-                        <CWDropdown
-                          label=""
-                          onSelect={handleSortChange}
-                          initialValue={{
-                            label: queryParams.sort,
-                            value: queryParams.sort,
-                          }}
-                          options={Object.keys(SearchSort).map((k) => ({
-                            label: k,
-                            value: k,
-                          }))}
-                        />
-                      </div>
-                    )}
-                  <div className="search-results-list">
-                    {renderSearchResults(
-                      results as any,
-                      queryParams.q,
-                      activeTab,
-                      commonNavigate
-                    )}
-                    <div ref={bottomRef}></div>
+              <CWText className="search-results-caption">
+                {totalResultsText} matching &apos;{queryParams.q}&apos;{' '}
+                {scopeText}
+                {community !== 'all_communities' && !app.isCustomDomain() && (
+                  <a
+                    href="#"
+                    className="search-all-communities"
+                    onClick={handleSearchAllCommunities}
+                  >
+                    Search all communities?
+                  </a>
+                )}
+              </CWText>
+              {VISIBLE_TABS.length > 0 &&
+                [SearchScope.Threads, SearchScope.Replies].includes(
+                  activeTab
+                ) && (
+                  <div className="search-results-filters">
+                    <CWText type="h5">Sort By:</CWText>
+                    <CWDropdown
+                      label=""
+                      onSelect={handleSortChange}
+                      initialValue={{
+                        label: queryParams.sort,
+                        value: queryParams.sort
+                      }}
+                      options={Object.keys(SearchSort).map((k) => ({
+                        label: k,
+                        value: k
+                      }))}
+                    />
                   </div>
-                </>
-              )}
+                )}
+              <div className="search-results-list">
+                {renderSearchResults(
+                  results as any,
+                  queryParams.q,
+                  activeTab,
+                  commonNavigate
+                )}
+                <div ref={bottomRef}></div>
+              </div>
             </>
-          </div>
+          )}
         </>
-      }
+      </div>
     </div>
   );
 };

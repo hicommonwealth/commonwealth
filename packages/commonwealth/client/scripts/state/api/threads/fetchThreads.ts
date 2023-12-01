@@ -35,6 +35,7 @@ interface FetchBulkThreadsProps extends CommonProps {
   topicId?: number;
   stage?: string;
   includePinnedThreads?: boolean;
+  isOnArchivePage?: boolean;
   orderBy?:
     | 'newest'
     | 'oldest'
@@ -125,7 +126,7 @@ const fetchBulkThreads = (props) => {
           bulk: true,
           page: pageParam,
           limit: props.limit,
-          chain: props.chainId,
+          community_id: props.chainId,
           ...(props.topicId && { topic_id: props.topicId }),
           ...(props.stage && { stage: props.stage }),
           ...(props.includePinnedThreads && {
@@ -136,8 +137,9 @@ const fetchBulkThreads = (props) => {
           orderBy:
             featuredFilterQueryMap[props.orderBy] ||
             featuredFilterQueryMap.newest,
+          ...(props.isOnArchivePage && { archived: true }),
         },
-      }
+      },
     );
 
     // transform the response
@@ -163,7 +165,7 @@ const fetchActiveThreads = (props) => {
           chain: props.chainId,
           threads_per_topic: props.topicsPerThread || 3,
         },
-      }
+      },
     );
 
     // transform response
@@ -172,7 +174,7 @@ const fetchActiveThreads = (props) => {
 };
 
 const useFetchThreadsQuery = (
-  props: FetchBulkThreadsProps | FetchActiveThreadsProps
+  props: FetchBulkThreadsProps | FetchActiveThreadsProps,
 ) => {
   // better to use this in case someone updates this props, we wont reflect those changes
   const [queryType] = useState(props.queryType);
@@ -186,7 +188,7 @@ const useFetchThreadsQuery = (
     ...(() => {
       if (isFetchBulkThreadsProps(props)) {
         return {
-          getNextPageParam: (lastPage, pages) => lastPage.pageParam,
+          getNextPageParam: (lastPage) => lastPage.pageParam,
         };
       }
     })(),
@@ -198,7 +200,7 @@ const useFetchThreadsQuery = (
     // transform pages into workable object
     const reducedData = (chosenQueryType?.data?.pages || []).reduce(
       (acc, curr) => ({ threads: [...acc.threads, ...curr.data.threads] }),
-      { threads: [] }
+      { threads: [] },
     );
 
     return {

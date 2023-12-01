@@ -1,20 +1,18 @@
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { ReactionAttributes } from '../../models/reaction';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
 } from '../../../../common-common/src/types';
-import { findAllRoles } from '../../util/roles';
-import validateTopicThreshold from '../../util/validateTopicThreshold';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
-import { AppError } from '../../../../common-common/src/errors';
-import { getThreadUrl } from '../../../shared/utils';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { ReactionAttributes } from '../../models/reaction';
+import { UserInstance } from '../../models/user';
+import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
 import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
 import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
@@ -23,12 +21,13 @@ export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
   BalanceCheckFailed: 'Could not verify user token balance',
   ThreadArchived: 'Thread is archived',
+  FailedCreateReaction: 'Failed to create reaction',
 };
 
 export type CreateThreadReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   reaction: string;
   threadId: number;
   canvasAction?: any;
@@ -47,7 +46,7 @@ export async function __createThreadReaction(
   {
     user,
     address,
-    chain,
+    community,
     reaction,
     threadId,
     canvasAction,
@@ -69,9 +68,9 @@ export async function __createThreadReaction(
   }
 
   // check address ban
-  if (chain) {
+  if (community) {
     const [canInteract, banError] = await this.banCache.checkBan({
-      chain: chain.id,
+      communityId: community.id,
       address: address.address,
     });
     if (!canInteract) {
@@ -81,32 +80,28 @@ export async function __createThreadReaction(
 
   // check balance (bypass for admin)
   if (
-    chain &&
-    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+    community &&
+    (community.type === ChainType.Token ||
+      community.network === ChainNetwork.Ethereum)
   ) {
-    const addressAdminRoles = await findAllRoles(
-      this.models,
-      { where: { address_id: address.id } },
-      chain.id,
-      ['admin']
-    );
-    const isGodMode = user.isAdmin;
-    const hasAdminRole = addressAdminRoles.length > 0;
-    if (!isGodMode && !hasAdminRole) {
-      let canReact;
-      try {
-        canReact = await validateTopicThreshold(
-          this.tokenBalanceCache,
-          this.models,
-          thread.topic_id,
-          address.address
-        );
-      } catch (e) {
-        throw new ServerError(Errors.BalanceCheckFailed, e);
-      }
-
-      if (!canReact) {
-        throw new AppError(Errors.InsufficientTokenBalance);
+    const isAdmin = await validateOwner({
+      models: this.models,
+      user,
+      communityId: community.id,
+      entity: thread,
+      allowAdmin: true,
+      allowGodMode: true,
+    });
+    if (!isAdmin) {
+      const { isValid, message } = await validateTopicGroupsMembership(
+        this.models,
+        this.tokenBalanceCache,
+        thread.topic_id,
+        community,
+        address
+      );
+      if (!isValid) {
+        throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
       }
     }
   }
@@ -115,7 +110,7 @@ export async function __createThreadReaction(
   const reactionData: ReactionAttributes = {
     reaction,
     address_id: address.id,
-    chain: chain.id,
+    chain: community.id,
     thread_id: thread.id,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -146,16 +141,8 @@ export async function __createThreadReaction(
         root_type: 'discussion',
         chain_id: finalReaction.chain,
         author_address: finalReaction.Address.address,
-        author_chain: finalReaction.Address.chain,
+        author_chain: finalReaction.Address.community_id,
       },
-    },
-    webhookData: {
-      user: finalReaction.Address.address,
-      author_chain: finalReaction.Address.chain,
-      url: getThreadUrl(thread),
-      title: thread.title,
-      chain: finalReaction.chain,
-      body: '',
     },
     excludeAddresses: [finalReaction.Address.address],
   };
@@ -163,7 +150,7 @@ export async function __createThreadReaction(
   // build analytics options
   const analyticsOptions: TrackOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
-    community: chain.id,
+    community: community.id,
     isCustomDomain: null,
   };
 

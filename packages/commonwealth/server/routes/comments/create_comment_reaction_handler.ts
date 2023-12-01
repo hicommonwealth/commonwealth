@@ -2,6 +2,7 @@ import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
 import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
+import { verifyReaction } from '../../../shared/canvas/serverVerify';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
@@ -26,7 +27,7 @@ export const createCommentReactionHandler = async (
   >,
   res: TypedResponse<CreateCommentReactionResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const {
     reaction,
     canvas_action: canvasAction,
@@ -43,12 +44,21 @@ export const createCommentReactionHandler = async (
     throw new AppError(Errors.InvalidCommentId);
   }
 
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    await verifyReaction(canvasAction, canvasSession, canvasHash, {
+      comment_id: commentId,
+      address: address.address,
+      chain: community.id,
+      value: reaction,
+    });
+  }
+
   // create comment reaction
   const [newReaction, notificationOptions, analyticsOptions] =
     await controllers.comments.createCommentReaction({
       user,
       address,
-      chain,
+      community,
       reaction,
       commentId,
       canvasAction,

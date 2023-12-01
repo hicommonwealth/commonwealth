@@ -1,3 +1,5 @@
+import { SupportedNetwork } from 'commonwealth/shared/chain/types/types';
+
 export enum NotificationCategories {
   NewComment = 'new-comment-creation',
   NewThread = 'new-thread-creation',
@@ -14,18 +16,11 @@ export type NotificationCategory =
   typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
-  SubstrateDemocracyReferendum = 'referendum',
-  SubstrateDemocracyProposal = 'democracyproposal',
-  SubstrateTreasuryTip = 'treasurytip',
-  SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
-  SubstrateTreasuryProposal = 'treasuryproposal',
   Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   CompoundProposal = 'compoundproposal',
   AaveProposal = 'onchainproposal',
   SputnikProposal = 'sputnikproposal',
-  SubstratePreimage = 'democracypreimage',
-  SubstrateImminentPreimage = 'democracyimminent',
 }
 
 export enum ChainBase {
@@ -60,12 +55,23 @@ export enum WalletId {
   WalletConnect = 'walletconnect',
   KeplrEthereum = 'keplr-ethereum',
   Keplr = 'keplr',
+  Leap = 'leap',
   NearWallet = 'near',
   TerraStation = 'terrastation',
   TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Ronin = 'ronin',
+}
+
+// 'google', 'github', 'discord', and 'twitter' are passed to magic login directly
+export enum WalletSsoSource {
+  Google = 'google',
+  Github = 'github',
+  Discord = 'discord',
+  Twitter = 'twitter',
+  Email = 'email',
+  Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 
 export enum ChainCategoryType {
@@ -114,6 +120,7 @@ export enum ChainNetwork {
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
   Kava = 'kava',
+  Kyve = 'kyve',
 }
 
 export enum BalanceType {
@@ -132,6 +139,8 @@ export enum RedisNamespaces {
   Global_Response = 'global_response',
   Test_Redis = 'test_redis',
   Database_Cleaner = 'database_cleaner',
+  Compound_Gov_Version = 'compound_gov_version',
+  Token_Balance = 'token_balance',
 }
 
 export interface ISnapshotNotification {
@@ -151,11 +160,16 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
-export type DiscordAction =
-  | 'create'
-  | 'update'
+export type ThreadDiscordActions =
   | 'thread-delete'
-  | 'comment-delete';
+  | 'thread-title-update'
+  | 'thread-body-update'
+  | 'thread-create';
+export type CommentDiscordActions =
+  | 'comment-delete'
+  | 'comment-update'
+  | 'comment-create';
+export type DiscordAction = ThreadDiscordActions | CommentDiscordActions;
 
 export interface IDiscordMessage {
   user?: {
@@ -172,6 +186,15 @@ export interface IDiscordMessage {
   action: DiscordAction;
 }
 
+export interface IDiscordMeta {
+  user: {
+    id: string;
+    username: string;
+  };
+  channel_id: string;
+  message_id: string;
+}
+
 export type HttpMethod =
   | 'get'
   | 'post'
@@ -180,3 +203,15 @@ export type HttpMethod =
   | 'patch'
   | 'options'
   | 'head';
+
+export type ChainEventAttributes = {
+  id: number;
+  block_number: number;
+  event_data: any;
+  queued: number;
+  entity_id?: number;
+  network: SupportedNetwork;
+  chain: string;
+  created_at?: Date;
+  updated_at?: Date;
+};

@@ -1,10 +1,11 @@
-import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
 import type { AccessLevel } from './permissions';
 import {
+  ChainEventAttributes,
   NotificationCategories,
   NotificationCategory,
 } from 'common-common/src/types';
+import type { SupportedNetwork } from '../shared/chain/types/types';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
@@ -141,7 +142,13 @@ export interface ICommentEditNotificationData
   comment_text: string;
 }
 
-export interface IChainEventNotificationData extends ChainEventAttributes {}
+export interface IChainEventNotificationData {
+  id?: number;
+  block_number?: number;
+  event_data: any;
+  network: SupportedNetwork;
+  chain: string;
+}
 
 export type NotificationDataTypes =
   | IForumNotificationData
@@ -209,3 +216,11 @@ export type RoleObject = {
   allow: number;
   deny: number;
 };
+
+export type AbiType = Record<string, unknown>[];
+
+export type WebhookCategory =
+  | NotificationCategories.ChainEvent
+  | NotificationCategories.NewThread
+  | NotificationCategories.NewComment
+  | NotificationCategories.NewReaction;

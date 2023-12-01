@@ -1,23 +1,23 @@
+import { uniq } from 'lodash';
 import moment from 'moment';
-import { UserInstance } from '../../models/user';
-import { ServerThreadsController } from '../server_threads_controller';
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
 import { Op, Sequelize, Transaction } from 'sequelize';
-import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
-import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError, ServerError } from '../../../../common-common/src/errors';
 import {
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { parseUserMentions } from '../../util/parseUserMentions';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { AppError, ServerError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
+import { renderQuillDeltaToText, validURL } from '../../../shared/utils';
 import { DB } from '../../models';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { ThreadAttributes, ThreadInstance } from '../../models/thread';
+import { UserInstance } from '../../models/user';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { findAllRoles } from '../../util/roles';
 import { TrackOptions } from '../server_analytics_methods/track';
-import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { uniq } from 'lodash';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -38,7 +38,7 @@ export const Errors = {
 export type UpdateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   threadId?: number;
   title?: string;
   body?: string;
@@ -63,7 +63,7 @@ export type UpdateThreadOptions = {
 export type UpdateThreadResult = [
   ThreadAttributes,
   EmitOptions[],
-  TrackOptions[]
+  TrackOptions[],
 ];
 
 export async function __updateThread(
@@ -71,7 +71,7 @@ export async function __updateThread(
   {
     user,
     address,
-    chain,
+    community,
     threadId,
     title,
     body,
@@ -88,7 +88,7 @@ export async function __updateThread(
     canvasAction,
     canvasHash,
     discordMeta,
-  }: UpdateThreadOptions
+  }: UpdateThreadOptions,
 ): Promise<UpdateThreadResult> {
   // Discobot handling
   if (!threadId) {
@@ -106,7 +106,7 @@ export async function __updateThread(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -125,16 +125,16 @@ export async function __updateThread(
   const roles = await findAllRoles(
     this.models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    chain.id,
-    ['moderator', 'admin']
+    community.id,
+    ['moderator', 'admin'],
   );
 
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
   const isMod = !!roles.find(
-    (r) => r.chain_id === chain.id && r.permission === 'moderator'
+    (r) => r.chain_id === community.id && r.permission === 'moderator',
   );
   const isAdmin = !!roles.find(
-    (r) => r.chain_id === chain.id && r.permission === 'admin'
+    (r) => r.chain_id === community.id && r.permission === 'admin',
   );
   const isSuperAdmin = user.isAdmin;
   if (!isThreadOwner && !isMod && !isAdmin && !isSuperAdmin) {
@@ -188,7 +188,7 @@ export async function __updateThread(
         canvasAction,
         canvasHash,
       },
-      toUpdate
+      toUpdate,
     );
 
     await setThreadPinned(permissions, pinned, toUpdate);
@@ -202,9 +202,9 @@ export async function __updateThread(
     await setThreadStage(
       permissions,
       stage,
-      chain,
+      community,
       allAnalyticsOptions,
-      toUpdate
+      toUpdate,
     );
 
     await setThreadTopic(
@@ -213,7 +213,7 @@ export async function __updateThread(
       topicId,
       topicName,
       this.models,
-      toUpdate
+      toUpdate,
     );
 
     await thread.update(
@@ -221,7 +221,7 @@ export async function __updateThread(
         ...toUpdate,
         last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      { transaction }
+      { transaction },
     );
 
     await updateThreadCollaborators(
@@ -229,7 +229,7 @@ export async function __updateThread(
       thread,
       collaborators,
       this.models,
-      transaction
+      transaction,
     );
 
     await transaction.commit();
@@ -275,11 +275,9 @@ export async function __updateThread(
         root_title: finalThread.title,
         chain_id: finalThread.chain,
         author_address: finalThread.Address.address,
-        author_chain: finalThread.Address.chain,
+        author_chain: finalThread.Address.community_id,
       },
     },
-    // don't send webhook notifications for edits
-    webhookData: null,
     excludeAddresses: [address.address],
   });
 
@@ -308,7 +306,7 @@ export async function __updateThread(
         try {
           const mentionedUser = await this.models.Address.findOne({
             where: {
-              chain: mention[0],
+              community_id: mention[0],
               address: mention[1],
             },
             include: [this.models.User],
@@ -317,7 +315,7 @@ export async function __updateThread(
         } catch (err) {
           return null;
         }
-      })
+      }),
     );
     // filter null results
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -341,10 +339,9 @@ export async function __updateThread(
             comment_text: finalThread.body,
             chain_id: finalThread.chain,
             author_address: finalThread.Address.address,
-            author_chain: finalThread.Address.chain,
+            author_chain: finalThread.Address.community_id,
           },
         },
-        webhookData: null,
         excludeAddresses: [finalThread.Address.address],
       });
     });
@@ -368,7 +365,7 @@ export type UpdateThreadPermissions = {
  */
 export function validatePermissions(
   permissions: UpdateThreadPermissions,
-  flags: Partial<UpdateThreadPermissions>
+  flags: Partial<UpdateThreadPermissions>,
 ) {
   const keys = ['isThreadOwner', 'isMod', 'isAdmin', 'isSuperAdmin'];
   for (const k of keys) {
@@ -404,7 +401,7 @@ async function setThreadAttributes(
     canvasAction,
     canvasHash,
   }: UpdatableThreadAttributes,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (
     typeof title !== 'undefined' ||
@@ -463,7 +460,7 @@ async function setThreadAttributes(
 async function setThreadPinned(
   permissions: UpdateThreadPermissions,
   pinned: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof pinned !== 'undefined') {
     validatePermissions(permissions, {
@@ -482,7 +479,7 @@ async function setThreadPinned(
 async function setThreadLocked(
   permissions: UpdateThreadPermissions,
   locked: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof locked !== 'undefined') {
     validatePermissions(permissions, {
@@ -505,7 +502,7 @@ async function setThreadLocked(
 async function setThreadArchived(
   permissions: UpdateThreadPermissions,
   archive: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof archive !== 'undefined') {
     validatePermissions(permissions, {
@@ -527,7 +524,7 @@ async function setThreadArchived(
 async function setThreadSpam(
   permissions: UpdateThreadPermissions,
   spam: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof spam !== 'undefined') {
     validatePermissions(permissions, {
@@ -548,9 +545,9 @@ async function setThreadSpam(
 async function setThreadStage(
   permissions: UpdateThreadPermissions,
   stage: string | undefined,
-  chain: ChainInstance,
+  community: CommunityInstance,
   allAnalyticsOptions: TrackOptions[],
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof stage !== 'undefined') {
     validatePermissions(permissions, {
@@ -563,9 +560,9 @@ async function setThreadStage(
     // fetch available stages
     let customStages = [];
     try {
-      const chainStages = JSON.parse(chain.custom_stages);
-      if (Array.isArray(chainStages)) {
-        customStages = Array.from(chainStages)
+      const communityStages = JSON.parse(community.custom_stages);
+      if (Array.isArray(communityStages)) {
+        customStages = Array.from(communityStages)
           .map((s) => s.toString())
           .filter((s) => s);
       }
@@ -604,7 +601,7 @@ async function setThreadTopic(
   topicId: number | undefined,
   topicName: string | undefined,
   models: DB,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
     validatePermissions(permissions, {
@@ -645,7 +642,7 @@ async function updateThreadCollaborators(
       }
     | undefined,
   models: DB,
-  transaction: Transaction
+  transaction: Transaction,
 ) {
   const { toAdd, toRemove } = collaborators || {};
   if (Array.isArray(toAdd) || Array.isArray(toRemove)) {
@@ -668,7 +665,7 @@ async function updateThreadCollaborators(
     if (toAddUnique.length > 0) {
       const collaboratorAddresses = await models.Address.findAll({
         where: {
-          chain: thread.chain,
+          community_id: thread.chain,
           id: {
             [Op.in]: toAddUnique,
           },
@@ -686,7 +683,7 @@ async function updateThreadCollaborators(
             },
             transaction,
           });
-        })
+        }),
       );
     }
 

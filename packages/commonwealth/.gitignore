@@ -21,6 +21,8 @@ coverage/
 *.csv
 cache/
 stats.json
+serviceAccountKey.json
+
 
 # Database downloads
 latest.dump
@@ -30,6 +32,11 @@ out.dump.*
 redacted.dump
 redacted.dump.*
 *.dat
+
+# Docker volumes
+.rabbitmq
+.postgres
+.redis-data
 
 # Bundle analyzer
 out.png

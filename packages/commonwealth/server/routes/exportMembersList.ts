@@ -5,7 +5,7 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 
 export const Errors = {
-  NotLoggedIn: 'Not logged in',
+  NotLoggedIn: 'Not signed in',
   NotAdmin: 'Must be a site admin',
   CannotExportMembersList: 'Cannot export members list',
   NoChain: 'Chain not found',
@@ -31,7 +31,7 @@ const exportMembersList = async (
 
   const { chainId } = req.body;
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: {
       id: chainId,
     },
@@ -61,7 +61,7 @@ const exportMembersList = async (
       LEFT JOIN 
           "Reactions" "r" ON "a"."id" = "r"."address_id" AND "r"."chain" = :chainId
       WHERE 
-          "a"."chain" = :chainId
+          "a"."community_id" = :chainId
       GROUP BY 
           "a"."address", "p"."profile_name"
     `,

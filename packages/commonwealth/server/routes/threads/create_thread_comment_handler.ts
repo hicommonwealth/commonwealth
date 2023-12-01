@@ -2,6 +2,7 @@ import { TypedRequest, TypedResponse, success } from '../../types';
 import { ServerControllers } from '../../routing/router';
 import { CommentInstance } from '../../models/comment';
 import { AppError } from '../../../../common-common/src/errors';
+import { verifyComment } from '../../../shared/canvas/serverVerify';
 
 export const Errors = {
   MissingThreadId: 'Must provide valid thread_id',
@@ -33,7 +34,7 @@ export const createThreadCommentHandler = async (
   req: TypedRequest<CreateThreadCommentRequestBody, null, { id: string }>,
   res: TypedResponse<CreateThreadCommentResponse>
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const { id: threadId } = req.params;
   const {
     parent_id: parentId,
@@ -51,11 +52,21 @@ export const createThreadCommentHandler = async (
     throw new AppError(Errors.MissingText);
   }
 
+  if (process.env.ENFORCE_SESSION_KEYS === 'true') {
+    await verifyComment(canvasAction, canvasSession, canvasHash, {
+      thread_id: parseInt(threadId, 10),
+      text,
+      address: address.address,
+      chain: community.id,
+      parent_comment_id: parentId,
+    });
+  }
+
   const [comment, notificationOptions, analyticsOptions] =
     await controllers.threads.createThreadComment({
       user,
       address,
-      chain,
+      community,
       parentId,
       threadId: parseInt(threadId, 10),
       text,

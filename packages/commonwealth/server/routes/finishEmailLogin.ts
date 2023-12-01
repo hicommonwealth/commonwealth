@@ -66,7 +66,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
       if (err)
         return redirectWithLoginError(
           res,
-          `Could not log in with user at ${email}`
+          `Could not sign in with user at ${email}`
         );
       // If the user is currently in a partly-logged-in state, merge their
       // social accounts over to the newly found user
@@ -119,7 +119,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
       if (err)
         return redirectWithLoginError(
           res,
-          `Could not log in with user at ${email}`
+          `Could not sign in with user at ${email}`
         );
       serverAnalyticsController.track(
         {
@@ -168,7 +168,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
         );
         return redirectWithLoginError(
           res,
-          `Could not log in with user at ${email}`
+          `Could not sign in with user at ${email}`
         );
       }
 
