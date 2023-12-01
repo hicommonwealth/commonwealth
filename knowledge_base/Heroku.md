@@ -38,7 +38,7 @@ The `common-app` comprises several sub-apps or servers:
 
 The #eng-infra Slack channel is used to communicate which servers are free for testing, and which PRs each sever is presently pegged to.
 
-For more complete information on our testing environments, see the dedicated [Testing Environments](./Testing-Environments.md) entry.
+For more complete information on our testing environments, and instructions on updating the #eng-infra channel topic, see the dedicated [Testing Environments](./Testing-Environments.md) entry.
 
 ### Common-bot
 
