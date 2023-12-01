@@ -1021,6 +1021,7 @@ describe('ServerThreadsController', () => {
           findOne: async () => ({
             id: 1,
             chain: 'ethereum',
+            address_id: 1,
             Address: {
               id: 1,
               address: '0x123',

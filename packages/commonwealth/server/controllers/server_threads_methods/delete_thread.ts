@@ -64,6 +64,7 @@ export async function __deleteThread(
     models: this.models,
     user,
     communityId: thread.chain,
+    entity: thread,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
