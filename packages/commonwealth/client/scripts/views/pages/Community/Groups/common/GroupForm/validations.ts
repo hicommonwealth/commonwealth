@@ -35,7 +35,7 @@ export const requirementSubFormValidationSchema = z.object({
       (value) => {
         return !isNaN(Number(value));
       },
-      { message: VALIDATION_MESSAGES.INVALID_VALUE }
+      { message: VALIDATION_MESSAGES.INVALID_INPUT }
     ),
 });
 
