@@ -105,7 +105,6 @@ describe('ServerThreadsController', () => {
       expect(analyticsOptions).to.include({
         event: 'Create New Reaction',
         community: 'ethereum',
-        isCustomDomain: null,
       });
     });
 

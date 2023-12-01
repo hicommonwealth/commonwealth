@@ -33,7 +33,7 @@ export async function createAddressHelper(
   req: CreateAddressReq,
   models: DB,
   user: Express.User & UserInstance,
-  next: NextFunction
+  next: NextFunction,
 ) {
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
@@ -53,6 +53,8 @@ export async function createAddressHelper(
   } else if (req.address.slice(0, 3) === 'inj') {
     return next(new AppError('Cannot join with an injective address'));
   }
+
+  const serverAnalyticsController = new ServerAnalyticsController();
 
   const chain = await models.Community.findOne({
     where: { id: req.chain },
@@ -98,11 +100,11 @@ export async function createAddressHelper(
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
       where: { community_id: req.chain, address: encodedAddress },
-    }
+    },
   );
 
   const existingAddressOnOtherChain = await models.Address.scope(
-    'withPrivateData'
+    'withPrivateData',
   ).findOne({
     where: { community_id: { [Op.ne]: req.chain }, address: encodedAddress },
   });
@@ -125,7 +127,7 @@ export async function createAddressHelper(
     // Address.updateWithToken
     const verification_token = crypto.randomBytes(18).toString('hex');
     const verification_token_expires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
     if (updatedId) {
       existingAddress.user_id = updatedId;
@@ -148,24 +150,31 @@ export async function createAddressHelper(
 
     // even if this is the existing address, there is a case to login to community through this address's chain
     // if community is valid, then we should create a role between this community vs address
+
+    let isRole = true;
     if (req.community) {
       const role = await findOneRole(
         models,
         { where: { address_id: updatedObj.id } },
-        req.community
+        req.community,
       );
       if (!role) {
         await createRole(models, updatedObj.id, req.community, 'member');
+        isRole = false;
       }
     }
-    return { ...updatedObj.toJSON(), newly_created: false };
+    return {
+      ...updatedObj.toJSON(),
+      newly_created: false,
+      joined_community: !isRole,
+    };
   } else {
     // address doesn't exist, add it to the database
     try {
       // Address.createWithToken
       const verification_token = crypto.randomBytes(18).toString('hex');
       const verification_token_expires = new Date(
-        +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+        +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
       );
       const last_active = new Date();
       let profile_id: number;
@@ -198,19 +207,18 @@ export async function createAddressHelper(
         await createRole(models, newObj.id, req.chain, 'member');
       }
 
-      const serverAnalyticsController = new ServerAnalyticsController();
       serverAnalyticsController.track(
         {
           event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
           chain: req.chain,
-          isCustomDomain: null,
         },
-        req
+        req,
       );
 
       return {
         ...newObj.toJSON(),
         newly_created: !existingAddressOnOtherChain,
+        joined_community: !!user,
       };
     } catch (e) {
       return next(e);

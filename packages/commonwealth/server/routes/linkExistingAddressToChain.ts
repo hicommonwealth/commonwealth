@@ -4,8 +4,10 @@ import { ChainBase } from 'common-common/src/types';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { DB } from '../models';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import { createRole, findOneRole } from '../util/roles';
@@ -27,7 +29,7 @@ const linkExistingAddressToChain = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.address) {
     return next(new AppError(Errors.NeedAddress));
@@ -65,7 +67,7 @@ const linkExistingAddressToChain = async (
         user_id: userId,
         verified: { [Op.ne]: null },
       },
-    }
+    },
   );
 
   if (!originalAddress) {
@@ -85,7 +87,7 @@ const linkExistingAddressToChain = async (
 
     verificationToken = crypto.randomBytes(18).toString('hex');
     verificationTokenExpires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
 
     await models.Address.update(
@@ -99,7 +101,7 @@ const linkExistingAddressToChain = async (
           address: req.body.address,
           community_id: { [Op.in]: chains.map((ch) => ch.id) },
         },
-      }
+      },
     );
   }
 
@@ -113,7 +115,7 @@ const linkExistingAddressToChain = async (
         : req.body.address;
 
     const existingAddress = await models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: { community_id: req.body.chain, address: encodedAddress },
     });
@@ -164,12 +166,22 @@ const linkExistingAddressToChain = async (
     const role = await findOneRole(
       models,
       { where: { address_id: addressId } },
-      req.body.chain
+      req.body.chain,
     );
 
     if (!role) {
       await createRole(models, addressId, req.body.chain, 'member');
     }
+
+    const serverAnalyticsController = new ServerAnalyticsController();
+    serverAnalyticsController.track(
+      {
+        community: req.body.chain,
+        userId: req.user.id,
+        event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+      },
+      req,
+    );
 
     return res.json({
       status: 'Success',
