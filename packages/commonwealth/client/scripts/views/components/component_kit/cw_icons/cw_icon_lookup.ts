@@ -67,7 +67,8 @@ export const iconLookup = {
   chatDots: withPhosphorIcon(ChatDots),
   check: Icons.CWCheck,
   checkCircle: withPhosphorIcon(CheckCircle),
-  checkCircleFilled: () => withPhosphorIcon(CheckCircle)({ weight: 'fill' }),
+  checkCircleFilled: (props) =>
+    withPhosphorIcon(CheckCircle)({ weight: 'fill', ...props }),
   chevronDown: Icons.CWChevronDown,
   chevronLeft: Icons.CWChevronLeft,
   chevronRight: Icons.CWChevronRight,
