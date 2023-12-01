@@ -203,7 +203,7 @@ export type MemberResult = {
   avatar_url: string;
   addresses: {
     id: number;
-    community: string;
+    chain: string;
     address: string;
   }[];
   roles?: any[];
@@ -213,7 +213,7 @@ type MemberResultRowProps = {
   setRoute: any;
 };
 const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
-  const { chain: community, address } = addr.addresses[0] as any;
+  const { chain: community, address } = addr.addresses[0];
   const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [community],
     profileAddresses: [address],
