@@ -4,10 +4,12 @@ import { ChainBase } from 'common-common/src/types';
 import { Op } from 'sequelize';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { UserInstance } from 'server/models/user';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../../shared/utils';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import type { CommunityAttributes } from '../../models/community';
 import { findOneRole } from '../../util/roles';
+import { TrackOptions } from '../server_analytics_methods/track';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -37,6 +39,7 @@ export type UpdateCommunityOptions = CommunityAttributes & {
 };
 export type UpdateCommunityResult = CommunityAttributes & {
   snapshot: string[];
+  analyticsOptions: TrackOptions;
 };
 
 export async function __updateCommunity(
@@ -205,6 +208,22 @@ export async function __updateCommunity(
   if (chain_node_id) {
     chain.chain_node_id = chain_node_id;
   }
+
+  let mixpanelEvent: MixpanelCommunityInteractionEvent;
+  let communitySelected = null;
+
+  if (chain.directory_page_enabled !== directory_page_enabled) {
+    mixpanelEvent = directory_page_enabled
+      ? MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_ENABLED
+      : MixpanelCommunityInteractionEvent.DIRECTORY_PAGE_DISABLED;
+
+    if (directory_page_enabled) {
+      communitySelected = await this.models.Community.findOne({
+        where: { chain_node_id: directory_page_chain_node_id },
+      });
+    }
+  }
+
   if (directory_page_enabled !== undefined) {
     chain.directory_page_enabled = directory_page_enabled;
   }
@@ -230,5 +249,13 @@ export async function __updateCommunity(
     return this.toString();
   };
 
-  return { ...chain.toJSON(), snapshot };
+  const analyticsOptions = {
+    event: mixpanelEvent,
+    community: chain.id,
+    userId: user.id,
+    isCustomDomain: null,
+    ...(communitySelected && { communitySelected: communitySelected.id }),
+  };
+
+  return { ...chain.toJSON(), snapshot, analyticsOptions };
 }
