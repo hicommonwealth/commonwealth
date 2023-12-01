@@ -1,6 +1,10 @@
 import type { SessionPayload } from '@canvas-js/interfaces';
-import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
-import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
+import type {
+  AccountData,
+  OfflineDirectSigner,
+  OfflineSigner,
+} from '@cosmjs/proto-signing';
+import type { ChainInfo } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import app from 'state';
@@ -8,28 +12,37 @@ import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface Window extends KeplrWindow {}
+  interface Window {
+    wallet?: any; // this will get set to window.keplr or window.leap
+  }
 }
 
-export const COSMOS_EVM_CHAINS = ['evmos', 'injective', 'evmos-dev'];
-
-class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
+/**
+ * This class is a wrapper for Keplr-like web wallets, such as Keplr and Leap,
+ * which share the same API.
+ * Ethermint chains should still use KeplrEthereumWebWalletController.
+ */
+class KeplrLikeWebWalletController implements IWebWallet<AccountData> {
   // GETTERS/SETTERS
   private _accounts: readonly AccountData[];
   private _enabled: boolean;
   private _enabling = false;
   private _chainId: string;
-  private _offlineSigner: OfflineDirectSigner;
+  private _chain: string;
+  private _offlineSigner: OfflineDirectSigner | OfflineSigner;
 
-  public readonly name = WalletId.KeplrEthereum;
-  public readonly label = 'Keplr';
+  public readonly name;
+  public readonly label;
+  public readonly defaultNetwork = ChainNetwork.Osmosis;
   public readonly chain = ChainBase.CosmosSDK;
-  public readonly defaultNetwork = ChainNetwork.Evmos;
-  public readonly specificChains = COSMOS_EVM_CHAINS;
 
-  public get available() {
-    return !!window.keplr;
+  constructor(walletName: WalletId, label: string) {
+    this.name = walletName;
+    this.label = label;
+  }
+
+  public get available(): boolean {
+    return !!window[this.name]; // window.keplr or window.leap
   }
 
   public get enabling() {
@@ -45,14 +58,14 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public get api() {
-    return window.keplr;
+    return window.wallet;
   }
 
   public get offlineSigner() {
     return this._offlineSigner;
   }
 
-  getChainId() {
+  public getChainId() {
     return this._chainId;
   }
 
@@ -75,23 +88,24 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     account: Account,
     canvasSessionPayload: SessionPayload,
   ): Promise<string> {
-    const keplr = await import('@keplr-wallet/types');
     const canvas = await import('@canvas-js/interfaces');
-    const signature = await window.keplr.signEthereum(
-      this._chainId,
+    const chainId = this.getChainId();
+    const stdSignature = await window.wallet.signArbitrary(
+      chainId,
       account.address,
       canvas.serializeSessionPayload(canvasSessionPayload),
-      keplr.EthSignType.MESSAGE,
     );
-    return `0x${Buffer.from(signature).toString('hex')}`;
+    return JSON.stringify(stdSignature);
   }
 
   // ACTIONS
   public async enable() {
-    console.log('Attempting to enable Keplr web wallet');
+    console.log(`Attempting to enable ${this.label} web wallet`);
 
-    if (!window.keplr?.experimentalSuggestChain) {
-      alert('Please update to a more recent version of Keplr');
+    window.wallet = window[this.name];
+
+    if (!window.wallet?.experimentalSuggestChain) {
+      alert(`Please update to a more recent version of ${this.label}`);
       return;
     }
 
@@ -99,7 +113,9 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}/cosmosAPI/${app.chain.network}`;
+      const url = `${window.location.origin}/cosmosAPI/${
+        app.chain?.network || this.defaultNetwork
+      }`;
       const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();
@@ -107,7 +123,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
       client.disconnect();
 
       try {
-        await window.keplr.enable(this._chainId);
+        await window.wallet.enable(this._chainId);
       } catch (err) {
         console.log(
           `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`,
@@ -122,7 +138,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           // use the RPC url as hack, which will break some querying functionality but not signing.
           rest: app.chain.meta.node.altWalletUrl || url,
           bip44: {
-            coinType: 60,
+            coinType: 118,
           },
           bech32Config: {
             bech32PrefixAccAddr: `${bech32Prefix}`,
@@ -135,43 +151,42 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           currencies: [
             {
               coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `a${app.chain.meta.default_symbol.toLowerCase()}`,
-              coinDecimals: 18,
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
+              coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           feeCurrencies: [
             {
               coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `a${app.chain.meta.default_symbol.toLowerCase()}`,
-              coinDecimals: 18,
-              gasPriceStep: {
-                low: 0,
-                average: 25000000000,
-                high: 40000000000,
-              },
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
+              coinDecimals: app.chain.meta.decimals || 6,
+              gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
             },
           ],
           stakeCurrency: {
             coinDenom: app.chain.meta.default_symbol,
-            coinMinimalDenom: `a${app.chain.meta.default_symbol.toLowerCase()}`,
-            coinDecimals: 18,
+            coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
+            coinDecimals: app.chain.meta.decimals || 6,
           },
-          features: ['eth-address-gen', 'eth-key-sign'],
+          features: [],
         };
-        await window.keplr.experimentalSuggestChain(info);
-        await window.keplr.enable(this._chainId);
+        await window.wallet.experimentalSuggestChain(info);
+        await window.wallet.enable(this._chainId);
+        this._chain = app.chain.id;
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
 
-      this._offlineSigner = window.keplr.getOfflineSigner(this._chainId);
+      this._offlineSigner = await window.wallet.getOfflineSignerAuto(
+        this._chainId,
+      );
       this._accounts = await this._offlineSigner.getAccounts();
       this._enabled = true;
       this._enabling = false;
     } catch (error) {
-      console.error(`Failed to enable keplr wallet: ${error.message}`);
+      console.error(`Failed to enable ${this.label} wallet: ${error.message}`);
       this._enabling = false;
     }
   }
 }
 
-export default EVMKeplrWebWalletController;
+export default KeplrLikeWebWalletController;
