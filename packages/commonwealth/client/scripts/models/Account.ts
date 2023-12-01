@@ -5,6 +5,8 @@ import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
 import BN from 'bn.js';
+import type momentType from 'moment';
+import moment from 'moment';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
@@ -13,6 +15,7 @@ class Account {
   public readonly address: string;
   public readonly community: ChainInfo;
   public readonly ghostAddress: boolean;
+  public lastActive?: momentType.Moment;
 
   // validation token sent by server
   private _validationToken?: string;
@@ -44,6 +47,7 @@ class Account {
     validationBlockInfo,
     profile,
     ignoreProfile = true,
+    lastActive,
   }: {
     // required args
     community: ChainInfo;
@@ -57,6 +61,7 @@ class Account {
     sessionPublicAddress?: string;
     validationBlockInfo?: string;
     profile?: MinimumProfile;
+    lastActive?: string | momentType.Moment;
 
     // flags
     ghostAddress?: boolean;
@@ -73,6 +78,7 @@ class Account {
     this._sessionPublicAddress = sessionPublicAddress;
     this._validationBlockInfo = validationBlockInfo;
     this.ghostAddress = !!ghostAddress;
+    this.lastActive = lastActive ? moment(lastActive) : null;
     if (profile) {
       this._profile = profile;
     } else if (!ignoreProfile && community?.id) {
@@ -87,7 +93,7 @@ class Account {
       // remove this discouraged method
       DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
         community?.id,
-        address
+        address,
       ).then((res) => {
         const data = res[0];
         if (!data) {
@@ -95,7 +101,7 @@ class Account {
             'No profile data found for address',
             address,
             'on chain',
-            community?.id
+            community?.id,
           );
         } else {
           updatedProfile.initialize(
@@ -104,7 +110,7 @@ class Account {
             data?.avatarUrl,
             data.id,
             updatedProfile.chain,
-            data?.lastActive
+            data?.lastActive,
           );
         }
         // manually trigger an update signal when data is fetched
@@ -174,7 +180,7 @@ class Account {
     signature: string,
     timestamp: number,
     chainId: string | number,
-    shouldRedraw = true
+    shouldRedraw = true,
   ) {
     if (!signature) {
       throw new Error('signature required for validation');
@@ -192,7 +198,7 @@ class Account {
       session_public_address: await app.sessions.getOrCreateAddress(
         this.community.base,
         chainId.toString(),
-        this.address
+        this.address,
       ),
       session_timestamp: timestamp,
       session_block_data: this.validationBlockInfo,
@@ -204,19 +210,21 @@ class Account {
         ({ address, ghostAddress, community }) =>
           ghostAddress &&
           this.community.id === community.id &&
-          app.user.activeAccounts.some((account) => account.address === address)
+          app.user.activeAccounts.some(
+            (account) => account.address === address,
+          ),
       );
       if (hasGhostAddress) {
         const { success, ghostAddressId } = await $.post(
           `${app.serverUrl()}/updateAddress`,
-          params
+          params,
         );
         if (success && ghostAddressId) {
           // remove ghost address from addresses
           app.user.setAddresses(
             app.user.addresses.filter(({ ghostAddress }) => {
               return !ghostAddress;
-            })
+            }),
           );
           app.user.setActiveAccounts([], shouldRedraw);
         }

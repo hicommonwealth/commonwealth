@@ -21,7 +21,7 @@ import { getTokenBalance } from 'helpers/token_balance_helper';
 export function linkExistingAddressToChainOrCommunity(
   address: string,
   chain: string,
-  originChain: string
+  originChain: string,
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     address,
@@ -33,7 +33,7 @@ export function linkExistingAddressToChainOrCommunity(
 
 export async function setActiveAccount(
   account: Account,
-  shouldRedraw = true
+  shouldRedraw = true,
 ): Promise<void> {
   const chain = app.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
@@ -46,7 +46,7 @@ export async function setActiveAccount(
     ) {
       app.user.setActiveAccounts(
         app.user.activeAccounts.concat([account]),
-        shouldRedraw
+        shouldRedraw,
       );
     }
 
@@ -92,7 +92,7 @@ export async function setActiveAccount(
   ) {
     app.user.setActiveAccounts(
       app.user.activeAccounts.concat([account]),
-      shouldRedraw
+      shouldRedraw,
     );
   }
 }
@@ -101,7 +101,8 @@ export async function completeClientLogin(account: Account) {
   try {
     let addressInfo = app.user.addresses.find(
       (a) =>
-        a.address === account.address && a.community.id === account.community.id
+        a.address === account.address &&
+        a.community.id === account.community.id,
     );
 
     if (!addressInfo && account.addressId) {
@@ -160,9 +161,17 @@ export async function updateActiveAddresses({
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.community.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
+      .map((addr) => {
+        const tempAddr = app.chain?.accounts.get(
+          addr.address,
+          addr.keytype,
+          false,
+        );
+        tempAddr.lastActive = addr.lastActive;
+        return tempAddr;
+      })
       .filter((addr) => addr),
-    shouldRedraw
+    shouldRedraw,
   );
 
   getTokenBalance();
@@ -178,15 +187,17 @@ export async function updateActiveAddresses({
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
-    const existingAddress = app.roles.getDefaultAddressInCommunity({
-      chain: chain.id,
-    });
+    const communityAddressesSortedByLastUsed =
+      app.roles.getSortedLastUsedAddressInCommunity({
+        chain: chain.id,
+      });
 
-    if (existingAddress) {
+    if (communityAddressesSortedByLastUsed) {
       const account = app.user.activeAccounts.find((a) => {
         return (
-          a.community.id === existingAddress.community.id &&
-          a.address === existingAddress.address
+          a.community.id ===
+            communityAddressesSortedByLastUsed[0].community.id &&
+          a.address === communityAddressesSortedByLastUsed[0].address
         );
       });
       if (account) await setActiveAccount(account, shouldRedraw);
@@ -229,13 +240,14 @@ export function updateActiveUser(data) {
             walletId: a.wallet_id,
             walletSsoSource: a.wallet_sso_source,
             ghostAddress: a.ghost_address,
-          })
-      )
+            lastActive: a.last_active,
+          }),
+      ),
     );
     app.user.setSocialAccounts(
       data.socialAccounts.map(
-        (sa) => new SocialAccount(sa.provider, sa.provider_username)
-      )
+        (sa) => new SocialAccount(sa.provider, sa.provider_username),
+      ),
     );
 
     app.user.setSiteAdmin(data.isAdmin);
@@ -250,7 +262,7 @@ export async function createUserWithAddress(
   walletSsoSource: WalletSsoSource,
   chain: string,
   sessionPublicAddress?: string,
-  validationBlockInfo?: BlockInfo
+  validationBlockInfo?: BlockInfo,
 ): Promise<{ account: Account; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
@@ -331,7 +343,7 @@ export async function startLoginWithMagicLink({
       provider: provider as any,
       redirectURI: new URL(
         '/finishsociallogin' + params,
-        window.location.origin
+        window.location.origin,
       ).href,
     });
 
@@ -429,7 +441,7 @@ export async function handleSocialLoginCallback({
         magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
       } catch (err) {
         console.error(
-          `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+          `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`,
         );
       }
 
@@ -437,7 +449,7 @@ export async function handleSocialLoginCallback({
       // the signed message. The API is already used by the Magic iframe,
       // but they don't expose the results.
       const nodeInfo = await $.get(
-        `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`
+        `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`,
       );
       const chainId = nodeInfo.node_info.network;
 
@@ -448,7 +460,7 @@ export async function handleSocialLoginCallback({
         ChainBase.CosmosSDK,
         signer,
         magicAddress,
-        timestamp
+        timestamp,
       );
       // TODO: provide blockhash as last argument to signSessionWithMagic
       signature.signatures[0].chain_id = chainId;
@@ -457,13 +469,13 @@ export async function handleSocialLoginCallback({
         chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
         magicAddress,
         sessionPayload,
-        JSON.stringify(signature.signatures[0])
+        JSON.stringify(signature.signatures[0]),
       );
       authedSessionPayload = JSON.stringify(sessionPayload);
       authedSignature = JSON.stringify(signature.signatures[0]);
       console.log(
         'Reauthenticated Cosmos session from magic address:',
-        magicAddress
+        magicAddress,
       );
     } else {
       const { Web3Provider } = await import('@ethersproject/providers');
@@ -478,7 +490,7 @@ export async function handleSocialLoginCallback({
         ChainBase.Ethereum,
         signer,
         checksumAddress,
-        timestamp
+        timestamp,
       );
       // TODO: provide blockhash as last argument to signSessionWithMagic
 
@@ -487,13 +499,13 @@ export async function handleSocialLoginCallback({
         chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
         checksumAddress,
         sessionPayload,
-        signature
+        signature,
       );
       authedSessionPayload = JSON.stringify(sessionPayload);
       authedSignature = signature;
       console.log(
         'Reauthenticated Ethereum session from magic address:',
-        checksumAddress
+        checksumAddress,
       );
     }
   } catch (err) {

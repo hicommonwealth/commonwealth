@@ -1,3 +1,5 @@
+import type momentType from 'moment';
+import moment from 'moment';
 import type { AccessLevel } from 'permissions';
 import type AddressInfo from './AddressInfo';
 
@@ -12,6 +14,7 @@ class RoleInfo {
   public allow: number;
   public deny: number;
   public is_user_default: boolean;
+  public lastActive?: momentType.Moment;
 
   constructor(
     id: number,
@@ -22,7 +25,8 @@ class RoleInfo {
     permission: AccessLevel,
     allow: number,
     deny: number,
-    is_user_default: boolean
+    is_user_default: boolean,
+    last_active?: string,
   ) {
     this.id = id;
     this.address_id = address_id;
@@ -33,6 +37,7 @@ class RoleInfo {
     this.allow = allow;
     this.deny = deny;
     this.is_user_default = is_user_default;
+    this.lastActive = last_active ? moment(last_active) : null;
   }
 }
 
