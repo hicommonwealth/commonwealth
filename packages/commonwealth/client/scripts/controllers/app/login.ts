@@ -377,6 +377,7 @@ function getProfileMetadata({ provider, userInfo }): {
   } else if (provider === 'google') {
     return { username: userInfo.name, avatarUrl: userInfo.picture };
   }
+
   return {};
 }
 

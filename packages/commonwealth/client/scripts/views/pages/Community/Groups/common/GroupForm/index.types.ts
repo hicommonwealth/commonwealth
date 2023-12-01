@@ -15,6 +15,7 @@ export type RequirementSubType = {
   requirementChain?: string;
   requirementCondition?: string;
   requirementAmount?: string;
+  requirementTokenId?: string;
 };
 
 export type LabelType = {
@@ -28,6 +29,7 @@ export type RequirementSubTypeWithLabel = {
   requirementChain?: LabelType;
   requirementCondition?: LabelType;
   requirementAmount?: string;
+  requirementTokenId?: string;
 };
 
 export type RequirementSubFormType = {
