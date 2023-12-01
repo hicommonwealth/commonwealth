@@ -33,8 +33,8 @@ The `common-app` comprises several sub-apps or servers:
 1. `commonwealth-beta`: used in the engineering QA process.
 2. `commonwealth-demo`: used by the Design and Product Teams to validate engineer work and provide feedback before merging deploying it to the livesite.
 3. `commonwealth-experimental`: used to host Common 2.0 development.
-4. `commonwealth-frick`: a full Common instance used for testing bots, chain events, and connected services.
-5. `commonwealth-frack`: a standalone raw Common instance that doesn't interact with other services; it is used for testing pure UI.
+4. `commonwealth-frick`: a full Common instance used for testing bots and connected services.
+5. `commonwealth-frack`: a standalone raw Common instance (including chain events) that doesn't interact with other services; it is used for testing migrations, API, and UI.
 
 The #eng-infra Slack channel is used to communicate which servers are free for testing, and which PRs each sever is presently pegged to.
 
@@ -51,6 +51,8 @@ The common-bot app several sub-apps or servers:
 ## Procfiles
 
 Heroku procfiles are used to specify the processes (workers, dynos, resources) executed by an app on startup. Processes of the "release" type are run during the [release phase](#release-phases). See [dedicated Heroku documentation](https://devcenter.heroku.com/articles/procfile) for a more detailed guide.
+
+Common currently uses a multi-procfile setup, which also entails a multi-procfile buildpack. See [the relevant GitHub repo ReadMe](https://github.com/heroku/heroku-buildpack-multi-procfile) for more information.
 
 ## Buildpacks
 
