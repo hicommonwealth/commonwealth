@@ -7,11 +7,11 @@ import { WalletSsoSource } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import { useCommonNavigate } from 'navigation/helpers';
 import useCheckAuthenticatedAddresses from 'views/components/Header/UserDropdown/useCheckAuthenticatedAddresses';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {
   PopoverMenu,
   PopoverMenuItem,
-} from 'views/components/component_kit/cw_popover/cw_popover_menu';
+} from 'views/components/component_kit/CWPopoverMenu';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {
   CWToggle,
   toggleDarkMode,

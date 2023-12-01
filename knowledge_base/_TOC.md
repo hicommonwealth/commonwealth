@@ -58,14 +58,3 @@
 
 - [Parameter Change example](./examples/Param-Change-Example.md)
 - [Shadow DOM](./examples/Shadow-DOM.md)
-- [Template OAS](./examples/Template-OAS.md)
-- [Templating JSON Schema - HEAD](./examples/Template-Schema.md)
-- [Templating JSON Schema (legacy/v.0.1)](./examples/Template-Schema-v0.1.md)
-- [Treasury Spend example](./examples/Treasury-Spend-Example.md)
-- [Template Parser](./examples/Template-Parser.md)
-
-## Documentation
-
-- [ReadMe](_README.md) (style guide, glossary)
-- [Wishlist](_Wishlist.md)
-- [Linter Rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md)

@@ -8,6 +8,7 @@ export const TOKENS = {
 export const SPECIFICATIONS = {
   ERC_20: 'erc20',
   ERC_721: 'erc721',
+  ERC_1155: 'erc1155'
 };
 
 export const BLOCKCHAINS = {
@@ -28,6 +29,7 @@ export const requirementTypes = [
   { value: TOKENS.COSMOS_TOKEN, label: 'Cosmos base tokens' },
   { value: SPECIFICATIONS.ERC_20, label: 'ERC-20' },
   { value: SPECIFICATIONS.ERC_721, label: 'ERC-721' },
+  { value: SPECIFICATIONS.ERC_1155, label: 'ERC-1155' },
   { value: TOKENS.EVM_TOKEN, label: 'EVM base tokens' },
 ];
 

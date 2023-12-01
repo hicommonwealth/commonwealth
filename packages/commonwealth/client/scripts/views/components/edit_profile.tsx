@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import _ from 'underscore';
+import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import MinimumProfile from '../../models/MinimumProfile';
@@ -299,10 +300,11 @@ const EditProfileComponent = () => {
               <CWTextInput
                 name="email-form-field"
                 inputValidationFn={(val: string) => {
-                  if (!val.match(/\S+@\S+\.\S+/)) {
-                    return ['failure', 'Must enter valid email'];
-                  } else {
+                  try {
+                    z.string().email().parse(val.trim());
                     return ['success', 'Input validated'];
+                  } catch {
+                    return ['failure', 'Must enter valid email'];
                   }
                 }}
                 label="Email"
