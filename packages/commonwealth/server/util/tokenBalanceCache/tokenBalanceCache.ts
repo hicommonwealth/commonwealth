@@ -77,24 +77,37 @@ export class TokenBalanceCache {
         }
       }
     }
+    const validatedAddresses = Object.keys(addressMap);
+    if (validatedAddresses.length === 0) return {};
 
-    // fetch from cache
-
-    // fetch missing from cache
-    const result = await __getCosmosNativeBalances.call(this, {
+    const cachedBalances = await this.getCachedBalances(
+      options,
+      validatedAddresses,
+    );
+    const freshBalances = await __getCosmosNativeBalances.call(this, {
       chainNode,
-      addresses: Object.keys(addressMap),
+      addresses: validatedAddresses,
     });
 
-    // update cache
+    await this.cacheBalances(options, freshBalances);
+
+    // this function facilitates reverting addresses to the format that was requested
+    // e.g. you could request osmosis balance and give a juno address ->
+    // to fetch the osmosis balance we convert juno address to osmosis address
+    // and this function undoes that change
+    const transformAddresses = (balances: Balances): Balances => {
+      const result: Balances = {};
+      for (const [address, balance] of Object.entries(balances)) {
+        result[addressMap[address]] = balance;
+      }
+      return result;
+    };
 
     // map to decoded addresses rather than the generated encoded addresses
-    const balances: Balances = {};
-    for (const [address, balance] of Object.entries(result)) {
-      balances[addressMap[address]] = balance as string;
-    }
+    const transformedFreshBalances = transformAddresses(freshBalances);
+    const transformedCachedBalances = transformAddresses(cachedBalances);
 
-    return balances;
+    return { ...transformedFreshBalances, ...transformedCachedBalances };
   }
 
   private async getEvmBalances(options: GetEvmBalancesOptions) {
@@ -109,25 +122,10 @@ export class TokenBalanceCache {
 
     if (validatedAddresses.length === 0) return {};
 
-    let balances: Balances = {};
-    if (!options.cacheRefresh) {
-      const result = await this.redis.getKeys(
-        RedisNamespaces.Token_Balance,
-        validatedAddresses.map((address) =>
-          this.buildCacheKey(options, address),
-        ),
-      );
-      if (result !== false) {
-        for (const [key, balance] of Object.entries(result)) {
-          const address = this.getAddressFromCacheKey(key);
-          balances[address] = balance as string;
-          const addressIndex = validatedAddresses.indexOf(address);
-          validatedAddresses[addressIndex] =
-            validatedAddresses[validatedAddresses.length - 1];
-          validatedAddresses.pop();
-        }
-      }
-    }
+    const cachedBalances = await this.getCachedBalances(
+      options,
+      validatedAddresses,
+    );
 
     const chainNode = await this.models.ChainNode.scope(
       'withPrivateData',
@@ -137,30 +135,30 @@ export class TokenBalanceCache {
       },
     });
 
-    let newBalances: Balances = {};
+    let freshBalances: Balances = {};
     switch (options.balanceSourceType) {
       case BalanceSourceType.ETHNative:
-        newBalances = await __getEthBalances.call(this, {
+        freshBalances = await __getEthBalances.call(this, {
           chainNode,
           addresses: validatedAddresses,
         });
         break;
       case BalanceSourceType.ERC20:
-        newBalances = await __getErc20Balances.call(this, {
+        freshBalances = await __getErc20Balances.call(this, {
           chainNode,
           addresses: validatedAddresses,
           contractAddress: options.sourceOptions.contractAddress,
         });
         break;
       case BalanceSourceType.ERC721:
-        newBalances = await __getErc721Balances.call(this, {
+        freshBalances = await __getErc721Balances.call(this, {
           chainNode,
           addresses: validatedAddresses,
           contractAddress: options.sourceOptions.contractAddress,
         });
         break;
       case BalanceSourceType.ERC1155:
-        newBalances = await __getErc1155Balances.call(this, {
+        freshBalances = await __getErc1155Balances.call(this, {
           chainNode,
           addresses: validatedAddresses,
           contractAddress: options.sourceOptions.contractAddress,
@@ -169,9 +167,37 @@ export class TokenBalanceCache {
         break;
     }
 
-    await this.cacheBalances(options, newBalances);
+    await this.cacheBalances(options, freshBalances);
 
-    return { ...newBalances, ...balances };
+    return { ...freshBalances, ...cachedBalances };
+  }
+
+  /**
+   * This function retrieves cached balances and modifies (in-place) the given addresses array
+   * to remove addresses whose balance was cached. This means that after executing this function,
+   * the addresses array only contains addresses whose balance was not cached.
+   */
+  private async getCachedBalances(
+    options: GetBalancesOptions,
+    addresses: string[],
+  ): Promise<Balances> {
+    const balances: Balances = {};
+    if (!options.cacheRefresh) {
+      const result = await this.redis.getKeys(
+        RedisNamespaces.Token_Balance,
+        addresses.map((address) => this.buildCacheKey(options, address)),
+      );
+      if (result !== false) {
+        for (const [key, balance] of Object.entries(result)) {
+          const address = this.getAddressFromCacheKey(key);
+          balances[address] = balance as string;
+          const addressIndex = addresses.indexOf(address);
+          addresses[addressIndex] = addresses[addresses.length - 1];
+          addresses.pop();
+        }
+      }
+    }
+    return balances;
   }
 
   private async cacheBalances(options: GetBalancesOptions, balances: Balances) {
@@ -189,6 +215,11 @@ export class TokenBalanceCache {
     }
   }
 
+  /**
+   * This function builds the cache key for a specific balance on any chain, contract, or token.
+   * WARNING: address MUST always be the last value in the key so that we can easily derive
+   * a wallet address from the cache key.
+   */
   private buildCacheKey(options: GetBalancesOptions, address: string): string {
     switch (options.balanceSourceType) {
       case BalanceSourceType.ETHNative:
