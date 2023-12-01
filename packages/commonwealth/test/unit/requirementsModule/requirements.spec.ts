@@ -26,13 +26,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable no-unused-vars */
       fetchUserBalanceWithChain: async function (
-        _network,
-        _userAddress: string,
-        _chainId: string,
-        _contractAddress?: string,
-        _tokenId?: string
-      ): Promise<string> {
+        network,
+        userAddress: string,
+        chainId: string,
+        contractAddress?: string,
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable no-unused-vars */
+      {
         return '2000';
       },
     };
@@ -61,13 +64,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable no-unused-vars */
       fetchUserBalanceWithChain: async function (
-        _network,
-        _userAddress: string,
-        _chainId: string,
-        _contractAddress?: string,
-        _tokenId?: string
-      ): Promise<string> {
+        network,
+        userAddress: string,
+        chainId: string,
+        contractAddress?: string,
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable no-unused-vars */
+      {
         return '2';
       },
     };
@@ -95,13 +101,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable no-unused-vars */
       fetchUserBalanceWithChain: async function (
-        _network,
-        _userAddress: string,
-        _chainId: string,
-        _contractAddress?: string,
-        _tokenId?: string
-      ): Promise<string> {
+        network,
+        userAddress: string,
+        chainId: string,
+        contractAddress?: string,
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable no-unused-vars */
+      {
         return '2000';
       },
     };
@@ -130,13 +139,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable no-unused-vars */
       fetchUserBalanceWithChain: async function (
-        _network,
-        _userAddress: string,
-        _chainId: string,
-        _contractAddress?: string,
-        _tokenId?: string
-      ): Promise<string> {
+        network,
+        userAddress: string,
+        chainId: string,
+        contractAddress?: string,
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable no-unused-vars */
+      {
         return '1';
       },
     };
@@ -166,13 +178,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable no-unused-vars */
       fetchUserBalanceWithChain: async function (
-        _network,
-        _userAddress: string,
-        _chainId: string,
-        _contractAddress?: string,
-        _tokenId?: string
-      ): Promise<string> {
+        network,
+        userAddress: string,
+        chainId: string,
+        contractAddress?: string,
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable no-unused-vars */
+      {
         return '1000';
       },
     };
@@ -260,18 +275,21 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable no-unused-vars */
       fetchUserBalanceWithChain: async function (
-        _network,
-        _userAddress: string,
-        _chainId: string,
-        _contractAddress?: string,
-        _tokenId?: string
-      ): Promise<string> {
-        if (_network == ChainNetwork.ERC20) {
+        network,
+        userAddress: string,
+        chainId: string,
+        contractAddress?: string,
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable no-unused-vars */
+      {
+        if (network == ChainNetwork.ERC20) {
           return '3000';
-        } else if (_network == ChainNetwork.ERC721) {
+        } else if (network == ChainNetwork.ERC721) {
           return '2';
-        } else if (_network == ChainNetwork.Ethereum) {
+        } else if (network == ChainNetwork.Ethereum) {
           return '2000';
         }
       },
@@ -328,18 +346,21 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable no-unused-vars */
       fetchUserBalanceWithChain: async function (
-        _network,
-        _userAddress: string,
-        _chainId: string,
-        _contractAddress?: string,
-        _tokenId?: string
-      ): Promise<string> {
-        if (_network == ChainNetwork.ERC20) {
+        network,
+        userAddress: string,
+        chainId: string,
+        contractAddress?: string,
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable no-unused-vars */
+      {
+        if (network == ChainNetwork.ERC20) {
           return '3000';
-        } else if (_network == ChainNetwork.ERC721) {
+        } else if (network == ChainNetwork.ERC721) {
           return '2';
-        } else if (_network == ChainNetwork.Ethereum) {
+        } else if (network == ChainNetwork.Ethereum) {
           return '2000';
         }
       },
