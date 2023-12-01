@@ -26,7 +26,7 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
-      /* eslint-disable no-unused-vars */
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
@@ -34,7 +34,7 @@ describe('validateGroupMembership', () => {
         contractAddress?: string,
         tokenId?: string
       ): Promise<string>
-      /* eslint-enable no-unused-vars */
+      /* eslint-enable */
       {
         return '2000';
       },
@@ -64,7 +64,7 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
-      /* eslint-disable no-unused-vars */
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
@@ -72,7 +72,7 @@ describe('validateGroupMembership', () => {
         contractAddress?: string,
         tokenId?: string
       ): Promise<string>
-      /* eslint-enable no-unused-vars */
+      /* eslint-enable */
       {
         return '2';
       },
@@ -101,7 +101,7 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
-      /* eslint-disable no-unused-vars */
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
@@ -109,7 +109,7 @@ describe('validateGroupMembership', () => {
         contractAddress?: string,
         tokenId?: string
       ): Promise<string>
-      /* eslint-enable no-unused-vars */
+      /* eslint-enable */
       {
         return '2000';
       },
@@ -139,7 +139,7 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
-      /* eslint-disable no-unused-vars */
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
@@ -147,7 +147,7 @@ describe('validateGroupMembership', () => {
         contractAddress?: string,
         tokenId?: string
       ): Promise<string>
-      /* eslint-enable no-unused-vars */
+      /* eslint-enable */
       {
         return '1';
       },
@@ -178,7 +178,7 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
-      /* eslint-disable no-unused-vars */
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
@@ -186,7 +186,7 @@ describe('validateGroupMembership', () => {
         contractAddress?: string,
         tokenId?: string
       ): Promise<string>
-      /* eslint-enable no-unused-vars */
+      /* eslint-enable */
       {
         return '1000';
       },
@@ -275,7 +275,7 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
-      /* eslint-disable no-unused-vars */
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
@@ -283,7 +283,7 @@ describe('validateGroupMembership', () => {
         contractAddress?: string,
         tokenId?: string
       ): Promise<string>
-      /* eslint-enable no-unused-vars */
+      /* eslint-enable */
       {
         if (network == ChainNetwork.ERC20) {
           return '3000';
@@ -346,7 +346,7 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
-      /* eslint-disable no-unused-vars */
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
@@ -354,7 +354,7 @@ describe('validateGroupMembership', () => {
         contractAddress?: string,
         tokenId?: string
       ): Promise<string>
-      /* eslint-enable no-unused-vars */
+      /* eslint-enable */
       {
         if (network == ChainNetwork.ERC20) {
           return '3000';
