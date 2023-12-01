@@ -27,11 +27,11 @@ describe('validateGroupMembership', () => {
     ];
     const tbc = {
       fetchUserBalanceWithChain: async function (
-        network,
-        userAddress: string,
-        chainId: string,
-        contractAddress?: string,
-        tokenId?: string
+        _network,
+        _userAddress: string,
+        _chainId: string,
+        _contractAddress?: string,
+        _tokenId?: string
       ): Promise<string> {
         return '2000';
       },
@@ -62,11 +62,11 @@ describe('validateGroupMembership', () => {
     ];
     const tbc = {
       fetchUserBalanceWithChain: async function (
-        network,
-        userAddress: string,
-        chainId: string,
-        contractAddress?: string,
-        tokenId?: string
+        _network,
+        _userAddress: string,
+        _chainId: string,
+        _contractAddress?: string,
+        _tokenId?: string
       ): Promise<string> {
         return '2';
       },
@@ -96,11 +96,11 @@ describe('validateGroupMembership', () => {
     ];
     const tbc = {
       fetchUserBalanceWithChain: async function (
-        network,
-        userAddress: string,
-        chainId: string,
-        contractAddress?: string,
-        tokenId?: string
+        _network,
+        _userAddress: string,
+        _chainId: string,
+        _contractAddress?: string,
+        _tokenId?: string
       ): Promise<string> {
         return '2000';
       },
@@ -131,11 +131,11 @@ describe('validateGroupMembership', () => {
     ];
     const tbc = {
       fetchUserBalanceWithChain: async function (
-        network,
-        userAddress: string,
-        chainId: string,
-        contractAddress?: string,
-        tokenId?: string
+        _network,
+        _userAddress: string,
+        _chainId: string,
+        _contractAddress?: string,
+        _tokenId?: string
       ): Promise<string> {
         return '1';
       },
@@ -167,11 +167,11 @@ describe('validateGroupMembership', () => {
     ];
     const tbc = {
       fetchUserBalanceWithChain: async function (
-        network,
-        userAddress: string,
-        chainId: string,
-        contractAddress?: string,
-        tokenId?: string
+        _network,
+        _userAddress: string,
+        _chainId: string,
+        _contractAddress?: string,
+        _tokenId?: string
       ): Promise<string> {
         return '1000';
       },
@@ -261,17 +261,17 @@ describe('validateGroupMembership', () => {
     ];
     const tbc = {
       fetchUserBalanceWithChain: async function (
-        network,
-        userAddress: string,
-        chainId: string,
-        contractAddress?: string,
-        tokenId?: string
+        _network,
+        _userAddress: string,
+        _chainId: string,
+        _contractAddress?: string,
+        _tokenId?: string
       ): Promise<string> {
-        if (network == ChainNetwork.ERC20) {
+        if (_network == ChainNetwork.ERC20) {
           return '3000';
-        } else if (network == ChainNetwork.ERC721) {
+        } else if (_network == ChainNetwork.ERC721) {
           return '2';
-        } else if (network == ChainNetwork.Ethereum) {
+        } else if (_network == ChainNetwork.Ethereum) {
           return '2000';
         }
       },
@@ -329,17 +329,17 @@ describe('validateGroupMembership', () => {
     ];
     const tbc = {
       fetchUserBalanceWithChain: async function (
-        network,
-        userAddress: string,
-        chainId: string,
-        contractAddress?: string,
-        tokenId?: string
+        _network,
+        _userAddress: string,
+        _chainId: string,
+        _contractAddress?: string,
+        _tokenId?: string
       ): Promise<string> {
-        if (network == ChainNetwork.ERC20) {
+        if (_network == ChainNetwork.ERC20) {
           return '3000';
-        } else if (network == ChainNetwork.ERC721) {
+        } else if (_network == ChainNetwork.ERC721) {
           return '2';
-        } else if (network == ChainNetwork.Ethereum) {
+        } else if (_network == ChainNetwork.Ethereum) {
           return '2000';
         }
       },
