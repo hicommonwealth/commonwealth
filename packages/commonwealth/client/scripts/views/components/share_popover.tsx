@@ -1,9 +1,9 @@
 import React from 'react';
 import app from '../../state';
 
-import type { PopoverTriggerProps } from './component_kit/cw_popover/cw_popover';
-import { PopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import { useLocation } from 'react-router-dom';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
+import { PopoverTriggerProps } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 
 type SharePopoverProps = {
@@ -61,12 +61,12 @@ export const SharePopover = ({
             if (!commentId) {
               await window.open(
                 `https://twitter.com/intent/tweet?text=${domain}${discussionLink}`,
-                '_blank'
+                '_blank',
               );
             } else {
               await window.open(
                 `https://twitter.com/intent/tweet?text=${domain}${discussionLink}?comment=${commentId}`,
-                '_blank'
+                '_blank',
               );
             }
           },
