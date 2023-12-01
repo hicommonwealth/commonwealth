@@ -187,17 +187,36 @@ export async function updateActiveAddresses({
   } else if (app.user.activeAccounts.length === 0) {
     // no addresses - preview the community
   } else {
+    // Find all addresses in the current community for this account, sorted by last used date/time
     const communityAddressesSortedByLastUsed =
       app.roles.getSortedLastUsedAddressInCommunity({
         chain: chain.id,
       });
 
-    if (communityAddressesSortedByLastUsed) {
+    // From the sorted adddress in the current community, find an address which has an active session key
+    const chainBase = app.chain?.base;
+    const idOrPrefix =
+      chainBase === ChainBase.CosmosSDK
+        ? app.chain?.meta.bech32Prefix
+        : app.chain?.meta.node?.ethChainId;
+    const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
+    const foundAddressWithActiveSessionKey =
+      await communityAddressesSortedByLastUsed.find(async (acc) => {
+        const isAuth = await app.sessions
+          .getSessionController(chainBase)
+          .hasAuthenticatedSession(canvasChainId, acc.address);
+        return isAuth;
+      });
+
+    // Use the address which has an active session key, if there is none then use the most recently used address
+    const addressToUse =
+      foundAddressWithActiveSessionKey || communityAddressesSortedByLastUsed[0];
+
+    if (addressToUse) {
       const account = app.user.activeAccounts.find((a) => {
         return (
-          a.community.id ===
-            communityAddressesSortedByLastUsed[0].community.id &&
-          a.address === communityAddressesSortedByLastUsed[0].address
+          a.community.id === addressToUse.community.id &&
+          a.address === addressToUse.address
         );
       });
       if (account) await setActiveAccount(account, shouldRedraw);
