@@ -91,7 +91,9 @@ export const PollEditorModal = ({
       return;
     }
 
-    if (!options?.length || !options[0]?.length || !options[1]?.length) {
+    const allOptionsAreFilledOut = options.every((option) => !!option.trim());
+
+    if (!options?.length || !allOptionsAreFilledOut) {
       notifyError('Must set poll options');
       return;
     }

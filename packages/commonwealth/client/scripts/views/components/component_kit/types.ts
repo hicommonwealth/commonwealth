@@ -4,7 +4,6 @@ import type { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
   AccountCreationButton = 'AccountCreationButton',
-  AddressTooltip = 'AddressTooltip',
   Avatar = 'Avatar',
   AvatarUpload = 'AvatarUpload',
   Banner = 'Banner',
@@ -30,9 +29,8 @@ export enum ComponentType {
   MobileMenu = 'MobileMenu',
   Modal = 'CWModal',
   OldTextInput = 'OldTextInput',
-  OldTooltip = 'OldTooltip',
-  Popover = 'Popover',
   PopoverMenu = 'PopoverMenu',
+  Popover = 'Popover',
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
