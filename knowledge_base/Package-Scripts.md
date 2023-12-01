@@ -5,6 +5,7 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
 - [Build Scripts](#build-scripts)
   - [build-app](#build-app)
   - [build:css](#buildcss)
+  - [heroku-prebuild](#heroku-prebuild)
 - [CI Scripts](#ci-scripts)
   - [wait-server](#wait-server)
 - [Database Scripts](#database-scripts)
@@ -85,6 +86,12 @@ Description: Builds project, allocating max 4096MB memory to Node; runs webpack 
 Definition: `NODE_ENV=production build client/styles/shared.scss` 
 
 Considerations: Why do we have a separate CSS build? Who uses it? And does it even work? We don't appear to have a `build` command that it could modify. **Deprecated; recommend removal.**
+
+## heroku-prebuild
+
+Definition: `yarn global add node-gyp`
+
+Description: Installs node-gyp (a library for compiling dependencies) prior to installing dependencies. Fixes error we get when building dependencies which blocks production releases and fails CI runs.
 
 # CI Scripts
 
