@@ -1,5 +1,5 @@
 import chai from 'chai';
-import type { GetBalanceProvidersReq } from 'common-common/src/api/extApiTypes';
+import type { GetBalanceProvidersReq } from 'server/api/extApiTypes';
 import models from 'server/database';
 import { getBalanceProviders } from 'server/routes/getBalanceProviders';
 import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
@@ -15,7 +15,7 @@ describe('getTokenBalance Tests', async () => {
       models,
       tokenBalanceCache,
       getReq(r),
-      res()
+      res(),
     )) as any;
 
     chai.assert.lengthOf(resp.result.balance_providers, 1);
