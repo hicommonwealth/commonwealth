@@ -22,7 +22,6 @@ export const createCommunityHandler = async (
   controllers.analytics.track(
     {
       chainBase: community.community.base,
-      isCustomDomain: null,
       communityType: null,
       event: MixpanelCommunityCreationEvent.NEW_COMMUNITY_CREATION,
       userId: req.user.id,

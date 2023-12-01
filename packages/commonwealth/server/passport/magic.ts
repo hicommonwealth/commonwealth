@@ -90,7 +90,6 @@ async function createMagicAddressInstances(
       await createRole(models, addressInstance.id, chain, 'member', false, t);
 
       serverAnalyticsController.track({
-        isCustomDomain: null,
         community: chain,
         userId: user_id,
         event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,

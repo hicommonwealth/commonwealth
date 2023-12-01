@@ -258,7 +258,6 @@ const finishSsoLogin = async (
           serverAnalyticsController.track(
             {
               event: MixpanelLoginEvent.LOGIN_COMPLETED,
-              isCustomDomain: null,
               userId: existingUser.id,
             },
             req,
@@ -277,7 +276,6 @@ const finishSsoLogin = async (
             serverAnalyticsController.track(
               {
                 event: MixpanelLoginEvent.LOGIN_FAILED,
-                isCustomDomain: null,
               },
               req,
             );
@@ -290,7 +288,6 @@ const finishSsoLogin = async (
           serverAnalyticsController.track(
             {
               event: MixpanelLoginEvent.LOGIN_COMPLETED,
-              isCustomDomain: null,
               userId: newUser.id,
             },
             req,
@@ -386,7 +383,6 @@ const finishSsoLogin = async (
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          isCustomDomain: null,
           userId: reqUser.id,
         },
         req,
@@ -410,7 +406,6 @@ const finishSsoLogin = async (
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_COMPLETED,
-            isCustomDomain: null,
             userId: newUser.id,
           },
           req,

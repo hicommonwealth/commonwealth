@@ -176,7 +176,6 @@ const linkExistingAddressToChain = async (
     const serverAnalyticsController = new ServerAnalyticsController();
     serverAnalyticsController.track(
       {
-        isCustomDomain: null,
         community: req.body.chain,
         userId: req.user.id,
         event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,

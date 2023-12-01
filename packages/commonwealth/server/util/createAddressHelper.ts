@@ -211,7 +211,6 @@ export async function createAddressHelper(
         {
           event: MixpanelUserSignupEvent.NEW_USER_SIGNUP,
           chain: req.chain,
-          isCustomDomain: null,
         },
         req,
       );

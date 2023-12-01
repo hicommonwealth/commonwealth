@@ -58,7 +58,6 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_FAILED,
-            isCustomDomain: null,
           },
           req,
         );
@@ -67,7 +66,6 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          isCustomDomain: null,
           userId: existingUser.id,
         },
         req,
@@ -99,7 +97,6 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_FAILED,
-            isCustomDomain: null,
           },
           req,
         );
@@ -108,7 +105,6 @@ const finishOAuthLogin = async (models: DB, req: Request, res: Response) => {
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          isCustomDomain: null,
           userId: newUser.id,
         },
         req,

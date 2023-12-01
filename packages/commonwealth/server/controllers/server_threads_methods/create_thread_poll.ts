@@ -102,7 +102,6 @@ export async function __createThreadPoll(
     event: MixpanelCommunityInteractionEvent.CREATE_POLL,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   };
 
   return [poll.toJSON(), analyticsOptions];

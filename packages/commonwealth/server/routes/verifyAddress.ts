@@ -250,7 +250,6 @@ const verifyAddress = async (
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_FAILED,
-            isCustomDomain: null,
           },
           req,
         );
@@ -259,7 +258,6 @@ const verifyAddress = async (
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          isCustomDomain: null,
           userId: user.id,
         },
         req,
