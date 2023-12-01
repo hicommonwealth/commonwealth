@@ -3,6 +3,7 @@ import { GroupAttributes } from 'server/models/group';
 import {
   GetBalancesOptions,
   GetCosmosBalancesOptions,
+  GetErc1155BalanceOptions,
   GetErcBalanceOptions,
   GetEthNativeBalanceOptions,
 } from '../tokenBalanceCache/types';
@@ -17,7 +18,8 @@ export function makeGetBalancesOptions(
   groups: GroupAttributes[],
   addresses: AddressAttributes[],
 ): GetBalancesOptions[] {
-  const allOptions: GetBalancesOptions[] = [];
+  const allOptions: Exclude<GetBalancesOptions, GetErc1155BalanceOptions>[] =
+    [];
 
   for (const address of addresses) {
     for (const group of groups) {
@@ -45,7 +47,7 @@ export function makeGetBalancesOptions(
                 }
               } else {
                 allOptions.push({
-                  balanceSourceType: castedSource.source_type,
+                  balanceSourceType: castedSource.source_type as any,
                   sourceOptions: {
                     contractAddress: castedSource.contract_address,
                     evmChainId: castedSource.evm_chain_id,

@@ -1,4 +1,4 @@
-type ContractSource = {
+export type ContractSource = {
   source_type:
     | BalanceSourceType.ERC20
     | BalanceSourceType.ERC721

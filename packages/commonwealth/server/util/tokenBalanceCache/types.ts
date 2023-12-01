@@ -25,7 +25,7 @@ type GetErc721BalanceOptions = GetEvmBalancesBase & {
     contractAddress: string;
   };
 };
-type GetErc1155BalanceOptions = GetEvmBalancesBase & {
+export type GetErc1155BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC1155;
   sourceOptions: {
     contractAddress: string;
