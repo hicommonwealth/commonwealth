@@ -120,14 +120,32 @@ const ReactQuillEditor = ({
       ___isMarkdown: isMarkdownEnabled,
     } as SerializableDeltaStatic);
 
-    // sets the correct cursor position after pasting content
+    // Check if the change is due to a paste operation
     if (editorRef?.current?.getEditor?.()?.getSelection?.()) {
       const selection = editorRef.current.getEditor().getSelection();
+
+      // Delay the cursor adjustment after the paste operation
       setTimeout(() => {
         editorRef.current
           .getEditor()
           .setSelection(selection.index, selection.length);
       });
+    }
+
+    // Handle the "Return" key separately
+    if (delta.ops.length >= 1) {
+      const cursorPosition = delta.ops[0].insert.length;
+
+      // Check if the current line is an h1 or h2
+      const currentFormat = editorRef.current
+        .getEditor()
+        .getFormat(cursorPosition);
+
+      if (currentFormat.header === 1 || currentFormat.header === 2) {
+        setTimeout(() => {
+          editorRef.current.getEditor().setSelection(cursorPosition, 0);
+        });
+      }
     }
   };
 
