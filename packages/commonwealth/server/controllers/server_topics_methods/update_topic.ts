@@ -95,7 +95,6 @@ export async function __updateTopic(
     event: MixpanelCommunityInteractionEvent.UPDATE_TOPIC,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   };
 
   return [topic.toJSON(), analyticsOptions];

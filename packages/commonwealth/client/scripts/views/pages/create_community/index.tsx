@@ -143,9 +143,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
 
   useNecessaryEffect(() => {
     const fetchEthChainNames = async () => {
-      const chains = await $.getJSON(
-        'https://chainid.network/chains.json',
-      );
+      const chains = await $.getJSON('https://chainid.network/chains.json');
 
       const newObject = {};
 

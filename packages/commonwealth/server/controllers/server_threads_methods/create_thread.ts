@@ -310,7 +310,6 @@ export async function __createThread(
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   };
 
   return [finalThread.toJSON(), allNotificationOptions, analyticsOptions];

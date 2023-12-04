@@ -174,7 +174,6 @@ export async function __updateGroup(
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.UPDATE_GROUP,
     community: community.id,
-    isCustomDomain: null,
     userId: user.id,
   };
 

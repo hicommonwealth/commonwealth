@@ -341,7 +341,6 @@ export async function __createThreadComment(
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   };
 
   return [finalComment.toJSON(), allNotificationOptions, analyticsOptions];

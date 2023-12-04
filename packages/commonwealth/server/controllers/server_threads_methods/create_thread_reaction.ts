@@ -152,7 +152,6 @@ export async function __createThreadReaction(
   const analyticsOptions: TrackOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
     community: community.id,
-    isCustomDomain: null,
   };
 
   return [finalReaction.toJSON(), notificationOptions, analyticsOptions];
