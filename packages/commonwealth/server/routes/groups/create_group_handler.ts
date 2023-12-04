@@ -1,26 +1,23 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
-import { AppError } from '../../../../common-common/src/errors';
 import z from 'zod';
-import { GroupMetadata } from '../../models/group';
-
-const Errors = {};
+import { AppError } from '../../../../common-common/src/errors';
+import { GroupAttributes, GroupMetadata } from '../../models/group';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type CreateGroupBody = {
   metadata: GroupMetadata;
   requirements: Requirement[];
   topics?: number[];
 };
-type CreateGroupResponse = CreateGroupResult;
+type CreateGroupResponse = GroupAttributes;
 
 export const createGroupHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateGroupBody>,
-  res: TypedResponse<CreateGroupResponse>
+  res: TypedResponse<CreateGroupResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
 
   const schema = z.object({
     body: z.object({
@@ -41,13 +38,21 @@ export const createGroupHandler = async (
     body: { metadata, requirements, topics },
   } = validationResult.data;
 
-  const result = await controllers.groups.createGroup({
+  const [group, analyticsOptions] = await controllers.groups.createGroup({
     user,
-    chain,
+    community,
     address,
     metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
   });
-  return success(res, result);
+
+  // refresh memberships in background
+  controllers.groups
+    .refreshCommunityMemberships({ community, group })
+    .catch(console.error);
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
+
+  return success(res, group);
 };

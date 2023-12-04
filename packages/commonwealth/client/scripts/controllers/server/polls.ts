@@ -1,4 +1,5 @@
 /* eslint-disable no-restricted-globals */
+import axios from 'axios';
 import $ from 'jquery';
 import moment from 'moment';
 import app from 'state';
@@ -6,13 +7,12 @@ import { updateThreadInAllCaches } from 'state/api/threads/helpers/cache';
 import PollStore from 'stores/PollStore';
 import Poll from '../../models/Poll';
 import Vote from '../../models/Vote';
-import axios from 'axios';
 
 export const modelFromServer = (poll) => {
   const {
     id,
     thread_id,
-    chain_id,
+    community_id,
     prompt,
     options,
     ends_at,
@@ -30,7 +30,7 @@ export const modelFromServer = (poll) => {
   return new Poll({
     id,
     threadId: thread_id,
-    chainId: chain_id,
+    communityId: community_id,
     prompt,
     options: pollOptions,
     endsAt: moment(ends_at),
@@ -46,12 +46,12 @@ class PollsController {
     return this._store;
   }
 
-  public async fetchPolls(chainId: string, threadId: number) {
+  public async fetchPolls(communityId: string, threadId: number) {
     await $.ajax({
       url: `${app.serverUrl()}/threads/${threadId}/polls`,
       type: 'GET',
       data: {
-        chain: chainId,
+        chain: communityId,
       },
       success: (response) => {
         for (const poll of response.result) {
@@ -68,7 +68,7 @@ class PollsController {
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
-            : 'Failed to fetch thread polls'
+            : 'Failed to fetch thread polls',
         );
       },
     });
@@ -88,14 +88,14 @@ class PollsController {
     const response = await axios.post(
       `${app.serverUrl()}/threads/${threadId}/polls`,
       {
-        chain: app.activeChainId(),
+        community_id: app.activeChainId(),
         author_chain: authorChain,
         address,
         jwt: app.user.jwt,
         prompt,
         options,
         custom_duration: customDuration?.split(' ')[0],
-      }
+      },
     );
 
     const modeledPoll = modelFromServer(response.data.result);
@@ -118,13 +118,13 @@ class PollsController {
       url: `${app.serverUrl()}/polls/${pollId}`,
       type: 'DELETE',
       data: {
-        chain_id: app.activeChainId(),
+        community_id: app.activeChainId(),
         author_chain: authorChain,
         address,
         jwt: app.user.jwt,
         poll_id: pollId,
       },
-      success: (response) => {
+      success: () => {
         // TODO: updateThreadInAllCaches should not be used anywhere outside of the /api/state folder
         // This is an exception until polls get migrated to react query
         updateThreadInAllCaches(app.activeChainId(), threadId, {
@@ -137,7 +137,7 @@ class PollsController {
         throw new Error(
           err.responseJSON && err.responseJSON.error
             ? err.responseJSON.error
-            : 'Failed to delete poll'
+            : 'Failed to delete poll',
         );
       },
     });

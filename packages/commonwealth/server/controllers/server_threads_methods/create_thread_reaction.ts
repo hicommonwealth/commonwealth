@@ -1,19 +1,19 @@
-import { AddressInstance } from '../../models/address';
-import { CommunityInstance } from '../../models/community';
-import { ReactionAttributes } from '../../models/reaction';
-import { UserInstance } from '../../models/user';
-import { EmitOptions } from '../server_notifications_methods/emit';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
 } from '../../../../common-common/src/types';
-import { AppError } from '../../../../common-common/src/errors';
 import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
-import { TrackOptions } from '../server_analytics_methods/track';
-import { ServerThreadsController } from '../server_threads_controller';
-import { validateOwner } from '../../util/validateOwner';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { ReactionAttributes } from '../../models/reaction';
+import { UserInstance } from '../../models/user';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { EmitOptions } from '../server_notifications_methods/emit';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -27,7 +27,7 @@ export const Errors = {
 export type CreateThreadReactionOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   reaction: string;
   threadId: number;
   canvasAction?: any;
@@ -38,7 +38,7 @@ export type CreateThreadReactionOptions = {
 export type CreateThreadReactionResult = [
   ReactionAttributes,
   EmitOptions,
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThreadReaction(
@@ -46,13 +46,13 @@ export async function __createThreadReaction(
   {
     user,
     address,
-    chain,
+    community,
     reaction,
     threadId,
     canvasAction,
     canvasSession,
     canvasHash,
-  }: CreateThreadReactionOptions
+  }: CreateThreadReactionOptions,
 ): Promise<CreateThreadReactionResult> {
   const thread = await this.models.Thread.findOne({
     where: { id: threadId },
@@ -68,9 +68,9 @@ export async function __createThreadReaction(
   }
 
   // check address ban
-  if (chain) {
+  if (community) {
     const [canInteract, banError] = await this.banCache.checkBan({
-      chain: chain.id,
+      communityId: community.id,
       address: address.address,
     });
     if (!canInteract) {
@@ -80,13 +80,14 @@ export async function __createThreadReaction(
 
   // check balance (bypass for admin)
   if (
-    chain &&
-    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+    community &&
+    (community.type === ChainType.Token ||
+      community.network === ChainNetwork.Ethereum)
   ) {
     const isAdmin = await validateOwner({
       models: this.models,
       user,
-      chainId: chain.id,
+      communityId: community.id,
       entity: thread,
       allowAdmin: true,
       allowGodMode: true,
@@ -96,8 +97,8 @@ export async function __createThreadReaction(
         this.models,
         this.tokenBalanceCache,
         thread.topic_id,
-        chain,
-        address
+        community,
+        address,
       );
       if (!isValid) {
         throw new AppError(`${Errors.FailedCreateReaction}: ${message}`);
@@ -109,7 +110,7 @@ export async function __createThreadReaction(
   const reactionData: ReactionAttributes = {
     reaction,
     address_id: address.id,
-    chain: chain.id,
+    chain: community.id,
     thread_id: thread.id,
     canvas_action: canvasAction,
     canvas_session: canvasSession,
@@ -149,8 +150,7 @@ export async function __createThreadReaction(
   // build analytics options
   const analyticsOptions: TrackOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
-    community: chain.id,
-    isCustomDomain: null,
+    community: community.id,
   };
 
   return [finalReaction.toJSON(), notificationOptions, analyticsOptions];

@@ -7,11 +7,11 @@ import React, { useEffect } from 'react';
 import app, { LoginState } from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
 import DashboardActivityNotification from '../../../models/DashboardActivityNotification';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { CWText } from '../../components/component_kit/cw_text';
 import { Feed } from '../../components/feed';
 import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { fetchActivity } from './helpers';
@@ -31,7 +31,7 @@ const UserDashboard = (props: UserDashboardProps) => {
   const { isLoggedIn } = useUserLoggedIn();
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
-    DashboardViews.Global
+    DashboardViews.Global,
   );
 
   useBrowserAnalyticsTrack({
@@ -83,7 +83,7 @@ const UserDashboard = (props: UserDashboardProps) => {
               onClick={() => {
                 if (!loggedIn) {
                   notifyInfo(
-                    'Sign in or create an account for custom activity feed'
+                    'Sign in or create an account for custom activity feed',
                   );
                   return;
                 }
@@ -107,53 +107,6 @@ const UserDashboard = (props: UserDashboardProps) => {
           </CWTabsRow>
         </div>
         <>
-          {/* TODO: add filter functionality */}
-          {/* <CWPopover
-              trigger={
-                <CWButton
-                  buttonType="mini-white"
-                  label="Filter"
-                  iconRight="chevronDown"
-                />
-              }
-              content={
-                <CWCard className="dashboard-filter-items">
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Threads"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Polls"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Proposals"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                  <CWCheckbox
-                    checked={false}
-                    value=""
-                    label="Crowdfunds"
-                    onchange={() => {
-                      // TODO: add filter functionality
-                    }}
-                  />
-                </CWCard>
-              }
-            />
-            <CWDivider /> */}
           {activePage === DashboardViews.ForYou && (
             <Feed
               fetchData={() => fetchActivity(activePage)}
@@ -181,9 +134,7 @@ const UserDashboard = (props: UserDashboardProps) => {
           )}
         </>
       </div>
-      <div>
-        <DashboardCommunitiesPreview />
-      </div>
+      <DashboardCommunitiesPreview />
     </div>
   );
 };

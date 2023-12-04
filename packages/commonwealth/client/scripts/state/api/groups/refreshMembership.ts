@@ -13,7 +13,8 @@ interface RefreshMembershipProps {
 }
 
 interface Memberships {
-  topicId?: string;
+  groupId: number;
+  topicIds: number[];
   isAllowed: boolean;
   rejectReason?: string;
 }
@@ -27,15 +28,16 @@ const refreshMembership = async ({
     `${app.serverUrl()}/refresh-membership`,
     {
       jwt: app.user.jwt,
-      chain: chainId,
-      author_chain: chainId,
+      community_id: chainId,
+      author_community_id: chainId,
       address,
       ...(topicId && { topic_id: topicId }),
-    }
+    },
   );
 
   return response?.data?.result?.map((r) => ({
-    topicId: r.topicId,
+    groupId: r.groupId,
+    topicIds: r.topicIds,
     isAllowed: r.allowed,
     rejectReason: JSON.parse(`${r.rejectReason || {}}`),
   }));

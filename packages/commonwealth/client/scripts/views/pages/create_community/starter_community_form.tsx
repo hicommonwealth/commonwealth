@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
 import $ from 'jquery';
+import React, { useEffect, useState } from 'react';
 
-import { initAppState } from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { initAppState } from 'state';
 
 import 'pages/create_community.scss';
 
+import ChainInfo from 'client/scripts/models/ChainInfo';
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
@@ -15,27 +17,46 @@ import { baseToNetwork } from '../../../helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import {
-  defaultChainRows,
+  defaultCommunityRows,
   updateAdminOnCreateCommunity,
-} from './chain_input_rows';
-import { useCommonNavigate } from 'navigation/helpers';
+} from './community_input_rows';
 import {
-  useChainFormDefaultFields,
-  useChainFormIdFields,
-  useChainFormState,
+  useCommunityFormDefaultFields,
+  useCommunityFormIdFields,
+  useCommunityFormState,
 } from './hooks';
 
 export const StarterCommunityForm = () => {
   const [base, setBase] = useState<ChainBase>(ChainBase.Ethereum);
+  const [defaultChain, setDefaultChain] = useState<ChainInfo>();
 
   const { id, setId, name, setName, symbol, setSymbol } =
-    useChainFormIdFields();
+    useCommunityFormIdFields();
 
-  const chainFormDefaultFields = useChainFormDefaultFields();
+  const communityFormDefaultFields = useCommunityFormDefaultFields();
 
-  const { saving, setSaving } = useChainFormState();
+  const { saving, setSaving } = useCommunityFormState();
 
   const navigate = useCommonNavigate();
+
+  useEffect(() => {
+    const selectChainForBase = () => {
+      if (base === ChainBase.CosmosSDK) {
+        const chain = app.config.chains?.getById('osmosis');
+        setDefaultChain(chain);
+      } else if (base === ChainBase.Ethereum) {
+        const ethereum = app.config.chains?.getById('ethereum');
+        setDefaultChain(ethereum);
+      } else if (base === ChainBase.NEAR) {
+        const near = app.config.chains?.getById('near');
+        setDefaultChain(near);
+      } else {
+        setDefaultChain(null);
+      }
+    };
+
+    selectChainForBase();
+  }, [base]);
 
   return (
     <div className="CreateCommunityForm">
@@ -68,7 +89,7 @@ export const StarterCommunityForm = () => {
           setBase(o.value as ChainBase);
         }}
       />
-      {defaultChainRows(chainFormDefaultFields)}
+      {defaultCommunityRows(communityFormDefaultFields)}
       <CWButton
         label="Save changes"
         disabled={saving || id.length < 1}
@@ -84,40 +105,10 @@ export const StarterCommunityForm = () => {
 
           // TODO: switch to using ChainNode.name instead of URL
           // defaults to be overridden when chain is no longer "starter" type
-          switch (base) {
-            case ChainBase.CosmosSDK: {
-              additionalArgs.node_url = 'https://rpc-osmosis.blockapsis.com';
-              additionalArgs.bech32_prefix = 'osmo';
-              additionalArgs.alt_wallet_url =
-                'https://lcd-osmosis.blockapsis.com';
-              break;
-            }
-
-            case ChainBase.NEAR: {
-              additionalArgs.node_url = 'https://rpc.mainnet.near.org';
-              break;
-            }
-
-            case ChainBase.Solana: {
-              additionalArgs.node_url = 'https://api.mainnet-beta.solana.com';
-              break;
-            }
-
-            case ChainBase.Substrate: {
-              additionalArgs.node_url = 'wss://mainnet.edgewa.re';
-              break;
-            }
-
-            case ChainBase.Ethereum:
-            default: {
-              additionalArgs.eth_chain_id = 1;
-              additionalArgs.node_url =
-                'https://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_';
-              additionalArgs.alt_wallet_url =
-                'https://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_';
-              break;
-            }
-          }
+          additionalArgs.node_url = defaultChain.node.url;
+          additionalArgs.alt_wallet_url = defaultChain.node.altWalletUrl;
+          additionalArgs.eth_chain_id = defaultChain.node.ethChainId;
+          additionalArgs.bech32_prefix = defaultChain.bech32Prefix;
 
           try {
             const res = await $.post(`${app.serverUrl()}/communities`, {
@@ -125,17 +116,17 @@ export const StarterCommunityForm = () => {
               address: '',
               type: ChainType.Offchain,
               network: baseToNetwork(base),
-              icon_url: chainFormDefaultFields.iconUrl,
+              icon_url: communityFormDefaultFields.iconUrl,
               id,
               name,
               default_symbol: symbol,
               base,
-              description: chainFormDefaultFields.description,
-              discord: chainFormDefaultFields.discord,
-              element: chainFormDefaultFields.element,
-              github: chainFormDefaultFields.github,
-              telegram: chainFormDefaultFields.telegram,
-              website: chainFormDefaultFields.website,
+              description: communityFormDefaultFields.description,
+              discord: communityFormDefaultFields.discord,
+              element: communityFormDefaultFields.element,
+              github: communityFormDefaultFields.github,
+              telegram: communityFormDefaultFields.telegram,
+              website: communityFormDefaultFields.website,
               ...additionalArgs,
             });
 
@@ -143,19 +134,20 @@ export const StarterCommunityForm = () => {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
             await initAppState(false);
             await updateAdminOnCreateCommunity(id);
 
-            navigate(`/${res.result.chain?.id}`);
+            navigate(`/${res.result.community?.id}`);
           } catch (err) {
             console.log(err);
 
             notifyError(
-              err.responseJSON?.error || 'Creating new starter community failed'
+              err.responseJSON?.error ||
+                'Creating new starter community failed',
             );
           } finally {
             setSaving(false);

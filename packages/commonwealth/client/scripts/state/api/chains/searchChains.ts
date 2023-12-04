@@ -50,14 +50,14 @@ const searchChains = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: chainId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
       },
-    }
+    },
   );
   return result;
 };
@@ -99,7 +99,7 @@ const useSearchChainsQuery = ({
       },
       staleTime: SEARCH_CHAINS_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

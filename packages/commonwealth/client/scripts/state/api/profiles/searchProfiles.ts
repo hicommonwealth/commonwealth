@@ -15,6 +15,7 @@ export type SearchProfilesResponse = {
     user_id: string;
     profile_name: string;
     avatar_url: string;
+    group_ids?: [];
     addresses: {
       id: number;
       chain: string;
@@ -35,7 +36,8 @@ interface SearchProfilesProps {
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
   includeRoles: boolean;
-
+  includeMembershipTypes?: 'in-group' | 'not-in-group';
+  includeGroupIds?: boolean;
   enabled?: boolean;
 }
 
@@ -46,6 +48,8 @@ const searchProfiles = async ({
   limit,
   orderBy,
   orderDirection,
+  includeMembershipTypes,
+  includeGroupIds,
   includeRoles,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
@@ -57,15 +61,17 @@ const searchProfiles = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: chainId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
         include_roles: includeRoles,
+        ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
+        ...(includeGroupIds && { include_group_ids: includeGroupIds }),
       },
-    }
+    },
   );
   return result;
 };
@@ -77,6 +83,8 @@ const useSearchProfilesQuery = ({
   orderBy,
   orderDirection,
   includeRoles,
+  includeGroupIds,
+  includeMembershipTypes,
   enabled = true,
 }: SearchProfilesProps) => {
   const key = [
@@ -86,6 +94,8 @@ const useSearchProfilesQuery = ({
       orderBy,
       orderDirection,
       includeRoles,
+      includeGroupIds,
+      includeMembershipTypes,
     },
   ];
   return useInfiniteQuery(
@@ -98,6 +108,8 @@ const useSearchProfilesQuery = ({
         limit,
         orderBy,
         orderDirection,
+        includeMembershipTypes,
+        includeGroupIds,
         includeRoles,
       }),
     {
@@ -110,7 +122,7 @@ const useSearchProfilesQuery = ({
       },
       staleTime: SEARCH_PROFILES_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

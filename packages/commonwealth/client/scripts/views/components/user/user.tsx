@@ -5,11 +5,13 @@ import { Link } from 'react-router-dom';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { Avatar } from 'views/components/Avatar';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
-import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
@@ -250,7 +252,7 @@ export const User = ({
     >
       {userFinal}
       {profile && (
-        <Popover
+        <CWPopover
           content={userPopover}
           {...popoverProps}
           placement={popoverPlacement}

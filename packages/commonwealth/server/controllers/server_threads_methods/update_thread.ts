@@ -38,7 +38,7 @@ export const Errors = {
 export type UpdateThreadOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   threadId?: number;
   title?: string;
   body?: string;
@@ -63,7 +63,7 @@ export type UpdateThreadOptions = {
 export type UpdateThreadResult = [
   ThreadAttributes,
   EmitOptions[],
-  TrackOptions[]
+  TrackOptions[],
 ];
 
 export async function __updateThread(
@@ -71,7 +71,7 @@ export async function __updateThread(
   {
     user,
     address,
-    chain,
+    community,
     threadId,
     title,
     body,
@@ -88,7 +88,7 @@ export async function __updateThread(
     canvasAction,
     canvasHash,
     discordMeta,
-  }: UpdateThreadOptions
+  }: UpdateThreadOptions,
 ): Promise<UpdateThreadResult> {
   // Discobot handling
   if (!threadId) {
@@ -106,7 +106,7 @@ export async function __updateThread(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -125,16 +125,16 @@ export async function __updateThread(
   const roles = await findAllRoles(
     this.models,
     { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    chain.id,
-    ['moderator', 'admin']
+    community.id,
+    ['moderator', 'admin'],
   );
 
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
   const isMod = !!roles.find(
-    (r) => r.chain_id === chain.id && r.permission === 'moderator'
+    (r) => r.chain_id === community.id && r.permission === 'moderator',
   );
   const isAdmin = !!roles.find(
-    (r) => r.chain_id === chain.id && r.permission === 'admin'
+    (r) => r.chain_id === community.id && r.permission === 'admin',
   );
   const isSuperAdmin = user.isAdmin;
   if (!isThreadOwner && !isMod && !isAdmin && !isSuperAdmin) {
@@ -188,7 +188,7 @@ export async function __updateThread(
         canvasAction,
         canvasHash,
       },
-      toUpdate
+      toUpdate,
     );
 
     await setThreadPinned(permissions, pinned, toUpdate);
@@ -202,9 +202,9 @@ export async function __updateThread(
     await setThreadStage(
       permissions,
       stage,
-      chain,
+      community,
       allAnalyticsOptions,
-      toUpdate
+      toUpdate,
     );
 
     await setThreadTopic(
@@ -213,7 +213,7 @@ export async function __updateThread(
       topicId,
       topicName,
       this.models,
-      toUpdate
+      toUpdate,
     );
 
     await thread.update(
@@ -221,7 +221,7 @@ export async function __updateThread(
         ...toUpdate,
         last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      { transaction }
+      { transaction },
     );
 
     await updateThreadCollaborators(
@@ -229,7 +229,7 @@ export async function __updateThread(
       thread,
       collaborators,
       this.models,
-      transaction
+      transaction,
     );
 
     await transaction.commit();
@@ -315,7 +315,7 @@ export async function __updateThread(
         } catch (err) {
           return null;
         }
-      })
+      }),
     );
     // filter null results
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -365,7 +365,7 @@ export type UpdateThreadPermissions = {
  */
 export function validatePermissions(
   permissions: UpdateThreadPermissions,
-  flags: Partial<UpdateThreadPermissions>
+  flags: Partial<UpdateThreadPermissions>,
 ) {
   const keys = ['isThreadOwner', 'isMod', 'isAdmin', 'isSuperAdmin'];
   for (const k of keys) {
@@ -401,7 +401,7 @@ async function setThreadAttributes(
     canvasAction,
     canvasHash,
   }: UpdatableThreadAttributes,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (
     typeof title !== 'undefined' ||
@@ -460,7 +460,7 @@ async function setThreadAttributes(
 async function setThreadPinned(
   permissions: UpdateThreadPermissions,
   pinned: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof pinned !== 'undefined') {
     validatePermissions(permissions, {
@@ -479,7 +479,7 @@ async function setThreadPinned(
 async function setThreadLocked(
   permissions: UpdateThreadPermissions,
   locked: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof locked !== 'undefined') {
     validatePermissions(permissions, {
@@ -502,7 +502,7 @@ async function setThreadLocked(
 async function setThreadArchived(
   permissions: UpdateThreadPermissions,
   archive: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof archive !== 'undefined') {
     validatePermissions(permissions, {
@@ -524,7 +524,7 @@ async function setThreadArchived(
 async function setThreadSpam(
   permissions: UpdateThreadPermissions,
   spam: boolean | undefined,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof spam !== 'undefined') {
     validatePermissions(permissions, {
@@ -545,9 +545,9 @@ async function setThreadSpam(
 async function setThreadStage(
   permissions: UpdateThreadPermissions,
   stage: string | undefined,
-  chain: CommunityInstance,
+  community: CommunityInstance,
   allAnalyticsOptions: TrackOptions[],
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof stage !== 'undefined') {
     validatePermissions(permissions, {
@@ -560,9 +560,9 @@ async function setThreadStage(
     // fetch available stages
     let customStages = [];
     try {
-      const chainStages = JSON.parse(chain.custom_stages);
-      if (Array.isArray(chainStages)) {
-        customStages = Array.from(chainStages)
+      const communityStages = JSON.parse(community.custom_stages);
+      if (Array.isArray(communityStages)) {
+        customStages = Array.from(communityStages)
           .map((s) => s.toString())
           .filter((s) => s);
       }
@@ -601,7 +601,7 @@ async function setThreadTopic(
   topicId: number | undefined,
   topicName: string | undefined,
   models: DB,
-  toUpdate: Partial<ThreadAttributes>
+  toUpdate: Partial<ThreadAttributes>,
 ) {
   if (typeof topicId !== 'undefined' || typeof topicName !== 'undefined') {
     validatePermissions(permissions, {
@@ -642,7 +642,7 @@ async function updateThreadCollaborators(
       }
     | undefined,
   models: DB,
-  transaction: Transaction
+  transaction: Transaction,
 ) {
   const { toAdd, toRemove } = collaborators || {};
   if (Array.isArray(toAdd) || Array.isArray(toRemove)) {
@@ -683,7 +683,7 @@ async function updateThreadCollaborators(
             },
             transaction,
           });
-        })
+        }),
       );
     }
 

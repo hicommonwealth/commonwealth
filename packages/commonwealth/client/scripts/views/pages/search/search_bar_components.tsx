@@ -5,7 +5,7 @@ import moment from 'moment';
 import 'pages/search/search_bar_components.scss';
 
 import { useCommonNavigate } from 'navigation/helpers';
-import ChainInfo from '../../../models/ChainInfo';
+import CommunityInfo from '../../../models/ChainInfo';
 import { CommunityLabel } from '../../components/community_label';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
@@ -25,9 +25,7 @@ type SearchChipProps = {
   onClick: () => void;
 };
 
-export const SearchChip = (props: SearchChipProps) => {
-  const { isActive, label, onClick } = props;
-
+export const SearchChip = ({ isActive, label, onClick }: SearchChipProps) => {
   return (
     <CWText
       type="b2"
@@ -36,7 +34,7 @@ export const SearchChip = (props: SearchChipProps) => {
         {
           isActive,
         },
-        'SearchChip'
+        'SearchChip',
       )}
       onClick={onClick}
     >
@@ -49,17 +47,17 @@ type SearchBarThreadPreviewRowProps = {
   searchResult: ThreadResult;
   searchTerm?: string;
 };
-export const SearchBarThreadPreviewRow = (
-  props: SearchBarThreadPreviewRowProps
-) => {
-  const { searchResult, searchTerm } = props;
+export const SearchBarThreadPreviewRow = ({
+  searchResult,
+  searchTerm,
+}: SearchBarThreadPreviewRowProps) => {
   const navigate = useCommonNavigate();
 
   const title = decodeURIComponent(searchResult.title);
   const content = decodeURIComponent(searchResult.body);
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.id}`;
+    const path = `/${searchResult.community}/discussion/${searchResult.id}`;
     navigate(path, {}, null);
   };
 
@@ -96,7 +94,7 @@ type SearchBarCommentPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarCommentPreviewRow = (
-  props: SearchBarCommentPreviewRowProps
+  props: SearchBarCommentPreviewRowProps,
 ) => {
   const { searchResult, searchTerm } = props;
   const navigate = useCommonNavigate();
@@ -105,7 +103,7 @@ export const SearchBarCommentPreviewRow = (
   const content = searchResult.text;
 
   const handleClick = () => {
-    const path = `/${searchResult.chain}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
+    const path = `/${searchResult.community}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
     navigate(path, {}, null);
   };
 
@@ -130,12 +128,12 @@ export const SearchBarCommentPreviewRow = (
   );
 };
 
-type SearchBarChainPreviewRowProps = {
+type SearchBarCommunityPreviewRowProps = {
   searchResult: CommunityResult;
   searchTerm?: string;
 };
 export const SearchBarCommunityPreviewRow = (
-  props: SearchBarChainPreviewRowProps
+  props: SearchBarCommunityPreviewRowProps,
 ) => {
   const { searchResult } = props;
   const navigate = useCommonNavigate();
@@ -144,11 +142,11 @@ export const SearchBarCommunityPreviewRow = (
     navigate(`/${searchResult.id}`, {}, null);
   };
 
-  const chainInfo = ChainInfo.fromJSON(searchResult as any);
+  const communityInfo = CommunityInfo.fromJSON(searchResult as any);
 
   return (
     <div className="SearchBarCommunityPreviewRow" onClick={handleClick}>
-      <CommunityLabel community={chainInfo} />
+      <CommunityLabel community={communityInfo} />
     </div>
   );
 };
@@ -158,10 +156,10 @@ type SearchBarMemberPreviewRowProps = {
   searchTerm?: string;
 };
 export const SearchBarMemberPreviewRow = (
-  props: SearchBarMemberPreviewRowProps
+  props: SearchBarMemberPreviewRowProps,
 ) => {
   const { searchResult } = props;
-  const chain = searchResult.addresses[0].chain;
+  const community = searchResult.addresses[0].chain;
   const address = searchResult.addresses[0].address;
 
   const navigate = useCommonNavigate();
@@ -172,7 +170,7 @@ export const SearchBarMemberPreviewRow = (
 
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
-      <User userAddress={address} userChainId={chain} shouldLinkProfile />
+      <User userAddress={address} userChainId={community} shouldLinkProfile />
     </div>
   );
 };

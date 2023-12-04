@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: $flex-direction;
   gap: $gap;
+  flex-wrap: wrap;
 }
 
 $width: 360px;
@@ -199,7 +200,7 @@ $width: 360px;
       gap: 8px;
       margin-bottom: 15px;
 
-      >.Text {
+      > .Text {
         min-width: 140px;
       }
     }
@@ -232,14 +233,37 @@ $width: 360px;
     @include gallery-grid(8px, column);
   }
 
-  .typeahead-gallery {
-    .typeahead-row {
-      margin-bottom: 20px;
+  .dropdowns {
+    .dropdown-type {
+      margin-bottom: 25px;
     }
+
+    .multi-select,
+    .typeahead {
+      .multi-select-row,
+      .typeahead-row {
+        margin-bottom: 15px;
+      }
+    }
+  }
+
+  .table {
+    width: 100%;
   }
 
   .new-tabs {
     width: max(100%, 300px);
     overflow-x: auto;
+  }
+
+  .CommunitySelectorContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+  }
+
+  .FormStepContainer {
+    width: 100%;
   }
 }

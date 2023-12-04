@@ -1,10 +1,9 @@
-import { UserInstance } from '../../models/user';
-import { findOneRole } from '../../util/roles';
-import { ServerThreadsController } from '../server_threads_controller';
-import { Op } from 'sequelize';
-import deleteThreadFromDb from '../../util/deleteThread';
 import { AppError } from '../../../../common-common/src/errors';
-import { AddressInstance } from 'server/models/address';
+import { AddressInstance } from '../../models/address';
+import { UserInstance } from '../../models/user';
+import deleteThreadFromDb from '../../util/deleteThread';
+import { validateOwner } from '../../util/validateOwner';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export const Errors = {
   ThreadNotFound: 'Thread not found',
@@ -22,13 +21,13 @@ export type DeleteThreadResult = void;
 
 export async function __deleteThread(
   this: ServerThreadsController,
-  { user, address, threadId, messageId }: DeleteThreadOptions
+  { user, address, threadId, messageId }: DeleteThreadOptions,
 ): Promise<DeleteThreadResult> {
   if (!threadId) {
     // Special handling for discobot threads
     const existingThread = await this.models.Thread.findOne({
       where: {
-        discord_meta: { [Op.contains]: { message_id: messageId } },
+        discord_meta: { message_id: messageId },
       },
     });
     if (existingThread) {
@@ -52,7 +51,7 @@ export async function __deleteThread(
   if (address) {
     // check ban
     const [canInteract, banError] = await this.banCache.checkBan({
-      chain: thread.chain,
+      communityId: thread.chain,
       address: address.address,
     });
     if (!canInteract) {
@@ -61,19 +60,16 @@ export async function __deleteThread(
   }
 
   // check ownership (bypass if admin)
-  const userOwnedAddressIds = (await user.getAddresses())
-    .filter((addr) => !!addr.verified)
-    .map((addr) => addr.id);
-
-  const isAuthor = userOwnedAddressIds.includes(thread.Address.id);
-
-  const isAdminOrMod = await findOneRole(
-    this.models,
-    { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
-    thread.chain,
-    ['admin', 'moderator']
-  );
-  if (!isAuthor && !isAdminOrMod) {
+  const isOwnerOrAdmin = await validateOwner({
+    models: this.models,
+    user,
+    communityId: thread.chain,
+    entity: thread,
+    allowMod: true,
+    allowAdmin: true,
+    allowGodMode: true,
+  });
+  if (!isOwnerOrAdmin) {
     throw new AppError(Errors.NotOwned);
   }
 

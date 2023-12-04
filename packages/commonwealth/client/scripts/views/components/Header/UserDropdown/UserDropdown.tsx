@@ -7,11 +7,11 @@ import { WalletSsoSource } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import { useCommonNavigate } from 'navigation/helpers';
 import useCheckAuthenticatedAddresses from 'views/components/Header/UserDropdown/useCheckAuthenticatedAddresses';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {
   PopoverMenu,
   PopoverMenuItem,
-} from 'views/components/component_kit/cw_popover/cw_popover_menu';
+} from 'views/components/component_kit/CWPopoverMenu';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import {
   CWToggle,
   toggleDarkMode,
@@ -29,13 +29,14 @@ import { WalletId } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { setDarkMode } from 'helpers/darkMode';
+import useGroupMutationBannerStore from 'state/ui/group';
 
 const resetWalletConnectSession = async () => {
   /**
    * Imp to reset wc session on logout as otherwise, subsequent login attempts will fail
    */
   const walletConnectWallet = WebWalletController.Instance.getByName(
-    WalletId.WalletConnect
+    WalletId.WalletConnect,
   );
   await walletConnectWallet.reset();
 };
@@ -57,13 +58,15 @@ const UserDropdown = () => {
   const navigate = useCommonNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
-    localStorage.getItem('dark-mode-state') === 'on'
+    localStorage.getItem('dark-mode-state') === 'on',
   );
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [revalidationModalData, setRevalidationModalData] = useState<{
     walletSsoSource: WalletSsoSource;
     walletAddress: string;
   }>(null);
+  const { clearSetGatingGroupBannerForCommunities } =
+    useGroupMutationBannerStore();
 
   const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
     recheck: isOpen,
@@ -77,7 +80,7 @@ const UserDropdown = () => {
       const signed = authenticatedAddresses[account.address];
       const isActive = app.user.activeAccount?.address === account.address;
       const walletSsoSource = app.user.addresses.find(
-        (address) => address.address === account.address
+        (address) => address.address === account.address,
       )?.walletSsoSource;
 
       return {
@@ -100,7 +103,7 @@ const UserDropdown = () => {
           });
         },
       };
-    }
+    },
   );
 
   return (
@@ -158,7 +161,10 @@ const UserDropdown = () => {
           {
             type: 'default',
             label: 'Sign out',
-            onClick: () => handleLogout(),
+            onClick: () => {
+              clearSetGatingGroupBannerForCommunities();
+              handleLogout();
+            },
           },
         ]}
         onOpenChange={(open) => setIsOpen(open)}

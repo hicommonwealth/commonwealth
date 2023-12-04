@@ -9,15 +9,16 @@ import {
   NotificationCategories,
 } from 'common-common/src/types';
 import { Op } from 'sequelize';
-import { urlHasValidHTTPPrefix } from '../../../shared/utils';
+import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 
+import { COSMOS_REGISTRY_API } from '../../config';
 import type { AddressInstance } from '../../models/address';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
 import axios from 'axios';
-import { ALL_CHAINS } from '../../middleware/databaseValidationService';
+import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { UserInstance } from '../../models/user';
 import {
   MAX_COMMUNITY_IMAGE_SIZE_BYTES,
@@ -42,13 +43,13 @@ export const Errors = {
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBase: 'Must provide valid chain base',
   InvalidChainId: 'Ethereum chain ID not provided or unsupported',
-  InvalidChainIdOrUrl:
-    'Could not determine a valid endpoint for provided chain',
-  ChainAddressExists: 'The address already exists',
-  ChainIDExists:
-    'The id for this chain already exists, please choose another id',
-  ChainNameExists:
-    'The name for this chain already exists, please choose another name',
+  InvalidCommunityIdOrUrl:
+    'Could not determine a valid endpoint for provided community',
+  CommunityAddressExists: 'The address already exists',
+  CommunityIDExists:
+    'The id for this community already exists, please choose another id',
+  CommunityNameExists:
+    'The name for this community already exists, please choose another name',
   ChainNodeIdExists: 'The chain node with this id already exists',
   CosmosChainNameRequired:
     'cosmos_chain_id is a required field. It should be the chain name as registered in the Cosmos Chain Registry.',
@@ -60,7 +61,10 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  UnegisteredCosmosChain: `Check https://cosmos.directory. Provided chain_name is not registered in the Cosmos Chain Registry`,
+  ImageDoesntExist: `Image url provided doesn't exist`,
+  ImageTooLarge: `Image must be smaller than ${MAX_COMMUNITY_IMAGE_SIZE_BYTES}kb`,
+  UnegisteredCosmosChain: `Check https://cosmos.directory. 
+  Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
 export type CreateCommunityOptions = {
@@ -76,7 +80,7 @@ export type CreateCommunityOptions = {
 };
 
 export type CreateCommunityResult = {
-  chain: CommunityAttributes;
+  community: CommunityAttributes;
   node: ChainNodeAttributes;
   role: RoleAttributes;
   admin_address: string;
@@ -84,7 +88,7 @@ export type CreateCommunityResult = {
 
 export async function __createCommunity(
   this: ServerCommunitiesController,
-  { user, community }: CreateCommunityOptions
+  { user, community }: CreateCommunityOptions,
 ): Promise<CreateCommunityResult> {
   if (!user) {
     throw new AppError('Not signed in');
@@ -101,7 +105,7 @@ export async function __createCommunity(
   if (!community.id || !community.id.trim()) {
     throw new AppError(Errors.NoId);
   }
-  if (community.id === ALL_CHAINS) {
+  if (community.id === ALL_COMMUNITIES) {
     throw new AppError(Errors.ReservedId);
   }
   if (!community.name || !community.name.trim()) {
@@ -126,10 +130,10 @@ export async function __createCommunity(
   if (community.icon_url) {
     await checkUrlFileSize(community.icon_url, MAX_COMMUNITY_IMAGE_SIZE_BYTES);
   }
-  const existingBaseChain = await this.models.Community.findOne({
+  const existingBaseCommunity = await this.models.Community.findOne({
     where: { base: community.base },
   });
-  if (!existingBaseChain) {
+  if (!existingBaseCommunity) {
     throw new AppError(Errors.InvalidBase);
   }
 
@@ -141,6 +145,7 @@ export async function __createCommunity(
   let altWalletUrl = community.alt_wallet_url;
   let privateUrl: string | undefined;
   let sanitizedSpec;
+  let hex;
 
   // always generate a chain id
   if (community.base === ChainBase.Ethereum) {
@@ -148,42 +153,6 @@ export async function __createCommunity(
       throw new AppError(Errors.InvalidChainId);
     }
     eth_chain_id = +community.eth_chain_id;
-  }
-
-  // cosmos_chain_id is the canonical identifier for a cosmos chain.
-  if (community.base === ChainBase.CosmosSDK) {
-    // Our convention is to follow the "chain_name" standard established by the
-    // Cosmos Chain Registry:
-    // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
-    // This community-led registry seeks to track chain info for all Cosmos chains.
-    // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
-    // It is a lowercase alphanumeric name, like 'osmosis'.
-    // See: https://github.com/hicommonwealth/commonwealth/issues/4951
-    cosmos_chain_id = community.cosmos_chain_id;
-
-    if (!cosmos_chain_id) {
-      throw new AppError(Errors.CosmosChainNameRequired);
-    } else {
-      const oldChainNode = await this.models.ChainNode.findOne({
-        where: { cosmos_chain_id },
-      });
-      if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
-        throw new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`);
-      }
-    }
-
-    const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
-    const { data: chains } = await axios.get(
-      `${REGISTRY_API_URL}/api/v1/mainnet`
-    );
-    const foundRegisteredChain = chains?.find(
-      (chain) => chain === cosmos_chain_id
-    );
-    if (!foundRegisteredChain) {
-      throw new AppError(
-        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`
-      );
-    }
   }
 
   // if not offchain, also validate the address
@@ -208,7 +177,7 @@ export async function __createCommunity(
     }
     if (!node && !url) {
       // must provide at least url to create a new node
-      throw new AppError(Errors.InvalidChainIdOrUrl);
+      throw new AppError(Errors.InvalidCommunityIdOrUrl);
     }
     if (node) {
       url = node.url;
@@ -257,6 +226,39 @@ export async function __createCommunity(
     community.base === ChainBase.CosmosSDK &&
     community.type !== ChainType.Offchain
   ) {
+    // cosmos_chain_id is the canonical identifier for a cosmos chain.
+    // Our convention is to follow the "chain_name" standard established by the
+    // Cosmos Chain Registry:
+    // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
+    // This community-led registry seeks to track chain info for all Cosmos chains.
+    // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
+    // It is a lowercase alphanumeric name, like 'osmosis'.
+    // See: https://github.com/hicommonwealth/commonwealth/issues/4951
+    cosmos_chain_id = community.cosmos_chain_id || null;
+
+    if (!cosmos_chain_id) {
+      throw new AppError(Errors.CosmosChainNameRequired);
+    } else {
+      const oldChainNode = await this.models.ChainNode.findOne({
+        where: { cosmos_chain_id },
+      });
+      if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
+        throw new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`);
+      }
+    }
+
+    const { data: chains } = await axios.get(
+      `${COSMOS_REGISTRY_API}/api/v1/mainnet`,
+    );
+    const foundRegisteredChain = chains?.find(
+      (chain) => chain === cosmos_chain_id,
+    );
+    if (!foundRegisteredChain) {
+      throw new AppError(
+        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
+      );
+    }
+
     // test cosmos endpoint validity -- must be http(s)
     if (!urlHasValidHTTPPrefix(url)) {
       throw new AppError(Errors.InvalidNodeUrl);
@@ -322,20 +324,20 @@ export async function __createCommunity(
     throw new AppError(Errors.InvalidIconUrl);
   }
 
-  const oldChain = await this.models.Community.findOne({
+  const oldCommunity = await this.models.Community.findOne({
     where: { [Op.or]: [{ name: community.name }, { id: community.id }] },
   });
-  if (oldChain && oldChain.id === community.id) {
-    throw new AppError(Errors.ChainIDExists);
+  if (oldCommunity && oldCommunity.id === community.id) {
+    throw new AppError(Errors.CommunityIDExists);
   }
-  if (oldChain && oldChain.name === community.name) {
-    throw new AppError(Errors.ChainNameExists);
+  if (oldCommunity && oldCommunity.name === community.name) {
+    throw new AppError(Errors.CommunityNameExists);
   }
 
   const [node] = await this.models.ChainNode.scope(
-    'withPrivateData'
+    'withPrivateData',
   ).findOrCreate({
-    where: { [Op.or]: [{ url }, { eth_chain_id }] },
+    where: { url },
     defaults: {
       url,
       eth_chain_id,
@@ -360,7 +362,7 @@ export async function __createCommunity(
     },
   });
 
-  const chain = await this.models.Community.create({
+  const createdCommunity = await this.models.Community.create({
     id,
     name,
     default_symbol,
@@ -400,26 +402,26 @@ export async function __createCommunity(
         address: community.address,
         chain_node_id: node.id,
         decimals: community.decimals,
-        token_name: chain.token_name,
-        symbol: chain.default_symbol,
-        type: chain.network,
-        abi_id: chain.network === 'erc20' ? erc20Abi?.id : null,
+        token_name: createdCommunity.token_name,
+        symbol: createdCommunity.default_symbol,
+        type: createdCommunity.network,
+        abi_id: createdCommunity.network === 'erc20' ? erc20Abi?.id : null,
       },
     });
 
     await this.models.CommunityContract.create({
-      chain_id: chain.id,
+      chain_id: createdCommunity.id,
       contract_id: contract.id,
     });
 
-    chain.Contract = contract;
+    createdCommunity.Contract = contract;
   }
 
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
   await this.models.Topic.create({
-    chain_id: chain.id,
+    chain_id: createdCommunity.id,
     name: 'General',
     featured_in_sidebar: true,
   });
@@ -429,9 +431,9 @@ export async function __createCommunity(
   let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
 
-  if (chain.base === ChainBase.Ethereum) {
+  if (createdCommunity.base === ChainBase.Ethereum) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -442,14 +444,14 @@ export async function __createCommunity(
       include: [
         {
           model: this.models.Community,
-          where: { base: chain.base },
+          where: { base: createdCommunity.base },
           required: true,
         },
       ],
     });
-  } else if (chain.base === ChainBase.NEAR) {
+  } else if (createdCommunity.base === ChainBase.NEAR) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -460,14 +462,14 @@ export async function __createCommunity(
       include: [
         {
           model: this.models.Community,
-          where: { base: chain.base },
+          where: { base: createdCommunity.base },
           required: true,
         },
       ],
     });
-  } else if (chain.base === ChainBase.Solana) {
+  } else if (createdCommunity.base === ChainBase.Solana) {
     addressToBeAdmin = await this.models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: {
         user_id: user.id,
@@ -479,7 +481,28 @@ export async function __createCommunity(
       include: [
         {
           model: this.models.Community,
-          where: { base: chain.base },
+          where: { base: createdCommunity.base },
+          required: true,
+        },
+      ],
+    });
+  } else if (
+    createdCommunity.base === ChainBase.CosmosSDK &&
+    // Onchain community can be created by Admin only,
+    // but we allow offchain cmty to have any creator as admin:
+    community.type === ChainType.Offchain
+  ) {
+    // if signed in with Keplr or Magic:
+    addressToBeAdmin = await this.models.Address.scope(
+      'withPrivateData',
+    ).findOne({
+      where: {
+        user_id: user.id,
+      },
+      include: [
+        {
+          model: this.models.Community,
+          where: { base: createdCommunity.base },
           required: true,
         },
       ],
@@ -487,11 +510,16 @@ export async function __createCommunity(
   }
 
   if (addressToBeAdmin) {
+    if (createdCommunity.base === ChainBase.CosmosSDK) {
+      hex = await bech32ToHex(addressToBeAdmin.address);
+    }
+
     const newAddress = await this.models.Address.create({
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
-      community_id: chain.id,
+      community_id: createdCommunity.id,
+      hex,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,
@@ -504,24 +532,24 @@ export async function __createCommunity(
 
     role = new RoleInstanceWithPermission(
       { community_role_id: 0, address_id: newAddress.id },
-      chain.id,
+      createdCommunity.id,
       'admin',
       0,
-      0
+      0,
     );
 
     await this.models.Subscription.findOrCreate({
       where: {
         subscriber_id: user.id,
         category_id: NotificationCategories.NewThread,
-        chain_id: chain.id,
+        chain_id: createdCommunity.id,
         is_active: true,
       },
     });
   }
 
   return {
-    chain: chain.toJSON(),
+    community: createdCommunity.toJSON(),
     node: nodeJSON,
     role: role?.toJSON(),
     admin_address: addressToBeAdmin?.address,
