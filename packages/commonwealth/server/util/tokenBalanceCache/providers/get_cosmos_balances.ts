@@ -22,6 +22,8 @@ export type GetCosmosBalanceOptions = {
 export async function __getCosmosNativeBalances(
   options: GetCosmosBalanceOptions,
 ): Promise<Balances> {
+  if (options.addresses.length === 0) return {};
+
   let tmClient: Tendermint34Client;
   if (options.addresses.length > 1) {
     const batchClient = new HttpBatchClient(
