@@ -102,7 +102,7 @@ export async function __updateCommunity(
     snapshot = [];
   }
 
-  const invalidSocialLinks = social_links.filter(
+  const invalidSocialLinks = social_links?.filter(
     (s) => !urlHasValidHTTPPrefix(s),
   );
   if (social_links && invalidSocialLinks.length > 0) {
@@ -175,7 +175,8 @@ export async function __updateCommunity(
   if (icon_url) chain.icon_url = icon_url;
   if (active !== undefined) chain.active = active;
   if (type) chain.type = type;
-  if (social_links !== null) chain.social_links = social_links;
+  if (social_links !== undefined && social_links.length > 0)
+    chain.social_links = social_links;
   if (hide_projects) chain.hide_projects = hide_projects;
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;

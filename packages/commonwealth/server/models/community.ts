@@ -28,7 +28,7 @@ export type CommunityAttributes = {
   type: ChainType;
   id?: string;
   description?: string;
-  social_links: string[];
+  social_links?: string[];
   ss58_prefix?: number;
   stages_enabled?: boolean;
   custom_stages?: string;
