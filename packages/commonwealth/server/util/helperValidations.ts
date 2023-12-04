@@ -1,5 +1,5 @@
-import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { body, oneOf, query } from 'express-validator';
+import { needParamErrMsg } from '../api/extApiTypes';
 
 const optionalAddress = (base) => {
   return [
@@ -8,7 +8,7 @@ const optionalAddress = (base) => {
         query(`${base}.*.address`).exists().toArray(),
         query(`${base}.*.address_id`).exists().toArray(),
       ],
-      `${needParamErrMsg} (address, address_id)`
+      `${needParamErrMsg} (address, address_id)`,
     ),
   ];
 };
@@ -59,4 +59,3 @@ export const postTopicsValidation = [
   body('comments.*.updated_at').not().exists(),
   body('comments.*.deleted_at').not().exists(),
 ];
-

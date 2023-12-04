@@ -26,12 +26,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-      ): Promise<string> {
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable */
+      {
         return '2000';
       },
     };
@@ -60,12 +64,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-      ): Promise<string> {
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable */
+      {
         return '2';
       },
     };
@@ -93,12 +101,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-      ): Promise<string> {
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable */
+      {
         return '2000';
       },
     };
@@ -127,12 +139,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-      ): Promise<string> {
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable */
+      {
         return '1';
       },
     };
@@ -162,12 +178,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-      ): Promise<string> {
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable */
+      {
         return '1000';
       },
     };
@@ -255,12 +275,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-      ): Promise<string> {
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable */
+      {
         if (network == ChainNetwork.ERC20) {
           return '3000';
         } else if (network == ChainNetwork.ERC721) {
@@ -322,12 +346,16 @@ describe('validateGroupMembership', () => {
       },
     ];
     const tbc = {
+      /* eslint-disable */
       fetchUserBalanceWithChain: async function (
         network,
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-      ): Promise<string> {
+        tokenId?: string
+      ): Promise<string>
+      /* eslint-enable */
+      {
         if (network == ChainNetwork.ERC20) {
           return '3000';
         } else if (network == ChainNetwork.ERC721) {

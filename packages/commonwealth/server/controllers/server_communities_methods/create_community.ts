@@ -108,6 +108,7 @@ export async function __createCommunity(
   let altWalletUrl = community.alt_wallet_url;
   let privateUrl: string | undefined;
   let sanitizedSpec;
+  let hex;
 
   // always generate a chain id
   if (community.base === ChainBase.Ethereum) {
@@ -469,11 +470,16 @@ export async function __createCommunity(
   }
 
   if (addressToBeAdmin) {
+    if (createdCommunity.base === ChainBase.CosmosSDK) {
+      hex = await bech32ToHex(addressToBeAdmin.address);
+    }
+
     const newAddress = await this.models.Address.create({
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
       community_id: createdCommunity.id,
+      hex,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,

@@ -45,8 +45,8 @@ export async function __refreshCommunityMemberships(
     },
   });
 
-  const toCreate = [];
-  const toUpdate = [];
+  const toCreate: MembershipAttributes[] = [];
+  const toUpdate: MembershipAttributes[] = [];
 
   const processMembership = async (
     address: AddressAttributes,
@@ -95,7 +95,7 @@ export async function __refreshCommunityMemberships(
     const computedMembership = {
       group_id: currentGroup.id,
       address_id: address.id,
-      reject_reason: isValid ? null : JSON.stringify(messages),
+      reject_reason: isValid ? null : JSON.stringify(messages).slice(0, 1024),
       last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
     };
     return computedMembership;

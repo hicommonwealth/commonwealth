@@ -1,6 +1,6 @@
 # Code Style
 
-This is the starter page for the Commonwealth Code Style Guide.
+This is the starter page for the Commonwealth Code Style Guide. As of 231109, it is considered under development and far from comprehensive!
 
 Unless otherwise noted, code styles in this guideline are for NodeJS & TypeScript. It is expected that engineers are already familiar with and follow the official [[TypeScript style guide](https://github.com/microsoft/TypeScript/wiki/Coding-guidelines)](<https://github.com/microsoft/TypeScript/wiki/Coding-guidelines>) which this document supplements.
 
