@@ -128,9 +128,11 @@ export class MockRabbitMQController extends AbstractRabbitMQController {
     const config =
       this._rabbitMQConfig.vhosts[Object.keys(this._rabbitMQConfig.vhosts)[0]];
     const { exchange, routingKey } = config.publications[publication];
-    const queue = Object.values(config.bindings).find(
-      (binding) =>
-        binding.source === exchange && binding.bindingKey === routingKey,
+    const queue = (
+      Object.values(config.bindings).find(
+        (binding: Rascal.BindingConfig) =>
+          binding.source === exchange && binding.bindingKey === routingKey,
+      ) as Rascal.BindingConfig
     ).destination;
 
     if (!queue) {

@@ -11,6 +11,7 @@ import { DB } from '../../models';
 import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
 import { rollbar } from '../rollbar';
 import { __getCosmosNativeBalances } from './providers/get_cosmos_balances';
+import { __getCw721Balances } from './providers/get_cw721_balances';
 import { __getErc1155Balances } from './providers/get_erc1155_balances';
 import { __getErc20Balances } from './providers/get_erc20_balances';
 import { __getErc721Balances } from './providers/get_erc721_balances';
@@ -42,7 +43,10 @@ export class TokenBalanceCache {
     let balances: Balances = {};
 
     try {
-      if (options.balanceSourceType === BalanceSourceType.CosmosNative) {
+      if (
+        options.balanceSourceType === BalanceSourceType.CosmosNative ||
+        options.balanceSourceType === BalanceSourceType.CW721
+      ) {
         balances = await this.getCosmosBalances(options);
       } else {
         balances = await this.getEvmBalances(options);
@@ -113,6 +117,7 @@ export class TokenBalanceCache {
         }
       }
     }
+
     const validatedAddresses = Object.keys(addressMap);
     if (validatedAddresses.length === 0) return {};
 
@@ -120,11 +125,25 @@ export class TokenBalanceCache {
       options,
       validatedAddresses,
     );
-    const freshBalances = await __getCosmosNativeBalances.call(this, {
-      chainNode,
-      addresses: validatedAddresses,
-      batchSize: options.batchSize,
-    });
+
+    let freshBalances = {};
+    switch (options.balanceSourceType) {
+      case BalanceSourceType.CosmosNative:
+        freshBalances = await __getCosmosNativeBalances.call(this, {
+          chainNode,
+          addresses: validatedAddresses,
+          batchSize: options.batchSize,
+        });
+        break;
+      case BalanceSourceType.CW721:
+        freshBalances = await __getCw721Balances.call(this, {
+          chainNode,
+          addresses: validatedAddresses,
+          contractAddress: options.sourceOptions.contractAddress,
+          batchSize: options.batchSize,
+        });
+        break;
+    }
 
     await this.cacheBalances(options, freshBalances);
 
@@ -286,6 +305,11 @@ export class TokenBalanceCache {
         );
       case BalanceSourceType.CosmosNative:
         return `${options.sourceOptions.cosmosChainId}_${address}`;
+      case BalanceSourceType.CW721:
+        return (
+          `${options.sourceOptions.cosmosChainId}_` +
+          `${options.sourceOptions.contractAddress}_${address}`
+        );
     }
   }
 
