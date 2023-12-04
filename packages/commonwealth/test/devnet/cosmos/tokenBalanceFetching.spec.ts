@@ -21,8 +21,6 @@ chaiUse(chaiAsPromised);
 // same mnemonic as defined in cosmos-chain-testing bootstrap files
 const addressOneMnemonic =
   'jewel disease neglect feel mother dry hire yellow minute main tray famous';
-const addressTwoMnemonic =
-  'wild science ski despair vault sure check car donate slush way window';
 
 describe('Token Balance Cache Cosmos Tests', function () {
   this.timeout(80_000);
