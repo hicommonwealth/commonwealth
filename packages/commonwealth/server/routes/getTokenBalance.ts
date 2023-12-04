@@ -1,9 +1,9 @@
-import type { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
+import { query, validationResult } from 'express-validator';
 import type {
   TokenBalanceCache,
   TokenBalanceResp,
 } from 'token-balance-cache/src';
-import { query, validationResult } from 'express-validator';
+import type { GetTokenBalanceReq } from '../api/extApiTypes';
 import type { DB } from '../models';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { failure, success } from '../types';
@@ -18,7 +18,7 @@ export const getTokenBalance = async (
   models: DB,
   tbc: TokenBalanceCache,
   req: TypedRequestQuery<GetTokenBalanceReq>,
-  res: TypedResponse<TokenBalanceResp>
+  res: TypedResponse<TokenBalanceResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -31,7 +31,7 @@ export const getTokenBalance = async (
     chain_node_id,
     addresses,
     balance_provider,
-    opts
+    opts,
   );
 
   return success(res, results);

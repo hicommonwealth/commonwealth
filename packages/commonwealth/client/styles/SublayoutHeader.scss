@@ -70,6 +70,10 @@ html.todesktop .SublayoutHeader {
       @include extraSmall {
         display: flex;
       }
+
+      @include smallInclusive {
+        display: flex;
+      }
     }
 
     .DesktopMenuContainer {
@@ -100,8 +104,16 @@ html.todesktop .SublayoutHeader {
       @include extraSmall {
         display: none;
       }
+
+      @include smallInclusive {
+        display: none;
+      }
     }
 
+    .Button {
+      -webkit-app-region: no-drag;
+    }
+    
     .LoginSelector {
       -webkit-app-region: no-drag;
     }
