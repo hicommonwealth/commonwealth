@@ -17,6 +17,7 @@ async function checkIconSize(val, ctx) {
       code: z.ZodIssueCode.custom,
       message: "Image url provided doesn't exist",
     });
+    return;
   }
   if (fileSizeBytes >= MAX_COMMUNITY_IMAGE_SIZE_KB * 1024) {
     ctx.addIssue({
@@ -54,9 +55,7 @@ export const createCommunitySchema = z.object({
   icon_url: z
     .string()
     .url()
-    .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
-    .or(z.string().max(0))
-    .optional(),
+    .superRefine(async (val, ctx) => await checkIconSize(val, ctx)),
   social_links: z.array(z.string().url()).optional(),
   tags: z.array(z.nativeEnum(ChainCategoryType)).default([]),
   directory_page_enabled: z.boolean().default(false),
