@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { SnapshotProposalAttributes } from 'shared/types';
+import type { SnapshotProposalAttributes } from '../../shared/types';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type SnapshotProposalInstance =
