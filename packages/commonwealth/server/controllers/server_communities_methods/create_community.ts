@@ -14,7 +14,7 @@ import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { z } from 'zod';
 import { createCommunitySchema } from '../../../shared/schemas/createCommunitySchema';
-import { urlHasValidHTTPPrefix } from '../../../shared/utils';
+import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import { COSMOS_REGISTRY_API } from '../../config';
 import type { AddressInstance } from '../../models/address';
