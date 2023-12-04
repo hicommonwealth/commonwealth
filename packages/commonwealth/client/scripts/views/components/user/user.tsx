@@ -99,6 +99,8 @@ export const User = ({
         ) : (
           'Anonymous'
         )
+      ) : !profile?.address ? (
+        'Addr. Removed'
       ) : !profile?.id ? (
         redactedAddress
       ) : !shouldShowAddressWithDisplayName ? (
@@ -206,8 +208,9 @@ export const User = ({
           </div>
           <div className="user-address">
             {profile?.address ? redactedAddress : 'Address removed'}
+            {/* {profile?.address && redactedAddress} */}
           </div>
-          {friendlyChainName && (
+          {friendlyChainName && profile?.address && (
             <div className="user-chain">{friendlyChainName}</div>
           )}
           {roleTags}
