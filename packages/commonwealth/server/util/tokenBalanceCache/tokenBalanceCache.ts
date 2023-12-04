@@ -94,6 +94,7 @@ export class TokenBalanceCache {
     const freshBalances = await __getCosmosNativeBalances.call(this, {
       chainNode,
       addresses: validatedAddresses,
+      batchSize: options.batchSize,
     });
 
     await this.cacheBalances(options, freshBalances);
