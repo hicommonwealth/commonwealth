@@ -123,7 +123,6 @@ describe('Token Balance Cache Cosmos Tests', function () {
       const denom = params?.bondDenom;
       const { amount } = await api.bank.balance(addressOne, denom);
       const originalAddressOneBalance = amount;
-      console.log('Original Balance', amount);
 
       const balance = await tbc.getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
@@ -133,7 +132,6 @@ describe('Token Balance Cache Cosmos Tests', function () {
         },
         cacheRefresh: true,
       });
-      console.log('Balance One:', balance);
       expect(Object.keys(balance).length).to.equal(1);
       expect(balance[addressOne]).to.equal(originalAddressOneBalance);
 
