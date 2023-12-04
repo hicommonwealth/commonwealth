@@ -107,6 +107,7 @@ export default (
       social_links: {
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: false,
+        defaultValue: [],
       },
       default_symbol: { type: dataTypes.STRING, allowNull: false },
       network: { type: dataTypes.STRING, allowNull: false },
