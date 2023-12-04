@@ -108,6 +108,19 @@ const CWTextInput = (props: TextInputProps) => {
   const formFieldErrorMessage =
     hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
+  const validateValue = (inputVal: string) => {
+    if (inputValidationFn) {
+      if (inputVal?.length === 0) {
+        validationProps.setValidationStatus(undefined);
+        validationProps.setStatusMessage(undefined);
+      } else {
+        const result = inputValidationFn(inputVal);
+        validationProps.setValidationStatus(result[0]);
+        validationProps.setStatusMessage(result[1]);
+      }
+    }
+  };
+
   return (
     <div
       className={getClasses<{
@@ -134,7 +147,7 @@ const CWTextInput = (props: TextInputProps) => {
         {iconLeftonClick && iconLeft ? (
           <div className="text-input-left-onClick-icon">{iconLeft}</div>
         ) : iconLeft ? (
-          <div className="text-input-left-icon">{iconLeft}</div>
+          <div className="text-input-icon text-input-left-icon">{iconLeft}</div>
         ) : null}
         <input
           ref={inputRef}
@@ -161,37 +174,14 @@ const CWTextInput = (props: TextInputProps) => {
           onInput={(e: any) => {
             if (onInput) onInput(e);
 
-            if (e.target.value?.length === 0) {
-              validationProps.setValidationStatus(undefined);
-              validationProps.setStatusMessage(undefined);
-            } else {
-              e.stopPropagation();
-              clearTimeout(validationProps.inputTimeout);
-              const timeout = e.target.value?.length > 3 ? 250 : 1000;
-              validationProps.setInputTimeout(
-                setTimeout(() => {
-                  if (inputValidationFn && e.target.value?.length > 3) {
-                    const result = inputValidationFn(e.target.value);
-                    validationProps.setValidationStatus(result[0]);
-                    validationProps.setStatusMessage(result[1]);
-                  }
-                }, timeout),
-              );
-            }
+            e.stopPropagation();
+
+            validateValue(e.target.value);
           }}
           onBlur={(e) => {
             if (hookToForm) formFieldContext?.onBlur?.(e);
 
-            if (inputValidationFn) {
-              if (e.target.value?.length === 0) {
-                validationProps.setValidationStatus(undefined);
-                validationProps.setStatusMessage(undefined);
-              } else {
-                const result = inputValidationFn(e.target.value);
-                validationProps.setValidationStatus(result[0]);
-                validationProps.setStatusMessage(result[1]);
-              }
-            }
+            validateValue(e.target.value);
           }}
           onKeyDown={(e) => {
             if (onenterkey && (e.key === 'Enter' || e.keyCode === 13)) {
@@ -204,7 +194,9 @@ const CWTextInput = (props: TextInputProps) => {
         {iconRightonClick && iconRight ? (
           <div className="text-input-right-onClick-icon">{iconRight}</div>
         ) : iconRight ? (
-          <div className="text-input-right-icon">{iconRight}</div>
+          <div className="text-input-icon text-input-right-icon">
+            {iconRight}
+          </div>
         ) : null}
       </div>
       {label && (
