@@ -38,7 +38,12 @@ export const createCommunitySchema = z.object({
   community_namespace: z
     .object({
       namespace: z.string().optional(),
-      tx_receipt: z.any().optional(), // this comes from NamespaceFactory#deployNamespace
+      tx_receipt: z
+        .object({
+          transactionHash: z.string(),
+          blockNumber: z.number(),
+        })
+        .optional(), // this comes from NamespaceFactory#deployNamespace
     })
     .refine(
       (data) => !!data.namespace === !!data.tx_receipt,
