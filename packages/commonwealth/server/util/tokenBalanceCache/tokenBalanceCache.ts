@@ -155,6 +155,7 @@ export class TokenBalanceCache {
         freshBalances = await __getEthBalances.call(this, {
           chainNode,
           addresses: validatedAddresses,
+          batchSize: options.batchSize,
         });
         break;
       case BalanceSourceType.ERC20:
@@ -162,6 +163,7 @@ export class TokenBalanceCache {
           chainNode,
           addresses: validatedAddresses,
           contractAddress: options.sourceOptions.contractAddress,
+          batchSize: options.batchSize,
         });
         break;
       case BalanceSourceType.ERC721:
@@ -169,6 +171,7 @@ export class TokenBalanceCache {
           chainNode,
           addresses: validatedAddresses,
           contractAddress: options.sourceOptions.contractAddress,
+          batchSize: options.batchSize,
         });
         break;
       case BalanceSourceType.ERC1155:
@@ -177,6 +180,7 @@ export class TokenBalanceCache {
           addresses: validatedAddresses,
           contractAddress: options.sourceOptions.contractAddress,
           tokenId: options.sourceOptions.tokenId,
+          batchSize: options.batchSize,
         });
         break;
     }

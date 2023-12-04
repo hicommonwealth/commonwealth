@@ -8,6 +8,7 @@ type GetEvmBalancesBase = {
     evmChainId: number;
   };
   cacheRefresh?: boolean;
+  batchSize?: number;
 };
 type GetErc20BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC20;
