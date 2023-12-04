@@ -7,6 +7,7 @@ import {
   setupStakingExtension,
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import BN from 'bn.js';
 import { use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { RedisCache } from 'common-common/src/redisCache';
@@ -99,7 +100,7 @@ describe('Token Balance Cache Cosmos Tests', function () {
     expect(balances[addressTwo]).to.equal(addressTwoBalance);
   });
 
-  describe.only('Caching', () => {
+  describe('Caching', () => {
     const balanceTTL = 20;
 
     before('Set TBC caching TTL and reset Redis', async () => {
@@ -147,16 +148,10 @@ describe('Token Balance Cache Cosmos Tests', function () {
         wallet,
       );
       const transferAmount = coins(76, denom);
-      const result = await client.sendTokens(
-        addressOne,
-        addressTwo,
-        transferAmount,
-        {
-          amount: coins(500, denom),
-          gas: '200000',
-        },
-      );
-      console.log('Transfer TXN:', result);
+      await client.sendTokens(addressOne, addressTwo, transferAmount, {
+        amount: coins(500, denom),
+        gas: '200000',
+      });
 
       const balanceTwo = await tbc.getBalances({
         balanceSourceType: BalanceSourceType.CosmosNative,
@@ -165,7 +160,6 @@ describe('Token Balance Cache Cosmos Tests', function () {
           cosmosChainId,
         },
       });
-      console.log('Balance Two:', balanceTwo);
       expect(Object.keys(balanceTwo).length).to.equal(1);
       expect(balanceTwo[addressOne]).to.equal(originalAddressOneBalance);
       await delay(20000);
@@ -177,9 +171,11 @@ describe('Token Balance Cache Cosmos Tests', function () {
           cosmosChainId,
         },
       });
-      console.log('Balance Three:', balanceThree);
+      const finalBn = new BN(originalAddressOneBalance);
       expect(Object.keys(balanceThree).length).to.equal(1);
-      expect(balanceThree[addressOne]).to.equal('20');
+      expect(balanceThree[addressOne]).to.equal(
+        finalBn.subn(500).subn(76).toString(10),
+      );
     });
   });
 });

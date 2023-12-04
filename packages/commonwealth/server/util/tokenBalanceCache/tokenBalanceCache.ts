@@ -62,6 +62,13 @@ export class TokenBalanceCache {
       },
     });
 
+    if (!chainNode) {
+      const msg = `ChainNode with cosmos_chain_id ${options.sourceOptions.cosmosChainId} does not exist`;
+      log.error(msg);
+      rollbar.error(msg);
+      return {};
+    }
+
     // maps an encoded address to a decoded address to avoid having to decode
     // all addresses twice before returning
     const addressMap: { [encodedAddress: string]: string } = {};
@@ -134,6 +141,13 @@ export class TokenBalanceCache {
         eth_chain_id: options.sourceOptions.evmChainId,
       },
     });
+
+    if (!chainNode) {
+      const msg = `ChainNode with eth_chain_id ${options.sourceOptions.evmChainId} does not exist`;
+      log.error(msg);
+      rollbar.error(msg);
+      return {};
+    }
 
     let freshBalances: Balances = {};
     switch (options.balanceSourceType) {
