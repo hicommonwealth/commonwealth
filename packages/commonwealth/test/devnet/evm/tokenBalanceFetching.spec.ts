@@ -29,7 +29,7 @@ async function resetChainNode(ethChainId: number) {
 
 function generateEVMAddresses(count: number): string[] {
   const web3 = new Web3();
-  let addresses: string[] = [];
+  const addresses: string[] = [];
 
   for (let i = 0; i < count; i++) {
     const account = web3.eth.accounts.create();

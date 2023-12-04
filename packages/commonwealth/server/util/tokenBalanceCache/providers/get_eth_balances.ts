@@ -84,7 +84,7 @@ async function getOffChainBatchEthBalances(
     },
     {
       method: 'eth_getBalance',
-      getParams: (abiCoder, address, tokenAddress) => {
+      getParams: (_abiCoder, address, _tokenAddress) => {
         return address;
       },
       batchSize,
