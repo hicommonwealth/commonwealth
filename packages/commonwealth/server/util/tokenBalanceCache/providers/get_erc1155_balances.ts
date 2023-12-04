@@ -106,7 +106,7 @@ async function getOnChainBatchErc1155Balances(
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
       const endIndex = Math.min(data.id + BATCH_SIZE, addresses.length);
-      const relevantAddresses = addresses.splice(data.id, endIndex);
+      const relevantAddresses = addresses.slice(data.id, endIndex);
       relevantAddresses.forEach(
         (key, i) => (addressBalanceMap[key] = balances[i]),
       );

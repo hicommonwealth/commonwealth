@@ -194,7 +194,7 @@ export async function evmBalanceFetcherBatching(
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
       const endIndex = Math.min(data.id + rpc.batchSize, addresses.length);
-      const relevantAddresses = addresses.splice(data.id, endIndex);
+      const relevantAddresses = addresses.slice(data.id, endIndex);
 
       if (data.error) {
         failedAddresses = [...failedAddresses, ...relevantAddresses];
