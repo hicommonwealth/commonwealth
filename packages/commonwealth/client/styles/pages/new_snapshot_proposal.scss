@@ -11,6 +11,10 @@
     width: 100%;
   }
 
+  @include smallInclusive {
+    padding: 16px;
+  }
+
   .date-range {
     display: flex;
     flex-direction: column;
