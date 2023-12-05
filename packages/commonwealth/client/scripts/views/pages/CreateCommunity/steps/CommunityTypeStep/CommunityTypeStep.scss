@@ -1,3 +1,9 @@
 .CommunityTypeStep {
-  background-color: white;
+
+
+  .selectors-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
 }
