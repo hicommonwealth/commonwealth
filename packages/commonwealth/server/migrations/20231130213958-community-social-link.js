@@ -14,6 +14,16 @@ module.exports = {
         { transaction },
       );
 
+      await queryInterface.addColumn(
+        'Communities',
+        'namespace',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
+
       // Update existing records to merge discord, website, telegram, and github into social_links
       await queryInterface.sequelize.query(
         `
@@ -96,6 +106,10 @@ module.exports = {
       );
 
       await queryInterface.removeColumn('Communities', 'social_links', {
+        transaction,
+      });
+
+      await queryInterface.removeColumn('Communities', 'namespace', {
         transaction,
       });
     });
