@@ -410,7 +410,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               onInput={(e) => {
                 setDraftTitle(e.target.value);
               }}
-              defaultValue={thread.title}
+              value={draftTitle || thread.title}
             />
           ) : (
             thread.title
