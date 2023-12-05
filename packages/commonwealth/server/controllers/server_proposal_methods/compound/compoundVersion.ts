@@ -3,9 +3,11 @@ import {
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
+  GovernorCountingSimple,
   GovernorAlpha__factory,
   GovernorBravoDelegate__factory,
   GovernorCompatibilityBravo__factory,
+  GovernorCountingSimple__factory,
 } from 'common-common/src/eth/types';
 import { GovVersion } from './types';
 import { RedisCache } from 'common-common/src/redisCache';
@@ -13,7 +15,7 @@ import { RedisNamespaces } from 'common-common/src/types';
 
 type ContractAndVersion = {
   version: GovVersion;
-  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo;
+  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo | GovernorCountingSimple;
 }
 
 /**
@@ -51,9 +53,18 @@ async function deriveCompoundGovContractAndVersion(
         await contract.COUNTING_MODE();
         return { version: GovVersion.OzBravo, contract };
       } catch (e2) {
-        throw new Error(
-          `Failed to find Compound contract version at ${compoundGovAddress}`
-        );
+        try {
+          const contract = GovernorCountingSimple__factory.connect(
+            compoundGovAddress,
+            provider
+          );
+          await contract.COUNTING_MODE();
+          return { version: GovVersion.RawOz, contract };
+        } catch (e3) {
+          throw new Error(
+            `Failed to find Compound contract version at ${compoundGovAddress}`
+          );
+        }
       }
     }
   }
@@ -74,6 +85,11 @@ function getCompoundGovContract(
       );
     case GovVersion.OzBravo:
       return GovernorCompatibilityBravo__factory.connect(
+        compoundGovAddress,
+        provider
+      );
+    case GovVersion.RawOz:
+      return GovernorCountingSimple__factory.connect(
         compoundGovAddress,
         provider
       );

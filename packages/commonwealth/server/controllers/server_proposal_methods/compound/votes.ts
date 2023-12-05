@@ -5,6 +5,7 @@ import {
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
+  GovernorCountingSimple,
 } from 'common-common/src/eth/types';
 import { ICompoundVoteResponse } from 'adapters/chain/compound/types';
 import { RedisCache } from 'common-common/src/redisCache';
@@ -53,6 +54,23 @@ export async function getCompoundProposalVotes(
     });
   } else if (govVersion === GovVersion.Bravo) {
     const typedContract = <GovernorBravoDelegate>contract;
+    const proposal = await typedContract.proposals(proposalId);
+    events = await typedContract.queryFilter(
+      typedContract.filters.VoteCast(null, null, null, null, null),
+      +proposal.startBlock,
+      +proposal.endBlock
+    );
+    events = events.map((e) => {
+      return {
+        voter: e.args[0],
+        proposalId: e.args[1],
+        support: e.args[2],
+        votes: e.args[3],
+        reason: e.args[4],
+      };
+    });
+  } else if (govVersion === GovVersion.RawOz) {
+    const typedContract = <GovernorCountingSimple>contract;
     const proposal = await typedContract.proposals(proposalId);
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null, null),

@@ -5,6 +5,7 @@ export enum GovVersion {
   Alpha = 'alpha',
   Bravo = 'bravo',
   OzBravo = 'oz-bravo',
+  RawOz = 'raw-oz'
 }
 
 export type CompoundProposalType = {

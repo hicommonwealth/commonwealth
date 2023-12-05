@@ -3,6 +3,7 @@ import {
   GovernorAlpha,
   GovernorBravoDelegate,
   GovernorCompatibilityBravo,
+  GovernorCountingSimple,
 } from 'common-common/src/eth/types';
 import { TypedEvent } from 'common-common/src/eth/types/commons';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
@@ -146,7 +147,7 @@ async function getProposalAsync(
  * @param contract
  */
 async function getProposalDataSequentially(
-  contract: GovernorCompatibilityBravo | GovernorBravoDelegate
+  contract: GovernorCompatibilityBravo | GovernorBravoDelegate | GovernorCountingSimple
 ): Promise<ResolvedProposalPromises> {
   console.log('Fetching proposal data sequentially');
   const proposalCreatedEvents = await getProposalCreatedEvents(contract);
@@ -220,7 +221,7 @@ export function mapProposalCreatedEvent(
 }
 
 async function getProposalCreatedEvents(
-  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo,
+  contract: GovernorAlpha | GovernorBravoDelegate | GovernorCompatibilityBravo | GovernorCountingSimple,
   fromBlock = 0,
   toBlock: number | 'latest' = 'latest'
 ): Promise<ProposalCreatedEventArgsObject[]> {
