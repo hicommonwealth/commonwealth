@@ -7,12 +7,17 @@ export type OptionsWithBalances = {
   balances: Balances;
 };
 
+type TbcConfigOptions = {
+  cacheRefresh?: boolean;
+  batchSize?: number;
+};
+
 type GetEvmBalancesBase = {
   addresses: string[];
   sourceOptions: {
     evmChainId: number;
   };
-};
+} & TbcConfigOptions;
 type GetErc20BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC20;
   sourceOptions: {
@@ -52,7 +57,7 @@ export type GetCosmosBalancesOptions = {
   sourceOptions: {
     cosmosChainId: string;
   };
-};
+} & TbcConfigOptions;
 
 export type GetBalancesOptions =
   | GetEvmBalancesOptions
