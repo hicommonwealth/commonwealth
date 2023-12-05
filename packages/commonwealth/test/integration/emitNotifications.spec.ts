@@ -24,11 +24,12 @@ describe('emitNotifications tests', () => {
   // author_chain, which is required for authorship lookup.
   // Therefore, a valid chain MUST be included alongside
   // communityId, unlike in non-test thread creation
-  let thread, comment, reaction;
+  let thread, comment;
+  //reaction;
   const title = 'test title';
-  const body = 'test body';
+  // const body = 'test body';
   const commentBody = 'test';
-  const topicName = 'test topic';
+  // const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;
@@ -101,7 +102,8 @@ describe('emitNotifications tests', () => {
       chain,
     });
 
-    reaction = await models.Reaction.create({
+    //reaction = await models.Reaction.create({
+    await models.Reaction.create({
       chain,
       thread_id: thread.id,
       address_id: userAddressId,
@@ -384,7 +386,7 @@ describe('emitNotifications tests', () => {
         expire: String(1680869325),
       };
 
-      const eventType: SnapshotEventType = SnapshotEventType.Created;
+      // const eventType: SnapshotEventType = SnapshotEventType.Created;
       const notififcation_data: NotificationDataAndCategory = {
         categoryId: NotificationCategories.SnapshotProposal,
         data: {

@@ -129,6 +129,7 @@ type ExtendedNotificationRowProps = NotificationRowProps & {
   allRead: boolean;
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   const { handleSetMarkingRead, markingRead, notification, allRead } = props;
   const [isRead, setIsRead] = useState<boolean>(notification.isRead);
@@ -226,6 +227,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SnapshotNotificationRow = (
   props: ExtendedNotificationRowProps,
 ) => {
