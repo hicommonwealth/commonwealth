@@ -153,7 +153,7 @@ async function computeMembership(
   balances: OptionsWithBalances[],
 ): Promise<ComputedMembership> {
   const { requirements } = currentGroup;
-  const { isValid } = await validateGroupMembership(
+  const { isValid, messages } = await validateGroupMembership(
     address.address,
     requirements,
     balances,
@@ -161,8 +161,7 @@ async function computeMembership(
   const computedMembership = {
     group_id: currentGroup.id,
     address_id: address.id,
-    // reject_reason: isValid ? null : JSON.stringify(messages),
-    reject_reason: isValid ? null : 'Group membership validation failed',
+    reject_reason: isValid ? null : JSON.stringify(messages),
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
   };
   return computedMembership;
