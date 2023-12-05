@@ -85,7 +85,7 @@ const GatingGrowl = () => {
             className="checkboxText"
             isCentered
           >
-            Please don't show this again
+            {`Please don't show this again`}
           </CWText>
         </div>
       </div>
