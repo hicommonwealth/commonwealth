@@ -1,6 +1,11 @@
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { filterLinks } from 'helpers/threads';
 
+import {
+  chainEntityTypeToProposalName,
+  chainEntityTypeToProposalSlug,
+  getProposalUrlPath,
+} from 'identifiers';
 import { LinkSource } from 'models/Thread';
 import 'pages/view_thread/linked_proposals_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -13,7 +18,21 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
-import { LinkedProposal } from './LinkedProposal';
+
+type ThreadLinkProps = {
+  threadChain: string;
+  identifier: string;
+};
+
+const getThreadLink = ({ threadChain, identifier }: ThreadLinkProps) => {
+  const slug = chainEntityTypeToProposalSlug();
+
+  const threadLink = `${
+    app.isCustomDomain() ? '' : `/${threadChain}`
+  }${getProposalUrlPath(slug, identifier, true)}`;
+
+  return threadLink;
+};
 
 type LinkedProposalsCardProps = {
   showAddProposalButton: boolean;
@@ -90,21 +109,34 @@ export const LinkedProposalsCard = ({
                     <div className="linked-proposals">
                       {initialProposalLinks.map((l) => {
                         return (
-                          <LinkedProposal
+                          <ReactRouterLink
                             key={l.identifier}
-                            thread={thread}
-                            title={l.title}
-                            identifier={l.identifier}
-                          />
+                            to={getThreadLink({
+                              threadChain: thread.chain,
+                              identifier: l.identifier,
+                            })}
+                          >
+                            {`${
+                              l.title ??
+                              chainEntityTypeToProposalName() ??
+                              'Proposal'
+                            } #${l.identifier}`}
+                          </ReactRouterLink>
                         );
                       })}
                     </div>
                   )}
-                  {showSnapshot && (
-                    <ReactRouterLink to={snapshotUrl}>
-                      Snapshot: {initialSnapshotLinks[0].title ?? snapshotTitle}
-                    </ReactRouterLink>
-                  )}
+                  {showSnapshot &&
+                    (snapshotUrl ? (
+                      <ReactRouterLink to={snapshotUrl}>
+                        Snapshot:{' '}
+                        {initialSnapshotLinks[0].title ?? snapshotTitle}
+                      </ReactRouterLink>
+                    ) : (
+                      <div className="snapshot-spinner-container">
+                        <CWSpinner size="medium" />
+                      </div>
+                    ))}
                 </div>
               ) : (
                 <CWText type="b2" className="no-proposals-text">

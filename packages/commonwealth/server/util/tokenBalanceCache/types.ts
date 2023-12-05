@@ -7,6 +7,7 @@ type GetEvmBalancesBase = {
   sourceOptions: {
     evmChainId: number;
   };
+  cacheRefresh?: boolean;
 };
 type GetErc20BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC20;
@@ -24,7 +25,7 @@ type GetErc1155BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC1155;
   sourceOptions: {
     contractAddress: string;
-    tokenId: string;
+    tokenId: number;
   };
 };
 type GetEthNativeBalanceOptions = GetEvmBalancesBase & {
@@ -43,6 +44,7 @@ export type GetCosmosBalancesOptions = {
   sourceOptions: {
     cosmosChainId: string;
   };
+  cacheRefresh?: boolean;
 };
 
 export type GetBalancesOptions =

@@ -56,7 +56,7 @@ const NotificationSettingsPage = () => {
 
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
-  }, [app?.user.notifications, app.user.emailInterval]);
+  }, [forceRerender]);
 
   useEffect(() => {
     // bundled snapshot subscriptions
@@ -331,6 +331,7 @@ const NotificationSettingsPage = () => {
           const communityInfo = app.config.chains.getById(communityName);
           const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
           const hasSomeInAppSubs = subs.some((s) => s.isActive);
+
           return (
             <div
               className="notification-row chain-events-subscriptions-padding"
@@ -399,8 +400,11 @@ const NotificationSettingsPage = () => {
         .sort((x, y) => x[0].localeCompare(y[0]))
         .map(([communityName, subs]) => {
           const communityInfo = app?.config.chains.getById(communityName);
-          const hasSomeEmailSubs = subs.some((s) => s.immediateEmail);
-          const hasSomeInAppSubs = subs.some((s) => s.isActive);
+          const sortedSubs = subs.sort((a, b) =>
+            a.category.localeCompare(b.category),
+          );
+          const hasSomeEmailSubs = sortedSubs.some((s) => s.immediateEmail);
+          const hasSomeInAppSubs = sortedSubs.some((s) => s.isActive);
 
           if (!communityInfo?.id) return null; // handles incomplete loading case
 
@@ -596,7 +600,7 @@ const NotificationSettingsPage = () => {
                   <div className="avatar-and-name">
                     <img
                       className="snapshot-icon"
-                      src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`}
+                      src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}&image=true`}
                     />
                     <CWText type="h5" fontWeight="medium">
                       {space.name}

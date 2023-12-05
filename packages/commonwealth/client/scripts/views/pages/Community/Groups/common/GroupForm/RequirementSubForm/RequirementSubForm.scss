@@ -32,7 +32,6 @@
         max-width: 100% !important;
       }
     }
-
   }
 
   .row-2 {
@@ -59,5 +58,18 @@
 
   .cursor-pointer {
     cursor: pointer;
+  }
+
+  .cols-5 {
+    display: grid;
+    grid-template-columns: 0.75fr 2.25fr 1fr 0.5fr 0.5fr; // Equally divides the space into 5
+
+    @include mediumSmallInclusive {
+      grid-template-columns: initial;
+      grid-template-rows: repeat(
+        5,
+        1fr
+      ); // Stacks them vertically on smaller screens
+    }
   }
 }

@@ -2,6 +2,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useForceRerender from 'hooks/useForceRerender';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/discussions/index.scss';
 import 'pages/overview/index.scss';
 import React, { useEffect } from 'react';
 import app from 'state';
@@ -20,7 +21,7 @@ import { TopicSummaryRow } from './TopicSummaryRow';
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const forceRerender = useForceRerender();
-  const { isWindowExtraSmall } = useBrowserWindow({});
+  const { isWindowSmallInclusive } = useBrowserWindow({});
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
@@ -94,16 +95,7 @@ const OverviewPage = () => {
             }}
           />
         </div>
-        {isWindowExtraSmall ? (
-          <CWIconButton
-            iconName="plusCircle"
-            iconButtonTheme="black"
-            onClick={() => {
-              navigate('/new/discussion');
-            }}
-            disabled={!hasJoinedCommunity}
-          />
-        ) : (
+        {!isWindowSmallInclusive && (
           <CWButton
             buttonType="primary"
             buttonHeight="sm"
@@ -138,6 +130,19 @@ const OverviewPage = () => {
       {topicSummaryRows.map((row, i) => (
         <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
       ))}
+      {isWindowSmallInclusive && (
+        <div className="floating-mobile-button">
+          <CWIconButton
+            iconName="plusCircle"
+            iconButtonTheme="black"
+            iconSize="xl"
+            onClick={() => {
+              navigate('/new/discussion');
+            }}
+            disabled={!hasJoinedCommunity}
+          />
+        </div>
+      )}
     </div>
   );
 };

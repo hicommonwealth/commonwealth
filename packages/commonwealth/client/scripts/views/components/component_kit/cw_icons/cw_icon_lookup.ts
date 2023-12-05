@@ -69,7 +69,8 @@ export const iconLookup = {
   chatDots: withPhosphorIcon(ChatDots),
   check: Icons.CWCheck,
   checkCircle: withPhosphorIcon(CheckCircle),
-  checkCircleFilled: () => withPhosphorIcon(CheckCircle)({ weight: 'fill' }),
+  checkCircleFilled: (props) =>
+    withPhosphorIcon(CheckCircle)({ weight: 'fill', ...props }),
   chevronDown: Icons.CWChevronDown,
   chevronLeft: Icons.CWChevronLeft,
   chevronRight: Icons.CWChevronRight,
@@ -191,6 +192,7 @@ export const customIconLookup = {
   'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWMetaMask,
   keplr: CustomIcons.CWKeplr,
+  leap: CustomIcons.CWLeap,
   magic: CustomIcons.CWMagic,
   metamask: CustomIcons.CWMetaMask,
   near: CustomIcons.CWNearWallet,

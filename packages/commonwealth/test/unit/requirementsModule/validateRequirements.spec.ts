@@ -6,7 +6,7 @@ import {
 import validateRequirements from 'server/util/requirementsModule/validateRequirements';
 
 describe('validateRequirements', () => {
-  it('should pass as valid for ContractSource', () => {
+  it('should pass as valid for ERC20 ContractSource', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
@@ -16,6 +16,31 @@ describe('validateRequirements', () => {
             source_type: BalanceSourceType.ERC20,
             evm_chain_id: 1,
             contract_address: '0x0000000000000000000000000000000000000000',
+          },
+        },
+      },
+      {
+        rule: 'allow',
+        data: {
+          allow: ['0x0000000000000000000000000000000000000000'],
+        },
+      },
+    ];
+    const err = validateRequirements(requirements);
+    expect(err).to.be.null;
+  });
+
+  it('should pass as valid for ERC1155 ContractSource', () => {
+    const requirements: Requirement[] = [
+      {
+        rule: 'threshold',
+        data: {
+          threshold: '1000',
+          source: {
+            source_type: BalanceSourceType.ERC1155,
+            evm_chain_id: 1,
+            contract_address: '0x0000000000000000000000000000000000000000',
+            token_id: '1',
           },
         },
       },

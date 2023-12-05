@@ -134,9 +134,7 @@ const UserDashboard = (props: UserDashboardProps) => {
           )}
         </>
       </div>
-      <div>
-        <DashboardCommunitiesPreview />
-      </div>
+      <DashboardCommunitiesPreview />
     </div>
   );
 };

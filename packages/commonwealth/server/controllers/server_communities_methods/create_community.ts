@@ -9,7 +9,7 @@ import {
   NotificationCategories,
 } from 'common-common/src/types';
 import { Op } from 'sequelize';
-import { urlHasValidHTTPPrefix } from '../../../shared/utils';
+import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import { COSMOS_REGISTRY_API } from '../../config';
 import type { AddressInstance } from '../../models/address';
@@ -61,8 +61,10 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  UnegisteredCosmosChain: `Check https://cosmos.directory.
-   Provided chain_name is not registered in the Cosmos Chain Registry`,
+  ImageDoesntExist: `Image url provided doesn't exist`,
+  ImageTooLarge: `Image must be smaller than ${MAX_COMMUNITY_IMAGE_SIZE_BYTES}kb`,
+  UnegisteredCosmosChain: `Check https://cosmos.directory. 
+  Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
 export type CreateCommunityOptions = {
@@ -143,6 +145,7 @@ export async function __createCommunity(
   let altWalletUrl = community.alt_wallet_url;
   let privateUrl: string | undefined;
   let sanitizedSpec;
+  let hex;
 
   // always generate a chain id
   if (community.base === ChainBase.Ethereum) {
@@ -507,11 +510,16 @@ export async function __createCommunity(
   }
 
   if (addressToBeAdmin) {
+    if (createdCommunity.base === ChainBase.CosmosSDK) {
+      hex = await bech32ToHex(addressToBeAdmin.address);
+    }
+
     const newAddress = await this.models.Address.create({
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
       community_id: createdCommunity.id,
+      hex,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,
