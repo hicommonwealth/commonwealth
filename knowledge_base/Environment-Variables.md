@@ -70,7 +70,7 @@ Contributor: Mark Hegel
 
 Type: Config
 
-## COSMOS_REGISTRY_API 
+## COSMOS_REGISTRY_API
 
 Default value: `https://cosmoschains.thesilverfox.pro`
 
@@ -176,7 +176,7 @@ Type: Auth
 
 ## DISCORD_WEBHOOK_URL_DEV
 
-Description: Required to use the emit-webhook script to send Discord webhooks.
+Description: Connects to the #webhook-testing Discord channel on the Commond Protocol Discord server. Required to use the emit-webhook script to send Discord webhooks. More info at [Webhooks.md](./Webhooks.md).
 
 Type: Auth
 
@@ -442,9 +442,9 @@ Type: Config
 
 ## ROLLBAR_ENV
 
-Default value: `production`
+Default value: n/a
 
-Description: Separates Rollbar reports by environment such that we can easily filter on the Rollbar dashboard.
+Description: Separates Rollbar reports by environment such that we can easily filter on the Rollbar dashboard. In staging Heroku apps it is set to the name of the app. Locally it should be set to some custom value like your name in lowercase (NEVER `production`).
 
 Type: Config
 
@@ -468,7 +468,7 @@ Type: Config
 
 Default value: `FALSE`
 
-Description: Enables Webhook and email dispatching in production when set to `TRUE`. Should be `FALSE` or undefined elsewhere.
+Description: Enables Webhook and email dispatching in production when set to `TRUE`. Should be `FALSE` or undefined elsewhere, to prevent Webhooks and emails from being sent in non-production environments.
 
 Type: Config
 
@@ -510,7 +510,7 @@ Description: Allows Slack users to send feedback via webhook.
 
 Default value: ?
 
-Description:/a Required to use the emit-webhook script to send Slack webhooks.
+Description: Connects to the #testing-webhooks Slack channel on the Common workspace. Required to use the `emit-webhook` script to send Slack webhooks. More info at [Webhooks.md](./Webhooks.md).
 
 ## SNAPSHOT_HUB_URL
 
@@ -518,7 +518,7 @@ Description:/a Required to use the emit-webhook script to send Slack webhooks.
 
 Default value:?
 
-Description: Required to use the `emit-webhook` script to send Telegram webhooks.
+Description: Connects to the CommonWebhooksDev Telegram Bot. Required to use the `emit-webhook` script to send Telegram webhooks. More info at [Webhooks.md](./Webhooks.md).
 
 ## TEST_ENV
 
@@ -530,6 +530,12 @@ Description: A unique ID that is generated to distinguish your remote docker con
 
 ## WITH_PRERENDER
 
+Description: ?
+
+Type: ?
+
 ## ZAPIER_WEBHOOK_URL_DEV
 
-Default value: Required to use the `emit-webhook`script to send Zapier webhooks.
+Default value: ?
+
+Description: Connects to the Common Webhooks Dev Zap on Zapier. Required to use the `emit-webhook`script to send Zapier webhooks. More info at [Webhooks.md](./Webhooks.md).
