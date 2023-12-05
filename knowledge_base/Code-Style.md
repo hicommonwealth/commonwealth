@@ -6,6 +6,8 @@ Unless otherwise noted, code styles in this guideline are for NodeJS & TypeScrip
 
 For a list of React-specific guidelines, see [React Best Practices](./React-Best-Practices-And-Improvements.md).
 
+For a list of API-specific guidelines, see [Platform Coding Guidelines](./Platform-Coding-Guidelines.md).
+
 ## Contents
 
 - [Inline Documentation](#inline-documentation)
