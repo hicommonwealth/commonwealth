@@ -47,6 +47,7 @@ import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
+import CWCommunityStakeBanner from './new_designs/CWCommunityStakeBanner';
 import { CWForm } from './new_designs/CWForm';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
@@ -624,6 +625,10 @@ export const ComponentShowcase = () => {
           <CWTag label="0xd83e1...a39bD" type="address" iconName="polkadot" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="polygon" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="twitterNew" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Group Tag</CWText>
+          <CWTag label="Group Name" type="group" />
         </div>
       </div>
       <div className="button-gallery">
@@ -1539,6 +1544,14 @@ export const ComponentShowcase = () => {
             );
           })}
         </div>
+      </div>
+      <div className="community-stake-banner">
+        <CWText type="h3">Community Stake Banner</CWText>
+        <CWCommunityStakeBanner
+          onClose={() => {}}
+          onBuy={() => {}}
+          groupName="Foo"
+        />
       </div>
       <div className="alerts">
         <CWText type="h3">Alerts</CWText>

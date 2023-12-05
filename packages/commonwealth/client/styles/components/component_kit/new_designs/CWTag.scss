@@ -161,7 +161,8 @@
     }
   }
 
-  &.input {
+  &.input,
+  &.group {
     background-color: $neutral-100;
     padding: 2px 8px;
     gap: 8px;
@@ -172,7 +173,7 @@
       margin-left: 8px;
 
       &:hover {
-        > svg {
+        >svg {
           background-color: $neutral-200;
         }
       }
@@ -190,7 +191,7 @@
       .close-container {
         background-color: $neutral-200;
 
-        > svg {
+        >svg {
           background-color: $neutral-200;
         }
       }
@@ -202,6 +203,14 @@
 
     &.container:hover {
       background-color: $neutral-200;
+    }
+  }
+
+  &.group {
+    .Text {
+      font-size: 12px;
+      line-height: 16px;
+      color: $neutral-700;
     }
   }
 
