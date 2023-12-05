@@ -24,6 +24,7 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import GatingGrowl from 'views/components/GatingGrowl/GatingGrowl';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -93,96 +94,99 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   return (
-    <div className="DiscussionsPage">
-      <Virtuoso
-        className="thread-list"
-        style={{ height: '100%', width: '100%' }}
-        data={isInitialLoading ? [] : filteredThreads}
-        itemContent={(i, thread) => {
-          const discussionLink = getProposalUrlPath(
-            thread.slug,
-            `${thread.identifier}-${slugify(thread.title)}`,
-          );
+    <>
+      <GatingGrowl />
+      <div className="DiscussionsPage">
+        <Virtuoso
+          className="thread-list"
+          style={{ height: '100%', width: '100%' }}
+          data={isInitialLoading ? [] : filteredThreads}
+          itemContent={(i, thread) => {
+            const discussionLink = getProposalUrlPath(
+              thread.slug,
+              `${thread.identifier}-${slugify(thread.title)}`,
+            );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
-          );
+            const isTopicGated = !!(memberships || []).find((membership) =>
+              membership.topicIds.includes(thread?.topic?.id),
+            );
 
-          const isActionAllowedInGatedTopic = !!(memberships || []).find(
-            (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
-              membership.isAllowed,
-          );
+            const isActionAllowedInGatedTopic = !!(memberships || []).find(
+              (membership) =>
+                membership.topicIds.includes(thread?.topic?.id) &&
+                membership.isAllowed,
+            );
 
-          const disabledActionsTooltipText = getThreadActionTooltipText({
-            isCommunityMember: !!hasJoinedCommunity,
-            isThreadArchived: !!thread?.archivedAt,
-            isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: isTopicGated && !isActionAllowedInGatedTopic,
-          });
+            const disabledActionsTooltipText = getThreadActionTooltipText({
+              isCommunityMember: !!hasJoinedCommunity,
+              isThreadArchived: !!thread?.archivedAt,
+              isThreadLocked: !!thread?.lockedAt,
+              isThreadTopicGated: isTopicGated && !isActionAllowedInGatedTopic,
+            });
 
-          return (
-            <ThreadCard
-              key={thread?.id + '-' + thread.readOnly}
-              thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
-              onEditStart={() => navigate(`${discussionLink}`)}
-              onStageTagClick={() => {
-                navigate(`/discussions?stage=${thread.stage}`);
-              }}
-              threadHref={`${getScopePrefix()}${discussionLink}`}
-              onBodyClick={() => {
-                const scrollEle = document.getElementsByClassName('Body')[0];
-
-                localStorage[`${app.activeChainId()}-discussions-scrollY`] =
-                  scrollEle.scrollTop;
-              }}
-              onCommentBtnClick={() =>
-                navigate(`${discussionLink}?focusEditor=true`)
-              }
-              disabledActionsTooltipText={disabledActionsTooltipText}
-            />
-          );
-        }}
-        endReached={() => hasNextPage && fetchNextPage()}
-        overscan={200}
-        components={{
-          EmptyPlaceholder: () =>
-            isInitialLoading ? (
-              <div className="threads-wrapper">
-                {Array(3)
-                  .fill({})
-                  .map((x, i) => (
-                    <ThreadCard key={i} showSkeleton thread={{} as any} />
-                  ))}
-              </div>
-            ) : (
-              <CWText type="b1" className="no-threads-text">
-                {isOnArchivePage
-                  ? 'There are no archived threads matching your filter.'
-                  : 'There are no threads matching your filter.'}
-              </CWText>
-            ),
-          Header: () => {
             return (
-              <HeaderWithFilters
-                topic={topicName}
-                stage={stageName}
-                featuredFilter={featuredFilter}
-                dateRange={dateRange}
-                totalThreadCount={threads ? totalThreadsInCommunity : 0}
-                isIncludingSpamThreads={includeSpamThreads}
-                onIncludeSpamThreads={setIncludeSpamThreads}
-                isIncludingArchivedThreads={includeArchivedThreads}
-                onIncludeArchivedThreads={setIncludeArchivedThreads}
-                isOnArchivePage={isOnArchivePage}
+              <ThreadCard
+                key={thread?.id + '-' + thread.readOnly}
+                thread={thread}
+                canReact={!disabledActionsTooltipText}
+                canComment={!disabledActionsTooltipText}
+                onEditStart={() => navigate(`${discussionLink}`)}
+                onStageTagClick={() => {
+                  navigate(`/discussions?stage=${thread.stage}`);
+                }}
+                threadHref={`${getScopePrefix()}${discussionLink}`}
+                onBodyClick={() => {
+                  const scrollEle = document.getElementsByClassName('Body')[0];
+
+                  localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+                    scrollEle.scrollTop;
+                }}
+                onCommentBtnClick={() =>
+                  navigate(`${discussionLink}?focusEditor=true`)
+                }
+                disabledActionsTooltipText={disabledActionsTooltipText}
               />
             );
-          },
-        }}
-      />
-    </div>
+          }}
+          endReached={() => hasNextPage && fetchNextPage()}
+          overscan={200}
+          components={{
+            EmptyPlaceholder: () =>
+              isInitialLoading ? (
+                <div className="threads-wrapper">
+                  {Array(3)
+                    .fill({})
+                    .map((x, i) => (
+                      <ThreadCard key={i} showSkeleton thread={{} as any} />
+                    ))}
+                </div>
+              ) : (
+                <CWText type="b1" className="no-threads-text">
+                  {isOnArchivePage
+                    ? 'There are no archived threads matching your filter.'
+                    : 'There are no threads matching your filter.'}
+                </CWText>
+              ),
+            Header: () => {
+              return (
+                <HeaderWithFilters
+                  topic={topicName}
+                  stage={stageName}
+                  featuredFilter={featuredFilter}
+                  dateRange={dateRange}
+                  totalThreadCount={threads ? totalThreadsInCommunity : 0}
+                  isIncludingSpamThreads={includeSpamThreads}
+                  onIncludeSpamThreads={setIncludeSpamThreads}
+                  isIncludingArchivedThreads={includeArchivedThreads}
+                  onIncludeArchivedThreads={setIncludeArchivedThreads}
+                  isOnArchivePage={isOnArchivePage}
+                />
+              );
+            },
+          }}
+        />
+      </div>
+    </>
   );
 };
 

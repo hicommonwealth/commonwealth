@@ -15,7 +15,6 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { LinkedProposal } from './LinkedProposal';
 
-
 type LinkedProposalsCardProps = {
   showAddProposalButton: boolean;
   thread: Thread;

@@ -1,6 +1,6 @@
 import axios from 'axios';
-import type { Express } from 'express';
 import { cacheDecorator } from 'common-common/src/cacheDecorator';
+import type { Express } from 'express';
 
 function setupIpfsProxy(app: Express) {
   // using bodyParser here because cosmjs generates text/plain type headers
@@ -9,7 +9,7 @@ function setupIpfsProxy(app: Express) {
     '/api/ipfsProxy',
     cacheDecorator.cacheMiddleware(
       24 * 60 * 60,
-      (req) => `/api/ipfsProxy_${req.query.hash}`
+      (req) => `/api/ipfsProxy_${req.query.hash}`,
     ),
     async function (req, res) {
       try {
@@ -22,7 +22,7 @@ function setupIpfsProxy(app: Express) {
             },
             timeout: 5000,
             responseType: 'arraybuffer',
-          }
+          },
         );
         const contentType = response.headers['content-type'];
         if (contentType) {
@@ -32,7 +32,7 @@ function setupIpfsProxy(app: Express) {
       } catch (err) {
         res.status(500).json({ message: err.message });
       }
-    }
+    },
   );
 }
 
