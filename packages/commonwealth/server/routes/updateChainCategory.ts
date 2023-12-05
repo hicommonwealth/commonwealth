@@ -7,7 +7,7 @@ import { ChainCategoryType } from 'common-common/src/types';
 
 type UpdateChainCategoryReq = {
   selected_tags: { [tag: string]: boolean };
-  chain_id: string;
+  community_id: string;
   auth: string;
   jwt: string;
 };
@@ -25,7 +25,7 @@ const updateChainCategory = async (
 ) => {
   const chain = await models.Community.findOne({
     where: {
-      id: req.body.chain_id,
+      id: req.body.community_id,
     },
   });
   if (!chain) throw new AppError('Invalid Chain Id');
@@ -48,10 +48,10 @@ const updateChainCategory = async (
     await chain.save();
   }
   const updatedCategory = {
-    [req.body.chain_id]: updateCategories as ChainCategoryType[],
+    [req.body.community_id]: updateCategories as ChainCategoryType[],
   };
   return success(res, {
-    chain: req.body.chain_id,
+    chain: req.body.community_id,
     tags: updateCategories as ChainCategoryType[],
   });
 };
