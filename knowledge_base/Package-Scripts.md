@@ -1,4 +1,6 @@
-This entry documents [the Commonwealth package.json file](../packages/commonwealth/package.json). `Package.json` scripts should always be organized alphabetically. If you add a script, you *must* add documentation in this file describing (1) what it does (2) when engineers might use it.
+This entry documents [the Commonwealth package.json file](../packages/commonwealth/package.json). `Package.json` scripts should always be organized alphabetically.
+
+If you add a script to the package.json, you must add documentation here, describing (1) what the script does (2) when engineers might want or need to use it. As with [all documentation](./_README.md#updating-the-docs-how--when), this should be included in the PR alongside the script addition.
 
 # Contents
 
@@ -36,42 +38,39 @@ This entry documents [the Commonwealth package.json file](../packages/commonweal
   - [start-android](#start-android)
   - [start-ios](#start-ios)
 - [Other Services](#other-services)
-  - [compress-images](#compress-images)
   - [datadog-db-setup](#datadog-db-setup)
+  - [send-cosmos-notifs](#send-cosmos-notifs)
   - [send-notification-digest-emails](#send-notification-digest-emails)
-  - [start-prerender](#start-prerender)
+  - [storybook](#storybook)
 - [Playwright](#playwright)
   - [e2e-start-server](#e2e-start-server)
-  - [gen-e2e](#gen-e2e)
   - [test-e2e](#test-e2e)
   - [test-e2e-serial](#test-e2e-serial)
-- [Storybook](#storybook)
-  - [build-storybook](#build-storybook)
-  - [storybook](#storybook-1)
 - [Testing](#testing)
   - [integration-test](#integration-test)
   - [test](#test)
   - [test-api](#test-api)
-  - [test-client](#test-client)
-  - [test-consumer](#test-consumer)
   - [test-devnet](#test-devnet)
   - [test-emit-notif](#test-emit-notif)
-  - [test-events](#test-events)
   - [test-integration-util](#test-integration-util)
-  - [test-query](#test-query)
   - [test-select](#test-select)
   - [test-suite](#test-suite)
   - [unit-test](#unit-test)
   - [unit-test:watch](#unit-testwatch)
 - [TypeScript](#typescript)
+  - [build-consumer](#build-consumer)
   - [check-types](#check-types)
 - [Webpack & TSNode](#webpack--tsnode)
   - [bundle-report](#bundle-report)
   - [listen](#listen)
-  - [profile](#profile)
   - [start](#start)
   - [start-all](#start-all)
   - [start-consumer](#start-consumer)
+  - [start-evm-ce](#start-evm-ce)
+- [Devnets](#devnets)
+  - [cosmos:build](#cosmos:build)
+  - [cosmos:start](#cosmos:start)
+  - [cosmos:stop](#cosmos:stop)
 
 # Build Scripts
 
@@ -95,14 +94,6 @@ Description: Installs node-gyp (a library for compiling dependencies) prior to i
 
 # CI Scripts
 
-## start-ci
-
-Definition: `FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts`
-
-Description: Used by our CI tool to start the server.
-
-Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file? **Flagged for possible removal.**
-
 ## wait-server
 
 Definition: `chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh`
@@ -111,15 +102,13 @@ Description: Used for CI. Waits for the server to be ready (start serving on por
 
 Contributor: Kurtis Assad
 
-Considerations: What is the purpose of scripts (which are developer-friendly shorthand) being used for CI? Why not just directly reference the full definition in our `CI.yml` file? **Flagged for possible removal.**
-
 # Database Scripts
 
 ## clean-db
 
 Definition: `ts-node --project tsconfig.json server/scripts/cleanDb.ts`
 
-Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily. 
+Description: This executes series of 'cleaner' functions that delete unnecessary data from the database, particularly notification and subscription data. For more documentation, see databaseCleaner.ts. On prod, the cleaner functions run daily.
 
 Considerations: Engineers will almost never need to use this locally (unless they have purposefully create a large number of test notifications). This script was authored at the request of Jake Naviasky; we should confer with him as to the long-term value of this script. **Flagged for possible removal.**
 
@@ -151,29 +140,17 @@ Definition: `yarn run dump-db && psql $(heroku config:get CW_READ_DB -a commonwe
 
 Description: In addition to running the [dump-db](#dump-db) script, this copies a limited set of Notification and Subscription data from the commonwealth-beta Heroku database. Used in conjunction with the [load-db-limit](#load-db-limit) script.
 
-## dump-db-local
-
-Definition: `pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump`
-
-Description: Exports the local Postgres database to a dump file, `local_save.dump`.
-
-## load-db 
+## load-db
 
 Definition: `chmod u+x scripts/load-db.sh && ./scripts/load-db.sh`
 
 Description: Loads database following the `load-db.sh` script. Looks for dump file `latest.dump` by default; if script is called with an argument, the value of DUMP_NAME will be updated to that argument's value.
 
-## load-db-limit 
+## load-db-limit
 
 Definition: `yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql`
 
 Description: Used in conjunction with [dump-db-limit](#dump-db-limit), this loads a dumped copy of the commonwealth-beta Heroku database alongside a limited, copied set of Notification and Subscription rows.
-
-## load-db-local
-
-Definition: `psql -d commonwealth -U commonwealth -W -f local_save.dump`
-
-Description: Loads local database from a dump file, `local_save.dump`.
 
 ## migrate-db
 
@@ -187,14 +164,6 @@ Definition: `npx sequelize db:migrate:undo`
 
 Description: Undoes the last-run Sequelize migration.
 
-## migrate-server
-
-Definition: `heroku run npx sequelize db:migrate --debug`
-
-Description: Runs a database migration on the Heroku dyno in debug mode.
-
-Considerations: The current script name does not sufficiently indicate its relationship to Heroku.
-
 ## psql
 
 Definition: `chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh`
@@ -207,11 +176,25 @@ Definition: `chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh`
 
 Description: Resets the local database.
 
-## reset-frack-db 
+## reset-frack-db
 
 Definition: `heroku pg:copy commonwealth-beta::CW_READ_DB DATABASE_URL --app commonwealth-frack --confirm commonwealth-frack`
 
 Description: Synchronizes `beta-db` (used for QA) against the `frack-db` (used for CDN cache testing). Good for undoing migration script run in previous commit to Frack. See [Testing Environments](./Testing-Environments.md) entry for more info.
+
+## db-doc
+
+Definition: `chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/wiki/Database-ERD.md`
+
+Description: This pulls the schema from a local Postgres instance and generates a Mermaid ERD, updating `/knowledge_base/wiki/Database-ERD.md`
+
+Considerations:
+
+- Using a local PG instance with the default configuration. Developers must ensure it has the latest schema
+- Recommended after major database migrations (adding/removing tables/fields/relationships)
+- Not integrated (CI) yet, need to review how we incorporate file changes from GH actions back to the repo
+
+Contributor: Roger Torres
 
 # Docker
 
@@ -229,7 +212,7 @@ Description: To be run in a new project or repo when first setting up remote doc
 
 # Linting & Formatting
 
-Open considerations: Given our Prettier pre-commit hook, this amount of linting and formatting commands may be unnecessary. 
+Open considerations: Given our Prettier pre-commit hook, this amount of linting and formatting commands may be unnecessary.
 
 ## format
 
@@ -241,7 +224,7 @@ Description: Autoformats files using config `prettierrc.json` config.
 
 Definition: `./scripts/lint-new-work.sh`
 
-Description: Lints new work, according to script file `lint-new-work.sh`. 
+Description: Lints new work, according to script file `lint-new-work.sh`.
 
 Considerations: Problematically, only checks .ts files. Name is misleading. Redundancy with [lint-branch](#lint-branch) script. **Flagged for possible removal.**
 
@@ -249,7 +232,7 @@ Considerations: Problematically, only checks .ts files. Name is misleading. Redu
 
 Definition: `eslint client/\\**/*.{ts,tsx} server/\\**/*.ts`
 
-Description: Only lints changed files on current branch. 
+Description: Only lints changed files on current branch.
 
 Considerations: May be more clearly renamed "lint-changes".
 
@@ -261,6 +244,12 @@ Description: Redundant with [lint](#lint) script, which uses 'git status' instea
 
 Considerations: Recommend eliminating either [lint](#lint) or [lint-branch](#lint-branch) scripts. Problematically, lint-branch only checks .ts files. **Flagged for possible removal.**
 
+## lint-branch-warnings
+
+Definition: `FAIL_WARNINGS=1 ./scripts/lint-branch.sh`
+
+Description: Used in the CI. Lints based on the target branch, fails on linter warnings
+
 ## style-lint
 
 Definition: `stylelint client/styles/*`
@@ -271,9 +260,7 @@ Considerations: Why lint styles separately? Why not just include `.scss` file ex
 
 # Mobile
 
-Open considerations: Are these still in use?
-
-## build-android 
+## build-android
 
 Definition: `NODE_ENV=mobile webpack --config webpack/webpack.config.mobile.js --progress && NODE_ENV=mobile npx cap sync android`
 
@@ -323,14 +310,6 @@ Contributor: Dillon Chen
 
 # Other services
 
-## compress-images
-
-Definition: `npx ts-node -T ./scripts/compressImages.ts`
-
-Considerations: (per contributor) **Deprecated; recommend removal.**
-
-Contributor: Kurtis Assad
-
 ## datadog-db-setup
 
 Definition: `chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh`
@@ -339,19 +318,27 @@ Description: Helper script to complete DataDog Postgres account setup, scripts, 
 
 Contributor: Nakul Manchanda
 
+## send-cosmos-notifs
+
+Definition: `ts-node --project tsconfig.json server/cosmosGovNotifications/generateCosmosGovNotifications.ts`
+
+Description: Generates Cosmos v1 and v1beta1 governance notifications by polling relevant Cosmos chains.
+
+Contributor: Timothee Legros
+
 ## send-notification-digest-emails
 
 Definition: `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
 
 Description: Schedules a daily task for sending notification email digests.
 
-Considerations: Script name might be worth shortening.
+## storybook
 
-## start-prerender
+Definition: `storybook dev -p 6006`
 
-Definition: `ts-node --project tsconfig.json server/scripts/runPrerenderService.ts`
+Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
 
-Considerations: Referenced prerender script no longer exists. **Deprecated; recommend removal.** 
+Contributor: Daniel Martins
 
 # Playwright
 
@@ -371,14 +358,6 @@ Description: Emits a chain-event or snapshot notification. Run `yarn emit-notifi
 
 Contributor: Timothee Legros
 
-## gen-e2e
-
-Definition: `npx playwright codegen`
-
-Description: Starts Playwright's test generation feature. This will open up a browser window and allow developers to click around on-screen and autogenerate Playwright code according to actions performed. [Loom example](https://www.loom.com/share/b1b36c7d7fae4b079b380ec2a61da25c)
-
-Contributor: Kurtis Assad
-
 ## test-e2e
 
 Definition: `TEST_ENV=playwright npx playwright test -c ./test/e2e/playwright.config.ts --workers 2 ./test/e2e/e2eRegular/*`
@@ -395,29 +374,10 @@ Description: Runs e2e tests one at a time, to avoid problems of parallel executi
 
 Contributor: Kurtis Assad
 
-# Storybook
-
-## build-storybook
-
-Definition `storybook build`
-
-Description:  Compiles Storybook instance for deployment.
-
-Contributor: Daniel Martins
-
-Considerations: Not used by Storybook / Design System team. **Deprecated; recommend removal.**
-
-## storybook
-
-Definition: `storybook dev -p 6006`
-
-Description: Compiles and serves a development build of Storybook reflecting source code changes in-browser in real time, at localhost:6006.
-
-Contributor: Daniel Martins
-
 # Testing
 
 Open considerations:
+
 - When and why do we invoke `nyc` and `NODE_ENV=test` in our scripts? No clear rhyme or reason to our use.
   - `nyc` runs IstanbulJS, which tracks and reports how much of our source code is covered by tests. `NODE_ENV=test` sets a global variable that changes how select parts of our wallet and chain infrastructure runs.
 - Do we need so many different scripts for specifying which part of the codebase we want to test? Would a generic test script, taking a directory as argument, suffice?
@@ -426,7 +386,7 @@ Open considerations:
 
 ## integration-test
 
-Definition: `nyc ts-mocha --project tsconfig.json ./test/integration/**/*.spec.ts`
+Definition: `nyc ts-mocha --project tsconfig.json './test/integration/**/*.spec.ts'`
 
 Description: Runs all tests in our integration folder and its subdirectories.
 
@@ -434,67 +394,35 @@ Considerations: This script breaks our more usual test script syntax, which typi
 
 ## test
 
-Definition: `nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts`
+Definition: `nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
 
 Description: Runs all tests in our /test directory.
 
 ## test-api
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/api/**/*.spec.ts`
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/api/**/*.spec.ts'`
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
-## test-client
-
-Definition: `webpack-dev-server --config webpack/webpack.config.test.js`
-
-Description: Ostensibly used to test only client-side code.
-
-Considerations: The `webpack.config.test.js` file referenced does not exist. **Deprecated; recommend removal.**
-
-## test-consumer
-
-Definition: `ts-mocha --project tsconfig.json test/systemTests/consumer.test.ts --timeout 20000`
-
-Considerations: The `consumer.test.ts` file referenced does not exist. **Deprecated; recommend removal.**
-
 ## test-devnet
 
-Definition: `nyc ts-mocha --project tsconfig.json ./test/devnet/**/*.spec.ts`
+Definition: `nyc ts-mocha --project tsconfig.json './test/devnet/${TEST_DIR:-.}/**/*.spec.ts'`
 
 Description: Runs all tests in our `/devnet`` folder.
 
-## test-emit-notif 
+## test-emit-notif
 
-Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/emitNotifications.spec.ts`
+Definition `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/emitNotifications.spec.ts'`
 
 Description: Runs only the `emitNotifications.spec.ts` test, of the three `/integration`` folder "utils."
 
-## test-events
-
-Definition: `nyc ts-mocha --project tsconfig.json ./test/integration/events/*.spec.ts`
-
-Description: Ostensibly used to test all events in our integration folder.
-
-Considerations: Misleading name (should be integration-scoped). More importantly, we do not have an /events folder inside our /integration directory. **Deprecated; recommend removal.**
-
 ## test-integration-util
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/integration/*.spec.ts`
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/integration/*.spec.ts'`
 
-Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing). 
+Description: Runs tests living in the top level of our integration folder, where we house tests that require "integrated" components (e.g. tests that need access to a live Postgres database or a live Redis instance, rather than to the mock Postgres or Redis instances we use in util testing).
 
 Considerations: The script name might misleadingly suggest that this script would pick out specifically the /util subfolder in the /integration directory. Might we be better off moving the three top-level scripts (e.g. databaseCleaner.spec.ts) into a dedicated subfolder, and targeting that?
-
-Contributor: Timothee Legros
-
-## test-query
-
-Definition: `ts-node server/scripts/testQuery.ts`
-
-Description: Executes testQuery.ts, which runs a select query on chains, for unclear-to-this-documentarian reasons.
-
-Considerations: Why do we have this? Is a "test-" prefix name misleading, given that it is not, strictly speaking, a test (in the same sense as our ts-mocha scripts).
 
 Contributor: Timothee Legros
 
@@ -506,7 +434,7 @@ Description: Append a path to run specific test files or folders.
 
 ## test-suite
 
-Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json ./test/**/*.spec.ts`
+Definition: `NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'`
 
 Description: Runs all tests in our /test directory.
 
@@ -534,6 +462,12 @@ Contributor: Ryan Bennett
 
 # TypeScript
 
+## build-consumer
+
+Definition: `tsc --project tsconfig.worker.json && tsc-alias --project tsconfig.worker.json`
+
+Description: Runs a compilation based on tsconfig.worker.json; does not emit files; replaces alias with relative paths post-compilation.
+
 ## check-types
 
 Definition: `tsc --noEmit`
@@ -542,10 +476,10 @@ Description: Runs a compilation of TypeScript files based on tsconfig.json; does
 
 # Webpack && TSNode
 
-## bundle-report    
+## bundle-report
 
 Definition: `webpack-bundle-analyzer --port 4200 build/stats.json`
-    
+
 Description:  Runs webpack-bundle-analyzer library to display breakdown of bundle size & makeup, hosted on port 4200 (localhost:4200). To generate a stats.json file, navigate to [webpack.prod.config.js](../packages/commonwealth/webpack/webpack.prod.config.js), set the `generateStatsFile` key to true, run `yarn build` , and finally `yarn bundle-report`.
 
 ## listen
@@ -554,19 +488,11 @@ Definition: `RUN_AS_LISTENER=true ts-node --project tsconfig.json server.ts`
 
 Description: Runs ts-node, a TypeScript execution engine for NodeJS, in listening mode for changes, following tsconfig.json and using [server.ts](../packages/commonwealth/server.ts) as the entry file.
 
-## profile 
-
-Definition: `NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.dev.config.js --json --profile > webpack-stats.json`
-
-Description: Runs build webpack analyzer. 
-
-Considerations: **Deprecated; recommend removal.** Appears to be redundant with `bundle-report`. As of 22-08-03 #all-eng conversation, appears to be unused. See also [stats.sh](../packages/commonwealth/stats.sh) for possible removal.
-
 ## start
 
 Definition: `ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts`
 
-Description: Windows-compatible start script. Used to start the Commonwealth app in development. 
+Description: Windows-compatible start script. Used to start the Commonwealth app in development.
 
 ## start-all
 
@@ -576,6 +502,32 @@ Description: Runs `yarn start` and `yarn start-consumer` (i.e., the main app ser
 
 ## start-consumer
 
-Definition: `ts-node --project ./tsconfig.consumer.json server/CommonwealthConsumer/CommonwealthConsumer.ts run-as-script`
+Definition: `ts-node --project tsconfig.worker.json server/workers/commonwealthConsumer/commonwealthConsumer.ts run-as-script`
 
 Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes RabbitMQ messages from external apps and services. See script file for more complete documentation.
+
+## start-evm-ce
+
+Definition: `ts-node ./server/workers/evmChainEvents/startEvmPolling.ts`
+
+Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.
+
+# Devnets
+
+## cosmos:build
+
+Definition: `chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh --build`
+
+Description: Fetches Docker images for all Cosmos devnets (evmos, v1beta1, and v1) and starts containers for each.
+
+## cosmos:start
+
+Definition: `chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh`
+
+Description: Starts existing dormant Cosmos devnet containers.
+
+## cosmos:stop
+
+Definition: `chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/cosmos-chain-testing/v1/stop.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/stop.sh && ./test/util/cosmos-chain-testing/v1beta1/stop.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/stop.sh && ./test/util/cosmos-chain-testing/ethermint/stop.sh`
+
+Description: Stop all Cosmos devnet containers.
