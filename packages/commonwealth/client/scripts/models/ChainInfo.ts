@@ -312,29 +312,38 @@ class ChainInfo {
   }
 
   public categorizeSocialLinks(): CategorizedSocialLinks {
-    const discord = this.socialLinks.find((l) => l.includes('://discord.com'));
-    const github = this.socialLinks.find((l) => l.includes('://github.com'));
-    const telegram = this.socialLinks.find((l) => l.includes('://t.me'));
-    const element = this.socialLinks.find((l) => l.includes('://matrix.to'));
-
-    return {
-      discord,
-      github,
-      telegram,
-      element,
-      remainingLinks: this.socialLinks.filter(
-        (l) => ![discord, github, telegram, element].includes(l),
-      ),
+    const categorizedLinks: CategorizedSocialLinks = {
+      discords: [],
+      githubs: [],
+      telegrams: [],
+      elements: [],
+      remainingLinks: [],
     };
+
+    this.socialLinks.forEach((link) => {
+      if (link.includes('://discord.com')) {
+        categorizedLinks.discords.push(link);
+      } else if (link.includes('://github.com')) {
+        categorizedLinks.githubs.push(link);
+      } else if (link.includes('://t.me')) {
+        categorizedLinks.telegrams.push(link);
+      } else if (link.includes('://matrix.to')) {
+        categorizedLinks.elements.push(link);
+      } else {
+        categorizedLinks.remainingLinks.push(link);
+      }
+    });
+
+    return categorizedLinks;
   }
 }
 
 export type CategorizedSocialLinks = {
-  discord?: string;
-  github?: string;
-  telegram?: string;
-  element?: string;
-  remainingLinks?: string[];
+  discords: string[];
+  githubs: string[];
+  telegrams: string[];
+  elements: string[];
+  remainingLinks: string[];
 };
 
 export default ChainInfo;

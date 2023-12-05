@@ -8,41 +8,43 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 export const ExternalLinksModule = () => {
   if (!app.chain) return;
   const meta = app.chain.meta;
-  const { remainingLinks, discord, element, telegram, github } =
+  const { remainingLinks, discords, elements, telegrams, githubs } =
     meta.categorizeSocialLinks();
-
-  if (!remainingLinks && !discord && !telegram && !github) return;
 
   return (
     <div className="ExternalLinksModule">
-      {discord && (
+      {discords.map((link) => (
         <CWIcon
+          key={link}
           iconName="discord"
           className="discord-link"
-          onClick={() => window.open(discord)}
+          onClick={() => window.open(link)}
         />
-      )}
-      {element && (
+      ))}
+      {elements.map((link) => (
         <CWIcon
+          key={link}
           iconName="element"
           className="element-link"
-          onClick={() => window.open(element)}
+          onClick={() => window.open(link)}
         />
-      )}
-      {telegram && (
+      ))}
+      {telegrams.map((link) => (
         <CWIcon
+          key={link}
           iconName="telegram"
           className="telegram-link"
-          onClick={() => window.open(telegram)}
+          onClick={() => window.open(link)}
         />
-      )}
-      {github && (
+      ))}
+      {githubs.map((link) => (
         <CWIcon
+          key={link}
           iconName="github"
           className="github-link"
-          onClick={() => window.open(github)}
+          onClick={() => window.open(link)}
         />
-      )}
+      ))}
       {remainingLinks.map((link) => (
         <CWIcon
           key={link}

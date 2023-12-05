@@ -53,20 +53,20 @@ export const CommunityMetadataRows = ({
   });
 
   const {
-    discord: initialDiscord,
-    element: initialElement,
-    telegram: initialTelegram,
-    github: initialGithub,
+    discords: initialDiscords,
+    elements: initialElements,
+    telegrams: initialTelegrams,
+    githubs: initialGithubs,
     remainingLinks,
   } = community.categorizeSocialLinks();
 
   const [name, setName] = useState(community.name);
   const [description, setDescription] = useState(community.description);
   const [website, setWebsite] = useState(remainingLinks[0]);
-  const [discord, setDiscord] = useState(initialDiscord);
-  const [element, setElement] = useState(initialElement);
-  const [telegram, setTelegram] = useState(initialTelegram);
-  const [github, setGithub] = useState(initialGithub);
+  const [discord, setDiscord] = useState(initialDiscords[0]);
+  const [element, setElement] = useState(initialElements[0]);
+  const [telegram, setTelegram] = useState(initialTelegrams[0]);
+  const [github, setGithub] = useState(initialGithubs[0]);
   const [stagesEnabled, setStagesEnabled] = useState(community.stagesEnabled);
   const [customStages, setCustomStages] = useState(community.customStages);
   const [customDomain, setCustomDomain] = useState(community.customDomain);
