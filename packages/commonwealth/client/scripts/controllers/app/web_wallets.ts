@@ -6,6 +6,7 @@ import IWebWallet from '../../models/IWebWallet';
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
 import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
+import LeapWebWalletController from './webWallets/leap_web_wallet';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import NearWebWalletController from './webWallets/near_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
@@ -52,10 +53,7 @@ export default class WebWalletController {
   }
 
   // sets a WalletId on the backend for an account whose walletId has not already been set
-  private async _setWalletId(
-    account: Account,
-    wallet: WalletId,
-  ): Promise<void> {
+  public async _setWalletId(account: Account, wallet: WalletId): Promise<void> {
     if (app.user.activeAccount.address !== account.address) {
       console.error('account must be active to set wallet id');
       return;
@@ -109,6 +107,7 @@ export default class WebWalletController {
       new MetamaskWebWalletController(),
       new WalletConnectWebWalletController(),
       new KeplrWebWalletController(),
+      new LeapWebWalletController(),
       new NearWebWalletController(),
       new TerraStationWebWalletController(),
       new CosmosEvmMetamaskWalletController(),

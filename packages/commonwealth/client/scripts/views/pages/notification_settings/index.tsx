@@ -56,7 +56,7 @@ const NotificationSettingsPage = () => {
 
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
-  }, [app?.user.notifications, app.user.emailInterval]);
+  }, [forceRerender]);
 
   useEffect(() => {
     // bundled snapshot subscriptions
@@ -600,7 +600,7 @@ const NotificationSettingsPage = () => {
                   <div className="avatar-and-name">
                     <img
                       className="snapshot-icon"
-                      src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`}
+                      src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}&image=true`}
                     />
                     <CWText type="h5" fontWeight="medium">
                       {space.name}

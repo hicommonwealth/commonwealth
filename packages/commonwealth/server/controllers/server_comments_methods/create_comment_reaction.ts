@@ -162,7 +162,6 @@ export async function __createCommentReaction(
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   });
 
   // update address last active

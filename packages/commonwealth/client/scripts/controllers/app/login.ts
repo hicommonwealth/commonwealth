@@ -252,7 +252,11 @@ export async function createUserWithAddress(
   chain: string,
   sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo,
-): Promise<{ account: Account; newlyCreated: boolean }> {
+): Promise<{
+  account: Account;
+  newlyCreated: boolean;
+  joinedCommunity: boolean;
+}> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
@@ -275,7 +279,11 @@ export async function createUserWithAddress(
     validationBlockInfo: response.result.block_info,
     ignoreProfile: false,
   });
-  return { account, newlyCreated: response.result.newly_created };
+  return {
+    account,
+    newlyCreated: response.result.newly_created,
+    joinedCommunity: response.result.joined_community,
+  };
 }
 
 async function constructMagic(isCosmos: boolean, chain?: string) {
@@ -369,6 +377,7 @@ function getProfileMetadata({ provider, userInfo }): {
   } else if (provider === 'google') {
     return { username: userInfo.name, avatarUrl: userInfo.picture };
   }
+
   return {};
 }
 

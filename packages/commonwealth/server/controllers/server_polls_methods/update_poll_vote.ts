@@ -107,7 +107,6 @@ export async function __updatePollVote(
     event: MixpanelCommunityInteractionEvent.SUBMIT_VOTE,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   };
 
   return [vote.toJSON(), analyticsOptions];

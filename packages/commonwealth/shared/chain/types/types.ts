@@ -1,5 +1,5 @@
-import { IEventData as CompoundEventData } from '../../../shared/chain/types/compound';
 import { IEventData as AaveEventData } from '../../../shared/chain/types/aave';
+import { IEventData as CompoundEventData } from '../../../shared/chain/types/compound';
 import { IEventData as CosmosEventData } from '../../../shared/chain/types/cosmos';
 
 export type IChainEventData =
@@ -14,6 +14,7 @@ export enum SupportedNetwork {
   Compound = 'compound',
   ERC20 = 'erc20',
   ERC721 = 'erc721',
+  ERC1155 = 'erc1155',
   Cosmos = 'cosmos',
 }
 

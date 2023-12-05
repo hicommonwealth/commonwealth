@@ -440,6 +440,7 @@ export const AdminActions = ({
 
       <CWModal
         size="medium"
+        visibleOverflow
         content={
           <UpdateProposalStatusModal
             onChangeHandler={(s) =>

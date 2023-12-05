@@ -122,6 +122,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
         chain_node_id: osmosisNode.id,
+        bech32_prefix: 'osmo',
       });
       await models.Community.create({
         id: 'csdk-beta',
@@ -134,6 +135,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: false,
         chain_node_id: csdkBetaNode.id,
+        bech32_prefix: 'cosmos',
       });
       await models.Community.create({
         id: 'csdk',
@@ -146,6 +148,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         base: ChainBase.CosmosSDK,
         has_chain_events_listener: true,
         chain_node_id: csdkV1Node.id,
+        bech32_prefix: 'cosmos',
       });
       const alexContract = await models.Contract.create({
         address: '0xFab46E002BbF0b4509813474841E0716E6730136',
@@ -305,7 +308,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         event: 'proposal/created',
         start: new Date().toString(),
         expire: new Date(
-          new Date().getTime() + 100 * 24 * 60 * 60 * 1000
+          new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
         ).toString(),
       });
 

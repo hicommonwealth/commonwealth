@@ -112,7 +112,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
 
@@ -410,7 +410,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               onInput={(e) => {
                 setDraftTitle(e.target.value);
               }}
-              defaultValue={thread.title}
+              value={draftTitle || thread.title}
             />
           ) : (
             thread.title
