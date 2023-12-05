@@ -128,7 +128,7 @@ export const PollEditorModal = ({
         <CWTextInput
           label="Question"
           placeholder="Do you support this proposal?"
-          defaultValue={prompt}
+          value={prompt}
           onInput={(e) => {
             setPrompt(e.target.value);
           }}
