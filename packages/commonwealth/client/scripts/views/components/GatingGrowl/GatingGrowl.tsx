@@ -28,7 +28,9 @@ const GatingGrowl = () => {
   return (
     <CWGrowl disabled={disabled} position="bottom-right">
       <div className="GatingGrowl">
-        <GatingImg onExit={() => handleExit()} />
+        <div onClick={handleExit}>
+          <GatingImg />
+        </div>
         <div className="container">
           <CWText type="h1" fontWeight="semiBold" isCentered>
             Introducing Groups

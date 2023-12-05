@@ -77,73 +77,75 @@ const OverviewPage = () => {
   return !topicSummaryRows.length ? (
     <PageLoading />
   ) : (
-    <div className="OverviewPage">
+    <>
       <GatingGrowl />
-      <div className="header-row">
-        <div className="header-row-left">
-          <CWText type="h3" fontWeight="semiBold">
-            Overview
-          </CWText>
-          <CWButton
-            className="latest-button"
-            buttonType="primary"
-            buttonHeight="sm"
-            label="Latest Threads"
-            iconLeft="home"
-            onClick={() => {
-              navigate('/discussions');
-            }}
-          />
+      <div className="OverviewPage">
+        <div className="header-row">
+          <div className="header-row-left">
+            <CWText type="h3" fontWeight="semiBold">
+              Overview
+            </CWText>
+            <CWButton
+              className="latest-button"
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Latest Threads"
+              iconLeft="home"
+              onClick={() => {
+                navigate('/discussions');
+              }}
+            />
+          </div>
+          {!isWindowSmallInclusive && (
+            <CWButton
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Create thread"
+              iconLeft="plus"
+              onClick={() => {
+                navigate('/new/discussion');
+              }}
+              disabled={!hasJoinedCommunity}
+            />
+          )}
         </div>
-        {!isWindowSmallInclusive && (
-          <CWButton
-            buttonType="primary"
-            buttonHeight="sm"
-            label="Create thread"
-            iconLeft="plus"
-            onClick={() => {
-              navigate('/new/discussion');
-            }}
-            disabled={!hasJoinedCommunity}
-          />
-        )}
-      </div>
-      <div className="column-headers-row">
-        <CWText
-          type="h5"
-          fontWeight="semiBold"
-          className="threads-header-row-text"
-        >
-          Topic
-        </CWText>
-        <div className="threads-header-container">
+        <div className="column-headers-row">
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="threads-header-row-text"
           >
-            Recent threads
+            Topic
           </CWText>
+          <div className="threads-header-container">
+            <CWText
+              type="h5"
+              fontWeight="semiBold"
+              className="threads-header-row-text"
+            >
+              Recent threads
+            </CWText>
+          </div>
         </div>
+        <CWDivider />
+        {topicSummaryRows.map((row, i) => (
+          <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
+        ))}
+        {isWindowSmallInclusive && (
+          <div className="floating-mobile-button">
+            <CWIconButton
+              iconName="plusCircle"
+              iconButtonTheme="black"
+              iconSize="xl"
+              onClick={() => {
+                navigate('/new/discussion');
+              }}
+              disabled={!hasJoinedCommunity}
+            />
+          </div>
+        )}
       </div>
-      <CWDivider />
-      {topicSummaryRows.map((row, i) => (
-        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
-      ))}
-      {isWindowSmallInclusive && (
-        <div className="floating-mobile-button">
-          <CWIconButton
-            iconName="plusCircle"
-            iconButtonTheme="black"
-            iconSize="xl"
-            onClick={() => {
-              navigate('/new/discussion');
-            }}
-            disabled={!hasJoinedCommunity}
-          />
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
