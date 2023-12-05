@@ -1,5 +1,4 @@
 import { AppError } from 'common-common/src/errors';
-import type { NextFunction, Response } from 'express';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
@@ -7,7 +6,7 @@ import { ChainCategoryType } from 'common-common/src/types';
 
 type UpdateChainCategoryReq = {
   selected_tags: { [tag: string]: boolean };
-  chain_id: string;
+  community_id: string;
   auth: string;
   jwt: string;
 };
@@ -20,12 +19,11 @@ type UpdateChainCategoryRes = {
 const updateChainCategory = async (
   models: DB,
   req: TypedRequestBody<UpdateChainCategoryReq>,
-  res: TypedResponse<UpdateChainCategoryRes>,
-  next: NextFunction
+  res: TypedResponse<UpdateChainCategoryRes>
 ) => {
   const chain = await models.Community.findOne({
     where: {
-      id: req.body.chain_id,
+      id: req.body.community_id,
     },
   });
   if (!chain) throw new AppError('Invalid Chain Id');
@@ -47,11 +45,8 @@ const updateChainCategory = async (
     chain.category = updateCategories;
     await chain.save();
   }
-  const updatedCategory = {
-    [req.body.chain_id]: updateCategories as ChainCategoryType[],
-  };
   return success(res, {
-    chain: req.body.chain_id,
+    chain: req.body.community_id,
     tags: updateCategories as ChainCategoryType[],
   });
 };
