@@ -1,6 +1,6 @@
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { featureFlags } from 'helpers/feature-flags';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';

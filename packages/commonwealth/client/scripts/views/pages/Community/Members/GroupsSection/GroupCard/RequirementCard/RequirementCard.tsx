@@ -1,8 +1,8 @@
 import React from 'react';
 import { getClasses } from 'views/components/component_kit/helpers';
+import { SPECIFICATIONS, TOKENS } from '../../../../common/constants';
 import { InfoBlock } from './InfoBlock';
 import './RequirementCard.scss';
-import { SPECIFICATIONS, TOKENS } from '../../../../common/constants';
 
 type RequirementCardProps = {
   requirementType: string;
@@ -10,7 +10,7 @@ type RequirementCardProps = {
   requirementContractAddress?: string;
   requirementCondition: string;
   requirementAmount: string;
-  requirementTokenId?: string,
+  requirementTokenId?: string;
 };
 
 const RequirementCard = ({
@@ -38,15 +38,13 @@ const RequirementCard = ({
             'cols-5'?: boolean;
             'row-1': boolean;
             'row-2': boolean;
-          }>(
-            {
-              'cols-3': isTokenRequirement,
-              'cols-4': !isTokenRequirement && !is1155Requirement,
-              'cols-5': !isTokenRequirement && is1155Requirement,
-              'row-1': !isTokenRequirement && is1155Requirement,
-              'row-2': !(!isTokenRequirement && is1155Requirement)
-            }
-          )}
+          }>({
+            'cols-3': isTokenRequirement,
+            'cols-4': !isTokenRequirement && !is1155Requirement,
+            'cols-5': !isTokenRequirement && is1155Requirement,
+            'row-1': !isTokenRequirement && is1155Requirement,
+            'row-2': !(!isTokenRequirement && is1155Requirement),
+          })}
         >
           <InfoBlock label="Chain" value={requirementChain} />
           {!!requirementContractAddress && (
@@ -57,7 +55,9 @@ const RequirementCard = ({
           )}
           <InfoBlock label="Condition" value={requirementCondition} />
           <InfoBlock label="Amount" value={requirementAmount} />
-          {is1155Requirement && (<InfoBlock label="Id" value={requirementTokenId} />)}
+          {is1155Requirement && (
+            <InfoBlock label="Id" value={requirementTokenId} />
+          )}
         </div>
       )}
     </div>

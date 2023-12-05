@@ -135,7 +135,7 @@ async function _thresholdCheck(
       userAddress,
       chainId,
       contractAddress,
-      tokenId
+      tokenId,
     );
 
     const result = toBN(balance).gt(toBN(thresholdData.threshold));
