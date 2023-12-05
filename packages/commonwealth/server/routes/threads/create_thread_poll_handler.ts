@@ -36,7 +36,7 @@ export const createThreadPollHandler = async (
     }
   }
 
-  const poll = await controllers.threads.createThreadPoll({
+  const [poll, analyticsOptions] = await controllers.threads.createThreadPoll({
     user: req.user,
     community,
     threadId: parseInt(threadId, 10),
@@ -45,6 +45,8 @@ export const createThreadPollHandler = async (
     customDuration:
       custom_duration === 'Infinite' ? Infinity : parseInt(custom_duration),
   });
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
 
   return success(res, poll);
 };

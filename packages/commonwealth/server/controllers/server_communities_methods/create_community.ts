@@ -9,8 +9,9 @@ import {
   NotificationCategories,
 } from 'common-common/src/types';
 import { Op } from 'sequelize';
-import { urlHasValidHTTPPrefix } from '../../../shared/utils';
+import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 
+import { COSMOS_REGISTRY_API } from '../../config';
 import type { AddressInstance } from '../../models/address';
 import type { ChainNodeAttributes } from '../../models/chain_node';
 import type { CommunityAttributes } from '../../models/community';
@@ -60,7 +61,9 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  UnegisteredCosmosChain: `Check https://cosmos.directory.
+  ImageDoesntExist: `Image url provided doesn't exist`,
+  ImageTooLarge: `Image must be smaller than ${MAX_COMMUNITY_IMAGE_SIZE_BYTES}kb`,
+  UnegisteredCosmosChain: `Check https://cosmos.directory. 
   Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
@@ -142,6 +145,7 @@ export async function __createCommunity(
   let altWalletUrl = community.alt_wallet_url;
   let privateUrl: string | undefined;
   let sanitizedSpec;
+  let hex;
 
   // always generate a chain id
   if (community.base === ChainBase.Ethereum) {
@@ -149,42 +153,6 @@ export async function __createCommunity(
       throw new AppError(Errors.InvalidChainId);
     }
     eth_chain_id = +community.eth_chain_id;
-  }
-
-  // cosmos_chain_id is the canonical identifier for a cosmos chain.
-  if (community.base === ChainBase.CosmosSDK) {
-    // Our convention is to follow the "chain_name" standard established by the
-    // Cosmos Chain Registry:
-    // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
-    // This community-led registry seeks to track chain info for all Cosmos chains.
-    // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
-    // It is a lowercase alphanumeric name, like 'osmosis'.
-    // See: https://github.com/hicommonwealth/commonwealth/issues/4951
-    cosmos_chain_id = community.cosmos_chain_id;
-
-    if (!cosmos_chain_id) {
-      throw new AppError(Errors.CosmosChainNameRequired);
-    } else {
-      const oldChainNode = await this.models.ChainNode.findOne({
-        where: { cosmos_chain_id },
-      });
-      if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
-        throw new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`);
-      }
-    }
-
-    const REGISTRY_API_URL = 'https://cosmoschains.thesilverfox.pro';
-    const { data: chains } = await axios.get(
-      `${REGISTRY_API_URL}/api/v1/mainnet`,
-    );
-    const foundRegisteredChain = chains?.find(
-      (chain) => chain === cosmos_chain_id,
-    );
-    if (!foundRegisteredChain) {
-      throw new AppError(
-        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
-      );
-    }
   }
 
   // if not offchain, also validate the address
@@ -258,6 +226,39 @@ export async function __createCommunity(
     community.base === ChainBase.CosmosSDK &&
     community.type !== ChainType.Offchain
   ) {
+    // cosmos_chain_id is the canonical identifier for a cosmos chain.
+    // Our convention is to follow the "chain_name" standard established by the
+    // Cosmos Chain Registry:
+    // https://github.com/cosmos/chain-registry/blob/dbec1643b587469383635fd345634fb19075b53a/chain.schema.json#L1-L20
+    // This community-led registry seeks to track chain info for all Cosmos chains.
+    // The primary key for a chain there is "chain_name." This is our cosmos_chain_id.
+    // It is a lowercase alphanumeric name, like 'osmosis'.
+    // See: https://github.com/hicommonwealth/commonwealth/issues/4951
+    cosmos_chain_id = community.cosmos_chain_id || null;
+
+    if (!cosmos_chain_id) {
+      throw new AppError(Errors.CosmosChainNameRequired);
+    } else {
+      const oldChainNode = await this.models.ChainNode.findOne({
+        where: { cosmos_chain_id },
+      });
+      if (oldChainNode && oldChainNode.cosmos_chain_id === cosmos_chain_id) {
+        throw new AppError(`${Errors.ChainNodeIdExists}: ${cosmos_chain_id}`);
+      }
+    }
+
+    const { data: chains } = await axios.get(
+      `${COSMOS_REGISTRY_API}/api/v1/mainnet`,
+    );
+    const foundRegisteredChain = chains?.find(
+      (chain) => chain === cosmos_chain_id,
+    );
+    if (!foundRegisteredChain) {
+      throw new AppError(
+        `${Errors.UnegisteredCosmosChain}: ${cosmos_chain_id}`,
+      );
+    }
+
     // test cosmos endpoint validity -- must be http(s)
     if (!urlHasValidHTTPPrefix(url)) {
       throw new AppError(Errors.InvalidNodeUrl);
@@ -336,7 +337,7 @@ export async function __createCommunity(
   const [node] = await this.models.ChainNode.scope(
     'withPrivateData',
   ).findOrCreate({
-    where: { [Op.or]: [{ url }, { eth_chain_id }] },
+    where: { url },
     defaults: {
       url,
       eth_chain_id,
@@ -485,14 +486,40 @@ export async function __createCommunity(
         },
       ],
     });
+  } else if (
+    createdCommunity.base === ChainBase.CosmosSDK &&
+    // Onchain community can be created by Admin only,
+    // but we allow offchain cmty to have any creator as admin:
+    community.type === ChainType.Offchain
+  ) {
+    // if signed in with Keplr or Magic:
+    addressToBeAdmin = await this.models.Address.scope(
+      'withPrivateData',
+    ).findOne({
+      where: {
+        user_id: user.id,
+      },
+      include: [
+        {
+          model: this.models.Community,
+          where: { base: createdCommunity.base },
+          required: true,
+        },
+      ],
+    });
   }
 
   if (addressToBeAdmin) {
+    if (createdCommunity.base === ChainBase.CosmosSDK) {
+      hex = await bech32ToHex(addressToBeAdmin.address);
+    }
+
     const newAddress = await this.models.Address.create({
       user_id: user.id,
       profile_id: addressToBeAdmin.profile_id,
       address: addressToBeAdmin.address,
       community_id: createdCommunity.id,
+      hex,
       verification_token: addressToBeAdmin.verification_token,
       verification_token_expires: addressToBeAdmin.verification_token_expires,
       verified: addressToBeAdmin.verified,

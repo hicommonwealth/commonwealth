@@ -71,6 +71,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                   requirementType.value === requirement.data.source.source_type,
               )?.label,
             },
+            requirementTokenId: requirement.data.source.token_id,
             requirementAmount: convertRequirementAmountFromWeiToTokens(
               requirement.data.source.source_type,
               requirement.data.threshold.trim(),

@@ -17,6 +17,7 @@ import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_rad
 import { ZodError, ZodObject } from 'zod';
 import {
   AMOUNT_CONDITIONS,
+  SPECIFICATIONS,
   TOKENS,
   conditionTypes,
 } from '../../../common/constants';
@@ -115,9 +116,16 @@ const getRequirementSubFormSchema = (
   requirementType: string,
 ): ZodObject<any> => {
   const isTokenRequirement = Object.values(TOKENS).includes(requirementType);
+  const is1155Requirement = requirementType === SPECIFICATIONS.ERC_1155;
+
   const schema = isTokenRequirement
     ? requirementSubFormValidationSchema.omit({
         requirementContractAddress: true,
+        requirementTokenId: true,
+      })
+    : !is1155Requirement
+    ? requirementSubFormValidationSchema.omit({
+        requirementTokenId: true,
       })
     : requirementSubFormValidationSchema;
   return schema;
@@ -166,6 +174,7 @@ const GroupForm = ({
         requirementCondition: AMOUNT_CONDITIONS.MORE,
         requirementContractAddress: '',
         requirementType: '',
+        requirementTokenId: '',
       },
       errors: {},
     },
@@ -187,6 +196,7 @@ const GroupForm = ({
             requirementCondition: AMOUNT_CONDITIONS.MORE,
             requirementContractAddress: x?.requirementContractAddress || '',
             requirementType: x?.requirementType?.value || '',
+            requirementTokenId: x?.requirementTokenId || '',
           },
           errors: {},
         })),
@@ -227,6 +237,7 @@ const GroupForm = ({
           requirementCondition: AMOUNT_CONDITIONS.MORE,
           requirementContractAddress: '',
           requirementType: '',
+          requirementTokenId: '',
         },
         errors: {},
       },

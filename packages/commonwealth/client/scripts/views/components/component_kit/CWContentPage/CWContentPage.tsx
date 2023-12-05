@@ -287,7 +287,7 @@ export const CWContentPage = ({
           {sidebarComponents?.length >= 2 &&
             tabSelected === 2 &&
             sidebarComponents[1].item}
-          {sidebarComponents?.length === 3 &&
+          {sidebarComponents?.length >= 3 &&
             tabSelected === 3 &&
             sidebarComponents[2].item}
         </div>

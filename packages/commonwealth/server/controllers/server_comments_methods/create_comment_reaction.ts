@@ -37,7 +37,7 @@ export type CreateCommentReactionOptions = {
 export type CreateCommentReactionResult = [
   ReactionAttributes,
   EmitOptions[],
-  TrackOptions[]
+  TrackOptions[],
 ];
 
 export async function __createCommentReaction(
@@ -51,7 +51,7 @@ export async function __createCommentReaction(
     canvasAction,
     canvasSession,
     canvasHash,
-  }: CreateCommentReactionOptions
+  }: CreateCommentReactionOptions,
 ): Promise<CreateCommentReactionResult> {
   const comment = await this.models.Comment.findOne({
     where: { id: commentId },
@@ -88,7 +88,7 @@ export async function __createCommentReaction(
       this.models,
       { where: { address_id: address.id } },
       community.id,
-      ['admin']
+      ['admin'],
     );
     const isGodMode = user.isAdmin;
     const hasAdminRole = addressAdminRoles.length > 0;
@@ -99,7 +99,7 @@ export async function __createCommentReaction(
           this.tokenBalanceCache,
           this.models,
           thread.topic_id,
-          address.address
+          address.address,
         );
       } catch (e) {
         throw new ServerError(`${Errors.BalanceCheckFailed}: ${e.message}`);
@@ -161,7 +161,7 @@ export async function __createCommentReaction(
   allAnalyticsOptions.push({
     event: MixpanelCommunityInteractionEvent.CREATE_REACTION,
     community: community.id,
-    isCustomDomain: null,
+    userId: user.id,
   });
 
   // update address last active

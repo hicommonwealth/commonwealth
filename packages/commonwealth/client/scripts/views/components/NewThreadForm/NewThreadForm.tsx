@@ -84,7 +84,7 @@ export const NewThreadForm = () => {
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
   const { data: memberships = [] } = useRefreshMembershipQuery({
@@ -169,7 +169,7 @@ export const NewThreadForm = () => {
       if (err instanceof SessionKeyError) {
         return;
       }
-      console.error(err?.responseJSON?.error || err?.message);
+      console.error(err.response.data.error || err?.message);
       notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
@@ -197,7 +197,7 @@ export const NewThreadForm = () => {
       <div className="NewThreadForm">
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            Create Discussion
+            Create thread
           </CWText>
         </div>
         <div className="new-thread-body">

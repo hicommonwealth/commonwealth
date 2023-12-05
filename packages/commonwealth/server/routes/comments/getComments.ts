@@ -1,9 +1,6 @@
-import type {
-  GetCommentsReq,
-  GetCommentsResp,
-} from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
+import type { GetCommentsReq, GetCommentsResp } from '../../api/extApiTypes';
 import type { DB } from '../../models';
 import { CommentAttributes } from '../../models/comment';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
@@ -24,7 +21,7 @@ export const getCommentsValidation = [
 export const getComments = async (
   models: DB,
   req: TypedRequestQuery<GetCommentsReq>,
-  res: TypedResponse<GetCommentsResp>
+  res: TypedResponse<GetCommentsResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {

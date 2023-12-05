@@ -123,7 +123,6 @@ describe('ServerCommentsController', () => {
       expect(allAnalyticsOptions[0]).to.include({
         event: 'Create New Reaction',
         community: 'ethereum',
-        isCustomDomain: null,
       });
     });
 

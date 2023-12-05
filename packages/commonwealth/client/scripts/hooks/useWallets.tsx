@@ -22,6 +22,8 @@ import app, { initAppState } from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import { addressSwapper } from 'utils';
 import {
+  BaseMixpanelPayload,
+  MixpanelCommunityInteractionEvent,
   MixpanelLoginEvent,
   MixpanelLoginPayload,
 } from '../../../shared/analytics/types';
@@ -93,7 +95,9 @@ const useWallets = (walletProps: IuseWalletProps) => {
 
   const isLinkingWallet = activeStep === 'selectPrevious';
 
-  const { trackAnalytics } = useBrowserAnalyticsTrack<MixpanelLoginPayload>({
+  const { trackAnalytics } = useBrowserAnalyticsTrack<
+    MixpanelLoginPayload | BaseMixpanelPayload
+  >({
     onAction: true,
   });
 
@@ -582,15 +586,18 @@ const useWallets = (walletProps: IuseWalletProps) => {
         // if getRecentBlock fails, continue with null blockhash
       }
 
-      const { account: signingAccount, newlyCreated } =
-        await createUserWithAddress(
-          selectedAddress,
-          wallet.name,
-          null, // no sso source
-          chainIdentifier,
-          sessionPublicAddress,
-          validationBlockInfo,
-        );
+      const {
+        account: signingAccount,
+        newlyCreated,
+        joinedCommunity,
+      } = await createUserWithAddress(
+        selectedAddress,
+        wallet.name,
+        null, // no sso source
+        chainIdentifier,
+        sessionPublicAddress,
+        validationBlockInfo,
+      );
 
       if (isMobile) {
         setSignerAccount(signingAccount);
@@ -604,6 +611,12 @@ const useWallets = (walletProps: IuseWalletProps) => {
           isLinkingWallet,
           wallet,
         );
+      }
+
+      if (joinedCommunity) {
+        trackAnalytics({
+          event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+        });
       }
 
       trackAnalytics({

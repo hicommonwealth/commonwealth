@@ -52,7 +52,7 @@ export type CreateThreadOptions = {
 export type CreateThreadResult = [
   ThreadAttributes,
   EmitOptions[],
-  TrackOptions
+  TrackOptions,
 ];
 
 export async function __createThread(
@@ -73,7 +73,7 @@ export async function __createThread(
     canvasSession,
     canvasHash,
     discordMeta,
-  }: CreateThreadOptions
+  }: CreateThreadOptions,
 ): Promise<CreateThreadResult> {
   if (kind === 'discussion') {
     if (!title || !title.trim()) {
@@ -158,7 +158,7 @@ export async function __createThread(
       } else {
         if (community.topics?.length) {
           throw new AppError(
-            'Must pass a topic_name string and/or a numeric topic_id'
+            'Must pass a topic_name string and/or a numeric topic_id',
           );
         }
       }
@@ -182,7 +182,7 @@ export async function __createThread(
             this.tokenBalanceCache,
             topicId,
             community,
-            address
+            address,
           );
           if (!isValid) {
             throw new AppError(`${Errors.FailedCreateThread}: ${message}`);
@@ -199,7 +199,7 @@ export async function __createThread(
 
       return thread.id;
       // end of transaction
-    }
+    },
   );
 
   const finalThread = await this.models.Thread.findOne({
@@ -248,7 +248,7 @@ export async function __createThread(
             },
             include: [this.models.User],
           });
-        })
+        }),
       );
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -308,7 +308,7 @@ export async function __createThread(
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
     community: community.id,
-    isCustomDomain: null,
+    userId: user.id,
   };
 
   return [finalThread.toJSON(), allNotificationOptions, analyticsOptions];
