@@ -1,15 +1,18 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import {
+  NotificationCategories,
+  ProposalType,
+  SupportedNetwork,
+} from 'common-common/src/types';
+import jwt from 'jsonwebtoken';
+import { NotificationDataAndCategory, SnapshotEventType } from 'types';
 import { resetDatabase } from '../../server-test';
+import { JWT_SECRET } from '../../server/config';
+import models from '../../server/database';
+import emitNotifications from '../../server/util/emitNotifications';
 import * as modelUtils from '../util/modelUtils';
 import { JoinCommunityArgs } from '../util/modelUtils';
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../../server/config';
-import emitNotifications from '../../server/util/emitNotifications';
-import models from '../../server/database';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import { NotificationDataAndCategory, SnapshotEventType } from 'types';
-import { SupportedNetwork } from '../../shared/chain/types/types';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -140,7 +143,7 @@ describe('emitNotifications tests', () => {
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notification_data)
+        JSON.stringify(notification_data),
       );
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -195,7 +198,7 @@ describe('emitNotifications tests', () => {
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notifData)
+        JSON.stringify(notifData),
       );
 
       const notifRead = await models.NotificationsRead.findOne({
@@ -255,7 +258,7 @@ describe('emitNotifications tests', () => {
       expect(notif).to.not.be.null;
       expect(notif.thread_id).to.equal(thread.id);
       expect(notif.toJSON().notification_data).to.deep.equal(
-        JSON.stringify(notification_data)
+        JSON.stringify(notification_data),
       );
 
       const notifRead = await models.NotificationsRead.findOne({

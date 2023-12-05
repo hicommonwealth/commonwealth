@@ -1,9 +1,9 @@
-import { publishRmqMsg } from 'common-common/src/rabbitmq/util';
 import {
   RascalExchanges,
   RascalRoutingKeys,
 } from 'common-common/src/rabbitmq/types';
-import { RABBITMQ_API_URI } from 'commonwealth/server/config';
+import { publishRmqMsg } from 'common-common/src/rabbitmq/util';
+import { RABBITMQ_API_URI } from '../server/config';
 
 async function publishRmqMessageScript() {
   const snapshot = {};
@@ -12,7 +12,7 @@ async function publishRmqMessageScript() {
     RABBITMQ_API_URI,
     RascalExchanges.SnapshotListener,
     RascalRoutingKeys.SnapshotListener,
-    snapshot
+    snapshot,
   );
 
   console.log(publishJson);

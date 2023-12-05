@@ -1,4 +1,8 @@
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import {
+  NotificationCategories,
+  ProposalType,
+  SupportedNetwork,
+} from 'common-common/src/types';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -10,7 +14,6 @@ import { User } from 'views/components/user/user';
 import type { IEventLabel } from '../../../../../shared/chain/labelers/util';
 import { Label as ChainEventLabel } from '../../../../../shared/chain/labelers/util';
 import type { CWEvent } from '../../../../../shared/chain/types/types';
-import { SupportedNetwork } from '../../../../../shared/chain/types/types';
 import AddressInfo from '../../../models/AddressInfo';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';

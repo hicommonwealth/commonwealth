@@ -1,11 +1,10 @@
-import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
-import type { AccessLevel } from './permissions';
+import type { SupportedNetwork } from 'common-common/src/types';
 import {
-  ChainEventAttributes,
   NotificationCategories,
   NotificationCategory,
 } from 'common-common/src/types';
-import type { SupportedNetwork } from '../shared/chain/types/types';
+import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
+import type { AccessLevel } from './permissions';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
@@ -21,17 +20,6 @@ export type SnapshotProposalNotification = {
   category_id: 'snapshot-proposal';
   chain_id: string;
   SnapshotProposal: SnapshotProposalAttributes;
-};
-
-export type ChainEventNotification = {
-  id: number;
-  notification_data: string;
-  chain_event_id: number;
-  category_id: 'chain-event';
-  chain_id: string;
-  updated_at: Date;
-  created_at: Date;
-  ChainEvent: ChainEventAttributes;
 };
 
 export const enum SnapshotEventType {
