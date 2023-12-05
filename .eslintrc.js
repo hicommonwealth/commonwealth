@@ -30,6 +30,6 @@ module.exports = {
     // Error: Rules with suggestions must set the `meta.hasSuggestions` property to `true`. `meta.docs.suggestion` is ignored by ESLint.
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-namespace": "off",
-    "@typescript-eslint/no-unused-vars": ["warning", {"argsIgnorePattern": "^_"}]
+    "@typescript-eslint/no-unused-vars": ["warn", {"argsIgnorePattern": "^_"}]
   }
 }
