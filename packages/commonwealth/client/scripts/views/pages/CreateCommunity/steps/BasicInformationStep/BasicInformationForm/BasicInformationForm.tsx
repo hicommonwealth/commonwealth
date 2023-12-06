@@ -7,14 +7,41 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { z } from 'zod';
+import { ZodError } from 'zod';
 import './BasicInformationForm.scss';
+import {
+  basicInformationFormValidationSchema,
+  socialLinkValidation,
+} from './validation';
 
-const BasicInformationForm = () => {
-  const [socialLinks, setSocialLinks] = useState<any[]>([0]);
+type SocialLinkField = {
+  value?: string;
+  error?: string;
+};
+type FormSubmitValues = {
+  communityName: string;
+  communityDescription: string;
+  chain: {
+    label: string;
+    value: string;
+  };
+  links?: string[];
+};
+
+type BasicInformationFormProps = {
+  onSubmit: (values: FormSubmitValues) => any;
+};
+
+const BasicInformationForm = ({ onSubmit }: BasicInformationFormProps) => {
+  const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([
+    {
+      value: '',
+      error: '',
+    },
+  ]);
 
   const addLink = () => {
-    setSocialLinks((x) => [...(x || []), x?.length || 1]);
+    setSocialLinks((x) => [...(x || []), { value: '', error: '' }]);
   };
 
   const removeLinkAtIndex = (index: number) => {
@@ -23,10 +50,72 @@ const BasicInformationForm = () => {
     setSocialLinks([...updatedSocialLinks]);
   };
 
+  const validateSocialLinks = (): boolean => {
+    const updatedSocialLinks = [...socialLinks];
+    socialLinks.map((link, index) => {
+      try {
+        const schema = socialLinkValidation;
+        if (link.value.trim() !== '') {
+          schema.parse(link.value);
+        }
+
+        updatedSocialLinks[index] = {
+          ...updatedSocialLinks[index],
+          error: '',
+        };
+      } catch (e: any) {
+        const zodError = e as ZodError;
+        updatedSocialLinks[index] = {
+          ...updatedSocialLinks[index],
+          error: zodError.errors[0].message,
+        };
+      }
+    });
+
+    setSocialLinks([...updatedSocialLinks]);
+
+    return !!updatedSocialLinks.find((x) => x.error);
+  };
+
+  const updateAndValidateSocialLinkAtIndex = (value: string, index: number) => {
+    const updatedSocialLinks = [...socialLinks];
+    updatedSocialLinks[index] = {
+      ...updatedSocialLinks[index],
+      value,
+    };
+    try {
+      const schema = socialLinkValidation;
+      if (updatedSocialLinks[index].value.trim() !== '') {
+        schema.parse(updatedSocialLinks[index].value);
+      }
+
+      updatedSocialLinks[index] = {
+        ...updatedSocialLinks[index],
+        error: '',
+      };
+    } catch (e: any) {
+      const zodError = e as ZodError;
+      updatedSocialLinks[index] = {
+        ...updatedSocialLinks[index],
+        error: zodError.errors[0].message,
+      };
+    }
+    setSocialLinks([...updatedSocialLinks]);
+  };
+
+  const handleSubmit = async (values: FormSubmitValues) => {
+    const hasLinksError = validateSocialLinks();
+    if (hasLinksError) return;
+
+    values.links = socialLinks.map((link) => link.value).filter(Boolean);
+
+    await onSubmit(values);
+  };
+
   return (
     <CWForm
-      validationSchema={z.object({})} // TODO: add proper validation
-      onSubmit={console.log} // TODO: connect api
+      validationSchema={basicInformationFormValidationSchema}
+      onSubmit={handleSubmit}
       className="BasicInformationForm"
     >
       <section className="header">
@@ -38,12 +127,16 @@ const BasicInformationForm = () => {
 
       {/* Form fields */}
       <CWTextInput
+        name="communityName"
+        hookToForm
         label="Community Name"
         placeholder="Name your community"
         fullWidth
       />
 
       <CWSelectList
+        name="chain"
+        hookToForm
         isClearable={false}
         label="Select chain"
         placeholder="Select chain"
@@ -58,11 +151,17 @@ const BasicInformationForm = () => {
       />
 
       <CWTextArea
+        name="communityDescription"
+        hookToForm
         label="Community Description"
         placeholder="Enter a description of your community or project"
       />
 
-      {/* TODO: update image uploader styles and add upload button and handle preview related changes */}
+      {/* TODO:
+        1. update image uploader styles add upload button
+        2. handle preview related changes
+        3. add form validation support
+      */}
       <CWCoverImageUploader
         subheaderText="Community Profile Image (Accepts JPG and PNG files)"
         uploadCompleteCallback={console.log}
@@ -86,13 +185,25 @@ const BasicInformationForm = () => {
               containerClassName="w-full"
               placeholder="https://example.com"
               fullWidth
+              value={x.value}
+              customError={x.error}
+              onInput={(e) =>
+                updateAndValidateSocialLinkAtIndex(
+                  e.target.value?.trim(),
+                  index,
+                )
+              }
+              onBlur={() => updateAndValidateSocialLinkAtIndex(x.value, index)}
+              onFocus={() => updateAndValidateSocialLinkAtIndex(x.value, index)}
             />
-            <CWIconButton
-              iconButtonTheme="neutral"
-              iconName="trash"
-              iconSize="large"
-              onClick={() => removeLinkAtIndex(index)}
-            />
+            {index > 0 && (
+              <CWIconButton
+                iconButtonTheme="neutral"
+                iconName="trash"
+                iconSize="large"
+                onClick={() => removeLinkAtIndex(index)}
+              />
+            )}
           </div>
         ))}
 
