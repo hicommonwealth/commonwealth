@@ -16,12 +16,12 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import {
   defaultCommunityRows,
-  updateAdminOnCreateCommunity
+  updateAdminOnCreateCommunity,
 } from './community_input_rows';
 import {
   useCommunityFormDefaultFields,
   useCommunityFormIdFields,
-  useCommunityFormState
+  useCommunityFormState,
 } from './hooks';
 
 export const SplTokenForm = () => {
@@ -74,7 +74,7 @@ export const SplTokenForm = () => {
     } catch (err) {
       communityFormState.setStatus('failure');
       communityFormState.setMessage(
-        `Error: ${err.message}` || 'Failed to load token'
+        `Error: ${err.message}` || 'Failed to load token',
       );
     }
 
@@ -88,7 +88,7 @@ export const SplTokenForm = () => {
         options={[
           { label: 'mainnet-beta', value: 'mainnet-beta' },
           { label: 'testnet', value: 'testnet' },
-          { label: 'devnet', value: 'devnet' }
+          { label: 'devnet', value: 'devnet' },
         ]}
         onSelect={(o) => {
           setCluster(o.value as solanaWeb3.Cluster);
@@ -162,7 +162,7 @@ export const SplTokenForm = () => {
               network: ChainNetwork.SPL,
               node_url: cluster,
               type: ChainType.Token,
-              default_symbol: symbol
+              default_symbol: symbol,
               // ...form, <-- not typed so I don't know what's needed
             });
 
@@ -170,7 +170,7 @@ export const SplTokenForm = () => {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 
@@ -180,7 +180,7 @@ export const SplTokenForm = () => {
             navigate(`/${res.result.community?.id}`);
           } catch (err) {
             notifyError(
-              err.responseJSON?.error || 'Creating new SPL community failed'
+              err.responseJSON?.error || 'Creating new SPL community failed',
             );
           } finally {
             communityFormState.setSaving(false);

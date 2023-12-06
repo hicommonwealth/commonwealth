@@ -11,6 +11,7 @@ export type GetErc1155BalancesOptions = {
   addresses: string[];
   contractAddress: string;
   tokenId: number;
+  batchSize?: number;
 };
 
 export async function __getErc1155Balances(options: GetErc1155BalancesOptions) {
@@ -34,6 +35,7 @@ export async function __getErc1155Balances(options: GetErc1155BalancesOptions) {
       options.contractAddress,
       options.tokenId,
       options.addresses,
+      options.batchSize,
     );
   }
 }
@@ -44,16 +46,16 @@ async function getOnChainBatchErc1155Balances(
   contractAddress: string,
   tokenId: number,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
-  const BATCH_SIZE = 1000;
   const rpcRequests = [];
 
   for (
     let startIndex = 0;
     startIndex < addresses.length;
-    startIndex += BATCH_SIZE
+    startIndex += batchSize
   ) {
-    const endIndex = Math.min(startIndex + BATCH_SIZE, addresses.length);
+    const endIndex = Math.min(startIndex + batchSize, addresses.length);
     const batchAddresses = addresses.slice(startIndex, endIndex);
 
     const calldata =
@@ -90,7 +92,7 @@ async function getOnChainBatchErc1155Balances(
   if (datas.error) {
     const msg =
       `On-chain batch request failed ` +
-      `with batch size ${BATCH_SIZE} on evm chain id ${evmChainId} for contract ${contractAddress}.`;
+      `with batch size ${batchSize} on evm chain id ${evmChainId} for contract ${contractAddress}.`;
     rollbar.error(msg, datas.error);
     log.error(msg, datas.error);
     return {};
@@ -105,8 +107,8 @@ async function getOnChainBatchErc1155Balances(
       const balances = AbiCoder.decodeParameter('uint256[]', data.result);
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
-      const endIndex = Math.min(data.id + BATCH_SIZE, addresses.length);
-      const relevantAddresses = addresses.splice(data.id, endIndex);
+      const endIndex = Math.min(data.id + batchSize, addresses.length);
+      const relevantAddresses = addresses.slice(data.id, endIndex);
       relevantAddresses.forEach(
         (key, i) => (addressBalanceMap[key] = balances[i]),
       );

@@ -143,7 +143,7 @@ const GroupForm = ({
   });
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const takenGroupNames = groups.map(({ name }) => name.toLowerCase());
