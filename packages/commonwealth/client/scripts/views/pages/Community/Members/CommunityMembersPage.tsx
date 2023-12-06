@@ -68,6 +68,7 @@ const CommunityMembersPage = () => {
   const { data: memberships = null } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
+    apiEnabled: !!featureFlags.gatingEnabled,
   });
 
   const debouncedSearchTerm = useDebounce<string>(
@@ -80,14 +81,17 @@ const CommunityMembersPage = () => {
     fetchNextPage,
     isLoading: isLoadingMembers,
   } = useSearchProfilesQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: '',
     limit: 30,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
     includeGroupIds: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled:
+      app?.user?.activeAccount?.address && featureFlags.gatingEnabled
+        ? !!memberships
+        : true,
     ...(searchFilters.category !== 'All groups' && {
       includeMembershipTypes: searchFilters.category
         .split(' ')
@@ -97,9 +101,12 @@ const CommunityMembersPage = () => {
   });
 
   const { data: groups } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled:
+      app?.user?.activeAccount?.address && featureFlags.gatingEnabled
+        ? !!memberships
+        : true,
   });
 
   const formattedMembers = useMemo(() => {

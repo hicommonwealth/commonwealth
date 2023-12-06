@@ -2,7 +2,7 @@ import type { RegisteredTypes } from '@polkadot/types/types';
 import axios from 'axios';
 import type { ChainNetwork, DefaultPage } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
-import { ETHERMINT_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
+import { COSMOS_EVM_CHAINS } from 'controllers/app/webWallets/keplr_ethereum_web_wallet';
 import app from 'state';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
@@ -179,7 +179,7 @@ class CommunityInfo {
       ? 6
       : 18;
 
-    if (ETHERMINT_CHAINS.some((c) => c === id)) {
+    if (COSMOS_EVM_CHAINS.some((c) => c === id)) {
       decimals = 18;
     }
 

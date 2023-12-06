@@ -41,7 +41,7 @@ const get = (route, args, callback) => {
 };
 
 interface NotifOptions {
-  chain_filter: string;
+  community_filter: string;
   maxId: number;
 }
 
@@ -331,8 +331,8 @@ class NotificationsController {
     }
 
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined };
+      ? { community_filter: app.activeChainId(), maxId: undefined }
+      : { community_filter: undefined, maxId: undefined };
 
     return post('/viewChainEventNotifications', options, (result) => {
       this._numPages = result.numPages;
@@ -347,8 +347,8 @@ class NotificationsController {
       throw new Error('must be signed in to refresh notifications');
     }
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined };
+      ? { community_filter: app.activeChainId(), maxId: undefined }
+      : { community_filter: undefined, maxId: undefined };
 
     return post('/viewDiscussionNotifications', options, (result) => {
       this._numPages = result.numPages;

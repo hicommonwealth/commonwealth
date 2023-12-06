@@ -55,6 +55,7 @@ export enum WalletId {
   WalletConnect = 'walletconnect',
   KeplrEthereum = 'keplr-ethereum',
   Keplr = 'keplr',
+  Leap = 'leap',
   NearWallet = 'near',
   TerraStation = 'terrastation',
   TerraWalletConnect = 'terra-walletconnect',
@@ -139,6 +140,7 @@ export enum RedisNamespaces {
   Test_Redis = 'test_redis',
   Database_Cleaner = 'database_cleaner',
   Compound_Gov_Version = 'compound_gov_version',
+  Token_Balance = 'token_balance',
 }
 
 export interface ISnapshotNotification {
