@@ -25,7 +25,8 @@ export const CWCommunityStakeBanner = ({
       buttons={[
         {
           label: 'Buy stake',
-          buttonType: 'primary',
+          buttonType: 'secondary',
+          // buttonAlt: 'alt-green',
           onClick: () => {
             navigate('/');
           },
