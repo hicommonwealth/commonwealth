@@ -36,13 +36,16 @@ const useToggleCommunityStarMutation = () => {
 
       if (starredCommunity) {
         app.user.addStarredCommunity(
-          new StarredCommunity(starredCommunity.chain, starredCommunity.user_id)
+          new StarredCommunity(
+            starredCommunity.chain,
+            starredCommunity.user_id,
+          ),
         );
       } else {
         const star = app.user.starredCommunities.find((c) => {
-          return c.chain === chain;
+          return c.community === chain;
         });
-        app.user.removeStarredCommunity(star.chain, star.user_id);
+        app.user.removeStarredCommunity(star.community, star.user_id);
       }
     },
   });

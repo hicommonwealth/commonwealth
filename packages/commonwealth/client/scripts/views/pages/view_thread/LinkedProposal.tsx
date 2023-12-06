@@ -3,10 +3,10 @@ import {
   chainEntityTypeToProposalSlug,
   getProposalUrlPath,
 } from 'identifiers';
-import type Thread from '../../../models/Thread';
 import React from 'react';
-import app from 'state';
 import { Link as ReactRouterLink } from 'react-router-dom';
+import app from 'state';
+import type Thread from '../../../models/Thread';
 
 type LinkedProposalProps = {
   thread: Thread;
@@ -14,7 +14,11 @@ type LinkedProposalProps = {
   identifier: string;
 };
 
-export const LinkedProposal = ({ thread, title, identifier }: LinkedProposalProps) => {
+export const LinkedProposal = ({
+  thread,
+  title,
+  identifier,
+}: LinkedProposalProps) => {
   const slug = chainEntityTypeToProposalSlug();
 
   const threadLink = `${
