@@ -71,24 +71,14 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
       // If the user is currently in a partly-logged-in state, merge their
       // social accounts over to the newly found user
       if (previousUser && previousUser.id !== existingUser.id) {
-        const [
-          oldSocialAccounts,
-          oldAddresses,
-          newSocialAccounts,
-          newAddresses,
-        ] = await Promise.all([
-          previousUser.getSocialAccounts(),
+        const [oldAddresses, newAddresses] = await Promise.all([
           (
             await previousUser.getAddresses()
           ).filter((address) => !!address.verified),
-          existingUser.getSocialAccounts(),
           (
             await existingUser.getAddresses()
           ).filter((address) => !!address.verified),
         ]);
-        await existingUser.setSocialAccounts(
-          oldSocialAccounts.concat(newSocialAccounts),
-        );
         await existingUser.setAddresses(oldAddresses.concat(newAddresses));
       }
       if (!existingUser.emailVerified) {

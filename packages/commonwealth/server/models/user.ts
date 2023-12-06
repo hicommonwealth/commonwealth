@@ -4,10 +4,6 @@ import type { DB } from '../models';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
-import type {
-  SocialAccountAttributes,
-  SocialAccountInstance,
-} from './social_account';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type EmailNotificationInterval = 'week' | 'never';
@@ -27,7 +23,6 @@ export type UserAttributes = {
   selectedChain?: CommunityAttributes | CommunityAttributes['id'];
   Addresses?: AddressAttributes[] | AddressAttributes['id'][];
   Profiles?: ProfileAttributes[];
-  SocialAccounts?: SocialAccountAttributes[] | SocialAccountAttributes['id'][];
   Chains?: CommunityAttributes[] | CommunityAttributes['id'][];
 };
 
@@ -50,19 +45,13 @@ export type UserInstance = ModelInstance<UserAttributes> & {
   >;
 
   getProfiles: Sequelize.HasManyGetAssociationsMixin<ProfileInstance>;
-
-  getSocialAccounts: Sequelize.HasManyGetAssociationsMixin<SocialAccountInstance>;
-  setSocialAccounts: Sequelize.HasManySetAssociationsMixin<
-    SocialAccountInstance,
-    SocialAccountInstance['id']
-  >;
 };
 
 export type UserCreationAttributes = UserAttributes & {
   createWithProfile?: (
     models: DB,
     attrs: UserAttributes,
-    options?: CreateOptions
+    options?: CreateOptions,
   ) => Promise<UserInstance>;
 };
 
@@ -71,7 +60,7 @@ export type UserModelStatic = ModelStatic<UserInstance> &
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): UserModelStatic => {
   const User = <UserModelStatic>sequelize.define(
     'User',
@@ -117,20 +106,20 @@ export default (
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   User.createWithProfile = async (
     models: DB,
     attrs: UserAttributes,
-    options?: CreateOptions
+    options?: CreateOptions,
   ): Promise<UserInstance> => {
     const newUser = await User.create(attrs, options);
     const profile = await models.Profile.create(
       {
         user_id: newUser.id,
       },
-      options
+      options,
     );
     newUser.Profiles = [profile];
     return newUser;
@@ -144,7 +133,6 @@ export default (
     });
     models.User.hasMany(models.Address);
     models.User.hasMany(models.Profile);
-    models.User.hasMany(models.SocialAccount);
     models.User.hasMany(models.StarredCommunity);
   };
 
