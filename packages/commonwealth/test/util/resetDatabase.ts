@@ -305,7 +305,7 @@ export const resetDatabase = (debug = false): Promise<void> => {
         event: 'proposal/created',
         start: new Date().toString(),
         expire: new Date(
-          new Date().getTime() + 100 * 24 * 60 * 60 * 1000
+          new Date().getTime() + 100 * 24 * 60 * 60 * 1000,
         ).toString(),
       });
 

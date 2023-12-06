@@ -80,7 +80,7 @@ describe('API Tests', () => {
         address,
         sessionWallet.address,
         timestamp,
-        TEST_BLOCK_INFO_BLOCKHASH
+        TEST_BLOCK_INFO_BLOCKHASH,
       );
       createSiweMessage;
       // const data = getEIP712SignableSession(message);

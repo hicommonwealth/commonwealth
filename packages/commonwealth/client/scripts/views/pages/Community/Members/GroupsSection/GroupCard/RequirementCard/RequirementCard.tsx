@@ -34,7 +34,7 @@ const RequirementCard = ({
               'cols-3': !requirementContractAddress,
               'cols-4': !!requirementContractAddress,
             },
-            `row-2`
+            `row-2`,
           )}
         >
           <InfoBlock label="Chain" value={requirementChain} />

@@ -26,7 +26,7 @@ export const getReactionsValidation = [
 const getReactions = async (
   models: DB,
   req: TypedRequestQuery<GetReactionsReq>,
-  res: TypedResponse<GetReactionsResp>
+  res: TypedResponse<GetReactionsResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {

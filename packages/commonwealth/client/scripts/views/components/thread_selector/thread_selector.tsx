@@ -55,7 +55,7 @@ export const ThreadSelector = ({
             address: t.address,
             chainId: t.address_chain,
           }),
-        } as any)
+        } as any),
     );
   }, [threadsData]);
 
@@ -91,7 +91,7 @@ export const ThreadSelector = ({
         />
       );
     },
-    [linkedThreadsToSet, onSelect]
+    [linkedThreadsToSet, onSelect],
   );
 
   const EmptyComponent = () => (

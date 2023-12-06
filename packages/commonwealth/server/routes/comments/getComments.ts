@@ -24,7 +24,7 @@ export const getCommentsValidation = [
 export const getComments = async (
   models: DB,
   req: TypedRequestQuery<GetCommentsReq>,
-  res: TypedResponse<GetCommentsResp>
+  res: TypedResponse<GetCommentsResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {

@@ -1,12 +1,12 @@
 import { createSiweMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
+import * as siwe from 'siwe';
 import app from 'state';
 import type Web3 from 'web3';
-import * as siwe from 'siwe';
 
-import { hexToNumber } from 'web3-utils';
 import type { SessionPayload } from '@canvas-js/interfaces';
+import { hexToNumber } from 'web3-utils';
 import Account from '../../../models/Account';
 import BlockInfo from '../../../models/BlockInfo';
 import ChainInfo from '../../../models/ChainInfo';
@@ -68,7 +68,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    sessionPayload: SessionPayload
+    sessionPayload: SessionPayload,
   ): Promise<string> {
     const nonce = siwe.generateNonce();
     // this must be open-ended, because of custom domains
@@ -140,7 +140,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public async initAccountsChanged() {
     await this._provider.on('accountsChanged', async (accounts: string[]) => {
       const updatedAddress = app.user.activeAccounts.find(
-        (addr) => addr.address === accounts[0]
+        (addr) => addr.address === accounts[0],
       );
       if (!updatedAddress) return;
       await setActiveAccount(updatedAddress);

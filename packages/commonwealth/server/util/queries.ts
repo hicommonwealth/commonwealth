@@ -78,7 +78,7 @@ export type PaginationSqlBind = PaginationSqlResult['bind'];
 
 export const validateOrderDirection = (
   orderDirection: string,
-  allowEmpty?: boolean
+  allowEmpty?: boolean,
 ): boolean => {
   if (allowEmpty && !orderDirection) {
     return true;
@@ -87,7 +87,7 @@ export const validateOrderDirection = (
 };
 
 export const buildPaginationSql = (
-  options: PaginationSqlOptions
+  options: PaginationSqlOptions,
 ): PaginationSqlResult => {
   const {
     limit,
@@ -134,7 +134,7 @@ export const buildPaginationSql = (
 export function buildPaginatedResponse<T>(
   items: T[],
   totalResults: number,
-  bind: PaginationSqlBind
+  bind: PaginationSqlBind,
 ): TypedPaginatedResult<T> {
   return {
     results: items,

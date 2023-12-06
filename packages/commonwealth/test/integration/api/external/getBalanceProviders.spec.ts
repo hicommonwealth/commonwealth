@@ -15,7 +15,7 @@ describe('getTokenBalance Tests', async () => {
       models,
       tokenBalanceCache,
       getReq(r),
-      res()
+      res(),
     )) as any;
 
     chai.assert.lengthOf(resp.result.balance_providers, 1);

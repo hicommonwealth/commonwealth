@@ -27,7 +27,7 @@ export const getThreadsValidation = [
 export const getThreads = async (
   models: DB,
   req: TypedRequestQuery<GetThreadsReq>,
-  res: TypedResponse<GetThreadsResp>
+  res: TypedResponse<GetThreadsResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {

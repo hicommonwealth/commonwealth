@@ -14,7 +14,6 @@ import QuillTooltip from './QuillTooltip';
 import { LoadingIndicator } from './loading_indicator';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { convertTwitterLinksToEmbeds } from './twitter_embed';
-import { useClipboardMatchers } from './use_clipboard_matchers';
 import { useImageDropAndPaste } from './use_image_drop_and_paste';
 import { useImageUploader } from './use_image_uploader';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
@@ -71,8 +70,10 @@ const ReactQuillEditor = ({
     lastSelectionRef,
   });
 
-  // handle clipboard behavior
-  const { clipboardMatchers } = useClipboardMatchers();
+  // This is unused at the moment, replaced with  'matchVisual: false,'
+  // but was kept here in case we need it in the future
+  // handle clipboard behavior:
+  // const { clipboardMatchers } = useClipboardMatchers();
 
   // handle image upload for drag and drop
   const { handleImageDropAndPaste } = useImageDropAndPaste({
@@ -119,34 +120,6 @@ const ReactQuillEditor = ({
       ...newContent,
       ___isMarkdown: isMarkdownEnabled,
     } as SerializableDeltaStatic);
-
-    // Check if the change is due to a paste operation
-    if (editorRef?.current?.getEditor?.()?.getSelection?.()) {
-      const selection = editorRef.current.getEditor().getSelection();
-
-      // Delay the cursor adjustment after the paste operation
-      setTimeout(() => {
-        editorRef.current
-          .getEditor()
-          .setSelection(selection.index, selection.length);
-      });
-    }
-
-    // Handle the "Return" key separately
-    if (delta.ops.length >= 1) {
-      const cursorPosition = delta.ops[0].insert.length;
-
-      // Check if the current line is an h1 or h2
-      const currentFormat = editorRef.current
-        .getEditor()
-        .getFormat(cursorPosition);
-
-      if (currentFormat.header === 1 || currentFormat.header === 2) {
-        setTimeout(() => {
-          editorRef.current.getEditor().setSelection(cursorPosition, 0);
-        });
-      }
-    }
   };
 
   const handleToggleMarkdown = () => {
@@ -336,7 +309,7 @@ const ReactQuillEditor = ({
                             handler: handleImageDropAndPaste,
                           },
                           clipboard: {
-                            matchers: clipboardMatchers,
+                            matchVisual: false,
                           },
                           mention,
                           magicUrl: !isMarkdownEnabled,

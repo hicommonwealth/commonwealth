@@ -57,13 +57,13 @@ import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import ViewTemplate from '../view_template/view_template';
 import { LinkedUrlCard } from './LinkedUrlCard';
 import { TemplateActionCard } from './TemplateActionCard';
+import { ThreadPollCard } from './ThreadPollCard';
+import { ThreadPollEditorCard } from './ThreadPollEditorCard';
 import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
-import { ThreadPollCard } from './ThreadPollCard';
-import { ThreadPollEditorCard } from './ThreadPollEditorCard';
 import { SnapshotCreationCard } from './snapshot_creation_card';
 
 export type ThreadPrefetch = {

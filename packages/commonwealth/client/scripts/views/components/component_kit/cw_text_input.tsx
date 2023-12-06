@@ -67,7 +67,7 @@ export const MessageRow = (props: MessageRowProps) => {
     <div
       className={getClasses<{ hasFeedback: boolean }>(
         { hasFeedback },
-        'MessageRow'
+        'MessageRow',
       )}
     >
       <CWLabel label={label} />
@@ -76,7 +76,7 @@ export const MessageRow = (props: MessageRowProps) => {
           type="caption"
           className={getClasses<{ status: ValidationStatus }>(
             { status: validationStatus },
-            'feedback-message-text'
+            'feedback-message-text',
           )}
         >
           {statusMessage}
@@ -149,7 +149,7 @@ export const CWTextInput = (props: TextInputProps) => {
           containerClassName,
           validationStatus: props.validationStatus,
         },
-        ComponentType.OldTextInput
+        ComponentType.OldTextInput,
       )}
       onClick={onClick}
     >
@@ -203,7 +203,7 @@ export const CWTextInput = (props: TextInputProps) => {
                     validationProps.setValidationStatus(result[0]);
                     validationProps.setStatusMessage(result[1]);
                   }
-                }, timeout)
+                }, timeout),
               );
             }
           }}

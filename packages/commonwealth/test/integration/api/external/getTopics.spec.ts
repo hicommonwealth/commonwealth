@@ -1,11 +1,11 @@
-import 'chai/register-should';
 import chai from 'chai';
+import chaiHttp from 'chai-http';
+import 'chai/register-should';
 import type { GetTopicsReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
-import { testTopics } from 'test/integration/api/external/dbEntityHooks.spec';
 import type { TopicAttributes } from 'server/models/topic';
 import { get } from 'test/integration/api/external/appHook.spec';
-import chaiHttp from 'chai-http';
+import { testTopics } from 'test/integration/api/external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
 
@@ -60,8 +60,8 @@ describe('getTopics Tests', () => {
       resp.result.topics,
       ([...resp.result.topics] as TopicAttributes[]).sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      )
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      ),
     );
 
     r.sort = OrderByOptions.UPDATED;
@@ -72,8 +72,8 @@ describe('getTopics Tests', () => {
       resp.result.topics,
       ([...resp.result.topics] as TopicAttributes[]).sort(
         (a, b) =>
-          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-      )
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+      ),
     );
   });
 
@@ -87,7 +87,7 @@ describe('getTopics Tests', () => {
     resp = await get(
       '/api/topics',
       { community_id: testTopics[0].chain_id, count_only: 3 },
-      true
+      true,
     );
 
     chai.assert.lengthOf(resp.result, 1);

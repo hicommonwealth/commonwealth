@@ -1,12 +1,12 @@
-import 'chai/register-should';
 import chai from 'chai';
+import 'chai/register-should';
 import type { GetReactionsReq } from 'common-common/src/api/extApiTypes';
 import { OrderByOptions } from 'common-common/src/api/extApiTypes';
+import type { ReactionAttributes } from 'server/models/reaction';
 import {
   testComments,
   testReactions,
 } from 'test/integration/api/external/dbEntityHooks.spec';
-import type { ReactionAttributes } from 'server/models/reaction';
 import { get } from './appHook.spec';
 
 describe('getReactions Tests', () => {
@@ -66,8 +66,8 @@ describe('getReactions Tests', () => {
       resp.result.reactions,
       ([...resp.result.reactions] as ReactionAttributes[]).sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      )
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      ),
     );
 
     r.sort = OrderByOptions.UPDATED;
@@ -78,8 +78,8 @@ describe('getReactions Tests', () => {
       resp.result.reactions,
       ([...resp.result.reactions] as ReactionAttributes[]).sort(
         (a, b) =>
-          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-      )
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+      ),
     );
   });
 
@@ -93,7 +93,7 @@ describe('getReactions Tests', () => {
     resp = await get(
       '/api/reactions',
       { community_id: testComments[0].chain, count_only: 3 },
-      true
+      true,
     );
 
     chai.assert.lengthOf(resp.result, 1);

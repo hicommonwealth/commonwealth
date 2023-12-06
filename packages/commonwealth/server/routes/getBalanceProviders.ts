@@ -16,7 +16,7 @@ export const getBalanceProviders = async (
   models: DB,
   tbc: TokenBalanceCache,
   req: TypedRequestQuery<GetBalanceProvidersReq>,
-  res: TypedResponse<GetBalanceProvidersResp>
+  res: TypedResponse<GetBalanceProvidersResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -26,7 +26,7 @@ export const getBalanceProviders = async (
   const { chain_node_ids } = req.query;
 
   const balanceProviders = await Promise.all(
-    chain_node_ids.map((id) => tbc.getBalanceProviders(id))
+    chain_node_ids.map((id) => tbc.getBalanceProviders(id)),
   );
 
   return success(res, {

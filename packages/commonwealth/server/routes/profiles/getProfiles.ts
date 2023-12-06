@@ -20,7 +20,7 @@ export const getProfilesValidation = [
       query('addresses').exists().toArray(),
       query('profile_ids').exists().toArray(),
     ],
-    `${needParamErrMsg} (addresses, profile_ids)`
+    `${needParamErrMsg} (addresses, profile_ids)`,
   ),
   query('count_only').optional().isBoolean().toBoolean(),
   ...paginationValidation,
@@ -29,7 +29,7 @@ export const getProfilesValidation = [
 const getProfiles = async (
   models: DB,
   req: TypedRequestQuery<GetProfilesReq>,
-  res: TypedResponse<GetProfilesResp>
+  res: TypedResponse<GetProfilesResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {

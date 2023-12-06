@@ -38,7 +38,7 @@ class DiscordController {
     try {
       const discordBotConfig = await $.post(
         `${app.serverUrl()}/getDiscordChannels`,
-        { chain_id, jwt: app.user.jwt }
+        { chain_id, jwt: app.user.jwt },
       );
 
       return {
@@ -53,7 +53,7 @@ class DiscordController {
 
   public async setForumChannelConnection(
     topicId: string,
-    channelId: string | null
+    channelId: string | null,
   ) {
     try {
       await axios.patch(
@@ -61,7 +61,7 @@ class DiscordController {
         {
           chain: app.activeChainId(),
           jwt: app.user.jwt,
-        }
+        },
       );
     } catch (e) {
       console.log(e);

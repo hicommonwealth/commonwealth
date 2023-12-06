@@ -27,7 +27,7 @@ const linkExistingAddressToChain = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.address) {
     return next(new AppError(Errors.NeedAddress));
@@ -65,7 +65,7 @@ const linkExistingAddressToChain = async (
         user_id: userId,
         verified: { [Op.ne]: null },
       },
-    }
+    },
   );
 
   if (!originalAddress) {
@@ -85,7 +85,7 @@ const linkExistingAddressToChain = async (
 
     verificationToken = crypto.randomBytes(18).toString('hex');
     verificationTokenExpires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
 
     await models.Address.update(
@@ -99,7 +99,7 @@ const linkExistingAddressToChain = async (
           address: req.body.address,
           community_id: { [Op.in]: chains.map((ch) => ch.id) },
         },
-      }
+      },
     );
   }
 
@@ -113,7 +113,7 @@ const linkExistingAddressToChain = async (
         : req.body.address;
 
     const existingAddress = await models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
       where: { community_id: req.body.chain, address: encodedAddress },
     });
@@ -164,7 +164,7 @@ const linkExistingAddressToChain = async (
     const role = await findOneRole(
       models,
       { where: { address_id: addressId } },
-      req.body.chain
+      req.body.chain,
     );
 
     if (!role) {

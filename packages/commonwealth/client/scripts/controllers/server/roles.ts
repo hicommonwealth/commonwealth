@@ -115,7 +115,7 @@ export class RolesController {
     return this.roles.find((r) => {
       const permission = r.permission === options.role;
       const referencedAddress = this.User.addresses.find(
-        (address) => address.id === r.address_id
+        (address) => address.id === r.address_id,
       );
       if (!referencedAddress) return;
       const isSame =
@@ -172,7 +172,7 @@ export class RolesController {
     const filteredActiveAccountsByRole = activeAccountsByRole.reduce(
       (arr: [Account, RoleInfo][], current: [Account, RoleInfo]) => {
         const index = arr.findIndex(
-          (item) => item[0].address === current[0].address
+          (item) => item[0].address === current[0].address,
         );
         if (index < 0) {
           return [...arr, current];
@@ -185,7 +185,7 @@ export class RolesController {
         }
         return arr;
       },
-      []
+      [],
     );
 
     return filteredActiveAccountsByRole;
@@ -227,11 +227,11 @@ export class RolesController {
         ? this.User.addresses.find(
             (a) =>
               options.account.address === a.address &&
-              options.account.community.id === a.community.id
+              options.account.community.id === a.community.id,
           )
         : options.account;
     const roles = this.roles.filter((role) =>
-      addressinfo ? role.address_id === addressinfo.id : true
+      addressinfo ? role.address_id === addressinfo.id : true,
     );
     if (options.chain) {
       return roles.map((r) => r.chain_id).indexOf(options.chain) !== -1;

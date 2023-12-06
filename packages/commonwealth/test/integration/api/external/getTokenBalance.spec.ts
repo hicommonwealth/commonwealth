@@ -1,17 +1,17 @@
-import type { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
 import BN from 'bn.js';
+import chai from 'chai';
+import type { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
 import {
   tokenBalanceCache,
   tokenProvider,
 } from 'test/integration/api/external/cacheHooks.spec';
-import chai from 'chai';
 import { get } from './appHook.spec';
 
 describe('getTokenBalance Tests', async () => {
   it('returns correct token balance', async () => {
     tokenProvider.balanceFn = async (
       tokenAddress: string,
-      userAddress: string
+      userAddress: string,
     ) => {
       if (userAddress === '0x1' || userAddress === '0x2') {
         return new BN(1);
