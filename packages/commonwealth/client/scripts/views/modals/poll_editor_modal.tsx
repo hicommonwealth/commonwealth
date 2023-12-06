@@ -110,7 +110,7 @@ export const PollEditorModal = ({
         options,
         customDuration: customDurationEnabled ? customDuration : null,
         address: app.user.activeAccount.address,
-        authorChain: app.user.activeAccount.community.id,
+        authorCommunity: app.user.activeAccount.community.id,
       });
       notifySuccess('Poll creation succeeded');
       onPollCreate();
@@ -128,7 +128,7 @@ export const PollEditorModal = ({
         <CWTextInput
           label="Question"
           placeholder="Do you support this proposal?"
-          defaultValue={prompt}
+          value={prompt}
           onInput={(e) => {
             setPrompt(e.target.value);
           }}

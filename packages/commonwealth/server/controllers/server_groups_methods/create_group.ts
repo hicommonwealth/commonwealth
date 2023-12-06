@@ -122,7 +122,6 @@ export async function __createGroup(
   const analyticsOptions = {
     event: MixpanelCommunityInteractionEvent.CREATE_GROUP,
     community: community.id,
-    isCustomDomain: null,
     userId: user.id,
   };
 

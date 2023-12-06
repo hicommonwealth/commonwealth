@@ -29,7 +29,7 @@ export type SearchCommentsResponse = {
 };
 
 interface SearchCommentsProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
@@ -39,7 +39,7 @@ interface SearchCommentsProps {
 
 const searchComments = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -54,7 +54,7 @@ const searchComments = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        community_id: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -67,7 +67,7 @@ const searchComments = async ({
 };
 
 const useSearchCommentsQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -77,7 +77,7 @@ const useSearchCommentsQuery = ({
   const key = [
     ApiEndpoints.searchComments(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
     },
@@ -87,7 +87,7 @@ const useSearchCommentsQuery = ({
     ({ pageParam }) =>
       searchComments({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,

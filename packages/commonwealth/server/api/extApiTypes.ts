@@ -1,16 +1,16 @@
 // contains types for external api
 
-import type { CommentAttributes } from 'commonwealth/server/models/comment';
-import type { ProfileAttributes } from 'commonwealth/server/models/profile';
-import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
-import type { RoleAttributes } from 'commonwealth/server/models/role';
-import type { ThreadAttributes } from 'commonwealth/server/models/thread';
-import type { TopicAttributes } from 'commonwealth/server/models/topic';
 import type {
   BalanceProviderResp,
   ChainNodeResp,
 } from 'token-balance-cache/src';
-import type { CommunityAttributes } from '../../../commonwealth/server/models/community';
+import type { CommentAttributes } from '../models/comment';
+import type { CommunityAttributes } from '../models/community';
+import type { ProfileAttributes } from '../models/profile';
+import type { ReactionAttributes } from '../models/reaction';
+import type { RoleAttributes } from '../models/role';
+import type { ThreadAttributes } from '../models/thread';
+import type { TopicAttributes } from '../models/topic';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
