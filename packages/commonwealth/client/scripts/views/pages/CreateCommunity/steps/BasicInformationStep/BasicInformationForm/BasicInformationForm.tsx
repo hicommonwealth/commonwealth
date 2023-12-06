@@ -11,7 +11,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { chainTypes } from 'views/pages/Community/common/constants';
 import { ZodError } from 'zod';
 import './BasicInformationForm.scss';
-import { POLOGON_CHAIN_OPTION } from './constants';
+import { POLOGON_CHAIN_OPTION, existingCommunityNames } from './constants';
 import {
   BasicInformationFormProps,
   FormSubmitValues,
@@ -34,6 +34,9 @@ const BasicInformationForm = ({
       error: '',
     },
   ]);
+  const isCommunityNameTaken = existingCommunityNames.find(
+    (name) => name === communityName.trim().toLowerCase(),
+  );
 
   const getChainOptions = () => {
     // Since we are treating polygon as an ecosystem, we will only have a single option, which will be
@@ -118,7 +121,7 @@ const BasicInformationForm = ({
 
   const handleSubmit = async (values: FormSubmitValues) => {
     const hasLinksError = validateSocialLinks();
-    if (hasLinksError) return;
+    if (isCommunityNameTaken || hasLinksError) return;
 
     values.links = socialLinks.map((link) => link.value).filter(Boolean);
 
@@ -149,6 +152,9 @@ const BasicInformationForm = ({
         placeholder="Name your community"
         fullWidth
         onInput={(e) => setCommunityName(e.target.value?.trim())}
+        customError={
+          isCommunityNameTaken ? 'Community name is already taken' : ''
+        }
       />
 
       <CWSelectList
