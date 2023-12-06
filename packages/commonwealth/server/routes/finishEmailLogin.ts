@@ -69,7 +69,7 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
           `Could not sign in with user at ${email}`,
         );
       // If the user is currently in a partly-logged-in state, merge their
-      // social accounts over to the newly found user
+      // addresses over to the newly found user
       if (previousUser && previousUser.id !== existingUser.id) {
         const [oldAddresses, newAddresses] = await Promise.all([
           (
