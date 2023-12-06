@@ -15,4 +15,5 @@ export type FormSubmitValues = {
 export type BasicInformationFormProps = {
   chainEcosystem: 'cosmos' | 'ethereum' | 'polygon';
   onSubmit: (values: FormSubmitValues) => any;
+  onCancel: () => any;
 };

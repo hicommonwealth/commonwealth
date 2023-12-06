@@ -7,8 +7,8 @@ const BasicInformationStep = () => {
     <div className="BasicInformationStep">
       <BasicInformationForm
         chainEcosystem="ethereum" // TODO: this has to come from step 1 when user selects the community ecosystem
-        // TODO: connect api from the onSubmit
-        onSubmit={(values) => console.log('submitted values => ', values)}
+        onSubmit={(values) => console.log('submitted values => ', values)} // TODO: connect api from the onSubmit
+        onCancel={() => {}} // TODO: connect when step 1 is done
       />
     </div>
   );

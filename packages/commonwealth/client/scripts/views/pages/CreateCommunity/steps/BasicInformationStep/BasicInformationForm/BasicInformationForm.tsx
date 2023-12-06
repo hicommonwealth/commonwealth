@@ -24,6 +24,7 @@ import {
 const BasicInformationForm = ({
   chainEcosystem,
   onSubmit,
+  onCancel,
 }: BasicInformationFormProps) => {
   const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([
     {
@@ -236,6 +237,7 @@ const BasicInformationForm = ({
           label="Cancel"
           buttonWidth="wide"
           buttonType="secondary"
+          onClick={onCancel}
         />
         <CWButton type="submit" buttonWidth="wide" label="Next" />
       </section>
