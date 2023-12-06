@@ -76,6 +76,16 @@ In cases where TSDoc is inappropriate for inline documentation, the following st
 - Use descriptive variable and function names to reduce the need for comments by making the code more self-explanatory.
 - Datestamps, when used, should be formatted YYMMDD.
 
+### Backend Errors
+Backend errors currently come in two varieties:
+- Errors instructive for the end user
+- Errors instructive for the client
+
+Errors instructive for the user should be formatted with formatErrorPretty from the errorUtils. These will be displayed
+on the front end directly in the modal.
+Errors instructive for the client should be directly passed to the backend. These should be handled by the backend for
+the possibility of taking recovery actions.
+
 ## Change Log
 
 - 231010: Updated by Graham Johnson with TSDoc guidelines. Import guidelines removed until new approach is implemented. (#5254).
