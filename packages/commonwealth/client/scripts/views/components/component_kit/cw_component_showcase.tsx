@@ -9,6 +9,7 @@ import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWAuthButton } from './cw_auth_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
+import { ChainBase } from 'common-common/src/types';
 import { DeltaStatic } from 'quill';
 import app from 'state';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
@@ -16,19 +17,20 @@ import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import CWCommunitySelector from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import CWCommunitySelector, {
+  CommunityType,
+} from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import {
-  ReactQuillEditor,
   createDeltaFromText,
+  ReactQuillEditor,
 } from 'views/components/react_quill_editor';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
-import { CWContentPageCard } from './CWContentPageCard';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
@@ -47,6 +49,11 @@ import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
+import { CWContentPageCard } from './CWContentPageCard';
+import { CWButton } from './new_designs/cw_button';
+import { CWThreadAction } from './new_designs/cw_thread_action';
+import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
+import { CWUpvote } from './new_designs/cw_upvote';
 import { CWForm } from './new_designs/CWForm';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
@@ -59,10 +66,6 @@ import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
-import { CWButton } from './new_designs/cw_button';
-import { CWThreadAction } from './new_designs/cw_thread_action';
-import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
-import { CWUpvote } from './new_designs/cw_upvote';
 import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
@@ -1900,7 +1903,8 @@ export const ComponentShowcase = () => {
       <div className="CommunitySelectorContainer">
         <CWText type="h3"> Community Selector </CWText>
         <CWCommunitySelector
-          type="ethereum"
+          type={CommunityType.Ethereum}
+          chainBase={ChainBase.Ethereum}
           title="Ethereum (EVM)"
           isRecommended
           onClick={(type) => console.log('Selected: ', type)}
@@ -1908,21 +1912,24 @@ export const ComponentShowcase = () => {
           Select this community type if you have minted a token on the Ethereum blockchain."
         />
         <CWCommunitySelector
-          type="cosmos"
+          type={CommunityType.Cosmos}
+          chainBase={ChainBase.CosmosSDK}
           title="Cosmos"
           onClick={(type) => console.log('Selected: ', type)}
           description="The Cosmos Network is a decentralized network of independent, scalable,
           and interoperable blockchains, creating the foundation for a new token economy."
         />
         <CWCommunitySelector
-          type="polygon"
+          type={CommunityType.Polygon}
+          chainBase={ChainBase.Ethereum}
           title="Polygon"
           onClick={(type) => console.log('Selected: ', type)}
           description="Polygon is built around making web3 technology accessible, with zero prior knowledge.
            Common supports communities on the Polygon network..."
         />
         <CWCommunitySelector
-          type="solana"
+          type={CommunityType.Solana}
+          chainBase={ChainBase.Solana}
           title="Solana"
           onClick={(type) => console.log('Selected: ', type)}
           description="Solana is a rapidly growing technology due to its speed and scale.

@@ -8,7 +8,8 @@ export const communityTypeOptions = [
     title: 'Ethereum (EVM)',
     isRecommended: true,
     description:
-      'Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable. Select this community type if you have minted a token on the Ethereum blockchain.',
+      'Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable. ' +
+      'Select this community type if you have minted a token on the Ethereum blockchain.',
   },
   {
     type: CommunityType.Cosmos,
@@ -16,7 +17,8 @@ export const communityTypeOptions = [
     title: 'Cosmos',
     isRecommended: false,
     description:
-      'The Cosmos Network is a decentralized network of independent, scalable, and interoperable blockchains, creating the foundation for a new token economy.',
+      'The Cosmos Network is a decentralized network of independent, scalable, ' +
+      'and interoperable blockchains, creating the foundation for a new token economy.',
   },
   {
     type: CommunityType.Polygon,
@@ -24,7 +26,8 @@ export const communityTypeOptions = [
     title: 'Polygon',
     isRecommended: false,
     description:
-      'Polygon is built around making web3 technology accessible, with zero prior knowledge. Common supports communities on the Polygon network...',
+      'Polygon is built around making web3 technology accessible, with zero prior knowledge. ' +
+      'Common supports communities on the Polygon network...',
   },
   {
     type: CommunityType.Solana,
@@ -32,6 +35,7 @@ export const communityTypeOptions = [
     title: 'Solana',
     isRecommended: false,
     description:
-      'Solana is a rapidly growing technology due to its speed and scale. Our integration with Solana allows you to create a community for your project with just a click!',
+      'Solana is a rapidly growing technology due to its speed and scale. ' +
+      'Our integration with Solana allows you to create a community for your project with just a click!',
   },
 ];
