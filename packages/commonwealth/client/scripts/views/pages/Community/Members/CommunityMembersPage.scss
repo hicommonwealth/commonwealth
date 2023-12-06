@@ -16,7 +16,7 @@
   }
 
   @include smallInclusive {
-    padding: 24px;
+    padding: 16px;
   }
 
   .filters {
@@ -74,7 +74,7 @@
         margin-left: auto;
         margin-right: 16px;
         width: fit-content;
-  
+
         @include extraSmall {
           margin-left: 0;
         }
