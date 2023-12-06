@@ -8,7 +8,8 @@ export const socialLinkValidation = z
 export const basicInformationFormValidationSchema = z.object({
   communityName: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
+    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+    .max(255, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED }),
   communityDescription: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
