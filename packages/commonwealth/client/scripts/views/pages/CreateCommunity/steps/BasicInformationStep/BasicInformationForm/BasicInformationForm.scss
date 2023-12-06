@@ -1,0 +1,50 @@
+@import "../../../../../../../styles/shared.scss";
+
+.BasicInformationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+
+  .header {
+    width: 100%;
+
+    .description {
+      color: $neutral-500;
+    }
+  }
+
+  .social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+
+    .link-input-container {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .add-link-button {
+      color: $neutral-600 !important;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      width: fit-content;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 16px;
+      letter-spacing: 0.32px;
+      margin-top: 16px;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

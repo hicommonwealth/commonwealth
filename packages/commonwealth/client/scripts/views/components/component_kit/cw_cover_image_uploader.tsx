@@ -7,6 +7,7 @@ import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import { CWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
 
+import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWRadioGroup } from './cw_radio_group';
 import { CWSpinner } from './cw_spinner';
@@ -14,7 +15,6 @@ import { CWText } from './cw_text';
 import { CWTextInput, MessageRow } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
 import { getClasses } from './helpers';
-import { compressImage } from 'utils/ImageCompression';
 
 type CoverImageUploaderProps = {
   headerText?: string;
@@ -24,6 +24,8 @@ type CoverImageUploaderProps = {
   defaultImageUrl?: string;
   defaultImageBehavior?: string;
   uploadCompleteCallback: CallableFunction;
+  canSelectImageBehaviour?: boolean;
+  defaultImageBehaviour?: ImageBehavior;
 };
 
 export enum ImageAs {
@@ -37,13 +39,25 @@ export enum ImageBehavior {
 }
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
-export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
+export const CWCoverImageUploader = ({
+  headerText,
+  subheaderText,
+  enableGenerativeAI,
+  generatedImageCallback,
+  defaultImageUrl,
+  defaultImageBehavior,
+  uploadCompleteCallback,
+  canSelectImageBehaviour = true,
+  defaultImageBehaviour,
+}: CoverImageUploaderProps) => {
   const [imageURL, setImageURL] = React.useState<string>();
   const [isUploading, setIsUploading] = React.useState<boolean>();
   const [uploadStatus, setUploadStatus] = React.useState<
     ValidationStatus | undefined
   >();
-  const [imageBehavior, setImageBehavior] = React.useState<ImageBehavior>();
+  const [imageBehavior, setImageBehavior] = React.useState<ImageBehavior>(
+    defaultImageBehaviour,
+  );
   const [prompt, setPrompt] = React.useState<string>();
   const [isPrompting, setIsPrompting] = React.useState<boolean>();
   const [isGenerating, setIsGenerating] = React.useState<boolean>();
@@ -52,7 +66,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   const pseudoInput = React.useRef<HTMLInputElement>(null);
 
   const uploadImage = async (
-    file: File
+    file: File,
   ): Promise<[string, ValidationStatus]> => {
     try {
       const signatureResponse = await $.post(
@@ -62,7 +76,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
           mimetype: file.type,
           auth: true,
           jwt: app.user.jwt,
-        }
+        },
       );
       if (signatureResponse.status !== 'Success') throw new Error();
 
@@ -99,8 +113,8 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
         setUploadStatus('success');
         attachButton.current.style.display = 'none';
 
-        props.generatedImageCallback(res.result.imageUrl, currentImageBehavior);
-        props.uploadCompleteCallback(res.result.imageUrl, currentImageBehavior);
+        generatedImageCallback(res.result.imageUrl, currentImageBehavior);
+        uploadCompleteCallback(res.result.imageUrl, currentImageBehavior);
       }
 
       setIsUploading(false);
@@ -183,8 +197,6 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
   };
 
   React.useEffect(() => {
-    const { defaultImageUrl, defaultImageBehavior } = props;
-
     setImageURL(defaultImageUrl);
     setImageBehavior(defaultImageBehavior as ImageBehavior);
     setIsPrompting(false);
@@ -208,13 +220,6 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
       attachZone.current?.removeEventListener('drop', dropHandler);
     };
   }, []);
-
-  const {
-    headerText,
-    subheaderText,
-    enableGenerativeAI,
-    uploadCompleteCallback,
-  } = props;
 
   const isFillImage = imageBehavior === ImageBehavior.Fill;
 
@@ -253,7 +258,7 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
             isUploading,
             uploadStatus,
           },
-          'attach-zone'
+          'attach-zone',
         )}
         style={backgroundStyles}
         ref={attachZone}
@@ -349,33 +354,35 @@ export const CWCoverImageUploader = (props: CoverImageUploaderProps) => {
           )}
         </div>
       </div>
-      <div className="options">
-        <CWText
-          type="caption"
-          fontWeight="medium"
-          className="cover-image-title"
-        >
-          Choose image behavior
-        </CWText>
-        <CWRadioGroup
-          name="image-behaviour"
-          onChange={(e) => {
-            setImageBehavior(e.target.value);
-            uploadCompleteCallback(imageURL, e.target.value);
-          }}
-          toggledOption={imageBehavior}
-          options={[
-            {
-              label: 'Fill',
-              value: ImageBehavior.Fill,
-            },
-            {
-              label: 'Tile',
-              value: ImageBehavior.Tiled,
-            },
-          ]}
-        />
-      </div>
+      {canSelectImageBehaviour && (
+        <div className="options">
+          <CWText
+            type="caption"
+            fontWeight="medium"
+            className="cover-image-title"
+          >
+            Choose image behavior
+          </CWText>
+          <CWRadioGroup
+            name="image-behaviour"
+            onChange={(e) => {
+              setImageBehavior(e.target.value);
+              uploadCompleteCallback(imageURL, e.target.value);
+            }}
+            toggledOption={imageBehavior}
+            options={[
+              {
+                label: 'Fill',
+                value: ImageBehavior.Fill,
+              },
+              {
+                label: 'Tile',
+                value: ImageBehavior.Tiled,
+              },
+            ]}
+          />
+        </div>
+      )}
     </div>
   );
 };
