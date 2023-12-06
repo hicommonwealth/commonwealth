@@ -1,8 +1,8 @@
+import moment from 'moment';
 import type {
   IChainEventData,
   SupportedNetwork,
 } from '../../../shared/chain/types/types';
-import moment from 'moment';
 import { ProfileWithAddress } from '../views/components/component_kit/cw_avatar_group';
 
 class DashboardActivityNotification {
@@ -15,7 +15,7 @@ class DashboardActivityNotification {
   public readonly notificationData?: string;
   public readonly threadId?: string;
   public readonly commenters?: ProfileWithAddress[];
-  public readonly chainId?: string;
+  public readonly communityId?: string;
   private _isRead?: boolean;
 
   public get isRead(): boolean {
@@ -27,7 +27,7 @@ class DashboardActivityNotification {
   public readonly eventData?: IChainEventData;
   public readonly updatedAt?: moment.Moment;
   public readonly eventNetwork?: SupportedNetwork;
-  public readonly chain?: string;
+  public readonly community?: string;
   public readonly iconUrl?: string;
 
   constructor({
@@ -43,10 +43,10 @@ class DashboardActivityNotification {
     eventData,
     updatedAt,
     eventNetwork,
-    chain,
+    community,
     iconUrl,
     commenters,
-    chainId,
+    communityId,
   }: {
     createdAt: string;
     threadId?: string;
@@ -61,10 +61,10 @@ class DashboardActivityNotification {
     id?: number;
     updatedAt?: string;
     eventNetwork?: SupportedNetwork;
-    chain?: string;
+    community?: string;
     iconUrl?: string;
     commenters?: ProfileWithAddress[];
-    chainId?: string;
+    communityId?: string;
   }) {
     this.categoryId = categoryId || 'chain-event';
     this.threadId = threadId;
@@ -78,10 +78,10 @@ class DashboardActivityNotification {
     this.eventData = eventData;
     this.updatedAt = moment(updatedAt);
     this.eventNetwork = eventNetwork;
-    this.chain = chain;
+    this.community = community;
     this.iconUrl = iconUrl;
     this.commenters = commenters;
-    this.chainId = chainId;
+    this.communityId = communityId;
   }
 
   public static fromJSON(json) {
@@ -98,10 +98,10 @@ class DashboardActivityNotification {
       eventData: json.event_data,
       updatedAt: json.updated_at,
       eventNetwork: json.network || json.event_network,
-      chain: json.chain,
+      community: json.chain,
       iconUrl: json.icon_url,
       commenters: json.commenters,
-      chainId: json.chain_id,
+      communityId: json.chain_id,
     });
   }
 }

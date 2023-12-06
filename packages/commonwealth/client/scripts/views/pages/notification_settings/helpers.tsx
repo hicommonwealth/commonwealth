@@ -2,15 +2,15 @@ import { NotificationCategories } from '../../../../../../common-common/src/type
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 export const bundleSubs = (
-  subs: Array<NotificationSubscription>
+  subs: Array<NotificationSubscription>,
 ): { [k: string]: Array<NotificationSubscription> } => {
   const result = {};
   for (const sub of subs) {
-    if (sub.Chain) {
-      if (result[sub.Chain.id]) {
-        result[sub.Chain.id].push(sub);
+    if (sub.Community) {
+      if (result[sub.Community.id]) {
+        result[sub.Community.id].push(sub);
       } else {
-        result[sub.Chain.id] = [sub];
+        result[sub.Community.id] = [sub];
       }
     }
   }
@@ -18,7 +18,7 @@ export const bundleSubs = (
 };
 
 export const extractSnapshotProposals = (
-  subs: Array<NotificationSubscription>
+  subs: Array<NotificationSubscription>,
 ) => {
   const snapshotProposals = {};
 

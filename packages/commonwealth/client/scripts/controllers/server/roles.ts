@@ -89,7 +89,7 @@ export class RolesController {
 
     return this.roles.find((r) => {
       const addressMatches = r.address_id === address_id;
-      const communityMatches = r.chain_id === options.community;
+      const communityMatches = r.community_id === options.community;
       return addressMatches && communityMatches;
     });
   }
@@ -118,7 +118,7 @@ export class RolesController {
       if (!referencedAddress) return;
       const isSame =
         this.User.activeAccount.address === referencedAddress.address;
-      const ofCommunity = r.chain_id === options.community;
+      const ofCommunity = r.community_id === options.community;
       return permission && referencedAddress && isSame && ofCommunity;
     });
   }
@@ -141,7 +141,7 @@ export class RolesController {
    */
   public getAllRolesInCommunity(options: { community?: string }) {
     return this.roles.filter((r) => {
-      return r.chain_id === options.community;
+      return r.community_id === options.community;
     });
   }
 
@@ -199,7 +199,7 @@ export class RolesController {
         role.address === this.User.activeAccount.address &&
         role.permission === AccessLevel.Admin &&
         options.community &&
-        role.chain_id === options.community
+        role.community_id === options.community
       );
     });
 
@@ -228,7 +228,7 @@ export class RolesController {
       addressinfo ? role.address_id === addressinfo.id : true,
     );
     if (options.community) {
-      return roles.map((r) => r.chain_id).indexOf(options.community) !== -1;
+      return roles.map((r) => r.community_id).indexOf(options.community) !== -1;
     } else {
       return false;
     }
@@ -236,7 +236,7 @@ export class RolesController {
 
   public getDefaultAddressInCommunity(options: { community?: string }) {
     const role = this.roles.find((r) => {
-      const communityMatches = r.chain_id === options.community;
+      const communityMatches = r.community_id === options.community;
       return communityMatches && r.is_user_default;
     });
 
