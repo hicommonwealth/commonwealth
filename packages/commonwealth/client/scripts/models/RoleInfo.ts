@@ -7,7 +7,7 @@ class RoleInfo {
   public readonly address_id: number;
   public readonly address: string;
   public readonly address_chain: string;
-  public readonly community_id: string;
+  public readonly chain_id: string;
   public permission: AccessLevel;
   public allow: number;
   public deny: number;
@@ -18,17 +18,17 @@ class RoleInfo {
     address_id: number,
     address: string,
     address_chain: string,
-    community_id: string,
+    chain_id: string,
     permission: AccessLevel,
     allow: number,
     deny: number,
-    is_user_default: boolean,
+    is_user_default: boolean
   ) {
     this.id = id;
     this.address_id = address_id;
     this.address = address;
     this.address_chain = address_chain;
-    this.community_id = community_id;
+    this.chain_id = chain_id;
     this.permission = permission;
     this.allow = allow;
     this.deny = deny;

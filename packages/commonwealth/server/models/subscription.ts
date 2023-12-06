@@ -1,10 +1,9 @@
-import { NotificationCategories } from 'common-common/src/types';
 import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
-import emitNotifications from '../util/emitNotifications';
-import type { CommentAttributes } from './comment';
 import type { CommunityAttributes } from './community';
+import type { CommentAttributes } from './comment';
 import type { NotificationCategoryAttributes } from './notification_category';
+import emitNotifications from '../util/emitNotifications';
 import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
@@ -12,6 +11,7 @@ import type {
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
+import { NotificationCategories } from 'common-common/src/types';
 
 export enum SubscriptionValidationErrors {
   NoChainId = 'Must provide a chain_id',
@@ -37,7 +37,7 @@ export type SubscriptionAttributes = {
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   NotificationsRead?: NotificationsReadAttributes[];
-  Community?: CommunityAttributes;
+  Chain?: CommunityAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
 };
@@ -52,7 +52,7 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: typeof DataTypes
 ): SubscriptionModelStatic => {
   const Subscription = <SubscriptionModelStatic>sequelize.define(
     'Subscription',
@@ -110,7 +110,7 @@ export default (
                 throw new Error(SubscriptionValidationErrors.NoThreadOrComment);
               if (this.thread_id && this.comment_id)
                 throw new Error(
-                  SubscriptionValidationErrors.NotBothThreadAndComment,
+                  SubscriptionValidationErrors.NotBothThreadAndComment
                 );
               break;
             case NotificationCategories.NewMention:
@@ -121,7 +121,7 @@ export default (
           }
         },
       },
-    },
+    }
   );
 
   Subscription.associate = (models) => {

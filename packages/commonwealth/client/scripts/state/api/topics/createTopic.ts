@@ -43,7 +43,7 @@ const useCreateTopicMutation = () => {
     mutationFn: createTopic,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, data.communityId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, data.chainId],
       });
     },
   });

@@ -100,7 +100,7 @@ const getTextRows = (
     return (
       <div
         className="header-row"
-        onClick={() => setRoute(`/${subscription.communityId}`)}
+        onClick={() => setRoute(`/${subscription.chainId}`)}
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -112,7 +112,7 @@ const getTextRows = (
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
           fontWeight="bold"
         >
-          {subscription.Community?.name}
+          {subscription.Chain?.name}
         </CWText>
       </div>
     );

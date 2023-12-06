@@ -33,7 +33,8 @@ describe('validateGroupMembership', () => {
         chainId: string,
         contractAddress?: string,
         tokenId?: string,
-      ): Promise<string> /* eslint-enable */ {
+      ): Promise<string> /* eslint-enable */
+      {
         return '2000';
       },
     };
@@ -69,7 +70,8 @@ describe('validateGroupMembership', () => {
         chainId: string,
         contractAddress?: string,
         tokenId?: string,
-      ): Promise<string> /* eslint-enable */ {
+      ): Promise<string> /* eslint-enable */
+      {
         return '2';
       },
     };
@@ -104,7 +106,8 @@ describe('validateGroupMembership', () => {
         chainId: string,
         contractAddress?: string,
         tokenId?: string,
-      ): Promise<string> /* eslint-enable */ {
+      ): Promise<string> /* eslint-enable */
+      {
         return '2000';
       },
     };
@@ -140,7 +143,8 @@ describe('validateGroupMembership', () => {
         chainId: string,
         contractAddress?: string,
         tokenId?: string,
-      ): Promise<string> /* eslint-enable */ {
+      ): Promise<string> /* eslint-enable */
+      {
         return '1';
       },
     };
@@ -177,7 +181,8 @@ describe('validateGroupMembership', () => {
         chainId: string,
         contractAddress?: string,
         tokenId?: string,
-      ): Promise<string> /* eslint-enable */ {
+      ): Promise<string> /* eslint-enable */
+      {
         return '1000';
       },
     };
@@ -272,7 +277,8 @@ describe('validateGroupMembership', () => {
         chainId: string,
         contractAddress?: string,
         tokenId?: string,
-      ): Promise<string> /* eslint-enable */ {
+      ): Promise<string> /* eslint-enable */
+      {
         if (network == ChainNetwork.ERC20) {
           return '3000';
         } else if (network == ChainNetwork.ERC721) {
@@ -341,7 +347,8 @@ describe('validateGroupMembership', () => {
         chainId: string,
         contractAddress?: string,
         tokenId?: string,
-      ): Promise<string> /* eslint-enable */ {
+      ): Promise<string> /* eslint-enable */
+      {
         if (network == ChainNetwork.ERC20) {
           return '3000';
         } else if (network == ChainNetwork.ERC721) {

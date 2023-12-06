@@ -50,17 +50,11 @@ export const UserDashboardRow = ({
     );
   }
 
-  const {
-    commentCount,
-    categoryId,
-    threadId,
-    blockNumber,
-    community,
-    commenters,
-  } = notification;
+  const { commentCount, categoryId, threadId, blockNumber, chain, commenters } =
+    notification;
 
   if (categoryId === 'chain-event') {
-    const communityInfo = app.config.chains.getById(community);
+    const communityInfo = app.config.chains.getById(chain);
 
     return (
       <UserDashboardChainEventRow
