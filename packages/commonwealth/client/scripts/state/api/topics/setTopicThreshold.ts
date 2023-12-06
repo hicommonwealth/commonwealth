@@ -1,8 +1,8 @@
-import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import Topic from 'models/Topic';
 import app from 'state';
+import { useMutation } from '@tanstack/react-query';
 import { ApiEndpoints, queryClient } from 'state/api/config';
+import Topic from 'models/Topic';
 
 interface SetTopicThresholdProps {
   topic: Topic;
@@ -25,7 +25,7 @@ const useSetTopicThresholdMutation = () => {
     mutationFn: setTopicThreshold,
     onSuccess: async (data, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, variables.topic.communityId],
+        queryKey: [ApiEndpoints.BULK_TOPICS, variables.topic.chainId],
       });
     },
   });

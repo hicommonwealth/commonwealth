@@ -26,7 +26,7 @@ const useUpdateFeaturedTopicsOrderMutation = () => {
   return useMutation({
     mutationFn: updateFeaturedTopicsOrder,
     onSuccess: async (data, variables) => {
-      const chainId = variables.featuredTopics[0].communityId;
+      const chainId = variables.featuredTopics[0].chainId;
       await queryClient.invalidateQueries({
         queryKey: [ApiEndpoints.BULK_TOPICS, chainId],
       });

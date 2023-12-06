@@ -5,7 +5,7 @@ class Topic {
   public readonly id: number;
   public readonly description: string;
   public readonly telegram?: string;
-  public readonly communityId: string;
+  public readonly chainId: string;
   public readonly channelId?: string;
   public readonly featuredInSidebar?: boolean;
   public readonly featuredInNewPost?: boolean;
@@ -27,7 +27,7 @@ class Topic {
     id,
     description,
     telegram,
-    communityId,
+    chain_id,
     featured_in_sidebar,
     featured_in_new_post,
     order,
@@ -40,7 +40,7 @@ class Topic {
     id: number;
     description: string;
     telegram?: string;
-    communityId?: string;
+    chain_id?: string;
     featured_in_sidebar?: boolean;
     featured_in_new_post?: boolean;
     order?: number;
@@ -53,7 +53,7 @@ class Topic {
     this.id = id;
     this.description = description;
     this.telegram = telegram;
-    this.communityId = communityId;
+    this.chainId = chain_id;
     this.featuredInSidebar = featured_in_sidebar;
     this.featuredInNewPost = featured_in_new_post;
     this.order = order;
