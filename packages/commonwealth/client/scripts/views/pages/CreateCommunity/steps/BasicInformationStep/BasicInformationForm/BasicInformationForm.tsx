@@ -7,38 +7,48 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { chainTypes } from 'views/pages/Community/common/constants';
 import { ZodError } from 'zod';
 import './BasicInformationForm.scss';
+import { POLOGON_CHAIN_OPTION } from './constants';
+import {
+  BasicInformationFormProps,
+  FormSubmitValues,
+  SocialLinkField,
+} from './types';
 import {
   basicInformationFormValidationSchema,
   socialLinkValidation,
 } from './validation';
 
-type SocialLinkField = {
-  value?: string;
-  error?: string;
-};
-type FormSubmitValues = {
-  communityName: string;
-  communityDescription: string;
-  chain: {
-    label: string;
-    value: string;
-  };
-  links?: string[];
-};
-
-type BasicInformationFormProps = {
-  onSubmit: (values: FormSubmitValues) => any;
-};
-
-const BasicInformationForm = ({ onSubmit }: BasicInformationFormProps) => {
+const BasicInformationForm = ({
+  chainEcosystem,
+  onSubmit,
+}: BasicInformationFormProps) => {
   const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([
     {
       value: '',
       error: '',
     },
   ]);
+
+  const getChainOptions = () => {
+    // Since we are treating polygon as an ecosystem, we will only have a single option, which will be
+    // preselected and further input's will be disabled
+    if (chainEcosystem === 'polygon') {
+      return [POLOGON_CHAIN_OPTION];
+    }
+
+    return chainTypes
+      .filter(
+        (x) =>
+          x.chainBase === (chainEcosystem === 'cosmos' ? 'cosmos' : 'ethereum'),
+      )
+      .map((chainType) => ({
+        label: chainType.label,
+        value: `${chainType.value}`,
+      }));
+  };
 
   const addLink = () => {
     setSocialLinks((x) => [...(x || []), { value: '', error: '' }]);
@@ -117,6 +127,9 @@ const BasicInformationForm = ({ onSubmit }: BasicInformationFormProps) => {
       validationSchema={basicInformationFormValidationSchema}
       onSubmit={handleSubmit}
       className="BasicInformationForm"
+      initialValues={{
+        ...(chainEcosystem === 'polygon' && { chain: POLOGON_CHAIN_OPTION }),
+      }}
     >
       <section className="header">
         <CWText type="h2">Tell us about your community</CWText>
@@ -140,7 +153,8 @@ const BasicInformationForm = ({ onSubmit }: BasicInformationFormProps) => {
         isClearable={false}
         label="Select chain"
         placeholder="Select chain"
-        options={[{ label: 'Solana', value: 'solana' }]}
+        isDisabled={chainEcosystem === 'polygon'}
+        options={getChainOptions()}
       />
 
       <CWTextInput
