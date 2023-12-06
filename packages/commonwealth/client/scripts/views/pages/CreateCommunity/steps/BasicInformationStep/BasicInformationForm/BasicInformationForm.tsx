@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { slugifyPreserveDashes } from 'utils';
 import { CWCoverImageUploader } from 'views/components/component_kit/cw_cover_image_uploader';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -26,6 +27,7 @@ const BasicInformationForm = ({
   onSubmit,
   onCancel,
 }: BasicInformationFormProps) => {
+  const [communityName, setCommunityName] = useState('');
   const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([
     {
       value: '',
@@ -146,6 +148,7 @@ const BasicInformationForm = ({
         label="Community Name"
         placeholder="Name your community"
         fullWidth
+        onInput={(e) => setCommunityName(e.target.value?.trim())}
       />
 
       <CWSelectList
@@ -163,6 +166,13 @@ const BasicInformationForm = ({
         placeholder="URL will appear when you name your community"
         fullWidth
         disabled
+        value={
+          communityName
+            ? `${window.location.origin}/${slugifyPreserveDashes(
+                communityName.toLowerCase(),
+              )}`
+            : ''
+        }
       />
 
       <CWTextArea
