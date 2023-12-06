@@ -1,4 +1,3 @@
-import { uniqBy } from 'lodash';
 import React, { useState } from 'react';
 
 import WebWalletController from 'controllers/app/web_wallets';
@@ -7,8 +6,7 @@ import AddressInfo from 'models/AddressInfo';
 import app from 'state';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import CWCommunitySelector, {
-  CommunityType,
-  SelectorClick,
+  SelectedCommunity,
 } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import NewCommunityAdminModal from 'views/modals/NewCommunityAdminModal';
@@ -18,62 +16,54 @@ import { communityTypeOptions } from './helpers';
 import './CommunityTypeStep.scss';
 
 interface CommunityTypeStepProps {
-  selectedCommunityType: CommunityType;
-  setSelectedCommunityType: (communityType: CommunityType) => void;
+  selectedCommunity: SelectedCommunity;
+  setSelectedCommunity: ({ type, chainBase }: SelectedCommunity) => void;
   setSelectedAddress: (addressInfo: AddressInfo) => void;
   handleContinue: () => void;
 }
 
 const CommunityTypeStep = ({
-  selectedCommunityType,
-  setSelectedCommunityType,
+  selectedCommunity,
+  setSelectedCommunity,
   setSelectedAddress,
   handleContinue,
 }: CommunityTypeStepProps) => {
   const [isNewCommunityAdminModalOpen, setIsNewCommunityAdminModalOpen] =
     useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [availableAddresses, setAvailableAddresses] = useState<AddressInfo[]>(
-    [],
-  );
+
   const { isLoggedIn } = useUserLoggedIn();
 
   const handleCommunitySelection = ({
     type: selectedType,
     chainBase: selectedChainBase,
-  }: SelectorClick) => {
-    const availableAddressesOnSelectedChain = app.user.addresses.filter(
-      (addressInfo) => {
-        if (selectedType === CommunityType.Polygon) {
-          return (
-            addressInfo.community.base === selectedChainBase &&
-            addressInfo.community.id === CommunityType.Polygon
-          );
-        }
-
-        return addressInfo.community.base === selectedChainBase;
-      },
-    );
-
-    const uniqueAddresses = uniqBy(
-      availableAddressesOnSelectedChain,
-      'address',
-    );
-
-    setSelectedCommunityType(selectedType);
+  }: SelectedCommunity) => {
+    setSelectedCommunity({ type: selectedType, chainBase: selectedChainBase });
 
     if (!isLoggedIn) {
       setIsLoginModalOpen(true);
     } else {
       setIsNewCommunityAdminModalOpen(true);
-      setAvailableAddresses(uniqueAddresses);
     }
   };
 
   const availableWallets = WebWalletController.Instance.availableWallets(
-    communityTypeOptions.find((c) => c.type === selectedCommunityType)
+    communityTypeOptions.find((c) => c.type === selectedCommunity.type)
       ?.chainBase,
   );
+
+  const handleClickConnectNewWallet = () => {
+    setIsLoginModalOpen(true);
+    setIsNewCommunityAdminModalOpen(false);
+  };
+
+  const handleClickContinue = (address: string) => {
+    const pickedAddress = app.user.addresses.find(
+      ({ addressId }) => String(addressId) === address,
+    );
+    setSelectedAddress(pickedAddress);
+    handleContinue();
+  };
 
   return (
     <div className="CommunityTypeStep">
@@ -95,18 +85,9 @@ const CommunityTypeStep = ({
         content={
           <NewCommunityAdminModal
             onModalClose={() => setIsNewCommunityAdminModalOpen(false)}
-            availableAddresses={availableAddresses}
-            handleClickConnectNewWallet={() => {
-              setIsLoginModalOpen(true);
-              setIsNewCommunityAdminModalOpen(false);
-            }}
-            handleClickContinue={(address) => {
-              const pickedAddress = availableAddresses.find(
-                ({ addressId }) => String(addressId) === address,
-              );
-              setSelectedAddress(pickedAddress);
-              handleContinue();
-            }}
+            selectedCommunity={selectedCommunity}
+            handleClickConnectNewWallet={handleClickConnectNewWallet}
+            handleClickContinue={handleClickContinue}
           />
         }
         onClose={() => setIsNewCommunityAdminModalOpen(false)}

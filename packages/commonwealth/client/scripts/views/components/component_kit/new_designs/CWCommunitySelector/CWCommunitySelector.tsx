@@ -15,7 +15,7 @@ export enum CommunityType {
   Solana = 'solana',
 }
 
-export type SelectorClick = {
+export type SelectedCommunity = {
   type: CommunityType;
   chainBase: ChainBase;
 };
@@ -26,7 +26,7 @@ interface CWCommunitySelectorProps {
   title: string;
   isRecommended?: boolean;
   description: string;
-  onClick: ({ type, chainBase }: SelectorClick) => void;
+  onClick: ({ type, chainBase }: SelectedCommunity) => void;
 }
 
 const CWCommunitySelector = ({

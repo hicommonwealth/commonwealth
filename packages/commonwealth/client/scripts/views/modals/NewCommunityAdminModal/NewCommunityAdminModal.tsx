@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 
 import { formatAddressShort } from 'helpers';
-import AddressInfo from 'models/AddressInfo';
+import { uniqBy } from 'lodash';
+import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import {
   CWModalBody,
   CWModalFooter,
@@ -14,17 +16,26 @@ import './NewCommunityAdminModal.scss';
 
 interface NewCommunityAdminModalProps {
   onModalClose: () => void;
-  availableAddresses: AddressInfo[];
   handleClickConnectNewWallet: () => void;
   handleClickContinue: (selectedAddress: string) => void;
+  selectedCommunity: SelectedCommunity;
 }
 
 const NewCommunityAdminModal = ({
   onModalClose,
-  availableAddresses,
   handleClickConnectNewWallet,
   handleClickContinue,
+  selectedCommunity,
 }: NewCommunityAdminModalProps) => {
+  const availableAddressesOnSelectedChain = app.user.addresses.filter(
+    (addressInfo) => addressInfo.community.base === selectedCommunity.chainBase,
+  );
+
+  const availableAddresses = uniqBy(
+    availableAddressesOnSelectedChain,
+    'address',
+  );
+
   const addressOptions = availableAddresses.map((addressInfo) => ({
     value: String(addressInfo.addressId),
     label: formatAddressShort(addressInfo.address, 6),
@@ -53,10 +64,7 @@ const NewCommunityAdminModal = ({
             value={tempAddress}
             defaultValue={addressOptions[0]}
             options={addressOptions}
-            onChange={(newValue) => {
-              setTempAddress(newValue);
-              console.log('selected value is: ', newValue.label);
-            }}
+            onChange={setTempAddress}
           />
         )}
       </CWModalBody>

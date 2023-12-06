@@ -4,7 +4,7 @@ import './CreateCommunity.scss';
 
 import AddressInfo from 'models/AddressInfo';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import BasicInformationStep from './steps/BasicInformationStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
@@ -19,9 +19,11 @@ enum CreateCommunityStep {
 const CreateCommunity = () => {
   const [createCommunityStep, setCreateCommunityStep] =
     useState<CreateCommunityStep>(CreateCommunityStep.CommunityTypeSelection);
-  const [selectedCommunityType, setSelectedCommunityType] =
-    useState<CommunityType>(null);
+  const [selectedCommunity, setSelectedCommunity] = useState<SelectedCommunity>(
+    { type: null, chainBase: null },
+  );
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
+
   const handleChangeStep = (action: number) => {
     setCreateCommunityStep((prevState) => prevState + action);
   };
@@ -31,8 +33,8 @@ const CreateCommunity = () => {
       case CreateCommunityStep.CommunityTypeSelection:
         return (
           <CommunityTypeStep
-            selectedCommunityType={selectedCommunityType}
-            setSelectedCommunityType={setSelectedCommunityType}
+            selectedCommunity={selectedCommunity}
+            setSelectedCommunity={setSelectedCommunity}
             setSelectedAddress={setSelectedAddress}
             handleContinue={() => handleChangeStep(1)}
           />
@@ -42,7 +44,7 @@ const CreateCommunity = () => {
         return (
           <BasicInformationStep
             selectedAddress={selectedAddress}
-            selectedCommunityType={selectedCommunityType}
+            selectedCommunity={selectedCommunity}
           />
         );
 
