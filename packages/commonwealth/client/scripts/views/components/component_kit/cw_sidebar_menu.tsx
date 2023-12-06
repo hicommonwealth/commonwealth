@@ -97,7 +97,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
-                  chain: item.id,
+                  community: item.id,
                   isAlreadyStarred: app.user.isCommunityStarred(item.id),
                 });
                 setIsStarred((prevState) => !prevState);

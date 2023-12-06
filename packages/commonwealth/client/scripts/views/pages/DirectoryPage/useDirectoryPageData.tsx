@@ -29,7 +29,7 @@ const useDirectoryPageData = ({
   const navigate = useCommonNavigate();
   const { data: relatedCommunities = [], isLoading } =
     useFetchRelatedCommunitiesQuery({
-      chainNodeId,
+      communityNodeId: chainNodeId,
     });
 
   const { trackAnalytics } =
