@@ -52,7 +52,7 @@ export const ReactionButton = ({
     error: createThreadReactionError,
     reset: resetCreateThreadReactionMutation,
   } = useCreateThreadReactionMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
   });
   const {
@@ -61,7 +61,7 @@ export const ReactionButton = ({
     error: deleteThreadReactionError,
     reset: resetDeleteThreadReactionMutation,
   } = useDeleteThreadReactionMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app.user.activeAccount?.address,
     threadId: thread.id,
   });
@@ -93,7 +93,7 @@ export const ReactionButton = ({
     }
     if (hasReacted) {
       deleteThreadReaction({
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         address: app.user.activeAccount?.address,
         threadId: thread.id,
         reactionId: reactedId as number,
@@ -105,7 +105,7 @@ export const ReactionButton = ({
       });
     } else {
       createThreadReaction({
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         address: activeAddress,
         threadId: thread.id,
         reactionType: 'like',

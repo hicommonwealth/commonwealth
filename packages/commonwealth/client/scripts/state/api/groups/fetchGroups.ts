@@ -22,7 +22,7 @@ const fetchGroups = async ({
     {
       params: {
         community_id: communityId,
-        // include_members: includeMembers,
+        // ...(includeMembers && { include_members: includeMembers }),
         ...(includeTopics && { include_topics: includeTopics }),
       },
     },
@@ -47,8 +47,8 @@ const useFetchGroupsQuery = ({
     queryFn: () =>
       fetchGroups({
         communityId,
-        // includeMembers,
         includeTopics,
+        // includeMembers,
       }),
     staleTime: GROUPS_STALE_TIME,
     enabled,

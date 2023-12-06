@@ -47,7 +47,7 @@ const updateProfileByAddress = async ({
     responseProfile.avatarUrl,
     profileId,
     chain,
-    responseProfile.lastActive
+    responseProfile.lastActive,
   );
   return updatedProfile;
 };

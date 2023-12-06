@@ -1,19 +1,19 @@
 import React from 'react';
 
-import type Thread from '../../../models/Thread';
-import 'pages/view_thread/edit_body.scss';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import app from 'state';
-import { ContentType } from 'types';
-import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
-import { CWButton } from '../../components/component_kit/new_designs/cw_button';
+import { SessionKeyError } from 'controllers/server/sessions';
+import 'pages/view_thread/edit_body.scss';
 import type { DeltaStatic } from 'quill';
+import app from 'state';
+import { useEditThreadMutation } from 'state/api/threads';
+import { ContentType } from 'types';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
+import { openConfirmation } from 'views/modals/confirmation_modal';
+import type Thread from '../../../models/Thread';
+import { CWButton } from '../../components/component_kit/new_designs/cw_button';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
-import { openConfirmation } from 'views/modals/confirmation_modal';
-import { useEditThreadMutation } from 'state/api/threads';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
+import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 
 type EditBodyProps = {
   title: string;
@@ -46,7 +46,7 @@ export const EditBody = (props: EditBodyProps) => {
     reset: resetEditThreadMutation,
     error: editThreadError,
   } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -102,7 +102,7 @@ export const EditBody = (props: EditBodyProps) => {
         threadId: thread.id,
         authorProfile: app.user.activeAccount.profile,
         address: app.user.activeAccount.address,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
       });
       clearEditingLocalStorage(thread.id, ContentType.Thread);
       notifySuccess('Thread successfully edited');

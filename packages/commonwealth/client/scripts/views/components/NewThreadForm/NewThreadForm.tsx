@@ -42,7 +42,7 @@ export const NewThreadForm = () => {
     chainId: app.activeChainId(),
   });
 
-  const chainId = app.chain.id;
+  const communityId = app.chain.id;
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
@@ -77,7 +77,7 @@ export const NewThreadForm = () => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
-  } = useNewThreadForm(chainId, topicsForSelector.enabledTopics);
+  } = useNewThreadForm(communityId, topicsForSelector.enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
@@ -88,7 +88,7 @@ export const NewThreadForm = () => {
     includeTopics: true,
   });
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
   });
 
@@ -97,7 +97,7 @@ export const NewThreadForm = () => {
     error: createThreadError,
     reset: resetCreateThreadMutation,
   } = useCreateThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { RevalidationModal } = useSessionRevalidationModal({
@@ -153,7 +153,7 @@ export const NewThreadForm = () => {
         stage: app.chain.meta.customStages
           ? parseCustomStages(app.chain.meta.customStages)[0]
           : ThreadStage.Discussion,
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         title: threadTitle,
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),

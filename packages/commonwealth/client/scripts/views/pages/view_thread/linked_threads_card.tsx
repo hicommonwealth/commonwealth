@@ -29,13 +29,13 @@ export const LinkedThreadsCard = ({
   const linkedThreadIds = useMemo(
     () =>
       filterLinks(thread.links, LinkSource.Thread).map(
-        ({ identifier }) => identifier
+        ({ identifier }) => identifier,
       ),
-    [thread.links]
+    [thread.links],
   );
 
   const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     ids: linkedThreadIds.map(Number),
     apiCallEnabled: linkedThreadIds.length > 0, // only call the api if we have thread id
   });
@@ -57,7 +57,7 @@ export const LinkedThreadsCard = ({
                     const discussionLink = getProposalUrlPath(
                       t.slug,
                       `${t.identifier}-${slugify(t.title)}`,
-                      false
+                      false,
                     );
 
                     return (

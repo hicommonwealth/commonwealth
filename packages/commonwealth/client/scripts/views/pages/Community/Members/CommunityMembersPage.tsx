@@ -66,7 +66,7 @@ const CommunityMembersPage = () => {
     });
 
   const { data: memberships = null } = useRefreshMembershipQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
     apiEnabled: !!featureFlags.gatingEnabled,
   });

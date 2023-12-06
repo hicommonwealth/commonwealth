@@ -12,7 +12,7 @@ import { updateThreadCountsByStageChange } from './helpers/counts';
 
 interface EditThreadProps {
   address: string;
-  chainId: string;
+  communityId: string;
   threadId: number;
   // for edit profile
   newBody?: string;
@@ -40,7 +40,7 @@ interface EditThreadProps {
 
 const editThread = async ({
   address,
-  chainId,
+  communityId,
   threadId,
   // for edit profile
   newBody,
@@ -76,9 +76,9 @@ const editThread = async ({
 
   const response = await axios.patch(`${app.serverUrl()}/threads/${threadId}`, {
     // common payload
-    author_community_id: chainId,
+    author_community_id: communityId,
     address: address,
-    community_id: chainId,
+    community_id: communityId,
     jwt: app.user.jwt,
     // for edit profile
     ...(url && { url }),
@@ -108,14 +108,14 @@ const editThread = async ({
 };
 
 interface UseEditThreadMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
   currentStage: ThreadStage;
   currentTopicId: number;
 }
 
 const useEditThreadMutation = ({
-  chainId,
+  communityId,
   threadId,
   currentStage,
   currentTopicId,
@@ -131,14 +131,14 @@ const useEditThreadMutation = ({
       // add/remove thread from different caches if the topic id was changed
       if (updatedThread.topic.id !== currentTopicId) {
         updateThreadTopicInAllCaches(
-          chainId,
+          communityId,
           threadId,
           updatedThread.topic,
           currentTopicId,
         );
       }
 
-      updateThreadInAllCaches(chainId, threadId, updatedThread);
+      updateThreadInAllCaches(communityId, threadId, updatedThread);
 
       return updatedThread;
     },

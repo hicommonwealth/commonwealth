@@ -46,7 +46,7 @@ export const ChangeThreadTopicModal = ({
   );
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     threadId: thread.id,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id,
@@ -55,7 +55,7 @@ export const ChangeThreadTopicModal = ({
   const handleSaveChanges = async () => {
     try {
       await editThread({
-        chainId: app.activeChainId(),
+        communityId: app.activeChainId(),
         address: app.user.activeAccount.address,
         threadId: thread.id,
         topicId: activeTopic.id,
