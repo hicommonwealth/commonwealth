@@ -9,7 +9,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './GatingGrowl.scss';
 
-const setShowGatingGrowl = 'dontShowAgain';
+const setShowGatingGrowl = 'dontShowGatingGrowl';
 
 const GatingGrowl = () => {
   const navigate = useCommonNavigate();
@@ -66,7 +66,7 @@ const GatingGrowl = () => {
             </CWText>
           ) : (
             <CWText type="b2" fontWeight="regular" isCentered className="body">
-              This is an admin-only capability. Reach out to your communuity
+              This is an admin-only capability. Reach out to your community
               admin to set up groups.
             </CWText>
           )}
@@ -91,15 +91,10 @@ const GatingGrowl = () => {
           </CWText>
         </div>
         <div className="checkboxContainer">
-          <CWCheckbox onChange={() => setDontShowAgain(!dontShowAgain)} />
-          <CWText
-            type="buttonSm"
-            fontWeight="regular"
-            className="checkboxText"
-            isCentered
-          >
-            Please don&apos;t show this again
-          </CWText>
+          <CWCheckbox
+            onChange={() => setDontShowAgain(!dontShowAgain)}
+            label="Please don't show this again"
+          />
         </div>
       </div>
     </CWGrowl>
