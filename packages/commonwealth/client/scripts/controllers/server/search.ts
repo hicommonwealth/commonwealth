@@ -51,7 +51,7 @@ class SearchController {
             discussion.SearchContentType = SearchContentType.Thread;
             discussion.searchType = SearchScope.Threads;
             return discussion;
-          }
+          },
         );
       }
 
@@ -79,10 +79,10 @@ class SearchController {
         });
 
         searchCache.results[SearchScope.Communities] = filteredComms
-          .map((chain) => {
-            chain.SearchContentType = SearchContentType.Chain;
-            chain.searchType = SearchScope.Communities;
-            return chain;
+          .map((community) => {
+            community.SearchContentType = SearchContentType.Chain;
+            community.searchType = SearchScope.Communities;
+            return community;
           })
           .sort(this.sortCommunities);
       }
@@ -90,7 +90,7 @@ class SearchController {
       if (scope.includes(SearchScope.Members)) {
         const { profiles } = await this.searchMentionableProfiles(
           searchTerm,
-          chainScope
+          chainScope,
         );
 
         searchCache.results[SearchScope.Members] = profiles
@@ -141,7 +141,7 @@ class SearchController {
     searchQuery: SearchQuery,
     tab: SearchScope,
     page: number,
-    pageSize: number
+    pageSize: number,
   ) {
     const { searchTerm, chainScope, sort } = searchQuery;
     const searchParams = {
@@ -154,7 +154,7 @@ class SearchController {
         const discussions = await this.searchDiscussions(
           searchTerm,
           searchParams,
-          page
+          page,
         );
         return discussions.map((row) => {
           return {
@@ -168,7 +168,7 @@ class SearchController {
         const replies = await this.searchComments(
           searchTerm,
           searchParams,
-          page
+          page,
         );
         return replies.map((row) => {
           return {
@@ -186,7 +186,7 @@ class SearchController {
   private searchDiscussions = async (
     searchTerm: string,
     params: SearchParams,
-    page?: number
+    page?: number,
   ) => {
     const { pageSize, chainScope, communityScope, sort } = params;
     try {
@@ -216,7 +216,7 @@ class SearchController {
   private searchComments = async (
     searchTerm: string,
     params: SearchParams,
-    page?: number
+    page?: number,
   ) => {
     const { pageSize, chainScope, communityScope, sort } = params;
     try {
@@ -245,7 +245,7 @@ class SearchController {
 
   public searchThreadTitles = async (
     searchTerm: string,
-    params: SearchParams
+    params: SearchParams,
   ): Promise<Thread[]> => {
     const { pageSize, chainScope, communityScope } = params;
     try {
@@ -275,7 +275,7 @@ class SearchController {
     chainScope: string,
     pageSize?: number,
     page?: number,
-    includeRoles?: boolean
+    includeRoles?: boolean,
   ) => {
     const response = await axios.get(`${app.serverUrl()}/profiles`, {
       params: {
@@ -296,10 +296,10 @@ class SearchController {
     // TODO: Token-sorting approach
     // Some users are not verified; we give them a default date of 1900
     const aCreatedAt = moment(
-      a.created_at || a.createdAt || a.verified || '1900-01-01T:00:00:00Z'
+      a.created_at || a.createdAt || a.verified || '1900-01-01T:00:00:00Z',
     );
     const bCreatedAt = moment(
-      b.created_at || b.createdAt || b.verified || '1900-01-01T:00:00:00Z'
+      b.created_at || b.createdAt || b.verified || '1900-01-01T:00:00:00Z',
     );
     return bCreatedAt.diff(aCreatedAt);
   };

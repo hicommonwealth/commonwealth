@@ -32,9 +32,8 @@ describe('validateGroupMembership', () => {
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-        tokenId?: string
-      ): Promise<string>
-      /* eslint-enable */
+        tokenId?: string,
+      ): Promise<string> /* eslint-enable */
       {
         return '2000';
       },
@@ -70,9 +69,8 @@ describe('validateGroupMembership', () => {
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-        tokenId?: string
-      ): Promise<string>
-      /* eslint-enable */
+        tokenId?: string,
+      ): Promise<string> /* eslint-enable */
       {
         return '2';
       },
@@ -107,9 +105,8 @@ describe('validateGroupMembership', () => {
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-        tokenId?: string
-      ): Promise<string>
-      /* eslint-enable */
+        tokenId?: string,
+      ): Promise<string> /* eslint-enable */
       {
         return '2000';
       },
@@ -145,9 +142,8 @@ describe('validateGroupMembership', () => {
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-        tokenId?: string
-      ): Promise<string>
-      /* eslint-enable */
+        tokenId?: string,
+      ): Promise<string> /* eslint-enable */
       {
         return '1';
       },
@@ -184,9 +180,8 @@ describe('validateGroupMembership', () => {
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-        tokenId?: string
-      ): Promise<string>
-      /* eslint-enable */
+        tokenId?: string,
+      ): Promise<string> /* eslint-enable */
       {
         return '1000';
       },
@@ -281,9 +276,8 @@ describe('validateGroupMembership', () => {
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-        tokenId?: string
-      ): Promise<string>
-      /* eslint-enable */
+        tokenId?: string,
+      ): Promise<string> /* eslint-enable */
       {
         if (network == ChainNetwork.ERC20) {
           return '3000';
@@ -352,9 +346,8 @@ describe('validateGroupMembership', () => {
         userAddress: string,
         chainId: string,
         contractAddress?: string,
-        tokenId?: string
-      ): Promise<string>
-      /* eslint-enable */
+        tokenId?: string,
+      ): Promise<string> /* eslint-enable */
       {
         if (network == ChainNetwork.ERC20) {
           return '3000';

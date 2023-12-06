@@ -7,7 +7,7 @@ import { useDebounce } from 'usehooks-ts';
 import { AccessLevel } from '../../../../../shared/permissions';
 import {
   APIOrderBy,
-  APIOrderDirection
+  APIOrderDirection,
 } from '../../../../scripts/helpers/constants';
 import { useSearchProfilesQuery } from '../../../../scripts/state/api/profiles';
 import NewProfilesController from '../../../controllers/server/newProfiles';
@@ -34,8 +34,8 @@ const ManageCommunityPage = () => {
       const res = await axios.get(`${app.serverUrl()}/roles`, {
         params: {
           chain_id: app.activeChainId(),
-          permissions: ['moderator', 'admin']
-        }
+          permissions: ['moderator', 'admin'],
+        },
       });
       const roles = res.data.result || [];
       roles.forEach((role) => {
@@ -54,12 +54,12 @@ const ManageCommunityPage = () => {
   };
 
   const { data: searchResults, refetch } = useSearchProfilesQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
     limit: 20,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
-    includeRoles: true
+    includeRoles: true,
   });
 
   const roleData = useMemo(() => {
@@ -71,14 +71,14 @@ const ManageCommunityPage = () => {
         ...(profile.roles[0] || {}),
         Address: profile.addresses[0],
         id: profile.addresses[0].id,
-        displayName: profile.profile_name || 'Anonymous'
+        displayName: profile.profile_name || 'Anonymous',
       };
     });
   }, [searchResults]);
 
   useEffect(() => {
     NewProfilesController.Instance.isFetched.on('redraw', () =>
-      forceRerender()
+      forceRerender(),
     );
 
     NewProfilesController.Instance.isFetched.off('redraw', forceRerender);
@@ -136,7 +136,7 @@ const ManageCommunityPage = () => {
         newRole.permission,
         newRole.allow,
         newRole.deny,
-        newRole.is_user_default
+        newRole.is_user_default,
       );
       adminsAndMods.push(roleInfo);
 
