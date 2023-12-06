@@ -1,4 +1,6 @@
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import type { Cluster } from '@solana/web3.js';
+import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
 import { AppError } from 'common-common/src/errors';
 import {
@@ -9,6 +11,9 @@ import {
   NotificationCategories,
 } from 'common-common/src/types';
 import { Op } from 'sequelize';
+import Web3 from 'web3';
+import { z } from 'zod';
+import { createCommunitySchema } from '../../../shared/schemas/createCommunitySchema';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';
 
 import { COSMOS_REGISTRY_API } from '../../config';
@@ -18,12 +23,7 @@ import type { CommunityAttributes } from '../../models/community';
 import type { RoleAttributes } from '../../models/role';
 
 import axios from 'axios';
-import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { UserInstance } from '../../models/user';
-import {
-  MAX_COMMUNITY_IMAGE_SIZE_BYTES,
-  checkUrlFileSize,
-} from '../../util/checkUrlFileSize';
 import { RoleInstanceWithPermission } from '../../util/roles';
 import testSubstrateSpec from '../../util/testSubstrateSpec';
 import { ServerCommunitiesController } from '../server_communities_controller';
@@ -37,7 +37,6 @@ export const Errors = {
   InvalidSymbolLength: 'Symbol should not exceed 9',
   NoType: 'Must provide chain type',
   NoBase: 'Must provide chain base',
-  NoNodeUrl: 'Must provide node url',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
   InvalidNode: 'RPC url returned invalid response. Check your node url',
   MustBeWs: 'Node must support websockets on ethereum',
@@ -61,22 +60,13 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  ImageDoesntExist: `Image url provided doesn't exist`,
-  ImageTooLarge: `Image must be smaller than ${MAX_COMMUNITY_IMAGE_SIZE_BYTES}kb`,
-  UnegisteredCosmosChain: `Check https://cosmos.directory. 
-  Provided chain_name is not registered in the Cosmos Chain Registry`,
+  UnegisteredCosmosChain: `Check https://cosmos.directory.
+   Provided chain_name is not registered in the Cosmos Chain Registry`,
 };
 
 export type CreateCommunityOptions = {
   user: UserInstance;
-  community: Omit<CommunityAttributes, 'substrate_spec'> &
-    Omit<ChainNodeAttributes, 'id'> & {
-      id: string;
-      node_url: string;
-      substrate_spec: string;
-      address?: string;
-      decimals: number;
-    };
+  community: z.infer<typeof createCommunitySchema>;
 };
 
 export type CreateCommunityResult = {
@@ -102,34 +92,7 @@ export async function __createCommunity(
       throw new AppError(Errors.NotAdmin);
     }
   }
-  if (!community.id || !community.id.trim()) {
-    throw new AppError(Errors.NoId);
-  }
-  if (community.id === ALL_COMMUNITIES) {
-    throw new AppError(Errors.ReservedId);
-  }
-  if (!community.name || !community.name.trim()) {
-    throw new AppError(Errors.NoName);
-  }
-  if (community.name.length > 255) {
-    throw new AppError(Errors.InvalidNameLength);
-  }
-  if (!community.default_symbol || !community.default_symbol.trim()) {
-    throw new AppError(Errors.NoSymbol);
-  }
-  if (community.default_symbol.length > 9) {
-    throw new AppError(Errors.InvalidSymbolLength);
-  }
-  if (!community.type || !community.type.trim()) {
-    throw new AppError(Errors.NoType);
-  }
-  if (!community.base || !community.base.trim()) {
-    throw new AppError(Errors.NoBase);
-  }
 
-  if (community.icon_url) {
-    await checkUrlFileSize(community.icon_url, MAX_COMMUNITY_IMAGE_SIZE_BYTES);
-  }
   const existingBaseCommunity = await this.models.Community.findOne({
     where: { base: community.base },
   });
@@ -160,7 +123,6 @@ export async function __createCommunity(
     community.base === ChainBase.Ethereum &&
     community.type !== ChainType.Offchain
   ) {
-    const Web3 = (await import('web3')).default;
     if (!Web3.utils.isAddress(community.address)) {
       throw new AppError(Errors.InvalidAddress);
     }
@@ -204,8 +166,7 @@ export async function __createCommunity(
     community.base === ChainBase.Solana &&
     community.type !== ChainType.Offchain
   ) {
-    const solw3 = await import('@solana/web3.js');
-    let pubKey;
+    let pubKey: solw3.PublicKey;
     try {
       pubKey = new solw3.PublicKey(community.address);
     } catch (e) {
@@ -264,8 +225,7 @@ export async function __createCommunity(
       throw new AppError(Errors.InvalidNodeUrl);
     }
     try {
-      const cosm = await import('@cosmjs/tendermint-rpc');
-      const tmClient = await cosm.Tendermint34Client.connect(url);
+      const tmClient = await Tendermint34Client.connect(url);
       await tmClient.block();
     } catch (err) {
       throw new AppError(Errors.InvalidNode);
