@@ -1,36 +1,47 @@
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
 import Persmissions from 'utils/Permissions';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWGrowl } from 'views/components/component_kit/cw_growl';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './GatingGrowl.scss';
-import { GatingImg } from './GatingGrowlImg';
+
+const setShowGatingGrowl = 'dontShowAgain';
 
 const GatingGrowl = () => {
   const navigate = useCommonNavigate();
 
-  const [dontShowAgain, setDontShowAgain] = React.useState(false);
-  const [disabled, setIsDisabled] = React.useState(
-    localStorage.getItem('dontShowGatingGrowl') === 'true',
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [disabled, setIsDisabled] = useState(
+    localStorage.getItem(setShowGatingGrowl) === 'true',
   );
   const isAdmin = Persmissions.isCommunityAdmin();
 
   const handleExit = () => {
     setIsDisabled(true);
     if (dontShowAgain) {
-      localStorage.setItem('dontShowGatingGrowl', 'true');
+      localStorage.setItem(setShowGatingGrowl, 'true');
     }
   };
 
   return (
     <CWGrowl disabled={disabled} position="bottom-right">
       <div className="GatingGrowl">
-        <div onClick={handleExit}>
-          <GatingImg />
-        </div>
+        <CWIconButton
+          iconName="close"
+          iconSize="medium"
+          className="closeButton"
+          onClick={handleExit}
+        />
+        <img
+          src="../../static/img/groupGrowl.png"
+          alt=""
+          className="img"
+          onClick={() => handleExit()}
+        />
         <div className="container">
           <CWText type="h1" fontWeight="semiBold" isCentered>
             Introducing Groups
@@ -87,7 +98,7 @@ const GatingGrowl = () => {
             className="checkboxText"
             isCentered
           >
-            {`Please don't show this again`}
+            Please don&apos;t show this again
           </CWText>
         </div>
       </div>
