@@ -18,9 +18,9 @@ interface ActiveProposalsProps {
 const useActiveCosmosProposalsQuery = ({
   isApiReady,
 }: ActiveProposalsProps) => {
-  const chainId = app.activeChainId();
+  const communityId = app.activeChainId();
   return useQuery({
-    queryKey: ['activeProposals', chainId],
+    queryKey: ['activeProposals', communityId],
     queryFn: fetchActiveProposals,
     enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     retry: 5, // these can be problematic, so we retry

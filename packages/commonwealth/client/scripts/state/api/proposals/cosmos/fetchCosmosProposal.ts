@@ -9,7 +9,7 @@ const PROPOSAL_CACHE_TIME = 1000 * 60 * 60;
 const PROPOSAL_STALE_TIME = 1000 * 10;
 
 const fetchCosmosProposal = async (
-  proposalId: string
+  proposalId: string,
 ): Promise<CosmosProposal | CosmosProposalV1> => {
   const { governance } = app.chain as Cosmos;
   return governance.getProposal(+proposalId);
@@ -24,9 +24,9 @@ const useCosmosProposalQuery = ({
   isApiReady,
   proposalId,
 }: CosmosProposalQueryProps) => {
-  const chainId = app.activeChainId();
+  const communityId = app.activeChainId();
   return useQuery({
-    queryKey: ['proposal', { chainId, proposalId }],
+    queryKey: ['proposal', { communityId, proposalId }],
     queryFn: () => fetchCosmosProposal(proposalId),
     enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     staleTime: PROPOSAL_STALE_TIME,

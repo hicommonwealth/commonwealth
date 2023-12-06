@@ -164,7 +164,7 @@ export const CommunityMetadataRows = ({
   );
 
   const { data: topics, refetch: refetchTopics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const { data: discordChannels } = useFetchDiscordChannelsQuery({

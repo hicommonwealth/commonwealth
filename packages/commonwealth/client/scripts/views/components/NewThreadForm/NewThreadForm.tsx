@@ -39,7 +39,7 @@ export const NewThreadForm = () => {
   const location = useLocation();
 
   const { data: topics = [] } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const chainId = app.chain.id;
