@@ -1,0 +1,6 @@
+init_config:
+
+instances:
+  - host: <YOUR_REDIS_HOST>
+    password: <YOUR_REDIS_PASSWORD>
+    port: <YOUR_REDIS_PORT>
