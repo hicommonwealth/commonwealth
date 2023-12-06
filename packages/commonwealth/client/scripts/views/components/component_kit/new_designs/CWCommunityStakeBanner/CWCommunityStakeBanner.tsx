@@ -1,17 +1,19 @@
+import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
+import { CWText } from '../../cw_text';
 import { CWTag } from '../CWTag';
 
 type CWCommunityStakeBannerProps = {
   onClose: () => void;
-  onBuy: () => void;
   groupName: string;
 };
 export const CWCommunityStakeBanner = ({
   onClose,
-  onBuy,
   groupName,
 }: CWCommunityStakeBannerProps) => {
+  const navigate = useCommonNavigate();
+
   return (
     <CWBanner
       className="CommunityStakeBanner"
@@ -24,23 +26,27 @@ export const CWCommunityStakeBanner = ({
         {
           label: 'Buy stake',
           buttonType: 'primary',
-          onClick: onBuy,
+          onClick: () => {
+            navigate('/');
+          },
         },
         {
           label: 'Learn More',
           buttonType: 'tertiary',
           onClick: () => {
-            console.log('Learn more clicked');
+            navigate('/');
           },
           iconRight: 'externalLink',
         },
       ]}
       onClose={onClose}
       footer={
-        <div className="footer">
-          Buying a stake will automatically place you in group
+        <>
+          <CWText type="caption">
+            Buying a stake will automatically place you in group
+          </CWText>
           <CWTag label={groupName} type="group" />
-        </div>
+        </>
       }
     />
   );

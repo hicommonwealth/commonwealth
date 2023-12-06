@@ -101,7 +101,7 @@ const CWBanner = ({
             })}
           </div>
         )}
-        <div className="footer">{footer && footer}</div>
+        {footer && <div className="footer">{footer}</div>}
       </div>
       <div className="close-icon-container">
         <X weight="light" size={20} className="close-icon" onClick={onClose} />

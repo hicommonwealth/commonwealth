@@ -75,6 +75,12 @@
     flex-wrap: wrap;
   }
 
+  .footer {
+    display: flex;
+    margin-top: 16px;
+    gap: 4px;
+  }
+
   &.info {
     @include bannerTheme($primary-700, $primary-25, $primary-500);
   }

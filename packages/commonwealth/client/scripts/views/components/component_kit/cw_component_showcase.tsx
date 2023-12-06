@@ -228,6 +228,8 @@ export const ComponentShowcase = () => {
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
+  const [isCommunityStakeBannerVisible, setIsCommunityStakeBannerVisible] =
+    useState(true);
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
   const allChains = app.config.chains.getAll();
   const [chainId, setChainId] = useState(allChains[1]);
@@ -1547,11 +1549,23 @@ export const ComponentShowcase = () => {
       </div>
       <div className="community-stake-banner">
         <CWText type="h3">Community Stake Banner</CWText>
-        <CWCommunityStakeBanner
-          onClose={() => {}}
-          onBuy={() => {}}
-          groupName="Foo"
-        />
+        <div className="btn-container">
+          <CWButton
+            buttonHeight="sm"
+            label="Restore Community Stake Banner"
+            onClick={() => setIsCommunityStakeBannerVisible(true)}
+            className="restore-btn"
+          />
+        </div>
+
+        {isCommunityStakeBannerVisible && (
+          <CWCommunityStakeBanner
+            onClose={() => {
+              setIsCommunityStakeBannerVisible(false);
+            }}
+            groupName="Foo"
+          />
+        )}
       </div>
       <div className="alerts">
         <CWText type="h3">Alerts</CWText>
