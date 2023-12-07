@@ -36,6 +36,7 @@ export async function evmOffChainRpcBatching(
   const idAddressMap = {};
 
   // iterate through addresses in batches of size rpcBatchSize creating a single request for each batch
+  let id = 1;
   for (
     let startIndex = 0;
     startIndex < addresses.length;
@@ -43,7 +44,6 @@ export async function evmOffChainRpcBatching(
   ) {
     const endIndex = Math.min(startIndex + rpc.batchSize, addresses.length);
     const batchAddresses = addresses.slice(startIndex, endIndex);
-    let id = 1;
     const rpcRequests = [];
     for (const address of batchAddresses) {
       rpcRequests.push({
@@ -194,7 +194,7 @@ export async function evmBalanceFetcherBatching(
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
       const endIndex = Math.min(data.id + rpc.batchSize, addresses.length);
-      const relevantAddresses = addresses.splice(data.id, endIndex);
+      const relevantAddresses = addresses.slice(data.id, endIndex);
 
       if (data.error) {
         failedAddresses = [...failedAddresses, ...relevantAddresses];

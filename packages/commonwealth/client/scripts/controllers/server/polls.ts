@@ -79,17 +79,23 @@ class PollsController {
     prompt: string;
     options: string[];
     customDuration?: string;
-    authorChain: string;
+    authorCommunity: string;
     address: string;
   }) {
-    const { threadId, prompt, options, customDuration, authorChain, address } =
-      args;
+    const {
+      threadId,
+      prompt,
+      options,
+      customDuration,
+      authorCommunity,
+      address,
+    } = args;
 
     const response = await axios.post(
       `${app.serverUrl()}/threads/${threadId}/polls`,
       {
         community_id: app.activeChainId(),
-        author_chain: authorChain,
+        author_chain: authorCommunity,
         address,
         jwt: app.user.jwt,
         prompt,
@@ -108,18 +114,18 @@ class PollsController {
   }
 
   public async deletePoll(args: {
-    authorChain: string;
+    authorCommunity: string;
     address: string;
     threadId: number;
     pollId: number;
   }) {
-    const { authorChain, address, threadId, pollId } = args;
+    const { authorCommunity, address, threadId, pollId } = args;
     await $.ajax({
       url: `${app.serverUrl()}/polls/${pollId}`,
       type: 'DELETE',
       data: {
         community_id: app.activeChainId(),
-        author_chain: authorChain,
+        author_chain: authorCommunity,
         address,
         jwt: app.user.jwt,
         poll_id: pollId,

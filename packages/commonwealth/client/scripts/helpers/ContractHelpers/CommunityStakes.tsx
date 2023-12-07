@@ -26,18 +26,18 @@ class CommunityStakes extends ContractBase {
   async getBuyPrice(
     name: string,
     id: number,
-    amount: number
+    amount: number,
   ): Promise<PriceData> {
     const namespaceAddress = await this.getNamespaceAddress(name);
     const totalPrice = this.toBN(
       await this.contract.methods
         .getBuyPriceAfterFee(namespaceAddress, id, amount)
-        .call()
+        .call(),
     );
     const feeFreePrice = this.toBN(
       await this.contract.methods
         .getBuyPrice(namespaceAddress, id, amount)
-        .call()
+        .call(),
     );
     return {
       price: feeFreePrice.div(this.toBN(1e18)).toString(),
@@ -56,18 +56,18 @@ class CommunityStakes extends ContractBase {
   async getSellPrice(
     name: string,
     id: number,
-    amount: number
+    amount: number,
   ): Promise<PriceData> {
     const namespaceAddress = await this.getNamespaceAddress(name);
     const totalPrice = this.toBN(
       await this.contract.methods
         .getSellPriceAfterFee(namespaceAddress, id, amount)
-        .call()
+        .call(),
     );
     const feeFreePrice = this.toBN(
       await this.contract.methods
         .getSellPrice(namespaceAddress, id, amount)
-        .call()
+        .call(),
     );
     return {
       price: feeFreePrice.div(this.toBN(1e18)).toString(),

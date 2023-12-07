@@ -14,6 +14,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export type GetEthBalancesOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
+  batchSize?: number;
 };
 
 export async function __getEthBalances(options: GetEthBalancesOptions) {
@@ -38,12 +39,14 @@ export async function __getEthBalances(options: GetEthBalancesOptions) {
       options.chainNode.eth_chain_id,
       rpcEndpoint,
       options.addresses,
+      options.batchSize,
     );
   } else {
     return await getOffChainBatchEthBalances(
       options.chainNode.eth_chain_id,
       rpcEndpoint,
       options.addresses,
+      options.batchSize,
     );
   }
 }
@@ -52,6 +55,7 @@ async function getOnChainBatchEthBalances(
   evmChainId: number,
   rpcEndpoint: string,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
   const { balances } = await evmBalanceFetcherBatching(
     {
@@ -59,7 +63,7 @@ async function getOnChainBatchEthBalances(
       url: rpcEndpoint,
     },
     {
-      batchSize: 1000,
+      batchSize,
     },
     addresses,
   );
@@ -71,6 +75,7 @@ async function getOffChainBatchEthBalances(
   evmChainId: number,
   rpcEndpoint: string,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
   const { balances } = await evmOffChainRpcBatching(
     {
@@ -79,10 +84,10 @@ async function getOffChainBatchEthBalances(
     },
     {
       method: 'eth_getBalance',
-      getParams: (abiCoder, address, tokenAddress) => {
+      getParams: (_abiCoder, address, _tokenAddress) => {
         return address;
       },
-      batchSize: 1000,
+      batchSize,
     },
     addresses,
   );
