@@ -1,17 +1,17 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
-import { CWText } from '../../cw_text';
-import { CWTag } from '../CWTag';
+import { CWText } from '../component_kit/cw_text';
+import { CWTag } from '../component_kit/new_designs/CWTag';
 
-type CWCommunityStakeBannerProps = {
+type CommunityStakeBannerProps = {
   onClose: () => void;
   groupName: string;
 };
-export const CWCommunityStakeBanner = ({
+export const CommunityStakeBanner = ({
   onClose,
   groupName,
-}: CWCommunityStakeBannerProps) => {
+}: CommunityStakeBannerProps) => {
   const navigate = useCommonNavigate();
 
   return (

@@ -28,6 +28,7 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
+import CommunityStakeBanner from '../CommunityStakeBanner';
 import { CWContentPageCard } from './CWContentPageCard';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
@@ -47,7 +48,6 @@ import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
-import CWCommunityStakeBanner from './new_designs/CWCommunityStakeBanner';
 import { CWForm } from './new_designs/CWForm';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
@@ -1695,7 +1695,7 @@ export const ComponentShowcase = () => {
         </div>
 
         {isCommunityStakeBannerVisible && (
-          <CWCommunityStakeBanner
+          <CommunityStakeBanner
             onClose={() => {
               setIsCommunityStakeBannerVisible(false);
             }}
