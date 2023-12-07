@@ -24,7 +24,7 @@ class NamespaceFactory extends ContractBase {
         ) {
           this.reservationHook = new this.web3.eth.Contract(
             reservationHookAbi as AbiItem[],
-            addr
+            addr,
           );
         }
       });
@@ -101,7 +101,7 @@ class NamespaceFactory extends ContractBase {
         .configureCommunityStakeId(
           name,
           name.concat(' Community Stake'),
-          stakesId
+          stakesId,
         )
         .send({ from: this.wallet.accounts[0] });
     } catch {

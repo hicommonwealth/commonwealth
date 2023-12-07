@@ -25,7 +25,7 @@ $size: 48px;
     }
 
     @include smallInclusive {
-      padding: 24px;
+      padding: 16px;
     }
   }
 
@@ -35,11 +35,6 @@ $size: 48px;
 
   div[data-viewport-type='element'] > div:first-child {
     padding-bottom: 16px !important;
-  }
-
-  .no-threads-text {
-    color: $neutral-500;
-    margin-left: 40px;
   }
 
   .RecentThreads {

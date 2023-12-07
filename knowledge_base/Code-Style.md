@@ -6,6 +6,8 @@ Unless otherwise noted, code styles in this guideline are for NodeJS & TypeScrip
 
 For a list of React-specific guidelines, see [React Best Practices](./React-Best-Practices-And-Improvements.md).
 
+For a list of API-specific guidelines, see [Platform Coding Guidelines](./Platform-Coding-Guidelines.md).
+
 ## Contents
 
 - [Inline Documentation](#inline-documentation)
@@ -75,6 +77,16 @@ In cases where TSDoc is inappropriate for inline documentation, the following st
 - Use comments to provide context and explain _why_ something is being done, not just 'what' is being done. This helps future developers understand the purpose and intent of the code.
 - Use descriptive variable and function names to reduce the need for comments by making the code more self-explanatory.
 - Datestamps, when used, should be formatted YYMMDD.
+
+### Backend Errors
+Backend errors currently come in two varieties:
+- Errors instructive for the end user
+- Errors instructive for the client
+
+Errors instructive for the user should be formatted with formatErrorPretty from the errorUtils. These will be displayed
+on the front end directly in the modal.
+Errors instructive for the client should be directly passed to the backend. These should be handled by the backend for
+the possibility of taking recovery actions.
 
 ## Change Log
 
