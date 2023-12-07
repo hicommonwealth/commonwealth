@@ -92,17 +92,25 @@ async function getErc721Balance(
     jsonrpc: '2.0',
   };
 
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    body: JSON.stringify(requestBody),
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const data = await response.json();
+  const msg =
+    `ERC20 balance fetch failed for address ${address} ` +
+    `on evm chain id ${evmChainId} for contract ${contractAddress}.`;
+  let data;
+  try {
+    const response = await fetch(rpcEndpoint, {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    data = await response.json();
+  } catch (e) {
+    const augmentedMsg = `FAILING OR RATE LIMITED CHAIN NODE: ${msg}`;
+    log.fatal(augmentedMsg, e);
+    rollbar.critical(augmentedMsg, e);
+    return {};
+  }
 
   if (data.error) {
-    const msg =
-      `ERC20 balance fetch failed for address ${address} ` +
-      `on evm chain id ${evmChainId} for contract ${contractAddress}.`;
     rollbar.error(msg, data.error);
     log.error(msg, data.error);
     return {};

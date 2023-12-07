@@ -79,20 +79,28 @@ async function getOnChainBatchErc1155Balances(
     });
   }
 
-  // returns an array of responses where each responses data contains an array of balances
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    body: JSON.stringify(rpcRequests),
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const msg =
+    `On-chain batch request failed ` +
+    `with batch size ${batchSize} on evm chain id ${evmChainId} for contract ${contractAddress}.`;
+  let datas;
+  try {
+    // returns an array of responses where each responses data contains an array of balances
+    const response = await fetch(rpcEndpoint, {
+      method: 'POST',
+      body: JSON.stringify(rpcRequests),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    datas = await response.json();
+  } catch (e) {
+    const augmentedMsg = `FAILING OR RATE LIMITED CHAIN NODE: ${msg}`;
+    log.fatal(augmentedMsg, e);
+    rollbar.critical(augmentedMsg, e);
+    return {};
+  }
 
-  const datas = await response.json();
   const addressBalanceMap = {};
 
   if (datas.error) {
-    const msg =
-      `On-chain batch request failed ` +
-      `with batch size ${batchSize} on evm chain id ${evmChainId} for contract ${contractAddress}.`;
     rollbar.error(msg, datas.error);
     log.error(msg, datas.error);
     return {};

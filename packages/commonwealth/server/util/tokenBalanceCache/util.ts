@@ -71,6 +71,11 @@ export async function evmOffChainRpcBatching(
   let failedAddresses: string[] = [];
   const jsonPromises = [];
   const responses = await Promise.allSettled(batchRequestPromises);
+  const chainNodeErrorMsg =
+    `FAILING OR RATE LIMITED CHAIN NODE: RPC batch request failed for method '${rpc.method}' ` +
+    `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
+      source.contractAddress ? `for token ${source.contractAddress}` : ''
+    }.`;
   responses.forEach((res, index) => {
     // handle a failed batch request
     if (res.status === 'rejected') {
@@ -80,20 +85,25 @@ export async function evmOffChainRpcBatching(
         Math.min(startIndex + rpc.batchSize, addresses.length),
       );
       failedAddresses = [...failedAddresses, ...relevantAddresses];
-
-      const msg =
-        `RPC batch request failed for method '${rpc.method}' ` +
-        `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
-          source.contractAddress ? `for token ${source.contractAddress}` : ''
-        }.`;
-      rollbar.error(msg, res.reason);
-      log.error(msg, res.reason);
+      rollbar.critical(chainNodeErrorMsg, res.reason);
+      log.fatal(chainNodeErrorMsg, res.reason);
     } else {
       jsonPromises.push(res.value.json());
     }
   });
 
-  const datas = (await Promise.all(jsonPromises)).flat();
+  let datas;
+  try {
+    datas = (await Promise.all(jsonPromises)).flat();
+  } catch (e) {
+    rollbar.critical(chainNodeErrorMsg, e);
+    log.fatal(chainNodeErrorMsg, e);
+    return {
+      balances: {},
+      failedAddresses: addresses,
+    };
+  }
+
   const balances = {};
   for (const data of datas) {
     if (data.error) {
@@ -169,23 +179,35 @@ export async function evmBalanceFetcherBatching(
     });
   }
 
-  // returns an array of responses where each responses data contains an array of balances
-  const response = await fetch(source.url, {
-    method: 'POST',
-    body: JSON.stringify(rpcRequests),
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const msg =
+    `On-chain batch request failed ` +
+    `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
+      source.contractAddress ? `for token ${source.contractAddress}` : ''
+    }.`;
+  let datas;
+  try {
+    // returns an array of responses where each responses data contains an array of balances
+    const response = await fetch(source.url, {
+      method: 'POST',
+      body: JSON.stringify(rpcRequests),
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-  const datas = await response.json();
+    datas = await response.json();
+  } catch (e) {
+    const augmentedMsg = `FAILING OR RATE LIMITED CHAIN NODE: ${msg}`;
+    log.fatal(augmentedMsg, e);
+    rollbar.critical(augmentedMsg, e);
+    return {
+      balances: {},
+      failedAddresses: addresses,
+    };
+  }
+
   const addressBalanceMap = {};
   let failedAddresses: string[] = [];
 
   if (datas.error) {
-    const msg =
-      `On-chain batch request failed ` +
-      `with batch size ${rpc.batchSize} on evm chain id ${source.evmChainId}${
-        source.contractAddress ? `for token ${source.contractAddress}` : ''
-      }.`;
     rollbar.error(msg, datas.error);
     log.error(msg, datas.error);
     return { balances: {}, failedAddresses: addresses };
