@@ -70,11 +70,6 @@ const ReactQuillEditor = ({
     lastSelectionRef,
   });
 
-  // This is no longer used but I kept it here in case we
-  // need it in the future.
-  // handle clipboard behavior
-  // const { clipboardMatchers } = useClipboardMatchers();
-
   // handle image upload for drag and drop
   const { handleImageDropAndPaste } = useImageDropAndPaste({
     editorRef,
