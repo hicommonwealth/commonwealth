@@ -34,7 +34,6 @@ import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
 import { CWDropdown } from './cw_dropdown';
-import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
@@ -48,6 +47,7 @@ import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
 import { CWForm } from './new_designs/CWForm';
+import CWIconButton from './new_designs/CWIconButton';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
 import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
@@ -344,6 +344,7 @@ export const ComponentShowcase = () => {
           <CWText>Unstyled Popover</CWText>
 
           <CWIconButton
+            buttonSize="med"
             iconName="infoEmpty"
             onMouseEnter={unstyledPopoverProps.handleInteraction}
             onMouseLeave={unstyledPopoverProps.handleInteraction}
@@ -363,6 +364,7 @@ export const ComponentShowcase = () => {
           <CWText>Styled by default Popover</CWText>
 
           <CWIconButton
+            buttonSize="med"
             iconName="infoEmpty"
             onMouseEnter={styledPopoverProps.handleInteraction}
             onMouseLeave={styledPopoverProps.handleInteraction}
@@ -379,7 +381,11 @@ export const ComponentShowcase = () => {
         <PopoverMenu
           menuItems={popoverMenuOptions()}
           renderTrigger={(onclick) => (
-            <CWIconButton iconName="plusCircle" onClick={onclick} />
+            <CWIconButton
+              buttonSize="med"
+              iconName="plusCircle"
+              onClick={onclick}
+            />
           )}
         />
       </div>
@@ -409,9 +415,7 @@ export const ComponentShowcase = () => {
         <div className="icon-button-row">
           <CWIconButton
             iconName="views"
-            iconSize="large"
-            iconButtonTheme="primary"
-            selected={selectedIconButton === 1}
+            buttonSize="med"
             onClick={() => {
               setSelectedIconButton(1);
             }}
@@ -423,9 +427,7 @@ export const ComponentShowcase = () => {
         <div className="icon-button-row">
           <CWIconButton
             iconName="views"
-            iconSize="large"
-            iconButtonTheme="neutral"
-            selected={selectedIconButton === 2}
+            buttonSize="med"
             onClick={() => {
               setSelectedIconButton(2);
             }}
@@ -437,9 +439,7 @@ export const ComponentShowcase = () => {
         <div className="icon-button-row">
           <CWIconButton
             iconName="views"
-            iconSize="large"
-            iconButtonTheme="black"
-            selected={selectedIconButton === 3}
+            buttonSize="med"
             onClick={() => {
               setSelectedIconButton(3);
             }}
