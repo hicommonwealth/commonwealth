@@ -1,18 +1,19 @@
 import React from 'react';
-import { CWText } from '../../components/component_kit/cw_text';
-import { ThreadCard } from './ThreadCard/index';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { ThreadCard } from '../ThreadCard';
+import './EmptyThreadsPlaceholder.scss';
 
-type DiscussionsPageEmptyPlaceholderProps = {
+type HeaderWithFiltersProps = {
   isInitialLoading: boolean;
   isOnArchivePage: boolean;
 };
 
-export const DiscussionsPageEmptyPlaceholder = ({
+export const EmptyThreadsPlaceholder = ({
   isInitialLoading,
   isOnArchivePage,
-}: DiscussionsPageEmptyPlaceholderProps) => {
+}: HeaderWithFiltersProps) => {
   return isInitialLoading ? (
-    <div className="threads-wrapper">
+    <div className="EmptyThreadsSkeletonContainer">
       {Array(3)
         .fill({})
         .map((x, i) => (
@@ -20,7 +21,7 @@ export const DiscussionsPageEmptyPlaceholder = ({
         ))}
     </div>
   ) : (
-    <CWText type="b1" className="no-threads-text">
+    <CWText type="b1" className="EmptyThreadsPlaceholderText">
       {isOnArchivePage
         ? 'There are no archived threads matching your filter.'
         : 'There are no threads matching your filter.'}

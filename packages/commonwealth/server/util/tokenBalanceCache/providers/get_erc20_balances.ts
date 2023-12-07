@@ -15,6 +15,7 @@ export type GetErc20BalancesOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
   contractAddress: string;
+  batchSize?: number;
 };
 
 export async function __getErc20Balances(
@@ -43,6 +44,7 @@ export async function __getErc20Balances(
       rpcEndpoint,
       options.contractAddress,
       options.addresses,
+      options.batchSize,
     );
   } else {
     return await getOffChainBatchErc20Balances(
@@ -50,6 +52,7 @@ export async function __getErc20Balances(
       rpcEndpoint,
       options.contractAddress,
       options.addresses,
+      options.batchSize,
     );
   }
 }
@@ -59,6 +62,7 @@ async function getOnChainBatchErc20Balances(
   rpcEndpoint: string,
   contractAddress: string,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
   // ignore failedAddresses returned property for now -> revisit if we want to implement retry strategy
   const { balances } = await evmBalanceFetcherBatching(
@@ -68,7 +72,7 @@ async function getOnChainBatchErc20Balances(
       contractAddress: contractAddress,
     },
     {
-      batchSize: 1000,
+      batchSize,
     },
     addresses,
   );
@@ -80,6 +84,7 @@ async function getOffChainBatchErc20Balances(
   rpcEndpoint: string,
   contractAddress: string,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
   // ignore failedAddresses returned property for now -> revisit if we want to implement retry strategy
   const { balances } = await evmOffChainRpcBatching(
@@ -99,7 +104,7 @@ async function getOffChainBatchErc20Balances(
           data: calldata,
         };
       },
-      batchSize: 1000,
+      batchSize,
     },
     addresses,
   );
