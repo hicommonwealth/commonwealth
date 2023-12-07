@@ -189,11 +189,6 @@ const BasicInformationForm = ({
         placeholder="Enter a description of your community or project"
       />
 
-      {/* TODO:
-        1. update image uploader styles add upload button
-        2. handle preview related changes
-        3. add form validation support
-      */}
       <CWCoverImageUploader
         subheaderText="Community Profile Image (Accepts JPG and PNG files)"
         uploadCompleteCallback={console.log}
