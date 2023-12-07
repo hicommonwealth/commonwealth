@@ -28,6 +28,7 @@ const BasicInformationForm = ({
   onCancel,
 }: BasicInformationFormProps) => {
   const [communityName, setCommunityName] = useState('');
+  const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
   const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([
     {
       value: '',
@@ -197,6 +198,10 @@ const BasicInformationForm = ({
         subheaderText="Community Profile Image (Accepts JPG and PNG files)"
         uploadCompleteCallback={console.log}
         canSelectImageBehaviour={false}
+        showUploadImageButton
+        onUploadStatusChange={setIsUploadingProfileImage}
+        name="communityProfileImageURL"
+        hookToForm
       />
 
       <section className="header">
@@ -255,7 +260,12 @@ const BasicInformationForm = ({
           buttonType="secondary"
           onClick={onCancel}
         />
-        <CWButton type="submit" buttonWidth="wide" label="Next" />
+        <CWButton
+          type="submit"
+          buttonWidth="wide"
+          label="Next"
+          disabled={isUploadingProfileImage}
+        />
       </section>
     </CWForm>
   );
