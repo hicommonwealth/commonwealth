@@ -36,21 +36,6 @@ export const createCommunitySchema = z.object({
       message: `String must not contain '${ALL_COMMUNITIES}'`,
     }),
   chain_node_id: z.number().optional(), // corresponds to the chain field
-  community_namespace: z
-    .object({
-      namespace: z.string().optional(),
-      tx_receipt: z
-        .object({
-          transactionHash: z.string(),
-          blockNumber: z.number(),
-        })
-        .optional(), // this comes from NamespaceFactory#deployNamespace
-    })
-    .refine(
-      (data) => !!data.namespace === !!data.tx_receipt,
-      'Must contain both namespace and tx_receipt',
-    )
-    .optional(),
   description: z.string().optional(),
   icon_url: z
     .string()
