@@ -867,28 +867,28 @@ export const ComponentShowcase = () => {
           <CWText type="h4">Secondary Alt-Green</CWText>
           <CWButton
             buttonType="secondary"
-            buttonAlt="alt-green"
+            buttonAlt="green"
             label="Secondary default"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             buttonHeight="lg"
-            buttonAlt="alt-green"
+            buttonAlt="green"
             label="Secondary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             buttonWidth="wide"
-            buttonAlt="alt-green"
+            buttonAlt="green"
             label="Secondary wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             buttonHeight="lg"
-            buttonAlt="alt-green"
+            buttonAlt="green"
             buttonWidth="wide"
             label="Secondary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
@@ -896,27 +896,27 @@ export const ComponentShowcase = () => {
           <CWButton
             iconLeft="person"
             buttonType="secondary"
-            buttonAlt="alt-green"
+            buttonAlt="green"
             label="Secondary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             buttonWidth="full"
-            buttonAlt="alt-green"
+            buttonAlt="green"
             label="Secondary full"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             label="Secondary default disabled"
-            buttonAlt="alt-green"
+            buttonAlt="green"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             iconLeft="person"
-            buttonAlt="alt-green"
+            buttonAlt="green"
             buttonType="secondary"
             label="Secondary default disabled w/ left icon"
             disabled
@@ -924,7 +924,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonAlt="alt-green"
+            buttonAlt="green"
             buttonWidth="full"
             label="Secondary disabled full"
             disabled
@@ -935,28 +935,28 @@ export const ComponentShowcase = () => {
           <CWText type="h4">Secondary Alt-Rorange</CWText>
           <CWButton
             buttonType="secondary"
-            buttonAlt="alt-rorange"
+            buttonAlt="rorange"
             label="Secondary default"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             buttonHeight="lg"
-            buttonAlt="alt-rorange"
+            buttonAlt="rorange"
             label="Secondary large"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             buttonWidth="wide"
-            buttonAlt="alt-rorange"
+            buttonAlt="rorange"
             label="Secondary wide"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             buttonHeight="lg"
-            buttonAlt="alt-rorange"
+            buttonAlt="rorange"
             buttonWidth="wide"
             label="Secondary large and wide"
             onClick={() => notifySuccess('Button clicked!')}
@@ -964,27 +964,27 @@ export const ComponentShowcase = () => {
           <CWButton
             iconLeft="person"
             buttonType="secondary"
-            buttonAlt="alt-rorange"
+            buttonAlt="rorange"
             label="Secondary default w/ left icon"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             buttonWidth="full"
-            buttonAlt="alt-rorange"
+            buttonAlt="rorange"
             label="Secondary full"
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             buttonType="secondary"
             label="Secondary default disabled"
-            buttonAlt="alt-rorange"
+            buttonAlt="rorange"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
           <CWButton
             iconLeft="person"
-            buttonAlt="alt-rorange"
+            buttonAlt="rorange"
             buttonType="secondary"
             label="Secondary default disabled w/ left icon"
             disabled
@@ -992,7 +992,7 @@ export const ComponentShowcase = () => {
           />
           <CWButton
             buttonType="secondary"
-            buttonAlt="alt-rorange"
+            buttonAlt="rorange"
             buttonWidth="full"
             label="Secondary disabled full"
             disabled

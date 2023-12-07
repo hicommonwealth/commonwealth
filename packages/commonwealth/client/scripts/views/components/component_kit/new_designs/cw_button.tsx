@@ -15,7 +15,7 @@ type ButtonHeight = 'lg' | 'med' | 'sm';
 
 type ButtonWidth = 'narrow' | 'wide' | 'full';
 
-type ButtonAlt = 'alt-green' | 'alt-rorange';
+type ButtonAlt = 'green' | 'rorange';
 
 type ButtonStyleProps = {
   buttonType?: ButtonType;
