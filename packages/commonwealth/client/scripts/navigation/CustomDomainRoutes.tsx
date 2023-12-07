@@ -6,7 +6,10 @@ import { withLayout } from 'views/Layout';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 
-const CreateCommunityPage = lazy(() => import('views/pages/create_community'));
+const OldCreateCommunityPage = lazy(
+  () => import('views/pages/create_community'),
+);
+const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
   () => import('views/pages/Community/Members/CommunityMembersPage'),
@@ -90,10 +93,32 @@ const CustomDomainRoutes = () => {
         type: 'blank',
       })}
     />,
+    ...[
+      featureFlags.newCreateCommunity ? (
+        <Route
+          key="/createCommunity"
+          path="/createCommunity"
+          element={withLayout(CreateCommunityPage, { type: 'common' })}
+        />
+      ) : (
+        [
+          <Route
+            key="/createCommunity"
+            path="/createCommunity"
+            element={withLayout(OldCreateCommunityPage, { type: 'common' })}
+          />,
+          <Route
+            key="/createCommunity/:type"
+            path="/createCommunity/:type"
+            element={withLayout(OldCreateCommunityPage, { type: 'common' })}
+          />,
+        ]
+      ),
+    ],
     <Route
       key="/createCommunity"
       path="/createCommunity"
-      element={withLayout(CreateCommunityPage, {
+      element={withLayout(OldCreateCommunityPage, {
         scoped: true,
         type: 'common',
       })}
@@ -101,7 +126,7 @@ const CustomDomainRoutes = () => {
     <Route
       key="/createCommunity/:type"
       path="/createCommunity/:type"
-      element={withLayout(CreateCommunityPage, {
+      element={withLayout(OldCreateCommunityPage, {
         scoped: true,
         type: 'common',
       })}

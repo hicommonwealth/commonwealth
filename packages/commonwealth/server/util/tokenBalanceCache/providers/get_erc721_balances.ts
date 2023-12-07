@@ -11,6 +11,7 @@ export type GetErc721BalancesOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
   contractAddress: string;
+  batchSize?: number;
 };
 
 export async function __getErc721Balances(options: GetErc721BalancesOptions) {
@@ -32,6 +33,7 @@ export async function __getErc721Balances(options: GetErc721BalancesOptions) {
       rpcEndpoint,
       options.contractAddress,
       options.addresses,
+      options.batchSize,
     );
   }
 }
@@ -41,6 +43,7 @@ async function getOffChainBatchErc721Balances(
   rpcEndpoint: string,
   contractAddress: string,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
   const { balances } = await evmOffChainRpcBatching(
     {
@@ -59,7 +62,7 @@ async function getOffChainBatchErc721Balances(
           data: calldata,
         };
       },
-      batchSize: 1000,
+      batchSize,
     },
     addresses,
   );

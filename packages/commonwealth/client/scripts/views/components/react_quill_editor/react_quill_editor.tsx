@@ -292,6 +292,7 @@ const ReactQuillEditor = ({
                         className={clsx('QuillEditor', className, {
                           markdownEnabled: isMarkdownEnabled,
                         })}
+                        scrollingContainer="html"
                         placeholder={placeholder}
                         tabIndex={tabIndex}
                         theme="snow"

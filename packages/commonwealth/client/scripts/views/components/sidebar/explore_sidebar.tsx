@@ -24,7 +24,9 @@ export const ExploreCommunitiesSidebar = ({
 
   const isInCommunity = (item) => {
     if (item instanceof ChainInfo) {
-      return app.roles.getAllRolesInCommunity({ chain: item.id }).length > 0;
+      return (
+        app.roles.getAllRolesInCommunity({ community: item.id }).length > 0
+      );
     } else {
       return false;
     }

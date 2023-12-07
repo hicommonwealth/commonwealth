@@ -16,6 +16,8 @@ import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
+import CWCommunitySelector from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
@@ -1892,6 +1894,50 @@ export const ComponentShowcase = () => {
               label="Action"
             />
           }
+        />
+      </div>
+
+      <div className="CommunitySelectorContainer">
+        <CWText type="h3"> Community Selector </CWText>
+        <CWCommunitySelector
+          type="ethereum"
+          title="Ethereum (EVM)"
+          isRecommended
+          onClick={(type) => console.log('Selected: ', type)}
+          description="Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable.
+          Select this community type if you have minted a token on the Ethereum blockchain."
+        />
+        <CWCommunitySelector
+          type="cosmos"
+          title="Cosmos"
+          onClick={(type) => console.log('Selected: ', type)}
+          description="The Cosmos Network is a decentralized network of independent, scalable,
+          and interoperable blockchains, creating the foundation for a new token economy."
+        />
+        <CWCommunitySelector
+          type="polygon"
+          title="Polygon"
+          onClick={(type) => console.log('Selected: ', type)}
+          description="Polygon is built around making web3 technology accessible, with zero prior knowledge.
+           Common supports communities on the Polygon network..."
+        />
+        <CWCommunitySelector
+          type="solana"
+          title="Solana"
+          onClick={(type) => console.log('Selected: ', type)}
+          description="Solana is a rapidly growing technology due to its speed and scale.
+          Our integration with Solana allows you to create a community for your project with just a click! "
+        />
+      </div>
+
+      <div className="FormStepContainer">
+        <CWText type="h3">Form Steps</CWText>
+        <CWFormSteps
+          steps={[
+            { label: 'First Step', state: 'completed' },
+            { label: 'Second Step', state: 'active' },
+            { label: 'Third Step', state: 'inactive' },
+          ]}
         />
       </div>
     </div>

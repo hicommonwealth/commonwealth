@@ -159,7 +159,7 @@ export const SearchBarMemberPreviewRow = (
   props: SearchBarMemberPreviewRowProps,
 ) => {
   const { searchResult } = props;
-  const community = searchResult.addresses[0].community;
+  const community = searchResult.addresses[0].chain;
   const address = searchResult.addresses[0].address;
 
   const navigate = useCommonNavigate();
