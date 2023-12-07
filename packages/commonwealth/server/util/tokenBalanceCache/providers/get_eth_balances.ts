@@ -6,6 +6,7 @@ import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
   evmOffChainRpcBatching,
+  evmRpcRequest,
   mapNodeToBalanceFetcherContract,
 } from '../util';
 
@@ -14,6 +15,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export type GetEthBalancesOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
+  batchSize?: number;
 };
 
 export async function __getEthBalances(options: GetEthBalancesOptions) {
@@ -38,12 +40,14 @@ export async function __getEthBalances(options: GetEthBalancesOptions) {
       options.chainNode.eth_chain_id,
       rpcEndpoint,
       options.addresses,
+      options.batchSize,
     );
   } else {
     return await getOffChainBatchEthBalances(
       options.chainNode.eth_chain_id,
       rpcEndpoint,
       options.addresses,
+      options.batchSize,
     );
   }
 }
@@ -52,6 +56,7 @@ async function getOnChainBatchEthBalances(
   evmChainId: number,
   rpcEndpoint: string,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
   const { balances } = await evmBalanceFetcherBatching(
     {
@@ -59,7 +64,7 @@ async function getOnChainBatchEthBalances(
       url: rpcEndpoint,
     },
     {
-      batchSize: 1000,
+      batchSize,
     },
     addresses,
   );
@@ -71,6 +76,7 @@ async function getOffChainBatchEthBalances(
   evmChainId: number,
   rpcEndpoint: string,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
   const { balances } = await evmOffChainRpcBatching(
     {
@@ -79,10 +85,10 @@ async function getOffChainBatchEthBalances(
     },
     {
       method: 'eth_getBalance',
-      getParams: (abiCoder, address, tokenAddress) => {
+      getParams: (_abiCoder, address, _tokenAddress) => {
         return address;
       },
-      batchSize: 1000,
+      batchSize,
     },
     addresses,
   );
@@ -101,19 +107,16 @@ async function getEthBalance(
     jsonrpc: '2.0',
   };
 
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    body: JSON.stringify(requestBody),
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const data = await response.json();
+  const errorMsg =
+    `Eth balance fetch failed for address ${address} ` +
+    `on evm chain id ${evmChainId}`;
+
+  const data = await evmRpcRequest(rpcEndpoint, requestBody, errorMsg);
+  if (!data) return {};
 
   if (data.error) {
-    const msg =
-      `Eth balance fetch failed for address ${address} ` +
-      `on evm chain id ${evmChainId}`;
-    rollbar.error(msg, data.error);
-    log.error(msg, data.error);
+    rollbar.error(errorMsg, data.error);
+    log.error(errorMsg, data.error);
     return {};
   } else {
     return {

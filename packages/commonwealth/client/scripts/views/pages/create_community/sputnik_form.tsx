@@ -16,12 +16,12 @@ import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/
 import { CWButton } from '../../components/component_kit/cw_button';
 import {
   defaultCommunityRows,
-  updateAdminOnCreateCommunity
+  updateAdminOnCreateCommunity,
 } from './community_input_rows';
 import {
   useCommunityFormDefaultFields,
   useCommunityFormIdFields,
-  useCommunityFormState
+  useCommunityFormState,
 } from './hooks';
 
 export const SputnikForm = () => {
@@ -90,7 +90,7 @@ export const SputnikForm = () => {
             network: ChainNetwork.Sputnik,
             node_url: url,
             default_symbol: isMainnet ? 'NEAR' : 'tNEAR',
-            type: ChainType.DAO
+            type: ChainType.DAO,
             // ...form, <-- not typed so I don't know what's needed
           };
 
@@ -119,14 +119,14 @@ export const SputnikForm = () => {
             // POST object
             const res = await $.post(
               `${app.serverUrl()}/communities`,
-              createCommunityArgs
+              createCommunityArgs,
             );
 
             if (res.result.admin_address) {
               await linkExistingAddressToChainOrCommunity(
                 res.result.admin_address,
                 res.result.role.chain_id,
-                res.result.role.chain_id
+                res.result.role.chain_id,
               );
             }
 

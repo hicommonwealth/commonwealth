@@ -280,7 +280,7 @@ export const HeaderWithFilters = ({
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
                   canEditOption={app.roles?.isAdminOfEntity({
-                    chain: app.activeChainId(),
+                    community: app.activeChainId(),
                   })}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(
