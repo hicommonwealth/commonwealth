@@ -1,12 +1,14 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 import $ from 'jquery';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import app from 'state';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import { CWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
+import { CWButton as NewCWButton } from './new_designs/cw_button';
 
+import { useFormContext } from 'react-hook-form';
 import { compressImage } from 'utils/ImageCompression';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWRadioGroup } from './cw_radio_group';
@@ -15,8 +17,16 @@ import { CWText } from './cw_text';
 import { CWTextInput, MessageRow } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
 import { getClasses } from './helpers';
+import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
 
-type CoverImageUploaderProps = {
+// TODO: currently it doesn't support "edit more", i.e if we set url in CWForm "initialValues", this component won't
+// pick it up like the rest of CWForm hooked components do. Add suport for it when needed.
+type CoverImageUploaderFormValidationProps = {
+  name?: string;
+  hookToForm?: boolean;
+};
+
+type CoverImageUploaderProps = CoverImageUploaderFormValidationProps & {
   headerText?: string;
   subheaderText?: string;
   enableGenerativeAI?: boolean;
@@ -26,6 +36,8 @@ type CoverImageUploaderProps = {
   uploadCompleteCallback: CallableFunction;
   canSelectImageBehaviour?: boolean;
   defaultImageBehaviour?: ImageBehavior;
+  showUploadImageButton?: boolean;
+  onUploadStatusChange?: (isUploading: boolean) => any;
 };
 
 export enum ImageAs {
@@ -40,6 +52,8 @@ export enum ImageBehavior {
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
 export const CWCoverImageUploader = ({
+  name,
+  hookToForm,
   headerText,
   subheaderText,
   enableGenerativeAI,
@@ -48,7 +62,9 @@ export const CWCoverImageUploader = ({
   defaultImageBehavior,
   uploadCompleteCallback,
   canSelectImageBehaviour = true,
+  showUploadImageButton,
   defaultImageBehaviour,
+  onUploadStatusChange = () => {},
 }: CoverImageUploaderProps) => {
   const [imageURL, setImageURL] = React.useState<string>();
   const [isUploading, setIsUploading] = React.useState<boolean>();
@@ -64,6 +80,23 @@ export const CWCoverImageUploader = ({
   const attachZone = React.useRef<HTMLDivElement>(null);
   const attachButton = React.useRef<HTMLDivElement>(null);
   const pseudoInput = React.useRef<HTMLInputElement>(null);
+
+  const formContext = useFormContext();
+  hookToForm && name && formContext.register(name);
+  const formFieldErrorMessage =
+    hookToForm &&
+    name &&
+    (formContext?.formState?.errors?.[name]?.message as string);
+
+  useEffect(() => {
+    onUploadStatusChange(isUploading);
+  }, [isUploading, onUploadStatusChange]);
+
+  useEffect(() => {
+    if (!imageURL) {
+      formContext.setValue(name, '');
+    }
+  }, [imageURL, formContext, name]);
 
   const uploadImage = async (
     file: File,
@@ -106,6 +139,10 @@ export const CWCoverImageUploader = ({
 
       if (isPrompting) {
         setImageURL(res.result.imageUrl);
+        if (hookToForm && name && formContext) {
+          formContext.setValue(name, res.result.imageURL);
+          formContext.setError(name, null);
+        }
         const currentImageBehavior = !imageBehavior
           ? ImageBehavior.Fill
           : imageBehavior;
@@ -152,6 +189,10 @@ export const CWCoverImageUploader = ({
 
     if (_imageURL) {
       setImageURL(_imageURL);
+      if (hookToForm && name && formContext) {
+        formContext.setValue(name, _imageURL);
+        formContext.setError(name, null);
+      }
       const currentImageBehavior = !imageBehavior
         ? ImageBehavior.Fill
         : imageBehavior;
@@ -191,7 +232,7 @@ export const CWCoverImageUploader = ({
   };
 
   const clickHandler = (e) => {
-    e.stopImmediatePropagation();
+    e?.stopImmediatePropagation?.();
     if (isUploading) return;
     pseudoInput.current?.click();
   };
@@ -253,10 +294,12 @@ export const CWCoverImageUploader = ({
         className={getClasses<{
           isUploading: boolean;
           uploadStatus: ValidationStatus;
+          validationStatus: 'failure' | undefined;
         }>(
           {
             isUploading,
             uploadStatus,
+            validationStatus: formFieldErrorMessage ? 'failure' : undefined,
           },
           'attach-zone',
         )}
@@ -336,10 +379,26 @@ export const CWCoverImageUploader = ({
         />
         {isUploading && <CWSpinner size="large" />}
         <div className="attach-btn" ref={attachButton}>
-          {!isUploading && <CWIcon iconName="imageUpload" iconSize="medium" />}
-          <CWText type="caption" fontWeight="medium">
-            {headerText}
-          </CWText>
+          {!isUploading && (
+            <CWIcon iconName="imageSquare" iconSize="large" weight="fill" />
+          )}
+          {headerText && (
+            <CWText type="caption" fontWeight="medium">
+              {headerText}
+            </CWText>
+          )}
+          {showUploadImageButton && !isUploading && (
+            <NewCWButton
+              containerClassName="upload-btn"
+              type="button"
+              buttonType="secondary"
+              label="Select Image"
+              onClick={(e) => {
+                e.stopPropagation();
+                clickHandler(e);
+              }}
+            />
+          )}
           {enableGenerativeAI && !isUploading && (
             <CWButton
               buttonType="mini-white"
@@ -354,6 +413,11 @@ export const CWCoverImageUploader = ({
           )}
         </div>
       </div>
+      <NewMessageRow
+        hasFeedback={!!formFieldErrorMessage}
+        statusMessage={formFieldErrorMessage}
+        validationStatus={formFieldErrorMessage ? 'failure' : undefined}
+      />
       {canSelectImageBehaviour && (
         <div className="options">
           <CWText
