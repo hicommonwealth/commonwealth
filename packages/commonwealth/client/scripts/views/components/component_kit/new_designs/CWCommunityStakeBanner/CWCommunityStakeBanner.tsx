@@ -26,7 +26,8 @@ export const CWCommunityStakeBanner = ({
         {
           label: 'Buy stake',
           buttonType: 'secondary',
-          // buttonAlt: 'alt-green',
+          buttonAlt: 'green',
+          buttonWidth: 'wide',
           onClick: () => {
             navigate('/');
           },
@@ -43,7 +44,7 @@ export const CWCommunityStakeBanner = ({
       onClose={onClose}
       footer={
         <>
-          <CWText type="caption">
+          <CWText type="caption" className="description">
             Buying a stake will automatically place you in group
           </CWText>
           <CWTag label={groupName} type="group" />

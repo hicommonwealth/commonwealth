@@ -79,6 +79,10 @@
     display: flex;
     margin-top: 16px;
     gap: 4px;
+
+    .description {
+      color: #656167;
+    }
   }
 
   &.info {
