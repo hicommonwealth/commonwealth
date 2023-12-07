@@ -8,11 +8,11 @@ import NotificationSubscription, {
 
 import app from 'state';
 
-import { NotificationStore } from 'stores';
-import Notification from '../../models/Notification';
 import { NotificationCategories } from 'common-common/src/types';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import { SubscriptionInstance } from 'server/models/subscription';
+import { NotificationStore } from 'stores';
+import Notification from '../../models/Notification';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
@@ -41,7 +41,7 @@ const get = (route, args, callback) => {
 };
 
 interface NotifOptions {
-  chain_filter: string;
+  community_filter: string;
   maxId: number;
 }
 
@@ -88,13 +88,13 @@ class NotificationsController {
 
   public get discussionSubscriptions(): NotificationSubscription[] {
     return this._subscriptions.filter(
-      (s) => s.categoryId !== NotificationCategories.ChainEvent
+      (s) => s.categoryId !== NotificationCategories.ChainEvent,
     );
   }
 
   public get chainEventSubscriptions(): NotificationSubscription[] {
     return this._subscriptions.filter(
-      (s) => s.categoryId === NotificationCategories.ChainEvent
+      (s) => s.categoryId === NotificationCategories.ChainEvent,
     );
   }
 
@@ -133,7 +133,7 @@ class NotificationsController {
               newSubscription.chainId,
             ]);
           this._subscriptions.push(newSubscription);
-        }
+        },
       );
     }
   }
@@ -152,7 +152,7 @@ class NotificationsController {
           if (s.category === 'chain-event') ceSubs.push(s.chainId);
         }
         app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
-      }
+      },
     );
   }
 
@@ -170,7 +170,7 @@ class NotificationsController {
           if (s.category === 'chain-event') ceSubs.push(s);
         }
         app.socket.chainEventsNs.deleteChainEventSubscriptions(ceSubs);
-      }
+      },
     );
   }
 
@@ -185,7 +185,7 @@ class NotificationsController {
         for (const s of subscriptions) {
           s.enableImmediateEmail();
         }
-      }
+      },
     );
   }
 
@@ -200,7 +200,7 @@ class NotificationsController {
         for (const s of subscriptions) {
           s.disableImmediateEmail();
         }
-      }
+      },
     );
   }
 
@@ -221,7 +221,7 @@ class NotificationsController {
           app.socket.chainEventsNs.deleteChainEventSubscriptions([
             subscription,
           ]);
-      }
+      },
     );
   }
 
@@ -245,7 +245,7 @@ class NotificationsController {
         if (unreadNotifications.slice(MAX_NOTIFICATIONS_READ).length > 0) {
           this.markAsRead(unreadNotifications.slice(MAX_NOTIFICATIONS_READ));
         }
-      }
+      },
     );
   }
 
@@ -288,7 +288,7 @@ class NotificationsController {
           this.delete(notifications.slice(MAX_NOTIFICATIONS_CLEAR));
         }
         // TODO: post(/clearNotifications) should wait on all notifications being marked as read before redrawing
-      }
+      },
     );
   }
 
@@ -304,7 +304,7 @@ class NotificationsController {
 
   public clearSubscriptions() {
     app.socket?.chainEventsNs.deleteChainEventSubscriptions(
-      this._subscriptions
+      this._subscriptions,
     );
     this._subscriptions = [];
   }
@@ -331,8 +331,8 @@ class NotificationsController {
     }
 
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined };
+      ? { community_filter: app.activeChainId(), maxId: undefined }
+      : { community_filter: undefined, maxId: undefined };
 
     return post('/viewChainEventNotifications', options, (result) => {
       this._numPages = result.numPages;
@@ -347,8 +347,8 @@ class NotificationsController {
       throw new Error('must be signed in to refresh notifications');
     }
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined };
+      ? { community_filter: app.activeChainId(), maxId: undefined }
+      : { community_filter: undefined, maxId: undefined };
 
     return post('/viewDiscussionNotifications', options, (result) => {
       this._numPages = result.numPages;

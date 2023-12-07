@@ -33,7 +33,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     chainId: app.activeChainId(),
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
   const foundGroup: Group = groups.find(

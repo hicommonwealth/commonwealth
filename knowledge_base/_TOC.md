@@ -6,6 +6,7 @@
 - [Ways of Working](Ways-Of-Working.md)
 - [Code Style (under development)](Code-Style.md)
 - [React Best Practices](React-Best-Practices-And-Improvements.md)
+- [Platform Coding Guidelines](Platform-Coding-Guidelines.md)
 
 ## Common App
 

@@ -135,14 +135,14 @@ const useWallets = (walletProps: IuseWalletProps) => {
       setSidebarType('communityWalletOptions');
       setActiveStep('walletList');
     } else {
-      const allChains = app.config.chains.getAll();
+      const allCommunities = app.config.chains.getAll();
       const sortedChainBases = [
         ChainBase.CosmosSDK,
         ChainBase.Ethereum,
         // ChainBase.NEAR,
         ChainBase.Substrate,
         ChainBase.Solana,
-      ].filter((base) => allChains.find((chain) => chain.base === base));
+      ].filter((base) => allCommunities.find((chain) => chain.base === base));
       setWallets(
         _.flatten(
           sortedChainBases.map((base) => {
@@ -275,10 +275,13 @@ const useWallets = (walletProps: IuseWalletProps) => {
         setDarkMode(true);
       }
       if (app.chain) {
-        const chain =
+        const community =
           app.user.selectedChain ||
           app.config.chains.getById(app.activeChainId());
-        await updateActiveAddresses({ chain, shouldRedraw: shouldRedrawApp });
+        await updateActiveAddresses({
+          chain: community,
+          shouldRedraw: shouldRedrawApp,
+        });
       }
     }
 

@@ -191,7 +191,7 @@ export function formatPercent(num: number, digits: number) {
 
 export function formatDuration(
   duration: moment.Duration,
-  includeSeconds = true
+  includeSeconds = true,
 ) {
   const days = Math.floor(duration.asDays());
   return [
@@ -210,11 +210,11 @@ export function formatProposalHashShort(hash: string) {
 export function formatAddressShort(
   address: string,
   numberOfVisibleCharacters = 5,
-  numberOfVisibleCharactersTail = 4
+  numberOfVisibleCharactersTail = 4,
 ) {
   if (address.length < 10) return address;
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
-    -numberOfVisibleCharactersTail
+    -numberOfVisibleCharactersTail,
   )}`;
 }
 
@@ -285,7 +285,7 @@ export const weiToTokens = (input: string, decimals: number) => {
 };
 
 export const isCommandClick = (
-  e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 ) => {
   return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
 };
@@ -296,7 +296,7 @@ export const handleRedirectClicks = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
-  callback: () => any
+  callback: () => any,
 ) => {
   if (isCommandClick(e)) {
     if (activeChainId) {
@@ -342,7 +342,7 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
   } else if (chain.network === ChainNetwork.ERC721) {
     decimals = 0;
   } else if (chain.network === ChainNetwork.ERC1155) {
-      decimals = 0;
+    decimals = 0;
   } else if (chain.base === ChainBase.CosmosSDK) {
     decimals = 6;
   }

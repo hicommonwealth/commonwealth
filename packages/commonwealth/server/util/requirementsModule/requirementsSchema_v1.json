@@ -17,7 +17,7 @@
         },
         "token_id": {
           "type": "string",
-          "pattern": "^[0-9]+$"        
+          "pattern": "^[0-9]+$"
         }
       },
       "required": ["source_type", "evm_chain_id", "contract_address"]

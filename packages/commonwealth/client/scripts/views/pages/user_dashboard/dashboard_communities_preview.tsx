@@ -1,8 +1,8 @@
 import { pluralize } from 'helpers';
-import CommunityInfo from '../../../models/ChainInfo';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 import React from 'react';
+import CommunityInfo from '../../../models/ChainInfo';
 
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -21,11 +21,11 @@ const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
   const visitedChain = !!unseenPosts[community.id];
   const updatedThreads = unseenPosts[community.id]?.activePosts || 0;
   const monthlyThreadCount = app.recentActivity.getCommunityThreadCount(
-    community.id
+    community.id,
   );
   const isMember = app.roles.isMember({
     account: app.user.activeAccount,
-    chain: community.id,
+    community: community.id,
   });
 
   return (

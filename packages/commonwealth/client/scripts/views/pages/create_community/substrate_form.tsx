@@ -14,13 +14,13 @@ import { InputRow } from 'views/components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import {
   defaultCommunityRows,
-  updateAdminOnCreateCommunity
+  updateAdminOnCreateCommunity,
 } from './community_input_rows';
 import {
   useCommunityFormDefaultFields,
   useCommunityFormIdFields,
   useCommunityFormState,
-  useEthCommunityFormFields
+  useEthCommunityFormFields,
 } from './hooks';
 
 const defaultSubstrateSpec = `{"types": {"Address": "MultiAddress", "ChainId": "u8",
@@ -103,14 +103,14 @@ export const SubstrateForm = () => {
           // create new API
           const provider = new polkadot.WsProvider(
             constructSubstrateUrl(ethCommunityFormFields.nodeUrl),
-            false
+            false,
           );
           try {
             await provider.connect();
             const api = await polkadot.ApiPromise.create({
               throwOnConnect: true,
               provider,
-              ...JSON.parse(substrateSpec)
+              ...JSON.parse(substrateSpec),
             });
             await api.disconnect();
             notifySuccess('Test has passed');
@@ -143,7 +143,7 @@ export const SubstrateForm = () => {
             node_url: ethCommunityFormFields.nodeUrl,
             substrate_spec: substrateSpec,
             type: ChainType.Chain,
-            default_symbol: symbol
+            default_symbol: symbol,
             // ...form, <-- not typed so I don't know what's needed
           })
             .then(async (res) => {
@@ -151,7 +151,7 @@ export const SubstrateForm = () => {
                 await linkExistingAddressToChainOrCommunity(
                   res.result.admin_address,
                   res.result.role.chain_id,
-                  res.result.role.chain_id
+                  res.result.role.chain_id,
                 );
               }
               await updateAdminOnCreateCommunity(slugify(name));
@@ -159,7 +159,7 @@ export const SubstrateForm = () => {
             })
             .catch((err: any) => {
               notifyError(
-                err.responseJSON?.error || 'Creating new community failed'
+                err.responseJSON?.error || 'Creating new community failed',
               );
             })
             .always(() => {

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import $ from 'jquery';
 import { EventEmitter } from 'events';
+import $ from 'jquery';
 
 import app from 'state';
 import Account from '../../models/Account';
@@ -79,7 +79,7 @@ export class UserController {
 
   private _setActiveAccounts(
     activeAccounts: Account[],
-    shouldRedraw = true
+    shouldRedraw = true,
   ): void {
     this._activeAccounts = activeAccounts;
     if (shouldRedraw) {
@@ -214,13 +214,13 @@ export class UserController {
   public removeAddress(address: AddressInfo): void {
     this._addresses.splice(
       this._addresses.findIndex((a) => a.address === address.address),
-      1
+      1,
     );
   }
 
   public setActiveAccounts(
     activeAccounts: Account[],
-    shouldRedraw = true
+    shouldRedraw = true,
   ): void {
     this._setActiveAccounts(activeAccounts, shouldRedraw);
   }
@@ -232,7 +232,7 @@ export class UserController {
   public removeActiveAddress(address: Account): void {
     this._activeAccounts.splice(
       this._activeAccounts.findIndex((a) => a.address === address.address),
-      1
+      1,
     );
   }
 
@@ -247,7 +247,7 @@ export class UserController {
   public removeSocialAccount(social: SocialAccount): void {
     this._socialAccounts.splice(
       this._socialAccounts.findIndex((s) => s.username === social.username),
-      1
+      1,
     );
   }
 
@@ -303,7 +303,7 @@ export class UserController {
 
   public removeStarredCommunity(chain: string, userId: number): void {
     const index = this._starredCommunities.findIndex(
-      (s) => s.user_id === userId && s.chain === chain
+      (s) => s.user_id === userId && s.chain === chain,
     );
     this._starredCommunities.splice(index, 1);
   }
