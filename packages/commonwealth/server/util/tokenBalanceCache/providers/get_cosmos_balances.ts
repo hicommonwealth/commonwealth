@@ -17,6 +17,7 @@ const log = factory.getLogger(formatFilename(__filename));
 export type GetCosmosBalanceOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
+  batchSize?: number;
 };
 
 export async function __getCosmosNativeBalances(
@@ -29,7 +30,7 @@ export async function __getCosmosNativeBalances(
     const batchClient = new HttpBatchClient(
       options.chainNode.private_url || options.chainNode.url,
       {
-        batchSizeLimit: 100,
+        batchSizeLimit: options.batchSize || 100,
         dispatchInterval: 10,
       },
     );

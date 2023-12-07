@@ -1,3 +1,4 @@
+import { Secp256k1HdWallet } from '@cosmjs/amino';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import {
   QueryClient,
@@ -21,6 +22,19 @@ chaiUse(chaiAsPromised);
 // same mnemonic as defined in cosmos-chain-testing bootstrap files
 const addressOneMnemonic =
   'jewel disease neglect feel mother dry hire yellow minute main tray famous';
+
+async function generateCosmosAddresses(numberOfAddresses: number) {
+  const addresses = [];
+  for (let i = 0; i < numberOfAddresses; i++) {
+    // Generate a new wallet with a random mnemonic
+    const wallet = await Secp256k1HdWallet.generate(12, { prefix: 'cosmos' });
+    // Get the first account from the wallet
+    const [firstAccount] = await wallet.getAccounts();
+    addresses.push(firstAccount.address);
+  }
+
+  return addresses;
+}
 
 describe('Token Balance Cache Cosmos Tests', function () {
   this.timeout(80_000);
@@ -94,6 +108,25 @@ describe('Token Balance Cache Cosmos Tests', function () {
     });
 
     expect(Object.keys(balances).length).to.equal(2);
+    expect(balances[addressOne]).to.equal(addressOneBalance);
+    expect(balances[addressTwo]).to.equal(addressTwoBalance);
+  });
+
+  it('should correctly batch balance requests', async () => {
+    const bulkAddresses = await generateCosmosAddresses(20);
+    bulkAddresses.splice(4, 0, addressOne);
+    bulkAddresses.splice(5, 0, addressTwo);
+    const balances = await tbc.getBalances({
+      balanceSourceType: BalanceSourceType.CosmosNative,
+      addresses: bulkAddresses,
+      sourceOptions: {
+        cosmosChainId,
+      },
+      cacheRefresh: true,
+      batchSize: 5,
+    });
+
+    expect(Object.keys(balances).length).to.equal(22);
     expect(balances[addressOne]).to.equal(addressOneBalance);
     expect(balances[addressTwo]).to.equal(addressTwoBalance);
   });

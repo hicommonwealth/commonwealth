@@ -4,9 +4,12 @@
 
 - [Navigating The Docs](#navigating-the-docs)
 - [Updating The Docs: How & When](#updating-the-docs-how--when)
+  * [Inline Documentation](#inline-documentation)
   * [Documentation Language](#documentation-language)
     + [Indexicality & Timestamps](#indexicality--timestamps)
     + [Must, Should, & May](#must-should--may)
+    + [Responsible, Accountable, Consulted, Informed](#responsible-accountable-consulted-informed)
+  * [Linting](#linting)
 - [Mermaid Visualizations](#mermaid-visualizations)
 - [Tracking Documentation Status](#tracking-documentation-status)
   * [Change Logs](#change-logs)
@@ -70,6 +73,12 @@ Per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119), the following prescripti
 #### Responsible, Accountable, Consulted, Informed
 
 Common as a team uses the RACI model for designating a spectrum of responsibility levels. **Responsible** parties perform the project's primary work. **Accountable** parties answer for the final deliverable. Consulted parties lend expertise to the project. **Informed** parties are kept up-to-date on the project's progress.
+
+### Linting
+
+The knowledge base uses David Anson's Markdownlint tool for linting and formatting; Markdownlint integrates with Prettier, once set as Prettier's default Markdown formatter.
+
+See our [markdownlint.json](./.markdownlint.json) file for current configuration, and a glossary of formatting rules in Markdownlint's [official repo](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md).
 
 ## Mermaid Visualizations
 

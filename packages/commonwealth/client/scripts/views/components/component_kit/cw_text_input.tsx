@@ -224,7 +224,7 @@ export const CWTextInput = ({
               onenterkey(e);
             }
           }}
-          value={value || ''}
+          value={value}
           defaultValue={defaultValue}
         />
         {iconRightonClick && !!iconRight && !disabled ? (

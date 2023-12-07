@@ -2,13 +2,17 @@ import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
 
 export type Balances = { [address: string]: string };
 
+type TbcConfigOptions = {
+  cacheRefresh?: boolean;
+  batchSize?: number;
+};
+
 type GetEvmBalancesBase = {
   addresses: string[];
   sourceOptions: {
     evmChainId: number;
   };
-  cacheRefresh?: boolean;
-};
+} & TbcConfigOptions;
 type GetErc20BalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ERC20;
   sourceOptions: {
@@ -32,11 +36,14 @@ type GetEthNativeBalanceOptions = GetEvmBalancesBase & {
   balanceSourceType: BalanceSourceType.ETHNative;
 };
 
-export type GetEvmBalancesOptions =
-  | GetEthNativeBalanceOptions
+export type GetErcBalanceOptions =
   | GetErc20BalanceOptions
   | GetErc721BalanceOptions
   | GetErc1155BalanceOptions;
+
+export type GetEvmBalancesOptions =
+  | GetEthNativeBalanceOptions
+  | GetErcBalanceOptions;
 
 export type GetCosmosBalancesOptions = {
   balanceSourceType: BalanceSourceType.CosmosNative;
@@ -44,8 +51,7 @@ export type GetCosmosBalancesOptions = {
   sourceOptions: {
     cosmosChainId: string;
   };
-  cacheRefresh?: boolean;
-};
+} & TbcConfigOptions;
 
 export type GetBalancesOptions =
   | GetEvmBalancesOptions

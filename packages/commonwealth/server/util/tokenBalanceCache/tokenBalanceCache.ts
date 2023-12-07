@@ -16,6 +16,7 @@ import {
   Balances,
   GetBalancesOptions,
   GetCosmosBalancesOptions,
+  GetErcBalanceOptions,
   GetEvmBalancesOptions,
 } from './types';
 
@@ -35,12 +36,37 @@ export class TokenBalanceCache {
   public async getBalances(options: GetBalancesOptions): Promise<Balances> {
     if (options.addresses.length === 0) return {};
 
-    let balances: Balances;
+    let balances: Balances = {};
 
-    if (options.balanceSourceType === BalanceSourceType.CosmosNative) {
-      balances = await this.getCosmosBalances(options);
-    } else {
-      balances = await this.getEvmBalances(options);
+    try {
+      if (options.balanceSourceType === BalanceSourceType.CosmosNative) {
+        balances = await this.getCosmosBalances(options);
+      } else {
+        balances = await this.getEvmBalances(options);
+      }
+    } catch (e) {
+      let chainId: string;
+      if ((options as GetEvmBalancesOptions).sourceOptions.evmChainId) {
+        chainId = `evm chain id ${
+          (options as GetEvmBalancesOptions).sourceOptions.evmChainId
+        }`;
+      } else {
+        chainId = `cosmos chain id ${
+          (options as GetCosmosBalancesOptions).sourceOptions.cosmosChainId
+        }`;
+      }
+
+      let contractAddress: string = '';
+      if ((options as GetErcBalanceOptions).sourceOptions.contractAddress) {
+        contractAddress = ` for contract address ${
+          (options as GetErcBalanceOptions).sourceOptions.contractAddress
+        }`;
+      }
+      const msg =
+        `Failed to fetch balance(s) for ${options.addresses.length}` +
+        ` address(es) on ${chainId}${contractAddress}`;
+      log.error(msg, e);
+      rollbar.error(msg, e);
     }
 
     StatsDController.get().increment(
@@ -94,6 +120,7 @@ export class TokenBalanceCache {
     const freshBalances = await __getCosmosNativeBalances.call(this, {
       chainNode,
       addresses: validatedAddresses,
+      batchSize: options.batchSize,
     });
 
     await this.cacheBalances(options, freshBalances);
@@ -155,6 +182,7 @@ export class TokenBalanceCache {
         freshBalances = await __getEthBalances.call(this, {
           chainNode,
           addresses: validatedAddresses,
+          batchSize: options.batchSize,
         });
         break;
       case BalanceSourceType.ERC20:
@@ -162,6 +190,7 @@ export class TokenBalanceCache {
           chainNode,
           addresses: validatedAddresses,
           contractAddress: options.sourceOptions.contractAddress,
+          batchSize: options.batchSize,
         });
         break;
       case BalanceSourceType.ERC721:
@@ -169,6 +198,7 @@ export class TokenBalanceCache {
           chainNode,
           addresses: validatedAddresses,
           contractAddress: options.sourceOptions.contractAddress,
+          batchSize: options.batchSize,
         });
         break;
       case BalanceSourceType.ERC1155:
@@ -177,6 +207,7 @@ export class TokenBalanceCache {
           addresses: validatedAddresses,
           contractAddress: options.sourceOptions.contractAddress,
           tokenId: options.sourceOptions.tokenId,
+          batchSize: options.batchSize,
         });
         break;
     }

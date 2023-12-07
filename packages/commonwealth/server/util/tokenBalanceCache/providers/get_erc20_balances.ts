@@ -6,6 +6,7 @@ import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
   evmOffChainRpcBatching,
+  evmRpcRequest,
   mapNodeToBalanceFetcherContract,
 } from '../util';
 
@@ -15,6 +16,7 @@ export type GetErc20BalancesOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
   contractAddress: string;
+  batchSize?: number;
 };
 
 export async function __getErc20Balances(
@@ -43,6 +45,7 @@ export async function __getErc20Balances(
       rpcEndpoint,
       options.contractAddress,
       options.addresses,
+      options.batchSize,
     );
   } else {
     return await getOffChainBatchErc20Balances(
@@ -50,6 +53,7 @@ export async function __getErc20Balances(
       rpcEndpoint,
       options.contractAddress,
       options.addresses,
+      options.batchSize,
     );
   }
 }
@@ -59,6 +63,7 @@ async function getOnChainBatchErc20Balances(
   rpcEndpoint: string,
   contractAddress: string,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
   // ignore failedAddresses returned property for now -> revisit if we want to implement retry strategy
   const { balances } = await evmBalanceFetcherBatching(
@@ -68,7 +73,7 @@ async function getOnChainBatchErc20Balances(
       contractAddress: contractAddress,
     },
     {
-      batchSize: 1000,
+      batchSize,
     },
     addresses,
   );
@@ -80,6 +85,7 @@ async function getOffChainBatchErc20Balances(
   rpcEndpoint: string,
   contractAddress: string,
   addresses: string[],
+  batchSize = 1000,
 ): Promise<Balances> {
   // ignore failedAddresses returned property for now -> revisit if we want to implement retry strategy
   const { balances } = await evmOffChainRpcBatching(
@@ -99,7 +105,7 @@ async function getOffChainBatchErc20Balances(
           data: calldata,
         };
       },
-      batchSize: 1000,
+      batchSize,
     },
     addresses,
   );
@@ -128,19 +134,16 @@ async function getErc20Balance(
     jsonrpc: '2.0',
   };
 
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    body: JSON.stringify(requestBody),
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const data = await response.json();
+  const errorMsg =
+    `ERC20 balance fetch failed for address ${address} ` +
+    `on evm chain id ${evmChainId} for contract ${contractAddress}.`;
+
+  const data = await evmRpcRequest(rpcEndpoint, requestBody, errorMsg);
+  if (!data) return {};
 
   if (data.error) {
-    const msg =
-      `ERC20 balance fetch failed for address ${address} ` +
-      `on evm chain id ${evmChainId} for contract ${contractAddress}.`;
-    rollbar.error(msg, data.error);
-    log.error(msg, data.error);
+    rollbar.error(errorMsg, data.error);
+    log.error(errorMsg, data.error);
     return {};
   } else {
     return {

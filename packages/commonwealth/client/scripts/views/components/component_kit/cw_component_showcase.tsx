@@ -863,6 +863,142 @@ export const ComponentShowcase = () => {
             onClick={() => notifySuccess('Button clicked!')}
           />
         </div>
+        <div className="button-row">
+          <CWText type="h4">Secondary Alt-Green</CWText>
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="green"
+            label="Secondary default"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="green"
+            label="Secondary large"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="wide"
+            buttonAlt="green"
+            label="Secondary wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="green"
+            buttonWidth="wide"
+            label="Secondary large and wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonType="secondary"
+            buttonAlt="green"
+            label="Secondary default w/ left icon"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="full"
+            buttonAlt="green"
+            label="Secondary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            label="Secondary default disabled"
+            buttonAlt="green"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonAlt="green"
+            buttonType="secondary"
+            label="Secondary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="green"
+            buttonWidth="full"
+            label="Secondary disabled full"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div className="button-row">
+          <CWText type="h4">Secondary Alt-Rorange</CWText>
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="rorange"
+            label="Secondary default"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="rorange"
+            label="Secondary large"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="wide"
+            buttonAlt="rorange"
+            label="Secondary wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="rorange"
+            buttonWidth="wide"
+            label="Secondary large and wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonType="secondary"
+            buttonAlt="rorange"
+            label="Secondary default w/ left icon"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="full"
+            buttonAlt="rorange"
+            label="Secondary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            label="Secondary default disabled"
+            buttonAlt="rorange"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonAlt="rorange"
+            buttonType="secondary"
+            label="Secondary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="rorange"
+            buttonWidth="full"
+            label="Secondary disabled full"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
       </div>
       <div className="basic-gallery">
         <CWText type="h4">Content Page Card</CWText>

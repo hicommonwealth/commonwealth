@@ -7,8 +7,8 @@ import type {
   UseCommunityFormDefaultFieldsHookType,
   UseCommunityFormIdFieldsHookType,
   UseCommunityFormStateHookType,
-  UseEthCommunityFormFieldsHookType,
   UseEthChainNodeFormStateHookType,
+  UseEthCommunityFormFieldsHookType,
 } from './types';
 
 export const useCommunityFormIdFields =
@@ -82,19 +82,18 @@ export const useCommunityFormState = (): UseCommunityFormStateHookType => {
   };
 };
 
-export const useEthChainFormState =
-  (): UseEthChainNodeFormStateHookType => {
-    const [ethChainNodes, setEthChainNodes] = useState<EthChainNodeType>({});
-    const [ethChainNodeNames, setEthChainNodeNames] =
-      useState<EthChainNodeNamesType>({});
+export const useEthChainFormState = (): UseEthChainNodeFormStateHookType => {
+  const [ethChainNodes, setEthChainNodes] = useState<EthChainNodeType>({});
+  const [ethChainNodeNames, setEthChainNodeNames] =
+    useState<EthChainNodeNamesType>({});
 
-    return {
-      ethChainNodes,
-      setEthChainNodes,
-      ethChainNodeNames,
-      setEthChainNodeNames,
-    };
+  return {
+    ethChainNodes,
+    setEthChainNodes,
+    ethChainNodeNames,
+    setEthChainNodeNames,
   };
+};
 
 export const useEthCommunityFormFields =
   (): UseEthCommunityFormFieldsHookType => {
