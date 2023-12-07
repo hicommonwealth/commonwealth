@@ -27,7 +27,7 @@ const NewCommunityAdminModal = ({
   handleClickContinue,
   selectedCommunity,
 }: NewCommunityAdminModalProps) => {
-  const availableAddressesOnSelectedChain = app.user.addresses.filter(
+  const availableAddressesOnSelectedChain = app.user?.addresses?.filter(
     (addressInfo) => addressInfo.community.base === selectedCommunity.chainBase,
   );
 
@@ -41,7 +41,7 @@ const NewCommunityAdminModal = ({
     label: formatAddressShort(addressInfo.address, 6),
   }));
 
-  const [tempAddress, setTempAddress] = useState(addressOptions[0]);
+  const [tempAddress, setTempAddress] = useState(addressOptions?.[0]);
   const walletsAvailable = availableAddresses?.length > 0;
 
   return (
