@@ -1,11 +1,22 @@
-import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
-import type { AccessLevel } from './permissions';
 import {
   ChainEventAttributes,
   NotificationCategories,
   NotificationCategory,
 } from 'common-common/src/types';
 import type { SupportedNetwork } from '../shared/chain/types/types';
+import type { AccessLevel } from './permissions';
+
+export type SnapshotProposalAttributes = {
+  id: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
+  space: string;
+  event: string;
+  start?: string;
+  expire: string;
+  is_upstream_deleted?: boolean;
+};
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
