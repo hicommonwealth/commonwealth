@@ -71,11 +71,13 @@ export async function getCompoundProposalVotes(
     });
   } else if (govVersion === GovVersion.RawOz) {
     const typedContract = <GovernorCountingSimple>contract;
-    const proposal = await typedContract.proposals(proposalId);
+    const proposalStart = await typedContract.proposalsSnapshot(proposalId);
+    const proposalEnd = await typedContract.proposalDeadline(proposalId);
+
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null, null),
-      +proposal.startBlock,
-      +proposal.endBlock
+      +proposalStart,
+      +proposalEnd
     );
     events = events.map((e) => {
       return {

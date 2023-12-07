@@ -84,6 +84,11 @@ export async function getCompoundProposals(
         <GovernorCompatibilityBravo>contract
       );
       break;
+    case GovVersion.RawOz:
+      proposalArrays = await getProposalDataFieldsSequentially(
+        <GovernorCountingSimple>contract
+      );
+      break;
     default:
       throw new Error(`Invalid Compound contract version: ${govVersion}`);
   }
@@ -147,7 +152,7 @@ async function getProposalAsync(
  * @param contract
  */
 async function getProposalDataSequentially(
-  contract: GovernorCompatibilityBravo | GovernorBravoDelegate | GovernorCountingSimple
+  contract: GovernorCompatibilityBravo | GovernorBravoDelegate 
 ): Promise<ResolvedProposalPromises> {
   console.log('Fetching proposal data sequentially');
   const proposalCreatedEvents = await getProposalCreatedEvents(contract);
@@ -156,6 +161,53 @@ async function getProposalDataSequentially(
   const proposalStatePromises: Promise<number>[] = [];
   for (const propCreatedEvent of proposalCreatedEvents) {
     proposalDataPromises.push(contract.proposals(propCreatedEvent.id));
+    proposalStatePromises.push(contract.state(propCreatedEvent.id));
+  }
+
+  const [proposals, proposalStates] = await Promise.all([
+    Promise.all(proposalDataPromises),
+    Promise.all(proposalStatePromises),
+  ]);
+
+  return [proposalCreatedEvents, proposals, proposalStates];
+}
+
+
+async function getProposalDataFieldsSequentially(
+  contract: GovernorCountingSimple
+): Promise<ResolvedProposalPromises> {
+  console.log('Fetching proposal data sequentially');
+  const proposalCreatedEvents = await getProposalCreatedEvents(contract);
+
+  const proposalDataPromises: Promise<CompoundProposalType>[] = [];
+  const proposalStatePromises: Promise<number>[] = [];
+  for (const propCreatedEvent of proposalCreatedEvents) {
+    // Construct big promise
+    const proposalDataFieldPromises: Promise<any>[] = []
+    proposalDataFieldPromises.push(contract.proposalProposer(propCreatedEvent.id))
+    proposalDataFieldPromises.push(contract.proposalSnapshot(propCreatedEvent.id))
+    proposalDataFieldPromises.push(contract.proposalEta(propCreatedEvent.id))
+    proposalDataFieldPromises.push(contract.proposalSnapshot(propCreatedEvent.id))
+    proposalDataFieldPromises.push(contract.proposalDeadline(propCreatedEvent.id))
+    proposalDataFieldPromises.push(contract.proposalVotes(propCreatedEvent.id))
+    proposalDataFieldPromises.push(contract.state(propCreatedEvent.id))
+
+    const proposalDataPromise = Promise.all(proposalDataFieldPromises).then((values) => {
+      return {
+        id: propCreatedEvent.id,
+        proposer: values[0],
+        eta: values[1],
+        startBlock: values[2],
+        endBlock: values[3],
+        forVotes: values[4].forVotes,
+        againstVotes: values[4].againstVotes,
+        abstainVotes: values[4]?.abstainVotes,
+        canceled: values[5] == 7,
+        executed: values[5] == 2
+      }
+    })
+
+    proposalDataPromises.push(proposalDataPromise);
     proposalStatePromises.push(contract.state(propCreatedEvent.id));
   }
 
