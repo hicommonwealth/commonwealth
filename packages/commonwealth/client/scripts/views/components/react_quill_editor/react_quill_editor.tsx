@@ -14,7 +14,6 @@ import QuillTooltip from './QuillTooltip';
 import { LoadingIndicator } from './loading_indicator';
 import { CustomQuillToolbar, useMarkdownToolbarHandlers } from './toolbar';
 import { convertTwitterLinksToEmbeds } from './twitter_embed';
-import { useClipboardMatchers } from './use_clipboard_matchers';
 import { useImageDropAndPaste } from './use_image_drop_and_paste';
 import { useImageUploader } from './use_image_uploader';
 import { useMarkdownShortcuts } from './use_markdown_shortcuts';
@@ -71,8 +70,10 @@ const ReactQuillEditor = ({
     lastSelectionRef,
   });
 
+  // This is no longer used but I kept it here in case we
+  // need it in the future.
   // handle clipboard behavior
-  const { clipboardMatchers } = useClipboardMatchers();
+  // const { clipboardMatchers } = useClipboardMatchers();
 
   // handle image upload for drag and drop
   const { handleImageDropAndPaste } = useImageDropAndPaste({
@@ -119,16 +120,6 @@ const ReactQuillEditor = ({
       ...newContent,
       ___isMarkdown: isMarkdownEnabled,
     } as SerializableDeltaStatic);
-
-    // sets the correct cursor position after pasting content
-    if (editorRef?.current?.getEditor?.()?.getSelection?.()) {
-      const selection = editorRef.current.getEditor().getSelection();
-      setTimeout(() => {
-        editorRef.current
-          .getEditor()
-          .setSelection(selection.index, selection.length);
-      });
-    }
   };
 
   const handleToggleMarkdown = () => {
@@ -319,7 +310,7 @@ const ReactQuillEditor = ({
                             handler: handleImageDropAndPaste,
                           },
                           clipboard: {
-                            matchers: clipboardMatchers,
+                            matchVisual: false,
                           },
                           mention,
                           magicUrl: !isMarkdownEnabled,
