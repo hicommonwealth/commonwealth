@@ -253,13 +253,16 @@ export const CWCoverImageUploader = ({
     attachZone.current.addEventListener('drop', dropHandler);
 
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       pseudoInput.current?.removeEventListener('change', pseudoInputHandler);
       attachZone.current?.removeEventListener('click', clickHandler);
       attachZone.current?.removeEventListener('dragenter', dragEnterHandler);
       attachZone.current?.removeEventListener('dragleave', dragLeaveHandler);
       attachZone.current?.removeEventListener('dragover', dragOverHandler);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       attachZone.current?.removeEventListener('drop', dropHandler);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isFillImage = imageBehavior === ImageBehavior.Fill;
