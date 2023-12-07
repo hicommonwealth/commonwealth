@@ -6,6 +6,7 @@ import { Balances } from '../types';
 import {
   evmBalanceFetcherBatching,
   evmOffChainRpcBatching,
+  evmRpcRequest,
   mapNodeToBalanceFetcherContract,
 } from '../util';
 
@@ -133,28 +134,16 @@ async function getErc20Balance(
     jsonrpc: '2.0',
   };
 
-  const msg =
+  const errorMsg =
     `ERC20 balance fetch failed for address ${address} ` +
     `on evm chain id ${evmChainId} for contract ${contractAddress}.`;
 
-  let data;
-  try {
-    const response = await fetch(rpcEndpoint, {
-      method: 'POST',
-      body: JSON.stringify(requestBody),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    data = await response.json();
-  } catch (e) {
-    const augmentedMsg = `FAILING OR RATE LIMITED CHAIN NODE: ${msg}`;
-    log.fatal(augmentedMsg, e);
-    rollbar.critical(augmentedMsg, e);
-    return {};
-  }
+  const data = await evmRpcRequest(rpcEndpoint, requestBody, errorMsg);
+  if (!data) return {};
 
   if (data.error) {
-    rollbar.error(msg, data.error);
-    log.error(msg, data.error);
+    rollbar.error(errorMsg, data.error);
+    log.error(errorMsg, data.error);
     return {};
   } else {
     return {
