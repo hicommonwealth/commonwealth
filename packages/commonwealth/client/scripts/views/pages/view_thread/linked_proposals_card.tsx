@@ -1,5 +1,6 @@
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { filterLinks } from 'helpers/threads';
+
 import {
   chainEntityTypeToProposalName,
   chainEntityTypeToProposalSlug,
@@ -18,26 +19,19 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
-type LinkedProposalProps = {
-  thread: Thread;
-  title: string;
+type ThreadLinkProps = {
+  threadChain: string;
   identifier: string;
 };
 
-const LinkedProposal = ({ thread, title, identifier }: LinkedProposalProps) => {
+const getThreadLink = ({ threadChain, identifier }: ThreadLinkProps) => {
   const slug = chainEntityTypeToProposalSlug();
 
   const threadLink = `${
-    app.isCustomDomain() ? '' : `/${thread.chain}`
+    app.isCustomDomain() ? '' : `/${threadChain}`
   }${getProposalUrlPath(slug, identifier, true)}`;
 
-  return (
-    <ReactRouterLink to={threadLink}>
-      {`${
-        title ?? chainEntityTypeToProposalName() ?? 'Proposal'
-      } #${identifier}`}
-    </ReactRouterLink>
-  );
+  return threadLink;
 };
 
 type LinkedProposalsCardProps = {
@@ -93,7 +87,7 @@ export const LinkedProposalsCard = ({
       }
       setSnapshotProposalsLoaded(true);
     }
-  }, [initialSnapshotLinks]);
+  }, [initialSnapshotLinks, thread.chain]);
 
   const showSnapshot =
     initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
@@ -115,21 +109,34 @@ export const LinkedProposalsCard = ({
                     <div className="linked-proposals">
                       {initialProposalLinks.map((l) => {
                         return (
-                          <LinkedProposal
+                          <ReactRouterLink
                             key={l.identifier}
-                            thread={thread}
-                            title={l.title}
-                            identifier={l.identifier}
-                          />
+                            to={getThreadLink({
+                              threadChain: thread.chain,
+                              identifier: l.identifier,
+                            })}
+                          >
+                            {`${
+                              l.title ??
+                              chainEntityTypeToProposalName() ??
+                              'Proposal'
+                            } #${l.identifier}`}
+                          </ReactRouterLink>
                         );
                       })}
                     </div>
                   )}
-                  {showSnapshot && (
-                    <ReactRouterLink to={snapshotUrl}>
-                      Snapshot: {initialSnapshotLinks[0].title ?? snapshotTitle}
-                    </ReactRouterLink>
-                  )}
+                  {showSnapshot &&
+                    (snapshotUrl ? (
+                      <ReactRouterLink to={snapshotUrl}>
+                        Snapshot:{' '}
+                        {initialSnapshotLinks[0].title ?? snapshotTitle}
+                      </ReactRouterLink>
+                    ) : (
+                      <div className="snapshot-spinner-container">
+                        <CWSpinner size="medium" />
+                      </div>
+                    ))}
                 </div>
               ) : (
                 <CWText type="b2" className="no-proposals-text">

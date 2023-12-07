@@ -11,9 +11,16 @@ import { CWBreadcrumbs } from './cw_breadcrumbs';
 
 import { DeltaStatic } from 'quill';
 import app from 'state';
+import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
+import CWCommunitySelector from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import {
   ReactQuillEditor,
   createDeltaFromText,
@@ -23,7 +30,6 @@ import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
 import { CWContentPageCard } from './CWContentPageCard';
 import { CWCard } from './cw_card';
-import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
@@ -32,11 +38,6 @@ import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
-import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
-import { CWFilterMenu } from './cw_popover/cw_filter_menu';
-import type { PopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { PopoverMenu } from './cw_popover/cw_popover_menu';
-import { CWTooltip as CWTooltipOld } from './cw_popover/cw_tooltip';
 import { CWProgressBar } from './cw_progress_bar';
 import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
@@ -81,29 +82,6 @@ const radioGroupOptions: Array<RadioButtonType> = [
   { label: 'A', value: 'A' },
   { label: 'Radio', value: 'Radio' },
   { label: 'Group', value: 'Group' },
-];
-
-const checkboxGroupOptions: Array<CheckboxType> = [
-  {
-    label: 'Discussion',
-    value: 'discussion',
-  },
-  {
-    label: 'Pre Voting',
-    value: 'preVoting',
-  },
-  {
-    label: 'In Voting',
-    value: 'inVoting',
-  },
-  {
-    label: 'Passed',
-    value: 'passed',
-  },
-  {
-    label: 'Failed',
-    value: 'failed',
-  },
 ];
 
 const bannerTypes: BannerType[] = [
@@ -228,9 +206,6 @@ export const ComponentShowcase = () => {
   const [selectedIconButton, setSelectedIconButton] = useState<
     number | undefined
   >(undefined);
-  const [checkboxGroupSelected, setCheckboxGroupSelected] = useState<
-    Array<string>
-  >([]);
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
@@ -256,6 +231,9 @@ export const ComponentShowcase = () => {
   const allChains = app.config.chains.getAll();
   const [chainId, setChainId] = useState(allChains[1]);
   const [currentTab, setCurrentTab] = useState(tagsList[0].id);
+
+  const unstyledPopoverProps = usePopover();
+  const styledPopoverProps = usePopover();
 
   const renderModal = (size?: ModalSize) => {
     return (
@@ -360,6 +338,43 @@ export const ComponentShowcase = () => {
         }
       />
       <div className="basic-gallery">
+        <CWText type="h3">Popover</CWText>
+
+        <div className="item-row">
+          <CWText>Unstyled Popover</CWText>
+
+          <CWIconButton
+            iconName="infoEmpty"
+            onMouseEnter={unstyledPopoverProps.handleInteraction}
+            onMouseLeave={unstyledPopoverProps.handleInteraction}
+          />
+          <CWPopover
+            content={
+              <div>
+                This is for unstyled content. You can add class to the container
+                and style it for your need.
+              </div>
+            }
+            {...unstyledPopoverProps}
+          />
+        </div>
+
+        <div className="item-row">
+          <CWText>Styled by default Popover</CWText>
+
+          <CWIconButton
+            iconName="infoEmpty"
+            onMouseEnter={styledPopoverProps.handleInteraction}
+            onMouseLeave={styledPopoverProps.handleInteraction}
+          />
+          <CWPopover
+            title="Title"
+            body={<div>This is body in styled popover</div>}
+            {...styledPopoverProps}
+          />
+        </div>
+      </div>
+      <div className="basic-gallery">
         <CWText type="h3">Popover Menu</CWText>
         <PopoverMenu
           menuItems={popoverMenuOptions()}
@@ -367,69 +382,6 @@ export const ComponentShowcase = () => {
             <CWIconButton iconName="plusCircle" onClick={onclick} />
           )}
         />
-      </div>
-      <div className="basic-gallery">
-        <CWText type="h3">Filter Menu</CWText>
-        <CWFilterMenu
-          header="Stages"
-          filterMenuItems={checkboxGroupOptions}
-          selectedItems={checkboxGroupSelected}
-          onChange={(e) => {
-            const itemValue = e.target.value;
-            if (checkboxGroupSelected.indexOf(itemValue) === -1) {
-              checkboxGroupSelected.push(itemValue);
-            } else {
-              setCheckboxGroupSelected(
-                checkboxGroupSelected.filter((item) => item !== itemValue),
-              );
-            }
-          }}
-        />
-      </div>
-      <div className="tooltip-gallery">
-        <CWText type="h3">Tooltips</CWText>
-        <div className="tooltip-row">
-          <CWText>Default</CWText>
-          <CWTooltipOld
-            content={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-            renderTrigger={(handleInteraction) => (
-              <CWIcon
-                iconName="infoEmpty"
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              />
-            )}
-          />
-        </div>
-        <div className="tooltip-row">
-          <CWText>Solid background</CWText>
-          <CWTooltipOld
-            content={`
-                I am an informational tool tip here to provide \
-                extra details on things people may need more help on.
-              `}
-            hasBackground
-            renderTrigger={(handleInteraction) => (
-              <CWIcon
-                iconName="infoEmpty"
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleInteraction}
-              />
-            )}
-          />
-        </div>
-        <div className="tooltip-row">
-          <CWText>Address tooltip</CWText>
-          <CWAddressTooltip
-            address="0xa5430730f12f1128bf10dfba38c8e00bc4d90eea"
-            renderTrigger={(handleInteraction) => (
-              <CWIconButton iconName="infoEmpty" onClick={handleInteraction} />
-            )}
-          />
-        </div>
       </div>
       <div className="icon-gallery">
         <CWText type="h3">Icons</CWText>
@@ -907,6 +859,142 @@ export const ComponentShowcase = () => {
             buttonType="destructive"
             buttonWidth="full"
             label="Destructive disabled full"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div className="button-row">
+          <CWText type="h4">Secondary Alt-Green</CWText>
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="green"
+            label="Secondary default"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="green"
+            label="Secondary large"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="wide"
+            buttonAlt="green"
+            label="Secondary wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="green"
+            buttonWidth="wide"
+            label="Secondary large and wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonType="secondary"
+            buttonAlt="green"
+            label="Secondary default w/ left icon"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="full"
+            buttonAlt="green"
+            label="Secondary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            label="Secondary default disabled"
+            buttonAlt="green"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonAlt="green"
+            buttonType="secondary"
+            label="Secondary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="green"
+            buttonWidth="full"
+            label="Secondary disabled full"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div className="button-row">
+          <CWText type="h4">Secondary Alt-Rorange</CWText>
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="rorange"
+            label="Secondary default"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="rorange"
+            label="Secondary large"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="wide"
+            buttonAlt="rorange"
+            label="Secondary wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="rorange"
+            buttonWidth="wide"
+            label="Secondary large and wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonType="secondary"
+            buttonAlt="rorange"
+            label="Secondary default w/ left icon"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="full"
+            buttonAlt="rorange"
+            label="Secondary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            label="Secondary default disabled"
+            buttonAlt="rorange"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonAlt="rorange"
+            buttonType="secondary"
+            label="Secondary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="rorange"
+            buttonWidth="full"
+            label="Secondary disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -1942,6 +2030,50 @@ export const ComponentShowcase = () => {
               label="Action"
             />
           }
+        />
+      </div>
+
+      <div className="CommunitySelectorContainer">
+        <CWText type="h3"> Community Selector </CWText>
+        <CWCommunitySelector
+          type="ethereum"
+          title="Ethereum (EVM)"
+          isRecommended
+          onClick={(type) => console.log('Selected: ', type)}
+          description="Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable.
+          Select this community type if you have minted a token on the Ethereum blockchain."
+        />
+        <CWCommunitySelector
+          type="cosmos"
+          title="Cosmos"
+          onClick={(type) => console.log('Selected: ', type)}
+          description="The Cosmos Network is a decentralized network of independent, scalable,
+          and interoperable blockchains, creating the foundation for a new token economy."
+        />
+        <CWCommunitySelector
+          type="polygon"
+          title="Polygon"
+          onClick={(type) => console.log('Selected: ', type)}
+          description="Polygon is built around making web3 technology accessible, with zero prior knowledge.
+           Common supports communities on the Polygon network..."
+        />
+        <CWCommunitySelector
+          type="solana"
+          title="Solana"
+          onClick={(type) => console.log('Selected: ', type)}
+          description="Solana is a rapidly growing technology due to its speed and scale.
+          Our integration with Solana allows you to create a community for your project with just a click! "
+        />
+      </div>
+
+      <div className="FormStepContainer">
+        <CWText type="h3">Form Steps</CWText>
+        <CWFormSteps
+          steps={[
+            { label: 'First Step', state: 'completed' },
+            { label: 'Second Step', state: 'active' },
+            { label: 'Third Step', state: 'inactive' },
+          ]}
         />
       </div>
     </div>

@@ -55,6 +55,7 @@ export enum WalletId {
   WalletConnect = 'walletconnect',
   KeplrEthereum = 'keplr-ethereum',
   Keplr = 'keplr',
+  Leap = 'leap',
   NearWallet = 'near',
   TerraStation = 'terrastation',
   TerraWalletConnect = 'terra-walletconnect',

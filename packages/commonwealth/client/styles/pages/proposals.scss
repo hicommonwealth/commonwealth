@@ -4,6 +4,10 @@
   flex: 1;
   padding: 24px;
 
+  @include smallInclusive {
+    padding: 16px;
+  }
+
   .header {
     padding-top: 32px;
     padding-bottom: 32px;

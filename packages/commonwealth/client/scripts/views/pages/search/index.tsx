@@ -121,7 +121,7 @@ const SearchPage = () => {
     SORT_MAP[queryParams.sort] || DEFAULT_SORT_OPTIONS;
 
   const sharedQueryOptions = {
-    chainId: app.activeChainId() || 'all_communities',
+    communityId: app.activeChainId() || 'all_communities',
     searchTerm: queryParams.q,
     limit: 20,
     orderBy,

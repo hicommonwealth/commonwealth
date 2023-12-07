@@ -1,4 +1,5 @@
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
@@ -7,6 +8,8 @@ import React from 'react';
 import { isMobile } from 'react-device-detect';
 import app from 'state';
 import useSidebarStore, { sidebarStore } from 'state/ui/sidebar';
+import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   handleIconClick,
@@ -16,8 +19,6 @@ import {
 import Permissions from '../../utils/Permissions';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import type { PopoverMenuItem } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { PopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 import { getClasses } from '../components/component_kit/helpers';
 
@@ -126,20 +127,19 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       : [];
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
-    // {
-    //   label: 'New Crowdfund',
-    //   iconLeft: 'wallet',
-    //   onClick: () => {
-
-    //   }
-    // },
     {
       label: 'New Community',
       iconLeft: 'people',
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();
-        navigate('/createCommunity/starter', {}, null);
+        navigate(
+          featureFlags.newCreateCommunity
+            ? '/createCommunity'
+            : '/createCommunity/starter',
+          {},
+          null,
+        );
       },
     },
   ];

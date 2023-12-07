@@ -26,6 +26,7 @@ export const makeGroupDataBaseAPIPayload = (
     if (
       x.requirementType === SPECIFICATIONS.ERC_20 ||
       x.requirementType === SPECIFICATIONS.ERC_721 ||
+      x.requirementType === SPECIFICATIONS.ERC_1155 ||
       x.requirementType === TOKENS.EVM_TOKEN
     ) {
       payload.requirements.push({
@@ -40,6 +41,9 @@ export const makeGroupDataBaseAPIPayload = (
             evm_chain_id: parseInt(x.requirementChain),
             ...(x.requirementType !== TOKENS.EVM_TOKEN && {
               contract_address: x.requirementContractAddress.trim(),
+            }),
+            ...(x.requirementType === SPECIFICATIONS.ERC_1155 && {
+              token_id: x.requirementTokenId.trim(),
             }),
           },
         },
