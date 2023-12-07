@@ -62,7 +62,9 @@ export class TokenBalanceCache {
           (options as GetErcBalanceOptions).sourceOptions.contractAddress
         }`;
       }
-      const msg = `Failed to fetch balance(s) for ${options.addresses.length} address(es) on ${chainId}${contractAddress}`;
+      const msg =
+        `Failed to fetch balance(s) for ${options.addresses.length}` +
+        ` address(es) on ${chainId}${contractAddress}`;
       log.error(msg, e);
       rollbar.error(msg, e);
     }
