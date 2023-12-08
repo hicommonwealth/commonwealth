@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
-import { CWCoverImageUploader } from 'views/components/component_kit/cw_cover_image_uploader';
+import {
+  CWCoverImageUploader,
+  ImageBehavior,
+} from 'views/components/component_kit/cw_cover_image_uploader';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -31,7 +34,8 @@ const BasicInformationForm = ({
   onCancel,
 }: BasicInformationFormProps) => {
   const [communityName, setCommunityName] = useState('');
-  const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
+  const [isProcessingProfileImage, setIsProcessingProfileImage] =
+    useState(false);
   const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([
     {
       value: '',
@@ -205,10 +209,12 @@ const BasicInformationForm = ({
         subheaderText="Community Profile Image (Accepts JPG and PNG files)"
         uploadCompleteCallback={console.log}
         canSelectImageBehaviour={false}
-        showUploadImageButton
-        onUploadStatusChange={setIsUploadingProfileImage}
+        showUploadAndGenerateText
+        onImageProcessStatusChange={setIsProcessingProfileImage}
         name="communityProfileImageURL"
         hookToForm
+        defaultImageBehaviour={ImageBehavior.Circle}
+        enableGenerativeAI
       />
 
       <section className="header">
@@ -269,7 +275,7 @@ const BasicInformationForm = ({
           type="submit"
           buttonWidth="wide"
           label="Next"
-          disabled={isUploadingProfileImage}
+          disabled={isProcessingProfileImage}
         />
       </section>
     </CWForm>

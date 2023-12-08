@@ -59,6 +59,13 @@
       padding: 16px;
       color: $neutral-400;
 
+      .circle-img {
+        height: 145px;
+        width: 145px;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+
       .Icon {
         fill: $neutral-400;
         margin: 4px 0;
@@ -68,7 +75,11 @@
         color: inherit;
       }
 
-      .upload-btn {
+      .upload-generate-text {
+        margin-top: 12px;
+      }
+
+      .generate-btn {
         margin-top: 16px;
 
         &:focus {

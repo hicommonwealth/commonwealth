@@ -36,8 +36,8 @@ type CoverImageUploaderProps = CoverImageUploaderFormValidationProps & {
   uploadCompleteCallback: CallableFunction;
   canSelectImageBehaviour?: boolean;
   defaultImageBehaviour?: ImageBehavior;
-  showUploadImageButton?: boolean;
-  onUploadStatusChange?: (isUploading: boolean) => any;
+  showUploadAndGenerateText?: boolean;
+  onImageProcessStatusChange?: (isProcessing: boolean) => any;
 };
 
 export enum ImageAs {
@@ -48,6 +48,7 @@ export enum ImageAs {
 export enum ImageBehavior {
   Fill = 'cover',
   Tiled = 'repeat',
+  Circle = 'circle',
 }
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
@@ -62,9 +63,9 @@ export const CWCoverImageUploader = ({
   defaultImageBehavior,
   uploadCompleteCallback,
   canSelectImageBehaviour = true,
-  showUploadImageButton,
+  showUploadAndGenerateText,
   defaultImageBehaviour,
-  onUploadStatusChange = () => {},
+  onImageProcessStatusChange = () => {},
 }: CoverImageUploaderProps) => {
   const [imageURL, setImageURL] = React.useState<string>();
   const [isUploading, setIsUploading] = React.useState<boolean>();
@@ -89,8 +90,8 @@ export const CWCoverImageUploader = ({
     (formContext?.formState?.errors?.[name]?.message as string);
 
   useEffect(() => {
-    onUploadStatusChange(isUploading);
-  }, [isUploading, onUploadStatusChange]);
+    onImageProcessStatusChange(isUploading || isGenerating);
+  }, [isUploading, isGenerating, onImageProcessStatusChange]);
 
   useEffect(() => {
     if (!imageURL) {
@@ -132,6 +133,7 @@ export const CWCoverImageUploader = ({
 
   const generateImage = async () => {
     try {
+      setImageURL('');
       const res = await $.post(`${app.serverUrl()}/generateImage`, {
         description: prompt,
         jwt: app.user.jwt,
@@ -197,7 +199,9 @@ export const CWCoverImageUploader = ({
         ? ImageBehavior.Fill
         : imageBehavior;
       setImageBehavior(currentImageBehavior);
-      attachButton.current.style.display = 'none';
+      if (defaultImageBehaviour !== ImageBehavior.Circle) {
+        attachButton.current.style.display = 'none';
+      }
       uploadCompleteCallback(_imageURL, currentImageBehavior);
     }
   };
@@ -268,7 +272,10 @@ export const CWCoverImageUploader = ({
   const isFillImage = imageBehavior === ImageBehavior.Fill;
 
   const backgroundStyles = {
-    backgroundImage: imageURL ? `url(${imageURL})` : 'none',
+    backgroundImage:
+      imageURL && defaultImageBehaviour !== ImageBehavior.Circle
+        ? `url(${imageURL})`
+        : 'none',
     backgroundSize: isFillImage ? 'cover' : '100px',
     backgroundRepeat: isFillImage ? 'no-repeat' : 'repeat',
     backgroundPosition: isFillImage ? 'center' : '0 0',
@@ -309,18 +316,20 @@ export const CWCoverImageUploader = ({
         style={backgroundStyles}
         ref={attachZone}
       >
-        {uploadStatus === 'success' && enableGenerativeAI && (
-          <OldCWButton
-            label="retry"
-            buttonType="mini-black"
-            className="retry-button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setPrompt('');
-              setIsPrompting(true);
-            }}
-          />
-        )}
+        {uploadStatus === 'success' &&
+          enableGenerativeAI &&
+          !showUploadAndGenerateText && (
+            <OldCWButton
+              label="retry"
+              buttonType="mini-black"
+              className="retry-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPrompt('');
+                setIsPrompting(true);
+              }}
+            />
+          )}
 
         {isPrompting && (
           <div
@@ -382,32 +391,33 @@ export const CWCoverImageUploader = ({
         />
         {isUploading && <CWSpinner size="large" />}
         <div className="attach-btn" ref={attachButton}>
-          {!isUploading && (
+          {imageURL && defaultImageBehaviour === ImageBehavior.Circle && (
+            <img className="circle-img" src={imageURL} />
+          )}
+          {!isUploading && !imageURL && (
             <CWIcon iconName="imageSquare" iconSize="large" weight="fill" />
           )}
-          {headerText && (
+          {headerText && !imageURL && (
             <CWText type="caption" fontWeight="medium">
               {headerText}
             </CWText>
           )}
-          {showUploadImageButton && !isUploading && (
-            <CWButton
-              buttonHeight="sm"
-              containerClassName="upload-btn"
-              type="button"
-              buttonType="secondary"
-              label="Select Image"
-              onClick={(e) => {
-                e.stopPropagation();
-                clickHandler(e);
-              }}
-            />
+          {showUploadAndGenerateText && !isUploading && !imageURL && (
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="upload-generate-text"
+            >
+              Drag an image here or generate one below
+            </CWText>
           )}
           {enableGenerativeAI && !isUploading && (
-            <OldCWButton
-              buttonType="mini-white"
+            <CWButton
+              buttonHeight="sm"
+              containerClassName="generate-btn"
+              type="button"
+              buttonType="secondary"
               label="Generate Image"
-              className="generate-btn"
               onClick={(e) => {
                 e.stopPropagation();
                 setPrompt('');
