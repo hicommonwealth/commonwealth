@@ -4,9 +4,9 @@ import React, { useEffect } from 'react';
 
 import app from 'state';
 import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
-import { CWButton } from './cw_button';
+import { CWButton as OldCWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
-import { CWButton as NewCWButton } from './new_designs/cw_button';
+import { CWButton } from './new_designs/cw_button';
 
 import { useFormContext } from 'react-hook-form';
 import { compressImage } from 'utils/ImageCompression';
@@ -310,7 +310,7 @@ export const CWCoverImageUploader = ({
         ref={attachZone}
       >
         {uploadStatus === 'success' && enableGenerativeAI && (
-          <CWButton
+          <OldCWButton
             label="retry"
             buttonType="mini-black"
             className="retry-button"
@@ -356,7 +356,7 @@ export const CWCoverImageUploader = ({
                   }}
                   containerClassName="prompt-input"
                 />
-                <CWButton
+                <OldCWButton
                   label="Generate"
                   buttonType="mini-black"
                   className="generate-btn"
@@ -391,7 +391,7 @@ export const CWCoverImageUploader = ({
             </CWText>
           )}
           {showUploadImageButton && !isUploading && (
-            <NewCWButton
+            <CWButton
               containerClassName="upload-btn"
               type="button"
               buttonType="secondary"
@@ -403,7 +403,7 @@ export const CWCoverImageUploader = ({
             />
           )}
           {enableGenerativeAI && !isUploading && (
-            <CWButton
+            <OldCWButton
               buttonType="mini-white"
               label="Generate Image"
               className="generate-btn"
