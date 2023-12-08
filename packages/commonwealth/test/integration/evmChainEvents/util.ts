@@ -1,21 +1,21 @@
-import models from '../../../server/database';
 import {
   BalanceType,
   ChainBase,
   ChainNetwork,
   ChainType,
 } from 'common-common/src/types';
+import models from '../../../server/database';
+import { hashAbi } from '../../../server/util/abiValidation';
+import {
+  rawAaveAbi,
+  rawDydxAbi,
+} from '../../../server/workers/evmChainEvents/hardCodedAbis';
 import {
   aavePropCreatedSignature,
   aavePropQueuedSignature,
   localRpc,
   sdk,
 } from '../../devnet/evm/evmChainEvents/util';
-import {
-  rawAaveAbi,
-  rawDydxAbi,
-} from '../../../server/workers/evmChainEvents/hardCodedAbis';
-import { hashAbi } from '../../../server/util/abiValidation';
 
 export const testChainId = 'aave-test';
 export const testChainIdV2 = 'dydx-test';
@@ -127,6 +127,7 @@ export async function getTestContract(version?: 'v1' | 'v2') {
     where: {
       address,
       chain_node_id: chainNode.id,
+      type: 'erc20',
     },
   });
 
