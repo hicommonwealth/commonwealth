@@ -94,7 +94,7 @@ export const CWCoverImageUploader = ({
 
   useEffect(() => {
     if (!imageURL) {
-      formContext.setValue(name, '');
+      formContext && name && formContext.setValue(name, '');
     }
   }, [imageURL, formContext, name]);
 
