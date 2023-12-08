@@ -35,6 +35,7 @@ export const refreshMembershipHandler = async (
     community,
     address,
     topicId: topic_id,
+    cacheRefresh: true,
   });
   return success(res, result);
 };

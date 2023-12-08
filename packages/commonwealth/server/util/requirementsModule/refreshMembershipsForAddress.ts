@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Sequelize } from 'sequelize';
 import { DB } from 'server/models';
-import { AddressInstance } from '../../models/address';
+import { AddressAttributes } from '../../models/address';
 import { GroupAttributes } from '../../models/group';
 import { MembershipInstance } from '../../models/membership';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
@@ -16,13 +16,15 @@ const MEMBERSHIP_TTL_SECONDS = 60 * 2;
  * @param address Address associated with memberships
  * @param groups Groups to check requirements from
  * @param topics Topics associated with groups
+ * @param cacheRefresh If true, force refresh the TBC cache
  * @returns MembershipInstance[]
  */
 export async function refreshMembershipsForAddress(
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  address: AddressInstance,
+  address: AddressAttributes,
   groups: GroupAttributes[],
+  cacheRefresh: boolean,
 ): Promise<MembershipInstance[]> {
   const getBalancesOptions = makeGetBalancesOptions(groups, [address]);
   const balances = await Promise.all(
@@ -50,7 +52,7 @@ export async function refreshMembershipsForAddress(
         ],
       });
 
-      if (membership) {
+      if (!cacheRefresh && membership) {
         // membership exists
         const expiresAt = moment(membership.last_checked).add(
           MEMBERSHIP_TTL_SECONDS,
@@ -90,7 +92,7 @@ async function recomputeMembership(
   models: DB,
   membership: MembershipInstance | null,
   group: GroupAttributes,
-  address: AddressInstance,
+  address: AddressAttributes,
   balances: OptionsWithBalances[],
 ): Promise<MembershipInstance> {
   const { requirements } = group;

@@ -387,7 +387,7 @@ describe('ServerCommentsController', () => {
         },
         // for validateTopicThreshold
         Topic: {
-          findOne: sandbox.stub().resolves({
+          findByPk: sandbox.stub().resolves({
             chain: {
               ChainNode: {
                 id: 99,

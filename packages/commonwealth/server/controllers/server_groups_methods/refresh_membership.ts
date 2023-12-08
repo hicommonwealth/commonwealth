@@ -15,6 +15,7 @@ export type RefreshMembershipOptions = {
   community: CommunityInstance;
   address: AddressInstance;
   topicId: number;
+  cacheRefresh: boolean;
 };
 export type RefreshMembershipResult = {
   topicId?: number;
@@ -24,7 +25,7 @@ export type RefreshMembershipResult = {
 
 export async function __refreshMembership(
   this: ServerGroupsController,
-  { community, address, topicId }: RefreshMembershipOptions,
+  { community, address, topicId, cacheRefresh }: RefreshMembershipOptions,
 ): Promise<RefreshMembershipResult> {
   // get all groups in the chain
   let groups = await this.models.Group.findAll({
@@ -47,6 +48,7 @@ export async function __refreshMembership(
     this.tokenBalanceCacheV2,
     address,
     groups,
+    cacheRefresh,
   );
 
   const topics = await this.models.Topic.findAll({

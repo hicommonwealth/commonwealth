@@ -8,8 +8,7 @@ import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { TokenBalanceCache as TokenBalanceCacheV2 } from '../tokenBalanceCache/tokenBalanceCache';
 import validateTopicThreshold from '../validateTopicThreshold';
-import { makeGetBalancesOptions } from './makeGetBalancesOptions';
-import validateGroupMembership from './validateGroupMembership';
+import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -33,52 +32,37 @@ export async function validateTopicGroupsMembership(
   tokenBalanceCacheV1: TokenBalanceCacheV1,
   tokenBalanceCacheV2: TokenBalanceCacheV2,
   topicId: number,
-  chain: CommunityInstance,
+  community: CommunityInstance,
   address: AddressAttributes,
 ): Promise<{ isValid: boolean; message?: string }> {
   if (FEATURE_FLAG_GROUP_CHECK_ENABLED) {
     // check via new TBC with groups
 
-    // get all groups of topic
-    const topic = await models.Topic.findOne({
+    // refresh all memberships (with cache) across specified topic
+    const topic = await models.Topic.findByPk(topicId);
+    const topicGroups = await models.Group.findAll({
       where: {
-        chain_id: chain.id,
-        id: topicId,
-      },
-    });
-    const groups = await models.Group.findAll({
-      where: {
+        community_id: community.id,
         id: { [Op.in]: topic.group_ids },
       },
     });
+    const memberships = await refreshMembershipsForAddress(
+      models,
+      tokenBalanceCacheV2,
+      address,
+      topicGroups,
+      false,
+    );
 
-    // check membership for all groups of topic
+    // check memberships for valid groups
     let numValidGroups = 0;
     const allErrorMessages: string[] = [];
 
-    const getBalancesOptions = makeGetBalancesOptions(groups, [address]);
-    const balances = await Promise.all(
-      getBalancesOptions.map(async (options) => {
-        return {
-          options,
-          balances: await tokenBalanceCacheV2.getBalances(options),
-        };
-      }),
-    );
-
-    for (const { metadata, requirements } of groups) {
-      const { isValid, messages } = await validateGroupMembership(
-        address.address,
-        requirements,
-        balances,
-        metadata.required_requirements || 0,
-      );
-      if (isValid) {
-        numValidGroups++;
+    for (const membership of memberships) {
+      if (membership.reject_reason) {
+        allErrorMessages.push(membership.reject_reason);
       } else {
-        for (const message of messages) {
-          allErrorMessages.push(JSON.stringify(message));
-        }
+        numValidGroups++;
       }
     }
 
