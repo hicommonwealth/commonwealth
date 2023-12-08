@@ -8,10 +8,13 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { chainTypes } from 'views/pages/Community/common/constants';
 import { ZodError } from 'zod';
 import './BasicInformationForm.scss';
-import { POLOGON_CHAIN_OPTION, existingCommunityNames } from './constants';
+import {
+  POLOGON_CHAIN_OPTION,
+  chainTypes,
+  existingCommunityNames,
+} from './constants';
 import {
   BasicInformationFormProps,
   FormSubmitValues,
@@ -44,6 +47,15 @@ const BasicInformationForm = ({
     // preselected and further input's will be disabled
     if (chainEcosystem === 'polygon') {
       return [POLOGON_CHAIN_OPTION];
+    }
+
+    if (chainEcosystem === 'solana') {
+      return chainTypes
+        .filter((x) => x.chainBase === 'solana')
+        .map((chainType) => ({
+          label: chainType.label,
+          value: `${chainType.value}`,
+        }));
     }
 
     return chainTypes
@@ -200,7 +212,9 @@ const BasicInformationForm = ({
       />
 
       <section className="header">
-        <CWText type="h4">Community Links</CWText>
+        <CWText type="h4">
+          Community Links <CWText type="b1">&#40;Optional&#41;</CWText>
+        </CWText>
         <CWText type="b1" className="description">
           Add your Discord, Twitter (X), Telegram, Website, etc.
         </CWText>
