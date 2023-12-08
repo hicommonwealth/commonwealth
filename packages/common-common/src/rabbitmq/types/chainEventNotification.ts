@@ -1,6 +1,6 @@
 import type { RmqMsgNamespace } from 'common-common/src/rabbitmq/types';
 import { RmqMsgFormatError } from 'common-common/src/rabbitmq/types';
-import type { ChainEventNotification } from 'commonwealth/shared/types';
+import type { ChainEventNotification } from '../../types';
 
 /**
  * This object is merged with the namespace with the same name below so that within one object we have the invalid
@@ -17,8 +17,8 @@ export const RmqCENotification: RmqMsgNamespace<ChainEventNotification> = {
   getInvalidFormatError(notification: any): RmqMsgFormatError {
     return new RmqMsgFormatError(
       `The following notification is improperly formatted: ${JSON.stringify(
-        notification
-      )}`
+        notification,
+      )}`,
     );
   },
 
@@ -58,8 +58,8 @@ export const RmqCENotification: RmqMsgNamespace<ChainEventNotification> = {
     if (!valid) {
       console.log(
         `The following notification is improperly formatted: ${JSON.stringify(
-          data
-        )}`
+          data,
+        )}`,
       );
       throw this.getInvalidFormatError(data);
     }
