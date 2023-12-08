@@ -1,0 +1,57 @@
+@import '../../../../../../styles/shared.scss';
+
+.circle-btn-border {
+  width: fit-content;
+  border-radius: 50%;
+  padding: 2px;
+  border: 2px solid $transparent;
+
+  &.primary {
+    &:focus-within {
+      border: 2px solid $neutral-800
+    }
+  }
+
+  &.secondary {}
+
+  .CircleButton {
+    line-height: 0;
+    width: fit-content;
+    border-radius: 50%;
+    padding: 6px;
+
+    &:focus {
+      outline: none;
+    }
+
+    svg {
+      height: 16px;
+      width: 16px;
+    }
+
+    &.primary {
+      border: none;
+      background-color: $neutral-700;
+
+      svg {
+        color: $white;
+      }
+
+      &:hover {
+        background-color: $neutral-800;
+      }
+
+      &:active {
+        background-color: $neutral-700;
+      }
+
+      &:focus {
+        background-color: $neutral-800;
+      }
+
+      &.disabled {}
+    }
+
+    &.secondary {}
+  }
+}

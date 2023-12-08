@@ -47,6 +47,7 @@ import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
+import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
 import { CWForm } from './new_designs/CWForm';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
@@ -999,6 +1000,21 @@ export const ComponentShowcase = () => {
             onClick={() => notifySuccess('Button clicked!')}
           />
         </div>
+      </div>
+      <div className="circle-button-gallery">
+        <CWText type="h4">Circle Buttons</CWText>
+        <CWCircleButton
+          buttonType="primary"
+          iconName="bell"
+          onClick={() => notifySuccess('Quack!')}
+        />
+        <span>some text</span>
+
+        {/* <CWCircleButton
+          buttonType="secondary"
+          iconName="bell"
+          onClick={() => notifySuccess('Quack!')}
+        /> */}
       </div>
       <div className="basic-gallery">
         <CWText type="h4">Content Page Card</CWText>

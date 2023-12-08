@@ -11,6 +11,7 @@ export enum ComponentType {
   Button = 'Button',
   Card = 'Card',
   Checkbox = 'Checkbox',
+  CircleButton = 'CircleButton',
   Collapsible = 'Collapsible',
   CommunityAvatar = 'CommunityAvatar',
   CommunitySelector = 'CommunitySelector',
