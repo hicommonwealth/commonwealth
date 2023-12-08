@@ -203,9 +203,6 @@ const tagsList = [
 ];
 
 export const ComponentShowcase = () => {
-  const [selectedIconButton, setSelectedIconButton] = useState<
-    number | undefined
-  >(undefined);
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
