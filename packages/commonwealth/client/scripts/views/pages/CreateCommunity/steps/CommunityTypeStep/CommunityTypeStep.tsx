@@ -4,6 +4,7 @@ import WebWalletController from 'controllers/app/web_wallets';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import AddressInfo from 'models/AddressInfo';
 import app from 'state';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import CWCommunitySelector, {
   SelectedCommunity,
@@ -65,10 +66,32 @@ const CommunityTypeStep = ({
     handleContinue();
   };
 
+  const [ethereumOption, ...advancedOptions] = communityTypeOptions;
+
   return (
     <div className="CommunityTypeStep">
-      <div className="selectors-container">
-        {communityTypeOptions.map(({ type, chainBase, title, description }) => (
+      <CWText type="h2">Launch a community</CWText>
+      <CWText className="subheader">
+        Select the type of community you are looking to launch to get started.
+        You must have a connected wallet with the ecosystem you select to launch
+        a community. Members must also have a compatible wallet type to join
+        your community.
+      </CWText>
+
+      <CWCommunitySelector
+        key={ethereumOption.type}
+        type={ethereumOption.type}
+        chainBase={ethereumOption.chainBase}
+        title={ethereumOption.title}
+        description={ethereumOption.description}
+        isRecommended={ethereumOption.isRecommended}
+        onClick={handleCommunitySelection}
+      />
+
+      <div className="advanced-options-container">
+        <CWText type="h4">Advanced Options</CWText>
+
+        {advancedOptions.map(({ type, chainBase, title, description }) => (
           <CWCommunitySelector
             key={type}
             type={type}
