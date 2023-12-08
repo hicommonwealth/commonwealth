@@ -1,12 +1,11 @@
 import React from 'react';
 
-import 'components/component_kit/new_designs/cw_button.scss';
+import './CWIconButton.scss';
 
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { IconName } from '../../cw_icons/cw_icon_lookup';
 import { getClasses } from '../../helpers';
 import type { BaseStyleProps } from '../../types';
-import { ComponentType } from '../../types';
 
 type ButtonSize = 'lg' | 'med' | 'sm';
 
@@ -28,28 +27,20 @@ export const CWIconButton = (props: ButtonProps) => {
   } = props;
 
   return (
-    <div
-      className={getClasses({
-        btnBorder: 'btn-border',
-        buttonSize,
-        disabled,
-      })}
+    <button
+      className={getClasses(
+        {
+          buttonSize,
+          disabled,
+          className,
+        },
+        'CWIconButton',
+      )}
+      onClick={onClick}
+      disabled={disabled}
+      {...otherProps}
     >
-      <button
-        className={getClasses(
-          {
-            buttonSize,
-            disabled,
-            className,
-          },
-          ComponentType.Button,
-        )}
-        onClick={onClick}
-        disabled={disabled}
-        {...otherProps}
-      >
-        <CWIcon iconName={iconName} className="button-icon" />
-      </button>
-    </div>
+      <CWIcon iconName={iconName} className="button-icon" />
+    </button>
   );
 };

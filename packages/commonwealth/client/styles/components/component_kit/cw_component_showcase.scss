@@ -126,15 +126,13 @@ $width: 360px;
     @include gallery-grid(8px, column);
 
     .icon-button-row {
+
       align-items: center;
       @include gallery-grid(initial, row);
       height: 32px;
       justify-content: space-between;
       width: 120px;
 
-      .icon-button-selected {
-        display: flex;
-      }
     }
   }
 

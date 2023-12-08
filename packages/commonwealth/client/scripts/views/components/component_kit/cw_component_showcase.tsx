@@ -411,42 +411,38 @@ export const ComponentShowcase = () => {
       </div>
       <div className="icon-button-gallery">
         <CWText type="h3">Icon Buttons</CWText>
-        <CWText>Click to see selected state</CWText>
         <div className="icon-button-row">
+          <CWText type="h4">Small</CWText>
           <CWIconButton
             iconName="views"
-            buttonSize="med"
-            onClick={() => {
-              setSelectedIconButton(1);
-            }}
+            buttonSize="sm"
+            onClick={() => notifySuccess('Small icon button clicked!')}
           />
-          {selectedIconButton === 1 && (
-            <div className="icon-button-selected">is selected</div>
-          )}
         </div>
         <div className="icon-button-row">
+          <CWText type="h4">Medium</CWText>
           <CWIconButton
             iconName="views"
             buttonSize="med"
-            onClick={() => {
-              setSelectedIconButton(2);
-            }}
+            onClick={() => notifySuccess('Medium icon button clicked!')}
           />
-          {selectedIconButton === 2 && (
-            <div className="icon-button-selected">is selected</div>
-          )}
         </div>
         <div className="icon-button-row">
+          <CWText type="h4">Large</CWText>
           <CWIconButton
             iconName="views"
-            buttonSize="med"
-            onClick={() => {
-              setSelectedIconButton(3);
-            }}
+            buttonSize="lg"
+            onClick={() => notifySuccess('Large icon button clicked!')}
           />
-          {selectedIconButton === 3 && (
-            <div className="icon-button-selected">is selected</div>
-          )}
+        </div>
+        <div className="icon-button-row">
+          <CWText type="h4">Disabled</CWText>
+          <CWIconButton
+            iconName="views"
+            buttonSize="lg"
+            disabled={true}
+            onClick={() => console.log('Nothing to the console')}
+          />
         </div>
       </div>
       <div className="text-gallery">
