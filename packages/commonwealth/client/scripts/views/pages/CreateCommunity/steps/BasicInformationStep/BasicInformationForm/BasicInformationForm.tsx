@@ -242,9 +242,6 @@ const BasicInformationForm = ({
         </button>
       </section>
 
-      {/* Intentional: for extra space */}
-      <div />
-
       {/* Action buttons */}
       <section className="action-buttons">
         <CWButton
