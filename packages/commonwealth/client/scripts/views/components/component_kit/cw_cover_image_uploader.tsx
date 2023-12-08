@@ -392,6 +392,7 @@ export const CWCoverImageUploader = ({
           )}
           {showUploadImageButton && !isUploading && (
             <CWButton
+              buttonHeight="sm"
               containerClassName="upload-btn"
               type="button"
               buttonType="secondary"

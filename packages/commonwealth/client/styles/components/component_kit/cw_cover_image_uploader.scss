@@ -70,6 +70,17 @@
 
       .upload-btn {
         margin-top: 16px;
+
+        &:focus {
+          background-color: white !important;
+        }
+
+        &:focus-within {
+          border-width: 1px !important;
+          padding: 0 !important;
+          margin: 3px !important;
+          margin-top: 16px !important;
+        }
       }
     }
 
