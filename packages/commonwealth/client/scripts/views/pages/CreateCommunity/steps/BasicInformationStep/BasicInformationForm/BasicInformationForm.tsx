@@ -227,14 +227,13 @@ const BasicInformationForm = ({
               onBlur={() => updateAndValidateSocialLinkAtIndex(x.value, index)}
               onFocus={() => updateAndValidateSocialLinkAtIndex(x.value, index)}
             />
-            {index > 0 && (
-              <CWIconButton
-                iconButtonTheme="neutral"
-                iconName="trash"
-                iconSize="large"
-                onClick={() => removeLinkAtIndex(index)}
-              />
-            )}
+            <CWIconButton
+              iconButtonTheme="neutral"
+              iconName="trash"
+              iconSize="large"
+              onClick={() => removeLinkAtIndex(index)}
+              disabled={socialLinks.length === 1}
+            />
           </div>
         ))}
 
