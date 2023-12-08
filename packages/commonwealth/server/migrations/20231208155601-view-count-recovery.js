@@ -10,32 +10,34 @@ module.exports = {
       return; // this is for people running on local. I don't want this to break their db-all.
     }
 
-    const client = new Client({
+    const recoveryClient = new Client({
       connectionString
     });
 
-    await client.connect();
+    await recoveryClient.connect();
 
-    const viewCounts = await client.query(
+    const viewCounts = await recoveryClient.query(
       `select object_id, view_count from "ViewCounts" where object_id not ilike '%discussion_%';`
     );
 
-    client.end();
+    recoveryClient.end();
 
-    await queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.sequelize.query(
-        `
+    const query = `
         UPDATE "Threads"
         SET view_count = CASE 
             ${viewCounts.rows
-          .map(
-            (count) =>
-              `WHEN id = ${count.object_id} THEN view_count + ${count.view_count}`
-          )
-          .join(' ')}
+      .map(
+        (count) =>
+          `WHEN id = ${count.object_id} THEN view_count + ${count.view_count}`
+      )
+      .join(' ')}
         ELSE view_count
         END
-        `,
+        `;
+
+    await queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.sequelize.query(
+        query,
         { transaction: t }
       );
     });
