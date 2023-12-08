@@ -17,17 +17,20 @@ const log = factory.getLogger(formatFilename(__filename));
 export type GetCosmosBalanceOptions = {
   chainNode: ChainNodeInstance;
   addresses: string[];
+  batchSize?: number;
 };
 
 export async function __getCosmosNativeBalances(
   options: GetCosmosBalanceOptions,
 ): Promise<Balances> {
+  if (options.addresses.length === 0) return {};
+
   let tmClient: Tendermint34Client;
   if (options.addresses.length > 1) {
     const batchClient = new HttpBatchClient(
       options.chainNode.private_url || options.chainNode.url,
       {
-        batchSizeLimit: 100,
+        batchSizeLimit: options.batchSize || 100,
         dispatchInterval: 10,
       },
     );

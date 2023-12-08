@@ -90,15 +90,13 @@ const RequirementSubForm = ({
             'cols-5'?: boolean;
             'row-1': boolean;
             'row-2': boolean;
-          }>(
-            {
-              'cols-3': isTokenRequirement,
-              'cols-4': !isTokenRequirement && !is1155Requirement,
-              'cols-5': !isTokenRequirement && is1155Requirement,
-              'row-1': !isTokenRequirement && is1155Requirement,
-              'row-2': !(!isTokenRequirement && is1155Requirement)
-            }
-          )}
+          }>({
+            'cols-3': isTokenRequirement,
+            'cols-4': !isTokenRequirement && !is1155Requirement,
+            'cols-5': !isTokenRequirement && is1155Requirement,
+            'row-1': !isTokenRequirement && is1155Requirement,
+            'row-2': !(!isTokenRequirement && is1155Requirement),
+          })}
         >
           <CWSelectList
             key={defaultValues?.requirementChain?.value}
@@ -186,8 +184,8 @@ const RequirementSubForm = ({
             customError={errors.requirementAmount}
             fullWidth
           />
-          {
-            is1155Requirement && (<CWTextInput
+          {is1155Requirement && (
+            <CWTextInput
               key={defaultValues.requirementTokenId}
               name="requirementTokenId"
               label="ID"

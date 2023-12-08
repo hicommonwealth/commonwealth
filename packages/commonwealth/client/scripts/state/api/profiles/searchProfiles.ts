@@ -30,7 +30,7 @@ export type SearchProfilesResponse = {
 };
 
 interface SearchProfilesProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
@@ -43,7 +43,7 @@ interface SearchProfilesProps {
 
 const searchProfiles = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -61,7 +61,7 @@ const searchProfiles = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        community_id: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -77,7 +77,7 @@ const searchProfiles = async ({
 };
 
 const useSearchProfilesQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -90,7 +90,7 @@ const useSearchProfilesQuery = ({
   const key = [
     ApiEndpoints.searchProfiles(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
       includeRoles,
@@ -103,7 +103,7 @@ const useSearchProfilesQuery = ({
     ({ pageParam }) =>
       searchProfiles({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,
