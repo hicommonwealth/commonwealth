@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
+import { ProjectTag } from '../../../../common-common/src/statsd';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { UserInstance } from '../../models/user';
@@ -42,12 +43,16 @@ export async function __refreshMembership(
     groups = groups.filter((g) => topic.group_ids.includes(g.id));
   }
 
+  const refreshStart = Date.now();
+
   const memberships = await refreshMembershipsForAddress(
     this.models,
     this.tokenBalanceCacheV2,
     address,
     groups,
   );
+
+  sendRefreshDuration(community.id, Date.now() - refreshStart);
 
   const topics = await this.models.Topic.findAll({
     where: {
@@ -69,4 +74,15 @@ export async function __refreshMembership(
   }));
 
   return results;
+}
+
+// -- metrics
+
+const statsKey = `groups.refreshMembership`;
+
+function sendRefreshDuration(communityId: string, duration: number) {
+  this.statsD.timing(`${statsKey}.duration`, duration, {
+    project: ProjectTag.Commonwealth,
+    communityId,
+  });
 }

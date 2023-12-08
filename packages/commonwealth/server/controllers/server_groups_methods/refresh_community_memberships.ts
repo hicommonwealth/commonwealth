@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
+import { ProjectTag } from '../../../../common-common/src/statsd';
 import { MEMBERSHIP_REFRESH_BATCH_SIZE } from '../../config';
 import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
@@ -50,12 +51,18 @@ export async function __refreshCommunityMemberships(
     1,
     MEMBERSHIP_REFRESH_BATCH_SIZE,
     async (addresses, page) => {
-      const pageStartedAt = Date.now();
+      const paginateStartedAt = Date.now();
 
       const getBalancesOptions = makeGetBalancesOptions(
         groupsToUpdate,
         addresses,
       );
+
+      sendMakeGetBalancesOptionsDuration(
+        community.id,
+        Date.now() - paginateStartedAt,
+      );
+
       const balances = await Promise.all(
         getBalancesOptions.map(async (options) => {
           let result: Balances = {};
@@ -82,23 +89,30 @@ export async function __refreshCommunityMemberships(
       totalNumUpdated += numUpdated;
       totalNumAddresses += addresses.length;
 
+      const paginateDuration = Date.now() - paginateStartedAt;
+
       console.log(
         `  * [${page}] Created ${numCreated} and updated ${numUpdated} memberships in ${
           community.id
-        } across ${addresses.length} addresses in ${
-          (Date.now() - pageStartedAt) / 1000
-        }s`,
+        } across ${addresses.length} addresses in ${paginateDuration / 1000}s`,
       );
+
+      sendPaginateAddressesDuration(community.id, paginateDuration);
+      sendIncrementMembershipsRefreshed(community.id, numCreated + numUpdated);
     },
   );
+
+  const communityRefreshDuration = Date.now() - communityStartedAt;
 
   console.log(
     `Created ${totalNumCreated} and updated ${totalNumUpdated} total memberships in ${
       community.id
     } across ${totalNumAddresses} addresses in ${
-      (Date.now() - communityStartedAt) / 1000
+      communityRefreshDuration / 1000
     }s`,
   );
+
+  sendTotalDuration(community.id, communityRefreshDuration);
 }
 
 // paginateAddresses paginates through all active addresses
@@ -215,9 +229,64 @@ async function processMemberships(
   }
 
   // perform creates and updates
+  const bulkCreateStart = Date.now();
+
   await models.Membership.bulkCreate([...toCreate, ...toUpdate], {
     updateOnDuplicate: ['reject_reason', 'last_checked'],
   });
 
+  const communityId = groupsToUpdate[0]?.community_id;
+  if (communityId) {
+    sendBulkCreateMembershipsDuration(
+      groupsToUpdate[0].community_id,
+      Date.now() - bulkCreateStart,
+    );
+  }
+
   return [toCreate.length, toUpdate.length];
+}
+
+// -- metrics
+
+const statsKey = `groups.refreshCommunityMemberships`;
+
+function sendTotalDuration(communityId: string, duration: number) {
+  this.statsD.timing(`${statsKey}.totalDuration`, duration, {
+    project: ProjectTag.Commonwealth,
+    communityId,
+  });
+}
+
+function sendPaginateAddressesDuration(communityId: string, duration: number) {
+  this.statsD.timing(`${statsKey}.paginateAddressesDuration`, duration, {
+    project: ProjectTag.Commonwealth,
+    communityId,
+  });
+}
+
+function sendBulkCreateMembershipsDuration(
+  communityId: string,
+  duration: number,
+) {
+  this.statsD.timing(`${statsKey}.bulkCreateMembershipsDuration`, duration, {
+    project: ProjectTag.Commonwealth,
+    communityId,
+  });
+}
+
+function sendIncrementMembershipsRefreshed(communityId: string, count: number) {
+  this.statsD.increment(`${statsKey}.membershipsRefreshedCount`, count, {
+    project: ProjectTag.Commonwealth,
+    communityId,
+  });
+}
+
+function sendMakeGetBalancesOptionsDuration(
+  communityId: string,
+  duration: number,
+) {
+  this.statsD.timing(`${statsKey}.makeGetBalancesOptionsDuration`, duration, {
+    project: ProjectTag.Commonwealth,
+    communityId,
+  });
 }
