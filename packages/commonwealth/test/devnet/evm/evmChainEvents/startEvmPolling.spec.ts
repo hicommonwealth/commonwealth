@@ -159,10 +159,7 @@ describe('EVM Chain Events End to End Tests', () => {
       await sdk.castVote(propCreatedResult.proposalId, 1, true, 'aave');
       res = getEvmSecondsAndBlocks(3);
       await sdk.advanceTime(String(res.secs), res.blocks);
-      const propQueuedResult = await sdk.queueProposal(
-        propCreatedResult.proposalId,
-        'aave',
-      );
+      await sdk.queueProposal(propCreatedResult.proposalId, 'aave');
 
       await clock.tickAsync(10_000);
       clock.restore();
