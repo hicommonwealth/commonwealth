@@ -14,6 +14,13 @@
     }
   }
 
+  .optional-label {
+    font-family: $font-family-silka;
+    color: $neutral-500;
+    margin-left: 6px;
+    margin-top: auto;
+  }
+
   .social-links {
     display: flex;
     flex-direction: column;
@@ -44,13 +51,11 @@
 
   .action-buttons {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     flex-wrap: wrap;
     margin-top: 24px;
-
-    @include extraSmall {
-      justify-content: end;
-    }
+    margin-bottom: 24px;
+    gap: 10px;
   }
 }

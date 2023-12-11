@@ -220,7 +220,10 @@ const BasicInformationForm = ({
 
       <section className="header">
         <CWText type="h4">
-          Community Links <CWText type="b1">&#40;Optional&#41;</CWText>
+          Community Links{' '}
+          <CWText type="b1" className="optional-label">
+            &#40;Optional&#41;
+          </CWText>
         </CWText>
         <CWText type="b1" className="description">
           Add your Discord, Twitter (X), Telegram, Website, etc.
@@ -275,7 +278,7 @@ const BasicInformationForm = ({
         <CWButton
           type="submit"
           buttonWidth="wide"
-          label="Next"
+          label="Launch Community"
           disabled={isProcessingProfileImage}
         />
       </section>
