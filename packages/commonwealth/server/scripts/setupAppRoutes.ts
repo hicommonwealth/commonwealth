@@ -16,10 +16,6 @@ const log = factory.getLogger(formatFilename(__filename));
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
 
-function cleanMalformedUrl(str: string) {
-  return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
-}
-
 const decodeTitle = (title: string) => {
   try {
     return decodeURIComponent(title);
