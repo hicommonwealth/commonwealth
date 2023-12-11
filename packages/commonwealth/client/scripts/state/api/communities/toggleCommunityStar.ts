@@ -15,7 +15,7 @@ const toggleCommunityStar = async ({
   // TODO: the endpoint is really a toggle to star/unstar a community, migrate
   // this to use the new restful standard
   const response = await axios.post(`${app.serverUrl()}/starCommunity`, {
-    community,
+    chain: community,
     auth: true,
     jwt: app.user.jwt,
     isAlreadyStarred: isAlreadyStarred + '', // backend expects a string
