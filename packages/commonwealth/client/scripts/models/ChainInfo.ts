@@ -295,11 +295,6 @@ class CommunityInfo {
     const updatedCommunity = r.data.result;
     this.name = updatedCommunity.name;
     this.description = updatedCommunity.description;
-    this.website = updatedCommunity.website;
-    this.discord = updatedCommunity.discord;
-    this.element = updatedCommunity.element;
-    this.telegram = updatedCommunity.telegram;
-    this.github = updatedCommunity.github;
     this.stagesEnabled = updatedCommunity.stages_enabled;
     this.customStages = updatedCommunity.custom_stages;
     this.customDomain = updatedCommunity.custom_domain;
