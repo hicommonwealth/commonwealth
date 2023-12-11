@@ -101,8 +101,6 @@ export const User = ({
         ) : (
           'Anonymous'
         )
-      ) : !profile?.address ? (
-        'Addr. Removed'
       ) : !profile?.id ? (
         redactedAddress
       ) : !shouldShowAddressWithDisplayName ? (
@@ -186,34 +184,32 @@ export const User = ({
             />
           </div>
           <div className="user-name">
-            {app.chain &&
-              app.chain.base === ChainBase.Substrate &&
-              profile?.address && (
-                <Link
-                  className="user-display-name substrate@"
-                  to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
-                >
-                  {!profile || !profile?.id ? (
-                    !profile?.id && userAddress ? (
-                      `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
-                    ) : (
-                      redactedAddress
-                    )
-                  ) : !shouldShowAddressWithDisplayName ? (
-                    profile?.name
+            {app.chain && app.chain.base === ChainBase.Substrate && (
+              <Link
+                className="user-display-name substrate@"
+                to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
+              >
+                {!profile || !profile?.id ? (
+                  !profile?.id && userAddress ? (
+                    `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
                   ) : (
-                    <>
-                      {profile?.name}
-                      <div className="id-short">{redactedAddress}</div>
-                    </>
-                  )}
-                </Link>
-              )}
+                    redactedAddress
+                  )
+                ) : !shouldShowAddressWithDisplayName ? (
+                  profile?.name
+                ) : (
+                  <>
+                    {profile?.name}
+                    <div className="id-short">{redactedAddress}</div>
+                  </>
+                )}
+              </Link>
+            )}
           </div>
-          <div className="user-address">
-            {profile?.address ? redactedAddress : 'Address removed'}
-          </div>
-          {friendlyChainName && profile?.address && (
+          {profile?.address && (
+            <div className="user-address">{redactedAddress}</div>
+          )}
+          {friendlyChainName && (
             <div className="user-chain">{friendlyChainName}</div>
           )}
           {roleTags}

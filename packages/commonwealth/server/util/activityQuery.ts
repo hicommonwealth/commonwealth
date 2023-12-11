@@ -1,7 +1,25 @@
 import { Op } from 'sequelize';
 import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
 
-export async function getActivityFeed(models: DB, id = 0) {
+export type GlobalActivity = Array<{
+  category_id: string;
+  comment_count: string;
+  last_activity: string;
+  notification_data: string; // actually object but stringified
+  reaction_count: string;
+  thread_id: string;
+  view_count: number;
+  commenters: {
+    id: number;
+    Addresses: AddressInstance[];
+  }[];
+}>;
+
+export async function getActivityFeed(
+  models: DB,
+  id = 0,
+): Promise<GlobalActivity> {
   /**
    * Last 50 updated threads
    */
@@ -67,7 +85,7 @@ export async function getActivityFeed(models: DB, id = 0) {
 
   const notificationsWithProfiles = notifications.map((notification) => {
     const filteredComments = comments.filter(
-      (c) => c.thread_id === notification.thread_id
+      (c) => c.thread_id === notification.thread_id,
     );
     const notificationProfiles = filteredComments.map((c) => {
       const filteredAddress = addresses.find((a) => a.id === c.address_id);

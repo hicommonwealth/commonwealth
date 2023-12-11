@@ -5,30 +5,39 @@ import { ComponentType } from '../../types';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 
+import { ChainBase } from 'common-common/src/types';
 import './CWCommunitySelector.scss';
 
-type CommunityType = 'ethereum' | 'cosmos' | 'polygon' | 'solana';
+export enum CommunityType {
+  Ethereum = 'ethereum',
+  Cosmos = 'cosmos',
+  Polygon = 'polygon',
+  Solana = 'solana',
+}
+
+export type SelectedCommunity = {
+  type: CommunityType;
+  chainBase: ChainBase;
+};
 
 interface CWCommunitySelectorProps {
   type: CommunityType;
   title: string;
   isRecommended?: boolean;
   description: string;
-  onClick: (type: CommunityType) => void;
+  onClick: () => void;
 }
 
 const CWCommunitySelector = ({
   type,
+  // chainBase,
   title,
   isRecommended,
   description,
   onClick,
 }: CWCommunitySelectorProps) => {
   return (
-    <div
-      className={ComponentType.CommunitySelector}
-      onClick={() => onClick(type)}
-    >
+    <div className={ComponentType.CommunitySelector} onClick={onClick}>
       <div className="chain-logo-container">
         <img src={`static/img/communitySelector/${type}.svg`} alt={title} />
       </div>
