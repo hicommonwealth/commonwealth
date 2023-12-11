@@ -1,27 +1,27 @@
+import { StdFee } from '@cosmjs/amino';
+import { Slip10RawIndex } from '@cosmjs/crypto';
+import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
+import { Wallet as EthWallet } from '@ethersproject/wallet';
 import chai from 'chai';
-import {
-  ProposalStatus,
-  VoteOption,
-} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import {
-  encodeMsgVote,
-  encodeMsgSubmitProposal,
-  encodeTextProposal,
-  getActiveProposalsV1Beta1,
-} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
+import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {
   getRPCClient,
   getTMClient,
 } from 'controllers/chain/cosmos/chain.utils';
 import EthSigningClient from 'controllers/chain/cosmos/eth_signing_client';
-import { CosmosApiType } from 'controllers/chain/cosmos/chain';
-import { waitOneBlock } from './utils/helpers';
-import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { Slip10RawIndex } from '@cosmjs/crypto';
-import { Wallet as EthWallet } from '@ethersproject/wallet';
+import {
+  encodeMsgSubmitProposal,
+  encodeMsgVote,
+  encodeTextProposal,
+  getActiveProposalsV1Beta1,
+} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import {
+  ProposalStatus,
+  VoteOption,
+} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import EthSigner from './utils/eth-signer';
-import { StdFee } from '@cosmjs/amino';
-import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
+import { waitOneBlock } from './utils/helpers';
 
 const { expect, assert } = chai;
 
@@ -53,7 +53,7 @@ export const setupTestSigner = async (lcdUrl: string) => {
       chainId,
       path: dbId,
     },
-    signer
+    signer,
   );
   const signerAddress = await signer.getAddress();
   return { client, signerAddress };
@@ -72,7 +72,7 @@ export const sendTx = async (lcdUrl, tx) => {
     signerAddress,
     [tx],
     DEFAULT_FEE,
-    DEFAULT_MEMO
+    DEFAULT_MEMO,
   );
   return result;
 };
@@ -95,7 +95,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     const { proposals: activeProposals } = await rpc.gov.proposals(
       ProposalStatus.PROPOSAL_STATUS_VOTING_PERIOD,
       '',
-      ''
+      '',
     );
     return activeProposals;
   };
@@ -110,7 +110,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
   it('creates a proposal', async () => {
     const content = encodeTextProposal(
       `evmos test title`,
-      `evmos test description`
+      `evmos test description`,
     );
     const msg = encodeMsgSubmitProposal(signerAddr, deposit, content);
 
@@ -123,6 +123,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     const activeProposals = await getActiveVotingProposals();
     expect(activeProposals.length).to.be.greaterThan(0);
   });
+
   it('votes NO on an active proposal', async () => {
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
@@ -133,7 +134,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     const msg = encodeMsgVote(
       signerAddr,
       proposal.proposalId,
-      VoteOption.VOTE_OPTION_NO
+      VoteOption.VOTE_OPTION_NO,
     );
     const resp = await sendTx(lcdUrl, msg);
 
@@ -142,6 +143,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     const voteValue = parseVoteValue(resp.rawLog);
     expect(voteValue).to.eql('VOTE_OPTION_NO');
   });
+
   it('votes NO WITH VETO on an active proposal', async () => {
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
@@ -152,7 +154,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     const msg = encodeMsgVote(
       signerAddr,
       proposal.proposalId,
-      VoteOption.VOTE_OPTION_NO_WITH_VETO
+      VoteOption.VOTE_OPTION_NO_WITH_VETO,
     );
     const resp = await sendTx(lcdUrl, msg);
 
@@ -161,6 +163,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     const voteValue = parseVoteValue(resp.rawLog);
     expect(voteValue).to.eql('VOTE_OPTION_NO_WITH_VETO');
   });
+
   it('votes ABSTAIN on an active proposal', async () => {
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
@@ -171,7 +174,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     const msg = encodeMsgVote(
       signerAddr,
       proposal.proposalId,
-      VoteOption.VOTE_OPTION_ABSTAIN
+      VoteOption.VOTE_OPTION_ABSTAIN,
     );
     const resp = await sendTx(lcdUrl, msg);
 
@@ -180,6 +183,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     const voteValue = parseVoteValue(resp.rawLog);
     expect(voteValue).to.eql('VOTE_OPTION_ABSTAIN');
   });
+
   it('votes YES on an active proposal', async () => {
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
@@ -192,7 +196,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     const msg = encodeMsgVote(
       signerAddr,
       proposal.proposalId,
-      VoteOption.VOTE_OPTION_YES
+      VoteOption.VOTE_OPTION_YES,
     );
     const resp = await sendTx(lcdUrl, msg);
 
@@ -208,7 +212,7 @@ describe('Ethermint Governance v1beta1 util Tests', () => {
     it('should fetch active proposals (evmos-dev-ci)', async () => {
       const id = 'evmos-dev-ci'; // CI devnet
       const tmClient = await getTMClient(
-        `http://localhost:8080/cosmosAPI/${id}`
+        `http://localhost:8080/cosmosAPI/${id}`,
       );
       const rpc = await getRPCClient(tmClient);
 
