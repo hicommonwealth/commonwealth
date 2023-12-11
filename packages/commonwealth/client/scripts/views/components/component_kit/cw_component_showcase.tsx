@@ -36,7 +36,6 @@ import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
 import { CWDropdown } from './cw_dropdown';
-import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
@@ -55,6 +54,7 @@ import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWForm } from './new_designs/CWForm';
+import CWIconButton from './new_designs/CWIconButton';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
 import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
@@ -206,9 +206,6 @@ const tagsList = [
 ];
 
 export const ComponentShowcase = () => {
-  const [selectedIconButton, setSelectedIconButton] = useState<
-    number | undefined
-  >(undefined);
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
@@ -349,6 +346,7 @@ export const ComponentShowcase = () => {
           <CWText>Unstyled Popover</CWText>
 
           <CWIconButton
+            buttonSize="med"
             iconName="infoEmpty"
             onMouseEnter={unstyledPopoverProps.handleInteraction}
             onMouseLeave={unstyledPopoverProps.handleInteraction}
@@ -368,6 +366,7 @@ export const ComponentShowcase = () => {
           <CWText>Styled by default Popover</CWText>
 
           <CWIconButton
+            buttonSize="med"
             iconName="infoEmpty"
             onMouseEnter={styledPopoverProps.handleInteraction}
             onMouseLeave={styledPopoverProps.handleInteraction}
@@ -384,7 +383,11 @@ export const ComponentShowcase = () => {
         <PopoverMenu
           menuItems={popoverMenuOptions()}
           renderTrigger={(onclick) => (
-            <CWIconButton iconName="plusCircle" onClick={onclick} />
+            <CWIconButton
+              buttonSize="med"
+              iconName="plusCircle"
+              onClick={onclick}
+            />
           )}
         />
       </div>
@@ -410,48 +413,38 @@ export const ComponentShowcase = () => {
       </div>
       <div className="icon-button-gallery">
         <CWText type="h3">Icon Buttons</CWText>
-        <CWText>Click to see selected state</CWText>
         <div className="icon-button-row">
+          <CWText type="h4">Small</CWText>
           <CWIconButton
             iconName="views"
-            iconSize="large"
-            iconButtonTheme="primary"
-            selected={selectedIconButton === 1}
-            onClick={() => {
-              setSelectedIconButton(1);
-            }}
+            buttonSize="sm"
+            onClick={() => notifySuccess('Small icon button clicked!')}
           />
-          {selectedIconButton === 1 && (
-            <div className="icon-button-selected">is selected</div>
-          )}
         </div>
         <div className="icon-button-row">
+          <CWText type="h4">Medium</CWText>
           <CWIconButton
             iconName="views"
-            iconSize="large"
-            iconButtonTheme="neutral"
-            selected={selectedIconButton === 2}
-            onClick={() => {
-              setSelectedIconButton(2);
-            }}
+            buttonSize="med"
+            onClick={() => notifySuccess('Medium icon button clicked!')}
           />
-          {selectedIconButton === 2 && (
-            <div className="icon-button-selected">is selected</div>
-          )}
         </div>
         <div className="icon-button-row">
+          <CWText type="h4">Large</CWText>
           <CWIconButton
             iconName="views"
-            iconSize="large"
-            iconButtonTheme="black"
-            selected={selectedIconButton === 3}
-            onClick={() => {
-              setSelectedIconButton(3);
-            }}
+            buttonSize="lg"
+            onClick={() => notifySuccess('Large icon button clicked!')}
           />
-          {selectedIconButton === 3 && (
-            <div className="icon-button-selected">is selected</div>
-          )}
+        </div>
+        <div className="icon-button-row">
+          <CWText type="h4">Disabled</CWText>
+          <CWIconButton
+            iconName="views"
+            buttonSize="lg"
+            disabled={true}
+            onClick={() => console.log('Nothing to the console')}
+          />
         </div>
       </div>
       <div className="text-gallery">
