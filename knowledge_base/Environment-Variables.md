@@ -104,14 +104,6 @@ Description: DataDog configuration token used to enable PSQL on Heroku.
 
 Type: Config
 
-## DD_HEROKU_CONF_FOLDER
-
-Default value: `packages/commonwealth/datadog`
-
-Description: DataDog configuration.
-
-Type: Config
-
 ## DD_LOG_LEVEL WARN
 
 Default value: `WARN`

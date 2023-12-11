@@ -21,7 +21,6 @@ https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle)
   DD_LOG_LEVEL=WARN
   DD_SITE=us5.datadoghq.com
   DD_ENABLE_HEROKU_POSTGRES=true #postgres specific
-  DD_HEROKU_CONF_FOLDER=packages/commonwealth/datadog
 ```
 
 **Install Datadog Buildpack**
