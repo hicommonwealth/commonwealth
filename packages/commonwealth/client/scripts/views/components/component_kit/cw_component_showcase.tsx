@@ -16,19 +16,20 @@ import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import CWBanner, {
   BannerType,
 } from 'views/components/component_kit/new_designs/CWBanner';
-import CWCommunitySelector from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import CWCommunitySelector, {
+  CommunityType,
+} from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import {
-  ReactQuillEditor,
   createDeltaFromText,
+  ReactQuillEditor,
 } from 'views/components/react_quill_editor';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
-import { CWContentPageCard } from './CWContentPageCard';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
@@ -47,6 +48,11 @@ import { CWText } from './cw_text';
 import { CWTextArea } from './cw_text_area';
 import { CWThreadVoteButton } from './cw_thread_vote_button';
 import type { ValidationStatus } from './cw_validation_text';
+import { CWContentPageCard } from './CWContentPageCard';
+import { CWButton } from './new_designs/cw_button';
+import { CWThreadAction } from './new_designs/cw_thread_action';
+import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
+import { CWUpvote } from './new_designs/cw_upvote';
 import { CWForm } from './new_designs/CWForm';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
@@ -59,10 +65,6 @@ import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
-import { CWButton } from './new_designs/cw_button';
-import { CWThreadAction } from './new_designs/cw_thread_action';
-import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
-import { CWUpvote } from './new_designs/cw_upvote';
 import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
@@ -859,6 +861,142 @@ export const ComponentShowcase = () => {
             buttonType="destructive"
             buttonWidth="full"
             label="Destructive disabled full"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div className="button-row">
+          <CWText type="h4">Secondary Alt-Green</CWText>
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="green"
+            label="Secondary default"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="green"
+            label="Secondary large"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="wide"
+            buttonAlt="green"
+            label="Secondary wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="green"
+            buttonWidth="wide"
+            label="Secondary large and wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonType="secondary"
+            buttonAlt="green"
+            label="Secondary default w/ left icon"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="full"
+            buttonAlt="green"
+            label="Secondary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            label="Secondary default disabled"
+            buttonAlt="green"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonAlt="green"
+            buttonType="secondary"
+            label="Secondary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="green"
+            buttonWidth="full"
+            label="Secondary disabled full"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+        </div>
+        <div className="button-row">
+          <CWText type="h4">Secondary Alt-Rorange</CWText>
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="rorange"
+            label="Secondary default"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="rorange"
+            label="Secondary large"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="wide"
+            buttonAlt="rorange"
+            label="Secondary wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonHeight="lg"
+            buttonAlt="rorange"
+            buttonWidth="wide"
+            label="Secondary large and wide"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonType="secondary"
+            buttonAlt="rorange"
+            label="Secondary default w/ left icon"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonWidth="full"
+            buttonAlt="rorange"
+            label="Secondary full"
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            label="Secondary default disabled"
+            buttonAlt="rorange"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            iconLeft="person"
+            buttonAlt="rorange"
+            buttonType="secondary"
+            label="Secondary default disabled w/ left icon"
+            disabled
+            onClick={() => notifySuccess('Button clicked!')}
+          />
+          <CWButton
+            buttonType="secondary"
+            buttonAlt="rorange"
+            buttonWidth="full"
+            label="Secondary disabled full"
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
@@ -1900,31 +2038,31 @@ export const ComponentShowcase = () => {
       <div className="CommunitySelectorContainer">
         <CWText type="h3"> Community Selector </CWText>
         <CWCommunitySelector
-          type="ethereum"
+          type={CommunityType.Ethereum}
           title="Ethereum (EVM)"
           isRecommended
-          onClick={(type) => console.log('Selected: ', type)}
+          onClick={() => console.log('Selected: ', CommunityType.Ethereum)}
           description="Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable.
           Select this community type if you have minted a token on the Ethereum blockchain."
         />
         <CWCommunitySelector
-          type="cosmos"
+          type={CommunityType.Cosmos}
           title="Cosmos"
-          onClick={(type) => console.log('Selected: ', type)}
+          onClick={() => console.log('Selected: ', CommunityType.Cosmos)}
           description="The Cosmos Network is a decentralized network of independent, scalable,
           and interoperable blockchains, creating the foundation for a new token economy."
         />
         <CWCommunitySelector
-          type="polygon"
+          type={CommunityType.Polygon}
           title="Polygon"
-          onClick={(type) => console.log('Selected: ', type)}
+          onClick={() => console.log('Selected: ', CommunityType.Polygon)}
           description="Polygon is built around making web3 technology accessible, with zero prior knowledge.
            Common supports communities on the Polygon network..."
         />
         <CWCommunitySelector
-          type="solana"
+          type={CommunityType.Solana}
           title="Solana"
-          onClick={(type) => console.log('Selected: ', type)}
+          onClick={() => console.log('Selected: ', CommunityType.Solana)}
           description="Solana is a rapidly growing technology due to its speed and scale.
           Our integration with Solana allows you to create a community for your project with just a click! "
         />

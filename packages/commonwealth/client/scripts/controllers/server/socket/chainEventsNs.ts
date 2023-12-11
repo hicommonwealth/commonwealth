@@ -1,7 +1,9 @@
-import { NotificationCategories } from 'common-common/src/types';
+import {
+  NotificationCategories,
+  type ChainEventNotification,
+} from 'common-common/src/types';
 import type { Socket } from 'socket.io-client';
 import app from 'state';
-import type { ChainEventNotification } from 'types';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import Notification from '../../../models/Notification';
 import type NotificationSubscription from '../../../models/NotificationSubscription';

@@ -130,7 +130,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       threadId: parseInt(`${threadId}`),
     });
 

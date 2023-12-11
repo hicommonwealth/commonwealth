@@ -1,14 +1,13 @@
 import JobRunner from 'common-common/src/cacheJobRunner';
 import type { DB } from '../models';
-import type { GlobalActivity } from './queryGlobalActivity';
-import { default as queryGlobalActivity } from './queryGlobalActivity';
+import { getActivityFeed, type GlobalActivity } from './activityQuery';
 
 type CacheT = { activity: GlobalActivity };
 
 export default class GlobalActivityCache extends JobRunner<CacheT> {
   constructor(
     private _models: DB,
-    _time: number = 60 * 5 // 5 minutes
+    _time: number = 60 * 5, // 5 minutes
   ) {
     super({ activity: [] }, _time, false);
   }
@@ -24,7 +23,7 @@ export default class GlobalActivityCache extends JobRunner<CacheT> {
 
   // prunes all expired cache entries based on initialized time-to-live
   protected async _job(): Promise<void> {
-    const globalActivity = await queryGlobalActivity(this._models);
+    const globalActivity = await getActivityFeed(this._models);
     await this.write(async (c) => {
       c.activity = globalActivity;
     });

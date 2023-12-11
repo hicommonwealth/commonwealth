@@ -8,7 +8,7 @@ import useFetchCommentsQuery from './fetchComments';
 interface CreateReactionProps {
   address: string;
   reactionType?: 'like';
-  chainId: string;
+  communityId: string;
   threadId: number;
   commentId: number;
 }
@@ -16,7 +16,7 @@ interface CreateReactionProps {
 const createReaction = async ({
   address,
   reactionType = 'like',
-  chainId,
+  communityId,
   commentId,
 }: CreateReactionProps) => {
   const {
@@ -32,7 +32,7 @@ const createReaction = async ({
     `${app.serverUrl()}/comments/${commentId}/reactions`,
     {
       author_community_id: app.user.activeAccount.community.id,
-      community_id: chainId,
+      community_id: communityId,
       address,
       reaction: reactionType,
       jwt: app.user.jwt,
@@ -47,11 +47,11 @@ const createReaction = async ({
 const useCreateCommentReactionMutation = ({
   threadId,
   commentId,
-  chainId,
+  communityId,
 }: Partial<CreateReactionProps>) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    chainId,
+    communityId,
     threadId,
   });
 
@@ -61,7 +61,7 @@ const useCreateCommentReactionMutation = ({
       const reaction = response.data.result;
 
       // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
+      const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
       queryClient.setQueryData(key, () => {
         const tempComments = [...comments];

@@ -17,11 +17,7 @@ class CommunityInfo {
   public readonly base: ChainBase;
   public iconUrl: string;
   public description: string;
-  public website: string;
-  public discord: string;
-  public element: string;
-  public telegram: string;
-  public github: string;
+  public socialLinks: string[];
   public stagesEnabled: boolean;
   public customStages: string;
   public customDomain: string;
@@ -59,11 +55,7 @@ class CommunityInfo {
     name,
     iconUrl,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    social_links,
     stagesEnabled,
     customStages,
     customDomain,
@@ -97,11 +89,7 @@ class CommunityInfo {
     this.name = name;
     this.iconUrl = iconUrl;
     this.description = description;
-    this.website = website;
-    this.discord = discord;
-    this.element = element;
-    this.telegram = telegram;
-    this.github = github;
+    this.socialLinks = social_links;
     this.stagesEnabled = stagesEnabled;
     this.customStages = customStages;
     this.customDomain = customDomain;
@@ -136,11 +124,7 @@ class CommunityInfo {
     name,
     icon_url,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    social_links,
     stages_enabled,
     custom_stages,
     custom_domain,
@@ -195,11 +179,7 @@ class CommunityInfo {
       name,
       iconUrl: icon_url,
       description,
-      website,
-      discord,
-      element,
-      telegram,
-      github,
+      social_links,
       stagesEnabled: stages_enabled,
       customStages: custom_stages,
       customDomain: custom_domain,
@@ -255,11 +235,7 @@ class CommunityInfo {
   public async updateChainData({
     name,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    socialLinks,
     stagesEnabled,
     customStages,
     customDomain,
@@ -277,11 +253,8 @@ class CommunityInfo {
   }: {
     name?: string;
     description?: string;
-    website?: string;
+    socialLinks?: string[];
     discord?: string;
-    element?: string;
-    telegram?: string;
-    github?: string;
     stagesEnabled?: boolean;
     customStages?: string;
     customDomain?: string;
@@ -302,11 +275,7 @@ class CommunityInfo {
       id,
       name,
       description,
-      website,
-      discord,
-      element,
-      telegram,
-      github,
+      socialLinks,
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
@@ -347,6 +316,39 @@ class CommunityInfo {
     this.directoryPageChainNodeId =
       updatedCommunity.directory_page_chain_node_id;
   }
+
+  public categorizeSocialLinks(): CategorizedSocialLinks {
+    const categorizedLinks: CategorizedSocialLinks = {
+      discords: [],
+      githubs: [],
+      telegrams: [],
+      elements: [],
+      remainingLinks: [],
+    };
+
+    this.socialLinks.forEach((link) => {
+      if (link.includes('://discord.com') || link.includes('://discord.gg')) {
+        categorizedLinks.discords.push(link);
+      } else if (link.includes('://github.com')) {
+        categorizedLinks.githubs.push(link);
+      } else if (link.includes('://t.me')) {
+        categorizedLinks.telegrams.push(link);
+      } else if (link.includes('://matrix.to')) {
+        categorizedLinks.elements.push(link);
+      } else {
+        categorizedLinks.remainingLinks.push(link);
+      }
+    });
+
+    return categorizedLinks;
+  }
 }
 
 export default CommunityInfo;
+export type CategorizedSocialLinks = {
+  discords: string[];
+  githubs: string[];
+  telegrams: string[];
+  elements: string[];
+  remainingLinks: string[];
+};
