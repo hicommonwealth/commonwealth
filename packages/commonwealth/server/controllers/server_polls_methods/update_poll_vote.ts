@@ -8,7 +8,7 @@ import { UserInstance } from '../../models/user';
 import { VoteAttributes } from '../../models/vote';
 import { validateTopicGroupsMembership } from '../../util/requirementsModule/validateTopicGroupsMembership';
 import { TrackOptions } from '../server_analytics_methods/track';
-import { ServerThreadsController } from '../server_threads_controller';
+import { ServerPollsController } from '../server_polls_controller';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -32,7 +32,7 @@ export type UpdatePollVoteOptions = {
 export type UpdatePollVoteResult = [VoteAttributes, TrackOptions];
 
 export async function __updatePollVote(
-  this: ServerThreadsController,
+  this: ServerPollsController,
   { user, address, community, pollId, option }: UpdatePollVoteOptions,
 ): Promise<UpdatePollVoteResult> {
   const poll = await this.models.Poll.findOne({

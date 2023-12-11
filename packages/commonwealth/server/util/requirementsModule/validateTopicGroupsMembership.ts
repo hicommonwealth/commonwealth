@@ -51,6 +51,9 @@ export async function validateTopicGroupsMembership(
         id: { [Op.in]: topic.group_ids },
       },
     });
+    if (groups.length === 0) {
+      return { isValid: true };
+    }
 
     // check membership for all groups of topic
     let numValidGroups = 0;

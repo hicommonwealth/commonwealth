@@ -243,7 +243,11 @@ function setupRouter(
       tokenBalanceCacheV1,
       banCache,
     ),
-    polls: new ServerPollsController(models, tokenBalanceCacheV1),
+    polls: new ServerPollsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+    ),
     proposals: new ServerProposalsController(models, redisCache),
     groups: new ServerGroupsController(
       models,
