@@ -5,14 +5,14 @@ import { ApiEndpoints } from 'state/api/config';
 import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteReactionProps {
-  chainId: string;
+  communityId: string;
   address: string;
   canvasHash: string;
   reactionId: number;
 }
 
 const deleteReaction = async ({
-  chainId,
+  communityId,
   address,
   canvasHash,
   reactionId,
@@ -27,7 +27,7 @@ const deleteReaction = async ({
   return await axios
     .delete(`${app.serverUrl()}/reactions/${reactionId}`, {
       data: {
-        author_community_id: chainId,
+        author_community_id: communityId,
         address: address,
         jwt: app.user.jwt,
         canvas_action: action,
@@ -48,7 +48,7 @@ const deleteReaction = async ({
 };
 
 interface UseDeleteCommentReactionMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
   commentId: number;
 }
@@ -56,11 +56,11 @@ interface UseDeleteCommentReactionMutationProps {
 const useDeleteCommentReactionMutation = ({
   threadId,
   commentId,
-  chainId,
+  communityId,
 }: UseDeleteCommentReactionMutationProps) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    chainId,
+    communityId,
     threadId,
   });
 
@@ -70,7 +70,7 @@ const useDeleteCommentReactionMutation = ({
       const { reactionId } = response.data.result;
 
       // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
+      const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
       queryClient.cancelQueries({ queryKey: key });
       queryClient.setQueryData(key, () => {
         const tempComments = [...comments];

@@ -6,7 +6,7 @@ import FormStep, { FormStepProps } from './FormStep';
 
 import './CWFormSteps.scss';
 
-interface CWFormStepsProps {
+export interface CWFormStepsProps {
   steps: Omit<FormStepProps, 'index'>[];
 }
 
