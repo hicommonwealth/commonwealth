@@ -1003,25 +1003,33 @@ export const ComponentShowcase = () => {
       </div>
       <div className="circle-button-gallery">
         <CWText type="h4">Circle Buttons</CWText>
-        <CWCircleButton
-          buttonType="primary"
-          iconName="bell"
-          onClick={() => notifySuccess('Quack!')}
-        />
+        <div className="button-row">
+          <CWText type="h4">Primary</CWText>
+          <CWCircleButton
+            buttonType="primary"
+            iconName="bell"
+            onClick={() => console.log('Quack!')}
+          />
+        </div>
 
-        <CWCircleButton
-          buttonType="primary"
-          iconName="bell"
-          disabled
-          onClick={() => notifySuccess('Quack!')}
-        />
-        <span>some text</span>
+        <div className="button-row">
+          <CWText type="h4">Primary Disabled</CWText>
+          <CWCircleButton buttonType="primary" iconName="bell" disabled />
+        </div>
 
-        {/* <CWCircleButton
-          buttonType="secondary"
-          iconName="bell"
-          onClick={() => notifySuccess('Quack!')}
-        /> */}
+        <div className="button-row">
+          <CWText type="h4">Secondary</CWText>
+          <CWCircleButton
+            buttonType="secondary"
+            iconName="bell"
+            onClick={() => console.log('Quack!')}
+          />
+        </div>
+
+        <div className="button-row">
+          <CWText type="h4">Secondary Disabled</CWText>
+          <CWCircleButton buttonType="secondary" iconName="bell" disabled />
+        </div>
       </div>
       <div className="basic-gallery">
         <CWText type="h4">Content Page Card</CWText>

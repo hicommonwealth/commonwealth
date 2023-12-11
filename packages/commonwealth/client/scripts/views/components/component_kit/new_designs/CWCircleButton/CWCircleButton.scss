@@ -3,16 +3,29 @@
 .circle-btn-border {
   width: fit-content;
   border-radius: 50%;
-  padding: 2px;
-  border: 2px solid $transparent;
 
   &.primary {
+    border: 2px solid $transparent;
+  }
+
+  &.secondary {
+    border: 1px solid $transparent;
+  }
+
+  &.primary,
+  &.secondary {
+    padding: 2px;
+
     &:focus-within {
-      border: 2px solid $neutral-800
+      border: 2px solid $neutral-800;
+
+      .CircleButton.secondary {
+        border: none;
+      }
     }
   }
 
-  &.secondary {}
+
 
   .CircleButton {
     line-height: 0;
@@ -33,10 +46,6 @@
       border: none;
       background-color: $neutral-700;
 
-      .Icon {
-        color: $white;
-      }
-
       svg {
         color: $white;
       }
@@ -56,12 +65,36 @@
       &.disabled {
         background-color: $neutral-200;
 
-        .Icon {
+        svg {
           color: $neutral-400;
         }
       }
     }
 
-    &.secondary {}
+    &.secondary {
+      border: 1px solid $neutral-200;
+      background-color: $neutral-50;
+
+      svg {
+        color: $black;
+      }
+
+      &:hover {
+        background-color: $neutral-100;
+      }
+
+      &:active,
+      &:focus {
+        background-color: $neutral-50;
+      }
+
+      &.disabled {
+        background-color: $neutral-50;
+
+        svg {
+          color: $neutral-400;
+        }
+      }
+    }
   }
 }

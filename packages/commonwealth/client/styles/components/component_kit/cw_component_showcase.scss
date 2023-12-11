@@ -138,7 +138,8 @@ $width: 360px;
     }
   }
 
-  .button-gallery {
+  .button-gallery,
+  .circle-button-gallery {
     @include gallery-grid(8px, column);
 
     .button-row {
@@ -240,6 +241,7 @@ $width: 360px;
 
     .multi-select,
     .typeahead {
+
       .multi-select-row,
       .typeahead-row {
         margin-bottom: 15px;
