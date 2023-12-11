@@ -1,5 +1,6 @@
+import type { SupportedNetwork } from 'common-common/src/types';
 import _ from 'underscore';
-import type { IChainEventData, SupportedNetwork } from 'chain-events/src';
+import type { IChainEventData } from '../../../shared/chain/types/types';
 
 class ChainEvent {
   public readonly id?: number;
@@ -26,7 +27,7 @@ class ChainEvent {
       json.id,
       json.chain,
       json.network,
-      json.blockNumber || json.block_number
+      json.blockNumber || json.block_number,
     );
   }
 }

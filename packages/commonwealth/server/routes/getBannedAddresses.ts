@@ -19,14 +19,14 @@ type GetBannedAddressesResp = BanAttributes[];
 const getBannedAddresses = async (
   models: DB,
   req: TypedRequestQuery<GetBannedAddressesReq>,
-  res: TypedResponse<GetBannedAddressesResp>
+  res: TypedResponse<GetBannedAddressesResp>,
 ) => {
   const chain = req.chain;
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain.id,
+    communityId: chain.id,
     allowAdmin: true,
     allowGodMode: true,
   });
@@ -37,7 +37,7 @@ const getBannedAddresses = async (
   const bans = await models.Ban.findAll({ where: { chain_id: chain.id } });
   return success(
     res,
-    bans.map((b) => b.toJSON())
+    bans.map((b) => b.toJSON()),
   );
 };
 

@@ -1,49 +1,58 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
-import { CreateGroupResult } from '../../controllers/server_groups_methods/create_group';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import z from 'zod';
 import { AppError } from '../../../../common-common/src/errors';
-
-const Errors = {
-  InvalidMetadata: 'Invalid metadata',
-  InvalidRequirements: 'Invalid requirements',
-  InvalidTopics: 'Invalid topics',
-};
+import { GroupAttributes, GroupMetadata } from '../../models/group';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
 type CreateGroupBody = {
-  metadata: any; // TODO: use proper type
+  metadata: GroupMetadata;
   requirements: Requirement[];
-  topics: number[];
+  topics?: number[];
 };
-type CreateGroupResponse = CreateGroupResult;
+type CreateGroupResponse = GroupAttributes;
 
 export const createGroupHandler = async (
   controllers: ServerControllers,
   req: TypedRequestBody<CreateGroupBody>,
-  res: TypedResponse<CreateGroupResponse>
+  res: TypedResponse<CreateGroupResponse>,
 ) => {
-  const { user, address, chain } = req;
-  const { metadata, requirements, topics } = req.body;
-  if (!metadata) {
-    throw new AppError(Errors.InvalidMetadata);
+  const { user, address, chain: community } = req;
+
+  const schema = z.object({
+    body: z.object({
+      metadata: z.object({
+        name: z.string(),
+        description: z.string(),
+        required_requirements: z.number().optional(),
+      }),
+      requirements: z.array(z.any()), // validated in controller
+      topics: z.array(z.number()).optional(),
+    }),
+  });
+  const validationResult = schema.safeParse(req);
+  if (validationResult.success === false) {
+    throw new AppError(JSON.stringify(validationResult.error));
   }
-  if (!requirements) {
-    throw new AppError(Errors.InvalidRequirements);
-  }
-  if (topics) {
-    for (const topicId of topics) {
-      if (typeof topicId !== 'number') {
-        throw new AppError(Errors.InvalidTopics);
-      }
-    }
-  }
-  const result = await controllers.groups.createGroup({
+  const {
+    body: { metadata, requirements, topics },
+  } = validationResult.data;
+
+  const [group, analyticsOptions] = await controllers.groups.createGroup({
     user,
-    chain,
+    community,
     address,
-    metadata,
+    metadata: metadata as Required<typeof metadata>,
     requirements,
     topics,
   });
-  return success(res, result);
+
+  // refresh memberships in background
+  controllers.groups
+    .refreshCommunityMemberships({ community, group })
+    .catch(console.error);
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
+
+  return success(res, group);
 };

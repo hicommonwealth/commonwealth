@@ -1,13 +1,13 @@
 import moment from 'moment';
-import { ChainInstance } from '../../models/chain';
-import { Link, ThreadAttributes, ThreadInstance } from '../../models/thread';
-import { ServerThreadsController } from '../server_threads_controller';
 import { QueryTypes } from 'sequelize';
-import { ServerError } from 'near-api-js/lib/utils/rpc_errors';
+import { ServerError } from '../../../../common-common/src/errors';
+import { CommunityInstance } from '../../models/community';
+import { ThreadAttributes, ThreadInstance } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export type GetBulkThreadsOptions = {
-  chain?: ChainInstance;
+  community?: CommunityInstance;
   stage: string;
   topicId: number;
   includePinnedThreads: boolean;
@@ -29,7 +29,7 @@ export type GetBulkThreadsResult = {
 export async function __getBulkThreads(
   this: ServerThreadsController,
   {
-    chain,
+    community,
     stage,
     topicId,
     includePinnedThreads,
@@ -39,7 +39,7 @@ export async function __getBulkThreads(
     fromDate,
     toDate,
     archived,
-  }: GetBulkThreadsOptions
+  }: GetBulkThreadsOptions,
 ): Promise<GetBulkThreadsResult> {
   // query params that bind to sql query
   const bind = (() => {
@@ -54,7 +54,7 @@ export async function __getBulkThreads(
       page: _page,
       limit: _limit,
       offset: _offset,
-      ...(chain && { chain: chain.id }),
+      ...(community && { community_id: community.id }),
       ...(stage && { stage }),
       ...(topicId && { topic_id: topicId }),
     };
@@ -78,14 +78,15 @@ export async function __getBulkThreads(
     responseThreads = await this.models.sequelize.query(
       `
       SELECT addr.id AS addr_id, addr.address AS addr_address, last_commented_on,
-        addr.chain AS addr_chain, threads.thread_id, thread_title,
+        addr.community_id AS addr_chain, threads.thread_id, thread_title,
         threads.marked_as_spam_at,
         threads.archived_at,
         thread_chain, thread_created, thread_updated, thread_locked, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.discord_meta,
         threads.has_poll, threads.plaintext,
         threads.url, threads.pinned, COALESCE(threads.number_of_comments,0) as threads_number_of_comments,
-        threads.reaction_ids, threads.reaction_type, threads.addresses_reacted, COALESCE(threads.total_likes, 0) as threads_total_likes,
+        threads.reaction_ids, threads.reaction_type, threads.addresses_reacted, COALESCE(threads.total_likes, 0)
+          as threads_total_likes,
         threads.links as links,
         topics.id AS topic_id, topics.name AS topic_name, topics.description AS topic_description,
         topics.chain_id AS topic_chain,
@@ -106,7 +107,7 @@ export async function __getBulkThreads(
           t.plaintext,
           t.stage, t.url, t.pinned, t.topic_id, t.kind, t.links, ARRAY_AGG(DISTINCT
             CONCAT(
-              '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
+              '{ "address": "', editors.address, '", "chain": "', editors.community_id, '" }'
               )
             ) AS collaborators
         FROM "Threads" t
@@ -120,18 +121,18 @@ export async function __getBulkThreads(
             STRING_AGG(r.reaction::text, ',') AS reaction_type,
             STRING_AGG(r.id::text, ',') AS reaction_ids
             FROM "Reactions" as r
-            JOIN "Threads" t2 
-            ON r.thread_id = t2.id and t2.chain = $chain ${
+            JOIN "Threads" t2
+            ON r.thread_id = t2.id and t2.chain = $community_id ${
               topicId ? ` AND t2.topic_id = $topic_id ` : ''
             }
             LEFT JOIN "Addresses" ad
             ON r.address_id = ad.id
-            where r.chain = $chain
+            where r.chain = $community_id
             GROUP BY thread_id
         ) reactions
         ON t.id = reactions.thread_id
         WHERE t.deleted_at IS NULL
-          ${chain ? ` AND t.chain = $chain` : ''}
+          ${community ? ` AND t.chain = $community_id` : ''}
           ${topicId ? ` AND t.topic_id = $topic_id ` : ''}
           ${stage ? ` AND t.stage = $stage ` : ''}
           ${archived ? ` AND t.archived_at IS NOT NULL ` : ''}
@@ -163,7 +164,7 @@ export async function __getBulkThreads(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     );
   } catch (e) {
     console.error(e);
@@ -201,7 +202,7 @@ export async function __getBulkThreads(
       Address: {
         id: t.addr_id,
         address: t.addr_address,
-        chain: t.addr_chain,
+        community_id: t.addr_chain,
       },
       numberOfComments: t.threads_number_of_comments,
       reactionIds: t.reaction_ids ? t.reaction_ids.split(',') : [],
@@ -228,7 +229,7 @@ export async function __getBulkThreads(
   const countsQuery = `
      SELECT id, title, stage FROM "Threads"
      WHERE ${
-       chain ? 'chain = $chain AND' : ''
+       community ? 'chain = $community_id AND' : ''
      } (stage = 'proposal_in_review' OR stage = 'voting')`;
 
   const threadsInVoting: ThreadInstance[] = await this.models.sequelize.query(
@@ -236,10 +237,10 @@ export async function __getBulkThreads(
     {
       bind,
       type: QueryTypes.SELECT,
-    }
+    },
   );
   const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
+    (t) => t.stage === 'voting',
   ).length;
 
   threads = await Promise.all(threads);

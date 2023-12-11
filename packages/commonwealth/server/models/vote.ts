@@ -7,8 +7,8 @@ export type VoteAttributes = {
   poll_id: number;
   option: string;
   address: string;
-  author_chain: string;
-  chain_id: string;
+  author_community_id: string;
+  community_id: string;
   id?: number;
   created_at?: Date;
   updated_at?: Date;
@@ -23,7 +23,7 @@ export type VoteModelStatic = ModelStatic<VoteInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): VoteModelStatic => {
   const Vote = <VoteModelStatic>sequelize.define(
     'Vote',
@@ -32,8 +32,8 @@ export default (
       poll_id: { type: dataTypes.INTEGER, allowNull: false },
       option: { type: dataTypes.STRING, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
-      author_chain: { type: Sequelize.STRING, allowNull: true },
-      chain_id: { type: Sequelize.STRING, allowNull: true },
+      author_community_id: { type: Sequelize.STRING, allowNull: true },
+      community_id: { type: Sequelize.STRING, allowNull: true },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
     },
@@ -42,8 +42,7 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [{ fields: ['poll_id'] }],
-    }
+    },
   );
 
   Vote.associate = (models) => {

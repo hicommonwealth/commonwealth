@@ -19,14 +19,14 @@ type UpdateBannerReq = Omit<CommunityBannerInstance, 'id'> & {
 const updateBanner = async (
   models: DB,
   req: TypedRequestBody<UpdateBannerReq>,
-  res: Response
+  res: Response,
 ) => {
   const chain = req.chain;
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain.id,
+    communityId: chain.id,
     allowAdmin: true,
     allowGodMode: true,
   });

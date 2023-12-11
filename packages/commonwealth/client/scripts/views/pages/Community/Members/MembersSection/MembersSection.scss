@@ -1,0 +1,41 @@
+@import '../../../../../../styles/shared';
+
+.MembersSection {
+  display: flex;
+  max-width: 100%;
+  flex: 1;
+  flex-direction: column;
+  gap: 24px;
+  padding-right: 0px;
+
+  table {
+    width: 100%;
+
+    .table-cell {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .user-info {
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: black;
+
+        div {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        :hover,
+        :focus,
+        :visited {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}

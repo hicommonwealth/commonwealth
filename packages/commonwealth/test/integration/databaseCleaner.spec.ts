@@ -1,12 +1,12 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { resetDatabase } from '../../server-test';
-import DatabaseCleaner from '../../server/util/databaseCleaner';
-import models from '../../server/database';
-import sinon from 'sinon';
+import { RedisCache } from 'common-common/src/redisCache';
 import { NotificationCategories } from 'common-common/src/types';
 import { Sequelize } from 'sequelize';
-import { RedisCache } from 'common-common/src/redisCache';
+import sinon from 'sinon';
+import { resetDatabase } from '../../server-test';
+import models from '../../server/database';
+import DatabaseCleaner from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -54,13 +54,13 @@ describe('DatabaseCleaner Tests', () => {
         now.getUTCHours() + 4,
         mockRedis,
         undefined,
-        true
+        true,
       );
 
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
       expect(dbCleaner.timeToRun.getTime()).to.be.equal(
-        now.getTime() + 14400000
+        now.getTime() + 14400000,
       );
       expect(dbCleaner.completed).to.be.false;
     });
@@ -85,7 +85,7 @@ describe('DatabaseCleaner Tests', () => {
         now.getUTCHours() - 4,
         mockRedis,
         undefined,
-        true
+        true,
       );
       expect(dbCleaner.timeoutID).to.not.be.undefined;
       clearTimeout(dbCleaner.timeoutID);
@@ -177,7 +177,7 @@ describe('DatabaseCleaner Tests', () => {
       const notifs = await models.Notification.findAll();
       expect(notifs.length).to.equal(1);
       expect(notifs[0].created_at.toString()).to.equal(
-        eightyEightDaysAgo.toString()
+        eightyEightDaysAgo.toString(),
       );
     });
 
@@ -186,7 +186,7 @@ describe('DatabaseCleaner Tests', () => {
 
       const oneYearAndTwoDaysAgo = new Date(now);
       oneYearAndTwoDaysAgo.setUTCFullYear(
-        oneYearAndTwoDaysAgo.getUTCFullYear() - 1
+        oneYearAndTwoDaysAgo.getUTCFullYear() - 1,
       );
       oneYearAndTwoDaysAgo.setUTCDate(oneYearAndTwoDaysAgo.getUTCDate() - 2);
 
@@ -198,7 +198,7 @@ describe('DatabaseCleaner Tests', () => {
       await models.Address.create({
         user_id: oldUser.id,
         address: '0x1234',
-        chain: 'ethereum',
+        community_id: 'ethereum',
         verification_token: 'blah',
         last_active: Sequelize.literal(`NOW() - INTERVAL '13 months'`) as any,
       });
@@ -211,7 +211,7 @@ describe('DatabaseCleaner Tests', () => {
       await models.Address.create({
         user_id: newUser.id,
         address: '0x2345',
-        chain: 'ethereum',
+        community_id: 'ethereum',
         verification_token: 'blah',
         last_active: Sequelize.literal(`NOW()`) as any,
       });

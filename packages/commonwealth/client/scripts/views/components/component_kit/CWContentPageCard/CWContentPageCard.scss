@@ -1,0 +1,16 @@
+@import '../../../../../styles/shared.scss';
+
+.ContentPageCard.Card {
+  border-color: $neutral-200;
+  overflow: hidden;
+  padding: 0;
+  width: 248px;
+
+  .header-container {
+    background-color: $neutral-50;
+    border-bottom: 1px solid $neutral-200;
+    min-height: 40px;
+    padding: 8px 16px;
+    width: 100%;
+  }
+}

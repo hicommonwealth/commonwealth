@@ -1,27 +1,68 @@
-import { TypedRequestBody, TypedResponse, success } from '../../types';
+import { GroupAttributes, GroupMetadata } from 'server/models/group';
+import z from 'zod';
+import { AppError } from '../../../../common-common/src/errors';
 import { ServerControllers } from '../../routing/router';
-import { UpdateGroupResult } from '../../controllers/server_groups_methods/update_group';
+import { TypedRequest, TypedResponse, success } from '../../types';
 import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 
+type UpdateGroupParams = { id: string };
 type UpdateGroupBody = {
-  metadata: any; // TODO: use proper type
+  metadata: GroupMetadata;
   requirements: Requirement[];
+  topics?: number[];
 };
-type UpdateGroupResponse = UpdateGroupResult;
+type UpdateGroupResponse = GroupAttributes;
 
 export const updateGroupHandler = async (
   controllers: ServerControllers,
-  req: TypedRequestBody<UpdateGroupBody>,
-  res: TypedResponse<UpdateGroupResponse>
+  req: TypedRequest<UpdateGroupBody, null, UpdateGroupParams>,
+  res: TypedResponse<UpdateGroupResponse>,
 ) => {
-  const { user, address, chain } = req;
-  const { metadata, requirements } = req.body;
-  const result = await controllers.groups.updateGroup({
-    user,
-    chain,
-    address,
-    metadata,
-    requirements,
+  const { user, address, chain: community } = req;
+
+  const schema = z.object({
+    params: z.object({
+      id: z.coerce.number(),
+    }),
+    body: z.object({
+      metadata: z
+        .object({
+          name: z.string(),
+          description: z.string(),
+          required_requirements: z.number().optional(),
+        })
+        .optional(),
+      requirements: z.array(z.any()).optional(), // validated in controller
+      topics: z.array(z.number()).optional(),
+    }),
   });
-  return success(res, result);
+  const validationResult = schema.safeParse(req);
+  if (validationResult.success === false) {
+    throw new AppError(JSON.stringify(validationResult.error));
+  }
+  const {
+    params: { id: groupId },
+    body: { metadata, requirements, topics },
+  } = validationResult.data;
+
+  const [group, analyticsOptions] = await controllers.groups.updateGroup({
+    user,
+    community,
+    address,
+    groupId,
+    metadata: metadata as Required<typeof metadata>,
+    requirements,
+    topics,
+  });
+
+  // refresh memberships in background if requirements updated
+  if (requirements?.length > 0) {
+    controllers.groups
+      .refreshCommunityMemberships({ community, group })
+      .catch(console.error);
+  }
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
+
+  return success(res, group);
 };

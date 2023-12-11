@@ -1,23 +1,23 @@
-import chai from 'chai';
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
+import chai from 'chai';
 
 import {
   ProposalStatus as ProposalStatusV1,
+  VoteOption as VoteOptionV1,
   voteOptionToJSON,
 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import { VoteOption as VoteOptionV1 } from 'common-common/src/cosmos-ts/src/codegen/cosmos/gov/v1/gov';
-import {
-  encodeMsgVote,
-  encodeMsgSubmitProposal,
-  encodeTextProposal,
-  encodeCommunitySpend,
-} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import { getLCDClient } from 'controllers/chain/cosmos/chain.utils';
 import {
   getActiveProposalsV1,
   getCompletedProposalsV1,
 } from 'controllers/chain/cosmos/gov/v1/utils-v1';
-import { LCD } from 'chain-events/src/chains/cosmos/types';
+import {
+  encodeCommunitySpend,
+  encodeMsgSubmitProposal,
+  encodeMsgVote,
+  encodeTextProposal,
+} from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
+import { LCD } from '../../../shared/chain/types/cosmos';
 import {
   deposit,
   sendTx,
@@ -52,7 +52,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
   const proposalTest = async (
     content: any,
     expectedProposalType: string,
-    isAmino?: boolean
+    isAmino?: boolean,
   ) => {
     const msg = encodeMsgSubmitProposal(signer, deposit, content);
     const resp = await sendTx(rpcUrl, msg, isAmino);
@@ -67,13 +67,13 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     const activeProposals = await getActiveVotingProposals();
     const onchainProposal = activeProposals[activeProposals?.length - 1];
     expect((onchainProposal?.messages?.[0] as any)?.content?.['@type']).to.eql(
-      expectedProposalType
+      expectedProposalType,
     );
   };
 
   const voteTest = async (
     voteOption: number,
-    isAmino?: boolean
+    isAmino?: boolean,
   ): Promise<void> => {
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
@@ -112,11 +112,11 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
         `v1 spend description`,
         'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
         '5',
-        'ustake'
+        'ustake',
       );
       await proposalTest(
         content,
-        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal'
+        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
       );
     });
   });
@@ -146,12 +146,12 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
         `v1 spend description amino`,
         'cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg',
         '5',
-        'ustake'
+        'ustake',
       );
       await proposalTest(
         content,
         '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-        true
+        true,
       );
     });
   });

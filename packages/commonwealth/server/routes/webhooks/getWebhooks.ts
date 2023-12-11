@@ -7,7 +7,7 @@ const getWebhooks = async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
 
@@ -24,13 +24,13 @@ const getWebhooks = async (
       },
     },
     chain.id,
-    ['admin']
+    ['admin'],
   );
   if (!req.user.isAdmin && adminRoles.length === 0)
     return next(new AppError(Errors.NotAdmin));
   // fetch webhooks
   const webhooks = await models.Webhook.findAll({
-    where: { chain_id: chain.id },
+    where: { community_id: chain.id },
   });
   return res.json({
     status: 'Success',

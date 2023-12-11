@@ -1,9 +1,14 @@
+import { Capacitor } from '@capacitor/core';
 import axios from 'axios';
 import { ChainCategoryType } from 'common-common/src/types';
 import { updateActiveUser } from 'controllers/app/login';
 import RecentActivityController from 'controllers/app/recent_activity';
+import CosmosAccount from 'controllers/chain/cosmos/account';
+import EthereumAccount from 'controllers/chain/ethereum/account';
+import { NearAccount } from 'controllers/chain/near/account';
 import SnapshotController from 'controllers/chain/snapshot';
-import ChainEntityController from 'controllers/server/chain_entities';
+import SolanaAccount from 'controllers/chain/solana/account';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import ContractsController from 'controllers/server/contracts';
 import DiscordController from 'controllers/server/discord';
 import PollsController from 'controllers/server/polls';
@@ -17,7 +22,6 @@ import ChainInfo from 'models/ChainInfo';
 import type IChainAdapter from 'models/IChainAdapter';
 import NodeInfo from 'models/NodeInfo';
 import NotificationCategory from 'models/NotificationCategory';
-import { Capacitor } from '@capacitor/core';
 import { ChainStore, NodeStore } from 'stores';
 
 export enum ApiStatus {
@@ -34,8 +38,14 @@ export const enum LoginState {
 
 export interface IApp {
   socket: WebSocketController;
-  chain: IChainAdapter<any, any>;
-  chainEntities: ChainEntityController;
+  chain: IChainAdapter<
+    any,
+    | CosmosAccount
+    | EthereumAccount
+    | NearAccount
+    | SolanaAccount
+    | SubstrateAccount
+  >;
 
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -123,7 +133,6 @@ const roles = new RolesController(user);
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
-  chainEntities: new ChainEntityController(),
   activeChainId: () => app.chain?.id,
 
   chainPreloading: false,
@@ -221,16 +230,16 @@ const app: IApp = {
 // On logout: called to reset everything
 export async function initAppState(
   updateSelectedChain = true,
-  shouldRedraw = true
+  shouldRedraw = true,
 ): Promise<void> {
   try {
     const [
       { data: statusRes },
-      { data: chainsWithSnapshotsRes },
+      { data: communitiesWithSnapshotsRes },
       { data: nodesRes },
     ] = await Promise.all([
       axios.get(`${app.serverUrl()}/status`),
-      axios.get(`${app.serverUrl()}/chains?snapshots=true`),
+      axios.get(`${app.serverUrl()}/communities?snapshots=true`),
       axios.get(`${app.serverUrl()}/nodes`),
     ]);
 
@@ -247,25 +256,25 @@ export async function initAppState(
         app.config.nodes.add(NodeInfo.fromJSON(node));
       });
 
-    chainsWithSnapshotsRes.result
-      .filter((chainsWithSnapshots) => chainsWithSnapshots.chain.active)
+    communitiesWithSnapshotsRes.result
+      .filter((chainsWithSnapshots) => chainsWithSnapshots.community.active)
       .forEach((chainsWithSnapshots) => {
-        delete chainsWithSnapshots.chain.ChainNode;
+        delete chainsWithSnapshots.community.ChainNode;
         app.config.chains.add(
           ChainInfo.fromJSON({
             ChainNode: app.config.nodes.getById(
-              chainsWithSnapshots.chain.chain_node_id
+              chainsWithSnapshots.community.chain_node_id,
             ),
             snapshot: chainsWithSnapshots.snapshot,
-            ...chainsWithSnapshots.chain,
-          })
+            ...chainsWithSnapshots.community,
+          }),
         );
       });
 
     app.roles.setRoles(statusRes.result.roles);
     app.config.notificationCategories =
       statusRes.result.notificationCategories.map((json) =>
-        NotificationCategory.fromJSON(json)
+        NotificationCategory.fromJSON(json),
       );
     app.config.chainCategoryMap = statusRes.result.chainCategoryMap;
 
@@ -301,7 +310,7 @@ export async function initAppState(
     }
 
     app.user.setStarredCommunities(
-      statusRes.result.user ? statusRes.result.user.starredCommunities : []
+      statusRes.result.user ? statusRes.result.user.starredCommunities : [],
     );
     // update the selectedChain, unless we explicitly want to avoid
     // changing the current state (e.g. when logging in through link_new_address_modal)
@@ -311,12 +320,12 @@ export async function initAppState(
       statusRes.result.user.selectedChain
     ) {
       app.user.setSelectedChain(
-        ChainInfo.fromJSON(statusRes.result.user.selectedChain)
+        ChainInfo.fromJSON(statusRes.result.user.selectedChain),
       );
     }
   } catch (err) {
     app.loadingError =
-      err.responseJSON?.error || 'Error loading application state';
+      err.response?.data?.error || 'Error loading application state';
     throw err;
   }
 }

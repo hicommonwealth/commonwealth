@@ -1,7 +1,7 @@
+import { AppError } from 'common-common/src/errors';
 import { Op, QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
-import { AppError } from 'common-common/src/errors';
 import { success } from '../types';
 
 export const Errors = {
@@ -25,7 +25,7 @@ type AdminAnalyticsResp = {
 const adminAnalytics = async (
   models: DB,
   req: TypedRequestBody<AdminAnalyticsReq>,
-  res: TypedResponse<AdminAnalyticsResp>
+  res: TypedResponse<AdminAnalyticsResp>,
 ) => {
   if (!req.user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
@@ -34,8 +34,8 @@ const adminAnalytics = async (
   try {
     // New Communities
     const newCommunites: Array<{ id: string }> = await models.sequelize.query(
-      `SELECT id FROM "Chains" WHERE created_at >= NOW() - INTERVAL '30 days'`,
-      { type: QueryTypes.SELECT }
+      `SELECT id FROM "Communities" WHERE created_at >= NOW() - INTERVAL '30 days'`,
+      { type: QueryTypes.SELECT },
     );
 
     // Community Stats
@@ -131,7 +131,7 @@ type CommunitySpecificAnalyticsResp = {
 export const communitySpecificAnalytics = async (
   models: DB,
   req: TypedRequestBody<CommunitySpecificAnalyticsReq>,
-  res: TypedResponse<CommunitySpecificAnalyticsResp>
+  res: TypedResponse<CommunitySpecificAnalyticsResp>,
 ) => {
   if (!req.user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
@@ -180,7 +180,7 @@ export const communitySpecificAnalytics = async (
         created_at: {
           [Op.gte]: oneMonthAgo,
         },
-        chain_id: chainId,
+        community_id: chainId,
       },
     });
 
@@ -190,7 +190,7 @@ export const communitySpecificAnalytics = async (
         created_at: {
           [Op.gte]: oneMonthAgo,
         },
-        chain_id: chainId,
+        community_id: chainId,
       },
     });
 
@@ -199,7 +199,7 @@ export const communitySpecificAnalytics = async (
         created_at: {
           [Op.gte]: oneMonthAgo,
         },
-        chain: chainId,
+        community_id: chainId,
       },
     });
 

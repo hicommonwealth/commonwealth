@@ -1,47 +1,79 @@
-import { ServerChainsController } from '../server_chains_controller';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
+import { Op, WhereOptions } from 'sequelize';
+import { GroupAttributes } from 'server/models/group';
+import { MembershipAttributes } from 'server/models/membership';
+import { TopicAttributes } from 'server/models/topic';
+import { CommunityInstance } from '../../models/community';
+import { ServerGroupsController } from '../server_groups_controller';
 
 export type GetGroupsOptions = {
-  withMembers?: boolean;
-  address?: string;
+  community: CommunityInstance;
+  includeMembers?: boolean;
+  includeTopics?: boolean;
 };
-// TODO: replace with GroupInstance after migration is complete
-export type GetGroupsResult = {
-  id: number;
-  chain_id: string;
-  metadata: any;
-  requirements: Requirement[];
-  members?: {
-    group_id: number;
-    address_id: number;
-    allowed: boolean;
-    last_checked: Date;
-  }[];
-}[];
+
+type GroupWithExtras = GroupAttributes & {
+  memberships?: MembershipAttributes[];
+  topics?: TopicAttributes[];
+};
+export type GetGroupsResult = GroupWithExtras[];
 
 export async function __getGroups(
-  this: ServerChainsController,
-  options: GetGroupsOptions
+  this: ServerGroupsController,
+  { community, includeMembers, includeTopics }: GetGroupsOptions,
 ): Promise<GetGroupsResult> {
-  /*
-    TODO: Query groups from DB, optionally include allowed membership
-  */
-  return [
-    {
-      id: 1,
-      chain_id: 'ethereum',
-      metadata: {},
-      requirements: [],
-      members: !options.withMembers
-        ? []
-        : [
-            {
-              group_id: 1,
-              address_id: 1,
-              allowed: true,
-              last_checked: new Date(),
-            },
-          ],
+  const groups = await this.models.Group.findAll({
+    where: {
+      community_id: community.id,
     },
-  ];
+  });
+
+  let groupsResult = groups.map((group) => group.toJSON() as GroupWithExtras);
+
+  if (includeMembers) {
+    // optionally include members with groups
+    const where: WhereOptions<MembershipAttributes> = {
+      group_id: {
+        [Op.in]: groupsResult.map(({ id }) => id),
+      },
+    };
+    const members = await this.models.Membership.findAll({
+      where,
+      include: [
+        {
+          model: this.models.Address,
+          as: 'address',
+        },
+      ],
+    });
+    const groupIdMembersMap: Record<number, MembershipAttributes[]> =
+      members.reduce((acc, member) => {
+        return {
+          ...acc,
+          [member.group_id]: (acc[member.group_id] || []).concat(member),
+        };
+      }, {});
+    groupsResult = groupsResult.map((group) => ({
+      ...group,
+      memberships: groupIdMembersMap[group.id] || [],
+    }));
+  }
+
+  if (includeTopics) {
+    const topics = await this.models.Topic.findAll({
+      where: {
+        chain_id: community.id,
+        group_ids: {
+          [Op.overlap]: groupsResult.map(({ id }) => id),
+        },
+      },
+    });
+    groupsResult = groupsResult.map((group) => ({
+      ...group,
+      topics: topics
+        .map((t) => t.toJSON())
+        .filter((t) => t.group_ids.includes(group.id)),
+    }));
+  }
+
+  return groupsResult;
 }

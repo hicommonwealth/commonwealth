@@ -1,10 +1,13 @@
 import React from 'react';
 
-import 'modals/offchain_voting_modal.scss';
 import Vote from '../../models/Vote';
-
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import {
+  CWModalBody,
+  CWModalHeader,
+} from '../components/component_kit/new_designs/CWModal';
 import { User } from '../components/user/user';
+
+import '../../../styles/modals/offchain_voting_modal.scss';
 
 type OffchainVotingModalProps = {
   onModalClose: () => void;
@@ -22,11 +25,8 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
 
   return (
     <div className="OffchainVotingModal">
-      <div className="compact-modal-title">
-        <h3>Votes</h3>
-        <CWIconButton iconName="close" onClick={() => onModalClose()} />
-      </div>
-      <div className="compact-modal-body">
+      <CWModalHeader label="Votes" onModalClose={onModalClose} />
+      <CWModalBody className="OffchainVotingModalBody">
         <div className="download-link">
           <a
             onClick={(e) => {
@@ -42,19 +42,19 @@ export const OffchainVotingModal = (props: OffchainVotingModalProps) => {
           </a>
         </div>
         {votes.map((vote) => (
-          <div className="offchain-poll-voter">
+          <div className="offchain-poll-voter" key={vote.id}>
             <div className="offchain-poll-voter-user">
               <User
                 shouldShowPopover
                 shouldLinkProfile
                 userAddress={vote.address}
-                userChainId={vote.authorChain}
+                userChainId={vote.authorCommunityId}
               />
             </div>
             <div className="offchain-poll-voter-choice">{vote.option}</div>
           </div>
         ))}
-      </div>
+      </CWModalBody>
     </div>
   );
 };

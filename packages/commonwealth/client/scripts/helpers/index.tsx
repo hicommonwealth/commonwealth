@@ -1,9 +1,9 @@
-import React from 'react';
+import type { Coin } from 'adapters/currency';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import moment from 'moment';
+import React from 'react';
 import app from 'state';
-import type { Coin } from 'adapters/currency';
 import Account from '../models/Account';
 import IChainAdapter from '../models/IChainAdapter';
 import { ThreadStage } from '../models/types';
@@ -66,10 +66,6 @@ export function extractDomain(url) {
   return re.exec(url)[1];
 }
 
-export function removeUrlPrefix(url) {
-  return url.replace(/^https?:\/\//, '');
-}
-
 /*
  * comparators
  */
@@ -81,25 +77,13 @@ export function byAscendingCreationDate(a, b) {
   return +a.createdAt - +b.createdAt;
 }
 
-export function byDescendingUpdatedDate(a, b) {
-  return (+b.updatedAt || +b.createdAt) - (+a.updatedAt || +a.createdAt);
-}
-
-export function byAscendingUpdatedDate(a, b) {
-  return (+a.updatedAt || +a.createdAt) - (+b.updatedAt || +b.createdAt);
-}
-
-export function orderAccountsByAddress(a, b) {
-  return a.address < b.address ? -1 : a.address > b.address ? 1 : 0;
-}
-
-export function isSameAccount(a, b) {
+export function isSameAccount(a: Account, b: Account) {
   return (
     a &&
     b &&
-    a.chain &&
-    b.chain &&
-    a.chain.id === b.chain.id &&
+    a.community &&
+    b.community &&
+    a.community.id === b.community.id &&
     a.address === b.address
   );
 }
@@ -207,7 +191,7 @@ export function formatPercent(num: number, digits: number) {
 
 export function formatDuration(
   duration: moment.Duration,
-  includeSeconds = true
+  includeSeconds = true,
 ) {
   const days = Math.floor(duration.asDays());
   return [
@@ -226,11 +210,11 @@ export function formatProposalHashShort(hash: string) {
 export function formatAddressShort(
   address: string,
   numberOfVisibleCharacters = 5,
-  numberOfVisibleCharactersTail = 4
+  numberOfVisibleCharactersTail = 4,
 ) {
   if (address.length < 10) return address;
   return `${address.slice(0, numberOfVisibleCharacters)}…${address.slice(
-    -numberOfVisibleCharactersTail
+    -numberOfVisibleCharactersTail,
   )}`;
 }
 
@@ -301,7 +285,7 @@ export const weiToTokens = (input: string, decimals: number) => {
 };
 
 export const isCommandClick = (
-  e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
 ) => {
   return e.metaKey || e.altKey || e.shiftKey || e.ctrlKey;
 };
@@ -312,7 +296,7 @@ export const handleRedirectClicks = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   redirectLink: string,
   activeChainId: string | null,
-  callback: () => any
+  callback: () => any,
 ) => {
   if (isCommandClick(e)) {
     if (activeChainId) {
@@ -356,6 +340,8 @@ export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
   } else if (chain && chain.meta) {
     decimals = chain.meta.decimals;
   } else if (chain.network === ChainNetwork.ERC721) {
+    decimals = 0;
+  } else if (chain.network === ChainNetwork.ERC1155) {
     decimals = 0;
   } else if (chain.base === ChainBase.CosmosSDK) {
     decimals = 6;

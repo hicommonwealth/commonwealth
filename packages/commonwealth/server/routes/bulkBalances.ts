@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { QueryTypes } from 'sequelize';
 import type { TokenBalanceCache } from 'token-balance-cache/src';
 import { sequelize } from '../database';
@@ -7,7 +8,6 @@ import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -49,7 +49,7 @@ const bulkBalances = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: TypedRequestBody<bulkBalanceReq>,
-  res: TypedResponse<bulkBalanceResp>
+  res: TypedResponse<bulkBalanceResp>,
 ) => {
   const { profileId, chainNodes, token } = req.body;
 
@@ -85,7 +85,7 @@ const bulkBalances = async (
   // THIS WILL BE REMOVED EVENTUALLY WHEN RULES-API GOES LIVE
   const baseQuery = `
     SELECT DISTINCT(c.base) FROM "Addresses" addr 
-      LEFT JOIN "Chains" c ON addr.chain = c.id 
+      LEFT JOIN "Communities" c ON addr.community_id = c.id 
       WHERE addr.profile_id = ${profileId};`;
   const basesRaw: string[] = <any>await sequelize.query(baseQuery, {
     raw: true,
@@ -117,7 +117,7 @@ const bulkBalances = async (
           nodeId,
           profileWalletAddresses,
           bp,
-          {}
+          {},
         );
         for (const balance of Object.values(balanceResults.balances)) {
           balanceTotal = balanceTotal.add(new BN(balance));
@@ -125,7 +125,7 @@ const bulkBalances = async (
         balances[nodeId] = balanceTotal.toString();
       } catch (e) {
         log.info(
-          `Couldn't get balances for chainNodeId ${nodeId}: ${e.message}`
+          `Couldn't get balances for chainNodeId ${nodeId}: ${e.message}`,
         );
       }
     } else {
@@ -144,7 +144,7 @@ const bulkBalances = async (
               {
                 contractType: contract.tokenType,
                 tokenAddress: contract.address,
-              }
+              },
             );
           for (const balance of Object.values(balanceResults.balances)) {
             balanceTotal = balanceTotal.add(new BN(balance));
@@ -152,7 +152,7 @@ const bulkBalances = async (
           tokenBalances[contract.address] = balanceTotal.toString();
         } catch (e) {
           log.info(
-            `Couldn't get token balances for chainNodeId ${nodeId} + contract ${contract.address}: ${e.message}`
+            `Couldn't get token balances for chainNodeId ${nodeId} + contract ${contract.address}: ${e.message}`,
           );
         }
       }

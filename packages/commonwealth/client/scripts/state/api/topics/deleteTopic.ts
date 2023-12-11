@@ -1,6 +1,6 @@
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import app from 'state';
-import { useMutation } from '@tanstack/react-query';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface DeleteTopicProps {
@@ -10,10 +10,11 @@ interface DeleteTopicProps {
 }
 
 const deleteTopic = async ({ topicId, chainId }: DeleteTopicProps) => {
-  await axios.post(`${app.serverUrl()}/deleteTopic`, {
-    id: topicId,
-    chain: chainId,
-    jwt: app.user.jwt,
+  await axios.delete(`${app.serverUrl()}/topics/${topicId}`, {
+    data: {
+      community_id: chainId,
+      jwt: app.user.jwt,
+    },
   });
 };
 

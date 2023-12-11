@@ -16,7 +16,7 @@ export type CommunityBannerModelStatic = ModelStatic<CommunityBannerInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommunityBannerModelStatic => {
   const CommunityBanner = <CommunityBannerModelStatic>sequelize.define(
     'CommunityBanner',
@@ -33,11 +33,11 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       timestamps: true,
-    }
+    },
   );
 
   CommunityBanner.associate = (models) => {
-    models.CommunityBanner.belongsTo(models.Chain);
+    models.CommunityBanner.belongsTo(models.Community);
   };
 
   return CommunityBanner;

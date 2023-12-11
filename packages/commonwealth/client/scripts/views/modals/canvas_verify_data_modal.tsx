@@ -1,12 +1,17 @@
-import React, { useEffect, useState } from 'react';
 import type { Action, Session } from '@canvas-js/interfaces';
+import React, { useEffect, useState } from 'react';
 
 import { verify } from 'canvas';
 
 import 'modals/canvas_verify_data_modal.scss';
+import {
+  CWModalBody,
+  CWModalHeader,
+} from 'views/components/component_kit/new_designs/CWModal';
 
 type CanvasVerifyDataModalProps = {
   obj: any;
+  onClose: () => void;
 };
 
 export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
@@ -53,19 +58,17 @@ export const CanvasVerifyDataModal = (props: CanvasVerifyDataModalProps) => {
         e.stopPropagation();
       }}
     >
-      <div className="compact-modal-body">
-        <h2>Verify Data</h2>
-        <div>
-          <h3>Action</h3>
-          {verifiedAction ? <p>✅ Verified</p> : <p>❌ Invalid</p>}
-          {actionPayload && <pre>{actionPayload}</pre>}
-          <pre>{actionSignature}</pre>
-          <h3>Session</h3>
-          {verifiedSession ? <p>✅ Verified</p> : <p>❌ Invalid</p>}
-          {sessionPayload && <pre>{sessionPayload}</pre>}
-          <pre>{sessionSignature}</pre>
-        </div>
-      </div>
+      <CWModalHeader onModalClose={props.onClose} label="Verify Data" />
+      <CWModalBody>
+        <h3>Action</h3>
+        {verifiedAction ? <p>✅ Verified</p> : <p>❌ Invalid</p>}
+        {actionPayload && <pre>{actionPayload}</pre>}
+        <pre>{actionSignature}</pre>
+        <h3>Session</h3>
+        {verifiedSession ? <p>✅ Verified</p> : <p>❌ Invalid</p>}
+        {sessionPayload && <pre>{sessionPayload}</pre>}
+        <pre>{sessionSignature}</pre>
+      </CWModalBody>
     </div>
   );
 };

@@ -1,21 +1,5 @@
-@import '../shared';
-
 .NewSnapshotProposalModal {
-  max-height: 95vh;
-  min-height: 95vh;
-
-  .compact-modal-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-
-  .compact-modal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-    width: 100%;
+  .CWModalBody {
+    margin-bottom: 24px;
   }
 }

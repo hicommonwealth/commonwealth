@@ -40,7 +40,7 @@ const editTopic = async (
   models: DB,
   req: TypedRequestBody<EditTopicReq>,
   res: TypedResponse<EditTopicResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
   if (!req.body.id) {
@@ -63,7 +63,7 @@ const editTopic = async (
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain.id,
+    communityId: chain.id,
     allowAdmin: true,
     allowGodMode: true,
   });

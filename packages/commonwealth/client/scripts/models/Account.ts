@@ -5,13 +5,13 @@ import app from 'state';
 import NewProfilesController from '../controllers/server/newProfiles';
 
 import BN from 'bn.js';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import type ChainInfo from './ChainInfo';
 import MinimumProfile from './MinimumProfile';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 
 class Account {
   public readonly address: string;
-  public readonly chain: ChainInfo;
+  public readonly community: ChainInfo;
   public readonly ghostAddress: boolean;
 
   // validation token sent by server
@@ -33,7 +33,7 @@ class Account {
   }
 
   constructor({
-    chain,
+    community,
     address,
     ghostAddress,
     addressId,
@@ -46,7 +46,7 @@ class Account {
     ignoreProfile = true,
   }: {
     // required args
-    chain: ChainInfo;
+    community: ChainInfo;
     address: string;
 
     // optional args
@@ -64,7 +64,7 @@ class Account {
   }) {
     // Check if the account is being initialized from a Community
     // Because there won't be any chain base or chain class
-    this.chain = chain;
+    this.community = community;
     this.address = address;
     this._addressId = addressId;
     this._walletId = walletId;
@@ -75,8 +75,8 @@ class Account {
     this.ghostAddress = !!ghostAddress;
     if (profile) {
       this._profile = profile;
-    } else if (!ignoreProfile && chain?.id) {
-      const updatedProfile = new MinimumProfile(address, chain?.id);
+    } else if (!ignoreProfile && community?.id) {
+      const updatedProfile = new MinimumProfile(address, community?.id);
 
       // the `ignoreProfile` var tells that we have to refetch any profile data related to provided
       // address and chain. This method mimic react query for non-react files and as the name suggests
@@ -85,21 +85,31 @@ class Account {
       // As an effort to gradually migrate, this method is used. After this account controller is
       // de-side-effected (all api calls removed from here). Then we would be in a better position to
       // remove this discouraged method
-      DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(chain?.id, address).then(
-        (res) => {
-          const data = res[0];
+      DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
+        community?.id,
+        address,
+      ).then((res) => {
+        const data = res[0];
+        if (!data) {
+          console.log(
+            'No profile data found for address',
+            address,
+            'on chain',
+            community?.id,
+          );
+        } else {
           updatedProfile.initialize(
             data?.name,
             data.address,
             data?.avatarUrl,
             data.id,
             updatedProfile.chain,
-            data?.lastActive
+            data?.lastActive,
           );
-          // manually trigger an update signal when data is fetched
-          NewProfilesController.Instance.isFetched.emit('redraw');
         }
-      );
+        // manually trigger an update signal when data is fetched
+        NewProfilesController.Instance.isFetched.emit('redraw');
+      });
 
       this._profile = updatedProfile;
     }
@@ -164,7 +174,7 @@ class Account {
     signature: string,
     timestamp: number,
     chainId: string | number,
-    shouldRedraw = true
+    shouldRedraw = true,
   ) {
     if (!signature) {
       throw new Error('signature required for validation');
@@ -172,17 +182,17 @@ class Account {
 
     const params = {
       address: this.address,
-      chain: this.chain.id,
+      chain: this.community.id,
       chain_id: chainId,
-      isToken: this.chain.type === ChainType.Token,
+      isToken: this.community.type === ChainType.Token,
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
       wallet_sso_source: this.walletSsoSource,
       session_public_address: await app.sessions.getOrCreateAddress(
-        this.chain.base,
+        this.community.base,
         chainId.toString(),
-        this.address
+        this.address,
       ),
       session_timestamp: timestamp,
       session_block_data: this.validationBlockInfo,
@@ -191,22 +201,24 @@ class Account {
     if (result.status === 'Success') {
       // update ghost address for discourse users
       const hasGhostAddress = app.user.addresses.some(
-        ({ address, ghostAddress, chain }) =>
+        ({ address, ghostAddress, community }) =>
           ghostAddress &&
-          this.chain.id === chain.id &&
-          app.user.activeAccounts.some((account) => account.address === address)
+          this.community.id === community.id &&
+          app.user.activeAccounts.some(
+            (account) => account.address === address,
+          ),
       );
       if (hasGhostAddress) {
         const { success, ghostAddressId } = await $.post(
           `${app.serverUrl()}/updateAddress`,
-          params
+          params,
         );
         if (success && ghostAddressId) {
           // remove ghost address from addresses
           app.user.setAddresses(
             app.user.addresses.filter(({ ghostAddress }) => {
               return !ghostAddress;
-            })
+            }),
           );
           app.user.setActiveAccounts([], shouldRedraw);
         }

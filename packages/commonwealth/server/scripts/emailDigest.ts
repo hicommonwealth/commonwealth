@@ -1,8 +1,8 @@
-import { formatAddressShort } from '../../shared/utils';
-import { SENDGRID_API_KEY } from '../config';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { DynamicTemplate } from '../../shared/types';
+import { formatAddressShort } from '../../shared/utils';
+import { SENDGRID_API_KEY } from '../config';
 import models from '../database';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -44,7 +44,7 @@ export const digestLevels = {
 
 // TODO: CHANGE TO 1 WEEK
 export const getTopThreads = async (
-  communityId: string
+  communityId: string,
 ): Promise<ThreadData[]> => {
   const res = await models.sequelize.query(`SELECT 
         t.title,
@@ -76,13 +76,13 @@ export const getTopThreads = async (
         row.author_address,
         communityId,
         false,
-        4
+        4,
       );
 
       const addressData = await models.Address.findOne({
         where: {
           address: row.author_address,
-          chain: communityId,
+          community_id: communityId,
         },
       });
 
@@ -98,7 +98,7 @@ export const getTopThreads = async (
           'missing profile for ',
           row.author_address,
           ' in ',
-          communityId
+          communityId,
         );
       }
 
@@ -123,7 +123,7 @@ export const getTopThreads = async (
 };
 
 const getCommunityActivityScore = async (
-  communityId: string
+  communityId: string,
 ): Promise<number> => {
   const activityScore = await models.sequelize.query(`SELECT 
           0.4 * COUNT(DISTINCT t.id) +
@@ -168,10 +168,10 @@ const getActivityCounts = async (communityId: string) => {
 
 export const emailDigestBuilder = async (
   digestLevel: number,
-  confirmationEmail: string
+  confirmationEmail: string,
 ) => {
   // Go through each community on CW
-  const communities = await models.Chain.findAll();
+  const communities = await models.Community.findAll();
 
   const communityDigestInfo: CommunityDigestInfo = {};
 
@@ -188,7 +188,7 @@ export const emailDigestBuilder = async (
       const activityScore = await getCommunityActivityScore(community.id);
 
       const { totalComments, totalThreads } = await getActivityCounts(
-        community.id
+        community.id,
       );
 
       communityDigestInfo[community.id] = {
@@ -233,8 +233,8 @@ export const emailDigestBuilder = async (
     });
 
     const userCommunities = userAddresses.reduce((acc, address) => {
-      if (address.chain && !acc.includes(address.chain)) {
-        acc.push(address.chain);
+      if (address.community_id && !acc.includes(address.community_id)) {
+        acc.push(address.community_id);
       }
       return acc;
     }, [] as string[]);

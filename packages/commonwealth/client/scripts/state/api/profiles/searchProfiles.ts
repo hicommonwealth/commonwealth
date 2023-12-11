@@ -15,6 +15,7 @@ export type SearchProfilesResponse = {
     user_id: string;
     profile_name: string;
     avatar_url: string;
+    group_ids?: [];
     addresses: {
       id: number;
       chain: string;
@@ -29,23 +30,26 @@ export type SearchProfilesResponse = {
 };
 
 interface SearchProfilesProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
   orderDirection: APIOrderDirection;
   includeRoles: boolean;
-
+  includeMembershipTypes?: 'in-group' | 'not-in-group';
+  includeGroupIds?: boolean;
   enabled?: boolean;
 }
 
 const searchProfiles = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
+  includeMembershipTypes,
+  includeGroupIds,
   includeRoles,
 }: SearchProfilesProps & { pageParam: number }) => {
   const {
@@ -57,35 +61,41 @@ const searchProfiles = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
         include_roles: includeRoles,
+        ...(includeMembershipTypes && { memberships: includeMembershipTypes }),
+        ...(includeGroupIds && { include_group_ids: includeGroupIds }),
       },
-    }
+    },
   );
   return result;
 };
 
 const useSearchProfilesQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
   includeRoles,
+  includeGroupIds,
+  includeMembershipTypes,
   enabled = true,
 }: SearchProfilesProps) => {
   const key = [
     ApiEndpoints.searchProfiles(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
       includeRoles,
+      includeGroupIds,
+      includeMembershipTypes,
     },
   ];
   return useInfiniteQuery(
@@ -93,11 +103,13 @@ const useSearchProfilesQuery = ({
     ({ pageParam }) =>
       searchProfiles({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,
         orderDirection,
+        includeMembershipTypes,
+        includeGroupIds,
         includeRoles,
       }),
     {
@@ -110,7 +122,7 @@ const useSearchProfilesQuery = ({
       },
       staleTime: SEARCH_PROFILES_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

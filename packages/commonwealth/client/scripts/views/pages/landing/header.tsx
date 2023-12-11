@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import { LoginModal } from 'views/modals/login_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { Modal } from '../../components/component_kit/cw_modal';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 
 type HeaderProps = {
   onLogin: () => void;
@@ -44,7 +44,7 @@ export const Header = ({ onLogin }: HeaderProps) => {
           </div>
         )}
       </div>
-      <Modal
+      <CWModal
         content={
           <LoginModal
             onSuccess={onLogin}

@@ -5,7 +5,7 @@ import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import { Errors } from '../../../server/routes/threads/create_thread_comment_handler';
-import { post, del } from './external/appHook.spec';
+import { del, post } from './external/appHook.spec';
 import {
   testAddresses,
   testThreads,
@@ -24,8 +24,8 @@ const getThreadCommentCount = async (threadId) => {
 const createValidComment = async (threadId, text, jwtToken) => {
   const validRequest = {
     jwt: jwtToken,
-    author_chain: testAddresses[0].chain,
-    chain: testAddresses[0].chain,
+    author_chain: testAddresses[0].community_id,
+    chain: testAddresses[0].community_id,
     thread_id: threadId,
     address: testAddresses[0].address,
     text,
@@ -35,7 +35,7 @@ const createValidComment = async (threadId, text, jwtToken) => {
     `/api/threads/${threadId}/comments`,
     validRequest,
     true,
-    app
+    app,
   );
 
   return response;
@@ -54,8 +54,8 @@ const getUniqueCommentText = async () => {
 const deleteComment = async (commentId, jwtToken) => {
   const validRequest = {
     jwt: jwtToken,
-    author_chain: testAddresses[0].chain,
-    chain: testAddresses[0].chain,
+    author_chain: testAddresses[0].community_id,
+    chain: testAddresses[0].community_id,
     address: testAddresses[0].address,
   };
 
@@ -63,7 +63,7 @@ const deleteComment = async (commentId, jwtToken) => {
     `/api/comments/${commentId}`,
     validRequest,
     false,
-    app
+    app,
   );
 
   return response;
@@ -75,15 +75,15 @@ describe('createComment Integration Tests', () => {
   beforeEach(() => {
     jwtTokenUser1 = jwt.sign(
       { id: testUsers[0].id, email: testUsers[0].email },
-      JWT_SECRET
+      JWT_SECRET,
     );
   });
 
   it('should return an error response if no text is specified', async () => {
     const invalidRequest = {
       jwt: jwtTokenUser1,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
+      chain: testAddresses[0].community_id,
       address: testAddresses[0].address,
       thread_id: testThreads[0].id,
     };
@@ -92,7 +92,7 @@ describe('createComment Integration Tests', () => {
       `/api/threads/${testThreads[0].id}/comments`,
       invalidRequest,
       true,
-      app
+      app,
     );
 
     response.should.have.status(400);
@@ -102,8 +102,8 @@ describe('createComment Integration Tests', () => {
   it('should return an error response if an invalid parent id is specified', async () => {
     const invalidRequest = {
       jwt: jwtTokenUser1,
-      author_chain: testAddresses[0].chain,
-      chain: testAddresses[0].chain,
+      author_chain: testAddresses[0].community_id,
+      chain: testAddresses[0].community_id,
       address: testAddresses[0].address,
       thread_id: testThreads[0].id,
       parent_id: -10,
@@ -114,7 +114,7 @@ describe('createComment Integration Tests', () => {
       `/api/threads/${testThreads[0].id}/comments`,
       invalidRequest,
       true,
-      app
+      app,
     );
 
     chai.assert.equal(response.error, Errors.InvalidParent);
@@ -125,7 +125,7 @@ describe('createComment Integration Tests', () => {
     const response = await createValidComment(
       testThreads[0].id,
       text,
-      jwtTokenUser1
+      jwtTokenUser1,
     );
     let comment = await models.Comment.findOne({
       where: { text },
@@ -141,7 +141,7 @@ describe('createComment Integration Tests', () => {
     const response = await createValidComment(
       testThreads[0].id,
       text,
-      jwtTokenUser1
+      jwtTokenUser1,
     );
 
     let comment = await models.Comment.findOne({

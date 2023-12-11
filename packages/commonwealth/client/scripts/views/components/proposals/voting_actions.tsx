@@ -4,11 +4,11 @@ import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
+import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import {
   CosmosProposal,
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
-import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
@@ -29,24 +29,13 @@ import { VotingType } from '../../../models/types';
 
 import app from 'state';
 
+import { naturalDenomToMinimal } from '../../../../../shared/utils';
 import { CompoundCancelButton } from '../../pages/view_proposal/proposal_components';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
+import { CannotVote } from './cannot_vote';
 import { getCanVote, getVotingResults } from './helpers';
 import { ProposalExtensions } from './proposal_extensions';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-
-type CannotVoteProps = { label: string };
-
-const CannotVote = (props: CannotVoteProps) => {
-  return (
-    <div className="CannotVote">
-      <CWButton disabled label={props.label} />
-    </div>
-  );
-};
 
 type VotingActionsProps = {
   onModalClose: () => void;
@@ -60,8 +49,7 @@ export const VotingActions = (props: VotingActionsProps) => {
 
   const [amount, setAmount] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(app.isLoggedIn());
-  const [conviction, setConviction] = useState<number>();
-  // conviction isn't used anywhere?
+  const [, setConviction] = useState<number>();
 
   useEffect(() => {
     app.loginStateEmitter.once('redraw', () => {
@@ -71,15 +59,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     return () => {
       app.loginStateEmitter.removeAllListeners();
     };
-  }, [app.loginState]);
-
-  if (
-    proposal instanceof SubstrateDemocracyProposal ||
-    proposal instanceof SubstrateDemocracyReferendum ||
-    proposal instanceof SubstrateTreasuryProposal
-  ) {
-    return null;
-  }
+  }, []);
 
   if (!isLoggedIn) {
     return <CannotVote label="Sign in to vote" />;
@@ -120,9 +100,14 @@ export const VotingActions = (props: VotingActionsProps) => {
       proposal instanceof CosmosProposalV1
     ) {
       if (proposal.status === 'DepositPeriod') {
-        // TODO: configure deposit amount
+        const chain = app.chain as Cosmos;
+        const depositAmountInMinimalDenom = parseInt(
+          naturalDenomToMinimal(amount, chain.meta?.decimals),
+          10,
+        );
+
         proposal
-          .submitDepositTx(user, (app.chain as Cosmos).chain.coins(amount))
+          .submitDepositTx(user, chain.chain.coins(depositAmountInMinimalDenom))
           .then(emitRedraw)
           .catch((err) => notifyError(err.toString()));
       } else {
@@ -144,7 +129,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     } else if (proposal instanceof NearSputnikProposal) {
       proposal
         .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Approve)
+          new NearSputnikVote(user, NearSputnikVoteString.Approve),
         )
         .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
@@ -179,7 +164,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     } else if (proposal instanceof NearSputnikProposal) {
       proposal
         .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Reject)
+          new NearSputnikVote(user, NearSputnikVoteString.Reject),
         )
         .then(emitRedraw)
         .catch((err) => notifyError(err.toString()));
@@ -240,7 +225,7 @@ export const VotingActions = (props: VotingActionsProps) => {
     if (proposal instanceof NearSputnikProposal) {
       proposal
         .submitVoteWebTx(
-          new NearSputnikVote(user, NearSputnikVoteString.Remove)
+          new NearSputnikVote(user, NearSputnikVoteString.Remove),
         )
         .then(() => {
           onModalClose();
@@ -283,7 +268,6 @@ export const VotingActions = (props: VotingActionsProps) => {
     />
   );
 
-  // substrate: multi-deposit approve
   const multiDepositApproveButton = (
     <CWButton
       disabled={!canVote || votingModalOpen}
@@ -364,9 +348,7 @@ export const VotingActions = (props: VotingActionsProps) => {
         <div className="button-row">{multiDepositApproveButton}</div>
         <ProposalExtensions
           proposal={proposal}
-          setCosmosDepositAmount={(c) => {
-            setAmount(c);
-          }}
+          setCosmosDepositAmount={setAmount}
         />
       </>
     );

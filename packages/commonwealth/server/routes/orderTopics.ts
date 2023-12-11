@@ -19,7 +19,7 @@ const OrderTopics = async (
   models: DB,
   req,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
 
@@ -30,7 +30,7 @@ const OrderTopics = async (
   const isAdminOrMod = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain.id,
+    communityId: chain.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -61,7 +61,7 @@ const OrderTopics = async (
           await topic.save();
           return topic;
         })();
-      })
+      }),
     );
 
     return res.json({

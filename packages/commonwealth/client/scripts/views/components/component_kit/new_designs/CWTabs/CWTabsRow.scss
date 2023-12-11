@@ -1,0 +1,23 @@
+@import '../../../../../../styles/shared.scss';
+
+.CWTabsRow {
+  display: inline-flex;
+  border-bottom: 1px solid $neutral-200;
+  margin-bottom: 8px;
+}
+
+.cw-tabs-row-container {
+  @include scrollbarStyles;
+  width: 100%;
+  overflow-x: auto;
+  display: flex;
+
+  &::-webkit-scrollbar {
+    height: 7px;
+    margin-bottom: 8px;
+  }
+
+  .CWTabsRow {
+    flex-grow: 1;
+  }
+}

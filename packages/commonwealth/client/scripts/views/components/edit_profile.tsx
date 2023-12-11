@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import app from 'state';
 import { useUpdateProfileByAddressMutation } from 'state/api/profiles';
 import _ from 'underscore';
+import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import MinimumProfile from '../../models/MinimumProfile';
@@ -57,7 +58,7 @@ const EditProfileComponent = () => {
   const { mutateAsync: updateProfile } = useUpdateProfileByAddressMutation({
     addressesWithChainsToUpdate: addresses?.map((a) => ({
       address: a.address,
-      chain: a.chain.id,
+      chain: a.community.id,
     })),
   });
 
@@ -83,7 +84,7 @@ const EditProfileComponent = () => {
             return new AddressInfo({
               id: a.id,
               address: a.address,
-              chainId: a.chain,
+              chainId: a.community_id,
               keytype: a.keytype,
               walletId: a.wallet_id,
               walletSsoSource: a.wallet_sso_source,
@@ -93,12 +94,12 @@ const EditProfileComponent = () => {
             console.error(`Could not return AddressInfo: "${err}"`);
             return null;
           }
-        })
+        }),
       );
     } catch (err) {
       if (
-        err.status === 500 &&
-        err.responseJSON?.error === NoProfileFoundError
+        err.response?.data?.status === 500 &&
+        err.response?.data?.error === NoProfileFoundError
       ) {
         setError(EditProfileError.NoProfileFound);
       }
@@ -124,7 +125,7 @@ const EditProfileComponent = () => {
 
     if (!_.isEqual(backgroundImageRef, profile?.backgroundImage))
       profileUpdate.backgroundImage = JSON.stringify(
-        backgroundImageRef.current
+        backgroundImageRef.current,
       );
 
     if (Object.keys(profileUpdate)?.length > 0) {
@@ -132,13 +133,13 @@ const EditProfileComponent = () => {
         ...profileUpdate,
         profileId: profile.id,
         address: app.user.activeAccount?.address,
-        chain: app.user.activeAccount?.chain,
+        chain: app.user.activeAccount?.community,
       })
         .then(() => {
           navigate(`/profile/id/${profile.id}`);
         })
         .catch((err) => {
-          notifyError(err?.responseJSON?.error || 'Something went wrong.');
+          notifyError(err?.response?.data?.error || 'Something went wrong.');
         });
     } else {
       setTimeout(() => {
@@ -171,8 +172,8 @@ const EditProfileComponent = () => {
     // should refactor AvatarUpload to make it work with new profiles
     if (addresses?.length > 0) {
       const oldProfile = new MinimumProfile(
-        addresses[0].chain.name,
-        addresses[0].address
+        addresses[0].community.name,
+        addresses[0].address,
       );
 
       oldProfile.initialize(
@@ -180,17 +181,17 @@ const EditProfileComponent = () => {
         addresses[0].address,
         avatarUrl,
         profile.id,
-        addresses[0].chain.name,
-        null
+        addresses[0].community.name,
+        null,
       );
 
       setAccount(
         new Account({
-          chain: addresses[0].chain,
+          community: addresses[0].community,
           address: addresses[0].address,
           profile: oldProfile,
           ignoreProfile: false,
-        })
+        }),
       );
     } else {
       setAccount(null);
@@ -299,10 +300,11 @@ const EditProfileComponent = () => {
               <CWTextInput
                 name="email-form-field"
                 inputValidationFn={(val: string) => {
-                  if (!val.match(/\S+@\S+\.\S+/)) {
-                    return ['failure', 'Must enter valid email'];
-                  } else {
+                  try {
+                    z.string().email().parse(val.trim());
                     return ['success', 'Input validated'];
+                  } catch {
+                    return ['failure', 'Must enter valid email'];
                   }
                 }}
                 label="Email"
@@ -343,7 +345,7 @@ const EditProfileComponent = () => {
             <CWCoverImageUploader
               uploadCompleteCallback={(
                 url: string,
-                imageBehavior: ImageBehavior
+                imageBehavior: ImageBehavior,
               ) => {
                 backgroundImageRef.current = {
                   url,
@@ -352,7 +354,7 @@ const EditProfileComponent = () => {
               }}
               generatedImageCallback={(
                 url: string,
-                imageBehavior: ImageBehavior
+                imageBehavior: ImageBehavior,
               ) => {
                 backgroundImageRef.current = {
                   url,
@@ -374,7 +376,7 @@ const EditProfileComponent = () => {
               refreshProfiles={(address: string) => {
                 getProfile();
                 app.user.removeAddress(
-                  addresses.find((a) => a.address === address)
+                  addresses.find((a) => a.address === address),
                 );
               }}
             />

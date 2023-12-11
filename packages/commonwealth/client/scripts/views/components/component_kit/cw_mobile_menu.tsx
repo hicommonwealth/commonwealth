@@ -2,13 +2,13 @@ import React from 'react';
 
 import 'components/component_kit/cw_mobile_menu.scss';
 
+import useSidebarStore from 'state/ui/sidebar';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import type { MenuItem } from './types';
 import { ComponentType } from './types';
-import useSidebarStore from 'state/ui/sidebar';
 
 const CWMobileMenuItem = (props: MenuItem) => {
   const { setMobileMenuName } = useSidebarStore();
@@ -21,7 +21,7 @@ const CWMobileMenuItem = (props: MenuItem) => {
       <div
         className={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
           { disabled, isSecondary },
-          'MobileMenuItem'
+          'MobileMenuItem',
         )}
         onClick={(e) => {
           setMobileMenuName(null);
@@ -73,14 +73,16 @@ type MobileMenuProps = {
   menuItems: Array<MenuItem>;
 };
 
-export const CWMobileMenu = (props: MobileMenuProps) => {
-  const { className, menuHeader, menuItems } = props;
-
+export const CWMobileMenu = ({
+  className,
+  menuHeader,
+  menuItems,
+}: MobileMenuProps) => {
   return (
     <div
       className={getClasses<{ className: string }>(
         { className },
-        ComponentType.MobileMenu
+        ComponentType.MobileMenu,
       )}
     >
       {menuHeader && (

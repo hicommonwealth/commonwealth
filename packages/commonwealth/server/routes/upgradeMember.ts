@@ -25,7 +25,7 @@ const upgradeMember = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -40,7 +40,7 @@ const upgradeMember = async (
   // find if the requester has an admin address in the target community
   const adminAddress = await models.Address.findOne({
     where: {
-      chain: chain.id,
+      community_id: chain.id,
       user_id: req.user.id,
       verified: {
         [Op.ne]: null,
@@ -56,7 +56,7 @@ const upgradeMember = async (
   // check if address provided exists
   const targetAddress = await models.Address.findOne({
     where: {
-      chain: chain.id,
+      community_id: chain.id,
       address: address,
     },
   });
@@ -74,7 +74,7 @@ const upgradeMember = async (
   ) {
     const otherExistingAdmin = await models.Address.findOne({
       where: {
-        chain: chain.id,
+        community_id: chain.id,
         role: 'admin',
         id: {
           [Op.ne]: targetAddress.id,
@@ -99,7 +99,7 @@ const upgradeMember = async (
       address_id: targetAddress.id,
       updated_at: targetAddress.updated_at,
       created_at: targetAddress.created_at,
-      chain_id: targetAddress.chain,
+      chain_id: targetAddress.community_id,
       permission: targetAddress.role,
       allow: '0',
       deny: '0',

@@ -69,12 +69,12 @@
         background-color: transparent !important;
 
         .Icon {
-          color: $white  !important;
+          color: $white !important;
         }
 
         .Text {
           font-weight: 400 !important;
-          color: $white  !important;
+          color: $white !important;
         }
 
         &:hover {
@@ -83,11 +83,11 @@
       }
 
       .wallet-magic-btn {
-        border-color: $primary-500  !important;
-        background-color: $primary-500  !important;
+        border-color: $primary-500 !important;
+        background-color: $primary-500 !important;
 
         .Text {
-          color: $white  !important;
+          color: $white !important;
         }
       }
     }
@@ -114,7 +114,7 @@
   background-size: cover;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
   justify-content: center;
   overflow-y: auto;
   padding: 24px;
@@ -127,7 +127,6 @@
   }
 
   .walletList {
-
     @include innerBodyStyles;
 
     .AvatarUsernameInput {

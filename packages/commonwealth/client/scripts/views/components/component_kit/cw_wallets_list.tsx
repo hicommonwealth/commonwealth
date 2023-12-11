@@ -1,6 +1,5 @@
-import { ChainNetwork, WalletSsoSource } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
-import 'components/component_kit/cw_wallets_list.scss';
+import type { ChainNetwork } from 'common-common/src/types';
+import { ChainBase, WalletSsoSource } from 'common-common/src/types';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import React from 'react';
 import app from 'state';
@@ -9,11 +8,12 @@ import IWebWallet from '../../../models/IWebWallet';
 import { User } from '../user/user';
 import { CWAuthButton, CWNoAuthMethodsAvailable } from './cw_auth_button';
 import { CWDivider } from './cw_divider';
-import { CWIconButton } from './cw_icon_button';
-import { Modal } from './cw_modal';
-import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
+import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
+import { CWTooltip } from './new_designs/CWTooltip';
+
+import 'components/component_kit/cw_wallets_list.scss';
 
 const LinkAccountItem = (props: {
   account: { address: string; meta?: { name: string } };
@@ -88,28 +88,24 @@ export const AccountSelector = (props: AccountSelectorProps) => {
 
   return (
     <div className="AccountSelector">
-      <div className="close-button-wrapper">
-        <CWIconButton
-          iconButtonTheme="primary"
-          iconName="close"
-          iconSize="small"
-          className="close-icon"
-          onClick={() => onModalClose()}
-        />
-      </div>
-
-      {accounts.map((account, idx) => {
-        return (
-          <LinkAccountItem
-            key={`${account.address}-${idx}`}
-            account={account}
-            walletChain={walletChain}
-            walletNetwork={walletNetwork}
-            onSelect={onSelect}
-            idx={idx}
-          />
-        );
-      })}
+      <CWModalHeader
+        label="Select account to join"
+        onModalClose={onModalClose}
+      />
+      <CWModalBody>
+        {accounts.map((account, idx) => {
+          return (
+            <LinkAccountItem
+              key={`${account.address}-${idx}`}
+              account={account}
+              walletChain={walletChain}
+              walletNetwork={walletNetwork}
+              onSelect={onSelect}
+              idx={idx}
+            />
+          );
+        })}
+      </CWModalBody>
     </div>
   );
 };
@@ -126,11 +122,11 @@ type WalletsListProps = {
   onWalletSelect: (wallet: IWebWallet<any>) => Promise<void>;
   onSocialLogin: (
     type: WalletSsoSource,
-    useSessionKeyRevalidationFlow: boolean
+    useSessionKeyRevalidationFlow: boolean,
   ) => Promise<void>;
   onWalletAddressSelect: (
     wallet: IWebWallet<any>,
-    address: string
+    address: string,
   ) => Promise<void>;
 };
 
@@ -157,7 +153,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
         <div
           className={getClasses<{ darkMode?: boolean }>(
             { darkMode },
-            'wallets'
+            'wallets',
           )}
         >
           {wallets.map((wallet: IWebWallet<any>, index) => (
@@ -168,12 +164,10 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 darkMode={darkMode}
                 onClick={async () => {
                   await onWalletSelect(wallet);
-                  if (wallet.chain === 'substrate') {
-                    // setIsModalOpen(true);
-                  }
                 }}
               />
-              <Modal
+              <CWModal
+                size="small"
                 content={
                   <AccountSelector
                     accounts={wallet.accounts}
@@ -184,15 +178,16 @@ export const CWWalletsList = (props: WalletsListProps) => {
                         if (app.chain) {
                           return addressSwapper({
                             address: wallet.accounts[accountIndex].address,
-                            currentPrefix: (app.chain as Substrate).chain
-                              .ss58Format,
+                            currentPrefix: parseInt(
+                              (app.chain as Substrate).meta.ss58Prefix,
+                              10,
+                            ),
                           });
                         }
                         return wallet.accounts[accountIndex].address;
                       })();
 
                       await onWalletAddressSelect(wallet, selectedAddress);
-                      // setIsModalOpen(false);
                     }}
                     onModalClose={() => setIsModalOpen(false)}
                   />
@@ -217,7 +212,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 onClick={async () =>
                   onSocialLogin(
                     WalletSsoSource.Google,
-                    useSessionKeyRevalidationFlow
+                    useSessionKeyRevalidationFlow,
                   )
                 }
               />
@@ -226,7 +221,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
                 type="b2"
                 className={getClasses<{ darkMode?: boolean }>(
                   { darkMode },
-                  'connect-another-way-link'
+                  'connect-another-way-link',
                 )}
               >
                 <a onClick={onConnectAnotherWay}>
@@ -237,13 +232,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
           )}
 
           <CWDivider className="wallets-divider" />
-          {/* <CWAuthButton
-            type="email"
-            label="Email"
-            darkMode={darkMode}
-            onClick={onConnectAnotherWay}
-            className="CustomIcon large email-auth-btn"
-          /> */}
+
           <CWAuthButton
             type="discord"
             label="Discord"
@@ -251,7 +240,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={async () =>
               onSocialLogin(
                 WalletSsoSource.Discord,
-                useSessionKeyRevalidationFlow
+                useSessionKeyRevalidationFlow,
               )
             }
             className="DiscordAuthButton"
@@ -263,7 +252,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={() =>
               onSocialLogin(
                 WalletSsoSource.Github,
-                useSessionKeyRevalidationFlow
+                useSessionKeyRevalidationFlow,
               )
             }
           />
@@ -274,7 +263,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
             onClick={() =>
               onSocialLogin(
                 WalletSsoSource.Twitter,
-                useSessionKeyRevalidationFlow
+                useSessionKeyRevalidationFlow,
               )
             }
           />
@@ -285,7 +274,7 @@ export const CWWalletsList = (props: WalletsListProps) => {
               type="caption"
               className={getClasses<{ darkMode?: boolean }>(
                 { darkMode },
-                'reset-wc-link'
+                'reset-wc-link',
               )}
             >
               <a
@@ -301,19 +290,8 @@ export const CWWalletsList = (props: WalletsListProps) => {
           )}
           {hasNoWalletsLink && (
             <CWTooltip
-              content={
-                <>
-                  <CWText type="caption">
-                    If you don’t see your wallet then make sure:
-                  </CWText>
-                  <CWText type="caption">
-                    • Your wallet chrome extension installed?
-                  </CWText>
-                  <CWText type="caption">
-                    • Your wallet chrome extension active?
-                  </CWText>
-                </>
-              }
+              content="Make sure that your wallet browser extension is installed and active."
+              placement="top"
               renderTrigger={(handleInteraction) => (
                 <CWText
                   onMouseEnter={handleInteraction}
@@ -321,10 +299,10 @@ export const CWWalletsList = (props: WalletsListProps) => {
                   type="caption"
                   className={getClasses<{ darkMode?: boolean }>(
                     { darkMode },
-                    'no-wallet-link'
+                    'no-wallet-link',
                   )}
                 >
-                  Don't see your wallet?
+                  Don&apos;t see your wallet?
                 </CWText>
               )}
             />

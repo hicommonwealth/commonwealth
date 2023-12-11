@@ -15,7 +15,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -26,7 +26,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -57,14 +57,14 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const [newReaction, notificationOptions, analyticsOptions] =
         await serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId: threadId,
         });
@@ -76,10 +76,10 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId: threadId,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newReaction).to.be.ok;
@@ -98,17 +98,6 @@ describe('ServerThreadsController', () => {
         author_chain: 'ethereum',
       });
 
-      expect(notificationOptions).to.have.property('webhookData');
-      const { webhookData } = notificationOptions;
-      expect(webhookData).to.include({
-        user: '0x123',
-        author_chain: 'ethereum',
-        url: 'http://localhost:8080/ethereum/discussion/4-big-thread',
-        title: 'Big Thread!',
-        chain: 'ethereum',
-        body: '',
-      });
-
       expect(notificationOptions).to.have.property('excludeAddresses');
       const { excludeAddresses } = notificationOptions;
       expect(excludeAddresses[0]).to.equal('0x123');
@@ -116,7 +105,6 @@ describe('ServerThreadsController', () => {
       expect(analyticsOptions).to.include({
         event: 'Create New Reaction',
         community: 'ethereum',
-        isCustomDomain: null,
       });
     });
 
@@ -129,7 +117,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -140,7 +128,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -169,17 +157,17 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       expect(
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId: 123,
-        })
+        }),
       ).to.be.rejectedWith('Thread not found: 123');
     });
 
@@ -192,7 +180,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -203,7 +191,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -238,17 +226,17 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       expect(
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId,
-        })
+        }),
       ).to.be.rejectedWith('Thread is archived');
     });
 
@@ -261,7 +249,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -272,7 +260,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -306,17 +294,17 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       expect(
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: big ban err');
     });
 
@@ -329,7 +317,7 @@ describe('ServerThreadsController', () => {
             chain: 'ethereum',
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             destroy: sandbox.stub(),
             toJSON: () => ({}),
@@ -340,7 +328,7 @@ describe('ServerThreadsController', () => {
               chain: 'ethereum',
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
               destroy: sandbox.stub(),
               toJSON: () => ({}),
@@ -398,24 +386,28 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       expect(
         serverThreadsController.createThreadReaction({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           reaction: reaction as any,
           threadId,
-        })
+        }),
       ).to.be.rejectedWith('Insufficient token balance');
     });
   });
 
   describe('#createThreadComment', () => {
     it('should create a thread comment', async () => {
-      const user = { id: 1, save: async () => ({}) };
+      const user = {
+        id: 1,
+        save: async () => ({}),
+        getAddresses: async () => [{}],
+      };
       const address = {
         id: 1,
         address: '0x123',
@@ -483,14 +475,14 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const [newComment, notificationOptions, analyticsOptions] =
         await serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
@@ -506,14 +498,14 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
           canvasAction,
           canvasSession,
           canvasHash,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(newComment).to.include({
@@ -573,7 +565,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const user = {};
@@ -597,14 +589,14 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
           canvasAction,
           canvasSession,
           canvasHash,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: big bad error');
     });
 
@@ -650,7 +642,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const user = {};
@@ -674,14 +666,14 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
           canvasAction,
           canvasSession,
           canvasHash,
-        })
+        }),
       ).to.be.rejectedWith('Thread not found');
     });
 
@@ -757,21 +749,21 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       expect(
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
           canvasAction,
           canvasSession,
           canvasHash,
-        })
+        }),
       ).to.be.rejectedWith('Thread is archived');
     });
 
@@ -820,7 +812,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const user = {};
@@ -844,14 +836,14 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
           canvasAction,
           canvasSession,
           canvasHash,
-        })
+        }),
       ).to.be.rejectedWith('Cannot comment when thread is read_only');
     });
 
@@ -905,7 +897,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const user = {};
@@ -928,14 +920,14 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
           canvasAction,
           canvasSession,
           canvasHash,
-        })
+        }),
       ).to.be.rejectedWith('Invalid parent');
     });
 
@@ -985,7 +977,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
 
       const user = {};
@@ -1009,14 +1001,14 @@ describe('ServerThreadsController', () => {
         serverThreadsController.createThreadComment({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           parentId,
           threadId,
           text,
           canvasAction,
           canvasSession,
           canvasHash,
-        })
+        }),
       ).to.be.rejectedWith('Comments can only be nested 8 levels deep');
     });
   });
@@ -1028,6 +1020,7 @@ describe('ServerThreadsController', () => {
           findOne: async () => ({
             id: 1,
             chain: 'ethereum',
+            address_id: 1,
             Address: {
               id: 1,
               address: '0x123',
@@ -1057,7 +1050,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
@@ -1077,7 +1070,7 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
     });
 
@@ -1105,7 +1098,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
@@ -1119,7 +1112,7 @@ describe('ServerThreadsController', () => {
           user: user as any,
           threadId,
           address: address as any,
-        })
+        }),
       ).to.be.rejectedWith('Thread not found: 1');
     });
 
@@ -1153,7 +1146,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
@@ -1167,7 +1160,7 @@ describe('ServerThreadsController', () => {
           user: user as any,
           threadId,
           address: address as any,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: bad');
     });
 
@@ -1200,7 +1193,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
       const user = {
         // address is different from thread author
@@ -1215,7 +1208,7 @@ describe('ServerThreadsController', () => {
           user: user as any,
           threadId,
           address: address as any,
-        })
+        }),
       ).to.be.rejectedWith('Not owned by this user');
     });
   });
@@ -1255,13 +1248,13 @@ describe('ServerThreadsController', () => {
             ...data,
             Address: {
               address: '0x123',
-              chain: 'ethereum',
+              community_id: 'ethereum',
             },
             toJSON: () => ({
               ...data,
               Address: {
                 address: '0x123',
-                chain: 'ethereum',
+                community_id: 'ethereum',
               },
             }),
           }),
@@ -1285,7 +1278,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db as any,
         tokenBalanceCache as any,
-        banCache as any
+        banCache as any,
       );
       const user = {
         getAddresses: async () => [{ id: 1, address: '0x123', verified: true }],
@@ -1311,11 +1304,11 @@ describe('ServerThreadsController', () => {
       const canvasSession = undefined;
       const canvasHash = undefined;
 
-      const [thread, notificationOptions, analyticsOptions] =
+      const [thread, notificationOptions] =
         await serverThreadsController.createThread({
           user: user as any,
           address: address as any,
-          chain: chain as any,
+          community: chain as any,
           title,
           body,
           kind,
@@ -1336,7 +1329,7 @@ describe('ServerThreadsController', () => {
             ...(address as any),
             address: '0xbanned',
           },
-          chain: chain as any,
+          community: chain as any,
           title,
           body,
           kind,
@@ -1348,7 +1341,7 @@ describe('ServerThreadsController', () => {
           canvasAction,
           canvasSession,
           canvasHash,
-        })
+        }),
       ).to.be.rejectedWith('Ban error: banned');
 
       expect(thread.title).to.equal(title);
@@ -1359,15 +1352,6 @@ describe('ServerThreadsController', () => {
       expect(notificationOptions[0]).to.have.property('notification');
       expect(notificationOptions[0].notification).to.include({
         categoryId: 'new-thread-creation',
-      });
-      expect(notificationOptions[0].webhookData).to.include({
-        user: '0x123',
-        author_chain: 'ethereum',
-        url: 'http://localhost:8080/ethereum/discussion/1-mythread',
-        title: 'mythread',
-        bodyUrl: 'http://blah',
-        chain: 'ethereum',
-        body: 'hello',
       });
       expect(notificationOptions[0].notification.data).to.include({
         thread_id: 1,

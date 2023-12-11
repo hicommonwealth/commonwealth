@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes, ChainInstance } from './chain';
+import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ContractAttributes, ContractInstance } from './contract';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -11,12 +11,12 @@ export type CommunityContractAttributes = {
 
   // Associations
   Contract?: ContractAttributes;
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
 };
 
 export type CommunityContractInstance =
   ModelInstance<CommunityContractAttributes> & {
-    getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+    getChain: Sequelize.BelongsToGetAssociationMixin<CommunityInstance>;
     getContract: Sequelize.BelongsToGetAssociationMixin<ContractInstance>;
   };
 
@@ -25,7 +25,7 @@ export type CommunityContractModelStatic =
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommunityContractModelStatic => {
   const CommunityContract = <CommunityContractModelStatic>sequelize.define(
     'CommunityContract',
@@ -43,7 +43,7 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       indexes: [{ fields: ['chain_id'], unique: true }],
-    }
+    },
   );
 
   CommunityContract.associate = (models) => {
@@ -51,7 +51,7 @@ export default (
       foreignKey: 'contract_id',
       targetKey: 'id',
     });
-    models.CommunityContract.belongsTo(models.Chain, {
+    models.CommunityContract.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

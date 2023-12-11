@@ -1,24 +1,22 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
-import {
-  NotificationCategories,
-} from 'common-common/src/types';
+import { NotificationCategories } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
 import type {
   IChainEventNotificationData,
   IForumNotificationData,
   NotificationDataAndCategory,
 } from '../../shared/types';
-import { SERVER_URL } from '../config';
+import { SEND_WEBHOOKS_EMAILS, SERVER_URL } from '../config';
 import type { DB } from '../models';
 import type { NotificationInstance } from '../models/notification';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
 } from '../scripts/emails';
-import type { WebhookContent } from '../webhookNotifier';
-import send from '../webhookNotifier';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { rollbar } from './rollbar';
 import { mapNotificationsDataToSubscriptions } from './subscriptionMapping';
+import { dispatchWebhooks } from './webhooks/dispatchWebhook';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,9 +25,8 @@ const { Op } = Sequelize;
 export default async function emitNotifications(
   models: DB,
   notification_data_and_category: NotificationDataAndCategory,
-  webhook_data?: Partial<WebhookContent>,
   excludeAddresses?: string[],
-  includeAddresses?: string[]
+  includeAddresses?: string[],
 ): Promise<NotificationInstance> {
   const notification_data = notification_data_and_category.data;
   const category_id = notification_data_and_category.categoryId;
@@ -41,7 +38,7 @@ export default async function emitNotifications(
   });
 
   const uniqueOptions = mapNotificationsDataToSubscriptions(
-    notification_data_and_category
+    notification_data_and_category,
   );
   const findOptions: any = {
     [Op.and]: [{ category_id }, { ...uniqueOptions }, { is_active: true }],
@@ -57,7 +54,7 @@ export default async function emitNotifications(
 
   // retrieve distinct user ids given a set of addresses
   const fetchUsersFromAddresses = async (
-    addresses: string[]
+    addresses: string[],
   ): Promise<number[]> => {
     // fetch user ids from address models
     const addressModels = await models.Address.findAll({
@@ -72,7 +69,7 @@ export default async function emitNotifications(
 
       // remove duplicates and null user_ids
       const userIdsDedup = userIds.filter(
-        (a, b) => userIds.indexOf(a) === b && a !== null
+        (a, b) => userIds.indexOf(a) === b && a !== null,
       );
       return userIdsDedup;
     } else {
@@ -123,7 +120,6 @@ export default async function emitNotifications(
         chain_event_id: chainEvent.id,
         category_id: 'chain-event',
         chain_id: chainEvent.chain,
-        entity_id: chainEvent.entity_id,
       });
     } else {
       notification = await models.Notification.create({
@@ -143,7 +139,7 @@ export default async function emitNotifications(
       msg = await createImmediateNotificationEmailObject(
         notification_data,
         category_id,
-        models
+        models,
       );
     }
   } catch (e) {
@@ -167,14 +163,14 @@ export default async function emitNotifications(
         notification.id,
         subscription.id,
         false,
-        subscription.subscriber_id
+        subscription.subscriber_id,
       );
     } else {
       // TODO: rollbar reported issue originates from here
       log.info(
         `Subscription: ${JSON.stringify(
-          subscription.toJSON()
-        )}\nNotification_data: ${JSON.stringify(notification_data)}`
+          subscription.toJSON(),
+        )}\nNotification_data: ${JSON.stringify(notification_data)}`,
       );
     }
   }
@@ -186,23 +182,25 @@ export default async function emitNotifications(
     });
   }
 
-  // send emails
-  for (const subscription of subscriptions) {
-    if (msg && isChainEventData && chainEvent.chain) {
-      msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+  if (SEND_WEBHOOKS_EMAILS) {
+    // emails
+    for (const subscription of subscriptions) {
+      if (msg && isChainEventData && chainEvent.chain) {
+        msg.dynamic_template_data.notification.path = `${SERVER_URL}/${chainEvent.chain}/notifications?id=${notification.id}`;
+      }
+      if (msg && subscription?.immediate_email && subscription?.User) {
+        // kick off async call and immediately return
+        sendImmediateNotificationEmail(subscription.User, msg);
+      }
     }
-    if (msg && subscription?.immediate_email && subscription?.User) {
-      // kick off async call and immediately return
-      sendImmediateNotificationEmail(subscription.User, msg);
-    }
-  }
 
-  // send data to relevant webhooks
-  if (webhook_data) {
-    await send(models, {
-      notificationCategory: category_id,
-      ...(webhook_data as Required<WebhookContent>),
-    });
+    // webhooks
+    try {
+      await dispatchWebhooks(notification_data_and_category);
+    } catch (e) {
+      log.error('Failed to dispatch webhooks', e);
+      rollbar.error('Failed to dispatch webhooks', e);
+    }
   }
 
   return notification;

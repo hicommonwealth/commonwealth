@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWContentPageCard } from '../../components/component_kit/CWContentPage';
 import { TemplateActionModal } from '../../modals/TemplateActionModal'; // Import the new modal component
 
-import 'pages/view_thread/TemplateActionCard.scss';
+import { filterLinks } from 'helpers/threads';
 import Thread, { Link, LinkDisplay, LinkSource } from 'models/Thread';
-import { Modal } from '../../components/component_kit/cw_modal';
+import 'pages/view_thread/TemplateActionCard.scss';
+import app from 'state';
+import { useDeleteThreadLinksMutation } from 'state/api/threads';
+import useAddThreadLinksMutation from 'state/api/threads/addThreadLinks';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import {
   CWDropdown,
   DropdownItemType,
 } from '../../components/component_kit/cw_dropdown';
-import { filterLinks } from 'helpers/threads';
-import app from 'state';
-import useAddThreadLinksMutation from 'state/api/threads/addThreadLinks';
-import { useDeleteThreadLinksMutation } from 'state/api/threads';
 
 type TemplateActionCardProps = {
   thread: Thread; // Pass the thread content to the modal
@@ -36,7 +36,7 @@ const dropdownOptions: DropdownItemType[] = [
 export const TemplateActionCard = ({ thread }: TemplateActionCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDisplay, setSelectedDisplay] = useState<DropdownItemType>(
-    dropdownOptions[0]
+    dropdownOptions[0],
   );
   const [initialTemplates, setInitialTemplates] = useState<Link[]>([]);
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
@@ -53,7 +53,7 @@ export const TemplateActionCard = ({ thread }: TemplateActionCardProps) => {
     setInitialTemplates(initLinks);
     if (initLinks.length > 0) {
       setSelectedDisplay(
-        dropdownOptions.find((o) => o.value === initLinks[0].display)
+        dropdownOptions.find((o) => o.value === initLinks[0].display),
       );
     }
   }, []);
@@ -104,7 +104,8 @@ export const TemplateActionCard = ({ thread }: TemplateActionCardProps) => {
           </div>
         }
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <TemplateActionModal
             isOpen={isModalOpen}

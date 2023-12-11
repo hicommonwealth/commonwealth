@@ -47,6 +47,10 @@
   color: unset !important;
   text-decoration: none;
 
+  @include smallInclusive {
+    padding: 16px 0 16px 0;
+  }
+
   a {
     color: unset !important;
 

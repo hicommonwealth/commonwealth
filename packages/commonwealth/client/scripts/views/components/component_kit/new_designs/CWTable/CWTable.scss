@@ -1,0 +1,89 @@
+@import '../../../../../../styles/shared.scss';
+
+.Table {
+  overflow-x: auto;
+
+  table {
+    @include b2;
+    letter-spacing: 0.14px;
+    font-weight: 400;
+    border-collapse: collapse;
+    color: $neutral-800;
+    width: 100%;
+
+    thead {
+      border-top: 1px solid $neutral-200;
+      border-bottom: 1px solid $neutral-200;
+      background-color: $neutral-50;
+
+      tr {
+        th {
+          .header-content {
+            padding: 14px 16px;
+            gap: 4px;
+            display: flex;
+
+            &.numeric {
+              justify-content: flex-end;
+            }
+
+            .header-text {
+              font-family: $font-family-neue-haas-unica;
+              font-weight: 700;
+              display: flex;
+              align-items: center;
+            }
+
+            .icon-container {
+              height: 24px;
+              width: 24px;
+              border-radius: $border-radius-corners-wider;
+              padding: 4px;
+
+              .Icon {
+                &.arrow-up-blue,
+                &.arrow-down-blue {
+                  fill: none;
+                }
+              }
+
+              &:hover {
+                background-color: $neutral-100;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $neutral-200;
+
+        &:hover {
+          background-color: $neutral-50;
+        }
+
+        td {
+          padding: 14px 16px;
+          vertical-align: top;
+          word-break: break-word;
+
+          .numeric {
+            text-align: end;
+          }
+
+          .avatar-cell {
+            font-weight: 500;
+            display: flex;
+            gap: 8px;
+
+            .text {
+              white-space: nowrap;
+            }
+          }
+        }
+      }
+    }
+  }
+}

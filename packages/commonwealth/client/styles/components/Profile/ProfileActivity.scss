@@ -15,15 +15,8 @@
       padding: 24px 24px 0 24px;
     }
 
-    .TabBar {
+    .CWTabsRow {
       align-items: center;
-
-      .divider {
-        height: 32px;
-        width: 1px;
-        background: $neutral-100;
-        margin: 0;
-      }
 
       .tab-header {
         display: flex;

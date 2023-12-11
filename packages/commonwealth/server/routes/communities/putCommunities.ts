@@ -1,17 +1,17 @@
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
 import type {
   PutCommunitiesReq,
   PutCommunitiesResp,
-} from 'common-common/src/api/extApiTypes';
-import type { NextFunction } from 'express';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
-import { AppError } from 'common-common/src/errors';
+} from '../../api/extApiTypes';
+import { sequelize } from '../../database';
 import type { DB } from '../../models';
 import type { TypedRequest, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { createAddressHelper } from '../../util/createAddressHelper';
 import type { CreateAddressReq } from '../createAddress';
-import { sequelize } from '../../database';
 
 export const Errors = {
   NeedPositiveBalance: 'Must provide address with positive balance',
@@ -43,7 +43,7 @@ export async function putCommunities(
   tbc: TokenBalanceCache,
   req: TypedRequest<PutCommunitiesReq>,
   res: TypedResponse<PutCommunitiesResp>,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -55,7 +55,7 @@ export async function putCommunities(
   const transaction = await sequelize.transaction();
   let error = '';
   try {
-    await models.Chain.create(community);
+    await models.Community.create(community);
     // if optionalValidation route is used, check for positive balance in address provided
     if (contract) {
       if (!contract.token_type || !contract.address || !admin_addresses) {
@@ -70,7 +70,7 @@ export async function putCommunities(
         {
           contractType: contract.token_type,
           tokenAddress: contract.address,
-        }
+        },
       );
 
       let positiveBalance = false;
@@ -100,13 +100,13 @@ export async function putCommunities(
             r,
             models,
             req.user,
-            next
+            next,
           );
           await models.Address.update(
             { role: 'admin' },
-            { where: { id: (newAddress as any).id } }
+            { where: { id: (newAddress as any).id } },
           );
-        })
+        }),
       );
     }
 

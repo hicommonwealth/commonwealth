@@ -1,9 +1,10 @@
+import clsx from 'clsx';
 import React from 'react';
 
 import 'components/sidebar/sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
-import app from 'state';
+import useSidebarStore from 'state/ui/sidebar';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import type {
@@ -11,7 +12,6 @@ import type {
   SidebarSectionAttrs,
   SubSectionAttrs,
 } from './types';
-import useSidebarStore from 'state/ui/sidebar';
 
 const SubSection = (props: SubSectionAttrs) => {
   const { isActive, isUpdated, isVisible, onClick, rightIcon, rowIcon, title } =
@@ -49,7 +49,7 @@ const SubSection = (props: SubSectionAttrs) => {
   );
 };
 
-const SubSectionGroup = (props: SectionGroupAttrs) => {
+export const SubSectionGroup = (props: SectionGroupAttrs) => {
   const {
     containsChildren,
     displayData,
@@ -60,11 +60,12 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
     onClick,
     rightIcon,
     title,
+    className,
   } = props;
 
   const { setMenu, menuName, menuVisible } = useSidebarStore();
   const [toggled, setToggled] = React.useState<boolean>(
-    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true'
+    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true',
   );
   const [hoverOn, setHoverOn] = React.useState<boolean>(false);
 
@@ -120,7 +121,7 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
 
   return (
     <div
-      className="SubSectionGroup"
+      className={clsx('SubSectionGroup', className)}
       onMouseEnter={(e) => mouseEnterHandler(e)}
       onMouseLeave={() => mouseLeaveHandler()}
     >
@@ -138,7 +139,7 @@ const SubSectionGroup = (props: SectionGroupAttrs) => {
         <CWText type="b2" className={`title-text ${titleTextClass}`}>
           {title}
         </CWText>
-        {rightIcon && <div className="right-icon">{rightIcon}</div>}
+        <div className="right-icon">{rightIcon}</div>
       </div>
       {containsChildren && toggled && (
         <div className="subsections">
@@ -162,7 +163,7 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
   } = props;
 
   const [toggled, setToggled] = React.useState<boolean>(
-    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true'
+    hasDefaultToggle || localStorage.getItem(`${title}-toggled`) === 'true',
   );
   const [hoverColor, setHoverColor] = React.useState<string>();
 
@@ -211,7 +212,6 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
       >
         {carat}
         <CWText>{title}</CWText>
-        {/* rightIcon && <div className="right-icon">{rightIcon}</div> */}
       </div>
       {toggled && (
         <div className="sections-container">

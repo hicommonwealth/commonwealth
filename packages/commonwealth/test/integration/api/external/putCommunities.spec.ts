@@ -7,8 +7,8 @@ import { testChainNodes } from './dbEntityHooks.spec';
 describe('putCommunities Tests', () => {
   it('add entities to db', async () => {
     chai.assert.equal(
-      await models.Chain.count({ where: { id: { [Op.in]: ['-1'] } } }),
-      0
+      await models.Community.count({ where: { id: { [Op.in]: ['-1'] } } }),
+      0,
     );
 
     const resp = await put('/api/communities', {
@@ -24,10 +24,10 @@ describe('putCommunities Tests', () => {
 
     chai.assert.equal(resp.result.error, '');
     chai.assert.equal(
-      await models.Chain.count({
+      await models.Community.count({
         where: { id: { [Op.in]: ['testChain1', 'testChain2'] } },
       }),
-      1
+      1,
     );
   });
 
@@ -37,7 +37,7 @@ describe('putCommunities Tests', () => {
       {
         community: { bad: 3 },
       },
-      true
+      true,
     );
 
     chai.assert.equal(resp.status, 'Failure');

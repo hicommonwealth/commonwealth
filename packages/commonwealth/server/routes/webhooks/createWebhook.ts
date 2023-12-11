@@ -7,7 +7,7 @@ const createWebhook = async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const chain = req.chain;
   // if chain is present we know we are dealing with a chain first community
@@ -25,7 +25,7 @@ const createWebhook = async (
       },
     },
     chain.id,
-    ['admin']
+    ['admin'],
   );
   if (!req.user.isAdmin && adminRoles.length === 0)
     return next(new AppError(Errors.NotAdmin));
@@ -33,14 +33,14 @@ const createWebhook = async (
   if (!req.body.webhookUrl) return next(new AppError(Errors.MissingWebhook));
   const existingWebhook = await models.Webhook.findOne({
     where: {
-      chain_id: chain.id,
+      community_id: chain.id,
       url: req.body.webhookUrl,
     },
   });
   if (existingWebhook) return next(new AppError(Errors.NoDuplicates));
   // create webhook
   const webhook = await models.Webhook.create({
-    chain_id: chain.id,
+    community_id: chain.id,
     url: req.body.webhookUrl,
   });
   return res.json({ status: 'Success', result: webhook.toJSON() });

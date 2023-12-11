@@ -39,7 +39,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   }
 
   public abstract chain: IChainModule<C, A>;
-  public abstract accounts: IAccountsModule<C, A>;
+  public abstract accounts: IAccountsModule<A>;
   public readonly communityBanner?: string;
 
   protected _serverLoaded: boolean;
@@ -98,16 +98,13 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       totalThreadsInCommunity: 0,
       totalThreadsInCommunityForVoting: 0,
     });
-    if (this.app.chainEntities) {
-      this.app.chainEntities.deinit();
-    }
     console.log(`${this.meta.name} stopped`);
   }
 
   public async initApi(): Promise<void> {
     this._apiInitialized = true;
     console.log(
-      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`
+      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`,
     );
   }
 
@@ -116,7 +113,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.chainModuleReady.emit('ready');
     this.app.isModuleReady = true;
     console.log(
-      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`
+      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`,
     );
   }
 
@@ -142,7 +139,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // TODO: does this need debouncing?
     if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
       await Promise.all(
-        modules.map((mod) => mod.init(this.chain, this.accounts))
+        modules.map((mod) => mod.init(this.chain, this.accounts)),
       );
       this.app.chainModuleReady.emit('ready');
     }
@@ -175,15 +172,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public abstract base: ChainBase;
 
   public networkStatus: ApiStatus = ApiStatus.Disconnected;
-  public networkError: string;
 
   public readonly meta: ChainInfo;
   public readonly block: IBlockInfo;
 
   public app: IApp;
-  public version: string;
-  public name: string;
-  public runtimeName: string;
   public gatedTopics: IGatedTopic[];
 
   constructor(meta: ChainInfo, app: IApp) {

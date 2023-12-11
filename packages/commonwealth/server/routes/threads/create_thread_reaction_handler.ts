@@ -1,8 +1,8 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
 import { AppError } from 'common-common/src/errors';
+import { verifyReaction } from '../../../shared/canvas/serverVerify';
 import { ReactionAttributes } from '../../models/reaction';
 import { ServerControllers } from '../../routing/router';
-import { verifyReaction } from '../../../shared/canvas/serverVerify';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 const Errors = {
   InvalidReaction: 'Invalid reaction',
@@ -25,9 +25,9 @@ export const createThreadReactionHandler = async (
     any,
     CreateThreadReactionRequestParams
   >,
-  res: TypedResponse<CreateThreadReactionResponse>
+  res: TypedResponse<CreateThreadReactionResponse>,
 ) => {
-  const { user, address, chain } = req;
+  const { user, address, chain: community } = req;
   const {
     reaction,
     canvas_action: canvasAction,
@@ -48,7 +48,7 @@ export const createThreadReactionHandler = async (
     await verifyReaction(canvasAction, canvasSession, canvasHash, {
       thread_id: threadId,
       address: address.address,
-      chain: chain.id,
+      chain: community.id,
       value: reaction,
     });
   }
@@ -58,7 +58,7 @@ export const createThreadReactionHandler = async (
     await controllers.threads.createThreadReaction({
       user,
       address,
-      chain,
+      community,
       reaction,
       threadId,
       canvasAction,

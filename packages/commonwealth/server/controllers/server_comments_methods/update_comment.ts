@@ -1,19 +1,19 @@
-import { Op } from 'sequelize';
 import moment from 'moment';
+import { Op } from 'sequelize';
 
-import { AddressInstance } from '../../models/address';
-import { ChainInstance } from '../../models/chain';
-import { UserInstance } from '../../models/user';
-import { getThreadUrl, renderQuillDeltaToText } from '../../../shared/utils';
+import { AppError } from '../../../../common-common/src/errors';
 import {
   NotificationCategories,
   ProposalType,
 } from '../../../../common-common/src/types';
-import { parseUserMentions } from '../../util/parseUserMentions';
+import { renderQuillDeltaToText } from '../../../shared/utils';
+import { AddressInstance } from '../../models/address';
 import { CommentAttributes } from '../../models/comment';
+import { CommunityInstance } from '../../models/community';
+import { UserInstance } from '../../models/user';
+import { parseUserMentions } from '../../util/parseUserMentions';
 import { ServerCommentsController } from '../server_comments_controller';
 import { EmitOptions } from '../server_notifications_methods/emit';
-import { AppError } from '../../../../common-common/src/errors';
 
 const Errors = {
   ThreadNotFoundForComment: 'Thread not found for comment',
@@ -25,7 +25,7 @@ const Errors = {
 export type UpdateCommentOptions = {
   user: UserInstance;
   address: AddressInstance;
-  chain: ChainInstance;
+  community: CommunityInstance;
   commentId?: number;
   commentBody: string;
   discordMeta?: any;
@@ -38,11 +38,11 @@ export async function __updateComment(
   {
     user,
     address,
-    chain,
+    community,
     commentId,
     commentBody,
     discordMeta,
-  }: UpdateCommentOptions
+  }: UpdateCommentOptions,
 ): Promise<UpdateCommentResult> {
   if (!commentId && !discordMeta) {
     throw new AppError(Errors.NoId);
@@ -61,7 +61,7 @@ export async function __updateComment(
 
   // check if banned
   const [canInteract, banError] = await this.banCache.checkBan({
-    chain: chain.id,
+    communityId: community.id,
     address: address.address,
   });
   if (!canInteract) {
@@ -105,7 +105,7 @@ export async function __updateComment(
   comment.plaintext = (() => {
     try {
       return renderQuillDeltaToText(
-        JSON.parse(decodeURIComponent(commentBody))
+        JSON.parse(decodeURIComponent(commentBody)),
       );
     } catch (e) {
       return decodeURIComponent(commentBody);
@@ -117,7 +117,6 @@ export async function __updateComment(
     include: [this.models.Address],
   });
 
-  const cwUrl = getThreadUrl(thread, comment?.id);
   const root_title = thread.title || '';
 
   const allNotificationOptions: EmitOptions[] = [];
@@ -134,14 +133,8 @@ export async function __updateComment(
         comment_text: finalComment.text,
         chain_id: finalComment.chain,
         author_address: finalComment.Address.address,
-        author_chain: finalComment.Address.chain,
+        author_chain: finalComment.Address.community_id,
       },
-    },
-    webhookData: {
-      user: finalComment.Address.address,
-      url: cwUrl,
-      title: thread.title || '',
-      chain: finalComment.chain,
     },
     excludeAddresses: [finalComment.Address.address],
   });
@@ -150,7 +143,7 @@ export async function __updateComment(
   try {
     const previousDraftMentions = parseUserMentions(latestVersion);
     const currentDraftMentions = parseUserMentions(
-      decodeURIComponent(commentBody)
+      decodeURIComponent(commentBody),
     );
     mentions = currentDraftMentions.filter((addrArray) => {
       let alreadyExists = false;
@@ -172,13 +165,13 @@ export async function __updateComment(
       mentions.map(async (mention) => {
         const mentionedUser = await this.models.Address.findOne({
           where: {
-            chain: mention[0],
+            community_id: mention[0],
             address: mention[1],
           },
           include: [this.models.User],
         });
         return mentionedUser;
-      })
+      }),
     );
     // filter null results
     mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
@@ -203,10 +196,9 @@ export async function __updateComment(
             comment_text: finalComment.text,
             chain_id: finalComment.chain,
             author_address: finalComment.Address.address,
-            author_chain: finalComment.Address.chain,
+            author_chain: finalComment.Address.community_id,
           },
         },
-        webhookData: null,
         excludeAddresses: [finalComment.Address.address],
       });
     });

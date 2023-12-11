@@ -1,4 +1,8 @@
+import clsx from 'clsx';
+import { SessionKeyError } from 'controllers/server/sessions';
+import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
+import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -14,6 +18,7 @@ import {
   deserializeDelta,
   serializeDelta,
 } from 'views/components/react_quill_editor/utils';
+import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { notifyError } from '../../../../controllers/app/notifications';
 import type { Comment as CommentType } from '../../../../models/Comment';
@@ -23,12 +28,7 @@ import { CommentCard } from '../CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import './CommentTree.scss';
 import { jumpHighlightComment } from './helpers';
-import useUserActiveAccount from 'hooks/useUserActiveAccount';
-import { CommentsFeaturedFilterTypes } from 'models/types';
-import clsx from 'clsx';
 import usePrepareCommentsList from './usePrepareCommentsList';
-import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import { SessionKeyError } from 'controllers/server/sessions';
 
 type CommentsTreeAttrs = {
   comments: Array<CommentType<any>>;
@@ -40,8 +40,11 @@ type CommentsTreeAttrs = {
   parentCommentId: number;
   setParentCommentId: (id: number) => void;
   fromDiscordBot?: boolean;
+  canReact?: boolean;
+  canReply?: boolean;
   canComment: boolean;
   commentSortType: CommentsFeaturedFilterTypes;
+  disabledActionsTooltipText?: string;
 };
 
 export const CommentTree = ({
@@ -54,8 +57,11 @@ export const CommentTree = ({
   setIsReplying,
   parentCommentId,
   setParentCommentId,
+  canReact = true,
+  canReply = true,
   canComment,
   commentSortType,
+  disabledActionsTooltipText,
 }: CommentsTreeAttrs) => {
   const [highlightedComment, setHighlightedComment] = useState(false);
 
@@ -160,7 +166,8 @@ export const CommentTree = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await deleteComment({
@@ -174,14 +181,15 @@ export const CommentTree = ({
               if (err instanceof SessionKeyError) {
                 return;
               }
-              console.error(err?.responseJSON?.error || err?.message);
+              console.error(err.response.data.error || err?.message);
               notifyError('Failed to delete comment');
             }
           },
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -189,7 +197,7 @@ export const CommentTree = ({
 
   const handleEditCancel = (
     comment: CommentType<any>,
-    hasContentChanged: boolean
+    hasContentChanged: boolean,
   ) => {
     if (hasContentChanged) {
       openConfirmation({
@@ -198,7 +206,8 @@ export const CommentTree = ({
         buttons: [
           {
             label: 'Yes',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: () => {
               setEdits((p) => ({
                 ...p,
@@ -214,7 +223,8 @@ export const CommentTree = ({
           },
           {
             label: 'No',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
           },
         ],
       });
@@ -233,7 +243,7 @@ export const CommentTree = ({
 
   const handleEditStart = (comment: CommentType<any>) => {
     const editDraft = localStorage.getItem(
-      `${app.activeChainId()}-edit-comment-${comment.id}-storedText`
+      `${app.activeChainId()}-edit-comment-${comment.id}-storedText`,
     );
     if (editDraft) {
       clearEditingLocalStorage(comment.id, ContentType.Comment);
@@ -245,7 +255,8 @@ export const CommentTree = ({
         buttons: [
           {
             label: 'Restore',
-            buttonType: 'mini-black',
+            buttonType: 'primary',
+            buttonHeight: 'sm',
             onClick: () => {
               setEdits((p) => ({
                 ...p,
@@ -261,7 +272,8 @@ export const CommentTree = ({
           },
           {
             label: 'Cancel',
-            buttonType: 'mini-white',
+            buttonType: 'secondary',
+            buttonHeight: 'sm',
             onClick: () => {
               setEdits((p) => ({
                 ...p,
@@ -293,7 +305,7 @@ export const CommentTree = ({
 
   const handleEditConfirm = async (
     comment: CommentType<any>,
-    newDelta: DeltaStatic
+    newDelta: DeltaStatic,
   ) => {
     {
       setEdits((p) => ({
@@ -351,10 +363,10 @@ export const CommentTree = ({
           <br />
           <p>
             Flagging as spam will help filter out unwanted content. Comments
-            flagged as spam are hidden from the main feed and can't be
+            flagged as spam are hidden from the main feed and can&apos;t be
             interacted with. For transparency, spam can still be viewed by
-            community members if they choose to "Include comments flagged as
-            spam."
+            community members if they choose to &quot;Include comments flagged
+            as spam.&quot;
           </p>
           <br />
           <p>Note that you can always unflag a comment as spam.</p>
@@ -368,7 +380,7 @@ export const CommentTree = ({
           <br />
           <p>
             For transparency, spam can still be viewed by community members if
-            they choose to “Include comments flagged as spam.”
+            they choose to &quot;Include comments flagged as spam.&quot;
             <br />
           </p>
         </>
@@ -376,11 +388,13 @@ export const CommentTree = ({
       buttons: [
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
         {
           label: !comment.markedAsSpamAt ? 'Confirm' : 'Unflag as spam?',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               await toggleCommentSpamStatus({
@@ -429,12 +443,18 @@ export const CommentTree = ({
                   </div>
                 )}
                 <CommentCard
-                  canReply={!!hasJoinedCommunity}
+                  disabledActionsTooltipText={disabledActionsTooltipText}
+                  isThreadArchived={!!thread.archivedAt}
+                  canReply={
+                    !!hasJoinedCommunity && !thread.archivedAt && canReply
+                  }
                   maxReplyLimitReached={comment.maxReplyLimitReached}
                   canReact={
-                    !!hasJoinedCommunity ||
-                    isAdmin ||
-                    !app.chain.isGatedTopic(thread.topic.id)
+                    !thread.archivedAt &&
+                    (!!hasJoinedCommunity ||
+                      isAdmin ||
+                      !app.chain.isGatedTopic(thread?.topic?.id)) &&
+                    canReact
                   }
                   canEdit={
                     !isLocked && (comment.isCommentAuthor || isAdminOrMod)

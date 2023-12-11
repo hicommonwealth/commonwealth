@@ -4,8 +4,8 @@ import moment from 'moment';
 import app from 'state';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { PopoverMenu } from 'views/components/component_kit/cw_popover/cw_popover_menu';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import {
   displayOptions,
   ManageContractTemplateModalProps,
@@ -32,7 +32,10 @@ type ContractTemplateCardProps = {
   handleShowModal: (
     templateId: number,
     cct_id: number,
-    template: Omit<ManageContractTemplateModalProps['template'], 'id' | 'title'>
+    template: Omit<
+      ManageContractTemplateModalProps['template'],
+      'id' | 'title'
+    >,
   ) => void;
 };
 
@@ -77,7 +80,8 @@ export const ContractTemplateCard = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
           onClick: async () => {
             await app.contracts.deleteCommunityContractTemplate({
               contract_id: contractId,
@@ -89,7 +93,8 @@ export const ContractTemplateCard = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
         },
       ],
     });
@@ -137,7 +142,9 @@ export const ContractTemplateCard = ({
                 <div className="enabledby-row">
                   <User
                     userAddress={enabler.address}
-                    userChainId={enabler.chain?.id || enabler?.profile?.chain}
+                    userChainId={
+                      enabler.community?.id || enabler?.profile?.chain
+                    }
                     shouldShowAddressWithDisplayName
                   />
                   <div className="text-group">

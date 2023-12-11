@@ -1,7 +1,7 @@
 import BN from 'bn.js';
+import { factory, formatFilename } from 'common-common/src/logging';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 import type { DB } from '../models';
 
@@ -11,14 +11,14 @@ const validateTopicThreshold = async (
   tbc: TokenBalanceCache,
   models: DB,
   topicId: number,
-  userAddress: string
+  userAddress: string,
 ): Promise<boolean> => {
   if (!topicId || !userAddress) return true;
   const topic = await models.Topic.findOne({
     where: { id: topicId },
     include: [
       {
-        model: models.Chain,
+        model: models.Community,
         required: true,
         as: 'chain',
         include: [
@@ -52,7 +52,7 @@ const validateTopicThreshold = async (
       topic.chain.network,
       topic.chain.ChainNode.id,
       userAddress,
-      communityContracts?.Contract?.address
+      communityContracts?.Contract?.address,
     );
 
     return new BN(balance).gte(threshold);

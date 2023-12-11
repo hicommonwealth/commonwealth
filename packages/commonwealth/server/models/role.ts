@@ -1,8 +1,5 @@
-import type * as Sequelize from 'sequelize';
-import type { DataTypes } from 'sequelize';
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
-import type { ModelInstance, ModelStatic } from './types';
+import type { CommunityAttributes } from './community';
 
 export type Role = 'admin' | 'moderator' | 'member';
 
@@ -21,5 +18,5 @@ export type RoleAttributes = {
 
   // associations
   Address?: AddressAttributes;
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
 };

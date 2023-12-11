@@ -1,31 +1,30 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import { initAppState } from 'state';
+import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { ChainBase, WalletId, WalletSsoSource } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { signSessionWithMagic } from 'controllers/server/sessions';
-import { chainBaseToCanvasChainId } from 'canvas/chainMappings';
 import { isSameAccount } from 'helpers';
 import $ from 'jquery';
+import { initAppState } from 'state';
 
 import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
-import SocialAccount from '../../models/SocialAccount';
 
 import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
-  chain: string,
-  originChain: string
+  community: string,
+  originChain: string,
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     address,
-    chain,
+    chain: community,
     originChain,
     jwt: app.user.jwt,
   });
@@ -33,10 +32,10 @@ export function linkExistingAddressToChainOrCommunity(
 
 export async function setActiveAccount(
   account: Account,
-  shouldRedraw = true
+  shouldRedraw = true,
 ): Promise<void> {
-  const chain = app.activeChainId();
-  const role = app.roles.getRoleInCommunity({ account, chain });
+  const community = app.activeChainId();
+  const role = app.roles.getRoleInCommunity({ account, community });
 
   if (!role) {
     app.user.ephemerallySetActiveAccount(account);
@@ -46,7 +45,7 @@ export async function setActiveAccount(
     ) {
       app.user.setActiveAccounts(
         app.user.activeAccounts.concat([account]),
-        shouldRedraw
+        shouldRedraw,
       );
     }
 
@@ -66,13 +65,13 @@ export async function setActiveAccount(
   try {
     const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
-      author_chain: account.chain.id,
-      chain,
+      author_chain: account.community.id,
+      chain: community,
       jwt: app.user.jwt,
       auth: true,
     });
 
-    app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
+    app.roles.getAllRolesInCommunity({ community }).forEach((r) => {
       r.is_user_default = false;
     });
     role.is_user_default = true;
@@ -92,7 +91,7 @@ export async function setActiveAccount(
   ) {
     app.user.setActiveAccounts(
       app.user.activeAccounts.concat([account]),
-      shouldRedraw
+      shouldRedraw,
     );
   }
 }
@@ -100,14 +99,16 @@ export async function setActiveAccount(
 export async function completeClientLogin(account: Account) {
   try {
     let addressInfo = app.user.addresses.find(
-      (a) => a.address === account.address && a.chain.id === account.chain.id
+      (a) =>
+        a.address === account.address &&
+        a.community.id === account.community.id,
     );
 
     if (!addressInfo && account.addressId) {
       addressInfo = new AddressInfo({
         id: account.addressId,
         address: account.address,
-        chainId: account.chain.id,
+        chainId: account.community.id,
         walletId: account.walletId,
         walletSsoSource: account.walletSsoSource,
       });
@@ -120,12 +121,12 @@ export async function completeClientLogin(account: Account) {
         if (
           !app.roles.getRoleInCommunity({
             account,
-            chain: app.activeChainId(),
+            community: app.activeChainId(),
           })
         ) {
           await app.roles.createRole({
             address: addressInfo,
-            chain: app.activeChainId(),
+            community: app.activeChainId(),
           });
         }
       } catch (e) {
@@ -158,17 +159,17 @@ export async function updateActiveAddresses({
   // for communities, addresses on all chains are available by default
   app.user.setActiveAccounts(
     app.user.addresses
-      .filter((a) => a.chain.id === chain.id)
+      .filter((a) => a.community.id === chain.id)
       .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype, false))
       .filter((addr) => addr),
-    shouldRedraw
+    shouldRedraw,
   );
 
   getTokenBalance();
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.roles.isMember({ chain: chain.id, account });
+    return app.roles.isMember({ community: chain.id, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -178,13 +179,13 @@ export async function updateActiveAddresses({
     // no addresses - preview the community
   } else {
     const existingAddress = app.roles.getDefaultAddressInCommunity({
-      chain: chain.id,
+      community: chain.id,
     });
 
     if (existingAddress) {
       const account = app.user.activeAccounts.find((a) => {
         return (
-          a.chain.id === existingAddress.chain.id &&
+          a.community.id === existingAddress.community.id &&
           a.address === existingAddress.address
         );
       });
@@ -194,7 +195,6 @@ export async function updateActiveAddresses({
 }
 
 // called from the server, which returns public keys
-// creates SubstrateAccount with associated SocialAccounts
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
     app.user.setEmail(null);
@@ -203,7 +203,6 @@ export function updateActiveUser(data) {
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
-    app.user.setSocialAccounts([]);
 
     app.user.setSiteAdmin(false);
     app.user.setDisableRichText(false);
@@ -223,18 +222,13 @@ export function updateActiveUser(data) {
           new AddressInfo({
             id: a.id,
             address: a.address,
-            chainId: a.chain,
+            chainId: a.community_id,
             keytype: a.keytype,
             walletId: a.wallet_id,
             walletSsoSource: a.wallet_sso_source,
             ghostAddress: a.ghost_address,
-          })
-      )
-    );
-    app.user.setSocialAccounts(
-      data.socialAccounts.map(
-        (sa) => new SocialAccount(sa.provider, sa.provider_username)
-      )
+          }),
+      ),
     );
 
     app.user.setSiteAdmin(data.isAdmin);
@@ -249,8 +243,12 @@ export async function createUserWithAddress(
   walletSsoSource: WalletSsoSource,
   chain: string,
   sessionPublicAddress?: string,
-  validationBlockInfo?: BlockInfo
-): Promise<{ account: Account; newlyCreated: boolean }> {
+  validationBlockInfo?: BlockInfo,
+): Promise<{
+  account: Account;
+  newlyCreated: boolean;
+  joinedCommunity: boolean;
+}> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
@@ -266,45 +264,18 @@ export async function createUserWithAddress(
   const account = new Account({
     addressId: id,
     address,
-    chain: chainInfo,
+    community: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
     ignoreProfile: false,
   });
-  return { account, newlyCreated: response.result.newly_created };
-}
-
-export async function unlinkLogin(account: AddressInfo) {
-  const unlinkingCurrentlyActiveAccount = app.user.activeAccount === account;
-  // TODO: Change to DELETE /address
-  await $.post(`${app.serverUrl()}/deleteAddress`, {
-    address: account.address,
-    chain: account.chain.id,
-    auth: true,
-    jwt: app.user.jwt,
-  });
-  // remove deleted role from app.roles
-  app.roles.deleteRole({
-    address: account,
-    chain: account.chain.id,
-  });
-  // Remove from all address stores in the frontend state.
-  // This might be more gracefully handled by calling initAppState again.
-  let index = app.user.activeAccounts.indexOf(account);
-  app.user.activeAccounts.splice(index, 1);
-  index = app.user.addresses.indexOf(
-    app.user.addresses.find((a) => a.address === account.address)
-  );
-  app.user.addresses.splice(index, 1);
-
-  if (!unlinkingCurrentlyActiveAccount) return;
-  if (app.user.activeAccounts.length > 0) {
-    await setActiveAccount(app.user.activeAccounts[0]);
-  } else {
-    app.user.ephemerallySetActiveAccount(null);
-  }
+  return {
+    account,
+    newlyCreated: response.result.newly_created,
+    joinedCommunity: response.result.joined_community,
+  };
 }
 
 async function constructMagic(isCosmos: boolean, chain?: string) {
@@ -351,7 +322,7 @@ export async function startLoginWithMagicLink({
   if (email) {
     // email-based login
     const bearer = await magic.auth.loginWithMagicLink({ email });
-    const address = await handleSocialLoginCallback({ bearer });
+    const address = await handleSocialLoginCallback({ bearer, isEmail: true });
     return { bearer, address };
   } else {
     const params = `?redirectTo=${
@@ -361,7 +332,7 @@ export async function startLoginWithMagicLink({
       provider: provider as any,
       redirectURI: new URL(
         '/finishsociallogin' + params,
-        window.location.origin
+        window.location.origin,
       ).href,
     });
 
@@ -398,6 +369,7 @@ function getProfileMetadata({ provider, userInfo }): {
   } else if (provider === 'google') {
     return { username: userInfo.name, avatarUrl: userInfo.picture };
   }
+
   return {};
 }
 
@@ -406,10 +378,12 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
+  isEmail,
 }: {
   bearer?: string;
   chain?: string;
   walletSsoSource?: string;
+  isEmail?: boolean;
 }): Promise<string> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
@@ -419,23 +393,35 @@ export async function handleSocialLoginCallback({
 
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
+  let profileMetadata, magicAddress;
+  if (isEmail) {
+    const metadata = await magic.user.getMetadata();
+    profileMetadata = { username: metadata.email };
 
-  const result = await magic.oauth.getRedirectResult();
-  if (!bearer) {
-    bearer = result.magic.idToken;
-    console.log('Magic redirect result:', result);
-  }
-
-  // Get magic metadata
-  const profileMetadata = getProfileMetadata(result.oauth);
-  let magicAddress, authedSessionPayload, authedSignature;
-  if (isCosmos) {
-    magicAddress = result.magic.userMetadata.publicAddress;
+    if (isCosmos) {
+      magicAddress = metadata.publicAddress;
+    } else {
+      const { utils } = await import('ethers');
+      magicAddress = utils.getAddress(metadata.publicAddress);
+    }
   } else {
-    const { utils } = await import('ethers');
-    magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
+    const result = await magic.oauth.getRedirectResult();
+
+    if (!bearer) {
+      bearer = result.magic.idToken;
+      console.log('Magic redirect result:', result);
+    }
+    // Get magic metadata
+    profileMetadata = getProfileMetadata(result.oauth);
+    if (isCosmos) {
+      magicAddress = result.magic.userMetadata.publicAddress;
+    } else {
+      const { utils } = await import('ethers');
+      magicAddress = utils.getAddress(result.magic.userMetadata.publicAddress);
+    }
   }
 
+  let authedSessionPayload, authedSignature;
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
@@ -445,7 +431,7 @@ export async function handleSocialLoginCallback({
         magicAddress = await magic.cosmos.changeAddress(bech32Prefix);
       } catch (err) {
         console.error(
-          `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`
+          `Error changing address to ${bech32Prefix}. Keeping default cosmos prefix and moving on. Error: ${err}`,
         );
       }
 
@@ -453,7 +439,7 @@ export async function handleSocialLoginCallback({
       // the signed message. The API is already used by the Magic iframe,
       // but they don't expose the results.
       const nodeInfo = await $.get(
-        `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`
+        `${document.location.origin}/magicCosmosAPI/${desiredChain.id}/node_info`,
       );
       const chainId = nodeInfo.node_info.network;
 
@@ -464,7 +450,7 @@ export async function handleSocialLoginCallback({
         ChainBase.CosmosSDK,
         signer,
         magicAddress,
-        timestamp
+        timestamp,
       );
       // TODO: provide blockhash as last argument to signSessionWithMagic
       signature.signatures[0].chain_id = chainId;
@@ -473,13 +459,13 @@ export async function handleSocialLoginCallback({
         chainBaseToCanvasChainId(ChainBase.CosmosSDK, bech32Prefix), // not the cosmos chain id, since that might change
         magicAddress,
         sessionPayload,
-        JSON.stringify(signature.signatures[0])
+        JSON.stringify(signature.signatures[0]),
       );
       authedSessionPayload = JSON.stringify(sessionPayload);
       authedSignature = JSON.stringify(signature.signatures[0]);
       console.log(
         'Reauthenticated Cosmos session from magic address:',
-        magicAddress
+        magicAddress,
       );
     } else {
       const { Web3Provider } = await import('@ethersproject/providers');
@@ -494,7 +480,7 @@ export async function handleSocialLoginCallback({
         ChainBase.Ethereum,
         signer,
         checksumAddress,
-        timestamp
+        timestamp,
       );
       // TODO: provide blockhash as last argument to signSessionWithMagic
 
@@ -503,13 +489,13 @@ export async function handleSocialLoginCallback({
         chainBaseToCanvasChainId(ChainBase.Ethereum, 1), // magic defaults to mainnet
         checksumAddress,
         sessionPayload,
-        signature
+        signature,
       );
       authedSessionPayload = JSON.stringify(sessionPayload);
       authedSignature = signature;
       console.log(
         'Reauthenticated Ethereum session from magic address:',
-        checksumAddress
+        checksumAddress,
       );
     }
   } catch (err) {

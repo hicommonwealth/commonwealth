@@ -5,13 +5,15 @@ import { Link } from 'react-router-dom';
 import app from 'state';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { Avatar } from 'views/components/Avatar';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
 import { CWButton } from '../component_kit/cw_button';
-import { Modal } from '../component_kit/cw_modal';
-import { Popover, usePopover } from '../component_kit/cw_popover/cw_popover';
 import { CWText } from '../component_kit/cw_text';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
 import type { UserAttrsWithSkeletonProp } from './user.types';
 
@@ -58,7 +60,7 @@ export const User = ({
     userChainId,
     true,
     undefined,
-    app.chain?.meta?.bech32Prefix
+    app.chain?.meta?.bech32Prefix,
   );
 
   const showAvatar = profile ? !shouldHideAvatar : false;
@@ -67,12 +69,12 @@ export const User = ({
   const friendlyChainName = app.config.chains.getById(userChainId)?.name;
   const adminsAndMods = app.chain?.meta.adminsAndMods || [];
   const isGhostAddress = app.user.addresses.some(
-    ({ address, ghostAddress }) => userAddress === address && ghostAddress
+    ({ address, ghostAddress }) => userAddress === address && ghostAddress,
   );
   const roleInCommunity =
     role ||
     adminsAndMods.find(
-      (r) => r.address === userAddress && r.address_chain === userChainId
+      (r) => r.address === userAddress && r.address_chain === userChainId,
     );
 
   const roleTags = (
@@ -99,6 +101,8 @@ export const User = ({
         ) : (
           'Anonymous'
         )
+      ) : !profile?.address ? (
+        'Addr. Removed'
       ) : !profile?.id ? (
         redactedAddress
       ) : !shouldShowAddressWithDisplayName ? (
@@ -182,32 +186,34 @@ export const User = ({
             />
           </div>
           <div className="user-name">
-            {app.chain && app.chain.base === ChainBase.Substrate && (
-              <Link
-                className="user-display-name substrate@"
-                to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
-              >
-                {!profile || !profile?.id ? (
-                  !profile?.id ? (
-                    `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
+            {app.chain &&
+              app.chain.base === ChainBase.Substrate &&
+              profile?.address && (
+                <Link
+                  className="user-display-name substrate@"
+                  to={profile?.id ? `/profile/id/${profile?.id}` : undefined}
+                >
+                  {!profile || !profile?.id ? (
+                    !profile?.id && userAddress ? (
+                      `${userAddress.slice(0, 8)}...${userAddress.slice(-5)}`
+                    ) : (
+                      redactedAddress
+                    )
+                  ) : !shouldShowAddressWithDisplayName ? (
+                    profile?.name
                   ) : (
-                    redactedAddress
-                  )
-                ) : !shouldShowAddressWithDisplayName ? (
-                  profile?.name
-                ) : (
-                  <>
-                    {profile?.name}
-                    <div className="id-short">{redactedAddress}</div>
-                  </>
-                )}
-              </Link>
-            )}
+                    <>
+                      {profile?.name}
+                      <div className="id-short">{redactedAddress}</div>
+                    </>
+                  )}
+                </Link>
+              )}
           </div>
-          {profile?.address && (
-            <div className="user-address">{redactedAddress}</div>
-          )}
-          {friendlyChainName && (
+          <div className="user-address">
+            {profile?.address ? redactedAddress : 'Address removed'}
+          </div>
+          {friendlyChainName && profile?.address && (
             <div className="user-chain">{friendlyChainName}</div>
           )}
           {roleTags}
@@ -218,14 +224,15 @@ export const User = ({
                 onClick={() => {
                   setIsModalOpen(true);
                 }}
-                label="Ban User"
+                label="Ban address"
                 buttonType="primary-red"
               />
             </div>
           )}
         </div>
       )}
-      <Modal
+      <CWModal
+        size="small"
         content={
           <BanUserModal
             address={userAddress}
@@ -246,7 +253,7 @@ export const User = ({
     >
       {userFinal}
       {profile && (
-        <Popover
+        <CWPopover
           content={userPopover}
           {...popoverProps}
           placement={popoverPlacement}

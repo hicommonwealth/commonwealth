@@ -1,20 +1,20 @@
 import { AppError } from 'common-common/src/errors';
-import type { NextFunction, Request, Response } from 'express';
-import type { DB } from '../../models';
-import Errors from './errors';
-import { ChainInstance } from 'server/models/chain';
-import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
 import { NotificationCategories } from 'common-common/src/types';
-import { CommentInstance } from '../../models/comment';
-import { ThreadInstance } from '../../models/thread';
+import type { NextFunction, Request, Response } from 'express';
 import { WhereOptions } from 'sequelize';
 import { SubscriptionAttributes } from 'server/models/subscription';
+import type { DB } from '../../models';
+import { CommentInstance } from '../../models/comment';
+import { CommunityInstance } from '../../models/community';
+import { ThreadInstance } from '../../models/thread';
+import { supportedSubscriptionCategories } from '../../util/subscriptionMapping';
+import Errors from './errors';
 
 export default async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
@@ -35,7 +35,7 @@ export default async (
   }
 
   let obj: WhereOptions<SubscriptionAttributes>,
-    chain: ChainInstance,
+    chain: CommunityInstance,
     thread: ThreadInstance,
     comment: CommentInstance;
 
@@ -43,7 +43,7 @@ export default async (
     case NotificationCategories.NewThread: {
       // this check avoids a 500 error -> 'WHERE parameter "id" has invalid "undefined" value'
       if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
-      chain = await models.Chain.findOne({
+      chain = await models.Community.findOne({
         where: {
           id: req.body.chain_id,
         },
@@ -96,7 +96,7 @@ export default async (
     case NotificationCategories.ChainEvent: {
       if (!req.body.chain_id) return next(new AppError(Errors.InvalidChain));
 
-      chain = await models.Chain.findOne({
+      chain = await models.Community.findOne({
         where: {
           id: req.body.chain_id,
         },

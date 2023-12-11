@@ -26,13 +26,13 @@ export const discussionTests = (test) => {
       await pwexpect(async () => {
         const numberOfThreads = await page.$$eval(
           'div[data-test-id] > div',
-          (divs) => divs.length
+          (divs) => divs.length,
         );
         expect(numberOfThreads).to.be.gte(testThreads.length - 1);
       }).toPass();
 
       const firstThread = await page.$(
-        'div[data-test-id="virtuoso-item-list"] > div:first-child'
+        'div[data-test-id="virtuoso-item-list"] > div:first-child',
       );
 
       // navigate to first link
@@ -83,7 +83,7 @@ export const discussionTests = (test) => {
       await pwexpect(async () => {
         reactionsCountDivs = await page.locator('.reactions-count');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
-          expectedNewReactionCount
+          expectedNewReactionCount,
         );
       }).toPass({ timeout: 5_000 });
 
@@ -97,9 +97,37 @@ export const discussionTests = (test) => {
       await pwexpect(async () => {
         reactionsCountDivs = await page.locator('.reactions-count');
         pwexpect(await reactionsCountDivs.first().innerText()).toEqual(
-          firstThreadReactionCount
+          firstThreadReactionCount,
         );
       }).toPass({ timeout: 5_000 });
     });
+
+    // test('Check User can interact with polls', async ({
+    //   page,
+    // }: {
+    //   page: Page;
+    // }) => {
+    //   const threadId = (
+    //     await testDb.query(`
+    //     INSERT INTO "Threads" (address_id, title, body, chain, topic_id, kind, created_at, updated_at)
+    //     VALUES (-1, 'Example Title', 'Example Body', 'cmntest', -1, 'discussion', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    //     RETURNING id;
+    // `)
+    //   )[0][0]['id'];
+
+    //   await page.goto(
+    //     `http://localhost:${PORT}/${testChains[0].id}/discussion/${threadId}`
+    //   );
+    //   await login(page);
+
+    //   const createPollButtonSelector = 'div.create-poll-button';
+    //   await page.waitForSelector(createPollButtonSelector);
+    //   await page.click(createPollButtonSelector);
+
+    //   await page.waitForSelector('#QuestionInput');
+    //   await page.type('#QuestionInput', 'my question?');
+    //   await page.type('input[placeholder="1."]', 'q1');
+    //   await page.type('input[placeholder="2."]', 'q2');
+    // });
   };
 };

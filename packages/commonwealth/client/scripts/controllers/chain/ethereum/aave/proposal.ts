@@ -6,32 +6,31 @@ import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
 import bs58 from 'bs58';
-import { AaveTypes } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
+import { EventEmitter } from 'events';
 import { blocknumToTime } from 'helpers';
 import $ from 'jquery';
-import { EventEmitter } from 'events';
+import moment from 'moment';
+import Web3 from 'web3-utils';
+import { ProposalState } from '../../../../../../shared/chain/types/aave';
 import type ChainEvent from '../../../../models/ChainEvent';
-import type { ITXModalData, IVote } from '../../../../models/interfaces';
 import Proposal from '../../../../models/Proposal';
+import type { ITXModalData, IVote } from '../../../../models/interfaces';
 import type { ProposalEndTime } from '../../../../models/types';
 import {
   ProposalStatus,
   VotingType,
   VotingUnit,
 } from '../../../../models/types';
-import moment from 'moment';
-import Web3 from 'web3-utils';
 import type EthereumAccount from '../account';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 
+import axios from 'axios';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
+import { ApiEndpoints } from 'state/api/config';
 import type AaveAPI from './api';
 import type AaveGovernance from './governance';
-import getFetch from 'helpers/getFetch';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
-import axios from 'axios';
-import { ApiEndpoints } from 'state/api/config';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
@@ -46,7 +45,7 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
 
   public format(): string {
     return `${formatNumberLong(+Web3.fromWei(this.power.toString()))} ${
-      this.account.chain.default_symbol
+      this.account.community.default_symbol
     }`;
   }
 }
@@ -92,16 +91,16 @@ export default class AaveProposal extends Proposal<
 
   public get isPassing(): ProposalStatus {
     switch (this.state) {
-      case AaveTypes.ProposalState.CANCELED:
+      case ProposalState.CANCELED:
         return ProposalStatus.Canceled;
-      case AaveTypes.ProposalState.SUCCEEDED:
-      case AaveTypes.ProposalState.QUEUED:
-      case AaveTypes.ProposalState.EXECUTED:
+      case ProposalState.SUCCEEDED:
+      case ProposalState.QUEUED:
+      case ProposalState.EXECUTED:
         return ProposalStatus.Passed;
-      case AaveTypes.ProposalState.EXPIRED:
-      case AaveTypes.ProposalState.FAILED:
+      case ProposalState.EXPIRED:
+      case ProposalState.FAILED:
         return ProposalStatus.Failed;
-      case AaveTypes.ProposalState.ACTIVE:
+      case ProposalState.ACTIVE:
         return this._isPassed()
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
@@ -123,20 +122,20 @@ export default class AaveProposal extends Proposal<
     return VotingUnit.PowerVote;
   }
 
-  public get state(): AaveTypes.ProposalState {
+  public get state(): ProposalState {
     const currentTime = Date.now() / 1000;
-    if (this.data.cancelled) return AaveTypes.ProposalState.CANCELED;
+    if (this.data.cancelled) return ProposalState.CANCELED;
     if (currentTime <= blocknumToTime(this.data.startBlock).unix())
-      return AaveTypes.ProposalState.PENDING;
+      return ProposalState.PENDING;
     if (currentTime <= blocknumToTime(this.data.endBlock).unix())
-      return AaveTypes.ProposalState.ACTIVE;
-    if (this._isPassed() === false) return AaveTypes.ProposalState.FAILED;
+      return ProposalState.ACTIVE;
+    if (this._isPassed() === false) return ProposalState.FAILED;
     if (!this.data.executionTime && !this.data.queued)
-      return AaveTypes.ProposalState.SUCCEEDED;
-    if (this.data.executed) return AaveTypes.ProposalState.EXECUTED;
+      return ProposalState.SUCCEEDED;
+    if (this.data.executed) return ProposalState.EXECUTED;
     if (currentTime > +this.data.executionTimeWithGracePeriod)
-      return AaveTypes.ProposalState.EXPIRED;
-    if (this.data.queued) return AaveTypes.ProposalState.QUEUED;
+      return ProposalState.EXPIRED;
+    if (this.data.queued) return ProposalState.QUEUED;
     return null;
   }
 
@@ -148,15 +147,15 @@ export default class AaveProposal extends Proposal<
     const state = this.state;
 
     // waiting to start
-    if (state === AaveTypes.ProposalState.PENDING)
+    if (state === ProposalState.PENDING)
       return { kind: 'fixed_block', blocknum: this.data.startBlock };
 
     // started
-    if (state === AaveTypes.ProposalState.ACTIVE)
+    if (state === ProposalState.ACTIVE)
       return { kind: 'fixed_block', blocknum: this.data.endBlock };
 
     // queued but not ready for execution
-    if (state === AaveTypes.ProposalState.QUEUED)
+    if (state === ProposalState.QUEUED)
       return { kind: 'fixed', time: moment.unix(this.data.executionTime) };
 
     // unavailable if: waiting to passed/failed but not in queue, or completed
@@ -252,7 +251,7 @@ export default class AaveProposal extends Proposal<
         this.ipfsDataReady.emit('ready');
       })
       .catch(() =>
-        console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`)
+        console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`),
       );
 
     this._initialized = true;
@@ -267,7 +266,7 @@ export default class AaveProposal extends Proposal<
           chainId: meta.id,
           proposalId: proposalId,
         },
-      }
+      },
     );
 
     const votes: IAaveVoteResponse[] = res.data.result.votes;
@@ -282,7 +281,7 @@ export default class AaveProposal extends Proposal<
       const aaveVote = new AaveProposalVote(
         accounts.get(vote.voter),
         vote.support,
-        power
+        power,
       );
       proposalInstance.addOrUpdateVote(aaveVote);
     }
@@ -293,7 +292,7 @@ export default class AaveProposal extends Proposal<
   constructor(
     Accounts: EthereumAccounts,
     Gov: AaveGovernance,
-    data: IAaveProposalResponse
+    data: IAaveProposalResponse,
   ) {
     super(ProposalType.AaveProposal, data);
     this._completed = data.completed;
@@ -304,7 +303,7 @@ export default class AaveProposal extends Proposal<
     this._Gov.store.add(this);
     // insert Qm prefix via hex
     this._ipfsAddress = bs58.encode(
-      Buffer.from(`1220${this.data.ipfsHash.slice(2)}`, 'hex')
+      Buffer.from(`1220${this.data.ipfsHash.slice(2)}`, 'hex'),
     );
   }
 
@@ -322,15 +321,15 @@ export default class AaveProposal extends Proposal<
 
   public get isCancellable() {
     return !(
-      this.state === AaveTypes.ProposalState.CANCELED ||
-      this.state === AaveTypes.ProposalState.FAILED ||
-      this.state === AaveTypes.ProposalState.EXECUTED ||
-      this.state === AaveTypes.ProposalState.EXPIRED
+      this.state === ProposalState.CANCELED ||
+      this.state === ProposalState.FAILED ||
+      this.state === ProposalState.EXECUTED ||
+      this.state === ProposalState.EXPIRED
     );
   }
 
   public get isQueueable() {
-    return this.state === AaveTypes.ProposalState.SUCCEEDED;
+    return this.state === ProposalState.SUCCEEDED;
   }
 
   public async cancelTx() {
@@ -346,7 +345,7 @@ export default class AaveProposal extends Proposal<
     // the guardian can always cancel, but any user can cancel if creator has lost
     // sufficient proposition power
     const executor = await this._Gov.api.getDeployedExecutor(
-      this.data.executor
+      this.data.executor,
     );
     if (!executor) {
       throw new Error('executor not found');
@@ -355,7 +354,7 @@ export default class AaveProposal extends Proposal<
     const isCancellable = await executor.validateProposalCancellation(
       this._Gov.api.Governance.address,
       this.data.proposer,
-      blockNumber - 1
+      blockNumber - 1,
     );
     if (!isCancellable) {
       const guardian = await this._Gov.api.Governance.getGuardian();
@@ -366,7 +365,7 @@ export default class AaveProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
+      this._Gov.api.Governance,
     );
     const tx = await contract.cancel(this.data.identifier, {
       gasLimit: this._Gov.api.gasLimit,
@@ -380,14 +379,14 @@ export default class AaveProposal extends Proposal<
 
   public async queueTx() {
     // validate proposal state
-    if (this.state !== AaveTypes.ProposalState.SUCCEEDED) {
+    if (this.state !== ProposalState.SUCCEEDED) {
       throw new Error('Proposal not in succeeded state');
     }
 
     // no user validation needed
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
+      this._Gov.api.Governance,
     );
     const tx = await contract.queue(this.data.id);
     const txReceipt = await tx.wait();
@@ -399,7 +398,7 @@ export default class AaveProposal extends Proposal<
   public get isExecutable() {
     // will be EXPIRED if over grace period
     return (
-      this.state === AaveTypes.ProposalState.QUEUED &&
+      this.state === ProposalState.QUEUED &&
       this.data.executionTime &&
       this.data.executionTime <= this._Gov.app.chain.block.lastTime.unix()
     );
@@ -413,7 +412,7 @@ export default class AaveProposal extends Proposal<
     // no user validation needed
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
+      this._Gov.api.Governance,
     );
     const tx = await contract.execute(this.data.id);
     const txReceipt = await tx.wait();
@@ -427,14 +426,14 @@ export default class AaveProposal extends Proposal<
     const address = this._Gov.app.user.activeAccount.address;
 
     // validate proposal state
-    if (this.state !== AaveTypes.ProposalState.ACTIVE) {
+    if (this.state !== ProposalState.ACTIVE) {
       throw new Error('Proposal not in active state');
     }
 
     // ensure user hasn't voted
     const previousVote = await this._Gov.api.Governance.getVoteOnProposal(
       this.data.id,
-      address
+      address,
     );
     if (previousVote && !previousVote.votingPower.isZero()) {
       throw new Error('user has already voted on this proposal');
@@ -442,7 +441,7 @@ export default class AaveProposal extends Proposal<
 
     const contract = await attachSigner(
       this._Gov.app.user.activeAccount,
-      this._Gov.api.Governance
+      this._Gov.api.Governance,
     );
     const tx = await contract.submitVote(this.data.id, vote.choice);
     const txReceipt = await tx.wait();

@@ -27,7 +27,7 @@ export type SearchThreadsResponse = {
 };
 
 interface SearchThreadsProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
@@ -39,7 +39,7 @@ interface SearchThreadsProps {
 
 const searchThreads = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -55,7 +55,7 @@ const searchThreads = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
@@ -63,25 +63,24 @@ const searchThreads = async ({
         order_direction: orderDirection,
         thread_title_only: threadTitleOnly,
       },
-    }
+    },
   );
   return result;
 };
 
 const useSearchThreadsQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
   threadTitleOnly,
-
   enabled = true,
 }: SearchThreadsProps) => {
   const key = [
     ApiEndpoints.searchThreads(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
     },
@@ -91,7 +90,7 @@ const useSearchThreadsQuery = ({
     ({ pageParam }) =>
       searchThreads({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,
@@ -108,7 +107,7 @@ const useSearchThreadsQuery = ({
       },
       staleTime: SEARCH_THREADS_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

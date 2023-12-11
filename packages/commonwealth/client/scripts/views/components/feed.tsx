@@ -8,7 +8,7 @@ import type DashboardActivityNotification from '../../models/DashboardActivityNo
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRow } from '../pages/user_dashboard/user_dashboard_row';
 
-import { IEventLabel, Label as ChainEventLabel } from 'chain-events/src';
+import { Label as ChainEventLabel, IEventLabel } from 'chain/labelers/util';
 
 type FeedProps = {
   fetchData: () => Promise<any>;
@@ -34,13 +34,13 @@ export const Feed = ({
   const [data, setData] = useState<DashboardActivityNotification[]>();
   const [labels, setLabels] = useState<(IEventLabel | undefined)[]>();
   const [currentCount, setCurrentCount] = useState<number>(
-    defaultCount || DEFAULT_COUNT
+    defaultCount || DEFAULT_COUNT,
   );
 
   const loadMore = useCallback(() => {
     return setTimeout(() => {
       setCurrentCount(
-        (prevState) => prevState + (defaultCount || DEFAULT_COUNT)
+        (prevState) => prevState + (defaultCount || DEFAULT_COUNT),
       );
     }, 500);
   }, [setCurrentCount, defaultCount]);

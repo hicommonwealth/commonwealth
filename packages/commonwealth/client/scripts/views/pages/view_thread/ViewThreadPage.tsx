@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
-import { filterLinks } from 'helpers/threads';
+import { commentsByDate } from 'helpers/dates';
+import { featureFlags } from 'helpers/feature-flags';
+import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
@@ -11,9 +13,15 @@ import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { getProposalUrlPath } from 'identifiers';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
+import 'pages/view_thread/index.scss';
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import {
+  useFetchGroupsQuery,
+  useRefreshMembershipQuery,
+} from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
   useGetThreadsByIdQuery,
@@ -25,14 +33,16 @@ import useJoinCommunity from 'views/components/Header/useJoinCommunity';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import { PageNotFound } from 'views/pages/404';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
+import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
 import Poll from '../../../models/Poll';
-import { Link, LinkSource, LinkDisplay } from '../../../models/Thread';
+import { Link, LinkDisplay, LinkSource } from '../../../models/Thread';
 import { CommentsFeaturedFilterTypes } from '../../../models/types';
 import Permissions from '../../../utils/Permissions';
 import { CreateComment } from '../../components/Comments/CreateComment';
 import { Select } from '../../components/Select';
 import type { SidebarComponents } from '../../components/component_kit/CWContentPage';
 import { CWContentPage } from '../../components/component_kit/CWContentPage';
+import { CWGatedTopicBanner } from '../../components/component_kit/CWGatedTopicBanner';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -44,21 +54,17 @@ import {
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import ViewTemplate from '../view_template/view_template';
+import { LinkedUrlCard } from './LinkedUrlCard';
+import { TemplateActionCard } from './TemplateActionCard';
+import { ThreadPollCard } from './ThreadPollCard';
+import { ThreadPollEditorCard } from './ThreadPollEditorCard';
+import { ViewTemplateFormCard } from './ViewTemplateFormCard';
 import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
-import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { SnapshotCreationCard } from './snapshot_creation_card';
-import { useSearchParams } from 'react-router-dom';
-import useManageDocumentTitle from '../../../hooks/useManageDocumentTitle';
-import { TemplateActionCard } from './TemplateActionCard';
-import { ViewTemplateFormCard } from './ViewTemplateFormCard';
-import ViewTemplate from '../view_template/view_template';
-import { featureFlags } from 'helpers/feature-flags';
-
-import 'pages/view_thread/index.scss';
-import { commentsByDate } from 'helpers/dates';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -97,11 +103,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [arePollsFetched, setArePollsFetched] = useState(false);
   const [isViewMarked, setIsViewMarked] = useState(false);
 
+  const [hideGatingBanner, setHideGatingBanner] = useState(false);
+
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
   const [searchParams] = useSearchParams();
   const shouldFocusCommentEditor = !!searchParams.get('focusEditor');
+
+  const { data: groups = [] } = useFetchGroupsQuery({
+    communityId: app.activeChainId(),
+    includeTopics: true,
+  });
 
   const {
     data,
@@ -126,6 +139,22 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    chainId: app.activeChainId(),
+    address: app?.user?.activeAccount?.address,
+  });
+
+  const isTopicGated = !!(memberships || []).find((membership) =>
+    membership.topicIds.includes(thread?.topic?.id),
+  );
+
+  const isActionAllowedInGatedTopic = !!(memberships || []).find(
+    (membership) =>
+      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+  );
+
+  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
   }, [fetchCommentsError]);
@@ -137,7 +166,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         (state: boolean) => {
           setIsCollapsedSize(state);
         },
-        isWindowMediumSmallInclusive
+        isWindowMediumSmallInclusive,
       ),
     resizeListenerUpdateDeps: [isCollapsedSize],
   });
@@ -148,12 +177,26 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       (state: boolean) => {
         setIsCollapsedSize(state);
       },
-      isWindowMediumSmallInclusive
+      isWindowMediumSmallInclusive,
     );
+    // Note: Disabling lint rule since we only want to run it once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // find if the current topic is gated
+  const foundGatedTopic = groups.find((x) => {
+    if (thread?.topic) {
+      return (
+        Array.isArray(x.topics) &&
+        x?.topics?.find((y) => y.id === thread.topic.id)
+      );
+    }
+  });
+
   useBrowserAnalyticsTrack({
-    payload: { event: MixpanelPageViewEvent.THREAD_PAGE_VIEW },
+    payload: {
+      event: MixpanelPageViewEvent.THREAD_PAGE_VIEW,
+    },
   });
 
   useEffect(() => {
@@ -173,7 +216,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       const url = getProposalUrlPath(
         thread.slug,
         `${threadId}-${slugify(thread?.title)}${window.location.search}`,
-        true
+        true,
       );
       navigate(url, { replace: true });
     }
@@ -234,7 +277,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     );
   }
 
-  if ((!isLoading && !thread) || fetchThreadError) {
+  if (
+    (!isLoading && !thread) ||
+    fetchThreadError ||
+    thread.chain !== app.activeChainId()
+  ) {
     return <PageNotFound />;
   }
 
@@ -269,9 +316,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
 
+  const hasWebLinks = thread.links.find((x) => x.source === 'web');
+
   const canComment =
-    !!hasJoinedCommunity ||
-    (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id));
+    (!!hasJoinedCommunity ||
+      (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id))) &&
+    !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -302,7 +352,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const editsToSave = localStorage.getItem(
-    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
+    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`,
   );
   const isStageDefault = isDefaultStage(thread.stage);
 
@@ -329,6 +379,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
+  const gatedGroupsMatchingTopic = groups?.filter((x) =>
+    x?.topics?.find((y) => y?.id === thread?.topic?.id),
+  );
+
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!hasJoinedCommunity,
+    isThreadArchived: !!thread?.archivedAt,
+    isThreadLocked: !!thread?.lockedAt,
+    isThreadTopicGated: isRestrictedMembership,
+  });
+
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
@@ -339,7 +400,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           showLinkedProposalOptions ||
           showLinkedThreadOptions ||
           polls?.length > 0 ||
-          isAuthor
+          isAuthor ||
+          hasWebLinks
         }
         isSpamThread={!!thread.markedAsSpamAt}
         title={
@@ -348,7 +410,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               onInput={(e) => {
                 setDraftTitle(e.target.value);
               }}
-              defaultValue={thread.title}
+              value={draftTitle || thread.title}
             />
           ) : (
             thread.title
@@ -468,7 +530,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       rootThread={thread}
                       canComment={canComment}
                       shouldFocusEditor={shouldFocusCommentEditor}
+                      tooltipText={disabledActionsTooltipText}
                     />
+                    {featureFlags.gatingEnabled &&
+                      foundGatedTopic &&
+                      !hideGatingBanner && (
+                        <CWGatedTopicBanner
+                          groupNames={gatedGroupsMatchingTopic.map(
+                            (g) => g.name,
+                          )}
+                          onClose={() => setHideGatingBanner(true)}
+                        />
+                      )}
                     {showBanner && (
                       <JoinCommunityBanner
                         onClose={handleCloseBanner}
@@ -524,8 +597,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               parentCommentId={parentCommentId}
               setParentCommentId={setParentCommentId}
               canComment={canComment}
+              canReact={!isRestrictedMembership}
+              canReply={!isRestrictedMembership}
               fromDiscordBot={fromDiscordBot}
               commentSortType={commentSortType}
+              disabledActionsTooltipText={disabledActionsTooltipText}
             />
           </>
         }
@@ -549,6 +625,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             allowLinking={isAuthor || isAdminOrMod}
                           />
                         )}
+                      </div>
+                    ),
+                  },
+                ]
+              : []),
+            ...(isAuthor || isAdmin || hasWebLinks
+              ? [
+                  {
+                    label: 'Web Links',
+                    item: (
+                      <div className="cards-column">
+                        <LinkedUrlCard
+                          thread={thread}
+                          allowLinking={isAuthor || isAdminOrMod}
+                        />
                       </div>
                     ),
                   },
@@ -579,7 +670,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       <div className="cards-column">
                         {[
                           ...new Map(
-                            polls?.map((poll) => [poll.id, poll])
+                            polls?.map((poll) => [poll.id, poll]),
                           ).values(),
                         ].map((poll: Poll) => {
                           return (

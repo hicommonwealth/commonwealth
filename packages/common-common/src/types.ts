@@ -1,3 +1,13 @@
+export enum SupportedNetwork {
+  Substrate = 'substrate',
+  Aave = 'aave',
+  Compound = 'compound',
+  ERC20 = 'erc20',
+  ERC721 = 'erc721',
+  ERC1155 = 'erc1155',
+  Cosmos = 'cosmos',
+}
+
 export enum NotificationCategories {
   NewComment = 'new-comment-creation',
   NewThread = 'new-thread-creation',
@@ -14,18 +24,11 @@ export type NotificationCategory =
   typeof NotificationCategories[keyof typeof NotificationCategories];
 
 export enum ProposalType {
-  SubstrateDemocracyReferendum = 'referendum',
-  SubstrateDemocracyProposal = 'democracyproposal',
-  SubstrateTreasuryTip = 'treasurytip',
-  SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
-  SubstrateTreasuryProposal = 'treasuryproposal',
   Thread = 'discussion',
   CosmosProposal = 'cosmosproposal',
   CompoundProposal = 'compoundproposal',
   AaveProposal = 'onchainproposal',
   SputnikProposal = 'sputnikproposal',
-  SubstratePreimage = 'democracypreimage',
-  SubstrateImminentPreimage = 'democracyimminent',
 }
 
 export enum ChainBase {
@@ -60,6 +63,7 @@ export enum WalletId {
   WalletConnect = 'walletconnect',
   KeplrEthereum = 'keplr-ethereum',
   Keplr = 'keplr',
+  Leap = 'leap',
   NearWallet = 'near',
   TerraStation = 'terrastation',
   TerraWalletConnect = 'terra-walletconnect',
@@ -144,6 +148,7 @@ export enum RedisNamespaces {
   Test_Redis = 'test_redis',
   Database_Cleaner = 'database_cleaner',
   Compound_Gov_Version = 'compound_gov_version',
+  Token_Balance = 'token_balance',
 }
 
 export interface ISnapshotNotification {
@@ -163,11 +168,16 @@ export enum DefaultPage {
   Homepage = 'homepage',
 }
 
-export type DiscordAction =
-  | 'create'
-  | 'update'
+export type ThreadDiscordActions =
   | 'thread-delete'
-  | 'comment-delete';
+  | 'thread-title-update'
+  | 'thread-body-update'
+  | 'thread-create';
+export type CommentDiscordActions =
+  | 'comment-delete'
+  | 'comment-update'
+  | 'comment-create';
+export type DiscordAction = ThreadDiscordActions | CommentDiscordActions;
 
 export interface IDiscordMessage {
   user?: {
@@ -184,6 +194,15 @@ export interface IDiscordMessage {
   action: DiscordAction;
 }
 
+export interface IDiscordMeta {
+  user: {
+    id: string;
+    username: string;
+  };
+  channel_id: string;
+  message_id: string;
+}
+
 export type HttpMethod =
   | 'get'
   | 'post'
@@ -192,3 +211,26 @@ export type HttpMethod =
   | 'patch'
   | 'options'
   | 'head';
+
+type ChainEventAttributes = {
+  id: number;
+  block_number: number;
+  event_data: any;
+  queued: number;
+  entity_id?: number;
+  network: SupportedNetwork;
+  chain: string;
+  created_at?: Date;
+  updated_at?: Date;
+};
+
+export type ChainEventNotification = {
+  id: number;
+  notification_data: string;
+  chain_event_id: number;
+  category_id: 'chain-event';
+  chain_id: string;
+  updated_at: Date;
+  created_at: Date;
+  ChainEvent: ChainEventAttributes;
+};

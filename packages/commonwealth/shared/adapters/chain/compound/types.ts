@@ -1,11 +1,11 @@
-import type { CompoundTypes } from 'chain-events/src/types';
-import type { ICompletable } from '../../shared';
 import { BigNumber } from 'ethers';
+import type {
+  IProposalCreated,
+  IVoteCast,
+} from '../../../chain/types/compound';
+import type { ICompletable } from '../../shared';
 
-export type ICompoundProposalResponse = Omit<
-  CompoundTypes.IProposalCreated,
-  'kind'
-> &
+export type ICompoundProposalResponse = Omit<IProposalCreated, 'kind'> &
   ICompletable & {
     eta?: number;
     forVotes: BigNumber;
@@ -14,4 +14,4 @@ export type ICompoundProposalResponse = Omit<
     state: number;
   };
 
-export type ICompoundVoteResponse = Omit<CompoundTypes.IVoteCast, 'kind'>;
+export type ICompoundVoteResponse = Omit<IVoteCast, 'kind'>;

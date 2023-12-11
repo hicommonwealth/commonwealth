@@ -1,20 +1,20 @@
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWCard } from 'views/components/component_kit/cw_card';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { ContractTemplateCard } from './contract_template_card';
 import type Contract from '../../../models/Contract';
+import { ContractTemplateCard } from './contract_template_card';
 
 import app from 'state';
 
-import 'pages/contracts/contract_card.scss';
 import { useCommonNavigate } from 'navigation/helpers';
-import { Modal } from 'views/components/component_kit/cw_modal';
+import 'pages/contracts/contract_card.scss';
 import React, { useState } from 'react';
 import ManageContractTemplateModal, {
   ManageContractTemplateModalProps,
 } from 'views/modals/manage_contract_template_modal';
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 
 type ContractCardProps = {
   id: number;
@@ -54,7 +54,7 @@ export const ContractCard = ({
       buttons: [
         {
           label: 'Delete',
-          buttonType: 'mini-red',
+          buttonType: 'destructive',
           onClick: async () => {
             try {
               await app.contracts.deleteCommunityContract({
@@ -68,7 +68,7 @@ export const ContractCard = ({
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
         },
       ],
     });
@@ -81,7 +81,7 @@ export const ContractCard = ({
   const handleOpenManageContractTemplateModal = async (
     templateId?: number,
     cctId?: number,
-    template?: any
+    template?: any,
   ) => {
     const contractTemplates = await app.contracts.getTemplatesForContract(id);
 
@@ -165,7 +165,8 @@ export const ContractCard = ({
             </CWText>
           )}
         </div>
-        <Modal
+        <CWModal
+          size="medium"
           content={
             <ManageContractTemplateModal
               contractId={manageContractTemplateModalData?.contractId}

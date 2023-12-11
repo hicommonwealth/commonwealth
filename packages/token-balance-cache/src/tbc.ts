@@ -5,6 +5,7 @@ import JobRunner from 'common-common/src/cacheJobRunner';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainNetwork } from 'common-common/src/types';
 
+import { TbcStatsDSender } from './tbcStatsDSender';
 import type {
   BalanceProvider,
   BalanceProviderResp,
@@ -15,12 +16,11 @@ import type {
   TokenBalanceResp,
 } from './types';
 import { FetchTokenBalanceErrors } from './types';
-import { TbcStatsDSender } from './tbcStatsDSender';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 async function queryChainNodesFromDB(
-  lastQueryUnixTime: number
+  lastQueryUnixTime: number,
 ): Promise<IChainNode[]> {
   const query = `SELECT * FROM "ChainNodes" WHERE updated_at >= to_timestamp (${lastQueryUnixTime})::date;`;
 
@@ -53,6 +53,8 @@ export class TokenBalanceCache
 {
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider<any> } = {};
+  // Maps global chain id -> Common DB chainIds for quick lookup in _nodes
+  private _chainIds: { [id: string]: number } = {};
   private _lastQueryTime = 0;
   private statsDSender: TbcStatsDSender = new TbcStatsDSender();
   private cacheContents = { zero: 0, nonZero: 0 };
@@ -62,8 +64,8 @@ export class TokenBalanceCache
     private readonly _hasBalancePruneTimeS: number = 1 * 60 * 60,
     providers: BalanceProvider<any>[] = null,
     private readonly _nodesProvider: (
-      lastQueryUnixTime: number
-    ) => Promise<IChainNode[]> = queryChainNodesFromDB
+      lastQueryUnixTime: number,
+    ) => Promise<IChainNode[]> = queryChainNodesFromDB,
   ) {
     super({}, noBalancePruneTimeS);
 
@@ -94,12 +96,12 @@ export class TokenBalanceCache
         description,
         base: balance_type,
         prefix: bech32 || ss58?.toString(),
-      })
+      }),
     );
   }
 
   public async getBalanceProviders(
-    nodeId?: number
+    nodeId?: number,
   ): Promise<BalanceProviderResp[]> {
     const formatBps = (bps: BalanceProvider<any>[]): BalanceProviderResp[] => {
       this.statsDSender.sendProviderInfo(bps, nodeId);
@@ -121,7 +123,7 @@ export class TokenBalanceCache
     }
     const base = node.balance_type;
     const bps = Object.values(this._providers).filter(({ validBases }) =>
-      validBases.includes(base)
+      validBases.includes(base),
     );
     return formatBps(bps);
   }
@@ -130,7 +132,7 @@ export class TokenBalanceCache
     nodeId: number,
     addresses: string[],
     balanceProvider: string,
-    opts: Record<string, string | undefined>
+    opts: Record<string, string | undefined>,
   ): Promise<TokenBalanceResp> {
     const node = this._nodes[nodeId];
     if (!node) {
@@ -155,7 +157,7 @@ export class TokenBalanceCache
           } else {
             return undefined;
           }
-        }
+        },
       );
       if (result !== undefined) return result;
 
@@ -192,14 +194,14 @@ export class TokenBalanceCache
             start,
             Date.now(),
             providerObj.name,
-            nodeId
+            nodeId,
           );
 
           results.balances[address] = balance;
         } catch (e) {
           results.errors[address] = e.message;
         }
-      })
+      }),
     );
 
     return results;
@@ -211,7 +213,8 @@ export class TokenBalanceCache
     network: ChainNetwork,
     nodeId: number,
     userAddress: string,
-    contractAddress?: string
+    contractAddress?: string,
+    tokenId?: string,
   ): Promise<string> {
     let bp: string;
     try {
@@ -224,13 +227,25 @@ export class TokenBalanceCache
     // grab contract if provided, otherwise query native token
     let opts = {};
     if (contractAddress) {
-      if (network !== ChainNetwork.ERC20 && network !== ChainNetwork.ERC721) {
+      if (
+        network !== ChainNetwork.ERC20 &&
+        network !== ChainNetwork.ERC721 &&
+        network !== ChainNetwork.ERC1155
+      ) {
         throw new Error(FetchTokenBalanceErrors.UnsupportedContractType);
       }
-      opts = {
-        tokenAddress: contractAddress,
-        contractType: network,
-      };
+      if (network === ChainNetwork.ERC1155) {
+        opts = {
+          tokenAddress: contractAddress,
+          contractType: network,
+          tokenId: tokenId,
+        };
+      } else {
+        opts = {
+          tokenAddress: contractAddress,
+          contractType: network,
+        };
+      }
     }
 
     let balancesResp: TokenBalanceResp;
@@ -239,7 +254,7 @@ export class TokenBalanceCache
         nodeId,
         [userAddress],
         bp,
-        opts
+        opts,
       );
     } catch (err) {
       throw new Error('Query Failed');
@@ -249,11 +264,32 @@ export class TokenBalanceCache
       return balancesResp.balances[userAddress];
     } else if (balancesResp.errors[userAddress]) {
       throw new Error(
-        `Error querying balance: ${balancesResp.errors[userAddress]}`
+        `Error querying balance: ${balancesResp.errors[userAddress]}`,
       );
     } else {
       throw new Error('Query failed');
     }
+  }
+
+  public async fetchUserBalanceWithChain(
+    network: ChainNetwork,
+    userAddress: string,
+    chainId: string,
+    contractAddress?: string,
+    tokenId?: string,
+  ): Promise<string> {
+    const nodeId = this._chainIds[chainId];
+    if (!nodeId) {
+      throw new Error('Invalid Chain Id');
+    }
+    const balance = await this.fetchUserBalance(
+      network,
+      nodeId,
+      userAddress,
+      contractAddress,
+      tokenId,
+    );
+    return balance;
   }
 
   private async _refreshNodes() {
@@ -262,6 +298,11 @@ export class TokenBalanceCache
     const nodes = await this._nodesProvider(lastQueryTime);
     for (const n of nodes) {
       this._nodes[n.id] = n;
+      if (n.eth_chain_id) {
+        this._chainIds[n.eth_chain_id.toString()] = n.id;
+      } else if (n.cosmos_chain_id) {
+        this._chainIds[n.cosmos_chain_id] = n.id;
+      }
     }
   }
 

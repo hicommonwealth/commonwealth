@@ -21,14 +21,14 @@ type BanAddressResp = BanAttributes;
 const banAddress = async (
   models: DB,
   req: TypedRequestBody<BanAddressReq>,
-  res: TypedResponse<BanAddressResp>
+  res: TypedResponse<BanAddressResp>,
 ) => {
   const chain = req.chain;
 
   const isAdmin = await validateOwner({
     models: models,
     user: req.user,
-    chainId: chain.id,
+    communityId: chain.id,
     allowAdmin: true,
     allowGodMode: true,
   });

@@ -1,14 +1,14 @@
-import { Modal } from 'views/components/component_kit/cw_modal';
-import React from 'react';
-import SessionRevalidationModal from 'views/modals/SessionRevalidationModal/SessionRevalidationModal';
 import { SessionKeyError } from 'controllers/server/sessions';
+import React from 'react';
+import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
+import SessionRevalidationModal from 'views/modals/SessionRevalidationModal/SessionRevalidationModal';
 
 const useSessionRevalidationModal = ({ handleClose, error }) => {
   const sessionKeyValidationError = error instanceof SessionKeyError && error;
 
   const RevalidationModal = (
-    <Modal
-      isFullScreen={false}
+    <CWModal
+      size="medium"
       content={
         <SessionRevalidationModal
           onModalClose={handleClose}

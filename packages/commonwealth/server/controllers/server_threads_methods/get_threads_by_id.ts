@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
-import { ServerThreadsController } from '../server_threads_controller';
 import { ThreadAttributes } from '../../models/thread';
+import { ServerThreadsController } from '../server_threads_controller';
 
 export type GetThreadsByIdOptions = {
   threadIds: number[];
@@ -10,13 +10,11 @@ export type GetThreadsByIdResult = ThreadAttributes[];
 
 export async function __getThreadsById(
   this: ServerThreadsController,
-  { threadIds }: GetThreadsByIdOptions
+  { threadIds }: GetThreadsByIdOptions,
 ): Promise<GetThreadsByIdResult> {
-  let threads;
-  threads = await this.models.Thread.findAll({
+  const threads = await this.models.Thread.findAll({
     where: {
       id: { [Op.in]: threadIds },
-      // chain: req.chain ? req.chain.id : undefined,
     },
     include: [
       {
@@ -25,7 +23,6 @@ export async function __getThreadsById(
       },
       {
         model: this.models.Address,
-        // through: models.Collaboration,
         as: 'collaborators',
       },
       {
@@ -46,11 +43,11 @@ export async function __getThreadsById(
     ],
   });
 
-  threads = threads.map((thread) => {
+  const result = threads.map((thread) => {
     const t = thread.toJSON();
-    t.numberOfComments = t.comment_count || 0;
+    (t as any).numberOfComments = t.comment_count || 0;
     return t;
   });
 
-  return threads;
+  return result;
 }

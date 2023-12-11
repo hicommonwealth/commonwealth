@@ -1,10 +1,16 @@
 import React from 'react';
 
 import { handleRedirectClicks } from 'helpers';
+import { featureFlags } from 'helpers/feature-flags';
+import { useCommonNavigate } from 'navigation/helpers';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import { sidebarStore } from 'state/ui/sidebar';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
 import { NewTopicModal } from '../../modals/new_topic_modal';
 import { OrderTopicsModal } from '../../modals/order_topics_modal';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import type {
@@ -12,12 +18,6 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import { Modal } from '../component_kit/cw_modal';
-import { useCommonNavigate } from 'navigation/helpers';
-import { featureFlags } from 'helpers/feature-flags';
-import { matchRoutes, useLocation } from 'react-router-dom';
-import { sidebarStore } from 'state/ui/sidebar';
-import { isWindowSmallInclusive } from '../component_kit/helpers';
 
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {
@@ -29,7 +29,7 @@ const resetSidebarState = () => {
 
 const setAdminToggleTree = (path: string, toggle: boolean) => {
   let currentTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-admin-toggle-tree`]
+    localStorage[`${app.activeChainId()}-admin-toggle-tree`],
   );
 
   const split = path.split('.');
@@ -63,15 +63,15 @@ const AdminSectionComponent = () => {
 
   const matchesManageCommunityRoute = matchRoutes(
     [{ path: '/manage' }, { path: ':scope/manage' }],
-    location
+    location,
   );
   const matchesAnalyticsRoute = matchRoutes(
     [{ path: '/analytics' }, { path: ':scope/analytics' }],
-    location
+    location,
   );
   const matchesContractsRoute = matchRoutes(
     [{ path: '/contracts' }, { path: ':scope/contracts' }],
-    location
+    location,
   );
 
   const adminGroupData: SectionGroupAttrs[] = [
@@ -93,7 +93,7 @@ const AdminSectionComponent = () => {
           app.activeChainId(),
           () => {
             setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
-          }
+          },
         );
       },
     },
@@ -115,7 +115,7 @@ const AdminSectionComponent = () => {
           app.activeChainId(),
           () => {
             setAdminToggleTree(`children.analytics.toggledState`, toggle);
-          }
+          },
         );
       },
     },
@@ -139,7 +139,7 @@ const AdminSectionComponent = () => {
                 app.activeChainId(),
                 () => {
                   setAdminToggleTree(`children.contracts.toggledState`, toggle);
-                }
+                },
               );
             },
           },
@@ -173,20 +173,24 @@ const AdminSectionComponent = () => {
         setIsOrderTopicsModalOpen(true);
       },
     },
-    {
-      title: 'Edit topic thresholds',
-      isActive: isEditTopicThresholdsModalOpen,
-      isVisible: true,
-      containsChildren: false,
-      displayData: null,
-      isUpdated: false,
-      hasDefaultToggle: false,
-      onClick: (e) => {
-        e.preventDefault();
-        resetSidebarState();
-        setIsEditTopicThresholdsModalOpen(true);
-      },
-    },
+    ...(!featureFlags.gatingEnabled
+      ? [
+          {
+            title: 'Edit topic thresholds',
+            isActive: isEditTopicThresholdsModalOpen,
+            isVisible: true,
+            containsChildren: false,
+            displayData: null,
+            isUpdated: false,
+            hasDefaultToggle: false,
+            onClick: (e) => {
+              e.preventDefault();
+              resetSidebarState();
+              setIsEditTopicThresholdsModalOpen(true);
+            },
+          },
+        ]
+      : []),
   ];
 
   // Build Toggle Tree
@@ -198,16 +202,16 @@ const AdminSectionComponent = () => {
   // Check if an existing toggle tree is stored
   if (!localStorage[`${app.activeChainId()}-admin-toggle-tree`]) {
     localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-      adminDefaultToggleTree
+      adminDefaultToggleTree,
     );
   } else if (!verifyCachedToggleTree('admin', adminDefaultToggleTree)) {
     localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-      adminDefaultToggleTree
+      adminDefaultToggleTree,
     );
   }
 
   const toggleTreeState = JSON.parse(
-    localStorage[`${app.activeChainId()}-admin-toggle-tree`]
+    localStorage[`${app.activeChainId()}-admin-toggle-tree`],
   );
 
   const sidebarSectionData: SidebarSectionAttrs = {
@@ -226,14 +230,16 @@ const AdminSectionComponent = () => {
   return (
     <React.Fragment>
       <SidebarSectionGroup {...sidebarSectionData} />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <NewTopicModal onModalClose={() => setIsNewTopicModalOpen(false)} />
         }
         onClose={() => setIsNewTopicModalOpen(false)}
         open={isNewTopicModalOpen}
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <OrderTopicsModal
             onModalClose={() => setIsOrderTopicsModalOpen(false)}
@@ -242,7 +248,8 @@ const AdminSectionComponent = () => {
         onClose={() => setIsOrderTopicsModalOpen(false)}
         open={isOrderTopicsModalOpen}
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <EditTopicThresholdsModal
             onModalClose={() => setIsEditTopicThresholdsModalOpen(false)}

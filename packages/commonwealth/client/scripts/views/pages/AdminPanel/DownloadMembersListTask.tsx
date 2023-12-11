@@ -1,12 +1,12 @@
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import 'pages/AdminPanel.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { openConfirmation } from '../../modals/confirmation_modal';
-import 'pages/AdminPanel.scss';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
+import { openConfirmation } from '../../modals/confirmation_modal';
 import { getCSVContent } from './utils';
 
 const DownloadMembersListTask = () => {
@@ -38,7 +38,8 @@ const DownloadMembersListTask = () => {
       buttons: [
         {
           label: 'Download',
-          buttonType: 'mini-black',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
           onClick: async () => {
             try {
               setIsDownloading(true);
@@ -80,7 +81,8 @@ const DownloadMembersListTask = () => {
         },
         {
           label: 'Cancel',
-          buttonType: 'mini-white',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
         },
       ],
     });

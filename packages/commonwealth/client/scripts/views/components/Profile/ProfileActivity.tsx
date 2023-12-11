@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 import 'components/Profile/ProfileActivity.scss';
 
-import type Thread from 'models/Thread';
-import type Comment from 'models/Comment';
 import type AddressInfo from 'models/AddressInfo';
+import type Comment from 'models/Comment';
+import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
-import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
+import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import ProfileActivityContent from './ProfileActivityContent';
 
 enum ProfileActivityType {
@@ -28,13 +28,13 @@ type ProfileActivityProps = {
 
 const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
   const [selectedActivity, setSelectedActivity] = useState(
-    ProfileActivityType.Comments
+    ProfileActivityType.Comments,
   );
 
   return (
     <div className="ProfileActivity">
       <div className="activity-nav">
-        <CWTabBar>
+        <CWTabsRow>
           <CWTab
             label="All Activity"
             onClick={() => {
@@ -54,7 +54,7 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
             }}
             isSelected={selectedActivity === ProfileActivityType.Threads}
           />
-        </CWTabBar>
+        </CWTabsRow>
       </div>
       <div className="activity-content">
         <ProfileActivityContent

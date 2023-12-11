@@ -33,18 +33,24 @@ html.todesktop .SublayoutHeader {
     gap: 8px;
     height: 100%;
 
-    .logo, .community-avatar-container, .IconButton {
+    .logo,
+    .community-avatar-container,
+    .IconButton {
       -webkit-app-region: no-drag;
     }
   }
 
-  .SearchBar {
-    @include extraSmall {
-      display: none;
-    }
+  .searchbar {
+    width: 608px;
 
-    input {
-      -webkit-app-region: no-drag;
+    .SearchBar {
+      @include extraSmall {
+        display: none;
+      }
+
+      input {
+        -webkit-app-region: no-drag;
+      }
     }
   }
 
@@ -62,6 +68,10 @@ html.todesktop .SublayoutHeader {
       display: none;
 
       @include extraSmall {
+        display: flex;
+      }
+
+      @include smallInclusive {
         display: flex;
       }
     }
@@ -94,9 +104,17 @@ html.todesktop .SublayoutHeader {
       @include extraSmall {
         display: none;
       }
+
+      @include smallInclusive {
+        display: none;
+      }
     }
-    
-    .LoginSelector{
+
+    .Button {
+      -webkit-app-region: no-drag;
+    }
+
+    .LoginSelector {
       -webkit-app-region: no-drag;
     }
 

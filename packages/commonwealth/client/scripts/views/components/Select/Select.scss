@@ -51,6 +51,7 @@
 }
 
 .Select-Options-Wrapper {
+  @include scrollbarStyles;
   min-width: 224px;
   max-width: 320px;
   text-overflow: ellipsis;
@@ -62,30 +63,19 @@
   margin-top: 4px;
   font-size: 14px !important;
   border: 1px solid $neutral-200 !important;
-  box-shadow: $elevation-6;
+  box-shadow: $elevation-4;
   overflow-y: scroll;
   overflow-x: hidden;
   scrollbar-gutter: stable both-edges;
-
-  &::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 7px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: 7px;
-    background-color: rgba(0, 0, 0, 0.5);
-    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
-  }
 
   p {
     text-overflow: ellipsis;
     max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
+  }
+
+  .IconButton.archiveTrayIcon {
+    fill: none;
   }
 }

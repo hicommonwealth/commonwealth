@@ -2,12 +2,12 @@ import React from 'react';
 
 import 'components/component_kit/new_designs/cw_button.scss';
 
-import type { IconName } from '../cw_icons/cw_icon_lookup';
 import { CWIcon } from '../cw_icons/cw_icon';
+import type { IconName } from '../cw_icons/cw_icon_lookup';
+import { CWText } from '../cw_text';
+import { getClasses } from '../helpers';
 import type { BaseStyleProps } from '../types';
 import { ComponentType } from '../types';
-import { getClasses } from '../helpers';
-import { CWText } from '../cw_text';
 
 export type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'destructive';
 
@@ -15,10 +15,13 @@ type ButtonHeight = 'lg' | 'med' | 'sm';
 
 type ButtonWidth = 'narrow' | 'wide' | 'full';
 
+type ButtonAlt = 'green' | 'rorange';
+
 type ButtonStyleProps = {
   buttonType?: ButtonType;
   buttonHeight?: ButtonHeight;
   buttonWidth?: ButtonWidth;
+  buttonAlt?: ButtonAlt;
 } & BaseStyleProps;
 
 export type ButtonProps = {
@@ -26,6 +29,7 @@ export type ButtonProps = {
   iconRight?: IconName;
   label: string | React.ReactNode;
   type?: 'reset' | 'submit' | 'button';
+  containerClassName?: string;
 } & ButtonStyleProps &
   React.HTMLAttributes<HTMLButtonElement>;
 
@@ -34,12 +38,14 @@ export const CWButton = (props: ButtonProps) => {
     buttonType = 'primary',
     buttonHeight = 'med',
     buttonWidth = 'narrow',
+    buttonAlt,
     className,
     disabled = false,
     iconLeft,
     iconRight,
     label,
     onClick,
+    containerClassName,
     ...otherProps
   } = props;
 
@@ -50,6 +56,7 @@ export const CWButton = (props: ButtonProps) => {
         buttonType,
         disabled,
         buttonWidth: buttonWidth === 'full' ? 'full' : '',
+        containerClassName,
       })}
     >
       <button
@@ -57,18 +64,23 @@ export const CWButton = (props: ButtonProps) => {
           {
             disabled,
             buttonType,
+            buttonAlt,
             buttonHeight,
             buttonWidth,
             className,
           },
-          ComponentType.Button
+          ComponentType.Button,
         )}
         onClick={onClick}
         disabled={disabled}
         {...otherProps}
       >
         {!!iconLeft && <CWIcon iconName={iconLeft} className="button-icon" />}
-        <CWText type={'buttonMini'} className="button-text" noWrap>
+        <CWText
+          type={buttonHeight === 'lg' ? 'buttonLg' : 'buttonSm'}
+          className="button-text"
+          noWrap
+        >
           {label}
         </CWText>
         {!!iconRight && <CWIcon iconName={iconRight} className="button-icon" />}

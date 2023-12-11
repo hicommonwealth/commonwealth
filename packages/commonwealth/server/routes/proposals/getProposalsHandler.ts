@@ -12,12 +12,12 @@ type GetProposalsResponse = {
 export const getProposalsHandler = async (
   controllers: ServerControllers,
   req: TypedRequestQuery<GetProposalsRequestParams>,
-  res: TypedResponse<GetProposalsResponse>
+  res: TypedResponse<GetProposalsResponse>,
 ) => {
   const { chainId } = req.query;
 
   const proposals = await controllers.proposals.getProposals({
-    chainId,
+    communityId: chainId,
   });
 
   return success(res, {

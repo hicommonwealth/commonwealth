@@ -9,7 +9,7 @@ export default async (
   models,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
@@ -32,7 +32,7 @@ export default async (
       include: [models.Address],
     },
     {
-      model: models.Chain,
+      model: models.Community,
       as: 'Chain',
       required: false,
       where: { active: true },

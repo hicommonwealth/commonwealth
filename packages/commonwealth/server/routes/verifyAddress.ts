@@ -10,12 +10,12 @@ import {
 } from 'common-common/src/types';
 import type { NextFunction, Request, Response } from 'express';
 
+import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { DynamicTemplate } from '../../shared/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
-import type { ChainInstance } from '../models/chain';
+import type { CommunityInstance } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
-import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import assertAddressOwnership from '../util/assertAddressOwnership';
 import verifySessionSignature from '../util/verifySessionSignature';
 
@@ -41,7 +41,7 @@ export const Errors = {
 
 const processAddress = async (
   models: DB,
-  chain: ChainInstance,
+  chain: CommunityInstance,
   chain_id: string | number,
   address: string,
   wallet_id: WalletId,
@@ -50,12 +50,12 @@ const processAddress = async (
   user: Express.User,
   sessionAddress: string | null,
   sessionIssued: string | null,
-  sessionBlockInfo: string | null
+  sessionBlockInfo: string | null,
 ): Promise<void> => {
   const addressInstance = await models.Address.scope('withPrivateData').findOne(
     {
-      where: { chain: chain.id, address },
-    }
+      where: { community_id: chain.id, address },
+    },
   );
   if (!addressInstance) {
     throw new AppError(Errors.AddressNF);
@@ -83,7 +83,7 @@ const processAddress = async (
       signature,
       sessionAddress,
       sessionIssued,
-      sessionBlockInfo
+      sessionBlockInfo,
     );
     if (!valid) {
       throw new AppError(Errors.InvalidSignature);
@@ -154,7 +154,7 @@ const processAddress = async (
           user_id: { [Op.ne]: addressInstance.user_id },
           verified: { [Op.ne]: null },
         },
-      }
+      },
     );
 
     try {
@@ -176,7 +176,7 @@ const processAddress = async (
       };
       await sgMail.send(msg);
       log.info(
-        `Sent address move email: ${address} transferred to a new account`
+        `Sent address move email: ${address} transferred to a new account`,
       );
     } catch (e) {
       log.error(`Could not send address move email for: ${address}`);
@@ -188,12 +188,12 @@ const verifyAddress = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.chain || !req.body.chain_id) {
     throw new AppError(Errors.NoChain);
   }
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain },
   });
   const chain_id = req.body.chain_id;
@@ -224,7 +224,7 @@ const verifyAddress = async (
     req.user,
     req.body.session_public_address,
     req.body.session_timestamp || null, // disallow empty strings
-    req.body.session_block_data || null // disallow empty strings
+    req.body.session_block_data || null, // disallow empty strings
   );
 
   // assertion check
@@ -239,7 +239,7 @@ const verifyAddress = async (
   } else {
     // if user isn't logged in, log them in now
     const newAddress = await models.Address.findOne({
-      where: { chain: req.body.chain, address },
+      where: { community_id: req.body.chain, address },
     });
     const user = await models.User.scope('withPrivateData').findOne({
       where: { id: newAddress.user_id },
@@ -250,18 +250,17 @@ const verifyAddress = async (
         serverAnalyticsController.track(
           {
             event: MixpanelLoginEvent.LOGIN_FAILED,
-            isCustomDomain: null,
           },
-          req
+          req,
         );
         return next(err);
       }
       serverAnalyticsController.track(
         {
           event: MixpanelLoginEvent.LOGIN_COMPLETED,
-          isCustomDomain: null,
+          userId: user.id,
         },
-        req
+        req,
       );
 
       return res.json({

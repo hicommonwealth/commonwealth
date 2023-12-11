@@ -7,9 +7,9 @@ import type {
 } from 'helpers/snapshot_utils';
 import moment from 'moment';
 
+import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
-import { Modal } from '../../components/component_kit/cw_modal';
 
 type SnapshotProposalCardsProps = {
   activeUserAddress: string;
@@ -44,7 +44,7 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
 }
 
 export const SnapshotPollCardContainer = (
-  props: SnapshotProposalCardsProps
+  props: SnapshotProposalCardsProps,
 ) => {
   const {
     activeUserAddress,
@@ -73,7 +73,7 @@ export const SnapshotPollCardContainer = (
       votes.find((vote) => {
         return vote.voter === activeUserAddress;
       })?.choice - 1
-    ]
+    ],
   );
   const [hasVoted, setHasVoted] = useState(userVote !== undefined);
 
@@ -134,7 +134,8 @@ export const SnapshotPollCardContainer = (
         tooltipErrorMessage={voteErrorText}
         isPreview={false}
       />
-      <Modal
+      <CWModal
+        size="small"
         content={
           <ConfirmSnapshotVoteModal
             space={space}

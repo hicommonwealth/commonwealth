@@ -2,17 +2,18 @@ import React, { useEffect, useRef } from 'react';
 
 import 'components/component_kit/cw_text_area.scss';
 
-import { ComponentType } from './types';
-import { getClasses } from './helpers';
-import type { ValidationStatus } from './cw_validation_text';
-import { MessageRow, useTextInputWithValidation } from './cw_text_input';
-import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
-import type { BaseTextInputProps } from './cw_text_input';
 import { useFormContext } from 'react-hook-form';
+import type { BaseTextInputProps } from './cw_text_input';
+import { MessageRow, useTextInputWithValidation } from './cw_text_input';
+import type { ValidationStatus } from './cw_validation_text';
+import { getClasses } from './helpers';
+import { MessageRow as NewMessageRow } from './new_designs/CWTextInput/MessageRow';
+import { ComponentType } from './types';
 
 type TextAreaStyleProps = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
+  instructionalMessage?: string;
   resizeWithText?: boolean;
 };
 
@@ -43,6 +44,7 @@ export const CWTextArea = (props: TextAreaProps) => {
     tabIndex,
     resizeWithText = false,
     hookToForm,
+    instructionalMessage,
   } = props;
 
   useEffect(() => {
@@ -72,7 +74,6 @@ export const CWTextArea = (props: TextAreaProps) => {
         />
       )}
       <textarea
-        {...formFieldContext}
         autoFocus={autoFocus}
         autoComplete={autoComplete}
         className={getClasses<TextAreaStyleProps & { isTyping: boolean }>({
@@ -88,6 +89,8 @@ export const CWTextArea = (props: TextAreaProps) => {
         name={name}
         placeholder={placeholder}
         ref={textareaRef}
+        value={value}
+        {...formFieldContext}
         onInput={(e) => {
           if (onInput) onInput(e);
 
@@ -108,7 +111,7 @@ export const CWTextArea = (props: TextAreaProps) => {
                   validationProps.setValidationStatus(result[0]);
                   validationProps.setStatusMessage(result[1]);
                 }
-              }, timeout)
+              }, timeout),
             );
           }
         }}
@@ -127,8 +130,14 @@ export const CWTextArea = (props: TextAreaProps) => {
             }
           }
         }}
-        value={value}
       />
+      {label && (
+        <NewMessageRow
+          instructionalMessage={instructionalMessage}
+          statusMessage={validationProps.statusMessage}
+          validationStatus={validationProps.validationStatus}
+        />
+      )}
       {label && (
         <NewMessageRow
           hasFeedback={!!inputValidationFn || !!formFieldErrorMessage}

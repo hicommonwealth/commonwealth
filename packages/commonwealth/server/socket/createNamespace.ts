@@ -1,9 +1,7 @@
 import { addPrefix, factory } from 'common-common/src/logging';
+import type { ChainEventNotification } from 'common-common/src/types';
 import type { Server } from 'socket.io';
-import type {
-  ChainEventNotification,
-  WebsocketNamespaces,
-} from '../../shared/types';
+import type { WebsocketNamespaces } from '../../shared/types';
 import {
   WebsocketEngineEvents,
   WebsocketMessageNames,
@@ -20,14 +18,14 @@ export function createNamespace(io: Server, namespace: WebsocketNamespaces) {
     log.info(
       `socket_id = ${socket.id}, user_id = ${
         (<any>socket).user.id
-      } connected to Chain-Events`
+      } connected to Chain-Events`,
     );
 
     socket.on('disconnect', () => {
       log.info(
         `socket_id = ${socket.id}, user_id = ${
           (<any>socket).user.id
-        } disconnected from Chain-Events`
+        } disconnected from Chain-Events`,
       );
     });
 
@@ -36,7 +34,7 @@ export function createNamespace(io: Server, namespace: WebsocketNamespaces) {
         log.info(
           `socket_id = ${socket.id}, user_id = ${
             (<any>socket).user.id
-          } joining ${JSON.stringify(chain)}`
+          } joining ${JSON.stringify(chain)}`,
         );
         socket.join(chain);
       }
@@ -49,11 +47,11 @@ export function createNamespace(io: Server, namespace: WebsocketNamespaces) {
           log.info(
             `socket_id = ${socket.id}, user_id = ${
               (<any>socket).user.id
-            } leaving ${JSON.stringify(eventTypes)}`
+            } leaving ${JSON.stringify(eventTypes)}`,
           );
           for (const eventType of eventTypes) socket.leave(eventType);
         }
-      }
+      },
     );
   });
 
@@ -61,14 +59,14 @@ export function createNamespace(io: Server, namespace: WebsocketNamespaces) {
     WebsocketEngineEvents.CreateRoom,
     (room) => {
       log.info(`New room created: ${room}`);
-    }
+    },
   );
 
   io.of(`/${namespace}`).adapter.on(
     WebsocketEngineEvents.DeleteRoom,
     (room) => {
       log.info(`Room: ${room}, was deleted`);
-    }
+    },
   );
 
   return CeNs;
@@ -81,7 +79,7 @@ export function createNamespace(io: Server, namespace: WebsocketNamespaces) {
  */
 export async function publishToChainEventsRoom(
   this: { server: Server },
-  notification: ChainEventNotification
+  notification: ChainEventNotification,
 ) {
   this.server
     .to(notification.ChainEvent.chain)

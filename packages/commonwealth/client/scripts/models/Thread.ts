@@ -1,12 +1,10 @@
 import { ProposalType } from 'common-common/src/types';
-import type ChainEntity from 'models/ChainEntity';
+import type MinimumProfile from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
-import app from 'state';
 import type { ReactionType } from './Reaction';
 import Topic from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
-import type MinimumProfile from 'models/MinimumProfile';
 
 function getDecodedString(str: string) {
   try {
@@ -41,28 +39,11 @@ function processVersionHistory(versionHistory: any[]) {
   return versionHistoryProcessed;
 }
 
-function processChainEntities(chain: string) {
-  const chainEntitiesProcessed: ChainEntity[] = [];
-
-  return chainEntitiesProcessed
-    ? chainEntitiesProcessed.map((ce) => {
-        return {
-          id: +ce.id,
-          chain,
-          type: ce.type,
-          typeId: (ce as any).type_id || ce.typeId,
-          completed: ce.completed,
-          author: this.author,
-        };
-      })
-    : [];
-}
-
 function processAssociatedReactions(
   reactions: any[],
   reactionIds: any[],
   reactionType: any[],
-  addressesReacted: any[]
+  addressesReacted: any[],
 ) {
   const temp = [];
   const tempReactionIds =
@@ -98,7 +79,7 @@ export interface VersionHistory {
 
 export interface IThreadCollaborator {
   address: string;
-  chain: string;
+  community_id: string;
 }
 
 export type AssociatedReaction = {
@@ -131,7 +112,6 @@ export type Link = {
 export class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
-  public chainEntities?: any[];
   public readonly authorChain: string;
   public readonly title: string;
   public readonly body: string;
@@ -152,6 +132,7 @@ export class Thread implements IUniqueId {
   public readonly createdAt: Moment;
   public readonly updatedAt: Moment;
   public readonly lastCommentedOn: Moment;
+  public archivedAt: Moment | null;
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
@@ -160,7 +141,6 @@ export class Thread implements IUniqueId {
   public readonly lastEdited: Moment;
 
   public markedAsSpamAt: Moment;
-  public archivedAt: Moment;
   public readonly lockedAt: Moment;
 
   public readonly hasPoll: boolean;
@@ -252,7 +232,7 @@ export class Thread implements IUniqueId {
     this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
     this.kind = kind;
     this.stage = stage;
-    this.authorChain = Address.chain;
+    this.authorChain = Address.community_id;
     this.pinned = pinned;
     this.url = url;
     this.chain = chain;
@@ -275,12 +255,11 @@ export class Thread implements IUniqueId {
     this.links = links || [];
     this.discord_meta = discord_meta;
     this.versionHistory = processVersionHistory(version_history);
-    this.chainEntities = processChainEntities(chain);
     this.associatedReactions = processAssociatedReactions(
       reactions,
       reactionIds,
       reactionType,
-      addressesReacted
+      addressesReacted,
     );
     this.latestActivity = last_commented_on
       ? moment(last_commented_on)

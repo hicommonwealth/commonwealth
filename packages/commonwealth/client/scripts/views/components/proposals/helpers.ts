@@ -1,5 +1,4 @@
 import { formatCoin } from 'adapters/currency';
-import { CompoundTypes } from 'chain-events/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import {
   CosmosProposal,
@@ -17,7 +16,7 @@ import {
   NearSputnikProposalStatus,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { ProposalState } from '../../../../../shared/chain/types/compound';
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus, VotingUnit } from '../../../models/types';
@@ -69,7 +68,7 @@ export const cancelProposal = (
   e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   toggleVotingModal: (newModalState: boolean) => void,
   proposal: AnyProposal,
-  onModalClose?: () => void
+  onModalClose?: () => void,
 ) => {
   e.preventDefault();
   toggleVotingModal(true);
@@ -102,7 +101,7 @@ export const cancelProposal = (
 
 export const getCanVote = (
   proposal: AnyProposal,
-  hasVotedForAnyChoice: boolean
+  hasVotedForAnyChoice: boolean,
 ) => {
   let canVote = true;
 
@@ -115,7 +114,7 @@ export const getCanVote = (
     canVote = false;
   } else if (
     proposal instanceof CompoundProposal &&
-    proposal.state !== CompoundTypes.ProposalState.Active
+    proposal.state !== ProposalState.Active
   ) {
     canVote = false;
   } else if (
@@ -125,12 +124,7 @@ export const getCanVote = (
   ) {
     canVote = false;
   } else if (hasVotedForAnyChoice) {
-    // enable re-voting for particular types
-    if (proposal instanceof SubstrateDemocracyProposal) {
-      canVote = true;
-    } else {
-      canVote = false;
-    }
+    canVote = false;
   }
 
   return canVote;
@@ -144,21 +138,14 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
   let hasVotedForAnyChoice;
   let hasVotedRemove;
 
-  if (proposal instanceof SubstrateDemocracyProposal) {
-    hasVotedYes =
-      proposal.getVotes().filter((vote) => {
-        return vote.account.address === user.address;
-      }).length > 0;
-
-    hasVotedForAnyChoice = hasVotedYes;
-  } else if (proposal instanceof CosmosProposal) {
+  if (proposal instanceof CosmosProposal) {
     hasVotedYes =
       user &&
       proposal
         .getVotes()
         .filter(
           (vote) =>
-            vote.choice === 'Yes' && vote.account.address === user.address
+            vote.choice === 'Yes' && vote.account.address === user.address,
         ).length > 0;
 
     hasVotedNo =
@@ -167,7 +154,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .getVotes()
         .filter(
           (vote) =>
-            vote.choice === 'No' && vote.account.address === user.address
+            vote.choice === 'No' && vote.account.address === user.address,
         ).length > 0;
 
     hasVotedAbstain =
@@ -176,7 +163,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .getVotes()
         .filter(
           (vote) =>
-            vote.choice === 'Abstain' && vote.account.address === user.address
+            vote.choice === 'Abstain' && vote.account.address === user.address,
         ).length > 0;
 
     hasVotedVeto =
@@ -186,7 +173,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .filter(
           (vote) =>
             vote.choice === 'NoWithVeto' &&
-            vote.account.address === user.address
+            vote.account.address === user.address,
         ).length > 0;
   } else if (proposal instanceof CompoundProposal) {
     hasVotedYes =
@@ -196,7 +183,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .filter(
           (vote) =>
             vote.choice === BravoVote.YES &&
-            vote.account.address === user.address
+            vote.account.address === user.address,
         ).length > 0;
 
     hasVotedNo =
@@ -206,7 +193,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .filter(
           (vote) =>
             vote.choice === BravoVote.NO &&
-            vote.account.address === user.address
+            vote.account.address === user.address,
         ).length > 0;
 
     hasVotedAbstain =
@@ -216,7 +203,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .filter(
           (vote) =>
             vote.choice === BravoVote.ABSTAIN &&
-            vote.account.address === user.address
+            vote.account.address === user.address,
         ).length > 0;
   } else if (proposal instanceof AaveProposal) {
     hasVotedYes =
@@ -239,7 +226,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .find(
           (vote) =>
             vote.choice === NearSputnikVoteString.Approve &&
-            vote.account.address === user.address
+            vote.account.address === user.address,
         );
 
     hasVotedNo =
@@ -249,7 +236,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .find(
           (vote) =>
             vote.choice === NearSputnikVoteString.Reject &&
-            vote.account.address === user.address
+            vote.account.address === user.address,
         );
 
     hasVotedRemove =
@@ -259,7 +246,7 @@ export const getVotingResults = (proposal: AnyProposal, user) => {
         .find(
           (vote) =>
             vote.choice === NearSputnikVoteString.Remove &&
-            vote.account.address === user.address
+            vote.account.address === user.address,
         );
 
     hasVotedForAnyChoice = hasVotedYes || hasVotedNo || hasVotedRemove;

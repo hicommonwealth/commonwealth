@@ -1,14 +1,16 @@
 import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase } from 'common-common/src/types';
 import crypto from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
-import { addressSwapper } from '../../shared/utils';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
+import { addressSwapper, bech32ToHex } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { DB } from '../models';
-import { createRole, findOneRole } from '../util/roles';
-import { factory, formatFilename } from 'common-common/src/logging';
 import assertAddressOwnership from '../util/assertAddressOwnership';
+import { createRole, findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,7 +29,7 @@ const linkExistingAddressToChain = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.address) {
     return next(new AppError(Errors.NeedAddress));
@@ -49,7 +51,7 @@ const linkExistingAddressToChain = async (
   }
   const userId = req.user.id;
 
-  const chain = await models.Chain.findOne({
+  const chain = await models.Community.findOne({
     where: { id: req.body.chain },
   });
 
@@ -65,7 +67,7 @@ const linkExistingAddressToChain = async (
         user_id: userId,
         verified: { [Op.ne]: null },
       },
-    }
+    },
   );
 
   if (!originalAddress) {
@@ -79,13 +81,13 @@ const linkExistingAddressToChain = async (
     verificationTokenExpires && +verificationTokenExpires <= +new Date();
 
   if (!isOriginalTokenValid) {
-    const chains = await models.Chain.findAll({
+    const chains = await models.Community.findAll({
       where: { base: chain.base },
     });
 
     verificationToken = crypto.randomBytes(18).toString('hex');
     verificationTokenExpires = new Date(
-      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000
+      +new Date() + ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
     );
 
     await models.Address.update(
@@ -97,9 +99,9 @@ const linkExistingAddressToChain = async (
         where: {
           user_id: originalAddress.user_id,
           address: req.body.address,
-          chain: { [Op.in]: chains.map((ch) => ch.id) },
+          community_id: { [Op.in]: chains.map((ch) => ch.id) },
         },
-      }
+      },
     );
   }
 
@@ -113,10 +115,15 @@ const linkExistingAddressToChain = async (
         : req.body.address;
 
     const existingAddress = await models.Address.scope(
-      'withPrivateData'
+      'withPrivateData',
     ).findOne({
-      where: { chain: req.body.chain, address: encodedAddress },
+      where: { community_id: req.body.chain, address: encodedAddress },
     });
+
+    let hex;
+    if (chain.base === ChainBase.CosmosSDK) {
+      hex = await bech32ToHex(req.body.address);
+    }
 
     let addressId: number;
     if (existingAddress) {
@@ -134,6 +141,7 @@ const linkExistingAddressToChain = async (
       existingAddress.verification_token_expires = verificationTokenExpires;
       existingAddress.last_active = new Date();
       existingAddress.verified = originalAddress.verified;
+      existingAddress.hex = hex;
       const updatedObj = await existingAddress.save();
       addressId = updatedObj.id;
     } else {
@@ -141,7 +149,8 @@ const linkExistingAddressToChain = async (
         user_id: originalAddress.user_id,
         profile_id: originalAddress.profile_id,
         address: encodedAddress,
-        chain: req.body.chain,
+        community_id: req.body.chain,
+        hex,
         verification_token: verificationToken,
         verification_token_expires: verificationTokenExpires,
         verified: originalAddress.verified,
@@ -164,12 +173,22 @@ const linkExistingAddressToChain = async (
     const role = await findOneRole(
       models,
       { where: { address_id: addressId } },
-      req.body.chain
+      req.body.chain,
     );
 
     if (!role) {
       await createRole(models, addressId, req.body.chain, 'member');
     }
+
+    const serverAnalyticsController = new ServerAnalyticsController();
+    serverAnalyticsController.track(
+      {
+        community: req.body.chain,
+        userId: req.user.id,
+        event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+      },
+      req,
+    );
 
     return res.json({
       status: 'Success',

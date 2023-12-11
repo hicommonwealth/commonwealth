@@ -5,24 +5,11 @@ dotenv.config();
 
 export const PORT = process.env.PORT || '8080';
 
-export const NODE_URL =
-  process.env.NODE_URL ||
-  (process.env.NODE_ENV === 'production'
-    ? 'ws://testnet2.edgewa.re:9944'
-    : 'ws://localhost:9944');
-
 export const SERVER_URL =
   process.env.SERVER_URL ||
   (process.env.NODE_ENV === 'production'
     ? 'https://commonwealth.im'
     : 'http://localhost:8080');
-
-export const CE_URL =
-  process.env.ENTITIES_URL ||
-  process.env.CE_URL ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://chain-events.herokuapp.com/api'
-    : 'http://localhost:8081/api');
 
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
@@ -36,37 +23,9 @@ export const ROLLBAR_ENV = process.env.ROLLBAR_ENV || 'local';
 
 export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
 
-export const SLACK_WEBHOOKS = {
-  cosmos: process.env.COSMOS_SLACK_WEBHOOK,
-  edgeware: process.env.EDGEWARE_SLACK_WEBHOOK,
-  ethereum: process.env.ETHEREUM_SLACK_WEBHOOK,
-  kusama: process.env.KUSAMA_SLACK_WEBHOOK,
-  near: process.env.NEAR_SLACK_WEBHOOK,
-};
-
 export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
-export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-export const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-export const GITHUB_OAUTH_CALLBACK =
-  process.env.GITHUB_OAUTH_CALLBACK ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://commonwealth.im'
-    : process.env.NODE_ENV === 'mobile'
-    ? 'capacitor://localhost'
-    : 'http://localhost:8080') + '/api/auth/github/callback';
-
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-export const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-export const DISCORD_OAUTH_CALLBACK =
-  process.env.DISCORD_OAUTH_CALLBACK ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://commonwealth.im'
-    : process.env.NODE_ENV === 'mobile'
-    ? 'capacitor://localhost'
-    : 'http://localhost:8080') + '/api/auth/discord/callback';
-export const DISCORD_OAUTH_SCOPES =
-  process.env.DISCORD_OAUTH_SCOPES?.split(' ');
 
 export const DATABASE_URI = process.env.USES_DOCKER_DB
   ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
@@ -118,7 +77,7 @@ export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
-  ','
+  ',',
 ) as ChainBase[]) || [ChainBase.Ethereum];
 export const MAGIC_DEFAULT_CHAIN =
   process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
@@ -128,21 +87,33 @@ export const DEFAULT_COMMONWEALTH_LOGO =
 
 export const AXIE_SHARED_SECRET = process.env.AXIE_SHARED_SECRET;
 
-export const WEBSOCKET_ADMIN_USERNAME = process.env.WEBSOCKET_ADMIN_USERNAME;
-export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
-
 export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
 
 export const ETHERSCAN_JS_API_KEY = process.env.ETHERSCAN_JS_API_KEY;
-export const CHAIN_EVENT_SERVICE_SECRET =
-  process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
 export const ETH_RPC = process.env.ETH_RPC || 'prod';
 
 export const COSMOS_GOV_V1_CHAIN_IDS = process.env.COSMOS_GOV_V1
   ? process.env.COSMOS_GOV_V1.split(',')
   : [];
 
+export const COSMOS_REGISTRY_API =
+  process.env.COSMOS_REGISTRY_API || 'https://cosmoschains.thesilverfox.pro';
+
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
 // Don't set default value so if env var is not set the database cleaner will not run
 export const DATABASE_CLEAN_HOUR = process.env.DATABASE_CLEAN_HOUR;
+
+export const TELEGRAM_BOT_TOKEN =
+  process.env.NODE_ENV === 'production'
+    ? process.env.TELEGRAM_BOT_TOKEN
+    : process.env.TELEGRAM_BOT_TOKEN_DEV;
+
+// Should be false EVERYWHERE except the production `commonwealthapp` Heroku app
+// Risks sending webhooks/emails to real users if incorrectly set to true
+export const SEND_WEBHOOKS_EMAILS =
+  process.env.NODE_ENV === 'production' &&
+  process.env.SEND_WEBHOOKS_EMAILS === 'true';
+
+export const FEATURE_FLAG_GROUP_CHECK_ENABLED =
+  process.env.FEATURE_FLAG_GROUP_CHECK_ENABLED === 'true' || false;

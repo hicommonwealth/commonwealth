@@ -1,15 +1,9 @@
+import { NotificationCategories } from 'common-common/src/types';
 import type { DataTypes } from 'sequelize';
 import Sequelize from 'sequelize';
-import type {
-  IChainEventNotificationData,
-  IForumNotificationData,
-  ISnapshotNotificationData,
-} from '../../shared/types';
-import type { DB } from '../models';
-import type { WebhookContent } from '../webhookNotifier';
-import type { ChainAttributes } from './chain';
+import emitNotifications from '../util/emitNotifications';
 import type { CommentAttributes } from './comment';
-import type { NotificationInstance } from './notification';
+import type { CommunityAttributes } from './community';
 import type { NotificationCategoryAttributes } from './notification_category';
 import type {
   NotificationsReadAttributes,
@@ -18,7 +12,6 @@ import type {
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 import type { UserAttributes } from './user';
-import { NotificationCategories } from 'common-common/src/types';
 
 export enum SubscriptionValidationErrors {
   NoChainId = 'Must provide a chain_id',
@@ -44,7 +37,7 @@ export type SubscriptionAttributes = {
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
   NotificationsRead?: NotificationsReadAttributes[];
-  Chain?: ChainAttributes;
+  Chain?: CommunityAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
 };
@@ -54,22 +47,12 @@ export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
 };
 
 export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
-  emitNotifications?: (
-    models: DB,
-    category_id: string,
-    notification_data:
-      | IForumNotificationData
-      | IChainEventNotificationData
-      | ISnapshotNotificationData,
-    webhook_data?: Partial<WebhookContent>,
-    excludeAddresses?: string[],
-    includeAddresses?: string[]
-  ) => Promise<NotificationInstance>;
+  emitNotification?: typeof emitNotifications;
 };
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): SubscriptionModelStatic => {
   const Subscription = <SubscriptionModelStatic>sequelize.define(
     'Subscription',
@@ -127,7 +110,7 @@ export default (
                 throw new Error(SubscriptionValidationErrors.NoThreadOrComment);
               if (this.thread_id && this.comment_id)
                 throw new Error(
-                  SubscriptionValidationErrors.NotBothThreadAndComment
+                  SubscriptionValidationErrors.NotBothThreadAndComment,
                 );
               break;
             case NotificationCategories.NewMention:
@@ -138,7 +121,7 @@ export default (
           }
         },
       },
-    }
+    },
   );
 
   Subscription.associate = (models) => {
@@ -154,7 +137,7 @@ export default (
       foreignKey: 'subscription_id',
       onDelete: 'cascade',
     });
-    models.Subscription.belongsTo(models.Chain, {
+    models.Subscription.belongsTo(models.Community, {
       foreignKey: 'chain_id',
       targetKey: 'id',
     });

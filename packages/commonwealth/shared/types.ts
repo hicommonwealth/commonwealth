@@ -1,11 +1,21 @@
-import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
-import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
-import type { AccessLevel } from './permissions';
+import type { SupportedNetwork } from 'common-common/src/types';
 import {
   NotificationCategories,
   NotificationCategory,
 } from 'common-common/src/types';
-import { SupportedNetwork } from 'chain-events/src';
+import type { AccessLevel } from './permissions';
+
+export type SnapshotProposalAttributes = {
+  id: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
+  space: string;
+  event: string;
+  start?: string;
+  expire: string;
+  is_upstream_deleted?: boolean;
+};
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
@@ -21,17 +31,6 @@ export type SnapshotProposalNotification = {
   category_id: 'snapshot-proposal';
   chain_id: string;
   SnapshotProposal: SnapshotProposalAttributes;
-};
-
-export type ChainEventNotification = {
-  id: number;
-  notification_data: string;
-  chain_event_id: number;
-  category_id: 'chain-event';
-  chain_id: string;
-  updated_at: Date;
-  created_at: Date;
-  ChainEvent: ChainEventAttributes;
 };
 
 export const enum SnapshotEventType {
@@ -148,10 +147,6 @@ export interface IChainEventNotificationData {
   event_data: any;
   network: SupportedNetwork;
   chain: string;
-
-  // TODO: @Timothee remove these once chain-events is removed
-  queued?: number;
-  entity_id?: number;
 }
 
 export type NotificationDataTypes =
@@ -222,3 +217,9 @@ export type RoleObject = {
 };
 
 export type AbiType = Record<string, unknown>[];
+
+export type WebhookCategory =
+  | NotificationCategories.ChainEvent
+  | NotificationCategories.NewThread
+  | NotificationCategories.NewComment
+  | NotificationCategories.NewReaction;

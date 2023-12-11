@@ -1,19 +1,19 @@
-import React, { FC } from 'react';
 import {
   ArrowBendUpRight,
+  ArrowFatUp,
   BellSimple,
   BellSimpleSlash,
-  DotsThree,
   ChatCenteredDots,
-  ArrowFatUp,
+  DotsThree,
 } from '@phosphor-icons/react';
+import React, { FC } from 'react';
 
+import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
 import 'components/component_kit/new_designs/cw_thread_action.scss';
-import { CWTooltip } from 'views/components/component_kit/cw_popover/cw_tooltip';
 
 export type ActionType =
   | 'upvote'
@@ -35,7 +35,7 @@ const commonProps = (disabled: boolean) => {
 const renderPhosphorIcon = (
   action: ActionType,
   disabled: boolean,
-  selected: boolean
+  selected: boolean,
 ) => {
   switch (action) {
     case 'upvote':
@@ -69,6 +69,7 @@ type CWThreadActionProps = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   label?: string;
   selected?: boolean;
+  isThreadArchived?: boolean;
   tooltipText?: string;
 };
 
@@ -110,7 +111,11 @@ export const TooltipWrapper = ({
   );
 };
 
-const getTooltipCopy = (action: ActionType) => {
+const getTooltipCopy = (action: ActionType, isThreadArchived: boolean) => {
+  if (isThreadArchived) {
+    return 'Thread is archived';
+  }
+
   switch (action) {
     case 'upvote':
       return 'Join community to upvote';
@@ -133,6 +138,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   onClick,
   label,
   selected,
+  isThreadArchived,
   tooltipText,
 }) => {
   const handleClick = (e) => {
@@ -148,7 +154,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
   return (
     <TooltipWrapper
       disabled={disabled}
-      text={tooltipText || getTooltipCopy(action)}
+      text={tooltipText || getTooltipCopy(action, isThreadArchived)}
     >
       <button
         onClick={handleClick}
@@ -157,7 +163,7 @@ export const CWThreadAction: FC<CWThreadActionProps> = ({
             disabled,
             upvoteSelected,
           },
-          ComponentType.ThreadAction
+          ComponentType.ThreadAction,
         )}
       >
         {renderPhosphorIcon(action, disabled, selected)}

@@ -1,24 +1,27 @@
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import $ from 'jquery';
+import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/create_community.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { MixpanelPageViewEvent } from '../../../../../shared/analytics/types';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
+import {
+  CWTab,
+  CWTabsRow,
+} from '../../components/component_kit/new_designs/CWTabs';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
 import { EthDaoForm } from './eth_dao_form';
 import { useEthChainFormState } from './hooks';
+import { PolygonForm } from './polygon_form';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
 import { StarterCommunityForm } from './starter_community_form';
 import { SubstrateForm } from './substrate_form';
-import { PolygonForm } from './polygon_form';
-import { useCommonNavigate } from 'navigation/helpers';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export enum CommunityType {
   StarterCommunity = 'Starter Community',
@@ -106,13 +109,17 @@ const CreateCommunity = (props: CreateCommunityProps) => {
     } else {
       setCurrentForm(getFormType(type));
     }
-  }, [type]);
+  }, [type, navigate]);
 
   const [currentForm, setCurrentForm] = useState<CommunityType>(
-    getFormType(type)
+    getFormType(type),
   );
-  const { ethChains, setEthChains, ethChainNames, setEthChainNames } =
-    useEthChainFormState();
+  const {
+    ethChainNodes,
+    setEthChainNodes,
+    ethChainNodeNames,
+    setEthChainNodeNames,
+  } = useEthChainFormState();
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -121,18 +128,18 @@ const CreateCommunity = (props: CreateCommunityProps) => {
   });
 
   useEffect(() => {
-    const fetchEthChains = async () => {
+    const fetchEthChainNodes = async () => {
       await $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(
         (res) => {
           if (res.status === 'Success') {
-            setEthChains(res.result);
+            setEthChainNodes(res.result);
           }
-        }
+        },
       );
     };
 
-    fetchEthChains();
-  }, []);
+    fetchEthChainNodes();
+  }, [setEthChainNodes]);
 
   useNecessaryEffect(() => {
     const fetchEthChainNames = async () => {
@@ -140,7 +147,7 @@ const CreateCommunity = (props: CreateCommunityProps) => {
 
       const newObject = {};
 
-      for (const id of Object.keys(ethChains)) {
+      for (const id of Object.keys(ethChainNodes)) {
         const chain = chains.find((c) => c.chainId === +id);
 
         if (chain) {
@@ -148,11 +155,11 @@ const CreateCommunity = (props: CreateCommunityProps) => {
         }
       }
 
-      setEthChainNames(newObject);
+      setEthChainNodeNames(newObject);
     };
 
     fetchEthChainNames();
-  }, [ethChains]);
+  }, [ethChainNodes]);
 
   const getCurrentForm = () => {
     switch (type) {
@@ -160,11 +167,17 @@ const CreateCommunity = (props: CreateCommunityProps) => {
         return <StarterCommunityForm />;
       case 'erc20':
         return (
-          <ERC20Form ethChains={ethChains} ethChainNames={ethChainNames} />
+          <ERC20Form
+            ethChainNodes={ethChainNodes}
+            ethChainNodeNames={ethChainNodeNames}
+          />
         );
       case 'erc721':
         return (
-          <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
+          <ERC721Form
+            ethChainNodes={ethChainNodes}
+            ethChainNodeNames={ethChainNodeNames}
+          />
         );
       case 'sputnik':
         return <SputnikForm />;
@@ -174,11 +187,17 @@ const CreateCommunity = (props: CreateCommunityProps) => {
         return <CosmosForm />;
       case 'ethdao':
         return (
-          <EthDaoForm ethChains={ethChains} ethChainNames={ethChainNames} />
+          <EthDaoForm
+            ethChainNodes={ethChainNodes}
+            ethChainNodeNames={ethChainNodeNames}
+          />
         );
       case 'polygon':
         return (
-          <PolygonForm ethChains={ethChains} ethChainNames={ethChainNames} />
+          <PolygonForm
+            ethChainNodes={ethChainNodes}
+            ethChainNodeNames={ethChainNodeNames}
+          />
         );
       case 'solana':
         return <SplTokenForm />;
@@ -192,29 +211,31 @@ const CreateCommunity = (props: CreateCommunityProps) => {
       <CWText type="h3" fontWeight="semiBold">
         New Commonwealth Community
       </CWText>
-      <CWTabBar>
-        {Object.values(CommunityType)
-          .filter((t) => {
-            return (
-              (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
-              t !== CommunityType.AbiFactory
-            );
-          })
-          .map((t, i) => {
-            return (
-              <CWTab
-                key={i}
-                label={t.toString()}
-                isSelected={currentForm === t}
-                onClick={() => {
-                  setCurrentForm(t);
-                  navigate(`/createCommunity/${getTypeUrl(t)}`);
-                }}
-              />
-            );
-          })}
-      </CWTabBar>
-      {Object.keys(ethChainNames).length !== 0 ? (
+      <div className="cw-tabs-row-container">
+        <CWTabsRow>
+          {Object.values(CommunityType)
+            .filter((t) => {
+              return (
+                (!ADMIN_ONLY_TABS.includes(t) || app?.user.isSiteAdmin) &&
+                t !== CommunityType.AbiFactory
+              );
+            })
+            .map((t, i) => {
+              return (
+                <CWTab
+                  key={i}
+                  label={t.toString()}
+                  isSelected={currentForm === t}
+                  onClick={() => {
+                    setCurrentForm(t);
+                    navigate(`/createCommunity/${getTypeUrl(t)}`);
+                  }}
+                />
+              );
+            })}
+        </CWTabsRow>
+      </div>
+      {Object.keys(ethChainNodeNames).length !== 0 ? (
         getCurrentForm()
       ) : (
         <div className="SpinnerContainer">

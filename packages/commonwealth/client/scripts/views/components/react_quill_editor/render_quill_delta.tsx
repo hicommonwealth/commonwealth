@@ -1,9 +1,9 @@
 import React, { ReactElement } from 'react';
 
-import { loadScript } from 'helpers';
-import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
-import app from 'state';
 import { Browser } from '@capacitor/browser';
+import { loadScript } from 'helpers';
+import app from 'state';
+import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
 
 type TempList = Array<
   Array<{
@@ -17,7 +17,7 @@ type TempList = Array<
 
 const getGroupTag = (
   group: { listtype: string },
-  collapse: boolean
+  collapse: boolean,
 ): ['span' | 'ul' | 'ol' | 'div', string?] => {
   if (collapse) return ['span'];
   if (group.listtype === 'bullet') return ['ul'];
@@ -31,7 +31,7 @@ const getParentTag = (
   parent: {
     attributes: { list?: string };
   },
-  collapse: boolean
+  collapse: boolean,
 ): ['span' | 'li' | 'div', ('checked' | 'unchecked')?] => {
   if (collapse) return ['span'];
   if (parent.attributes?.list === 'bullet') return ['li'];
@@ -70,7 +70,7 @@ export const renderQuillDelta = (
   hideFormatting = false,
   collapse = false,
   openLinksInNewTab = false,
-  navigate
+  navigate,
 ) => {
   // convert quill delta into a tree of {block -> parent -> child} nodes
   // blocks are <ul> <ol>, parents are all other block nodes, children are inline nodes
@@ -148,14 +148,14 @@ export const renderQuillDelta = (
                             return;
                           if (
                             child.attributes.link.startsWith(
-                              `${document.location.origin}/`
+                              `${document.location.origin}/`,
                             )
                           ) {
                             // don't open a new window if the link is on Commonwealth
                             e.preventDefault();
                             e.stopPropagation();
                             const navigateTo = child.attributes.link.split(
-                              `${document.location.origin}`
+                              `${document.location.origin}`,
                             )[1];
                             navigate(navigateTo, {}, null);
                           }
@@ -175,7 +175,7 @@ export const renderQuillDelta = (
                 })}
               </ParentTag>
             );
-          })
+          }),
         );
       })
     : consolidateOrderedLists(groups).map((group) => {
@@ -244,14 +244,14 @@ export const renderQuillDelta = (
                   if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
                   if (
                     child.attributes.link.startsWith(
-                      `${document.location.origin}/`
+                      `${document.location.origin}/`,
                     )
                   ) {
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
                     const navigateTo = child.attributes.link.split(
-                      `${document.location.origin}`
+                      `${document.location.origin}`,
                     )[1];
                     navigate(navigateTo, {}, null);
                   }
@@ -348,25 +348,11 @@ export const renderQuillDelta = (
               ? 'unchecked'
               : '';
 
-          if (parent.attributes?.header === 1) {
-            return (
-              <h1 key={ii} className={className}>
-                {parent.children[0].insert}
-              </h1>
-            );
-          } else if (parent.attributes?.header === 2) {
-            return (
-              <h2 key={ii} className={className}>
-                {parent.children[0].insert}
-              </h2>
-            );
-          } else {
-            return (
-              <Tag key={ii} className={className}>
-                {parent.children.map(renderChild)}
-              </Tag>
-            );
-          }
+          return (
+            <Tag key={ii} className={className}>
+              {parent.children.map(renderChild)}
+            </Tag>
+          );
         };
 
         // special handler for lists, which need to be un-flattened and turned into a tree
@@ -387,7 +373,7 @@ export const renderQuillDelta = (
                   type="checkbox"
                   disabled
                   checked={isChecked}
-                />
+                />,
               );
             }
 
@@ -420,7 +406,7 @@ export const renderQuillDelta = (
                         </data.tag>
                       );
                     })}
-                  </GroupTag>
+                  </GroupTag>,
                 );
                 iiii++;
               }
@@ -447,7 +433,7 @@ export const renderQuillDelta = (
                     </data.tag>
                   );
                 })}
-              </GroupTag>
+              </GroupTag>,
             );
             iii++;
           }

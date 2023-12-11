@@ -1,8 +1,6 @@
-import { NotificationDataAndCategory } from 'types';
-import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { CreationAttributes } from 'sequelize';
-import { SubscriptionInstance } from '../models/subscription';
+import { NotificationCategories } from 'common-common/src/types';
+import { NotificationDataAndCategory } from '../../shared/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,7 +12,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * @param notification
  */
 export function mapNotificationsDataToSubscriptions(
-  notification: NotificationDataAndCategory
+  notification: NotificationDataAndCategory,
 ): Record<string, unknown> {
   const uniqueData = { category_id: notification.categoryId };
   if (notification.categoryId === NotificationCategories.ChainEvent) {

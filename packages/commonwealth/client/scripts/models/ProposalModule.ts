@@ -1,23 +1,16 @@
-import type { Coin } from 'adapters/currency';
-import type { IIdentifiable } from 'adapters/shared';
 import type { IApp } from 'state';
+import type { Coin } from '../../../shared/adapters/currency';
+import type { IIdentifiable } from '../../../shared/adapters/shared';
 import { ProposalStore } from '../stores';
-import type ChainEntity from './ChainEntity';
-import type ChainEvent from './ChainEvent';
-import type {
-  IAccountsModule,
-  IChainModule,
-  ITXModalData,
-  IVote,
-} from './interfaces';
 import type Proposal from './Proposal';
 import StorageModule from './StorageModule';
+import type { IAccountsModule, IChainModule, IVote } from './interfaces';
 
 // Implemented by a chain's governance module, assuming it uses a proposal-based mechanism.
 export abstract class ProposalModule<
   ApiT,
   CT extends IIdentifiable,
-  ProposalT extends Proposal<ApiT, Coin, CT, IVote<Coin>>
+  ProposalT extends Proposal<ApiT, Coin, CT, IVote<Coin>>,
 > extends StorageModule {
   public readonly store = new ProposalStore<ProposalT>();
 
@@ -54,28 +47,7 @@ export abstract class ProposalModule<
     return this._app;
   }
 
-  protected _entityConstructor(entity: ChainEntity): ProposalT {
-    try {
-      return this._constructorFunc(entity);
-    } catch (e) {
-      console.error(`failed to construct proposal from entity: ${e.message}`);
-      console.error('failed entity: ', entity);
-    }
-  }
-
-  public updateProposal(entity: ChainEntity, event: ChainEvent): void {
-    const proposal = this.store.getByIdentifier(entity.typeId);
-    if (!proposal) {
-      this._entityConstructor(entity);
-    } else {
-      proposal.update(event);
-    }
-  }
-
-  constructor(
-    app: IApp,
-    protected _constructorFunc?: (e: ChainEntity) => ProposalT
-  ) {
+  constructor(app: IApp) {
     super();
     this._app = app;
   }
@@ -106,7 +78,7 @@ export abstract class ProposalModule<
   */
   public abstract init(
     ChainInfo: IChainModule<any, any>,
-    Accounts: IAccountsModule<any, any>
+    Accounts: IAccountsModule<any>,
   ): Promise<void>;
 
   public deinit() {

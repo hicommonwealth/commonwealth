@@ -1,6 +1,6 @@
+import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import React from 'react';
 import { CWCheck } from 'views/components/component_kit/cw_icons/cw_icons';
-import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { CWText } from '../component_kit/cw_text';
 
 interface CosmosProposalSelectorItemProps {
@@ -15,7 +15,7 @@ const CosmosProposalSelectorItem = ({
   isSelected,
 }: CosmosProposalSelectorItemProps) => {
   return (
-    <div className="chain-entity" onClick={() => onClick(proposal)}>
+    <div className="proposal" onClick={() => onClick(proposal)}>
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
         <CWText fontWeight="medium" truncate noWrap>

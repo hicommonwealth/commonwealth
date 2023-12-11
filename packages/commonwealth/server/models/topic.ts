@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ChainAttributes } from './chain';
+import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -19,9 +19,10 @@ export type TopicAttributes = {
   deleted_at?: Date;
   token_threshold: string;
   default_offchain_template?: string;
+  group_ids: number[];
 
   // associations
-  chain?: ChainAttributes;
+  chain?: CommunityAttributes;
   threads?: ThreadAttributes[] | TopicAttributes['id'][];
 };
 
@@ -33,7 +34,7 @@ export type TopicModelStatic = ModelStatic<TopicInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): TopicModelStatic => {
   const Topic = <TopicModelStatic>sequelize.define(
     'Topic',
@@ -64,6 +65,11 @@ export default (
         defaultValue: '',
       },
       channel_id: { type: dataTypes.STRING, allowNull: true },
+      group_ids: {
+        type: dataTypes.ARRAY(dataTypes.INTEGER),
+        allowNull: false,
+        defaultValue: [],
+      },
     },
     {
       timestamps: true,
@@ -78,11 +84,11 @@ export default (
           exclude: ['created_at', 'updated_at', 'deleted_at'],
         },
       },
-    }
+    },
   );
 
   Topic.associate = (models) => {
-    models.Topic.belongsTo(models.Chain, {
+    models.Topic.belongsTo(models.Community, {
       as: 'chain',
       foreignKey: 'chain_id',
       targetKey: 'id',

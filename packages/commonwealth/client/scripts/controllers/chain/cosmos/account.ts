@@ -23,9 +23,9 @@ export default class CosmosAccount extends Account {
     app: IApp,
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
-    address: string
+    address: string,
   ) {
-    super({ chain: app.chain.meta, address });
+    super({ community: app.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {
@@ -45,7 +45,7 @@ export default class CosmosAccount extends Account {
     try {
       const bal = await this._Chain.api.bank.balance(
         this.address,
-        this._Chain.denom
+        this._Chain.denom,
       );
       this._balance = this._Chain.coins(new BN(bal.amount));
     } catch (e) {

@@ -1,13 +1,31 @@
-import type { DB } from '../models';
 import { Op } from 'sequelize';
+import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
 
-export async function getActivityFeed(models: DB, id = 0) {
+export type GlobalActivity = Array<{
+  category_id: string;
+  comment_count: string;
+  last_activity: string;
+  notification_data: string; // actually object but stringified
+  reaction_count: string;
+  thread_id: string;
+  view_count: number;
+  commenters: {
+    id: number;
+    Addresses: AddressInstance[];
+  }[];
+}>;
+
+export async function getActivityFeed(
+  models: DB,
+  id = 0,
+): Promise<GlobalActivity> {
   /**
    * Last 50 updated threads
    */
 
   const filterByChainForUsers = id
-    ? 'JOIN "Addresses" a on a.chain=t.chain and a.user_id = ?'
+    ? 'JOIN "Addresses" a on a.community_id=t.chain and a.user_id = ?'
     : '';
 
   const query = `
@@ -55,7 +73,7 @@ export async function getActivityFeed(models: DB, id = 0) {
         [Op.in]: comments.map((c) => c.address_id),
       },
     },
-    attributes: ['id', 'address', 'chain', 'profile_id'],
+    attributes: ['id', 'address', 'community_id', 'profile_id'],
   });
 
   const profiles = addresses.map((a) => {
@@ -67,7 +85,7 @@ export async function getActivityFeed(models: DB, id = 0) {
 
   const notificationsWithProfiles = notifications.map((notification) => {
     const filteredComments = comments.filter(
-      (c) => c.thread_id === notification.thread_id
+      (c) => c.thread_id === notification.thread_id,
     );
     const notificationProfiles = filteredComments.map((c) => {
       const filteredAddress = addresses.find((a) => a.id === c.address_id);
