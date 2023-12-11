@@ -219,7 +219,7 @@ export const getUserStatus = async (models: DB, user: UserInstance) => {
     const id = comment.thread_id;
     unseenPosts[comment.chain].activePosts
       ? unseenPosts[comment.chain].activePosts.add(id)
-      : (unseenPosts[comment.chain].activePosts = new Set(id));
+      : (unseenPosts[comment.chain].activePosts = new Set([id]));
     unseenPosts[comment.chain].comments
       ? unseenPosts[comment.chain].comments++
       : (unseenPosts[comment.chain].comments = 1);
