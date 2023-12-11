@@ -152,6 +152,7 @@ const BasicInformationForm = ({
       className="BasicInformationForm"
       initialValues={{
         ...(chainEcosystem === 'polygon' && { chain: POLOGON_CHAIN_OPTION }),
+        ...(chainEcosystem === 'solana' && { chain: getChainOptions()?.[0] }),
       }}
     >
       <section className="header">
@@ -180,7 +181,7 @@ const BasicInformationForm = ({
         isClearable={false}
         label="Select chain"
         placeholder="Select chain"
-        isDisabled={chainEcosystem === 'polygon'}
+        isDisabled={chainEcosystem === 'polygon' || chainEcosystem === 'solana'}
         options={getChainOptions()}
       />
 

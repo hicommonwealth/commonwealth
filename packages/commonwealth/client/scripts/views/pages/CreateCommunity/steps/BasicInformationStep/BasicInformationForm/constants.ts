@@ -14,7 +14,10 @@ export const chainTypes = app.config.nodes
   .getAll()
   .filter(
     (chain) =>
-      chain.ethChainId || chain.cosmosChainId || chain.balanceType === 'solana',
+      chain.ethChainId ||
+      chain.cosmosChainId ||
+      (chain.balanceType === 'solana' &&
+        chain.name.toLowerCase().includes('mainnet')),
   )
   .map((chain) => ({
     chainBase: chain.ethChainId
