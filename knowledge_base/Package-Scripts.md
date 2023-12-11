@@ -67,6 +67,10 @@ If you add a script to the package.json, you must add documentation here, descri
   - [start-all](#start-all)
   - [start-consumer](#start-consumer)
   - [start-evm-ce](#start-evm-ce)
+- [Devnets](#devnets)
+  - [cosmos:build](#cosmos:build)
+  - [cosmos:start](#cosmos:start)
+  - [cosmos:stop](#cosmos:stop)
 
 # Build Scripts
 
@@ -126,9 +130,9 @@ Contributor: Kurtis Assad
 
 ## dump-db
 
-Definition: `pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump`
+Definition: `pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump`
 
-Description: Creates a database dump file, `latest.dump`, from Heroku's commonwealth-beta db, excluding several tables such as DiscussionDrafts, Subscriptions, Notifications, and SocialAccounts.
+Description: Creates a database dump file, `latest.dump`, from Heroku's commonwealth-beta db, excluding several tables such as DiscussionDrafts, Subscriptions, and Notifications.
 
 ## dump-db-limit
 
@@ -507,3 +511,23 @@ Description: Runs `CommonwealthConsumer.ts` script, which consumes & processes R
 Definition: `ts-node ./server/workers/evmChainEvents/startEvmPolling.ts`
 
 Description: Runs `startEvmPolling.ts` script, which polls Ethereum chains for events in order to generate notifications.
+
+# Devnets
+
+## cosmos:build
+
+Definition: `chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh --build`
+
+Description: Fetches Docker images for all Cosmos devnets (evmos, v1beta1, and v1) and starts containers for each.
+
+## cosmos:start
+
+Definition: `chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh`
+
+Description: Starts existing dormant Cosmos devnet containers.
+
+## cosmos:stop
+
+Definition: `chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/cosmos-chain-testing/v1/stop.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/stop.sh && ./test/util/cosmos-chain-testing/v1beta1/stop.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/stop.sh && ./test/util/cosmos-chain-testing/ethermint/stop.sh`
+
+Description: Stop all Cosmos devnet containers.

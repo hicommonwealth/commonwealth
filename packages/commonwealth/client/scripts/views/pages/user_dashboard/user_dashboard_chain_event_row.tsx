@@ -1,8 +1,8 @@
+import type { IEventLabel } from 'chain/labelers/util';
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { IEventLabel } from 'chain/labelers/util';
-import ChainInfo from '../../../models/ChainInfo';
+import CommunityInfo from '../../../models/ChainInfo';
 import { Skeleton } from '../../components/Skeleton';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -12,7 +12,7 @@ import { getClasses } from '../../components/component_kit/helpers';
 
 type UserDashboardChainEventRowProps = {
   blockNumber?: number;
-  chain: ChainInfo;
+  community: CommunityInfo;
   label: IEventLabel;
   showSkeleton?: boolean;
 };
@@ -48,11 +48,12 @@ export const UserDashboardChainEventRowSkeleton = () => {
   );
 };
 
-export const UserDashboardChainEventRow = (
-  props: UserDashboardChainEventRowProps
-) => {
-  const { blockNumber, chain, label, showSkeleton } = props;
-
+export const UserDashboardChainEventRow = ({
+  blockNumber,
+  community,
+  label,
+  showSkeleton,
+}: UserDashboardChainEventRowProps) => {
   if (showSkeleton) {
     return <UserDashboardChainEventRowSkeleton />;
   }
@@ -61,7 +62,7 @@ export const UserDashboardChainEventRow = (
     <Link
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!label.linkUrl },
-        'UserDashboardChainEventRow'
+        'UserDashboardChainEventRow',
       )}
       {...(label.linkUrl && { to: label.linkUrl })}
     >
@@ -73,15 +74,15 @@ export const UserDashboardChainEventRow = (
       </div>
       <div className="chain-event-text-container">
         <div className="community-title">
-          <CWCommunityAvatar community={chain} size="small" />
+          <CWCommunityAvatar community={community} size="small" />
           <Link
             onClick={(e) => {
               e.stopPropagation();
             }}
-            {...(chain?.id && { to: `/${chain?.id}` })}
+            {...(community?.id && { to: `/${community?.id}` })}
           >
             <CWText type="caption" fontWeight="medium">
-              {chain?.name || 'Unknown chain'}
+              {community?.name || 'Unknown chain'}
             </CWText>
           </Link>
           <div className="dot">.</div>

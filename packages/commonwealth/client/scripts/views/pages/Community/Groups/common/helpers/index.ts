@@ -1,10 +1,11 @@
 import app from 'state';
 import { SPECIFICATIONS, TOKENS } from '../../../common/constants';
+import { convertRequirementAmountFromTokensToWei } from '../../../common/helpers';
 import { GroupResponseValuesType } from '../GroupForm/index.types';
 
 // Makes create/edit group api payload from provided form submit values
 export const makeGroupDataBaseAPIPayload = (
-  formSubmitValues: GroupResponseValuesType
+  formSubmitValues: GroupResponseValuesType,
 ) => {
   const payload = {
     chainId: app.activeChainId(),
@@ -25,17 +26,24 @@ export const makeGroupDataBaseAPIPayload = (
     if (
       x.requirementType === SPECIFICATIONS.ERC_20 ||
       x.requirementType === SPECIFICATIONS.ERC_721 ||
+      x.requirementType === SPECIFICATIONS.ERC_1155 ||
       x.requirementType === TOKENS.EVM_TOKEN
     ) {
       payload.requirements.push({
         rule: 'threshold',
         data: {
-          threshold: x.requirementAmount.trim(),
+          threshold: convertRequirementAmountFromTokensToWei(
+            x.requirementType as any,
+            x.requirementAmount,
+          ),
           source: {
             source_type: x.requirementType,
             evm_chain_id: parseInt(x.requirementChain),
             ...(x.requirementType !== TOKENS.EVM_TOKEN && {
               contract_address: x.requirementContractAddress.trim(),
+            }),
+            ...(x.requirementType === SPECIFICATIONS.ERC_1155 && {
+              token_id: x.requirementTokenId.trim(),
             }),
           },
         },
@@ -48,7 +56,10 @@ export const makeGroupDataBaseAPIPayload = (
       payload.requirements.push({
         rule: 'threshold',
         data: {
-          threshold: x.requirementAmount.trim(),
+          threshold: convertRequirementAmountFromTokensToWei(
+            x.requirementType as any,
+            x.requirementAmount,
+          ),
           source: {
             source_type: x.requirementType,
             cosmos_chain_id: x.requirementChain,

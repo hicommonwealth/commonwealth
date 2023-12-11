@@ -28,11 +28,7 @@ export type CommunityAttributes = {
   type: ChainType;
   id?: string;
   description?: string;
-  discord?: string;
-  element?: string;
-  website?: string;
-  telegram?: string;
-  github?: string;
+  social_links?: string[];
   ss58_prefix?: number;
   stages_enabled?: boolean;
   custom_stages?: string;
@@ -93,7 +89,7 @@ export type CommunityModelStatic = ModelStatic<CommunityInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): CommunityModelStatic => {
   const Community = <CommunityModelStatic>sequelize.define(
     // Leave this as is for now so that we don't need to alias and models can join
@@ -108,11 +104,11 @@ export default (
       discord_config_id: { type: dataTypes.INTEGER, allowNull: true }, // null if no bot enabled
       description: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
-      website: { type: dataTypes.STRING, allowNull: true },
-      discord: { type: dataTypes.STRING, allowNull: true },
-      element: { type: dataTypes.STRING, allowNull: true },
-      telegram: { type: dataTypes.STRING, allowNull: true },
-      github: { type: dataTypes.STRING, allowNull: true },
+      social_links: {
+        type: dataTypes.ARRAY(dataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+      },
       default_symbol: { type: dataTypes.STRING, allowNull: false },
       network: { type: dataTypes.STRING, allowNull: false },
       base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
@@ -151,8 +147,16 @@ export default (
         type: dataTypes.BOOLEAN,
         defaultValue: false,
       },
-      directory_page_enabled: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-      directory_page_chain_node_id: { type: dataTypes.INTEGER, allowNull: true, defaultValue: null },
+      directory_page_enabled: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      directory_page_chain_node_id: {
+        type: dataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null,
+      },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
     },
@@ -162,11 +166,13 @@ export default (
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: false,
-    }
+    },
   );
 
   Community.associate = (models) => {
-    models.Community.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id' });
+    models.Community.belongsTo(models.ChainNode, {
+      foreignKey: 'chain_node_id',
+    });
     models.Community.hasMany(models.Address, { foreignKey: 'community_id' });
     models.Community.hasMany(models.Notification, { foreignKey: 'chain_id' });
     models.Community.hasMany(models.Topic, {
@@ -179,6 +185,7 @@ export default (
     models.Community.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });
+    models.Community.hasMany(models.Group, { foreignKey: 'community_id' });
   };
 
   return Community;

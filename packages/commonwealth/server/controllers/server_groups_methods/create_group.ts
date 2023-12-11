@@ -1,20 +1,22 @@
-import { ServerCommunitiesController } from '../server_communities_controller';
-import { CommunityInstance } from '../../models/community';
-import { AddressInstance } from '../../models/address';
-import { Requirement } from '../../util/requirementsModule/requirementsTypes';
-import { UserInstance } from '../../models/user';
-import validateRequirements from '../../util/requirementsModule/validateRequirements';
-import { AppError } from '../../../../common-common/src/errors';
-import { validateOwner } from '../../util/validateOwner';
-import { GroupAttributes, GroupMetadata } from '../../models/group';
 import { Op } from 'sequelize';
+import { AppError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { sequelize } from '../../database';
+import { AddressInstance } from '../../models/address';
+import { CommunityInstance } from '../../models/community';
+import { GroupAttributes, GroupMetadata } from '../../models/group';
+import { UserInstance } from '../../models/user';
+import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
+import validateRequirements from '../../util/requirementsModule/validateRequirements';
+import { validateOwner } from '../../util/validateOwner';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { ServerGroupsController } from '../server_groups_controller';
 
-const MAX_GROUPS_PER_CHAIN = 20;
+const MAX_GROUPS_PER_COMMUNITY = 20;
 
 const Errors = {
-  InvalidMetadata: 'Invalid requirements',
+  InvalidMetadata: 'Invalid metadata',
   InvalidRequirements: 'Invalid requirements',
   Unauthorized: 'Unauthorized',
   MaxGroups: 'Exceeded max number of groups',
@@ -23,23 +25,23 @@ const Errors = {
 
 export type CreateGroupOptions = {
   user: UserInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   metadata: GroupMetadata;
   requirements: Requirement[];
   topics?: number[];
 };
 
-export type CreateGroupResult = GroupAttributes;
+export type CreateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __createGroup(
-  this: ServerCommunitiesController,
-  { user, chain, metadata, requirements, topics }: CreateGroupOptions
+  this: ServerGroupsController,
+  { user, community, metadata, requirements, topics }: CreateGroupOptions,
 ): Promise<CreateGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -56,16 +58,16 @@ export async function __createGroup(
   const requirementsValidationErr = validateRequirements(requirements);
   if (requirementsValidationErr) {
     throw new AppError(
-      `${Errors.InvalidRequirements}: ${requirementsValidationErr}`
+      `${Errors.InvalidRequirements}: ${requirementsValidationErr}`,
     );
   }
 
-  const numChainGroups = await this.models.Group.count({
+  const numCommunityGroups = await this.models.Group.count({
     where: {
-      chain_id: chain.id,
+      community_id: community.id,
     },
   });
-  if (numChainGroups >= MAX_GROUPS_PER_CHAIN) {
+  if (numCommunityGroups >= MAX_GROUPS_PER_COMMUNITY) {
     throw new AppError(Errors.MaxGroups);
   }
 
@@ -74,7 +76,7 @@ export async function __createGroup(
       id: {
         [Op.in]: topics || [],
       },
-      chain_id: chain.id,
+      chain_id: community.id,
     },
   });
   if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
@@ -87,11 +89,11 @@ export async function __createGroup(
       // create group
       const group = await this.models.Group.create(
         {
-          chain_id: chain.id,
+          community_id: community.id,
           metadata,
           requirements,
         },
-        { transaction }
+        { transaction },
       );
       if (topicsToAssociate.length > 0) {
         // add group to all specified topics
@@ -100,7 +102,7 @@ export async function __createGroup(
             group_ids: sequelize.fn(
               'array_append',
               sequelize.col('group_ids'),
-              group.id
+              group.id,
             ),
           },
           {
@@ -110,12 +112,18 @@ export async function __createGroup(
               },
             },
             transaction,
-          }
+          },
         );
       }
       return group.toJSON();
-    }
+    },
   );
 
-  return newGroup;
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.CREATE_GROUP,
+    community: community.id,
+    userId: user.id,
+  };
+
+  return [newGroup, analyticsOptions];
 }

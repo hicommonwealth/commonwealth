@@ -25,27 +25,7 @@ export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
 
 export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
-export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-export const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-export const GITHUB_OAUTH_CALLBACK =
-  process.env.GITHUB_OAUTH_CALLBACK ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://commonwealth.im'
-    : process.env.NODE_ENV === 'mobile'
-    ? 'capacitor://localhost'
-    : 'http://localhost:8080') + '/api/auth/github/callback';
-
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-export const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-export const DISCORD_OAUTH_CALLBACK =
-  process.env.DISCORD_OAUTH_CALLBACK ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://commonwealth.im'
-    : process.env.NODE_ENV === 'mobile'
-    ? 'capacitor://localhost'
-    : 'http://localhost:8080') + '/api/auth/discord/callback';
-export const DISCORD_OAUTH_SCOPES =
-  process.env.DISCORD_OAUTH_SCOPES?.split(' ');
 
 export const DATABASE_URI = process.env.USES_DOCKER_DB
   ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml
@@ -97,7 +77,7 @@ export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
-  ','
+  ',',
 ) as ChainBase[]) || [ChainBase.Ethereum];
 export const MAGIC_DEFAULT_CHAIN =
   process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
@@ -116,6 +96,9 @@ export const ETH_RPC = process.env.ETH_RPC || 'prod';
 export const COSMOS_GOV_V1_CHAIN_IDS = process.env.COSMOS_GOV_V1
   ? process.env.COSMOS_GOV_V1.split(',')
   : [];
+
+export const COSMOS_REGISTRY_API =
+  process.env.COSMOS_REGISTRY_API || 'https://cosmoschains.thesilverfox.pro';
 
 export const CW_BOT_KEY = process.env.CW_BOT_KEY;
 // Don't set default value so if env var is not set the database cleaner will not run

@@ -1,10 +1,11 @@
-import { TypedRequest, TypedResponse, success } from '../../types';
-import { ServerControllers } from '../../routing/router';
+import { IDiscordMeta } from 'common-common/src/types';
 import { CommentAttributes } from 'server/models/comment';
+import { ServerControllers } from '../../routing/router';
+import { TypedRequest, TypedResponse, success } from '../../types';
 
 type UpdateCommentRequestBody = {
   body: string;
-  discord_meta?: any;
+  discord_meta?: IDiscordMeta;
 };
 type UpdateCommentRequestParams = {
   id: number;
@@ -15,9 +16,9 @@ type UpdateCommentResponse = CommentAttributes;
 export const updateCommentHandler = async (
   controllers: ServerControllers,
   req: TypedRequest<UpdateCommentRequestBody, {}, UpdateCommentRequestParams>,
-  res: TypedResponse<UpdateCommentResponse>
+  res: TypedResponse<UpdateCommentResponse>,
 ) => {
-  const { user, chain, address } = req;
+  const { user, chain: community, address } = req;
   const { id: commentId } = req.params;
   const { body: commentBody, discord_meta: discordMeta } = req.body;
 
@@ -25,7 +26,7 @@ export const updateCommentHandler = async (
     await controllers.comments.updateComment({
       user,
       address,
-      chain,
+      community,
       commentId,
       commentBody,
       discordMeta,

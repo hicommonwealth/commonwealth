@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { TopicInstance } from 'server/models/topic';
 import { AppError } from '../../../../common-common/src/errors';
+import { MixpanelCommunityInteractionEvent } from '../../../shared/analytics/types';
 import { sequelize } from '../../database';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
@@ -10,7 +11,8 @@ import { Requirement } from '../../util/requirementsModule/requirementsTypes';
 import validateMetadata from '../../util/requirementsModule/validateMetadata';
 import validateRequirements from '../../util/requirementsModule/validateRequirements';
 import { validateOwner } from '../../util/validateOwner';
-import { ServerCommunitiesController } from '../server_communities_controller';
+import { TrackOptions } from '../server_analytics_methods/track';
+import { ServerGroupsController } from '../server_groups_controller';
 
 const Errors = {
   InvalidMetadata: 'Invalid metadata',
@@ -22,7 +24,7 @@ const Errors = {
 
 export type UpdateGroupOptions = {
   user: UserInstance;
-  chain: CommunityInstance;
+  community: CommunityInstance;
   address: AddressInstance;
   groupId: number;
   metadata?: GroupMetadata;
@@ -30,16 +32,23 @@ export type UpdateGroupOptions = {
   topics?: number[];
 };
 
-export type UpdateGroupResult = GroupAttributes;
+export type UpdateGroupResult = [GroupAttributes, TrackOptions];
 
 export async function __updateGroup(
-  this: ServerCommunitiesController,
-  { user, chain, groupId, metadata, requirements, topics }: UpdateGroupOptions
+  this: ServerGroupsController,
+  {
+    user,
+    community,
+    groupId,
+    metadata,
+    requirements,
+    topics,
+  }: UpdateGroupOptions,
 ): Promise<UpdateGroupResult> {
   const isAdmin = await validateOwner({
     models: this.models,
     user,
-    chainId: chain.id,
+    communityId: community.id,
     allowMod: true,
     allowAdmin: true,
     allowGodMode: true,
@@ -59,7 +68,7 @@ export async function __updateGroup(
     const requirementsValidationErr = validateRequirements(requirements);
     if (requirementsValidationErr) {
       throw new AppError(
-        `${Errors.InvalidRequirements}: ${requirementsValidationErr}`
+        `${Errors.InvalidRequirements}: ${requirementsValidationErr}`,
       );
     }
   }
@@ -71,7 +80,7 @@ export async function __updateGroup(
         id: {
           [Op.in]: topics || [],
         },
-        chain_id: chain.id,
+        chain_id: community.id,
       },
     });
     if (topics?.length > 0 && topics.length !== topicsToAssociate.length) {
@@ -83,7 +92,7 @@ export async function __updateGroup(
   const group = await this.models.Group.findOne({
     where: {
       id: groupId,
-      chain_id: chain.id,
+      community_id: community.id,
     },
   });
   if (!group) {
@@ -113,14 +122,14 @@ export async function __updateGroup(
     // update group
     await group.update(toUpdate, { transaction });
 
-    if (topicsToAssociate && topicsToAssociate.length > 0) {
+    if (topicsToAssociate) {
       // add group to all specified topics
       await this.models.Topic.update(
         {
           group_ids: sequelize.fn(
             'array_append',
             sequelize.col('group_ids'),
-            group.id
+            group.id,
           ),
         },
         {
@@ -135,7 +144,7 @@ export async function __updateGroup(
             },
           },
           transaction,
-        }
+        },
       );
 
       // remove group from existing group topics
@@ -144,7 +153,7 @@ export async function __updateGroup(
           group_ids: sequelize.fn(
             'array_remove',
             sequelize.col('group_ids'),
-            group.id
+            group.id,
           ),
         },
         {
@@ -157,10 +166,16 @@ export async function __updateGroup(
             },
           },
           transaction,
-        }
+        },
       );
     }
   });
 
-  return group.toJSON();
+  const analyticsOptions = {
+    event: MixpanelCommunityInteractionEvent.UPDATE_GROUP,
+    community: community.id,
+    userId: user.id,
+  };
+
+  return [group.toJSON(), analyticsOptions];
 }

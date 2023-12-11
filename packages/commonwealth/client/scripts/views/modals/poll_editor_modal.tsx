@@ -25,7 +25,7 @@ import '../../../styles/modals/poll_editor_modal.scss';
 
 const getPollDurationCopy = (
   customDuration: string,
-  customDurationEnabled: boolean
+  customDurationEnabled: boolean,
 ) => {
   if (customDurationEnabled && customDuration === 'Infinite') {
     return 'This poll will never expire.';
@@ -91,7 +91,9 @@ export const PollEditorModal = ({
       return;
     }
 
-    if (!options?.length || !options[0]?.length || !options[1]?.length) {
+    const allOptionsAreFilledOut = options.every((option) => !!option.trim());
+
+    if (!options?.length || !allOptionsAreFilledOut) {
       notifyError('Must set poll options');
       return;
     }
@@ -108,7 +110,7 @@ export const PollEditorModal = ({
         options,
         customDuration: customDurationEnabled ? customDuration : null,
         address: app.user.activeAccount.address,
-        authorChain: app.user.activeAccount.community.id,
+        authorCommunity: app.user.activeAccount.community.id,
       });
       notifySuccess('Poll creation succeeded');
       onPollCreate();
@@ -126,7 +128,7 @@ export const PollEditorModal = ({
         <CWTextInput
           label="Question"
           placeholder="Do you support this proposal?"
-          defaultValue={prompt}
+          value={prompt}
           onInput={(e) => {
             setPrompt(e.target.value);
           }}

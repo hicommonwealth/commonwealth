@@ -9,12 +9,12 @@ import 'pages/view_proposal/proposal_components.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import ExternalLink from 'views/components/ExternalLink';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWText } from '../../components/component_kit/cw_text';
 import {
   getStatusClass,
   getStatusText,
 } from '../../components/ProposalCard/helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../../components/component_kit/cw_text';
 import { cancelProposal } from '../../components/proposals/helpers';
 import { ThreadLink } from './proposal_header_links';
 
@@ -107,7 +107,10 @@ export const ProposalSubheader = (props: ProposalSubheaderProps) => {
         (linkedThreads && (
           <div className="proposal-links">
             {linkedThreads && (
-              <ThreadLink threads={linkedThreads} chain={proposal['chain']} />
+              <ThreadLink
+                threads={linkedThreads}
+                community={proposal['chain']}
+              />
             )}
             {proposal['blockExplorerLink'] && (
               <ExternalLink url={proposal['blockExplorerLink']}>

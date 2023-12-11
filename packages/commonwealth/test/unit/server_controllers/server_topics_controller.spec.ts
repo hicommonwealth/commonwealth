@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
-import { CommunityInstance } from '../../../server/models/community';
 import { UserInstance } from 'server/models/user';
+import { CommunityInstance } from '../../../server/models/community';
 
 const createMockedTopicsController = (isAdmin: boolean = false) => {
   const db: any = {
@@ -62,7 +62,7 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
   const controller = new ServerTopicsController(
     db,
     tokenBalanceCache,
-    banCache
+    banCache,
   );
   const user = {
     getAddresses: async () => [],
@@ -75,35 +75,38 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 describe('ServerTopicsController', () => {
   describe('#createTopic', async () => {
     const { controller, user, chain } = createMockedTopicsController();
-    const result = await controller.createTopic({
-      user,
-      chain,
-      body: {
-        name: 'hhh',
-        description: 'ddd',
-        featured_in_new_post: false,
-        featured_in_sidebar: false,
-        token_threshold: '0',
-      },
-    });
-    expect(result.name).to.equal('hhh');
-    expect(result.description).to.equal('ddd');
-    expect(result.featured_in_new_post).to.equal(false);
-    expect(result.featured_in_sidebar).to.equal(false);
-    expect(result.token_threshold).to.equal('0');
+    const [topic] = await Promise.all(
+      await controller.createTopic({
+        user,
+        community: chain,
+        body: {
+          name: 'hhh',
+          description: 'ddd',
+          featured_in_new_post: false,
+          featured_in_sidebar: false,
+          token_threshold: '0',
+        },
+      }),
+    );
+
+    expect(topic.name).to.equal('hhh');
+    expect(topic.description).to.equal('ddd');
+    expect(topic.featured_in_new_post).to.equal(false);
+    expect(topic.featured_in_sidebar).to.equal(false);
+    expect(topic.token_threshold).to.equal('0');
   });
   describe('#deleteTopic', async () => {
     const { controller, user, chain } = createMockedTopicsController();
     await controller.deleteTopic({
       user,
-      chain,
+      community: chain,
       topicId: 1,
     });
   });
   describe('#getTopics', async () => {
     const { controller, chain } = createMockedTopicsController();
     const topics = await controller.getTopics({
-      chain,
+      community: chain,
     });
     expect(topics).to.have.length(1);
   });
@@ -111,7 +114,7 @@ describe('ServerTopicsController', () => {
     const { controller, user, chain } = createMockedTopicsController(true);
     await controller.updateTopicChannel({
       user,
-      chain,
+      community: chain,
       topicId: 1,
       channelId: 'ccc',
     });
@@ -120,7 +123,7 @@ describe('ServerTopicsController', () => {
     const { controller, user, chain } = createMockedTopicsController(true);
     await controller.updateTopic({
       user,
-      chain,
+      community: chain,
       body: {
         id: 1,
         name: 'ddd',
@@ -131,7 +134,7 @@ describe('ServerTopicsController', () => {
     const { controller, user, chain } = createMockedTopicsController(true);
     await controller.updateTopicsOrder({
       user,
-      chain,
+      community: chain,
       body: {
         orderedIds: ['1', '2'],
       },

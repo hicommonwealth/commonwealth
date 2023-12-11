@@ -2,35 +2,36 @@ import { useState } from 'react';
 
 import type { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import type {
-  EthChainNamesType,
-  EthChainsType,
-  UseChainFormDefaultFieldsHookType,
-  UseChainFormIdFieldsHookType,
-  UseChainFormStateHookType,
-  UseEthChainFormFieldsHookType,
-  UseEthChainFormStateHookType,
+  EthChainNodeNamesType,
+  EthChainNodeType,
+  UseCommunityFormDefaultFieldsHookType,
+  UseCommunityFormIdFieldsHookType,
+  UseCommunityFormStateHookType,
+  UseEthChainNodeFormStateHookType,
+  UseEthCommunityFormFieldsHookType,
 } from './types';
 
-export const useChainFormIdFields = (): UseChainFormIdFieldsHookType => {
-  const [id, setId] = useState('');
-  const [name, setName] = useState('');
-  const [chainName, setChainName] = useState('');
-  const [symbol, setSymbol] = useState('XYZ');
+export const useCommunityFormIdFields =
+  (): UseCommunityFormIdFieldsHookType => {
+    const [id, setId] = useState('');
+    const [name, setName] = useState('');
+    const [communityName, setCommunityName] = useState('');
+    const [symbol, setSymbol] = useState('XYZ');
 
-  return {
-    id,
-    name,
-    chainName,
-    setId,
-    setName,
-    setChainName,
-    setSymbol,
-    symbol,
+    return {
+      id,
+      name,
+      communityName,
+      setId,
+      setName,
+      setCommunityName,
+      setSymbol,
+      symbol,
+    };
   };
-};
 
-export const useChainFormDefaultFields =
-  (): UseChainFormDefaultFieldsHookType => {
+export const useCommunityFormDefaultFields =
+  (): UseCommunityFormDefaultFieldsHookType => {
     const [description, setDescription] = useState('');
     const [discord, setDiscord] = useState('');
     const [element, setElement] = useState('');
@@ -60,7 +61,7 @@ export const useChainFormDefaultFields =
     };
   };
 
-export const useChainFormState = (): UseChainFormStateHookType => {
+export const useCommunityFormState = (): UseCommunityFormStateHookType => {
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -81,35 +82,37 @@ export const useChainFormState = (): UseChainFormStateHookType => {
   };
 };
 
-export const useEthChainFormState = (): UseEthChainFormStateHookType => {
-  const [ethChains, setEthChains] = useState<EthChainsType>({});
-  const [ethChainNames, setEthChainNames] = useState<EthChainNamesType>({});
+export const useEthChainFormState = (): UseEthChainNodeFormStateHookType => {
+  const [ethChainNodes, setEthChainNodes] = useState<EthChainNodeType>({});
+  const [ethChainNodeNames, setEthChainNodeNames] =
+    useState<EthChainNodeNamesType>({});
 
   return {
-    ethChains,
-    setEthChains,
-    ethChainNames,
-    setEthChainNames,
+    ethChainNodes,
+    setEthChainNodes,
+    ethChainNodeNames,
+    setEthChainNodeNames,
   };
 };
 
-export const useEthChainFormFields = (): UseEthChainFormFieldsHookType => {
-  const [address, setAddress] = useState('');
-  const [altWalletUrl, setAltWalletUrl] = useState('');
-  const [chainString, setChainString] = useState('');
-  const [ethChainId, setEthChainId] = useState('');
-  const [nodeUrl, setNodeUrl] = useState('');
+export const useEthCommunityFormFields =
+  (): UseEthCommunityFormFieldsHookType => {
+    const [address, setAddress] = useState('');
+    const [altWalletUrl, setAltWalletUrl] = useState('');
+    const [communityString, setCommunityString] = useState('');
+    const [ethChainId, setEthChainId] = useState('');
+    const [nodeUrl, setNodeUrl] = useState('');
 
-  return {
-    address,
-    altWalletUrl,
-    chainString,
-    ethChainId,
-    nodeUrl,
-    setAddress,
-    setAltWalletUrl,
-    setChainString,
-    setEthChainId,
-    setNodeUrl,
+    return {
+      address,
+      altWalletUrl,
+      chainName: communityString,
+      ethChainId,
+      nodeUrl,
+      setAddress,
+      setAltWalletUrl,
+      setChainName: setCommunityString,
+      setEthChainId: setEthChainId,
+      setNodeUrl,
+    };
   };
-};

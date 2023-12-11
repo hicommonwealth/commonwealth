@@ -14,7 +14,7 @@
     "datadog-db-setup": "chmod u+x scripts/setup-datadog-postgres.sh && ./scripts/setup-datadog-postgres.sh",
     "db-all": "yarn reset-db && yarn load-db && yarn migrate-db",
     "db-doc": "chmod u+x scripts/gen-mermaid-erd.sh && ./scripts/gen-mermaid-erd.sh > ../../knowledge_base/Database-ERD.md",
-    "dump-db": "pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
+    "dump-db": "pg_dump $(heroku config:get CW_READ_DB -a commonwealth-beta) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
     "e2e-start-server": "ETH_RPC=e2e-test yarn start",
     "emit-notification": "ts-node --project tsconfig.json server/scripts/emitTestNotification.ts",
     "emit-webhook": "ts-node --project tsconfig.json server/scripts/emitWebhook.ts",
@@ -57,7 +57,11 @@
     "test-suite": "NODE_ENV=test nyc ts-mocha --project tsconfig.json './test/**/*.spec.ts'",
     "unit-test": "NODE_ENV=test ts-mocha --project tsconfig.json './test/unit/**/*.spec.ts'",
     "unit-test:watch": "NODE_ENV=test ts-mocha --project tsconfig.json --opts test/mocha-dev.opts './test/unit/**/*.spec.ts' -w --watch-files '**/*.ts'",
-    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
+    "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh",
+    "refresh-all-memberships": "npx ts-node -T ./scripts/refresh-all-memberships.ts",
+    "cosmos:build": "chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh --build && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh --build",
+    "cosmos:start": "chmod u+x test/util/cosmos-chain-testing/v1/start.sh && ./test/util/cosmos-chain-testing/v1/start.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/start.sh && ./test/util/cosmos-chain-testing/v1beta1/start.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/start.sh && ./test/util/cosmos-chain-testing/ethermint/start.sh",
+    "cosmos:stop": "chmod u+x test/util/cosmos-chain-testing/v1/stop.sh && ./test/util/cosmos-chain-testing/v1/stop.sh && chmod u+x test/util/cosmos-chain-testing/v1beta1/stop.sh && ./test/util/cosmos-chain-testing/v1beta1/stop.sh && chmod u+x test/util/cosmos-chain-testing/ethermint/stop.sh && ./test/util/cosmos-chain-testing/ethermint/stop.sh"
   },
   "engines": {
     "node": "18.x"
@@ -131,7 +135,7 @@
     "@types/underscore": "^1.9.4",
     "@types/websocket": "^1.0.0",
     "@types/ws": "^7.2.4",
-    "@walletconnect/ethereum-provider": "^2.8.1",
+    "@walletconnect/ethereum-provider": "^2.10.1",
     "@walletconnect/modal": "^2.4.6",
     "ajv": "^8.12.0",
     "amqplib": "^0.8.0",

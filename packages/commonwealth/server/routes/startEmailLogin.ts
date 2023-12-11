@@ -1,19 +1,19 @@
-import moment from 'moment';
-import type { Request, Response, NextFunction } from 'express';
-import {
-  SENDGRID_API_KEY,
-  LOGIN_RATE_LIMIT_MINS,
-  LOGIN_RATE_LIMIT_TRIES,
-  MAGIC_SUPPORTED_BASES,
-  MAGIC_DEFAULT_CHAIN,
-} from '../config';
-import { DynamicTemplate } from '../../shared/types';
+import sgMail from '@sendgrid/mail';
+import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { WalletId } from 'common-common/src/types';
-import { validateChain } from '../middleware/validateChain';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
+import { DynamicTemplate } from '../../shared/types';
+import {
+  LOGIN_RATE_LIMIT_MINS,
+  LOGIN_RATE_LIMIT_TRIES,
+  MAGIC_DEFAULT_CHAIN,
+  MAGIC_SUPPORTED_BASES,
+  SENDGRID_API_KEY,
+} from '../config';
+import { validateCommunity } from '../middleware/validateCommunity';
 import type { DB } from '../models';
-import { AppError } from 'common-common/src/errors';
-import sgMail from '@sendgrid/mail';
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -29,7 +29,7 @@ const startEmailLogin = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const protocol = req.headers['x-forwarded-proto'] || req.protocol;
   const hostname = req.headers['x-forwarded-host'] || req.hostname;
@@ -67,7 +67,7 @@ const startEmailLogin = async (
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
   const context = req.body.chain ? req.body : { chain: MAGIC_DEFAULT_CHAIN };
-  const [chain] = await validateChain(models, context);
+  const [chain] = await validateCommunity(models, context);
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;

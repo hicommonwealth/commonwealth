@@ -25,7 +25,7 @@ export type SearchChainsResponse = {
 };
 
 interface SearchChainsProps {
-  chainId: string;
+  communityId: string;
   searchTerm: string;
   limit: number;
   orderBy: APIOrderBy;
@@ -35,7 +35,7 @@ interface SearchChainsProps {
 
 const searchChains = async ({
   pageParam = 1,
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -50,20 +50,20 @@ const searchChains = async ({
         'Content-Type': 'application/json',
       },
       params: {
-        chain: chainId,
+        community_id: communityId,
         search: searchTerm,
         limit: limit.toString(),
         page: pageParam.toString(),
         order_by: orderBy,
         order_direction: orderDirection,
       },
-    }
+    },
   );
   return result;
 };
 
 const useSearchChainsQuery = ({
-  chainId,
+  communityId,
   searchTerm,
   limit,
   orderBy,
@@ -73,7 +73,7 @@ const useSearchChainsQuery = ({
   const key = [
     ApiEndpoints.searchChains(searchTerm),
     {
-      chainId,
+      communityId,
       orderBy,
       orderDirection,
     },
@@ -83,7 +83,7 @@ const useSearchChainsQuery = ({
     ({ pageParam }) =>
       searchChains({
         pageParam,
-        chainId,
+        communityId,
         searchTerm,
         limit,
         orderBy,
@@ -99,7 +99,7 @@ const useSearchChainsQuery = ({
       },
       staleTime: SEARCH_CHAINS_STALE_TIME,
       enabled,
-    }
+    },
   );
 };
 

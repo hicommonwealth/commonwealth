@@ -7,39 +7,51 @@ import { ApiEndpoints } from 'state/api/config';
 const GROUPS_STALE_TIME = 5000; // 5 seconds
 
 interface FetchGroupsProps {
-  chainId: string;
+  communityId: string;
   includeTopics?: boolean;
-  includeMembers?: boolean;
+  // includeMembers?: boolean;
 }
 
 const fetchGroups = async ({
-  chainId,
-  includeMembers = false,
+  communityId,
+  // includeMembers = false,
   includeTopics = false,
 }: FetchGroupsProps): Promise<Group[]> => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_GROUPS}`,
     {
       params: {
-        chain_id: chainId,
-        include_members: includeMembers,
-        include_topics: includeTopics,
+        community_id: communityId,
+        // include_members: includeMembers,
+        ...(includeTopics && { include_topics: includeTopics }),
       },
-    }
+    },
   );
 
   return response.data.result.map((t) => new Group(t));
 };
 
 const useFetchGroupsQuery = ({
-  chainId,
-  includeMembers,
+  communityId,
+  // includeMembers,
   includeTopics,
-}: FetchGroupsProps) => {
+  enabled = true,
+}: FetchGroupsProps & { enabled?: boolean }) => {
   return useQuery({
-    queryKey: [ApiEndpoints.FETCH_GROUPS, chainId, includeMembers, includeTopics],
-    queryFn: () => fetchGroups({ chainId, includeMembers, includeTopics }),
+    queryKey: [
+      ApiEndpoints.FETCH_GROUPS,
+      communityId,
+      includeTopics,
+      // includeMembers,
+    ],
+    queryFn: () =>
+      fetchGroups({
+        communityId,
+        // includeMembers,
+        includeTopics,
+      }),
     staleTime: GROUPS_STALE_TIME,
+    enabled,
   });
 };
 
