@@ -6,7 +6,7 @@ import { ApiEndpoints } from 'state/api/config';
 const RELATED_COMMUNITIES_STALE_TIME = 60 * 5 * 1_000; // 5 min
 
 interface FetchRelatedCommunitiesProps {
-  communityNodeId: number;
+  chainNodeId: number;
 }
 
 interface FetchRelatedCommunitiesResponse {
@@ -19,13 +19,13 @@ interface FetchRelatedCommunitiesResponse {
 }
 
 const fetchRelatedCommunities = async ({
-  communityNodeId,
+  chainNodeId,
 }: FetchRelatedCommunitiesProps) => {
   const response = await axios.get(
     `${app.serverUrl()}${ApiEndpoints.FETCH_RELATED_COMMUNITIES}`,
     {
       params: {
-        communityNodeId,
+        chainNodeId,
       },
     },
   );
@@ -34,11 +34,11 @@ const fetchRelatedCommunities = async ({
 };
 
 const useFetchRelatedCommunitiesQuery = ({
-  communityNodeId,
+  chainNodeId,
 }: FetchRelatedCommunitiesProps) => {
   return useQuery<FetchRelatedCommunitiesResponse[]>({
-    queryKey: [ApiEndpoints.FETCH_RELATED_COMMUNITIES, communityNodeId],
-    queryFn: () => fetchRelatedCommunities({ communityNodeId }),
+    queryKey: [ApiEndpoints.FETCH_RELATED_COMMUNITIES, chainNodeId],
+    queryFn: () => fetchRelatedCommunities({ chainNodeId }),
     staleTime: RELATED_COMMUNITIES_STALE_TIME,
   });
 };
