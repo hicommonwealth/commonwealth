@@ -1008,6 +1008,13 @@ export const ComponentShowcase = () => {
           iconName="bell"
           onClick={() => notifySuccess('Quack!')}
         />
+
+        <CWCircleButton
+          buttonType="primary"
+          iconName="bell"
+          disabled
+          onClick={() => notifySuccess('Quack!')}
+        />
         <span>some text</span>
 
         {/* <CWCircleButton

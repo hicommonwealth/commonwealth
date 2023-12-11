@@ -33,6 +33,10 @@
       border: none;
       background-color: $neutral-700;
 
+      .Icon {
+        color: $white;
+      }
+
       svg {
         color: $white;
       }
@@ -49,7 +53,13 @@
         background-color: $neutral-800;
       }
 
-      &.disabled {}
+      &.disabled {
+        background-color: $neutral-200;
+
+        .Icon {
+          color: $neutral-400;
+        }
+      }
     }
 
     &.secondary {}
