@@ -12,7 +12,6 @@ export const growlStore = createStore<IGrowlStore>()(
     (set) => ({
       growlHidden: false,
       setGrowlHidden: (growlHidden: boolean) => set({ growlHidden }),
-      message: '',
     }),
     {
       name: 'growl',
