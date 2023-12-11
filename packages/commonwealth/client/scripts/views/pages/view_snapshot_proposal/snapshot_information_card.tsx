@@ -61,7 +61,7 @@ export const SnapshotInformationCard = ({
   threads,
 }: SnapshotInformationCardProps) => {
   const votingSystem = capitalize(
-    proposal.type.split('-').join(' ').concat(' voting')
+    proposal.type.split('-').join(' ').concat(' voting'),
   );
 
   return (

@@ -30,6 +30,7 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
+import CommunityStakeBanner from '../CommunityStakeBanner';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
@@ -229,6 +230,8 @@ export const ComponentShowcase = () => {
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
+  const [isCommunityStakeBannerVisible, setIsCommunityStakeBannerVisible] =
+    useState(true);
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
   const allChains = app.config.chains.getAll();
   const [chainId, setChainId] = useState(allChains[1]);
@@ -626,6 +629,10 @@ export const ComponentShowcase = () => {
           <CWTag label="0xd83e1...a39bD" type="address" iconName="polkadot" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="polygon" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="twitterNew" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Group Tag</CWText>
+          <CWTag label="Group Name" type="group" />
         </div>
       </div>
       <div className="button-gallery">
@@ -1677,6 +1684,26 @@ export const ComponentShowcase = () => {
             );
           })}
         </div>
+      </div>
+      <div className="community-stake-banner">
+        <CWText type="h3">Community Stake Banner</CWText>
+        <div className="btn-container">
+          <CWButton
+            buttonHeight="sm"
+            label="Restore Community Stake Banner"
+            onClick={() => setIsCommunityStakeBannerVisible(true)}
+            className="restore-btn"
+          />
+        </div>
+
+        {isCommunityStakeBannerVisible && (
+          <CommunityStakeBanner
+            onClose={() => {
+              setIsCommunityStakeBannerVisible(false);
+            }}
+            groupName="Foo"
+          />
+        )}
       </div>
       <div className="alerts">
         <CWText type="h3">Alerts</CWText>

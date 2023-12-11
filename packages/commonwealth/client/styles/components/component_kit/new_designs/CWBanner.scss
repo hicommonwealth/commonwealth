@@ -75,6 +75,16 @@
     flex-wrap: wrap;
   }
 
+  .footer {
+    display: flex;
+    margin-top: 16px;
+    gap: 4px;
+
+    .description {
+      color: $neutral-500;
+    }
+  }
+
   &.info {
     @include bannerTheme($primary-700, $primary-25, $primary-500);
   }
