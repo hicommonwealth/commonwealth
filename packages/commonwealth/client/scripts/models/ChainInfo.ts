@@ -7,7 +7,7 @@ import app from 'state';
 import type NodeInfo from './NodeInfo';
 import RoleInfo from './RoleInfo';
 
-class CommunityInfo {
+class ChainInfo {
   public readonly id: string;
   public readonly ChainNode: NodeInfo;
   public readonly tokenName: string;
@@ -17,11 +17,7 @@ class CommunityInfo {
   public readonly base: ChainBase;
   public iconUrl: string;
   public description: string;
-  public website: string;
-  public discord: string;
-  public element: string;
-  public telegram: string;
-  public github: string;
+  public socialLinks: string[];
   public stagesEnabled: boolean;
   public customStages: string;
   public customDomain: string;
@@ -59,11 +55,7 @@ class CommunityInfo {
     name,
     iconUrl,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    social_links,
     stagesEnabled,
     customStages,
     customDomain,
@@ -97,11 +89,7 @@ class CommunityInfo {
     this.name = name;
     this.iconUrl = iconUrl;
     this.description = description;
-    this.website = website;
-    this.discord = discord;
-    this.element = element;
-    this.telegram = telegram;
-    this.github = github;
+    this.socialLinks = social_links;
     this.stagesEnabled = stagesEnabled;
     this.customStages = customStages;
     this.customDomain = customDomain;
@@ -136,11 +124,7 @@ class CommunityInfo {
     name,
     icon_url,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    social_links,
     stages_enabled,
     custom_stages,
     custom_domain,
@@ -188,18 +172,14 @@ class CommunityInfo {
     const v1Chains = process.env.COSMOS_GOV_V1?.split(',');
     const cosmos_governance_version = v1Chains?.includes(id) ? 'v1' : 'v1beta1';
 
-    return new CommunityInfo({
+    return new ChainInfo({
       id,
       network,
       default_symbol,
       name,
       iconUrl: icon_url,
       description,
-      website,
-      discord,
-      element,
-      telegram,
-      github,
+      social_links,
       stagesEnabled: stages_enabled,
       customStages: custom_stages,
       customDomain: custom_domain,
@@ -255,11 +235,7 @@ class CommunityInfo {
   public async updateChainData({
     name,
     description,
-    website,
-    discord,
-    element,
-    telegram,
-    github,
+    socialLinks,
     stagesEnabled,
     customStages,
     customDomain,
@@ -277,11 +253,8 @@ class CommunityInfo {
   }: {
     name?: string;
     description?: string;
-    website?: string;
+    socialLinks?: string[];
     discord?: string;
-    element?: string;
-    telegram?: string;
-    github?: string;
     stagesEnabled?: boolean;
     customStages?: string;
     customDomain?: string;
@@ -302,11 +275,7 @@ class CommunityInfo {
       id,
       name,
       description,
-      website,
-      discord,
-      element,
-      telegram,
-      github,
+      socialLinks,
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
@@ -323,30 +292,58 @@ class CommunityInfo {
       directory_page_chain_node_id,
       jwt: app.user.jwt,
     });
-    const updatedCommunity = r.data.result;
-    this.name = updatedCommunity.name;
-    this.description = updatedCommunity.description;
-    this.website = updatedCommunity.website;
-    this.discord = updatedCommunity.discord;
-    this.element = updatedCommunity.element;
-    this.telegram = updatedCommunity.telegram;
-    this.github = updatedCommunity.github;
-    this.stagesEnabled = updatedCommunity.stages_enabled;
-    this.customStages = updatedCommunity.custom_stages;
-    this.customDomain = updatedCommunity.custom_domain;
-    this.snapshot = updatedCommunity.snapshot;
-    this.terms = updatedCommunity.terms;
-    this.iconUrl = updatedCommunity.icon_url;
-    this.defaultOverview = updatedCommunity.default_summary_view;
-    this.defaultPage = updatedCommunity.default_page;
-    this.hasHomepage = updatedCommunity.has_homepage;
-    this.cosmosGovernanceVersion = updatedCommunity.cosmos_governance_version;
-    this.discordBotWebhooksEnabled =
-      updatedCommunity.discord_bot_webhooks_enabled;
-    this.directoryPageEnabled = updatedCommunity.directory_page_enabled;
-    this.directoryPageChainNodeId =
-      updatedCommunity.directory_page_chain_node_id;
+    const updatedChain = r.data.result;
+    this.name = updatedChain.name;
+    this.description = updatedChain.description;
+    this.socialLinks = updatedChain.socialLinks;
+    this.stagesEnabled = updatedChain.stages_enabled;
+    this.customStages = updatedChain.custom_stages;
+    this.customDomain = updatedChain.custom_domain;
+    this.snapshot = updatedChain.snapshot;
+    this.terms = updatedChain.terms;
+    this.iconUrl = updatedChain.icon_url;
+    this.defaultOverview = updatedChain.default_summary_view;
+    this.defaultPage = updatedChain.default_page;
+    this.hasHomepage = updatedChain.has_homepage;
+    this.cosmosGovernanceVersion = updatedChain.cosmos_governance_version;
+    this.discordBotWebhooksEnabled = updatedChain.discord_bot_webhooks_enabled;
+    this.directoryPageEnabled = updatedChain.directory_page_enabled;
+    this.directoryPageChainNodeId = updatedChain.directory_page_chain_node_id;
+  }
+
+  public categorizeSocialLinks(): CategorizedSocialLinks {
+    const categorizedLinks: CategorizedSocialLinks = {
+      discords: [],
+      githubs: [],
+      telegrams: [],
+      elements: [],
+      remainingLinks: [],
+    };
+
+    this.socialLinks.forEach((link) => {
+      if (link.includes('://discord.com') || link.includes('://discord.gg')) {
+        categorizedLinks.discords.push(link);
+      } else if (link.includes('://github.com')) {
+        categorizedLinks.githubs.push(link);
+      } else if (link.includes('://t.me')) {
+        categorizedLinks.telegrams.push(link);
+      } else if (link.includes('://matrix.to')) {
+        categorizedLinks.elements.push(link);
+      } else {
+        categorizedLinks.remainingLinks.push(link);
+      }
+    });
+
+    return categorizedLinks;
   }
 }
 
-export default CommunityInfo;
+export type CategorizedSocialLinks = {
+  discords: string[];
+  githubs: string[];
+  telegrams: string[];
+  elements: string[];
+  remainingLinks: string[];
+};
+
+export default ChainInfo;

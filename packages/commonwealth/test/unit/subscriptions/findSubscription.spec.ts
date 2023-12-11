@@ -230,7 +230,7 @@ describe('findSubscription tests', () => {
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(findOptions, notifSubscriptions);
       expect(result).to.be.not.undefined;
-      expect(result.communityId).to.equal(chainId);
+      expect(result.chainId).to.equal(chainId);
       expect(result.id).to.equal(2);
     });
   });
@@ -259,7 +259,7 @@ describe('findSubscription tests', () => {
       // type coercion necessary here since type error would usually be thrown to stop us from not passing a chain
       const result = findSubscription(findOptions, notifSubscriptions);
       expect(result).to.be.not.undefined;
-      expect(result.communityId).to.equal(chainId);
+      expect(result.chainId).to.equal(chainId);
       expect(result.id).to.equal(4);
     });
   });

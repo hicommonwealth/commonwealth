@@ -130,7 +130,7 @@ class NotificationsController {
           const newSubscription = modelFromServer(result);
           if (newSubscription.category === 'chain-event')
             app.socket.chainEventsNs.addChainEventSubscriptions([
-              newSubscription.communityId,
+              newSubscription.chainId,
             ]);
           this._subscriptions.push(newSubscription);
         },
@@ -149,7 +149,7 @@ class NotificationsController {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.enable();
-          if (s.category === 'chain-event') ceSubs.push(s.communityId);
+          if (s.category === 'chain-event') ceSubs.push(s.chainId);
         }
         app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
       },

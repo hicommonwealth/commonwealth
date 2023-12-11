@@ -43,9 +43,9 @@ const useToggleCommunityStarMutation = () => {
         );
       } else {
         const star = app.user.starredCommunities.find((c) => {
-          return c.community === chain;
+          return c.chain === chain;
         });
-        app.user.removeStarredCommunity(star.community, star.user_id);
+        app.user.removeStarredCommunity(star.chain, star.user_id);
       }
     },
   });

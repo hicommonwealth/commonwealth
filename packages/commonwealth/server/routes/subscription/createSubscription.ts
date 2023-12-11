@@ -119,7 +119,7 @@ export default async (
   const subJson = subscription.toJSON();
 
   if (chain) {
-    subJson.Community = chain.toJSON();
+    subJson.Chain = chain.toJSON();
   }
   if (thread) {
     subJson.Thread = thread.toJSON();

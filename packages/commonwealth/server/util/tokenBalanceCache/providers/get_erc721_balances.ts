@@ -3,7 +3,7 @@ import AbiCoder from 'web3-eth-abi';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { rollbar } from '../../rollbar';
 import { Balances } from '../types';
-import { evmOffChainRpcBatching } from '../util';
+import { evmOffChainRpcBatching, evmRpcRequest } from '../util';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -92,19 +92,16 @@ async function getErc721Balance(
     jsonrpc: '2.0',
   };
 
-  const response = await fetch(rpcEndpoint, {
-    method: 'POST',
-    body: JSON.stringify(requestBody),
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const data = await response.json();
+  const errorMsg =
+    `ERC20 balance fetch failed for address ${address} ` +
+    `on evm chain id ${evmChainId} for contract ${contractAddress}.`;
+
+  const data = await evmRpcRequest(rpcEndpoint, requestBody, errorMsg);
+  if (!data) return {};
 
   if (data.error) {
-    const msg =
-      `ERC20 balance fetch failed for address ${address} ` +
-      `on evm chain id ${evmChainId} for contract ${contractAddress}.`;
-    rollbar.error(msg, data.error);
-    log.error(msg, data.error);
+    rollbar.error(errorMsg, data.error);
+    log.error(errorMsg, data.error);
     return {};
   } else {
     return {

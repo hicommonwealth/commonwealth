@@ -8,7 +8,6 @@ import app from 'state';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import ChainInfo from '../../models/ChainInfo';
-import SocialAccount from '../../models/SocialAccount';
 import StarredCommunity from '../../models/StarredCommunity';
 import { notifyError } from '../app/notifications';
 
@@ -85,15 +84,6 @@ export class UserController {
     if (shouldRedraw) {
       this.isFetched.emit('redraw');
     }
-  }
-
-  private _socialAccounts: SocialAccount[] = [];
-  public get socialAccounts(): SocialAccount[] {
-    return this._socialAccounts;
-  }
-
-  private _setSocialAccounts(socialAccounts: SocialAccount[]): void {
-    this._socialAccounts = socialAccounts;
   }
 
   private _selectedChain: ChainInfo;
@@ -236,21 +226,6 @@ export class UserController {
     );
   }
 
-  public setSocialAccounts(socialAccounts: SocialAccount[]): void {
-    this._setSocialAccounts(socialAccounts);
-  }
-
-  public addSocialAccount(social: SocialAccount): void {
-    this._socialAccounts.push(social);
-  }
-
-  public removeSocialAccount(social: SocialAccount): void {
-    this._socialAccounts.splice(
-      this._socialAccounts.findIndex((s) => s.username === social.username),
-      1,
-    );
-  }
-
   public setSelectedChain(selectedChain: ChainInfo): void {
     this._setSelectedChain(selectedChain);
   }
@@ -292,7 +267,7 @@ export class UserController {
   public isCommunityStarred(chain: string): boolean {
     return (
       this._starredCommunities.findIndex((c) => {
-        return c.community === chain;
+        return c.chain === chain;
       }) !== -1
     );
   }
@@ -303,7 +278,7 @@ export class UserController {
 
   public removeStarredCommunity(chain: string, userId: number): void {
     const index = this._starredCommunities.findIndex(
-      (s) => s.user_id === userId && s.community === chain,
+      (s) => s.user_id === userId && s.chain === chain,
     );
     this._starredCommunities.splice(index, 1);
   }

@@ -5,16 +5,16 @@ import { Role } from 'server/models/role';
 class CommunityRole {
   public readonly id: number;
   public readonly name: Role;
-  public readonly community_id: string;
+  public readonly chain_id: string;
   public readonly allow: number;
   public readonly deny: number;
   public readonly createdAt: moment.Moment;
   public readonly updatedAt: moment.Moment;
 
-  constructor(id, name, community_id, allow, deny, createdAt, updatedAt) {
+  constructor(id, name, chain_id, allow, deny, createdAt, updatedAt) {
     this.id = id;
     this.name = name;
-    this.community_id = community_id;
+    this.chain_id = chain_id;
     this.allow = allow;
     this.deny = deny;
     this.createdAt = createdAt;
@@ -24,7 +24,7 @@ class CommunityRole {
   public static fromJSON({
     id,
     name,
-    community_id,
+    chain_id,
     allow,
     deny,
     createdAt,
@@ -33,7 +33,7 @@ class CommunityRole {
     return new CommunityRole(
       id,
       name,
-      community_id,
+      chain_id,
       allow,
       deny,
       createdAt,

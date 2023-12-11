@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
-import type CommunityInfo from './ChainInfo';
+import type ChainInfo from './ChainInfo';
 import { default as CommentT } from './Comment';
 import { Thread as ThreadT } from './Thread';
 import type { IUniqueId } from './interfaces';
@@ -10,7 +10,7 @@ class NotificationSubscription {
   public readonly category: string;
   public readonly snapshotId: string;
   public readonly createdAt: moment.Moment;
-  public readonly Community: CommunityInfo;
+  public readonly Chain: ChainInfo;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
 
@@ -42,8 +42,8 @@ class NotificationSubscription {
     return this._isActive;
   }
 
-  public get communityId() {
-    return this.Community?.id;
+  public get chainId() {
+    return this.Chain?.id;
   }
 
   public get threadId() {
@@ -64,7 +64,7 @@ class NotificationSubscription {
     isActive,
     createdAt,
     immediateEmail,
-    Community?,
+    Chain?,
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT,
     snapshotId?: string,
@@ -74,7 +74,7 @@ class NotificationSubscription {
     this._isActive = isActive;
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
-    this.Community = Community;
+    this.Chain = Chain;
     this.Comment = comment;
     this.Thread = thread;
     this.snapshotId = snapshotId;
@@ -87,7 +87,7 @@ class NotificationSubscription {
       json.is_active,
       json.created_at,
       json.immediate_email,
-      json.Community,
+      json.Chain,
       json.Comment,
       json.Thread,
       json.snapshot_id,
@@ -102,7 +102,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     is_active,
     created_at,
     immediate_email,
-    Community,
+    Chain,
     Comment,
     Thread,
     snapshot_id,
@@ -137,7 +137,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     is_active,
     created_at,
     immediate_email,
-    Community,
+    Chain,
     modeledComment,
     modeledThread,
     snapshot_id,

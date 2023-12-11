@@ -1,7 +1,9 @@
-import { NotificationCategories } from 'common-common/src/types';
+import {
+  NotificationCategories,
+  type ChainEventNotification,
+} from 'common-common/src/types';
 import type { Socket } from 'socket.io-client';
 import app from 'state';
-import type { ChainEventNotification } from 'types';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import Notification from '../../../models/Notification';
 import type NotificationSubscription from '../../../models/NotificationSubscription';
@@ -50,9 +52,9 @@ export class ChainEventsNamespace {
     if (this._isConnected) {
       const roomsToLeave = [];
       for (const sub of subs) {
-        if (this.subscriptionRoomsJoined.has(sub.communityId)) {
-          roomsToLeave.push(sub.communityId);
-          this.subscriptionRoomsJoined.delete(sub.communityId);
+        if (this.subscriptionRoomsJoined.has(sub.chainId)) {
+          roomsToLeave.push(sub.chainId);
+          this.subscriptionRoomsJoined.delete(sub.chainId);
         }
       }
 
@@ -86,7 +88,7 @@ export class ChainEventsNamespace {
   private onConnect() {
     this._isConnected = true;
     this.addChainEventSubscriptions(
-      app.user.notifications.chainEventSubscriptions.map((s) => s.communityId),
+      app.user.notifications.chainEventSubscriptions.map((s) => s.chainId),
     );
     console.log('Chain events namespace connected!');
   }

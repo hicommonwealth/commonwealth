@@ -6,11 +6,11 @@ export const bundleSubs = (
 ): { [k: string]: Array<NotificationSubscription> } => {
   const result = {};
   for (const sub of subs) {
-    if (sub.Community) {
-      if (result[sub.Community.id]) {
-        result[sub.Community.id].push(sub);
+    if (sub.Chain) {
+      if (result[sub.Chain.id]) {
+        result[sub.Chain.id].push(sub);
       } else {
-        result[sub.Community.id] = [sub];
+        result[sub.Chain.id] = [sub];
       }
     }
   }

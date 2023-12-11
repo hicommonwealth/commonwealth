@@ -55,7 +55,7 @@ export function findSubscription(
     return subs.find(
       (s) =>
         s.categoryId === categoryId &&
-        s.communityId === findOptions.options.chainId,
+        s.chainId === findOptions.options.chainId,
     );
   } else if (
     categoryId === NotificationCategories.NewCollaboration ||
