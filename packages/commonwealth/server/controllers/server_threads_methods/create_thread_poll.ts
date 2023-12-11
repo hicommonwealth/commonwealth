@@ -79,7 +79,7 @@ export async function __createThreadPoll(
       allowAdmin: true,
     });
     if (!isAdmin) {
-      new AppError(Errors.MustBeAdmin);
+      throw new AppError(Errors.MustBeAdmin);
     }
   }
 
