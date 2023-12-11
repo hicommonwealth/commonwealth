@@ -9,7 +9,6 @@ import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CWAuthButton } from './cw_auth_button';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 
-import { ChainBase } from 'common-common/src/types';
 import { DeltaStatic } from 'quill';
 import app from 'state';
 import type { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
@@ -2040,34 +2039,30 @@ export const ComponentShowcase = () => {
         <CWText type="h3"> Community Selector </CWText>
         <CWCommunitySelector
           type={CommunityType.Ethereum}
-          chainBase={ChainBase.Ethereum}
           title="Ethereum (EVM)"
           isRecommended
-          onClick={(type) => console.log('Selected: ', type)}
+          onClick={() => console.log('Selected: ', CommunityType.Ethereum)}
           description="Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable.
           Select this community type if you have minted a token on the Ethereum blockchain."
         />
         <CWCommunitySelector
           type={CommunityType.Cosmos}
-          chainBase={ChainBase.CosmosSDK}
           title="Cosmos"
-          onClick={(type) => console.log('Selected: ', type)}
+          onClick={() => console.log('Selected: ', CommunityType.Cosmos)}
           description="The Cosmos Network is a decentralized network of independent, scalable,
           and interoperable blockchains, creating the foundation for a new token economy."
         />
         <CWCommunitySelector
           type={CommunityType.Polygon}
-          chainBase={ChainBase.Ethereum}
           title="Polygon"
-          onClick={(type) => console.log('Selected: ', type)}
+          onClick={() => console.log('Selected: ', CommunityType.Polygon)}
           description="Polygon is built around making web3 technology accessible, with zero prior knowledge.
            Common supports communities on the Polygon network..."
         />
         <CWCommunitySelector
           type={CommunityType.Solana}
-          chainBase={ChainBase.Solana}
           title="Solana"
-          onClick={(type) => console.log('Selected: ', type)}
+          onClick={() => console.log('Selected: ', CommunityType.Solana)}
           description="Solana is a rapidly growing technology due to its speed and scale.
           Our integration with Solana allows you to create a community for your project with just a click! "
         />

@@ -22,26 +22,22 @@ export type SelectedCommunity = {
 
 interface CWCommunitySelectorProps {
   type: CommunityType;
-  chainBase: ChainBase;
   title: string;
   isRecommended?: boolean;
   description: string;
-  onClick: ({ type, chainBase }: SelectedCommunity) => void;
+  onClick: () => void;
 }
 
 const CWCommunitySelector = ({
   type,
-  chainBase,
+  // chainBase,
   title,
   isRecommended,
   description,
   onClick,
 }: CWCommunitySelectorProps) => {
   return (
-    <div
-      className={ComponentType.CommunitySelector}
-      onClick={() => onClick({ type, chainBase })}
-    >
+    <div className={ComponentType.CommunitySelector} onClick={onClick}>
       <div className="chain-logo-container">
         <img src={`static/img/communitySelector/${type}.svg`} alt={title} />
       </div>

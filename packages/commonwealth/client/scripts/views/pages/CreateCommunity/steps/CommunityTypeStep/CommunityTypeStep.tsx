@@ -81,11 +81,15 @@ const CommunityTypeStep = ({
       <CWCommunitySelector
         key={ethereumOption.type}
         type={ethereumOption.type}
-        chainBase={ethereumOption.chainBase}
         title={ethereumOption.title}
         description={ethereumOption.description}
         isRecommended={ethereumOption.isRecommended}
-        onClick={handleCommunitySelection}
+        onClick={() =>
+          handleCommunitySelection({
+            type: ethereumOption.type,
+            chainBase: ethereumOption.chainBase,
+          })
+        }
       />
 
       <div className="advanced-options-container">
@@ -95,10 +99,9 @@ const CommunityTypeStep = ({
           <CWCommunitySelector
             key={type}
             type={type}
-            chainBase={chainBase}
             title={title}
             description={description}
-            onClick={handleCommunitySelection}
+            onClick={() => handleCommunitySelection({ type, chainBase })}
           />
         ))}
       </div>
