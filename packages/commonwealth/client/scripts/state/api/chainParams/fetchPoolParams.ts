@@ -1,5 +1,5 @@
-import app from 'state';
 import { useQuery } from '@tanstack/react-query';
+import app from 'state';
 
 import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
@@ -13,9 +13,9 @@ const fetchPoolParams = async (): Promise<CosmosToken> => {
 };
 
 const usePoolParamsQuery = () => {
-  const chainId = app.activeChainId();
+  const communityId = app.activeChainId();
   return useQuery({
-    queryKey: ['poolParams', chainId],
+    queryKey: ['poolParams', communityId],
     queryFn: fetchPoolParams,
     enabled: app.chain?.base === ChainBase.CosmosSDK,
     cacheTime: POOL_PARAMS_CACHE_TIME,
