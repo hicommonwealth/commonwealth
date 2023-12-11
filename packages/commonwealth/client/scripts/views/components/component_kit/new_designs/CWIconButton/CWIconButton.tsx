@@ -16,16 +16,14 @@ type ButtonStyleProps = {
 
 type ButtonProps = ButtonStyleProps & React.HTMLAttributes<HTMLButtonElement>;
 
-export const CWIconButton = (props: ButtonProps) => {
-  const {
-    buttonSize = 'med',
-    iconName,
-    className,
-    disabled = false,
-    onClick,
-    ...otherProps
-  } = props;
-
+export const CWIconButton = ({
+  buttonSize = 'med',
+  className,
+  iconName,
+  disabled = false,
+  onClick,
+  ...otherProps
+}: ButtonProps) => {
   return (
     <button
       className={getClasses(
