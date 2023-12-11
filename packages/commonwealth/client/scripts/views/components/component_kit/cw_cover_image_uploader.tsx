@@ -150,9 +150,11 @@ export const CWCoverImageUploader = ({
           : imageBehavior;
         setImageBehavior(currentImageBehavior);
         setUploadStatus('success');
-        attachButton.current.style.display = 'none';
+        if (defaultImageBehaviour !== ImageBehavior.Circle) {
+          attachButton.current.style.display = 'none';
+        }
 
-        generatedImageCallback(res.result.imageUrl, currentImageBehavior);
+        generatedImageCallback?.(res.result.imageUrl, currentImageBehavior);
         uploadCompleteCallback(res.result.imageUrl, currentImageBehavior);
       }
 
