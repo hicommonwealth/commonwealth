@@ -17,38 +17,11 @@ export type SnapshotProposalAttributes = {
   is_upstream_deleted?: boolean;
 };
 
-export enum WebsocketMessageNames {
-  ChainEventNotification = 'chain-event-notification',
-  SnapshotProposalNotification = 'snapshot-proposal-notification',
-  SnapshotListener = 'snapshot-listener',
-  NewSubscriptions = 'new-subscriptions',
-  DeleteSubscriptions = 'delete-subscriptions',
-  Error = 'exception',
-}
-
-export type SnapshotProposalNotification = {
-  id: string;
-  category_id: 'snapshot-proposal';
-  chain_id: string;
-  SnapshotProposal: SnapshotProposalAttributes;
-};
-
 export const enum SnapshotEventType {
   Created = 'proposal/created',
   Deleted = 'proposal/deleted',
   Ended = 'proposal/end',
   Started = 'proposal/start',
-}
-
-export enum WebsocketNamespaces {
-  SnapshotProposals = 'snapshot-proposals',
-  ChainEvents = 'chain-events',
-  SnapshotListener = 'snapshot-listener',
-}
-
-export enum WebsocketEngineEvents {
-  CreateRoom = 'create-room',
-  DeleteRoom = 'delete-room',
 }
 
 export interface ISnapshotNotificationData {
