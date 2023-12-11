@@ -40,7 +40,7 @@ describe('validateRequirements', () => {
             source_type: BalanceSourceType.ERC1155,
             evm_chain_id: 1,
             contract_address: '0x0000000000000000000000000000000000000000',
-            token_id: "1"
+            token_id: '1',
           },
         },
       },
