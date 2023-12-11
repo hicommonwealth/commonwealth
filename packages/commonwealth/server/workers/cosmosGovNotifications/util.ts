@@ -8,7 +8,9 @@ import {
 import Rollbar from 'rollbar';
 import { EventKind, coinToCoins } from '../../../shared/chain/types/cosmos';
 import { DB } from '../../models';
+import { SubscriptionAttributes } from '../../models/subscription';
 import emitNotifications from '../../util/emitNotifications';
+import { attributeOf } from '../../util/sequelizeHelpers';
 import { AllCosmosProposals } from './proposalFetching/types';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -17,8 +19,11 @@ export async function fetchCosmosNotifChains(models: DB) {
   const chainIds = await models.Subscription.findAll({
     attributes: [
       [
-        models.sequelize.fn('DISTINCT', models.sequelize.col('chain_id')),
-        'chain_id',
+        models.sequelize.fn(
+          'DISTINCT',
+          models.sequelize.col(attributeOf<SubscriptionAttributes>('chain_id')),
+        ),
+        attributeOf<SubscriptionAttributes>('chain_id'),
       ],
     ],
     where: {

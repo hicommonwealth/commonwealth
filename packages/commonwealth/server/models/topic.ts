@@ -1,5 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { attributesOf } from '../util/sequelizeHelpers';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance, ModelStatic } from './types';
@@ -34,7 +35,7 @@ export type TopicModelStatic = ModelStatic<TopicInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): TopicModelStatic => {
   const Topic = <TopicModelStatic>sequelize.define(
     'Topic',
@@ -81,10 +82,14 @@ export default (
       paranoid: true,
       defaultScope: {
         attributes: {
-          exclude: ['created_at', 'updated_at', 'deleted_at'],
+          exclude: attributesOf<TopicAttributes>(
+            'created_at',
+            'updated_at',
+            'deleted_at',
+          ),
         },
       },
-    }
+    },
   );
 
   Topic.associate = (models) => {

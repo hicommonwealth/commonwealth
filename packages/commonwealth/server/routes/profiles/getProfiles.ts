@@ -3,11 +3,15 @@ import Sequelize, { WhereOptions } from 'sequelize';
 import type { GetProfilesReq, GetProfilesResp } from '../../api/extApiTypes';
 import { needParamErrMsg } from '../../api/extApiTypes';
 import type { DB } from '../../models';
+import { AddressAttributes } from '../../models/address';
+import { CommentAttributes } from '../../models/comment';
 import { ProfileAttributes } from '../../models/profile';
+import { ThreadAttributes } from '../../models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
 import { formatPagination } from '../../util/queries';
+import { attributesOf } from '../../util/sequelizeHelpers';
 
 const { Op } = Sequelize;
 
@@ -42,7 +46,7 @@ const getProfiles = async (
   if (addresses) {
     newProfileIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },
-      attributes: ['profile_id'],
+      attributes: attributesOf<AddressAttributes>('profile_id'),
     });
   }
 
@@ -71,13 +75,21 @@ const getProfiles = async (
     ({ rows: profiles, count } = await models.Profile.findAndCountAll({
       where,
       include,
-      attributes: { exclude: ['user_id', 'address_id'] },
+      attributes: {
+        exclude: attributesOf<
+          ProfileAttributes & ThreadAttributes & CommentAttributes
+        >('user_id', 'address_id'),
+      },
       ...pagination,
     }));
   } else {
     count = await models.Profile.count({
       where,
-      attributes: { exclude: ['user_id', 'address_id'] },
+      attributes: {
+        exclude: attributesOf<
+          ProfileAttributes & ThreadAttributes & CommentAttributes
+        >('user_id', 'address_id'),
+      },
       include,
       ...pagination,
     });

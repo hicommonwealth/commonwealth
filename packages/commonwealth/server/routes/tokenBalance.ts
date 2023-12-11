@@ -3,8 +3,10 @@ import { col, fn } from 'sequelize';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
 import type { DB } from '../models';
+import { AddressAttributes } from '../models/address';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import { attributeOf } from '../util/sequelizeHelpers';
 
 export const Errors = {
   NoAddress: 'Address not found',
@@ -31,7 +33,7 @@ const tokenBalance = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   req: TypedRequestBody<TokenBalanceReq>,
-  res: TypedResponse<TokenBalanceResp>
+  res: TypedResponse<TokenBalanceResp>,
 ) => {
   if (!req.body.address) {
     throw new AppError(Errors.NoAddress);
@@ -67,7 +69,12 @@ const tokenBalance = async (
     if (req.body.all) {
       const user_id = req.user?.id;
       const addresses: any = await models.Address.findAll({
-        attributes: [[fn('DISTINCT', col('address')), 'distinctAddress']],
+        attributes: [
+          [
+            fn('DISTINCT', col(attributeOf<AddressAttributes>('id'))),
+            'distinctAddress',
+          ],
+        ],
         where: {
           community_id: req.body.chain,
           user_id: user_id,
@@ -84,17 +91,17 @@ const tokenBalance = async (
             chain.network,
             chain_node_id,
             address.dataValues.distinctAddress,
-            req.body.contract_address
+            req.body.contract_address,
           );
           return { address, balance: addrBalance };
-        })
+        }),
       );
     } else {
       balance = await tokenBalanceCache.fetchUserBalance(
         chain.network,
         chain_node_id,
         req.body.address,
-        req.body.contract_address
+        req.body.contract_address,
       );
     }
     return success(res, balance);

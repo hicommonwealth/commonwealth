@@ -12,11 +12,15 @@ import type {
 import { ETH_RPC, JWT_SECRET } from '../config';
 import { sequelize } from '../database';
 import type { DB } from '../models';
-import type { CommunityInstance } from '../models/community';
+import type {
+  CommunityAttributes,
+  CommunityInstance,
+} from '../models/community';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
+import { attributesOf } from '../util/sequelizeHelpers';
 
 type ThreadCountQueryData = {
   concat: string;
@@ -87,7 +91,7 @@ const getChainStatus = async (models: DB) => {
 export const getUserStatus = async (models: DB, user: UserInstance) => {
   const chains = await models.Community.findAll({
     where: { active: true },
-    attributes: ['id'],
+    attributes: attributesOf<CommunityAttributes>('id'),
   });
 
   const unfilteredAddresses = await user.getAddresses();

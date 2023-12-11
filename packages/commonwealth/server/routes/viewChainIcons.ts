@@ -1,6 +1,8 @@
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
+import { CommunityAttributes } from '../models/community';
+import { attributesOf } from '../util/sequelizeHelpers';
 
 const viewChainIcons = async (
   models: DB,
@@ -14,7 +16,7 @@ const viewChainIcons = async (
   const communities = JSON.parse(req.body.communities);
 
   const iconUrls = await models.Community.findAll({
-    attributes: ['id', 'icon_url'],
+    attributes: attributesOf<CommunityAttributes>('id', 'icon_url'),
     where: {
       id: communities,
     },

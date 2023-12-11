@@ -6,6 +6,7 @@ import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { MembershipAttributes } from '../../models/membership';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
+import { attributesOf } from '../../util/sequelizeHelpers';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const MEMBERSHIP_TTL_SECONDS = 60 * 2;
@@ -37,7 +38,7 @@ export async function __refreshCommunityMemberships(
         [Op.ne]: null,
       },
     },
-    attributes: ['id', 'address'],
+    attributes: attributesOf<AddressAttributes>('id', 'address'),
     include: {
       model: this.models.Membership,
       as: 'Memberships',

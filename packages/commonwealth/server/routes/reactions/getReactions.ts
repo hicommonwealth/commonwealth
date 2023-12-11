@@ -2,11 +2,13 @@ import { query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
 import type { GetReactionsReq, GetReactionsResp } from '../../api/extApiTypes';
 import type { DB } from '../../models';
+import { AddressAttributes } from '../../models/address';
 import { ReactionAttributes } from '../../models/reaction';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
 import { flattenIncludedAddresses, formatPagination } from '../../util/queries';
+import { attributesOf } from '../../util/sequelizeHelpers';
 
 const { Op } = Sequelize;
 
@@ -38,7 +40,7 @@ const getReactions = async (
   if (addresses) {
     const addressIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },
-      attributes: ['id'],
+      attributes: attributesOf<AddressAttributes>('id'),
     });
 
     where.address_id = { [Op.in]: addressIds.map((p) => p.id) };
@@ -47,7 +49,7 @@ const getReactions = async (
   const include = [
     {
       model: models.Address,
-      attributes: ['address'],
+      attributes: attributesOf<AddressAttributes>('address'),
       required: true,
     },
   ];
@@ -60,14 +62,14 @@ const getReactions = async (
     ({ rows: reactions, count } = await models.Reaction.findAndCountAll({
       where,
       include,
-      attributes: { exclude: ['address_id'] },
+      attributes: { exclude: attributesOf<ReactionAttributes>('address_id') },
       ...pagination,
     }));
   } else {
     count = await models.Reaction.count({
       where,
       include,
-      attributes: { exclude: ['address_id'] },
+      attributes: { exclude: attributesOf<ReactionAttributes>('address_id') },
       ...pagination,
     });
   }

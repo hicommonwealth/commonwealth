@@ -1,5 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { attributesOf } from '../util/sequelizeHelpers';
 import type { AddressAttributes } from './address';
 import type { ModelInstance, ModelStatic } from './types';
 
@@ -21,7 +22,7 @@ export type SsoTokenModelStatic = ModelStatic<SsoTokenInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): SsoTokenModelStatic => {
   const SsoToken = <SsoTokenModelStatic>sequelize.define(
     'SsoToken',
@@ -42,20 +43,20 @@ export default (
       indexes: [{ fields: ['id'] }, { fields: ['issuer', 'address_id'] }],
       defaultScope: {
         attributes: {
-          exclude: [
+          exclude: attributesOf<SsoTokenAttributes>(
             'issued_at',
             'issuer',
             'address_id',
             'state_id',
             'created_at',
             'updated_at',
-          ],
+          ),
         },
       },
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   SsoToken.associate = (models) => {

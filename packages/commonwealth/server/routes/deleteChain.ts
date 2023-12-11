@@ -3,8 +3,10 @@ import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { sequelize } from '../database';
 import type { DB } from '../models';
+import { ThreadAttributes } from '../models/thread';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import { attributesOf } from '../util/sequelizeHelpers';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -30,7 +32,7 @@ const deleteChain = async (
   models: DB,
   req: TypedRequestBody<deleteChainReq>,
   res: TypedResponse<deleteChainResp>,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { id } = req.body;
 
@@ -70,7 +72,7 @@ const deleteChain = async (
                 selected_chain_id: chain.id,
               },
               transaction: t,
-            }
+            },
           );
 
           await models.Reaction.destroy({
@@ -86,7 +88,7 @@ const deleteChain = async (
                     FROM "Addresses"
                     WHERE "Comments".address_id = "Addresses".id)
                  WHERE chain = '${chain.id}'`,
-            { transaction: t }
+            { transaction: t },
           );
 
           await models.Comment.destroy({
@@ -118,7 +120,7 @@ const deleteChain = async (
 
           const threads = await models.Thread.findAll({
             where: { chain: chain.id },
-            attributes: ['id'],
+            attributes: attributesOf<ThreadAttributes>('id'),
           });
 
           await models.Collaboration.destroy({
@@ -146,7 +148,7 @@ const deleteChain = async (
                     FROM "Addresses"
                     WHERE "Threads".address_id = "Addresses".id)
                  WHERE chain = '${chain.id}'`,
-            { transaction: t }
+            { transaction: t },
           );
 
           await models.Thread.destroy({

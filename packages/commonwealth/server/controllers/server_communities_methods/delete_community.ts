@@ -2,6 +2,8 @@ import { AppError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
 import { UserInstance } from 'server/models/user';
 import { sequelize } from '../../database';
+import { ThreadAttributes } from '../../models/thread';
+import { attributesOf } from '../../util/sequelizeHelpers';
 import { ServerCommunitiesController } from '../server_communities_controller';
 
 export const Errors = {
@@ -102,7 +104,7 @@ export async function __deleteCommunity(
 
           const threads = await this.models.Thread.findAll({
             where: { chain: community.id },
-            attributes: ['id'],
+            attributes: attributesOf<ThreadAttributes>('id'),
             paranoid: false, // necessary in order to delete associations with soft-deleted threads
           });
 

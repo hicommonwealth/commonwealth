@@ -2,11 +2,13 @@ import { query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
 import type { GetThreadsReq, GetThreadsResp } from '../../api/extApiTypes';
 import type { DB } from '../../models';
+import { AddressAttributes } from '../../models/address';
 import { ThreadAttributes } from '../../models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
 import { flattenIncludedAddresses, formatPagination } from '../../util/queries';
+import { attributesOf } from '../../util/sequelizeHelpers';
 
 const { Op } = Sequelize;
 
@@ -48,7 +50,7 @@ export const getThreads = async (
   if (addresses) {
     const addressIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },
-      attributes: ['id'],
+      attributes: attributesOf<AddressAttributes>('id'),
     });
 
     where.address_id = { [Op.in]: addressIds.map((p) => p.id) };
@@ -57,7 +59,7 @@ export const getThreads = async (
   const include: any = [
     {
       model: models.Address,
-      attributes: ['address'],
+      attributes: attributesOf<AddressAttributes>('address'),
       as: 'Address',
       required: true,
     },

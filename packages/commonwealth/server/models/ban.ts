@@ -15,7 +15,7 @@ export type BanModelStatic = ModelStatic<BanInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): BanModelStatic => {
   const Ban = <BanModelStatic>sequelize.define(
     'Bans',
@@ -33,7 +33,7 @@ export default (
       updatedAt: 'updated_at',
       timestamps: true,
       indexes: [{ fields: ['chain_id'] }],
-    }
+    },
   );
 
   Ban.associate = (models) => {

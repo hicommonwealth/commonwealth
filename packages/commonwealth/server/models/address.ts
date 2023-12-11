@@ -1,6 +1,7 @@
 import { WalletId, WalletSsoSource } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import { attributesOf } from '../util/sequelizeHelpers';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import { MembershipAttributes } from './membership';
 import type { ProfileAttributes, ProfileInstance } from './profile';
@@ -132,13 +133,13 @@ export default (
       ],
       defaultScope: {
         attributes: {
-          exclude: [
+          exclude: attributesOf<AddressAttributes>(
             'verification_token',
             'verification_token_expires',
             'block_info',
             'created_at',
             'updated_at',
-          ],
+          ),
         },
       },
       scopes: {

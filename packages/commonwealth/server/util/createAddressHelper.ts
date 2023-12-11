@@ -15,9 +15,11 @@ import { addressSwapper, bech32ToHex } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { DB } from '../models';
+import { ProfileAttributes } from '../models/profile';
 import type { UserInstance } from '../models/user';
 import { Errors } from '../routes/createAddress';
 import { createRole, findOneRole } from './roles';
+import { attributesOf } from './sequelizeHelpers';
 
 type CreateAddressReq = {
   address: string;
@@ -205,7 +207,7 @@ export async function createAddressHelper(
 
       if (user_id) {
         const profile = await models.Profile.findOne({
-          attributes: ['id'],
+          attributes: attributesOf<ProfileAttributes>('id'),
           where: { user_id },
         });
         profile_id = profile?.id;

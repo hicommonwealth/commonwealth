@@ -2,11 +2,13 @@ import { query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
 import type { GetCommentsReq, GetCommentsResp } from '../../api/extApiTypes';
 import type { DB } from '../../models';
+import { AddressAttributes } from '../../models/address';
 import { CommentAttributes } from '../../models/comment';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
 import { failure, success } from '../../types';
 import { paginationValidation } from '../../util/helperValidations';
 import { flattenIncludedAddresses, formatPagination } from '../../util/queries';
+import { attributesOf } from '../../util/sequelizeHelpers';
 
 const { Op } = Sequelize;
 
@@ -36,7 +38,7 @@ export const getComments = async (
   if (addresses) {
     const addressIds = await models.Address.findAll({
       where: { address: { [Op.in]: addresses } },
-      attributes: ['id'],
+      attributes: attributesOf<AddressAttributes>('id'),
     });
 
     where['address_id'] = { [Op.in]: addressIds.map((p) => p.id) };
@@ -49,7 +51,7 @@ export const getComments = async (
   const include = [
     {
       model: models.Address,
-      attributes: ['address'],
+      attributes: attributesOf<AddressAttributes>('address'),
       required: true,
     },
   ];
@@ -59,7 +61,7 @@ export const getComments = async (
     ({ rows: comments, count } = await models.Comment.findAndCountAll({
       where,
       include,
-      attributes: { exclude: ['address_id'] },
+      attributes: { exclude: attributesOf<CommentAttributes>('address_id') },
       ...formatPagination(req.query),
     }));
   } else {
@@ -67,7 +69,7 @@ export const getComments = async (
       logging: console.log,
       where,
       include,
-      attributes: { exclude: ['address_id'] },
+      attributes: { exclude: attributesOf<CommentAttributes>('address_id') },
       ...formatPagination(req.query),
     });
   }
