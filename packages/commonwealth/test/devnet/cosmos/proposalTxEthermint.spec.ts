@@ -27,7 +27,8 @@ const { expect, assert } = chai;
 
 // evmos1yc36qsnpgnnwnhjp5v524lk3cadlq4480u47x2
 const mnemonic =
-  'extra cute enough manage arctic acid ball divide reduce turtle pony duck remind short find feature tooth steak fix assault vote sad cattle roof';
+  'extra cute enough manage arctic acid ball divide reduce turtle ' +
+  'pony duck remind short find feature tooth steak fix assault vote sad cattle roof';
 
 export const setupTestSigner = async (lcdUrl: string) => {
   const dbId = 'evmos-dev-ci';
