@@ -1,5 +1,5 @@
-import app from 'state';
 import { useQuery } from '@tanstack/react-query';
+import app from 'state';
 
 import { ChainBase } from 'common-common/src/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
@@ -12,9 +12,9 @@ const fetchStakingParams = async (): Promise<string> => {
 };
 
 const useStakingParamsQuery = () => {
-  const chainId = app.activeChainId();
+  const communityId = app.activeChainId();
   return useQuery({
-    queryKey: ['stakingParams', chainId],
+    queryKey: ['stakingParams', communityId],
     queryFn: fetchStakingParams,
     enabled: app.chain?.base === ChainBase.CosmosSDK,
     cacheTime: STAKING_PARAMS_CACHE_TIME,
