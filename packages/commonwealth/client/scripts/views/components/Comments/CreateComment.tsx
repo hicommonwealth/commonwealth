@@ -40,7 +40,7 @@ export const CreateComment = ({
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
       ? `new-thread-comment-${rootThread.id}`
-      : `new-comment-reply-${parentCommentId}`
+      : `new-comment-reply-${parentCommentId}`,
   );
 
   // get restored draft on init
@@ -54,7 +54,7 @@ export const CreateComment = ({
   const [sendingComment, setSendingComment] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [tokenPostingThreshold, setTokenPostingThreshold] = useState(
-    new BN('0')
+    new BN('0'),
   );
   const [userBalance, setUserBalance] = useState(new BN('0'));
   const [balanceLoading, setBalanceLoading] = useState(false);
@@ -89,7 +89,7 @@ export const CreateComment = ({
     reset: resetCreateCommentMutation,
   } = useCreateCommentMutation({
     threadId: rootThread.id,
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
@@ -102,12 +102,12 @@ export const CreateComment = ({
     setErrorMsg(null);
     setSendingComment(true);
 
-    const chainId = app.activeChainId();
+    const communityId = app.activeChainId();
 
     try {
       const newComment: any = await createComment({
         threadId: rootThread.id,
-        chainId: chainId,
+        communityId,
         address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),

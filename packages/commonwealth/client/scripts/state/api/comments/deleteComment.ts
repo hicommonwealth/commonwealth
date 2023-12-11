@@ -7,7 +7,7 @@ import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteCommentProps {
   address: string;
-  chainId: string;
+  communityId: string;
   canvasHash: string;
   commentId: number;
   existingNumberOfComments: number;
@@ -15,7 +15,7 @@ interface DeleteCommentProps {
 
 const deleteComment = async ({
   address,
-  chainId,
+  communityId,
   commentId,
   canvasHash,
 }: DeleteCommentProps) => {
@@ -31,8 +31,8 @@ const deleteComment = async ({
     data: {
       jwt: app.user.jwt,
       address: address,
-      community_id: chainId,
-      author_community_id: chainId,
+      community_id: communityId,
+      author_community_id: communityId,
     },
   });
 
@@ -54,19 +54,19 @@ const deleteComment = async ({
 };
 
 interface UseDeleteCommentMutationProps {
-  chainId: string;
+  communityId: string;
   threadId: number;
   existingNumberOfComments: number;
 }
 
 const useDeleteCommentMutation = ({
-  chainId,
+  communityId,
   threadId,
   existingNumberOfComments,
 }: UseDeleteCommentMutationProps) => {
   const queryClient = useQueryClient();
   const { data: comments } = useFetchCommentsQuery({
-    chainId,
+    communityId,
     threadId,
   });
 
@@ -85,7 +85,7 @@ const useDeleteCommentMutation = ({
         );
 
         // update fetch comments query state
-        const key = [ApiEndpoints.FETCH_COMMENTS, chainId, threadId];
+        const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
         queryClient.cancelQueries({ queryKey: key });
         queryClient.setQueryData(key, () => {
           const updatedComments = [...(comments || [])];
@@ -93,7 +93,7 @@ const useDeleteCommentMutation = ({
           return [...updatedComments];
         });
       }
-      updateThreadInAllCaches(chainId, threadId, {
+      updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments - 1 || 0,
       });
       return response;
