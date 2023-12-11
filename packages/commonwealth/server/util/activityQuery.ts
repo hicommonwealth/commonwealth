@@ -1,6 +1,8 @@
 import { Op } from 'sequelize';
 import type { DB } from '../models';
-import type { AddressInstance } from '../models/address';
+import type { AddressAttributes, AddressInstance } from '../models/address';
+import { CommentAttributes } from '../models/comment';
+import { attributesOf } from './sequelizeHelpers';
 
 export type GlobalActivity = Array<{
   category_id: string;
@@ -64,7 +66,11 @@ export async function getActivityFeed(
         [Op.in]: notifications.map((n) => n.thread_id),
       },
     },
-    attributes: ['id', 'thread_id', 'address_id'],
+    attributes: attributesOf<CommentAttributes>(
+      'id',
+      'thread_id',
+      'address_id',
+    ),
   });
 
   const addresses = await models.Address.findAll({
@@ -73,7 +79,12 @@ export async function getActivityFeed(
         [Op.in]: comments.map((c) => c.address_id),
       },
     },
-    attributes: ['id', 'address', 'community_id', 'profile_id'],
+    attributes: attributesOf<AddressAttributes>(
+      'id',
+      'address',
+      'community_id',
+      'profile_id',
+    ),
   });
 
   const profiles = addresses.map((a) => {

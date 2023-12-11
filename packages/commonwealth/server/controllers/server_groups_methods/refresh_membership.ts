@@ -2,8 +2,10 @@ import { Op } from 'sequelize';
 import { AppError } from '../../../../common-common/src/errors';
 import { AddressInstance } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
+import { TopicAttributes } from '../../models/topic';
 import { UserInstance } from '../../models/user';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
+import { attributesOf } from '../../util/sequelizeHelpers';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const Errors = {
@@ -55,7 +57,7 @@ export async function __refreshMembership(
         [Op.overlap]: groups.map((g) => g.id),
       },
     },
-    attributes: ['id', 'group_ids'],
+    attributes: attributesOf<TopicAttributes>('id', 'group_ids'),
   });
 
   // transform memberships to result shape

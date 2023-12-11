@@ -3,6 +3,8 @@
 
 import type { DB } from '../models';
 import type { CommunityInstance } from '../models/community';
+import { TopicAttributes } from '../models/topic';
+import { attributesOf } from '../util/sequelizeHelpers';
 import { ALL_COMMUNITIES } from './databaseValidationService';
 
 export const CommunityCommunityErrors = {
@@ -30,7 +32,7 @@ const getCommunityQuery = (
             model: models.Topic,
             as: 'topics',
             required: false,
-            attributes: ['id', 'name', 'chain_id'],
+            attributes: attributesOf<TopicAttributes>('id', 'name', 'chain_id'),
           },
         ]
       : []),

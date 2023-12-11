@@ -1,6 +1,7 @@
 import type { BalanceType } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
+import { attributesOf } from '../util/sequelizeHelpers';
 import type { ModelInstance, ModelStatic } from './types';
 
 export type ChainNodeAttributes = {
@@ -23,7 +24,7 @@ export type ChainNodeModelStatic = ModelStatic<ChainNodeInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): ChainNodeModelStatic => {
   const ChainNode = <ChainNodeModelStatic>sequelize.define(
     'ChainNode',
@@ -54,13 +55,13 @@ export default (
       underscored: true,
       defaultScope: {
         attributes: {
-          exclude: ['private_url'],
+          exclude: attributesOf<ChainNodeAttributes>('private_url'),
         },
       },
       scopes: {
         withPrivateData: {},
       },
-    }
+    },
   );
 
   ChainNode.associate = (models) => {

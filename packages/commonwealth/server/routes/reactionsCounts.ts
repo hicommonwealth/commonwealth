@@ -2,7 +2,8 @@ import { ServerError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';
 import { Sequelize } from 'sequelize';
 import type { DB } from '../models';
-import type { ReactionInstance } from '../models/reaction';
+import type { ReactionAttributes, ReactionInstance } from '../models/reaction';
+import { attributesOf } from '../util/sequelizeHelpers';
 
 /*
 2 queries:
@@ -18,7 +19,7 @@ const reactionsCounts = async (
   models: DB,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { active_address, thread_ids, comment_ids, proposal_ids } = req.body;
   try {
@@ -33,27 +34,38 @@ const reactionsCounts = async (
         Promise<[ReactionInstance[], ReactionInstance[]]>
       >Promise.all([
         models.Reaction.findAll({
-          group: ['thread_id', 'comment_id', 'proposal_id', 'reaction'],
-          attributes: [
+          group: attributesOf<ReactionAttributes>(
             'thread_id',
             'comment_id',
             'proposal_id',
             'reaction',
+          ),
+          attributes: [
+            ...attributesOf<ReactionAttributes>(
+              'thread_id',
+              'comment_id',
+              'proposal_id',
+              'reaction',
+            ),
             [Sequelize.fn('COUNT', countField), 'count'],
           ],
           where: Sequelize.or(
             { thread_id: thread_ids || [] },
             { proposal_id: proposal_ids || [] },
-            { comment_id: comment_ids || [] }
+            { comment_id: comment_ids || [] },
           ),
         }),
         active_address
           ? models.Reaction.findAll({
-              attributes: ['thread_id', 'comment_id', 'proposal_id'],
+              attributes: attributesOf<ReactionAttributes>(
+                'thread_id',
+                'comment_id',
+                'proposal_id',
+              ),
               where: Sequelize.or(
                 { thread_id: thread_ids || [] },
                 { proposal_id: proposal_ids || [] },
-                { comment_id: comment_ids || [] }
+                { comment_id: comment_ids || [] },
               ),
               include: [
                 {
@@ -73,14 +85,14 @@ const reactionsCounts = async (
             rcJSon.thread_id || rcJSon.comment_id || rcJSon.proposal_id;
           const index = acc.findIndex(
             ({ thread_id, comment_id, proposal_id }) =>
-              id === thread_id || id === comment_id || id === proposal_id
+              id === thread_id || id === comment_id || id === proposal_id,
           );
           const has_reacted = myReactions.some(
             ({ thread_id, comment_id, proposal_id }) => {
               return (
                 id === thread_id || id === comment_id || id === proposal_id
               );
-            }
+            },
           );
           const { reaction, count, thread_id, comment_id, proposal_id } =
             rcJSon as never;

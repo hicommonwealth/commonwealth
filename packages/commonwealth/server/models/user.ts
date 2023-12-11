@@ -1,6 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { CreateOptions, DataTypes } from 'sequelize';
 import type { DB } from '../models';
+import { attributesOf } from '../util/sequelizeHelpers';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommunityAttributes, CommunityInstance } from './community';
 import type { ProfileAttributes, ProfileInstance } from './profile';
@@ -94,13 +95,13 @@ export default (
       indexes: [{ fields: ['email'], unique: true }],
       defaultScope: {
         attributes: {
-          exclude: [
+          exclude: attributesOf<UserAttributes>(
             'emailVerified',
             'emailNotificationInterval',
             'isAdmin',
             'created_at',
             'updated_at',
-          ],
+          ),
         },
       },
       scopes: {
