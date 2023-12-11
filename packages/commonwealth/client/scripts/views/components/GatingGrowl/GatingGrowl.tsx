@@ -1,5 +1,6 @@
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import useGrowlStore from 'state/ui/growl/Growl';
 import Persmissions from 'utils/Permissions';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWGrowl } from 'views/components/component_kit/cw_growl';
@@ -11,47 +12,24 @@ import './GatingGrowl.scss';
 
 const setShowGatingGrowl = 'dontShowGatingGrowlEver';
 
-const tempHideGatingGrowl = 'tempHideGatingGrowl';
-
 const GatingGrowl = () => {
   const navigate = useCommonNavigate();
+  const { setGrowlHidden, growlHidden } = useGrowlStore();
 
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [disabled, setIsDisabled] = useState(
-    localStorage.getItem(setShowGatingGrowl) === 'true' ||
-      localStorage.getItem(tempHideGatingGrowl) === 'true',
+    localStorage.getItem(setShowGatingGrowl) === 'true' || growlHidden,
   );
   const isAdmin = Persmissions.isCommunityAdmin();
 
   const handleExit = () => {
     setIsDisabled(true);
 
-    localStorage.setItem(tempHideGatingGrowl, 'true');
+    setGrowlHidden(true);
     if (dontShowAgain) {
       localStorage.setItem(setShowGatingGrowl, 'true');
     }
   };
-
-  useEffect(() => {
-    const detectRefresh = () => {
-      const navigationEntries =
-        window.performance.getEntriesByType('navigation');
-
-      if (navigationEntries.length > 0) {
-        const firstEventArr = navigationEntries[0];
-
-        if ('type' in firstEventArr && firstEventArr.type === 'reload') {
-          localStorage.setItem(tempHideGatingGrowl, 'false');
-        }
-      }
-    };
-
-    window.addEventListener('beforeunload', detectRefresh);
-
-    return () => {
-      window.removeEventListener('beforeunload', detectRefresh);
-    };
-  }, []);
 
   return (
     <CWGrowl disabled={disabled} position="bottom-right">
