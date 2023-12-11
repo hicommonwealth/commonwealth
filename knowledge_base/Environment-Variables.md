@@ -154,26 +154,6 @@ Description: For Discord OAuth login.
 
 Type: Auth
 
-## DISCORD_CLIENT_SECRET
-
-Type: Auth
-
-## DISCORD_OAUTH_CALLBACK
-
-Default value: `https://commonwealth.im`
-
-Description: For Discord OAuth login.
-
-Type: Config
-
-## DISCORD_OAUTH_SCOPES
-
-Default value: `identify`
-
-Description: For Discord OAuth login.
-
-Type: Auth
-
 ## DISCORD_WEBHOOK_URL_DEV
 
 Description: Connects to the #webhook-testing Discord channel on the Commond Protocol Discord server. Required to use the emit-webhook script to send Discord webhooks. More info at [Webhooks.md](./Webhooks.md).
@@ -231,24 +211,6 @@ Type: Config
 Default value: `FALSE`
 
 Description: Toggles side-wide visibility of discussions homepage sidebar. Temporary flag for 2.0 work.
-
-Type: Config
-
-## GITHUB_CLIENT_ID
-
-Description: Used in GitHub OAuth login.
-
-Type: Auth.
-
-## GITHUB_CLIENT_SECRET
-
-Description: Used in GitHub OAuth login.
-
-## GITHUB_OAUTH_CALLBACK
-
-Default value: `https://commonwealth.im`
-
-Description: For GitHub OAuth login.
 
 Type: Config
 
