@@ -9,7 +9,7 @@ const SuccessStep = () => {
     <div className="SuccessStep">
       <img src="../../static/img/communityIslive.png" alt="" className="img" />
       <CWText type="h2">Your community is live!</CWText>
-      <CWText type="b1">
+      <CWText type="b1" className="description">
         Your community is now live and discoverable on Common. You can now use
         the admin panel to change settings and create topics for discussion.
       </CWText>
