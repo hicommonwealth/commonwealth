@@ -295,7 +295,7 @@ class ChainInfo {
     const updatedChain = r.data.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
-    this.socialLinks = updatedChain.socialLinks;
+    this.socialLinks = updatedChain.social_links;
     this.stagesEnabled = updatedChain.stages_enabled;
     this.customStages = updatedChain.custom_stages;
     this.customDomain = updatedChain.custom_domain;
