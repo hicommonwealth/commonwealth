@@ -235,7 +235,7 @@ class ChainInfo {
   public async updateChainData({
     name,
     description,
-    socialLinks,
+    social_links,
     stagesEnabled,
     customStages,
     customDomain,
@@ -253,7 +253,7 @@ class ChainInfo {
   }: {
     name?: string;
     description?: string;
-    socialLinks?: string[];
+    social_links?: string[];
     discord?: string;
     stagesEnabled?: boolean;
     customStages?: string;
@@ -275,7 +275,7 @@ class ChainInfo {
       id,
       name,
       description,
-      socialLinks,
+      social_links,
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
