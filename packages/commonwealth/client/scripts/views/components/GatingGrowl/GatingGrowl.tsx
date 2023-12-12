@@ -66,26 +66,25 @@ const GatingGrowl = () => {
               : `This is an admin-only capability. Reach out to your community
       admin to set up groups.`}
           </CWText>
-
-          <CWText
-            type="b1"
-            fontWeight="link"
-            isCentered
-            className="learnMore"
-            onClick={() =>
-              window.open(
-                'https://blog.commonwealth.im/introducing-common-groups',
-                '_blank',
-              )
-            }
+          <a
+            href="https://blog.commonwealth.im/introducing-common-groups"
+            target="_blank"
+            rel="noreferrer"
           >
-            Learn More
-            <CWIcon
-              iconName="arrowSquareOut"
-              iconSize="medium"
-              className="icon"
-            />
-          </CWText>
+            <CWText
+              type="b1"
+              fontWeight="link"
+              isCentered
+              className="learnMore"
+            >
+              Learn More
+              <CWIcon
+                iconName="arrowSquareOut"
+                iconSize="medium"
+                className="icon"
+              />
+            </CWText>
+          </a>
         </div>
         <div className="checkboxContainer">
           <CWCheckbox
