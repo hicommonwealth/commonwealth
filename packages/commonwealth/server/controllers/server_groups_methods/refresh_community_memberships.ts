@@ -5,7 +5,10 @@ import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { GroupAttributes } from '../../models/group';
-import { MembershipAttributes } from '../../models/membership';
+import {
+  MembershipAttributes,
+  MembershipRejectReason,
+} from '../../models/membership';
 import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import {
@@ -142,7 +145,7 @@ async function paginateAddresses(
 type ComputedMembership = {
   group_id: number;
   address_id: number;
-  reject_reason: string | null;
+  reject_reason: MembershipRejectReason;
   last_checked: any;
 };
 
@@ -161,7 +164,7 @@ async function computeMembership(
   const computedMembership = {
     group_id: currentGroup.id,
     address_id: address.id,
-    reject_reason: isValid ? null : JSON.stringify(messages),
+    reject_reason: isValid ? null : messages,
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
   };
   return computedMembership;
