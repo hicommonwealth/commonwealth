@@ -1,13 +1,15 @@
-import CompoundGovernance from 'controllers/chain/ethereum/compound/governance';
+import { useQuery } from '@tanstack/react-query';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
+import CompoundGovernance from 'controllers/chain/ethereum/compound/governance';
 import app from 'state';
 import { ApiEndpoints } from 'state/api/config';
-import { useQuery } from '@tanstack/react-query';
 
 const PROPOSAL_STALE_TIME = 30000; // 30 seconds
 
 const fetchCompoundProposals = async () => {
-  return CompoundGovernance.getProposals(app.chain as Compound);
+  const proposals = CompoundGovernance.getProposals(app.chain as Compound);
+  console.log(proposals);
+  return proposals;
 };
 
 const useCompoundProposalsQuery = ({

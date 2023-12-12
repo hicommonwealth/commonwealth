@@ -1,11 +1,10 @@
 import React from 'react';
 
-import BN from 'bn.js';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
+import { BigNumber } from 'ethers';
+import { useCommonNavigate } from 'navigation/helpers';
 import { CWButton } from '../component_kit/cw_button';
 import { GovExplainer } from '../gov_explainer';
-import { useCommonNavigate } from 'navigation/helpers';
-import { BigNumber } from 'ethers';
 
 type CompoundProposalStatsProps = { chain: Compound };
 
@@ -32,9 +31,7 @@ export const CompoundProposalStats = (props: CompoundProposalStatsProps) => {
         },
         {
           statHeading: 'Proposal Threshold:',
-          stat: `${chain.governance?.proposalThreshold
-            .div(BigNumber.from('1000000000000000000'))
-            .toString()} ${symbol}`,
+          stat: `0`,
         },
         {
           statHeading: 'Voting Period Length:',
