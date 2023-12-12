@@ -10,15 +10,16 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import './GatingGrowl.scss';
 
-const setShowGatingGrowl = 'dontShowGatingGrowlEver';
+const LOCALSTORAGE_GATING_GROWL_KEY = 'dontShowGatingGrowlEver';
 
 const GatingGrowl = () => {
   const navigate = useCommonNavigate();
   const { setGrowlHidden, growlHidden } = useGrowlStore();
 
-  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [isGrowlVisible, setIsGrowlVisible] = useState(false);
   const [disabled, setIsDisabled] = useState(
-    localStorage.getItem(setShowGatingGrowl) === 'true' || growlHidden,
+    localStorage.getItem(LOCALSTORAGE_GATING_GROWL_KEY) === 'true' ||
+      growlHidden,
   );
   const isAdmin = Persmissions.isCommunityAdmin();
 
@@ -26,8 +27,8 @@ const GatingGrowl = () => {
     setIsDisabled(true);
 
     setGrowlHidden(true);
-    if (dontShowAgain) {
-      localStorage.setItem(setShowGatingGrowl, 'true');
+    if (isGrowlVisible) {
+      localStorage.setItem(LOCALSTORAGE_GATING_GROWL_KEY, 'true');
     }
   };
 
@@ -59,16 +60,13 @@ const GatingGrowl = () => {
                 : navigate('/members?tab=groups');
             }}
           />
-          {isAdmin ? (
-            <CWText type="b2" fontWeight="regular" isCentered className="body">
-              Only admins can create groups.
-            </CWText>
-          ) : (
-            <CWText type="b2" fontWeight="regular" isCentered className="body">
-              This is an admin-only capability. Reach out to your community
-              admin to set up groups.
-            </CWText>
-          )}
+          <CWText type="b2" fontWeight="regular" isCentered className="body">
+            {isAdmin
+              ? `Only admins can create groups.`
+              : `This is an admin-only capability. Reach out to your community
+      admin to set up groups.`}
+          </CWText>
+
           <CWText
             type="b1"
             fontWeight="link"
@@ -91,7 +89,7 @@ const GatingGrowl = () => {
         </div>
         <div className="checkboxContainer">
           <CWCheckbox
-            onChange={() => setDontShowAgain(!dontShowAgain)}
+            onChange={() => setIsGrowlVisible(!isGrowlVisible)}
             label="Please don't show this again"
             labelClassName="checkbox"
           />

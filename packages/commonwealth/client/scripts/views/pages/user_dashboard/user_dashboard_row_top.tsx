@@ -65,7 +65,7 @@ export const UserDashboardRowTop = (props: UserDashboardRowTopProps) => {
     >
       <User
         userAddress={author_address}
-        userChainId={author_chain}
+        userCommunityId={author_chain}
         shouldLinkProfile
         avatarSize={16}
       />

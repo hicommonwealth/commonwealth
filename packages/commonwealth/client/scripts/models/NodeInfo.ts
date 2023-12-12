@@ -5,6 +5,7 @@ class NodeInfo {
   public readonly ethChainId?: number;
   public readonly cosmosChainId?: string;
   public readonly altWalletUrl?: string;
+  public readonly balanceType?: string;
 
   constructor({
     id,
@@ -13,6 +14,7 @@ class NodeInfo {
     eth_chain_id,
     cosmos_chain_id,
     alt_wallet_url,
+    balance_type,
   }) {
     this.id = id;
     this.name = name;
@@ -20,6 +22,7 @@ class NodeInfo {
     this.ethChainId = eth_chain_id;
     this.cosmosChainId = cosmos_chain_id;
     this.altWalletUrl = alt_wallet_url;
+    this.balanceType = balance_type;
   }
 
   public static fromJSON(json) {
