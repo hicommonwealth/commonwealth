@@ -320,19 +320,21 @@ class ChainInfo {
       remainingLinks: [],
     };
 
-    this.socialLinks.forEach((link) => {
-      if (link.includes('://discord.com') || link.includes('://discord.gg')) {
-        categorizedLinks.discords.push(link);
-      } else if (link.includes('://github.com')) {
-        categorizedLinks.githubs.push(link);
-      } else if (link.includes('://t.me')) {
-        categorizedLinks.telegrams.push(link);
-      } else if (link.includes('://matrix.to')) {
-        categorizedLinks.elements.push(link);
-      } else {
-        categorizedLinks.remainingLinks.push(link);
-      }
-    });
+    this.socialLinks
+      .filter((link) => !!link)
+      .forEach((link) => {
+        if (link.includes('://discord.com') || link.includes('://discord.gg')) {
+          categorizedLinks.discords.push(link);
+        } else if (link.includes('://github.com')) {
+          categorizedLinks.githubs.push(link);
+        } else if (link.includes('://t.me')) {
+          categorizedLinks.telegrams.push(link);
+        } else if (link.includes('://matrix.to')) {
+          categorizedLinks.elements.push(link);
+        } else {
+          categorizedLinks.remainingLinks.push(link);
+        }
+      });
 
     return categorizedLinks;
   }
