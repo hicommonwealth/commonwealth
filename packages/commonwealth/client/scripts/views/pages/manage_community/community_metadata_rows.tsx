@@ -152,12 +152,18 @@ export const CommunityMetadataRows = ({
     } catch (err) {
       console.log(err);
     }
-    const socialLinks: string[] = [website, discord, element, telegram, github];
+    const social_links: string[] = [
+      website,
+      discord,
+      element,
+      telegram,
+      github,
+    ];
     try {
       await community.updateChainData({
         name,
         description,
-        socialLinks,
+        social_links,
         stagesEnabled,
         customStages,
         customDomain,
