@@ -155,13 +155,6 @@ const BasicInformationForm = ({
         ...(chainEcosystem === 'solana' && { chain: getChainOptions()?.[0] }),
       }}
     >
-      <section className="header">
-        <CWText type="h2">Tell us about your community</CWText>
-        <CWText type="b1" className="description">
-          Let’s start with some basic information about your community
-        </CWText>
-      </section>
-
       {/* Form fields */}
       <CWTextInput
         name="communityName"
