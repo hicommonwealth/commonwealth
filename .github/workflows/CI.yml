@@ -471,11 +471,11 @@ jobs:
       cosmos_test_app:
         image: mhagel1/csdk-v1
         ports:
-         - 5050:5050
+         - 5051:5051
       cosmos_beta_test_app:
         image: mhagel1/csdk-beta
         ports:
-         - 5051:5051
+         - 5050:5050
       evmos_test_app:
         image: mhagel1/evmos-dev
         ports:
