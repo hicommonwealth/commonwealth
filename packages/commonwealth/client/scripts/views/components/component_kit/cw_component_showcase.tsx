@@ -30,12 +30,12 @@ import {
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import { z } from 'zod';
 import { AvatarUpload } from '../Avatar';
+import CommunityStakeBanner from '../CommunityStakeBanner';
 import { CWCard } from './cw_card';
 import { CWCheckbox } from './cw_checkbox';
 import { CWCollapsible } from './cw_collapsible';
 import { CWCoverImageUploader } from './cw_cover_image_uploader';
 import { CWDropdown } from './cw_dropdown';
-import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { iconLookup } from './cw_icons/cw_icon_lookup';
@@ -55,6 +55,7 @@ import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
 import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
 import { CWForm } from './new_designs/CWForm';
+import CWIconButton from './new_designs/CWIconButton';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
 import { ModalSize } from './new_designs/CWModal/CWModal';
 import { CWRelatedCommunityCard } from './new_designs/CWRelatedCommunityCard';
@@ -185,7 +186,7 @@ const validationSchema = z.object({
 });
 
 const chainValidationSchema = z.object({
-  chain: z
+  community: z
     .array(
       z.object({
         value: z.string().nonempty({ message: 'Invalid value' }),
@@ -206,9 +207,6 @@ const tagsList = [
 ];
 
 export const ComponentShowcase = () => {
-  const [selectedIconButton, setSelectedIconButton] = useState<
-    number | undefined
-  >(undefined);
   const [isSmallToggled, setIsSmallToggled] = useState<boolean>(false);
   const [isLargeToggled, setIsLargeToggled] = useState<boolean>(false);
   const [voteCount, setVoteCount] = useState<number>(0);
@@ -230,9 +228,11 @@ export const ComponentShowcase = () => {
   );
   const [isEditorDisabled, setIsEditorDisabled] = useState(false);
   const [isBannerVisible, setIsBannerVisible] = useState(initialBannersState);
+  const [isCommunityStakeBannerVisible, setIsCommunityStakeBannerVisible] =
+    useState(true);
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
-  const allChains = app.config.chains.getAll();
-  const [chainId, setChainId] = useState(allChains[1]);
+  const allCommunities = app.config.chains.getAll();
+  const [communityId, setCommunityId] = useState(allCommunities[1]);
   const [currentTab, setCurrentTab] = useState(tagsList[0].id);
 
   const unstyledPopoverProps = usePopover();
@@ -347,6 +347,7 @@ export const ComponentShowcase = () => {
           <CWText>Unstyled Popover</CWText>
 
           <CWIconButton
+            buttonSize="med"
             iconName="infoEmpty"
             onMouseEnter={unstyledPopoverProps.handleInteraction}
             onMouseLeave={unstyledPopoverProps.handleInteraction}
@@ -366,6 +367,7 @@ export const ComponentShowcase = () => {
           <CWText>Styled by default Popover</CWText>
 
           <CWIconButton
+            buttonSize="med"
             iconName="infoEmpty"
             onMouseEnter={styledPopoverProps.handleInteraction}
             onMouseLeave={styledPopoverProps.handleInteraction}
@@ -382,7 +384,11 @@ export const ComponentShowcase = () => {
         <PopoverMenu
           menuItems={popoverMenuOptions()}
           renderTrigger={(onclick) => (
-            <CWIconButton iconName="plusCircle" onClick={onclick} />
+            <CWIconButton
+              buttonSize="med"
+              iconName="plusCircle"
+              onClick={onclick}
+            />
           )}
         />
       </div>
@@ -408,48 +414,38 @@ export const ComponentShowcase = () => {
       </div>
       <div className="icon-button-gallery">
         <CWText type="h3">Icon Buttons</CWText>
-        <CWText>Click to see selected state</CWText>
         <div className="icon-button-row">
+          <CWText type="h4">Small</CWText>
           <CWIconButton
             iconName="views"
-            iconSize="large"
-            iconButtonTheme="primary"
-            selected={selectedIconButton === 1}
-            onClick={() => {
-              setSelectedIconButton(1);
-            }}
+            buttonSize="sm"
+            onClick={() => notifySuccess('Small icon button clicked!')}
           />
-          {selectedIconButton === 1 && (
-            <div className="icon-button-selected">is selected</div>
-          )}
         </div>
         <div className="icon-button-row">
+          <CWText type="h4">Medium</CWText>
           <CWIconButton
             iconName="views"
-            iconSize="large"
-            iconButtonTheme="neutral"
-            selected={selectedIconButton === 2}
-            onClick={() => {
-              setSelectedIconButton(2);
-            }}
+            buttonSize="med"
+            onClick={() => notifySuccess('Medium icon button clicked!')}
           />
-          {selectedIconButton === 2 && (
-            <div className="icon-button-selected">is selected</div>
-          )}
         </div>
         <div className="icon-button-row">
+          <CWText type="h4">Large</CWText>
           <CWIconButton
             iconName="views"
-            iconSize="large"
-            iconButtonTheme="black"
-            selected={selectedIconButton === 3}
-            onClick={() => {
-              setSelectedIconButton(3);
-            }}
+            buttonSize="lg"
+            onClick={() => notifySuccess('Large icon button clicked!')}
           />
-          {selectedIconButton === 3 && (
-            <div className="icon-button-selected">is selected</div>
-          )}
+        </div>
+        <div className="icon-button-row">
+          <CWText type="h4">Disabled</CWText>
+          <CWIconButton
+            iconName="views"
+            buttonSize="lg"
+            disabled={true}
+            onClick={() => console.log('Nothing to the console')}
+          />
         </div>
       </div>
       <div className="text-gallery">
@@ -590,12 +586,12 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Input Tag</CWText>
-          {chainId && (
+          {communityId && (
             <CWTag
-              label={allChains[1].name}
+              label={allCommunities[1].name}
               type="input"
-              community={allChains[1]}
-              onClick={() => setChainId(null)}
+              community={allCommunities[1]}
+              onClick={() => setCommunityId(null)}
             />
           )}
         </div>
@@ -627,6 +623,10 @@ export const ComponentShowcase = () => {
           <CWTag label="0xd83e1...a39bD" type="address" iconName="polkadot" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="polygon" />
           <CWTag label="0xd83e1...a39bD" type="address" iconName="twitterNew" />
+        </div>
+        <div className="tag-row">
+          <CWText type="h4">Group Tag</CWText>
+          <CWTag label="Group Name" type="group" />
         </div>
       </div>
       <div className="button-gallery">
@@ -1708,6 +1708,26 @@ export const ComponentShowcase = () => {
             );
           })}
         </div>
+      </div>
+      <div className="community-stake-banner">
+        <CWText type="h3">Community Stake Banner</CWText>
+        <div className="btn-container">
+          <CWButton
+            buttonHeight="sm"
+            label="Restore Community Stake Banner"
+            onClick={() => setIsCommunityStakeBannerVisible(true)}
+            className="restore-btn"
+          />
+        </div>
+
+        {isCommunityStakeBannerVisible && (
+          <CommunityStakeBanner
+            onClose={() => {
+              setIsCommunityStakeBannerVisible(false);
+            }}
+            groupName="Foo"
+          />
+        )}
       </div>
       <div className="alerts">
         <CWText type="h3">Alerts</CWText>

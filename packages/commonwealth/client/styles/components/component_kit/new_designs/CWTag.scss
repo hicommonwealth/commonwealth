@@ -161,7 +161,8 @@
     }
   }
 
-  &.input {
+  &.input,
+  &.group {
     background-color: $neutral-100;
     padding: 2px 8px;
     gap: 8px;
@@ -202,6 +203,14 @@
 
     &.container:hover {
       background-color: $neutral-200;
+    }
+  }
+
+  &.group {
+    .Text {
+      font-size: 12px;
+      line-height: 16px;
+      color: $neutral-700;
     }
   }
 

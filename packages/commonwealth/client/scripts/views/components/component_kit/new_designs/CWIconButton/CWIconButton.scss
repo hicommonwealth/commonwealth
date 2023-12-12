@@ -1,0 +1,54 @@
+@import '../../../../../../styles/shared.scss';
+
+.CWIconButton {
+  border-radius: $border-radius-corners-wider;
+  line-height: 0;
+  padding: 4px;
+  border: none;
+  outline: none;
+  width: fit-content;
+
+  svg {
+    color: $neutral-500;
+  }
+
+  &:hover:not(.disabled) {
+    background-color: $neutral-100;
+    cursor: pointer;
+  }
+
+  &:active {
+    background-color: $neutral-50;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &.disabled {
+    svg {
+      color: $neutral-400;
+    }
+  }
+
+  &.sm {
+    svg {
+      height: 16px;
+      width: 16px;
+    }
+  }
+
+  &.med {
+    svg {
+      height: 20px;
+      width: 20px;
+    }
+  }
+
+  &.lg {
+    svg {
+      height: 24px;
+      width: 24px;
+    }
+  }
+}

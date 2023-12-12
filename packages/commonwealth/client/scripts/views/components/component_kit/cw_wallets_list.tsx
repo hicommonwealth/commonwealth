@@ -15,15 +15,21 @@ import { CWTooltip } from './new_designs/CWTooltip';
 
 import 'components/component_kit/cw_wallets_list.scss';
 
-const LinkAccountItem = (props: {
+type LinkAccountItemProps = {
   account: { address: string; meta?: { name: string } };
   idx: number;
   onSelect: (idx: number) => void;
   walletChain: ChainBase;
   walletNetwork: ChainNetwork;
-}) => {
-  const { account, walletNetwork, walletChain, onSelect, idx } = props;
+};
 
+const LinkAccountItem = ({
+  account,
+  walletNetwork,
+  walletChain,
+  onSelect,
+  idx,
+}: LinkAccountItemProps) => {
   const address = app.chain
     ? addressSwapper({
         address: account.address,
@@ -50,7 +56,7 @@ const LinkAccountItem = (props: {
         <div className="account-user">
           <User
             userAddress={address}
-            userChainId={app.chain?.id || walletNetwork}
+            userCommunityId={app.chain?.id || walletNetwork}
             shouldShowAvatarOnly
             avatarSize={40}
           />
@@ -62,7 +68,7 @@ const LinkAccountItem = (props: {
           <div className="account-user">
             <User
               userAddress={address}
-              userChainId={app.chain?.id || walletNetwork}
+              userCommunityId={app.chain?.id || walletNetwork}
               shouldHideAvatar
             />
           </div>

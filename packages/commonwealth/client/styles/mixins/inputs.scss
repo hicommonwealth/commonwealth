@@ -31,18 +31,20 @@
     }
   }
 
-  &.success {
-    border-color: $green-500;
-    background-color: $green-50;
-  }
+  &:not(:focus-within) {
+    &.success {
+      border-color: $green-500;
+      background-color: $green-50;
+    }
 
-  &.failure {
-    border-color: $rorange-600 !important;
-    background-color: $white !important;
+    &.failure {
+      border-color: $rorange-600 !important;
+      background-color: $white !important;
+    }
   }
 
   &.disabled {
-    background-color: $neutral-100;
+    background-color: $neutral-50;
     border-color: $neutral-200;
     color: $neutral-400;
     cursor: not-allowed;

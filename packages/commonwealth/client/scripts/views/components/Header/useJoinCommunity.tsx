@@ -26,7 +26,7 @@ const useJoinCommunity = () => {
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
   const hasTermsOfService = !!activeChainInfo?.terms;
-  const activeChainId = activeChainInfo?.id;
+  const activeCommunityId = activeChainInfo?.id;
 
   const samebaseAddresses = app.user.addresses.filter((a, idx) => {
     // if no active chain, add all addresses
@@ -105,13 +105,14 @@ const useJoinCommunity = () => {
 
     if (originAddressInfo) {
       try {
-        const targetChain = activeChainId || originAddressInfo.community.id;
+        const targetCommunity =
+          activeCommunityId || originAddressInfo.community.id;
 
         const address = originAddressInfo.address;
 
         const res = await linkExistingAddressToChainOrCommunity(
           address,
-          targetChain,
+          targetCommunity,
           originAddressInfo.community.id,
         );
 
@@ -130,7 +131,8 @@ const useJoinCommunity = () => {
           );
           const addressInfo = app.user.addresses.find(
             (a) =>
-              a.address === encodedAddress && a.community.id === targetChain,
+              a.address === encodedAddress &&
+              a.community.id === targetCommunity,
           );
 
           const account = app.chain.accounts.get(
@@ -142,15 +144,15 @@ const useJoinCommunity = () => {
             console.log('setting validation token');
           }
           if (
-            activeChainId &&
+            activeCommunityId &&
             !app.roles.getRoleInCommunity({
               account,
-              community: activeChainId,
+              community: activeCommunityId,
             })
           ) {
             await app.roles.createRole({
               address: addressInfo,
-              community: activeChainId,
+              community: activeCommunityId,
             });
           }
           await setActiveAccount(account);

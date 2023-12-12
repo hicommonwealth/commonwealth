@@ -174,7 +174,7 @@ export const DefaultNotificationRow = (props: ExtendedNotificationRowProps) => {
       {authorInfo.length === 1 ? (
         <User
           userAddress={(authorInfo[0] as [string, string])[1]}
-          userChainId={(authorInfo[0] as [string, string])[0]}
+          userCommunityId={(authorInfo[0] as [string, string])[0]}
           shouldShowAvatarOnly
           avatarSize={26}
         />
