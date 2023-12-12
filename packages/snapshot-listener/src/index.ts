@@ -41,7 +41,7 @@ log.info(
 );
 
 const app = express();
-const port = process.env.PORT || DEFAULT_PORT;
+const port = process.env.SL_PORT || DEFAULT_PORT;
 app.use(express.json());
 
 let controller: RabbitMQController;

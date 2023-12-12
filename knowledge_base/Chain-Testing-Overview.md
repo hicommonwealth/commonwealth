@@ -73,7 +73,7 @@ Post request types can be found in `src/types.ts`
 
 **Response**
 
-See response here https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59
+See response here <https://web3js.readthedocs.io/en/v1.2.11/web3-eth.html#id59>
 
 </details>
 
