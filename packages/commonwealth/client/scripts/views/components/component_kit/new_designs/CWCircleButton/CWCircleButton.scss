@@ -1,15 +1,13 @@
 @import '../../../../../../styles/shared.scss';
 
 .circle-btn-border {
+  cursor: pointer;
   width: fit-content;
   border-radius: 50%;
 
-  &.primary {
-    border: 2px solid $transparent;
-  }
-
+  &.primary,
   &.secondary {
-    border: 1px solid $transparent;
+    border: 2px solid $transparent;
   }
 
   &.primary,
@@ -20,7 +18,7 @@
       border: 2px solid $neutral-800;
 
       .CircleButton.secondary {
-        border: none;
+        border: 1px solid $transparent;
       }
     }
   }
@@ -28,10 +26,10 @@
 
 
   .CircleButton {
+    cursor: pointer;
     line-height: 0;
     width: fit-content;
     border-radius: 50%;
-    padding: 6px;
 
     &:focus {
       outline: none;
@@ -43,6 +41,7 @@
     }
 
     &.primary {
+      padding: 8px;
       border: none;
       background-color: $neutral-700;
 
@@ -72,6 +71,7 @@
     }
 
     &.secondary {
+      padding: 7px;
       border: 1px solid $neutral-200;
       background-color: $neutral-50;
 
