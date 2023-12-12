@@ -250,8 +250,7 @@ async function main() {
 
   if (!rabbitMQController.initialized) {
     console.warn(
-      'The RabbitMQController is not initialized! Some services may be unavailable e.g.' +
-        ' (Create/Delete chain and Websocket notifications)',
+      'The RabbitMQController is not initialized! Some services may be unavailable',
     );
     rollbar.critical('The main service RabbitMQController is not initialized!');
     // TODO: this requires an immediate response if in production

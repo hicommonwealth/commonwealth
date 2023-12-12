@@ -13,12 +13,12 @@ type NewThreadDraft = {
   body: DeltaStatic;
 };
 
-const useNewThreadForm = (chainId: string, topicsForSelector: Topic[]) => {
+const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   const [searchParams] = useSearchParams();
   const topicIdFromUrl: number = parseInt(searchParams.get('topic') || '0');
 
   const { saveDraft, restoreDraft, clearDraft } = useDraft<NewThreadDraft>(
-    `new-thread-${chainId}-info`,
+    `new-thread-${communityId}-info`,
   );
   const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
 

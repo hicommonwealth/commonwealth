@@ -18,7 +18,6 @@ import {
 import app from '../../../state';
 import { useFetchTopicsQuery } from '../../../state/api/topics';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { DiscussionsPageEmptyPlaceholder } from './DiscussionsPageEmptyPlaceholder';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
@@ -26,6 +25,7 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -46,7 +46,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     'dateRange',
   ) as ThreadTimelineFilterTypes;
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
@@ -153,7 +153,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         components={{
           // eslint-disable-next-line react/no-multi-comp
           EmptyPlaceholder: () => (
-            <DiscussionsPageEmptyPlaceholder
+            <EmptyThreadsPlaceholder
               isInitialLoading={isInitialLoading}
               isOnArchivePage={isOnArchivePage}
             />
@@ -165,7 +165,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               stage={stageName}
               featuredFilter={featuredFilter}
               dateRange={dateRange}
-              totalThreadCount={threads ? totalThreadsInCommunity : 0}
+              totalThreadCount={
+                isOnArchivePage
+                  ? filteredThreads.length || 0
+                  : threads
+                  ? totalThreadsInCommunity
+                  : 0
+              }
               isIncludingSpamThreads={includeSpamThreads}
               onIncludeSpamThreads={setIncludeSpamThreads}
               isIncludingArchivedThreads={includeArchivedThreads}

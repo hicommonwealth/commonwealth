@@ -1,11 +1,17 @@
-import Bluebird from 'bluebird';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
-import { GroupAttributes } from 'server/models/group';
+import { MEMBERSHIP_REFRESH_BATCH_SIZE } from '../../config';
+import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
+import { GroupAttributes } from '../../models/group';
 import { MembershipAttributes } from '../../models/membership';
+import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
+import {
+  Balances,
+  OptionsWithBalances,
+} from '../../util/tokenBalanceCache/types';
 import { ServerGroupsController } from '../server_groups_controller';
 
 const MEMBERSHIP_TTL_SECONDS = 60 * 2;
@@ -21,7 +27,7 @@ export async function __refreshCommunityMemberships(
   this: ServerGroupsController,
   { community, group }: RefreshCommunityMembershipsOptions,
 ): Promise<void> {
-  const startedAt = Date.now();
+  const communityStartedAt = Date.now();
 
   let groupsToUpdate: GroupAttributes[];
   if (group) {
@@ -30,109 +36,188 @@ export async function __refreshCommunityMemberships(
     groupsToUpdate = await this.getGroups({ community });
   }
 
-  const addresses = await this.models.Address.findAll({
+  console.log(
+    `Paginating addresses in ${groupsToUpdate.length} groups in ${community.id}...`,
+  );
+
+  let totalNumCreated = 0;
+  let totalNumUpdated = 0;
+  let totalNumAddresses = 0;
+
+  await paginateAddresses(
+    this.models,
+    community.id,
+    1,
+    MEMBERSHIP_REFRESH_BATCH_SIZE,
+    async (addresses, page) => {
+      const pageStartedAt = Date.now();
+
+      const getBalancesOptions = makeGetBalancesOptions(
+        groupsToUpdate,
+        addresses,
+      );
+      const balances = await Promise.all(
+        getBalancesOptions.map(async (options) => {
+          let result: Balances = {};
+          try {
+            result = await this.tokenBalanceCacheV2.getBalances(options);
+          } catch (err) {
+            console.error(err);
+          }
+          return {
+            options,
+            balances: result,
+          };
+        }),
+      );
+
+      const [numCreated, numUpdated] = await processMemberships(
+        this.models,
+        groupsToUpdate,
+        addresses,
+        balances,
+      );
+
+      totalNumCreated += numCreated;
+      totalNumUpdated += numUpdated;
+      totalNumAddresses += addresses.length;
+
+      console.log(
+        `  * [${page}] Created ${numCreated} and updated ${numUpdated} memberships in ${
+          community.id
+        } across ${addresses.length} addresses in ${
+          (Date.now() - pageStartedAt) / 1000
+        }s`,
+      );
+    },
+  );
+
+  console.log(
+    `Created ${totalNumCreated} and updated ${totalNumUpdated} total memberships in ${
+      community.id
+    } across ${totalNumAddresses} addresses in ${
+      (Date.now() - communityStartedAt) / 1000
+    }s`,
+  );
+}
+
+// paginateAddresses paginates through all active addresses
+// within the community
+async function paginateAddresses(
+  models: DB,
+  communityId: string,
+  page: number,
+  pageSize: number,
+  callback: (addresses: AddressAttributes[], page: number) => Promise<void>,
+): Promise<void> {
+  const offset = (page - 1) * pageSize;
+  const limit = pageSize;
+
+  const addresses = await models.Address.findAll({
     where: {
-      community_id: community.id,
+      community_id: communityId,
       verified: {
         [Op.ne]: null,
       },
     },
     attributes: ['id', 'address'],
     include: {
-      model: this.models.Membership,
+      model: models.Membership,
       as: 'Memberships',
       required: false,
     },
+    offset,
+    limit,
   });
 
-  const toCreate: MembershipAttributes[] = [];
-  const toUpdate: MembershipAttributes[] = [];
+  if (addresses.length === 0) {
+    return;
+  }
 
-  const processMembership = async (
-    address: AddressAttributes,
-    currentGroup: GroupAttributes,
-  ) => {
-    const existingMembership = address.Memberships.find(
-      ({ group_id }) => group_id === currentGroup.id,
-    );
-    if (existingMembership) {
-      // membership exists
-      const expiresAt = moment(existingMembership.last_checked).add(
-        MEMBERSHIP_TTL_SECONDS,
-        'seconds',
+  await callback(addresses, page);
+
+  return paginateAddresses(models, communityId, page + 1, pageSize, callback);
+}
+
+type ComputedMembership = {
+  group_id: number;
+  address_id: number;
+  reject_reason: string | null;
+  last_checked: any;
+};
+
+// computeMembership returns a recomputed membership given an address and group
+async function computeMembership(
+  address: AddressAttributes,
+  currentGroup: GroupAttributes,
+  balances: OptionsWithBalances[],
+): Promise<ComputedMembership> {
+  const { requirements } = currentGroup;
+  const { isValid, messages } = await validateGroupMembership(
+    address.address,
+    requirements,
+    balances,
+  );
+  const computedMembership = {
+    group_id: currentGroup.id,
+    address_id: address.id,
+    reject_reason: isValid ? null : JSON.stringify(messages),
+    last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
+  };
+  return computedMembership;
+}
+
+// processMemberships upserts memberships for each
+// combination of address and group
+async function processMemberships(
+  models: DB,
+  groupsToUpdate: GroupAttributes[],
+  addresses: AddressAttributes[],
+  balances: OptionsWithBalances[],
+): Promise<[number, number]> {
+  const toCreate = [];
+  const toUpdate = [];
+
+  for (const currentGroup of groupsToUpdate) {
+    for (const address of addresses) {
+      // populate toCreate and toUpdate arrays
+      const existingMembership = address.Memberships.find(
+        ({ group_id }) => group_id === currentGroup.id,
       );
-      if (moment().isBefore(expiresAt)) {
-        // membership is fresh, do nothing
-        return;
+      if (existingMembership) {
+        // membership exists
+        const expiresAt = moment(existingMembership.last_checked).add(
+          MEMBERSHIP_TTL_SECONDS,
+          'seconds',
+        );
+        if (moment().isBefore(expiresAt)) {
+          // membership is fresh, do nothing
+          continue;
+        }
+        // membership stale, update
+        const computedMembership = await computeMembership(
+          address,
+          currentGroup,
+          balances,
+        );
+        toUpdate.push(computedMembership);
+        continue;
       }
-      // membership stale, update
-      const computedMembership = await refreshAndQueueOperation(
+
+      // membership does not exist, create
+      const computedMembership = await computeMembership(
         address,
         currentGroup,
+        balances,
       );
-      toUpdate.push(computedMembership);
-      return;
+      toCreate.push(computedMembership);
     }
-
-    // membership does not exist, create
-    const computedMembership = await refreshAndQueueOperation(
-      address,
-      currentGroup,
-    );
-    toCreate.push(computedMembership);
-  };
-
-  const refreshAndQueueOperation = async (
-    address: AddressAttributes,
-    currentGroup: GroupAttributes,
-  ) => {
-    const { requirements } = currentGroup;
-    const { isValid, messages } = await validateGroupMembership(
-      address.address,
-      requirements,
-      this.tokenBalanceCache,
-    );
-    const computedMembership = {
-      group_id: currentGroup.id,
-      address_id: address.id,
-      reject_reason: isValid ? null : JSON.stringify(messages).slice(0, 1024),
-      last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
-    };
-    return computedMembership;
-  };
-
-  console.log(
-    `Checking ${addresses.length} addresses in ${groupsToUpdate.length} groups in ${community.id}...`,
-  );
-
-  await Bluebird.map(
-    groupsToUpdate,
-    async (currentGroup) => {
-      return Bluebird.map(
-        addresses,
-        async (address) => {
-          return processMembership(address, currentGroup);
-        },
-        {
-          concurrency: 20,
-        },
-      );
-    },
-    { concurrency: 20 },
-  );
-
-  console.log(
-    `Done checking. Starting ${toCreate.length} creates and ${toUpdate.length} updates...`,
-  );
+  }
 
   // perform creates and updates
-  await this.models.Membership.bulkCreate([...toCreate, ...toUpdate], {
+  await models.Membership.bulkCreate([...toCreate, ...toUpdate], {
     updateOnDuplicate: ['reject_reason', 'last_checked'],
   });
 
-  console.log(
-    `Created ${toCreate.length} and updated ${toUpdate.length} memberships in ${
-      community.id
-    } within ${(Date.now() - startedAt) / 1000}s`,
-  );
+  return [toCreate.length, toUpdate.length];
 }

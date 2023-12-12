@@ -1,7 +1,11 @@
-import { ChainNetwork } from 'common-common/src/types';
 import { toBN } from 'web3-utils';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
-import { AllowlistData, Requirement, ThresholdData } from './requirementsTypes';
+import { OptionsWithBalances } from '../tokenBalanceCache/types';
+import {
+  AllowlistData,
+  BalanceSourceType,
+  Requirement,
+  ThresholdData,
+} from './requirementsTypes';
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
@@ -16,13 +20,13 @@ export type ValidateGroupMembershipResponse = {
  * Validates if a given user address passes a set of requirements and grants access to group
  * @param userAddress address of user
  * @param requirements An array of requirement types to be validated against
- * @param tbc initialized Token Balance Cache instance
+ * @param balances address balances
  * @returns ValidateGroupMembershipResponse validity and messages on requirements that failed
  */
 export default async function validateGroupMembership(
   userAddress: string,
   requirements: Requirement[],
-  tbc?: TokenBalanceCache,
+  balances: OptionsWithBalances[],
   numRequiredRequirements: number = 0,
 ): Promise<ValidateGroupMembershipResponse> {
   const response: ValidateGroupMembershipResponse = {
@@ -36,7 +40,11 @@ export default async function validateGroupMembership(
     let checkResult: { result: boolean; message: string };
     switch (requirement.rule) {
       case 'threshold': {
-        checkResult = await _thresholdCheck(userAddress, requirement.data, tbc);
+        checkResult = await _thresholdCheck(
+          userAddress,
+          requirement.data,
+          balances,
+        );
         break;
       }
       case 'allow': {
@@ -89,54 +97,76 @@ export default async function validateGroupMembership(
 async function _thresholdCheck(
   userAddress: string,
   thresholdData: ThresholdData,
-  tbc: TokenBalanceCache,
+  balances: OptionsWithBalances[],
 ): Promise<{ result: boolean; message: string }> {
   try {
-    let chainNetwork: ChainNetwork;
+    let balanceSourceType: BalanceSourceType;
     let contractAddress: string;
     let chainId: string;
     let tokenId: string;
     switch (thresholdData.source.source_type) {
       case 'erc20': {
-        chainNetwork = ChainNetwork.ERC20;
+        balanceSourceType = BalanceSourceType.ERC20;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'erc721': {
-        chainNetwork = ChainNetwork.ERC721;
+        balanceSourceType = BalanceSourceType.ERC721;
         contractAddress = thresholdData.source.contract_address;
         chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'erc1155': {
-        chainNetwork = ChainNetwork.ERC1155;
+        balanceSourceType = BalanceSourceType.ERC1155;
         contractAddress = thresholdData.source.contract_address;
-        tokenId = thresholdData.source.token_id;
         chainId = thresholdData.source.evm_chain_id.toString();
+        tokenId = thresholdData.source.token_id.toString();
         break;
       }
       case 'eth_native': {
-        chainNetwork = ChainNetwork.Ethereum;
+        balanceSourceType = BalanceSourceType.ETHNative;
         chainId = thresholdData.source.evm_chain_id.toString();
         break;
       }
       case 'cosmos_native': {
-        //chainNetwork not used downstream by tbc other than EVM contracts, Osmosis works for all cosmos chains
-        chainNetwork = ChainNetwork.Osmosis;
+        //balanceSourceType not used downstream by tbc other than EVM contracts, Osmosis works for all cosmos chains
+        balanceSourceType = BalanceSourceType.CosmosNative;
         chainId = thresholdData.source.cosmos_chain_id;
         break;
       }
       default:
         break;
     }
-    const balance = await tbc.fetchUserBalanceWithChain(
-      chainNetwork,
-      userAddress,
-      chainId,
-      contractAddress,
-      tokenId
-    );
+
+    const balance = balances
+      .filter((b) => b.options.balanceSourceType === balanceSourceType)
+      .find((b) => {
+        switch (b.options.balanceSourceType) {
+          case BalanceSourceType.ERC20:
+          case BalanceSourceType.ERC721:
+            return (
+              b.options.sourceOptions.contractAddress == contractAddress &&
+              b.options.sourceOptions.evmChainId.toString() === chainId
+            );
+          case BalanceSourceType.ERC1155:
+            return (
+              b.options.sourceOptions.contractAddress == contractAddress &&
+              b.options.sourceOptions.evmChainId.toString() === chainId &&
+              b.options.sourceOptions.tokenId.toString() === tokenId
+            );
+          case BalanceSourceType.ETHNative:
+            return b.options.sourceOptions.evmChainId.toString() === chainId;
+          case BalanceSourceType.CosmosNative:
+            return b.options.sourceOptions.cosmosChainId.toString() === chainId;
+          default:
+            return null;
+        }
+      })?.balances[userAddress];
+
+    if (typeof balance !== 'string') {
+      throw new Error(`Failed to get balance for address`);
+    }
 
     const result = toBN(balance).gt(toBN(thresholdData.threshold));
     return {

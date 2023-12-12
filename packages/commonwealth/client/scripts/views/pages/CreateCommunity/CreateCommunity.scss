@@ -1,7 +1,14 @@
+@import '../../../../styles/shared';
+
 .CreateCommunity {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 24px 48px;
+
+  @include extraSmall {
+    padding: 16px;
+  }
 
   .footer {
     display: flex;

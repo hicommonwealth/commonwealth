@@ -1,8 +1,8 @@
 import { AppError } from 'common-common/src/errors';
+import { ChainCategoryType } from 'common-common/src/types';
 import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { ChainCategoryType } from 'common-common/src/types';
 
 type UpdateChainCategoryReq = {
   selected_tags: { [tag: string]: boolean };
@@ -19,7 +19,7 @@ type UpdateChainCategoryRes = {
 const updateChainCategory = async (
   models: DB,
   req: TypedRequestBody<UpdateChainCategoryReq>,
-  res: TypedResponse<UpdateChainCategoryRes>
+  res: TypedResponse<UpdateChainCategoryRes>,
 ) => {
   const chain = await models.Community.findOne({
     where: {
@@ -39,7 +39,7 @@ const updateChainCategory = async (
   if (
     existingCategories.length !== updateCategories.length ||
     !updateCategories.every(
-      (element, index) => element === existingCategories[index]
+      (element, index) => element === existingCategories[index],
     )
   ) {
     chain.category = updateCategories;

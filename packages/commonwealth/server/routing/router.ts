@@ -4,7 +4,8 @@ import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 
-import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache as NewTokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {
   methodNotAllowedMiddleware,
@@ -23,7 +24,6 @@ import {
   fetchEtherscanContractAbi,
 } from '../routes/etherscanAPI';
 import finishEmailLogin from '../routes/finishEmailLogin';
-import finishOAuthLogin from '../routes/finishOAuthLogin';
 import getAddressProfile, {
   getAddressProfileValidation,
 } from '../routes/getAddressProfile';
@@ -33,7 +33,6 @@ import reactionsCounts from '../routes/reactionsCounts';
 import selectChain from '../routes/selectChain';
 import starCommunity from '../routes/starCommunity';
 import startEmailLogin from '../routes/startEmailLogin';
-import startOAuthLogin from '../routes/startOAuthLogin';
 import { status } from '../routes/status';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import updateBanner from '../routes/updateBanner';
@@ -45,7 +44,6 @@ import viewCount from '../routes/viewCount';
 
 import clearNotifications from '../routes/clearNotifications';
 import clearReadNotifications from '../routes/clearReadNotifications';
-import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileNew from '../routes/getNewProfile';
 import markNotificationsRead from '../routes/markNotificationsRead';
 import setDefaultRole from '../routes/setDefaultRole';
@@ -210,7 +208,7 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  tokenBalanceCache: TokenBalanceCache,
+  tokenBalanceCacheV1: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
@@ -218,22 +216,43 @@ function setupRouter(
 ) {
   // controllers
 
+  const tokenBalanceCacheV2 = new NewTokenBalanceCache(models, redisCache);
+
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, tokenBalanceCache, banCache),
-    comments: new ServerCommentsController(models, tokenBalanceCache, banCache),
+    threads: new ServerThreadsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+      banCache,
+    ),
+    comments: new ServerCommentsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+      banCache,
+    ),
     reactions: new ServerReactionsController(models, banCache),
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(
       models,
-      tokenBalanceCache,
+      tokenBalanceCacheV1,
       banCache,
     ),
-    polls: new ServerPollsController(models, tokenBalanceCache),
+    polls: new ServerPollsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+    ),
     proposals: new ServerProposalsController(models, redisCache),
-    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
-    topics: new ServerTopicsController(models, tokenBalanceCache, banCache),
+    groups: new ServerGroupsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+      banCache,
+    ),
+    topics: new ServerTopicsController(models, banCache),
   };
 
   // ---
@@ -421,13 +440,13 @@ function setupRouter(
     'post',
     '/tokenBalance',
     databaseValidationService.validateCommunity,
-    tokenBalance.bind(this, models, tokenBalanceCache),
+    tokenBalance.bind(this, models, tokenBalanceCacheV1),
   );
   registerRoute(
     router,
     'post',
     '/bulkBalances',
-    bulkBalances.bind(this, models, tokenBalanceCache),
+    bulkBalances.bind(this, models, tokenBalanceCacheV1),
   );
   registerRoute(
     router,
@@ -909,22 +928,6 @@ function setupRouter(
     updateProfileNew.bind(this, models),
   );
 
-  // social accounts
-  registerRoute(
-    router,
-    'delete',
-    '/githubAccount',
-    passport.authenticate('jwt', { session: false }),
-    deleteSocialAccount.bind(this, models, 'github'),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/discordAccount',
-    passport.authenticate('jwt', { session: false }),
-    deleteSocialAccount.bind(this, models, 'discord'),
-  );
-
   // viewCount
   registerRoute(
     router,
@@ -1212,58 +1215,6 @@ function setupRouter(
     'get',
     '/finishLogin',
     finishEmailLogin.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/finishOAuthLogin',
-    finishOAuthLogin.bind(this, models),
-  );
-
-  // OAuth2.0 for Discord and GitHub:
-  // The way this works is first the /auth.discord route is hit and passport.authenticate triggers for the first time
-  // to send a request for a code to the discord API passing along a state parameter and a callback. The Discord api
-  // adds the same state parameter to the callback URL (and a new code param) before returning. Once Discord returns,
-  // /auth/discord/callback is called which triggers passport.authenticate for a second time. On this second run the
-  // authenticateSocialAccount function in socialAccount.ts is called. If a successRedirect url is specified, in the
-  // passport.authenticate options then the passport.authenticate function will handle redirecting after the
-  // authenticateSocialAccount function and WILL NOT trigger the route handler for the callback routes (startOAuthLogin)
-
-  // You cac put any data you wish to persist post OAuth into the state object below. The data will be made available
-  // ONLY in the req.authInfo.state object in the callback i.e. startOAuthLogin.ts.
-  // NOTE: if a successfulRedirect url is used in the options then there is no way to access that data.
-
-  registerRoute(router, 'get', '/auth/github', (req, res, next) => {
-    passport.authenticate('github', <any>{ state: { hostname: req.hostname } })(
-      req,
-      res,
-      next,
-    );
-  });
-  registerRoute(
-    router,
-    'get',
-    '/auth/github/callback',
-    passport.authenticate('github', {
-      failureRedirect: '/',
-    }),
-    startOAuthLogin.bind(this, models, 'github'),
-  );
-
-  registerRoute(router, 'get', '/auth/discord', (req, res, next) => {
-    passport.authenticate('discord', <any>{
-      state: { hostname: req.hostname },
-    })(req, res, next);
-  });
-
-  registerRoute(
-    router,
-    'get',
-    '/auth/discord/callback',
-    passport.authenticate('discord', {
-      failureRedirect: '/',
-    }),
-    startOAuthLogin.bind(this, models, 'discord'),
   );
 
   registerRoute(

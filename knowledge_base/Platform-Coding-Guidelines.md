@@ -1,10 +1,30 @@
-Platform Coding Guidelines – Structuring code for the backend API
+# Platform Coding Guidelines
 
-# RESTful API
-#### Problem
+Structuring code for the backend API.
+
+## Contents
+
+- [RESTful API](#restful-api)
+  + [Problem](#problem)
+  + [Solution + Guidelines](#solution--guidelines)
+- [Route Handlers and Controllers](#route-handlers-and-controllers)
+  + [Problem](#problem-1)
+  + [Solution + Guidelines](#solution--guidelines-1)
+  + [Route Handler](#route-handler)
+  + [Controller](#controller)
+  + [Method](#method)
+  + [Wiring Up The Route](#wiring-up-the-route)
+- [Testing](#testing)
+- [Change Log](#change-log)
+
+## RESTful API
+
+### Problem
+
 The problem with creating an API is that there are many possible ways to define an API endpoint. Different developers tend to use different conventions for the URL pattern, resulting in inconsistency across the API.
 
-#### Solution + Guidelines
+### Solution + Guidelines
+
 By using RESTful API conventions, the API becomes predictable and intuitive for both internal and external developers who build clients for the API.
 
 - Each API endpoint should use RESTful conventions:
@@ -17,18 +37,21 @@ By using RESTful API conventions, the API becomes predictable and intuitive for 
   - ❌ `PUT /threads/3/topic`
   - ❌ `PUT /threads/3/archived`
   - ✅ `PATCH /threads/3`
-- Reference: https://restfulapi.net/resource-naming/
+- Reference: <https://restfulapi.net/resource-naming/>
 
 ## Route Handlers and Controllers
-#### Problem
+
+### Problem
+
 The straightforward approach for implementing a route is to simply add business logic directly into the route handler. The problem with that approach is that it results in business logic which is tightly coupled with the Express server, difficult to reuse, and difficult to write automated tests for.
 
-#### Solution + Guidelines
+### Solution + Guidelines
+
 The chosen solution is for routes to use controllers as the way to access business logic. Controller classes are used in order to bucket business logic into logical domains (e.g. Threads, Comments, Reactions), and also to hold references to stateful objects (e.g. DB handle, TBC, banCache).
 
 The stack for an API endpoint is: `Route -> Controller -> Method`
 
-##### Route Handler
+### Route Handler
 
 ```ts
 // Example Route Handler
@@ -53,6 +76,7 @@ export const getItemHandler = async (
 ```
 
 A route handler is a function that is bound to a particular endpoint
+
 - All route handlers should be stored at `server/routes/{entity}/{handler}.ts`
   - e.g. `server/routes/threads/get_threads_handler.ts`
     - Should use snake_case filename suffixed with `_handler.ts`
@@ -67,7 +91,7 @@ A route handler is a function that is bound to a particular endpoint
 - Route handlers should not directly contain business logic, but should use
 controllers to invoke logic
 
-##### Controller
+### Controller
 
 ```ts
 // Example Controller
@@ -89,14 +113,17 @@ export class ServerItemsController {
   }
 }
 ```
+
 A controller is a class that contains business logic
+
 - Each controller file should be placed at
 `server/controllers/server_{entity}_controller.ts`:
   - e.g. `server_items_controller.ts`
 - Use explicit types for argument and return value
 - Methods are invoked with `call` so that the `this` context is bound to the
 function being called
-##### Method
+
+### Method
 
 ```ts
 // Example Method
@@ -121,9 +148,10 @@ export async function __getItem(
 To prevent each controller file from becoming inconveniently long, method
 logic should be placed in a seperate file (not inline in the class) at
 `server/controllers/server_{entity}_methods/{method_name}.ts`
-  - Should use snake_case for method file
-  - Method name prefixed with two underscores, e.g. `__getItem` to indicate that this method is private and should not be imported anywhere except for the controller
-  - Method arguments (options) and return value (result) have explicit defined types
+
+- Should use snake_case for method file
+- Method name prefixed with two underscores, e.g. `__getItem` to indicate that this method is private and should not be imported anywhere except for the controller
+- Method arguments (options) and return value (result) have explicit defined types
 - Class should use dependency injection for common objects like TBC (passed via
 constructor)
 - Method argument type should have suffix `Options`
@@ -133,9 +161,10 @@ constructor)
 function
 - Return type should be explicitly set, not inferred
 
-##### Wiring up the route
+### Wiring Up The Route
 
 In the root router file, instantiate the controller and register the route:
+
 ```ts
 // > routing/router.ts
 
@@ -154,7 +183,7 @@ registerRoute(
 );
 ```
 
-# Testing
+## Testing
 
 Since the business logic is encapsulated in controller classes and decoupled from the server, controllers can be unit tested via mocking.
 
@@ -189,3 +218,7 @@ describe('ServerItemsController', () => {
 ```
 
 For logic which uses raw SQL queries, API tests provide stronger guarantees.
+
+## Change Log
+
+- 231016: Authored by Ryan Bennett (#5325).
