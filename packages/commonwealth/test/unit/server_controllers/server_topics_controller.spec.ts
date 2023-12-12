@@ -57,13 +57,8 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
       },
     },
   };
-  const tokenBalanceCache: any = {};
   const banCache: any = {};
-  const controller = new ServerTopicsController(
-    db,
-    tokenBalanceCache,
-    banCache,
-  );
+  const controller = new ServerTopicsController(db, banCache);
   const user = {
     getAddresses: async () => [],
     isAdmin,
