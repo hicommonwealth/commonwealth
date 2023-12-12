@@ -1,6 +1,6 @@
 import app from 'state';
 
-export const POLOGON_CHAIN_OPTION = {
+export const POLYGON_CHAIN_OPTION = {
   label: 'Polygon',
   value: 'polygon',
 };

@@ -1,7 +1,10 @@
+import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
+
 export type SocialLinkField = {
   value?: string;
   error?: string;
 };
+
 export type FormSubmitValues = {
   communityName: string;
   communityDescription: string;
@@ -13,7 +16,7 @@ export type FormSubmitValues = {
 };
 
 export type BasicInformationFormProps = {
-  chainEcosystem: 'cosmos' | 'ethereum' | 'polygon' | 'solana';
+  selectedCommunity: SelectedCommunity;
   onSubmit: (values: FormSubmitValues) => any;
   onCancel: () => any;
 };

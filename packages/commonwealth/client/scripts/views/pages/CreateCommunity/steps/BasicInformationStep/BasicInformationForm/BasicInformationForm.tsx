@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
+import { ZodError } from 'zod';
+
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -7,14 +9,14 @@ import {
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
+import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
-import { ZodError } from 'zod';
-import './BasicInformationForm.scss';
+
 import {
-  POLOGON_CHAIN_OPTION,
+  POLYGON_CHAIN_OPTION,
   chainTypes,
   existingCommunityNames,
 } from './constants';
@@ -28,8 +30,10 @@ import {
   socialLinkValidation,
 } from './validation';
 
+import './BasicInformationForm.scss';
+
 const BasicInformationForm = ({
-  chainEcosystem,
+  selectedCommunity,
   onSubmit,
   onCancel,
 }: BasicInformationFormProps) => {
@@ -49,13 +53,13 @@ const BasicInformationForm = ({
   const getChainOptions = () => {
     // Since we are treating polygon as an ecosystem, we will only have a single option, which will be
     // preselected and further input's will be disabled
-    if (chainEcosystem === 'polygon') {
-      return [POLOGON_CHAIN_OPTION];
+    if (selectedCommunity.type === CommunityType.Polygon) {
+      return [POLYGON_CHAIN_OPTION];
     }
 
-    if (chainEcosystem === 'solana') {
+    if (selectedCommunity.type === CommunityType.Solana) {
       return chainTypes
-        .filter((x) => x.chainBase === 'solana')
+        .filter((chainType) => chainType.chainBase === CommunityType.Solana)
         .map((chainType) => ({
           label: chainType.label,
           value: `${chainType.value}`,
@@ -64,8 +68,11 @@ const BasicInformationForm = ({
 
     return chainTypes
       .filter(
-        (x) =>
-          x.chainBase === (chainEcosystem === 'cosmos' ? 'cosmos' : 'ethereum'),
+        (chainType) =>
+          chainType.chainBase ===
+          (selectedCommunity.type === CommunityType.Cosmos
+            ? CommunityType.Cosmos
+            : CommunityType.Ethereum),
       )
       .map((chainType) => ({
         label: chainType.label,
@@ -74,7 +81,10 @@ const BasicInformationForm = ({
   };
 
   const addLink = () => {
-    setSocialLinks((x) => [...(x || []), { value: '', error: '' }]);
+    setSocialLinks((socialLink) => [
+      ...(socialLink || []),
+      { value: '', error: '' },
+    ]);
   };
 
   const removeLinkAtIndex = (index: number) => {
@@ -107,7 +117,7 @@ const BasicInformationForm = ({
 
     setSocialLinks([...updatedSocialLinks]);
 
-    return !!updatedSocialLinks.find((x) => x.error);
+    return !!updatedSocialLinks.find((socialLink) => socialLink.error);
   };
 
   const updateAndValidateSocialLinkAtIndex = (value: string, index: number) => {
@@ -151,8 +161,12 @@ const BasicInformationForm = ({
       onSubmit={handleSubmit}
       className="BasicInformationForm"
       initialValues={{
-        ...(chainEcosystem === 'polygon' && { chain: POLOGON_CHAIN_OPTION }),
-        ...(chainEcosystem === 'solana' && { chain: getChainOptions()?.[0] }),
+        ...(selectedCommunity.type === CommunityType.Polygon && {
+          chain: POLYGON_CHAIN_OPTION,
+        }),
+        ...(selectedCommunity.type === CommunityType.Solana && {
+          chain: getChainOptions()?.[0],
+        }),
       }}
     >
       {/* Form fields */}
@@ -174,7 +188,10 @@ const BasicInformationForm = ({
         isClearable={false}
         label="Select chain"
         placeholder="Select chain"
-        isDisabled={chainEcosystem === 'polygon' || chainEcosystem === 'solana'}
+        isDisabled={
+          selectedCommunity.type === CommunityType.Polygon ||
+          selectedCommunity.type === CommunityType.Solana
+        }
         options={getChainOptions()}
       />
 
@@ -227,22 +244,26 @@ const BasicInformationForm = ({
       <section className="social-links">
         <CWText type="caption">Social Links</CWText>
 
-        {socialLinks.map((x, index) => (
+        {socialLinks.map((socialLink, index) => (
           <div className="link-input-container" key={index}>
             <CWTextInput
               containerClassName="w-full"
               placeholder="https://example.com"
               fullWidth
-              value={x.value}
-              customError={x.error}
+              value={socialLink.value}
+              customError={socialLink.error}
               onInput={(e) =>
                 updateAndValidateSocialLinkAtIndex(
                   e.target.value?.trim(),
                   index,
                 )
               }
-              onBlur={() => updateAndValidateSocialLinkAtIndex(x.value, index)}
-              onFocus={() => updateAndValidateSocialLinkAtIndex(x.value, index)}
+              onBlur={() =>
+                updateAndValidateSocialLinkAtIndex(socialLink.value, index)
+              }
+              onFocus={() =>
+                updateAndValidateSocialLinkAtIndex(socialLink.value, index)
+              }
             />
             <CWIconButton
               iconButtonTheme="neutral"
