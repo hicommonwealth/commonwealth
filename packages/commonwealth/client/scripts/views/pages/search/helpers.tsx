@@ -208,6 +208,7 @@ export type MemberResult = {
     chain: string;
     address: string;
   }[];
+  group_ids?: [];
   roles?: any[];
 };
 type MemberResultRowProps = {
