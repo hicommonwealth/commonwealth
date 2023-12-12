@@ -11,7 +11,7 @@ import { TokenBalanceCache as TokenBalanceCacheV2 } from '../server/util/tokenBa
 async function main() {
   const models = db;
   const redisCache = new RedisCache();
-  await redisCache.init(REDIS_URL, VULTR_IP);
+  await redisCache.init(REDIS_URL);
   const banCache = new BanCache(models);
 
   const tokenBalanceCacheV1 = new TokenBalanceCacheV1();
