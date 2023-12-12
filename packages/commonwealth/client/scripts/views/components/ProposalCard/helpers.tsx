@@ -8,9 +8,9 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
 import { blocknumToDuration, formatNumberLong } from 'helpers';
+import moment from 'moment';
 import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus } from '../../../models/types';
-import moment from 'moment';
 
 import { Countdown } from 'views/components/countdown';
 
@@ -62,7 +62,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
             duration={blocknumToDuration(proposal.endTime.blocknum)}
           />,
           ` left (ends on block ${formatNumberLong(
-            proposal.endTime.blocknum
+            proposal.endTime.blocknum,
           )})`,
         ]
       : proposal.endTime.kind === 'dynamic'
@@ -71,7 +71,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
             duration={blocknumToDuration(proposal.endTime.getBlocknum())}
           />,
           ` left (ends on block ${formatNumberLong(
-            proposal.endTime.getBlocknum()
+            proposal.endTime.getBlocknum(),
           )})`,
         ]
       : proposal.endTime.kind === 'threshold'
@@ -131,5 +131,19 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
   return '';
 };
 
+export const shortenIdentifier = (identifer: string) => {
+  // Check if the string is longer than 6 characters
+  if (identifer.length > 6) {
+    // Extract the first three and last three characters
+    const start = identifer.substring(0, 3);
+    const end = identifer.substring(identifer.length - 3);
+    // Return the formatted string
+    return `${start}...${end}`;
+  } else {
+    // Return the original string if it's 6 characters or shorter
+    return identifer;
+  }
+};
+
 export const getPrimaryTagText = (proposal: AnyProposal) => `
-  Prop ${proposal.shortIdentifier}`;
+  Prop ${shortenIdentifier(proposal.shortIdentifier)}`;

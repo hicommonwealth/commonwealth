@@ -31,7 +31,7 @@ export const CompoundProposalStats = (props: CompoundProposalStatsProps) => {
         },
         {
           statHeading: 'Proposal Threshold:',
-          stat: `0`,
+          stat: `0`, // TODO: We shouldn't be hardcoding these decimal amounts
         },
         {
           statHeading: 'Voting Period Length:',

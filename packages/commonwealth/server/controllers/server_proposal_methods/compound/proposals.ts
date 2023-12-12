@@ -186,16 +186,13 @@ async function getProposalDataFieldsSequentially(
   for (const propCreatedEvent of proposalCreatedEvents) {
     // Construct big promise
     const proposalDataFieldPromises: Promise<any>[] = [];
-    // proposalDataFieldPromises.push(
-    //   contract.proposalProposer(propCreatedEvent.id),
-    // );
+    proposalDataFieldPromises.push(
+      contract.proposalProposer(propCreatedEvent.id),
+    );
+    proposalDataFieldPromises.push(contract.proposalEta(propCreatedEvent.id));
     proposalDataFieldPromises.push(
       contract.proposalSnapshot(propCreatedEvent.id),
     );
-    // proposalDataFieldPromises.push(contract.proposalEta(propCreatedEvent.id));
-    // proposalDataFieldPromises.push(
-    //   contract.proposalSnapshot(propCreatedEvent.id),
-    // );
     proposalDataFieldPromises.push(
       contract.proposalDeadline(propCreatedEvent.id),
     );
@@ -206,15 +203,15 @@ async function getProposalDataFieldsSequentially(
       (values) => {
         return {
           id: propCreatedEvent.id,
-          proposer: null,
-          eta: null,
-          startBlock: values[0],
-          endBlock: values[1],
-          forVotes: values[2].forVotes,
-          againstVotes: values[2].againstVotes,
-          abstainVotes: values[2]?.abstainVotes,
-          canceled: values[3] == 7,
-          executed: values[3] == 2,
+          proposer: values[0],
+          eta: values[1],
+          startBlock: values[2],
+          endBlock: values[3],
+          forVotes: values[4].forVotes,
+          againstVotes: values[4].againstVotes,
+          abstainVotes: values[4]?.abstainVotes,
+          canceled: values[5] == 7,
+          executed: values[5] == 2,
         };
       },
     );
