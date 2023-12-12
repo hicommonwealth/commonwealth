@@ -130,7 +130,7 @@ export const EditCollaboratorsModal = ({
                 >
                   <User
                     userAddress={c.Address.address}
-                    userChainId={c.chain_id}
+                    userCommunityId={c.chain_id}
                   />
                 </div>
               ))
@@ -149,7 +149,10 @@ export const EditCollaboratorsModal = ({
             <div className="collaborator-rows-container">
               {collaborators.map((c, i) => (
                 <div key={i} className="collaborator-row">
-                  <User userAddress={c.address} userChainId={c.community_id} />
+                  <User
+                    userAddress={c.address}
+                    userCommunityId={c.community_id}
+                  />
                   <CWIconButton
                     iconName="close"
                     iconSize="small"
