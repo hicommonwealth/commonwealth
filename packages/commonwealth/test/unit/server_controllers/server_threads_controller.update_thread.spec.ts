@@ -16,6 +16,7 @@ describe('ServerThreadsController', () => {
         isMod: false,
         isAdmin: false,
         isSuperAdmin: false,
+        isCollaborator: false,
       };
       expect(() =>
         validatePermissions(permissions, {
@@ -33,6 +34,7 @@ describe('ServerThreadsController', () => {
         isMod: false,
         isAdmin: true,
         isSuperAdmin: false,
+        isCollaborator: false,
       };
 
       // throws
