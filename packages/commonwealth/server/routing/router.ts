@@ -91,7 +91,6 @@ import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import getSupportedEthChains from '../routes/getSupportedEthChains';
 import getTokenForum from '../routes/getTokenForum';
-import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
@@ -263,14 +262,6 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/domain', domain.bind(this, models));
   registerRoute(router, 'get', '/status', status.bind(this, models));
-  registerRoute(
-    router,
-    'post',
-    '/ipfsPin',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    ipfsPin.bind(this, models),
-  );
   registerRoute(
     router,
     'post',
