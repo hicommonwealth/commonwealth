@@ -17,10 +17,11 @@ https://docs.datadoghq.com/database_monitoring/guide/heroku-postgres/#pagetitle)
 ```bash
   DD_AGENT_MAJOR_VERSION=7
   DD_API_KEY=<SECRET-DATADOG-ACCOUNT-KEY>
-  DD_DYNO_HOST=true
+  DD_DYNO_HOST=TRUE
   DD_LOG_LEVEL=WARN
   DD_SITE=us5.datadoghq.com
-  DD_ENABLE_HEROKU_POSTGRES=true #postgres specific
+  DD_ENABLE_HEROKU_POSTGRES=TRUE
+  DD_ENABLE_HEROKU_REDIS=TRUE
 ```
 
 **Install Datadog Buildpack**

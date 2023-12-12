@@ -6,508 +6,403 @@ For a list of config tokens to get you started developing, see our [.env.example
 
 We use GitHub Secrets to manage our auth tokens; reach out to the documentarian Graham Johnson, or else to an engineering lead, if you need access.
 
-If you add a new environment variable, you must add documentation here, providing a default value (if public/config) and describing (1) what does (2) when engineers might need it. As with [all documentation](./_README.md#updating-the-docs-how--when), these changes should be included in the relevant PR where the variable is added.
+If you add a new environment variable, you must add documentation here. Please describe what the variable does and when engineers might need it; tag yourself as an owner if applicable, and list a default value for config tokens. As with [all documentation](./_README.md#updating-the-docs-how--when), these changes should be included in the relevant PR where the variable is added.
 
 ## Contents
 
+- [AIRPLANE_SECRET](#airplane_secret)
+- [AWS_ACCESS_KEY_ID](#aws_access_key_id)
+- [AWS_REGION](#aws_region)
+- [AWS_SECRET_ACCESS_KEY](#aws_secret_access_key)
+- [AXIE_SHARED_SECRET](#axie_shared_secret)
+- [CHAIN_PORT](#chain_port)
+- [CLOUDAMQP_URL](#cloudamqp_url)
+- [COSMOS_GOV_V1](#cosmos_gov_v1)
+- [COSMOS_REGISTRY_API](#cosmos_registry_api)
+- [CW_BOT_KEY](#cw_bot_key)
+- [DATABASE_CLEAN_HOUR](#database_clean_hour)
+- [DATABASE_URI](#database_uri)
+- [DATABASE_URL](#database_url)
+- [DD_ENABLE_HEROKU_POSTGRES](#dd_enable_heroku_postgres)
+- [DD_ENABLE_HEROKU_REDIS](#dd_enable_heroku_redis)
+- [DD_DISABLE_HOST_METRICS](#dd_disable_host_metrics)
+- [DD_LOG_LEVEL](#dd_log_level)
+- [DD_SITE](#dd_site)
+- [DISABLE_CACHE](#disable_cache)
+- [DISCORD_BOT_SUCCESS_URL](#discord_bot_success_url)
+- [DISCORD_BOT_TOKEN](#discord_bot_token)
+- [DISCORD_BOT_URL](#discord_bot_url)
+- [DISCORD_CLIENT_ID](#discord_client_id)
+- [DISCORD_WEBHOOK_URL_DEV](#discord_webhook_url_dev)
+- [ENFORCE_SESSION_KEYS](#enforce_session_keys)
+- [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
+- [ETH_RPC](#eth_rpc)
+- [ETHERSCAN_JS_API_KEY](#etherscan_js_api_key)
+- [FLAG_COMMUNITY_HOMEPAGE](#flag_community_homepage)
+- [FLAG_PROPOSAL_TEMPLATES](#flag_proposal_templates)
+- [FLAG_SIDEBAR_TOGGLE](#flag_sidebar_toggle)
+- [HEROKU_APP_NAME](#heroku_app_name)
+- [IS_CI](#is_ci)
+- [JWT_SECRET](#jwt_secret)
+- [MAGIC_API_KEY](#magic_api_key)
+- [MAGIC_DEFAULT_CHAIN](#magic_default_chain)
+- [MAGIC_PUBLISHABLE_KEY](#magic_publishable_key)
+- [MAGIC_SUPPORTED_BASES](#magic_supported_bases)
+- [MIXPANEL_DEV_TOKEN](#mixpanel_dev_token)
+- [MIXPANEL_PROD_TOKEN](#mixpanel_prod_token)
+- [NEXT_PUBLIC_RSA_PRIVATE_KEY](#next_public_rsa_private_key)
+- [NEXT_PUBLIC_RSA_PUBLIC_KEY](#next_public_rsa_public_key)
+- [NO_CLIENT](#no_client)
+- [NO_GLOBAL_ACTIVITY_CACHE](#no_global_activity_cache)
+- [NO_PRERENDER](#no_prerender)
+- [NO_SSL](#no_ssl)
+- [NO_TOKEN_BALANCE_CACHE](#no_token_balance_cache)
+- [NODE_ENV](#node_env)
+- [PGPASSWORD](#pgpassword)
+- [PORT](#port)
+- [PROCFILE](#procfile)
+- [RABBITMQ_API_URI](#rabbitmq_api_uri)
+- [RABBITMQ_URI](#rabbitmq_uri)
+- [REDIS_URL](#redis_url)
+- [REPEAT_TIME](#repeat_time)
+- [ROLLBAR_ENV](#rollbar_env)
+- [ROLLBAR_SERVER_TOKEN](#rollbar_server_token)
+- [RPC_HOST](#rpc_host)
+- [SEND_WEBHOOKS_EMAILS](#send_webhooks_emails)
+- [SENDGRID_API_KEY](#sendgrid_api_key)
+- [SERVER_URL](#server_url)
+- [SESSION_SECRET](#session_secret)
+- [SL_BUILD](#sl_build)
+- [SL_PORT](#sl_port)
+- [SLACK_FEEDBACK_WEBHOOK](#slack_feedback_webhook)
+- [SLACK_WEBHOOK_URL_DEV](#slack_webhook_url_dev)
+- [SNAPSHOT_HUB_URL](#snapshot_hub_url)
+- [TELEGRAM_BOT_TOKEN_DEV](#telegram_bot_token_dev)
+- [TEST_ENV](#test_env)
+- [UNIQUE_DOCKER_CONTAINER_ID](#unique_docker_container_id)
+- [WITH_PRERENDER](#with_prerender)
+- [ZAPIER_WEBHOOK_URL_DEV](#zapier_webhook_url_dev)
+
 ## AIRPLANE_SECRET
 
-Description: We use Airplane.dev tasks for our custom domains. See our [Custom-Domains.md](./knowledge_base/Custom-Domains.md) entry for more info.
-
-Type: Auth.
+We use Airplane.dev tasks for our custom domains. See our [Custom-Domains.md](./knowledge_base/Custom-Domains.md) entry for more info.
 
 ## AWS_ACCESS_KEY_ID
 
-Description: AWS access key ID for programmatic requests. Used alongside `AWS_SECRET_ACCESS_KEY`.
-
-Type: Auth.
+AWS access key ID for programmatic requests. Used alongside `AWS_SECRET_ACCESS_KEY`.
 
 ## AWS_REGION
 
-Description: AWS region used primarily for uploading local image files.
-
-Type: Config.
-
-Default Value: `us-east-1`
+AWS region used primarily for uploading local image files. Common uses `us-east-1` by default.
 
 ## AWS_SECRET_ACCESS_KEY
 
-Description: AWS secret used alongside `AWS_ACCESS_KEY_ID`.
-
-Type: Auth
+AWS secret used alongside `AWS_ACCESS_KEY_ID`.
 
 ## AXIE_SHARED_SECRET
 
-Description: Secret token used for Axie Infinity login integration.
-
-Type: Auth.
+Secret token used for Axie Infinity login integration.
 
 ## CHAIN_PORT
 
-Description: Used in chain testing; for more information, see [Chain-Testing-Overview.md](../knowledge_base/Chain-Testing-Overview.md).
-
-Type: Config.
-
-Default Value: `3000`
+Used in chain testing; the default value is `3000`. For more information, see [Chain-Testing-Overview.md](../knowledge_base/Chain-Testing-Overview.md).
 
 ## CLOUDAMQP_URL
 
-Description: Required in production. The URI of our RabbitMQ instance. This value is usually set automatically by Heroku when a CLOUDAMQP instance is attached to an app.
-
-Type: Heroku.
+Required in production. The URI of our RabbitMQ instance. This value is usually set automatically by Heroku when a CLOUDAMQP instance is attached to an app.
 
 ## COSMOS_GOV_V1
 
-Description: Comma-separated list (e.g. "kyve,csdk") of Cosmos chains using v1 (not v1beta1).
-
-Type: Config.
+Comma-separated list (e.g. "kyve,csdk") of Cosmos chains using v1 (not v1beta1). As of 231212, this should be `kyve,csdk,csdk-v1,quicksilver-protocol,juno,regen` by default.
 
 Owner: Mark Hegel.
-
-Default Value: `kyve,csdk,csdk-v1,quicksilver-protocol,juno,regen`
 
 ## COSMOS_REGISTRY_API
 
-Description: Community-maintained data source for Cosmos ecosystem blockchains. Pulls from a [GitHub repo](https://github.com/cosmos/chain-registry/) as its source of truth.
-
-Type: Config.
+Community-maintained data source for Cosmos ecosystem blockchains. Pulls from a [GitHub repo](https://github.com/cosmos/chain-registry/) as its source of truth. As of 231212, this should be `https://cosmoschains.thesilverfox.pro` by default.
 
 Owner: Mark Hegel.
 
-Default value: `https://cosmoschains.thesilverfox.pro`
-
 ## CW_BOT_KEY
 
-Description: Required for Common bots, e.g. Discobot. In development, can be set to any random identifier string, but must match the value of `CW_BOT_KEY` set in Discobot's .env file.
+Required for Common bots, e.g. Discobot. In development, can be set to any random identifier string, but must match the value of `CW_BOT_KEY` set in Discobot's .env file.
 
 ## DATABASE_CLEAN_HOUR
 
-Description: When the cleaner runs is determined by the DATABASE_CLEAN_HOUR env var. The env var is a simple number between 0 and 24 indicating (in 24hr format) at what time the cleaner should execute the cleaning functions. If env var is not set, the database cleaner will not run.
+When the cleaner runs is determined by the DATABASE_CLEAN_HOUR env var. The env var is a simple number between 0 and 24 indicating (in 24hr format) at what time the cleaner should execute the cleaning functions. If env var is not set, the database cleaner will not run.
 
 Owner: Timothee Legros.
 
 ## DATABASE_URI
 
-Description: Used to initialize connections to the database.
-
-Type: Config.
-
-Default value: `postgresql://commonwealth:edgeware@localhost/commonwealth`
+Used to initialize connections to the database. By default, set to `postgresql://commonwealth:edgeware@localhost/commonwealth`.
 
 ## DATABASE_URL
 
-Description: Required in production. The URI of the database to connect to. This value is usually set automatically by Heroku when a Heroku Postgres instance is attached to an app. If `NODE_ENV=production` this url is the default.
+Required in production. This value is usually set automatically by Heroku when a Heroku Postgres instance is attached to an app.
 
 ## DD_ENABLE_HEROKU_POSTGRES
 
-Description: Set on our Heroku `commonwealthapp` pipeline. DataDog configuration token used to enable PSQL on Heroku.
-
-Type: Heroku, Production.
-
-Default value: `TRUE`
+Set in our Heroku `commonwealthapp` pipeline to enable PSQL analytics through DataDog. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
 
 ## DD_ENABLE_HEROKU_REDIS
 
-Description: Set on our Heroku `commonwealthapp` pipeline. DataDog configuration token used to enable PSQL on Heroku.
-
-Type: Heroku, Production.
-
-Default value: `TRUE`
+Set in our Heroku `commonwealthapp` pipeline to enable Redis analytics through DataDog. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
 
 ## DD_DISABLE_HOST_METRICS
 
-Description: Set on our Heroku `commonwealthapp` pipeline to disable metrics that are not presently useful to us.
-
-Type: Heroku, Production.
-
-Default value: `TRUE`
+Set in our Heroku `commonwealthapp` pipeline to disable metrics that are not presently useful to us. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
 
 ## DD_LOG_LEVEL
 
-Description: Set on our Heroku `commonwealthapp` pipeline. DataDog configuration token determining severity level logged (e.g. ). May be set to `OFF`, `CRITICAL`, `ERROR`, `WARN`, `INFO`, `DEBUG`, or `TRACE`.
-
-Type: Heroku, Production.
-
-Default value: `WARN`
+As of 231212, set to `WARN` in our Heroku `commonwealthapp` pipeline. DataDog configuration token determining severity level logged (e.g. ). May be set to `OFF`, `CRITICAL`, `ERROR`, `WARN`, `INFO`, `DEBUG`, or `TRACE`. See [DataDog.md](../knowledge_base/Datadog.md) for more info.
 
 ## DD_SITE
 
-Description: Set on our Heroku `commonwealthapp` pipeline. DataDog configuration token specifying our DataDog site region. For more documentation, see [DataDog docs](https://docs.datadoghq.com/getting_started/site/).
-
-Type: Heroku, Production.
-
-Default value: `us5.datadoghq.com`
+DataDog configuration token in our Heroku pipeline, specifying our DataDog site region. As of 231212, that region is `us5.datadoghq.com`. For more documentation, see [DataDog docs](https://docs.datadoghq.com/getting_started/site/) and [DataDog.md](../knowledge_base/Datadog.md).
 
 ## DISABLE_CACHE
 
-Description: Disables caching middleware.
-
-Type: Config.
-
-Default value: `FALSE`
+If `true`, disables Redis caching middleware.
 
 ## DISCORD_BOT_SUCCESS_URL
 
-Description: Used to construct callback URLs for the `/authCallback` route.
-
-Type: Config.
-
-Default value: `http://localhost:3000`
+Used to construct callback URLs for the `/authCallback` route, used in user sign-in flow. By default, expects `http://localhost:3000`.
 
 ## DISCORD_BOT_TOKEN
 
-Description: This value should mirror the value of `DISCORD_TOKEN` in the Discobot .env file.
+This value should mirror the value of `DISCORD_TOKEN` in the Discobot .env file.
 
 ## DISCORD_BOT_URL
 
-Type: Auth
+<!-- This token appears to be a holdover from the first iteration of Discobot, but is still (likely erroneously) referenced in the Snapshot Consumer. Flagged for removal. -->
 
 ## DISCORD_CLIENT_ID
 
-Description: For local testing, we use the staging Discord app/bot. The client ID can therefore be found on the [developer dashboard](https://discord.com/developers/applications/1027997517964644453/oauth2/general) or by contacting Jake or Timothee.
-
-Type: Auth.
+For local testing, we use the staging Discord app/bot. The client ID can therefore be found on the [developer dashboard](https://discord.com/developers/applications/1027997517964644453/oauth2/general) or by contacting Jake or Timothee..
 
 ## DISCORD_WEBHOOK_URL_DEV
 
-Description: Connects to the #webhook-testing Discord channel on the Commond Protocol Discord server. Required to use the emit-webhook script to send Discord webhooks. More info at [Webhooks.md](./Webhooks.md).
-
-Type: Auth.
+Connects to the #webhook-testing Discord channel on the Commond Protocol Discord server. Required to use the emit-webhook script to send Discord webhooks. More info at [Webhooks.md](./Webhooks.md).
 
 ## ENFORCE_SESSION_KEYS
 
-Description: Feature flag for server-side enforcement of Canvas session keys.
-
-Type: Config.
+Boolean feature flag for server-side enforcement of Canvas session keys; by default, `false`.
 
 Owner: Raymond Zhong.
 
-Default value: `FALSE`
-
 ## ETH_ALCHEMY_API_KEY
 
-Type: CI/CD
+Used in our CI/CD and stored in GitHub repo secrets. If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants. Only needed if doing work that involves querying Ethereum.
 
-Description: If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants. Only needed if doing work involving querying Ethereum.
+Owner: Kurtis Assad.
 
 ## ETH_RPC
 
-<!-- In need of documentation; if you have information about this token, please contribute! -->
+<!-- In need of documentation; if you have information about this token, please contribute. -->
 
 ## ETHERSCAN_JS_API_KEY
 
-<!-- In need of documentation; if you have information about this token, please contribute! -->
+<!-- In need of documentation; if you have information about this token, please contribute. -->
 
 ## FLAG_COMMUNITY_HOMEPAGE
 
-Default value: `FALSE`
-
-Description: Toggles side-wide homepage feature for communities. Temporary flag for 2.0 work.
-
-Type: Config
+Boolean toggle to display side-wide homepage feature for communities. Temporary flag for 2.0 work.
 
 ## FLAG_PROPOSAL_TEMPLATES
 
-Default value: `FALSE`
-
-Description: Toggles side-wide visibility of sidebar proposal templates. Temporary flag for 2.0 work.
-
-Type: Config
+Boolean toggle to display side-wide sidebar proposal templates. Temporary flag for 2.0 work.
 
 ## FLAG_SIDEBAR_TOGGLE
 
-Default value: `FALSE`
-
-Description: Toggles side-wide visibility of discussions homepage sidebar. Temporary flag for 2.0 work.
-
-Type: Config
+Boolean toggle to display site-wide discussions homepage sidebar. Temporary flag for 2.0 work.
 
 ## HEROKU_APP_NAME
 
-Default value: ?
-
-Description: The subdomain of the heroku app hosting the server.
-
-Type: Config.
+Set in Heroku; the respective app name. Required when using the DataDog PSQL integration.
 
 ## IS_CI
 
-Description: Used and defined on-the-fly in e2e scripts.
+Used and defined on-the-fly in e2e scripts.
 
 Owner: Kurtis Assad.
 
 ## JWT_SECRET
 
-Description: Required in production. The JWT secret that is used to generate all user JWTs.
-
-Type: Auth
+Required in production. The JWT seed secret that is used to generate all user JWTs.
 
 ## MAGIC_API_KEY
 
-Description: Secret API key for Magic login. Contact Jake Naviasky or Graham Johnson for access.
-
-Type: Auth.
+Secret API key for Magic login. Contact Jake Naviasky or Graham Johnson for access.
 
 ## MAGIC_DEFAULT_CHAIN
 
-Description: Default chain for Magic login.
-
-Type: Config.
-
-Default value: `ethereum`
+Default chain for Magic login; as of 231212, we use `ethereum`.
 
 ## MAGIC_PUBLISHABLE_KEY
 
-Description: Publishable API key for Magic login.
-
-Default value: `pk_live_EF89AABAFB87D6F4`
+Publishable API key for Magic login; as of 231212, development uses `pk_live_EF89AABAFB87D6F4`.
 
 ## MAGIC_SUPPORTED_BASES
 
-Default value: `substrate,ethereum`
-
-Description: Supported chain bases for Magic login.
-
-Type: Config
+Chain bases supported for Magic login; as of 231212, we use  `substrate,ethereum`.
 
 ## MIXPANEL_DEV_TOKEN
 
-Mixpanel analytics tracking token for development work.
-
-Type: Auth
+Mixpanel analytics tracking token for development work. Reach out to a lead to request a token.
 
 ## MIXPANEL_PROD_TOKEN
 
-Description: Mixpanel analytics tracking token for product.
-
-Type: Auth
+Mixpanel analytics tracking token for our live production site.
 
 ## NEXT_PUBLIC_RSA_PRIVATE_KEY
 
-Description: ?
-
-Type: Auth
+<!-- Introduced in #2096 but never documented. If you have information about this token, please contribute. Otherwise, this entry is flagged for removal, and the referrent code for refactoring. -->
 
 ## NEXT_PUBLIC_RSA_PUBLIC_KEY
 
-Description: ?
-
-Type: ?
+<!-- Introduced in #2096 but never documented. If you have information about this token, please contribute. Otherwise, this entry is flagged for removal, and the referrent code for refactoring. -->
 
 ## NO_CLIENT
 
-Default value: `FALSE`
-
-Description: Disables the front-end build if set to `TRUE`.
+If `true`, disables the front-end build.
 
 ## NO_GLOBAL_ACTIVITY_CACHE
 
-Default value: ?
-
-Description: ?
-
-Type: Config
+If `true`, disables the initialization of `globalActivityCache.ts` from server.
 
 ## NO_PRERENDER
 
-Default value: ?
-
-Description: ?
-
-Type: Config
+In a production environment, prerender is only run from `commonwealth/server.ts` if this flag is false or blank.
 
 ## NO_SSL
 
-Default value: `FALSE`
-
-Description: Used in `start-external-webpack` package.json script.
-
-Type: Config
+Used and defined on-the-fly for the `start-external-webpack` package.json script.
 
 ## NO_TOKEN_BALANCE_CACHE
 
-Default value: `FALSE`
-
-Description: If `TRUE`, token balance cache not started.
-
-Type: Config
+If `true`, the token balance cache is not initialized.
 
 ## NODE_ENV
 
-Default value: `development`
-
-Description: May be set to `production` or `development`. Dictates where a listener will get its initial spec. When `NODE_ENV=production` the listener gets its spec from commonwealth.im. Otherwise, the listener will get its spec from the commonwealth server hosted locally.
-
-Type: Config
+The current environment; set to `production` or `development`. Upstream of how we handle several other env vars.
 
 ## PGPASSWORD
 
-Default value: `edgeware`
-
-Description: Postgres DB password. Bypasses usual password prompt for local DB commands.
-
-Type: Config
+Postgres DB password (by default, `edgeware`). Bypasses usual password prompt for local DB commands.
 
 ## PORT
 
-Default value: `8080`
-
-Description: Localhost port location.
-
-Type: Config
+Localhost port location, default value `8080`.
 
 ## PROCFILE
 
-Default value: `packages/chain-events/Procfile`
-
-Description: Set in all of our Heroku apps that use a separate procfile. Specifies the path from the root of the repo to the Procfile to use for the deployed app. It is never needed locally but it must be set manually on Heroku and is required in production.
-
-Type: Heroku, Production.
+Set in all of our Heroku apps that use a separate procfile. Specifies the path from the root of the repo to the Procfile to use for the deployed app. It is never needed locally but it must be set manually on Heroku and is required in production. Presently set to `packages/chain-events/Procfile`
 
 ## RABBITMQ_API_URI
 
-Default value: ?
-
-Description: ?
-
-Type: ?
+<!-- In need of documentation; if you have information about this token, please contribute. -->
 
 ## RABBITMQ_URI
 
-Default value: ?
+<!-- In need of documentation; if you have information about this token, please contribute. -->
 
-Description: Should be set if running in the local environment.
-
-Type: ?
+Should be set if running in the local environment.
 
 ## REDIS_URL
 
-Default value: `redis://localhost:6379`
-
-Description: Location of local Redis instance.
+Location to host a local Redis instance. By default `redis://localhost:6379`.
 
 ## REPEAT_TIME
 
-Default value: ?
-
-Description: The number of minutes the ChainSubscriber should wait between requests to the CW app to retrieve the chains it should be listening to. It is currently set to 10 minutes which means every 10 minutes the ChainSubscriber will query the CW App and retrieve all chains that have `has_chain_events_listener` set to True in the `Chains` model.
-
-Type: Config
+The number of minutes the ChainSubscriber should wait between requests to the CW app to retrieve the chains it should be listening to. It is currently set to `10` (minutes) which means every 10 minutes the ChainSubscriber will query the CW App and retrieve all chains that have `has_chain_events_listener` set to True in the `Chains` model.
 
 ## ROLLBAR_ENV
 
-Default value: n/a
-
-Description: Separates Rollbar reports by environment such that we can easily filter on the Rollbar dashboard. In staging Heroku apps it is set to the name of the app. Locally it should be set to some custom value like your name in lowercase (NEVER `production`).
-
-Type: Config
+A tag used to identify Rollbar reports by environment, such that we can easily filter on the Rollbar dashboard. In staging and demo apps, we set it to the name of the app. For local production, it should be set to some custom value such as your name in lowercase. It should NEVER be set to `production`.
 
 ## ROLLBAR_SERVER_TOKEN
 
-Default value: `?`
-
-Description: Required in production. The Rollbar token for the appropriate environment/app. Real-time error tracking.
-
-Type: Config
+Required in production; used for real-time error tracking. In local environments and in staging (i.e. non-prod) environments (such as frick, frack, demo, experimental), should be set to the CommonwealthDev token (found on our Rollbar dashboard or by contacting Timothee Legros). Only our production environment uses the CommonwealthProject token.
 
 ## RPC_HOST
 
+Used in chain testing; for more information, see [Chain-Testing-Overview.md](../knowledge_base/Chain-Testing-Overview.md).
+
 Default value: `ganache`
-
-Description: Used in chain testing; for more information, see [Chain-Testing-Overview.md](../knowledge_base/Chain-Testing-Overview.md).
-
-Type: Config
 
 ## SEND_WEBHOOKS_EMAILS
 
-Default value: `FALSE`
+Default value: `false`
 
-Description: Enables Webhook and email dispatching in production when set to `TRUE`. Should be `FALSE` or undefined elsewhere, to prevent Webhooks and emails from being sent in non-production environments.
-
-Type: Config
+Enables Webhook and email dispatching in production when set to `true`. Should be `false` or undefined elsewhere, to prevent Webhooks and emails from being sent in non-production environments.
 
 ## SENDGRID_API_KEY
 
-<!-- In need of documentation; if you have information about this token, please contribute! -->
-
-Description: Used in email-based communications (notifications, digests, login).
-
-Type: Auth
+Used in email-based communications (notifications, digests, login).
 
 ## SERVER_URL
 
 Default value: `https://commonwealth.im`
 
-Description: By default, this is set in our `commonwealth/server/config` file to `https://commonwealth.im` if in production, and `http://localhost:8080` otherwise.
-
-Type: Config
+By default, this is set in our `commonwealth/server/config` file to `https://commonwealth.im` if in production, and `http://localhost:8080` otherwise.
 
 ## SESSION_SECRET
 
-<!-- In need of documentation; if you have information about this token, please contribute! -->
+<!-- In need of documentation; if you have information about this token, please contribute. -->
 
 ## SL_BUILD
 
-Default value: `TRUE`
+Default value: `true`
 
-Description: Boolean triggering our `snapshot-listener` package to build.
-
-Type: Config
+Boolean triggering our `snapshot-listener` package to build.
 
 ## SL_PORT
 
 Default value: `8001`
 
-Description: Port used for the `snapshot-listener` package.
+Port used for the `snapshot-listener` package.
 
 ## SLACK_FEEDBACK_WEBHOOK
 
-<!-- In need of documentation; if you have information about this token, please contribute! -->
+<!-- In need of documentation; if you have information about this token, please contribute. -->
 
-Description: Allows Slack users to send feedback via webhook.
+Allows Slack users to send feedback via webhook.
 
 ## SLACK_WEBHOOK_URL_DEV
 
-Description: Connects to the #testing-webhooks Slack channel on the Common workspace. Required to use the `emit-webhook` script to send Slack webhooks. This webhook url can be found here: <https://api.slack.com/apps/A05UQUGRWGH/install-on-team>. More info at [Webhooks.md](./Webhooks.md).
-
-Type: Auth.
+Connects to the #testing-webhooks Slack channel on the Common workspace. Required to use the `emit-webhook` script to send Slack webhooks. This webhook url can be found here: <https://api.slack.com/apps/A05UQUGRWGH/install-on-team>. More info at [Webhooks.md](./Webhooks.md)..
 
 ## SNAPSHOT_HUB_URL
 
-Description: Snapshot Hub URL used for Snapshot API requests.
+Snapshot Hub URL used for Snapshot API requests.
 
 Default value: `https://hub.snapshot.org`
 
 ## TELEGRAM_BOT_TOKEN_DEV
 
-Description: Connects to the CommonWebhooksDev Telegram Bot. Required to use the `emit-webhook` script to send Telegram webhooks. Contact Timothee Legros for an invitation to the channel. More info at [Webhooks.md](./Webhooks.md).
-
-Type: Auth.
+Connects to the CommonWebhooksDev Telegram Bot. Required to use the `emit-webhook` script to send Telegram webhooks. Contact Timothee Legros for an invitation to the channel. More info at [Webhooks.md](./Webhooks.md)..
 
 Owner: Timothee Legros.
 
 ## TEST_ENV
 
-Description: Used and defined on-the-fly in Playwright scripts.
+Used and defined on-the-fly in Playwright scripts.
 
 Owner: Kurtis Assad.
 
 ## UNIQUE_DOCKER_CONTAINER_ID
 
-Description: A unique ID that is generated to distinguish your remote docker containers from other users.
+A unique ID that is generated to distinguish your remote docker containers from other users.
 
 ## WITH_PRERENDER
 
-Description: In a development environment, prerender is only run from `commonwealth/server.ts` if this flag is provided. In production, prerender is run by default and this flag is unnecessary.
+In a development environment, prerender is only run from `commonwealth/server.ts` if this flag is provided.
 
-Default value: `FALSE`
-
-Type: Config, Development.
+Default value: `false`
 
 ## ZAPIER_WEBHOOK_URL_DEV
 
-Description: Connects to the Common Webhooks Dev Zap on Zapier. Required to use the `emit-webhook`script to send Zapier webhooks. The webhook url can be found by contacting Timothee or by viewing the Zap's settings [here](https://zapier.com/editor/209598943/published/209598943/setup) (requires Zapier account access). More info at [Webhooks.md](./Webhooks.md).
-
-Type: Auth.
+Connects to the Common Webhooks Dev Zap on Zapier. Required to use the `emit-webhook`script to send Zapier webhooks. The webhook url can be found by contacting Timothee or by viewing the Zap's settings [here](https://zapier.com/editor/209598943/published/209598943/setup) (requires Zapier account access). More info at [Webhooks.md](./Webhooks.md)..
 
 Owner: Timothee Legros.
