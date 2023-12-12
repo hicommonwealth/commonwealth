@@ -86,7 +86,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => 
     await waitOneBlock(rpcUrlBeta);
     const activeProposals = await getActiveVotingProposals();
     assert.isAtLeast(activeProposals.length, 1);
-    const proposal = activeProposals[0];
+    const proposal = activeProposals[activeProposals.length - 1];
     const msg = encodeMsgVote(signer, proposal.proposalId, voteOption);
 
     const resp = await sendTx(rpcUrlBeta, msg, isAmino);

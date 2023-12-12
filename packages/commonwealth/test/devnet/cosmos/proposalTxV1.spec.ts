@@ -104,13 +104,14 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
     await waitOneBlock(rpcUrl);
     const activeProposals = await getActiveVotingProposals();
     assert.isAtLeast(activeProposals.length, 1);
-    const proposal = activeProposals[0];
-    const msg = encodeMsgVote(signer, proposal.id, voteOption);
+    const latestProposal = activeProposals[activeProposals.length - 1];
+    const msg = encodeMsgVote(signer, latestProposal.id, voteOption);
 
     const resp = await sendTx(rpcUrl, msg, isAmino);
 
     expect(resp.transactionHash).to.not.be.undefined;
     expect(resp.rawLog).to.not.be.undefined;
+    expect(resp.rawLog).to.not.include('failed to execute message');
     expect(resp.rawLog).to.include(voteOptionToJSON(voteOption));
   };
 
