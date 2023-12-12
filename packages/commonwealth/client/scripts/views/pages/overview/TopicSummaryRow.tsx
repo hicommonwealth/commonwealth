@@ -100,7 +100,9 @@ export const TopicSummaryRow = ({
                   <div className="user-and-date-row">
                     <User
                       userAddress={user.address}
-                      userChainId={user.community?.id || user.profile?.chain}
+                      userCommunityId={
+                        user.community?.id || user.profile?.chain
+                      }
                       shouldShowAddressWithDisplayName
                       shouldLinkProfile
                       avatarSize={24}

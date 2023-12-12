@@ -53,6 +53,7 @@ import { CWButton } from './new_designs/cw_button';
 import { CWThreadAction } from './new_designs/cw_thread_action';
 import { CWToggle, toggleDarkMode } from './new_designs/cw_toggle';
 import { CWUpvote } from './new_designs/cw_upvote';
+import { CWCircleButton } from './new_designs/CWCircleButton/CWCircleButton';
 import { CWForm } from './new_designs/CWForm';
 import CWIconButton from './new_designs/CWIconButton';
 import { CWModal, CWModalBody, CWModalHeader } from './new_designs/CWModal';
@@ -185,7 +186,7 @@ const validationSchema = z.object({
 });
 
 const chainValidationSchema = z.object({
-  chain: z
+  community: z
     .array(
       z.object({
         value: z.string().nonempty({ message: 'Invalid value' }),
@@ -230,8 +231,8 @@ export const ComponentShowcase = () => {
   const [isCommunityStakeBannerVisible, setIsCommunityStakeBannerVisible] =
     useState(true);
   const [isAlertVisible, setIsAlertVisible] = useState(initialBannersState);
-  const allChains = app.config.chains.getAll();
-  const [chainId, setChainId] = useState(allChains[1]);
+  const allCommunities = app.config.chains.getAll();
+  const [communityId, setCommunityId] = useState(allCommunities[1]);
   const [currentTab, setCurrentTab] = useState(tagsList[0].id);
 
   const unstyledPopoverProps = usePopover();
@@ -585,12 +586,12 @@ export const ComponentShowcase = () => {
         </div>
         <div className="tag-row">
           <CWText type="h4">Input Tag</CWText>
-          {chainId && (
+          {communityId && (
             <CWTag
-              label={allChains[1].name}
+              label={allCommunities[1].name}
               type="input"
-              community={allChains[1]}
-              onClick={() => setChainId(null)}
+              community={allCommunities[1]}
+              onClick={() => setCommunityId(null)}
             />
           )}
         </div>
@@ -1000,6 +1001,36 @@ export const ComponentShowcase = () => {
             disabled
             onClick={() => notifySuccess('Button clicked!')}
           />
+        </div>
+      </div>
+      <div className="circle-button-gallery">
+        <CWText type="h4">Circle Buttons</CWText>
+        <div className="button-row">
+          <CWText type="h4">Primary</CWText>
+          <CWCircleButton
+            buttonType="primary"
+            iconName="bell"
+            onClick={() => console.log('Quack!')}
+          />
+        </div>
+
+        <div className="button-row">
+          <CWText type="h4">Primary Disabled</CWText>
+          <CWCircleButton buttonType="primary" iconName="bell" disabled />
+        </div>
+
+        <div className="button-row">
+          <CWText type="h4">Secondary</CWText>
+          <CWCircleButton
+            buttonType="secondary"
+            iconName="bell"
+            onClick={() => console.log('Quack!')}
+          />
+        </div>
+
+        <div className="button-row">
+          <CWText type="h4">Secondary Disabled</CWText>
+          <CWCircleButton buttonType="secondary" iconName="bell" disabled />
         </div>
       </div>
       <div className="basic-gallery">
