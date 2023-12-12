@@ -102,7 +102,7 @@ export async function __updateCommunity(
     snapshot = [];
   }
 
-  const nonEmptySocialLinks = social_links.filter((s) => s && s !== '');
+  const nonEmptySocialLinks = social_links?.filter((s) => s && s !== '');
   const invalidSocialLinks = nonEmptySocialLinks?.filter(
     (s) => !urlHasValidHTTPPrefix(s),
   );
