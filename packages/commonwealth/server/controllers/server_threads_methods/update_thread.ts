@@ -135,7 +135,7 @@ export async function __updateThread(
     ['moderator', 'admin'],
   );
 
-  const isCollaborator = !!thread.collaborators.find(
+  const isCollaborator = !!thread.collaborators?.find(
     (a) => a.address === address.address,
   );
   const isThreadOwner = userOwnedAddressIds.includes(thread.address_id);
