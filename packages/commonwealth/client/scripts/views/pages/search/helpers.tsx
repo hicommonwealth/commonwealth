@@ -64,7 +64,7 @@ const ThreadResultRow = ({
         <div className="search-results-thread-subtitle">
           <User
             userAddress={thread.address}
-            userChainId={thread.address_chain}
+            userCommunityId={thread.address_chain}
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -139,7 +139,7 @@ const ReplyResultRow = ({
         <div className="search-results-thread-subtitle">
           <User
             userAddress={comment.address}
-            userChainId={comment.address_chain}
+            userCommunityId={comment.address_chain}
           />
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}
@@ -237,7 +237,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
     <div key={address} className="member-result-row" onClick={handleClick}>
       <User
         userAddress={address}
-        userChainId={community}
+        userCommunityId={community}
         shouldShowRole
         shouldLinkProfile
         avatarSize={32}

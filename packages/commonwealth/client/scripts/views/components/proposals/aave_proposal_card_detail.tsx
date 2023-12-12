@@ -42,7 +42,7 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
   useEffect(() => {
     // TODO: we need to load titles / description async too
     proposal.ipfsDataReady.once('ready', () =>
-      setAuthor(proposal.ipfsData?.author)
+      setAuthor(proposal.ipfsData?.author),
     );
   });
   // TODO: move executor display to entire page
@@ -61,7 +61,7 @@ export const AaveProposalCardDetail = (props: AaveProposalCardDetailProps) => {
           ) : (
             <User
               userAddress={proposal.author.address}
-              userChainId={
+              userCommunityId={
                 proposal.author.community?.id || proposal.author.profile?.chain
               }
               shouldHideAvatar
