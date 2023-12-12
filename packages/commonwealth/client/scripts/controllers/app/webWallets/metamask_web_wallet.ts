@@ -32,17 +32,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public readonly chain = ChainBase.Ethereum;
 
   public get available() {
-    let isMetamask = false;
-    if (window.ethereum) {
-      if (window.ethereum.isMetaMask) {
-        isMetamask = true;
-      } else if (window.ethereum.providers?.length) {
-        window.ethereum.providers.forEach(async (p) => {
-          if (p.isMetaMask) isMetamask = true;
-        });
-      }
-    }
-    return isMetamask;
+    return !!window.ethereum;
   }
 
   public get provider() {
