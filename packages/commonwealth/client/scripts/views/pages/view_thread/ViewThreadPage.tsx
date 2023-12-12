@@ -679,6 +679,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
+                              isTopicMembershipRestricted={
+                                isRestrictedMembership
+                              }
                               showDeleteButton={isAuthor || isAdmin}
                               onDelete={() => {
                                 setInitializedPolls(false);
