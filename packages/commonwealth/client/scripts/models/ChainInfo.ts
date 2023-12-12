@@ -235,7 +235,7 @@ class ChainInfo {
   public async updateChainData({
     name,
     description,
-    socialLinks,
+    social_links,
     stagesEnabled,
     customStages,
     customDomain,
@@ -253,7 +253,7 @@ class ChainInfo {
   }: {
     name?: string;
     description?: string;
-    socialLinks?: string[];
+    social_links?: string[];
     discord?: string;
     stagesEnabled?: boolean;
     customStages?: string;
@@ -275,7 +275,7 @@ class ChainInfo {
       id,
       name,
       description,
-      socialLinks,
+      social_links,
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
@@ -295,7 +295,7 @@ class ChainInfo {
     const updatedChain = r.data.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
-    this.socialLinks = updatedChain.socialLinks;
+    this.socialLinks = updatedChain.social_links;
     this.stagesEnabled = updatedChain.stages_enabled;
     this.customStages = updatedChain.custom_stages;
     this.customDomain = updatedChain.custom_domain;
