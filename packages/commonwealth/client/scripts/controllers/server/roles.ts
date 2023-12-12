@@ -244,24 +244,4 @@ export class RolesController {
     if (!role) return;
     return this.User.addresses.find((a) => a.id === role.address_id);
   }
-
-  public getSortedLastUsedAddressInCommunity(options: {
-    chain?: string;
-    community?: string;
-  }) {
-    // Find all roles in current community
-    const communityRoles = this.roles.filter(
-      (r) => r.chain_id === options.chain,
-    );
-
-    // Find all address info for found roles in current community
-    const communityAddresses = this.User.addresses.filter((a) =>
-      communityRoles.find((role) => role.address_id === a.id),
-    );
-
-    // Sort found address infos based on last active address
-    return [...communityAddresses].sort((a, b) =>
-      b?.lastActive?.diff(a?.lastActive),
-    );
-  }
 }

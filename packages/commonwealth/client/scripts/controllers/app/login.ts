@@ -187,10 +187,9 @@ export async function updateActiveAddresses({
     // no addresses - preview the community
   } else {
     // Find all addresses in the current community for this account, sorted by last used date/time
-    const communityAddressesSortedByLastUsed =
-      app.roles.getSortedLastUsedAddressInCommunity({
-        chain: chain.id,
-      });
+    const communityAddressesSortedByLastUsed = [
+      ...(app.user.addresses.filter((a) => a.community.id === chain.id) || []),
+    ].sort((a, b) => b.lastActive.diff(a.lastActive));
 
     // From the sorted adddress in the current community, find an address which has an active session key
     const chainBase = app.chain?.base;
