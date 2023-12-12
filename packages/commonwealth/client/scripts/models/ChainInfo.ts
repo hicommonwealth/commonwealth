@@ -321,6 +321,9 @@ class ChainInfo {
     };
 
     this.socialLinks.forEach((link) => {
+      if (!link) {
+        return;
+      }
       if (link.includes('://discord.com') || link.includes('://discord.gg')) {
         categorizedLinks.discords.push(link);
       } else if (link.includes('://github.com')) {

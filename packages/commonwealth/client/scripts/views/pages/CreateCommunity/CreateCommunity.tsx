@@ -5,7 +5,6 @@ import './CreateCommunity.scss';
 import AddressInfo from 'models/AddressInfo';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
-import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import BasicInformationStep from './steps/BasicInformationStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
@@ -40,6 +39,7 @@ const CreateCommunity = () => {
           <BasicInformationStep
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
+            handleGoBack={() => handleChangeStep(-1)}
           />
         );
 
@@ -53,18 +53,6 @@ const CreateCommunity = () => {
       <CWFormSteps steps={getFormSteps(createCommunityStep)} />
 
       {getCurrentStep()}
-
-      <div className="footer">
-        <CWButton
-          iconLeft="arrowLeft"
-          buttonHeight="sm"
-          label="Prev"
-          disabled={
-            createCommunityStep === CreateCommunityStep.CommunityTypeSelection
-          }
-          onClick={() => handleChangeStep(-1)}
-        />
-      </div>
     </div>
   );
 };
