@@ -31,7 +31,9 @@ export const CompoundProposalStats = (props: CompoundProposalStatsProps) => {
         },
         {
           statHeading: 'Proposal Threshold:',
-          stat: `0`, // TODO: We shouldn't be hardcoding these decimal amounts
+          stat: `${chain.governance?.proposalThreshold
+            .div(BigNumber.from('1000000000000000000'))
+            .toString()} ${symbol}`, // TODO: We shouldn't be hardcoding these decimal amounts
         },
         {
           statHeading: 'Voting Period Length:',

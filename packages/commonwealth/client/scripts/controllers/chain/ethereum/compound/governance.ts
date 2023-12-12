@@ -1,20 +1,23 @@
 import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
+import axios from 'axios';
+import type {
+  GovernorCompatibilityBravo,
+  GovernorCountingSimple,
+} from 'common-common/src/eth/types';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import { deserializeBigNumbers } from 'controllers/chain/ethereum/util';
 import type { BigNumberish, ContractTransaction } from 'ethers';
 import { BigNumber } from 'ethers';
-import type { ITXModalData } from '../../../../models/interfaces';
-import ProposalModule from '../../../../models/ProposalModule';
 import type { IApp } from 'state';
+import { ApiEndpoints } from 'state/api/config';
+import ProposalModule from '../../../../models/ProposalModule';
+import type { ITXModalData } from '../../../../models/interfaces';
 import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 import type CompoundAPI from './api';
 import { GovernorType } from './api';
 import type CompoundChain from './chain';
 import CompoundProposal from './proposal';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
-import axios from 'axios';
-import { ApiEndpoints } from 'state/api/config';
-import { deserializeBigNumbers } from 'controllers/chain/ethereum/util';
 
 export interface CompoundProposalArgs {
   targets: string[];
@@ -75,7 +78,7 @@ export default class CompoundGovernance extends ProposalModule<
     const address = this.app.user.activeAccount.address;
     const contract = await attachSigner(
       this.app.user.activeAccount,
-      this._api.Contract
+      this._api.Contract,
     );
 
     const { targets, values, signatures, calldatas, description } = args;
@@ -96,7 +99,7 @@ export default class CompoundGovernance extends ProposalModule<
         values,
         calldatas,
         description,
-        { gasLimit }
+        { gasLimit },
       );
     } else {
       const gasLimit = await contract.estimateGas[
@@ -128,7 +131,7 @@ export default class CompoundGovernance extends ProposalModule<
     this._Accounts = Accounts;
 
     this._votingPeriod = BigNumber.from(
-      (await this._api.Contract.votingPeriod()).toString()
+      (await this._api.Contract.votingPeriod()).toString(),
     );
 
     // determine capacities and init type-specific parameters
@@ -136,19 +139,20 @@ export default class CompoundGovernance extends ProposalModule<
       this._supportsAbstain = false;
       this._useAbstainInQuorum = false;
       this._quorumVotes = BigNumber.from(
-        (await this._api.Contract.quorumVotes()).toString()
+        (await this._api.Contract.quorumVotes()).toString(),
       );
+
       this._proposalThreshold = BigNumber.from(
-        (await this._api.Contract.proposalThreshold()).toString()
+        (await this._api.Contract.proposalThreshold()).toString(),
       );
     } else if (this.api.govType === GovernorType.Bravo) {
       this._supportsAbstain = true;
       this._useAbstainInQuorum = false;
       this._quorumVotes = BigNumber.from(
-        (await this._api.Contract.quorumVotes()).toString()
+        (await this._api.Contract.quorumVotes()).toString(),
       );
       this._proposalThreshold = BigNumber.from(
-        (await this._api.Contract.proposalThreshold()).toString()
+        (await this._api.Contract.proposalThreshold()).toString(),
       );
     } else {
       // OZ we need to query and parse counting mode
@@ -162,9 +166,16 @@ export default class CompoundGovernance extends ProposalModule<
       this._quorumVotes = BigNumber.from(
         (
           await (this.api.Contract as GovernorCompatibilityBravo).quorum(
-            blockNumber - 1
+            blockNumber - 1,
           )
-        ).toString()
+        ).toString(),
+      );
+      this._proposalThreshold = BigNumber.from(
+        (
+          await (
+            this.api.Contract as GovernorCountingSimple
+          ).proposalThreshold()
+        ).toString(),
       );
     }
 
@@ -179,7 +190,7 @@ export default class CompoundGovernance extends ProposalModule<
         params: {
           chainId: meta.id,
         },
-      }
+      },
     );
     const proposals: ICompoundProposalResponse[] = res.data.result.proposals;
     proposals.forEach((p) => {
@@ -188,7 +199,7 @@ export default class CompoundGovernance extends ProposalModule<
           accounts,
           chain,
           governance,
-          deserializeBigNumbers(p)
+          deserializeBigNumbers(p),
         );
       }
     });

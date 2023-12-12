@@ -10,6 +10,7 @@ import {
   ERC20VotesComp__factory,
   GovernorAlpha__factory,
   GovernorCompatibilityBravo__factory,
+  GovernorCountingSimple__factory,
   MPond__factory,
 } from 'common-common/src/eth/types';
 
@@ -107,16 +108,30 @@ export default class CompoundAPI
       } catch (_e2) {
         // test to ensure it is Oz-style
         try {
-          await (this._Contract as GovernorCompatibilityBravo).COUNTING_MODE();
-        } catch (e) {
-          throw new Error(
-            `Could not determine governance contract type of ${this.contractAddress}`,
+          this._Contract = GovernorCountingSimple__factory.connect(
+            this.contractAddress,
+            this.Provider,
           );
+          await this.Contract.proposalVotes(1);
+          console.log(
+            `Found GovCountingSimple contract at ${this.Contract.address}, using GovernorCountingSimple`,
+          );
+          this._govType = GovernorType.Oz;
+        } catch (_e3) {
+          try {
+            await (
+              this._Contract as GovernorCompatibilityBravo
+            ).COUNTING_MODE();
+          } catch (e) {
+            throw new Error(
+              `Could not determine governance contract type of ${this.contractAddress}`,
+            );
+          }
+          console.log(
+            `Falling back to OpenZeppelin governor contract at ${this.Contract.address}`,
+          );
+          this._govType = GovernorType.Oz;
         }
-        console.log(
-          `Falling back to OpenZeppelin governor contract at ${this.Contract.address}`,
-        );
-        this._govType = GovernorType.Oz;
       }
     }
 
