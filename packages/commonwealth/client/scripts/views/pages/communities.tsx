@@ -129,7 +129,7 @@ const CommunitiesPage = () => {
         return threadCountB - threadCountA;
       })
       .map((community: CommunityInfo, i) => {
-        return <CommunityCard key={i} chain={community} />;
+        return <CommunityCard key={i} community={community} />;
       });
 
     return res;

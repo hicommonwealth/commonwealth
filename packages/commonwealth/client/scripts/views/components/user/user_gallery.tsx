@@ -17,9 +17,13 @@ type UserGalleryProps = {
 // The list of passed users must be unique to begin with, if one
 // wishes to prevent redundant rendering of avatars.
 
-export const UserGallery = (props: UserGalleryProps) => {
-  const { users, avatarSize, popover, addressesCount, maxUsers = 10 } = props;
-
+export const UserGallery = ({
+  users,
+  avatarSize,
+  popover,
+  addressesCount,
+  maxUsers = 10,
+}: UserGalleryProps) => {
   const userCount = users.length;
 
   const overflowUsers =
@@ -33,7 +37,7 @@ export const UserGallery = (props: UserGalleryProps) => {
           return (
             <User
               userAddress={user.address}
-              userChainId={user.community?.id || user.profile?.chain}
+              userCommunityId={user.community?.id || user.profile?.chain}
               shouldShowAvatarOnly
               shouldShowAsDeleted
               shouldShowPopover={popover}

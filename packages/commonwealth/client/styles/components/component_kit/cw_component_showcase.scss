@@ -131,10 +131,6 @@ $width: 360px;
       height: 32px;
       justify-content: space-between;
       width: 120px;
-
-      .icon-button-selected {
-        display: flex;
-      }
     }
   }
 
@@ -265,5 +261,11 @@ $width: 360px;
 
   .FormStepContainer {
     width: 100%;
+  }
+
+  .community-stake-banner {
+    .btn-container {
+      margin-bottom: 15px;
+    }
   }
 }

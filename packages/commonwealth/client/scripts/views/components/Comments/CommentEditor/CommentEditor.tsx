@@ -66,7 +66,7 @@ export const CommentEditor = ({
           >
             <User
               userAddress={author?.address}
-              userChainId={author?.community.id}
+              userCommunityId={author?.community.id}
               shouldHideAvatar
               shouldLinkProfile
             />

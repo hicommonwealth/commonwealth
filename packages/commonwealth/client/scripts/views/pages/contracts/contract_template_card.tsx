@@ -142,7 +142,7 @@ export const ContractTemplateCard = ({
                 <div className="enabledby-row">
                   <User
                     userAddress={enabler.address}
-                    userChainId={
+                    userCommunityId={
                       enabler.community?.id || enabler?.profile?.chain
                     }
                     shouldShowAddressWithDisplayName
