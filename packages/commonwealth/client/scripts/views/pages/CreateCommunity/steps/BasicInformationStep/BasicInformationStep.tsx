@@ -11,12 +11,14 @@ interface BasicInformationStepProps {
   selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   handleGoBack: () => void;
+  handleContinue: () => void;
 }
 
 const BasicInformationStep = ({
   selectedAddress,
   selectedCommunity,
   handleGoBack,
+  handleContinue,
 }: BasicInformationStepProps) => {
   console.log('selectedAddress', selectedAddress);
   console.log('selectedCommunity', selectedCommunity);
@@ -59,7 +61,10 @@ const BasicInformationStep = ({
 
       <BasicInformationForm
         chainEcosystem="ethereum" // TODO: this has to come from step 1 when user selects the community ecosystem
-        onSubmit={(values) => console.log('submitted values => ', values)} // TODO: connect api from the onSubmit
+        onSubmit={(values) => {
+          console.log('submitted values => ', values);
+          handleContinue();
+        }} // TODO: connect api from the onSubmit
         onCancel={handleClickCancel} // TODO: connect when step 1 is done
       />
     </div>

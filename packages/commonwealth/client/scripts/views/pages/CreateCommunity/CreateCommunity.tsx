@@ -22,6 +22,8 @@ const CreateCommunity = () => {
     setCreateCommunityStep((prevState) => prevState + action);
   };
 
+  const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
+
   const getCurrentStep = () => {
     switch (createCommunityStep) {
       case CreateCommunityStep.CommunityTypeSelection:
@@ -40,6 +42,7 @@ const CreateCommunity = () => {
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
             handleGoBack={() => handleChangeStep(-1)}
+            handleContinue={() => handleChangeStep(1)}
           />
         );
 
@@ -50,7 +53,9 @@ const CreateCommunity = () => {
 
   return (
     <div className="CreateCommunity">
-      <CWFormSteps steps={getFormSteps(createCommunityStep)} />
+      {!isSuccessStep && (
+        <CWFormSteps steps={getFormSteps(createCommunityStep)} />
+      )}
 
       {getCurrentStep()}
     </div>

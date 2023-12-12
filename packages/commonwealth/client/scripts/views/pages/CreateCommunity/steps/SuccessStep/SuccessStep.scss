@@ -1,7 +1,7 @@
 @import '../../../../../../styles/shared';
 
 .SuccessStep {
-  margin: auto;
+  margin: 40px auto 0;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
@@ -10,7 +10,6 @@
   text-align: center;
   max-width: 600px;
   gap: 12px;
-  padding: 24px;
 
   .img {
     width: 140px;
@@ -26,6 +25,7 @@
 
     @include extraSmall {
       min-width: auto;
+      width: 100%;
     }
   }
 }
