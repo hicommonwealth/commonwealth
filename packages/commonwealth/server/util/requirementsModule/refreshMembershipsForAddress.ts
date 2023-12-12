@@ -1,10 +1,12 @@
 import moment from 'moment';
 import { Sequelize } from 'sequelize';
 import { DB } from 'server/models';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
 import { AddressInstance } from '../../models/address';
 import { GroupAttributes } from '../../models/group';
 import { MembershipInstance } from '../../models/membership';
+import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
+import { OptionsWithBalances } from '../tokenBalanceCache/types';
+import { makeGetBalancesOptions } from './makeGetBalancesOptions';
 import validateGroupMembership from './validateGroupMembership';
 
 const MEMBERSHIP_TTL_SECONDS = 60 * 2;
@@ -22,6 +24,16 @@ export async function refreshMembershipsForAddress(
   address: AddressInstance,
   groups: GroupAttributes[],
 ): Promise<MembershipInstance[]> {
+  const getBalancesOptions = makeGetBalancesOptions(groups, [address]);
+  const balances = await Promise.all(
+    getBalancesOptions.map(async (options) => {
+      return {
+        options,
+        balances: await tokenBalanceCache.getBalances(options),
+      };
+    }),
+  );
+
   // update membership for each group
   const updatedMemberships = await Promise.all(
     groups.map(async (group) => {
@@ -54,18 +66,12 @@ export async function refreshMembershipsForAddress(
           membership,
           group,
           address,
-          tokenBalanceCache,
+          balances,
         );
       }
 
       // membership does not exist, create it and recompute
-      return recomputeMembership(
-        models,
-        membership,
-        group,
-        address,
-        tokenBalanceCache,
-      );
+      return recomputeMembership(models, membership, group, address, balances);
     }),
   );
 
@@ -85,13 +91,13 @@ async function recomputeMembership(
   membership: MembershipInstance | null,
   group: GroupAttributes,
   address: AddressInstance,
-  tokenBalanceCache: TokenBalanceCache,
+  balances: OptionsWithBalances[],
 ): Promise<MembershipInstance> {
   const { requirements } = group;
   const { isValid, messages } = await validateGroupMembership(
     address.address,
     requirements,
-    tokenBalanceCache,
+    balances,
   );
   const computedMembership = {
     group_id: group.id,

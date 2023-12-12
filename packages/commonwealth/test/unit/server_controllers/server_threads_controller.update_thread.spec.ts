@@ -129,6 +129,7 @@ describe('ServerThreadsController', () => {
       const serverThreadsController = new ServerThreadsController(
         db,
         tokenBalanceCache,
+        tokenBalanceCache,
         banCache,
       );
       const [updatedThread, notificationOptions, analyticsOptions] =

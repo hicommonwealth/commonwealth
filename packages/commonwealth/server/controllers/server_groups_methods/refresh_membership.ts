@@ -44,7 +44,7 @@ export async function __refreshMembership(
 
   const memberships = await refreshMembershipsForAddress(
     this.models,
-    this.tokenBalanceCache,
+    this.tokenBalanceCacheV2,
     address,
     groups,
   );

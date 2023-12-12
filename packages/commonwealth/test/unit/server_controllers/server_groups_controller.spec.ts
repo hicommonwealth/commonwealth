@@ -125,6 +125,7 @@ const createMockedGroupsController = () => {
   const controller = new ServerGroupsController(
     db,
     tokenBalanceCache,
+    tokenBalanceCache,
     banCache,
   );
   return controller;
