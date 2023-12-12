@@ -51,7 +51,6 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
   };
 
   const waitForOnchainProposal = async (proposalId: number) => {
-    // Set up a loop to check for a new block
     let newProposal;
     while (!newProposal) {
       // Wait for a short period
