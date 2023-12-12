@@ -184,7 +184,7 @@ const validationSchema = z.object({
     .max(200, { message: 'Bio must not be more than 200 chars' }),
 });
 
-const communityValidationSchema = z.object({
+const chainValidationSchema = z.object({
   community: z
     .array(
       z.object({
@@ -192,8 +192,8 @@ const communityValidationSchema = z.object({
         label: z.string().nonempty({ message: 'Invalid value' }),
       }),
     )
-    .min(1, { message: 'At least 1 communityis required' })
-    .nonempty({ message: 'Communities are required' }),
+    .min(1, { message: 'At least 1 chain is required' })
+    .nonempty({ message: 'Chains are required' }),
 });
 
 const tagsList = [
@@ -1987,7 +1987,7 @@ export const ComponentShowcase = () => {
           <div className="multi-select-row">
             <CWForm
               className="w-full"
-              validationSchema={communityValidationSchema}
+              validationSchema={chainValidationSchema}
               onSubmit={(values) => console.log('values => ', values)}
             >
               <CWSelectList
