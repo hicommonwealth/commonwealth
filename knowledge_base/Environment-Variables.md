@@ -102,7 +102,7 @@ Default value: `TRUE`
 
 Description: DataDog configuration token used to enable PSQL on Heroku.
 
-Type: Config
+Type: Heroku
 
 ## DD_LOG_LEVEL WARN
 
@@ -110,7 +110,7 @@ Default value: `WARN`
 
 Description: DataDog configuration token.
 
-Type: Config
+Type: Heroku
 
 ## DD_SITE
 
@@ -118,7 +118,7 @@ Default value: `us5.datadoghq.com`
 
 Description: DataDog configuration token.
 
-Type: Config
+Type: Heroku
 
 ## DISABLE_CACHE
 
@@ -162,19 +162,11 @@ Type: Config
 
 Contributor: Raymond Zhong
 
-## ENTITIES_URL
-
-Default value: `https://chain-events.herokuapp.com/api`
-
-Description: Used in CI flow.
-
-Type: Config
-
 ## ETH_ALCHEMY_API_KEY
 
-Type: ?
+Type: CI/CD
 
-Description: If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants.
+Description: If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants. Only needed if doing work involving querying Ethereum.
 
 ## ETH_RPC
 
@@ -380,7 +372,7 @@ Type: ?
 
 ## REDIS_URL
 
-Default value: ?
+Default value: `redis://localhost:6379`
 
 Description: ?
 
@@ -438,7 +430,7 @@ Type: Auth
 
 Default value: `https://commonwealth.im`
 
-Description: The Commonwealth server URL
+Description: By default, this is set in our `commonwealth/server/config` file to `https://commonwealth.im` if in production, and `http://localhost:8080` otherwise.
 
 Type: Config
 

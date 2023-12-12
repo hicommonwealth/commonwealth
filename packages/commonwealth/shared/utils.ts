@@ -7,6 +7,7 @@ import {
 } from '@polkadot/util-crypto';
 import { AccessLevel } from './permissions';
 import type { RoleObject } from './types';
+import { SERVER_URL } from 'server/config';
 
 export const slugify = (str: string): string => {
   // Remove any character that isn't a alphanumeric character or a
@@ -51,9 +52,7 @@ export const getThreadUrl = (
   const tTitle = thread.title ? `-${slugify(thread.title)}` : '';
   const cId = comment ? `?comment=${comment}` : '';
 
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`
-    : `http://localhost:8080/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
+  return `${SERVER_URL}/${aId}/discussion/${tId}${tTitle.toLowerCase()}${cId}`;
 };
 
 export const getThreadUrlWithoutObject = (
@@ -65,15 +64,11 @@ export const getThreadUrlWithoutObject = (
   const tId = proposalId;
   const cId = comment ? `?comment=${comment.id}` : '';
 
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${aId}/discussion/${tId}${cId}`
-    : `http://localhost:8080/${aId}/discussion/${tId}${cId}`;
+  return `${SERVER_URL}/${aId}/discussion/${tId}${cId}`;
 };
 
 export const getCommunityUrl = (community: string): string => {
-  return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${community}`
-    : `http://localhost:8080/${community}`;
+  return `${SERVER_URL}/${community}`
 };
 
 export const smartTrim = (text, maxLength = 200) => {
