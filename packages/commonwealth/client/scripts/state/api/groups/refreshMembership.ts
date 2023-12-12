@@ -39,7 +39,13 @@ const refreshMembership = async ({
     groupId: r.groupId,
     topicIds: r.topicIds,
     isAllowed: r.allowed,
-    rejectReason: JSON.parse(`${r.rejectReason || {}}`),
+    rejectReason: (() => {
+      try {
+        return JSON.parse(`${r.rejectReason || {}}`);
+      } catch {
+        return 'Failed to parse JSON';
+      }
+    })(),
   }));
 };
 

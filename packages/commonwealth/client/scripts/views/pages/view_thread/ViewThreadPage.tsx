@@ -534,7 +534,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     />
                     {featureFlags.gatingEnabled &&
                       foundGatedTopic &&
-                      !hideGatingBanner && (
+                      !hideGatingBanner &&
+                      isRestrictedMembership && (
                         <CWGatedTopicBanner
                           groupNames={gatedGroupsMatchingTopic.map(
                             (g) => g.name,
