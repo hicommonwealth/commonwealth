@@ -25,7 +25,7 @@ import {
 
 const { expect, assert } = chai;
 
-describe.only('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => {
+describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', () => {
   let rpc: CosmosApiType;
   let signer: string;
   // v1beta1 CI devnet
@@ -69,7 +69,7 @@ describe.only('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', (
 
     const rawLog = JSON.parse(resp.rawLog);
 
-    const submitProposalEvent = rawLog[0]?.['events']?.find(
+    const submitProposalEvent = rawLog[0]?.events?.find(
       (e) => e['type'] === 'submit_proposal',
     );
     const proposalType = submitProposalEvent?.attributes.find(
