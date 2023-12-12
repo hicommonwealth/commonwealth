@@ -2,6 +2,7 @@ export const breadCrumbURLS = [
   {
     url: 'dashboard',
     breadcrumb: 'Dashboard',
+    className: 'dashboard',
   },
   {
     url: 'profile/id',
@@ -74,8 +75,8 @@ export const breadCrumbURLS = [
   {
     url: 'discussions',
     className: 'discussions',
-    breadcrumb: 'Discussions',
-    isParent: true,
+    breadcrumb: 'All Discussions',
+    isParent: false,
   },
   {
     url: 'notification-settings',

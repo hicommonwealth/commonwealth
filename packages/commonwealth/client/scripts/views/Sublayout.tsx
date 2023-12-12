@@ -87,7 +87,11 @@ const Sublayout = ({
               <AppMobileMenus />
             ) : (
               <div className="Body">
-                {!toggleMobileView && <Breadcrumbs />}
+                {!toggleMobileView && (
+                  <div className="breadcrumbContainer">
+                    <Breadcrumbs />
+                  </div>
+                )}
                 {children}
                 {!app.isCustomDomain() && !hideFooter && <Footer />}
               </div>

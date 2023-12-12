@@ -14,9 +14,13 @@ export const generateBreadcrumbs = (
     .filter((segment) => segment.length > 0);
 
   const breadcrumbs = pathSegments.map((pathSegment, index) => {
-    // Find the matching breadcrumb data for the current path segment.
     const matchedBreadcrumb = breadcrumbData.find((breadcrumbItem) => {
-      // Check if breadcrumbItem.url is falsy or if index is out of bounds
+      breadcrumbItem.breadcrumb = breadcrumbItem.breadcrumb?.replace(
+        ':community',
+        pathSegments[0],
+      );
+      // matchedBreadcrumb?.breadcrumb?.includes(':community') &&
+      // matchedBreadcrumb.breadcrumb.replace(':community', pathSegments[0]);
       return (
         !breadcrumbItem.url ||
         index >= pathSegments.length ||
@@ -55,6 +59,7 @@ export const generateBreadcrumbs = (
         ) {
           // Generate the link for 'discussion' segment.
           link = `discussions`;
+          pathSegments[index] = 'Discussions';
         } else {
           // Generate a default link for other segments.
           link = pathSegments.slice(0, index + 1).join('/');
@@ -85,25 +90,25 @@ export const generateBreadcrumbs = (
     };
   });
 
-  const discussionsIndex = pathSegments.indexOf('discussions');
-  if (discussionsIndex !== -1) {
-    breadcrumbs.sort((a, b) => {
-      if (
-        a.label.toLowerCase() === 'discussions' ||
-        a.label.toLowerCase() === 'discussion'
-      ) {
-        return -1;
-      } else if (
-        b.label.toLowerCase() === 'discussions' ||
-        b.label.toLowerCase() === 'discussion'
-      ) {
-        return 1;
-      }
-      return 0;
-    });
-
-    console.log('bread', breadcrumbs);
-  }
+  // const discussionsIndex = pathSegments.indexOf('discussions');
+  // if (discussionsIndex !== -1) {
+  //   breadcrumbs.sort((a, b) => {
+  //     if (
+  //       a.label.toLowerCase() === 'discussions' ||
+  //       a.label.toLowerCase() === 'discussion'
+  //     ) {
+  //       return -1;
+  //     } else if (
+  //       b.label.toLowerCase() === 'discussions' ||
+  //       b.label.toLowerCase() === 'discussion'
+  //     ) {
+  //       return 1;
+  //     }
+  //     return 0;
+  //   });
+  //
+  //   console.log('bread', breadcrumbs);
+  // }
 
   return breadcrumbs.filter((val) => val !== undefined);
 };

@@ -4,7 +4,6 @@
   align-items: center;
   font-size: 0.875rem;
   color: $neutral-400;
-  background-color: $white;
   min-height: 8px;
   padding: 2px 0px;
   position: fixed;
@@ -42,6 +41,28 @@
 
     @include extraSmall {
       padding-left: 26px;
+    }
+  }
+
+  .dashboard {
+    display: flex;
+    flex-direction: row;
+    padding-left: 32px;
+
+    @include large {
+      padding-left: 56px;
+    }
+
+    @include medium {
+      padding-left: 40px;
+    }
+
+    @include small {
+      padding-left: 18px;
+    }
+
+    @include extraSmall {
+      padding-left: 18px;
     }
   }
 
