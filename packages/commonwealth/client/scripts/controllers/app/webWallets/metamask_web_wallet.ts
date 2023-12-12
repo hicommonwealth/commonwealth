@@ -107,9 +107,13 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
       const Web3 = (await import('web3')).default;
 
-      const ethereum = window.ethereum.overrideIsMetaMask
-        ? window.ethereum.providerMap.get('MetaMask')
-        : window.ethereum;
+      let ethereum = window.ethereum;
+
+      if (window.ethereum.providers?.length) {
+        window.ethereum.providers.forEach(async (p) => {
+          if (p.isMetaMask) ethereum = p;
+        });
+      }
 
       this._web3 =
         process.env.ETH_RPC !== 'e2e-test'
