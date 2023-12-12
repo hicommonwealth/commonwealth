@@ -52,7 +52,7 @@ export const UserDashboardChainEventRow = ({
   blockNumber,
   community,
   label,
-  showSkeleton
+  showSkeleton,
 }: UserDashboardChainEventRowProps) => {
   if (showSkeleton) {
     return <UserDashboardChainEventRowSkeleton />;
@@ -62,7 +62,7 @@ export const UserDashboardChainEventRow = ({
     <Link
       className={getClasses<{ isLink?: boolean }>(
         { isLink: !!label.linkUrl },
-        'UserDashboardChainEventRow'
+        'UserDashboardChainEventRow',
       )}
       {...(label.linkUrl && { to: label.linkUrl })}
     >

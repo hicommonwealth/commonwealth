@@ -71,7 +71,7 @@ export async function __createThreadPoll(
   }
 
   // check if admin_only flag is set
-  if (thread.Chain?.admin_only_polling) {
+  if (community.admin_only_polling) {
     const isAdmin = await validateOwner({
       models: this.models,
       user,
@@ -79,7 +79,7 @@ export async function __createThreadPoll(
       allowAdmin: true,
     });
     if (!isAdmin) {
-      new AppError(Errors.MustBeAdmin);
+      throw new AppError(Errors.MustBeAdmin);
     }
   }
 
@@ -102,7 +102,6 @@ export async function __createThreadPoll(
     event: MixpanelCommunityInteractionEvent.CREATE_POLL,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   };
 
   return [poll.toJSON(), analyticsOptions];

@@ -64,7 +64,7 @@ const ThreadResultRow = ({
         <div className="search-results-thread-subtitle">
           <User
             userAddress={thread.address}
-            userChainId={thread.address_chain}
+            userCommunityId={thread.address_chain}
           />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
@@ -137,7 +137,7 @@ const ReplyResultRow = ({
         <div className="search-results-thread-subtitle">
           <User
             userAddress={comment.address}
-            userChainId={comment.address_chain}
+            userCommunityId={comment.address_chain}
           />
           <CWText className="created-at">
             {moment(comment.created_at).fromNow()}
@@ -203,7 +203,7 @@ export type MemberResult = {
   avatar_url: string;
   addresses: {
     id: number;
-    community: string;
+    chain: string;
     address: string;
   }[];
   roles?: any[];
@@ -213,7 +213,7 @@ type MemberResultRowProps = {
   setRoute: any;
 };
 const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
-  const { community, address } = addr.addresses[0];
+  const { chain: community, address } = addr.addresses[0];
   const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [community],
     profileAddresses: [address],
@@ -234,7 +234,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
     <div key={address} className="member-result-row" onClick={handleClick}>
       <User
         userAddress={address}
-        userChainId={community}
+        userCommunityId={community}
         shouldShowRole
         shouldLinkProfile
         avatarSize={32}

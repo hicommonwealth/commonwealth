@@ -11,7 +11,6 @@ import { useFetchTopicsQuery } from 'state/api/topics';
 import useEXCEPTION_CASE_threadCountersStore from 'state/ui/thread';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
@@ -175,16 +174,7 @@ export const HeaderWithFilters = ({
           >
             {totalThreadCount} Threads
           </CWText>
-          {isWindowExtraSmall ? (
-            <CWIconButton
-              iconName="plusCircle"
-              iconButtonTheme="black"
-              onClick={() => {
-                navigate('/new/discussion');
-              }}
-              disabled={!hasJoinedCommunity}
-            />
-          ) : (
+          {!isWindowExtraSmall && (
             <CWButton
               buttonType="primary"
               buttonHeight="sm"
@@ -290,7 +280,7 @@ export const HeaderWithFilters = ({
                   ]}
                   dropdownPosition={rightFiltersDropdownPosition}
                   canEditOption={app.roles?.isAdminOfEntity({
-                    chain: app.activeChainId(),
+                    community: app.activeChainId(),
                   })}
                   onOptionEdit={(item: any) =>
                     setTopicSelectedToEdit(

@@ -42,7 +42,7 @@ export const NewThreadForm = () => {
     chainId: app.activeChainId(),
   });
 
-  const chainId = app.chain.id;
+  const communityId = app.chain.id;
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin();
 
@@ -77,14 +77,14 @@ export const NewThreadForm = () => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
-  } = useNewThreadForm(chainId, topicsForSelector.enabledTopics);
+  } = useNewThreadForm(communityId, topicsForSelector.enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
   const { data: memberships = [] } = useRefreshMembershipQuery({

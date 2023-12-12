@@ -56,7 +56,7 @@ const NotificationSettingsPage = () => {
 
   useEffect(() => {
     app.user.notifications.isLoaded.once('redraw', forceRerender);
-  }, [app?.user.notifications, app.user.emailInterval]);
+  }, [forceRerender]);
 
   useEffect(() => {
     // bundled snapshot subscriptions
@@ -470,14 +470,14 @@ const NotificationSettingsPage = () => {
                           return (
                             <User
                               userAddress={sub.Thread.author}
-                              userChainId={sub.Thread.chain}
+                              userCommunityId={sub.Thread.chain}
                             />
                           );
                         } else if (sub.Comment?.chain) {
                           return (
                             <User
                               userAddress={sub.Comment.author}
-                              userChainId={sub.Comment.chain}
+                              userCommunityId={sub.Comment.chain}
                             />
                           );
                         } else {
@@ -600,7 +600,7 @@ const NotificationSettingsPage = () => {
                   <div className="avatar-and-name">
                     <img
                       className="snapshot-icon"
-                      src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}`}
+                      src={`${app.serverUrl()}/ipfsProxy?hash=${avatar}&image=true`}
                     />
                     <CWText type="h5" fontWeight="medium">
                       {space.name}

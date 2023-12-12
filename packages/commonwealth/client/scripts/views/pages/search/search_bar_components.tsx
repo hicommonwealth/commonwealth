@@ -66,7 +66,7 @@ export const SearchBarThreadPreviewRow = ({
       <div className="header-row">
         <User
           userAddress={searchResult.address}
-          userChainId={searchResult.address_chain}
+          userCommunityId={searchResult.address_chain}
         />
         <CWText className="last-updated-text">•</CWText>
         <CWText type="caption" className="last-updated-text">
@@ -159,7 +159,7 @@ export const SearchBarMemberPreviewRow = (
   props: SearchBarMemberPreviewRowProps,
 ) => {
   const { searchResult } = props;
-  const community = searchResult.addresses[0].community;
+  const community = searchResult.addresses[0].chain;
   const address = searchResult.addresses[0].address;
 
   const navigate = useCommonNavigate();
@@ -170,7 +170,11 @@ export const SearchBarMemberPreviewRow = (
 
   return (
     <div className="SearchBarMemberPreviewRow" onClick={handleClick}>
-      <User userAddress={address} userChainId={community} shouldLinkProfile />
+      <User
+        userAddress={address}
+        userCommunityId={community}
+        shouldLinkProfile
+      />
     </div>
   );
 };

@@ -1,8 +1,15 @@
 import bodyParser from 'body-parser';
+import { factory, formatFilename } from 'common-common/src/logging';
 import {
-  getRabbitMQConfig,
   RabbitMQController,
+  getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
+import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
+import { RedisCache } from 'common-common/src/redisCache';
+import {
+  ServiceKey,
+  startHealthCheckLoop,
+} from 'common-common/src/scripts/startHealthCheckLoop';
 import { StatsDController } from 'common-common/src/statsd';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -18,6 +25,7 @@ import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import * as v8 from 'v8';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   DATABASE_CLEAN_HOUR,
@@ -41,18 +49,10 @@ import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
+import { databaseCleaner } from './server/util/databaseCleaner';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import ViewCountCache from './server/util/viewCountCache';
-import * as v8 from 'v8';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { databaseCleaner } from './server/util/databaseCleaner';
-import { RedisCache } from 'common-common/src/redisCache';
-import { RascalConfigServices } from 'common-common/src/rabbitmq/rabbitMQConfig';
-import {
-  ServiceKey,
-  startHealthCheckLoop,
-} from 'common-common/src/scripts/startHealthCheckLoop';
 
 let isServiceHealthy = false;
 
@@ -73,8 +73,8 @@ const app = express();
 
 log.info(
   `Node Option max-old-space-size set to: ${JSON.stringify(
-    v8.getHeapStatistics().heap_size_limit / 1000000000
-  )} GB`
+    v8.getHeapStatistics().heap_size_limit / 1000000000,
+  )} GB`,
 );
 
 async function main() {
@@ -155,8 +155,8 @@ async function main() {
           /192.168.1.(\d{1,3}):(\d{4})/,
         ],
         [],
-        301
-      )
+        301,
+      ),
     );
 
     // dynamic compression settings used
@@ -235,26 +235,25 @@ async function main() {
       <BrokerConfig>(
         getRabbitMQConfig(
           RABBITMQ_URI,
-          RascalConfigServices.CommonwealthService
+          RascalConfigServices.CommonwealthService,
         )
-      )
+      ),
     );
     await rabbitMQController.init();
   } catch (e) {
     console.warn(
       'The main service RabbitMQController failed to initialize!',
-      e
+      e,
     );
     rollbar.critical(
       'The main service RabbitMQController failed to initialize!',
-      e
+      e,
     );
   }
 
   if (!rabbitMQController.initialized) {
     console.warn(
-      'The RabbitMQController is not initialized! Some services may be unavailable e.g.' +
-        ' (Create/Delete chain and Websocket notifications)'
+      'The RabbitMQController is not initialized! Some services may be unavailable',
     );
     rollbar.critical('The main service RabbitMQController is not initialized!');
     // TODO: this requires an immediate response if in production
@@ -284,7 +283,7 @@ async function main() {
     banCache,
     globalActivityCache,
     dbValidationService,
-    redisCache
+    redisCache,
   );
 
   // new API
@@ -317,7 +316,7 @@ async function main() {
     models,
     Number(DATABASE_CLEAN_HOUR),
     redisCache,
-    rollbar
+    rollbar,
   );
 
   isServiceHealthy = true;

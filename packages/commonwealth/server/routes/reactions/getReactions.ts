@@ -1,9 +1,6 @@
-import type {
-  GetReactionsReq,
-  GetReactionsResp,
-} from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
 import Sequelize, { WhereOptions } from 'sequelize';
+import type { GetReactionsReq, GetReactionsResp } from '../../api/extApiTypes';
 import type { DB } from '../../models';
 import { ReactionAttributes } from '../../models/reaction';
 import type { TypedRequestQuery, TypedResponse } from '../../types';
@@ -26,7 +23,7 @@ export const getReactionsValidation = [
 const getReactions = async (
   models: DB,
   req: TypedRequestQuery<GetReactionsReq>,
-  res: TypedResponse<GetReactionsResp>
+  res: TypedResponse<GetReactionsResp>,
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {

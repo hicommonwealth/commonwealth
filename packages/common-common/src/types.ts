@@ -1,4 +1,12 @@
-import { SupportedNetwork } from 'commonwealth/shared/chain/types/types';
+export enum SupportedNetwork {
+  Substrate = 'substrate',
+  Aave = 'aave',
+  Compound = 'compound',
+  ERC20 = 'erc20',
+  ERC721 = 'erc721',
+  ERC1155 = 'erc1155',
+  Cosmos = 'cosmos',
+}
 
 export enum NotificationCategories {
   NewComment = 'new-comment-creation',
@@ -55,6 +63,7 @@ export enum WalletId {
   WalletConnect = 'walletconnect',
   KeplrEthereum = 'keplr-ethereum',
   Keplr = 'keplr',
+  Leap = 'leap',
   NearWallet = 'near',
   TerraStation = 'terrastation',
   TerraWalletConnect = 'terra-walletconnect',
@@ -203,7 +212,7 @@ export type HttpMethod =
   | 'options'
   | 'head';
 
-export type ChainEventAttributes = {
+type ChainEventAttributes = {
   id: number;
   block_number: number;
   event_data: any;
@@ -213,4 +222,15 @@ export type ChainEventAttributes = {
   chain: string;
   created_at?: Date;
   updated_at?: Date;
+};
+
+export type ChainEventNotification = {
+  id: number;
+  notification_data: string;
+  chain_event_id: number;
+  category_id: 'chain-event';
+  chain_id: string;
+  updated_at: Date;
+  created_at: Date;
+  ChainEvent: ChainEventAttributes;
 };

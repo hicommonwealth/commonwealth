@@ -25,27 +25,7 @@ export const SLACK_FEEDBACK_WEBHOOK = process.env.SLACK_FEEDBACK_WEBHOOK;
 
 export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
-export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-export const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-export const GITHUB_OAUTH_CALLBACK =
-  process.env.GITHUB_OAUTH_CALLBACK ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://commonwealth.im'
-    : process.env.NODE_ENV === 'mobile'
-    ? 'capacitor://localhost'
-    : 'http://localhost:8080') + '/api/auth/github/callback';
-
 export const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-export const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-export const DISCORD_OAUTH_CALLBACK =
-  process.env.DISCORD_OAUTH_CALLBACK ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://commonwealth.im'
-    : process.env.NODE_ENV === 'mobile'
-    ? 'capacitor://localhost'
-    : 'http://localhost:8080') + '/api/auth/discord/callback';
-export const DISCORD_OAUTH_SCOPES =
-  process.env.DISCORD_OAUTH_SCOPES?.split(' ');
 
 export const DATABASE_URI = process.env.USES_DOCKER_DB
   ? 'postgresql://commonwealth:edgeware@postgres/commonwealth' // this is because url will be hidden in CI.yaml

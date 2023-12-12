@@ -14,18 +14,17 @@ import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
-import SocialAccount from '../../models/SocialAccount';
 
 import { getTokenBalance } from 'helpers/token_balance_helper';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
-  chain: string,
+  community: string,
   originChain: string,
 ) {
   return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
     address,
-    chain,
+    chain: community,
     originChain,
     jwt: app.user.jwt,
   });
@@ -35,8 +34,8 @@ export async function setActiveAccount(
   account: Account,
   shouldRedraw = true,
 ): Promise<void> {
-  const chain = app.activeChainId();
-  const role = app.roles.getRoleInCommunity({ account, chain });
+  const community = app.activeChainId();
+  const role = app.roles.getRoleInCommunity({ account, community });
 
   if (!role) {
     app.user.ephemerallySetActiveAccount(account);
@@ -67,12 +66,12 @@ export async function setActiveAccount(
     const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
       address: account.address,
       author_chain: account.community.id,
-      chain,
+      chain: community,
       jwt: app.user.jwt,
       auth: true,
     });
 
-    app.roles.getAllRolesInCommunity({ chain }).forEach((r) => {
+    app.roles.getAllRolesInCommunity({ community }).forEach((r) => {
       r.is_user_default = false;
     });
     role.is_user_default = true;
@@ -122,12 +121,12 @@ export async function completeClientLogin(account: Account) {
         if (
           !app.roles.getRoleInCommunity({
             account,
-            chain: app.activeChainId(),
+            community: app.activeChainId(),
           })
         ) {
           await app.roles.createRole({
             address: addressInfo,
-            chain: app.activeChainId(),
+            community: app.activeChainId(),
           });
         }
       } catch (e) {
@@ -178,7 +177,7 @@ export async function updateActiveAddresses({
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {
-    return app.roles.isMember({ chain: chain.id, account });
+    return app.roles.isMember({ community: chain.id, account });
   });
 
   if (memberAddresses.length === 1) {
@@ -225,7 +224,6 @@ export async function updateActiveAddresses({
 }
 
 // called from the server, which returns public keys
-// creates SubstrateAccount with associated SocialAccounts
 export function updateActiveUser(data) {
   if (!data || data.loggedIn === false) {
     app.user.setEmail(null);
@@ -234,7 +232,6 @@ export function updateActiveUser(data) {
     app.user.setJWT(null);
 
     app.user.setAddresses([]);
-    app.user.setSocialAccounts([]);
 
     app.user.setSiteAdmin(false);
     app.user.setDisableRichText(false);
@@ -263,11 +260,6 @@ export function updateActiveUser(data) {
           }),
       ),
     );
-    app.user.setSocialAccounts(
-      data.socialAccounts.map(
-        (sa) => new SocialAccount(sa.provider, sa.provider_username),
-      ),
-    );
 
     app.user.setSiteAdmin(data.isAdmin);
     app.user.setDisableRichText(data.disableRichText);
@@ -282,7 +274,11 @@ export async function createUserWithAddress(
   chain: string,
   sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo,
-): Promise<{ account: Account; newlyCreated: boolean }> {
+): Promise<{
+  account: Account;
+  newlyCreated: boolean;
+  joinedCommunity: boolean;
+}> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
@@ -305,7 +301,11 @@ export async function createUserWithAddress(
     validationBlockInfo: response.result.block_info,
     ignoreProfile: false,
   });
-  return { account, newlyCreated: response.result.newly_created };
+  return {
+    account,
+    newlyCreated: response.result.newly_created,
+    joinedCommunity: response.result.joined_community,
+  };
 }
 
 async function constructMagic(isCosmos: boolean, chain?: string) {
