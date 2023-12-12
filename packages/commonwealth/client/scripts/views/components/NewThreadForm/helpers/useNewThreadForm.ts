@@ -28,7 +28,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
       return null;
     }
     return restoreDraft();
-  }, [restoreDraft, topicsForSelector]);
+  }, [restoreDraft, topicsForSelector, topicIdFromUrl]);
 
   const defaultTopic = useMemo(() => {
     return (
@@ -40,7 +40,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
       topicsForSelector.find((t) => t.name.includes('General')) ||
       null
     );
-  }, [restoredDraft, topicsForSelector]);
+  }, [restoredDraft, topicsForSelector, topicIdFromUrl]);
 
   const [threadKind, setThreadKind] = useState<ThreadKind>(
     ThreadKind.Discussion,
@@ -81,16 +81,8 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
       return;
     }
     saveDraft(draft);
-  }, [saveDraft, threadTopic, threadTitle, threadContentDelta]);
 
-  useEffect(() => {
-    if (!threadTopic && defaultTopic) {
-      setThreadTopic(defaultTopic);
-    }
-  }, [defaultTopic, threadTopic]);
-
-  useEffect(() => {
-    if (threadTopic?.defaultOffchainTemplate) {
+    if (!threadContentDelta && threadTopic?.defaultOffchainTemplate) {
       try {
         const template = JSON.parse(
           threadTopic.defaultOffchainTemplate,
@@ -100,7 +92,11 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
         console.log(e);
       }
     }
-  }, [threadTopic]);
+
+    if (!threadTopic && defaultTopic) {
+      setThreadTopic(defaultTopic);
+    }
+  }, [saveDraft, threadTopic, threadTitle, threadContentDelta, defaultTopic]);
 
   return {
     threadKind,

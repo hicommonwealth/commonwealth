@@ -117,11 +117,12 @@ export class RedisCache {
   /**
    * This function facilitates setting a key-value pair in Redis. Since Redis has a single keyspace we include a prefix
    * to simulate many keyspaces. That is, all key-value pairs for a specific functionality should use a matching prefix.
-   * For example, for the chat WebSockets we store user_id => address key-value pairs. Since we may want to store other
-   * data in which the key would be the user_id we use the 'chat_socket' prefix for all key-pairs pertaining to the
-   * chat websocket. The resulting key would thus be 'chat_socket_[user_id]'. The prefix can be thought of as the
+   * For example, for if we had chat WebSockets we store user_id => address key-value pairs. Since we may want to store
+   * other data in which the key would be the user_id we use the 'chat_socket' prefix for all key-pairs pertaining to
+   * the chat websocket. The resulting key would thus be 'chat_socket_[user_id]'. The prefix can be thought of as the
    * namespace of the data that you are trying to store.
-   * @param namespace The prefix to append to the dynamic key i.e. the namespace. An instance of the RedisNamespaces enum.
+   * @param namespace The prefix to append to the dynamic key i.e. the namespace. An instance of the
+   * RedisNamespaces enum.
    * @param key The actual key you want to store (can be any valid string).
    * @param value The value to associate with the namespace and key
    * @param duration The number of seconds after which the key should be automatically 'deleted' by Redis i.e. TTL
@@ -192,13 +193,20 @@ export class RedisCache {
   /**
    * This function works the same way at the 'setKey' function above but is meant to be used when multiple key value
    * pairs need to be inserted at the same time in an 'all or none' fashion i.e. SQL transaction style.
-   * @param namespace
-   * @param data
+   * @param namespace The prefix to append to the key.
+   * @param data The key-value pairs to set in Redis
+   * @param duration The TTL for each key in data.
+   * @param transaction This boolean indicates whether keys should all be set within a transaction when
+   * the duration parameter is set. Specifically, if transaction is true we use multi-exec and if
+   * transaction is false we use a pipeline and return any keys that failed to set. Note that if transaction
+   * is true, a blocking and potentially less performant operation is executed.
    */
   public async setKeys(
     namespace: RedisNamespaces,
     data: { [key: string]: string },
-  ): Promise<boolean> {
+    duration = 0,
+    transaction = true,
+  ): Promise<false | Array<'OK' | null>> {
     if (!this._initialized) {
       log.error(
         'Redis client is not initialized. Run RedisCache.init() first!',
@@ -206,23 +214,77 @@ export class RedisCache {
       return false;
     }
 
-    try {
-      this._client.MSET(data);
-    } catch (e) {
+    // add the namespace prefix to all keys
+    const transformedData = Object.keys(data).reduce((result, key) => {
+      result[RedisCache.getNamespaceKey(namespace, key)] = data[key];
+      return result;
+    }, {});
+
+    if (duration > 0) {
+      // MSET doesn't support setting TTL, so we need use
+      // a multi-exec to process many SET commands
+      const multi = this._client.multi();
+      for (const key of Object.keys(transformedData)) {
+        multi.set(key, transformedData[key], { EX: duration });
+      }
+
+      try {
+        let result: Array<'OK' | null>;
+        if (transaction) result = await multi.exec();
+        else result = await multi.execAsPipeline();
+        return result;
+      } catch (e) {
+        const msg =
+          `Error occurred while setting multiple keys ` +
+          `${transaction ? 'in a transaction' : 'in a pipeline'}`;
+        log.error(msg, e);
+        this._rollbar.error(msg, e);
+        return false;
+      }
+    } else {
+      try {
+        return await this._client.MSET(transformedData);
+      } catch (e) {
+        const msg = 'Error occurred while setting multiple keys';
+        log.error(msg, e);
+        this._rollbar.error(msg, e);
+        return false;
+      }
+    }
+  }
+
+  public async getKeys(
+    namespace: RedisNamespaces,
+    keys: string[],
+  ): Promise<false | Record<string, unknown>> {
+    if (!this._initialized) {
       log.error(
-        `An error occurred while setting the following data: ${data}`,
-        e,
+        'Redis client is not initialized. Run RedisCache.init() first!',
       );
       return false;
     }
 
-    return true;
+    const transformedKeys = keys.map((k) =>
+      RedisCache.getNamespaceKey(namespace, k),
+    );
+    let result: Record<string, unknown>;
+    try {
+      const values = await this._client.MGET(transformedKeys);
+      result = transformedKeys.reduce((obj, key, index) => {
+        if (values[index] !== null) {
+          obj[key] = values[index];
+        }
+        return obj;
+      }, {});
+    } catch (e) {
+      const msg = 'An error occurred while getting many keys';
+      log.error(msg, e);
+      this._rollbar.error(msg, e);
+      return false;
+    }
+    return result;
   }
 
-  // eslint-disable-next-line
-  public async getKeys(namespace: RedisNamespaces, keys: string[]) {
-    return {};
-  }
   /**
    * Get all the key-value pairs of a specific namespace.
    * @param namespace The name of the namespace to retrieve keys from
@@ -329,5 +391,9 @@ export class RedisCache {
       );
       return 0;
     }
+  }
+
+  public get client(): typeof this._client {
+    return this._client;
   }
 }

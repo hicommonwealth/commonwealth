@@ -54,7 +54,7 @@ const ManageCommunityPage = () => {
   };
 
   const { data: searchResults, refetch } = useSearchProfilesQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: debouncedSearchTerm,
     limit: 20,
     orderBy: APIOrderBy.LastActive,

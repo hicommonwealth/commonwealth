@@ -14,7 +14,7 @@ interface SearchBarMemberPreviewRowProps {
 export const SearchBarMemberPreviewRow: FC<SearchBarMemberPreviewRowProps> = ({
   searchResult,
 }) => {
-  const community = searchResult.addresses[0].community;
+  const community = searchResult.addresses[0].chain;
   const address = searchResult.addresses[0].address;
 
   const navigate = useCommonNavigate();

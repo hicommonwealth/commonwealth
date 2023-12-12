@@ -87,7 +87,6 @@ export async function __createTopic(
     event: MixpanelCommunityInteractionEvent.CREATE_TOPIC,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   };
 
   return [newTopic.toJSON(), analyticsOptions];

@@ -64,7 +64,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
     );
   } else if (props.type === 'community') {
     const item = props.community;
-    const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
+    const roles = app.roles.getAllRolesInCommunity({ community: item.id });
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
@@ -97,7 +97,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
-                  chain: item.id,
+                  community: item.id,
                   isAlreadyStarred: app.user.isCommunityStarred(item.id),
                 });
                 setIsStarred((prevState) => !prevState);

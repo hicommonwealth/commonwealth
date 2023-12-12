@@ -1,4 +1,5 @@
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import useUserLoggedIn from 'hooks/useUserLoggedIn';
 import { uuidv4 } from 'lib/util';
@@ -126,20 +127,19 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
       : [];
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
-    // {
-    //   label: 'New Crowdfund',
-    //   iconLeft: 'wallet',
-    //   onClick: () => {
-
-    //   }
-    // },
     {
       label: 'New Community',
       iconLeft: 'people',
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();
-        navigate('/createCommunity/starter', {}, null);
+        navigate(
+          featureFlags.newCreateCommunity
+            ? '/createCommunity'
+            : '/createCommunity/starter',
+          {},
+          null,
+        );
       },
     },
   ];

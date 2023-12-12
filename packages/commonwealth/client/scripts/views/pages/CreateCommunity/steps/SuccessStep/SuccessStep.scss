@@ -1,0 +1,31 @@
+@import '../../../../../../styles/shared';
+
+.SuccessStep {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  max-width: 600px;
+  gap: 12px;
+  padding: 24px;
+
+  .img {
+    width: 140px;
+    height: 140px;
+  }
+
+  .description {
+    color: $neutral-500;
+  }
+
+  .cta-btn {
+    min-width: 328px;
+
+    @include extraSmall {
+      min-width: auto;
+    }
+  }
+}

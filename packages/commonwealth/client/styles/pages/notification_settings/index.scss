@@ -21,8 +21,8 @@
     padding: 24px 72px;
   }
 
-  @include small {
-    padding: 24px 56px;
+  @include smallInclusive {
+    padding: 16px;
   }
 
   @include extraSmall {
@@ -112,7 +112,7 @@
   }
 
   .chain-events-section-margin {
-    margin: 0 0 16px 0;
+    margin: 30px 0 16px 0;
   }
 
   .chain-events-subscriptions-padding {

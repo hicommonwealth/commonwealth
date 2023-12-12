@@ -147,12 +147,12 @@ const useJoinCommunity = () => {
             activeCommunityId &&
             !app.roles.getRoleInCommunity({
               account,
-              chain: activeCommunityId,
+              community: activeCommunityId,
             })
           ) {
             await app.roles.createRole({
               address: addressInfo,
-              chain: activeCommunityId,
+              community: activeCommunityId,
             });
           }
           await setActiveAccount(account);

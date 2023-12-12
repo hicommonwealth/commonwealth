@@ -84,7 +84,7 @@ export const NewThreadForm = () => {
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
   const { data: memberships = [] } = useRefreshMembershipQuery({

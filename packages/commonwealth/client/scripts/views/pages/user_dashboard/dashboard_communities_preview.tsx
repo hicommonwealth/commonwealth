@@ -25,7 +25,7 @@ const CommunityPreviewCard = ({ community }: CommunityPreviewCardProps) => {
   );
   const isMember = app.roles.isMember({
     account: app.user.activeAccount,
-    chain: community.id,
+    community: community.id,
   });
 
   return (

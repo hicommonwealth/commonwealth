@@ -89,7 +89,7 @@ export const CreateComment = ({
     reset: resetCreateCommentMutation,
   } = useCreateCommentMutation({
     threadId: rootThread.id,
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
@@ -107,7 +107,7 @@ export const CreateComment = ({
     try {
       const newComment: any = await createComment({
         threadId: rootThread.id,
-        chainId: communityId,
+        communityId,
         address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
