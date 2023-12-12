@@ -72,9 +72,9 @@ describe.only('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', (
     const submitProposalEvent = rawLog[0]?.['events']?.find(
       (e) => e['type'] === 'submit_proposal',
     );
-    const proposalType = submitProposalEvent.attributes.find(
+    const proposalType = submitProposalEvent?.attributes.find(
       (a) => a.key === 'proposal_type',
-    ).value;
+    )?.value;
 
     expect(proposalType).to.eql(expectedProposalType);
   };
@@ -137,7 +137,7 @@ describe.only('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', (
         `beta text title`,
         `beta text description`,
       );
-      await proposalTest(content, '/cosmos.gov.v1beta1.TextProposal', true);
+      await proposalTest(content, 'Text', true);
     });
     it('votes NO on an active proposal with legacy amino', async () => {
       await voteTest(VoteOption.VOTE_OPTION_NO, true);
@@ -160,11 +160,7 @@ describe.only('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-ci)', (
         '5',
         'ustake',
       );
-      await proposalTest(
-        content,
-        '/cosmos.distribution.v1beta1.CommunityPoolSpendProposal',
-        true,
-      );
+      await proposalTest(content, 'CommunityPoolSpend', true);
     });
   });
 });
