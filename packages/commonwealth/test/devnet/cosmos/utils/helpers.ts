@@ -10,7 +10,8 @@ import {
 } from 'controllers/chain/cosmos/chain.utils';
 
 const mnemonic =
-  'ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought';
+  `ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse ` +
+  `scrap clutch cup daughter bench length sell goose deliver critic favorite thought`;
 const DEFAULT_FEE: StdFee = {
   gas: '180000',
   amount: [{ amount: '0', denom: 'ustake' }],
@@ -63,7 +64,7 @@ export const waitOneBlock = async (rpcUrl: string): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Check the current block height again
-    const block = await tm.block();
-    newHeight = block.block.header.height;
+    const latestBlock = await tm.block();
+    newHeight = latestBlock.block.header.height;
   }
 };
