@@ -1,3 +1,4 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
 import { MEMBERSHIP_REFRESH_BATCH_SIZE } from '../../config';
@@ -13,6 +14,8 @@ import {
   OptionsWithBalances,
 } from '../../util/tokenBalanceCache/types';
 import { ServerGroupsController } from '../server_groups_controller';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const MEMBERSHIP_TTL_SECONDS = 60 * 2;
 
@@ -36,7 +39,7 @@ export async function __refreshCommunityMemberships(
     groupsToUpdate = await this.getGroups({ community });
   }
 
-  console.log(
+  log.info(
     `Paginating addresses in ${groupsToUpdate.length} groups in ${community.id}...`,
   );
 
@@ -77,16 +80,16 @@ export async function __refreshCommunityMemberships(
     totalNumUpdated += numUpdated;
     totalNumAddresses += addresses.length;
 
-    // console.log(
-    //   `  * [${page}] Created ${numCreated} and updated ${numUpdated} memberships in ${
-    //     community.id
-    //   } across ${addresses.length} addresses in ${
-    //     (Date.now() - pageStartedAt) / 1000
-    //   }s`,
-    // );
+    log.info(
+      `Created ${numCreated} and updated ${numUpdated} memberships in ${
+        community.id
+      } across ${addresses.length} addresses in ${
+        (Date.now() - pageStartedAt) / 1000
+      }s`,
+    );
   });
 
-  console.log(
+  log.info(
     `Created ${totalNumCreated} and updated ${totalNumUpdated} total memberships in ${
       community.id
     } across ${totalNumAddresses} addresses in ${
@@ -103,7 +106,6 @@ async function paginateAddresses(
   minAddressId: number,
   callback: (addresses: AddressAttributes[]) => Promise<void>,
 ): Promise<void> {
-  console.log(`Page starting at address id ${minAddressId}`);
   const addresses = await models.Address.findAll({
     where: {
       community_id: communityId,
@@ -127,6 +129,8 @@ async function paginateAddresses(
   }
 
   await callback(addresses);
+
+  if (addresses.length < MEMBERSHIP_REFRESH_BATCH_SIZE) return;
 
   return paginateAddresses(
     models,
