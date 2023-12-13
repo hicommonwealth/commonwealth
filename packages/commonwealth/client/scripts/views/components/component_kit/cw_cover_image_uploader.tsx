@@ -139,10 +139,12 @@ export const CWCoverImageUploader = ({
         jwt: app.user.jwt,
       });
 
+      const generatedImageURL = res.result.imageUrl;
+
       if (isPrompting) {
-        setImageURL(res.result.imageUrl);
+        setImageURL(generatedImageURL);
         if (hookToForm && name && formContext) {
-          formContext.setValue(name, res.result.imageURL);
+          formContext.setValue(name, generatedImageURL);
           formContext.setError(name, null);
         }
         const currentImageBehavior = !imageBehavior
@@ -154,15 +156,15 @@ export const CWCoverImageUploader = ({
           attachButton.current.style.display = 'none';
         }
 
-        generatedImageCallback?.(res.result.imageUrl, currentImageBehavior);
-        uploadCompleteCallback(res.result.imageUrl, currentImageBehavior);
+        generatedImageCallback?.(generatedImageURL, currentImageBehavior);
+        uploadCompleteCallback(generatedImageURL, currentImageBehavior);
       }
 
       setIsUploading(false);
       setIsPrompting(false);
       setIsGenerating(false);
 
-      return res.result.imageUrl;
+      return generatedImageURL;
     } catch (e) {
       setUploadStatus('failure');
       setIsUploading(false);

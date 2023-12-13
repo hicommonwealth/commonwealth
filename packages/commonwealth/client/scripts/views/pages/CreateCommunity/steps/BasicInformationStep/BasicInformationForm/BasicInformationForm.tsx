@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 import { ZodError } from 'zod';
 
+import useCreateCommunityMutation from 'state/api/communities/createCommunity';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -14,6 +15,7 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import {
   POLYGON_CHAIN_OPTION,
@@ -30,7 +32,10 @@ import {
   socialLinkValidation,
 } from './validation';
 
+import { ChainBase } from 'common-common/src/types';
 import './BasicInformationForm.scss';
+
+const ETHEREUM_MAINNET_ID = '1';
 
 const BasicInformationForm = ({
   selectedCommunity,
@@ -49,6 +54,14 @@ const BasicInformationForm = ({
   const isCommunityNameTaken = existingCommunityNames.find(
     (name) => name === communityName.trim().toLowerCase(),
   );
+
+  const communityId = slugifyPreserveDashes(communityName.toLowerCase());
+
+  const {
+    mutateAsync: createCommunityMutation,
+    error: createCommunityError,
+    isLoading: createCommunityLoading,
+  } = useCreateCommunityMutation();
 
   const getChainOptions = () => {
     // Since we are treating polygon as an ecosystem, we will only have a single option, which will be
@@ -79,6 +92,18 @@ const BasicInformationForm = ({
         value: `${chainType.value}`,
       }));
   };
+
+  const getInitialValue = () => ({
+    ...(selectedCommunity.type === CommunityType.Polygon && {
+      chain: POLYGON_CHAIN_OPTION,
+    }),
+    ...(selectedCommunity.type === CommunityType.Solana && {
+      chain: getChainOptions()?.[0],
+    }),
+    ...(selectedCommunity.type === CommunityType.Ethereum && {
+      chain: getChainOptions()?.find((o) => o.value === ETHEREUM_MAINNET_ID),
+    }),
+  });
 
   const addLink = () => {
     setSocialLinks((socialLink) => [
@@ -149,10 +174,52 @@ const BasicInformationForm = ({
   const handleSubmit = async (values: FormSubmitValues) => {
     const hasLinksError = validateSocialLinks();
     if (isCommunityNameTaken || hasLinksError) return;
-
     values.links = socialLinks.map((link) => link.value).filter(Boolean);
 
-    await onSubmit(values);
+    const selectedChainNode = chainTypes.find(
+      (chain) => String(chain.value) === values.chain.value,
+    );
+
+    console.log('values', values);
+
+    await createCommunityMutation({
+      id: communityId,
+      name: values.communityName,
+      chainBase: selectedCommunity.chainBase,
+      description: values.communityDescription,
+      iconUrl: values.communityProfileImageURL,
+      socialLinks: values.links,
+      ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
+        ethChainId: values.chain.value,
+      }),
+      ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
+        cosmosChainId: values.chain.value,
+      }),
+      nodeUrl: selectedChainNode.nodeUrl,
+      altWalletUrl: selectedChainNode.altWalletUrl,
+    });
+
+    await onSubmit(communityId);
+  };
+
+  const handleCancel = () => {
+    openConfirmation({
+      title: 'Are you sure you want to cancel?',
+      description: 'Your details will not be saved. Cancel create community?',
+      buttons: [
+        {
+          label: 'Yes, cancel',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: onCancel,
+        },
+        {
+          label: 'No, continue',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
+        },
+      ],
+    });
   };
 
   return (
@@ -160,14 +227,7 @@ const BasicInformationForm = ({
       validationSchema={basicInformationFormValidationSchema}
       onSubmit={handleSubmit}
       className="BasicInformationForm"
-      initialValues={{
-        ...(selectedCommunity.type === CommunityType.Polygon && {
-          chain: POLYGON_CHAIN_OPTION,
-        }),
-        ...(selectedCommunity.type === CommunityType.Solana && {
-          chain: getChainOptions()?.[0],
-        }),
-      }}
+      initialValues={getInitialValue()}
     >
       {/* Form fields */}
       <CWTextInput
@@ -200,13 +260,7 @@ const BasicInformationForm = ({
         placeholder="URL will appear when you name your community"
         fullWidth
         disabled
-        value={
-          communityName
-            ? `${window.location.origin}/${slugifyPreserveDashes(
-                communityName.toLowerCase(),
-              )}`
-            : ''
-        }
+        value={communityName ? `${window.location.origin}/${communityId}` : ''}
       />
 
       <CWTextArea
@@ -287,7 +341,7 @@ const BasicInformationForm = ({
           label="Cancel"
           buttonWidth="wide"
           buttonType="secondary"
-          onClick={onCancel}
+          onClick={handleCancel}
         />
         <CWButton
           type="submit"

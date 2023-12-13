@@ -1,17 +1,18 @@
-import AddressInfo from 'models/AddressInfo';
 import React from 'react';
+
+import AddressInfo from 'models/AddressInfo';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
-import { openConfirmation } from 'views/modals/confirmation_modal';
 import CreateCommunityHint from 'views/pages/CreateCommunity/components/CreateCommunityHint/CreateCommunityHint';
 import BasicInformationForm from './BasicInformationForm/BasicInformationForm';
+
 import './BasicInformationStep.scss';
 
 interface BasicInformationStepProps {
   selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   handleGoBack: () => void;
-  handleContinue: () => void;
+  handleContinue: (communityId: string) => void;
 }
 
 const BasicInformationStep = ({
@@ -22,27 +23,6 @@ const BasicInformationStep = ({
 }: BasicInformationStepProps) => {
   console.log('selectedAddress', selectedAddress);
   console.log('selectedCommunity', selectedCommunity);
-  const handleClickCancel = () => {
-    // todo open confirmation modal only when some input form is filled out
-
-    openConfirmation({
-      title: 'Are you sure you want to cancel?',
-      description: 'Your details will not be saved. Cancel create community?',
-      buttons: [
-        {
-          label: 'Yes, cancel',
-          buttonType: 'destructive',
-          buttonHeight: 'sm',
-          onClick: handleGoBack,
-        },
-        {
-          label: 'No, continue',
-          buttonType: 'primary',
-          buttonHeight: 'sm',
-        },
-      ],
-    });
-  };
 
   return (
     <div className="BasicInformationStep">
@@ -61,11 +41,8 @@ const BasicInformationStep = ({
 
       <BasicInformationForm
         selectedCommunity={selectedCommunity}
-        onSubmit={(values) => {
-          console.log('submitted values => ', values);
-          handleContinue();
-        }}
-        onCancel={handleClickCancel}
+        onSubmit={handleContinue}
+        onCancel={handleGoBack}
       />
     </div>
   );

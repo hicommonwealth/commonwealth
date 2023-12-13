@@ -1,11 +1,18 @@
 import React from 'react';
 
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 
 import './SuccessStep.scss';
 
-const SuccessStep = () => {
+interface SuccessStepProps {
+  communityId: string;
+}
+
+const SuccessStep = ({ communityId }: SuccessStepProps) => {
+  const navigate = useCommonNavigate();
+
   return (
     <div className="SuccessStep">
       <img src="../../static/img/communityIslive.png" alt="" className="img" />
@@ -19,6 +26,11 @@ const SuccessStep = () => {
         label="Go to community"
         containerClassName="cta-btn"
         className="w-full"
+        onClick={() => {
+          navigateToCommunity({ navigate, path: '', chain: communityId });
+          // TODO fix this, should not reload
+          window.location.reload();
+        }}
       />
     </div>
   );

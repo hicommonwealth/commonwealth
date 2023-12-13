@@ -25,6 +25,8 @@ export const chainTypes = app.config.nodes
       : chain.cosmosChainId
       ? 'cosmos'
       : 'solana',
+    altWalletUrl: chain.altWalletUrl,
+    nodeUrl: chain.url,
     value: chain.ethChainId || chain.cosmosChainId || 'solana',
     label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
   }));

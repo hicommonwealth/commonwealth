@@ -8,6 +8,7 @@ export type SocialLinkField = {
 export type FormSubmitValues = {
   communityName: string;
   communityDescription: string;
+  communityProfileImageURL: string;
   chain: {
     label: string;
     value: string;
@@ -17,6 +18,6 @@ export type FormSubmitValues = {
 
 export type BasicInformationFormProps = {
   selectedCommunity: SelectedCommunity;
-  onSubmit: (values: FormSubmitValues) => any;
+  onSubmit: (communityId: string) => any;
   onCancel: () => any;
 };
