@@ -1,4 +1,5 @@
 import React from 'react';
+import app from 'state';
 import CWPopover, {
   UsePopoverProps,
 } from '../component_kit/new_designs/CWPopover/CWPopover';
@@ -13,19 +14,18 @@ export const UpvotePopover = ({
   upvoters,
   ...popoverProps
 }: UpvotePopoverProps) => {
-  const maxVisibleReactingAccounts = 3;
+  const maxVisibleUpvotingAccounts = 3;
 
-  const getDisplayedReactorsForPopup = (reactors) => {
-    const slicedReactors = reactors
-      .slice(0, maxVisibleReactingAccounts)
-      .map((reactorAddress) => {
+  const createUpvoterList = (upvoterAddresses) => {
+    const slicedUpvoters = upvoterAddresses
+      .slice(0, maxVisibleUpvotingAccounts)
+      .map((upvoterAddress) => {
         return (
-          <div key={reactorAddress} className="upvoter-row">
+          <div key={upvoterAddress} className="upvoter-row">
             <User
-              userAddress={reactorAddress}
+              userAddress={upvoterAddress}
               // set to 1inch for use on components page
-              // userCommunityId={app.chain.id}
-              userCommunityId="1inch"
+              userCommunityId={app.chain?.id || '1inch'}
               shouldLinkProfile
             />
             <div className="vote-weight">5x</div>
@@ -33,30 +33,23 @@ export const UpvotePopover = ({
         );
       });
 
-    if (reactors.length > maxVisibleReactingAccounts) {
-      slicedReactors.push(
+    if (upvoterAddresses.length > maxVisibleUpvotingAccounts) {
+      slicedUpvoters.push(
         <div
           className="upvoter-count"
           key="final"
-        >{`${reactors.length} votes total`}</div>,
+        >{`${upvoterAddresses.length} votes total`}</div>,
       );
     }
 
-    return (
-      <div
-        className="upvoters-list"
-        style={{ display: 'flex', flexDirection: 'column' }}
-      >
-        {slicedReactors}
-      </div>
-    );
+    return <div className="upvoters-list">{slicedUpvoters}</div>;
   };
 
   return (
     <CWPopover
       className="UpvotePopover"
       title="Recent Upvotes"
-      body={getDisplayedReactorsForPopup(upvoters)}
+      body={createUpvoterList(upvoters)}
       {...popoverProps}
     />
   );
