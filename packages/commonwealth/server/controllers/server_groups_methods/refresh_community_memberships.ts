@@ -120,7 +120,7 @@ async function paginateAddresses(
       as: 'Memberships',
       required: false,
     },
-    order: ['id', 'ASC'],
+    order: [['id', 'ASC']],
     limit: MEMBERSHIP_REFRESH_BATCH_SIZE,
   });
 
