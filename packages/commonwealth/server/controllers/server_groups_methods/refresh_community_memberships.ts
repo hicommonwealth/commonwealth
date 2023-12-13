@@ -1,7 +1,10 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
-import { MEMBERSHIP_REFRESH_BATCH_SIZE } from '../../config';
+import {
+  MEMBERSHIP_REFRESH_BATCH_SIZE,
+  MEMBERSHIP_REFRESH_TTL_SECONDS,
+} from '../../config';
 import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
@@ -19,8 +22,6 @@ import {
 import { ServerGroupsController } from '../server_groups_controller';
 
 const log = factory.getLogger(formatFilename(__filename));
-
-const MEMBERSHIP_TTL_SECONDS = 60 * 2;
 
 export type RefreshCommunityMembershipsOptions = {
   community: CommunityInstance;
@@ -61,7 +62,10 @@ export async function __refreshCommunityMemberships(
       getBalancesOptions.map(async (options) => {
         let result: Balances = {};
         try {
-          result = await this.tokenBalanceCacheV2.getBalances(options);
+          result = await this.tokenBalanceCacheV2.getBalances({
+            ...options,
+            cacheRefresh: false, // get cached balances
+          });
         } catch (err) {
           console.error(err);
         }
@@ -191,7 +195,7 @@ async function processMemberships(
       if (existingMembership) {
         // membership exists
         const expiresAt = moment(existingMembership.last_checked).add(
-          MEMBERSHIP_TTL_SECONDS,
+          MEMBERSHIP_REFRESH_TTL_SECONDS,
           'seconds',
         );
         if (moment().isBefore(expiresAt)) {
