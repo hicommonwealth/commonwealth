@@ -83,7 +83,7 @@
   position: fixed !important;
   left: 50% !important;
   top: 50% !important;
-  display: none;
+  opacity: 0;
 }
 
 .QuillEditorWrapper {
@@ -129,6 +129,12 @@
 
     &.ql-blank::before {
       font-style: normal;
+    }
+    & h1 {
+      font-size: 24px !important;
+    }
+    & h2 {
+      font-size: 20px !important;
     }
   }
 

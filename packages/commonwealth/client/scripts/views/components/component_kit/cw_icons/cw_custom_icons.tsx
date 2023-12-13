@@ -388,6 +388,29 @@ export const CWRonin = (props: CustomIconProps) => {
   );
 };
 
+export const CWCoinbase = (props: CustomIconProps) => {
+  const { componentType, iconSize, ...otherProps } = props;
+  return (
+    <svg
+      className={getClasses<CustomIconStyleProps>({ iconSize }, componentType)}
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      fill="none"
+      viewBox="0 0 32 32"
+      {...otherProps}
+    >
+      <circle cx="16" cy="16" r="16" fill="#0052FF" />
+      <path
+        fill="#FFFFFF"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M 4.800781 16 C 4.800781 22.1875 9.8125 27.199219 16 27.199219 C 22.1875 27.199219 27.199219 22.1875 27.199219 16 C 27.199219 9.8125 22.1875 4.800781 16 4.800781 C 9.8125 4.800781 4.800781 9.8125 4.800781 16 Z M 13.136719 12.390625 C 12.726562 12.390625 12.390625 12.726562 12.390625 13.136719 L 12.390625 18.863281 C 12.390625 19.273438 12.726562 19.609375 13.136719 19.609375 L 18.863281 19.609375 C 19.273438 19.609375 19.609375 19.273438 19.609375 18.863281 L 19.609375 13.136719 C 19.609375 12.726562 19.273438 12.390625 18.863281 12.390625 Z M 13.136719 12.390625 "
+      />
+    </svg>
+  );
+};
+
 export const CWTerraStation = (props: CustomIconProps) => {
   const { componentType, iconSize, ...otherProps } = props;
   return (

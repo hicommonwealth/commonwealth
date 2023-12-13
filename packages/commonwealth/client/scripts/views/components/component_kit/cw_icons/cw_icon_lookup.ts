@@ -4,6 +4,7 @@ import {
   ArrowFatDown,
   ArrowFatUp,
   ArrowRight,
+  ArrowSquareOut,
   BellSimple,
   BellSimpleRinging,
   BellSimpleSlash,
@@ -51,6 +52,7 @@ export const iconLookup = {
   arrowFatUpBlue600: Icons.CWArrowFatUpBlue600,
   arrowUpBlue500: Icons.CWArrowUpBlue500,
   arrowUpNeutral400: Icons.CWArrowUpNeutral400,
+  arrowSquareOut: withPhosphorIcon(ArrowSquareOut),
   keyLockOpened: withPhosphorIcon(LockKeyOpen),
   keyLockClosed: withPhosphorIcon(LockKey),
   eye: withPhosphorIcon(Eye),
@@ -207,6 +209,7 @@ export const customIconLookup = {
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
   'terra-walletconnect': CustomIcons.CWWalletConnect,
+  coinbase: CustomIcons.CWCoinbase,
 };
 
 export type IconName = keyof typeof iconLookup;

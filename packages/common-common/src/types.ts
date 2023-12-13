@@ -21,7 +21,7 @@ export enum NotificationCategories {
 }
 
 export type NotificationCategory =
-  typeof NotificationCategories[keyof typeof NotificationCategories];
+  (typeof NotificationCategories)[keyof typeof NotificationCategories];
 
 export enum ProposalType {
   Thread = 'discussion',
@@ -70,6 +70,7 @@ export enum WalletId {
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Ronin = 'ronin',
+  Coinbase = 'coinbase',
 }
 
 // 'google', 'github', 'discord', and 'twitter' are passed to magic login directly
