@@ -16,7 +16,7 @@ const MEMBERSHIP_TTL_SECONDS = 60 * 2;
  * @param address Address associated with memberships
  * @param groups Groups to check requirements from
  * @param topics Topics associated with groups
- * @param cacheRefresh if true, forces the TBC cache to refresh when fetching balances
+ * @param cacheRefresh if true, forces TBC cache to refresh and force updates membership
  * @returns MembershipInstance[]
  */
 export async function refreshMembershipsForAddress(
@@ -55,7 +55,7 @@ export async function refreshMembershipsForAddress(
         ],
       });
 
-      if (membership) {
+      if (!cacheRefresh && membership) {
         // membership exists
         const expiresAt = moment(membership.last_checked).add(
           MEMBERSHIP_TTL_SECONDS,
