@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Sequelize } from 'sequelize';
 import { DB } from 'server/models';
-import { AddressInstance } from '../../models/address';
+import { AddressAttributes } from '../../models/address';
 import { GroupAttributes } from '../../models/group';
 import { MembershipInstance } from '../../models/membership';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
@@ -16,20 +16,25 @@ const MEMBERSHIP_TTL_SECONDS = 60 * 2;
  * @param address Address associated with memberships
  * @param groups Groups to check requirements from
  * @param topics Topics associated with groups
+ * @param cacheRefresh if true, forces the TBC cache to refresh when fetching balances
  * @returns MembershipInstance[]
  */
 export async function refreshMembershipsForAddress(
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  address: AddressInstance,
+  address: AddressAttributes,
   groups: GroupAttributes[],
+  cacheRefresh: boolean,
 ): Promise<MembershipInstance[]> {
   const getBalancesOptions = makeGetBalancesOptions(groups, [address]);
   const balances = await Promise.all(
     getBalancesOptions.map(async (options) => {
       return {
         options,
-        balances: await tokenBalanceCache.getBalances(options),
+        balances: await tokenBalanceCache.getBalances({
+          ...options,
+          cacheRefresh,
+        }),
       };
     }),
   );
@@ -90,7 +95,7 @@ async function recomputeMembership(
   models: DB,
   membership: MembershipInstance | null,
   group: GroupAttributes,
-  address: AddressInstance,
+  address: AddressAttributes,
   balances: OptionsWithBalances[],
 ): Promise<MembershipInstance> {
   const { requirements } = group;

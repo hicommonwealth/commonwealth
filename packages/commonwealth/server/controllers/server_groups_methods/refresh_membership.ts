@@ -47,6 +47,7 @@ export async function __refreshMembership(
     this.tokenBalanceCacheV2,
     address,
     groups,
+    true, // use fresh balances
   );
 
   const topics = await this.models.Topic.findAll({
