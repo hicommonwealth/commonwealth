@@ -145,7 +145,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
-import { TBC_BALANCE_TTL_SECONDS } from 'server/config';
+import { TBC_BALANCE_TTL_SECONDS } from '../config';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
