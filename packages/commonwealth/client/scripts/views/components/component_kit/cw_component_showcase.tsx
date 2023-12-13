@@ -67,6 +67,7 @@ import { CWTag } from './new_designs/CWTag';
 import { CWTextInput } from './new_designs/CWTextInput';
 import { CWTooltip } from './new_designs/CWTooltip';
 import { CWTypeaheadSelectList } from './new_designs/CWTypeaheadSelectList';
+import CWVoteWeightModule from './new_designs/CWVoteWeightModule';
 import { createColumnInfo, makeData, optionList } from './showcase_helpers';
 
 const displayIcons = (icons) => {
@@ -2128,6 +2129,9 @@ export const ComponentShowcase = () => {
             { label: 'Third Step', state: 'inactive' },
           ]}
         />
+      </div>
+      <div>
+        <CWVoteWeightModule />
       </div>
     </div>
   );
