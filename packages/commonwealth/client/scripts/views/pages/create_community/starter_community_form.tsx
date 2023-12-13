@@ -105,9 +105,9 @@ export const StarterCommunityForm = () => {
 
           // TODO: switch to using ChainNode.name instead of URL
           // defaults to be overridden when chain is no longer "starter" type
-          additionalArgs.node_url = defaultChain.node.url;
-          additionalArgs.alt_wallet_url = defaultChain.node.altWalletUrl;
-          additionalArgs.eth_chain_id = defaultChain.node.ethChainId;
+          additionalArgs.node_url = defaultChain.node?.url;
+          additionalArgs.alt_wallet_url = defaultChain.node?.altWalletUrl;
+          additionalArgs.eth_chain_id = defaultChain.node?.ethChainId;
           additionalArgs.bech32_prefix = defaultChain.bech32Prefix;
 
           try {
