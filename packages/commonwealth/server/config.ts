@@ -123,6 +123,11 @@ export const MEMBERSHIP_REFRESH_BATCH_SIZE = process.env
   ? parseInt(process.env.MEMBERSHIP_REFRESH_BATCH_SIZE, 10)
   : 1000;
 
+export const MEMBERSHIP_REFRESH_TTL_SECONDS = process.env
+  .MEMBERSHIP_REFRESH_TTL_SECONDS
+  ? parseInt(process.env.MEMBERSHIP_REFRESH_TTL_SECONDS, 10)
+  : 120;
+
 export const TBC_BALANCE_TTL_SECONDS = process.env.TBC_BALANCE_TTL_SECONDS
   ? parseInt(process.env.TBC_BALANCE_TTL_SECONDS, 10)
   : 300;

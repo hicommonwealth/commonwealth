@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { Sequelize } from 'sequelize';
-import { DB } from 'server/models';
+import { MEMBERSHIP_REFRESH_TTL_SECONDS } from '../../config';
+import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
 import { GroupAttributes } from '../../models/group';
 import { MembershipInstance } from '../../models/membership';
@@ -8,8 +9,6 @@ import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import { OptionsWithBalances } from '../tokenBalanceCache/types';
 import { makeGetBalancesOptions } from './makeGetBalancesOptions';
 import validateGroupMembership from './validateGroupMembership';
-
-const MEMBERSHIP_TTL_SECONDS = 60 * 2;
 
 /**
  * refreshMembershipsForAddress refreshes the memberships for the given address
@@ -58,7 +57,7 @@ export async function refreshMembershipsForAddress(
       if (!cacheRefresh && membership) {
         // membership exists
         const expiresAt = moment(membership.last_checked).add(
-          MEMBERSHIP_TTL_SECONDS,
+          MEMBERSHIP_REFRESH_TTL_SECONDS,
           'seconds',
         );
         if (moment().isBefore(expiresAt)) {
