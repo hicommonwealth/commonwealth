@@ -108,6 +108,25 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
     return vote;
   };
 
+  const voteTest = async (
+    voteOption: VoteOption,
+    expectedVoteString: string,
+  ): Promise<void> => {
+    await waitOneBlock(rpcUrl);
+    const activeProposals = await getActiveVotingProposals();
+
+    assert.isAtLeast(activeProposals.length, 1);
+    const proposal = activeProposals[activeProposals.length - 1];
+
+    const msg = encodeMsgVote(signerAddr, proposal.proposalId, voteOption);
+    const resp = await sendTx(lcdUrl, msg);
+
+    expect(resp.transactionHash).to.not.be.undefined;
+    expect(resp.rawLog).to.not.be.undefined;
+    const voteValue = parseVoteValue(resp.rawLog);
+    expect(voteValue).to.eql(expectedVoteString);
+  };
+
   it('creates a proposal', async () => {
     const content = encodeTextProposal(
       `evmos test title`,
@@ -126,85 +145,22 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-ci)', () => {
   });
 
   it('votes NO on an active proposal', async () => {
-    await waitOneBlock(rpcUrl);
-    const activeProposals = await getActiveVotingProposals();
-
-    assert.isAtLeast(activeProposals.length, 1);
-    const proposal = activeProposals[0];
-
-    const msg = encodeMsgVote(
-      signerAddr,
-      proposal.proposalId,
-      VoteOption.VOTE_OPTION_NO,
-    );
-    const resp = await sendTx(lcdUrl, msg);
-
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue).to.eql('VOTE_OPTION_NO');
+    await voteTest(VoteOption.VOTE_OPTION_NO, 'VOTE_OPTION_NO');
   });
 
   it('votes NO WITH VETO on an active proposal', async () => {
-    await waitOneBlock(rpcUrl);
-    const activeProposals = await getActiveVotingProposals();
-
-    assert.isAtLeast(activeProposals.length, 1);
-    const proposal = activeProposals[0];
-
-    const msg = encodeMsgVote(
-      signerAddr,
-      proposal.proposalId,
+    await voteTest(
       VoteOption.VOTE_OPTION_NO_WITH_VETO,
+      'VOTE_OPTION_NO_WITH_VETO',
     );
-    const resp = await sendTx(lcdUrl, msg);
-
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue).to.eql('VOTE_OPTION_NO_WITH_VETO');
   });
 
   it('votes ABSTAIN on an active proposal', async () => {
-    await waitOneBlock(rpcUrl);
-    const activeProposals = await getActiveVotingProposals();
-
-    assert.isAtLeast(activeProposals.length, 1);
-    const proposal = activeProposals[0];
-
-    const msg = encodeMsgVote(
-      signerAddr,
-      proposal.proposalId,
-      VoteOption.VOTE_OPTION_ABSTAIN,
-    );
-    const resp = await sendTx(lcdUrl, msg);
-
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue).to.eql('VOTE_OPTION_ABSTAIN');
+    await voteTest(VoteOption.VOTE_OPTION_ABSTAIN, 'VOTE_OPTION_ABSTAIN');
   });
 
   it('votes YES on an active proposal', async () => {
-    await waitOneBlock(rpcUrl);
-    const activeProposals = await getActiveVotingProposals();
-
-    expect(activeProposals).to.not.be.undefined;
-    expect(activeProposals.length).to.be.greaterThan(0);
-
-    const proposal = activeProposals[0];
-
-    const msg = encodeMsgVote(
-      signerAddr,
-      proposal.proposalId,
-      VoteOption.VOTE_OPTION_YES,
-    );
-    const resp = await sendTx(lcdUrl, msg);
-
-    expect(resp.transactionHash).to.not.be.undefined;
-    expect(resp.rawLog).to.not.be.undefined;
-    const voteValue = parseVoteValue(resp.rawLog);
-    expect(voteValue).to.eql('VOTE_OPTION_YES');
+    await voteTest(VoteOption.VOTE_OPTION_YES, 'VOTE_OPTION_YES');
   });
 });
 
