@@ -60,7 +60,7 @@ export async function validateTopicGroupsMembership(
     const allErrorMessages: MembershipRejectReason[] = [];
 
     const memberships = await refreshMembershipsForAddress(
-      this.models,
+      models,
       tokenBalanceCacheV2,
       address,
       groups,
