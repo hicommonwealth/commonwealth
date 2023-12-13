@@ -1,0 +1,31 @@
+@import '../../../../styles/shared.scss';
+
+.Popover.UpvotePopover {
+  padding: 8px 0;
+  width: 256px;
+
+  .popover-title {
+    padding: 8px 16px;
+    margin-bottom: 0;
+  }
+
+  .upvoters-list {
+    .upvoter-row {
+      display: flex;
+      height: 40px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      align-self: stretch;
+    }
+  }
+
+  .upvoter-count {
+    height: 40px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    color: $neutral-400;
+  }
+
+}

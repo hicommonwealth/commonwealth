@@ -31,6 +31,7 @@ export const getDisplayedReactorsForPopup = ({
       );
     });
 
+  console.log('THE CHAIN ID', app.chain.id);
   if (reactors.length > MAX_VISIBLE_REACTING_ACCOUNTS) {
     const diff = reactors.length - MAX_VISIBLE_REACTING_ACCOUNTS;
 
