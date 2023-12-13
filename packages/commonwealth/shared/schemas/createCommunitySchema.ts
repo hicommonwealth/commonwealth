@@ -40,7 +40,8 @@ export const createCommunitySchema = z.object({
   icon_url: z
     .string()
     .url()
-    .superRefine(async (val, ctx) => await checkIconSize(val, ctx)),
+    .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
+    .optional(),
   social_links: z.array(z.string().url()).optional(),
   tags: z.array(z.nativeEnum(ChainCategoryType)).default([]),
   directory_page_enabled: z.boolean().default(false),
