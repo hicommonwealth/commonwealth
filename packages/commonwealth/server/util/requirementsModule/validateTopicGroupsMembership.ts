@@ -6,6 +6,7 @@ import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
 import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
+import { MembershipRejectReason } from '../../models/membership';
 import { TokenBalanceCache as TokenBalanceCacheV2 } from '../tokenBalanceCache/tokenBalanceCache';
 import validateTopicThreshold from '../validateTopicThreshold';
 import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
@@ -56,7 +57,7 @@ export async function validateTopicGroupsMembership(
 
     // check membership for all groups of topic
     let numValidGroups = 0;
-    const allErrorMessages: string[] = [];
+    const allErrorMessages: MembershipRejectReason[] = [];
 
     const memberships = await refreshMembershipsForAddress(
       this.models,
