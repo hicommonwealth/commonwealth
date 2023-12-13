@@ -104,7 +104,7 @@ export async function __searchThreads(
     WHERE
       ${communityWhere}
       "Threads".deleted_at IS NULL AND
-      ${searchWhere}
+      (${searchWhere})
     ${paginationSort}
   `;
 

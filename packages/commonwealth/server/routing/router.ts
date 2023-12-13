@@ -4,7 +4,8 @@ import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 
-import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache as NewTokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {
   methodNotAllowedMiddleware,
@@ -91,7 +92,6 @@ import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
 import getSupportedEthChains from '../routes/getSupportedEthChains';
 import getTokenForum from '../routes/getTokenForum';
-import ipfsPin from '../routes/ipfsPin';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
@@ -145,6 +145,7 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
+import { TBC_BALANCE_TTL_SECONDS } from '../config';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
@@ -207,7 +208,7 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  tokenBalanceCache: TokenBalanceCache,
+  tokenBalanceCacheV1: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
@@ -215,22 +216,47 @@ function setupRouter(
 ) {
   // controllers
 
+  const tokenBalanceCacheV2 = new NewTokenBalanceCache(
+    models,
+    redisCache,
+    TBC_BALANCE_TTL_SECONDS,
+  );
+
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, tokenBalanceCache, banCache),
-    comments: new ServerCommentsController(models, tokenBalanceCache, banCache),
+    threads: new ServerThreadsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+      banCache,
+    ),
+    comments: new ServerCommentsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+      banCache,
+    ),
     reactions: new ServerReactionsController(models, banCache),
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(
       models,
-      tokenBalanceCache,
+      tokenBalanceCacheV1,
       banCache,
     ),
-    polls: new ServerPollsController(models, tokenBalanceCache),
+    polls: new ServerPollsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+    ),
     proposals: new ServerProposalsController(models, redisCache),
-    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
-    topics: new ServerTopicsController(models, tokenBalanceCache, banCache),
+    groups: new ServerGroupsController(
+      models,
+      tokenBalanceCacheV1,
+      tokenBalanceCacheV2,
+      banCache,
+    ),
+    topics: new ServerTopicsController(models, banCache),
   };
 
   // ---
@@ -263,14 +289,6 @@ function setupRouter(
   );
   registerRoute(router, 'get', '/domain', domain.bind(this, models));
   registerRoute(router, 'get', '/status', status.bind(this, models));
-  registerRoute(
-    router,
-    'post',
-    '/ipfsPin',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    ipfsPin.bind(this, models),
-  );
   registerRoute(
     router,
     'post',
@@ -418,13 +436,13 @@ function setupRouter(
     'post',
     '/tokenBalance',
     databaseValidationService.validateCommunity,
-    tokenBalance.bind(this, models, tokenBalanceCache),
+    tokenBalance.bind(this, models, tokenBalanceCacheV1),
   );
   registerRoute(
     router,
     'post',
     '/bulkBalances',
-    bulkBalances.bind(this, models, tokenBalanceCache),
+    bulkBalances.bind(this, models, tokenBalanceCacheV1),
   );
   registerRoute(
     router,

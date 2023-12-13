@@ -26,7 +26,7 @@ export const ProposalSelector = ({
   >([]);
 
   const { data, isLoading } = useRawEvmProposalsQuery({
-    chainId: app.chain.id,
+    communityId: app.chain.id,
     chainNetwork: app.chain.network,
   });
 

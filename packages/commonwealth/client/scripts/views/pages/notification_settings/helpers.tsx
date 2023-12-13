@@ -2,7 +2,7 @@ import { NotificationCategories } from '../../../../../../common-common/src/type
 import type NotificationSubscription from '../../../models/NotificationSubscription';
 
 export const bundleSubs = (
-  subs: Array<NotificationSubscription>
+  subs: Array<NotificationSubscription>,
 ): { [k: string]: Array<NotificationSubscription> } => {
   const result = {};
   for (const sub of subs) {
@@ -18,7 +18,7 @@ export const bundleSubs = (
 };
 
 export const extractSnapshotProposals = (
-  subs: Array<NotificationSubscription>
+  subs: Array<NotificationSubscription>,
 ) => {
   const snapshotProposals = {};
 

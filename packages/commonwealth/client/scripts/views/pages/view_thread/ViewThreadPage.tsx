@@ -534,7 +534,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     />
                     {featureFlags.gatingEnabled &&
                       foundGatedTopic &&
-                      !hideGatingBanner && (
+                      !hideGatingBanner &&
+                      isRestrictedMembership && (
                         <CWGatedTopicBanner
                           groupNames={gatedGroupsMatchingTopic.map(
                             (g) => g.name,
@@ -678,6 +679,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
+                              isTopicMembershipRestricted={
+                                isRestrictedMembership
+                              }
                               showDeleteButton={isAuthor || isAdmin}
                               onDelete={() => {
                                 setInitializedPolls(false);
