@@ -26,6 +26,13 @@ export const ThreadPollCard = ({
 }: ThreadPollCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const getTooltipErrorMessage = () => {
+    if (!app.user.activeAccount)
+      return 'Error: You must join this community to vote.';
+    if (isTopicMembershipRestricted) return 'Error: Topic is gated.';
+    return '';
+  };
+
   return (
     <>
       <PollCard
@@ -62,12 +69,7 @@ export const ThreadPollCard = ({
         })}
         incrementalVoteCast={1}
         isPreview={false}
-        tooltipErrorMessage={(() => {
-          if (!app.user.activeAccount)
-            return 'You must join this community to vote.';
-          if (isTopicMembershipRestricted) return 'Topic is gated';
-          return '';
-        })()}
+        tooltipErrorMessage={getTooltipErrorMessage()}
         onVoteCast={(option, isSelected) => {
           handlePollVote(poll, option, isSelected, onVote);
         }}
