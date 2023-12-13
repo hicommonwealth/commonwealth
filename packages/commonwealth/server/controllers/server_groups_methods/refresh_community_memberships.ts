@@ -1,3 +1,4 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import moment from 'moment';
 import { Op, Sequelize } from 'sequelize';
 import { MEMBERSHIP_REFRESH_BATCH_SIZE } from '../../config';
@@ -5,7 +6,10 @@ import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
 import { GroupAttributes } from '../../models/group';
-import { MembershipAttributes } from '../../models/membership';
+import {
+  MembershipAttributes,
+  MembershipRejectReason,
+} from '../../models/membership';
 import { makeGetBalancesOptions } from '../../util/requirementsModule/makeGetBalancesOptions';
 import validateGroupMembership from '../../util/requirementsModule/validateGroupMembership';
 import {
@@ -13,6 +17,8 @@ import {
   OptionsWithBalances,
 } from '../../util/tokenBalanceCache/types';
 import { ServerGroupsController } from '../server_groups_controller';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const MEMBERSHIP_TTL_SECONDS = 60 * 2;
 
@@ -36,7 +42,7 @@ export async function __refreshCommunityMemberships(
     groupsToUpdate = await this.getGroups({ community });
   }
 
-  console.log(
+  log.info(
     `Paginating addresses in ${groupsToUpdate.length} groups in ${community.id}...`,
   );
 
@@ -44,58 +50,52 @@ export async function __refreshCommunityMemberships(
   let totalNumUpdated = 0;
   let totalNumAddresses = 0;
 
-  await paginateAddresses(
-    this.models,
-    community.id,
-    1,
-    MEMBERSHIP_REFRESH_BATCH_SIZE,
-    async (addresses, page) => {
-      const pageStartedAt = Date.now();
+  await paginateAddresses(this.models, community.id, 0, async (addresses) => {
+    const pageStartedAt = Date.now();
 
-      const getBalancesOptions = makeGetBalancesOptions(
-        groupsToUpdate,
-        addresses,
-      );
-      const balances = await Promise.all(
-        getBalancesOptions.map(async (options) => {
-          let result: Balances = {};
-          try {
-            result = await this.tokenBalanceCacheV2.getBalances({
-              ...options,
-              cacheRefresh: false, // get cached balances
-            });
-          } catch (err) {
-            console.error(err);
-          }
-          return {
-            options,
-            balances: result,
-          };
-        }),
-      );
+    const getBalancesOptions = makeGetBalancesOptions(
+      groupsToUpdate,
+      addresses,
+    );
+    const balances = await Promise.all(
+      getBalancesOptions.map(async (options) => {
+        let result: Balances = {};
+        try {
+          result = await this.tokenBalanceCacheV2.getBalances({
+            ...options,
+            cacheRefresh: false, // get cached balances
+          });
+        } catch (err) {
+          console.error(err);
+        }
+        return {
+          options,
+          balances: result,
+        };
+      }),
+    );
 
-      const [numCreated, numUpdated] = await processMemberships(
-        this.models,
-        groupsToUpdate,
-        addresses,
-        balances,
-      );
+    const [numCreated, numUpdated] = await processMemberships(
+      this.models,
+      groupsToUpdate,
+      addresses,
+      balances,
+    );
 
-      totalNumCreated += numCreated;
-      totalNumUpdated += numUpdated;
-      totalNumAddresses += addresses.length;
+    totalNumCreated += numCreated;
+    totalNumUpdated += numUpdated;
+    totalNumAddresses += addresses.length;
 
-      console.log(
-        `  * [${page}] Created ${numCreated} and updated ${numUpdated} memberships in ${
-          community.id
-        } across ${addresses.length} addresses in ${
-          (Date.now() - pageStartedAt) / 1000
-        }s`,
-      );
-    },
-  );
+    log.info(
+      `Created ${numCreated} and updated ${numUpdated} memberships in ${
+        community.id
+      } across ${addresses.length} addresses in ${
+        (Date.now() - pageStartedAt) / 1000
+      }s`,
+    );
+  });
 
-  console.log(
+  log.info(
     `Created ${totalNumCreated} and updated ${totalNumUpdated} total memberships in ${
       community.id
     } across ${totalNumAddresses} addresses in ${
@@ -109,19 +109,16 @@ export async function __refreshCommunityMemberships(
 async function paginateAddresses(
   models: DB,
   communityId: string,
-  page: number,
-  pageSize: number,
-  callback: (addresses: AddressAttributes[], page: number) => Promise<void>,
+  minAddressId: number,
+  callback: (addresses: AddressAttributes[]) => Promise<void>,
 ): Promise<void> {
-  const offset = (page - 1) * pageSize;
-  const limit = pageSize;
-
   const addresses = await models.Address.findAll({
     where: {
       community_id: communityId,
       verified: {
         [Op.ne]: null,
       },
+      id: { [Op.gt]: minAddressId },
     },
     attributes: ['id', 'address'],
     include: {
@@ -129,23 +126,30 @@ async function paginateAddresses(
       as: 'Memberships',
       required: false,
     },
-    offset,
-    limit,
+    order: [['id', 'ASC']],
+    limit: MEMBERSHIP_REFRESH_BATCH_SIZE,
   });
 
   if (addresses.length === 0) {
     return;
   }
 
-  await callback(addresses, page);
+  await callback(addresses);
 
-  return paginateAddresses(models, communityId, page + 1, pageSize, callback);
+  if (addresses.length < MEMBERSHIP_REFRESH_BATCH_SIZE) return;
+
+  return paginateAddresses(
+    models,
+    communityId,
+    addresses[addresses.length - 1].id,
+    callback,
+  );
 }
 
 type ComputedMembership = {
   group_id: number;
   address_id: number;
-  reject_reason: string | null;
+  reject_reason: MembershipRejectReason;
   last_checked: any;
 };
 
@@ -164,7 +168,7 @@ async function computeMembership(
   const computedMembership = {
     group_id: currentGroup.id,
     address_id: address.id,
-    reject_reason: isValid ? null : JSON.stringify(messages),
+    reject_reason: isValid ? null : messages,
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
   };
   return computedMembership;

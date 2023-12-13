@@ -107,7 +107,7 @@ async function recomputeMembership(
   const computedMembership = {
     group_id: group.id,
     address_id: address.id,
-    reject_reason: isValid ? null : JSON.stringify(messages),
+    reject_reason: isValid ? null : messages,
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
   };
   if (!membership) {

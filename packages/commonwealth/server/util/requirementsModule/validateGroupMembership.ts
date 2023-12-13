@@ -1,3 +1,4 @@
+import { MembershipRejectReason } from 'server/models/membership';
 import { toBN } from 'web3-utils';
 import { OptionsWithBalances } from '../tokenBalanceCache/types';
 import {
@@ -9,10 +10,7 @@ import {
 
 export type ValidateGroupMembershipResponse = {
   isValid: boolean;
-  messages?: {
-    requirement: Requirement;
-    message: string;
-  }[];
+  messages?: MembershipRejectReason;
   numRequirementsMet?: number;
 };
 

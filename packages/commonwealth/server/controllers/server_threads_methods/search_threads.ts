@@ -34,7 +34,7 @@ export async function __searchThreads(
     page,
     orderBy,
     orderDirection,
-  }: SearchThreadsOptions
+  }: SearchThreadsOptions,
 ): Promise<SearchThreadsResult> {
   // sort by rank by default
   let sortOptions: PaginationSqlOptions = {
@@ -92,7 +92,7 @@ export async function __searchThreads(
       "Addresses".address,
       "Addresses".community_id as address_chain,
       "Threads".created_at,
-      "Threads".chain,
+      "Threads".chain as community,
       ts_rank_cd("Threads"._search, query) as rank
     FROM "Threads"
     JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
@@ -100,7 +100,7 @@ export async function __searchThreads(
     WHERE
       ${communityWhere}
       "Threads".deleted_at IS NULL AND
-      ${searchWhere}
+      (${searchWhere})
     ${paginationSort}
   `;
 

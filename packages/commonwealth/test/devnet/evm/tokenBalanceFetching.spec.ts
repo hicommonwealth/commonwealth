@@ -14,17 +14,33 @@ import { ERC1155 } from '../../util/evm-chain-testing/sdk/erc1155';
 import { ERC721 } from '../../util/evm-chain-testing/sdk/nft';
 
 async function resetChainNode(ethChainId: number) {
-  await models.ChainNode.destroy({
+  const ganacheChainNode = await models.ChainNode.findOne({
     where: {
       url: 'http://localhost:8545',
     },
   });
-  await models.ChainNode.create({
-    url: 'http://localhost:8545',
-    eth_chain_id: ethChainId,
-    balance_type: BalanceType.Ethereum,
-    name: 'Local EVM Chain',
-  });
+
+  if (ganacheChainNode) {
+    await models.ChainNode.update(
+      {
+        eth_chain_id: ethChainId,
+        balance_type: BalanceType.Ethereum,
+        name: 'Local EVM Chain',
+      },
+      {
+        where: {
+          url: 'http://localhost:8545',
+        },
+      },
+    );
+  } else {
+    await models.ChainNode.create({
+      url: 'http://localhost:8545',
+      eth_chain_id: ethChainId,
+      balance_type: BalanceType.Ethereum,
+      name: 'Local EVM Chain',
+    });
+  }
 }
 
 function generateEVMAddresses(count: number): string[] {
