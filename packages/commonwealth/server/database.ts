@@ -62,7 +62,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
       : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
   pool: {
     max: MAX_SEQUELIZE_POOL_SIZE,
-    min: 0,
+    min: 1,
     acquire: 40000,
     idle: 40000,
   },
