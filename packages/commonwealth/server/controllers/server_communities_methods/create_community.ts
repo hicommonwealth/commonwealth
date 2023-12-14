@@ -261,6 +261,7 @@ export async function __createCommunity(
     description,
     network,
     type,
+    social_links,
     website,
     discord,
     telegram,
@@ -322,7 +323,13 @@ export async function __createCommunity(
     },
   });
 
-  const social_links = [website, telegram, discord, element, github];
+  const uniqueLinksArray = [
+    ...new Set(
+      [...social_links, website, telegram, discord, element, github].filter(
+        (a) => a,
+      ),
+    ),
+  ];
 
   const createdCommunity = await this.models.Community.create({
     id,
@@ -332,7 +339,7 @@ export async function __createCommunity(
     description,
     network,
     type,
-    social_links,
+    social_links: uniqueLinksArray,
     base,
     bech32_prefix,
     active: true,

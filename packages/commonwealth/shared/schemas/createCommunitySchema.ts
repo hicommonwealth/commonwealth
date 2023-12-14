@@ -42,7 +42,7 @@ export const createCommunitySchema = z.object({
     .url()
     .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
     .optional(),
-  social_links: z.array(z.string().url()).optional(),
+  social_links: z.array(z.string().url()).default([]),
   tags: z.array(z.nativeEnum(ChainCategoryType)).default([]),
   directory_page_enabled: z.boolean().default(false),
   type: z.nativeEnum(ChainType).default(ChainType.Offchain),
