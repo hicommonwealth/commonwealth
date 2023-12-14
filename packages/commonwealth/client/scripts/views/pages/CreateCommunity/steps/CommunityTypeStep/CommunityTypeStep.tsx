@@ -122,6 +122,7 @@ const CommunityTypeStep = ({
         open={isNewCommunityAdminModalOpen}
       />
       <CWModal
+        rootClassName="CreateCommunityLoginModal"
         content={
           <LoginModal
             initialSidebar="createCommunityLogin"
