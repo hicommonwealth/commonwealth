@@ -86,7 +86,6 @@ import type ViewCountCache from '../util/viewCountCache';
 import type { DB } from '../models';
 import authCallback from '../routes/authCallback';
 import banAddress from '../routes/banAddress';
-import bulkBalances from '../routes/bulkBalances';
 import editSubstrateSpec from '../routes/editSubstrateSpec';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getBannedAddresses from '../routes/getBannedAddresses';
@@ -418,12 +417,6 @@ function setupRouter(
     '/tokenBalance',
     databaseValidationService.validateCommunity,
     tokenBalance.bind(this, models, tokenBalanceCacheV1),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/bulkBalances',
-    bulkBalances.bind(this, models, tokenBalanceCacheV1),
   );
   registerRoute(
     router,
