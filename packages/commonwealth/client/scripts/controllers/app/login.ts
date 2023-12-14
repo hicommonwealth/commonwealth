@@ -198,13 +198,17 @@ export async function updateActiveAddresses({
         ? app.chain?.meta.bech32Prefix
         : app.chain?.meta.node?.ethChainId;
     const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
-    const foundAddressWithActiveSessionKey =
-      await communityAddressesSortedByLastUsed.find(async (acc) => {
-        const isAuth = await app.sessions
-          .getSessionController(chainBase)
-          .hasAuthenticatedSession(canvasChainId, acc.address);
-        return isAuth;
-      });
+    let foundAddressWithActiveSessionKey = null;
+    for await (const communityAccount of communityAddressesSortedByLastUsed) {
+      const isAuth = await app.sessions
+        .getSessionController(chainBase)
+        .hasAuthenticatedSession(canvasChainId, communityAccount.address);
+
+      if (isAuth) {
+        foundAddressWithActiveSessionKey = communityAccount;
+        break;
+      }
+    }
 
     // Use the address which has an active session key, if there is none then use the most recently used address
     const addressToUse =
