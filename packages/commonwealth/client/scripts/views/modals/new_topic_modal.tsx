@@ -128,7 +128,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setDescription(e.target.value);
           }}
         />
-        {!featureFlags.gatingEnabled && app.activeChainId() && (
+        {!featureFlags.newGatingEnabled && app.activeChainId() && (
           <React.Fragment>
             <CWLabel
               label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}

@@ -28,7 +28,7 @@ const columns = [
     numeric: false,
     sortable: true,
   },
-  ...(featureFlags.gatingEnabled
+  ...(featureFlags.newGatingEnabled
     ? [
         {
           key: 'groups',
