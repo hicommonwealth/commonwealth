@@ -45,6 +45,7 @@ export const Errors = {
   InvalidCommunityIdOrUrl:
     'Could not determine a valid endpoint for provided community',
   CommunityAddressExists: 'The address already exists',
+  UserAddressNotExists: 'The user does not own the user_address specified',
   CommunityIDExists:
     'The id for this community already exists, please choose another id',
   CommunityNameExists:
@@ -269,6 +270,7 @@ export async function __createCommunity(
     base,
     bech32_prefix,
     token_name,
+    user_address,
   } = community;
   if (website && !urlHasValidHTTPPrefix(website)) {
     throw new AppError(Errors.InvalidWebsite);
@@ -282,6 +284,17 @@ export async function __createCommunity(
     throw new AppError(Errors.InvalidGithub);
   } else if (icon_url && !urlHasValidHTTPPrefix(icon_url)) {
     throw new AppError(Errors.InvalidIconUrl);
+  }
+
+  let selectedUserAddress: string;
+  if (user_address) {
+    const addresses = (await user.getAddresses()).filter(
+      (a) => a.address === user_address,
+    );
+    if (addresses.length === 0) {
+      throw new AppError(Errors.UserAddressNotExists);
+    }
+    selectedUserAddress = addresses[0].address;
   }
 
   const oldCommunity = await this.models.Community.findOne({
@@ -388,6 +401,24 @@ export async function __createCommunity(
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
   let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
+
+  if (user_address) {
+    addressToBeAdmin = await this.models.Address.scope(
+      'withPrivateData',
+    ).findOne({
+      where: {
+        user_id: user.id,
+        address: selectedUserAddress,
+      },
+      include: [
+        {
+          model: this.models.Community,
+          where: { base: createdCommunity.base },
+          required: true,
+        },
+      ],
+    });
+  }
 
   if (createdCommunity.base === ChainBase.Ethereum) {
     addressToBeAdmin = await this.models.Address.scope(
