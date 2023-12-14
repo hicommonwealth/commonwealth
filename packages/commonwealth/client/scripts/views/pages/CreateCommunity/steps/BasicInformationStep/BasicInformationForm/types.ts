@@ -1,4 +1,5 @@
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
+import AddressInfo from '../../../../../../models/AddressInfo';
 
 export type SocialLinkField = {
   value?: string;
@@ -17,6 +18,7 @@ export type FormSubmitValues = {
 };
 
 export type BasicInformationFormProps = {
+  selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   onSubmit: (communityId: string) => any;
   onCancel: () => any;
