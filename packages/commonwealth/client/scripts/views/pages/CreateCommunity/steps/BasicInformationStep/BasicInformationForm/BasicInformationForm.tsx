@@ -3,6 +3,7 @@ import { slugifyPreserveDashes } from 'utils';
 import { ZodError } from 'zod';
 
 import { ChainBase } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
 import {
   CWCoverImageUploader,
@@ -187,25 +188,29 @@ const BasicInformationForm = ({
       (chain) => String(chain.value) === values.chain.value,
     );
 
-    await createCommunityMutation({
-      id: communityId,
-      name: values.communityName,
-      chainBase: selectedCommunity.chainBase,
-      description: values.communityDescription,
-      iconUrl: values.communityProfileImageURL,
-      socialLinks: values.links,
-      ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
-        ethChainId: values.chain.value,
-      }),
-      ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
-        cosmosChainId: values.chain.value,
-      }),
-      nodeUrl: selectedChainNode.nodeUrl,
-      altWalletUrl: selectedChainNode.altWalletUrl,
-      userAddress: selectedAddress.address,
-    });
-
-    await onSubmit(communityId);
+    try {
+      await createCommunityMutation({
+        id: communityId,
+        name: values.communityName,
+        chainBase: selectedCommunity.chainBase,
+        description: values.communityDescription,
+        iconUrl: values.communityProfileImageURL,
+        socialLinks: values.links,
+        ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
+          ethChainId: values.chain.value,
+        }),
+        ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
+          cosmosChainId: values.chain.value,
+        }),
+        nodeUrl: selectedChainNode.nodeUrl,
+        altWalletUrl: selectedChainNode.altWalletUrl,
+        userAddress: selectedAddress.address,
+      });
+      onSubmit(communityId);
+    } catch (err) {
+      notifyError(err.response?.data?.error);
+      console.log(err);
+    }
   };
 
   const handleCancel = () => {
