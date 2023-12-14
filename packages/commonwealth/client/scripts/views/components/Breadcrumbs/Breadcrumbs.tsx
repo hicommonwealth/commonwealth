@@ -2,6 +2,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useGetThreadsByIdQuery } from 'state/api/threads';
 import { CWBreadcrumbs } from '../component_kit/cw_breadcrumbs';
 import './Breadcrumbs.scss';
 import { breadCrumbURLS } from './data';
@@ -10,6 +11,17 @@ import { generateBreadcrumbs } from './utils';
 export const Breadcrumbs = () => {
   const location = useLocation();
   const navigate = useCommonNavigate();
+
+  // const { data: topics = [] } = useFetchTopicsQuery({
+  //   chainId: app.activeChainId()
+  // });
+  const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
+    chainId: app.activeChainId(),
+    ids: [3781],
+    // apiCallEnabled: linkedThreadIds.length > 0, // only call the api if we have thread id
+  });
+
+  console.log('topic', linkedThreads);
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
@@ -90,8 +102,6 @@ export const Breadcrumbs = () => {
       return tooltips.discussionsGovernance;
     }
   };
-
-  console.log('path', pathnames);
 
   return (
     <nav className="Breadcrumbs">

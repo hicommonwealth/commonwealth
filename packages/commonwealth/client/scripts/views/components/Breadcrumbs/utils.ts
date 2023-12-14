@@ -15,12 +15,6 @@ export const generateBreadcrumbs = (
 
   const breadcrumbs = pathSegments.map((pathSegment, index) => {
     const matchedBreadcrumb = breadcrumbData.find((breadcrumbItem) => {
-      breadcrumbItem.breadcrumb = breadcrumbItem.breadcrumb?.replace(
-        ':community',
-        pathSegments[0],
-      );
-      // matchedBreadcrumb?.breadcrumb?.includes(':community') &&
-      // matchedBreadcrumb.breadcrumb.replace(':community', pathSegments[0]);
       return (
         !breadcrumbItem.url ||
         index >= pathSegments.length ||
@@ -53,10 +47,7 @@ export const generateBreadcrumbs = (
         }
         break;
       default:
-        if (
-          pathSegments[index] === 'discussion' ||
-          pathSegments[index] === 'discussions'
-        ) {
+        if (pathSegments[index] === 'discussions') {
           // Generate the link for 'discussion' segment.
           link = `discussions`;
           pathSegments[index] = 'Discussions';
@@ -73,12 +64,28 @@ export const generateBreadcrumbs = (
       '',
     );
 
-    const label =
+    let label =
       index === pathSegments.length - 1 && !!threadName
         ? threadName
         : matchedBreadcrumb
         ? matchedBreadcrumb.breadcrumb
         : removedThreadId;
+
+    if (pathSegments[1] === 'discussions' || pathSegments[1] === 'discussion') {
+      label = 'Discussions';
+
+      if (pathSegments.length > 2) {
+        console.log('FIRED', pathSegments);
+        pathSegments.splice(0, 1);
+      }
+      console.log('FIRED1');
+    } else if (pathSegments[1] === 'overview' && label !== 'Overview') {
+      label = 'Discussions';
+      console.log('FIRED2');
+      // } else if (index === 1) {
+      //   pathSegments.splice(0, 1);
+      //   label = pathSegments[index].replace(/^\d+-/, '');
+    }
 
     // Create the breadcrumb object.
     return {
@@ -89,26 +96,6 @@ export const generateBreadcrumbs = (
         matchedBreadcrumb?.isParent || pathSegments[0] === splitLinks[index],
     };
   });
-
-  // const discussionsIndex = pathSegments.indexOf('discussions');
-  // if (discussionsIndex !== -1) {
-  //   breadcrumbs.sort((a, b) => {
-  //     if (
-  //       a.label.toLowerCase() === 'discussions' ||
-  //       a.label.toLowerCase() === 'discussion'
-  //     ) {
-  //       return -1;
-  //     } else if (
-  //       b.label.toLowerCase() === 'discussions' ||
-  //       b.label.toLowerCase() === 'discussion'
-  //     ) {
-  //       return 1;
-  //     }
-  //     return 0;
-  //   });
-  //
-  //   console.log('bread', breadcrumbs);
-  // }
 
   return breadcrumbs.filter((val) => val !== undefined);
 };
