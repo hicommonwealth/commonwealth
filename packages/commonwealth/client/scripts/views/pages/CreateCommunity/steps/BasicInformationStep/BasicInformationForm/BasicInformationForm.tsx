@@ -19,7 +19,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import {
-  POLYGON_CHAIN_OPTION,
+  POLYGON_ETH_CHAIN_ID,
   chainTypes,
   existingCommunityNames,
 } from './constants';
@@ -67,7 +67,12 @@ const BasicInformationForm = ({
     // Since we are treating polygon as an ecosystem, we will only have a single option, which will be
     // preselected and further input's will be disabled
     if (selectedCommunity.type === CommunityType.Polygon) {
-      return [POLYGON_CHAIN_OPTION];
+      return chainTypes
+        .filter((chainType) => chainType.value === POLYGON_ETH_CHAIN_ID)
+        .map((chainType) => ({
+          label: chainType.label,
+          value: `${chainType.value}`,
+        }));
     }
 
     if (selectedCommunity.type === CommunityType.Solana) {
@@ -95,7 +100,7 @@ const BasicInformationForm = ({
 
   const getInitialValue = () => ({
     ...(selectedCommunity.type === CommunityType.Polygon && {
-      chain: POLYGON_CHAIN_OPTION,
+      chain: getChainOptions()?.[0],
     }),
     ...(selectedCommunity.type === CommunityType.Solana && {
       chain: getChainOptions()?.[0],
