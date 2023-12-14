@@ -48,7 +48,9 @@ const CWGatedTopicBanner = ({
         {
           label: 'Learn more about gating',
           onClick: () =>
-            (window.location.href = `https://blog.commonwealth.im/introducing-common-groups/`),
+            window.open(
+              `https://blog.commonwealth.im/introducing-common-groups/`,
+            ),
         },
       ]}
       onClose={onClose}
