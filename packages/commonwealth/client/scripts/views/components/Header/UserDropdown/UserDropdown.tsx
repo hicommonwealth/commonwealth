@@ -87,7 +87,7 @@ const UserDropdown = () => {
         type: 'default',
         label: (
           <UserDropdownItem
-            isSignedIn={true /*signed*/}
+            isSignedIn={signed}
             hasJoinedCommunity={isActive}
             address={account.address}
           />
