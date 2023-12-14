@@ -1,7 +1,8 @@
 import moment from 'moment';
 import { Sequelize } from 'sequelize';
-import { DB } from 'server/models';
-import { AddressInstance } from '../../models/address';
+import { MEMBERSHIP_REFRESH_TTL_SECONDS } from '../../config';
+import { DB } from '../../models';
+import { AddressAttributes } from '../../models/address';
 import { GroupAttributes } from '../../models/group';
 import { MembershipInstance } from '../../models/membership';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
@@ -9,27 +10,30 @@ import { OptionsWithBalances } from '../tokenBalanceCache/types';
 import { makeGetBalancesOptions } from './makeGetBalancesOptions';
 import validateGroupMembership from './validateGroupMembership';
 
-const MEMBERSHIP_TTL_SECONDS = 60 * 2;
-
 /**
  * refreshMembershipsForAddress refreshes the memberships for the given address
  * @param address Address associated with memberships
  * @param groups Groups to check requirements from
  * @param topics Topics associated with groups
+ * @param cacheRefresh if true, forces TBC cache to refresh and force updates membership
  * @returns MembershipInstance[]
  */
 export async function refreshMembershipsForAddress(
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
-  address: AddressInstance,
+  address: AddressAttributes,
   groups: GroupAttributes[],
+  cacheRefresh: boolean,
 ): Promise<MembershipInstance[]> {
   const getBalancesOptions = makeGetBalancesOptions(groups, [address]);
   const balances = await Promise.all(
     getBalancesOptions.map(async (options) => {
       return {
         options,
-        balances: await tokenBalanceCache.getBalances(options),
+        balances: await tokenBalanceCache.getBalances({
+          ...options,
+          cacheRefresh,
+        }),
       };
     }),
   );
@@ -50,10 +54,10 @@ export async function refreshMembershipsForAddress(
         ],
       });
 
-      if (membership) {
+      if (!cacheRefresh && membership) {
         // membership exists
         const expiresAt = moment(membership.last_checked).add(
-          MEMBERSHIP_TTL_SECONDS,
+          MEMBERSHIP_REFRESH_TTL_SECONDS,
           'seconds',
         );
         if (moment().isBefore(expiresAt)) {
@@ -90,7 +94,7 @@ async function recomputeMembership(
   models: DB,
   membership: MembershipInstance | null,
   group: GroupAttributes,
-  address: AddressInstance,
+  address: AddressAttributes,
   balances: OptionsWithBalances[],
 ): Promise<MembershipInstance> {
   const { requirements } = group;
@@ -102,7 +106,7 @@ async function recomputeMembership(
   const computedMembership = {
     group_id: group.id,
     address_id: address.id,
-    reject_reason: isValid ? null : JSON.stringify(messages),
+    reject_reason: isValid ? null : messages,
     last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
   };
   if (!membership) {

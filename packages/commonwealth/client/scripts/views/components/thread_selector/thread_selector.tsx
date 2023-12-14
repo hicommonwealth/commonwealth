@@ -49,7 +49,7 @@ export const ThreadSelector = ({
         new Thread({
           id: t.id,
           title: t.title,
-          chain: t.chain,
+          chain: t.community_id,
           Address: new AddressInfo({
             id: t.address_id,
             address: t.address,
