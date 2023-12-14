@@ -86,6 +86,7 @@ export const CreateComment = ({
         setUserBalance(app.user.activeAccount?.tokenBalance);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenPostingThreshold]);
 
   const {
