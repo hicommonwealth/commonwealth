@@ -14,8 +14,7 @@ export const Errors = {
 
 /**
  * Validates if a given user address passes a set of requirements and grants access for
- * all groups of the given topic. Depending on the FEATURE_FLAG_GROUP_CHECK_ENABLED
- * feature flag, may use Gating API implementation or original TBC implementation.
+ * all groups of the given topic.
  * @param models DB handle
  * @param tokenBalanceCache Token balance cache handle (new implementation)
  * @param topicId ID of the topic
