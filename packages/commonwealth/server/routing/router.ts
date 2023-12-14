@@ -231,17 +231,12 @@ function setupRouter(
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(
       models,
-      tokenBalanceCacheV1,
+      tokenBalanceCache,
       banCache,
     ),
     polls: new ServerPollsController(models, tokenBalanceCache),
     proposals: new ServerProposalsController(models, redisCache),
-    groups: new ServerGroupsController(
-      models,
-      tokenBalanceCacheV1,
-      tokenBalanceCache,
-      banCache,
-    ),
+    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
     topics: new ServerTopicsController(models, banCache),
   };
 
