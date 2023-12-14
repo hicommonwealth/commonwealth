@@ -216,23 +216,18 @@ function setupRouter(
 ) {
   // controllers
 
-  const tokenBalanceCacheV2 = new NewTokenBalanceCache(
+  const tokenBalanceCache = new NewTokenBalanceCache(
     models,
     redisCache,
     TBC_BALANCE_TTL_SECONDS,
   );
 
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(
-      models,
-      tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
-      banCache,
-    ),
+    threads: new ServerThreadsController(models, tokenBalanceCache, banCache),
     comments: new ServerCommentsController(
       models,
       tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
+      tokenBalanceCache,
       banCache,
     ),
     reactions: new ServerReactionsController(models, banCache),
@@ -247,13 +242,13 @@ function setupRouter(
     polls: new ServerPollsController(
       models,
       tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
+      tokenBalanceCache,
     ),
     proposals: new ServerProposalsController(models, redisCache),
     groups: new ServerGroupsController(
       models,
       tokenBalanceCacheV1,
-      tokenBalanceCacheV2,
+      tokenBalanceCache,
       banCache,
     ),
     topics: new ServerTopicsController(models, banCache),

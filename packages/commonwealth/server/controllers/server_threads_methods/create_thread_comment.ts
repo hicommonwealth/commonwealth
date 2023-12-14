@@ -138,8 +138,7 @@ export async function __createThreadComment(
     if (!isAdmin) {
       const { isValid, message } = await validateTopicGroupsMembership(
         this.models,
-        this.tokenBalanceCacheV1,
-        this.tokenBalanceCacheV2,
+        this.tokenBalanceCache,
         thread.topic_id,
         community,
         address,
