@@ -18,7 +18,7 @@ interface CreateCommunityProps {
   nodeUrl: string;
   altWalletUrl: string;
   userAddress: string;
-  bech32Prefix?: 'osmo';
+  bech32Prefix?: string;
 }
 
 const createCommunity = async ({

@@ -56,7 +56,7 @@ export const createCommunitySchema = z.object({
   address: z.string().optional(), // address for the contract of the chain
   decimals: z.number().optional(),
   substrate_spec: z.string().optional(),
-  bech32_prefix: z.string().optional(),
+  bech32_prefix: z.string().optional(), // required for cosmos communities
   token_name: z.string().optional(),
 
   // deprecated params to be removed

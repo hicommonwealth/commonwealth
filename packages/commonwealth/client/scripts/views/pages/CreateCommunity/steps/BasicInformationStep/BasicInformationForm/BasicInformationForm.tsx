@@ -205,7 +205,7 @@ const BasicInformationForm = ({
         nodeUrl: selectedChainNode.nodeUrl,
         altWalletUrl: selectedChainNode.altWalletUrl,
         userAddress: selectedAddress.address,
-        bech32Prefix: selectedCommunity.type === 'cosmos' ? 'osmo' : null,
+        bech32Prefix: selectedChainNode.bech32Prefix,
       });
       onSubmit(communityId);
     } catch (err) {

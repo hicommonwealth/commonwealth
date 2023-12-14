@@ -32,4 +32,5 @@ export const chainTypes = app.config.nodes
     nodeUrl: chain.url,
     value: chain.ethChainId || chain.cosmosChainId || 'solana',
     label: chain.name.replace(/\b\w/g, (l) => l.toUpperCase()),
+    bech32Prefix: chain.bech32,
   }));
