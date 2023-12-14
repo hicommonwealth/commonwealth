@@ -1,24 +1,33 @@
 import React, { FC } from 'react';
 
 import { SearchScope } from '../../../../../models/SearchQuery';
-import { CWText } from '../../cw_text';
 import { CWDivider } from '../../cw_divider';
+import { CWText } from '../../cw_text';
 import { SearchBarCommentPreviewRow } from './SearchBarCommentPreviewRow';
 import { SearchBarCommunityPreviewRow } from './SearchBarCommunityPreviewRow';
 import { SearchBarMemberPreviewRow } from './SearchBarMemberPreviewRow';
 import { SearchBarThreadPreviewRow } from './SearchBarThreadPreviewRow';
 
+import { SearchResults } from '../../../../../hooks/useSearchResults';
+import { SearchChainsResponse } from '../../../../../state/api/chains/searchChains';
+import { SearchCommentsResponse } from '../../../../../state/api/comments/searchComments';
+import { SearchProfilesResponse } from '../../../../../state/api/profiles/searchProfiles';
+import { SearchThreadsResponse } from '../../../../../state/api/threads/searchThreads';
 import './SearchBarDropdown.scss';
 
 interface SearchBarPreviewSectionProps {
-  searchResults: any;
+  searchResults:
+    | SearchThreadsResponse['results']
+    | SearchCommentsResponse['results']
+    | SearchChainsResponse['results']
+    | SearchProfilesResponse['results'];
   searchTerm: string;
   searchScope: SearchScope;
 }
 
 interface SearchBarDropdownProps {
   searchTerm: string;
-  searchResults: any;
+  searchResults: SearchResults;
 }
 
 const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({

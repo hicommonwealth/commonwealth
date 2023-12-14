@@ -37,7 +37,7 @@ class CommunityRole {
       allow,
       deny,
       createdAt,
-      updatedAt
+      updatedAt,
     );
   }
 }

@@ -68,7 +68,8 @@ const CommunityMembersPage = () => {
   const { data: memberships = null } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
-    apiEnabled: !!featureFlags.gatingEnabled,
+    apiEnabled:
+      app?.user?.activeAccount?.address && !!featureFlags.gatingEnabled,
   });
 
   const debouncedSearchTerm = useDebounce<string>(

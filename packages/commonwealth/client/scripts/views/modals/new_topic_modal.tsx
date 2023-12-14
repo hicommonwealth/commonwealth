@@ -39,7 +39,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);

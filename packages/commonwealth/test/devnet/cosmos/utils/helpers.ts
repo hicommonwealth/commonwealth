@@ -1,5 +1,5 @@
-import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { Secp256k1HdWallet, StdFee } from '@cosmjs/amino';
+import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { DeliverTxResponse } from '@cosmjs/stargate';
 
 import { CosmosToken } from 'controllers/chain/cosmos/types';
@@ -10,7 +10,8 @@ import {
 } from 'controllers/chain/cosmos/chain.utils';
 
 const mnemonic =
-  'ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse scrap clutch cup daughter bench length sell goose deliver critic favorite thought';
+  `ignore medal pitch lesson catch stadium victory jewel first stairs humble excuse ` +
+  `scrap clutch cup daughter bench length sell goose deliver critic favorite thought`;
 const DEFAULT_FEE: StdFee = {
   gas: '180000',
   amount: [{ amount: '0', denom: 'ustake' }],
@@ -38,14 +39,14 @@ export const setupTestSigner = async (rpcUrl: string, isAmino?: boolean) => {
 export const sendTx = async (
   rpcUrl: string,
   tx: any,
-  isAmino?: boolean
+  isAmino?: boolean,
 ): Promise<DeliverTxResponse> => {
   const { client, signerAddress } = await setupTestSigner(rpcUrl, isAmino);
   const result = await client.signAndBroadcast(
     signerAddress,
     [tx],
     DEFAULT_FEE,
-    DEFAULT_MEMO
+    DEFAULT_MEMO,
   );
   return result;
 };
@@ -60,10 +61,10 @@ export const waitOneBlock = async (rpcUrl: string): Promise<void> => {
   let newHeight = currentHeight;
   while (newHeight === currentHeight) {
     // Wait for a short period
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Check the current block height again
-    const block = await tm.block();
-    newHeight = block.block.header.height;
+    const latestBlock = await tm.block();
+    newHeight = latestBlock.block.header.height;
   }
 };
