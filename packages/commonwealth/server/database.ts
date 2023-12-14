@@ -1,5 +1,5 @@
 import { DataTypes, Sequelize } from 'sequelize';
-import { DATABASE_URI } from './config';
+import { DATABASE_URI, MAX_SEQUELIZE_POOL_SIZE } from './config';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { DB, Models } from './models';
@@ -61,7 +61,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
       ? { requestTimeout: 40000, ssl: false }
       : { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
   pool: {
-    max: 10,
+    max: MAX_SEQUELIZE_POOL_SIZE,
     min: 0,
     acquire: 40000,
     idle: 40000,

@@ -131,3 +131,7 @@ export const MEMBERSHIP_REFRESH_TTL_SECONDS = process.env
 export const TBC_BALANCE_TTL_SECONDS = process.env.TBC_BALANCE_TTL_SECONDS
   ? parseInt(process.env.TBC_BALANCE_TTL_SECONDS, 10)
   : 300;
+
+export const MAX_SEQUELIZE_POOL_SIZE = process.env.MAX_SEQUELIZE_POOL_SIZE
+  ? parseInt(process.env.MAX_SEQUELIZE_POOL_SIZE, 10)
+  : 10;
