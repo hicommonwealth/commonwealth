@@ -7,6 +7,7 @@ import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
 import { SessionKeyError } from 'controllers/server/sessions';
+import { featureFlags } from 'helpers/feature-flags';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 import { useDraft } from 'hooks/useDraft';
 import app from 'state';
@@ -71,7 +72,11 @@ export const CreateComment = ({
   }, [activeTopic]);
 
   useEffect(() => {
-    if (!tokenPostingThreshold.isZero() && !balanceLoading) {
+    if (
+      !tokenPostingThreshold.isZero() &&
+      !balanceLoading &&
+      !featureFlags.newGatingEnabled
+    ) {
       setBalanceLoading(true);
       if (!app.user.activeAccount?.tokenBalance) {
         getTokenBalance().then(() => {
@@ -144,7 +149,8 @@ export const CreateComment = ({
     }
   };
 
-  const userFailsThreshold = app.chain.isGatedTopic(activeTopic?.id);
+  const userFailsThreshold =
+    !featureFlags.newGatingEnabled && app.chain.isGatedTopic(activeTopic?.id);
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 ||

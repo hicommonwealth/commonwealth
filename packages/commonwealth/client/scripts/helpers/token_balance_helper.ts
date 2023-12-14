@@ -1,13 +1,15 @@
+import axios from 'axios';
 import BN from 'bn.js';
 import app from 'state';
 import {
   ChainNetwork,
   ContractType,
 } from '../../../../common-common/src/types';
-import axios from 'axios';
+import { featureFlags } from './feature-flags';
 
 export const getTokenBalance = async () => {
   if (
+    !featureFlags.newGatingEnabled &&
     app.user.activeAccounts[0] &&
     app.chain.gatedTopics?.length > 0 &&
     !app.user.activeAccounts[0].tokenBalance
@@ -29,7 +31,7 @@ export const getTokenBalance = async () => {
           if (balanceResp.data?.result) {
             balanceResp.data.result.forEach((balObj) => {
               const account = app.user.activeAccounts.find(
-                (acc) => acc.address == balObj.address.distinctAddress
+                (acc) => acc.address == balObj.address.distinctAddress,
               );
               if (account) account.setTokenBalance(new BN(balObj.balance, 10));
             });

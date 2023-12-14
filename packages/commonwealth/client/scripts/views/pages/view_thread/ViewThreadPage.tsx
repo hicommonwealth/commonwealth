@@ -320,7 +320,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const canComment =
     (!!hasJoinedCommunity ||
-      (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id))) &&
+      (!isAdminOrMod &&
+        app.chain.isGatedTopic(thread?.topic?.id) &&
+        !featureFlags.newGatingEnabled)) &&
     !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
@@ -532,7 +534,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
-                    {featureFlags.gatingEnabled &&
+                    {featureFlags.newGatingEnabled &&
                       foundGatedTopic &&
                       !hideGatingBanner &&
                       isRestrictedMembership && (
