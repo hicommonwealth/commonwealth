@@ -44,7 +44,7 @@ export const NewThreadForm = () => {
 
   const communityId = app.chain.id;
   const hasTopics = topics?.length;
-  const isAdmin = Permissions.isCommunityAdmin();
+  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
@@ -123,7 +123,8 @@ export const NewThreadForm = () => {
       group.topics.find((topic) => topic.id === threadTopic?.id),
     )
     .map((group) => group.name);
-  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+  const isRestrictedMembership =
+    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const handleNewThreadCreation = async () => {
     if (isRestrictedMembership) {
