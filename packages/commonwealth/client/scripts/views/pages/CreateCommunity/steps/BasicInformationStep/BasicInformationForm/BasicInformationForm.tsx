@@ -36,6 +36,7 @@ import {
 import './BasicInformationForm.scss';
 
 const ETHEREUM_MAINNET_ID = '1';
+const OSMOSIS_ID = 'osmosis';
 
 const BasicInformationForm = ({
   selectedAddress,
@@ -107,6 +108,9 @@ const BasicInformationForm = ({
     }),
     ...(selectedCommunity.type === CommunityType.Ethereum && {
       chain: getChainOptions()?.find((o) => o.value === ETHEREUM_MAINNET_ID),
+    }),
+    ...(selectedCommunity.type === CommunityType.Cosmos && {
+      chain: getChainOptions()?.find((o) => o.value === OSMOSIS_ID),
     }),
   });
 

@@ -124,6 +124,7 @@ const CommunityTypeStep = ({
       <CWModal
         content={
           <LoginModal
+            initialSidebar="createCommunityLogin"
             initialWallets={availableWallets}
             onModalClose={() => setIsLoginModalOpen(false)}
             onSuccess={() => {
