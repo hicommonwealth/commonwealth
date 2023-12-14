@@ -1,4 +1,4 @@
-import db from '../database';
+import db from '../database'; // TODO: use port/adapter pattern to test in-memory
 import { ActorMiddleware } from './middleware';
 
 /**
@@ -10,6 +10,7 @@ export const isCommunityAuthor: ActorMiddleware = async (actor) => {
   if (!actor?.address_id) return 'Must provide an address';
   if (!actor.community) return 'Must load community';
 
+  // TODO: wrap in cache
   const author = await db.Address.findOne({
     where: {
       user_id: !actor.user.isAdmin && actor.user.id, // TODO: validate this logic

@@ -14,6 +14,7 @@ export const loadCommunity: ActorMiddleware = async (actor) => {
   // if all chains, then bypass validation
   if (actor.community_id === ALL_COMMUNITIES) return actor;
 
+  // TODO: wrap in cache
   const community = await db.Community.findOne({
     where: { id: actor.community_id },
   });
