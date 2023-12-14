@@ -1,6 +1,10 @@
-import { Request, RequestHandler, Response } from 'express';
-import { Actor } from '.';
-import { ActorMiddleware, validate } from './middleware';
+import type {
+  Request,
+  RequestHandler,
+  Response,
+} from 'express-serve-static-core';
+import type { Actor } from '.';
+import { validate, type ActorMiddleware } from './middleware';
 
 /**
  * Command signature
@@ -16,7 +20,7 @@ export type Command<
 /**
  * Adapts commands to express handlers
  * - By convention, the aggregate id is a request parameter `:id`
- * - By convention, we can expect the following optional arguments in the request:
+ * - By convention, we can expect the following optional arguments in the body of the request: TODO: check this
  *  - address?: string;
  *  - author_chain?: string;
  *  - author_community_id?: string;
@@ -29,13 +33,19 @@ export type Command<
  */
 export const command =
   <M, R>(fn: Command<M, R>, middleware: ActorMiddleware[]): RequestHandler =>
-  // TODO: check express types version, should show more generic options
-  async (req: Request<{ id: string }>, res: Response<R>) => {
+  async (
+    req: Request<
+      { id: string },
+      R,
+      M & { address_id?: string; chain_id?: string; community_id?: string }
+    >,
+    res: Response<R>,
+  ) => {
     const actor = await validate(
       {
         user: req.user,
-        // TODO: address_id: req.address_id,
-        // TODO: community_id: req.chain_id ?? req.community_id,
+        address_id: req.body.address_id,
+        community_id: req.body.chain_id ?? req.body.community_id,
       },
       middleware,
     );

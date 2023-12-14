@@ -1,6 +1,6 @@
-import { AddressAttributes } from '../models/address';
-import { CommunityAttributes } from '../models/community';
-import { UserAttributes } from '../models/user';
+import type { AddressAttributes } from '../models/address';
+import type { CommunityAttributes } from '../models/community';
+import type { UserAttributes } from '../models/user';
 
 /**
  * "Core" abstraction representing the "user acting on a system", either invoking a command or query operation

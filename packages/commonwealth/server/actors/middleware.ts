@@ -1,4 +1,4 @@
-import { Actor, ActorValidationError } from '.';
+import { ActorValidationError, type Actor } from '.';
 
 /**
  * Middleware signature to loads and/or validates actor state in a chain of responsibility pattern
