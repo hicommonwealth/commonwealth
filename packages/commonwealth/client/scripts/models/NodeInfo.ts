@@ -7,6 +7,7 @@ class NodeInfo {
   public readonly altWalletUrl?: string;
   public readonly balanceType?: string;
   public readonly bech32?: string;
+  public readonly network?: string;
 
   constructor({
     id,

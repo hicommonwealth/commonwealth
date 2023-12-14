@@ -1,7 +1,6 @@
 import {
   ChainBase,
   ChainCategoryType,
-  ChainNetwork,
   ChainType,
 } from 'common-common/src/types';
 import { z } from 'zod';
@@ -61,7 +60,7 @@ export const createCommunitySchema = z.object({
 
   // deprecated params to be removed
   node_url: z.string().url(),
-  network: z.nativeEnum(ChainNetwork),
+  network: z.string(),
   default_symbol: z.string().max(9),
   website: z.string().url().optional(),
   github: z.string().url().startsWith('https://github.com/').optional(),
