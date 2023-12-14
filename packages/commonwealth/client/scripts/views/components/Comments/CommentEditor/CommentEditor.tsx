@@ -102,7 +102,7 @@ export const CommentEditor = ({
           )}
           <CWButton
             buttonWidth="wide"
-            disabled={disabled && !isAdmin}
+            disabled={disabled}
             onClick={handleSubmitComment}
             label="Submit"
           />
