@@ -45,7 +45,7 @@ export async function __refreshMembership(
 
   const memberships = await refreshMembershipsForAddress(
     this.models,
-    this.tokenBalanceCacheV2,
+    this.tokenBalanceCache,
     address,
     groups,
     true, // use fresh balances
