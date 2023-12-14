@@ -425,9 +425,7 @@ export async function __createCommunity(
         },
       ],
     });
-  }
-
-  if (createdCommunity.base === ChainBase.Ethereum) {
+  } else if (createdCommunity.base === ChainBase.Ethereum) {
     addressToBeAdmin = await this.models.Address.scope(
       'withPrivateData',
     ).findOne({
