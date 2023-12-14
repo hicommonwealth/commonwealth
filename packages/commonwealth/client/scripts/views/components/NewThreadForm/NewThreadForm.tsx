@@ -48,14 +48,18 @@ export const NewThreadForm = () => {
 
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
-      if (
-        isAdmin ||
-        t.tokenThreshold.isZero() ||
-        !app.chain.isGatedTopic(t.id)
-      ) {
+      if (featureFlags.newGatingEnabled) {
         acc?.enabledTopics?.push(t);
       } else {
-        acc?.disabledTopics?.push(t);
+        if (
+          isAdmin ||
+          t.tokenThreshold.isZero() ||
+          !app.chain.isGatedTopic(t.id)
+        ) {
+          acc?.enabledTopics?.push(t);
+        } else {
+          acc?.disabledTopics?.push(t);
+        }
       }
       return acc;
     },
@@ -268,7 +272,7 @@ export const NewThreadForm = () => {
               />
             )}
 
-            {featureFlags.gatingEnabled &&
+            {featureFlags.newGatingEnabled &&
               isRestrictedMembership &&
               canShowGatingBanner && (
                 <div>

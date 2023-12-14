@@ -8,6 +8,7 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import { setDarkMode } from '../helpers/darkMode';
+import { featureFlags } from '../helpers/feature-flags';
 import { EXCEPTION_CASE_threadCountersStore } from '../state/ui/thread';
 import Account from './Account';
 import type ChainInfo from './ChainInfo';
@@ -84,7 +85,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.meta.setAdmins(admins);
     this.meta.setBanner(communityBanner);
     this.app.contracts.initialize(contractsWithTemplatesData, true);
-    if (gateStrategies.length > 0) {
+    if (gateStrategies.length > 0 && !featureFlags.newGatingEnabled) {
       this.gatedTopics = gateStrategies;
     }
 
@@ -104,7 +105,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async initApi(): Promise<void> {
     this._apiInitialized = true;
     console.log(
-      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`
+      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`,
     );
   }
 
@@ -113,7 +114,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.chainModuleReady.emit('ready');
     this.app.isModuleReady = true;
     console.log(
-      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`
+      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`,
     );
   }
 
@@ -139,14 +140,18 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // TODO: does this need debouncing?
     if (modules.some((mod) => !!mod && !mod.initializing && !mod.ready)) {
       await Promise.all(
-        modules.map((mod) => mod.init(this.chain, this.accounts))
+        modules.map((mod) => mod.init(this.chain, this.accounts)),
       );
       this.app.chainModuleReady.emit('ready');
     }
   }
 
   public getTopicThreshold(topicId: number): BN {
-    if (this.gatedTopics?.length > 0 && topicId) {
+    if (
+      this.gatedTopics?.length > 0 &&
+      topicId &&
+      !featureFlags.newGatingEnabled
+    ) {
       const topicGate = this.gatedTopics.find((i) => i.id === topicId);
 
       if (!topicGate) return new BN('0', 10);
@@ -157,12 +162,16 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   }
 
   public isGatedTopic(topicId: number): boolean {
+    if (featureFlags.newGatingEnabled) return false;
+
     const tokenPostingThreshold = this.getTopicThreshold(topicId);
     if (
       !tokenPostingThreshold.isZero() &&
       !this.app.user.activeAccount?.tokenBalance
-    )
+    ) {
       return true;
+    }
+
     return (
       !tokenPostingThreshold.isZero() &&
       tokenPostingThreshold.gt(this.app.user.activeAccount.tokenBalance)

@@ -1,4 +1,5 @@
 import { SessionKeyError } from 'controllers/server/sessions';
+import { featureFlags } from 'helpers/feature-flags';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -80,7 +81,10 @@ export const ReactionButton = ({
 
   // token balance check if needed
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isUserForbidden = !isAdmin && app.chain.isGatedTopic(thread.topic?.id);
+  const isUserForbidden =
+    !isAdmin &&
+    app.chain.isGatedTopic(thread.topic?.id) &&
+    !featureFlags.newGatingEnabled;
 
   const handleVoteClick = async (event) => {
     event.stopPropagation();
