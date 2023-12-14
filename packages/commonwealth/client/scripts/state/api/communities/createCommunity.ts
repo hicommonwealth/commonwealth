@@ -18,6 +18,7 @@ interface CreateCommunityProps {
   nodeUrl: string;
   altWalletUrl: string;
   userAddress: string;
+  bech32Prefix?: 'osmo';
 }
 
 const createCommunity = async ({
@@ -32,6 +33,7 @@ const createCommunity = async ({
   nodeUrl,
   altWalletUrl,
   userAddress,
+  bech32Prefix,
 }: CreateCommunityProps) => {
   const nameToSymbol = name.toUpperCase().slice(0, 4);
 
@@ -51,6 +53,7 @@ const createCommunity = async ({
     type: ChainType.Offchain,
     network: baseToNetwork(chainBase),
     default_symbol: nameToSymbol,
+    bech32_prefix: bech32Prefix,
     jwt: app.user.jwt,
   });
 };
