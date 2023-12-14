@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
 import { ZodError } from 'zod';
 
+import { ChainBase } from 'common-common/src/types';
 import useCreateCommunityMutation from 'state/api/communities/createCommunity';
 import {
   CWCoverImageUploader,
@@ -32,7 +33,6 @@ import {
   socialLinkValidation,
 } from './validation';
 
-import { ChainBase } from 'common-common/src/types';
 import './BasicInformationForm.scss';
 
 const ETHEREUM_MAINNET_ID = '1';
@@ -60,7 +60,6 @@ const BasicInformationForm = ({
 
   const {
     mutateAsync: createCommunityMutation,
-    error: createCommunityError,
     isLoading: createCommunityLoading,
   } = useCreateCommunityMutation();
 
@@ -123,9 +122,8 @@ const BasicInformationForm = ({
     const updatedSocialLinks = [...socialLinks];
     socialLinks.map((link, index) => {
       try {
-        const schema = socialLinkValidation;
         if (link.value.trim() !== '') {
-          schema.parse(link.value);
+          socialLinkValidation.parse(link.value);
         }
 
         updatedSocialLinks[index] = {
@@ -153,9 +151,8 @@ const BasicInformationForm = ({
       value,
     };
     try {
-      const schema = socialLinkValidation;
       if (updatedSocialLinks[index].value.trim() !== '') {
-        schema.parse(updatedSocialLinks[index].value);
+        socialLinkValidation.parse(updatedSocialLinks[index].value);
       }
 
       updatedSocialLinks[index] = {
@@ -180,8 +177,6 @@ const BasicInformationForm = ({
     const selectedChainNode = chainTypes.find(
       (chain) => String(chain.value) === values.chain.value,
     );
-
-    console.log('values', values);
 
     await createCommunityMutation({
       id: communityId,
@@ -349,7 +344,7 @@ const BasicInformationForm = ({
           type="submit"
           buttonWidth="wide"
           label="Launch Community"
-          disabled={isProcessingProfileImage}
+          disabled={createCommunityLoading || isProcessingProfileImage}
         />
       </section>
     </CWForm>

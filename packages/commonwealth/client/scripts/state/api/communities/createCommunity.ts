@@ -1,8 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { ChainBase, ChainType } from 'common-common/src/types';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { baseToNetwork } from 'helpers';
-import app from 'state';
+import app, { initAppState } from 'state';
+import { updateAdminOnCreateCommunity } from 'views/pages/create_community/community_input_rows';
 
 interface CreateCommunityProps {
   id: string;
@@ -50,17 +52,23 @@ const createCommunity = async ({
     network: baseToNetwork(chainBase),
     default_symbol: nameToSymbol,
     jwt: app.user.jwt,
-
-    // address: '', ??
-    // bech32_prefix => ??
   });
 };
 
 const useCreateCommunityMutation = () => {
   return useMutation({
     mutationFn: createCommunity,
-    onSuccess: async () => {
-      console.log('success');
+    onSuccess: async ({ data }, variables) => {
+      if (data?.result?.admin_address) {
+        await linkExistingAddressToChainOrCommunity(
+          data.result.admin_address,
+          data.result.role.chain_id,
+          data.result.role.chain_id,
+        );
+      }
+
+      await initAppState(false);
+      await updateAdminOnCreateCommunity(variables.id);
     },
   });
 };

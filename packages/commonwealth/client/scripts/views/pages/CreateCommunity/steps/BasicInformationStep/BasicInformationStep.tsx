@@ -21,9 +21,6 @@ const BasicInformationStep = ({
   handleGoBack,
   handleContinue,
 }: BasicInformationStepProps) => {
-  console.log('selectedAddress', selectedAddress);
-  console.log('selectedCommunity', selectedCommunity);
-
   return (
     <div className="BasicInformationStep">
       <section className="header">

@@ -17,6 +17,7 @@ const CreateCommunity = () => {
     { type: null, chainBase: null },
   );
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
+  const [createdCommunityId, setCreatedCommunityId] = useState('');
 
   const handleChangeStep = (action: number) => {
     setCreateCommunityStep((prevState) => prevState + action);
@@ -42,12 +43,15 @@ const CreateCommunity = () => {
             selectedAddress={selectedAddress}
             selectedCommunity={selectedCommunity}
             handleGoBack={() => handleChangeStep(-1)}
-            handleContinue={() => handleChangeStep(1)}
+            handleContinue={(communityId) => {
+              handleChangeStep(1);
+              setCreatedCommunityId(communityId);
+            }}
           />
         );
 
       case CreateCommunityStep.Success:
-        return <SuccessStep />;
+        return <SuccessStep communityId={createdCommunityId} />;
     }
   };
 

@@ -28,8 +28,6 @@ const SuccessStep = ({ communityId }: SuccessStepProps) => {
         className="w-full"
         onClick={() => {
           navigateToCommunity({ navigate, path: '', chain: communityId });
-          // TODO fix this, should not reload
-          window.location.reload();
         }}
       />
     </div>
