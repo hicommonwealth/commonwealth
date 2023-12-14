@@ -31,6 +31,13 @@ export const command =
   <M, R>(fn: Command<M, R>, middleware: ActorMiddleware[]): RequestHandler =>
   // TODO: check express types version, should show more generic options
   async (req: Request<{ id: string }>, res: Response<R>) => {
-    const actor = await validate({ user: req.user }, middleware);
+    const actor = await validate(
+      {
+        user: req.user,
+        // TODO: address_id: req.address_id,
+        // TODO: community_id: req.chain_id ?? req.community_id,
+      },
+      middleware,
+    );
     return res.json(await fn(actor, req.params.id, req.body));
   };
