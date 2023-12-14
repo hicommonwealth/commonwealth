@@ -15,6 +15,7 @@ interface CreateCommunityProps {
   socialLinks: string[];
   nodeUrl: string;
   altWalletUrl: string;
+  userAddress: string;
 }
 
 const createCommunity = async ({
@@ -28,6 +29,7 @@ const createCommunity = async ({
   socialLinks,
   nodeUrl,
   altWalletUrl,
+  userAddress,
 }: CreateCommunityProps) => {
   const nameToSymbol = name.toUpperCase().slice(0, 4);
 
@@ -42,6 +44,7 @@ const createCommunity = async ({
     cosmos_chain_id: cosmosChainId,
     node_url: nodeUrl,
     alt_wallet_url: altWalletUrl,
+    user_address: userAddress,
 
     type: ChainType.Offchain,
     network: baseToNetwork(chainBase),

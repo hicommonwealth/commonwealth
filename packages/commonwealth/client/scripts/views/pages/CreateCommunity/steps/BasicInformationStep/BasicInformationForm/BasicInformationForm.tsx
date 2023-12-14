@@ -38,6 +38,7 @@ import './BasicInformationForm.scss';
 const ETHEREUM_MAINNET_ID = '1';
 
 const BasicInformationForm = ({
+  selectedAddress,
   selectedCommunity,
   onSubmit,
   onCancel,
@@ -197,6 +198,7 @@ const BasicInformationForm = ({
       }),
       nodeUrl: selectedChainNode.nodeUrl,
       altWalletUrl: selectedChainNode.altWalletUrl,
+      userAddress: selectedAddress.address,
     });
 
     await onSubmit(communityId);

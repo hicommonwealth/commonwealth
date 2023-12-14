@@ -42,17 +42,18 @@ export const createCommunitySchema = z.object({
     .url()
     .superRefine(async (val, ctx) => await checkIconSize(val, ctx))
     .optional(),
-  social_links: z.array(z.string().url()).optional(),
+  social_links: z.array(z.string().url()).default([]),
   tags: z.array(z.nativeEnum(ChainCategoryType)).default([]),
   directory_page_enabled: z.boolean().default(false),
   type: z.nativeEnum(ChainType).default(ChainType.Offchain),
   base: z.nativeEnum(ChainBase),
 
   // hidden optional params
+  user_address: z.string().optional(), // address for the user
   alt_wallet_url: z.string().url().optional(),
   eth_chain_id: z.coerce.number().optional(),
   cosmos_chain_id: z.string().optional(),
-  address: z.string().optional(),
+  address: z.string().optional(), // address for the contract of the chain
   decimals: z.number().optional(),
   substrate_spec: z.string().optional(),
   bech32_prefix: z.string().optional(),

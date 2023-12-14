@@ -40,6 +40,7 @@ const BasicInformationStep = ({
       />
 
       <BasicInformationForm
+        selectedAddress={selectedAddress}
         selectedCommunity={selectedCommunity}
         onSubmit={handleContinue}
         onCancel={handleGoBack}
