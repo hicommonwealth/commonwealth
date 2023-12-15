@@ -23,11 +23,9 @@ import { ServerThreadsController } from '../server_threads_controller';
 const Errors = {
   ThreadNotFound: 'Thread not found',
   BanError: 'Ban error',
-  InsufficientTokenBalance: 'Insufficient token balance',
   InvalidParent: 'Invalid parent',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   NestingTooDeep: 'Comments can only be nested 8 levels deep',
-  BalanceCheckFailed: 'Could not verify user token balance',
   ThreadArchived: 'Thread is archived',
   ParseMentionsFailed: 'Failed to parse mentions',
   FailedCreateComment: 'Failed to create comment',
