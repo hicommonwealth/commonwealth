@@ -506,6 +506,14 @@ describe('ServerThreadsController', () => {
         Subscription: {
           create: async () => ({}),
         },
+        Topic: {
+          findOne: async () => ({
+            group_ids: [],
+          }),
+        },
+        Group: {
+          findAll: async () => [],
+        },
       };
       const tokenBalanceCache = {};
       const banCache = BAN_CACHE_MOCK_FN(chain.id);
