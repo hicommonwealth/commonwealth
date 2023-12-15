@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { useState } from 'react';
 
 export const useAnimation = () => {
   const [animationStyles, setAnimationStyles] = useState({
@@ -7,18 +8,12 @@ export const useAnimation = () => {
     transition: '1s',
   });
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setAnimationStyles({
-        opacity: 1,
-        transform: 'translateY(0)',
-        transition: '1s',
-      });
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
+  useNecessaryEffect(() => {
+    setAnimationStyles({
+      opacity: 1,
+      transform: 'translateY(0)',
+      transition: '1s',
+    });
   }, []);
 
   return { animationStyles };
