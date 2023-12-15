@@ -7,14 +7,14 @@ import { ServerError } from 'common-common/src/errors';
 //
 import type { Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
+import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
+import { TopicInstance } from 'server/models/topic';
 import type { DB } from '../models';
 import type { CommunityBannerInstance } from '../models/community_banner';
 import type { ContractInstance } from '../models/contract';
-import type { CommunityContractTemplateInstance } from 'server/models/community_contract_template';
 import type { ThreadInstance } from '../models/thread';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { findAllRoles } from '../util/roles';
-import { TopicInstance } from 'server/models/topic';
 
 export const Errors = {};
 
@@ -47,7 +47,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           ccts: Array<CommunityContractTemplateInstance>;
           hasGlobalTemplate: boolean;
         }>,
-        TopicInstance[]
+        TopicInstance[],
       ]
     >
   >Promise.all([
@@ -56,13 +56,13 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       models,
       { include: [models.Address], order: [['created_at', 'DESC']] },
       chain.id,
-      ['admin', 'moderator']
+      ['admin', 'moderator'],
     ),
     // most active users
     new Promise(async (resolve, reject) => {
       try {
         const thirtyDaysAgo = new Date(
-          (new Date() as any) - 1000 * 24 * 60 * 60 * 30
+          (new Date() as any) - 1000 * 24 * 60 * 60 * 30,
         );
         const activeUsers = {};
         const where = {
@@ -105,7 +105,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       {
         replacements,
         type: QueryTypes.SELECT,
-      }
+      },
     ),
     await models.sequelize.query(
       `
@@ -138,7 +138,7 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
       {
         bind: { chain: chain.id, created_at: new Date().toISOString() },
         type: QueryTypes.SELECT,
-      }
+      },
     ),
     models.CommunityBanner.findOne({
       where: {
@@ -212,19 +212,10 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
   ]));
 
   const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
+    (t) => t.stage === 'voting',
   ).length;
 
   const numTotalThreads = parseInt(totalThreads[0].count);
-  const gateStrategies = topics.map((topic) => {
-    return {
-      id: topic.id,
-      type: 'token',
-      data: {
-        threshold: topic.token_threshold,
-      },
-    };
-  });
 
   return res.json({
     status: 'Success',
@@ -241,7 +232,6 @@ const bulkOffchain = async (models: DB, req: Request, res: Response) => {
           hasGlobalTemplate: c.hasGlobalTemplate,
         };
       }),
-      gateStrategies,
     },
   });
 };

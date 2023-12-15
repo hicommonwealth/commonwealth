@@ -1,5 +1,4 @@
 import { SessionKeyError } from 'controllers/server/sessions';
-import { featureFlags } from 'helpers/feature-flags';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -7,7 +6,6 @@ import {
   useCreateThreadReactionMutation,
   useDeleteThreadReactionMutation,
 } from 'state/api/threads';
-import Permissions from 'utils/Permissions';
 import { getDisplayedReactorsForPopup } from 'views/components/ReactionButton/helpers';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
@@ -79,13 +77,6 @@ export const ReactionButton = ({
   if (showSkeleton) return <ReactionButtonSkeleton />;
   const isLoading = isAddingReaction || isDeletingReaction;
 
-  // token balance check if needed
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isUserForbidden =
-    !isAdmin &&
-    app.chain.isGatedTopic(thread.topic?.id) &&
-    !featureFlags.newGatingEnabled;
-
   const handleVoteClick = async (event) => {
     event.stopPropagation();
     event.preventDefault();
@@ -127,7 +118,7 @@ export const ReactionButton = ({
       {size === 'small' ? (
         <CWUpvoteSmall
           voteCount={reactors.length}
-          disabled={isUserForbidden || disabled}
+          disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
           onClick={handleVoteClick}
