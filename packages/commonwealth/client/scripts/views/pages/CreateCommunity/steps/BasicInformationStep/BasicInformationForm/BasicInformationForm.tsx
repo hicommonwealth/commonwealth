@@ -201,11 +201,11 @@ const BasicInformationForm = ({
         }),
         ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
           cosmosChainId: values.chain.value,
+          bech32Prefix: selectedChainNode.bech32Prefix,
         }),
         nodeUrl: selectedChainNode.nodeUrl,
         altWalletUrl: selectedChainNode.altWalletUrl,
         userAddress: selectedAddress.address,
-        bech32Prefix: selectedCommunity.type === 'cosmos' ? 'osmo' : null,
       });
       onSubmit(communityId);
     } catch (err) {
