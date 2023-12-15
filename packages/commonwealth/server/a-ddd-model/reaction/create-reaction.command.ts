@@ -3,14 +3,12 @@ import db from '../../database';
 import type { ReactionAttributes } from '../../models/reaction';
 import type { Command } from '../types';
 
-export const CreateReactionSchema = z.object({
+export const CreateReaction = z.object({
   content: z.string(),
 });
 
-export type CreateReaction = z.infer<typeof CreateReactionSchema>;
-
 export const createReaction: Command<
-  CreateReaction,
+  typeof CreateReaction,
   ReactionAttributes
 > = async () =>
   //actor,

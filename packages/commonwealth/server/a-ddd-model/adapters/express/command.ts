@@ -3,6 +3,8 @@ import type {
   RequestHandler,
   Response,
 } from 'express-serve-static-core';
+import { InvalidInput } from 'server/a-ddd-model/errors';
+import { ZodError, ZodSchema, z } from 'zod';
 import {
   validate,
   type ActorMiddleware,
@@ -24,22 +26,41 @@ import type { Command } from '../../types';
  * @returns express command handler
  */
 export const command =
-  <M, R>(fn: Command<M, R>, middleware: ActorMiddleware[]): RequestHandler =>
+  <M extends ZodSchema, R>(
+    fn: Command<M, R>,
+    schema: M,
+    middleware: ActorMiddleware[],
+  ): RequestHandler =>
   async (
     req: Request<
       { id: string },
       R,
-      M & { address_id?: string; chain_id?: string; community_id?: string }
+      z.infer<M> & {
+        address_id?: string;
+        chain_id?: string;
+        community_id?: string;
+      }
     >,
     res: Response<R>,
   ) => {
-    const actor = await validate(
-      {
-        user: req.user,
-        address_id: req.body.address_id,
-        community_id: req.body.chain_id ?? req.body.community_id,
-      },
-      middleware,
-    );
-    return res.json(await fn(actor, req.params.id, req.body));
+    try {
+      const payload = schema.parse(req.body);
+      const actor = await validate(
+        {
+          user: req.user,
+          address_id: req.body.address_id,
+          community_id: req.body.chain_id ?? req.body.community_id,
+        },
+        middleware,
+      );
+      return res.json(await fn(actor, req.params.id, payload));
+    } catch (error) {
+      if (error instanceof Error && error.name === 'ZodError') {
+        const details = (error as ZodError).issues.map(
+          ({ path, message }) => `${path.join('.')}: ${message}`,
+        );
+        throw new InvalidInput('Invalid command', details);
+      }
+      throw new InvalidInput('Invalid command', [error]);
+    }
   };

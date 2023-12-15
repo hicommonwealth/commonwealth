@@ -3,14 +3,12 @@ import db from '../../database';
 import type { CommunityAttributes } from '../../models/community';
 import type { Command } from '../types';
 
-export const CreateCommunitySchema = z.object({
+export const CreateCommunity = z.object({
   content: z.string(),
 });
 
-export type CreateCommunity = z.infer<typeof CreateCommunitySchema>;
-
 export const createCommunity: Command<
-  CreateCommunity,
+  typeof CreateCommunity,
   CommunityAttributes
 > = async () =>
   //actor,

@@ -1,4 +1,12 @@
-import { createCommunity } from './create-community.command';
-import { setCommunityNamespace } from './set-community-namespace.command';
+import { CreateCommunity, createCommunity } from './create-community.command';
+import {
+  SetCommunityNamespace,
+  setCommunityNamespace,
+} from './set-community-namespace.command';
 
-export { createCommunity, setCommunityNamespace };
+export {
+  CreateCommunity,
+  SetCommunityNamespace,
+  createCommunity,
+  setCommunityNamespace,
+};

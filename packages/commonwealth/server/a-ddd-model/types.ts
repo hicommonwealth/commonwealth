@@ -1,3 +1,4 @@
+import { z, ZodSchema } from 'zod';
 import { Actor } from './actor';
 
 /**
@@ -6,7 +7,8 @@ import { Actor } from './actor';
  * @param id the aggregate id
  * @param payload the command payload
  */
-export type Command<
-  M extends Record<string, any>,
-  R extends Record<string, any>,
-> = (actor: Actor, id: string, payload: M) => Promise<R>;
+export type Command<M extends ZodSchema, R> = (
+  actor: Actor,
+  id: string,
+  payload: z.infer<M>,
+) => Promise<R>;

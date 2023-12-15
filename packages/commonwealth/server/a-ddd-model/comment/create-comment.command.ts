@@ -3,14 +3,12 @@ import db from '../../database';
 import type { CommentAttributes } from '../../models/comment';
 import type { Command } from '../types';
 
-export const CreateCommentSchema = z.object({
+export const CreateComment = z.object({
   content: z.string(),
 });
 
-export type CreateComment = z.infer<typeof CreateCommentSchema>;
-
 export const createComment: Command<
-  CreateComment,
+  typeof CreateComment,
   CommentAttributes
 > = async () =>
   //actor,

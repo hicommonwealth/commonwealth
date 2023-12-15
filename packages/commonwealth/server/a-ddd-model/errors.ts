@@ -2,9 +2,11 @@ import { Actor } from './actor';
 
 export const INVALID_INPUT_ERROR = 'InvalidInputError';
 export class InvalidInput extends Error {
-  constructor(message: string) {
+  public details?: string[];
+  constructor(message: string, details?: string[]) {
     super(message);
     this.name = INVALID_INPUT_ERROR;
+    this.details = details;
   }
 }
 

@@ -4,17 +4,15 @@ import type { CommunityAttributes } from '../../models/community';
 import { InvalidInput } from '../errors';
 import type { Command } from '../types';
 
-export const SetCommunityNamespaceSchema = z.object({
+export const SetCommunityNamespace = z.object({
   namespace: z.string(),
 });
-
-export type SetCommunityNamespace = z.infer<typeof SetCommunityNamespaceSchema>;
 
 /**
  * Sets community namespace
  */
 export const setCommunityNamespace: Command<
-  SetCommunityNamespace,
+  typeof SetCommunityNamespace,
   CommunityAttributes
 > = async (actor, id, payload) => {
   // if loaded by actor middleware
