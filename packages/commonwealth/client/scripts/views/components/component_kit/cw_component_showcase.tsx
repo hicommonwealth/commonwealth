@@ -2131,7 +2131,12 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div>
-        <CWVoteWeightModule />
+        <CWVoteWeightModule
+          voteWeight={100}
+          stakeNumber={1}
+          stakeValue={0.072}
+          denomination="ETH"
+        />
       </div>
     </div>
   );
