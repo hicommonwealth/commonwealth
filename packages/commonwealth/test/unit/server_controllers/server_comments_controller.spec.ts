@@ -1,11 +1,14 @@
 import BN from 'bn.js';
 import { expect } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { NotificationCategories } from 'common-common/src/types';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
 import { BAN_CACHE_MOCK_FN } from 'test/util/banCacheMock';
 import { CommunityInstance } from '../../../server/models/community';
+
+chai.use(chaiAsPromised);
 
 describe('ServerCommentsController', () => {
   describe('#createCommentReaction', () => {
@@ -104,7 +107,6 @@ describe('ServerCommentsController', () => {
       );
 
       expect(notification.data).to.have.property('created_at');
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>', notification.data);
       expect(notification.data).to.include({
         thread_id: 4,
         comment_id: 3,

@@ -287,6 +287,7 @@
     "@tanstack/eslint-plugin-query": "^4.29.4",
     "@tharsis/address-converter": "^0.1.8",
     "@types/chai": "^4.2.11",
+    "@types/chai-as-promised": "^7.1.1",
     "@types/mocha": "^7.0.2",
     "@types/node-fetch": "2.x",
     "@types/pg": "^8.6.1",
