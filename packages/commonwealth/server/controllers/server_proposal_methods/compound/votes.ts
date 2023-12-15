@@ -71,8 +71,10 @@ export async function getCompoundProposalVotes(
     });
   } else if (govVersion === GovVersion.OzCountSimple) {
     const typedContract = <GovernorCountingSimple>contract;
-    const proposalStart = await typedContract.proposalSnapshot(proposalId);
-    const proposalEnd = await typedContract.proposalDeadline(proposalId);
+    const [proposalStart, proposalEnd] = await Promise.all([
+      typedContract.proposalSnapshot(proposalId),
+      typedContract.proposalDeadline(proposalId),
+    ]);
 
     events = await typedContract.queryFilter(
       typedContract.filters.VoteCast(null, null, null, null, null),

@@ -185,19 +185,14 @@ async function getProposalDataFieldsSequentially(
   const proposalStatePromises: Promise<number>[] = [];
   for (const propCreatedEvent of proposalCreatedEvents) {
     // Construct big promise
-    const proposalDataFieldPromises: Promise<any>[] = [];
-    proposalDataFieldPromises.push(
+    const proposalDataFieldPromises: Promise<any>[] = [
       contract.proposalProposer(propCreatedEvent.id),
-    );
-    proposalDataFieldPromises.push(contract.proposalEta(propCreatedEvent.id));
-    proposalDataFieldPromises.push(
+      contract.proposalEta(propCreatedEvent.id),
       contract.proposalSnapshot(propCreatedEvent.id),
-    );
-    proposalDataFieldPromises.push(
       contract.proposalDeadline(propCreatedEvent.id),
-    );
-    proposalDataFieldPromises.push(contract.proposalVotes(propCreatedEvent.id));
-    proposalDataFieldPromises.push(contract.state(propCreatedEvent.id));
+      contract.proposalVotes(propCreatedEvent.id),
+      contract.state(propCreatedEvent.id),
+    ];
 
     const proposalDataPromise = Promise.all(proposalDataFieldPromises).then(
       (values) => {
