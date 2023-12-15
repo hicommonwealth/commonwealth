@@ -12,19 +12,25 @@ export const Breadcrumbs = () => {
   const location = useLocation();
   const navigate = useCommonNavigate();
 
-  // const { data: topics = [] } = useFetchTopicsQuery({
-  //   chainId: app.activeChainId()
-  // });
-  const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
-    chainId: app.activeChainId(),
-    ids: [3781],
-    // apiCallEnabled: linkedThreadIds.length > 0, // only call the api if we have thread id
-  });
+  const getThreadId = location.pathname.match(/\/(\d+)-/);
 
-  console.log('topic', linkedThreads);
+  const { data: linkedThreads } = useGetThreadsByIdQuery({
+    chainId: app.activeChainId(),
+    ids: [getThreadId && Number(getThreadId[1])],
+    apiCallEnabled:
+      location.pathname.split('/')[1].toLowerCase() === 'discussion', // only call the api if we have thread id
+  });
 
   const user = app.user.addresses[0];
   const profileId = user?.profileId || user?.profile.id;
+
+  const currentDiscussion = {
+    currentThreadName: linkedThreads?.[0].title,
+    currentTopic: linkedThreads?.[0]?.topic.name,
+    topicURL: `/discussions/${encodeURI(linkedThreads?.[0]?.topic.name)}`,
+  };
+
+  console.log('currentTopic', linkedThreads?.[0].title);
 
   let standalone = false;
 
@@ -52,6 +58,7 @@ export const Breadcrumbs = () => {
     breadCrumbURLS,
     profileId,
     navigate,
+    currentDiscussion,
   );
 
   //Determines the style based on the current page.

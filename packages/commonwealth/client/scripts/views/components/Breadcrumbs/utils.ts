@@ -1,19 +1,28 @@
 import { To } from 'react-router-dom';
 import { breadCrumbURLS } from './data';
 
+type currentDiscussion = {
+  currentThreadName: string;
+  currentTopic: string;
+  topicURL: string;
+};
+
 export const generateBreadcrumbs = (
   locationPath: string,
   breadcrumbData: typeof breadCrumbURLS,
   profileId: number,
   navigate: (val: To) => void,
+  currentDiscussion?: currentDiscussion,
 ) => {
-  let threadName: string | undefined;
   let link: string;
   const pathSegments = locationPath
     .split('/')
     .filter((segment) => segment.length > 0);
 
+  console.log('TOPIC:', currentDiscussion);
+
   const breadcrumbs = pathSegments.map((pathSegment, index) => {
+    //Checks to see if it's an easy page so we match with the data file & early return out.
     const matchedBreadcrumb = breadcrumbData.find((breadcrumbItem) => {
       return (
         !breadcrumbItem.url ||
@@ -65,26 +74,21 @@ export const generateBreadcrumbs = (
     );
 
     let label =
-      index === pathSegments.length - 1 && !!threadName
-        ? threadName
+      index === pathSegments.length - 1 && !!currentDiscussion.currentThreadName
+        ? currentDiscussion.currentThreadName
         : matchedBreadcrumb
         ? matchedBreadcrumb.breadcrumb
         : removedThreadId;
 
+    //Handles the unique logic of the discussions section
     if (pathSegments[1] === 'discussions' || pathSegments[1] === 'discussion') {
       label = 'Discussions';
 
       if (pathSegments.length > 2) {
-        console.log('FIRED', pathSegments);
         pathSegments.splice(0, 1);
       }
-      console.log('FIRED1');
     } else if (pathSegments[1] === 'overview' && label !== 'Overview') {
       label = 'Discussions';
-      console.log('FIRED2');
-      // } else if (index === 1) {
-      //   pathSegments.splice(0, 1);
-      //   label = pathSegments[index].replace(/^\d+-/, '');
     }
 
     // Create the breadcrumb object.
@@ -97,5 +101,14 @@ export const generateBreadcrumbs = (
     };
   });
 
+  currentDiscussion.currentTopic &&
+    breadcrumbs.splice(1, 0, {
+      label: currentDiscussion.currentTopic,
+      path: currentDiscussion.topicURL,
+      navigate: (val: To) => navigate(val),
+      isParent: false,
+    });
+
+  console.log('bread', breadcrumbs);
   return breadcrumbs.filter((val) => val !== undefined);
 };
