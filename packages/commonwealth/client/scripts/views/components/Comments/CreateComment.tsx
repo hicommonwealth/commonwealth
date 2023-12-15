@@ -10,7 +10,6 @@ import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { ContentType } from 'types';
 import { useSessionRevalidationModal } from 'views/modals/SessionRevalidationModal';
-import Permissions from '../../../utils/Permissions';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
@@ -56,7 +55,6 @@ export const CreateComment = ({
   const author = app.user.activeAccount;
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
-  const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
 
   const {
     mutateAsync: createComment,
@@ -119,7 +117,6 @@ export const CreateComment = ({
     }
   };
 
-  const isAdmin = Permissions.isCommunityAdmin();
   const disabled = editorValue.length === 0 || sendingComment;
 
   const handleCancel = (e) => {

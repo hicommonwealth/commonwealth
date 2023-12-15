@@ -1,7 +1,6 @@
 import type { DeltaStatic } from 'quill';
 import React, { useEffect } from 'react';
 
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { pluralizeWithoutNumberPrefix } from '../../helpers';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
@@ -50,7 +49,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const [featuredInSidebar, setFeaturedInSidebar] =
     React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
-  const [tokenThreshold, setTokenThreshold] = React.useState<string>('0');
+  const [tokenThreshold] = React.useState<string>('0');
 
   const editorText = getTextFromDelta(contentDelta);
 
@@ -65,15 +64,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
     }
     setErrorMsg(null);
   }, [name, featuredInNewPost, editorText]);
-
-  const decimals = app.chain?.meta?.decimals
-    ? app.chain.meta.decimals
-    : app.chain.network === ChainNetwork.ERC721 ||
-      app.chain.network === ChainNetwork.ERC1155
-    ? 0
-    : app.chain.base === ChainBase.CosmosSDK
-    ? 6
-    : 18;
 
   return (
     <div className="NewTopicModal">
