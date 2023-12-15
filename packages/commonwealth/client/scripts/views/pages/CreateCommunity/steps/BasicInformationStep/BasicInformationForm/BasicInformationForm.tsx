@@ -36,6 +36,7 @@ import {
 
 import './BasicInformationForm.scss';
 
+// used for default chain dropdown options
 const ETHEREUM_MAINNET_ID = '1';
 const OSMOSIS_ID = 'osmosis';
 

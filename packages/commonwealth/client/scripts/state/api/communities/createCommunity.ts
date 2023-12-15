@@ -36,9 +36,10 @@ const createCommunity = async ({
   bech32Prefix,
 }: CreateCommunityProps) => {
   const nameToSymbol = name.toUpperCase().slice(0, 4);
-  const communityNetwork = ChainBase.CosmosSDK
-    ? cosmosChainId
-    : baseToNetwork(chainBase);
+  const communityNetwork =
+    chainBase === ChainBase.CosmosSDK
+      ? cosmosChainId
+      : baseToNetwork(chainBase);
 
   return await axios.post(`${app.serverUrl()}/communities`, {
     id,

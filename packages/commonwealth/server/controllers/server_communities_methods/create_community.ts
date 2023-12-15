@@ -6,6 +6,7 @@ import { AppError } from 'common-common/src/errors';
 import {
   BalanceType,
   ChainBase,
+  ChainNetwork,
   ChainType,
   DefaultPage,
   NotificationCategories,
@@ -350,7 +351,7 @@ export async function __createCommunity(
     default_symbol,
     icon_url,
     description,
-    network,
+    network: network as ChainNetwork,
     type,
     social_links: uniqueLinksArray,
     base,
