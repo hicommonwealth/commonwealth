@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'utils';
-import { ZodError } from 'zod';
 
 import { ChainBase } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
@@ -19,26 +18,18 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CWButton } from 'views/components/component_kit/new_designs/cw_button';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
+import './BasicInformationForm.scss';
 import {
+  ETHEREUM_MAINNET_ID,
+  OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
   chainTypes,
   existingCommunityNames,
 } from './constants';
-import {
-  BasicInformationFormProps,
-  FormSubmitValues,
-  SocialLinkField,
-} from './types';
-import {
-  basicInformationFormValidationSchema,
-  socialLinkValidation,
-} from './validation';
+import { BasicInformationFormProps, FormSubmitValues } from './types';
+import { basicInformationFormValidationSchema } from './validation';
 
-import './BasicInformationForm.scss';
-
-// used for default chain dropdown options
-const ETHEREUM_MAINNET_ID = '1';
-const OSMOSIS_ID = 'osmosis';
+import useSocialLinks from './useSocialLinks';
 
 const BasicInformationForm = ({
   selectedAddress,
@@ -49,22 +40,24 @@ const BasicInformationForm = ({
   const [communityName, setCommunityName] = useState('');
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
-  const [socialLinks, setSocialLinks] = useState<SocialLinkField[]>([
-    {
-      value: '',
-      error: '',
-    },
-  ]);
-  const isCommunityNameTaken = existingCommunityNames.find(
-    (name) => name === communityName.trim().toLowerCase(),
-  );
 
-  const communityId = slugifyPreserveDashes(communityName.toLowerCase());
+  const {
+    socialLinks,
+    addLink,
+    removeLinkAtIndex,
+    validateSocialLinks,
+    updateAndValidateSocialLinkAtIndex,
+  } = useSocialLinks();
 
   const {
     mutateAsync: createCommunityMutation,
     isLoading: createCommunityLoading,
   } = useCreateCommunityMutation();
+
+  const communityId = slugifyPreserveDashes(communityName.toLowerCase());
+  const isCommunityNameTaken = existingCommunityNames.find(
+    (name) => name === communityName.trim().toLowerCase(),
+  );
 
   const getChainOptions = () => {
     // Since we are treating polygon as an ecosystem, we will only have a single option, which will be
@@ -101,87 +94,27 @@ const BasicInformationForm = ({
       }));
   };
 
-  const getInitialValue = () => ({
-    ...(selectedCommunity.type === CommunityType.Polygon && {
-      chain: getChainOptions()?.[0],
-    }),
-    ...(selectedCommunity.type === CommunityType.Solana && {
-      chain: getChainOptions()?.[0],
-    }),
-    ...(selectedCommunity.type === CommunityType.Ethereum && {
-      chain: getChainOptions()?.find((o) => o.value === ETHEREUM_MAINNET_ID),
-    }),
-    ...(selectedCommunity.type === CommunityType.Cosmos && {
-      chain: getChainOptions()?.find((o) => o.value === OSMOSIS_ID),
-    }),
-  });
-
-  const addLink = () => {
-    setSocialLinks((socialLink) => [
-      ...(socialLink || []),
-      { value: '', error: '' },
-    ]);
-  };
-
-  const removeLinkAtIndex = (index: number) => {
-    const updatedSocialLinks = [...socialLinks];
-    updatedSocialLinks.splice(index, 1);
-    setSocialLinks([...updatedSocialLinks]);
-  };
-
-  const validateSocialLinks = (): boolean => {
-    const updatedSocialLinks = [...socialLinks];
-    socialLinks.map((link, index) => {
-      try {
-        if (link.value.trim() !== '') {
-          socialLinkValidation.parse(link.value);
-        }
-
-        updatedSocialLinks[index] = {
-          ...updatedSocialLinks[index],
-          error: '',
+  const getInitialValue = () => {
+    switch (selectedCommunity.type) {
+      case CommunityType.Ethereum:
+        return {
+          chain: getChainOptions()?.find(
+            (o) => o.value === ETHEREUM_MAINNET_ID,
+          ),
         };
-      } catch (e: any) {
-        const zodError = e as ZodError;
-        updatedSocialLinks[index] = {
-          ...updatedSocialLinks[index],
-          error: zodError.errors[0].message,
+      case CommunityType.Cosmos:
+        return {
+          chain: getChainOptions()?.find((o) => o.value === OSMOSIS_ID),
         };
-      }
-    });
-
-    setSocialLinks([...updatedSocialLinks]);
-
-    return !!updatedSocialLinks.find((socialLink) => socialLink.error);
-  };
-
-  const updateAndValidateSocialLinkAtIndex = (value: string, index: number) => {
-    const updatedSocialLinks = [...socialLinks];
-    updatedSocialLinks[index] = {
-      ...updatedSocialLinks[index],
-      value,
-    };
-    try {
-      if (updatedSocialLinks[index].value.trim() !== '') {
-        socialLinkValidation.parse(updatedSocialLinks[index].value);
-      }
-
-      updatedSocialLinks[index] = {
-        ...updatedSocialLinks[index],
-        error: '',
-      };
-    } catch (e: any) {
-      const zodError = e as ZodError;
-      updatedSocialLinks[index] = {
-        ...updatedSocialLinks[index],
-        error: zodError.errors[0].message,
-      };
+      case CommunityType.Polygon:
+      case CommunityType.Solana:
+        return { chain: getChainOptions()?.[0] };
     }
-    setSocialLinks([...updatedSocialLinks]);
   };
 
   const handleSubmit = async (values: FormSubmitValues) => {
     const hasLinksError = validateSocialLinks();
+
     if (isCommunityNameTaken || hasLinksError) return;
     values.links = socialLinks.map((link) => link.value).filter(Boolean);
 
@@ -197,6 +130,9 @@ const BasicInformationForm = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links,
+        nodeUrl: selectedChainNode.nodeUrl,
+        altWalletUrl: selectedChainNode.altWalletUrl,
+        userAddress: selectedAddress.address,
         ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
           ethChainId: values.chain.value,
         }),
@@ -204,9 +140,6 @@ const BasicInformationForm = ({
           cosmosChainId: values.chain.value,
           bech32Prefix: selectedChainNode.bech32Prefix,
         }),
-        nodeUrl: selectedChainNode.nodeUrl,
-        altWalletUrl: selectedChainNode.altWalletUrl,
-        userAddress: selectedAddress.address,
       });
       onSubmit(communityId);
     } catch (err) {

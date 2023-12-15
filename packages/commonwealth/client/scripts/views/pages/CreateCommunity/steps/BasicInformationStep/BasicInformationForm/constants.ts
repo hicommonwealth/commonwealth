@@ -1,7 +1,10 @@
 import NodeInfo from 'models/NodeInfo';
 import app from 'state';
 
+// used for default chain dropdown options
 export const POLYGON_ETH_CHAIN_ID = 137;
+export const ETHEREUM_MAINNET_ID = '1';
+export const OSMOSIS_ID = 'osmosis';
 
 export const existingCommunityNames = app.config.chains
   .getAll()
