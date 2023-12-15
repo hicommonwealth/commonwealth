@@ -24,7 +24,6 @@ import setupPassport from './server/passport';
 import BanCache from './server/util/banCheckCache';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import ViewCountCache from './server/util/viewCountCache';
-import { MockTokenBalanceProvider } from './test/util/modelUtils';
 
 import { ServerError } from 'common-common/src/errors';
 import { cacheDecorator } from '../common-common/src/cacheDecorator';
@@ -44,7 +43,6 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
-const mockTokenBalanceProvider = new MockTokenBalanceProvider();
 const databaseValidationService = new DatabaseValidationService(models);
 let server;
 
