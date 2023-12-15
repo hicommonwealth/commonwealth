@@ -173,24 +173,6 @@ const AdminSectionComponent = () => {
         setIsOrderTopicsModalOpen(true);
       },
     },
-    ...(!featureFlags.newGatingEnabled
-      ? [
-          {
-            title: 'Edit topic thresholds',
-            isActive: isEditTopicThresholdsModalOpen,
-            isVisible: true,
-            containsChildren: false,
-            displayData: null,
-            isUpdated: false,
-            hasDefaultToggle: false,
-            onClick: (e) => {
-              e.preventDefault();
-              resetSidebarState();
-              setIsEditTopicThresholdsModalOpen(true);
-            },
-          },
-        ]
-      : []),
   ];
 
   // Build Toggle Tree

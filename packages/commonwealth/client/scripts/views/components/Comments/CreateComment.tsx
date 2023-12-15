@@ -1,14 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import BN from 'bn.js';
-
 import { notifyError } from 'controllers/app/notifications';
 import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
 import { SessionKeyError } from 'controllers/server/sessions';
-import { featureFlags } from 'helpers/feature-flags';
-import { getTokenBalance } from 'helpers/token_balance_helper';
 import { useDraft } from 'hooks/useDraft';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
@@ -54,40 +50,13 @@ export const CreateComment = ({
 
   const [sendingComment, setSendingComment] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [tokenPostingThreshold, setTokenPostingThreshold] = useState(
-    new BN('0'),
-  );
-  const [userBalance, setUserBalance] = useState(new BN('0'));
-  const [balanceLoading, setBalanceLoading] = useState(false);
+
   const editorValue = getTextFromDelta(contentDelta);
 
   const author = app.user.activeAccount;
 
   const parentType = parentCommentId ? ContentType.Comment : ContentType.Thread;
   const activeTopic = rootThread instanceof Thread ? rootThread?.topic : null;
-
-  useEffect(() => {
-    activeTopic?.id &&
-      setTokenPostingThreshold(app.chain.getTopicThreshold(activeTopic?.id));
-  }, [activeTopic]);
-
-  useEffect(() => {
-    if (
-      !tokenPostingThreshold.isZero() &&
-      !balanceLoading &&
-      !featureFlags.newGatingEnabled
-    ) {
-      setBalanceLoading(true);
-      if (!app.user.activeAccount?.tokenBalance) {
-        getTokenBalance().then(() => {
-          setUserBalance(app.user.activeAccount?.tokenBalance);
-        });
-      } else {
-        setUserBalance(app.user.activeAccount?.tokenBalance);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenPostingThreshold]);
 
   const {
     mutateAsync: createComment,
@@ -150,14 +119,8 @@ export const CreateComment = ({
     }
   };
 
-  const userFailsThreshold =
-    !featureFlags.newGatingEnabled && app.chain.isGatedTopic(activeTopic?.id);
   const isAdmin = Permissions.isCommunityAdmin();
-  const disabled =
-    editorValue.length === 0 ||
-    sendingComment ||
-    userFailsThreshold ||
-    !canComment;
+  const disabled = editorValue.length === 0 || sendingComment;
 
   const handleCancel = (e) => {
     e.preventDefault();
@@ -184,12 +147,8 @@ export const CreateComment = ({
             errorMsg={errorMsg}
             contentDelta={contentDelta}
             setContentDelta={setContentDelta}
-            tokenPostingThreshold={tokenPostingThreshold}
-            topicName={activeTopic?.name}
-            userBalance={userBalance}
             disabled={disabled}
             onCancel={handleCancel}
-            isAdmin={isAdmin}
             author={author}
             editorValue={editorValue}
             shouldFocus={shouldFocusEditor}

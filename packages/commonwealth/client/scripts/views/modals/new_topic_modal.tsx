@@ -10,7 +10,6 @@ import {
   useFetchTopicsQuery,
 } from '../../state/api/topics';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
-import { CWLabel } from '../components/component_kit/cw_label';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import {
@@ -25,9 +24,7 @@ import {
   getTextFromDelta,
 } from '../components/react_quill_editor';
 import { serializeDelta } from '../components/react_quill_editor/utils';
-import { TokenDecimalInput } from '../components/token_decimal_input';
 
-import { featureFlags } from 'helpers/feature-flags';
 import '../../../styles/modals/new_topic_modal.scss';
 
 type NewTopicModalProps = {
@@ -128,20 +125,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setDescription(e.target.value);
           }}
         />
-        {!featureFlags.newGatingEnabled && app.activeChainId() && (
-          <React.Fragment>
-            <CWLabel
-              label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
-            />
-            <TokenDecimalInput
-              decimals={decimals}
-              defaultValueInWei="0"
-              onInputChange={(newValue: string) => {
-                setTokenThreshold(newValue);
-              }}
-            />
-          </React.Fragment>
-        )}
         <div className="checkboxes">
           <CWCheckbox
             label="Featured in Sidebar"
