@@ -22,18 +22,6 @@ import {
   putCommunitiesValidation,
 } from '../routes/communities/putCommunities';
 import { deleteEntities } from '../routes/deleteEntities';
-import {
-  getBalanceProviders,
-  getBalanceProvidersValidation,
-} from '../routes/getBalanceProviders';
-import {
-  getChainNodes,
-  getChainNodesValidation,
-} from '../routes/getChainNodes';
-import {
-  getTokenBalance,
-  getTokenBalanceValidation,
-} from '../routes/getTokenBalance';
 import getProfiles, {
   getProfilesValidation,
 } from '../routes/profiles/getProfiles';
@@ -142,22 +130,6 @@ export function addExternalRoutes(
     '/topics',
     onlyIds,
     deleteEntities.bind(this, 'chain_id', models, models.Topic),
-  );
-
-  router.get(
-    '/chainNodes',
-    getChainNodesValidation,
-    getChainNodes.bind(this, models, tokenBalanceCache),
-  );
-  router.get(
-    '/balanceProviders',
-    getBalanceProvidersValidation,
-    getBalanceProviders.bind(this, models, tokenBalanceCache),
-  );
-  router.get(
-    '/tokenBalance',
-    getTokenBalanceValidation,
-    getTokenBalance.bind(this, models, tokenBalanceCache),
   );
 
   app.use(endpoint, router);

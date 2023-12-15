@@ -94,7 +94,6 @@ import getTokenForum from '../routes/getTokenForum';
 import setAddressWallet from '../routes/setAddressWallet';
 import { sendMessage } from '../routes/snapshotAPI';
 import startSsoLogin from '../routes/startSsoLogin';
-import tokenBalance from '../routes/tokenBalance';
 import updateAddress from '../routes/updateAddress';
 import viewChainIcons from '../routes/viewChainIcons';
 import type BanCache from '../util/banCheckCache';
@@ -410,13 +409,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     starCommunity.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/tokenBalance',
-    databaseValidationService.validateCommunity,
-    tokenBalance.bind(this, models, tokenBalanceCacheV1),
   );
   registerRoute(
     router,
