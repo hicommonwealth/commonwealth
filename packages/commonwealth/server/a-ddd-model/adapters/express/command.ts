@@ -3,8 +3,11 @@ import type {
   RequestHandler,
   Response,
 } from 'express-serve-static-core';
-import type { Command } from '../types';
-import { validate, type ActorMiddleware } from './actor-middleware';
+import {
+  validate,
+  type ActorMiddleware,
+} from '../../middleware/actor-middleware';
+import type { Command } from '../../types';
 
 /**
  * Adapts commands to express handlers
