@@ -4,8 +4,7 @@ import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { TokenBalanceCache as NewTokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {
   methodNotAllowedMiddleware,
@@ -206,7 +205,6 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  tokenBalanceCacheV1: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
@@ -214,7 +212,7 @@ function setupRouter(
 ) {
   // controllers
 
-  const tokenBalanceCache = new NewTokenBalanceCache(
+  const tokenBalanceCache = new TokenBalanceCache(
     models,
     redisCache,
     TBC_BALANCE_TTL_SECONDS,

@@ -24,7 +24,6 @@ import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import * as v8 from 'v8';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
@@ -85,7 +84,6 @@ async function main() {
   const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
-  const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
   const NO_GLOBAL_ACTIVITY_CACHE =
     process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
@@ -93,8 +91,6 @@ async function main() {
     SHOULD_SEND_EMAILS ||
     SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
-  const tokenBalanceCache = new TokenBalanceCache();
-  await tokenBalanceCache.initBalanceProviders();
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
@@ -262,7 +258,6 @@ async function main() {
   const redisCache = new RedisCache();
   await redisCache.init(REDIS_URL, VULTR_IP);
 
-  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
 
@@ -279,7 +274,6 @@ async function main() {
     app,
     models,
     viewCountCache,
-    tokenBalanceCache,
     banCache,
     globalActivityCache,
     dbValidationService,
@@ -287,7 +281,7 @@ async function main() {
   );
 
   // new API
-  addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addExternalRoutes('/external', app, models);
   addSwagger('/docs', app);
 
   setupCosmosProxy(app, models);
