@@ -26,7 +26,7 @@ const CreateCommunityGroupPage = () => {
   });
 
   if (
-    !featureFlags.gatingEnabled ||
+    !featureFlags.newGatingEnabled ||
     !app.isLoggedIn() ||
     !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
   ) {

@@ -25,6 +25,7 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
+import Permissions from 'utils/Permissions';
 import GatingGrowl from 'views/components/GatingGrowl/GatingGrowl';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
@@ -49,6 +50,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId(),
   });
+
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topicId = (topics || []).find(({ name }) => name === topicName)?.id;
 
@@ -119,11 +122,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               membership.isAllowed,
           );
 
+          const isRestrictedMembership =
+            !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: !!hasJoinedCommunity,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
-            isThreadTopicGated: isTopicGated && !isActionAllowedInGatedTopic,
+            isThreadTopicGated: isRestrictedMembership,
           });
 
           return (

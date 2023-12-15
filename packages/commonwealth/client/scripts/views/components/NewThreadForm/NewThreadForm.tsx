@@ -44,18 +44,22 @@ export const NewThreadForm = () => {
 
   const communityId = app.chain.id;
   const hasTopics = topics?.length;
-  const isAdmin = Permissions.isCommunityAdmin();
+  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
-      if (
-        isAdmin ||
-        t.tokenThreshold.isZero() ||
-        !app.chain.isGatedTopic(t.id)
-      ) {
+      if (featureFlags.newGatingEnabled) {
         acc?.enabledTopics?.push(t);
       } else {
-        acc?.disabledTopics?.push(t);
+        if (
+          isAdmin ||
+          t.tokenThreshold.isZero() ||
+          !app.chain.isGatedTopic(t.id)
+        ) {
+          acc?.enabledTopics?.push(t);
+        } else {
+          acc?.disabledTopics?.push(t);
+        }
       }
       return acc;
     },
@@ -123,7 +127,8 @@ export const NewThreadForm = () => {
       group.topics.find((topic) => topic.id === threadTopic?.id),
     )
     .map((group) => group.name);
-  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+  const isRestrictedMembership =
+    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const handleNewThreadCreation = async () => {
     if (isRestrictedMembership) {
@@ -268,7 +273,7 @@ export const NewThreadForm = () => {
               />
             )}
 
-            {featureFlags.gatingEnabled &&
+            {featureFlags.newGatingEnabled &&
               isRestrictedMembership &&
               canShowGatingBanner && (
                 <div>
