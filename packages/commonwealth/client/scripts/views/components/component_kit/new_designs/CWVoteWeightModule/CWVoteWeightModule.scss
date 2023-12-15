@@ -56,3 +56,17 @@
     }
   }
 }
+
+.Popover {
+  .popover-title {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .explanation-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+}

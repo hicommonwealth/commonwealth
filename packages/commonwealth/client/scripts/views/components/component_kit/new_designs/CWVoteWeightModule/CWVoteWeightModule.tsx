@@ -1,6 +1,5 @@
 import React from 'react';
-// import { CWIcon } from '../../cw_icons/cw_icon';
-import useBrowserWindow from '../../../../../hooks/useBrowserWindow';
+import { isMobile } from 'react-device-detect';
 import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
 import CWIconButton from '../CWIconButton';
@@ -22,7 +21,6 @@ export const CWVoteWeightModule = ({
   denomination,
 }: VoteWeightModuleProps) => {
   const popoverProps = usePopover();
-  const { isWindowSmallInclusive } = useBrowserWindow({});
 
   return (
     <div className={ComponentType.VoteWeightModule}>
@@ -36,7 +34,6 @@ export const CWVoteWeightModule = ({
             buttonSize="sm"
             onMouseEnter={popoverProps.handleInteraction}
             onMouseLeave={popoverProps.handleInteraction}
-            onClick={popoverProps.handleInteraction}
           />
         </div>
         <CWText className="vote-weight" type="h3" fontWeight="bold">
@@ -81,24 +78,37 @@ export const CWVoteWeightModule = ({
           )}
         </div>
       </div>
+
       <CWPopover
-        content={
-          <div>
-            {' '}
-            <CWText type="caption" fontWeight="uppercase">
-              Vote Weight Explainer
-            </CWText>
-            {isWindowSmallInclusive && (
+        title={
+          <>
+            Vote Weight Explainer
+            {isMobile && (
               <div className="close">
                 <CWIconButton
                   iconName="close"
                   buttonSize="sm"
-                  onClick={() => {
-                    console.log('hello!');
-                  }}
+                  onClick={popoverProps.handleInteraction}
                 />
               </div>
             )}
+          </>
+        }
+        body={
+          <div className="explanation-container">
+            <CWText type="b2">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
+              egestas sem non laoreet suscipit.
+            </CWText>
+
+            <CWText type="b2">
+              Aenean commodo id nisi vitae elementum. Ut imperdiet nibh id elit
+              facilisis hendrerit.
+            </CWText>
+
+            <CWText type="b2">
+              Donec a sagittis arcu. Phasellus at auctor arcu.
+            </CWText>
           </div>
         }
         {...popoverProps}
