@@ -49,7 +49,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const [featuredInSidebar, setFeaturedInSidebar] =
     React.useState<boolean>(false);
   const [name, setName] = React.useState<string>('');
-  const [tokenThreshold] = React.useState<string>('0');
 
   const editorText = getTextFromDelta(contentDelta);
 
@@ -161,7 +160,6 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
                   description,
                   featuredInSidebar,
                   featuredInNewPost,
-                  tokenThreshold,
                   defaultOffchainTemplate: serializeDelta(contentDelta),
                 });
                 navigate(`/discussions/${encodeURI(name.toString().trim())}`);

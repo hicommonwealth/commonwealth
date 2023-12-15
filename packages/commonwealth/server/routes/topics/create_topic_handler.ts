@@ -22,7 +22,6 @@ export const createTopicHandler = async (
   const validationSchema = z.object({
     name: z.string().optional(),
     description: z.string().optional(),
-    token_threshold: z.string().optional(),
     featured_in_sidebar: z.coerce.boolean().optional(),
     featured_in_new_post: z.coerce.boolean().optional(),
     default_offchain_template: z.string().optional(),
