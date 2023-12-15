@@ -2131,6 +2131,7 @@ export const ComponentShowcase = () => {
         />
       </div>
       <div>
+        <CWText type="h3">Vote Weight Module</CWText>
         <CWVoteWeightModule
           voteWeight={100}
           stakeNumber={1}
