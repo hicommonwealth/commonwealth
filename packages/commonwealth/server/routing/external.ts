@@ -2,7 +2,6 @@ import type { Express } from 'express';
 import express from 'express';
 import type Router from 'express/lib/router/index';
 import passport from 'passport';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
 import type {
   PostReactionsReq,
   PostTopicsReq,
@@ -17,10 +16,6 @@ import {
 import getCommunities, {
   getCommunitiesValidation,
 } from '../routes/communities/getCommunities';
-import {
-  putCommunities,
-  putCommunitiesValidation,
-} from '../routes/communities/putCommunities';
 import { deleteEntities } from '../routes/deleteEntities';
 import getProfiles, {
   getProfilesValidation,
@@ -43,7 +38,6 @@ export function addExternalRoutes(
   endpoint: string,
   app: Express,
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
 ): Router {
   const router = express.Router();
 
@@ -101,11 +95,6 @@ export function addExternalRoutes(
     '/communities',
     getCommunitiesValidation,
     getCommunities.bind(this, models),
-  );
-  router.put(
-    '/communities',
-    putCommunitiesValidation,
-    putCommunities.bind(this, models, tokenBalanceCache),
   );
 
   router.get(
