@@ -41,7 +41,7 @@ const GatingGrowl = () => {
           className="closeButton"
           onClick={handleExit}
         />
-        <img src="../../static/img/groupGrowl.png" alt="" className="img" />
+        <img src="../../../static/img/groupGrowl.png" alt="" className="img" />
         <div className="container">
           <CWText type="h1" fontWeight="semiBold" isCentered>
             Introducing Groups
