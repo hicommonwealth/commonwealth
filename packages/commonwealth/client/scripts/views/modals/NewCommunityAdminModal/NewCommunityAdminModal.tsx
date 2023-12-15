@@ -84,7 +84,7 @@ const NewCommunityAdminModal = ({
             />
             <CWButton
               label="Continue"
-              onClick={() => handleClickContinue(tempAddress.value)}
+              onClick={() => handleClickContinue(tempAddress?.value)}
             />
           </>
         ) : (
