@@ -26,15 +26,3 @@ export type Actor = {
   // flags
   author?: boolean;
 };
-
-export const ACTOR_VALIDATION_ERROR = 'ActorValidationError';
-/**
- * Custom actor validation error
- * - Used by specific protocol adapters to build error responses (with codes, etc)
- */
-export class ActorValidationError extends Error {
-  constructor(public actor: Actor, message: string) {
-    super(message);
-    this.name = ACTOR_VALIDATION_ERROR;
-  }
-}

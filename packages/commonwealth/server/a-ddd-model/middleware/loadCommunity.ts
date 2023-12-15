@@ -1,5 +1,5 @@
-import db from '../database'; // TODO: use port/adapter pattern to test in-memory
-import type { ActorMiddleware } from './middleware';
+import db from '../../database'; // TODO: use port/adapter pattern to test in-memory
+import type { ActorMiddleware } from './actor-middleware';
 
 export const ALL_COMMUNITIES = 'all_communities';
 

@@ -1,4 +1,5 @@
-import { ActorValidationError, type Actor } from '.';
+import { type Actor } from '../actor';
+import { InvalidActor } from '../errors';
 
 /**
  * Middleware signature to loads and/or validates actor state in a chain of responsibility pattern
@@ -20,8 +21,7 @@ export const validate = async (
 ): Promise<Actor> => {
   for (const fn of middleware) {
     const result = await fn(actor);
-    if (typeof result === 'string')
-      throw new ActorValidationError(actor, result);
+    if (typeof result === 'string') throw new InvalidActor(actor, result);
     actor = result;
   }
   return actor;

@@ -1,5 +1,5 @@
-import db from '../database'; // TODO: use port/adapter pattern to test in-memory
-import type { ActorMiddleware } from './middleware';
+import db from '../../database'; // TODO: use port/adapter pattern to test in-memory
+import type { ActorMiddleware } from './actor-middleware';
 
 /**
  * Middleware to validate user as author of the loaded community

@@ -3,19 +3,8 @@ import type {
   RequestHandler,
   Response,
 } from 'express-serve-static-core';
-import type { Actor } from '.';
-import { validate, type ActorMiddleware } from './middleware';
-
-/**
- * Command signature
- * @param actor the command actor
- * @param id the aggregate id
- * @param payload the command payload
- */
-export type Command<
-  M extends Record<string, any>,
-  R extends Record<string, any>,
-> = (actor: Actor, id: string, payload: M) => Promise<R>;
+import type { Command } from '../types';
+import { validate, type ActorMiddleware } from './actor-middleware';
 
 /**
  * Adapts commands to express handlers
