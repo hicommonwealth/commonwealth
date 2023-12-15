@@ -30,7 +30,6 @@ interface CWCommunitySelectorProps {
 
 const CWCommunitySelector = ({
   type,
-  // chainBase,
   title,
   isRecommended,
   description,
@@ -39,7 +38,7 @@ const CWCommunitySelector = ({
   return (
     <div className={ComponentType.CommunitySelector} onClick={onClick}>
       <div className="chain-logo-container">
-        <img src={`static/img/communitySelector/${type}.svg`} alt={title} />
+        <img src={`/static/img/communitySelector/${type}.svg`} alt={title} />
       </div>
       <div className="content-container">
         <div className="title-row">

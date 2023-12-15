@@ -65,6 +65,22 @@ export const LoginDesktopSidebar = ({
         </div>
       )}
 
+      {sidebarType === 'createCommunityLogin' && (
+        <div className="connect-wallet">
+          <div className="sidebar-content">
+            <LoginText
+              headerText={
+                wallets.length > 0
+                  ? 'Sign in to create your community'
+                  : 'Please Install a Wallet to sign in'
+              }
+              bodyText="To launch your community choose a sign-in option
+              that is compatible with the ecosystem you selected."
+            />
+          </div>
+        </div>
+      )}
+
       {sidebarType === 'emailLogin' && (
         <div className="connect-wallet">
           <div className="sidebar-content">
