@@ -144,7 +144,6 @@ const BasicInformationForm = ({
       onSubmit(communityId);
     } catch (err) {
       notifyError(err.response?.data?.error);
-      console.log(err);
     }
   };
 
