@@ -62,7 +62,7 @@ export class TokenBalanceCache
   constructor(
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 1 * 60 * 60,
-    providers: BalanceProvider<any>[] = null,
+    providers?: BalanceProvider<any>[],
     private readonly _nodesProvider: (
       lastQueryUnixTime: number,
     ) => Promise<IChainNode[]> = queryChainNodesFromDB,
@@ -70,16 +70,16 @@ export class TokenBalanceCache
     super({}, noBalancePruneTimeS);
 
     // if providers is set, init during constructor
-    if (providers != null) {
+    if (providers) {
       for (const provider of providers) {
         this._providers[provider.name] = provider;
       }
     }
   }
 
-  public async initBalanceProviders(providers: BalanceProvider<any>[] = null) {
+  public async initBalanceProviders(providers?: BalanceProvider<any>[]) {
     // lazy load import to improve test speed
-    if (providers == null) {
+    if (!providers) {
       const p = await import('./providers');
       providers = p.default;
     }
@@ -101,7 +101,7 @@ export class TokenBalanceCache
   }
 
   public async getBalanceProviders(
-    nodeId?: number,
+    nodeId: number,
   ): Promise<BalanceProviderResp[]> {
     const formatBps = (bps: BalanceProvider<any>[]): BalanceProviderResp[] => {
       this.statsDSender.sendProviderInfo(bps, nodeId);

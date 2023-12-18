@@ -1,4 +1,4 @@
-import { StatsDController, ProjectTag } from 'common-common/src/statsd';
+import { ProjectTag, StatsDController } from 'common-common/src/statsd';
 import type { BalanceProvider } from './types';
 
 // Class with Helper functions to send statsD
@@ -6,7 +6,7 @@ export class TbcStatsDSender {
   private statsD = StatsDController.get();
 
   // Log requests per provider + node + contract
-  sendProviderInfo(bps: BalanceProvider<any>[], nodeId?: number) {
+  sendProviderInfo(bps: BalanceProvider<any>[], nodeId: number) {
     bps.forEach((bp) => {
       const tags = {
         name: bp.name,
