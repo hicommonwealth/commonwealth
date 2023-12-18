@@ -6,7 +6,6 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import { sidebarStore } from 'state/ui/sidebar';
-import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
 import { NewTopicModal } from '../../modals/new_topic_modal';
 import { OrderTopicsModal } from '../../modals/order_topics_modal';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
@@ -54,8 +53,6 @@ const AdminSectionComponent = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
-  const [isEditTopicThresholdsModalOpen, setIsEditTopicThresholdsModalOpen] =
-    React.useState<boolean>(false);
   const [isOrderTopicsModalOpen, setIsOrderTopicsModalOpen] =
     React.useState<boolean>(false);
   const [isNewTopicModalOpen, setIsNewTopicModalOpen] =
@@ -229,16 +226,6 @@ const AdminSectionComponent = () => {
         }
         onClose={() => setIsOrderTopicsModalOpen(false)}
         open={isOrderTopicsModalOpen}
-      />
-      <CWModal
-        size="small"
-        content={
-          <EditTopicThresholdsModal
-            onModalClose={() => setIsEditTopicThresholdsModalOpen(false)}
-          />
-        }
-        onClose={() => setIsEditTopicThresholdsModalOpen(false)}
-        open={isEditTopicThresholdsModalOpen}
       />
     </React.Fragment>
   );

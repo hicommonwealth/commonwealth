@@ -1,9 +1,7 @@
 import Account from 'client/scripts/models/Account';
 import clsx from 'clsx';
-import { getDecimals } from 'helpers';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
-import app from 'state';
 import { ContentType } from 'types';
 import { User } from 'views/components/user/user';
 import { CWText } from '../../component_kit/cw_text';
@@ -41,8 +39,6 @@ export const CommentEditor = ({
   shouldFocus,
   tooltipText,
 }: CommentEditorProps) => {
-  const decimals = getDecimals(app.chain);
-
   return (
     <div className="CommentEditor">
       <div className="attribution-row">
