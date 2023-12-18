@@ -5,6 +5,24 @@ const { hasher } = require('node-object-hash');
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const transaction = await queryInterface.sequelize.transaction();
+
+    // Initial check to determine if migration should proceed
+    const communityExists = await queryInterface.sequelize.query(
+      `SELECT 1 FROM "Communities" WHERE id = 'divastaking'`,
+      { type: Sequelize.QueryTypes.SELECT, transaction },
+    );
+
+    const contractExists = await queryInterface.sequelize.query(
+      `SELECT 1 FROM "Contracts" WHERE address = '0xBFAbdE619ed5C4311811cF422562709710DB587d'`,
+      { type: Sequelize.QueryTypes.SELECT, transaction },
+    );
+
+    // If the specific records don't exist, skip the migration logic
+    if (communityExists.length === 0 || contractExists.length === 0) {
+      await transaction.commit();
+      return;
+    }
+
     // Update "Communities" and "Contracts" tables as per your previous script
     await queryInterface.sequelize.query(
       `
@@ -21,7 +39,7 @@ module.exports = {
       UPDATE "Contracts"
       SET address = '0xFb6B7C11a55C57767643F1FF65c34C8693a11A70',
           type = 'compound'
-      WHERE id = 710;
+      WHERE address = '0xBFAbdE619ed5C4311811cF422562709710DB587d';
     `,
       { transaction },
     );
@@ -661,8 +679,14 @@ module.exports = {
     const abiHash = hashInstance.hash(JSON.parse(abiData));
     await queryInterface.sequelize.query(
       `
-      INSERT INTO "ContractAbis" ("abi", "abi_hash", "verified", "nickname", "created_at", "updated_at")
-      VALUES (:abi, :abiHash, :verified, :nickname, NOW(), NOW())
+      WITH inserted AS (
+        INSERT INTO "ContractAbis" ("abi", "abi_hash", "verified", "nickname", "created_at", "updated_at")
+        VALUES (:abi, :abiHash, :verified, :nickname, NOW(), NOW())
+        RETURNING id
+      )
+      UPDATE "Contracts"
+      SET "abi_id" = (SELECT id FROM inserted)
+      WHERE address = '0xFb6B7C11a55C57767643F1FF65c34C8693a11A70';
     `,
       {
         replacements: {
@@ -672,31 +696,6 @@ module.exports = {
           nickname: 'GovernorCountingSimple',
         },
         type: Sequelize.QueryTypes.INSERT,
-        transaction,
-      },
-    );
-
-    // Retrieve the ID of the newly inserted "ContractAbi" (if needed for further operations)
-    const contractAbiId = await queryInterface.sequelize.query(
-      `
-      SELECT id FROM "ContractAbis" WHERE nickname = 'GovernorCountingSimple'
-    `,
-      {
-        type: Sequelize.QueryTypes.SELECT,
-        transaction,
-      },
-    );
-
-    // Assuming you need the ID for the next operation
-    await queryInterface.sequelize.query(
-      `
-      UPDATE "Contracts"
-      SET "abi_id" = :abiId
-      WHERE id = 710
-    `,
-      {
-        replacements: { abiId: contractAbiId[0].id },
-        type: Sequelize.QueryTypes.UPDATE,
         transaction,
       },
     );
@@ -714,7 +713,7 @@ module.exports = {
         },
         {
           where: {
-            id: 710,
+            address: '0xFb6B7C11a55C57767643F1FF65c34C8693a11A70',
           },
           transaction,
         },
@@ -745,7 +744,7 @@ module.exports = {
         UPDATE "Contracts"
         SET address = '0xBFAbdE619ed5C4311811cF422562709710DB587d',
             type = 'erc20'
-        WHERE id = 710;
+        WHERE address = '0xFb6B7C11a55C57767643F1FF65c34C8693a11A70';
       `,
         { transaction },
       );
