@@ -8,7 +8,6 @@ const PROPOSAL_STALE_TIME = 30000; // 30 seconds
 
 const fetchCompoundProposals = async () => {
   const proposals = CompoundGovernance.getProposals(app.chain as Compound);
-  console.log(proposals);
   return proposals;
 };
 

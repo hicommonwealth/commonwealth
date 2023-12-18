@@ -22,7 +22,6 @@ import {
 export function formatCompoundBravoProposal(
   proposalData: ProposalDataType,
 ): ICompoundProposalResponse {
-  console.log(proposalData);
   return {
     identifier:
       proposalData.identifier || proposalData.rawProposal.id.toString(),
@@ -61,8 +60,6 @@ export async function getCompoundProposals(
       compoundGovAddress,
       provider,
     );
-
-  console.log('Version of contract', govVersion);
 
   await contract.deployed();
   let proposalArrays: ResolvedProposalPromises;
