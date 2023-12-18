@@ -4,29 +4,10 @@ import {
   ChainType,
 } from 'common-common/src/types';
 import { z } from 'zod';
-import { ALL_COMMUNITIES } from '../../server/middleware/databaseValidationService';
-import { getFileSizeBytes } from '../../server/util/getFilesSizeBytes';
+import { ALL_COMMUNITIES } from '../constants';
+import { checkIconSize } from '../utils/checkIconSize';
 
-export const MAX_COMMUNITY_IMAGE_SIZE_KB = 500;
-
-async function checkIconSize(val, ctx) {
-  const fileSizeBytes = await getFileSizeBytes(val);
-  if (fileSizeBytes === 0) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Image url provided doesn't exist",
-    });
-    return;
-  }
-  if (fileSizeBytes >= MAX_COMMUNITY_IMAGE_SIZE_KB * 1024) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Image must be smaller than ${MAX_COMMUNITY_IMAGE_SIZE_KB}kb`,
-    });
-  }
-}
-
-export const createCommunitySchema = z.object({
+export const CreateCommunitySchema = z.object({
   id: z.string(),
   name: z
     .string()
@@ -68,3 +49,5 @@ export const createCommunitySchema = z.object({
   element: z.string().url().startsWith('https://matrix.to/').optional(),
   discord: z.string().url().startsWith('https://discord.com/').optional(),
 });
+
+export type CreateCommunity = z.infer<typeof CreateCommunitySchema>;

@@ -1,0 +1,16 @@
+{
+  "name": "@hicommonwealth/core",
+  "private": "true",
+  "version": "0.1.0",
+  "description": "Core Model",
+  "main": "build/index",
+  "scripts": {
+    "build": "rm -rf build && npx tsc"
+  },
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}
