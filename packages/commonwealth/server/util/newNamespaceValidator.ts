@@ -19,7 +19,20 @@ const factoryContracts: {
     chainId: 5,
   },
 };
-
+/**
+ * Validate if an attested new namespace is valid on-chain Checks:
+ * 1. Tx success
+ * 2. sender validity
+ * 3. correct contract address
+ * 4. If user is the admin of namespace on-chain
+ * @param model
+ * @param tbc
+ * @param namespace The namespace name
+ * @param txHash transaction hash of creation tx
+ * @param address user's address
+ * @param chain Select a chain from the validChains enum
+ * @returns an AppError if any validations fail, else passses
+ */
 export const validateNamespace = async (
   model: DB,
   tbc: TokenBalanceCache,
