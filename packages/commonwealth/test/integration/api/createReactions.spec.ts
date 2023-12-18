@@ -50,7 +50,7 @@ describe('createReaction Integration Tests', () => {
     userSession = { session: res.session, sign: res.sign };
   });
 
-  it.only('should create comment reactions and verify comment reaction count', async () => {
+  it('should create comment reactions and verify comment reaction count', async () => {
     const text = await getUniqueCommentText();
     const createCommentResponse = await modelUtils.createComment({
       chain: 'ethereum',
