@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
-import app from 'state';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { isNonEmptyString } from 'helpers/typeGuards';
-import ITokenAdapter from '../models/ITokenAdapter';
+import app from 'state';
 import ChainInfo from '../models/ChainInfo';
 import {
-  Old_CWBanner,
   CWMessageBanner,
+  Old_CWBanner,
 } from './components/component_kit/cw_banner';
 import { TermsBanner } from './components/terms_banner';
 
@@ -24,7 +24,7 @@ export const SublayoutBanners = ({
   const bannerLocalStorageId = `${app.activeChainId()}-banner`;
 
   const [bannerStatus, setBannerStatus] = useState(
-    localStorage.getItem(bannerLocalStorageId)
+    localStorage.getItem(bannerLocalStorageId),
   );
 
   const handleDismissBanner = () => {
@@ -38,7 +38,15 @@ export const SublayoutBanners = ({
         <CWMessageBanner bannerContent={banner} onClose={handleDismissBanner} />
       )}
       {app.isLoggedIn() &&
-        ITokenAdapter.instanceOf(app.chain) &&
+        ([
+          ChainNetwork.ERC721,
+          ChainNetwork.ERC20,
+          ChainNetwork.AxieInfinity,
+          ChainNetwork.Ethereum,
+        ].includes(app.chain.meta.network) ||
+          [ChainBase.CosmosSDK, ChainBase.Solana].includes(
+            app.chain.meta.base,
+          )) &&
         !app.user.activeAccount && (
           <Old_CWBanner
             bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
