@@ -12,3 +12,4 @@ node_modules/
 *.postgres
 *.rabbitmq
 redis-data
+**/.terraform/*
