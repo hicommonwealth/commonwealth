@@ -73,18 +73,6 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     ).default;
     newChain = new Cosmos(chain, app);
   } else if (
-    chain.network === ChainNetwork.Ethereum ||
-    chain.network === ChainNetwork.ERC721
-  ) {
-    const Ethereum = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "ethereum-main" */
-        '../controllers/chain/ethereum/tokenAdapter'
-      )
-    ).default;
-    newChain = new Ethereum(chain, app);
-  } else if (
     chain.network === ChainNetwork.NEAR ||
     chain.network === ChainNetwork.NEARTestnet
   ) {
@@ -126,27 +114,9 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     ).default;
     newChain = new Aave(chain, app);
   } else if (
-    chain.network === ChainNetwork.ERC20 ||
-    chain.network === ChainNetwork.AxieInfinity
+    chain.base === ChainBase.Solana ||
+    chain.network === ChainNetwork.SPL
   ) {
-    const ERC20 = (
-      await import(
-        //   /* webpackMode: "lazy" */
-        //   /* webpackChunkName: "erc20-main" */
-        '../controllers/chain/ethereum/tokenAdapter'
-      )
-    ).default;
-    newChain = new ERC20(chain, app);
-  } else if (chain.network === ChainNetwork.SPL) {
-    const SPL = (
-      await import(
-        //   /* webpackMode: "lazy" */
-        //   /* webpackChunkName: "spl-main" */
-        '../controllers/chain/solana/tokenAdapter'
-      )
-    ).default;
-    newChain = new SPL(chain, app);
-  } else if (chain.base === ChainBase.Solana) {
     const Solana = (
       await import(
         /* webpackMode: "lazy" */
@@ -156,8 +126,11 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
     ).default;
     newChain = new Solana(chain, app);
   } else if (
-    chain.base === ChainBase.Ethereum &&
-    chain.type === ChainType.Offchain
+    (chain.base === ChainBase.Ethereum && chain.type === ChainType.Offchain) ||
+    chain.network === ChainNetwork.Ethereum ||
+    chain.network === ChainNetwork.ERC721 ||
+    chain.network === ChainNetwork.ERC20 ||
+    chain.network === ChainNetwork.AxieInfinity
   ) {
     const Ethereum = (
       await import(
