@@ -1,8 +1,8 @@
-import axios from 'axios';
-import app from 'state';
 import { useMutation } from '@tanstack/react-query';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import axios from 'axios';
 import Topic from 'models/Topic';
+import app from 'state';
+import { ApiEndpoints, queryClient } from 'state/api/config';
 
 interface SetTopicThresholdProps {
   topic: Topic;

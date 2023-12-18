@@ -7,6 +7,7 @@ import type { DeltaStatic } from 'quill';
 import Thread from '../../../models/Thread';
 
 import { SessionKeyError } from 'controllers/server/sessions';
+import { featureFlags } from 'helpers/feature-flags';
 import { getTokenBalance } from 'helpers/token_balance_helper';
 import { useDraft } from 'hooks/useDraft';
 import app from 'state';
@@ -40,7 +41,7 @@ export const CreateComment = ({
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
       ? `new-thread-comment-${rootThread.id}`
-      : `new-comment-reply-${parentCommentId}`
+      : `new-comment-reply-${parentCommentId}`,
   );
 
   // get restored draft on init
@@ -54,7 +55,7 @@ export const CreateComment = ({
   const [sendingComment, setSendingComment] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [tokenPostingThreshold, setTokenPostingThreshold] = useState(
-    new BN('0')
+    new BN('0'),
   );
   const [userBalance, setUserBalance] = useState(new BN('0'));
   const [balanceLoading, setBalanceLoading] = useState(false);
@@ -71,7 +72,11 @@ export const CreateComment = ({
   }, [activeTopic]);
 
   useEffect(() => {
-    if (!tokenPostingThreshold.isZero() && !balanceLoading) {
+    if (
+      !tokenPostingThreshold.isZero() &&
+      !balanceLoading &&
+      !featureFlags.newGatingEnabled
+    ) {
       setBalanceLoading(true);
       if (!app.user.activeAccount?.tokenBalance) {
         getTokenBalance().then(() => {
@@ -81,6 +86,7 @@ export const CreateComment = ({
         setUserBalance(app.user.activeAccount?.tokenBalance);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenPostingThreshold]);
 
   const {
@@ -89,7 +95,7 @@ export const CreateComment = ({
     reset: resetCreateCommentMutation,
   } = useCreateCommentMutation({
     threadId: rootThread.id,
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
@@ -102,12 +108,12 @@ export const CreateComment = ({
     setErrorMsg(null);
     setSendingComment(true);
 
-    const chainId = app.activeChainId();
+    const communityId = app.activeChainId();
 
     try {
       const newComment: any = await createComment({
         threadId: rootThread.id,
-        chainId: chainId,
+        communityId,
         address: app.user.activeAccount.address,
         parentCommentId: parentCommentId,
         unescapedText: serializeDelta(contentDelta),
@@ -144,7 +150,8 @@ export const CreateComment = ({
     }
   };
 
-  const userFailsThreshold = app.chain.isGatedTopic(activeTopic?.id);
+  const userFailsThreshold =
+    !featureFlags.newGatingEnabled && app.chain.isGatedTopic(activeTopic?.id);
   const isAdmin = Permissions.isCommunityAdmin();
   const disabled =
     editorValue.length === 0 ||

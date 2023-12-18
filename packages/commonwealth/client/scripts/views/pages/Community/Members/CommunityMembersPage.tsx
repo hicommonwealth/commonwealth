@@ -37,7 +37,9 @@ import { GroupCategory, MembershipFilter, SearchFilters } from './index.types';
 
 const TABS = [
   { value: 'all-members', label: 'All members' },
-  ...(featureFlags.gatingEnabled ? [{ value: 'groups', label: 'Groups' }] : []),
+  ...(featureFlags.newGatingEnabled
+    ? [{ value: 'groups', label: 'Groups' }]
+    : []),
 ];
 
 const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
@@ -68,6 +70,8 @@ const CommunityMembersPage = () => {
   const { data: memberships = null } = useRefreshMembershipQuery({
     chainId: app.activeChainId(),
     address: app?.user?.activeAccount?.address,
+    apiEnabled:
+      app?.user?.activeAccount?.address && !!featureFlags.newGatingEnabled,
   });
 
   const debouncedSearchTerm = useDebounce<string>(
@@ -80,14 +84,17 @@ const CommunityMembersPage = () => {
     fetchNextPage,
     isLoading: isLoadingMembers,
   } = useSearchProfilesQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     searchTerm: '',
     limit: 30,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     includeRoles: true,
     includeGroupIds: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled:
+      app?.user?.activeAccount?.address && featureFlags.newGatingEnabled
+        ? !!memberships
+        : true,
     ...(searchFilters.category !== 'All groups' && {
       includeMembershipTypes: searchFilters.category
         .split(' ')
@@ -97,9 +104,12 @@ const CommunityMembersPage = () => {
   });
 
   const { data: groups } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
-    enabled: app?.user?.activeAccount?.address ? !!memberships : true,
+    enabled:
+      app?.user?.activeAccount?.address && featureFlags.newGatingEnabled
+        ? !!memberships
+        : true,
   });
 
   const formattedMembers = useMemo(() => {
@@ -214,7 +224,7 @@ const CommunityMembersPage = () => {
       return;
     }
 
-    featureFlags.gatingEnabled && updateActiveTab(TABS[1].value);
+    featureFlags.newGatingEnabled && updateActiveTab(TABS[1].value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -267,7 +277,7 @@ const CommunityMembersPage = () => {
         )}
 
       {/* Filter section */}
-      {featureFlags.gatingEnabled &&
+      {featureFlags.newGatingEnabled &&
       selectedTab === TABS[1].value &&
       groups?.length === 0 ? (
         <></>
@@ -278,8 +288,8 @@ const CommunityMembersPage = () => {
             'cols-4': boolean;
           }>(
             {
-              'cols-3': featureFlags.gatingEnabled && !isAdmin,
-              'cols-4': featureFlags.gatingEnabled && isAdmin,
+              'cols-3': featureFlags.newGatingEnabled && !isAdmin,
+              'cols-4': featureFlags.newGatingEnabled && isAdmin,
             },
             'filters',
           )}
@@ -300,7 +310,7 @@ const CommunityMembersPage = () => {
               }))
             }
           />
-          {featureFlags.gatingEnabled && app.user.activeAccount && (
+          {featureFlags.newGatingEnabled && app.user.activeAccount && (
             <div className="select-dropdown-container">
               <CWText type="b2" fontWeight="bold" className="filter-text">
                 Filter
@@ -320,7 +330,7 @@ const CommunityMembersPage = () => {
               />
             </div>
           )}
-          {featureFlags.gatingEnabled && isAdmin && (
+          {featureFlags.newGatingEnabled && isAdmin && (
             <CWButton
               buttonWidth="full"
               label="Create group"
@@ -332,7 +342,7 @@ const CommunityMembersPage = () => {
       )}
 
       {/* Main content section: based on the selected tab */}
-      {featureFlags.gatingEnabled && selectedTab === TABS[1].value ? (
+      {featureFlags.newGatingEnabled && selectedTab === TABS[1].value ? (
         <GroupsSection
           filteredGroups={filteredGroups}
           canManageGroups={isAdmin}

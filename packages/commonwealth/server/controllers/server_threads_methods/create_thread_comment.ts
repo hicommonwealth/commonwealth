@@ -138,7 +138,8 @@ export async function __createThreadComment(
     if (!isAdmin) {
       const { isValid, message } = await validateTopicGroupsMembership(
         this.models,
-        this.tokenBalanceCache,
+        this.tokenBalanceCacheV1,
+        this.tokenBalanceCacheV2,
         thread.topic_id,
         community,
         address,
@@ -340,7 +341,6 @@ export async function __createThreadComment(
     event: MixpanelCommunityInteractionEvent.CREATE_COMMENT,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   };
 
   return [finalComment.toJSON(), allNotificationOptions, analyticsOptions];

@@ -1,4 +1,3 @@
-import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import bodyParser from 'body-parser';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
@@ -25,7 +24,6 @@ import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
 import favicon from 'serve-favicon';
-import swaggerUi from 'swagger-ui-express';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { createOpenApiExpressMiddleware } from 'trpc-openapi';
 import * as v8 from 'v8';
@@ -42,6 +40,7 @@ import {
 import models from './server/database';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 import setupPassport from './server/passport';
+import { addSwagger } from './server/routing/addSwagger';
 import { addExternalRoutes } from './server/routing/external';
 import setupAPI from './server/routing/router';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
@@ -49,8 +48,6 @@ import setupAppRoutes from './server/scripts/setupAppRoutes';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import setupServer from './server/scripts/setupServer';
-import { appRouter, openApiDocument } from './server/trpc/rootRouter';
-import { createContext } from './server/trpc/trpc';
 import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import { databaseCleaner } from './server/util/databaseCleaner';
@@ -257,8 +254,7 @@ async function main() {
 
   if (!rabbitMQController.initialized) {
     console.warn(
-      'The RabbitMQController is not initialized! Some services may be unavailable e.g.' +
-        ' (Create/Delete chain and Websocket notifications)',
+      'The RabbitMQController is not initialized! Some services may be unavailable',
     );
     rollbar.critical('The main service RabbitMQController is not initialized!');
     // TODO: this requires an immediate response if in production
@@ -321,6 +317,7 @@ async function main() {
 
   // new API
   addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addSwagger('/docs', app);
 
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);

@@ -4,6 +4,7 @@ import {
   setActiveAccount,
 } from 'controllers/app/login';
 import { isSameAccount } from 'helpers';
+import { featureFlags } from 'helpers/feature-flags';
 import AddressInfo from 'models/AddressInfo';
 import ITokenAdapter from 'models/ITokenAdapter';
 import React, { useState } from 'react';
@@ -26,7 +27,7 @@ const useJoinCommunity = () => {
   const activeChainInfo = app.chain?.meta;
   const activeBase = activeChainInfo?.base;
   const hasTermsOfService = !!activeChainInfo?.terms;
-  const activeChainId = activeChainInfo?.id;
+  const activeCommunityId = activeChainInfo?.id;
 
   const samebaseAddresses = app.user.addresses.filter((a, idx) => {
     // if no active chain, add all addresses
@@ -54,7 +55,7 @@ const useJoinCommunity = () => {
               address: a.address,
               currentPrefix: 42,
             })
-          : prev.address === a.address)
+          : prev.address === a.address),
     );
 
     if (addressExists) {
@@ -80,7 +81,7 @@ const useJoinCommunity = () => {
         return true;
       }
       return false;
-    }
+    },
   );
 
   const performJoinCommunityLinking = async () => {
@@ -105,14 +106,15 @@ const useJoinCommunity = () => {
 
     if (originAddressInfo) {
       try {
-        const targetChain = activeChainId || originAddressInfo.community.id;
+        const targetCommunity =
+          activeCommunityId || originAddressInfo.community.id;
 
         const address = originAddressInfo.address;
 
         const res = await linkExistingAddressToChainOrCommunity(
           address,
-          targetChain,
-          originAddressInfo.community.id
+          targetCommunity,
+          originAddressInfo.community.id,
         );
 
         if (res && res.result) {
@@ -126,31 +128,32 @@ const useJoinCommunity = () => {
                 keytype: a.keytype,
                 walletId: a.wallet_id,
               });
-            })
+            }),
           );
           const addressInfo = app.user.addresses.find(
             (a) =>
-              a.address === encodedAddress && a.community.id === targetChain
+              a.address === encodedAddress &&
+              a.community.id === targetCommunity,
           );
 
           const account = app.chain.accounts.get(
             encodedAddress,
-            addressInfo.keytype
+            addressInfo.keytype,
           );
           if (app.chain) {
             account.setValidationToken(verification_token);
             console.log('setting validation token');
           }
           if (
-            activeChainId &&
+            activeCommunityId &&
             !app.roles.getRoleInCommunity({
               account,
-              chain: activeChainId,
+              community: activeCommunityId,
             })
           ) {
             await app.roles.createRole({
               address: addressInfo,
-              chain: activeChainId,
+              community: activeCommunityId,
             });
           }
           await setActiveAccount(account);
@@ -159,7 +162,7 @@ const useJoinCommunity = () => {
               .length === 0
           ) {
             app.user.setActiveAccounts(
-              app.user.activeAccounts.concat([account])
+              app.user.activeAccounts.concat([account]),
             );
           }
         } else {
@@ -167,7 +170,11 @@ const useJoinCommunity = () => {
         }
 
         // If token forum make sure has token and add to app.chain obj
-        if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
+        if (
+          app.chain &&
+          ITokenAdapter.instanceOf(app.chain) &&
+          !featureFlags.newGatingEnabled
+        ) {
           await app.chain.activeAddressHasToken(app.user.activeAccount.address);
         }
       } catch (err) {

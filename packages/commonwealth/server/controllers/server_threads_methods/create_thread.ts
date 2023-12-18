@@ -179,7 +179,8 @@ export async function __createThread(
         if (!isAdmin) {
           const { isValid, message } = await validateTopicGroupsMembership(
             this.models,
-            this.tokenBalanceCache,
+            this.tokenBalanceCacheV1,
+            this.tokenBalanceCacheV2,
             topicId,
             community,
             address,
@@ -309,7 +310,6 @@ export async function __createThread(
     event: MixpanelCommunityInteractionEvent.CREATE_THREAD,
     community: community.id,
     userId: user.id,
-    isCustomDomain: null,
   };
 
   return [finalThread.toJSON(), allNotificationOptions, analyticsOptions];

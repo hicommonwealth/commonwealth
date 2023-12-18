@@ -41,7 +41,7 @@ const get = (route, args, callback) => {
 };
 
 interface NotifOptions {
-  chain_filter: string;
+  community_filter: string;
   maxId: number;
 }
 
@@ -128,10 +128,6 @@ class NotificationsController {
         },
         (result: SubscriptionInstance) => {
           const newSubscription = modelFromServer(result);
-          if (newSubscription.category === 'chain-event')
-            app.socket.chainEventsNs.addChainEventSubscriptions([
-              newSubscription.chainId,
-            ]);
           this._subscriptions.push(newSubscription);
         },
       );
@@ -146,12 +142,9 @@ class NotificationsController {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
       () => {
-        const ceSubs = [];
         for (const s of subscriptions) {
           s.enable();
-          if (s.category === 'chain-event') ceSubs.push(s.chainId);
         }
-        app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
       },
     );
   }
@@ -169,7 +162,6 @@ class NotificationsController {
           s.disable();
           if (s.category === 'chain-event') ceSubs.push(s);
         }
-        app.socket.chainEventsNs.deleteChainEventSubscriptions(ceSubs);
       },
     );
   }
@@ -217,10 +209,6 @@ class NotificationsController {
           throw new Error('subscription not found!');
         }
         this._subscriptions.splice(idx, 1);
-        if (subscription.category === 'chain-event')
-          app.socket.chainEventsNs.deleteChainEventSubscriptions([
-            subscription,
-          ]);
       },
     );
   }
@@ -303,9 +291,6 @@ class NotificationsController {
   }
 
   public clearSubscriptions() {
-    app.socket?.chainEventsNs.deleteChainEventSubscriptions(
-      this._subscriptions,
-    );
     this._subscriptions = [];
   }
 
@@ -331,8 +316,8 @@ class NotificationsController {
     }
 
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined };
+      ? { community_filter: app.activeChainId(), maxId: undefined }
+      : { community_filter: undefined, maxId: undefined };
 
     return post('/viewChainEventNotifications', options, (result) => {
       this._numPages = result.numPages;
@@ -347,8 +332,8 @@ class NotificationsController {
       throw new Error('must be signed in to refresh notifications');
     }
     const options: NotifOptions = app.isCustomDomain()
-      ? { chain_filter: app.activeChainId(), maxId: undefined }
-      : { chain_filter: undefined, maxId: undefined };
+      ? { community_filter: app.activeChainId(), maxId: undefined }
+      : { community_filter: undefined, maxId: undefined };
 
     return post('/viewDiscussionNotifications', options, (result) => {
       this._numPages = result.numPages;
@@ -359,8 +344,6 @@ class NotificationsController {
   }
 
   private parseNotifications(subscriptions) {
-    const ceSubs: string[] = [];
-
     for (const subscriptionJSON of subscriptions) {
       const subscriptionId = subscriptionJSON.subscription_id;
       const categoryId = subscriptionJSON.category_id;
@@ -382,9 +365,7 @@ class NotificationsController {
             this._discussionStore.add(notification);
         }
       }
-      if (categoryId === 'chain-event') ceSubs.push(subscriptionJSON.chain_id);
     }
-    app.socket.chainEventsNs.addChainEventSubscriptions(ceSubs);
   }
 
   public getSubscriptions() {
@@ -409,7 +390,6 @@ class NotificationsController {
       this.getSubscriptions(),
       this.getSubscribedChains(),
     ]);
-    console.log();
     this.isLoaded.emit('redraw');
     return Promise.resolve();
   }

@@ -20,11 +20,15 @@ export const updateCommunityHandler = async (
     'snapshot[]': snapshot,
     ...rest
   } = req.body;
-  const community = await controllers.communities.updateCommunity({
-    user: req.user,
-    featuredTopics,
-    snapshot,
-    ...rest,
-  });
+  const { analyticsOptions, ...community } =
+    await controllers.communities.updateCommunity({
+      user: req.user,
+      featuredTopics,
+      snapshot,
+      ...rest,
+    });
+
+  controllers.analytics.track(analyticsOptions, req).catch(console.error);
+
   return success(res, community);
 };

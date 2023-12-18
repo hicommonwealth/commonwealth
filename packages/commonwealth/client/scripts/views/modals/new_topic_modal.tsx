@@ -39,7 +39,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
   const { mutateAsync: createTopic } = useCreateTopicMutation();
   const navigate = useCommonNavigate();
   const { data: topics } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
@@ -71,7 +71,8 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
 
   const decimals = app.chain?.meta?.decimals
     ? app.chain.meta.decimals
-    : app.chain.network === ChainNetwork.ERC721
+    : app.chain.network === ChainNetwork.ERC721 ||
+      app.chain.network === ChainNetwork.ERC1155
     ? 0
     : app.chain.base === ChainBase.CosmosSDK
     ? 6
@@ -127,7 +128,7 @@ export const NewTopicModal = (props: NewTopicModalProps) => {
             setDescription(e.target.value);
           }}
         />
-        {!featureFlags.gatingEnabled && app.activeChainId() && (
+        {!featureFlags.newGatingEnabled && app.activeChainId() && (
           <React.Fragment>
             <CWLabel
               label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}

@@ -3,8 +3,10 @@ import React, { FC } from 'react';
 import 'components/component_kit/new_designs/CWTooltip.scss';
 
 import { Placement } from '@popperjs/core/lib';
-import type { PopoverTriggerProps } from '../../cw_popover/cw_popover';
-import { Popover, usePopover } from '../../cw_popover/cw_popover';
+import CWPopover, {
+  PopoverTriggerProps,
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
 import { CWText } from '../../cw_text';
 import { TooltipContainer } from './TooltipContainer';
 
@@ -26,7 +28,7 @@ export const CWTooltip: FC<TooltipProps> = ({
     <>
       {renderTrigger(popoverProps.handleInteraction, popoverProps.open)}
       {content && (
-        <Popover
+        <CWPopover
           disablePortal={disablePortal}
           placement={placement}
           content={

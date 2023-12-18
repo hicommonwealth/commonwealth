@@ -8,18 +8,18 @@ import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import { AaveExecutor } from 'controllers/chain/ethereum/aave/api';
 import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import app from 'state';
+import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { User } from 'views/components/user/user';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import { PopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import {
   CWTab,
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
 
@@ -49,7 +49,7 @@ export const AaveProposalForm = () => {
   const updateAaveProposalState = <K extends keyof AaveProposalState>(
     index: number,
     key: K,
-    value: AaveProposalState[K]
+    value: AaveProposalState[K],
   ) => {
     const newAaveProposalState = [...aaveProposalState];
     newAaveProposalState[index][key] = value;
@@ -62,7 +62,7 @@ export const AaveProposalForm = () => {
         <CWLabel label="Proposer (you)" />
         <User
           userAddress={author.address}
-          userChainId={author.community?.id || author.profile?.chain}
+          userCommunityId={author.community?.id || author.profile?.chain}
           shouldLinkProfile
           shouldShowPopover
           shouldShowAddressWithDisplayName
@@ -142,7 +142,7 @@ export const AaveProposalForm = () => {
                 setActiveTabIndex(tabCount - 1);
 
                 const newAaveProposalState = aaveProposalState.filter(
-                  (_, i) => i !== aaveProposalState.length - 1
+                  (_, i) => i !== aaveProposalState.length - 1,
                 );
 
                 setAaveProposalState(newAaveProposalState);
@@ -192,7 +192,7 @@ export const AaveProposalForm = () => {
           updateAaveProposalState(
             activeTabIndex,
             'withDelegateCall',
-            e.target.checked
+            e.target.checked,
           );
         }}
         label="Delegate Call"

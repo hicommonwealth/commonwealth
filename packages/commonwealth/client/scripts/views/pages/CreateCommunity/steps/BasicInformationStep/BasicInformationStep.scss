@@ -1,0 +1,37 @@
+@import '../../../../../../styles/shared';
+
+$form-width: 596px;
+
+.BasicInformationStep {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+
+  .CreateCommunityHint {
+    position: absolute;
+    max-width: 244px;
+    left: calc($form-width + 100px);
+    top: 100px;
+  }
+
+  .header {
+    margin-top: 8px;
+    width: 100%;
+
+    .description {
+      color: $neutral-500;
+    }
+  }
+
+  @include smallInclusive {
+    flex-direction: column;
+    gap: 16px;
+
+    .CreateCommunityHint {
+      position: static;
+      width: 100%;
+      max-width: $form-width;
+    }
+  }
+}

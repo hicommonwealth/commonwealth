@@ -125,6 +125,7 @@ const createMockedGroupsController = () => {
   const controller = new ServerGroupsController(
     db,
     tokenBalanceCache,
+    tokenBalanceCache,
     banCache,
   );
   return controller;
@@ -193,7 +194,6 @@ describe('ServerGroupsController', () => {
     expect(analytics).to.eql({
       event: 'Create New Group',
       community: chain.id,
-      isCustomDomain: null,
       userId: user.id,
     });
   });
@@ -238,7 +238,6 @@ describe('ServerGroupsController', () => {
     expect(analytics).to.eql({
       event: 'Update Group',
       community: chain.id,
-      isCustomDomain: null,
       userId: user.id,
     });
   });

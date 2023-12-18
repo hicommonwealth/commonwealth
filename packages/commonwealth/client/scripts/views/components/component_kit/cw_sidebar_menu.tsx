@@ -43,7 +43,7 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
       <div
         className={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
           { disabled, isSecondary },
-          'SidebarMenuItem default'
+          'SidebarMenuItem default',
         )}
         onClick={(e) => {
           if (onClick) onClick(e);
@@ -64,12 +64,12 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
     );
   } else if (props.type === 'community') {
     const item = props.community;
-    const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
+    const roles = app.roles.getAllRolesInCommunity({ community: item.id });
     return (
       <div
         className={getClasses<{ isSelected: boolean }>(
           { isSelected: app.activeChainId() === item.id },
-          'SidebarMenuItem community'
+          'SidebarMenuItem community',
         )}
         onClick={(e) => {
           e.preventDefault();
@@ -90,14 +90,14 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               avatarSize={18}
               shouldShowAvatarOnly
               userAddress={roles[0].address}
-              userChainId={roles[0].address_chain || roles[0].chain_id}
+              userCommunityId={roles[0].address_chain || roles[0].chain_id}
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
-                  chain: item.id,
+                  community: item.id,
                   isAlreadyStarred: app.user.isCommunityStarred(item.id),
                 });
                 setIsStarred((prevState) => !prevState);
@@ -125,7 +125,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
     <div
       className={getClasses<{ className: string }>(
         { className },
-        ComponentType.SidebarMenu
+        ComponentType.SidebarMenu,
       )}
     >
       <div className="sidebar-top">

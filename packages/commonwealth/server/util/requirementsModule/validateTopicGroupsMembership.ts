@@ -1,12 +1,15 @@
 import { Op } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
-import { TokenBalanceCache } from '../../../../token-balance-cache/src';
+
+import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../../token-balance-cache/src';
 import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
 import { DB } from '../../models';
-import { AddressInstance } from '../../models/address';
+import { AddressAttributes } from '../../models/address';
 import { CommunityInstance } from '../../models/community';
+import { MembershipRejectReason } from '../../models/membership';
+import { TokenBalanceCache as TokenBalanceCacheV2 } from '../tokenBalanceCache/tokenBalanceCache';
 import validateTopicThreshold from '../validateTopicThreshold';
-import validateGroupMembership from './validateGroupMembership';
+import { refreshMembershipsForAddress } from './refreshMembershipsForAddress';
 
 export const Errors = {
   InsufficientTokenBalance: 'Insufficient token balance',
@@ -18,7 +21,8 @@ export const Errors = {
  * all groups of the given topic. Depending on the FEATURE_FLAG_GROUP_CHECK_ENABLED
  * feature flag, may use Gating API implementation or original TBC implementation.
  * @param models DB handle
- * @param tokenBalanceCache Token balance cache handle
+ * @param tokenBalanceCacheV1 Token balance cache handle (old implementation)
+ * @param tokenBalanceCacheV2 Token balance cache handle (new implementation)
  * @param topicId ID of the topic
  * @param chain Chain of the groups
  * @param address Address to check against requirements
@@ -26,13 +30,14 @@ export const Errors = {
  */
 export async function validateTopicGroupsMembership(
   models: DB,
-  tokenBalanceCache: TokenBalanceCache,
+  tokenBalanceCacheV1: TokenBalanceCacheV1,
+  tokenBalanceCacheV2: TokenBalanceCacheV2,
   topicId: number,
   chain: CommunityInstance,
-  address: AddressInstance
+  address: AddressAttributes,
 ): Promise<{ isValid: boolean; message?: string }> {
   if (FEATURE_FLAG_GROUP_CHECK_ENABLED) {
-    // check via groups
+    // check via new TBC with groups
 
     // get all groups of topic
     const topic = await models.Topic.findOne({
@@ -46,24 +51,27 @@ export async function validateTopicGroupsMembership(
         id: { [Op.in]: topic.group_ids },
       },
     });
+    if (groups.length === 0) {
+      return { isValid: true };
+    }
 
     // check membership for all groups of topic
     let numValidGroups = 0;
-    const allErrorMessages: string[] = [];
+    const allErrorMessages: MembershipRejectReason[] = [];
 
-    for (const { metadata, requirements } of groups) {
-      const { isValid, messages } = await validateGroupMembership(
-        address.address,
-        requirements,
-        tokenBalanceCache,
-        metadata.required_requirements || 0
-      );
-      if (isValid) {
-        numValidGroups++;
+    const memberships = await refreshMembershipsForAddress(
+      models,
+      tokenBalanceCacheV2,
+      address,
+      groups,
+      false, // use cached balances
+    );
+
+    for (const membership of memberships) {
+      if (membership.reject_reason) {
+        allErrorMessages.push(membership.reject_reason);
       } else {
-        for (const message of messages) {
-          allErrorMessages.push(JSON.stringify(message));
-        }
+        numValidGroups++;
       }
     }
 
@@ -74,13 +82,13 @@ export async function validateTopicGroupsMembership(
     return { isValid: true };
   }
 
-  // check via TBC
+  // check via old TBC without groups
   try {
     const canReact = await validateTopicThreshold(
-      tokenBalanceCache,
+      tokenBalanceCacheV1,
       models,
       topicId,
-      address.address
+      address.address,
     );
     if (!canReact) {
       return { isValid: false, message: Errors.InsufficientTokenBalance };

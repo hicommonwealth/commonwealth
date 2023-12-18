@@ -1,18 +1,71 @@
 import { expect } from 'chai';
-import { Requirement } from 'server/util/requirementsModule/requirementsTypes';
+import {
+  BalanceSourceType,
+  Requirement,
+} from 'server/util/requirementsModule/requirementsTypes';
 import validateRequirements from 'server/util/requirementsModule/validateRequirements';
 
 describe('validateRequirements', () => {
-  it('should pass as valid for ContractSource', () => {
+  it('should pass as valid for ERC20 ContractSource', () => {
     const requirements: Requirement[] = [
       {
         rule: 'threshold',
         data: {
           threshold: '1000',
           source: {
-            source_type: 'erc20',
+            source_type: BalanceSourceType.ERC20,
             evm_chain_id: 1,
             contract_address: '0x0000000000000000000000000000000000000000',
+          },
+        },
+      },
+      {
+        rule: 'allow',
+        data: {
+          allow: ['0x0000000000000000000000000000000000000000'],
+        },
+      },
+    ];
+    const err = validateRequirements(requirements);
+    expect(err).to.be.null;
+  });
+
+  it('should pass as valid for ERC721 ContractSource', () => {
+    const requirements: Requirement[] = [
+      {
+        rule: 'threshold',
+        data: {
+          threshold: '1000',
+          source: {
+            source_type: BalanceSourceType.ERC721,
+            evm_chain_id: 1,
+            contract_address: '0x0000000000000000000000000000000000000000',
+            token_id: '1',
+          },
+        },
+      },
+      {
+        rule: 'allow',
+        data: {
+          allow: ['0x0000000000000000000000000000000000000000'],
+        },
+      },
+    ];
+    const err = validateRequirements(requirements);
+    expect(err).to.be.null;
+  });
+
+  it('should pass as valid for ERC1155 ContractSource', () => {
+    const requirements: Requirement[] = [
+      {
+        rule: 'threshold',
+        data: {
+          threshold: '1000',
+          source: {
+            source_type: BalanceSourceType.ERC1155,
+            evm_chain_id: 1,
+            contract_address: '0x0000000000000000000000000000000000000000',
+            token_id: '1',
           },
         },
       },
@@ -34,7 +87,7 @@ describe('validateRequirements', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'eth_native',
+            source_type: BalanceSourceType.ETHNative,
             evm_chain_id: 1,
           },
         },
@@ -57,7 +110,7 @@ describe('validateRequirements', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'cosmos_native',
+            source_type: BalanceSourceType.CosmosNative,
             cosmos_chain_id: 'blah',
             token_symbol: 'BLAH',
           },
@@ -79,9 +132,9 @@ describe('validateRequirements', () => {
       {
         rule: 'threshold',
         data: {
-          threshold: (1000 as unknown) as string, // wrong type
+          threshold: 1000 as unknown as string, // wrong type
           source: {
-            source_type: 'erc20',
+            source_type: BalanceSourceType.ERC20,
             evm_chain_id: 1,
             contract_address: '0x0000000000000000000000000000000000000000',
           },
@@ -105,7 +158,7 @@ describe('validateRequirements', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'erc20',
+            source_type: BalanceSourceType.ERC20,
             evm_chain_id: 1,
             contract_address: 'nope',
           },
@@ -129,7 +182,7 @@ describe('validateRequirements', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'eth_native',
+            source_type: BalanceSourceType.ETHNative,
             evm_chain_id: 'blah' as any,
           },
         },
@@ -152,7 +205,7 @@ describe('validateRequirements', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'cosmos_native',
+            source_type: BalanceSourceType.CosmosNative,
             cosmos_chain_id: 1 as any,
             token_symbol: 'BLAH',
           },
@@ -176,7 +229,7 @@ describe('validateRequirements', () => {
         data: {
           threshold: '1000',
           source: {
-            source_type: 'cosmos_native',
+            source_type: BalanceSourceType.CosmosNative,
             cosmos_chain_id: 'blah',
             token_symbol: 'BLAH',
           },

@@ -33,7 +33,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
     chainId: app.activeChainId(),
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
   const foundGroup: Group = groups.find(
@@ -45,7 +45,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   });
 
   if (
-    !featureFlags.gatingEnabled ||
+    !featureFlags.newGatingEnabled ||
     !app.isLoggedIn() ||
     !(Permissions.isCommunityAdmin() || Permissions.isSiteAdmin())
   ) {
@@ -71,6 +71,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
                   requirementType.value === requirement.data.source.source_type,
               )?.label,
             },
+            requirementTokenId: requirement.data.source.token_id,
             requirementAmount: convertRequirementAmountFromWeiToTokens(
               requirement.data.source.source_type,
               requirement.data.threshold.trim(),

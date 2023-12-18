@@ -44,7 +44,7 @@ export const ManageRoles = ({
       const newRole = res.data.result;
       onRoleUpdate(role, newRole);
     } catch (err) {
-      const errMsg = err.responseJSON?.error || 'Failed to alter role.';
+      const errMsg = err.response?.data?.error || 'Failed to alter role.';
       notifyError(errMsg);
     }
   };
@@ -136,7 +136,7 @@ export const ManageRoles = ({
             <div className="role-row" key={addr.id}>
               <User
                 userAddress={addr.address}
-                userChainId={role.chain_id}
+                userCommunityId={role.chain_id}
                 shouldShowPopover
                 shouldLinkProfile
                 shouldHideAvatar

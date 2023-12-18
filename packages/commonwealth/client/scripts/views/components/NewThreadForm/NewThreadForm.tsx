@@ -39,23 +39,27 @@ export const NewThreadForm = () => {
   const location = useLocation();
 
   const { data: topics = [] } = useFetchTopicsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
   });
 
-  const chainId = app.chain.id;
+  const communityId = app.chain.id;
   const hasTopics = topics?.length;
-  const isAdmin = Permissions.isCommunityAdmin();
+  const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
   const topicsForSelector = topics?.reduce(
     (acc, t) => {
-      if (
-        isAdmin ||
-        t.tokenThreshold.isZero() ||
-        !app.chain.isGatedTopic(t.id)
-      ) {
+      if (featureFlags.newGatingEnabled) {
         acc?.enabledTopics?.push(t);
       } else {
-        acc?.disabledTopics?.push(t);
+        if (
+          isAdmin ||
+          t.tokenThreshold.isZero() ||
+          !app.chain.isGatedTopic(t.id)
+        ) {
+          acc?.enabledTopics?.push(t);
+        } else {
+          acc?.disabledTopics?.push(t);
+        }
       }
       return acc;
     },
@@ -77,14 +81,14 @@ export const NewThreadForm = () => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
-  } = useNewThreadForm(chainId, topicsForSelector.enabledTopics);
+  } = useNewThreadForm(communityId, topicsForSelector.enabledTopics);
 
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
   const { activeAccount: hasJoinedCommunity } = useUserActiveAccount();
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    chainId: app.activeChainId(),
+    communityId: app.activeChainId(),
     includeTopics: true,
   });
   const { data: memberships = [] } = useRefreshMembershipQuery({
@@ -123,7 +127,8 @@ export const NewThreadForm = () => {
       group.topics.find((topic) => topic.id === threadTopic?.id),
     )
     .map((group) => group.name);
-  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+  const isRestrictedMembership =
+    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const handleNewThreadCreation = async () => {
     if (isRestrictedMembership) {
@@ -169,7 +174,7 @@ export const NewThreadForm = () => {
       if (err instanceof SessionKeyError) {
         return;
       }
-      console.error(err?.responseJSON?.error || err?.message);
+      console.error(err.response.data.error || err?.message);
       notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
@@ -197,7 +202,7 @@ export const NewThreadForm = () => {
       <div className="NewThreadForm">
         <div className="header">
           <CWText type="h2" fontWeight="medium">
-            Create Discussion
+            Create thread
           </CWText>
         </div>
         <div className="new-thread-body">
@@ -268,7 +273,7 @@ export const NewThreadForm = () => {
               />
             )}
 
-            {featureFlags.gatingEnabled &&
+            {featureFlags.newGatingEnabled &&
               isRestrictedMembership &&
               canShowGatingBanner && (
                 <div>

@@ -1,0 +1,25 @@
+@import '../../../../../../styles/shared';
+
+.CreateCommunityLoginModal {
+  z-index: 100;
+}
+
+.CommunityTypeStep {
+  max-width: 774px;
+
+  .subheader {
+    color: $neutral-500;
+    margin-bottom: 24px;
+  }
+
+  .advanced-options-container {
+    & > .Text {
+      color: $neutral-500;
+    }
+
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+}
