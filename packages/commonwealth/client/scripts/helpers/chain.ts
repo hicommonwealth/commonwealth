@@ -72,7 +72,10 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
       )
     ).default;
     newChain = new Cosmos(chain, app);
-  } else if (chain.network === ChainNetwork.Ethereum) {
+  } else if (
+    chain.network === ChainNetwork.Ethereum ||
+    chain.network === ChainNetwork.ERC721
+  ) {
     const Ethereum = (
       await import(
         /* webpackMode: "lazy" */
@@ -134,15 +137,6 @@ export const selectChain = async (chain?: ChainInfo): Promise<boolean> => {
       )
     ).default;
     newChain = new ERC20(chain, app);
-  } else if (chain.network === ChainNetwork.ERC721) {
-    const ERC721 = (
-      await import(
-        //   /* webpackMode: "lazy" */
-        //   /* webpackChunkName: "erc721-main" */
-        '../controllers/chain/ethereum/NftAdapter'
-      )
-    ).default;
-    newChain = new ERC721(chain, app);
   } else if (chain.network === ChainNetwork.SPL) {
     const SPL = (
       await import(
