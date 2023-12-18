@@ -1,4 +1,4 @@
-import { TokenBalanceCache } from '../../../token-balance-cache/src';
+import { TokenBalanceCache } from 'token-balance-cache/src';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import {

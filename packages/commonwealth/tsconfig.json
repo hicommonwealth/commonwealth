@@ -6,10 +6,9 @@
     "baseUrl": ".",
     "skipLibCheck": true,
     "paths": {
-      "common-common": ["../../packages/common-common"],
-      "common-common/*": ["../../packages/common-common/*"],
-      "token-balance-cache": ["../../packages/token-balance-cache"],
-      "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
+      "common-common/*": ["./packages/common-common/*"],
+      "token-balance-cache/*": ["./packages/token-balance-cache/*"],
+      "discord-bot/*": ["packages/discord-bot/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     }
   },

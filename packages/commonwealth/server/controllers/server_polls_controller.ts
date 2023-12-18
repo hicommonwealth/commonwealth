@@ -1,6 +1,6 @@
 import { DB } from 'server/models';
 
-import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../token-balance-cache/src';
+import { TokenBalanceCache as TokenBalanceCacheV1 } from 'token-balance-cache/src';
 import { TokenBalanceCache as TokenBalanceCacheV2 } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {

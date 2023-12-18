@@ -166,14 +166,6 @@ module.exports = {
       'node_modules', // local node modules
       '../node_modules', // global node modules
     ],
-    alias: {
-      'common-common': path.resolve(__dirname, '../../common-common'),
-      'chain-events': path.resolve(__dirname, '../../chain-events'),
-      'token-balance-cache': path.resolve(
-        __dirname,
-        '../../token-balance-cache',
-      ),
-    },
     fallback: {
       fs: false,
       net: false,
@@ -197,7 +189,7 @@ module.exports = {
           path.resolve(__dirname, '../shared'),
           path.resolve(__dirname, '../../common-common'),
           path.resolve(__dirname, '../../chain-events'),
-          path.resolve(__dirname, '../../token-balance-cache'),
+          path.resolve(__dirname, 'token-balance-cache'),
         ],
         loader: 'esbuild-loader',
         options: {

@@ -37,7 +37,7 @@ module.exports = merge(common, {
           path.resolve(__dirname, '../shared'),
           path.resolve(__dirname, '../../common-common'),
           path.resolve(__dirname, '../../chain-events'),
-          path.resolve(__dirname, '../../token-balance-cache'),
+          path.resolve(__dirname, 'token-balance-cache'),
         ],
         exclude: /\/node_modules\//,
         use: {

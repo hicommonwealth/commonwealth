@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
 
-import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../../token-balance-cache/src';
+import { TokenBalanceCache as TokenBalanceCacheV1 } from 'token-balance-cache/src';
 import { FEATURE_FLAG_GROUP_CHECK_ENABLED } from '../../config';
 import { DB } from '../../models';
 import { AddressAttributes } from '../../models/address';
