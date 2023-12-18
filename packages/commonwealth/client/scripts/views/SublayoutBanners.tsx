@@ -12,11 +12,7 @@ type SublayoutBannersProps = {
   terms?: string;
 };
 
-export const SublayoutBanners = ({
-  banner,
-  chain,
-  terms,
-}: SublayoutBannersProps) => {
+export const SublayoutBanners = ({ banner, terms }: SublayoutBannersProps) => {
   const bannerLocalStorageId = `${app.activeChainId()}-banner`;
 
   const [bannerStatus, setBannerStatus] = useState(

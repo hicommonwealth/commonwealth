@@ -31,7 +31,7 @@ const deleteReaction = async (reactionId, jwtToken, userAddress) => {
 const getUniqueCommentText = async () => {
   const time = new Date().getMilliseconds();
   const text = `testCommentCreated at ${time}`;
-  let comment = await models.Comment.findOne({
+  const comment = await models.Comment.findOne({
     where: { text },
   });
   chai.assert.isNull(comment);
@@ -108,7 +108,7 @@ describe('createReaction Integration Tests', () => {
       where: { id: testThreads[0].id },
     });
     chai.assert.isNotNull(thread);
-    let beforeReactionCount = thread.reaction_count;
+    const beforeReactionCount = thread.reaction_count;
 
     const createReactionResponse = await modelUtils.createThreadReaction({
       chain: 'ethereum',
