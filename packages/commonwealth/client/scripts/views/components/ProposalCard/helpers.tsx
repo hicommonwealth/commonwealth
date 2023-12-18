@@ -7,7 +7,11 @@ import 'components/ProposalCard/ProposalCard.scss';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 
-import { blocknumToDuration, formatNumberLong } from 'helpers';
+import {
+  blocknumToDuration,
+  formatNumberLong,
+  shortenIdentifier,
+} from 'helpers';
 import moment from 'moment';
 import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus } from '../../../models/types';
@@ -129,20 +133,6 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
     return ['Not passing, ', countdown];
   }
   return '';
-};
-
-export const shortenIdentifier = (identifer: string) => {
-  // Check if the string is longer than 6 characters
-  if (identifer.length > 6) {
-    // Extract the first three and last three characters
-    const start = identifer.substring(0, 3);
-    const end = identifer.substring(identifer.length - 3);
-    // Return the formatted string
-    return `${start}...${end}`;
-  } else {
-    // Return the original string if it's 6 characters or shorter
-    return identifer;
-  }
 };
 
 export const getPrimaryTagText = (proposal: AnyProposal) => `
