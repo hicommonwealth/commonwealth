@@ -47,7 +47,7 @@ const GatingGrowl = () => {
             Introducing Groups
           </CWText>
           <CWText type="b1" fontWeight="regular" isCentered>
-            Gate topics by token threasholds using Groups.
+            Gate topics by token thresholds using Groups.
           </CWText>
           <CWButton
             className="latest-button"
