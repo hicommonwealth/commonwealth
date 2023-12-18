@@ -199,7 +199,7 @@ export async function updateActiveAddresses({
         : app.chain?.meta.node?.ethChainId;
     const canvasChainId = chainBaseToCanvasChainId(chainBase, idOrPrefix);
     let foundAddressWithActiveSessionKey = null;
-    for await (const communityAccount of communityAddressesSortedByLastUsed) {
+    for (const communityAccount of communityAddressesSortedByLastUsed) {
       const isAuth = await app.sessions
         .getSessionController(chainBase)
         .hasAuthenticatedSession(canvasChainId, communityAccount.address);
