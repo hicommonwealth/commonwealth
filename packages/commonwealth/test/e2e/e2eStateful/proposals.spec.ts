@@ -1,5 +1,7 @@
 import { models } from '@hicommonwealth/model';
 import { expect, test } from '@playwright/test';
+import chai from 'chai';
+const chaiExpect = chai.expect;
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -41,7 +43,7 @@ test.describe('Community proposals page', () => {
         '.ProposalCard',
         (cards) => cards.length,
       );
-      expect(cardCount).toBeGreaterThanOrEqual(expectedMinimumCount);
+      await expect(cardCount).toBeGreaterThanOrEqual(expectedMinimumCount);
     }).toPass();
   };
 
@@ -285,5 +287,107 @@ test.describe('Community proposals page', () => {
         });
       });
     });
+    test('Inactive proposal cards load', async ({ page }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalCardsTest({ page }, 23); // as of commit, should never be less than 23
+    });
+    test('Inactive proposal page loads from Proposal Card click', async ({
+      page,
+    }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalPageTest({ page }, true);
+    });
+    test('Inactive proposal page loads on direct URL', async ({ page }) => {
+      await page.goto(`http://localhost:8080/kyve/proposal/5`);
+      await inactiveProposalPageAssertions({ page, isV1: true });
+    });
+    test('All proposal cards have titles', async ({ page }) => {
+      await page.goto(proposalsPageUrl);
+      await allProposalCardsHaveTitles({ page });
+    });
+  });
+
+  test.describe('qwoyn (gov v1beta1 upgraded to v1)', () => {
+    const chain = 'qwoyn-network';
+    const proposalsPageUrl = `http://localhost:8080/${chain}/proposals`;
+
+    test('Proposal fetch fails', async ({ page }) => {
+      await models.ChainNode.update(
+        { alt_wallet_url: null, cosmos_gov_version: null },
+        { where: { cosmos_chain_id: 'qwoyn' } },
+      );
+
+      const communityBeforeUpgrade = await models.Community.findOne({
+        where: { id: chain },
+        include: [models.ChainNode],
+      });
+
+      chaiExpect(communityBeforeUpgrade.ChainNode.cosmos_gov_version).to.equal(
+        null,
+      );
+      chaiExpect(communityBeforeUpgrade.ChainNode.alt_wallet_url).to.equal(
+        null,
+      );
+
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalCardsTest({ page }, 0);
+    });
+    test('After failure: sets db to "v1beta1-attempt-failed" and populates REST endpoint', async () => {
+      const communityAfterFailure = await models.Community.findOne({
+        where: { id: chain },
+        include: [models.ChainNode],
+      });
+      chaiExpect(communityAfterFailure.ChainNode.cosmos_gov_version).to.equal(
+        'v1beta1-attempt-failed',
+      );
+      chaiExpect(communityAfterFailure.ChainNode.alt_wallet_url).to.equal(
+        'https://rest.cosmos.directory/qwoyn',
+      );
+    });
+    test('After refresh: Inactive proposal cards should load with v1 API', async ({
+      page,
+    }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalCardsTest({ page }, 13);
+
+      const communityAfterRefresh = await models.Community.findOne({
+        where: { id: chain },
+        include: [models.ChainNode],
+      });
+
+      chaiExpect(communityAfterRefresh.ChainNode.cosmos_gov_version).to.equal(
+        'v1',
+      );
+      chaiExpect(communityAfterRefresh.ChainNode.alt_wallet_url).to.equal(
+        'https://rest.cosmos.directory/qwoyn',
+      );
+    });
+    test('Inactive proposal page loads from Proposal Card click', async ({
+      page,
+    }) => {
+      await page.goto(proposalsPageUrl);
+      await inactiveProposalPageTest({ page }, true);
+    });
+    test('Inactive proposal page loads on direct URL', async ({ page }) => {
+      await page.goto(`http://localhost:8080/${chain}/proposal/5`);
+      await page.waitForSelector('.Spinner');
+      await inactiveProposalPageAssertions({ page, isV1: true });
+    });
+    test('All proposal cards have titles', async ({ page }) => {
+      await page.goto(proposalsPageUrl);
+      await allProposalCardsHaveTitles({ page });
+    });
+  });
+
+  test.describe('stargaze (gov v1beta1)', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto(`http://localhost:8080/stargaze/proposals`);
+    });
+    test('Active header loads', headerTest);
+    test('Inactive proposal cards load', ({ page }) =>
+      inactiveProposalCardsTest({ page }, 200)); // as of commit, should never be less than 200
+    test('Inactive proposal page loads', ({ page }) =>
+      inactiveProposalPageTest({ page }));
+    test('All proposal cards have titles', allProposalCardsHaveTitles);
   });
 });
