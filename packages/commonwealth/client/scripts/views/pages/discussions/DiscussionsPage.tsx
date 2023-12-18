@@ -26,7 +26,6 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import 'pages/discussions/index.scss';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from 'utils/Permissions';
-import GatingGrowl from 'views/components/GatingGrowl/GatingGrowl';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
@@ -101,7 +100,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   return (
     <div className="DiscussionsPage">
-      <GatingGrowl />
       <Virtuoso
         className="thread-list"
         style={{ height: '100%', width: '100%' }}

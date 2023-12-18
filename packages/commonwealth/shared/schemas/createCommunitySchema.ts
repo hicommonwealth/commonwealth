@@ -1,7 +1,6 @@
 import {
   ChainBase,
   ChainCategoryType,
-  ChainNetwork,
   ChainType,
 } from 'common-common/src/types';
 import { z } from 'zod';
@@ -49,18 +48,19 @@ export const createCommunitySchema = z.object({
   base: z.nativeEnum(ChainBase),
 
   // hidden optional params
+  user_address: z.string().optional(), // address for the user
   alt_wallet_url: z.string().url().optional(),
   eth_chain_id: z.coerce.number().optional(),
   cosmos_chain_id: z.string().optional(),
-  address: z.string().optional(),
+  address: z.string().optional(), // address for the contract of the chain
   decimals: z.number().optional(),
   substrate_spec: z.string().optional(),
-  bech32_prefix: z.string().optional(),
+  bech32_prefix: z.string().optional(), // required for cosmos communities
   token_name: z.string().optional(),
 
   // deprecated params to be removed
   node_url: z.string().url(),
-  network: z.nativeEnum(ChainNetwork),
+  network: z.string(),
   default_symbol: z.string().max(9),
   website: z.string().url().optional(),
   github: z.string().url().startsWith('https://github.com/').optional(),
