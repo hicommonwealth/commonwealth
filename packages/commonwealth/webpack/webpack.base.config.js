@@ -62,11 +62,6 @@ module.exports = {
       ),
     }),
     new webpack.DefinePlugin({
-      'process.env.FLAG_NEW_CREATE_COMMUNITY': JSON.stringify(
-        process.env.FLAG_NEW_CREATE_COMMUNITY,
-      ),
-    }),
-    new webpack.DefinePlugin({
       'process.env.FLAG_PROPOSAL_TEMPLATES': JSON.stringify(
         process.env.FLAG_PROPOSAL_TEMPLATES,
       ),

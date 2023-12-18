@@ -1,6 +1,5 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import clsx from 'clsx';
-import { featureFlags } from 'helpers/feature-flags';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -48,13 +47,7 @@ const DirectoryPage = () => {
   });
 
   const handleCreateCommunity = () => {
-    navigate(
-      featureFlags.newCreateCommunity
-        ? '/createCommunity'
-        : '/createCommunity/starter',
-      {},
-      null,
-    );
+    navigate('/createCommunity', {}, null);
   };
 
   useBrowserAnalyticsTrack({
