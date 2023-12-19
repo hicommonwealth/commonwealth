@@ -12,7 +12,7 @@ module.exports = {
 
     const recoveryClient = new Client({
       connectionString,
-      ssl: true,
+      ssl: { rejectUnauthorized: false },
     });
 
     await recoveryClient.connect();
