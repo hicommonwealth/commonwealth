@@ -8,7 +8,6 @@ import type { CommentAttributes } from '../models/comment';
 import type { CommunityAttributes } from '../models/community';
 import type { ProfileAttributes } from '../models/profile';
 import type { ReactionAttributes } from '../models/reaction';
-import type { RoleAttributes } from '../models/role';
 import type { ThreadAttributes } from '../models/thread';
 import type { TopicAttributes } from '../models/topic';
 
@@ -95,10 +94,6 @@ export type GetProfilesReq = {
   count_only?: boolean;
 } & IPagination;
 
-export type PostProfilesReq = {
-  profiles: (ProfileAttributes[] & { community_id: string })[];
-};
-
 export type GetProfilesResp = { profiles?: ProfileAttributes[]; count: number };
 
 export type GetChainNodesReq = {
@@ -117,13 +112,6 @@ export type GetBalanceProvidersResp = {
   count: number;
 };
 
-export type GetTokenBalanceReq = {
-  chain_node_id: number;
-  addresses: string[];
-  balance_provider: string;
-  opts: Record<string, string | undefined>;
-};
-
 export type GetTopicsReq = {
   community_id: string;
   count_only?: boolean;
@@ -134,19 +122,6 @@ export type PostTopicsReq = {
 };
 
 export type GetTopicsResp = { topics?: TopicAttributes[]; count: number };
-
-export type GetRolesReq = {
-  community_id: string;
-  addresses?: string[];
-  count_only?: boolean;
-  permissions?: string[];
-} & IPagination;
-
-export type GetRolesResp = { roles?: RoleAttributes[]; count: number };
-
-export type PostRolesReq = {
-  roles: (RoleAttributes & { community_id: string })[];
-};
 
 export type OnlyErrorResp = { error?: string | object };
 
