@@ -7,11 +7,18 @@ import { buildUser } from '../../unit/unitHelpers';
 
 describe('create chain tests', () => {
   it('fails when no eth_chain_id is provided when chain is ethereum', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
-    const user: UserInstance =
-      buildUser({ models, userAttributes: { email: '', id: 1, isAdmin: true } }) as UserInstance;
+    const controller = new ServerCommunitiesController(models, null);
+    const user: UserInstance = buildUser({
+      models,
+      userAttributes: { email: '', id: 1, isAdmin: true },
+    }) as UserInstance;
     try {
-      await controller.createChainNode({ user, url: 'wss://', name: 'test', balanceType: 'ethereum' });
+      await controller.createChainNode({
+        user,
+        url: 'wss://',
+        name: 'test',
+        balanceType: 'ethereum',
+      });
     } catch (e) {
       assert.equal(e.status, 400);
       assert.equal(e.message, Errors.ChainIdNaN);
@@ -22,13 +29,19 @@ describe('create chain tests', () => {
   });
 
   it('fails when eth_chain_id is not a number', async () => {
-    const controller = new ServerCommunitiesController(models, null, null);
-    const user: UserInstance =
-      buildUser({ models, userAttributes: { email: '', id: 1, isAdmin: true } }) as UserInstance;
+    const controller = new ServerCommunitiesController(models, null);
+    const user: UserInstance = buildUser({
+      models,
+      userAttributes: { email: '', id: 1, isAdmin: true },
+    }) as UserInstance;
     try {
-      await controller.createChainNode(
-        { user, url: 'wss://', balanceType: 'ethereum', name: 'test', eth_chain_id: 'test' as unknown as number }
-      );
+      await controller.createChainNode({
+        user,
+        url: 'wss://',
+        balanceType: 'ethereum',
+        name: 'test',
+        eth_chain_id: 'test' as unknown as number,
+      });
     } catch (e) {
       assert.equal(e.status, 400);
       assert.equal(e.message, Errors.ChainIdNaN);

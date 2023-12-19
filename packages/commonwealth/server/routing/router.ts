@@ -230,11 +230,7 @@ function setupRouter(
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
-    communities: new ServerCommunitiesController(
-      models,
-      tokenBalanceCacheV1,
-      banCache,
-    ),
+    communities: new ServerCommunitiesController(models, banCache),
     polls: new ServerPollsController(models, tokenBalanceCacheV2),
     proposals: new ServerProposalsController(models, redisCache),
     groups: new ServerGroupsController(models, tokenBalanceCacheV2, banCache),

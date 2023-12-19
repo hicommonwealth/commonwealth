@@ -22,7 +22,6 @@ async function main() {
 
   const communitiesController = new ServerCommunitiesController(
     models,
-    tokenBalanceCacheV1,
     banCache,
   );
 
