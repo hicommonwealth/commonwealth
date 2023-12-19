@@ -4,8 +4,8 @@ import {
   ChainType,
 } from 'common-common/src/types';
 import { z } from 'zod';
-import { ALL_COMMUNITIES } from '../constants';
 import { checkIconSize } from '../utils/checkIconSize';
+import { ALL_COMMUNITIES } from '../utils/constants';
 
 export const CreateCommunitySchema = z.object({
   id: z.string(),

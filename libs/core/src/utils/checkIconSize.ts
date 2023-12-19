@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MAX_COMMUNITY_IMAGE_SIZE_KB } from '../constants';
+import { MAX_COMMUNITY_IMAGE_SIZE_KB } from './constants';
 import { getFileSizeBytes } from './getFileSizeBytes';
 
 export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
