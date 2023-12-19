@@ -23,10 +23,6 @@ import {
 } from '../routes/communities/putCommunities';
 import { deleteEntities } from '../routes/deleteEntities';
 import {
-  getBalanceProviders,
-  getBalanceProvidersValidation,
-} from '../routes/getBalanceProviders';
-import {
   getChainNodes,
   getChainNodesValidation,
 } from '../routes/getChainNodes';
@@ -144,11 +140,6 @@ export function addExternalRoutes(
     '/chainNodes',
     getChainNodesValidation,
     getChainNodes.bind(this, models, tokenBalanceCache),
-  );
-  router.get(
-    '/balanceProviders',
-    getBalanceProvidersValidation,
-    getBalanceProviders.bind(this, models, tokenBalanceCache),
   );
 
   app.use(endpoint, router);
