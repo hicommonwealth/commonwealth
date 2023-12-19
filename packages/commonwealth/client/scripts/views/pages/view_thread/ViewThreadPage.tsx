@@ -128,9 +128,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const thread = data?.[0];
 
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
-      chainId: app.activeChainId(),
+      communityId: app.activeChainId(),
       threadId: parseInt(`${threadId}`),
     });
 
@@ -153,7 +155,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
   );
 
-  const isRestrictedMembership = isTopicGated && !isActionAllowedInGatedTopic;
+  const isRestrictedMembership =
+    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -288,7 +291,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // Original posters have full editorial control, while added collaborators
   // merely have access to the body and title
   const isAuthor = Permissions.isThreadAuthor(thread);
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
@@ -320,7 +322,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const canComment =
     (!!hasJoinedCommunity ||
-      (!isAdminOrMod && app.chain.isGatedTopic(thread?.topic?.id))) &&
+      (!isAdminOrMod &&
+        app.chain.isGatedTopic(thread?.topic?.id) &&
+        !featureFlags.newGatingEnabled)) &&
     !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
@@ -532,9 +536,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       shouldFocusEditor={shouldFocusCommentEditor}
                       tooltipText={disabledActionsTooltipText}
                     />
-                    {featureFlags.gatingEnabled &&
+                    {featureFlags.newGatingEnabled &&
                       foundGatedTopic &&
-                      !hideGatingBanner && (
+                      !hideGatingBanner &&
+                      isRestrictedMembership && (
                         <CWGatedTopicBanner
                           groupNames={gatedGroupsMatchingTopic.map(
                             (g) => g.name,
@@ -678,6 +683,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                               poll={poll}
                               key={poll.id}
                               onVote={() => setInitializedPolls(false)}
+                              isTopicMembershipRestricted={
+                                isRestrictedMembership
+                              }
                               showDeleteButton={isAuthor || isAdmin}
                               onDelete={() => {
                                 setInitializedPolls(false);

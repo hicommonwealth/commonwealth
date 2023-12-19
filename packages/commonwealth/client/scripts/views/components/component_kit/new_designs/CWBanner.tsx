@@ -83,7 +83,6 @@ const CWBanner = ({
             <CWText type="b2" className="body">
               {body}
             </CWText>
-            {footer && footer}
           </div>
         )}
         {buttons?.length > 0 && (
@@ -102,6 +101,7 @@ const CWBanner = ({
             })}
           </div>
         )}
+        {footer && <div className="footer">{footer}</div>}
       </div>
       <div className="close-icon-container">
         <X weight="light" size={20} className="close-icon" onClick={onClose} />

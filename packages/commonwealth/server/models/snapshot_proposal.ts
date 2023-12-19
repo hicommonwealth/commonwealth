@@ -1,18 +1,7 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
+import type { SnapshotProposalAttributes } from '../../shared/types';
 import type { ModelInstance, ModelStatic } from './types';
-
-export type SnapshotProposalAttributes = {
-  id: string;
-  title?: string;
-  body?: string;
-  choices?: string[];
-  space: string;
-  event: string;
-  start?: string;
-  expire: string;
-  is_upstream_deleted?: boolean;
-};
 
 export type SnapshotProposalInstance =
   ModelInstance<SnapshotProposalAttributes> & {
@@ -23,7 +12,7 @@ export type SnapshotProposalModelStatic = ModelStatic<SnapshotProposalInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes
+  dataTypes: typeof DataTypes,
 ): SnapshotProposalModelStatic => {
   const SnapshotProposal = <SnapshotProposalModelStatic>sequelize.define(
     'SnapshotProposal',
@@ -68,7 +57,7 @@ export default (
       },
       createdAt: { type: dataTypes.DATE, allowNull: false },
       updatedAt: { type: dataTypes.DATE, allowNull: false },
-    }
+    },
   );
 
   SnapshotProposal.associate = (models) => {

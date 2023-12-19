@@ -2,7 +2,7 @@ import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { ServerError } from '../../../../common-common/src/errors';
 import { CommunityInstance } from '../../models/community';
-import { ThreadAttributes, ThreadInstance } from '../../models/thread';
+import { ThreadAttributes } from '../../models/thread';
 import { getLastEdited } from '../../util/getLastEdited';
 import { ServerThreadsController } from '../server_threads_controller';
 
@@ -39,7 +39,7 @@ export async function __getBulkThreads(
     fromDate,
     toDate,
     archived,
-  }: GetBulkThreadsOptions
+  }: GetBulkThreadsOptions,
 ): Promise<GetBulkThreadsResult> {
   // query params that bind to sql query
   const bind = (() => {
@@ -164,7 +164,7 @@ export async function __getBulkThreads(
       {
         bind,
         type: QueryTypes.SELECT,
-      }
+      },
     );
   } catch (e) {
     console.error(e);
@@ -226,22 +226,12 @@ export async function __getBulkThreads(
     return data;
   });
 
-  const countsQuery = `
-     SELECT id, title, stage FROM "Threads"
-     WHERE ${
-       community ? 'chain = $community_id AND' : ''
-     } (stage = 'proposal_in_review' OR stage = 'voting')`;
-
-  const threadsInVoting: ThreadInstance[] = await this.models.sequelize.query(
-    countsQuery,
-    {
-      bind,
-      type: QueryTypes.SELECT,
-    }
-  );
-  const numVotingThreads = threadsInVoting.filter(
-    (t) => t.stage === 'voting'
-  ).length;
+  const numVotingThreads = await this.models.Thread.count({
+    where: {
+      chain: community?.id,
+      stage: 'voting',
+    },
+  });
 
   threads = await Promise.all(threads);
 

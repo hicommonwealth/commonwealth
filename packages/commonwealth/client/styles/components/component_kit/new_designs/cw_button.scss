@@ -240,7 +240,7 @@
       }
     }
 
-    &.alt-green {
+    &.green {
       background-color: $green-50;
       @include iconAndTextColors($neutral-800, $neutral-700);
 
@@ -265,7 +265,7 @@
       }
     }
 
-    &.alt-rorange {
+    &.rorange {
       background-color: $rorange-50;
       @include iconAndTextColors($neutral-800, $neutral-700);
 

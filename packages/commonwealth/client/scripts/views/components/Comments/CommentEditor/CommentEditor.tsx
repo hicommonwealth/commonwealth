@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import Account from 'client/scripts/models/Account';
 import clsx from 'clsx';
 import { getDecimals, weiToTokens } from 'helpers';
+import { featureFlags } from 'helpers/feature-flags';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
 import app from 'state';
@@ -66,7 +67,7 @@ export const CommentEditor = ({
           >
             <User
               userAddress={author?.address}
-              userChainId={author?.community.id}
+              userCommunityId={author?.community.id}
               shouldHideAvatar
               shouldLinkProfile
             />
@@ -82,19 +83,21 @@ export const CommentEditor = ({
         tooltipLabel={tooltipText}
         shouldFocus={shouldFocus}
       />
-      {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-        <CWText className="token-req-text">
-          Commenting in {topicName} requires{' '}
-          {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-          {app.chain.meta.default_symbol}.{' '}
-          {userBalance && (
-            <>
-              You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-              {app.chain.meta.default_symbol}.
-            </>
-          )}
-        </CWText>
-      )}
+      {!featureFlags.newGatingEnabled &&
+        tokenPostingThreshold &&
+        tokenPostingThreshold.gt(new BN(0)) && (
+          <CWText className="token-req-text">
+            Commenting in {topicName} requires{' '}
+            {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
+            {app.chain.meta.default_symbol}.{' '}
+            {userBalance && (
+              <>
+                You have {weiToTokens(userBalance.toString(), decimals)}{' '}
+                {app.chain.meta.default_symbol}.
+              </>
+            )}
+          </CWText>
+        )}
       <div className="form-bottom">
         <div className="form-buttons">
           {editorValue.length > 0 && (
@@ -102,7 +105,7 @@ export const CommentEditor = ({
           )}
           <CWButton
             buttonWidth="wide"
-            disabled={disabled && !isAdmin}
+            disabled={disabled}
             onClick={handleSubmitComment}
             label="Submit"
           />

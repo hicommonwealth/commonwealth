@@ -90,14 +90,14 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
               avatarSize={18}
               shouldShowAvatarOnly
               userAddress={roles[0].address}
-              userChainId={roles[0].address_chain || roles[0].chain_id}
+              userCommunityId={roles[0].address_chain || roles[0].chain_id}
             />
             <div
               className={isStarred ? 'star-filled' : 'star-empty'}
               onClick={async (e) => {
                 e.stopPropagation();
                 await toggleCommunityStar({
-                  chain: item.id,
+                  community: item.id,
                   isAlreadyStarred: app.user.isCommunityStarred(item.id),
                 });
                 setIsStarred((prevState) => !prevState);
