@@ -1,9 +1,9 @@
 import { ERC721Token } from 'adapters/chain/ethereum/types';
 
+import { ContractType } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import type { ERC721 } from 'common-common/src/eth/types';
 import { ERC721__factory } from 'common-common/src/eth/types';
-import { ContractType } from 'common-common/src/types';
 import Ethereum from 'controllers/chain/ethereum/adapter';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 import type { IApp } from 'state';
@@ -26,11 +26,11 @@ export default class Nft extends Ethereum implements ITokenAdapter {
 
     // query balance
     const balanceBN = await this.contractApi.Contract.balanceOf(
-      account.address
+      account.address,
     );
     const balance = new ERC721Token(
       this.contractAddress,
-      new BN(balanceBN.toString(), 10)
+      new BN(balanceBN.toString(), 10),
     );
     this.hasToken = balance && !balance.isZero();
     if (balance) this.tokenBalance = balance;
@@ -57,7 +57,7 @@ export default class Nft extends Ethereum implements ITokenAdapter {
     const api = new NftApi(
       ERC721__factory.connect,
       this.contractAddress,
-      this.chain.api.currentProvider as any
+      this.chain.api.currentProvider as any,
     );
 
     await api.init();

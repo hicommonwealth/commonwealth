@@ -5,7 +5,7 @@ import { ComponentType } from '../../types';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 
-import { ChainBase } from 'common-common/src/types';
+import { ChainBase } from '@hicommonwealth/core';
 import './CWCommunitySelector.scss';
 
 export enum CommunityType {

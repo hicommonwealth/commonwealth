@@ -1,6 +1,6 @@
+import { NotificationCategories } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { NotificationCategories } from 'common-common/src/types';
 import { findSubscription, SubUniqueData } from 'helpers/findSubscription';
 import Comment from 'models/Comment';
 import NotificationSubscription from 'models/NotificationSubscription';

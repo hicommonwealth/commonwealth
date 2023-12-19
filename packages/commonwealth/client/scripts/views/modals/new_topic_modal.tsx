@@ -1,7 +1,7 @@
 import type { DeltaStatic } from 'quill';
 import React, { useEffect } from 'react';
 
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import { pluralizeWithoutNumberPrefix } from '../../helpers';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';

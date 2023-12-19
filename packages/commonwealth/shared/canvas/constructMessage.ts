@@ -1,5 +1,5 @@
 import type { SessionPayload } from '@canvas-js/interfaces';
-import { ChainBase } from '../../../common-common/src/types';
+import { ChainBase } from '@hicommonwealth/core';
 import { chainBaseToCaip2 } from './chainMappings';
 
 export const createCanvasSessionPayload = (
@@ -8,7 +8,7 @@ export const createCanvasSessionPayload = (
   from: string,
   sessionAddress: string,
   sessionIssued: number | null,
-  block: string | null
+  block: string | null,
 ): SessionPayload => {
   // This will be replaced with an IPFS hash
   const placeholderMultihash = '/commonwealth';

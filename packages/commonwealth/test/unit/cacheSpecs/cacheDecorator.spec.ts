@@ -1,14 +1,13 @@
 // import { describe, it, beforeEach, afterEach } from 'mocha';
-import chai from 'chai';
-import { expect } from 'chai';
+import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 
+import { RedisNamespaces } from '@hicommonwealth/core';
 import { CacheDecorator } from 'common-common/src/cacheDecorator';
+import { CacheKeyDuration } from 'common-common/src/cacheKeyUtils';
 import { Activity } from 'common-common/src/daemons/activity';
 import { RedisCache } from 'common-common/src/redisCache';
-import { RedisNamespaces } from 'common-common/src/types';
-import { CacheKeyDuration } from 'common-common/src/cacheKeyUtils';
 
 chai.use(chaiAsPromised);
 
@@ -49,7 +48,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
           expect(result).to.equal('test-result');
@@ -71,7 +70,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -92,7 +91,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -114,7 +113,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -134,7 +133,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -154,7 +153,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -174,7 +173,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -195,7 +194,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -215,7 +214,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -236,7 +235,7 @@ describe('CacheDecorator', () => {
             fn,
             key,
             duration,
-            RedisNamespaces.Function_Response
+            RedisNamespaces.Function_Response,
           );
           const result = await wrapFn();
 
@@ -261,7 +260,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -283,7 +282,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -309,7 +308,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -318,8 +317,8 @@ describe('CacheDecorator', () => {
         expect(
           mockRedis.getKey.calledWith(
             RedisNamespaces.Function_Response,
-            'test-key'
-          )
+            'test-key',
+          ),
         ).to.be.true;
         expect(mockRedis.setKey.called).to.be.false;
       });
@@ -341,7 +340,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -350,8 +349,8 @@ describe('CacheDecorator', () => {
         expect(
           mockRedis.getKey.calledWith(
             RedisNamespaces.Function_Response,
-            'test-key'
-          )
+            'test-key',
+          ),
         ).to.be.true;
         expect(mockRedis.setKey.called).to.be.true;
         expect(
@@ -359,8 +358,8 @@ describe('CacheDecorator', () => {
             RedisNamespaces.Function_Response,
             'test-key',
             JSON.stringify('new-result'),
-            100
-          )
+            100,
+          ),
         ).to.be.true;
       });
     });
@@ -380,7 +379,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -404,7 +403,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         const result = await wrapFn();
 
@@ -429,7 +428,7 @@ describe('CacheDecorator', () => {
           fn,
           key,
           duration,
-          RedisNamespaces.Function_Response
+          RedisNamespaces.Function_Response,
         );
         await expect(wrapFn()).to.be.rejectedWith('Error: test-error');
 
@@ -479,7 +478,7 @@ describe('CacheDecorator', () => {
           keyGenerator1,
           60,
           RedisNamespaces.Function_Response,
-          cacheDecorator
+          cacheDecorator,
         );
         const wrapFn = activityWrapper.queryWithCache;
         const result = await wrapFn(1, 2, 3);
@@ -487,8 +486,8 @@ describe('CacheDecorator', () => {
         expect(
           mockRedis.getKey.calledWith(
             RedisNamespaces.Function_Response,
-            '1-2-3'
-          )
+            '1-2-3',
+          ),
         ).to.be.true;
         expect(mockRedis.getKey.calledOnce).to.be.true;
         expect(mockRedis.setKey.calledOnce).to.be.true;
@@ -497,8 +496,8 @@ describe('CacheDecorator', () => {
             RedisNamespaces.Function_Response,
             '1-2-3',
             JSON.stringify(6),
-            6
-          )
+            6,
+          ),
         ).to.be.true;
       });
 
@@ -513,7 +512,7 @@ describe('CacheDecorator', () => {
           keyGenerator3,
           60,
           RedisNamespaces.Function_Response,
-          cacheDecorator
+          cacheDecorator,
         );
         const wrapFn = activityWrapper.queryWithCache;
         const result = await wrapFn(1, 2, 3);
@@ -522,8 +521,8 @@ describe('CacheDecorator', () => {
         expect(
           mockRedis.getKey.calledWith(
             RedisNamespaces.Function_Response,
-            'test-key'
-          )
+            'test-key',
+          ),
         ).to.be.true;
         expect(mockRedis.setKey.called).to.be.false;
       });
@@ -538,7 +537,7 @@ describe('CacheDecorator', () => {
           keyGenerator2,
           60,
           RedisNamespaces.Function_Response,
-          cacheDecorator
+          cacheDecorator,
         );
         const wrapFn = activityWrapper.queryWithCacheOverride;
         const result = await wrapFn(1, 2, 3);
@@ -550,8 +549,8 @@ describe('CacheDecorator', () => {
             RedisNamespaces.Function_Response,
             '1-2-3',
             JSON.stringify(6),
-            60
-          )
+            60,
+          ),
         ).to.be.true;
       });
     });

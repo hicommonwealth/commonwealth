@@ -1,10 +1,7 @@
+import { ChainNetwork, ContractType } from '@hicommonwealth/core';
 import axios from 'axios';
 import BN from 'bn.js';
 import app from 'state';
-import {
-  ChainNetwork,
-  ContractType,
-} from '../../../../common-common/src/types';
 import { featureFlags } from './feature-flags';
 
 export const getTokenBalance = async () => {

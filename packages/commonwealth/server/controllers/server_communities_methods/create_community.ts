@@ -1,8 +1,4 @@
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import type { Cluster } from '@solana/web3.js';
-import * as solw3 from '@solana/web3.js';
-import BN from 'bn.js';
-import { AppError } from 'common-common/src/errors';
 import {
   BalanceType,
   ChainBase,
@@ -10,7 +6,11 @@ import {
   ChainType,
   DefaultPage,
   NotificationCategories,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
+import type { Cluster } from '@solana/web3.js';
+import * as solw3 from '@solana/web3.js';
+import BN from 'bn.js';
+import { AppError } from 'common-common/src/errors';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import { bech32ToHex, urlHasValidHTTPPrefix } from '../../../shared/utils';

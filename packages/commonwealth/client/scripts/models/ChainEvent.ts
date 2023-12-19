@@ -1,4 +1,4 @@
-import type { SupportedNetwork } from 'common-common/src/types';
+import type { SupportedNetwork } from '@hicommonwealth/core';
 import _ from 'underscore';
 import type { IChainEventData } from '../../../shared/chain/types/types';
 

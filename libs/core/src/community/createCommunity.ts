@@ -1,9 +1,5 @@
-import {
-  ChainBase,
-  ChainCategoryType,
-  ChainType,
-} from 'common-common/src/types';
 import { z } from 'zod';
+import { ChainBase, ChainCategoryType, ChainType } from '../types';
 import { checkIconSize } from '../utils/checkIconSize';
 import { ALL_COMMUNITIES } from '../utils/constants';
 

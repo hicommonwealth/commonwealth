@@ -1,5 +1,5 @@
+import { ContractType } from '@hicommonwealth/core';
 import BN from 'bn.js';
-import { ContractType } from 'common-common/src/types';
 import $ from 'jquery';
 import ITokenAdapter from '../../../models/ITokenAdapter';
 import Solana from './adapter';

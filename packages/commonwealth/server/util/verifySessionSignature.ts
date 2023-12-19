@@ -9,7 +9,7 @@ import {
   ChainBase,
   NotificationCategories,
   WalletId,
-} from 'common-common/src/types';
+} from '@hicommonwealth/core';
 import * as ethUtil from 'ethereumjs-util';
 import { configure as configureStableStringify } from 'safe-stable-stringify';
 import Sequelize from 'sequelize';

@@ -1,5 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
 import { parseFunctionsFromABI } from 'abi_utils';
-import { ChainBase } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { ethers } from 'ethers';
@@ -30,7 +30,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
   const [saving, setSaving] = useState(false);
   const [contract, setContract] = useState<Contract>();
   const functionNameToFunctionOutput = useRef<Map<string, Result>>(
-    new Map<string, Result>()
+    new Map<string, Result>(),
   );
   const [abiItems, setAbiItems] = useState<AbiItem[]>([]);
   const functionNameToFunctionInputArgs = useRef<
@@ -46,7 +46,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
         // from etherscan, which it does not do rn
       } catch (err) {
         notifyError(
-          err.message || `Fetching ABI for ${_contract.address} failed: ${err}`
+          err.message || `Fetching ABI for ${_contract.address} failed: ${err}`,
         );
       }
     }
@@ -83,7 +83,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
 
       functionNameToFunctionOutput.current.set(
         fn.name,
-        ethersInterface.decodeFunctionResult(fn.name, result)
+        ethersInterface.decodeFunctionResult(fn.name, result),
       );
       setSaving(false);
       setLoaded(true);
@@ -155,7 +155,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                               inputIdx,
                               e.target.value,
                               fn.name,
-                              functionNameToFunctionInputArgs.current
+                              functionNameToFunctionInputArgs.current,
                             );
 
                             setLoaded(true);
@@ -204,7 +204,7 @@ const GeneralContractPage = ({ contractAddress }: GeneralContractPageProps) => {
                       callFunction(contractAddress, fn);
                     } catch (err) {
                       notifyError(
-                        err.message || 'Submitting Function Call failed'
+                        err.message || 'Submitting Function Call failed',
                       );
                     } finally {
                       setSaving(false);

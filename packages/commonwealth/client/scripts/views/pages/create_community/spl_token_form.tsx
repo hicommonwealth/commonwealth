@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 import 'pages/create_community.scss';
 
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/core';
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import app, { initAppState } from 'state';

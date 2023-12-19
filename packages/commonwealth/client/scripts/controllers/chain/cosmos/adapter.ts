@@ -1,5 +1,5 @@
+import { ChainBase } from '@hicommonwealth/core';
 import BN from 'bn.js';
-import { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 import type { IApp } from 'state';
 import type ChainInfo from '../../../models/ChainInfo';

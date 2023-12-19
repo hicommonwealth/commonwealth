@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
 
-import './SessionRevalidationModal.scss';
+import { WalletSsoSource } from '@hicommonwealth/core';
+import { setActiveAccount } from 'controllers/app/login';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import WebWalletController from 'controllers/app/web_wallets';
+import useWallets from 'hooks/useWallets';
+import app from 'state';
+import _ from 'underscore';
+import { CWAuthButton } from 'views/components/component_kit/cw_auth_button';
+import { CWButton } from 'views/components/component_kit/cw_button';
+import { CWSpinner } from 'views/components/component_kit/cw_spinner';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
+import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
 import {
   CWModalBody,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { formatAddress } from 'views/components/user/user_block';
-import { WalletSsoSource } from 'common-common/src/types';
-import { CWAuthButton } from 'views/components/component_kit/cw_auth_button';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { CWSpinner } from 'views/components/component_kit/cw_spinner';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWWalletsList } from 'views/components/component_kit/cw_wallets_list';
-import useWallets from 'hooks/useWallets';
-import app from 'state';
-import WebWalletController from 'controllers/app/web_wallets';
-import _ from 'underscore';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { setActiveAccount } from 'controllers/app/login';
+import './SessionRevalidationModal.scss';
 
 interface SessionRevalidationModalProps {
   onModalClose: () => void;
@@ -70,7 +70,7 @@ const SessionRevalidationModal = ({
         });
       } else {
         const updatedAddress = app.user.activeAccounts.find(
-          (addr) => addr.address === walletAddress
+          (addr) => addr.address === walletAddress,
         );
         await setActiveAccount(updatedAddress);
       }
@@ -85,7 +85,7 @@ const SessionRevalidationModal = ({
     (w) =>
       (w instanceof WalletConnectWebWalletController ||
         w instanceof TerraWalletConnectWebWalletController) &&
-      w.enabled
+      w.enabled,
   );
 
   return (
