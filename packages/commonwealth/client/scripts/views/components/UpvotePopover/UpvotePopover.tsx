@@ -26,6 +26,7 @@ export const UpvotePopover = ({
               userAddress={upvoterAddress}
               // set to 1inch for use on components page
               userCommunityId={app.chain?.id || '1inch'}
+              avatarSize={24}
               shouldLinkProfile
             />
             <div className="vote-weight">5x</div>
