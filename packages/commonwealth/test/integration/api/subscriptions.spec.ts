@@ -571,7 +571,7 @@ describe('Subscriptions Tests', () => {
       it('should create a snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
-        const snapshot_id = 'test_space';
+        //const snapshot_id = 'test_space';
         const res = await chai
           .request(app)
           .post('/api/createSubscription')
@@ -588,7 +588,7 @@ describe('Subscriptions Tests', () => {
       it('should not create a duplicate snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
-        const snapshot_id = 'test_space';
+        //const snapshot_id = 'test_space';
         const res = await chai
           .request(app)
           .post('/api/createSubscription')
@@ -1069,7 +1069,7 @@ describe('Subscriptions Tests', () => {
     });
 
     it(`should fail to create a ${NotificationCategories.NewThread} subscription without a chain_id`, async () => {
-      let category_id = NotificationCategories.NewThread;
+      const category_id = NotificationCategories.NewThread;
       try {
         await models.Subscription.create({
           subscriber_id: userId,
@@ -1084,7 +1084,7 @@ describe('Subscriptions Tests', () => {
     });
 
     it(`should fail to create a ${NotificationCategories.ChainEvent} subscription without a chain_id`, async () => {
-      let category_id = NotificationCategories.ChainEvent;
+      const category_id = NotificationCategories.ChainEvent;
       try {
         await models.Subscription.create({
           subscriber_id: userId,
@@ -1100,7 +1100,7 @@ describe('Subscriptions Tests', () => {
 
     describe(`${NotificationCategories.NewComment} tests`, () => {
       it(`should fail to create a subscription without a chain_id`, async () => {
-        let category_id = NotificationCategories.NewComment;
+        const category_id = NotificationCategories.NewComment;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1115,7 +1115,7 @@ describe('Subscriptions Tests', () => {
       });
 
       it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewComment;
+        const category_id = NotificationCategories.NewComment;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1133,7 +1133,7 @@ describe('Subscriptions Tests', () => {
       });
 
       it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewComment;
+        const category_id = NotificationCategories.NewComment;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1151,7 +1151,7 @@ describe('Subscriptions Tests', () => {
 
     describe(`${NotificationCategories.NewReaction} tests`, () => {
       it(`should fail to create a subscription without a chain_id`, async () => {
-        let category_id = NotificationCategories.NewReaction;
+        const category_id = NotificationCategories.NewReaction;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1166,7 +1166,7 @@ describe('Subscriptions Tests', () => {
       });
 
       it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewReaction;
+        const category_id = NotificationCategories.NewReaction;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1184,7 +1184,7 @@ describe('Subscriptions Tests', () => {
       });
 
       it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewReaction;
+        const category_id = NotificationCategories.NewReaction;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1201,7 +1201,7 @@ describe('Subscriptions Tests', () => {
     });
 
     it(`should allow ${NotificationCategories.NewMention} to be created`, async () => {
-      let category_id = NotificationCategories.NewMention;
+      const category_id = NotificationCategories.NewMention;
       try {
         const result = await models.Subscription.create({
           subscriber_id: userId,
@@ -1214,7 +1214,7 @@ describe('Subscriptions Tests', () => {
     });
 
     it(`should allow ${NotificationCategories.NewCollaboration} to be created`, async () => {
-      let category_id = NotificationCategories.NewCollaboration;
+      const category_id = NotificationCategories.NewCollaboration;
       try {
         const result = await models.Subscription.create({
           subscriber_id: userId,

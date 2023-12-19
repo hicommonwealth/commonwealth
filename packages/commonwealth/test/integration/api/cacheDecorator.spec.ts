@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable dot-notation */
+/* eslint-disable no-unused-expressions */
 require('dotenv').config();
 import chai from 'chai';
 import chaiHttp from 'chai-http';

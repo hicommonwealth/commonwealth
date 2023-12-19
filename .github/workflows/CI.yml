@@ -67,7 +67,7 @@ jobs:
         run: yarn workspace @hicommonwealth/core build
 
       - name: Install core link
-        run: yarn --ignore-engines
+        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -170,7 +170,7 @@ jobs:
         run: yarn workspace @hicommonwealth/core build
 
       - name: Install core link
-        run: yarn --ignore-engines        
+        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines   
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -272,7 +272,7 @@ jobs:
         run: yarn workspace @hicommonwealth/core build
 
       - name: Install core link
-        run: yarn --ignore-engines
+        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines
         
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -375,7 +375,7 @@ jobs:
         run: yarn workspace @hicommonwealth/core build
 
       - name: Install core link
-        run: yarn --ignore-engines
+        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines
 
       - name: Assert yarn.lock is correct
         run: |
@@ -541,7 +541,7 @@ jobs:
         run: yarn workspace @hicommonwealth/core build
 
       - name: Install core link
-        run: yarn --ignore-engines
+        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
