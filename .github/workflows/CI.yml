@@ -63,6 +63,12 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Build core lib
+        run: yarn workspace @hicommonwealth/core build
+
+      - name: Install core link
+        run: yarn --ignore-engines
+
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
 
@@ -160,6 +166,12 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Build core lib
+        run: yarn workspace @hicommonwealth/core build
+
+      - name: Install core link
+        run: yarn --ignore-engines        
+
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
 
@@ -256,6 +268,12 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Build core lib
+        run: yarn workspace @hicommonwealth/core build
+
+      - name: Install core link
+        run: yarn --ignore-engines
+        
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
 
