@@ -46,11 +46,15 @@ export const UpvotePopover = ({
   };
 
   return (
-    <CWPopover
-      className="UpvotePopover"
-      title="Recent Upvotes"
-      body={createUpvoterList(upvoters)}
-      {...popoverProps}
-    />
+    <>
+      {upvoters.length > 0 && (
+        <CWPopover
+          className="UpvotePopover"
+          title="Recent Upvotes"
+          body={createUpvoterList(upvoters)}
+          {...popoverProps}
+        />
+      )}
+    </>
   );
 };
