@@ -6,9 +6,9 @@ import type {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import {
+  SignTypedDataVersion,
   personalSign,
   signTypedData,
-  SignTypedDataVersion,
 } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a } from '@polkadot/util';
@@ -31,10 +31,10 @@ import type { Role } from '../../server/models/role';
 
 import { Link, LinkSource } from 'server/models/thread';
 import {
-  createSiweMessage,
-  getEIP712SignableAction,
   TEST_BLOCK_INFO_BLOCKHASH,
   TEST_BLOCK_INFO_STRING,
+  createSiweMessage,
+  getEIP712SignableAction,
 } from '../../shared/adapters/chain/ethereum/keys';
 
 const sortedStringify = configureStableStringify({
@@ -61,7 +61,6 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .set('Accept', 'application/json')
       .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
     const address_id = res.body.result.id;
-    const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
     const timestamp = 1665083987891;
@@ -109,14 +108,11 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       email,
       session,
       sign: (actionPayload: ActionPayload) => {
-        const { types, primaryType, domain, message } =
-          getEIP712SignableAction(actionPayload);
-        const signature = signTypedData({
+        return signTypedData({
           privateKey: Buffer.from(sessionWallet.privateKey.slice(2), 'hex'),
           data: getEIP712SignableAction(actionPayload),
           version: SignTypedDataVersion.V4,
         });
-        return signature;
       },
     };
   }
@@ -178,8 +174,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
         const signatureBytes = sessionWallet.sign(
           stringToU8a(sortedStringify(actionPayload)),
         );
-        const signature = new Buffer(signatureBytes).toString('hex');
-        return signature;
+        return new Buffer(signatureBytes).toString('hex');
       },
     };
   }
