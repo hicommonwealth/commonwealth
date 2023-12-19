@@ -1,7 +1,6 @@
 import { DB } from 'server/models';
 
-import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../../token-balance-cache/src';
-import { TokenBalanceCache as TokenBalanceCacheV2 } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {
   DeletePollOptions,
@@ -24,11 +23,7 @@ import {
  *
  */
 export class ServerPollsController {
-  constructor(
-    public models: DB,
-    public tokenBalanceCacheV1: TokenBalanceCacheV1,
-    public tokenBalanceCacheV2: TokenBalanceCacheV2,
-  ) {}
+  constructor(public models: DB, public tokenBalanceCache: TokenBalanceCache) {}
 
   async deletePoll(options: DeletePollOptions): Promise<DeletePollResult> {
     return __deletePoll.call(this, options);
