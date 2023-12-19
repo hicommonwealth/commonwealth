@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-shadow */
 import type {
   Action,
   ActionPayload,

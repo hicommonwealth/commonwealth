@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 // import { describe, it, beforeEach, afterEach } from 'mocha';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -250,7 +251,7 @@ describe('CacheDecorator', () => {
       it('key function if returns object with no cacheKey, skip caching', async () => {
         const fn = async () => 'test-result';
         const duration = 60;
-        const key = () => {
+        const keyfn = () => {
           return {} as unknown as CacheKeyDuration;
         };
         mockRedis.isInitialized.returns(true);
@@ -258,7 +259,7 @@ describe('CacheDecorator', () => {
         const wrapFn = cacheDecorator.cacheWrap(
           false,
           fn,
-          key,
+          keyfn,
           duration,
           RedisNamespaces.Function_Response,
         );

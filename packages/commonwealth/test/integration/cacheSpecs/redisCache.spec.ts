@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable dot-notation */
+/* eslint-disable no-unused-expressions */
 const chai = require('chai');
 const expect = chai.expect;
 import { RedisNamespaces } from '@hicommonwealth/core';
