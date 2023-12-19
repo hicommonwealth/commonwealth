@@ -11,7 +11,6 @@ export const Errors = {
   NotLoggedIn: 'Not signed in',
   TopicRequired: 'Topic name required',
   MustBeAdmin: 'Must be an admin',
-  InvalidTokenThreshold: 'Invalid token threshold',
   DefaultTemplateRequired: 'Default Template required',
   InvalidTopicName: 'Topic uses disallowed special characters',
 };
