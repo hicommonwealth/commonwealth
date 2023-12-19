@@ -384,13 +384,12 @@ export const ComponentShowcase = () => {
       </div>
       <div className="basic-gallery">
         <CWText type="h3">Upvote Popover</CWText>
-        <div className="item-row">
-          <CWIconButton
-            buttonSize="med"
-            iconName="infoEmpty"
-            onMouseEnter={upvotePopoverProps.handleInteraction}
-            onMouseLeave={upvotePopoverProps.handleInteraction}
-          />
+        <div
+          className="upvote-popover-wrapper"
+          onMouseEnter={upvotePopoverProps.handleInteraction}
+          onMouseLeave={upvotePopoverProps.handleInteraction}
+        >
+          <CWIconButton buttonSize="med" iconName="infoEmpty" />
           <UpvotePopover
             upvoters={[
               '0x4d9E3fEEe018eD9bD86f0F9D61C682E2e97e777F',
