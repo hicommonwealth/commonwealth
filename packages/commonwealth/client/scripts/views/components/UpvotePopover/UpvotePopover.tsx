@@ -1,5 +1,6 @@
 import React from 'react';
 import app from 'state';
+import { CWText } from '../component_kit/cw_text';
 import CWPopover, {
   UsePopoverProps,
 } from '../component_kit/new_designs/CWPopover/CWPopover';
@@ -29,17 +30,20 @@ export const UpvotePopover = ({
               avatarSize={24}
               shouldLinkProfile
             />
-            <div className="vote-weight">5x</div>
+            <CWText className="vote-weight" type="b2">
+              5x
+            </CWText>
           </div>
         );
       });
 
     if (upvoterAddresses.length > maxVisibleUpvotingAccounts) {
       slicedUpvoters.push(
-        <div
+        <CWText
+          type="caption"
           className="upvoter-count"
           key="final"
-        >{`${upvoterAddresses.length} votes total`}</div>,
+        >{`${upvoterAddresses.length} votes total`}</CWText>,
       );
     }
 
