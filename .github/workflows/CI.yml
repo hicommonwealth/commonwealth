@@ -353,6 +353,12 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Build core lib
+        run: yarn workspace @hicommonwealth/core build
+
+      - name: Install core link
+        run: yarn --ignore-engines
+
       - name: Assert yarn.lock is correct
         run: |
           if ! git diff --quiet; then
