@@ -223,7 +223,6 @@ function setupRouter(
     threads: new ServerThreadsController(models, tokenBalanceCacheV2, banCache),
     comments: new ServerCommentsController(
       models,
-      tokenBalanceCacheV1,
       tokenBalanceCacheV2,
       banCache,
     ),

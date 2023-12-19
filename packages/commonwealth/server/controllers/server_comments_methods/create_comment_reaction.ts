@@ -97,7 +97,7 @@ export async function __createCommentReaction(
       try {
         const { isValid } = await validateTopicGroupsMembership(
           this.models,
-          this.tokenBalanceCacheV2,
+          this.tokenBalanceCache,
           thread.topic_id,
           community,
           address,
