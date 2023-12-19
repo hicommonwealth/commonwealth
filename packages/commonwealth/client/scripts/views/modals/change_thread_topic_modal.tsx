@@ -44,8 +44,8 @@ export const ChangeThreadTopicModal = ({
         } else {
           acc.disabledTopics.push(t);
         }
-        return acc;
       }
+      return acc;
     },
     { enabledTopics: [], disabledTopics: [] },
   );
