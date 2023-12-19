@@ -4,8 +4,7 @@ import express from 'express';
 import useragent from 'express-useragent';
 import passport from 'passport';
 
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { TokenBalanceCache as NewTokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
+import { TokenBalanceCache } from '../util/tokenBalanceCache/tokenBalanceCache';
 
 import {
   methodNotAllowedMiddleware,
@@ -142,7 +141,6 @@ import { ServerReactionsController } from '../controllers/server_reactions_contr
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
-import { TBC_BALANCE_TTL_SECONDS } from '../config';
 import { createCommentReactionHandler } from '../routes/comments/create_comment_reaction_handler';
 import { deleteBotCommentHandler } from '../routes/comments/delete_comment_bot_handler';
 import { deleteCommentHandler } from '../routes/comments/delete_comment_handler';
@@ -205,35 +203,24 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  tokenBalanceCacheV1: TokenBalanceCache,
+  tokenBalanceCache: TokenBalanceCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
   redisCache: RedisCache,
 ) {
   // controllers
-
-  const tokenBalanceCacheV2 = new NewTokenBalanceCache(
-    models,
-    redisCache,
-    TBC_BALANCE_TTL_SECONDS,
-  );
-
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, tokenBalanceCacheV2, banCache),
-    comments: new ServerCommentsController(
-      models,
-      tokenBalanceCacheV2,
-      banCache,
-    ),
+    threads: new ServerThreadsController(models, tokenBalanceCache, banCache),
+    comments: new ServerCommentsController(models, tokenBalanceCache, banCache),
     reactions: new ServerReactionsController(models, banCache),
     notifications: new ServerNotificationsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(models, banCache),
-    polls: new ServerPollsController(models, tokenBalanceCacheV2),
+    polls: new ServerPollsController(models, tokenBalanceCache),
     proposals: new ServerProposalsController(models, redisCache),
-    groups: new ServerGroupsController(models, tokenBalanceCacheV2, banCache),
+    groups: new ServerGroupsController(models, tokenBalanceCache, banCache),
     topics: new ServerTopicsController(models, banCache),
   };
 
