@@ -17,10 +17,6 @@ import {
 import getCommunities, {
   getCommunitiesValidation,
 } from '../routes/communities/getCommunities';
-import {
-  putCommunities,
-  putCommunitiesValidation,
-} from '../routes/communities/putCommunities';
 import { deleteEntities } from '../routes/deleteEntities';
 import getProfiles, {
   getProfilesValidation,
@@ -101,11 +97,6 @@ export function addExternalRoutes(
     '/communities',
     getCommunitiesValidation,
     getCommunities.bind(this, models),
-  );
-  router.put(
-    '/communities',
-    putCommunitiesValidation,
-    putCommunities.bind(this, models, tokenBalanceCache),
   );
 
   router.get(
