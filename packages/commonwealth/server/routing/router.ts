@@ -68,7 +68,6 @@ import getUploadSignature from '../routes/getUploadSignature';
 import bulkOffchain from '../routes/bulkOffchain';
 import logout from '../routes/logout';
 import sendFeedback from '../routes/sendFeedback';
-import setTopicThreshold from '../routes/setTopicThreshold';
 import updateProfileNew from '../routes/updateNewProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 
@@ -769,13 +768,6 @@ function setupRouter(
     '/topics' /* OLD: /bulkTopics */,
     databaseValidationService.validateCommunity,
     getTopicsHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/setTopicThreshold',
-    passport.authenticate('jwt', { session: false }),
-    setTopicThreshold.bind(this, models),
   );
 
   // reactions
