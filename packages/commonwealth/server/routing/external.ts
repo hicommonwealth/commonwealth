@@ -22,10 +22,6 @@ import {
   putCommunitiesValidation,
 } from '../routes/communities/putCommunities';
 import { deleteEntities } from '../routes/deleteEntities';
-import {
-  getChainNodes,
-  getChainNodesValidation,
-} from '../routes/getChainNodes';
 import getProfiles, {
   getProfilesValidation,
 } from '../routes/profiles/getProfiles';
@@ -134,12 +130,6 @@ export function addExternalRoutes(
     '/topics',
     onlyIds,
     deleteEntities.bind(this, 'chain_id', models, models.Topic),
-  );
-
-  router.get(
-    '/chainNodes',
-    getChainNodesValidation,
-    getChainNodes.bind(this, models, tokenBalanceCache),
   );
 
   app.use(endpoint, router);
