@@ -28,7 +28,6 @@ async function main() {
 
   const groupsController = new ServerGroupsController(
     models,
-    tokenBalanceCacheV1,
     tokenBalanceCacheV2,
     banCache,
   );
