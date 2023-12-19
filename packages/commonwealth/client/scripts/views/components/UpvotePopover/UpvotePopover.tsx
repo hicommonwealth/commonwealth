@@ -11,7 +11,7 @@ type UpvotePopoverProps = {
 } & UsePopoverProps;
 
 export const UpvotePopover = ({
-  upvoters,
+  upvoters = [],
   ...popoverProps
 }: UpvotePopoverProps) => {
   const maxVisibleUpvotingAccounts = 3;
