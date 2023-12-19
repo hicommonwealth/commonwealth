@@ -30,10 +30,6 @@ import {
   getChainNodes,
   getChainNodesValidation,
 } from '../routes/getChainNodes';
-import {
-  getTokenBalance,
-  getTokenBalanceValidation,
-} from '../routes/getTokenBalance';
 import getProfiles, {
   getProfilesValidation,
 } from '../routes/profiles/getProfiles';
@@ -153,11 +149,6 @@ export function addExternalRoutes(
     '/balanceProviders',
     getBalanceProvidersValidation,
     getBalanceProviders.bind(this, models, tokenBalanceCache),
-  );
-  router.get(
-    '/tokenBalance',
-    getTokenBalanceValidation,
-    getTokenBalance.bind(this, models, tokenBalanceCache),
   );
 
   app.use(endpoint, router);
