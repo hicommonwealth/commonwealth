@@ -287,7 +287,7 @@ async function main() {
   );
 
   // new API
-  addExternalRoutes('/external', app, models, tokenBalanceCache);
+  addExternalRoutes('/external', app, models);
   addSwagger('/docs', app);
 
   setupCosmosProxy(app, models);
