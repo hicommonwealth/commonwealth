@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BalanceType } from '@hicommonwealth/core';
 import BN from 'bn.js';
 import type { ERC20 } from 'common-common/src/eth/types';

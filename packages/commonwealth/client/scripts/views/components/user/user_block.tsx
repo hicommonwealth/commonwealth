@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 /* eslint-disable no-script-url */
 import { WalletId } from '@hicommonwealth/core';
 import 'components/user/user.scss';

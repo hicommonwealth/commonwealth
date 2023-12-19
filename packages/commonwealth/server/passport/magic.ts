@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
 import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
 import { verify } from 'jsonwebtoken';

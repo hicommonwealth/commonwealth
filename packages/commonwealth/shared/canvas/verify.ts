@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Action, Session } from '@canvas-js/interfaces';
 
 import { ChainBase } from '@hicommonwealth/core';

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { NotificationCategories } from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';

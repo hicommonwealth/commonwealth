@@ -1,3 +1,4 @@
+/* eslint-disable react/function-component-definition */
 import React, { useEffect } from 'react';
 import { NavigateOptions } from 'react-router-dom';
 

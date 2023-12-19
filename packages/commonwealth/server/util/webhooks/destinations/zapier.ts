@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NotificationCategories } from '@hicommonwealth/core';
 import { factory, formatFilename } from 'common-common/src/logging';
 import request from 'superagent';

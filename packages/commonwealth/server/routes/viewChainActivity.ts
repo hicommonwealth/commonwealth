@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NotificationCategories } from '@hicommonwealth/core';
 import { NextFunction, Request, Response } from 'express';
 import { DB } from '../models';

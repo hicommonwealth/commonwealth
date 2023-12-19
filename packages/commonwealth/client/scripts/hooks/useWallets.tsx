@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import type { SessionPayload } from '@canvas-js/interfaces';
 import { ChainBase, WalletSsoSource } from '@hicommonwealth/core';
 import 'components/component_kit/cw_wallets_list.scss';

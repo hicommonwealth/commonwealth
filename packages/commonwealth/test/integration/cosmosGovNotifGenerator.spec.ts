@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable max-len */
 import { GovProposalId } from '@cosmjs/stargate/build/modules/gov/queries';
 import {
   BalanceType,

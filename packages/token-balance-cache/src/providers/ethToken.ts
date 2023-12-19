@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BalanceType } from '@hicommonwealth/core';
 import Web3 from 'web3';
 import type { WebsocketProvider } from 'web3-core';

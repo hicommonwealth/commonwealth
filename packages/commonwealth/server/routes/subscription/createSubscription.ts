@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NotificationCategories } from '@hicommonwealth/core';
 import { AppError } from 'common-common/src/errors';
 import type { NextFunction, Request, Response } from 'express';

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import { ChainBase, ChainNetwork } from '@hicommonwealth/core';
 import { featureFlags } from 'helpers/feature-flags';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';

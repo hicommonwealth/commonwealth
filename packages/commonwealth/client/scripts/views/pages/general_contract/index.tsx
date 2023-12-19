@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-key */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ChainBase } from '@hicommonwealth/core';
 import { parseFunctionsFromABI } from 'abi_utils';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';

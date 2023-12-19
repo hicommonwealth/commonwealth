@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BalanceType } from '@hicommonwealth/core';
 import { assert, use as chaiUse, expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
