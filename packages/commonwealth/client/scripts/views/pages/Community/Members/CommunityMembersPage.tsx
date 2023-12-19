@@ -4,6 +4,7 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserActiveAccount from 'hooks/useUserActiveAccount';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import app from 'state';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import {
@@ -50,6 +51,7 @@ const GROUP_AND_MEMBER_FILTERS: GroupCategory[] = [
 
 const CommunityMembersPage = () => {
   useUserActiveAccount();
+  const location = useLocation();
   const navigate = useCommonNavigate();
 
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
@@ -191,11 +193,7 @@ const CommunityMembersPage = () => {
   const updateActiveTab = (activeTab: string) => {
     const params = new URLSearchParams();
     params.set('tab', activeTab);
-    history.pushState(
-      null,
-      '',
-      `${window.location.pathname}?${params.toString()}`,
-    );
+    navigate(`${window.location.pathname}?${params.toString()}`, {}, null);
     setSelectedTab(activeTab);
 
     let eventType;
@@ -214,7 +212,9 @@ const CommunityMembersPage = () => {
     // Invalidate group memberships cache
     queryClient.cancelQueries([ApiEndpoints.FETCH_GROUPS]);
     queryClient.refetchQueries([ApiEndpoints.FETCH_GROUPS]);
+  }, []);
 
+  useEffect(() => {
     // Set the active tab based on URL
     const params = new URLSearchParams(window.location.search.toLowerCase());
     const activeTab = params.get('tab')?.toLowerCase();
@@ -226,7 +226,7 @@ const CommunityMembersPage = () => {
 
     featureFlags.newGatingEnabled && updateActiveTab(TABS[1].value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [location.search]);
 
   const navigateToCreateGroupPage = () => {
     navigate(`/members/groups/create`);
