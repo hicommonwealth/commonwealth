@@ -17,7 +17,7 @@ export const UpvotePopover = ({
 }: UpvotePopoverProps) => {
   const maxVisibleUpvotingAccounts = 3;
 
-  const createUpvoterList = (upvoterAddresses) => {
+  const createUpvoterList = (upvoterAddresses: string[]) => {
     const slicedUpvoters = upvoterAddresses
       .slice(0, maxVisibleUpvotingAccounts)
       .map((upvoterAddress) => {
