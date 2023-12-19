@@ -15,5 +15,5 @@
     "declarationMap": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "__tests__/utils/checkIconSize.spec.ts"]
+  "include": ["src"]
 }
