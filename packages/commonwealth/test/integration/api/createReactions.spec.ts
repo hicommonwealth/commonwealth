@@ -1,21 +1,32 @@
+import { ActionPayload, Session } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import models from '../../../server/database';
+import { CommentInstance } from '../../../server/models/comment';
+import { ThreadInstance } from '../../../server/models/thread';
+import {
+  getTestAddress,
+  getTestComment,
+  getTestUserSession,
+} from '../../util/getTestingRecords';
 import * as modelUtils from '../../util/modelUtils';
 import { del } from './external/appHook.spec';
-import { testThreads } from './external/dbEntityHooks.spec';
 
 chai.use(chaiHttp);
 
-const deleteReaction = async (reactionId, jwtToken, userAddress) => {
+const deleteReaction = async (
+  reactionId: number,
+  jwtToken: string,
+  userAddress: string,
+  communityId: string,
+) => {
   const validRequest = {
     jwt: jwtToken,
     address: userAddress,
-    author_chain: 'ethereum',
-    chain: 'ethereum',
+    author_chain: communityId,
+    chain: communityId,
   };
 
   const response = await del(
@@ -28,65 +39,46 @@ const deleteReaction = async (reactionId, jwtToken, userAddress) => {
   return response;
 };
 
-const getUniqueCommentText = async () => {
-  const time = new Date().getMilliseconds();
-  const text = `testCommentCreated at ${time}`;
-  const comment = await models.Comment.findOne({
-    where: { text },
-  });
-  chai.assert.isNull(comment);
-  return text;
-};
-
 describe('createReaction Integration Tests', () => {
-  let userAddress;
-  let userJWT;
-  let userSession;
+  let userAddress: string;
+  let userJWT: string;
+  let userSession: {
+    session: Session;
+    sign: (payload: ActionPayload) => string;
+  };
+  let comment: CommentInstance;
+  let thread: ThreadInstance;
 
   before(async () => {
-    const res = await modelUtils.createAndVerifyAddress({ chain: 'ethereum' });
-    userAddress = res.address;
-    userJWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
-    userSession = { session: res.session, sign: res.sign };
+    const { user, address, wallet } = await getTestAddress();
+    userJWT = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
+    userAddress = address.address;
+    userSession = await getTestUserSession(address, wallet);
+
+    const result = await getTestComment();
+    comment = result.comment;
+    thread = result.thread;
   });
 
   it('should create comment reactions and verify comment reaction count', async () => {
-    const text = await getUniqueCommentText();
-    const createCommentResponse = await modelUtils.createComment({
-      chain: 'ethereum',
-      address: userAddress,
-      jwt: userJWT,
-      text,
-      thread_id: testThreads[0].id,
-      session: userSession.session,
-      sign: userSession.sign,
-    });
-
-    let comment = await models.Comment.findOne({
-      where: { text },
-    });
-
     const beforeReactionCount = comment.reaction_count;
 
     chai.assert.isNotNull(comment);
-    chai.assert.equal(createCommentResponse.status, 'Success');
 
     const createReactionResponse = await modelUtils.createReaction({
-      chain: 'ethereum',
+      chain: comment.chain,
       address: userAddress,
       jwt: userJWT,
       reaction: 'like',
-      comment_id: createCommentResponse.result.id,
-      author_chain: 'ethereum',
+      comment_id: comment.id,
+      author_chain: comment.chain,
       session: userSession.session,
       sign: userSession.sign,
     });
 
     chai.assert.equal(createReactionResponse.status, 'Success');
 
-    comment = await models.Comment.findOne({
-      where: { text },
-    });
+    await comment.reload();
     chai.assert.equal(comment.reaction_count, beforeReactionCount + 1);
 
     const reactionId = createReactionResponse.result.id;
@@ -94,38 +86,32 @@ describe('createReaction Integration Tests', () => {
       reactionId,
       userJWT,
       userAddress,
+      comment.chain,
     );
     chai.assert.equal(deleteReactionResponse.status, 'Success');
 
-    comment = await models.Comment.findOne({
-      where: { text },
-    });
+    await comment.reload();
     chai.assert.equal(comment.reaction_count, beforeReactionCount);
   });
 
   it('should create thread reactions and verify thread reaction count', async () => {
-    let thread = await models.Thread.findOne({
-      where: { id: testThreads[0].id },
-    });
     chai.assert.isNotNull(thread);
     const beforeReactionCount = thread.reaction_count;
 
     const createReactionResponse = await modelUtils.createThreadReaction({
-      chain: 'ethereum',
+      chain: thread.chain,
       address: userAddress,
       jwt: userJWT,
       reaction: 'like',
       thread_id: thread.id,
-      author_chain: 'ethereum',
+      author_chain: thread.chain,
       session: userSession.session,
       sign: userSession.sign,
     });
 
     chai.assert.equal(createReactionResponse.status, 'Success');
 
-    thread = await models.Thread.findOne({
-      where: { id: testThreads[0].id },
-    });
+    await thread.reload();
     chai.assert.equal(thread.reaction_count, beforeReactionCount + 1);
 
     const reactionId = createReactionResponse.result.id;
@@ -133,14 +119,12 @@ describe('createReaction Integration Tests', () => {
       reactionId,
       userJWT,
       userAddress,
+      thread.chain,
     );
 
     chai.assert.equal(deleteReactionResponse.status, 'Success');
 
-    thread = await models.Thread.findOne({
-      where: { id: testThreads[0].id },
-    });
-
+    await thread.reload();
     chai.assert.equal(thread.reaction_count, beforeReactionCount);
   });
 });

@@ -23,13 +23,15 @@ export const testAbiNickname = 'AaveGovernanceV2';
 export const testAbiNicknameV2 = 'DydxGovernor';
 
 export async function getTestChainNode(version?: 'v1' | 'v2') {
-  let rpc: string, name: string;
+  let rpc: string, name: string, ethChainId: number;
   if (!version || version === 'v1') {
     rpc = localRpc;
     name = 'Test Node';
+    ethChainId = 1337;
   } else {
     rpc = 'http://localhost:8546';
     name = 'Test Node 2';
+    ethChainId = 1338;
   }
 
   const [chainNode] = await models.ChainNode.findOrCreate({
@@ -39,6 +41,7 @@ export async function getTestChainNode(version?: 'v1' | 'v2') {
     },
     defaults: {
       name,
+      eth_chain_id: ethChainId,
     },
   });
 
