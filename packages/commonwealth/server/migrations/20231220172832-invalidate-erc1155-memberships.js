@@ -23,6 +23,9 @@ module.exports = {
         {
           group_id: result.map((g) => g.id),
         },
+        {
+          transaction,
+        },
       );
     });
   },
