@@ -6,19 +6,19 @@ import React, {
   useState,
 } from 'react';
 
-import 'components/quill/markdown_formatted_text.scss';
+import 'components/react_quill/markdown_formatted_text.scss';
 
 import DOMPurify from 'dompurify';
+import { loadScript } from 'helpers';
+import { twitterLinkRegex } from 'helpers/constants';
+import { debounce } from 'lodash';
 import { marked } from 'marked';
+import removeMd from 'remove-markdown';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
-import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
 import { renderTruncatedHighlights } from './highlighter';
-import removeMd from 'remove-markdown';
 import { QuillRendererProps } from './quill_renderer';
-import { loadScript } from 'helpers';
-import { debounce } from 'lodash';
-import { twitterLinkRegex } from 'helpers/constants';
+import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -118,7 +118,7 @@ export const MarkdownFormattedText = ({
       // walk through rendered markdown DOM elements
       const walker = document.createTreeWalker(
         containerRef.current,
-        NodeFilter.SHOW_ELEMENT
+        NodeFilter.SHOW_ELEMENT,
       );
 
       while (walker?.nextNode()) {
@@ -138,7 +138,7 @@ export const MarkdownFormattedText = ({
                   embedEl.innerHTML = embedInfo.result.html;
                   walker?.currentNode?.parentElement?.insertBefore(
                     embedEl,
-                    walker.currentNode
+                    walker.currentNode,
                   );
                 }, 1);
               };
@@ -152,7 +152,7 @@ export const MarkdownFormattedText = ({
         }
       }
     }, 300),
-    []
+    [],
   );
 
   // when doc is rendered, convert twitter links to embeds
@@ -172,7 +172,7 @@ export const MarkdownFormattedText = ({
         ref={containerRef}
         className={getClasses<{ collapsed?: boolean }>(
           { collapsed: isTruncated },
-          'MarkdownFormattedText'
+          'MarkdownFormattedText',
         )}
       >
         {finalDoc}
