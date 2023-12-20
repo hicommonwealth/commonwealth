@@ -570,7 +570,6 @@ describe('Subscriptions Tests', () => {
       it('should create a snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
-        const snapshot_id = 'test_space';
         const res = await chai
           .request(app)
           .post('/api/createSubscription')
@@ -587,7 +586,6 @@ describe('Subscriptions Tests', () => {
       it('should not create a duplicate snapshot-proposal subscription', async () => {
         const is_active = true;
         const category = NotificationCategories.SnapshotProposal;
-        const snapshot_id = 'test_space';
         const res = await chai
           .request(app)
           .post('/api/createSubscription')

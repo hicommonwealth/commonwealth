@@ -82,7 +82,7 @@ describe.only('createReaction Integration Tests', () => {
           block: '',
         },
       },
-      sign: function (actionPayload: {
+      sign: function (_actionPayload: {
         app: string;
         chain: string;
         from: string;
@@ -109,7 +109,7 @@ describe.only('createReaction Integration Tests', () => {
       sign: userSession.sign,
     });
 
-    let comment = await models.Comment.findOne({
+    const comment = await models.Comment.findOne({
       where: { text },
     });
 
@@ -147,7 +147,7 @@ describe.only('createReaction Integration Tests', () => {
   });
 
   it('should create thread reactions and verify thread reaction count', async () => {
-    let thread = await models.Thread.findOne({
+    const thread = await models.Thread.findOne({
       where: { id: threadId },
     });
     chai.assert.isNotNull(thread);
