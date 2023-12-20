@@ -4,9 +4,9 @@ import jwt from 'jsonwebtoken';
 import app from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
+import * as modelUtils from '../../util/modelUtils';
 import { del } from './external/appHook.spec';
 import { testThreads } from './external/dbEntityHooks.spec';
-import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 
@@ -22,7 +22,7 @@ const deleteReaction = async (reactionId, jwtToken, userAddress) => {
     `/api/reactions/${reactionId}`,
     validRequest,
     false,
-    app
+    app,
   );
 
   return response;
@@ -31,7 +31,7 @@ const deleteReaction = async (reactionId, jwtToken, userAddress) => {
 const getUniqueCommentText = async () => {
   const time = new Date().getMilliseconds();
   const text = `testCommentCreated at ${time}`;
-  let comment = await models.Comment.findOne({
+  const comment = await models.Comment.findOne({
     where: { text },
   });
   chai.assert.isNull(comment);
@@ -93,7 +93,7 @@ describe('createReaction Integration Tests', () => {
     const deleteReactionResponse = await deleteReaction(
       reactionId,
       userJWT,
-      userAddress
+      userAddress,
     );
     chai.assert.equal(deleteReactionResponse.status, 'Success');
 
@@ -108,7 +108,7 @@ describe('createReaction Integration Tests', () => {
       where: { id: testThreads[0].id },
     });
     chai.assert.isNotNull(thread);
-    let beforeReactionCount = thread.reaction_count;
+    const beforeReactionCount = thread.reaction_count;
 
     const createReactionResponse = await modelUtils.createThreadReaction({
       chain: 'ethereum',
@@ -132,7 +132,7 @@ describe('createReaction Integration Tests', () => {
     const deleteReactionResponse = await deleteReaction(
       reactionId,
       userJWT,
-      userAddress
+      userAddress,
     );
 
     chai.assert.equal(deleteReactionResponse.status, 'Success');

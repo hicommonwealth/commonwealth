@@ -11,7 +11,6 @@ export const Errors = {
   NotLoggedIn: 'Not signed in',
   TopicRequired: 'Topic name required',
   MustBeAdmin: 'Must be an admin',
-  InvalidTokenThreshold: 'Invalid token threshold',
   DefaultTemplateRequired: 'Default Template required',
   InvalidTopicName: 'Topic uses disallowed special characters',
 };
@@ -60,15 +59,9 @@ export async function __createTopic(
     throw new AppError(Errors.MustBeAdmin);
   }
 
-  const isNumber = /^\d+$/.test(body.token_threshold);
-  if (!isNumber) {
-    throw new AppError(Errors.InvalidTokenThreshold);
-  }
-
   const options: Partial<TopicAttributes> = {
     name,
     description: body.description || '',
-    token_threshold: body.token_threshold,
     featured_in_sidebar,
     featured_in_new_post,
     default_offchain_template: default_offchain_template || '',

@@ -15,9 +15,6 @@ import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
 import type ChainInfo from '../../models/ChainInfo';
 
-import { featureFlags } from 'helpers/feature-flags';
-import { getTokenBalance } from 'helpers/token_balance_helper';
-
 export function linkExistingAddressToChainOrCommunity(
   address: string,
   community: string,
@@ -165,8 +162,6 @@ export async function updateActiveAddresses({
       .filter((addr) => addr),
     shouldRedraw,
   );
-
-  !featureFlags.newGatingEnabled && getTokenBalance();
 
   // select the address that the new chain should be initialized with
   const memberAddresses = app.user.activeAccounts.filter((account) => {

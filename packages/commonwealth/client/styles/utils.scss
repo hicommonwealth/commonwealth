@@ -1,3 +1,7 @@
+.m-auto {
+  margin: auto !important;
+}
+
 .ml-auto {
   margin-left: auto !important;
 }
@@ -16,4 +20,15 @@
 
 .capitalize {
   text-transform: capitalize;
+}
+
+.px-16 {
+  padding: 0 16px !important;
+}
+
+.no-outline {
+  outline: none !important;
+  &:focus-within {
+    border: none !important;
+  }
 }

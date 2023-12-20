@@ -38,6 +38,7 @@ import {
   Trash,
   TwitterLogo,
   Users,
+  UsersThree,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import * as Icons from './cw_icons';
@@ -144,6 +145,7 @@ export const iconLookup = {
   notepad: withPhosphorIcon(Notepad),
   paperPlaneTilt: withPhosphorIcon(PaperPlaneTilt),
   people: Icons.CWPeople,
+  peopleNew: withPhosphorIcon(UsersThree),
   person: Icons.CWPerson,
   // pin: Icons.CWPin,
   pin: withPhosphorIcon(PushPin),

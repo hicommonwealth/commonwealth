@@ -1,4 +1,3 @@
-import { featureFlags } from 'helpers/feature-flags';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
@@ -28,16 +27,12 @@ const columns = [
     numeric: false,
     sortable: true,
   },
-  ...(featureFlags.newGatingEnabled
-    ? [
-        {
-          key: 'groups',
-          header: 'Groups',
-          numeric: false,
-          sortable: true,
-        },
-      ]
-    : []),
+  {
+    key: 'groups',
+    header: 'Groups',
+    numeric: false,
+    sortable: true,
+  },
 ];
 
 const MembersSection = ({
