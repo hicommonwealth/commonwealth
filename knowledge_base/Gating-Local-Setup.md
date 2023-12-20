@@ -1,11 +1,6 @@
 
  # How to setup Gating for local development
-
-– First, add the following to the `.env` file:
- ```sh
-GATING_API_ENABLED=true
- ```
-
+ 
 – In the DB, set your user's `isAdmin` column to `true` to become a superuser
 
 – Run latest migrations, it will generate groups from existing topic thresholds
