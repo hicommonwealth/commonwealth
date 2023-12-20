@@ -1,12 +1,11 @@
 import { ActionArgument } from '@canvas-js/interfaces';
-import chai from 'chai';
+import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
 import * as modelUtils from '../../util/modelUtils';
-import { del } from './external/appHook.spec';
 
 chai.use(chaiHttp);
 
@@ -18,14 +17,14 @@ const deleteReaction = async (reactionId, jwtToken, userAddress) => {
     chain: 'ethereum',
   };
 
-  const response = await del(
-    `/api/reactions/${reactionId}`,
-    validRequest,
-    false,
-    app,
-  );
+  const res = await chai
+    .request(app)
+    .delete(`/api/reactions/${reactionId}`)
+    .set('Accept', 'application/json')
+    .send(validRequest);
+  assert.equal((res as any).statusCode, 200);
 
-  return response;
+  return JSON.parse(res.text);
 };
 
 const getUniqueCommentText = async () => {
@@ -38,7 +37,7 @@ const getUniqueCommentText = async () => {
   return text;
 };
 
-describe.only('createReaction Integration Tests', () => {
+describe('createReaction Integration Tests', () => {
   const communityId = 'ethereum';
   let userAddress;
   let userJWT;
