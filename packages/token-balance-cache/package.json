@@ -15,7 +15,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@hicommonwealth/core": "./libs/core"
+    "@hicommonwealth/core": "*"
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
