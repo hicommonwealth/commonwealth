@@ -1,0 +1,44 @@
+@import '../../../../styles/shared';
+
+.ComponentsShowcase {
+  display: flex;
+  height: calc(100vh - #{$global-header-height});
+
+  .page-sidebar {
+    width: 224px;
+    padding: 24px;
+    overflow-y: auto;
+
+    @include extraSmall {
+      display: none;
+    }
+
+    .list-header {
+      text-transform: uppercase;
+      color: $neutral-400;
+      padding: 6px 12px;
+    }
+
+    .list-item {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+  }
+
+  .page-body {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+
+    .page-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .showcase-body-divider {
+      margin-block: 40px;
+    }
+  }
+}
