@@ -1,4 +1,4 @@
-import Bluebird from 'bluebird';
+import * as dotenv from 'dotenv';
 import { RedisCache } from '../../common-common/src/redisCache';
 import { TokenBalanceCache as TokenBalanceCacheV1 } from '../../token-balance-cache/src';
 import { REDIS_URL } from '../server/config';
@@ -7,6 +7,8 @@ import { ServerGroupsController } from '../server/controllers/server_groups_cont
 import db from '../server/database';
 import BanCache from '../server/util/banCheckCache';
 import { TokenBalanceCache as TokenBalanceCacheV2 } from '../server/util/tokenBalanceCache/tokenBalanceCache';
+
+dotenv.config();
 
 async function main() {
   const models = db;
@@ -37,15 +39,13 @@ async function main() {
     hasGroups: true,
   });
 
-  await Bluebird.map(
-    communitiesResult,
-    async ({ community }) => {
-      await groupsController.refreshCommunityMemberships({
-        community,
-      });
-    },
-    { concurrency: 1 }, // limit concurrency
-  );
+  for (const { community } of communitiesResult) {
+    if (process.env.COMMUNITY_ID && process.env.COMMUNITY_ID !== community.id)
+      continue;
+    await groupsController.refreshCommunityMemberships({
+      community,
+    });
+  }
 
   console.log(`done- refreshed ${communitiesResult.length} communities`);
   process.exit(0);
