@@ -45,13 +45,10 @@ export const NewThreadForm = () => {
   const hasTopics = topics?.length;
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
 
-  const topicsForSelector = topics?.reduce(
-    (acc, t) => {
-      acc?.enabledTopics?.push(t);
-      return acc;
-    },
-    { enabledTopics: [], disabledTopics: [] },
-  );
+  const topicsForSelector = {
+    enabledTopics: hasTopics ? topics : [],
+    disabledTopics: [],
+  };
 
   const {
     threadTitle,

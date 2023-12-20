@@ -128,8 +128,12 @@ const getCreateContentMenuItems = (navigate): PopoverMenuItem[] => {
 
   const getUniversalCreateItems = (): PopoverMenuItem[] => [
     {
-      label: 'New Community',
-      iconLeft: 'people',
+      label: featureFlags.newCreateCommunity
+        ? 'Create community'
+        : 'New Community',
+      isButton: featureFlags.newCreateCommunity,
+      iconLeft: featureFlags.newCreateCommunity ? 'peopleNew' : 'people',
+      ...(featureFlags.newCreateCommunity && { iconLeftWeight: 'bold' }),
       onClick: (e) => {
         e?.preventDefault();
         resetSidebarState();
