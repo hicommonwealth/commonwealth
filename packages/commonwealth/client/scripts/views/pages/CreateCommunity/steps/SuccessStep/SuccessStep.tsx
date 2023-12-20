@@ -17,7 +17,7 @@ const SuccessStep = ({ communityId }: SuccessStepProps) => {
 
   return (
     <div className="SuccessStep" style={animationStyles}>
-      <img src="../../static/img/communityIslive.png" alt="" className="img" />
+      <img src="/static/img/communityIsLive.png" alt="" className="img" />
       <CWText type="h2">Your community is live!</CWText>
       <div className="container" style={animationStyles}>
         <CWText type="b1" className="description">
