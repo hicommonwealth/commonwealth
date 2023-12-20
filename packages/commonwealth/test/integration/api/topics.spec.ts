@@ -18,7 +18,6 @@ let adminJWT;
 let adminAddress;
 let userJWT;
 let userAddress;
-let topic;
 
 describe('Topic Tests', () => {
   const chain = 'ethereum';
@@ -86,7 +85,6 @@ describe('Topic Tests', () => {
       expect(res2.result).to.not.be.null;
       expect(res2.result.Address).to.not.be.null;
       expect(res2.result.Address.address).to.equal(adminAddress);
-      topic = res2.result.topic;
     });
 
     it('Should pass /bulkTopics', async () => {

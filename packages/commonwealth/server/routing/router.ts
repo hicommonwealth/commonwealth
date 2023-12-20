@@ -1,4 +1,3 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { Express } from 'express';
 import express from 'express';
 import useragent from 'express-useragent';
@@ -195,8 +194,6 @@ export type ServerControllers = {
   groups: ServerGroupsController;
   topics: ServerTopicsController;
 };
-
-const log = factory.getLogger(formatFilename(__filename));
 
 function setupRouter(
   endpoint: string,

@@ -17,13 +17,7 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Subscriptions Tests', () => {
-  let jwtToken,
-    loggedInAddr,
-    loggedInAddrId,
-    loggedInSession,
-    thread,
-    comment,
-    userId: number;
+  let jwtToken, loggedInAddr, loggedInSession, thread, comment, userId: number;
   const chain = 'ethereum';
 
   before('reset database', async () => {
@@ -31,7 +25,6 @@ describe('Subscriptions Tests', () => {
     // get logged in address/user with JWT
     const result = await modelUtils.createAndVerifyAddress({ chain });
     loggedInAddr = result.address;
-    loggedInAddrId = result.address_id;
     loggedInSession = { session: result.session, sign: result.sign };
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
@@ -725,7 +718,7 @@ describe('Subscriptions Tests', () => {
         JWT_SECRET,
       );
 
-      const newThreadSub = await modelUtils.createSubscription({
+      await modelUtils.createSubscription({
         jwt: newJWT,
         is_active: true,
         category: NotificationCategories.NewThread,
@@ -1075,7 +1068,7 @@ describe('Subscriptions Tests', () => {
     });
 
     it(`should fail to create a ${NotificationCategories.NewThread} subscription without a chain_id`, async () => {
-      let category_id = NotificationCategories.NewThread;
+      const category_id = NotificationCategories.NewThread;
       try {
         await models.Subscription.create({
           subscriber_id: userId,
@@ -1090,7 +1083,7 @@ describe('Subscriptions Tests', () => {
     });
 
     it(`should fail to create a ${NotificationCategories.ChainEvent} subscription without a chain_id`, async () => {
-      let category_id = NotificationCategories.ChainEvent;
+      const category_id = NotificationCategories.ChainEvent;
       try {
         await models.Subscription.create({
           subscriber_id: userId,
@@ -1106,7 +1099,7 @@ describe('Subscriptions Tests', () => {
 
     describe(`${NotificationCategories.NewComment} tests`, () => {
       it(`should fail to create a subscription without a chain_id`, async () => {
-        let category_id = NotificationCategories.NewComment;
+        const category_id = NotificationCategories.NewComment;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1121,7 +1114,7 @@ describe('Subscriptions Tests', () => {
       });
 
       it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewComment;
+        const category_id = NotificationCategories.NewComment;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1139,7 +1132,7 @@ describe('Subscriptions Tests', () => {
       });
 
       it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewComment;
+        const category_id = NotificationCategories.NewComment;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1157,7 +1150,7 @@ describe('Subscriptions Tests', () => {
 
     describe(`${NotificationCategories.NewReaction} tests`, () => {
       it(`should fail to create a subscription without a chain_id`, async () => {
-        let category_id = NotificationCategories.NewReaction;
+        const category_id = NotificationCategories.NewReaction;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1172,7 +1165,7 @@ describe('Subscriptions Tests', () => {
       });
 
       it(`should fail to create a subscription with both a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewReaction;
+        const category_id = NotificationCategories.NewReaction;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1190,7 +1183,7 @@ describe('Subscriptions Tests', () => {
       });
 
       it(`should fail to create a subscription without a thread_id and a comment_id`, async () => {
-        let category_id = NotificationCategories.NewReaction;
+        const category_id = NotificationCategories.NewReaction;
         try {
           await models.Subscription.create({
             subscriber_id: userId,
@@ -1207,7 +1200,7 @@ describe('Subscriptions Tests', () => {
     });
 
     it(`should allow ${NotificationCategories.NewMention} to be created`, async () => {
-      let category_id = NotificationCategories.NewMention;
+      const category_id = NotificationCategories.NewMention;
       try {
         const result = await models.Subscription.create({
           subscriber_id: userId,
@@ -1220,7 +1213,7 @@ describe('Subscriptions Tests', () => {
     });
 
     it(`should allow ${NotificationCategories.NewCollaboration} to be created`, async () => {
-      let category_id = NotificationCategories.NewCollaboration;
+      const category_id = NotificationCategories.NewCollaboration;
       try {
         const result = await models.Subscription.create({
           subscriber_id: userId,

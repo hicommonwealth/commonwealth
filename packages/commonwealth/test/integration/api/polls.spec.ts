@@ -66,7 +66,7 @@ describe('Polls', () => {
           block: '',
         },
       },
-      sign: function (actionPayload: {
+      sign: function (_actionPayload: {
         app: string;
         chain: string;
         from: string;

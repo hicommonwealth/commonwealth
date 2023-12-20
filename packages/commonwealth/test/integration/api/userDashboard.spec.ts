@@ -20,11 +20,9 @@ describe('User Dashboard API', () => {
   // communityId, unlike in non-test thread creation
   const title = 'test title';
   const body = 'test body';
-  const topicName = 'test topic';
   const kind = 'discussion';
 
   let userJWT;
-  let userSession;
   let userId;
   let userAddress;
   let userAddressId;
@@ -61,7 +59,6 @@ describe('User Dashboard API', () => {
     userAddress = firstUser.address;
     userAddressId = firstUser.address_id;
     userJWT = jwt.sign({ id: userId, email: firstUser.email }, JWT_SECRET);
-    userSession = { session: firstUser.session, sign: firstUser.sign };
     expect(userId).to.not.be.null;
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
@@ -92,7 +89,7 @@ describe('User Dashboard API', () => {
     expect(res).to.equal(true);
 
     // sets user-2 to be admin of the alex community
-    let isAdmin = await modelUtils.updateRole({
+    const isAdmin = await modelUtils.updateRole({
       address_id: userAddressId2,
       chainOrCommObj: { chain_id: chain2 },
       role: 'admin',
