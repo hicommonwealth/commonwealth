@@ -1235,9 +1235,6 @@ function setupRouter(
   );
 
   // Group routes
-
-  log.debug('GATING API ENABLED');
-
   registerRoute(
     router,
     'put',
