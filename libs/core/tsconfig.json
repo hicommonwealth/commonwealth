@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "module": "CommonJS",
-    "target": "ES2021",
+    "target": "ESNext",
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "preserveConstEnums": true,

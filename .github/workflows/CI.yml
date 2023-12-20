@@ -63,11 +63,11 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Build core lib
+      - name: Build libs
         run: yarn workspace @hicommonwealth/core build
 
-      - name: Install core link
-        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines
+      - name: Link libs
+        run: yarn upgrade @hicommonwealth
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -166,11 +166,11 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Build core lib
+      - name: Build libs
         run: yarn workspace @hicommonwealth/core build
 
-      - name: Install core link
-        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines   
+      - name: Link libs
+        run: yarn upgrade @hicommonwealth
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -268,11 +268,11 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Build core lib
+      - name: Build libs
         run: yarn workspace @hicommonwealth/core build
 
-      - name: Install core link
-        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines
+      - name: Link libs
+        run: yarn upgrade @hicommonwealth
         
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -371,11 +371,11 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Build core lib
+      - name: Build libs
         run: yarn workspace @hicommonwealth/core build
 
-      - name: Install core link
-        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines
+      - name: Link libs
+        run: yarn upgrade @hicommonwealth
 
       - name: Assert yarn.lock is correct
         run: |
@@ -447,11 +447,11 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Build core lib
+      - name: Build libs
         run: yarn workspace @hicommonwealth/core build
 
-      - name: Install core link
-        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines
+      - name: Link libs
+        run: yarn upgrade @hicommonwealth
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -537,11 +537,11 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      - name: Build core lib
+      - name: Build libs
         run: yarn workspace @hicommonwealth/core build
 
-      - name: Install core link
-        run: yarn upgrade @hicommonwealth/core && yarn --ignore-engines
+      - name: Link libs
+        run: yarn upgrade @hicommonwealth
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
