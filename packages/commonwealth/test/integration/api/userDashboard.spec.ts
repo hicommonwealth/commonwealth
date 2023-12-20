@@ -1,11 +1,11 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import app, { resetDatabase } from '../../../server-test';
-import * as modelUtils from '../../util/modelUtils';
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
+import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import models from '../../../server/database';
-import { Op } from 'sequelize';
+import * as modelUtils from '../../util/modelUtils';
 import { JoinCommunityArgs, ThreadArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
@@ -34,9 +34,26 @@ describe('User Dashboard API', () => {
   let userAddress2;
   let userAddressId2;
   let threadOne;
+  let topicId: number;
+  let topicId2: number;
 
   before('Reset database', async () => {
     await resetDatabase();
+
+    const topic = await models.Topic.findOne({
+      where: {
+        chain_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
+
+    const topic2 = await models.Topic.create({
+      name: 'Test Topic',
+      description: 'A topic made for testing',
+      chain_id: chain2,
+    });
+    topicId2 = topic2.id;
 
     // creates 2 ethereum users
     const firstUser = await modelUtils.createAndVerifyAddress({ chain });
@@ -90,7 +107,7 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName,
+      topicId: topicId2,
       session: userSession2.session,
       sign: userSession2.sign,
     };
@@ -106,7 +123,7 @@ describe('User Dashboard API', () => {
       body,
       readOnly: false,
       kind,
-      topicName,
+      topicId,
       session: userSession2.session,
       sign: userSession2.sign,
     };
@@ -200,7 +217,7 @@ describe('User Dashboard API', () => {
           body,
           readOnly: false,
           kind,
-          topicName,
+          topicId,
           session: userSession2.session,
           sign: userSession2.sign,
         };

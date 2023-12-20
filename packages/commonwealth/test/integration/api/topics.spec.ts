@@ -5,10 +5,11 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
+import { ApiEndpoints } from 'state/api/config';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
+import models from '../../../server/database';
 import * as modelUtils from '../../util/modelUtils';
-import { ApiEndpoints } from 'state/api/config';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -23,8 +24,6 @@ describe('Topic Tests', () => {
   const chain = 'ethereum';
   const title = 'test title';
   const body = 'test body';
-  const topicName = 'test topic';
-  const topicId = undefined;
   const kind = 'discussion';
   const stage = 'discussion';
 
@@ -63,14 +62,21 @@ describe('Topic Tests', () => {
       expect(adminAddress).to.not.be.null;
       expect(adminJWT).to.not.be.null;
       expect(isAdmin).to.not.be.null;
+
+      const topicInstance = await models.Topic.findOne({
+        where: {
+          chain_id: chain,
+          group_ids: [],
+        },
+      });
+
       const res2 = await modelUtils.createThread({
         chainId: chain,
         address: adminAddress,
         jwt: adminJWT,
         title,
         body,
-        topicName,
-        topicId,
+        topicId: topicInstance.id,
         kind,
         stage,
         session: res.session,
