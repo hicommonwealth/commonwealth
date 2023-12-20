@@ -4,6 +4,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import { isNotUndefined } from 'helpers/typeGuards';
 
 import app from 'state';
+import { trpc } from '../../utils/trpc';
 import { CWButton } from './component_kit/cw_button';
 
 export const SubscriptionButton = () => {
@@ -13,11 +14,14 @@ export const SubscriptionButton = () => {
     options: { chainId: app.activeChainId() },
   });
   const [notificationsOn, setNotificationsOn] = useState<boolean>(
-    isNotUndefined(communitySubscription)
+    isNotUndefined(communitySubscription),
   );
+  const createSubscriptionMutation =
+    trpc.Subscription.createSubscription.useMutation();
 
   return (
     <CWButton
+      disabled={createSubscriptionMutation.isLoading}
       onClick={(e) => {
         e.preventDefault();
         if (isNotUndefined(communitySubscription)) {
@@ -25,14 +29,11 @@ export const SubscriptionButton = () => {
             .deleteSubscription(communitySubscription)
             .then(() => setNotificationsOn(false));
         } else {
-          subscriptions
-            .subscribe({
-              categoryId: NotificationCategories.NewThread,
-              options: {
-                chainId: app.activeChainId(),
-              },
-            })
-            .then(() => setNotificationsOn(true));
+          createSubscriptionMutation.mutate({
+            category: NotificationCategories.NewThread,
+            chain_id: app.activeChainId(),
+          });
+          setNotificationsOn(true);
         }
       }}
       label={notificationsOn ? 'Notifications on' : 'Notifications off'}
