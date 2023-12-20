@@ -13,7 +13,7 @@ import models from '../../../server/database';
 chai.use(chaiHttp);
 const { expect } = chai;
 
-describe.only('Linking Tests', () => {
+describe('Linking Tests', () => {
   const chain = 'ethereum';
 
   const title = 'test title';

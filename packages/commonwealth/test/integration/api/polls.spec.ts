@@ -1,11 +1,12 @@
+import { ActionArgument } from '@canvas-js/interfaces';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../../../server/config';
-import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from 'test/util/modelUtils';
-import { ActionArgument } from '@canvas-js/interfaces';
+import app, { resetDatabase } from '../../../server-test';
+import { JWT_SECRET } from '../../../server/config';
+import models from '../../../server/database';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -13,25 +14,29 @@ const { expect } = chai;
 describe('Polls', () => {
   const chain = 'ethereum';
 
-  let userJWT;
-  let userId;
-  let userAddress;
-  let userAddressId;
+  let userJWT: string;
+  let userAddress: string;
 
   let threadId = 0;
-  let threadChain = '';
   let pollId = 0;
+  let topicId: number;
 
   before(async () => {
     await resetDatabase();
 
+    const topic = await models.Topic.findOne({
+      where: {
+        chain_id: chain,
+        group_ids: [],
+      },
+    });
+    topicId = topic.id;
+
     const userRes = await modelUtils.createAndVerifyAddress({ chain });
     userAddress = userRes.address;
-    userId = userRes.user_id;
-    userAddressId = userRes.address_id;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
-      JWT_SECRET
+      JWT_SECRET,
     );
     expect(userAddress).to.not.be.null;
     expect(userJWT).to.not.be.null;
@@ -47,7 +52,7 @@ describe('Polls', () => {
       kind: 'discussion',
       stage: 'discussion',
       topicName: 't1',
-      topicId: undefined,
+      topicId,
       session: {
         type: 'session',
         signature: '',
@@ -98,7 +103,6 @@ describe('Polls', () => {
     });
 
     threadId = thread.id;
-    threadChain = thread.chain;
     pollId = res.body.result.id;
   });
 
@@ -160,7 +164,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionA');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress
+      userAddress,
     );
   });
 
@@ -200,7 +204,7 @@ describe('Polls', () => {
     expect(res.body.result[0].votes[0]).to.have.property('option', 'optionB');
     expect(res.body.result[0].votes[0]).to.have.property(
       'address',
-      userAddress
+      userAddress,
     );
   });
 
