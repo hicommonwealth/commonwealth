@@ -4,9 +4,7 @@
 – First, add the following to the `.env` file:
  ```sh
 GATING_API_ENABLED=true
-FEATURE_FLAG_GROUP_CHECK_ENABLED=true
  ```
- You can disable `FEATURE_FLAG_GROUP_CHECK_ENABLED` to bypass gating on actions such as create thread/comment/reaction
 
 – In the DB, set your user's `isAdmin` column to `true` to become a superuser
 
