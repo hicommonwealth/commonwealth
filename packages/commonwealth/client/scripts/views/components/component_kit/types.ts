@@ -85,6 +85,7 @@ export type DefaultMenuItem = {
   type?: 'default';
   className?: string;
   preventClosing?: boolean;
+  isButton?: boolean;
 };
 
 type NotificationMenuItem = {
