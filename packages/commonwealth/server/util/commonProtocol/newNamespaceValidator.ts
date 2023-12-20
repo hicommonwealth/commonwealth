@@ -1,10 +1,10 @@
 import { DB } from 'server/models';
 import Web3 from 'web3';
-import { AbiItem } from 'web3-utils';
 import { AppError } from '../../../../common-common/src/errors';
 import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
 import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
 import { factoryContracts, validChains } from './chainConfig';
+import { getNamespace } from './contractHelpers';
 
 /**
  * Validate if an attested new namespace is valid on-chain Checks:
@@ -47,31 +47,11 @@ export const validateNamespace = async (
   }
 
   //validate contract data
-  const factory = new web3.eth.Contract(
-    {
-      inputs: [
-        {
-          internalType: 'bytes32',
-          name: '',
-          type: 'bytes32',
-        },
-      ],
-      stateMutability: 'view',
-      type: 'function',
-      name: 'getNamespace',
-      outputs: [
-        {
-          internalType: 'address',
-          name: '',
-          type: 'address',
-        },
-      ],
-    } as AbiItem,
+  const activeNamespace = await getNamespace(
+    web3,
+    namespace,
     factoryData.factory,
   );
-
-  const hexString = web3.utils.utf8ToHex(namespace);
-  const activeNamespace = await factory.methods.getNamespace(hexString).call();
   if (activeNamespace !== txReceipt.contractAddress) {
     return new AppError('Invalid tx hash for namespace creation');
   }
