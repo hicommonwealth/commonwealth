@@ -18,8 +18,7 @@ export function makeGetBalancesOptions(
   groups: GroupAttributes[],
   addresses: AddressAttributes[],
 ): GetBalancesOptions[] {
-  const allOptions: Exclude<GetBalancesOptions, GetErc1155BalanceOptions>[] =
-    [];
+  const allOptions: GetBalancesOptions[] = [];
 
   const addressStrings = addresses.map((a) => a.address);
 
@@ -48,6 +47,34 @@ export function makeGetBalancesOptions(
                 sourceOptions: {
                   contractAddress: castedSource.contract_address,
                   evmChainId: castedSource.evm_chain_id,
+                },
+                addresses: addressStrings,
+              });
+            }
+            break;
+          }
+          case BalanceSourceType.ERC1155: {
+            const castedSource = requirement.data.source as ContractSource;
+            const existingOptions = allOptions.find((opt) => {
+              const castedOpt = opt as GetErc1155BalanceOptions;
+              return (
+                castedOpt.balanceSourceType === BalanceSourceType.ERC1155 &&
+                castedOpt.sourceOptions.evmChainId ===
+                  castedSource.evm_chain_id &&
+                castedOpt.sourceOptions.contractAddress ===
+                  castedSource.contract_address &&
+                castedOpt.sourceOptions.tokenId ===
+                  parseInt(castedSource.token_id, 10)
+              );
+            });
+
+            if (!existingOptions) {
+              allOptions.push({
+                balanceSourceType: BalanceSourceType.ERC1155,
+                sourceOptions: {
+                  evmChainId: castedSource.evm_chain_id,
+                  contractAddress: castedSource.contract_address,
+                  tokenId: parseInt(castedSource.token_id, 10),
                 },
                 addresses: addressStrings,
               });
