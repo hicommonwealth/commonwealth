@@ -63,12 +63,6 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      # - name: Build libs
-      #   run: yarn workspace @hicommonwealth/core build
-
-      # - name: Link libs
-      #   run: yarn upgrade @hicommonwealth
-
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
 
@@ -166,12 +160,6 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      # - name: Build libs
-      #   run: yarn workspace @hicommonwealth/core build
-
-      # - name: Link libs
-      #   run: yarn upgrade @hicommonwealth
-
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
 
@@ -268,12 +256,6 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      # - name: Build libs
-      #   run: yarn workspace @hicommonwealth/core build
-
-      # - name: Link libs
-      #   run: yarn upgrade @hicommonwealth
-        
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
 
@@ -371,12 +353,6 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
-      # - name: Build libs
-      #   run: yarn workspace @hicommonwealth/core build
-
-      # - name: Link libs
-      #   run: yarn upgrade @hicommonwealth
-
       - name: Assert yarn.lock is correct
         run: |
           if ! git diff --quiet; then
@@ -446,12 +422,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn --ignore-engines
-
-      # - name: Build libs
-      #   run: yarn workspace @hicommonwealth/core build
-
-      # - name: Link libs
-      #   run: yarn upgrade @hicommonwealth
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
@@ -536,12 +506,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn --ignore-engines
-
-      # - name: Build libs
-      #   run: yarn workspace @hicommonwealth/core build
-
-      # - name: Link libs
-      #   run: yarn upgrade @hicommonwealth
 
       - name: Init Db
         run: cd packages/commonwealth && npx sequelize db:migrate
