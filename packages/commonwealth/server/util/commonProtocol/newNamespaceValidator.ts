@@ -1,24 +1,11 @@
 import { DB } from 'server/models';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import { AppError } from '../../../common-common/src/errors';
-import { BalanceSourceType } from './requirementsModule/requirementsTypes';
-import { TokenBalanceCache } from './tokenBalanceCache/tokenBalanceCache';
+import { AppError } from '../../../../common-common/src/errors';
+import { BalanceSourceType } from '../requirementsModule/requirementsTypes';
+import { TokenBalanceCache } from '../tokenBalanceCache/tokenBalanceCache';
+import { factoryContracts, validChains } from './chainConfig';
 
-// Chains with deployed namespace factories. As new chains are enabled, add here.
-export enum validChains {
-  Goerli,
-}
-
-// Requires a live contract for each enum chain. Add address of factory here on new deploy.
-const factoryContracts: {
-  [key in validChains]: { factory: string; chainId: number };
-} = {
-  [validChains.Goerli]: {
-    factory: '0xf877acdb66586ace7381b6e0b83697540f4c3871',
-    chainId: 5,
-  },
-};
 /**
  * Validate if an attested new namespace is valid on-chain Checks:
  * 1. Tx success
