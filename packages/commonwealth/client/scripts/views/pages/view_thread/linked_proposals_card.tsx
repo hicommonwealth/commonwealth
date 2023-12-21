@@ -87,7 +87,7 @@ export const LinkedProposalsCard = ({
       }
       setSnapshotProposalsLoaded(true);
     }
-  }, [initialSnapshotLinks, thread.chain]);
+  }, [initialSnapshotLinks, thread.community_id]);
 
   const showSnapshot =
     initialSnapshotLinks.length > 0 && snapshotProposalsLoaded;
@@ -112,7 +112,7 @@ export const LinkedProposalsCard = ({
                           <ReactRouterLink
                             key={l.identifier}
                             to={getThreadLink({
-                              threadChain: thread.chain,
+                              threadChain: thread.community_id,
                               identifier: l.identifier,
                             })}
                           >
