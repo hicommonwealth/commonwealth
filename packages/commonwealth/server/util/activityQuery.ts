@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 
-export type GlobalActivity = Array<{
+export type ActivityRow = {
   category_id: string;
   comment_count: string;
   last_activity: string;
@@ -14,7 +14,9 @@ export type GlobalActivity = Array<{
     id: number;
     Addresses: AddressInstance[];
   }[];
-}>;
+};
+
+export type GlobalActivity = Array<ActivityRow>;
 
 export async function getActivityFeed(
   models: DB,
