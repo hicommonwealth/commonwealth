@@ -111,7 +111,7 @@ const communityAvatar = {
 const AvatarsShowcase = () => {
   return (
     <>
-      <CWText type="h4">Avatar</CWText>
+      <CWText type="h5">Avatar</CWText>
       <div className="flex-row">
         <CWAvatar avatarUrl="/static/img/ghost.svg" size={16} />
         <CWAvatar avatarUrl="/static/img/ghost.svg" size={20} />
@@ -119,7 +119,7 @@ const AvatarsShowcase = () => {
         <CWAvatar avatarUrl="/static/img/ghost.svg" size={32} />
       </div>
 
-      <CWText type="h4">Avatar Group</CWText>
+      <CWText type="h5">Avatar Group</CWText>
       <div className="flex-row">
         <CWAvatarGroup
           profiles={avatarGroupProfiles as ProfileWithAddress[]}
@@ -127,7 +127,7 @@ const AvatarsShowcase = () => {
         />
       </div>
 
-      <CWText type="h4">Community Avatar</CWText>
+      <CWText type="h5">Community Avatar</CWText>
       <div className="flex-row">
         <CWCommunityAvatar
           size="small"
