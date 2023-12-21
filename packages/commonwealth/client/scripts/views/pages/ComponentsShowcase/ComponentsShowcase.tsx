@@ -6,15 +6,12 @@ import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 
 import { componentItems } from './componentsList';
+import { alphabetically, pascalCaseToNormalText } from './utils';
+
 import './ComponentsShowcase.scss';
 
 const NAVBAR_HEIGHT = 56;
 const BODY_CLASS_NAME = 'page-body';
-
-type Item = typeof componentItems[0];
-
-const alphabetically = (a: Item, b: Item) =>
-  a.displayName.localeCompare(b.displayName);
 
 const ComponentsShowcase = () => {
   const handleClick = (itemId: string) => {
@@ -53,7 +50,7 @@ const ComponentsShowcase = () => {
                 className="list-item"
                 onClick={() => handleClick(displayName)}
               >
-                {displayName}
+                {pascalCaseToNormalText(displayName)}
               </CWText>
             ))}
 
@@ -76,7 +73,7 @@ const ComponentsShowcase = () => {
               ({ displayName, ComponentPage }) => (
                 <div key={displayName} id={displayName}>
                   <CWText className="component-header" type="h4">
-                    {displayName}
+                    {pascalCaseToNormalText(displayName)}
                   </CWText>
 
                   <div className={clsx(displayName, 'component-content')}>

@@ -57,8 +57,26 @@
   .flex-row {
     display: flex;
     gap: 8px;
-    justify-content: center;
     align-items: center;
     margin-block: 8px;
+    width: 100%;
+  }
+
+  .flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    align-items: start;
+    margin-block: 8px;
+    width: 100%;
+  }
+
+  .BannersAndAlerts {
+    .CWBanner,
+    .MessageBanner,
+    .TermsBanner {
+      width: 100%;
+    }
   }
 }
