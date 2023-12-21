@@ -28,6 +28,7 @@
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "migrate-db": "npx sequelize db:migrate",
     "migrate-db-down": "npx sequelize db:migrate:undo",
+    "run-view-counts": "ts-node ./scripts/recoverViewCounts.ts",
     "open-android": "NODE_ENV=mobile npx cap open ios",
     "open-ios": "NODE_ENV=mobile npx cap open ios",
     "psql": "chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh",

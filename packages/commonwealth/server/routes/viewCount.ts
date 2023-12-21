@@ -15,7 +15,7 @@ const viewCount = async (
   cache: ViewCountCache,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.body.object_id) {
     return next(new AppError(Errors.NoObjectId));
@@ -48,6 +48,7 @@ const viewCount = async (
   if (isNewView) {
     count = await count.update({
       view_count: count.view_count + 1,
+      new_view_count: count.new_view_count + 1, // TODO: Delete this after view count recovery is run
     });
   }
 
