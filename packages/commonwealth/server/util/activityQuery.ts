@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 
@@ -80,11 +80,14 @@ export async function getActivityFeed(
     ORDER BY nts.created_at DESC;
   `;
 
-  const notifications: any = await models.sequelize.query(query, {
-    type: 'SELECT',
-    raw: true,
-    replacements: [id],
-  });
+  const notifications: any = await models.sequelize.query<GlobalActivity>(
+    query,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: [id],
+    },
+  );
 
   return notifications;
 }
