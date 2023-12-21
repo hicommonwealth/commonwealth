@@ -1,3 +1,4 @@
+import AvatarsShowcase from 'views/pages/ComponentsShowcase/components/Avatars.showcase';
 import ButtonsShowcase from 'views/pages/ComponentsShowcase/components/Buttons.showcase';
 import CheckboxShowcase from 'views/pages/ComponentsShowcase/components/Checkbox.showcase';
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
@@ -8,6 +9,7 @@ export const ComponentPageName = {
   Checkbox: 'Checkbox',
   Tooltips: 'Tooltips',
   Elevations: 'Elevations',
+  Avatars: 'Avatars',
 };
 
 export const ComponentType = {
@@ -35,5 +37,10 @@ export const componentItems = [
     ComponentPage: ElevationsShowcase,
     displayName: ComponentPageName.Elevations,
     type: ComponentType.Foundations,
+  },
+  {
+    ComponentPage: AvatarsShowcase,
+    displayName: ComponentPageName.Avatars,
+    type: ComponentType.Components,
   },
 ];
