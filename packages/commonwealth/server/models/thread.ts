@@ -34,7 +34,6 @@ export type ThreadAttributes = {
   pinned?: boolean;
   chain: string;
   view_count: number;
-  new_view_count: number;
   links: Link[] | null;
 
   read_only?: boolean;
@@ -105,11 +104,6 @@ export default (
       },
       chain: { type: dataTypes.STRING, allowNull: false },
       view_count: {
-        type: dataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      new_view_count: {
         type: dataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
